@@ -75,29 +75,29 @@ export function Hero() {
           en la parte baja, como referencia Airbnb/Apple/Booking.
       */}
       <Container
-        className="relative flex min-h-[100svh] flex-col justify-center gap-5 pb-10 pt-20 md:min-h-[100dvh] md:justify-end md:gap-0 md:pb-24 md:pt-40"
+        className="relative flex min-h-[100svh] flex-col justify-center gap-4 pb-10 pt-20 md:min-h-[100dvh] md:justify-end md:gap-0 md:pb-28 md:pt-40"
       >
-        <p className="font-script text-[1.75rem] leading-tight text-white/95 drop-shadow-sm sm:text-4xl md:text-5xl">
+        <p className="font-script text-[1.625rem] leading-tight text-white/95 drop-shadow-sm sm:text-3xl md:text-[2.5rem]">
           {t("hero.eyebrow")}
         </p>
-        <h1 className="max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] sm:text-5xl sm:leading-[1.05] md:mt-2 md:text-6xl lg:text-[4.25rem]">
+        <h1 className="max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:text-[2.75rem] sm:leading-[1.05] md:mt-3 md:text-[3.5rem] lg:text-[4rem]">
           {t("hero.title")}
         </h1>
-        <p className="max-w-2xl text-pretty text-base text-white/90 drop-shadow sm:text-lg md:mt-5 md:text-xl">
+        <p className="max-w-2xl text-pretty text-base text-white/90 drop-shadow sm:text-lg md:mt-5 md:text-lg lg:text-xl">
           {t("hero.subtitle")}
         </p>
 
-        <div className="flex flex-wrap items-center gap-3 md:mt-9">
+        <div className="flex flex-wrap items-center gap-3 md:mt-8">
           <Link
             to="/oriente-maya"
-            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/20 transition hover:scale-[1.02] hover:opacity-95 sm:px-6 sm:py-3"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-black/5 transition hover:scale-[1.02] hover:opacity-95 sm:px-6 sm:py-3"
           >
             {t("hero.cta_primary")}
             <ArrowRight className="size-4" aria-hidden />
           </Link>
           <Link
             to="/arma-tu-viaje"
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20 sm:px-6 sm:py-3"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/35 bg-white/5 px-5 py-2.5 text-sm font-medium text-white/95 backdrop-blur transition hover:bg-white/15 sm:px-6 sm:py-3"
           >
             <Compass className="size-4" aria-hidden />
             {t("hero.cta_secondary")}
@@ -109,7 +109,7 @@ export function Hero() {
           role="search"
           aria-label="Búsqueda rápida"
           onSubmit={(e) => e.preventDefault()}
-          className="mt-5 flex max-w-xl items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-2 shadow-sm backdrop-blur-md sm:mt-6 md:mt-10"
+          className="mt-4 flex max-w-md items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 shadow-sm backdrop-blur-md sm:mt-6 md:mt-10"
         >
           <Search className="size-4 shrink-0 text-white/80" aria-hidden />
           <input
@@ -118,7 +118,7 @@ export function Hero() {
             className="w-full bg-transparent text-sm text-white placeholder:text-white/70 focus:outline-none"
             aria-label={t("hero.search_placeholder")}
           />
-          <span className="hidden text-xs text-white/70 sm:inline">{t("hero.search_helper")}</span>
+          <span className="hidden text-[11px] text-white/60 lg:inline">{t("hero.search_helper")}</span>
         </form>
       </Container>
     </section>
