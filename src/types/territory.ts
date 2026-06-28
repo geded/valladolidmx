@@ -37,6 +37,12 @@ export interface Destination {
   tagline: string;
   long_description?: string;
   hero_palette: "territorio" | "selva" | "cenote" | "atardecer";
+  /**
+   * URL absoluta o import resuelto (ES6 import .jpg). Cuando exista, las
+   * tarjetas y micrositios renderizan fotografía real en vez del placeholder
+   * gradiente. Listo para sustituirse por activos oficiales de valladolid.mx.
+   */
+  image_url?: string;
   highlights: readonly string[];
 }
 

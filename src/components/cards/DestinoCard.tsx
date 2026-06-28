@@ -19,12 +19,42 @@ const REGION_TO_ROUTE: Record<string, "/oriente-maya/$destino"> = {
   "oriente-maya": "/oriente-maya/$destino",
 };
 
+/**
+ * DestinoMedia — Renderiza fotografía real cuando hay `image_url`,
+ * o el placeholder territorial si todavía no llegan los activos oficiales.
+ * Aislado para que sustituir el banco de imágenes sea un cambio puntual.
+ */
+function DestinoMedia({ destination }: { destination: Destination }) {
+  if (destination.image_url) {
+    return (
+      <div className="aspect-[4/3] w-full overflow-hidden">
+        <img
+          src={destination.image_url}
+          alt={`${destination.name} — ${destination.tagline}`}
+          loading="lazy"
+          width={1280}
+          height={960}
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+        />
+      </div>
+    );
+  }
+  return (
+    <PlaceholderImage
+      palette={destination.hero_palette}
+      label={destination.name}
+      aspect="4/3"
+      className="rounded-none border-0 transition group-hover:scale-[1.02]"
+    />
+  );
+}
+
 export function DestinoCard({ destination }: { destination: Destination }) {
   const { t } = useTranslation();
   const route = REGION_TO_ROUTE[destination.region_slug];
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition hover:shadow-lg">
+    <article className="group relative flex flex-col overflow-hidden rounded-3xl border border-border/70 bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl">
       {route ? (
         <Link
           to={route}
@@ -32,24 +62,14 @@ export function DestinoCard({ destination }: { destination: Destination }) {
           className="block focus:outline-none"
           aria-label={`${destination.name} — ${destination.tagline}`}
         >
-          <PlaceholderImage
-            palette={destination.hero_palette}
-            label={destination.name}
-            aspect="4/3"
-            className="rounded-none border-0 transition group-hover:scale-[1.02]"
-          />
+          <DestinoMedia destination={destination} />
         </Link>
       ) : (
-        <PlaceholderImage
-          palette={destination.hero_palette}
-          label={destination.name}
-          aspect="4/3"
-          className="rounded-none border-0"
-        />
+        <DestinoMedia destination={destination} />
       )}
-      <div className="flex flex-1 flex-col gap-3 p-5">
+      <div className="flex flex-1 flex-col gap-3 p-6">
         <div>
-          <h3 className="text-xl font-semibold tracking-tight">{destination.name}</h3>
+          <h3 className="text-2xl font-semibold tracking-tight">{destination.name}</h3>
           <p className="mt-1 text-sm text-muted-foreground">{destination.tagline}</p>
         </div>
         <ul className="flex flex-wrap gap-1.5">
