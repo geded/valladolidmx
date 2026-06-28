@@ -9,6 +9,6 @@ export const SITE = {
   url: "https://valladolid.mx",
   default_description:
     "Despierta en Valladolid y descubre el Oriente Maya: cenotes, cultura, gastronomía y experiencias auténticas de Yucatán.",
-  theme_color: "#b8732e",
-  og_image: "/icon-512.svg",
+  theme_color: "#EAA840",
+  og_image: "/logo.png",
 } as const;
