@@ -1,8 +1,59 @@
 {
-  "nav": { "home": "Start", "destinations": "Reiseziele", "experiences": "Erlebnisse", "hotels": "Hotels", "restaurants": "Restaurants", "events": "Events", "plan_trip": "Reise planen", "alux": "Alux", "for_business": "Für Unternehmen", "sign_in": "Anmelden" },
-  "hero": { "eyebrow": "Oriente Maya · Yucatán", "title": "Wache in Valladolid auf und entdecke das östliche Maya-Land.", "subtitle": "Cenoten, lebendige Städte und authentische Routen.", "cta_primary": "Reiseziele entdecken", "cta_secondary": "Reise planen", "search_placeholder": "Suche Ziel, Erlebnis oder Geschmack…", "search_helper": "Nur wenn du schon weißt, was du suchst" },
-  "sections": { "destinations_title": "Reiseziele im östlichen Maya-Land", "destinations_sub": "Jedes mit eigenem Charakter.", "categories_title": "Was dich bewegt", "categories_sub": "Wähle nach Gefühl.", "routes_title": "Empfohlene Routen", "routes_sub": "Zum Erleben, nicht zum Abhaken.", "alux_title": "Ein Tipp von Alux", "alux_body": "Plane mindestens einen ganzen Tag für das östliche Maya-Land ein.", "ayv_title": "Reise planen", "ayv_sub": "Deine persönliche Reiseakte. Dein Concierge erhält sie, wenn du bereit bist.", "envivo_title": "Oriente Maya live", "envivo_sub": "Was heute vor Ort passiert.", "empresas_title": "Empfohlene Unternehmen", "empresas_sub": "Sortiert vom intelligenten Sichtbarkeitsmotor.", "reviews_title": "Was Reisende berichten", "reviews_sub": "Echte Stimmen, sorgfältig übersetzt." },
-  "common": { "coming_soon": "Bald verfügbar", "add_to_trip": "Zu meiner Reise hinzufügen", "learn_more": "Mehr erfahren", "explore": "Entdecken", "days": "Tage", "by": "von", "language": "Sprache" },
-  "footer": { "tagline": "Offizielle Plattform des östlichen Maya-Landes in Yucatán.", "explore": "Entdecken", "platform": "Plattform", "legal": "Impressum", "privacy": "Datenschutz", "rights": "Alle Rechte vorbehalten." },
+  "nav": {
+    "home": "Start",
+    "destinations": "Reiseziele",
+    "experiences": "Erlebnisse",
+    "hotels": "Hotels",
+    "restaurants": "Restaurants",
+    "events": "Events",
+    "plan_trip": "Reise planen",
+    "alux": "Alux",
+    "for_business": "Für Unternehmen",
+    "sign_in": "Anmelden"
+  },
+  "hero": {
+    "eyebrow": "Oriente Maya · Yucatán",
+    "title": "Wache in Valladolid auf und entdecke das östliche Maya-Yucatán.",
+    "subtitle": "Cenoten, lebendige Städte und authentische Routen.",
+    "cta_primary": "Reiseziele entdecken",
+    "cta_secondary": "Reise planen",
+    "search_placeholder": "Suche Ziel, Erlebnis oder Geschmack…",
+    "search_helper": "Nur wenn du schon weißt, was du suchst"
+  },
+  "sections": {
+    "destinations_title": "Reiseziele im östlichen Maya-Land",
+    "destinations_sub": "Jedes mit eigenem Charakter.",
+    "categories_title": "Was dich bewegt",
+    "categories_sub": "Wähle nach Gefühl.",
+    "routes_title": "Empfohlene Routen",
+    "routes_sub": "Zum Erleben, nicht zum Abhaken.",
+    "alux_title": "Ein Tipp von Alux",
+    "alux_body": "Plane mindestens einen ganzen Tag für das östliche Maya-Land ein.",
+    "ayv_title": "Reise planen",
+    "ayv_sub": "Deine persönliche Reiseakte. Dein Concierge erhält sie, wenn du bereit bist.",
+    "envivo_title": "Oriente Maya live",
+    "envivo_sub": "Was heute vor Ort passiert.",
+    "empresas_title": "Empfohlene Unternehmen",
+    "empresas_sub": "Sortiert vom intelligenten Sichtbarkeitsmotor.",
+    "reviews_title": "Was Reisende berichten",
+    "reviews_sub": "Echte Stimmen, sorgfältig übersetzt."
+  },
+  "common": {
+    "coming_soon": "Bald verfügbar",
+    "add_to_trip": "Zu meiner Reise hinzufügen",
+    "learn_more": "Mehr erfahren",
+    "explore": "Entdecken",
+    "days": "Tage",
+    "by": "von",
+    "language": "Sprache"
+  },
+  "footer": {
+    "tagline": "Offizielle Plattform des östlichen Maya-Landes in Yucatán.",
+    "explore": "Entdecken",
+    "platform": "Plattform",
+    "legal": "Impressum",
+    "privacy": "Datenschutz",
+    "rights": "Alle Rechte vorbehalten."
+  },
   "alux_floating": "Alux kommt bald"
 }
