@@ -1,13 +1,12 @@
 /**
- * DestinoCard — Tarjeta reutilizable de Destino para cualquier región.
+ * DestinoCard — Tarjeta reutilizable de Destino.
  *
- * Propósito: presentar un Destino con imagen placeholder, nombre, tagline
- * y CTA "+ Arma tu Viaje" (deshabilitado en Fase 0).
+ * Propósito: presentar un Destino con placeholder visual, nombre, tagline,
+ * highlights y CTA "+ Arma tu Viaje" (deshabilitado en Fase 0).
  *
- * Reutilizable: recibe `destination` y `region_slug` por props. No hardcodea
- * Oriente Maya — sirve para cualquier región futura.
- *
- * Dependencias: types/territory, PlaceholderImage, @tanstack/react-router Link.
+ * Reutilizable: recibe `destination` por props. Hoy enruta a
+ * /oriente-maya/$destino; cuando se sume otra región se ampliará con
+ * un mapa region_slug → ruta sin tocar el resto del componente.
  */
 import { Link } from "@tanstack/react-router";
 import { Plus, ArrowUpRight } from "lucide-react";
@@ -15,21 +14,24 @@ import { PlaceholderImage } from "@/components/common/PlaceholderImage";
 import type { Destination } from "@/types/territory";
 import { useTranslation } from "@/i18n/context";
 
-interface Props {
-  destination: Destination;
-  /** Permite preparar slots para múltiples regiones. */
-  region_slug?: string;
-}
+// Multi-región ready: añadir aquí nuevas regiones cuando existan.
+const REGION_TO_ROUTE: Record<string, "/oriente-maya/$destino"> = {
+  "oriente-maya": "/oriente-maya/$destino",
+};
 
-export function DestinoCard({ destination, region_slug }: Props) {
+export function DestinoCard({ destination }: { destination: Destination }) {
   const { t } = useTranslation();
-  const region = region_slug ?? destination.region_slug;
+  const route = REGION_TO_ROUTE[destination.region_slug];
+
+  const LinkOrSpan = route ? Link : "span";
+  const linkProps = route
+    ? ({ to: route, params: { destino: destination.slug } } as const)
+    : ({} as Record<string, never>);
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition hover:shadow-lg">
-      <Link
-        to="/$region/$destino"
-        params={{ region, destino: destination.slug }}
+      <LinkOrSpan
+        {...(linkProps as never)}
         className="block focus:outline-none"
         aria-label={`${destination.name} — ${destination.tagline}`}
       >
@@ -39,7 +41,7 @@ export function DestinoCard({ destination, region_slug }: Props) {
           aspect="4/3"
           className="rounded-none border-0 transition group-hover:scale-[1.02]"
         />
-      </Link>
+      </LinkOrSpan>
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div>
           <h3 className="text-xl font-semibold tracking-tight">{destination.name}</h3>
@@ -47,23 +49,23 @@ export function DestinoCard({ destination, region_slug }: Props) {
         </div>
         <ul className="flex flex-wrap gap-1.5">
           {destination.highlights.slice(0, 3).map((h) => (
-            <li
-              key={h}
-              className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground"
-            >
+            <li key={h} className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">
               {h}
             </li>
           ))}
         </ul>
         <div className="mt-auto flex items-center justify-between gap-2 pt-2">
-          <Link
-            to="/$region/$destino"
-            params={{ region, destino: destination.slug }}
-            className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
-          >
-            {t("common.explore")}
-            <ArrowUpRight className="size-3.5" aria-hidden />
-          </Link>
+          {route ? (
+            <Link
+              to={route}
+              params={{ destino: destination.slug }}
+              className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+            >
+              {t("common.explore")} <ArrowUpRight className="size-3.5" aria-hidden />
+            </Link>
+          ) : (
+            <span className="text-xs text-muted-foreground">{t("common.coming_soon")}</span>
+          )}
           <button
             type="button"
             disabled
