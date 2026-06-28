@@ -59,6 +59,17 @@ export function SiteHeader({ variant = "solid" }: Props) {
           : "border-b border-border/70 bg-background/90 backdrop-blur shadow-[0_1px_0_color-mix(in_oklab,var(--color-foreground)_4%,transparent)]",
       )}
     >
+      {/*
+        Scrim editorial superior (12C.0/12C.1): garantiza que el logotipo
+        oficial y la navegación sean siempre legibles sobre la fotografía
+        del Hero, sin alterar la transparencia percibida del Header.
+      */}
+      {isOverlay && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-24 bg-[linear-gradient(180deg,rgba(0,0,0,0.45)_0%,rgba(0,0,0,0.18)_55%,rgba(0,0,0,0)_100%)]"
+        />
+      )}
       <Container className="flex h-16 items-center justify-between gap-4">
         <Link to="/" aria-label="Inicio" className="flex items-center">
           <BrandLogo tone={isOverlay ? "light" : "dark"} size="md" />
@@ -91,7 +102,7 @@ export function SiteHeader({ variant = "solid" }: Props) {
             className={cn(
               "hidden items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition sm:inline-flex",
               isOverlay
-                ? "bg-white text-foreground hover:bg-white/90"
+                ? "border border-white/40 bg-white/10 text-white backdrop-blur hover:bg-white/20"
                 : "border border-primary/40 bg-primary/10 text-primary hover:bg-primary/15",
             )}
           >
