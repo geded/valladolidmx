@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
+import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrienteMayaIndexRoute = OrienteMayaIndexRouteImport.update({
+  id: '/oriente-maya/',
+  path: '/oriente-maya/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrienteMayaDestinoRoute = OrienteMayaDestinoRouteImport.update({
+  id: '/oriente-maya/$destino',
+  path: '/oriente-maya/$destino',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/oriente-maya/': typeof OrienteMayaIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/oriente-maya': typeof OrienteMayaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/oriente-maya/': typeof OrienteMayaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/oriente-maya/$destino' | '/oriente-maya/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/oriente-maya/$destino' | '/oriente-maya'
+  id: '__root__' | '/' | '/oriente-maya/$destino' | '/oriente-maya/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRoute
+  OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/oriente-maya/': {
+      id: '/oriente-maya/'
+      path: '/oriente-maya'
+      fullPath: '/oriente-maya/'
+      preLoaderRoute: typeof OrienteMayaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oriente-maya/$destino': {
+      id: '/oriente-maya/$destino'
+      path: '/oriente-maya/$destino'
+      fullPath: '/oriente-maya/$destino'
+      preLoaderRoute: typeof OrienteMayaDestinoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  OrienteMayaDestinoRoute: OrienteMayaDestinoRoute,
+  OrienteMayaIndexRoute: OrienteMayaIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
