@@ -6,19 +6,39 @@
  *
  * Dependencias: I18nProvider, LanguageSwitcher, UserMenu, Container.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, X, Compass } from "lucide-react";
 import { Container } from "./Container";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { UserMenu } from "./UserMenu";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { useTranslation } from "@/i18n/context";
-import { SITE } from "@/config/site";
 import { cn } from "@/lib/utils";
 
-export function SiteHeader() {
+/**
+ * variant="overlay" → cabecera transparente sobre el Hero fotográfico de Home.
+ * Pasa a estado sólido (sticky, fondo blanco + sombra) tras hacer scroll.
+ * variant="solid"   → cabecera sólida estándar en rutas interiores.
+ */
+interface Props {
+  variant?: "solid" | "overlay";
+}
+
+export function SiteHeader({ variant = "solid" }: Props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    if (variant !== "overlay") return;
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [variant]);
+
+  const isOverlay = variant === "overlay" && !scrolled && !open;
 
   const nav = [
     { to: "/oriente-maya" as const, label: t("nav.destinations") },
@@ -30,16 +50,17 @@ export function SiteHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur">
+    <header
+      className={cn(
+        "sticky top-0 z-30 transition-colors duration-300",
+        isOverlay
+          ? "border-b border-transparent bg-transparent"
+          : "border-b border-border/70 bg-background/90 backdrop-blur shadow-[0_1px_0_color-mix(in_oklab,var(--color-foreground)_4%,transparent)]",
+      )}
+    >
       <Container className="flex h-16 items-center justify-between gap-4">
-        <Link to="/" className="flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
-          <span
-            aria-hidden
-            className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground"
-          >
-            V
-          </span>
-          <span className="hidden sm:inline">{SITE.name}</span>
+        <Link to="/" aria-label="Inicio" className="flex items-center">
+          <BrandLogo tone={isOverlay ? "light" : "dark"} size="md" />
         </Link>
 
         <nav aria-label="Principal" className="hidden lg:block">
@@ -49,7 +70,12 @@ export function SiteHeader() {
                 <Link
                   to={n.to}
                   activeProps={{ className: "bg-accent text-accent-foreground" }}
-                  className="rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
+                  className={cn(
+                    "rounded-full px-3 py-1.5 text-sm font-medium transition",
+                    isOverlay
+                      ? "text-white/90 hover:bg-white/15 hover:text-white"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                  )}
                 >
                   {n.label}
                 </Link>
@@ -61,7 +87,12 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <Link
             to="/arma-tu-viaje"
-            className="hidden items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary hover:bg-primary/15 sm:inline-flex"
+            className={cn(
+              "hidden items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition sm:inline-flex",
+              isOverlay
+                ? "bg-white text-foreground hover:bg-white/90"
+                : "border border-primary/40 bg-primary/10 text-primary hover:bg-primary/15",
+            )}
           >
             <Compass className="size-4" aria-hidden />
             {t("nav.plan_trip")}
@@ -72,7 +103,12 @@ export function SiteHeader() {
           </div>
           <button
             type="button"
-            className="lg:hidden inline-flex size-9 items-center justify-center rounded-full border border-border bg-card"
+            className={cn(
+              "lg:hidden inline-flex size-9 items-center justify-center rounded-full border transition",
+              isOverlay
+                ? "border-white/30 bg-white/10 text-white"
+                : "border-border bg-card text-foreground",
+            )}
             aria-label="Menú"
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
