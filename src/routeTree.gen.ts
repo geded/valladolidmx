@@ -9,38 +9,228 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RestaurantesRouteImport } from './routes/restaurantes'
+import { Route as HotelesRouteImport } from './routes/hoteles'
+import { Route as ExperienciasRouteImport } from './routes/experiencias'
+import { Route as EventosRouteImport } from './routes/eventos'
+import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ArmaTuViajeRouteImport } from './routes/arma-tu-viaje'
+import { Route as AluxRouteImport } from './routes/alux'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
+import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
 
+const RestaurantesRoute = RestaurantesRouteImport.update({
+  id: '/restaurantes',
+  path: '/restaurantes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HotelesRoute = HotelesRouteImport.update({
+  id: '/hoteles',
+  path: '/hoteles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperienciasRoute = ExperienciasRouteImport.update({
+  id: '/experiencias',
+  path: '/experiencias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventosRoute = EventosRouteImport.update({
+  id: '/eventos',
+  path: '/eventos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmpresasRoute = EmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArmaTuViajeRoute = ArmaTuViajeRouteImport.update({
+  id: '/arma-tu-viaje',
+  path: '/arma-tu-viaje',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AluxRoute = AluxRouteImport.update({
+  id: '/alux',
+  path: '/alux',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrienteMayaIndexRoute = OrienteMayaIndexRouteImport.update({
+  id: '/oriente-maya/',
+  path: '/oriente-maya/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrienteMayaDestinoRoute = OrienteMayaDestinoRouteImport.update({
+  id: '/oriente-maya/$destino',
+  path: '/oriente-maya/$destino',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/alux': typeof AluxRoute
+  '/arma-tu-viaje': typeof ArmaTuViajeRoute
+  '/auth': typeof AuthRoute
+  '/empresas': typeof EmpresasRoute
+  '/eventos': typeof EventosRoute
+  '/experiencias': typeof ExperienciasRoute
+  '/hoteles': typeof HotelesRoute
+  '/restaurantes': typeof RestaurantesRoute
+  '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/oriente-maya/': typeof OrienteMayaIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/alux': typeof AluxRoute
+  '/arma-tu-viaje': typeof ArmaTuViajeRoute
+  '/auth': typeof AuthRoute
+  '/empresas': typeof EmpresasRoute
+  '/eventos': typeof EventosRoute
+  '/experiencias': typeof ExperienciasRoute
+  '/hoteles': typeof HotelesRoute
+  '/restaurantes': typeof RestaurantesRoute
+  '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/oriente-maya': typeof OrienteMayaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/alux': typeof AluxRoute
+  '/arma-tu-viaje': typeof ArmaTuViajeRoute
+  '/auth': typeof AuthRoute
+  '/empresas': typeof EmpresasRoute
+  '/eventos': typeof EventosRoute
+  '/experiencias': typeof ExperienciasRoute
+  '/hoteles': typeof HotelesRoute
+  '/restaurantes': typeof RestaurantesRoute
+  '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/oriente-maya/': typeof OrienteMayaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/alux'
+    | '/arma-tu-viaje'
+    | '/auth'
+    | '/empresas'
+    | '/eventos'
+    | '/experiencias'
+    | '/hoteles'
+    | '/restaurantes'
+    | '/oriente-maya/$destino'
+    | '/oriente-maya/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/alux'
+    | '/arma-tu-viaje'
+    | '/auth'
+    | '/empresas'
+    | '/eventos'
+    | '/experiencias'
+    | '/hoteles'
+    | '/restaurantes'
+    | '/oriente-maya/$destino'
+    | '/oriente-maya'
+  id:
+    | '__root__'
+    | '/'
+    | '/alux'
+    | '/arma-tu-viaje'
+    | '/auth'
+    | '/empresas'
+    | '/eventos'
+    | '/experiencias'
+    | '/hoteles'
+    | '/restaurantes'
+    | '/oriente-maya/$destino'
+    | '/oriente-maya/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AluxRoute: typeof AluxRoute
+  ArmaTuViajeRoute: typeof ArmaTuViajeRoute
+  AuthRoute: typeof AuthRoute
+  EmpresasRoute: typeof EmpresasRoute
+  EventosRoute: typeof EventosRoute
+  ExperienciasRoute: typeof ExperienciasRoute
+  HotelesRoute: typeof HotelesRoute
+  RestaurantesRoute: typeof RestaurantesRoute
+  OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRoute
+  OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/restaurantes': {
+      id: '/restaurantes'
+      path: '/restaurantes'
+      fullPath: '/restaurantes'
+      preLoaderRoute: typeof RestaurantesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hoteles': {
+      id: '/hoteles'
+      path: '/hoteles'
+      fullPath: '/hoteles'
+      preLoaderRoute: typeof HotelesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiencias': {
+      id: '/experiencias'
+      path: '/experiencias'
+      fullPath: '/experiencias'
+      preLoaderRoute: typeof ExperienciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eventos': {
+      id: '/eventos'
+      path: '/eventos'
+      fullPath: '/eventos'
+      preLoaderRoute: typeof EventosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/empresas': {
+      id: '/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/arma-tu-viaje': {
+      id: '/arma-tu-viaje'
+      path: '/arma-tu-viaje'
+      fullPath: '/arma-tu-viaje'
+      preLoaderRoute: typeof ArmaTuViajeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alux': {
+      id: '/alux'
+      path: '/alux'
+      fullPath: '/alux'
+      preLoaderRoute: typeof AluxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +238,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/oriente-maya/': {
+      id: '/oriente-maya/'
+      path: '/oriente-maya'
+      fullPath: '/oriente-maya/'
+      preLoaderRoute: typeof OrienteMayaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oriente-maya/$destino': {
+      id: '/oriente-maya/$destino'
+      path: '/oriente-maya/$destino'
+      fullPath: '/oriente-maya/$destino'
+      preLoaderRoute: typeof OrienteMayaDestinoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AluxRoute: AluxRoute,
+  ArmaTuViajeRoute: ArmaTuViajeRoute,
+  AuthRoute: AuthRoute,
+  EmpresasRoute: EmpresasRoute,
+  EventosRoute: EventosRoute,
+  ExperienciasRoute: ExperienciasRoute,
+  HotelesRoute: HotelesRoute,
+  RestaurantesRoute: RestaurantesRoute,
+  OrienteMayaDestinoRoute: OrienteMayaDestinoRoute,
+  OrienteMayaIndexRoute: OrienteMayaIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
