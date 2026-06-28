@@ -6,7 +6,7 @@
  *
  * Dependencias: I18nProvider, LanguageSwitcher, UserMenu, Container.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, X, Compass } from "lucide-react";
 import { Container } from "./Container";
@@ -29,6 +29,7 @@ export function SiteHeader({ variant = "solid" }: Props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const drawerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (variant !== "overlay") return;
@@ -37,6 +38,33 @@ export function SiteHeader({ variant = "solid" }: Props) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, [variant]);
+
+  // Bloqueo de scroll del documento + cierre con Escape + focus trap básico
+  // cuando el Mobile Drawer está abierto. Garantiza que el menú se comporte
+  // como un panel modal y que el Hero quede completamente detrás (12C.1).
+  useEffect(() => {
+    if (!open) return;
+    const { body, documentElement } = document;
+    const prevBody = body.style.overflow;
+    const prevHtml = documentElement.style.overflow;
+    body.style.overflow = "hidden";
+    documentElement.style.overflow = "hidden";
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+
+    // Mover foco al panel para lectores de pantalla y navegación por teclado.
+    const t = window.setTimeout(() => drawerRef.current?.focus(), 0);
+
+    return () => {
+      body.style.overflow = prevBody;
+      documentElement.style.overflow = prevHtml;
+      window.removeEventListener("keydown", onKey);
+      window.clearTimeout(t);
+    };
+  }, [open]);
 
   const isOverlay = variant === "overlay" && !scrolled && !open;
 
@@ -135,21 +163,27 @@ export function SiteHeader({ variant = "solid" }: Props) {
       <div
         aria-hidden={!open}
         className={cn(
-          "lg:hidden fixed inset-0 z-40 transition-opacity duration-200",
+          "lg:hidden fixed inset-0 z-[60] transition-opacity duration-200",
           open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
         )}
         onClick={() => setOpen(false)}
       >
-        <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-foreground/70 backdrop-blur-md" />
       </div>
       <aside
+        ref={drawerRef}
         id="mobile-drawer"
         role="dialog"
         aria-modal="true"
         aria-label="Navegación principal"
+        tabIndex={-1}
         className={cn(
-          "lg:hidden fixed inset-y-0 right-0 z-50 w-[86%] max-w-sm bg-background shadow-2xl",
+          "lg:hidden fixed inset-y-0 right-0 z-[70] w-[86%] max-w-sm bg-background shadow-2xl outline-none",
           "transition-transform duration-200 ease-out",
+          // Fondo sólido garantizado: evita que el Hero atraviese el panel
+          // en navegadores que interpretan `bg-background` como variable con
+          // alfa. Mantiene el aspecto del Design System.
+          "[background-color:var(--color-background,#ffffff)]",
           open ? "translate-x-0" : "translate-x-full",
         )}
       >
