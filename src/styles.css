@@ -84,102 +84,109 @@
 :root {
   --radius: 0.75rem;
 
-  /* Base — papel cálido del Oriente Maya */
-  --background: oklch(0.985 0.012 80);
-  --foreground: oklch(0.22 0.025 50);
-  --card: oklch(0.995 0.008 80);
-  --card-foreground: oklch(0.22 0.025 50);
-  --popover: oklch(0.995 0.008 80);
-  --popover-foreground: oklch(0.22 0.025 50);
+  /*
+   * Paleta oficial Valladolid.mx (aprobada).
+   * Fuente: docs/brand-assets/colors/official-palette.md
+   */
 
-  /* Primario — ocre cálido Valladolid colonial */
-  --primary: oklch(0.62 0.14 55);
-  --primary-foreground: oklch(0.985 0.012 80);
+  /* Fondo — Crema Cálido #FBF7EE / Texto — Noche Maya #1C1D14 */
+  --background: oklch(0.977 0.013 86.8);
+  --foreground: oklch(0.227 0.017 112.9);
+  --card: oklch(0.993 0.008 86.8);
+  --card-foreground: oklch(0.227 0.017 112.9);
+  --popover: oklch(0.993 0.008 86.8);
+  --popover-foreground: oklch(0.227 0.017 112.9);
 
-  /* Secundario — piedra caliza */
-  --secondary: oklch(0.94 0.018 75);
-  --secondary-foreground: oklch(0.28 0.03 50);
+  /* Primario — Ocre Valladolid #EAA840 */
+  --primary: oklch(0.777 0.140 74.9);
+  --primary-foreground: oklch(0.227 0.017 112.9);
 
-  --muted: oklch(0.945 0.012 80);
-  --muted-foreground: oklch(0.48 0.025 60);
+  /* Secundario — Piedra Caliza #ECE4D3 */
+  --secondary: oklch(0.921 0.024 85.8);
+  --secondary-foreground: oklch(0.227 0.017 112.9);
 
-  --accent: oklch(0.92 0.035 80);
-  --accent-foreground: oklch(0.28 0.03 50);
+  --muted: oklch(0.945 0.018 85.8);
+  --muted-foreground: oklch(0.511 0.073 125.9);
+
+  /* Acento — Cenote Profundo (variante accesible) #0E7E96 */
+  --accent: oklch(0.548 0.096 217.9);
+  --accent-foreground: oklch(0.977 0.013 86.8);
 
   --destructive: oklch(0.58 0.22 25);
-  --destructive-foreground: oklch(0.985 0.012 80);
+  --destructive-foreground: oklch(0.977 0.013 86.8);
 
-  --border: oklch(0.89 0.018 75);
-  --input: oklch(0.89 0.018 75);
-  --ring: oklch(0.62 0.14 55);
+  --border: oklch(0.88 0.022 85.8);
+  --input: oklch(0.88 0.022 85.8);
+  --ring: oklch(0.777 0.140 74.9);
 
-  /* Acentos territoriales */
-  --selva: oklch(0.48 0.10 155);
-  --selva-foreground: oklch(0.985 0.012 80);
-  --cenote: oklch(0.62 0.12 215);
-  --cenote-foreground: oklch(0.985 0.012 80);
-  --caliza: oklch(0.92 0.020 75);
-  --caliza-foreground: oklch(0.28 0.03 50);
-  --atardecer: oklch(0.68 0.18 40);
-  --atardecer-foreground: oklch(0.985 0.012 80);
+  /* Acentos territoriales oficiales */
+  --selva: oklch(0.511 0.073 125.9);            /* Verde Selva #5C6E3F */
+  --selva-foreground: oklch(0.977 0.013 86.8);
+  --cenote: oklch(0.702 0.126 218.1);           /* Cenote #00B1D3 — solo microacentos */
+  --cenote-foreground: oklch(0.227 0.017 112.9);
+  --caliza: oklch(0.921 0.024 85.8);            /* Piedra Caliza #ECE4D3 */
+  --caliza-foreground: oklch(0.227 0.017 112.9);
+  --atardecer: oklch(0.777 0.140 74.9);         /* Ocre Valladolid (atardecer cálido) */
+  --atardecer-foreground: oklch(0.227 0.017 112.9);
 
-  --chart-1: oklch(0.62 0.14 55);
-  --chart-2: oklch(0.48 0.10 155);
-  --chart-3: oklch(0.62 0.12 215);
-  --chart-4: oklch(0.68 0.18 40);
-  --chart-5: oklch(0.55 0.08 90);
+  --chart-1: oklch(0.777 0.140 74.9);
+  --chart-2: oklch(0.511 0.073 125.9);
+  --chart-3: oklch(0.548 0.096 217.9);
+  --chart-4: oklch(0.702 0.126 218.1);
+  --chart-5: oklch(0.329 0.048 129.7);
 
-  --sidebar: oklch(0.97 0.014 80);
-  --sidebar-foreground: oklch(0.22 0.025 50);
-  --sidebar-primary: oklch(0.62 0.14 55);
-  --sidebar-primary-foreground: oklch(0.985 0.012 80);
-  --sidebar-accent: oklch(0.94 0.018 75);
-  --sidebar-accent-foreground: oklch(0.28 0.03 50);
-  --sidebar-border: oklch(0.89 0.018 75);
-  --sidebar-ring: oklch(0.62 0.14 55);
+  --sidebar: oklch(0.96 0.018 86.8);
+  --sidebar-foreground: oklch(0.227 0.017 112.9);
+  --sidebar-primary: oklch(0.777 0.140 74.9);
+  --sidebar-primary-foreground: oklch(0.227 0.017 112.9);
+  --sidebar-accent: oklch(0.921 0.024 85.8);
+  --sidebar-accent-foreground: oklch(0.227 0.017 112.9);
+  --sidebar-border: oklch(0.88 0.022 85.8);
+  --sidebar-ring: oklch(0.777 0.140 74.9);
 }
 
 .dark {
-  --background: oklch(0.18 0.018 60);
-  --foreground: oklch(0.96 0.012 80);
-  --card: oklch(0.22 0.020 60);
-  --card-foreground: oklch(0.96 0.012 80);
-  --popover: oklch(0.22 0.020 60);
-  --popover-foreground: oklch(0.96 0.012 80);
-  --primary: oklch(0.72 0.14 60);
-  --primary-foreground: oklch(0.18 0.018 60);
-  --secondary: oklch(0.28 0.025 60);
-  --secondary-foreground: oklch(0.96 0.012 80);
-  --muted: oklch(0.26 0.020 60);
-  --muted-foreground: oklch(0.72 0.020 70);
-  --accent: oklch(0.30 0.030 60);
-  --accent-foreground: oklch(0.96 0.012 80);
+  /* Dark — base Selva Oscuro #2D3A1F, tinta Crema, primario Ocre. */
+  --background: oklch(0.329 0.048 129.7);
+  --foreground: oklch(0.977 0.013 86.8);
+  --card: oklch(0.38 0.045 129.7);
+  --card-foreground: oklch(0.977 0.013 86.8);
+  --popover: oklch(0.38 0.045 129.7);
+  --popover-foreground: oklch(0.977 0.013 86.8);
+  --primary: oklch(0.777 0.140 74.9);
+  --primary-foreground: oklch(0.227 0.017 112.9);
+  --secondary: oklch(0.42 0.045 129.7);
+  --secondary-foreground: oklch(0.977 0.013 86.8);
+  --muted: oklch(0.40 0.040 129.7);
+  --muted-foreground: oklch(0.82 0.020 86.8);
+  --accent: oklch(0.702 0.126 218.1);
+  --accent-foreground: oklch(0.227 0.017 112.9);
   --destructive: oklch(0.65 0.20 25);
-  --destructive-foreground: oklch(0.96 0.012 80);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.72 0.14 60);
-  --selva: oklch(0.62 0.10 155);
-  --selva-foreground: oklch(0.18 0.018 60);
-  --cenote: oklch(0.72 0.12 215);
-  --cenote-foreground: oklch(0.18 0.018 60);
-  --caliza: oklch(0.32 0.020 75);
-  --caliza-foreground: oklch(0.96 0.012 80);
-  --atardecer: oklch(0.74 0.18 40);
-  --atardecer-foreground: oklch(0.18 0.018 60);
-  --chart-1: oklch(0.72 0.14 60);
-  --chart-2: oklch(0.62 0.10 155);
-  --chart-3: oklch(0.72 0.12 215);
-  --chart-4: oklch(0.74 0.18 40);
-  --chart-5: oklch(0.65 0.08 90);
-  --sidebar: oklch(0.22 0.020 60);
-  --sidebar-foreground: oklch(0.96 0.012 80);
-  --sidebar-primary: oklch(0.72 0.14 60);
-  --sidebar-primary-foreground: oklch(0.18 0.018 60);
-  --sidebar-accent: oklch(0.28 0.025 60);
-  --sidebar-accent-foreground: oklch(0.96 0.012 80);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.72 0.14 60);
+  --destructive-foreground: oklch(0.977 0.013 86.8);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.777 0.140 74.9);
+  --selva: oklch(0.511 0.073 125.9);
+  --selva-foreground: oklch(0.977 0.013 86.8);
+  --cenote: oklch(0.702 0.126 218.1);
+  --cenote-foreground: oklch(0.227 0.017 112.9);
+  --caliza: oklch(0.42 0.045 129.7);
+  --caliza-foreground: oklch(0.977 0.013 86.8);
+  --atardecer: oklch(0.777 0.140 74.9);
+  --atardecer-foreground: oklch(0.227 0.017 112.9);
+  --chart-1: oklch(0.777 0.140 74.9);
+  --chart-2: oklch(0.511 0.073 125.9);
+  --chart-3: oklch(0.548 0.096 217.9);
+  --chart-4: oklch(0.702 0.126 218.1);
+  --chart-5: oklch(0.921 0.024 85.8);
+  --sidebar: oklch(0.38 0.045 129.7);
+  --sidebar-foreground: oklch(0.977 0.013 86.8);
+  --sidebar-primary: oklch(0.777 0.140 74.9);
+  --sidebar-primary-foreground: oklch(0.227 0.017 112.9);
+  --sidebar-accent: oklch(0.42 0.045 129.7);
+  --sidebar-accent-foreground: oklch(0.977 0.013 86.8);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.777 0.140 74.9);
 }
 
 @layer base {
