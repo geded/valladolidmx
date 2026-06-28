@@ -5,6 +5,7 @@
 import { Link } from "@tanstack/react-router";
 import { Container } from "./Container";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { useTranslation } from "@/i18n/context";
 import { SITE } from "@/config/site";
 
@@ -14,15 +15,7 @@ export function SiteFooter() {
     <footer className="mt-24 border-t border-border bg-secondary/40">
       <Container className="grid gap-10 py-12 md:grid-cols-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span
-              aria-hidden
-              className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground font-display"
-            >
-              V
-            </span>
-            <span className="font-display text-lg font-semibold">{SITE.name}</span>
-          </div>
+          <BrandLogo tone="dark" size="md" />
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">{t("footer.tagline")}</p>
         </div>
 
