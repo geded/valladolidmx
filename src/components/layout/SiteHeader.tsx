@@ -208,7 +208,11 @@ export function SiteHeader({ variant = "solid" }: Props) {
                 <li key={n.to}>
                   <Link
                     to={n.to}
-                    activeProps={{ className: "bg-accent text-accent-foreground" }}
+                    activeProps={{
+                      className: isOverlay
+                        ? "bg-white/20 text-white"
+                        : "bg-accent text-accent-foreground",
+                    }}
                     className={cn(
                       "rounded-full px-3 py-1.5 text-sm font-medium transition",
                       isOverlay
