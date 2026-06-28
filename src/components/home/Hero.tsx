@@ -62,43 +62,60 @@ export function Hero() {
       {/* Degradado editorial para legibilidad sin enturbiar la foto. */}
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.55)_0%,rgba(0,0,0,0.15)_38%,rgba(0,0,0,0.45)_72%,rgba(0,0,0,0.78)_100%)]"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.62)_0%,rgba(0,0,0,0.30)_42%,rgba(0,0,0,0.50)_75%,rgba(0,0,0,0.80)_100%)]"
       />
 
-      <Container className="relative flex min-h-[88dvh] flex-col justify-end pb-14 pt-36 md:min-h-[100dvh] md:pb-24 md:pt-40">
-        <p className="font-script text-3xl text-white/95 drop-shadow-sm sm:text-4xl md:text-5xl">
+      {/*
+        Composición Hero (12C.0 / 12C.2):
+        — Mobile: el bloque (eyebrow + H1 + subtítulo + CTAs) se centra
+          verticalmente entre la base del Header (h-16) y el borde inferior
+          del viewport, asegurando que TODO sea visible sin scroll en una
+          ventana 100svh (incluye barra de direcciones del navegador).
+        — Desktop/tablet: se mantiene la composición editorial anclada
+          en la parte baja, como referencia Airbnb/Apple/Booking.
+      */}
+      <Container
+        className="relative flex min-h-[100svh] flex-col justify-center gap-5 pb-10 pt-20 md:min-h-[100dvh] md:justify-end md:gap-0 md:pb-24 md:pt-40"
+      >
+        <p className="font-script text-[1.75rem] leading-tight text-white/95 drop-shadow-sm sm:text-4xl md:text-5xl">
           {t("hero.eyebrow")}
         </p>
-        <h1 className="mt-2 max-w-4xl text-balance text-[2.5rem] leading-[1.05] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] sm:text-5xl md:text-6xl lg:text-[4.25rem]">
+        <h1 className="max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] sm:text-5xl sm:leading-[1.05] md:mt-2 md:text-6xl lg:text-[4.25rem]">
           {t("hero.title")}
         </h1>
-        <p className="mt-5 max-w-2xl text-pretty text-lg text-white/90 drop-shadow md:text-xl">
+        <p className="max-w-2xl text-pretty text-base text-white/90 drop-shadow sm:text-lg md:mt-5 md:text-xl">
           {t("hero.subtitle")}
         </p>
 
-        <div className="mt-9 flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 md:mt-9">
           <Link
             to="/oriente-maya"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/20 transition hover:scale-[1.02] hover:opacity-95"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/20 transition hover:scale-[1.02] hover:opacity-95 sm:px-6 sm:py-3"
           >
             {t("hero.cta_primary")}
             <ArrowRight className="size-4" aria-hidden />
           </Link>
           <Link
             to="/arma-tu-viaje"
-            className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20 sm:px-6 sm:py-3"
           >
             <Compass className="size-4" aria-hidden />
             {t("hero.cta_secondary")}
           </Link>
         </div>
 
-        {/* Buscador discreto, secundario al mensaje inspirador. */}
+        {/*
+          Buscador discreto (12C.1): secundario al mensaje inspirador.
+          Se oculta en mobile para garantizar que el bloque editorial
+          (eyebrow + H1 + subtítulo + CTAs) entre completo sin scroll;
+          el acceso a búsqueda permanece disponible en el Header y en
+          la sección Destinos inmediatamente posterior.
+        */}
         <form
           role="search"
           aria-label="Búsqueda rápida"
           onSubmit={(e) => e.preventDefault()}
-          className="mt-10 flex max-w-xl items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-2 shadow-sm backdrop-blur-md"
+          className="mt-10 hidden max-w-xl items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-2 shadow-sm backdrop-blur-md md:flex"
         >
           <Search className="size-4 shrink-0 text-white/80" aria-hidden />
           <input
