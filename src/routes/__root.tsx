@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -130,6 +131,8 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const headerVariant = pathname === "/" ? "overlay" : "solid";
 
   // Fase 0: limpia SWs huérfanos (PWA skill compliance). En fase futura,
   // este punto se cambia por registro real con vite-plugin-pwa.
@@ -146,7 +149,7 @@ function RootComponent() {
         >
           Saltar al contenido
         </a>
-        <SiteHeader />
+        <SiteHeader variant={headerVariant} />
         <Outlet />
         <SiteFooter />
         <AluxFloatingTrigger />
