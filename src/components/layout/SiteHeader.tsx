@@ -123,7 +123,7 @@ export function SiteHeader({ variant = "solid" }: Props) {
         <>
           <div
             aria-hidden
-            className="fixed inset-0 z-[998] bg-foreground/75 backdrop-blur-md lg:hidden"
+            className="fixed inset-0 z-[998] bg-foreground/58 backdrop-blur-sm lg:hidden"
             onClick={() => setOpen(false)}
           />
           <aside
@@ -134,26 +134,26 @@ export function SiteHeader({ variant = "solid" }: Props) {
             aria-label="Navegación principal"
             tabIndex={-1}
             style={{ backgroundColor: "var(--background)" }}
-            className="fixed inset-y-0 right-0 z-[999] flex w-[86vw] max-w-sm flex-col overflow-y-auto shadow-2xl outline-none lg:hidden"
+            className="fixed right-3 top-3 z-[999] flex max-h-[calc(100dvh-1.5rem)] w-[min(76vw,21rem)] flex-col overflow-y-auto rounded-2xl border border-border/70 shadow-2xl outline-none lg:hidden"
           >
-            <div className="flex h-16 shrink-0 items-center justify-between border-b border-border/70 px-5">
+            <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 px-4">
               <BrandLogo tone="dark" size="sm" />
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Cerrar menú"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground"
               >
-                <X className="size-5" />
+                <X className="size-4" />
               </button>
             </div>
-            <nav aria-label="Menú móvil" className="flex flex-col gap-1 p-4">
+            <nav aria-label="Menú móvil" className="flex flex-col gap-0.5 px-4 py-5">
               {nav.map((n) => (
                 <Link
                   key={n.to}
                   to={n.to}
                   onClick={() => setOpen(false)}
-                  className="rounded-xl px-4 py-3 text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+                  className="rounded-lg px-3 py-2.5 text-[0.95rem] font-medium leading-tight text-foreground hover:bg-accent hover:text-accent-foreground"
                 >
                   {n.label}
                 </Link>
@@ -161,7 +161,7 @@ export function SiteHeader({ variant = "solid" }: Props) {
               <Link
                 to="/arma-tu-viaje"
                 onClick={() => setOpen(false)}
-                className="mt-3 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-base font-semibold text-primary-foreground"
+                className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-[0.95rem] font-semibold text-primary-foreground"
               >
                 <Compass className="size-4" aria-hidden />
                 {t("nav.plan_trip")}
