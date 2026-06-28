@@ -1,8 +1,59 @@
 {
-  "nav": { "home": "Início", "destinations": "Destinos", "experiences": "Experiências", "hotels": "Hotéis", "restaurants": "Restaurantes", "events": "Eventos", "plan_trip": "Monta a tua viagem", "alux": "Alux", "for_business": "Empresas", "sign_in": "Entrar" },
-  "hero": { "eyebrow": "Oriente Maya · Yucatán", "title": "Acorda em Valladolid e descobre o Oriente Maia.", "subtitle": "Cenotes, cidades vivas e rotas autênticas.", "cta_primary": "Explorar destinos", "cta_secondary": "Monta a tua viagem", "search_placeholder": "Procura destino, experiência ou sabor…", "search_helper": "Só se já souberes o que procuras" },
-  "sections": { "destinations_title": "Destinos do Oriente Maia", "destinations_sub": "Cada um com o seu carácter.", "categories_title": "O que te move", "categories_sub": "Escolhe pela emoção.", "routes_title": "Rotas sugeridas", "routes_sub": "Pensadas para viver o território.", "alux_title": "Um conselho do Alux", "alux_body": "Dedica pelo menos um dia inteiro ao Oriente Maia.", "ayv_title": "Monta a tua viagem", "ayv_sub": "O teu dossiê pessoal. O concierge recebe-o quando estiveres pronto.", "envivo_title": "Oriente Maia ao vivo", "envivo_sub": "O que está a acontecer hoje no destino.", "empresas_title": "Empresas recomendadas", "empresas_sub": "Ordenado pelo Motor de Visibilidade Inteligente.", "reviews_title": "O que dizem os viajantes", "reviews_sub": "Vozes reais, traduzidas com cuidado." },
-  "common": { "coming_soon": "Em breve", "add_to_trip": "Adicionar à minha viagem", "learn_more": "Saber mais", "explore": "Explorar", "days": "dias", "by": "por", "language": "Idioma" },
-  "footer": { "tagline": "Plataforma oficial do Oriente Maia de Yucatán.", "explore": "Explorar", "platform": "Plataforma", "legal": "Legal", "privacy": "Privacidade", "rights": "Todos os direitos reservados." },
+  "nav": {
+    "home": "Início",
+    "destinations": "Destinos",
+    "experiences": "Experiências",
+    "hotels": "Hotéis",
+    "restaurants": "Restaurantes",
+    "events": "Eventos",
+    "plan_trip": "Monta a tua viagem",
+    "alux": "Alux",
+    "for_business": "Empresas",
+    "sign_in": "Entrar"
+  },
+  "hero": {
+    "eyebrow": "Oriente Maya · Yucatán",
+    "title": "Acorda em Valladolid e descobre o Oriente Maia de Yucatán.",
+    "subtitle": "Cenotes, cidades vivas e rotas autênticas.",
+    "cta_primary": "Explorar destinos",
+    "cta_secondary": "Monta a tua viagem",
+    "search_placeholder": "Procura destino, experiência ou sabor…",
+    "search_helper": "Só se já souberes o que procuras"
+  },
+  "sections": {
+    "destinations_title": "Destinos do Oriente Maia",
+    "destinations_sub": "Cada um com o seu carácter.",
+    "categories_title": "O que te move",
+    "categories_sub": "Escolhe pela emoção.",
+    "routes_title": "Rotas sugeridas",
+    "routes_sub": "Pensadas para viver o território.",
+    "alux_title": "Um conselho do Alux",
+    "alux_body": "Dedica pelo menos um dia inteiro ao Oriente Maia.",
+    "ayv_title": "Monta a tua viagem",
+    "ayv_sub": "O teu dossiê pessoal. O concierge recebe-o quando estiveres pronto.",
+    "envivo_title": "Oriente Maia ao vivo",
+    "envivo_sub": "O que está a acontecer hoje no destino.",
+    "empresas_title": "Empresas recomendadas",
+    "empresas_sub": "Ordenado pelo Motor de Visibilidade Inteligente.",
+    "reviews_title": "O que dizem os viajantes",
+    "reviews_sub": "Vozes reais, traduzidas com cuidado."
+  },
+  "common": {
+    "coming_soon": "Em breve",
+    "add_to_trip": "Adicionar à minha viagem",
+    "learn_more": "Saber mais",
+    "explore": "Explorar",
+    "days": "dias",
+    "by": "por",
+    "language": "Idioma"
+  },
+  "footer": {
+    "tagline": "Plataforma oficial do Oriente Maia de Yucatán.",
+    "explore": "Explorar",
+    "platform": "Plataforma",
+    "legal": "Legal",
+    "privacy": "Privacidade",
+    "rights": "Todos os direitos reservados."
+  },
   "alux_floating": "Alux chega em breve"
 }
