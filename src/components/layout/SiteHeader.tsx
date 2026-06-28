@@ -40,12 +40,13 @@ export function SiteHeader({ variant = "solid" }: Props) {
 
   const isOverlay = variant === "overlay" && !scrolled && !open;
 
+  // Navegación oficial 12C.1 — priorización breve:
+  // Destinos · Experiencias · Arma tu Viaje · Alux · Empresas.
   const nav = [
     { to: "/oriente-maya" as const, label: t("nav.destinations") },
     { to: "/experiencias" as const, label: t("nav.experiences") },
-    { to: "/hoteles" as const, label: t("nav.hotels") },
-    { to: "/restaurantes" as const, label: t("nav.restaurants") },
-    { to: "/eventos" as const, label: t("nav.events") },
+    { to: "/arma-tu-viaje" as const, label: t("nav.plan_trip") },
+    { to: "/alux" as const, label: t("nav.alux") },
     { to: "/empresas" as const, label: t("nav.for_business") },
   ];
 
@@ -104,34 +105,61 @@ export function SiteHeader({ variant = "solid" }: Props) {
           <button
             type="button"
             className={cn(
-              "lg:hidden inline-flex size-9 items-center justify-center rounded-full border transition",
+              "lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-full border transition",
               isOverlay
                 ? "border-white/30 bg-white/10 text-white"
                 : "border-border bg-card text-foreground",
             )}
             aria-label="Menú"
             aria-expanded={open}
+            aria-controls="mobile-drawer"
             onClick={() => setOpen((v) => !v)}
           >
-            {open ? <X className="size-4" /> : <Menu className="size-4" />}
+            {open ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
         </div>
       </Container>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer lateral (12C.1) */}
       <div
+        aria-hidden={!open}
         className={cn(
-          "lg:hidden overflow-hidden border-t border-border/70 bg-background transition-[max-height] duration-300",
-          open ? "max-h-[28rem]" : "max-h-0",
+          "lg:hidden fixed inset-0 z-40 transition-opacity duration-200",
+          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
+        )}
+        onClick={() => setOpen(false)}
+      >
+        <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" />
+      </div>
+      <aside
+        id="mobile-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navegación principal"
+        className={cn(
+          "lg:hidden fixed inset-y-0 right-0 z-50 w-[86%] max-w-sm bg-background shadow-2xl",
+          "transition-transform duration-200 ease-out",
+          open ? "translate-x-0" : "translate-x-full",
         )}
       >
-        <Container className="flex flex-col gap-1 py-3">
+        <div className="flex h-16 items-center justify-between border-b border-border/70 px-5">
+          <BrandLogo tone="dark" size="sm" />
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Cerrar menú"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground"
+          >
+            <X className="size-5" />
+          </button>
+        </div>
+        <nav aria-label="Menú móvil" className="flex flex-col gap-1 p-4">
           {nav.map((n) => (
             <Link
               key={n.to}
               to={n.to}
               onClick={() => setOpen(false)}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-foreground hover:bg-accent"
+              className="rounded-xl px-4 py-3 text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
             >
               {n.label}
             </Link>
@@ -139,16 +167,16 @@ export function SiteHeader({ variant = "solid" }: Props) {
           <Link
             to="/arma-tu-viaje"
             onClick={() => setOpen(false)}
-            className="mt-2 inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
+            className="mt-3 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-base font-semibold text-primary-foreground"
           >
             <Compass className="size-4" aria-hidden />
             {t("nav.plan_trip")}
           </Link>
-          <div className="mt-2 sm:hidden">
+          <div className="mt-4 border-t border-border/70 pt-4 sm:hidden">
             <UserMenu />
           </div>
-        </Container>
-      </div>
+        </nav>
+      </aside>
     </header>
   );
 }
