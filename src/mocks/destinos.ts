@@ -1,14 +1,13 @@
 /**
  * mocks/destinos.ts — Destinos placeholder Fase 0.
  * UUIDs reales, snake_case. Listos para Fase 1 (BD real).
+ *
+ * Doc 12B: NO se incluyen fotografías hasta recibir el banco oficial.
+ * Los componentes consumen `image_url` opcional; si no existe, renderizan
+ * el `PlaceholderImage` territorial. Para activar el banco oficial basta
+ * con añadir `image_url` aquí — el resto del sistema funciona sin cambios.
  */
 import type { Destination } from "@/types/territory";
-import imgValladolid from "@/assets/destino-valladolid.jpg";
-import imgEkBalam from "@/assets/destino-ek-balam.jpg";
-import imgRioLagartos from "@/assets/destino-rio-lagartos.jpg";
-import imgLasColoradas from "@/assets/destino-las-coloradas.jpg";
-import imgIzamal from "@/assets/destino-izamal.jpg";
-import imgUayma from "@/assets/destino-uayma.jpg";
 
 export const DESTINOS_MOCK: readonly Destination[] = [
   {
@@ -18,7 +17,6 @@ export const DESTINOS_MOCK: readonly Destination[] = [
     name: "Valladolid",
     tagline: "La puerta colonial del Oriente Maya.",
     hero_palette: "territorio",
-    image_url: imgValladolid,
     highlights: ["Calzada de los Frailes", "Cenote Zací", "Casa de los Venados"],
   },
   {
@@ -28,7 +26,6 @@ export const DESTINOS_MOCK: readonly Destination[] = [
     name: "Ek Balam",
     tagline: "La ciudad maya del jaguar negro.",
     hero_palette: "selva",
-    image_url: imgEkBalam,
     highlights: ["Acrópolis", "Cenote Xcanché", "Comunidad maya viva"],
   },
   {
@@ -38,7 +35,6 @@ export const DESTINOS_MOCK: readonly Destination[] = [
     name: "Río Lagartos",
     tagline: "Manglares, flamencos y noches de bioluminiscencia.",
     hero_palette: "cenote",
-    image_url: imgRioLagartos,
     highlights: ["Reserva de la Biosfera", "Flamencos rosados", "Petén Tucha"],
   },
   {
@@ -48,7 +44,6 @@ export const DESTINOS_MOCK: readonly Destination[] = [
     name: "Las Coloradas",
     tagline: "Salineras rosadas frente al Golfo.",
     hero_palette: "atardecer",
-    image_url: imgLasColoradas,
     highlights: ["Lagunas rosadas", "Aves migratorias", "Atardeceres mar adentro"],
   },
   {
@@ -58,7 +53,6 @@ export const DESTINOS_MOCK: readonly Destination[] = [
     name: "Izamal",
     tagline: "La ciudad amarilla y tres culturas.",
     hero_palette: "territorio",
-    image_url: imgIzamal,
     highlights: ["Convento de San Antonio", "Pirámide Kinich Kakmó", "Talleres artesanos"],
   },
   {
@@ -68,7 +62,6 @@ export const DESTINOS_MOCK: readonly Destination[] = [
     name: "Uayma",
     tagline: "Una iglesia barroca que parece bordada.",
     hero_palette: "selva",
-    image_url: imgUayma,
     highlights: ["Templo de Santo Domingo", "Pueblo tranquilo", "Ruta cercana a Valladolid"],
   },
 ];
