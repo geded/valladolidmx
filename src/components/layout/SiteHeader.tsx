@@ -210,14 +210,14 @@ export function SiteHeader({ variant = "solid" }: Props) {
                     to={n.to}
                     activeProps={{
                       className: isOverlay
-                        ? "bg-white/20 text-white"
-                        : "bg-accent text-accent-foreground",
+                        ? "!bg-white/15 !text-white ring-1 ring-white/30"
+                        : "!bg-secondary/70 !text-foreground ring-1 ring-border/70",
                     }}
                     className={cn(
                       "rounded-full px-3 py-1.5 text-sm font-medium transition",
                       isOverlay
                         ? "text-white/90 hover:bg-white/15 hover:text-white"
-                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                        : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground",
                     )}
                   >
                     {n.label}
