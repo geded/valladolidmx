@@ -5,17 +5,20 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system definition.
+ * Valladolid.mx — Design System (Fase 0)
  *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
+ * Paleta inspirada en:
+ *  - cálidos coloniales de Valladolid (ocre, terracota, caliza)
+ *  - verdes selva maya
+ *  - azul cenote
+ *  - atardecer del Oriente Maya
  *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ * REGLAS:
+ *  - Todos los colores en oklch.
+ *  - Tipografía centralizada vía --font-display / --font-sans / --font-mono.
+ *    Los componentes NUNCA declaran font-family literal.
+ *  - Para añadir color semántico: declarar en :root + .dark y mapear en
+ *    @theme inline como --color-<nombre>.
  */
 
 @theme inline {
@@ -26,6 +29,12 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  /* Tipografía centralizada */
+  --font-display: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -59,77 +68,117 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Acentos territoriales — Oriente Maya */
+  --color-selva: var(--selva);
+  --color-selva-foreground: var(--selva-foreground);
+  --color-cenote: var(--cenote);
+  --color-cenote-foreground: var(--cenote-foreground);
+  --color-caliza: var(--caliza);
+  --color-caliza-foreground: var(--caliza-foreground);
+  --color-atardecer: var(--atardecer);
+  --color-atardecer-foreground: var(--atardecer-foreground);
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
+  --radius: 0.75rem;
+
+  /* Base — papel cálido del Oriente Maya */
+  --background: oklch(0.985 0.012 80);
+  --foreground: oklch(0.22 0.025 50);
+  --card: oklch(0.995 0.008 80);
+  --card-foreground: oklch(0.22 0.025 50);
+  --popover: oklch(0.995 0.008 80);
+  --popover-foreground: oklch(0.22 0.025 50);
+
+  /* Primario — ocre cálido Valladolid colonial */
+  --primary: oklch(0.62 0.14 55);
+  --primary-foreground: oklch(0.985 0.012 80);
+
+  /* Secundario — piedra caliza */
+  --secondary: oklch(0.94 0.018 75);
+  --secondary-foreground: oklch(0.28 0.03 50);
+
+  --muted: oklch(0.945 0.012 80);
+  --muted-foreground: oklch(0.48 0.025 60);
+
+  --accent: oklch(0.92 0.035 80);
+  --accent-foreground: oklch(0.28 0.03 50);
+
+  --destructive: oklch(0.58 0.22 25);
+  --destructive-foreground: oklch(0.985 0.012 80);
+
+  --border: oklch(0.89 0.018 75);
+  --input: oklch(0.89 0.018 75);
+  --ring: oklch(0.62 0.14 55);
+
+  /* Acentos territoriales */
+  --selva: oklch(0.48 0.10 155);
+  --selva-foreground: oklch(0.985 0.012 80);
+  --cenote: oklch(0.62 0.12 215);
+  --cenote-foreground: oklch(0.985 0.012 80);
+  --caliza: oklch(0.92 0.020 75);
+  --caliza-foreground: oklch(0.28 0.03 50);
+  --atardecer: oklch(0.68 0.18 40);
+  --atardecer-foreground: oklch(0.985 0.012 80);
+
+  --chart-1: oklch(0.62 0.14 55);
+  --chart-2: oklch(0.48 0.10 155);
+  --chart-3: oklch(0.62 0.12 215);
+  --chart-4: oklch(0.68 0.18 40);
+  --chart-5: oklch(0.55 0.08 90);
+
+  --sidebar: oklch(0.97 0.014 80);
+  --sidebar-foreground: oklch(0.22 0.025 50);
+  --sidebar-primary: oklch(0.62 0.14 55);
+  --sidebar-primary-foreground: oklch(0.985 0.012 80);
+  --sidebar-accent: oklch(0.94 0.018 75);
+  --sidebar-accent-foreground: oklch(0.28 0.03 50);
+  --sidebar-border: oklch(0.89 0.018 75);
+  --sidebar-ring: oklch(0.62 0.14 55);
 }
 
 .dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --background: oklch(0.18 0.018 60);
+  --foreground: oklch(0.96 0.012 80);
+  --card: oklch(0.22 0.020 60);
+  --card-foreground: oklch(0.96 0.012 80);
+  --popover: oklch(0.22 0.020 60);
+  --popover-foreground: oklch(0.96 0.012 80);
+  --primary: oklch(0.72 0.14 60);
+  --primary-foreground: oklch(0.18 0.018 60);
+  --secondary: oklch(0.28 0.025 60);
+  --secondary-foreground: oklch(0.96 0.012 80);
+  --muted: oklch(0.26 0.020 60);
+  --muted-foreground: oklch(0.72 0.020 70);
+  --accent: oklch(0.30 0.030 60);
+  --accent-foreground: oklch(0.96 0.012 80);
+  --destructive: oklch(0.65 0.20 25);
+  --destructive-foreground: oklch(0.96 0.012 80);
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.72 0.14 60);
+  --selva: oklch(0.62 0.10 155);
+  --selva-foreground: oklch(0.18 0.018 60);
+  --cenote: oklch(0.72 0.12 215);
+  --cenote-foreground: oklch(0.18 0.018 60);
+  --caliza: oklch(0.32 0.020 75);
+  --caliza-foreground: oklch(0.96 0.012 80);
+  --atardecer: oklch(0.74 0.18 40);
+  --atardecer-foreground: oklch(0.18 0.018 60);
+  --chart-1: oklch(0.72 0.14 60);
+  --chart-2: oklch(0.62 0.10 155);
+  --chart-3: oklch(0.72 0.12 215);
+  --chart-4: oklch(0.74 0.18 40);
+  --chart-5: oklch(0.65 0.08 90);
+  --sidebar: oklch(0.22 0.020 60);
+  --sidebar-foreground: oklch(0.96 0.012 80);
+  --sidebar-primary: oklch(0.72 0.14 60);
+  --sidebar-primary-foreground: oklch(0.18 0.018 60);
+  --sidebar-accent: oklch(0.28 0.025 60);
+  --sidebar-accent-foreground: oklch(0.96 0.012 80);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --sidebar-ring: oklch(0.72 0.14 60);
 }
 
 @layer base {
@@ -137,8 +186,65 @@
     border-color: var(--color-border);
   }
 
+  html {
+    font-family: var(--font-sans);
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+    font-feature-settings: "ss01";
+    letter-spacing: -0.015em;
+  }
+
+  /* Foco accesible global */
+  :where(a, button, [role="button"], input, select, textarea):focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+/*
+ * Placeholders territoriales.
+ * Gradientes sobrios que sugieren el Oriente Maya SIN sustituir fotografía
+ * real. Se reemplazarán con imágenes oficiales en fases posteriores.
+ */
+@utility placeholder-territorio {
+  background-image:
+    radial-gradient(ellipse at 30% 20%, color-mix(in oklab, var(--color-atardecer) 35%, transparent), transparent 60%),
+    radial-gradient(ellipse at 80% 80%, color-mix(in oklab, var(--color-selva) 35%, transparent), transparent 55%),
+    linear-gradient(135deg, color-mix(in oklab, var(--color-primary) 18%, var(--color-muted)), var(--color-muted));
+}
+
+@utility placeholder-cenote {
+  background-image:
+    radial-gradient(ellipse at 70% 30%, color-mix(in oklab, var(--color-cenote) 45%, transparent), transparent 60%),
+    linear-gradient(135deg, color-mix(in oklab, var(--color-cenote) 28%, var(--color-muted)), var(--color-muted));
+}
+
+@utility placeholder-selva {
+  background-image:
+    radial-gradient(ellipse at 30% 70%, color-mix(in oklab, var(--color-selva) 50%, transparent), transparent 60%),
+    linear-gradient(135deg, color-mix(in oklab, var(--color-selva) 25%, var(--color-muted)), var(--color-muted));
+}
+
+@utility placeholder-atardecer {
+  background-image:
+    radial-gradient(ellipse at 50% 90%, color-mix(in oklab, var(--color-atardecer) 60%, transparent), transparent 55%),
+    linear-gradient(180deg, color-mix(in oklab, var(--color-cenote) 30%, var(--color-background)), color-mix(in oklab, var(--color-atardecer) 30%, var(--color-background)));
+}
+
+/* Patrón sutil de papel/textura para fondos cálidos. */
+@utility texture-paper {
+  background-image:
+    radial-gradient(color-mix(in oklab, var(--color-foreground) 4%, transparent) 1px, transparent 1px);
+  background-size: 18px 18px;
 }
