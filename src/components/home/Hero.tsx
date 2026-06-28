@@ -104,18 +104,12 @@ export function Hero() {
           </Link>
         </div>
 
-        {/*
-          Buscador discreto (12C.1): secundario al mensaje inspirador.
-          Se oculta en mobile para garantizar que el bloque editorial
-          (eyebrow + H1 + subtítulo + CTAs) entre completo sin scroll;
-          el acceso a búsqueda permanece disponible en el Header y en
-          la sección Destinos inmediatamente posterior.
-        */}
+        {/* Buscador discreto (12C.1): secundario al mensaje inspirador. */}
         <form
           role="search"
           aria-label="Búsqueda rápida"
           onSubmit={(e) => e.preventDefault()}
-          className="mt-10 hidden max-w-xl items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-2 shadow-sm backdrop-blur-md md:flex"
+          className="mt-5 flex max-w-xl items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-2 shadow-sm backdrop-blur-md sm:mt-6 md:mt-10"
         >
           <Search className="size-4 shrink-0 text-white/80" aria-hidden />
           <input
