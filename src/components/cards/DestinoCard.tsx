@@ -23,25 +23,30 @@ export function DestinoCard({ destination }: { destination: Destination }) {
   const { t } = useTranslation();
   const route = REGION_TO_ROUTE[destination.region_slug];
 
-  const LinkOrSpan = route ? Link : "span";
-  const linkProps = route
-    ? ({ to: route, params: { destino: destination.slug } } as const)
-    : ({} as Record<string, never>);
-
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition hover:shadow-lg">
-      <LinkOrSpan
-        {...(linkProps as never)}
-        className="block focus:outline-none"
-        aria-label={`${destination.name} — ${destination.tagline}`}
-      >
+      {route ? (
+        <Link
+          to={route}
+          params={{ destino: destination.slug }}
+          className="block focus:outline-none"
+          aria-label={`${destination.name} — ${destination.tagline}`}
+        >
+          <PlaceholderImage
+            palette={destination.hero_palette}
+            label={destination.name}
+            aspect="4/3"
+            className="rounded-none border-0 transition group-hover:scale-[1.02]"
+          />
+        </Link>
+      ) : (
         <PlaceholderImage
           palette={destination.hero_palette}
           label={destination.name}
           aspect="4/3"
-          className="rounded-none border-0 transition group-hover:scale-[1.02]"
+          className="rounded-none border-0"
         />
-      </LinkOrSpan>
+      )}
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div>
           <h3 className="text-xl font-semibold tracking-tight">{destination.name}</h3>

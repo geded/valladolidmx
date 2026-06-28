@@ -53,7 +53,7 @@ function DestinoPage() {
           <div className="mt-8">
             <h2 className="text-2xl">Lo esencial</h2>
             <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-              {dest.highlights.map((h) => (
+              {dest.highlights.map((h: string) => (
                 <li
                   key={h}
                   className="rounded-xl border border-border bg-card px-4 py-3 text-sm"
