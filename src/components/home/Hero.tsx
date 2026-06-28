@@ -50,10 +50,11 @@ export function Hero() {
             src={src}
             alt=""
             aria-hidden
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
+            className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-[2000ms] ease-in-out ${
               i === index ? "opacity-100" : "opacity-0"
             }`}
             loading={i === 0 ? "eager" : "lazy"}
+            fetchPriority={i === 0 ? "high" : "auto"}
             decoding="async"
           />
         ))}
@@ -64,11 +65,11 @@ export function Hero() {
         className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.55)_0%,rgba(0,0,0,0.15)_38%,rgba(0,0,0,0.45)_72%,rgba(0,0,0,0.78)_100%)]"
       />
 
-      <Container className="relative flex min-h-[92vh] flex-col justify-end pb-14 pt-36 md:min-h-screen md:pb-24 md:pt-40">
+      <Container className="relative flex min-h-[88dvh] flex-col justify-end pb-14 pt-36 md:min-h-[100dvh] md:pb-24 md:pt-40">
         <p className="font-script text-3xl text-white/95 drop-shadow-sm sm:text-4xl md:text-5xl">
           {t("hero.eyebrow")}
         </p>
-        <h1 className="mt-2 max-w-4xl text-balance text-5xl leading-[1.02] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] sm:text-6xl md:text-7xl lg:text-[5.25rem]">
+        <h1 className="mt-2 max-w-4xl text-balance text-[2.5rem] leading-[1.05] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] sm:text-5xl md:text-6xl lg:text-[4.25rem]">
           {t("hero.title")}
         </h1>
         <p className="mt-5 max-w-2xl text-pretty text-lg text-white/90 drop-shadow md:text-xl">
