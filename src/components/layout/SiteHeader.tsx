@@ -208,18 +208,17 @@ export function SiteHeader({ variant = "solid" }: Props) {
                 <li key={n.to}>
                   <Link
                     to={n.to}
-                    className={({ isActive }) =>
-                      cn(
-                        "rounded-full px-3 py-1.5 text-sm font-medium transition",
-                        isOverlay
-                          ? isActive
-                            ? "bg-white/15 text-white ring-1 ring-white/30"
-                            : "text-white/90 hover:bg-white/12 hover:text-white"
-                          : isActive
-                            ? "bg-secondary/70 text-foreground ring-1 ring-border/70"
-                            : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground",
-                      )
-                    }
+                    activeProps={{
+                      className: isOverlay
+                        ? "!bg-white/15 !text-white ring-1 ring-white/30"
+                        : "!bg-secondary/70 !text-foreground ring-1 ring-border/70",
+                    }}
+                    className={cn(
+                      "rounded-full px-3 py-1.5 text-sm font-medium transition",
+                      isOverlay
+                        ? "text-white/90 hover:bg-white/15 hover:text-white"
+                        : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground",
+                    )}
                   >
                     {n.label}
                   </Link>
