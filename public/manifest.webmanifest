@@ -9,8 +9,11 @@
   "orientation": "portrait",
   "lang": "es-MX",
   "dir": "ltr",
-  "background_color": "#f7f1e6",
-  "theme_color": "#b8732e",
-  "icons": [],
+  "background_color": "#FBF7EE",
+  "theme_color": "#EAA840",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon" },
+    { "src": "/logo.png", "sizes": "470x159", "type": "image/png", "purpose": "any" }
+  ],
   "categories": ["travel", "lifestyle"]
 }

@@ -10,13 +10,31 @@
  * sustituir el bloque `<div data-hero-media>` por un `<img src={…} />`
  * sin tocar layout, copy, CTAs ni degradados.
  */
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Search, ArrowRight, Compass } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { useTranslation } from "@/i18n/context";
+import heroBg01 from "@/assets/brand/hero/bg01.jpg";
+import heroBg02 from "@/assets/brand/hero/bg02.jpg";
+
+const HERO_SLIDES = [heroBg01, heroBg02] as const;
+const SLIDE_INTERVAL_MS = 7000;
 
 export function Hero() {
   const { t } = useTranslation();
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (HERO_SLIDES.length < 2) return;
+    const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+    const id = window.setInterval(
+      () => setIndex((i) => (i + 1) % HERO_SLIDES.length),
+      SLIDE_INTERVAL_MS,
+    );
+    return () => window.clearInterval(id);
+  }, []);
 
   return (
     <section
@@ -24,12 +42,22 @@ export function Hero() {
       // Compensar la cabecera overlay (h-16) para que la foto arranque desde el top.
       style={{ marginTop: "-4rem" }}
     >
-      {/* Placeholder territorial — sustituir por <img/> oficial cuando exista. */}
-      <div
-        data-hero-media
-        aria-hidden
-        className="placeholder-atardecer absolute inset-0 -z-20 h-full w-full"
-      />
+      {/* Carrusel cinematográfico con las fotografías oficiales del Hero. */}
+      <div data-hero-media aria-hidden className="absolute inset-0 -z-20 h-full w-full overflow-hidden bg-foreground">
+        {HERO_SLIDES.map((src, i) => (
+          <img
+            key={src}
+            src={src}
+            alt=""
+            aria-hidden
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
+              i === index ? "opacity-100" : "opacity-0"
+            }`}
+            loading={i === 0 ? "eager" : "lazy"}
+            decoding="async"
+          />
+        ))}
+      </div>
       {/* Degradado editorial para legibilidad sin enturbiar la foto. */}
       <div
         aria-hidden
