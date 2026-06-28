@@ -1,28 +1,19 @@
 /**
- * Hero — Sección 1 de Home (Doc 12).
+ * Hero — Sección 1 de Home (Doc 12 + Doc 12A-v2 + Doc 12B).
  *
- * Propósito: INSPIRAR antes de vender.
- * Imagen de gran formato (placeholder territorial), título display,
- * subtítulo breve, dos CTAs primarios (Destinos + Arma tu Viaje) y un
- * buscador DISCRETO debajo (no domina visualmente).
- */
-/**
- * Hero — Sección 1 de Home (Doc 12 + Doc 12A-v2).
+ * Pieza cinematográfica: fondo placeholder territorial (tonos selva/cenote
+ * del Design System) listo para recibir la fotografía oficial, degradado
+ * editorial para legibilidad, eslogan en script + titular display + dos
+ * CTAs y buscador discreto. Empuja la cabecera a modo overlay transparente.
  *
- * Pieza cinematográfica: fotografía protagonista del Oriente Maya,
- * degradado para legibilidad, eslogan en script + titular display + dos CTAs
- * y buscador discreto. Empuja la cabecera a modo overlay transparente.
- *
- * Imagen actual: render generado de Calzada de los Frailes (placeholder
- * fotográfico). Sustituible por el activo oficial cambiando `HERO_IMAGE`.
+ * Reemplazo futuro (Doc 12B): cuando llegue el banco fotográfico oficial,
+ * sustituir el bloque `<div data-hero-media>` por un `<img src={…} />`
+ * sin tocar layout, copy, CTAs ni degradados.
  */
 import { Link } from "@tanstack/react-router";
 import { Search, ArrowRight, Compass } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { useTranslation } from "@/i18n/context";
-import heroValladolid from "@/assets/hero-valladolid.jpg";
-
-const HERO_IMAGE = heroValladolid;
 
 export function Hero() {
   const { t } = useTranslation();
@@ -33,13 +24,11 @@ export function Hero() {
       // Compensar la cabecera overlay (h-16) para que la foto arranque desde el top.
       style={{ marginTop: "-4rem" }}
     >
-      <img
-        src={HERO_IMAGE}
-        alt="Calle colonial del Oriente Maya al atardecer"
-        width={1920}
-        height={1280}
-        fetchPriority="high"
-        className="absolute inset-0 -z-20 h-full w-full object-cover"
+      {/* Placeholder territorial — sustituir por <img/> oficial cuando exista. */}
+      <div
+        data-hero-media
+        aria-hidden
+        className="placeholder-atardecer absolute inset-0 -z-20 h-full w-full"
       />
       {/* Degradado editorial para legibilidad sin enturbiar la foto. */}
       <div
