@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "destinations": "Destinos",
+    "experiences": "Experiencias",
+    "hotels": "Hoteles",
+    "restaurants": "Restaurantes",
+    "events": "Eventos",
+    "plan_trip": "Arma tu Viaje",
+    "alux": "Alux",
+    "for_business": "Empresas",
+    "sign_in": "Iniciar sesión"
+  },
+  "hero": {
+    "eyebrow": "Oriente Maya · Yucatán",
+    "title": "Despierta en Valladolid y descubre el Oriente Maya.",
+    "subtitle": "Cenotes, ciudades vivas y rutas auténticas más allá de la costumbre.",
+    "cta_primary": "Explorar destinos",
+    "cta_secondary": "Arma tu viaje",
+    "search_placeholder": "Busca un destino, una experiencia, un sabor…",
+    "search_helper": "Sólo si ya sabes qué buscar"
+  },
+  "sections": {
+    "destinations_title": "Destinos del Oriente Maya",
+    "destinations_sub": "Cada uno con su carácter. Empieza por el que más te llame.",
+    "categories_title": "Qué te mueve",
+    "categories_sub": "Elige por lo que sientes, no por lo que se vende.",
+    "routes_title": "Rutas sugeridas",
+    "routes_sub": "Recorridos pensados para vivir el territorio, no para correrlo.",
+    "alux_title": "Un consejo de Alux",
+    "alux_body": "Si visitas Valladolid, dedica al menos un día completo al Oriente Maya: te llevará más lejos que cualquier mapa.",
+    "ayv_title": "Arma tu Viaje",
+    "ayv_sub": "Tu expediente personal. Guarda destinos, experiencias y notas. Tu concierge humano lo recibe cuando estés listo.",
+    "envivo_title": "Oriente Maya en vivo",
+    "envivo_sub": "Lo que está pasando hoy en el destino. Próximamente conectado a Instagram y Facebook.",
+    "empresas_title": "Empresas recomendadas",
+    "empresas_sub": "Selección ordenada por el Motor de Visibilidad Inteligente, no por el mayor pago.",
+    "reviews_title": "Lo que cuentan quienes ya vinieron",
+    "reviews_sub": "Voces reales, traducidas y resumidas con cuidado."
+  },
+  "common": {
+    "coming_soon": "Disponible próximamente",
+    "add_to_trip": "Agregar a mi viaje",
+    "learn_more": "Conocer más",
+    "explore": "Explorar",
+    "days": "días",
+    "by": "por",
+    "language": "Idioma"
+  },
+  "footer": {
+    "tagline": "Plataforma oficial del Oriente Maya de Yucatán.",
+    "explore": "Explorar",
+    "platform": "Plataforma",
+    "legal": "Aviso legal",
+    "privacy": "Privacidad",
+    "rights": "Todos los derechos reservados."
+  },
+  "alux_floating": "Alux llega pronto"
+}

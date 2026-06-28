@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "home": "Home",
+    "destinations": "Destinations",
+    "experiences": "Experiences",
+    "hotels": "Hotels",
+    "restaurants": "Restaurants",
+    "events": "Events",
+    "plan_trip": "Plan your trip",
+    "alux": "Alux",
+    "for_business": "For business",
+    "sign_in": "Sign in"
+  },
+  "hero": {
+    "eyebrow": "Oriente Maya · Yucatán",
+    "title": "Wake up in Valladolid and discover the Eastern Maya.",
+    "subtitle": "Cenotes, living cities and authentic routes beyond the usual.",
+    "cta_primary": "Explore destinations",
+    "cta_secondary": "Plan your trip",
+    "search_placeholder": "Search a destination, an experience, a flavor…",
+    "search_helper": "Only if you already know what you're looking for"
+  },
+  "sections": {
+    "destinations_title": "Eastern Maya destinations",
+    "destinations_sub": "Each one has its own character. Start with the one that calls you.",
+    "categories_title": "What moves you",
+    "categories_sub": "Choose by feeling, not by what's being sold.",
+    "routes_title": "Suggested routes",
+    "routes_sub": "Itineraries built to live the territory, not to rush through it.",
+    "alux_title": "A tip from Alux",
+    "alux_body": "If you visit Valladolid, give the Eastern Maya at least one full day — it will take you further than any map.",
+    "ayv_title": "Plan your trip",
+    "ayv_sub": "Your personal travel file. Save destinations, experiences and notes. Your human concierge gets it when you're ready.",
+    "envivo_title": "Eastern Maya live",
+    "envivo_sub": "What's happening today on the ground. Soon connected to Instagram and Facebook.",
+    "empresas_title": "Recommended businesses",
+    "empresas_sub": "Sorted by the Smart Visibility Engine, not by who pays the most.",
+    "reviews_title": "What travelers say",
+    "reviews_sub": "Real voices, carefully translated and summarised."
+  },
+  "common": {
+    "coming_soon": "Coming soon",
+    "add_to_trip": "Add to my trip",
+    "learn_more": "Learn more",
+    "explore": "Explore",
+    "days": "days",
+    "by": "by",
+    "language": "Language"
+  },
+  "footer": {
+    "tagline": "Official platform of the Eastern Maya of Yucatán.",
+    "explore": "Explore",
+    "platform": "Platform",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "rights": "All rights reserved."
+  },
+  "alux_floating": "Alux arrives soon"
+}
