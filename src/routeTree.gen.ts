@@ -18,9 +18,12 @@ import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArmaTuViajeRouteImport } from './routes/arma-tu-viaje'
 import { Route as AluxRouteImport } from './routes/alux'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
+import { Route as AuthenticatedCmsRouteImport } from './routes/_authenticated/cms'
+import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticated/cms/index'
 
 const RestaurantesRoute = RestaurantesRouteImport.update({
   id: '/restaurantes',
@@ -67,6 +70,10 @@ const AluxRoute = AluxRouteImport.update({
   path: '/alux',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -82,6 +89,16 @@ const OrienteMayaDestinoRoute = OrienteMayaDestinoRouteImport.update({
   path: '/oriente-maya/$destino',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedCmsRoute = AuthenticatedCmsRouteImport.update({
+  id: '/cms',
+  path: '/cms',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCmsIndexRoute = AuthenticatedCmsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedCmsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -94,8 +111,10 @@ export interface FileRoutesByFullPath {
   '/hoteles': typeof HotelesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/cms': typeof AuthenticatedCmsRouteWithChildren
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/cms/': typeof AuthenticatedCmsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,10 +129,12 @@ export interface FileRoutesByTo {
   '/restaurantes': typeof RestaurantesRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
+  '/cms': typeof AuthenticatedCmsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/alux': typeof AluxRoute
   '/arma-tu-viaje': typeof ArmaTuViajeRoute
   '/auth': typeof AuthRoute
@@ -123,8 +144,10 @@ export interface FileRoutesById {
   '/hoteles': typeof HotelesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/_authenticated/cms': typeof AuthenticatedCmsRouteWithChildren
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -139,8 +162,10 @@ export interface FileRouteTypes {
     | '/hoteles'
     | '/reset-password'
     | '/restaurantes'
+    | '/cms'
     | '/oriente-maya/$destino'
     | '/oriente-maya/'
+    | '/cms/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,9 +180,11 @@ export interface FileRouteTypes {
     | '/restaurantes'
     | '/oriente-maya/$destino'
     | '/oriente-maya'
+    | '/cms'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/alux'
     | '/arma-tu-viaje'
     | '/auth'
@@ -167,12 +194,15 @@ export interface FileRouteTypes {
     | '/hoteles'
     | '/reset-password'
     | '/restaurantes'
+    | '/_authenticated/cms'
     | '/oriente-maya/$destino'
     | '/oriente-maya/'
+    | '/_authenticated/cms/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AluxRoute: typeof AluxRoute
   ArmaTuViajeRoute: typeof ArmaTuViajeRoute
   AuthRoute: typeof AuthRoute
@@ -251,6 +281,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AluxRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -272,11 +309,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrienteMayaDestinoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/cms': {
+      id: '/_authenticated/cms'
+      path: '/cms'
+      fullPath: '/cms'
+      preLoaderRoute: typeof AuthenticatedCmsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/cms/': {
+      id: '/_authenticated/cms/'
+      path: '/'
+      fullPath: '/cms/'
+      preLoaderRoute: typeof AuthenticatedCmsIndexRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
   }
 }
 
+interface AuthenticatedCmsRouteChildren {
+  AuthenticatedCmsIndexRoute: typeof AuthenticatedCmsIndexRoute
+}
+
+const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
+  AuthenticatedCmsIndexRoute: AuthenticatedCmsIndexRoute,
+}
+
+const AuthenticatedCmsRouteWithChildren =
+  AuthenticatedCmsRoute._addFileChildren(AuthenticatedCmsRouteChildren)
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedCmsRoute: typeof AuthenticatedCmsRouteWithChildren
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedCmsRoute: AuthenticatedCmsRouteWithChildren,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AluxRoute: AluxRoute,
   ArmaTuViajeRoute: ArmaTuViajeRoute,
   AuthRoute: AuthRoute,
