@@ -2167,6 +2167,26 @@ export type Database = {
         Returns: undefined
       }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
+      register_business_media: {
+        Args: {
+          _alt_text?: string
+          _bucket: string
+          _business_id: string
+          _caption?: string
+          _height?: number
+          _mime: string
+          _path: string
+          _role: string
+          _size_bytes: number
+          _sort_order?: number
+          _width?: number
+        }
+        Returns: Json
+      }
+      remove_business_media: {
+        Args: { _business_media_id: string }
+        Returns: undefined
+      }
       request_business_review: {
         Args: { _business_id: string; _notes?: string }
         Returns: undefined
@@ -2177,6 +2197,15 @@ export type Database = {
           _entity_kind: Database["public"]["Enums"]["entity_kind"]
           _notes?: string
           _to_status: Database["public"]["Enums"]["content_status"]
+        }
+        Returns: undefined
+      }
+      update_business_media_meta: {
+        Args: {
+          _alt_text?: string
+          _business_media_id: string
+          _caption?: string
+          _sort_order?: number
         }
         Returns: undefined
       }
