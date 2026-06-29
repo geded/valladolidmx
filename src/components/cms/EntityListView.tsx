@@ -26,6 +26,7 @@ interface Props<Row> {
   isFetching?: boolean;
   rowKey: (row: Row) => string;
   emptyMessage?: string;
+  headerActions?: ReactNode;
 }
 
 export function EntityListView<Row>(props: Props<Row>) {
@@ -41,6 +42,7 @@ export function EntityListView<Row>(props: Props<Row>) {
     isFetching,
     rowKey,
     emptyMessage = "Sin registros que mostrar.",
+    headerActions,
   } = props;
 
   const inputId = useId();
@@ -64,9 +66,12 @@ export function EntityListView<Row>(props: Props<Row>) {
             </p>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">
-          {isFetching ? "Actualizando…" : `${total} registro${total === 1 ? "" : "s"}`}
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="text-xs text-muted-foreground">
+            {isFetching ? "Actualizando…" : `${total} registro${total === 1 ? "" : "s"}`}
+          </p>
+          {headerActions}
+        </div>
       </header>
 
       <form

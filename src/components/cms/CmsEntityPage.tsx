@@ -8,6 +8,7 @@ import {
   EntityListView,
   type EntityColumn,
 } from "@/components/cms/EntityListView";
+import type { ReactNode } from "react";
 
 interface ListResult<Row> {
   rows: Row[];
@@ -28,6 +29,7 @@ interface Props<Row> {
   columns: EntityColumn<Row>[];
   rowKey: (row: Row) => string;
   emptyMessage?: string;
+  headerActions?: ReactNode;
 }
 
 export function CmsEntityPage<Row>(props: Props<Row>) {
@@ -72,6 +74,7 @@ export function CmsEntityPage<Row>(props: Props<Row>) {
       isFetching={query.isFetching}
       rowKey={props.rowKey}
       emptyMessage={props.emptyMessage}
+      headerActions={props.headerActions}
     />
   );
 }
