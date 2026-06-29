@@ -17,13 +17,11 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-
-type ContentStatus =
-  | "draft"
-  | "in_review"
-  | "approved"
-  | "published"
-  | "archived";
+import {
+  ALLOWED_TRANSITIONS,
+  assertAllowedTransition,
+  type ContentStatus,
+} from "@/lib/cms/workflow";
 
 const EDITABLE_TABLES = [
   "tourism_regions",
