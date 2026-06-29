@@ -211,15 +211,18 @@ async function logAudit(
     notes?: string | null;
   },
 ) {
-  // Best-effort: si el RLS de content_audit_log no permite al editor
-  // escribir, no rompemos la operación principal — la auditoría
-  // editorial (transiciones) ya está cubierta en RPCs SECURITY DEFINER.
-  await supabase.from("content_audit_log").insert({
-    entity_kind: "business",
-    entity_id: args.businessId,
-    action: args.action,
-    actor_user_id: args.actorId,
-    notes: args.notes ?? null,
+  // El INSERT directo en content_audit_log está reservado a roles
+  // editoriales globales (is_editor_or_admin). Para owners/editores de
+  // empresa usamos la RPC SECURITY DEFINER `log_business_presence_audit`,
+  // que valida acceso editor + acción permitida antes de insertar.
+  // Best-effort: si la auditoría falla por motivos transitorios, no
+  // rompemos la operación principal — el cambio ya quedó registrado
+  // en updated_at/updated_by de la fila correspondiente.
+  void args.actorId;
+  await supabase.rpc("log_business_presence_audit", {
+    _business_id: args.businessId,
+    _action: args.action,
+    _notes: args.notes ?? null,
   });
 }
 
