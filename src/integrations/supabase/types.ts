@@ -2204,6 +2204,7 @@ export type Database = {
         | "faq"
         | "banner"
         | "promotion"
+        | "review"
       hero_palette: "territorio" | "selva" | "cenote" | "atardecer"
       invitation_status: "pending" | "accepted" | "revoked" | "expired"
       locale_code: "es" | "en" | "fr" | "de" | "it" | "pt"
@@ -2379,6 +2380,7 @@ export const Constants = {
         "faq",
         "banner",
         "promotion",
+        "review",
       ],
       hero_palette: ["territorio", "selva", "cenote", "atardecer"],
       invitation_status: ["pending", "accepted", "revoked", "expired"],
