@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import { listReviewsCms } from "@/lib/cms/reads.functions";
@@ -31,16 +31,69 @@ function ReviewsPage() {
       queryKey="reviews"
       fn={listReviewsCms}
       title="Reseñas"
-      stage="Ola 1 · Etapa 2 · Lecturas"
-      description="Vista de sólo lectura. La moderación llega en Etapa 5."
+      stage="Ola 1 · Etapa 5 · Moderación"
+      description="Listado de reseñas con acceso directo al panel de moderación."
       rowKey={(r) => r.id}
       columns={[
-        { key: "rating", header: "★", render: (r) => <span className="text-xs">{r.rating ?? "—"}</span>, className: "w-12" },
-        { key: "title", header: "Título", render: (r) => <span className="font-medium">{r.title ?? "(sin título)"}</span> },
-        { key: "author", header: "Autor", render: (r) => <span className="text-xs text-muted-foreground">{r.author_display_name ?? "Anónimo"}</span> },
-        { key: "kind", header: "Sujeto", render: (r) => <span className="text-xs text-muted-foreground">{r.subject_kind ?? "—"}</span> },
-        { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
-        { key: "created", header: "Fecha", render: (r) => <span className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString("es-MX")}</span> },
+        {
+          key: "rating",
+          header: "★",
+          render: (r) => <span className="text-xs">{r.rating ?? "—"}</span>,
+          className: "w-12",
+        },
+        {
+          key: "title",
+          header: "Título",
+          render: (r) => (
+            <span className="font-medium">{r.title ?? "(sin título)"}</span>
+          ),
+        },
+        {
+          key: "author",
+          header: "Autor",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">
+              {r.author_display_name ?? "Anónimo"}
+            </span>
+          ),
+        },
+        {
+          key: "kind",
+          header: "Sujeto",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">
+              {r.subject_kind ?? "—"}
+            </span>
+          ),
+        },
+        {
+          key: "status",
+          header: "Estado",
+          render: (r) => <StatusBadge value={r.status} />,
+        },
+        {
+          key: "created",
+          header: "Fecha",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">
+              {new Date(r.created_at).toLocaleDateString("es-MX")}
+            </span>
+          ),
+        },
+        {
+          key: "actions",
+          header: "",
+          className: "w-28 text-right",
+          render: (r) => (
+            <Link
+              to={"/cms/reviews/$id/moderar" as never}
+              params={{ id: r.id } as never}
+              className="inline-flex h-8 items-center rounded-md border border-border bg-background px-3 text-[11px] font-medium hover:bg-accent"
+            >
+              Moderar
+            </Link>
+          ),
+        },
       ]}
     />
   );
