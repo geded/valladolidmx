@@ -299,10 +299,10 @@ export const registerBusinessMedia = createServerFn({ method: "POST" })
           _path: data.path,
           _mime: data.mime,
           _size_bytes: data.sizeBytes,
-          _width: data.width,
-          _height: data.height,
-          _alt_text: data.altText,
-          _caption: data.caption,
+          _width: data.width ?? undefined,
+          _height: data.height ?? undefined,
+          _alt_text: data.altText ?? undefined,
+          _caption: data.caption ?? undefined,
           _sort_order: data.sortOrder,
         },
       );
@@ -341,9 +341,9 @@ export const updateBusinessMediaMeta = createServerFn({ method: "POST" })
       "update_business_media_meta",
       {
         _business_media_id: data.businessMediaId,
-        _alt_text: data.altText,
-        _caption: data.caption,
-        _sort_order: data.sortOrder,
+        _alt_text: data.altText ?? undefined,
+        _caption: data.caption ?? undefined,
+        _sort_order: data.sortOrder ?? undefined,
       },
     );
     if (error) throw new Error(`update_media_failed: ${error.message}`);
