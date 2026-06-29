@@ -164,15 +164,19 @@ export const updateBusinessCard = createServerFn({ method: "POST" })
     if (accErr) throw new Error(`access_check_failed: ${accErr.message}`);
     if (!allowed) throw new Error("forbidden_business_access");
 
+    // display_name must remain non-null. Drop null assignments.
+    const sanitized: Record<string, string | null> = { ...data.patch };
+    if (sanitized.display_name === null) delete sanitized.display_name;
     const patch = {
-      ...data.patch,
+      ...sanitized,
       updated_by: userId,
       updated_at: new Date().toISOString(),
-    };
+    } as Record<string, unknown>;
 
     const { data: row, error } = await supabase
       .from("businesses")
-      .update(patch)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .update(patch as any)
       .eq("id", data.businessId)
       .is("deleted_at", null)
       .select(
