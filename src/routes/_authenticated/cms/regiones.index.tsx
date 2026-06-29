@@ -11,7 +11,7 @@ type Row = {
   updated_at: string;
 };
 
-export const Route = createFileRoute("/_authenticated/cms/regiones")({
+export const Route = createFileRoute("/_authenticated/cms/regiones/")({
   head: () => ({
     meta: [
       { title: "Regiones · CMS Studio" },

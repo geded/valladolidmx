@@ -12,7 +12,7 @@ type Row = {
   updated_at: string;
 };
 
-export const Route = createFileRoute("/_authenticated/cms/categorias")({
+export const Route = createFileRoute("/_authenticated/cms/categorias/")({
   head: () => ({
     meta: [
       { title: "Categorías · CMS Studio" },
