@@ -2163,6 +2163,10 @@ export type Database = {
       }
       is_editor_or_admin: { Args: { _user_id: string }; Returns: boolean }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
+      request_business_review: {
+        Args: { _business_id: string; _notes?: string }
+        Returns: undefined
+      }
       transition_content_status: {
         Args: {
           _entity_id: string
@@ -2170,6 +2174,10 @@ export type Database = {
           _notes?: string
           _to_status: Database["public"]["Enums"]["content_status"]
         }
+        Returns: undefined
+      }
+      withdraw_business_review: {
+        Args: { _business_id: string; _notes?: string }
         Returns: undefined
       }
     }
