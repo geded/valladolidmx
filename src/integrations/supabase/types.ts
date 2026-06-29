@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_profiles: {
+        Row: {
+          active: boolean
+          created_at: string
+          department: string | null
+          id: string
+          permission_level: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          department?: string | null
+          id?: string
+          permission_level?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          department?: string | null
+          id?: string
+          permission_level?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       business_categories: {
         Row: {
           created_at: string
@@ -364,6 +394,47 @@ export type Database = {
           },
         ]
       }
+      business_users: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          invited_by: string | null
+          role: Database["public"]["Enums"]["business_user_role"]
+          status: Database["public"]["Enums"]["membership_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          role?: Database["public"]["Enums"]["business_user_role"]
+          status?: Database["public"]["Enums"]["membership_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          role?: Database["public"]["Enums"]["business_user_role"]
+          status?: Database["public"]["Enums"]["membership_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_users_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       businesses: {
         Row: {
           cover_media_id: string | null
@@ -461,6 +532,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      concierge_profiles: {
+        Row: {
+          active: boolean
+          created_at: string
+          display_name: string | null
+          id: string
+          languages: Json
+          max_active_requests: number
+          specialties: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          languages?: Json
+          max_active_requests?: number
+          specialties?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          languages?: Json
+          max_active_requests?: number
+          specialties?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       countries: {
         Row: {
@@ -650,6 +757,51 @@ export type Database = {
           },
         ]
       }
+      invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          scope_id: string | null
+          scope_type: string | null
+          status: Database["public"]["Enums"]["invitation_status"]
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          invited_by?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          scope_id?: string | null
+          scope_type?: string | null
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          scope_id?: string | null
+          scope_type?: string | null
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       media_assets: {
         Row: {
           alt_text: string | null
@@ -716,6 +868,42 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           width?: number | null
+        }
+        Relationships: []
+      }
+      permissions_audit_log: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          created_at: string
+          id: string
+          metadata: Json
+          role: Database["public"]["Enums"]["app_role"] | null
+          scope_id: string | null
+          scope_type: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          role?: Database["public"]["Enums"]["app_role"] | null
+          scope_id?: string | null
+          scope_type?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          role?: Database["public"]["Enums"]["app_role"] | null
+          scope_id?: string | null
+          scope_type?: string | null
+          target_user_id?: string | null
         }
         Relationships: []
       }
@@ -919,6 +1107,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          country: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          preferred_language: string
+          status: string
+          timezone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          preferred_language?: string
+          status?: string
+          timezone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          preferred_language?: string
+          status?: string
+          timezone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       reviews: {
         Row: {
@@ -1156,14 +1395,118 @@ export type Database = {
         }
         Relationships: []
       }
+      traveler_profiles: {
+        Row: {
+          accessibility_needs: string | null
+          budget_range: string | null
+          created_at: string
+          dietary_restrictions: string | null
+          id: string
+          interests: Json
+          preferred_destinations: Json
+          preferred_language: string | null
+          travel_style: string | null
+          trip_context: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accessibility_needs?: string | null
+          budget_range?: string | null
+          created_at?: string
+          dietary_restrictions?: string | null
+          id?: string
+          interests?: Json
+          preferred_destinations?: Json
+          preferred_language?: string | null
+          travel_style?: string | null
+          trip_context?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accessibility_needs?: string | null
+          budget_range?: string | null
+          created_at?: string
+          dietary_restrictions?: string | null
+          id?: string
+          interests?: Json
+          preferred_destinations?: Json
+          preferred_language?: string | null
+          travel_style?: string | null
+          trip_context?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          scope_id: string | null
+          scope_type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          scope_id?: string | null
+          scope_type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          scope_id?: string | null
+          scope_type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_business_access: {
+        Args: {
+          _business_id: string
+          _min_role?: Database["public"]["Enums"]["business_user_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_concierge: { Args: { _user_id: string }; Returns: boolean }
+      is_concierge_assigned: {
+        Args: { _request_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_editor_or_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
+      app_role:
+        | "traveler"
+        | "business_owner"
+        | "concierge"
+        | "editor"
+        | "admin"
+        | "super_admin"
+      business_user_role: "owner" | "manager" | "editor" | "viewer"
       content_status:
         | "draft"
         | "in_review"
@@ -1186,8 +1529,10 @@ export type Database = {
         | "event"
         | "route"
       hero_palette: "territorio" | "selva" | "cenote" | "atardecer"
+      invitation_status: "pending" | "accepted" | "revoked" | "expired"
       locale_code: "es" | "en" | "fr" | "de" | "it" | "pt"
       media_kind: "image" | "video" | "document" | "audio"
+      membership_status: "active" | "suspended" | "removed"
       product_type:
         | "experiencia"
         | "hotel"
@@ -1324,6 +1669,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: [
+        "traveler",
+        "business_owner",
+        "concierge",
+        "editor",
+        "admin",
+        "super_admin",
+      ],
+      business_user_role: ["owner", "manager", "editor", "viewer"],
       content_status: [
         "draft",
         "in_review",
@@ -1348,8 +1702,10 @@ export const Constants = {
         "route",
       ],
       hero_palette: ["territorio", "selva", "cenote", "atardecer"],
+      invitation_status: ["pending", "accepted", "revoked", "expired"],
       locale_code: ["es", "en", "fr", "de", "it", "pt"],
       media_kind: ["image", "video", "document", "audio"],
+      membership_status: ["active", "suspended", "removed"],
       product_type: [
         "experiencia",
         "hotel",
