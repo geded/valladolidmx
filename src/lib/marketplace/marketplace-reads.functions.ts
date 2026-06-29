@@ -85,9 +85,9 @@ export interface MarketplaceSearchResult {
 }
 
 export interface MarketplaceSearchInput {
-  q?: string;
-  destination_slug?: string;
-  category_slug?: string;
+  q?: string | null;
+  destination_slug?: string | null;
+  category_slug?: string | null;
   price_min?: number | null;
   price_max?: number | null;
   limit?: number;
