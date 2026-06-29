@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider } from "@/i18n/context";
+import { AuthProvider } from "@/hooks/useAuth";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { AluxFloatingTrigger } from "@/components/layout/AluxFloatingTrigger";
@@ -151,6 +152,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
+        <AuthProvider>
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground"
@@ -161,6 +163,7 @@ function RootComponent() {
         <Outlet />
         <SiteFooter />
         <AluxFloatingTrigger />
+        </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>
   );

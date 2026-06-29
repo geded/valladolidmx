@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RestaurantesRouteImport } from './routes/restaurantes'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as HotelesRouteImport } from './routes/hoteles'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
 import { Route as EventosRouteImport } from './routes/eventos'
@@ -24,6 +25,11 @@ import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$d
 const RestaurantesRoute = RestaurantesRouteImport.update({
   id: '/restaurantes',
   path: '/restaurantes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HotelesRoute = HotelesRouteImport.update({
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/eventos': typeof EventosRoute
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/eventos': typeof EventosRoute
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/eventos': typeof EventosRoute
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/reset-password'
     | '/restaurantes'
     | '/oriente-maya/$destino'
     | '/oriente-maya/'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/reset-password'
     | '/restaurantes'
     | '/oriente-maya/$destino'
     | '/oriente-maya'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/reset-password'
     | '/restaurantes'
     | '/oriente-maya/$destino'
     | '/oriente-maya/'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   EventosRoute: typeof EventosRoute
   ExperienciasRoute: typeof ExperienciasRoute
   HotelesRoute: typeof HotelesRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   RestaurantesRoute: typeof RestaurantesRoute
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
@@ -180,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/restaurantes'
       fullPath: '/restaurantes'
       preLoaderRoute: typeof RestaurantesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hoteles': {
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventosRoute: EventosRoute,
   ExperienciasRoute: ExperienciasRoute,
   HotelesRoute: HotelesRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   RestaurantesRoute: RestaurantesRoute,
   OrienteMayaDestinoRoute: OrienteMayaDestinoRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,

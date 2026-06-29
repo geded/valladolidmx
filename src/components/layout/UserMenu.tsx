@@ -7,39 +7,84 @@
  *
  * Dependencias: types/auth, useTranslation.
  */
-import { UserRound } from "lucide-react";
+import { useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { UserRound, LogOut, ChevronDown } from "lucide-react";
 import { useTranslation } from "@/i18n/context";
-import { ROLE_LABELS, type AppRole, type AuthUserShape } from "@/types/auth";
+import { ROLE_LABELS } from "@/types/auth";
+import { useAuth } from "@/hooks/useAuth";
 
-interface Props {
-  user?: AuthUserShape | null;
-  role?: AppRole | null;
-}
-
-export function UserMenu({ user = null, role = null }: Props) {
+export function UserMenu() {
   const { t } = useTranslation();
+  const { authUser, role, signOut, loading } = useAuth();
+  const [open, setOpen] = useState(false);
 
-  if (user && role) {
+  if (loading) {
     return (
-      <button
-        type="button"
-        className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium hover:bg-accent"
-        title={ROLE_LABELS[role]}
+      <span
+        className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground"
+        aria-busy="true"
       >
-        <UserRound className="size-4" aria-hidden />
-        <span className="hidden sm:inline">{user.display_name ?? user.email}</span>
-      </button>
+        <UserRound className="size-4 opacity-60" aria-hidden />
+      </span>
+    );
+  }
+
+  if (authUser) {
+    return (
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          onBlur={() => setTimeout(() => setOpen(false), 120)}
+          className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium hover:bg-accent"
+          title={role ? ROLE_LABELS[role] : undefined}
+          aria-haspopup="menu"
+          aria-expanded={open}
+        >
+          <UserRound className="size-4" aria-hidden />
+          <span className="hidden max-w-[120px] truncate sm:inline">
+            {authUser.display_name ?? authUser.email}
+          </span>
+          <ChevronDown className="size-3 opacity-60" aria-hidden />
+        </button>
+        {open ? (
+          <div
+            role="menu"
+            className="absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border border-border bg-popover shadow-lg"
+          >
+            <div className="border-b border-border px-3 py-2 text-xs text-muted-foreground">
+              <div className="truncate font-medium text-foreground">
+                {authUser.display_name ?? authUser.email}
+              </div>
+              {role ? <div className="mt-0.5">{ROLE_LABELS[role]}</div> : null}
+            </div>
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                void signOut();
+                setOpen(false);
+              }}
+              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-accent"
+            >
+              <LogOut className="size-4" aria-hidden />
+              Cerrar sesión
+            </button>
+          </div>
+        ) : null}
+      </div>
     );
   }
 
   return (
-    <button
-      type="button"
+    <Link
+      to="/auth"
       className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90"
       title={t("nav.sign_in")}
     >
       <UserRound className="size-4" aria-hidden />
       <span>{t("nav.sign_in")}</span>
-    </button>
+    </Link>
   );
 }
