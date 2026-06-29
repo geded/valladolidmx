@@ -238,14 +238,6 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
 
 /* ──────────────────  Transición de estado editorial  ────────────────── */
 
-const ALLOWED_TRANSITIONS: Record<ContentStatus, ContentStatus[]> = {
-  draft: ["in_review", "archived"],
-  in_review: ["approved", "draft", "archived"],
-  approved: ["published", "draft", "archived"],
-  published: ["archived", "draft"],
-  archived: ["draft"],
-};
-
 interface TransitionInput {
   table: string;
   id: string;
@@ -276,10 +268,7 @@ export const transitionEntityStatus = createServerFn({ method: "POST" })
     if (!current) throw new Error("not_found");
 
     const from = current.status as ContentStatus;
-    const allowed = ALLOWED_TRANSITIONS[from] ?? [];
-    if (!allowed.includes(data.to)) {
-      throw new Error(`invalid_transition:${from}->${data.to}`);
-    }
+    assertAllowedTransition(from, data.to);
 
     const patch: Record<string, unknown> = {
       status: data.to,
