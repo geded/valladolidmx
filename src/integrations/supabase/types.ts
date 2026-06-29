@@ -44,6 +44,170 @@ export type Database = {
         }
         Relationships: []
       }
+      articles: {
+        Row: {
+          author_user_id: string | null
+          body: string | null
+          cover_media_id: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          destination_id: string | null
+          excerpt: string | null
+          id: string
+          locale: Database["public"]["Enums"]["locale_code"]
+          metadata: Json
+          published_at: string | null
+          scheduled_at: string | null
+          slug: string
+          status: Database["public"]["Enums"]["content_status"]
+          tags: string[]
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          author_user_id?: string | null
+          body?: string | null
+          cover_media_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          destination_id?: string | null
+          excerpt?: string | null
+          id?: string
+          locale?: Database["public"]["Enums"]["locale_code"]
+          metadata?: Json
+          published_at?: string | null
+          scheduled_at?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["content_status"]
+          tags?: string[]
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          author_user_id?: string | null
+          body?: string | null
+          cover_media_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          destination_id?: string | null
+          excerpt?: string | null
+          id?: string
+          locale?: Database["public"]["Enums"]["locale_code"]
+          metadata?: Json
+          published_at?: string | null
+          scheduled_at?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["content_status"]
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articles_cover_media_id_fkey"
+            columns: ["cover_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articles_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      banners: {
+        Row: {
+          cover_media_id: string | null
+          created_at: string
+          created_by: string | null
+          cta_label: string | null
+          cta_url: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          ends_at: string | null
+          id: string
+          locale: Database["public"]["Enums"]["locale_code"]
+          palette: Database["public"]["Enums"]["hero_palette"] | null
+          placement: string
+          position: number
+          published_at: string | null
+          slug: string
+          starts_at: string | null
+          status: Database["public"]["Enums"]["content_status"]
+          subtitle: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          cover_media_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          cta_label?: string | null
+          cta_url?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          ends_at?: string | null
+          id?: string
+          locale?: Database["public"]["Enums"]["locale_code"]
+          palette?: Database["public"]["Enums"]["hero_palette"] | null
+          placement?: string
+          position?: number
+          published_at?: string | null
+          slug: string
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["content_status"]
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          cover_media_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          cta_label?: string | null
+          cta_url?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          ends_at?: string | null
+          id?: string
+          locale?: Database["public"]["Enums"]["locale_code"]
+          palette?: Database["public"]["Enums"]["hero_palette"] | null
+          placement?: string
+          position?: number
+          published_at?: string | null
+          slug?: string
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["content_status"]
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banners_cover_media_id_fkey"
+            columns: ["cover_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_categories: {
         Row: {
           created_at: string
@@ -569,6 +733,45 @@ export type Database = {
         }
         Relationships: []
       }
+      content_audit_log: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          created_at: string
+          entity_id: string
+          entity_kind: Database["public"]["Enums"]["entity_kind"]
+          from_status: Database["public"]["Enums"]["content_status"] | null
+          id: string
+          metadata: Json
+          notes: string | null
+          to_status: Database["public"]["Enums"]["content_status"] | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          created_at?: string
+          entity_id: string
+          entity_kind: Database["public"]["Enums"]["entity_kind"]
+          from_status?: Database["public"]["Enums"]["content_status"] | null
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          to_status?: Database["public"]["Enums"]["content_status"] | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_kind?: Database["public"]["Enums"]["entity_kind"]
+          from_status?: Database["public"]["Enums"]["content_status"] | null
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          to_status?: Database["public"]["Enums"]["content_status"] | null
+        }
+        Relationships: []
+      }
       countries: {
         Row: {
           created_at: string
@@ -757,6 +960,231 @@ export type Database = {
           },
         ]
       }
+      editorial_routes: {
+        Row: {
+          body: string | null
+          cover_media_id: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          destination_ids: string[]
+          duration_days: number
+          id: string
+          locale: Database["public"]["Enums"]["locale_code"]
+          name: string
+          palette: Database["public"]["Enums"]["hero_palette"] | null
+          published_at: string | null
+          slug: string
+          status: Database["public"]["Enums"]["content_status"]
+          summary: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          body?: string | null
+          cover_media_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          destination_ids?: string[]
+          duration_days?: number
+          id?: string
+          locale?: Database["public"]["Enums"]["locale_code"]
+          name: string
+          palette?: Database["public"]["Enums"]["hero_palette"] | null
+          published_at?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["content_status"]
+          summary?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          body?: string | null
+          cover_media_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          destination_ids?: string[]
+          duration_days?: number
+          id?: string
+          locale?: Database["public"]["Enums"]["locale_code"]
+          name?: string
+          palette?: Database["public"]["Enums"]["hero_palette"] | null
+          published_at?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["content_status"]
+          summary?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editorial_routes_cover_media_id_fkey"
+            columns: ["cover_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          body: string | null
+          business_id: string | null
+          cover_media_id: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          destination_id: string | null
+          ends_at: string | null
+          external_url: string | null
+          id: string
+          is_free: boolean
+          locale: Database["public"]["Enums"]["locale_code"]
+          published_at: string | null
+          slug: string
+          starts_at: string
+          status: Database["public"]["Enums"]["content_status"]
+          summary: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+          venue_name: string | null
+        }
+        Insert: {
+          body?: string | null
+          business_id?: string | null
+          cover_media_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          destination_id?: string | null
+          ends_at?: string | null
+          external_url?: string | null
+          id?: string
+          is_free?: boolean
+          locale?: Database["public"]["Enums"]["locale_code"]
+          published_at?: string | null
+          slug: string
+          starts_at: string
+          status?: Database["public"]["Enums"]["content_status"]
+          summary?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          venue_name?: string | null
+        }
+        Update: {
+          body?: string | null
+          business_id?: string | null
+          cover_media_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          destination_id?: string | null
+          ends_at?: string | null
+          external_url?: string | null
+          id?: string
+          is_free?: boolean
+          locale?: Database["public"]["Enums"]["locale_code"]
+          published_at?: string | null
+          slug?: string
+          starts_at?: string
+          status?: Database["public"]["Enums"]["content_status"]
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          venue_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_cover_media_id_fkey"
+            columns: ["cover_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      faqs: {
+        Row: {
+          answer: string
+          category: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          entity_id: string | null
+          entity_kind: Database["public"]["Enums"]["entity_kind"] | null
+          id: string
+          locale: Database["public"]["Enums"]["locale_code"]
+          position: number
+          published_at: string | null
+          question: string
+          status: Database["public"]["Enums"]["content_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          answer: string
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          entity_id?: string | null
+          entity_kind?: Database["public"]["Enums"]["entity_kind"] | null
+          id?: string
+          locale?: Database["public"]["Enums"]["locale_code"]
+          position?: number
+          published_at?: string | null
+          question: string
+          status?: Database["public"]["Enums"]["content_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          answer?: string
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          entity_id?: string | null
+          entity_kind?: Database["public"]["Enums"]["entity_kind"] | null
+          id?: string
+          locale?: Database["public"]["Enums"]["locale_code"]
+          position?: number
+          published_at?: string | null
+          question?: string
+          status?: Database["public"]["Enums"]["content_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       invitations: {
         Row: {
           accepted_at: string | null
@@ -870,6 +1298,71 @@ export type Database = {
           width?: number | null
         }
         Relationships: []
+      }
+      pages: {
+        Row: {
+          blocks: Json
+          body: string | null
+          cover_media_id: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          is_system: boolean
+          locale: Database["public"]["Enums"]["locale_code"]
+          published_at: string | null
+          slug: string
+          status: Database["public"]["Enums"]["content_status"]
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          blocks?: Json
+          body?: string | null
+          cover_media_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          is_system?: boolean
+          locale?: Database["public"]["Enums"]["locale_code"]
+          published_at?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["content_status"]
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          blocks?: Json
+          body?: string | null
+          cover_media_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          is_system?: boolean
+          locale?: Database["public"]["Enums"]["locale_code"]
+          published_at?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["content_status"]
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pages_cover_media_id_fkey"
+            columns: ["cover_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       permissions_audit_log: {
         Row: {
@@ -1159,6 +1652,97 @@ export type Database = {
         }
         Relationships: []
       }
+      promotions: {
+        Row: {
+          business_id: string | null
+          cover_media_id: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          description: string | null
+          discount_percent: number | null
+          ends_at: string | null
+          id: string
+          locale: Database["public"]["Enums"]["locale_code"]
+          product_id: string | null
+          published_at: string | null
+          slug: string
+          starts_at: string | null
+          status: Database["public"]["Enums"]["content_status"]
+          terms: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          business_id?: string | null
+          cover_media_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string | null
+          discount_percent?: number | null
+          ends_at?: string | null
+          id?: string
+          locale?: Database["public"]["Enums"]["locale_code"]
+          product_id?: string | null
+          published_at?: string | null
+          slug: string
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["content_status"]
+          terms?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          business_id?: string | null
+          cover_media_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string | null
+          discount_percent?: number | null
+          ends_at?: string | null
+          id?: string
+          locale?: Database["public"]["Enums"]["locale_code"]
+          product_id?: string | null
+          published_at?: string | null
+          slug?: string
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["content_status"]
+          terms?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promotions_cover_media_id_fkey"
+            columns: ["cover_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promotions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           author_display_name: string | null
@@ -1221,6 +1805,86 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: []
+      }
+      seo_metadata: {
+        Row: {
+          canonical_url: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          entity_id: string
+          entity_kind: Database["public"]["Enums"]["entity_kind"]
+          id: string
+          json_ld: Json | null
+          locale: Database["public"]["Enums"]["locale_code"]
+          meta_description: string | null
+          meta_title: string | null
+          noindex: boolean
+          og_description: string | null
+          og_image_media_id: string | null
+          og_image_url: string | null
+          og_title: string | null
+          slug: string | null
+          twitter_card: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          canonical_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          entity_id: string
+          entity_kind: Database["public"]["Enums"]["entity_kind"]
+          id?: string
+          json_ld?: Json | null
+          locale?: Database["public"]["Enums"]["locale_code"]
+          meta_description?: string | null
+          meta_title?: string | null
+          noindex?: boolean
+          og_description?: string | null
+          og_image_media_id?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
+          slug?: string | null
+          twitter_card?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          canonical_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          entity_id?: string
+          entity_kind?: Database["public"]["Enums"]["entity_kind"]
+          id?: string
+          json_ld?: Json | null
+          locale?: Database["public"]["Enums"]["locale_code"]
+          meta_description?: string | null
+          meta_title?: string | null
+          noindex?: boolean
+          og_description?: string | null
+          og_image_media_id?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
+          slug?: string | null
+          twitter_card?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seo_metadata_og_image_media_id_fkey"
+            columns: ["og_image_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       states: {
         Row: {
@@ -1497,6 +2161,15 @@ export type Database = {
         Returns: boolean
       }
       is_editor_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      transition_content_status: {
+        Args: {
+          _entity_id: string
+          _entity_kind: Database["public"]["Enums"]["entity_kind"]
+          _notes?: string
+          _to_status: Database["public"]["Enums"]["content_status"]
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role:
@@ -1528,6 +2201,9 @@ export type Database = {
         | "page"
         | "event"
         | "route"
+        | "faq"
+        | "banner"
+        | "promotion"
       hero_palette: "territorio" | "selva" | "cenote" | "atardecer"
       invitation_status: "pending" | "accepted" | "revoked" | "expired"
       locale_code: "es" | "en" | "fr" | "de" | "it" | "pt"
@@ -1700,6 +2376,9 @@ export const Constants = {
         "page",
         "event",
         "route",
+        "faq",
+        "banner",
+        "promotion",
       ],
       hero_palette: ["territorio", "selva", "cenote", "atardecer"],
       invitation_status: ["pending", "accepted", "revoked", "expired"],
