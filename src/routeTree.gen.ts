@@ -21,6 +21,7 @@ import { Route as AluxRouteImport } from './routes/alux'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
+import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index'
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
 import { Route as AuthenticatedCmsRouteImport } from './routes/_authenticated/cms'
 import { Route as AuthenticatedPortalRouteRouteImport } from './routes/_authenticated/portal/route'
@@ -103,6 +104,11 @@ const IndexRoute = IndexRouteImport.update({
 const OrienteMayaIndexRoute = OrienteMayaIndexRouteImport.update({
   id: '/oriente-maya/',
   path: '/oriente-maya/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
+  id: '/marketplace/',
+  path: '/marketplace/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrienteMayaDestinoRoute = OrienteMayaDestinoRouteImport.update({
@@ -259,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/cms': typeof AuthenticatedCmsRouteWithChildren
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
@@ -294,6 +301,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/marketplace': typeof MarketplaceIndexRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
@@ -333,6 +341,7 @@ export interface FileRoutesById {
   '/_authenticated/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/_authenticated/cms': typeof AuthenticatedCmsRouteWithChildren
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/_authenticated/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/_authenticated/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
@@ -372,6 +381,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/cms'
     | '/oriente-maya/$destino'
+    | '/marketplace/'
     | '/oriente-maya/'
     | '/cms/destinos'
     | '/cms/empresas'
@@ -407,6 +417,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/restaurantes'
     | '/oriente-maya/$destino'
+    | '/marketplace'
     | '/oriente-maya'
     | '/cms/destinos'
     | '/cms/empresas'
@@ -445,6 +456,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal'
     | '/_authenticated/cms'
     | '/oriente-maya/$destino'
+    | '/marketplace/'
     | '/oriente-maya/'
     | '/_authenticated/cms/destinos'
     | '/_authenticated/cms/empresas'
@@ -482,6 +494,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   RestaurantesRoute: typeof RestaurantesRoute
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRoute
+  MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
 }
 
@@ -569,6 +582,13 @@ declare module '@tanstack/react-router' {
       path: '/oriente-maya'
       fullPath: '/oriente-maya/'
       preLoaderRoute: typeof OrienteMayaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/': {
+      id: '/marketplace/'
+      path: '/marketplace'
+      fullPath: '/marketplace/'
+      preLoaderRoute: typeof MarketplaceIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/oriente-maya/$destino': {
@@ -834,6 +854,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   RestaurantesRoute: RestaurantesRoute,
   OrienteMayaDestinoRoute: OrienteMayaDestinoRoute,
+  MarketplaceIndexRoute: MarketplaceIndexRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
 }
 export const routeTree = rootRouteImport
