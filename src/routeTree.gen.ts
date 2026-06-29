@@ -36,6 +36,7 @@ import { Route as AuthenticatedCmsRegionesNuevaRouteImport } from './routes/_aut
 import { Route as AuthenticatedCmsRegionesEditarRouteImport } from './routes/_authenticated/cms/regiones..editar'
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
 import { Route as AuthenticatedCmsCategoriasEditarRouteImport } from './routes/_authenticated/cms/categorias..editar'
+import { Route as AuthenticatedCmsReviewsIdModerarRouteImport } from './routes/_authenticated/cms/reviews.$id.moderar'
 
 const RestaurantesRoute = RestaurantesRouteImport.update({
   id: '/restaurantes',
@@ -181,6 +182,12 @@ const AuthenticatedCmsCategoriasEditarRoute =
     path: '/categorias/editar',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsReviewsIdModerarRoute =
+  AuthenticatedCmsReviewsIdModerarRouteImport.update({
+    id: '/reviews/$id/moderar',
+    path: '/reviews/$id/moderar',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
+  '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -236,6 +244,7 @@ export interface FileRoutesByTo {
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews': typeof AuthenticatedCmsReviewsIndexRoute
+  '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -266,6 +275,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/_authenticated/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/_authenticated/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
+  '/_authenticated/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/cms/categorias/'
     | '/cms/regiones/'
     | '/cms/reviews/'
+    | '/cms/reviews/$id/moderar'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -323,6 +334,7 @@ export interface FileRouteTypes {
     | '/cms/categorias'
     | '/cms/regiones'
     | '/cms/reviews'
+    | '/cms/reviews/$id/moderar'
   id:
     | '__root__'
     | '/'
@@ -352,6 +364,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/categorias/'
     | '/_authenticated/cms/regiones/'
     | '/_authenticated/cms/reviews/'
+    | '/_authenticated/cms/reviews/$id/moderar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -561,6 +574,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsCategoriasEditarRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/reviews/$id/moderar': {
+      id: '/_authenticated/cms/reviews/$id/moderar'
+      path: '/reviews/$id/moderar'
+      fullPath: '/cms/reviews/$id/moderar'
+      preLoaderRoute: typeof AuthenticatedCmsReviewsIdModerarRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
   }
 }
 
@@ -578,6 +598,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsCategoriasIndexRoute: typeof AuthenticatedCmsCategoriasIndexRoute
   AuthenticatedCmsRegionesIndexRoute: typeof AuthenticatedCmsRegionesIndexRoute
   AuthenticatedCmsReviewsIndexRoute: typeof AuthenticatedCmsReviewsIndexRoute
+  AuthenticatedCmsReviewsIdModerarRoute: typeof AuthenticatedCmsReviewsIdModerarRoute
 }
 
 const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
@@ -594,6 +615,7 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsCategoriasIndexRoute: AuthenticatedCmsCategoriasIndexRoute,
   AuthenticatedCmsRegionesIndexRoute: AuthenticatedCmsRegionesIndexRoute,
   AuthenticatedCmsReviewsIndexRoute: AuthenticatedCmsReviewsIndexRoute,
+  AuthenticatedCmsReviewsIdModerarRoute: AuthenticatedCmsReviewsIdModerarRoute,
 }
 
 const AuthenticatedCmsRouteWithChildren =
