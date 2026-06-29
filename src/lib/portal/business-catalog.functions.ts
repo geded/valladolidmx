@@ -67,7 +67,7 @@ export const listBusinessProducts = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }): Promise<PortalProduct[]> => {
     const { supabase, userId } = context;
-    const { data: ok } = await supabase.rpc("has_business_access", {
+    const { data: ok } = await (supabase.rpc as any)("has_business_access", {
       _user_id: userId,
       _business_id: data.businessId,
       _min_role: "viewer",
@@ -93,7 +93,7 @@ export const listBusinessPromotions = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }): Promise<PortalPromotion[]> => {
     const { supabase, userId } = context;
-    const { data: ok } = await supabase.rpc("has_business_access", {
+    const { data: ok } = await (supabase.rpc as any)("has_business_access", {
       _user_id: userId,
       _business_id: data.businessId,
       _min_role: "viewer",
@@ -157,7 +157,7 @@ export const createBusinessProduct = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }): Promise<{ id: string }> => {
     const { supabase } = context;
-    const { data: id, error } = await supabase.rpc("create_business_product", {
+    const { data: id, error } = await (supabase.rpc as any)("create_business_product", {
       _business_id: data.businessId,
       _name: data.name,
       _slug: data.slug,
@@ -196,7 +196,7 @@ export const updateBusinessProduct = createServerFn({ method: "POST" })
     },
   )
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc("update_business_product", {
+    const { error } = await (context.supabase.rpc as any)("update_business_product", {
       _product_id: data.productId,
       _name: data.name ?? null,
       _tagline: data.tagline ?? null,
@@ -218,7 +218,7 @@ export const archiveBusinessProduct = createServerFn({ method: "POST" })
     return data;
   })
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc("archive_business_product", {
+    const { error } = await (context.supabase.rpc as any)("archive_business_product", {
       _product_id: data.productId,
     });
     if (error) throw new Error(error.message);
@@ -232,7 +232,7 @@ export const requestProductReview = createServerFn({ method: "POST" })
     return data;
   })
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc("request_product_review", {
+    const { error } = await (context.supabase.rpc as any)("request_product_review", {
       _product_id: data.productId,
       _notes: data.notes ?? null,
     });
@@ -247,7 +247,7 @@ export const withdrawProductReview = createServerFn({ method: "POST" })
     return data;
   })
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc("withdraw_product_review", {
+    const { error } = await (context.supabase.rpc as any)("withdraw_product_review", {
       _product_id: data.productId,
       _notes: data.notes ?? null,
     });
@@ -290,7 +290,7 @@ export const createBusinessPromotion = createServerFn({ method: "POST" })
     },
   )
   .handler(async ({ data, context }): Promise<{ id: string }> => {
-    const { data: id, error } = await context.supabase.rpc(
+    const { data: id, error } = await (context.supabase.rpc as any)(
       "create_business_promotion",
       {
         _business_id: data.businessId,
@@ -334,7 +334,7 @@ export const updateBusinessPromotion = createServerFn({ method: "POST" })
     },
   )
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc("update_business_promotion", {
+    const { error } = await (context.supabase.rpc as any)("update_business_promotion", {
       _promotion_id: data.promotionId,
       _title: data.title ?? null,
       _description: data.description ?? null,
@@ -356,7 +356,7 @@ export const archiveBusinessPromotion = createServerFn({ method: "POST" })
     return data;
   })
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc("archive_business_promotion", {
+    const { error } = await (context.supabase.rpc as any)("archive_business_promotion", {
       _promotion_id: data.promotionId,
     });
     if (error) throw new Error(error.message);
@@ -370,7 +370,7 @@ export const requestPromotionReview = createServerFn({ method: "POST" })
     return data;
   })
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc("request_promotion_review", {
+    const { error } = await (context.supabase.rpc as any)("request_promotion_review", {
       _promotion_id: data.promotionId,
       _notes: data.notes ?? null,
     });
@@ -385,7 +385,7 @@ export const withdrawPromotionReview = createServerFn({ method: "POST" })
     return data;
   })
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc("withdraw_promotion_review", {
+    const { error } = await (context.supabase.rpc as any)("withdraw_promotion_review", {
       _promotion_id: data.promotionId,
       _notes: data.notes ?? null,
     });
