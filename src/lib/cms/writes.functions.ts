@@ -18,7 +18,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
-  ALLOWED_TRANSITIONS,
   assertAllowedTransition,
   type ContentStatus,
 } from "@/lib/cms/workflow";
