@@ -237,15 +237,23 @@ export const searchMarketplace = createServerFn({ method: "GET" })
   })
   .handler(async ({ data }): Promise<MarketplaceSearchResult> => {
     const supabase = publicClient();
-    const { data: rows, error } = await supabase.rpc("search_marketplace", {
-      p_q: data.q,
-      p_destination_slug: data.destination_slug,
-      p_category_slug: data.category_slug,
-      p_price_min: data.price_min,
-      p_price_max: data.price_max,
-      p_limit: data.limit,
-      p_offset: data.offset,
-    });
+    // El tipo generado puede no haberse regenerado tras la migración;
+    // se llama vía cast acotado y se valida la forma del resultado.
+    const { data: rows, error } = await (supabase.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: { message: string } | null }>)(
+      "search_marketplace",
+      {
+        p_q: data.q,
+        p_destination_slug: data.destination_slug,
+        p_category_slug: data.category_slug,
+        p_price_min: data.price_min,
+        p_price_max: data.price_max,
+        p_limit: data.limit,
+        p_offset: data.offset,
+      },
+    );
     if (error) throw new Error(`marketplace_search_failed: ${error.message}`);
     const list = (rows ?? []) as Array<Record<string, unknown>>;
     const total = list.length > 0 ? Number(list[0].total_count ?? 0) : 0;
