@@ -2162,6 +2162,10 @@ export type Database = {
         Returns: boolean
       }
       is_editor_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      log_business_presence_audit: {
+        Args: { _action: string; _business_id: string; _notes?: string }
+        Returns: undefined
+      }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
       request_business_review: {
         Args: { _business_id: string; _notes?: string }
