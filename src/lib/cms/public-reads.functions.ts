@@ -112,3 +112,56 @@ export const listPublishedDestinations = createServerFn({ method: "GET" }).handl
     });
   },
 );
+
+/**
+ * listPublishedRoutes — Devuelve las rutas editoriales publicadas y
+ * resuelve cada `destination_ids[]` a slugs reales mediante un segundo
+ * lookup contra `destinations`. Cliente publishable; RLS aplica como anon
+ * (editorial_routes_public_read + destinations_public_read).
+ */
+export const listPublishedRoutes = createServerFn({ method: "GET" }).handler(
+  async (): Promise<SuggestedRoute[]> => {
+    const supabase = publicClient();
+    const { data: routes, error } = await supabase
+      .from("editorial_routes")
+      .select("id, slug, name, summary, duration_days, palette, destination_ids, status, deleted_at, published_at")
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .order("published_at", { ascending: true })
+      .limit(24);
+    if (error) throw new Error(`routes_read_failed: ${error.message}`);
+
+    const allIds = Array.from(
+      new Set((routes ?? []).flatMap((r) => (r.destination_ids ?? []) as string[])),
+    );
+    const idToSlug = new Map<string, string>();
+    if (allIds.length > 0) {
+      const { data: dests, error: destErr } = await supabase
+        .from("destinations")
+        .select("id, slug, status, deleted_at")
+        .in("id", allIds)
+        .eq("status", "published")
+        .is("deleted_at", null);
+      if (destErr) throw new Error(`routes_destinations_read_failed: ${destErr.message}`);
+      for (const d of dests ?? []) idToSlug.set(d.id, d.slug);
+    }
+
+    return (routes ?? []).map((row) => {
+      const palette = ALLOWED_HERO_PALETTES.has(row.palette ?? "")
+        ? (row.palette as SuggestedRoute["palette"])
+        : "territorio";
+      const destination_slugs = ((row.destination_ids ?? []) as string[])
+        .map((id) => idToSlug.get(id))
+        .filter((s): s is string => typeof s === "string");
+      return {
+        id: row.id,
+        slug: row.slug,
+        name: row.name,
+        duration_days: row.duration_days,
+        summary: row.summary ?? "",
+        destination_slugs,
+        palette,
+      };
+    });
+  },
+);
