@@ -2139,6 +2139,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_business_invitation: { Args: { _token: string }; Returns: Json }
       has_business_access: {
         Args: {
           _business_id: string
@@ -2161,6 +2162,7 @@ export type Database = {
         Returns: boolean
       }
       is_editor_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      preview_business_invitation: { Args: { _token: string }; Returns: Json }
       transition_content_status: {
         Args: {
           _entity_id: string
