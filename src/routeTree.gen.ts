@@ -35,6 +35,7 @@ import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './rout
 import { Route as AuthenticatedCmsReviewsIndexRouteImport } from './routes/_authenticated/cms/reviews.index'
 import { Route as AuthenticatedCmsRegionesIndexRouteImport } from './routes/_authenticated/cms/regiones.index'
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
+import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
 import { Route as AuthenticatedCmsRegionesNuevaRouteImport } from './routes/_authenticated/cms/regiones.nueva'
 import { Route as AuthenticatedCmsRegionesEditarRouteImport } from './routes/_authenticated/cms/regiones..editar'
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
@@ -179,6 +180,12 @@ const AuthenticatedCmsCategoriasIndexRoute =
     path: '/categorias/',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedPortalInvitacionesTokenRoute =
+  AuthenticatedPortalInvitacionesTokenRouteImport.update({
+    id: '/invitaciones/$token',
+    path: '/invitaciones/$token',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
 const AuthenticatedCmsRegionesNuevaRoute =
   AuthenticatedCmsRegionesNuevaRouteImport.update({
     id: '/regiones/nueva',
@@ -236,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
+  '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
@@ -266,6 +274,7 @@ export interface FileRoutesByTo {
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
+  '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews': typeof AuthenticatedCmsReviewsIndexRoute
@@ -300,6 +309,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/_authenticated/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/_authenticated/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
+  '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/_authenticated/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/_authenticated/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
@@ -334,6 +344,7 @@ export interface FileRouteTypes {
     | '/cms/categorias/nueva'
     | '/cms/regiones/editar'
     | '/cms/regiones/nueva'
+    | '/portal/invitaciones/$token'
     | '/cms/categorias/'
     | '/cms/regiones/'
     | '/cms/reviews/'
@@ -364,6 +375,7 @@ export interface FileRouteTypes {
     | '/cms/categorias/nueva'
     | '/cms/regiones/editar'
     | '/cms/regiones/nueva'
+    | '/portal/invitaciones/$token'
     | '/cms/categorias'
     | '/cms/regiones'
     | '/cms/reviews'
@@ -397,6 +409,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/categorias/nueva'
     | '/_authenticated/cms/regiones/editar'
     | '/_authenticated/cms/regiones/nueva'
+    | '/_authenticated/portal/invitaciones/$token'
     | '/_authenticated/cms/categorias/'
     | '/_authenticated/cms/regiones/'
     | '/_authenticated/cms/reviews/'
@@ -604,6 +617,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsCategoriasIndexRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/portal/invitaciones/$token': {
+      id: '/_authenticated/portal/invitaciones/$token'
+      path: '/invitaciones/$token'
+      fullPath: '/portal/invitaciones/$token'
+      preLoaderRoute: typeof AuthenticatedPortalInvitacionesTokenRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
     '/_authenticated/cms/regiones/nueva': {
       id: '/_authenticated/cms/regiones/nueva'
       path: '/regiones/nueva'
@@ -644,12 +664,15 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
+  AuthenticatedPortalInvitacionesTokenRoute: typeof AuthenticatedPortalInvitacionesTokenRoute
   AuthenticatedPortalInvitacionesIndexRoute: typeof AuthenticatedPortalInvitacionesIndexRoute
 }
 
 const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildren =
   {
     AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
+    AuthenticatedPortalInvitacionesTokenRoute:
+      AuthenticatedPortalInvitacionesTokenRoute,
     AuthenticatedPortalInvitacionesIndexRoute:
       AuthenticatedPortalInvitacionesIndexRoute,
   }
