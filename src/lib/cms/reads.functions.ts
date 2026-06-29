@@ -27,13 +27,9 @@ function normalizeInput(data: ListInput | undefined): Required<ListInput> {
   return { limit, offset, search };
 }
 
-async function assertEditorial(context: {
-  supabase: ReturnType<typeof Object>;
-  userId: string;
-}) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = context.supabase as any;
-  const { data, error } = await sb.rpc("is_editor_or_admin", {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function assertEditorial(context: { supabase: any; userId: string }) {
+  const { data, error } = await context.supabase.rpc("is_editor_or_admin", {
     _user_id: context.userId,
   });
   if (error) throw new Error(`role_check_failed: ${error.message}`);
