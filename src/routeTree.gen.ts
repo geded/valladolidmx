@@ -26,6 +26,7 @@ import { Route as AuthenticatedCmsRouteImport } from './routes/_authenticated/cm
 import { Route as AuthenticatedPortalRouteRouteImport } from './routes/_authenticated/portal/route'
 import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal/index'
 import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticated/cms/index'
+import { Route as AuthenticatedPortalFichaRouteImport } from './routes/_authenticated/portal/ficha'
 import { Route as AuthenticatedCmsZonasRouteImport } from './routes/_authenticated/cms/zonas'
 import { Route as AuthenticatedCmsProductosRouteImport } from './routes/_authenticated/cms/productos'
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
@@ -128,6 +129,12 @@ const AuthenticatedCmsIndexRoute = AuthenticatedCmsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedCmsRoute,
 } as any)
+const AuthenticatedPortalFichaRoute =
+  AuthenticatedPortalFichaRouteImport.update({
+    id: '/ficha',
+    path: '/ficha',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
 const AuthenticatedCmsZonasRoute = AuthenticatedCmsZonasRouteImport.update({
   id: '/zonas',
   path: '/zonas',
@@ -237,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/cms/': typeof AuthenticatedCmsIndexRoute
   '/portal/': typeof AuthenticatedPortalIndexRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
@@ -268,6 +276,7 @@ export interface FileRoutesByTo {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/cms': typeof AuthenticatedCmsIndexRoute
   '/portal': typeof AuthenticatedPortalIndexRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
@@ -303,6 +312,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/_authenticated/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/_authenticated/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
   '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
   '/_authenticated/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | '/cms/media'
     | '/cms/productos'
     | '/cms/zonas'
+    | '/portal/ficha'
     | '/cms/'
     | '/portal/'
     | '/cms/categorias/editar'
@@ -369,6 +380,7 @@ export interface FileRouteTypes {
     | '/cms/media'
     | '/cms/productos'
     | '/cms/zonas'
+    | '/portal/ficha'
     | '/cms'
     | '/portal'
     | '/cms/categorias/editar'
@@ -403,6 +415,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/media'
     | '/_authenticated/cms/productos'
     | '/_authenticated/cms/zonas'
+    | '/_authenticated/portal/ficha'
     | '/_authenticated/cms/'
     | '/_authenticated/portal/'
     | '/_authenticated/cms/categorias/editar'
@@ -554,6 +567,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsIndexRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/portal/ficha': {
+      id: '/_authenticated/portal/ficha'
+      path: '/ficha'
+      fullPath: '/portal/ficha'
+      preLoaderRoute: typeof AuthenticatedPortalFichaRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
     '/_authenticated/cms/zonas': {
       id: '/_authenticated/cms/zonas'
       path: '/zonas'
@@ -663,6 +683,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedPortalRouteRouteChildren {
+  AuthenticatedPortalFichaRoute: typeof AuthenticatedPortalFichaRoute
   AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
   AuthenticatedPortalInvitacionesTokenRoute: typeof AuthenticatedPortalInvitacionesTokenRoute
   AuthenticatedPortalInvitacionesIndexRoute: typeof AuthenticatedPortalInvitacionesIndexRoute
@@ -670,6 +691,7 @@ interface AuthenticatedPortalRouteRouteChildren {
 
 const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildren =
   {
+    AuthenticatedPortalFichaRoute: AuthenticatedPortalFichaRoute,
     AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
     AuthenticatedPortalInvitacionesTokenRoute:
       AuthenticatedPortalInvitacionesTokenRoute,
