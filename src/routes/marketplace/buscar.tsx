@@ -83,12 +83,12 @@ export const Route = createFileRoute("/marketplace/buscar")({
   }),
   component: MarketplaceSearchPage,
   errorComponent: ({ error }) => (
-    <PageShell title="Búsqueda no disponible" crumbs={[{ label: "Marketplace", href: "/marketplace" }, { label: "Buscar" }]}>
+    <PageShell title="Búsqueda no disponible" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}>
       <p className="text-sm text-muted-foreground">{String(error.message)}</p>
     </PageShell>
   ),
   notFoundComponent: () => (
-    <PageShell title="Sin resultados" crumbs={[{ label: "Marketplace", href: "/marketplace" }, { label: "Buscar" }]}>
+    <PageShell title="Sin resultados" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}>
       <p className="text-sm text-muted-foreground">No encontramos coincidencias.</p>
     </PageShell>
   ),
@@ -104,7 +104,7 @@ function MarketplaceSearchPage() {
       eyebrow="Marketplace"
       title="Buscar en el catálogo"
       description="Productos, experiencias y promociones publicadas."
-      crumbs={[{ label: "Marketplace", href: "/marketplace" }, { label: "Buscar" }]}
+      crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}
     >
       <form method="get" className="grid gap-3 rounded-2xl border border-border bg-card p-4 md:grid-cols-5">
         <label className="flex flex-col gap-1 text-xs md:col-span-2">
@@ -179,7 +179,7 @@ function MarketplaceSearchPage() {
         </p>
       ) : (
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {result.items.map((hit) => (
+          {result.items.map((hit: MarketplaceSearchHit) => (
             <SearchHitCard key={hit.product_id} hit={hit} />
           ))}
         </ul>
