@@ -13,7 +13,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { Destination } from "@/types/territory";
-import type { SuggestedRoute, BusinessTeaser } from "@/types/entities";
+import type { SuggestedRoute, BusinessTeaser, Review } from "@/types/entities";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -65,6 +65,39 @@ export const listHomeFeaturedCategories = createServerFn({ method: "GET" }).hand
         description: row.description ?? "",
         icon: row.icon ?? "Sparkles",
         palette,
+      };
+    });
+  },
+);
+
+/**
+ * listFeaturedReviews — Devuelve reseñas publicadas marcadas con
+ * `metadata.home_featured = true` para la sección "Reseñas" del home.
+ * Cliente publishable; RLS aplica como anon (reviews_public_read).
+ */
+export const listFeaturedReviews = createServerFn({ method: "GET" }).handler(
+  async (): Promise<Review[]> => {
+    const supabase = publicClient();
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("id, author_display_name, rating, body, language, published_at, created_at, metadata, status, deleted_at")
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .filter("metadata->>home_featured", "eq", "true")
+      .order("published_at", { ascending: false })
+      .limit(12);
+    if (error) throw new Error(`reviews_read_failed: ${error.message}`);
+    return (data ?? []).map((row) => {
+      const metadata = (row.metadata ?? {}) as Record<string, unknown>;
+      const origin = typeof metadata.author_origin === "string" ? metadata.author_origin : "";
+      return {
+        id: row.id,
+        author_name: row.author_display_name ?? "Anónimo",
+        author_origin: origin,
+        rating: row.rating,
+        body: row.body ?? "",
+        locale: row.language,
+        created_at: row.published_at ?? row.created_at,
       };
     });
   },
