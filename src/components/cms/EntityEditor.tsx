@@ -70,9 +70,11 @@ export function EntityEditor(props: Props) {
 
   const isEdit = Boolean(id);
 
-  const detail = useQuery<Record<string, unknown>>({
+  type DetailRow = Record<string, string | number | boolean | null>;
+  const detail = useQuery({
     queryKey: ["cms", listQueryKey, "detail", id],
-    queryFn: () => fetchById({ data: { table, id: id! } }),
+    queryFn: (): Promise<DetailRow> =>
+      fetchById({ data: { table, id: id! } }) as Promise<DetailRow>,
     enabled: isEdit,
   });
 
@@ -96,7 +98,8 @@ export function EntityEditor(props: Props) {
     }
   }, [detail.data, fields, initialValues]);
 
-  const status = (detail.data?.status as ContentStatus | undefined) ?? "draft";
+  const status =
+    ((detail.data?.status as unknown) as ContentStatus | undefined) ?? "draft";
 
   const saveMutation = useMutation({
     mutationFn: async () => {
