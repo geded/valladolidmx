@@ -114,8 +114,11 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
     assertEditableTable(data.table);
     const clean = sanitizePayload(data.table, data.payload);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = context.supabase as any;
+
     if (data.id) {
-      const { data: row, error } = await context.supabase
+      const { data: row, error } = await db
         .from(data.table)
         .update({ ...clean, updated_by: context.userId })
         .eq("id", data.id)
@@ -126,7 +129,7 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
       return { id: row.id as string, mode: "update" as const };
     }
 
-    const { data: row, error } = await context.supabase
+    const { data: row, error } = await db
       .from(data.table)
       .insert({
         ...clean,
@@ -215,12 +218,15 @@ export const getCmsEntityById = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
     assertEditableTable(data.table);
-    const { data: row, error } = await context.supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = context.supabase as any;
+    const { data: row, error } = await db
       .from(data.table)
       .select("*")
       .eq("id", data.id)
       .is("deleted_at", null)
       .single();
     if (error) throw error;
-    return row as Record<string, unknown>;
+    // Devolvemos string-map plano para mantener serializabilidad estricta.
+    return JSON.parse(JSON.stringify(row)) as Record<string, string | number | boolean | null>;
   });
