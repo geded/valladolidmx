@@ -154,8 +154,10 @@ export const getSeoMetadata = createServerFn({ method: "GET" })
       og_image_url: string | null;
       twitter_card: string | null;
       noindex: boolean;
-      json_ld: Record<string, unknown> | null;
+      json_ld: string | null;
     }>;
     void data;
-    return rows[0] ?? null;
+    const r = rows[0];
+    if (!r) return null;
+    return { ...r, json_ld: r.json_ld ? JSON.stringify(r.json_ld) : null };
   });
