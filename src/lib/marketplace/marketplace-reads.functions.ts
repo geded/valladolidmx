@@ -255,7 +255,7 @@ export const searchMarketplace = createServerFn({ method: "GET" })
       },
     );
     if (error) throw new Error(`marketplace_search_failed: ${error.message}`);
-    const list = (rows ?? []) as Array<Record<string, unknown>>;
+    const list = (Array.isArray(rows) ? rows : []) as Array<Record<string, unknown>>;
     const total = list.length > 0 ? Number(list[0].total_count ?? 0) : 0;
     const items: MarketplaceSearchHit[] = list.map((r) => ({
       product_id: String(r.product_id),
