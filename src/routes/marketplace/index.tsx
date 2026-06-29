@@ -36,12 +36,12 @@ export const Route = createFileRoute("/marketplace/")({
   }),
   component: MarketplaceIndex,
   errorComponent: ({ error }) => (
-    <PageShell title="Marketplace no disponible">
+    <PageShell title="Marketplace no disponible" crumbs={[{ label: "Marketplace" }]}>
       <p className="text-sm text-muted-foreground">{String(error.message)}</p>
     </PageShell>
   ),
   notFoundComponent: () => (
-    <PageShell title="Marketplace no disponible">
+    <PageShell title="Marketplace no disponible" crumbs={[{ label: "Marketplace" }]}>
       <p className="text-sm text-muted-foreground">No hay empresas publicadas aún.</p>
     </PageShell>
   ),
@@ -62,7 +62,7 @@ function MarketplaceIndex() {
         </p>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {businesses.map((b) => (
+          {businesses.map((b: MarketplaceBusinessCard) => (
             <BusinessTile key={b.id} item={b} />
           ))}
         </ul>
