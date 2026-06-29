@@ -163,6 +163,7 @@ function RootComponent() {
         <Outlet />
         <SiteFooter />
         <AluxFloatingTrigger />
+        </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>
   );
