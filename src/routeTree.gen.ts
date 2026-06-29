@@ -31,6 +31,7 @@ import { Route as AuthenticatedCmsProductosRouteImport } from './routes/_authent
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
 import { Route as AuthenticatedCmsEmpresasRouteImport } from './routes/_authenticated/cms/empresas'
 import { Route as AuthenticatedCmsDestinosRouteImport } from './routes/_authenticated/cms/destinos'
+import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './routes/_authenticated/portal/invitaciones.index'
 import { Route as AuthenticatedCmsReviewsIndexRouteImport } from './routes/_authenticated/cms/reviews.index'
 import { Route as AuthenticatedCmsRegionesIndexRouteImport } from './routes/_authenticated/cms/regiones.index'
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
@@ -154,6 +155,12 @@ const AuthenticatedCmsDestinosRoute =
     path: '/destinos',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedPortalInvitacionesIndexRoute =
+  AuthenticatedPortalInvitacionesIndexRouteImport.update({
+    id: '/invitaciones/',
+    path: '/invitaciones/',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
 const AuthenticatedCmsReviewsIndexRoute =
   AuthenticatedCmsReviewsIndexRouteImport.update({
     id: '/reviews/',
@@ -232,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
+  '/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
 }
 export interface FileRoutesByTo {
@@ -261,6 +269,7 @@ export interface FileRoutesByTo {
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews': typeof AuthenticatedCmsReviewsIndexRoute
+  '/portal/invitaciones': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
 }
 export interface FileRoutesById {
@@ -294,6 +303,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/_authenticated/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/_authenticated/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
+  '/_authenticated/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/_authenticated/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
 }
 export interface FileRouteTypes {
@@ -327,6 +337,7 @@ export interface FileRouteTypes {
     | '/cms/categorias/'
     | '/cms/regiones/'
     | '/cms/reviews/'
+    | '/portal/invitaciones/'
     | '/cms/reviews/$id/moderar'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -356,6 +367,7 @@ export interface FileRouteTypes {
     | '/cms/categorias'
     | '/cms/regiones'
     | '/cms/reviews'
+    | '/portal/invitaciones'
     | '/cms/reviews/$id/moderar'
   id:
     | '__root__'
@@ -388,6 +400,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/categorias/'
     | '/_authenticated/cms/regiones/'
     | '/_authenticated/cms/reviews/'
+    | '/_authenticated/portal/invitaciones/'
     | '/_authenticated/cms/reviews/$id/moderar'
   fileRoutesById: FileRoutesById
 }
@@ -563,6 +576,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsDestinosRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/portal/invitaciones/': {
+      id: '/_authenticated/portal/invitaciones/'
+      path: '/invitaciones'
+      fullPath: '/portal/invitaciones/'
+      preLoaderRoute: typeof AuthenticatedPortalInvitacionesIndexRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
     '/_authenticated/cms/reviews/': {
       id: '/_authenticated/cms/reviews/'
       path: '/reviews'
@@ -624,11 +644,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
+  AuthenticatedPortalInvitacionesIndexRoute: typeof AuthenticatedPortalInvitacionesIndexRoute
 }
 
 const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildren =
   {
     AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
+    AuthenticatedPortalInvitacionesIndexRoute:
+      AuthenticatedPortalInvitacionesIndexRoute,
   }
 
 const AuthenticatedPortalRouteRouteWithChildren =
