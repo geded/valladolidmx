@@ -14,6 +14,8 @@ import {
   getCmsEntityById,
   transitionEntityStatus,
   upsertCmsEntity,
+  listEntityHistory,
+  type CmsHistoryEntry,
 } from "@/lib/cms/writes.functions";
 import { StatusBadge } from "@/components/cms/EntityListView";
 
@@ -67,6 +69,7 @@ export function EntityEditor(props: Props) {
   const fetchById = useServerFn(getCmsEntityById);
   const upsert = useServerFn(upsertCmsEntity);
   const transition = useServerFn(transitionEntityStatus);
+  const fetchHistory = useServerFn(listEntityHistory);
 
   const isEdit = Boolean(id);
 
@@ -75,6 +78,13 @@ export function EntityEditor(props: Props) {
     queryKey: ["cms", listQueryKey, "detail", id],
     queryFn: (): Promise<DetailRow> =>
       fetchById({ data: { table, id: id! } }) as Promise<DetailRow>,
+    enabled: isEdit,
+  });
+
+  const history = useQuery({
+    queryKey: ["cms", listQueryKey, "history", id],
+    queryFn: (): Promise<CmsHistoryEntry[]> =>
+      fetchHistory({ data: { table, id: id! } }) as Promise<CmsHistoryEntry[]>,
     enabled: isEdit,
   });
 
@@ -120,6 +130,7 @@ export function EntityEditor(props: Props) {
         navigate({ to: `${backTo}/${res.id}/editar` as never });
       } else {
         await detail.refetch();
+        await history.refetch();
       }
     },
     onError: (e) => setError(e instanceof Error ? e.message : "Error al guardar."),
@@ -131,6 +142,7 @@ export function EntityEditor(props: Props) {
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["cms", listQueryKey] });
       await detail.refetch();
+      await history.refetch();
     },
     onError: (e) =>
       setError(e instanceof Error ? e.message : "Error en transición."),
@@ -243,6 +255,58 @@ export function EntityEditor(props: Props) {
                 Sin transiciones disponibles desde este estado.
               </span>
             )}
+          </div>
+        </section>
+      )}
+
+      {isEdit && (
+        <section className="mt-6 rounded-xl border border-border bg-card p-5">
+          <header className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold tracking-tight">
+              Historial editorial
+            </h2>
+            <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+              content_audit_log
+            </span>
+          </header>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Bitácora append-only de creaciones, ediciones y transiciones de
+            estado. Insumo oficial de auditoría (Serie 13.4).
+          </p>
+          <div className="mt-4 divide-y divide-border text-xs">
+            {history.isLoading && (
+              <p className="py-2 text-muted-foreground">Cargando historial…</p>
+            )}
+            {history.data && history.data.length === 0 && (
+              <p className="py-2 text-muted-foreground">
+                Sin eventos registrados aún.
+              </p>
+            )}
+            {history.data?.map((h) => (
+              <div
+                key={h.id}
+                className="flex flex-col gap-1 py-2 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="rounded-md border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider">
+                    {h.action}
+                  </span>
+                  {h.from_status && h.to_status && (
+                    <span className="text-muted-foreground">
+                      {h.from_status} → <strong>{h.to_status}</strong>
+                    </span>
+                  )}
+                  {!h.from_status && h.to_status && (
+                    <span className="text-muted-foreground">
+                      → <strong>{h.to_status}</strong>
+                    </span>
+                  )}
+                </div>
+                <time className="text-muted-foreground">
+                  {new Date(h.created_at).toLocaleString()}
+                </time>
+              </div>
+            ))}
           </div>
         </section>
       )}
