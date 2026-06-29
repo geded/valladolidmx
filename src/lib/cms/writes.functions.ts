@@ -170,7 +170,10 @@ export const transitionEntityStatus = createServerFn({ method: "POST" })
     await assertEditorial(context);
     assertEditableTable(data.table);
 
-    const { data: current, error: readErr } = await context.supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = context.supabase as any;
+
+    const { data: current, error: readErr } = await db
       .from(data.table)
       .select("id, status")
       .eq("id", data.id)
@@ -193,7 +196,7 @@ export const transitionEntityStatus = createServerFn({ method: "POST" })
       patch.published_at = new Date().toISOString();
     }
 
-    const { error: updErr } = await context.supabase
+    const { error: updErr } = await db
       .from(data.table)
       .update(patch)
       .eq("id", data.id);
