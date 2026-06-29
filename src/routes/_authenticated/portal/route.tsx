@@ -16,7 +16,7 @@ import {
   Outlet,
   useRouterState,
 } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
 import { BrandLogo } from "@/components/brand/BrandLogo";
@@ -41,6 +41,7 @@ function PortalLayout() {
   const { user, profile, signOut } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const fetchBusinesses = useServerFn(listMyBusinesses);
+  const queryClient = useQueryClient();
 
   const { data: businesses = [], isLoading, error } = useQuery({
     queryKey: ["portal", "my-businesses", user?.id],
@@ -75,9 +76,18 @@ function PortalLayout() {
   }, [businesses, activeBusinessId]);
 
   const setActiveBusinessId = (id: string) => {
+    const previous = activeBusinessId;
     setActiveBusinessIdState(id);
     if (typeof window !== "undefined") {
       window.localStorage.setItem(STORAGE_KEY, id);
+    }
+    // Invalida contexto de la empresa anterior para que ninguna vista
+    // muestre datos de un business al que el usuario ya no apunta.
+    if (previous && previous !== id) {
+      queryClient.removeQueries({
+        predicate: (q) =>
+          Array.isArray(q.queryKey) && q.queryKey.includes(previous),
+      });
     }
   };
 
@@ -89,6 +99,7 @@ function PortalLayout() {
   const navItems = useMemo(
     () => [
       { to: "/portal" as const, label: "Resumen" },
+      { to: "/portal/invitaciones" as const, label: "Invitaciones" },
     ],
     [],
   );
