@@ -100,6 +100,7 @@ function PortalLayout() {
     () => [
       { to: "/portal" as const, label: "Resumen" },
       { to: "/portal/ficha" as const, label: "Ficha pública" },
+      { to: "/portal/presencia" as const, label: "Presencia" },
       { to: "/portal/invitaciones" as const, label: "Invitaciones" },
     ],
     [],
