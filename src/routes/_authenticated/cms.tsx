@@ -25,18 +25,18 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { to: "/_authenticated/cms", label: "Resumen", hint: "Panel general" },
-  { to: "/_authenticated/cms", label: "Regiones", hint: "Próxima etapa" },
-  { to: "/_authenticated/cms", label: "Destinos", hint: "Próxima etapa" },
-  { to: "/_authenticated/cms", label: "Zonas", hint: "Próxima etapa" },
-  { to: "/_authenticated/cms", label: "Categorías", hint: "Próxima etapa" },
-  { to: "/_authenticated/cms", label: "Empresas", hint: "Próxima etapa" },
-  { to: "/_authenticated/cms", label: "Productos", hint: "Próxima etapa" },
-  { to: "/_authenticated/cms", label: "Media", hint: "Próxima etapa" },
-  { to: "/_authenticated/cms", label: "Reseñas", hint: "Próxima etapa" },
+  { to: "/cms", label: "Resumen", hint: "Panel general" },
+  { to: "/cms", label: "Regiones", hint: "Próxima etapa" },
+  { to: "/cms", label: "Destinos", hint: "Próxima etapa" },
+  { to: "/cms", label: "Zonas", hint: "Próxima etapa" },
+  { to: "/cms", label: "Categorías", hint: "Próxima etapa" },
+  { to: "/cms", label: "Empresas", hint: "Próxima etapa" },
+  { to: "/cms", label: "Productos", hint: "Próxima etapa" },
+  { to: "/cms", label: "Media", hint: "Próxima etapa" },
+  { to: "/cms", label: "Reseñas", hint: "Próxima etapa" },
 ];
 
-export const Route = createFileRoute("/_authenticated/cms")({
+export const Route = createFileRoute("/cms")({
   component: CmsLayout,
 });
 
@@ -95,7 +95,7 @@ function CmsLayout() {
               return (
                 <Link
                   key={`${item.label}-${i}`}
-                  to="/_authenticated/cms"
+                  to="/cms"
                   className={[
                     "flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors",
                     active
