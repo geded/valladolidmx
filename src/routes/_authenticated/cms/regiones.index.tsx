@@ -32,7 +32,7 @@ function RegionesPage() {
       rowKey={(r) => r.id}
       headerActions={
         <Link
-          to="/_authenticated/cms/regiones/nueva" as never
+          to={"/cms/regiones/nueva" as never}
           className="h-9 inline-flex items-center rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95"
         >
           + Nueva
