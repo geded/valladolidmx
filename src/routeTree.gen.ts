@@ -29,6 +29,7 @@ import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedPortalPresenciaRouteImport } from './routes/_authenticated/portal/presencia'
 import { Route as AuthenticatedPortalGaleriaRouteImport } from './routes/_authenticated/portal/galeria'
 import { Route as AuthenticatedPortalFichaRouteImport } from './routes/_authenticated/portal/ficha'
+import { Route as AuthenticatedPortalCatalogoRouteImport } from './routes/_authenticated/portal/catalogo'
 import { Route as AuthenticatedCmsZonasRouteImport } from './routes/_authenticated/cms/zonas'
 import { Route as AuthenticatedCmsProductosRouteImport } from './routes/_authenticated/cms/productos'
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
@@ -149,6 +150,12 @@ const AuthenticatedPortalFichaRoute =
     path: '/ficha',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
+const AuthenticatedPortalCatalogoRoute =
+  AuthenticatedPortalCatalogoRouteImport.update({
+    id: '/catalogo',
+    path: '/catalogo',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
 const AuthenticatedCmsZonasRoute = AuthenticatedCmsZonasRouteImport.update({
   id: '/zonas',
   path: '/zonas',
@@ -258,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
@@ -292,6 +300,7 @@ export interface FileRoutesByTo {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
@@ -330,6 +339,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/_authenticated/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/_authenticated/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/_authenticated/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/_authenticated/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/_authenticated/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
@@ -368,6 +378,7 @@ export interface FileRouteTypes {
     | '/cms/media'
     | '/cms/productos'
     | '/cms/zonas'
+    | '/portal/catalogo'
     | '/portal/ficha'
     | '/portal/galeria'
     | '/portal/presencia'
@@ -402,6 +413,7 @@ export interface FileRouteTypes {
     | '/cms/media'
     | '/cms/productos'
     | '/cms/zonas'
+    | '/portal/catalogo'
     | '/portal/ficha'
     | '/portal/galeria'
     | '/portal/presencia'
@@ -439,6 +451,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/media'
     | '/_authenticated/cms/productos'
     | '/_authenticated/cms/zonas'
+    | '/_authenticated/portal/catalogo'
     | '/_authenticated/portal/ficha'
     | '/_authenticated/portal/galeria'
     | '/_authenticated/portal/presencia'
@@ -614,6 +627,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalFichaRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
+    '/_authenticated/portal/catalogo': {
+      id: '/_authenticated/portal/catalogo'
+      path: '/catalogo'
+      fullPath: '/portal/catalogo'
+      preLoaderRoute: typeof AuthenticatedPortalCatalogoRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
     '/_authenticated/cms/zonas': {
       id: '/_authenticated/cms/zonas'
       path: '/zonas'
@@ -723,6 +743,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedPortalRouteRouteChildren {
+  AuthenticatedPortalCatalogoRoute: typeof AuthenticatedPortalCatalogoRoute
   AuthenticatedPortalFichaRoute: typeof AuthenticatedPortalFichaRoute
   AuthenticatedPortalGaleriaRoute: typeof AuthenticatedPortalGaleriaRoute
   AuthenticatedPortalPresenciaRoute: typeof AuthenticatedPortalPresenciaRoute
@@ -733,6 +754,7 @@ interface AuthenticatedPortalRouteRouteChildren {
 
 const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildren =
   {
+    AuthenticatedPortalCatalogoRoute: AuthenticatedPortalCatalogoRoute,
     AuthenticatedPortalFichaRoute: AuthenticatedPortalFichaRoute,
     AuthenticatedPortalGaleriaRoute: AuthenticatedPortalGaleriaRoute,
     AuthenticatedPortalPresenciaRoute: AuthenticatedPortalPresenciaRoute,

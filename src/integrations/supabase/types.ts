@@ -2140,6 +2140,43 @@ export type Database = {
     }
     Functions: {
       accept_business_invitation: { Args: { _token: string }; Returns: Json }
+      archive_business_product: {
+        Args: { _product_id: string }
+        Returns: undefined
+      }
+      archive_business_promotion: {
+        Args: { _promotion_id: string }
+        Returns: undefined
+      }
+      create_business_product: {
+        Args: {
+          _business_id: string
+          _capacity?: number
+          _description?: string
+          _duration_minutes?: number
+          _name: string
+          _price_amount?: number
+          _price_currency?: string
+          _product_type: Database["public"]["Enums"]["product_type"]
+          _slug: string
+          _tagline?: string
+        }
+        Returns: string
+      }
+      create_business_promotion: {
+        Args: {
+          _business_id: string
+          _description?: string
+          _discount_percent?: number
+          _ends_at?: string
+          _product_id?: string
+          _slug: string
+          _starts_at?: string
+          _terms?: string
+          _title: string
+        }
+        Returns: string
+      }
       has_business_access: {
         Args: {
           _business_id: string
@@ -2191,6 +2228,14 @@ export type Database = {
         Args: { _business_id: string; _notes?: string }
         Returns: undefined
       }
+      request_product_review: {
+        Args: { _notes?: string; _product_id: string }
+        Returns: undefined
+      }
+      request_promotion_review: {
+        Args: { _notes?: string; _promotion_id: string }
+        Returns: undefined
+      }
       transition_content_status: {
         Args: {
           _entity_id: string
@@ -2209,8 +2254,44 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_business_product: {
+        Args: {
+          _capacity?: number
+          _clear_price?: boolean
+          _description?: string
+          _duration_minutes?: number
+          _name?: string
+          _price_amount?: number
+          _price_currency?: string
+          _product_id: string
+          _tagline?: string
+        }
+        Returns: undefined
+      }
+      update_business_promotion: {
+        Args: {
+          _clear_dates?: boolean
+          _clear_discount?: boolean
+          _description?: string
+          _discount_percent?: number
+          _ends_at?: string
+          _promotion_id: string
+          _starts_at?: string
+          _terms?: string
+          _title?: string
+        }
+        Returns: undefined
+      }
       withdraw_business_review: {
         Args: { _business_id: string; _notes?: string }
+        Returns: undefined
+      }
+      withdraw_product_review: {
+        Args: { _notes?: string; _product_id: string }
+        Returns: undefined
+      }
+      withdraw_promotion_review: {
+        Args: { _notes?: string; _promotion_id: string }
         Returns: undefined
       }
     }
