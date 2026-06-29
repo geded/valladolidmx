@@ -14,6 +14,8 @@ import {
   getCmsEntityById,
   transitionEntityStatus,
   upsertCmsEntity,
+  listEntityHistory,
+  type CmsHistoryEntry,
 } from "@/lib/cms/writes.functions";
 import { StatusBadge } from "@/components/cms/EntityListView";
 
@@ -67,6 +69,7 @@ export function EntityEditor(props: Props) {
   const fetchById = useServerFn(getCmsEntityById);
   const upsert = useServerFn(upsertCmsEntity);
   const transition = useServerFn(transitionEntityStatus);
+  const fetchHistory = useServerFn(listEntityHistory);
 
   const isEdit = Boolean(id);
 
@@ -75,6 +78,13 @@ export function EntityEditor(props: Props) {
     queryKey: ["cms", listQueryKey, "detail", id],
     queryFn: (): Promise<DetailRow> =>
       fetchById({ data: { table, id: id! } }) as Promise<DetailRow>,
+    enabled: isEdit,
+  });
+
+  const history = useQuery({
+    queryKey: ["cms", listQueryKey, "history", id],
+    queryFn: (): Promise<CmsHistoryEntry[]> =>
+      fetchHistory({ data: { table, id: id! } }) as Promise<CmsHistoryEntry[]>,
     enabled: isEdit,
   });
 
@@ -120,6 +130,7 @@ export function EntityEditor(props: Props) {
         navigate({ to: `${backTo}/${res.id}/editar` as never });
       } else {
         await detail.refetch();
+        await history.refetch();
       }
     },
     onError: (e) => setError(e instanceof Error ? e.message : "Error al guardar."),
@@ -131,6 +142,7 @@ export function EntityEditor(props: Props) {
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["cms", listQueryKey] });
       await detail.refetch();
+      await history.refetch();
     },
     onError: (e) =>
       setError(e instanceof Error ? e.message : "Error en transición."),
