@@ -13,6 +13,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { Destination } from "@/types/territory";
+import type { SuggestedRoute } from "@/types/entities";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
