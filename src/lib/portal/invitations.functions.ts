@@ -179,7 +179,7 @@ export const previewInvitation = createServerFn({ method: "POST" })
       { _token: data.token },
     );
     if (error) throw new Error(`preview_failed: ${error.message}`);
-    return (res ?? { found: false }) as InvitationPreview;
+    return (res ?? { found: false }) as unknown as InvitationPreview;
   });
 
 /**
