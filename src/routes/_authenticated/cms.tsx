@@ -19,21 +19,29 @@ import { ROLE_LABELS, type AppRole } from "@/types/auth";
 const EDITORIAL_ROLES: AppRole[] = ["super_admin", "admin", "editor"];
 
 interface NavItem {
-  to: string;
+  to:
+    | "/cms"
+    | "/cms/regiones"
+    | "/cms/destinos"
+    | "/cms/zonas"
+    | "/cms/categorias"
+    | "/cms/empresas"
+    | "/cms/productos"
+    | "/cms/media"
+    | "/cms/reviews";
   label: string;
-  hint: string;
 }
 
 const NAV: NavItem[] = [
-  { to: "/cms", label: "Resumen", hint: "Panel general" },
-  { to: "/cms", label: "Regiones", hint: "Próxima etapa" },
-  { to: "/cms", label: "Destinos", hint: "Próxima etapa" },
-  { to: "/cms", label: "Zonas", hint: "Próxima etapa" },
-  { to: "/cms", label: "Categorías", hint: "Próxima etapa" },
-  { to: "/cms", label: "Empresas", hint: "Próxima etapa" },
-  { to: "/cms", label: "Productos", hint: "Próxima etapa" },
-  { to: "/cms", label: "Media", hint: "Próxima etapa" },
-  { to: "/cms", label: "Reseñas", hint: "Próxima etapa" },
+  { to: "/cms", label: "Resumen" },
+  { to: "/cms/regiones", label: "Regiones" },
+  { to: "/cms/destinos", label: "Destinos" },
+  { to: "/cms/zonas", label: "Zonas" },
+  { to: "/cms/categorias", label: "Categorías" },
+  { to: "/cms/empresas", label: "Empresas" },
+  { to: "/cms/productos", label: "Productos" },
+  { to: "/cms/media", label: "Media" },
+  { to: "/cms/reviews", label: "Reseñas" },
 ];
 
 export const Route = createFileRoute("/_authenticated/cms")({
@@ -88,14 +96,15 @@ function CmsLayout() {
           </p>
 
           <nav className="mt-6 grid gap-1">
-            {NAV.map((item, i) => {
+            {NAV.map((item) => {
               const active =
-                i === 0 &&
-                (pathname === "/cms" || pathname === "/cms/");
+                item.to === "/cms"
+                  ? pathname === "/cms" || pathname === "/cms/"
+                  : pathname === item.to || pathname.startsWith(`${item.to}/`);
               return (
                 <Link
-                  key={`${item.label}-${i}`}
-                  to="/cms"
+                  key={item.to}
+                  to={item.to}
                   className={[
                     "flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors",
                     active
@@ -104,11 +113,6 @@ function CmsLayout() {
                   ].join(" ")}
                 >
                   <span>{item.label}</span>
-                  {i !== 0 && (
-                    <span className="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
-                      Etapa 2+
-                    </span>
-                  )}
                 </Link>
               );
             })}
