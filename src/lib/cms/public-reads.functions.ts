@@ -13,7 +13,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { Destination } from "@/types/territory";
-import type { SuggestedRoute } from "@/types/entities";
+import type { SuggestedRoute, BusinessTeaser } from "@/types/entities";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -64,6 +64,55 @@ export const listHomeFeaturedCategories = createServerFn({ method: "GET" }).hand
         name: row.name,
         description: row.description ?? "",
         icon: row.icon ?? "Sparkles",
+        palette,
+      };
+    });
+  },
+);
+
+const ALLOWED_BUSINESS_PALETTES = new Set(["territorio", "selva", "cenote", "atardecer"]);
+
+/**
+ * listFeaturedBusinesses — Devuelve empresas publicadas marcadas con
+ * `metadata.home_featured = true` para la sección "Empresas" del home,
+ * resolviendo el slug de su categoría primaria y de su destino.
+ */
+export const listFeaturedBusinesses = createServerFn({ method: "GET" }).handler(
+  async (): Promise<BusinessTeaser[]> => {
+    const supabase = publicClient();
+    const { data, error } = await supabase
+      .from("businesses")
+      .select(
+        "id, slug, display_name, tagline, metadata, status, deleted_at, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug )",
+      )
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .filter("metadata->>home_featured", "eq", "true")
+      .order("display_name", { ascending: true })
+      .limit(24);
+    if (error) throw new Error(`businesses_read_failed: ${error.message}`);
+    return (data ?? []).map((row) => {
+      const metadata = (row.metadata ?? {}) as Record<string, unknown>;
+      const rawPalette = typeof metadata.palette === "string" ? metadata.palette : "territorio";
+      const palette = (ALLOWED_BUSINESS_PALETTES.has(rawPalette)
+        ? rawPalette
+        : "territorio") as BusinessTeaser["palette"];
+      const destSlug =
+        row.destinations && typeof (row.destinations as { slug?: unknown }).slug === "string"
+          ? (row.destinations as { slug: string }).slug
+          : "";
+      const catSlug =
+        row.business_categories &&
+        typeof (row.business_categories as { slug?: unknown }).slug === "string"
+          ? (row.business_categories as { slug: string }).slug
+          : "";
+      return {
+        id: row.id,
+        slug: row.slug,
+        name: row.display_name,
+        category_slug: catSlug,
+        destination_slug: destSlug,
+        tagline: row.tagline ?? "",
         palette,
       };
     });
