@@ -102,6 +102,7 @@ function PortalLayout() {
       { to: "/portal/ficha" as const, label: "Ficha pública" },
       { to: "/portal/presencia" as const, label: "Presencia" },
       { to: "/portal/galeria" as const, label: "Galería" },
+      { to: "/portal/catalogo" as const, label: "Catálogo" },
       { to: "/portal/invitaciones" as const, label: "Invitaciones" },
     ],
     [],
