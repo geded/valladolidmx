@@ -2236,6 +2236,32 @@ export type Database = {
         Args: { _notes?: string; _promotion_id: string }
         Returns: undefined
       }
+      search_marketplace: {
+        Args: {
+          p_category_slug?: string
+          p_destination_slug?: string
+          p_limit?: number
+          p_offset?: number
+          p_price_max?: number
+          p_price_min?: number
+          p_q?: string
+        }
+        Returns: {
+          business_id: string
+          business_name: string
+          business_slug: string
+          category_slug: string
+          destination_slug: string
+          price_amount: number
+          price_currency: string
+          product_id: string
+          product_name: string
+          product_slug: string
+          product_tagline: string
+          product_type: string
+          total_count: number
+        }[]
+      }
       transition_content_status: {
         Args: {
           _entity_id: string

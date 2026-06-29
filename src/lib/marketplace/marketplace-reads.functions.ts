@@ -62,6 +62,38 @@ export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
   promotions: MarketplacePromotionCard[];
 }
 
+export interface MarketplaceSearchHit {
+  product_id: string;
+  product_slug: string;
+  product_name: string;
+  product_tagline: string;
+  product_type: string;
+  price_amount: number | null;
+  price_currency: string;
+  business_id: string;
+  business_slug: string;
+  business_name: string;
+  destination_slug: string;
+  category_slug: string;
+}
+
+export interface MarketplaceSearchResult {
+  items: MarketplaceSearchHit[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface MarketplaceSearchInput {
+  q?: string | null;
+  destination_slug?: string | null;
+  category_slug?: string | null;
+  price_min?: number | null;
+  price_max?: number | null;
+  limit?: number;
+  offset?: number;
+}
+
 /**
  * listMarketplaceBusinesses — Devuelve empresas publicadas para el
  * listado público del Marketplace. Whitelist estricta de columnas.
@@ -176,4 +208,68 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         business_name: biz.display_name,
       })),
     };
+  });
+
+/**
+ * searchMarketplace — Ola 4 · Etapa 2. Invoca el RPC público
+ * `search_marketplace` (SECURITY DEFINER · solo SELECT) sobre el
+ * cliente publishable. Sin auth, sin acceso a tablas crudas.
+ * Whitelist estricta de parámetros y límites server-side.
+ */
+export const searchMarketplace = createServerFn({ method: "GET" })
+  .inputValidator((input: MarketplaceSearchInput | undefined) => {
+    const v = input ?? {};
+    const clampStr = (s: unknown, max = 120) =>
+      typeof s === "string" && s.length > 0 && s.length <= max ? s : null;
+    const clampNum = (n: unknown) =>
+      typeof n === "number" && Number.isFinite(n) && n >= 0 && n <= 1_000_000_000 ? n : null;
+    const limit = typeof v.limit === "number" && v.limit > 0 ? Math.min(100, Math.floor(v.limit)) : 24;
+    const offset = typeof v.offset === "number" && v.offset >= 0 ? Math.floor(v.offset) : 0;
+    return {
+      q: clampStr(v.q, 200),
+      destination_slug: clampStr(v.destination_slug),
+      category_slug: clampStr(v.category_slug),
+      price_min: clampNum(v.price_min),
+      price_max: clampNum(v.price_max),
+      limit,
+      offset,
+    };
+  })
+  .handler(async ({ data }): Promise<MarketplaceSearchResult> => {
+    const supabase = publicClient();
+    // El tipo generado puede no haberse regenerado tras la migración;
+    // se llama vía cast acotado y se valida la forma del resultado.
+    const { data: rows, error } = await (supabase.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: { message: string } | null }>)(
+      "search_marketplace",
+      {
+        p_q: data.q,
+        p_destination_slug: data.destination_slug,
+        p_category_slug: data.category_slug,
+        p_price_min: data.price_min,
+        p_price_max: data.price_max,
+        p_limit: data.limit,
+        p_offset: data.offset,
+      },
+    );
+    if (error) throw new Error(`marketplace_search_failed: ${error.message}`);
+    const list = (Array.isArray(rows) ? rows : []) as Array<Record<string, unknown>>;
+    const total = list.length > 0 ? Number(list[0].total_count ?? 0) : 0;
+    const items: MarketplaceSearchHit[] = list.map((r) => ({
+      product_id: String(r.product_id),
+      product_slug: String(r.product_slug),
+      product_name: String(r.product_name ?? ""),
+      product_tagline: r.product_tagline ? String(r.product_tagline) : "",
+      product_type: String(r.product_type ?? ""),
+      price_amount: r.price_amount !== null && r.price_amount !== undefined ? Number(r.price_amount) : null,
+      price_currency: String(r.price_currency ?? "MXN"),
+      business_id: String(r.business_id),
+      business_slug: String(r.business_slug),
+      business_name: String(r.business_name ?? ""),
+      destination_slug: r.destination_slug ? String(r.destination_slug) : "",
+      category_slug: r.category_slug ? String(r.category_slug) : "",
+    }));
+    return { items, total, limit: data.limit, offset: data.offset };
   });
