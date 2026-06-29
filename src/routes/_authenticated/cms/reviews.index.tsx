@@ -15,7 +15,7 @@ type Row = {
   created_at: string;
 };
 
-export const Route = createFileRoute("/_authenticated/cms/reviews")({
+export const Route = createFileRoute("/_authenticated/cms/reviews/")({
   head: () => ({
     meta: [
       { title: "Reseñas · CMS Studio" },
