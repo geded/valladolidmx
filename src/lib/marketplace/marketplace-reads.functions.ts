@@ -62,6 +62,38 @@ export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
   promotions: MarketplacePromotionCard[];
 }
 
+export interface MarketplaceSearchHit {
+  product_id: string;
+  product_slug: string;
+  product_name: string;
+  product_tagline: string;
+  product_type: string;
+  price_amount: number | null;
+  price_currency: string;
+  business_id: string;
+  business_slug: string;
+  business_name: string;
+  destination_slug: string;
+  category_slug: string;
+}
+
+export interface MarketplaceSearchResult {
+  items: MarketplaceSearchHit[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface MarketplaceSearchInput {
+  q?: string;
+  destination_slug?: string;
+  category_slug?: string;
+  price_min?: number | null;
+  price_max?: number | null;
+  limit?: number;
+  offset?: number;
+}
+
 /**
  * listMarketplaceBusinesses — Devuelve empresas publicadas para el
  * listado público del Marketplace. Whitelist estricta de columnas.
