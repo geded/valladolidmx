@@ -35,6 +35,28 @@ const EDITABLE_TABLES = [
 ] as const;
 type EditableTable = (typeof EDITABLE_TABLES)[number];
 
+/**
+ * Mapeo tabla → entity_kind oficial (enum del dominio, Serie 11).
+ * Indispensable para registrar `content_audit_log` desde las server
+ * functions del CMS Studio sin modificar el modelo de dominio.
+ */
+const TABLE_TO_ENTITY_KIND: Record<
+  EditableTable,
+  | "tourism_region"
+  | "destination"
+  | "destination_zone"
+  | "business_category"
+  | "business"
+  | "product"
+> = {
+  tourism_regions: "tourism_region",
+  destinations: "destination",
+  destination_zones: "destination_zone",
+  business_categories: "business_category",
+  businesses: "business",
+  products: "product",
+};
+
 const EDITABLE_COLUMNS: Record<EditableTable, readonly string[]> = {
   tourism_regions: ["slug", "name", "description", "sort_order", "metadata"],
   destinations: ["tourism_region_id", "slug", "name", "description", "metadata"],
@@ -92,6 +114,65 @@ function sanitizePayload(table: EditableTable, payload: Record<string, unknown>)
   return out;
 }
 
+/* ─────────────────  Capa conceptual reservada  ─────────────────────── */
+/**
+ * assertBusinessRules — Hook arquitectónico reservado (Ola 1 · Etapa 4).
+ *
+ * Ubicación oficial: DESPUÉS de `sanitizePayload()` y ANTES de la
+ * persistencia. Su propósito es concentrar futuras reglas de negocio
+ * (invariantes cruzados, validaciones semánticas, restricciones de
+ * dominio) sin modificar la arquitectura existente ni acoplarlas a la
+ * UI, a RLS o a triggers de base de datos.
+ *
+ * En esta etapa NO ejecuta validaciones: queda intencionalmente como
+ * no-op para evitar cambios funcionales hasta que cada regla sea
+ * documentada y aprobada en una ola posterior.
+ */
+async function assertBusinessRules(
+  _table: EditableTable,
+  _mode: "insert" | "update",
+  _payload: Record<string, unknown>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _context: { supabase: any; userId: string },
+): Promise<void> {
+  return;
+}
+
+/* ─────────────────────────  Auditoría CMS  ─────────────────────────── */
+/**
+ * Registra una entrada en `content_audit_log` reutilizando la política
+ * RLS existente `content_audit_editor_insert` (solo editores/admins).
+ * No modifica RLS ni el esquema. Los errores se silencian para que el
+ * fallo de auditoría nunca tumbe la operación editorial.
+ */
+async function logCmsAudit(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any,
+  params: {
+    table: EditableTable;
+    entityId: string;
+    action: "created" | "updated" | "transition";
+    fromStatus?: ContentStatus | null;
+    toStatus?: ContentStatus | null;
+    notes?: string | null;
+    metadata?: Record<string, unknown>;
+  },
+) {
+  try {
+    await db.from("content_audit_log").insert({
+      entity_kind: TABLE_TO_ENTITY_KIND[params.table],
+      entity_id: params.entityId,
+      action: params.action,
+      from_status: params.fromStatus ?? null,
+      to_status: params.toStatus ?? null,
+      notes: params.notes ?? null,
+      metadata: params.metadata ?? {},
+    });
+  } catch {
+    // intencional: no romper la operación si auditoría falla
+  }
+}
+
 /* ─────────────────────────  Upsert genérico  ────────────────────────── */
 
 interface UpsertInput {
@@ -118,6 +199,7 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
     const db = context.supabase as any;
 
     if (data.id) {
+      await assertBusinessRules(data.table, "update", clean, context);
       const { data: row, error } = await db
         .from(data.table)
         .update({ ...clean, updated_by: context.userId })
@@ -126,9 +208,16 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
         .select("id")
         .single();
       if (error) throw error;
+      await logCmsAudit(db, {
+        table: data.table,
+        entityId: row.id as string,
+        action: "updated",
+        metadata: { fields: Object.keys(clean) },
+      });
       return { id: row.id as string, mode: "update" as const };
     }
 
+    await assertBusinessRules(data.table, "insert", clean, context);
     const { data: row, error } = await db
       .from(data.table)
       .insert({
@@ -140,6 +229,12 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw error;
+    await logCmsAudit(db, {
+      table: data.table,
+      entityId: row.id as string,
+      action: "created",
+      toStatus: "draft",
+    });
     return { id: row.id as string, mode: "insert" as const };
   });
 
@@ -202,6 +297,15 @@ export const transitionEntityStatus = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (updErr) throw updErr;
 
+    await logCmsAudit(db, {
+      table: data.table,
+      entityId: data.id,
+      action: "transition",
+      fromStatus: from,
+      toStatus: data.to,
+      notes: data.notes ?? null,
+    });
+
     return { id: data.id, from, to: data.to };
   });
 
@@ -232,4 +336,47 @@ export const getCmsEntityById = createServerFn({ method: "POST" })
     if (error) throw error;
     // Devolvemos string-map plano para mantener serializabilidad estricta.
     return JSON.parse(JSON.stringify(row)) as Record<string, string | number | boolean | null>;
+  });
+
+/* ────────────  Historial editorial (Ola 1 · Etapa 4)  ──────────────── */
+
+export interface CmsHistoryEntry {
+  id: string;
+  action: string;
+  from_status: string | null;
+  to_status: string | null;
+  actor_user_id: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+interface HistoryInput {
+  table: string;
+  id: string;
+  limit?: number;
+}
+
+export const listEntityHistory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: HistoryInput) => {
+    if (!d?.table || !d?.id) throw new Error("invalid_input");
+    return d;
+  })
+  .handler(async ({ data, context }): Promise<CmsHistoryEntry[]> => {
+    await assertEditorial(context);
+    assertEditableTable(data.table);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = context.supabase as any;
+    const kind = TABLE_TO_ENTITY_KIND[data.table];
+    const { data: rows, error } = await db
+      .from("content_audit_log")
+      .select(
+        "id, action, from_status, to_status, actor_user_id, notes, created_at",
+      )
+      .eq("entity_kind", kind)
+      .eq("entity_id", data.id)
+      .order("created_at", { ascending: false })
+      .limit(Math.min(data.limit ?? 50, 200));
+    if (error) throw error;
+    return (rows ?? []) as CmsHistoryEntry[];
   });
