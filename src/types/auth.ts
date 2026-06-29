@@ -9,19 +9,29 @@
 export type AppRole =
   | "super_admin"
   | "admin"
+  | "editor"
   | "concierge"
   | "business_owner"
-  | "business_staff"
   | "traveler";
 
 export const ROLE_LABELS: Record<AppRole, string> = {
   super_admin: "Super Administrador",
   admin: "Administrador",
+  editor: "Editor",
   concierge: "Concierge",
   business_owner: "Empresa",
-  business_staff: "Equipo Empresa",
   traveler: "Viajero",
 };
+
+/** Prioridad oficial (mayor índice = más privilegio). Útil para elegir el rol primario. */
+export const ROLE_PRIORITY: AppRole[] = [
+  "traveler",
+  "business_owner",
+  "concierge",
+  "editor",
+  "admin",
+  "super_admin",
+];
 
 export interface AuthUserShape {
   id: string;
