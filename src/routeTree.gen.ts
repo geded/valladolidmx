@@ -23,6 +23,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index'
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
+import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
 import { Route as AuthenticatedCmsRouteImport } from './routes/_authenticated/cms'
 import { Route as AuthenticatedPortalRouteRouteImport } from './routes/_authenticated/portal/route'
 import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal/index'
@@ -114,6 +115,11 @@ const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
 const OrienteMayaDestinoRoute = OrienteMayaDestinoRouteImport.update({
   id: '/oriente-maya/$destino',
   path: '/oriente-maya/$destino',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
+  id: '/marketplace/$slug',
+  path: '/marketplace/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCmsRoute = AuthenticatedCmsRouteImport.update({
@@ -264,6 +270,7 @@ export interface FileRoutesByFullPath {
   '/restaurantes': typeof RestaurantesRoute
   '/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/cms': typeof AuthenticatedCmsRouteWithChildren
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
@@ -300,6 +307,7 @@ export interface FileRoutesByTo {
   '/hoteles': typeof HotelesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
@@ -340,6 +348,7 @@ export interface FileRoutesById {
   '/restaurantes': typeof RestaurantesRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/_authenticated/cms': typeof AuthenticatedCmsRouteWithChildren
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
@@ -380,6 +389,7 @@ export interface FileRouteTypes {
     | '/restaurantes'
     | '/portal'
     | '/cms'
+    | '/marketplace/$slug'
     | '/oriente-maya/$destino'
     | '/marketplace/'
     | '/oriente-maya/'
@@ -416,6 +426,7 @@ export interface FileRouteTypes {
     | '/hoteles'
     | '/reset-password'
     | '/restaurantes'
+    | '/marketplace/$slug'
     | '/oriente-maya/$destino'
     | '/marketplace'
     | '/oriente-maya'
@@ -455,6 +466,7 @@ export interface FileRouteTypes {
     | '/restaurantes'
     | '/_authenticated/portal'
     | '/_authenticated/cms'
+    | '/marketplace/$slug'
     | '/oriente-maya/$destino'
     | '/marketplace/'
     | '/oriente-maya/'
@@ -493,6 +505,7 @@ export interface RootRouteChildren {
   HotelesRoute: typeof HotelesRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RestaurantesRoute: typeof RestaurantesRoute
+  MarketplaceSlugRoute: typeof MarketplaceSlugRoute
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
@@ -596,6 +609,13 @@ declare module '@tanstack/react-router' {
       path: '/oriente-maya/$destino'
       fullPath: '/oriente-maya/$destino'
       preLoaderRoute: typeof OrienteMayaDestinoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/$slug': {
+      id: '/marketplace/$slug'
+      path: '/marketplace/$slug'
+      fullPath: '/marketplace/$slug'
+      preLoaderRoute: typeof MarketplaceSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/cms': {
@@ -853,6 +873,7 @@ const rootRouteChildren: RootRouteChildren = {
   HotelesRoute: HotelesRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RestaurantesRoute: RestaurantesRoute,
+  MarketplaceSlugRoute: MarketplaceSlugRoute,
   OrienteMayaDestinoRoute: OrienteMayaDestinoRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
