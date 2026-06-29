@@ -36,7 +36,7 @@ const NAV: NavItem[] = [
   { to: "/cms", label: "Reseñas", hint: "Próxima etapa" },
 ];
 
-export const Route = createFileRoute("/cms")({
+export const Route = createFileRoute("/_authenticated/cms")({
   component: CmsLayout,
 });
 
