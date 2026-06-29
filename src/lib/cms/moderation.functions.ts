@@ -57,7 +57,6 @@ export interface ReviewDetail {
   language: string | null;
   status: ContentStatus;
   published_at: string | null;
-  metadata: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
 }
@@ -86,7 +85,7 @@ export const getReviewForModeration = createServerFn({ method: "POST" })
     const { data: row, error } = await db
       .from("reviews")
       .select(
-        "id, subject_kind, subject_id, author_user_id, author_display_name, rating, title, body, language, status, published_at, metadata, created_at, updated_at",
+        "id, subject_kind, subject_id, author_user_id, author_display_name, rating, title, body, language, status, published_at, created_at, updated_at",
       )
       .eq("id", data.id)
       .is("deleted_at", null)
