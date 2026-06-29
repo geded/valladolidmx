@@ -25,17 +25,18 @@ import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$d
 import { Route as AuthenticatedCmsRouteImport } from './routes/_authenticated/cms'
 import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticated/cms/index'
 import { Route as AuthenticatedCmsZonasRouteImport } from './routes/_authenticated/cms/zonas'
-import { Route as AuthenticatedCmsReviewsRouteImport } from './routes/_authenticated/cms/reviews'
 import { Route as AuthenticatedCmsProductosRouteImport } from './routes/_authenticated/cms/productos'
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
 import { Route as AuthenticatedCmsEmpresasRouteImport } from './routes/_authenticated/cms/empresas'
 import { Route as AuthenticatedCmsDestinosRouteImport } from './routes/_authenticated/cms/destinos'
+import { Route as AuthenticatedCmsReviewsIndexRouteImport } from './routes/_authenticated/cms/reviews.index'
 import { Route as AuthenticatedCmsRegionesIndexRouteImport } from './routes/_authenticated/cms/regiones.index'
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
 import { Route as AuthenticatedCmsRegionesNuevaRouteImport } from './routes/_authenticated/cms/regiones.nueva'
 import { Route as AuthenticatedCmsRegionesEditarRouteImport } from './routes/_authenticated/cms/regiones..editar'
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
 import { Route as AuthenticatedCmsCategoriasEditarRouteImport } from './routes/_authenticated/cms/categorias..editar'
+import { Route as AuthenticatedCmsReviewsIdModerarRouteImport } from './routes/_authenticated/cms/reviews.$id.moderar'
 
 const RestaurantesRoute = RestaurantesRouteImport.update({
   id: '/restaurantes',
@@ -116,11 +117,6 @@ const AuthenticatedCmsZonasRoute = AuthenticatedCmsZonasRouteImport.update({
   path: '/zonas',
   getParentRoute: () => AuthenticatedCmsRoute,
 } as any)
-const AuthenticatedCmsReviewsRoute = AuthenticatedCmsReviewsRouteImport.update({
-  id: '/reviews',
-  path: '/reviews',
-  getParentRoute: () => AuthenticatedCmsRoute,
-} as any)
 const AuthenticatedCmsProductosRoute =
   AuthenticatedCmsProductosRouteImport.update({
     id: '/productos',
@@ -142,6 +138,12 @@ const AuthenticatedCmsDestinosRoute =
   AuthenticatedCmsDestinosRouteImport.update({
     id: '/destinos',
     path: '/destinos',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
+const AuthenticatedCmsReviewsIndexRoute =
+  AuthenticatedCmsReviewsIndexRouteImport.update({
+    id: '/reviews/',
+    path: '/reviews/',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
 const AuthenticatedCmsRegionesIndexRoute =
@@ -180,6 +182,12 @@ const AuthenticatedCmsCategoriasEditarRoute =
     path: '/categorias/editar',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsReviewsIdModerarRoute =
+  AuthenticatedCmsReviewsIdModerarRouteImport.update({
+    id: '/reviews/$id/moderar',
+    path: '/reviews/$id/moderar',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -199,7 +207,6 @@ export interface FileRoutesByFullPath {
   '/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
-  '/cms/reviews': typeof AuthenticatedCmsReviewsRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/cms/': typeof AuthenticatedCmsIndexRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
@@ -208,6 +215,8 @@ export interface FileRoutesByFullPath {
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
+  '/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
+  '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -226,7 +235,6 @@ export interface FileRoutesByTo {
   '/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
-  '/cms/reviews': typeof AuthenticatedCmsReviewsRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/cms': typeof AuthenticatedCmsIndexRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
@@ -235,6 +243,8 @@ export interface FileRoutesByTo {
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesIndexRoute
+  '/cms/reviews': typeof AuthenticatedCmsReviewsIndexRoute
+  '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -256,7 +266,6 @@ export interface FileRoutesById {
   '/_authenticated/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/productos': typeof AuthenticatedCmsProductosRoute
-  '/_authenticated/cms/reviews': typeof AuthenticatedCmsReviewsRoute
   '/_authenticated/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
   '/_authenticated/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
@@ -265,6 +274,8 @@ export interface FileRoutesById {
   '/_authenticated/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/_authenticated/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
+  '/_authenticated/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
+  '/_authenticated/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -286,7 +297,6 @@ export interface FileRouteTypes {
     | '/cms/empresas'
     | '/cms/media'
     | '/cms/productos'
-    | '/cms/reviews'
     | '/cms/zonas'
     | '/cms/'
     | '/cms/categorias/editar'
@@ -295,6 +305,8 @@ export interface FileRouteTypes {
     | '/cms/regiones/nueva'
     | '/cms/categorias/'
     | '/cms/regiones/'
+    | '/cms/reviews/'
+    | '/cms/reviews/$id/moderar'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -313,7 +325,6 @@ export interface FileRouteTypes {
     | '/cms/empresas'
     | '/cms/media'
     | '/cms/productos'
-    | '/cms/reviews'
     | '/cms/zonas'
     | '/cms'
     | '/cms/categorias/editar'
@@ -322,6 +333,8 @@ export interface FileRouteTypes {
     | '/cms/regiones/nueva'
     | '/cms/categorias'
     | '/cms/regiones'
+    | '/cms/reviews'
+    | '/cms/reviews/$id/moderar'
   id:
     | '__root__'
     | '/'
@@ -342,7 +355,6 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/empresas'
     | '/_authenticated/cms/media'
     | '/_authenticated/cms/productos'
-    | '/_authenticated/cms/reviews'
     | '/_authenticated/cms/zonas'
     | '/_authenticated/cms/'
     | '/_authenticated/cms/categorias/editar'
@@ -351,6 +363,8 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/regiones/nueva'
     | '/_authenticated/cms/categorias/'
     | '/_authenticated/cms/regiones/'
+    | '/_authenticated/cms/reviews/'
+    | '/_authenticated/cms/reviews/$id/moderar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -483,13 +497,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsZonasRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
-    '/_authenticated/cms/reviews': {
-      id: '/_authenticated/cms/reviews'
-      path: '/reviews'
-      fullPath: '/cms/reviews'
-      preLoaderRoute: typeof AuthenticatedCmsReviewsRouteImport
-      parentRoute: typeof AuthenticatedCmsRoute
-    }
     '/_authenticated/cms/productos': {
       id: '/_authenticated/cms/productos'
       path: '/productos'
@@ -516,6 +523,13 @@ declare module '@tanstack/react-router' {
       path: '/destinos'
       fullPath: '/cms/destinos'
       preLoaderRoute: typeof AuthenticatedCmsDestinosRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
+    '/_authenticated/cms/reviews/': {
+      id: '/_authenticated/cms/reviews/'
+      path: '/reviews'
+      fullPath: '/cms/reviews/'
+      preLoaderRoute: typeof AuthenticatedCmsReviewsIndexRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
     '/_authenticated/cms/regiones/': {
@@ -560,6 +574,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsCategoriasEditarRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/reviews/$id/moderar': {
+      id: '/_authenticated/cms/reviews/$id/moderar'
+      path: '/reviews/$id/moderar'
+      fullPath: '/cms/reviews/$id/moderar'
+      preLoaderRoute: typeof AuthenticatedCmsReviewsIdModerarRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
   }
 }
 
@@ -568,7 +589,6 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsEmpresasRoute: typeof AuthenticatedCmsEmpresasRoute
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
   AuthenticatedCmsProductosRoute: typeof AuthenticatedCmsProductosRoute
-  AuthenticatedCmsReviewsRoute: typeof AuthenticatedCmsReviewsRoute
   AuthenticatedCmsZonasRoute: typeof AuthenticatedCmsZonasRoute
   AuthenticatedCmsIndexRoute: typeof AuthenticatedCmsIndexRoute
   AuthenticatedCmsCategoriasEditarRoute: typeof AuthenticatedCmsCategoriasEditarRoute
@@ -577,6 +597,8 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsRegionesNuevaRoute: typeof AuthenticatedCmsRegionesNuevaRoute
   AuthenticatedCmsCategoriasIndexRoute: typeof AuthenticatedCmsCategoriasIndexRoute
   AuthenticatedCmsRegionesIndexRoute: typeof AuthenticatedCmsRegionesIndexRoute
+  AuthenticatedCmsReviewsIndexRoute: typeof AuthenticatedCmsReviewsIndexRoute
+  AuthenticatedCmsReviewsIdModerarRoute: typeof AuthenticatedCmsReviewsIdModerarRoute
 }
 
 const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
@@ -584,7 +606,6 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsEmpresasRoute: AuthenticatedCmsEmpresasRoute,
   AuthenticatedCmsMediaRoute: AuthenticatedCmsMediaRoute,
   AuthenticatedCmsProductosRoute: AuthenticatedCmsProductosRoute,
-  AuthenticatedCmsReviewsRoute: AuthenticatedCmsReviewsRoute,
   AuthenticatedCmsZonasRoute: AuthenticatedCmsZonasRoute,
   AuthenticatedCmsIndexRoute: AuthenticatedCmsIndexRoute,
   AuthenticatedCmsCategoriasEditarRoute: AuthenticatedCmsCategoriasEditarRoute,
@@ -593,6 +614,8 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsRegionesNuevaRoute: AuthenticatedCmsRegionesNuevaRoute,
   AuthenticatedCmsCategoriasIndexRoute: AuthenticatedCmsCategoriasIndexRoute,
   AuthenticatedCmsRegionesIndexRoute: AuthenticatedCmsRegionesIndexRoute,
+  AuthenticatedCmsReviewsIndexRoute: AuthenticatedCmsReviewsIndexRoute,
+  AuthenticatedCmsReviewsIdModerarRoute: AuthenticatedCmsReviewsIdModerarRoute,
 }
 
 const AuthenticatedCmsRouteWithChildren =
