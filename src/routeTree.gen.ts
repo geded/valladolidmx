@@ -25,6 +25,7 @@ import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$d
 import { Route as AuthenticatedCmsRouteImport } from './routes/_authenticated/cms'
 import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticated/cms/index'
 import { Route as AuthenticatedCmsRegionesRouteImport } from './routes/_authenticated/cms/regiones'
+import { Route as AuthenticatedCmsDestinosRouteImport } from './routes/_authenticated/cms/destinos'
 
 const RestaurantesRoute = RestaurantesRouteImport.update({
   id: '/restaurantes',
@@ -106,6 +107,12 @@ const AuthenticatedCmsRegionesRoute =
     path: '/regiones',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsDestinosRoute =
+  AuthenticatedCmsDestinosRouteImport.update({
+    id: '/destinos',
+    path: '/destinos',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/cms': typeof AuthenticatedCmsRouteWithChildren
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesRoute
   '/cms/': typeof AuthenticatedCmsIndexRoute
 }
@@ -137,6 +145,7 @@ export interface FileRoutesByTo {
   '/restaurantes': typeof RestaurantesRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
+  '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesRoute
   '/cms': typeof AuthenticatedCmsIndexRoute
 }
@@ -156,6 +165,7 @@ export interface FileRoutesById {
   '/_authenticated/cms': typeof AuthenticatedCmsRouteWithChildren
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/_authenticated/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/_authenticated/cms/regiones': typeof AuthenticatedCmsRegionesRoute
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
 }
@@ -175,6 +185,7 @@ export interface FileRouteTypes {
     | '/cms'
     | '/oriente-maya/$destino'
     | '/oriente-maya/'
+    | '/cms/destinos'
     | '/cms/regiones'
     | '/cms/'
   fileRoutesByTo: FileRoutesByTo
@@ -191,6 +202,7 @@ export interface FileRouteTypes {
     | '/restaurantes'
     | '/oriente-maya/$destino'
     | '/oriente-maya'
+    | '/cms/destinos'
     | '/cms/regiones'
     | '/cms'
   id:
@@ -209,6 +221,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms'
     | '/oriente-maya/$destino'
     | '/oriente-maya/'
+    | '/_authenticated/cms/destinos'
     | '/_authenticated/cms/regiones'
     | '/_authenticated/cms/'
   fileRoutesById: FileRoutesById
@@ -343,15 +356,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsRegionesRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/destinos': {
+      id: '/_authenticated/cms/destinos'
+      path: '/destinos'
+      fullPath: '/cms/destinos'
+      preLoaderRoute: typeof AuthenticatedCmsDestinosRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
   }
 }
 
 interface AuthenticatedCmsRouteChildren {
+  AuthenticatedCmsDestinosRoute: typeof AuthenticatedCmsDestinosRoute
   AuthenticatedCmsRegionesRoute: typeof AuthenticatedCmsRegionesRoute
   AuthenticatedCmsIndexRoute: typeof AuthenticatedCmsIndexRoute
 }
 
 const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
+  AuthenticatedCmsDestinosRoute: AuthenticatedCmsDestinosRoute,
   AuthenticatedCmsRegionesRoute: AuthenticatedCmsRegionesRoute,
   AuthenticatedCmsIndexRoute: AuthenticatedCmsIndexRoute,
 }
