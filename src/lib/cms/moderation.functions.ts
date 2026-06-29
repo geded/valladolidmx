@@ -20,21 +20,10 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-
-type ContentStatus =
-  | "draft"
-  | "in_review"
-  | "approved"
-  | "published"
-  | "archived";
-
-const ALLOWED_TRANSITIONS: Record<ContentStatus, ContentStatus[]> = {
-  draft: ["in_review", "archived"],
-  in_review: ["approved", "draft", "archived"],
-  approved: ["published", "draft", "archived"],
-  published: ["archived", "draft"],
-  archived: ["draft"],
-};
+import {
+  assertAllowedTransition,
+  type ContentStatus,
+} from "@/lib/cms/workflow";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function assertAdmin(context: { supabase: any; userId: string }) {
@@ -123,10 +112,7 @@ export const moderateReview = createServerFn({ method: "POST" })
     if (!current) throw new Error("not_found");
 
     const from = current.status as ContentStatus;
-    const allowed = ALLOWED_TRANSITIONS[from] ?? [];
-    if (!allowed.includes(data.to)) {
-      throw new Error(`invalid_transition:${from}->${data.to}`);
-    }
+    assertAllowedTransition(from, data.to);
 
     const notes = (data.notes ?? "").trim().slice(0, 1000);
 
