@@ -202,10 +202,11 @@ export const requestBusinessReview = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const { error } = await supabase.rpc("request_business_review", {
+    const args: { _business_id: string; _notes?: string } = {
       _business_id: data.businessId,
-      _notes: data.notes,
-    });
+    };
+    if (data.notes) args._notes = data.notes;
+    const { error } = await supabase.rpc("request_business_review", args);
     if (error) throw new Error(error.message ?? "request_review_failed");
     return { ok: true };
   });
@@ -226,10 +227,11 @@ export const withdrawBusinessReview = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const { error } = await supabase.rpc("withdraw_business_review", {
+    const args: { _business_id: string; _notes?: string } = {
       _business_id: data.businessId,
-      _notes: data.notes,
-    });
+    };
+    if (data.notes) args._notes = data.notes;
+    const { error } = await supabase.rpc("withdraw_business_review", args);
     if (error) throw new Error(error.message ?? "withdraw_review_failed");
     return { ok: true };
   });
