@@ -91,6 +91,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Viajero (vista interna)",
     items: [
       { to: "/cuenta", label: "Cuenta" },
+      { to: "/cuenta/perfil", label: "Perfil" },
       { to: "/cuenta/favoritos", label: "Favoritos" },
       { to: "/cuenta/carrito", label: "Carrito" },
       { to: "/cuenta/historial", label: "Historial" },
@@ -105,6 +106,22 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/cms", label: "CMS Studio (todo)" },
       { to: "/portal", label: "Portal empresarial" },
       { to: "/concierge", label: "Centro Concierge" },
+    ],
+  },
+  {
+    label: "Vistas públicas",
+    items: [
+      { to: "/", label: "Home pública", hint: "Composición EB" },
+      { to: "/alux", label: "Alux Concierge" },
+      { to: "/marketplace", label: "Marketplace" },
+      { to: "/marketplace/buscar", label: "Buscar en Marketplace" },
+      { to: "/arma-tu-viaje", label: "Arma tu viaje" },
+      { to: "/empresas", label: "Empresas (público)" },
+      { to: "/experiencias", label: "Experiencias" },
+      { to: "/hoteles", label: "Hoteles" },
+      { to: "/restaurantes", label: "Restaurantes" },
+      { to: "/eventos", label: "Eventos" },
+      { to: "/oriente-maya", label: "Oriente Maya" },
     ],
   },
 ];
