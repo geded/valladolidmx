@@ -1,73 +1,27 @@
 /**
- * /_authenticated/cms — Layout del CMS Studio (Ola 1 · Etapa 1).
+ * /_authenticated/cms — Workspace "cms" (Adenda 15.10.5c.4 · Ola 4).
  *
- * Shell administrativo aislado del shell público de Fase 1.
- * Sólo verifica rol editorial en cliente para UX; la autorización
- * dura ocurre server-side en cada server function.
+ * Migrado al Workspace Engine v2.0. Toda la estructura visual
+ * (sidebar, topbar, inspector, command palette, bottom-nav, sheets,
+ * toasts) proviene del Workspace Engine y de los Registries oficiales.
+ * Sólo se preserva el gate de UX por rol editorial (la autorización
+ * dura sigue ocurriendo server-side en cada server function).
  */
-import { useMemo, useState, useEffect } from "react";
-import {
-  createFileRoute,
-  Link,
-  Outlet,
-  useRouterState,
-} from "@tanstack/react-router";
+import { useMemo } from "react";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
-import { BrandLogo } from "@/components/brand/BrandLogo";
-import { ROLE_LABELS, type AppRole } from "@/types/auth";
+import { type AppRole } from "@/types/auth";
+import { WorkspaceProvider } from "@/components/workspace/WorkspaceProvider";
+import { WorkspaceShell } from "@/components/workspace/WorkspaceShell";
 
 const EDITORIAL_ROLES: AppRole[] = ["super_admin", "admin", "editor"];
-
-interface NavItem {
-  to:
-    | "/cms"
-    | "/cms/regiones"
-    | "/cms/destinos"
-    | "/cms/zonas"
-    | "/cms/categorias"
-    | "/cms/empresas"
-    | "/cms/productos"
-    | "/cms/media"
-    | "/cms/reviews"
-    | "/cms/pagos"
-    | "/cms/observabilidad"
-    | "/cms/alertas"
-    | "/cms/actividad"
-    | "/cms/experience-builder";
-  label: string;
-}
-
-const NAV: NavItem[] = [
-  { to: "/cms", label: "Resumen" },
-  { to: "/cms/regiones", label: "Regiones" },
-  { to: "/cms/destinos", label: "Destinos" },
-  { to: "/cms/zonas", label: "Zonas" },
-  { to: "/cms/categorias", label: "Categorías" },
-  { to: "/cms/empresas", label: "Empresas" },
-  { to: "/cms/productos", label: "Productos" },
-  { to: "/cms/media", label: "Media" },
-  { to: "/cms/reviews", label: "Reseñas" },
-  { to: "/cms/pagos", label: "Pagos" },
-  { to: "/cms/observabilidad", label: "Observabilidad" },
-  { to: "/cms/alertas", label: "Alertas" },
-  { to: "/cms/actividad", label: "Actividad" },
-  { to: "/cms/experience-builder", label: "Experience Builder" },
-];
 
 export const Route = createFileRoute("/_authenticated/cms")({
   component: CmsLayout,
 });
 
 function CmsLayout() {
-  const { role, roles, signOut, profile, user } = useAuth();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  // Cierra el drawer al navegar
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
-
+  const { roles } = useAuth();
   const isEditorial = useMemo(
     () => roles.some((r) => EDITORIAL_ROLES.includes(r)),
     [roles],
@@ -98,180 +52,10 @@ function CmsLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Topbar móvil (visible <lg) */}
-      <header className="sticky top-0 z-40 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-card/90 px-3 py-2 backdrop-blur lg:hidden">
-        <BrandLogo className="h-8 w-auto shrink-0" />
-        <span className="truncate text-center text-sm font-semibold tracking-wide">CMS Studio</span>
-        <button
-          type="button"
-          onClick={() => setMobileOpen(true)}
-          aria-label="Abrir menú"
-          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-background"
-        >
-          <span aria-hidden className="block h-[2px] w-5 bg-foreground shadow-[0_-6px_0_currentColor,0_6px_0_currentColor]" />
-        </button>
-      </header>
-
-      {/* Overlay móvil */}
-      {mobileOpen ? (
-        <div
-          className="fixed inset-0 z-40 bg-foreground/40 lg:hidden"
-          onClick={() => setMobileOpen(false)}
-          aria-hidden
-        />
-      ) : null}
-
-      <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col lg:flex-row">
-        <aside
-          className={[
-            "bg-card/95 px-5 py-6",
-            // Móvil: drawer lateral deslizable
-            "fixed inset-y-0 left-0 z-50 w-72 max-w-[85%] transform overflow-y-auto border-r border-border shadow-xl transition-transform lg:hidden",
-            mobileOpen ? "translate-x-0" : "-translate-x-full",
-          ].join(" ")}
-        >
-          <SidebarContent
-            pathname={pathname}
-            profile={profile}
-            user={user}
-            role={role}
-            signOut={signOut}
-            onClose={() => setMobileOpen(false)}
-          />
-        </aside>
-
-        {/* Sidebar desktop (lg+) */}
-        <aside className="hidden border-border bg-card/60 px-5 py-6 lg:block lg:w-64 lg:shrink-0 lg:border-r">
-          <div className="flex items-center gap-2">
-            <BrandLogo className="h-8 w-auto" />
-            <span className="text-sm font-semibold tracking-wide">
-              CMS Studio
-            </span>
-          </div>
-          <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-            Fase 2 · Ola 1
-          </p>
-
-          <nav className="mt-6 grid gap-1">
-            {NAV.map((item) => {
-              const active =
-                item.to === "/cms"
-                  ? pathname === "/cms" || pathname === "/cms/"
-                  : pathname === item.to || pathname.startsWith(`${item.to}/`);
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={[
-                    "flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors",
-                    active
-                      ? "bg-primary/10 font-semibold text-primary"
-                      : "text-foreground hover:bg-accent",
-                  ].join(" ")}
-                >
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="mt-8 rounded-lg border border-border bg-background p-3 text-xs">
-            <p className="font-semibold">
-              {profile?.display_name ?? user?.email}
-            </p>
-            <p className="mt-0.5 text-muted-foreground">
-              {role ? ROLE_LABELS[role] : "Sin rol"}
-            </p>
-            <button
-              type="button"
-              onClick={() => void signOut()}
-              className="mt-3 w-full rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium hover:bg-accent"
-            >
-              Cerrar sesión
-            </button>
-          </div>
-        </aside>
-
-        <main className="min-w-0 flex-1 px-4 py-6 sm:px-5 lg:px-10 lg:py-8">
-          <Outlet />
-        </main>
-      </div>
-    </div>
-  );
-}
-
-function SidebarContent({
-  pathname,
-  profile,
-  user,
-  role,
-  signOut,
-  onClose,
-}: {
-  pathname: string;
-  profile: { display_name?: string | null } | null;
-  user: { email?: string | null } | null;
-  role: AppRole | null;
-  signOut: () => Promise<void> | void;
-  onClose: () => void;
-}) {
-  return (
-    <>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <BrandLogo className="h-8 w-auto" />
-          <span className="text-sm font-semibold tracking-wide">CMS Studio</span>
-        </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Cerrar menú"
-          className="rounded-md border border-border bg-background px-2 py-1 text-xs"
-        >
-          ✕
-        </button>
-      </div>
-      <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-        Fase 2 · Ola 1
-      </p>
-      <nav className="mt-6 grid gap-1">
-        {NAV.map((item) => {
-          const active =
-            item.to === "/cms"
-              ? pathname === "/cms" || pathname === "/cms/"
-              : pathname === item.to || pathname.startsWith(`${item.to}/`);
-          return (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={[
-                "flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors",
-                active
-                  ? "bg-primary/10 font-semibold text-primary"
-                  : "text-foreground hover:bg-accent",
-              ].join(" ")}
-            >
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
-      <div className="mt-8 rounded-lg border border-border bg-background p-3 text-xs">
-        <p className="font-semibold">
-          {profile?.display_name ?? user?.email}
-        </p>
-        <p className="mt-0.5 text-muted-foreground">
-          {role ? ROLE_LABELS[role] : "Sin rol"}
-        </p>
-        <button
-          type="button"
-          onClick={() => void signOut()}
-          className="mt-3 w-full rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium hover:bg-accent"
-        >
-          Cerrar sesión
-        </button>
-      </div>
-    </>
+    <WorkspaceProvider initialWorkspaceId="cms">
+      <WorkspaceShell title="CMS Studio">
+        <Outlet />
+      </WorkspaceShell>
+    </WorkspaceProvider>
   );
 }
