@@ -80,6 +80,9 @@ function PortalLayout() {
     setActiveBusinessIdState(id);
     if (typeof window !== "undefined") {
       window.localStorage.setItem(STORAGE_KEY, id);
+      window.dispatchEvent(
+        new CustomEvent("portal:active-business-changed", { detail: id }),
+      );
     }
     // Invalida contexto de la empresa anterior para que ninguna vista
     // muestre datos de un business al que el usuario ya no apunta.
@@ -103,6 +106,7 @@ function PortalLayout() {
       { to: "/portal/presencia" as const, label: "Presencia" },
       { to: "/portal/galeria" as const, label: "Galería" },
       { to: "/portal/catalogo" as const, label: "Catálogo" },
+      { to: "/portal/pagos" as const, label: "Pagos y visibilidad" },
       { to: "/portal/actividad" as const, label: "Actividad" },
       { to: "/portal/concierge" as const, label: "Concierge" },
       { to: "/portal/invitaciones" as const, label: "Invitaciones" },
@@ -178,7 +182,7 @@ function PortalLayout() {
             </select>
             {activeBusiness && (
               <p className="mt-2 text-[11px] text-muted-foreground">
-                Tu rol: <span className="font-semibold">{activeBusiness.role}</span>
+                Tu rol: <span className="font-semibold">{formatRole(activeBusiness.role)}</span>
                 {" · "}
                 Estado: <span className="font-semibold">{activeBusiness.status}</span>
               </p>
@@ -230,6 +234,17 @@ function PortalLayout() {
       <PortalContextBridge value={ctx} />
     </div>
   );
+}
+
+function formatRole(role: PortalBusinessSummary["role"]): string {
+  const labels: Record<PortalBusinessSummary["role"], string> = {
+    viewer: "lector",
+    editor: "editor",
+    manager: "gerente",
+    owner: "propietario",
+    admin: "administrador",
+  };
+  return labels[role] ?? role;
 }
 
 // Placeholder de bridge — en etapas posteriores se reemplazará por
