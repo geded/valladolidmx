@@ -30,6 +30,7 @@ function CuentaLayout() {
       { to: "/cuenta/favoritos" as const, label: "Favoritos" },
       { to: "/cuenta/carrito" as const, label: "Carrito" },
       { to: "/cuenta/historial" as const, label: "Historial" },
+      { to: "/cuenta/notificaciones" as const, label: "Notificaciones" },
     ],
     [],
   );
