@@ -49,11 +49,18 @@ function requireApiKey(): string {
   return key;
 }
 
-async function fetchContext(
-  supabase: { rpc: (name: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> },
-  caseId: string,
-): Promise<unknown> {
-  const { data, error } = await supabase.rpc("concierge_alux_context_for_case", {
+// Supabase typed-client wrapper helpers — cast through `unknown` because
+// these RPCs are generated names; the database guarantees the shape.
+type RpcClient = {
+  rpc: (
+    name: string,
+    args: Record<string, unknown>,
+  ) => Promise<{ data: unknown; error: { message: string } | null }>;
+};
+
+async function fetchContext(supabase: unknown, caseId: string): Promise<unknown> {
+  const c = supabase as RpcClient;
+  const { data, error } = await c.rpc("concierge_alux_context_for_case", {
     _case_id: caseId,
   });
   if (error) throw new Error(error.message);
@@ -61,12 +68,13 @@ async function fetchContext(
 }
 
 async function logSuggestion(
-  supabase: { rpc: (name: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }> },
+  supabase: unknown,
   caseId: string,
   capability: AluxCapability,
   meta: Record<string, unknown>,
 ) {
-  const { error } = await supabase.rpc("concierge_alux_log_suggestion", {
+  const c = supabase as RpcClient;
+  const { error } = await c.rpc("concierge_alux_log_suggestion", {
     _case_id: caseId,
     _capability: capability,
     _meta: meta,
@@ -79,7 +87,7 @@ async function runAlux(
   systemPrompt: string,
   context: unknown,
   userPrompt: string,
-  supabase: Parameters<typeof fetchContext>[0],
+  supabase: unknown,
   caseId: string,
 ): Promise<AluxSuggestion> {
   const provider = createLovableAiGatewayProvider(requireApiKey());
