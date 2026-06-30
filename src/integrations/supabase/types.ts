@@ -1660,8 +1660,10 @@ export type Database = {
       }
       products: {
         Row: {
+          accepts_online_payment: boolean
           business_id: string
           capacity: number | null
+          conversion_mode: Database["public"]["Enums"]["product_conversion_mode"]
           cover_media_id: string | null
           created_at: string
           created_by: string | null
@@ -1669,22 +1671,31 @@ export type Database = {
           deleted_by: string | null
           description: string | null
           duration_minutes: number | null
+          eligible_for_ems_campaigns: boolean
+          generates_commission: boolean
           id: string
           metadata: Json
           name: string
           price_amount: number | null
           price_currency: string
+          primary_action_label: string | null
           product_type: Database["public"]["Enums"]["product_type"]
           published_at: string | null
+          requires_availability: boolean
+          secondary_action_label: string | null
+          secondary_action_mode: string | null
           slug: string
           status: Database["public"]["Enums"]["content_status"]
           tagline: string | null
           updated_at: string
           updated_by: string | null
+          visibility_level: Database["public"]["Enums"]["product_visibility_level"]
         }
         Insert: {
+          accepts_online_payment?: boolean
           business_id: string
           capacity?: number | null
+          conversion_mode?: Database["public"]["Enums"]["product_conversion_mode"]
           cover_media_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -1692,22 +1703,31 @@ export type Database = {
           deleted_by?: string | null
           description?: string | null
           duration_minutes?: number | null
+          eligible_for_ems_campaigns?: boolean
+          generates_commission?: boolean
           id?: string
           metadata?: Json
           name: string
           price_amount?: number | null
           price_currency?: string
+          primary_action_label?: string | null
           product_type: Database["public"]["Enums"]["product_type"]
           published_at?: string | null
+          requires_availability?: boolean
+          secondary_action_label?: string | null
+          secondary_action_mode?: string | null
           slug: string
           status?: Database["public"]["Enums"]["content_status"]
           tagline?: string | null
           updated_at?: string
           updated_by?: string | null
+          visibility_level?: Database["public"]["Enums"]["product_visibility_level"]
         }
         Update: {
+          accepts_online_payment?: boolean
           business_id?: string
           capacity?: number | null
+          conversion_mode?: Database["public"]["Enums"]["product_conversion_mode"]
           cover_media_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -1715,18 +1735,25 @@ export type Database = {
           deleted_by?: string | null
           description?: string | null
           duration_minutes?: number | null
+          eligible_for_ems_campaigns?: boolean
+          generates_commission?: boolean
           id?: string
           metadata?: Json
           name?: string
           price_amount?: number | null
           price_currency?: string
+          primary_action_label?: string | null
           product_type?: Database["public"]["Enums"]["product_type"]
           published_at?: string | null
+          requires_availability?: boolean
+          secondary_action_label?: string | null
+          secondary_action_mode?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["content_status"]
           tagline?: string | null
           updated_at?: string
           updated_by?: string | null
+          visibility_level?: Database["public"]["Enums"]["product_visibility_level"]
         }
         Relationships: [
           {
@@ -2562,6 +2589,14 @@ export type Database = {
         | "fulfilled"
         | "note_added"
       order_status: "cart" | "pending" | "confirmed" | "cancelled" | "fulfilled"
+      product_conversion_mode:
+        | "informacion"
+        | "arma_tu_viaje"
+        | "solicitar_cotizacion"
+        | "reservar_en_linea"
+        | "whatsapp"
+        | "telefono"
+        | "sitio_externo"
       product_type:
         | "experiencia"
         | "hotel"
@@ -2571,6 +2606,7 @@ export type Database = {
         | "transporte"
         | "servicio"
         | "artesanal"
+      product_visibility_level: "standard" | "destacado" | "premium"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2751,6 +2787,15 @@ export const Constants = {
         "note_added",
       ],
       order_status: ["cart", "pending", "confirmed", "cancelled", "fulfilled"],
+      product_conversion_mode: [
+        "informacion",
+        "arma_tu_viaje",
+        "solicitar_cotizacion",
+        "reservar_en_linea",
+        "whatsapp",
+        "telefono",
+        "sitio_externo",
+      ],
       product_type: [
         "experiencia",
         "hotel",
@@ -2761,6 +2806,7 @@ export const Constants = {
         "servicio",
         "artesanal",
       ],
+      product_visibility_level: ["standard", "destacado", "premium"],
     },
   },
 } as const
