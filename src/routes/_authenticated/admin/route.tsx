@@ -39,6 +39,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/admin/operaciones", label: "Operaciones" },
       { to: "/admin/ia", label: "Inteligencia (Alux)" },
       { to: "/admin/sistema", label: "Sistema" },
+      { to: "/admin/sistema/usuarios", label: "Usuarios y roles", hint: "super_admin" },
     ],
   },
   {
