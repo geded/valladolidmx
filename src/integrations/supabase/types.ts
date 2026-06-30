@@ -2473,6 +2473,97 @@ export type Database = {
         }
         Relationships: []
       }
+      page_compositions: {
+        Row: {
+          active_revision_id: string | null
+          created_at: string
+          created_by: string | null
+          current_draft: Json
+          description: string | null
+          id: string
+          page_type: string
+          slug: string
+          status: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active_revision_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_draft?: Json
+          description?: string | null
+          id?: string
+          page_type?: string
+          slug: string
+          status?: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active_revision_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_draft?: Json
+          description?: string | null
+          id?: string
+          page_type?: string
+          slug?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_compositions_active_revision_fk"
+            columns: ["active_revision_id"]
+            isOneToOne: false
+            referencedRelation: "page_revisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      page_revisions: {
+        Row: {
+          composition_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          revision_number: number
+          snapshot: Json
+        }
+        Insert: {
+          composition_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          revision_number: number
+          snapshot: Json
+        }
+        Update: {
+          composition_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          revision_number?: number
+          snapshot?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_revisions_composition_id_fkey"
+            columns: ["composition_id"]
+            isOneToOne: false
+            referencedRelation: "page_compositions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pages: {
         Row: {
           blocks: Json
@@ -3885,6 +3976,19 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      eb_create_composition: {
+        Args: {
+          _description?: string
+          _page_type?: string
+          _slug: string
+          _title: string
+        }
+        Returns: string
+      }
+      eb_create_revision: {
+        Args: { _id: string; _notes?: string }
+        Returns: string
+      }
       eb_deprecate_block: {
         Args: { _reason?: string; _type: string }
         Returns: undefined
@@ -3922,6 +4026,14 @@ export type Database = {
           _version: string
         }
         Returns: string
+      }
+      eb_restore_revision: {
+        Args: { _id: string; _revision_id: string }
+        Returns: undefined
+      }
+      eb_save_composition_draft: {
+        Args: { _id: string; _tree: Json }
+        Returns: undefined
       }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
@@ -4527,6 +4639,8 @@ export type Database = {
         | "promotion"
         | "review"
         | "block"
+        | "composition"
+        | "revision"
       favorite_entity_kind: "business" | "product" | "promotion"
       hero_palette: "territorio" | "selva" | "cenote" | "atardecer"
       invitation_status: "pending" | "accepted" | "revoked" | "expired"
@@ -4751,6 +4865,8 @@ export const Constants = {
         "promotion",
         "review",
         "block",
+        "composition",
+        "revision",
       ],
       favorite_entity_kind: ["business", "product", "promotion"],
       hero_palette: ["territorio", "selva", "cenote", "atardecer"],

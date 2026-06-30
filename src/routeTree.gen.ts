@@ -51,6 +51,7 @@ import { Route as AuthenticatedCmsProductosRouteImport } from './routes/_authent
 import { Route as AuthenticatedCmsPagosRouteImport } from './routes/_authenticated/cms/pagos'
 import { Route as AuthenticatedCmsObservabilidadRouteImport } from './routes/_authenticated/cms/observabilidad'
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
+import { Route as AuthenticatedCmsExperienceBuilderRouteImport } from './routes/_authenticated/cms/experience-builder'
 import { Route as AuthenticatedCmsEmpresasRouteImport } from './routes/_authenticated/cms/empresas'
 import { Route as AuthenticatedCmsDestinosRouteImport } from './routes/_authenticated/cms/destinos'
 import { Route as AuthenticatedCmsAlertasRouteImport } from './routes/_authenticated/cms/alertas'
@@ -301,6 +302,12 @@ const AuthenticatedCmsMediaRoute = AuthenticatedCmsMediaRouteImport.update({
   path: '/media',
   getParentRoute: () => AuthenticatedCmsRoute,
 } as any)
+const AuthenticatedCmsExperienceBuilderRoute =
+  AuthenticatedCmsExperienceBuilderRouteImport.update({
+    id: '/experience-builder',
+    path: '/experience-builder',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsEmpresasRoute =
   AuthenticatedCmsEmpresasRouteImport.update({
     id: '/empresas',
@@ -445,6 +452,7 @@ export interface FileRoutesByFullPath {
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
+  '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRoute
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
@@ -505,6 +513,7 @@ export interface FileRoutesByTo {
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
+  '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRoute
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
@@ -570,6 +579,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/_authenticated/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/_authenticated/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
+  '/_authenticated/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRoute
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/_authenticated/cms/pagos': typeof AuthenticatedCmsPagosRoute
@@ -635,6 +645,7 @@ export interface FileRouteTypes {
     | '/cms/alertas'
     | '/cms/destinos'
     | '/cms/empresas'
+    | '/cms/experience-builder'
     | '/cms/media'
     | '/cms/observabilidad'
     | '/cms/pagos'
@@ -695,6 +706,7 @@ export interface FileRouteTypes {
     | '/cms/alertas'
     | '/cms/destinos'
     | '/cms/empresas'
+    | '/cms/experience-builder'
     | '/cms/media'
     | '/cms/observabilidad'
     | '/cms/pagos'
@@ -759,6 +771,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/alertas'
     | '/_authenticated/cms/destinos'
     | '/_authenticated/cms/empresas'
+    | '/_authenticated/cms/experience-builder'
     | '/_authenticated/cms/media'
     | '/_authenticated/cms/observabilidad'
     | '/_authenticated/cms/pagos'
@@ -1116,6 +1129,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsMediaRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/experience-builder': {
+      id: '/_authenticated/cms/experience-builder'
+      path: '/experience-builder'
+      fullPath: '/cms/experience-builder'
+      preLoaderRoute: typeof AuthenticatedCmsExperienceBuilderRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/empresas': {
       id: '/_authenticated/cms/empresas'
       path: '/empresas'
@@ -1347,6 +1367,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsAlertasRoute: typeof AuthenticatedCmsAlertasRoute
   AuthenticatedCmsDestinosRoute: typeof AuthenticatedCmsDestinosRoute
   AuthenticatedCmsEmpresasRoute: typeof AuthenticatedCmsEmpresasRoute
+  AuthenticatedCmsExperienceBuilderRoute: typeof AuthenticatedCmsExperienceBuilderRoute
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
   AuthenticatedCmsObservabilidadRoute: typeof AuthenticatedCmsObservabilidadRoute
   AuthenticatedCmsPagosRoute: typeof AuthenticatedCmsPagosRoute
@@ -1368,6 +1389,8 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsAlertasRoute: AuthenticatedCmsAlertasRoute,
   AuthenticatedCmsDestinosRoute: AuthenticatedCmsDestinosRoute,
   AuthenticatedCmsEmpresasRoute: AuthenticatedCmsEmpresasRoute,
+  AuthenticatedCmsExperienceBuilderRoute:
+    AuthenticatedCmsExperienceBuilderRoute,
   AuthenticatedCmsMediaRoute: AuthenticatedCmsMediaRoute,
   AuthenticatedCmsObservabilidadRoute: AuthenticatedCmsObservabilidadRoute,
   AuthenticatedCmsPagosRoute: AuthenticatedCmsPagosRoute,
