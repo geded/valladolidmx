@@ -36,7 +36,8 @@ export function SheetStackProvider({ children }: { children: ReactNode }) {
   const push = useCallback<Ctx["push"]>((entry) => {
     const id =
       entry.id ?? `sheet_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    setStack((s) => [...s, { snap: entry.snap ?? "half", ...entry, id }]);
+    const snap: SheetSnap = entry.snap ?? "half";
+    setStack((s) => [...s, { ...entry, snap, id }]);
     return id;
   }, []);
 
