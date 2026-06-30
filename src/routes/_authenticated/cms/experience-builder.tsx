@@ -111,6 +111,19 @@ function ExperienceBuilderStudio() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string>("Listo.");
 
+  // Modal state (replaces window.prompt/confirm — mejor UX en iPad/móvil)
+  const [createOpen, setCreateOpen] = useState(false);
+  const [publishOpen, setPublishOpen] = useState<null | "revision" | "public">(null);
+  const [confirmState, setConfirmState] = useState<
+    | null
+    | {
+        title: string;
+        message: string;
+        confirmLabel?: string;
+        onConfirm: () => void | Promise<void>;
+      }
+  >(null);
+
   // Initial load
   useEffect(() => {
     void (async () => {
@@ -174,20 +187,20 @@ function ExperienceBuilderStudio() {
     setStatus("Composición cargada.");
   };
 
-  const onCreate = async () => {
-    const slug = window.prompt("Slug interno (único)");
-    if (!slug) return;
-    const title = window.prompt("Título editorial") ?? slug;
-    const pageType = window.prompt(
-      `Tipo de página (${PAGE_TYPES.join(", ")})`,
-      "generic",
-    ) ?? "generic";
+  const onCreate = () => setCreateOpen(true);
+
+  const submitCreate = async (input: {
+    slug: string;
+    title: string;
+    page_type: string;
+  }) => {
     try {
       const { id } = await create({
-        data: { slug, title, page_type: pageType },
+        data: input,
       });
       const comps = await list();
       setCompositions(comps);
+      setCreateOpen(false);
       await openComposition(id);
     } catch (e) {
       setStatus(`Error: ${(e as Error).message}`);
@@ -246,36 +259,50 @@ function ExperienceBuilderStudio() {
     setStatus("Borrador guardado.");
   };
 
-  const publishRevision = async () => {
+  const publishRevision = () => {
     if (!active) return;
-    const notes = window.prompt("Notas de la revisión (opcional)", "") ?? undefined;
+    setPublishOpen("revision");
+  };
+
+  const submitPublishRevision = async (notes: string) => {
+    if (!active) return;
     await save({ data: { id: active.id, tree } });
-    const { revision_id } = await publish({ data: { id: active.id, notes } });
+    const { revision_id } = await publish({
+      data: { id: active.id, notes: notes || undefined },
+    });
     const revs = await listRevs({ data: { id: active.id } });
     setRevisions(revs);
     setDirty(false);
+    setPublishOpen(null);
     setStatus(`Revisión publicada (${revision_id.slice(0, 8)}).`);
   };
 
-  const restoreRevision = async (rev: CompositionRevisionSummary) => {
+  const restoreRevision = (rev: CompositionRevisionSummary) => {
     if (!active) return;
-    if (!window.confirm(`Restaurar revisión #${rev.revision_number}?`)) return;
-    await restore({ data: { id: active.id, revision_id: rev.id } });
-    await openComposition(active.id);
-    setStatus(`Revisión #${rev.revision_number} restaurada.`);
+    setConfirmState({
+      title: `Restaurar revisión #${rev.revision_number}`,
+      message:
+        "Se cargará esta revisión como borrador actual. Podrás seguir editando y publicar después.",
+      confirmLabel: "Restaurar",
+      onConfirm: async () => {
+        await restore({ data: { id: active.id, revision_id: rev.id } });
+        await openComposition(active.id);
+        setStatus(`Revisión #${rev.revision_number} restaurada.`);
+      },
+    });
   };
 
-  const publishPublic = async () => {
+  const publishPublic = () => {
     if (!active) return;
     if (!isAdmin) {
       setStatus("Solo administradores pueden publicar.");
       return;
     }
-    const notes = window.prompt(
-      `Publicar "${active.title}" (${active.page_type})\n\nEsto reemplazará la versión pública actual del tipo "${active.page_type}". Notas de publicación (opcional):`,
-      "",
-    );
-    if (notes === null) return;
+    setPublishOpen("public");
+  };
+
+  const submitPublishPublic = async (notes: string) => {
+    if (!active) return;
     try {
       await save({ data: { id: active.id, tree } });
       const { revision_id } = await publicPublish({
@@ -284,28 +311,38 @@ function ExperienceBuilderStudio() {
       const comps = await list();
       setCompositions(comps);
       await openComposition(active.id);
+      setPublishOpen(null);
       setStatus(`Publicada (rev ${revision_id.slice(0, 8)}).`);
     } catch (e) {
       setStatus(`Error al publicar: ${(e as Error).message}`);
     }
   };
 
-  const unpublishPublic = async () => {
+  const unpublishPublic = () => {
     if (!active) return;
     if (!isAdmin) {
       setStatus("Solo administradores pueden despublicar.");
       return;
     }
-    if (!window.confirm(`Despublicar "${active.title}"? La página volverá al Home legacy.`)) return;
-    try {
-      await publicUnpublish({ data: { id: active.id } });
-      const comps = await list();
-      setCompositions(comps);
-      await openComposition(active.id);
-      setStatus("Composición despublicada.");
-    } catch (e) {
-      setStatus(`Error al despublicar: ${(e as Error).message}`);
-    }
+    setConfirmState({
+      title: `Despublicar "${active.title}"`,
+      message:
+        active.page_type === "home"
+          ? "La página volverá al Home legacy. Podrás volver a publicar más tarde."
+          : "La versión pública dejará de servirse.",
+      confirmLabel: "Despublicar",
+      onConfirm: async () => {
+        try {
+          await publicUnpublish({ data: { id: active.id } });
+          const comps = await list();
+          setCompositions(comps);
+          await openComposition(active.id);
+          setStatus("Composición despublicada.");
+        } catch (e) {
+          setStatus(`Error al despublicar: ${(e as Error).message}`);
+        }
+      },
+    });
   };
 
   return (
@@ -513,6 +550,46 @@ function ExperienceBuilderStudio() {
           </aside>
         </div>
       )}
+
+      {createOpen ? (
+        <CreateCompositionModal
+          onClose={() => setCreateOpen(false)}
+          onSubmit={submitCreate}
+        />
+      ) : null}
+
+      {publishOpen ? (
+        <NotesModal
+          title={
+            publishOpen === "public"
+              ? `Publicar "${active?.title ?? ""}"`
+              : "Crear revisión"
+          }
+          description={
+            publishOpen === "public"
+              ? `Reemplazará la versión pública actual del tipo "${active?.page_type ?? ""}".`
+              : "Guarda un snapshot del borrador como nueva revisión interna."
+          }
+          confirmLabel={publishOpen === "public" ? "Publicar" : "Crear revisión"}
+          onClose={() => setPublishOpen(null)}
+          onSubmit={
+            publishOpen === "public" ? submitPublishPublic : submitPublishRevision
+          }
+        />
+      ) : null}
+
+      {confirmState ? (
+        <ConfirmModal
+          title={confirmState.title}
+          message={confirmState.message}
+          confirmLabel={confirmState.confirmLabel}
+          onClose={() => setConfirmState(null)}
+          onConfirm={async () => {
+            await confirmState.onConfirm();
+            setConfirmState(null);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
@@ -543,6 +620,10 @@ function CompositionsList({
           Aún no hay composiciones. Crea la primera para empezar.
         </p>
       ) : (
+        <>
+        <p className="mb-2 text-xs text-muted-foreground">
+          Toca una composición para abrirla y editarla.
+        </p>
         <ul className="grid gap-2">
           {compositions.map((c) => (
             <li key={c.id}>
@@ -564,8 +645,230 @@ function CompositionsList({
             </li>
           ))}
         </ul>
+        </>
       )}
     </div>
+  );
+}
+
+function ModalShell({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-lg border border-border bg-card p-4 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-semibold">{title}</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-xs text-muted-foreground hover:underline"
+          >
+            Cerrar
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function CreateCompositionModal({
+  onClose,
+  onSubmit,
+}: {
+  onClose: () => void;
+  onSubmit: (input: { slug: string; title: string; page_type: string }) => void | Promise<void>;
+}) {
+  const [slug, setSlug] = useState("");
+  const [title, setTitle] = useState("");
+  const [pageType, setPageType] = useState("generic");
+  const [busy, setBusy] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!slug.trim()) return;
+    setBusy(true);
+    try {
+      await onSubmit({
+        slug: slug.trim(),
+        title: title.trim() || slug.trim(),
+        page_type: pageType,
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <ModalShell title="Nueva composición" onClose={onClose}>
+      <form onSubmit={submit} className="grid gap-3">
+        <label className="grid gap-1 text-xs">
+          <span className="font-semibold">Slug interno (único)</span>
+          <input
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            placeholder="home, landing-verano, etc."
+            required
+            className="rounded-md border border-border bg-background px-2 py-2 text-sm"
+          />
+        </label>
+        <label className="grid gap-1 text-xs">
+          <span className="font-semibold">Título editorial</span>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Home"
+            className="rounded-md border border-border bg-background px-2 py-2 text-sm"
+          />
+        </label>
+        <label className="grid gap-1 text-xs">
+          <span className="font-semibold">Tipo de página</span>
+          <select
+            value={pageType}
+            onChange={(e) => setPageType(e.target.value)}
+            className="rounded-md border border-border bg-background px-2 py-2 text-sm"
+          >
+            {PAGE_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="mt-2 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-border bg-background px-3 py-1.5 text-xs"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={busy || !slug.trim()}
+            className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+          >
+            {busy ? "Creando…" : "Crear"}
+          </button>
+        </div>
+      </form>
+    </ModalShell>
+  );
+}
+
+function NotesModal({
+  title,
+  description,
+  confirmLabel,
+  onClose,
+  onSubmit,
+}: {
+  title: string;
+  description: string;
+  confirmLabel: string;
+  onClose: () => void;
+  onSubmit: (notes: string) => void | Promise<void>;
+}) {
+  const [notes, setNotes] = useState("");
+  const [busy, setBusy] = useState(false);
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      await onSubmit(notes);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <ModalShell title={title} onClose={onClose}>
+      <form onSubmit={submit} className="grid gap-3">
+        <p className="text-xs text-muted-foreground">{description}</p>
+        <label className="grid gap-1 text-xs">
+          <span className="font-semibold">Notas (opcional)</span>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+            className="rounded-md border border-border bg-background px-2 py-2 text-sm"
+          />
+        </label>
+        <div className="mt-2 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-border bg-background px-3 py-1.5 text-xs"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={busy}
+            className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+          >
+            {busy ? "Procesando…" : confirmLabel}
+          </button>
+        </div>
+      </form>
+    </ModalShell>
+  );
+}
+
+function ConfirmModal({
+  title,
+  message,
+  confirmLabel,
+  onClose,
+  onConfirm,
+}: {
+  title: string;
+  message: string;
+  confirmLabel?: string;
+  onClose: () => void;
+  onConfirm: () => void | Promise<void>;
+}) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <ModalShell title={title} onClose={onClose}>
+      <p className="text-sm text-muted-foreground">{message}</p>
+      <div className="mt-4 flex justify-end gap-2">
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-md border border-border bg-background px-3 py-1.5 text-xs"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true);
+            try {
+              await onConfirm();
+            } finally {
+              setBusy(false);
+            }
+          }}
+          className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+        >
+          {busy ? "Procesando…" : confirmLabel ?? "Confirmar"}
+        </button>
+      </div>
+    </ModalShell>
   );
 }
 
