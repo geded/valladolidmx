@@ -2482,11 +2482,14 @@ export type Database = {
           description: string | null
           id: string
           page_type: string
+          published_at: string | null
+          published_by: string | null
           slug: string
           status: string
           title: string
           updated_at: string
           updated_by: string | null
+          variant_key: string
         }
         Insert: {
           active_revision_id?: string | null
@@ -2496,11 +2499,14 @@ export type Database = {
           description?: string | null
           id?: string
           page_type?: string
+          published_at?: string | null
+          published_by?: string | null
           slug: string
           status?: string
           title: string
           updated_at?: string
           updated_by?: string | null
+          variant_key?: string
         }
         Update: {
           active_revision_id?: string | null
@@ -2510,11 +2516,14 @@ export type Database = {
           description?: string | null
           id?: string
           page_type?: string
+          published_at?: string | null
+          published_by?: string | null
           slug?: string
           status?: string
           title?: string
           updated_at?: string
           updated_by?: string | null
+          variant_key?: string
         }
         Relationships: [
           {
@@ -3993,6 +4002,21 @@ export type Database = {
         Args: { _reason?: string; _type: string }
         Returns: undefined
       }
+      eb_get_published_home: {
+        Args: { _variant_key?: string }
+        Returns: {
+          description: string
+          id: string
+          page_type: string
+          published_at: string
+          revision_id: string
+          revision_number: number
+          slug: string
+          snapshot: Json
+          title: string
+          variant_key: string
+        }[]
+      }
       eb_list_block_library: {
         Args: never
         Returns: {
@@ -4010,6 +4034,10 @@ export type Database = {
           type: string
           updated_at: string
         }[]
+      }
+      eb_publish_composition: {
+        Args: { _id: string; _notes?: string }
+        Returns: string
       }
       eb_register_block: {
         Args: {
@@ -4033,6 +4061,10 @@ export type Database = {
       }
       eb_save_composition_draft: {
         Args: { _id: string; _tree: Json }
+        Returns: undefined
+      }
+      eb_unpublish_composition: {
+        Args: { _id: string; _notes?: string }
         Returns: undefined
       }
       enqueue_email: {
