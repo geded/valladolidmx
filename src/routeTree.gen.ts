@@ -38,6 +38,7 @@ import { Route as AuthenticatedPortalCatalogoRouteImport } from './routes/_authe
 import { Route as AuthenticatedCuentaPerfilRouteImport } from './routes/_authenticated/cuenta/perfil'
 import { Route as AuthenticatedCuentaHistorialRouteImport } from './routes/_authenticated/cuenta/historial'
 import { Route as AuthenticatedCuentaFavoritosRouteImport } from './routes/_authenticated/cuenta/favoritos'
+import { Route as AuthenticatedCuentaCarritoRouteImport } from './routes/_authenticated/cuenta/carrito'
 import { Route as AuthenticatedCmsZonasRouteImport } from './routes/_authenticated/cms/zonas'
 import { Route as AuthenticatedCmsProductosRouteImport } from './routes/_authenticated/cms/productos'
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
@@ -209,6 +210,12 @@ const AuthenticatedCuentaFavoritosRoute =
     path: '/favoritos',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
+const AuthenticatedCuentaCarritoRoute =
+  AuthenticatedCuentaCarritoRouteImport.update({
+    id: '/carrito',
+    path: '/carrito',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
 const AuthenticatedCmsZonasRoute = AuthenticatedCmsZonasRouteImport.update({
   id: '/zonas',
   path: '/zonas',
@@ -322,6 +329,7 @@ export interface FileRoutesByFullPath {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
@@ -364,6 +372,7 @@ export interface FileRoutesByTo {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
@@ -411,6 +420,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/_authenticated/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/_authenticated/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/_authenticated/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/_authenticated/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
@@ -458,6 +468,7 @@ export interface FileRouteTypes {
     | '/cms/media'
     | '/cms/productos'
     | '/cms/zonas'
+    | '/cuenta/carrito'
     | '/cuenta/favoritos'
     | '/cuenta/historial'
     | '/cuenta/perfil'
@@ -500,6 +511,7 @@ export interface FileRouteTypes {
     | '/cms/media'
     | '/cms/productos'
     | '/cms/zonas'
+    | '/cuenta/carrito'
     | '/cuenta/favoritos'
     | '/cuenta/historial'
     | '/cuenta/perfil'
@@ -546,6 +558,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/media'
     | '/_authenticated/cms/productos'
     | '/_authenticated/cms/zonas'
+    | '/_authenticated/cuenta/carrito'
     | '/_authenticated/cuenta/favoritos'
     | '/_authenticated/cuenta/historial'
     | '/_authenticated/cuenta/perfil'
@@ -792,6 +805,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCuentaFavoritosRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
+    '/_authenticated/cuenta/carrito': {
+      id: '/_authenticated/cuenta/carrito'
+      path: '/carrito'
+      fullPath: '/cuenta/carrito'
+      preLoaderRoute: typeof AuthenticatedCuentaCarritoRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
     '/_authenticated/cms/zonas': {
       id: '/_authenticated/cms/zonas'
       path: '/zonas'
@@ -901,6 +921,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedCuentaRouteRouteChildren {
+  AuthenticatedCuentaCarritoRoute: typeof AuthenticatedCuentaCarritoRoute
   AuthenticatedCuentaFavoritosRoute: typeof AuthenticatedCuentaFavoritosRoute
   AuthenticatedCuentaHistorialRoute: typeof AuthenticatedCuentaHistorialRoute
   AuthenticatedCuentaPerfilRoute: typeof AuthenticatedCuentaPerfilRoute
@@ -909,6 +930,7 @@ interface AuthenticatedCuentaRouteRouteChildren {
 
 const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildren =
   {
+    AuthenticatedCuentaCarritoRoute: AuthenticatedCuentaCarritoRoute,
     AuthenticatedCuentaFavoritosRoute: AuthenticatedCuentaFavoritosRoute,
     AuthenticatedCuentaHistorialRoute: AuthenticatedCuentaHistorialRoute,
     AuthenticatedCuentaPerfilRoute: AuthenticatedCuentaPerfilRoute,

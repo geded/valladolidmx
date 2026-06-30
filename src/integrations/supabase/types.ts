@@ -1299,6 +1299,150 @@ export type Database = {
         }
         Relationships: []
       }
+      order_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          event_type: Database["public"]["Enums"]["order_event_type"]
+          id: string
+          order_id: string
+          payload: Json
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type: Database["public"]["Enums"]["order_event_type"]
+          id?: string
+          order_id: string
+          payload?: Json
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type?: Database["public"]["Enums"]["order_event_type"]
+          id?: string
+          order_id?: string
+          payload?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          business_id: string
+          created_at: string
+          currency: string
+          id: string
+          order_id: string
+          product_id: string
+          quantity: number
+          snapshot_name: string
+          snapshot_slug: string
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          currency: string
+          id?: string
+          order_id: string
+          product_id: string
+          quantity: number
+          snapshot_name: string
+          snapshot_slug: string
+          unit_price: number
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          order_id?: string
+          product_id?: string
+          quantity?: number
+          snapshot_name?: string
+          snapshot_slug?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          cancelled_at: string | null
+          client_request_id: string | null
+          confirmed_at: string | null
+          created_at: string
+          currency: string
+          id: string
+          notes: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal_amount: number
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          client_request_id?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal_amount?: number
+          total_amount?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          client_request_id?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal_amount?: number
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pages: {
         Row: {
           blocks: Json
@@ -2163,6 +2307,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _order_recompute_totals: {
+        Args: { p_order_id: string }
+        Returns: undefined
+      }
       accept_business_invitation: { Args: { _token: string }; Returns: Json }
       archive_business_product: {
         Args: { _product_id: string }
@@ -2170,6 +2318,20 @@ export type Database = {
       }
       archive_business_promotion: {
         Args: { _promotion_id: string }
+        Returns: undefined
+      }
+      cart_add_item: {
+        Args: {
+          p_client_request_id?: string
+          p_product_id: string
+          p_quantity?: number
+        }
+        Returns: string
+      }
+      cart_ensure: { Args: never; Returns: string }
+      cart_remove_item: { Args: { p_item_id: string }; Returns: undefined }
+      cart_update_qty: {
+        Args: { p_item_id: string; p_quantity: number }
         Returns: undefined
       }
       create_business_product: {
@@ -2226,6 +2388,11 @@ export type Database = {
       log_business_presence_audit: {
         Args: { _action: string; _business_id: string; _notes?: string }
         Returns: undefined
+      }
+      order_cancel: { Args: { p_order_id: string }; Returns: undefined }
+      order_confirm: {
+        Args: { p_client_request_id?: string; p_notes?: string }
+        Returns: string
       }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
       register_business_media: {
@@ -2385,6 +2552,16 @@ export type Database = {
       locale_code: "es" | "en" | "fr" | "de" | "it" | "pt"
       media_kind: "image" | "video" | "document" | "audio"
       membership_status: "active" | "suspended" | "removed"
+      order_event_type:
+        | "created"
+        | "item_added"
+        | "item_removed"
+        | "item_qty_updated"
+        | "confirmed"
+        | "cancelled"
+        | "fulfilled"
+        | "note_added"
+      order_status: "cart" | "pending" | "confirmed" | "cancelled" | "fulfilled"
       product_type:
         | "experiencia"
         | "hotel"
@@ -2563,6 +2740,17 @@ export const Constants = {
       locale_code: ["es", "en", "fr", "de", "it", "pt"],
       media_kind: ["image", "video", "document", "audio"],
       membership_status: ["active", "suspended", "removed"],
+      order_event_type: [
+        "created",
+        "item_added",
+        "item_removed",
+        "item_qty_updated",
+        "confirmed",
+        "cancelled",
+        "fulfilled",
+        "note_added",
+      ],
+      order_status: ["cart", "pending", "confirmed", "cancelled", "fulfilled"],
       product_type: [
         "experiencia",
         "hotel",

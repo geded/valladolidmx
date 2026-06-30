@@ -28,6 +28,7 @@ function CuentaLayout() {
       { to: "/cuenta" as const, label: "Resumen" },
       { to: "/cuenta/perfil" as const, label: "Mi perfil de viaje" },
       { to: "/cuenta/favoritos" as const, label: "Favoritos" },
+      { to: "/cuenta/carrito" as const, label: "Carrito" },
       { to: "/cuenta/historial" as const, label: "Historial" },
     ],
     [],
