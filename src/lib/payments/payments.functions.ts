@@ -127,7 +127,7 @@ export const startPayment = createServerFn({ method: "POST" })
     const { data: profile } = await supabase
       .from("profiles")
       .select("email")
-      .eq("id", userId)
+      .eq("user_id", userId)
       .maybeSingle();
     const customerEmail =
       (profile?.email as string | undefined) ??
