@@ -54,6 +54,7 @@ import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './rout
 import { Route as AuthenticatedCmsReviewsIndexRouteImport } from './routes/_authenticated/cms/reviews.index'
 import { Route as AuthenticatedCmsRegionesIndexRouteImport } from './routes/_authenticated/cms/regiones.index'
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
 import { Route as AuthenticatedCuentaPagosExitoRouteImport } from './routes/_authenticated/cuenta/pagos.exito'
 import { Route as AuthenticatedCuentaPagosErrorRouteImport } from './routes/_authenticated/cuenta/pagos.error'
@@ -311,6 +312,12 @@ const AuthenticatedCmsCategoriasIndexRoute =
     path: '/categorias/',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedPortalInvitacionesTokenRoute =
   AuthenticatedPortalInvitacionesTokenRouteImport.update({
     id: '/invitaciones/$token',
@@ -414,6 +421,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
@@ -466,6 +474,7 @@ export interface FileRoutesByTo {
   '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews': typeof AuthenticatedCmsReviewsIndexRoute
@@ -523,6 +532,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/_authenticated/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/_authenticated/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/_authenticated/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
@@ -580,6 +590,7 @@ export interface FileRouteTypes {
     | '/cuenta/pagos/error'
     | '/cuenta/pagos/exito'
     | '/portal/invitaciones/$token'
+    | '/lovable/email/queue/process'
     | '/cms/categorias/'
     | '/cms/regiones/'
     | '/cms/reviews/'
@@ -632,6 +643,7 @@ export interface FileRouteTypes {
     | '/cuenta/pagos/error'
     | '/cuenta/pagos/exito'
     | '/portal/invitaciones/$token'
+    | '/lovable/email/queue/process'
     | '/cms/categorias'
     | '/cms/regiones'
     | '/cms/reviews'
@@ -688,6 +700,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/pagos/error'
     | '/_authenticated/cuenta/pagos/exito'
     | '/_authenticated/portal/invitaciones/$token'
+    | '/lovable/email/queue/process'
     | '/_authenticated/cms/categorias/'
     | '/_authenticated/cms/regiones/'
     | '/_authenticated/cms/reviews/'
@@ -713,6 +726,7 @@ export interface RootRouteChildren {
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   ApiPublicPaymentsProviderWebhookRoute: typeof ApiPublicPaymentsProviderWebhookRoute
 }
 
@@ -1033,6 +1047,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsCategoriasIndexRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/portal/invitaciones/$token': {
       id: '/_authenticated/portal/invitaciones/$token'
       path: '/invitaciones/$token'
@@ -1236,6 +1257,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrienteMayaDestinoRoute: OrienteMayaDestinoRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   ApiPublicPaymentsProviderWebhookRoute: ApiPublicPaymentsProviderWebhookRoute,
 }
 export const routeTree = rootRouteImport
