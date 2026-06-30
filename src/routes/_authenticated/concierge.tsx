@@ -11,7 +11,7 @@ import {
   type ConciergeCase,
   type ConciergeCaseScope,
 } from "@/lib/concierge/concierge.functions";
-import { PageShell } from "@/components/common/PageShell";
+// Vista mínima sin PageShell para no requerir crumbs en una superficie operativa interna.
 
 function casesQueryOptions(fn: () => Promise<ConciergeCase[]>, scope: ConciergeCaseScope) {
   return queryOptions({
@@ -42,7 +42,7 @@ function ConciergeInboxPage() {
   const mineQ = useSuspenseQuery(casesQueryOptions(load("concierge"), "concierge"));
 
   return (
-    <PageShell>
+    <main className="mx-auto w-full max-w-[1100px] px-5 py-10">
       <header className="mb-6">
         <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
           Ola 6 · Concierge Workspace
@@ -55,7 +55,7 @@ function ConciergeInboxPage() {
 
       <CasesSection title="Todos los expedientes (lead)" cases={leadQ.data} empty="Sin expedientes registrados." />
       <CasesSection title="Mis expedientes" cases={mineQ.data} empty="Sin expedientes asignados." />
-    </PageShell>
+    </main>
   );
 }
 
