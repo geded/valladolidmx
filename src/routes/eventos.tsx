@@ -1,23 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { SITE } from "@/config/site";
 
 export const Route = createFileRoute("/eventos")({
-  head: () => ({
-    meta: [
-      { title: `Eventos · ${SITE.name}` },
-      { name: "description", content: "Fiestas, festivales y celebraciones del calendario maya." },
-      { property: "og:title", content: `Eventos · ${SITE.name}` },
-      { property: "og:description", content: "Fiestas, festivales y celebraciones del calendario maya." },
-    ],
-  }),
+  head: () =>
+    buildPublicHead({
+      title: `Eventos · ${SITE.name}`,
+      description: "Fiestas, festivales y celebraciones del calendario maya.",
+      path: "/eventos",
+    }),
   component: PlaceholderRoute,
 });
 
 function PlaceholderRoute() {
   return (
-    <PageShell
+    <PublicShell
       eyebrow="Categoría"
       title="Eventos"
       description="Fiestas, festivales y celebraciones del calendario maya."
@@ -31,6 +30,6 @@ function PlaceholderRoute() {
           con buscador, filtros y tarjetas detalladas.
         </p>
       </div>
-    </PageShell>
+    </PublicShell>
   );
 }

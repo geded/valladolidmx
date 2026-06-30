@@ -1,23 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { SITE } from "@/config/site";
 
 export const Route = createFileRoute("/hoteles")({
-  head: () => ({
-    meta: [
-      { title: `Hoteles · ${SITE.name}` },
-      { name: "description", content: "Haciendas restauradas, posadas familiares y refugios en el corazón del Oriente Maya." },
-      { property: "og:title", content: `Hoteles · ${SITE.name}` },
-      { property: "og:description", content: "Haciendas restauradas, posadas familiares y refugios en el corazón del Oriente Maya." },
-    ],
-  }),
+  head: () =>
+    buildPublicHead({
+      title: `Hoteles · ${SITE.name}`,
+      description:
+        "Haciendas restauradas, posadas familiares y refugios en el corazón del Oriente Maya.",
+      path: "/hoteles",
+    }),
   component: PlaceholderRoute,
 });
 
 function PlaceholderRoute() {
   return (
-    <PageShell
+    <PublicShell
       eyebrow="Categoría"
       title="Hoteles"
       description="Haciendas restauradas, posadas familiares y refugios en el corazón del Oriente Maya."
@@ -31,6 +31,6 @@ function PlaceholderRoute() {
           con buscador, filtros y tarjetas detalladas.
         </p>
       </div>
-    </PageShell>
+    </PublicShell>
   );
 }

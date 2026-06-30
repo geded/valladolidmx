@@ -1,25 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { DestinoCard } from "@/components/cards/DestinoCard";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
 
 export const Route = createFileRoute("/oriente-maya/")({
-  head: () => ({
-    meta: [
-      { title: `Oriente Maya — Destinos · ${SITE.name}` },
-      { name: "description", content: ORIENTE_MAYA.short_description },
-      { property: "og:title", content: `Oriente Maya — Destinos · ${SITE.name}` },
-      { property: "og:description", content: ORIENTE_MAYA.short_description },
-    ],
-  }),
+  head: () =>
+    buildPublicHead({
+      title: `Oriente Maya — Destinos · ${SITE.name}`,
+      description: ORIENTE_MAYA.short_description,
+      path: "/oriente-maya",
+    }),
   component: OrienteMayaIndex,
 });
 
 function OrienteMayaIndex() {
   return (
-    <PageShell
+    <PublicShell
       eyebrow="Región turística"
       title={ORIENTE_MAYA.name}
       description={ORIENTE_MAYA.short_description}
@@ -30,6 +29,6 @@ function OrienteMayaIndex() {
           <DestinoCard key={d.id} destination={d} />
         ))}
       </div>
-    </PageShell>
+    </PublicShell>
   );
 }

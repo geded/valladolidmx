@@ -1,23 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { SITE } from "@/config/site";
 
 export const Route = createFileRoute("/experiencias")({
-  head: () => ({
-    meta: [
-      { title: `Experiencias · ${SITE.name}` },
-      { name: "description", content: "Vivencias auténticas con comunidades, cocineros y guías locales del Oriente Maya." },
-      { property: "og:title", content: `Experiencias · ${SITE.name}` },
-      { property: "og:description", content: "Vivencias auténticas con comunidades, cocineros y guías locales del Oriente Maya." },
-    ],
-  }),
+  head: () =>
+    buildPublicHead({
+      title: `Experiencias · ${SITE.name}`,
+      description:
+        "Vivencias auténticas con comunidades, cocineros y guías locales del Oriente Maya.",
+      path: "/experiencias",
+    }),
   component: PlaceholderRoute,
 });
 
 function PlaceholderRoute() {
   return (
-    <PageShell
+    <PublicShell
       eyebrow="Categoría"
       title="Experiencias"
       description="Vivencias auténticas con comunidades, cocineros y guías locales del Oriente Maya."
@@ -31,6 +31,6 @@ function PlaceholderRoute() {
           con buscador, filtros y tarjetas detalladas.
         </p>
       </div>
-    </PageShell>
+    </PublicShell>
   );
 }

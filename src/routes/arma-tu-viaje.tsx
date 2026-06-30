@@ -1,27 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Compass, FileText, MessageCircle } from "lucide-react";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { SITE } from "@/config/site";
 import { RequestConciergeButton } from "@/components/concierge/RequestConciergeButton";
 
 export const Route = createFileRoute("/arma-tu-viaje")({
-  head: () => ({
-    meta: [
-      { title: `Arma tu Viaje · ${SITE.name}` },
-      {
-        name: "description",
-        content:
-          "Tu expediente personal del Oriente Maya. Guarda destinos, experiencias y notas. Tu concierge humano lo recibe cuando estés listo.",
-      },
-    ],
-  }),
+  head: () =>
+    buildPublicHead({
+      title: `Arma tu Viaje · ${SITE.name}`,
+      description:
+        "Tu expediente personal del Oriente Maya. Guarda destinos, experiencias y notas. Tu concierge humano lo recibe cuando estés listo.",
+      path: "/arma-tu-viaje",
+    }),
   component: AYVPage,
 });
 
 function AYVPage() {
   return (
-    <PageShell
+    <PublicShell
       eyebrow="Plataforma"
       title="Arma tu Viaje"
       description="No es un carrito de compras. Es tu expediente personal. Cuando estés listo, lo recibe tu concierge humano."
@@ -64,6 +62,6 @@ function AYVPage() {
           />
         </div>
       </div>
-    </PageShell>
+    </PublicShell>
   );
 }

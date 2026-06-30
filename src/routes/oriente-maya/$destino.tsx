@@ -1,5 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { PlaceholderImage } from "@/components/common/PlaceholderImage";
 import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
@@ -14,31 +15,30 @@ export const Route = createFileRoute("/oriente-maya/$destino")({
     if (!dest) throw notFound();
     return { dest };
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.dest.name} — ${ORIENTE_MAYA.name} · ${SITE.name}` },
-          { name: "description", content: loaderData.dest.tagline },
-          { property: "og:title", content: `${loaderData.dest.name} — ${ORIENTE_MAYA.name}` },
-          { property: "og:description", content: loaderData.dest.tagline },
-        ]
-      : [],
-  }),
+  head: ({ loaderData, params }) =>
+    loaderData
+      ? buildPublicHead({
+          title: `${loaderData.dest.name} — ${ORIENTE_MAYA.name} · ${SITE.name}`,
+          description: loaderData.dest.tagline,
+          path: `/oriente-maya/${params.destino}`,
+          ogType: "place",
+        })
+      : { meta: [], links: [], scripts: [] },
   component: DestinoPage,
   notFoundComponent: () => (
-    <PageShell
+    <PublicShell
       title="Destino no disponible"
       crumbs={[{ label: ORIENTE_MAYA.name, to: "/oriente-maya" }, { label: "—" }]}
     >
       <p className="text-muted-foreground">Aún no publicamos esta página de destino.</p>
-    </PageShell>
+    </PublicShell>
   ),
 });
 
 function DestinoPage() {
   const { dest } = Route.useLoaderData();
   return (
-    <PageShell
+    <PublicShell
       eyebrow={ORIENTE_MAYA.name}
       title={dest.name}
       description={dest.tagline}
@@ -79,6 +79,6 @@ function DestinoPage() {
           </div>
         </aside>
       </div>
-    </PageShell>
+    </PublicShell>
   );
 }
