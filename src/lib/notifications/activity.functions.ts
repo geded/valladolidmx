@@ -7,12 +7,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
+
 export interface ActivityItem {
   kind: string;
   occurred_at: string;
   severity: string;
   title: string;
-  ref: Record<string, unknown>;
+  ref: JsonValue;
 }
 
 const clampLimit = (n?: number) => Math.min(Math.max(n ?? 50, 1), 200);
