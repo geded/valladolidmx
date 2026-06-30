@@ -63,6 +63,12 @@ import { Route as AuthenticatedCmsEmpresasRouteImport } from './routes/_authenti
 import { Route as AuthenticatedCmsDestinosRouteImport } from './routes/_authenticated/cms/destinos'
 import { Route as AuthenticatedCmsAlertasRouteImport } from './routes/_authenticated/cms/alertas'
 import { Route as AuthenticatedCmsActividadRouteImport } from './routes/_authenticated/cms/actividad'
+import { Route as AuthenticatedAdminTuristasRouteImport } from './routes/_authenticated/admin/turistas'
+import { Route as AuthenticatedAdminSistemaRouteImport } from './routes/_authenticated/admin/sistema'
+import { Route as AuthenticatedAdminOperacionesRouteImport } from './routes/_authenticated/admin/operaciones'
+import { Route as AuthenticatedAdminIaRouteImport } from './routes/_authenticated/admin/ia'
+import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
+import { Route as AuthenticatedAdminConciergeRouteImport } from './routes/_authenticated/admin/concierge'
 import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './routes/_authenticated/portal/invitaciones.index'
 import { Route as AuthenticatedPortalEmpresasIndexRouteImport } from './routes/_authenticated/portal/empresas.index'
 import { Route as AuthenticatedCmsReviewsIndexRouteImport } from './routes/_authenticated/cms/reviews.index'
@@ -378,6 +384,41 @@ const AuthenticatedCmsActividadRoute =
     path: '/actividad',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedAdminTuristasRoute =
+  AuthenticatedAdminTuristasRouteImport.update({
+    id: '/turistas',
+    path: '/turistas',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminSistemaRoute =
+  AuthenticatedAdminSistemaRouteImport.update({
+    id: '/sistema',
+    path: '/sistema',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminOperacionesRoute =
+  AuthenticatedAdminOperacionesRouteImport.update({
+    id: '/operaciones',
+    path: '/operaciones',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminIaRoute = AuthenticatedAdminIaRouteImport.update({
+  id: '/ia',
+  path: '/ia',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminEmpresasRoute =
+  AuthenticatedAdminEmpresasRouteImport.update({
+    id: '/empresas',
+    path: '/empresas',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminConciergeRoute =
+  AuthenticatedAdminConciergeRouteImport.update({
+    id: '/concierge',
+    path: '/concierge',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedPortalInvitacionesIndexRoute =
   AuthenticatedPortalInvitacionesIndexRouteImport.update({
     id: '/invitaciones/',
@@ -524,6 +565,12 @@ export interface FileRoutesByFullPath {
   '/preview/$token': typeof PreviewTokenRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
+  '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/admin/ia': typeof AuthenticatedAdminIaRoute
+  '/admin/operaciones': typeof AuthenticatedAdminOperacionesRoute
+  '/admin/sistema': typeof AuthenticatedAdminSistemaRoute
+  '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
@@ -595,6 +642,12 @@ export interface FileRoutesByTo {
   '/preview/$token': typeof PreviewTokenRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
+  '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
+  '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/admin/ia': typeof AuthenticatedAdminIaRoute
+  '/admin/operaciones': typeof AuthenticatedAdminOperacionesRoute
+  '/admin/sistema': typeof AuthenticatedAdminSistemaRoute
+  '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
@@ -672,6 +725,12 @@ export interface FileRoutesById {
   '/preview/$token': typeof PreviewTokenRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/_authenticated/admin/concierge': typeof AuthenticatedAdminConciergeRoute
+  '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/_authenticated/admin/ia': typeof AuthenticatedAdminIaRoute
+  '/_authenticated/admin/operaciones': typeof AuthenticatedAdminOperacionesRoute
+  '/_authenticated/admin/sistema': typeof AuthenticatedAdminSistemaRoute
+  '/_authenticated/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/_authenticated/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/_authenticated/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/_authenticated/cms/destinos': typeof AuthenticatedCmsDestinosRoute
@@ -749,6 +808,12 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/marketplace/'
     | '/oriente-maya/'
+    | '/admin/concierge'
+    | '/admin/empresas'
+    | '/admin/ia'
+    | '/admin/operaciones'
+    | '/admin/sistema'
+    | '/admin/turistas'
     | '/cms/actividad'
     | '/cms/alertas'
     | '/cms/destinos'
@@ -820,6 +885,12 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/marketplace'
     | '/oriente-maya'
+    | '/admin/concierge'
+    | '/admin/empresas'
+    | '/admin/ia'
+    | '/admin/operaciones'
+    | '/admin/sistema'
+    | '/admin/turistas'
     | '/cms/actividad'
     | '/cms/alertas'
     | '/cms/destinos'
@@ -896,6 +967,12 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/marketplace/'
     | '/oriente-maya/'
+    | '/_authenticated/admin/concierge'
+    | '/_authenticated/admin/empresas'
+    | '/_authenticated/admin/ia'
+    | '/_authenticated/admin/operaciones'
+    | '/_authenticated/admin/sistema'
+    | '/_authenticated/admin/turistas'
     | '/_authenticated/cms/actividad'
     | '/_authenticated/cms/alertas'
     | '/_authenticated/cms/destinos'
@@ -1350,6 +1427,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsActividadRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/admin/turistas': {
+      id: '/_authenticated/admin/turistas'
+      path: '/turistas'
+      fullPath: '/admin/turistas'
+      preLoaderRoute: typeof AuthenticatedAdminTuristasRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/sistema': {
+      id: '/_authenticated/admin/sistema'
+      path: '/sistema'
+      fullPath: '/admin/sistema'
+      preLoaderRoute: typeof AuthenticatedAdminSistemaRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/operaciones': {
+      id: '/_authenticated/admin/operaciones'
+      path: '/operaciones'
+      fullPath: '/admin/operaciones'
+      preLoaderRoute: typeof AuthenticatedAdminOperacionesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/ia': {
+      id: '/_authenticated/admin/ia'
+      path: '/ia'
+      fullPath: '/admin/ia'
+      preLoaderRoute: typeof AuthenticatedAdminIaRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/empresas': {
+      id: '/_authenticated/admin/empresas'
+      path: '/empresas'
+      fullPath: '/admin/empresas'
+      preLoaderRoute: typeof AuthenticatedAdminEmpresasRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/concierge': {
+      id: '/_authenticated/admin/concierge'
+      path: '/concierge'
+      fullPath: '/admin/concierge'
+      preLoaderRoute: typeof AuthenticatedAdminConciergeRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/portal/invitaciones/': {
       id: '/_authenticated/portal/invitaciones/'
       path: '/invitaciones'
@@ -1494,11 +1613,23 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminConciergeRoute: typeof AuthenticatedAdminConciergeRoute
+  AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
+  AuthenticatedAdminIaRoute: typeof AuthenticatedAdminIaRoute
+  AuthenticatedAdminOperacionesRoute: typeof AuthenticatedAdminOperacionesRoute
+  AuthenticatedAdminSistemaRoute: typeof AuthenticatedAdminSistemaRoute
+  AuthenticatedAdminTuristasRoute: typeof AuthenticatedAdminTuristasRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminConciergeRoute: AuthenticatedAdminConciergeRoute,
+    AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
+    AuthenticatedAdminIaRoute: AuthenticatedAdminIaRoute,
+    AuthenticatedAdminOperacionesRoute: AuthenticatedAdminOperacionesRoute,
+    AuthenticatedAdminSistemaRoute: AuthenticatedAdminSistemaRoute,
+    AuthenticatedAdminTuristasRoute: AuthenticatedAdminTuristasRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
 
