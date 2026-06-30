@@ -201,7 +201,7 @@ export const ebRollbackPage = createServerFn({ method: "POST" })
     const { data: vid, error } = await context.supabase.rpc("eb_page_rollback", {
       _page_id: data.page_id,
       _version_id: data.version_id,
-      _note: data.note ?? null,
+      _note: data.note ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { version_id: vid as unknown as string };
@@ -213,7 +213,7 @@ export const ebInvalidatePageCache = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ cache_version: number }> => {
     const { data: v, error } = await context.supabase.rpc("eb_cache_invalidate", {
       _page_id: data.page_id,
-      _reason: data.reason ?? null,
+      _reason: data.reason ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { cache_version: v as unknown as number };
