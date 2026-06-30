@@ -14,6 +14,24 @@ import { useTranslation } from "@/i18n/context";
 import { ROLE_LABELS, type AppRole } from "@/types/auth";
 import { useAuth } from "@/hooks/useAuth";
 
+type MenuLink = { to: "/admin" | "/cms" | "/empresa" | "/concierge" | "/mi-viaje" | "/cuenta"; label: string; icon: typeof UserRound };
+
+function buildMenuLinks(role: AppRole | null): MenuLink[] {
+  const links: MenuLink[] = [];
+  if (!role) return links;
+  if (role === "super_admin" || role === "admin") {
+    links.push({ to: "/admin", label: "Panel de administración", icon: Shield });
+    links.push({ to: "/cms", label: "CMS", icon: LayoutDashboard });
+  }
+  if (role === "editor") links.push({ to: "/cms", label: "CMS", icon: LayoutDashboard });
+  if (role === "business_owner") links.push({ to: "/empresa", label: "Mi empresa", icon: Briefcase });
+  if (role === "concierge" || role === "concierge_lead")
+    links.push({ to: "/concierge", label: "Concierge", icon: Headphones });
+  links.push({ to: "/mi-viaje", label: "Mi viaje", icon: Compass });
+  links.push({ to: "/cuenta", label: "Mi cuenta", icon: UserRound });
+  return links;
+}
+
 export function UserMenu() {
   const { t } = useTranslation();
   const { authUser, role, signOut, loading } = useAuth();
