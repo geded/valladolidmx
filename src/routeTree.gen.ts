@@ -26,6 +26,7 @@ import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
 import { Route as MarketplaceBuscarRouteImport } from './routes/marketplace/buscar'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
+import { Route as LSlugRouteImport } from './routes/l.$slug'
 import { Route as AuthenticatedMiViajeRouteImport } from './routes/_authenticated/mi-viaje'
 import { Route as AuthenticatedEmpresaRouteImport } from './routes/_authenticated/empresa'
 import { Route as AuthenticatedConciergeRouteImport } from './routes/_authenticated/concierge'
@@ -162,6 +163,11 @@ const MarketplaceBuscarRoute = MarketplaceBuscarRouteImport.update({
 const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
   id: '/marketplace/$slug',
   path: '/marketplace/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LSlugRoute = LSlugRouteImport.update({
+  id: '/l/$slug',
+  path: '/l/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedMiViajeRoute = AuthenticatedMiViajeRouteImport.update({
@@ -490,6 +496,7 @@ export interface FileRoutesByFullPath {
   '/concierge': typeof AuthenticatedConciergeRouteWithChildren
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
+  '/l/$slug': typeof LSlugRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -557,6 +564,7 @@ export interface FileRoutesByTo {
   '/concierge': typeof AuthenticatedConciergeRouteWithChildren
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
+  '/l/$slug': typeof LSlugRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -630,6 +638,7 @@ export interface FileRoutesById {
   '/_authenticated/concierge': typeof AuthenticatedConciergeRouteWithChildren
   '/_authenticated/empresa': typeof AuthenticatedEmpresaRoute
   '/_authenticated/mi-viaje': typeof AuthenticatedMiViajeRoute
+  '/l/$slug': typeof LSlugRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -703,6 +712,7 @@ export interface FileRouteTypes {
     | '/concierge'
     | '/empresa'
     | '/mi-viaje'
+    | '/l/$slug'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
@@ -770,6 +780,7 @@ export interface FileRouteTypes {
     | '/concierge'
     | '/empresa'
     | '/mi-viaje'
+    | '/l/$slug'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
@@ -842,6 +853,7 @@ export interface FileRouteTypes {
     | '/_authenticated/concierge'
     | '/_authenticated/empresa'
     | '/_authenticated/mi-viaje'
+    | '/l/$slug'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
@@ -908,6 +920,7 @@ export interface RootRouteChildren {
   HotelesRoute: typeof HotelesRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RestaurantesRoute: typeof RestaurantesRoute
+  LSlugRoute: typeof LSlugRoute
   MarketplaceSlugRoute: typeof MarketplaceSlugRoute
   MarketplaceBuscarRoute: typeof MarketplaceBuscarRoute
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRoute
@@ -1037,6 +1050,13 @@ declare module '@tanstack/react-router' {
       path: '/marketplace/$slug'
       fullPath: '/marketplace/$slug'
       preLoaderRoute: typeof MarketplaceSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/l/$slug': {
+      id: '/l/$slug'
+      path: '/l/$slug'
+      fullPath: '/l/$slug'
+      preLoaderRoute: typeof LSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/mi-viaje': {
@@ -1639,6 +1659,7 @@ const rootRouteChildren: RootRouteChildren = {
   HotelesRoute: HotelesRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RestaurantesRoute: RestaurantesRoute,
+  LSlugRoute: LSlugRoute,
   MarketplaceSlugRoute: MarketplaceSlugRoute,
   MarketplaceBuscarRoute: MarketplaceBuscarRoute,
   OrienteMayaDestinoRoute: OrienteMayaDestinoRoute,

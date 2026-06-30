@@ -192,6 +192,33 @@ export const ebUnpublishPage = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+/* Rollback + cache (Fase 3) ----------------------------------------- */
+
+export const ebRollbackPage = createServerFn({ method: "POST" })
+  .inputValidator((d: { page_id: string; version_id: string; note?: string }) => d)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ version_id: string }> => {
+    const { data: vid, error } = await context.supabase.rpc("eb_page_rollback", {
+      _page_id: data.page_id,
+      _version_id: data.version_id,
+      _note: data.note ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return { version_id: vid as unknown as string };
+  });
+
+export const ebInvalidatePageCache = createServerFn({ method: "POST" })
+  .inputValidator((d: { page_id: string; reason?: string }) => d)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ cache_version: number }> => {
+    const { data: v, error } = await context.supabase.rpc("eb_cache_invalidate", {
+      _page_id: data.page_id,
+      _reason: data.reason ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return { cache_version: v as unknown as number };
+  });
+
 /* Themes ------------------------------------------------------------- */
 
 export const ebListThemes = createServerFn({ method: "GET" })
