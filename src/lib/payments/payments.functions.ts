@@ -94,12 +94,12 @@ export const startPayment = createServerFn({ method: "POST" })
     const { data: products, error: pErr } = await supabase
       .from("products")
       .select(
-        "id, status, currency, base_price, conversion_mode, accepts_online_payment",
+        "id, status, price_currency, price_amount, conversion_mode, accepts_online_payment",
       )
       .in("id", productIds);
     if (pErr) throw new Error(`products_read_failed: ${pErr.message}`);
     const byId = new Map(
-      ((products ?? []) as Array<Record<string, unknown>>).map((p) => [
+      ((products ?? []) as unknown as Array<Record<string, unknown>>).map((p) => [
         String(p.id),
         p,
       ]),
@@ -115,11 +115,11 @@ export const startPayment = createServerFn({ method: "POST" })
       if (p.accepts_online_payment !== true) {
         throw new Error("product_payment_not_accepted");
       }
-      const currentPrice = Number(p.base_price ?? 0);
+      const currentPrice = Number(p.price_amount ?? 0);
       if (Math.abs(currentPrice - Number(it.unit_price)) > 0.005) {
         throw new Error("price_changed");
       }
-      if (String(p.currency) !== String(it.currency)) {
+      if (String(p.price_currency) !== String(it.currency)) {
         throw new Error("currency_mismatch");
       }
     }
