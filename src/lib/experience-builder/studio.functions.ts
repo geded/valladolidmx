@@ -82,7 +82,7 @@ export const createComposition = createServerFn({ method: "POST" })
     const { data: id, error } = await context.supabase.rpc("eb_create_composition", {
       _slug: data.slug,
       _title: data.title,
-      _description: data.description ?? null,
+      _description: data.description,
       _page_type: data.page_type ?? "generic",
     });
     if (error) throw new Error(error.message);
@@ -107,7 +107,7 @@ export const createCompositionRevision = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ revision_id: string }> => {
     const { data: rev_id, error } = await context.supabase.rpc("eb_create_revision", {
       _id: data.id,
-      _notes: data.notes ?? null,
+      _notes: data.notes,
     });
     if (error) throw new Error(error.message);
     return { revision_id: rev_id as unknown as string };
