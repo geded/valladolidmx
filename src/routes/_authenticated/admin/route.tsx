@@ -39,19 +39,22 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Operación",
     items: [
       { to: "/cms/pagos", label: "Pagos y órdenes" },
-      { to: "/portal/empresas", label: "Empresas (super)" },
       { to: "/cms/observabilidad", label: "Observabilidad" },
       { to: "/cms/alertas", label: "Alertas" },
       { to: "/cms/actividad", label: "Centro de actividad" },
+      { to: "/portal/pagos", label: "Pagos (Portal)" },
+      { to: "/portal/actividad", label: "Actividad (Portal)" },
     ],
   },
   {
     label: "Contenido",
     items: [
       { to: "/cms/experience-builder", label: "Constructor de páginas", hint: "Editar Home" },
+      { to: "/cms/experience-builder/pages", label: "Páginas EB" },
       { to: "/cms/empresas", label: "Empresas (CMS)" },
       { to: "/cms/productos", label: "Productos" },
       { to: "/cms/destinos", label: "Destinos" },
+      { to: "/cms/zonas", label: "Zonas" },
       { to: "/cms/regiones", label: "Regiones" },
       { to: "/cms/categorias", label: "Categorías" },
       { to: "/cms/media", label: "Media" },
@@ -62,6 +65,32 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/cms/reviews", label: "Reseñas / moderación" },
       { to: "/concierge", label: "Concierge" },
+      { to: "/portal/concierge", label: "Concierge (Portal)" },
+    ],
+  },
+  {
+    label: "Empresas & Portal",
+    items: [
+      { to: "/portal/empresas", label: "Empresas (super)" },
+      { to: "/portal", label: "Resumen Portal" },
+      { to: "/portal/ficha", label: "Ficha pública" },
+      { to: "/portal/catalogo", label: "Catálogo" },
+      { to: "/portal/galeria", label: "Galería" },
+      { to: "/portal/presencia", label: "Presencia digital" },
+      { to: "/portal/propiedad", label: "Propiedad / transferencias" },
+      { to: "/portal/invitaciones", label: "Invitaciones" },
+    ],
+  },
+  {
+    label: "Viajero (vista interna)",
+    items: [
+      { to: "/cuenta", label: "Cuenta" },
+      { to: "/cuenta/favoritos", label: "Favoritos" },
+      { to: "/cuenta/carrito", label: "Carrito" },
+      { to: "/cuenta/historial", label: "Historial" },
+      { to: "/cuenta/concierge", label: "Concierge viajero" },
+      { to: "/cuenta/notificaciones", label: "Notificaciones" },
+      { to: "/cuenta/actividad", label: "Actividad" },
     ],
   },
   {
@@ -69,6 +98,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/cms", label: "CMS Studio (todo)" },
       { to: "/portal", label: "Portal empresarial" },
+      { to: "/concierge", label: "Centro Concierge" },
     ],
   },
 ];
