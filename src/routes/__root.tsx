@@ -14,8 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider } from "@/i18n/context";
 import { AuthProvider } from "@/hooks/useAuth";
-import { SiteHeader } from "@/components/layout/SiteHeader";
-import { SiteFooter } from "@/components/layout/SiteFooter";
+import { PublicHeader, PublicFooter } from "@/components/discovery";
 import { AluxFloatingTrigger } from "@/components/layout/AluxFloatingTrigger";
 import { registerServiceWorker } from "@/pwa/register-sw";
 import { SITE } from "@/config/site";
@@ -95,14 +94,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: SITE.name },
       { name: "format-detection", content: "telephone=no" },
-      { title: "Lovable App" },
-      { property: "og:title", content: "Lovable App" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "description", content: "ValladolidMx is a project documentation and architecture management application." },
-      { property: "og:description", content: "ValladolidMx is a project documentation and architecture management application." },
-      { name: "twitter:description", content: "ValladolidMx is a project documentation and architecture management application." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/451dae27-7852-4208-a44a-50306b30f806/id-preview-75119557--fd89b51f-9afc-4e15-8ee2-21fe468f6aa9.lovable.app-1782672665144.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/451dae27-7852-4208-a44a-50306b30f806/id-preview-75119557--fd89b51f-9afc-4e15-8ee2-21fe468f6aa9.lovable.app-1782672665144.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -168,9 +159,9 @@ function RootComponent() {
         >
           Saltar al contenido
         </a>
-        {!isAppShellRoute ? <SiteHeader variant={headerVariant} /> : null}
+        {!isAppShellRoute ? <PublicHeader variant={headerVariant} /> : null}
         <Outlet />
-        {!isAppShellRoute ? <SiteFooter /> : null}
+        {!isAppShellRoute ? <PublicFooter /> : null}
         {!isAppShellRoute ? <AluxFloatingTrigger /> : null}
         </AuthProvider>
       </I18nProvider>
