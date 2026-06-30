@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Building2, BarChart3, Megaphone, ShieldCheck } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Building2, BarChart3, Megaphone, ShieldCheck, ArrowRight } from "lucide-react";
 import { PageShell } from "@/components/common/PageShell";
 import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { SITE } from "@/config/site";
@@ -43,13 +43,20 @@ function EmpresasLanding() {
         ))}
       </div>
 
-      <div className="mt-10 rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center">
-        <ComingSoonBadge label="Onboarding en Fase 3" />
-        <h2 className="mt-4 text-2xl">Onboarding de empresas</h2>
+      <div className="mt-10 rounded-2xl border border-border bg-card/60 p-10 text-center">
+        <ComingSoonBadge label="Portal Empresarial activo" />
+        <h2 className="mt-4 text-2xl">Gestiona tu empresa</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          Pronto podrás registrar tu empresa, crear tu perfil y conectar con viajeros
-          listos para descubrir el territorio.
+          Accede a ficha pública, presencia, galería, catálogo, pagos,
+          actividad, concierge, invitaciones y propiedad desde el portal.
         </p>
+        <Link
+          to="/portal"
+          className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+        >
+          Entrar al Portal Empresarial
+          <ArrowRight className="size-4" aria-hidden />
+        </Link>
       </div>
     </PageShell>
   );
