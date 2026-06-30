@@ -1556,6 +1556,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          last_seen_at: string
+          p256dh: string
+          revoked_at: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          last_seen_at?: string
+          p256dh: string
+          revoked_at?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          last_seen_at?: string
+          p256dh?: string
+          revoked_at?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_subscriptions: {
         Row: {
           audience: string
@@ -1594,6 +1630,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      notification_webhook_endpoints: {
+        Row: {
+          business_id: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          label: string | null
+          owner_user_id: string
+          secret_current: string
+          secret_previous: string | null
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          business_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          owner_user_id: string
+          secret_current: string
+          secret_previous?: string | null
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          business_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          owner_user_id?: string
+          secret_current?: string
+          secret_previous?: string | null
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_webhook_endpoints_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_events: {
         Row: {
@@ -3266,6 +3349,74 @@ export type Database = {
           _event_type: string
           _payload_ref?: Json
           _recipient_user_id: string
+        }
+        Returns: {
+          attempt_count: number
+          audience: string
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          delivered_at: string | null
+          event_id: string
+          event_type: string
+          id: string
+          last_error: string | null
+          payload_ref: Json
+          read_at: string | null
+          recipient_user_id: string | null
+          status: Database["public"]["Enums"]["notification_delivery_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "notification_deliveries"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      unc_publish_push: {
+        Args: {
+          _audience: string
+          _category: Database["public"]["Enums"]["notification_category"]
+          _event_id: string
+          _event_type: string
+          _payload_ref?: Json
+          _recipient_user_id: string
+          _template_key: string
+        }
+        Returns: {
+          attempt_count: number
+          audience: string
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          delivered_at: string | null
+          event_id: string
+          event_type: string
+          id: string
+          last_error: string | null
+          payload_ref: Json
+          read_at: string | null
+          recipient_user_id: string | null
+          status: Database["public"]["Enums"]["notification_delivery_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "notification_deliveries"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      unc_publish_webhook: {
+        Args: {
+          _audience: string
+          _category: Database["public"]["Enums"]["notification_category"]
+          _endpoint_id: string
+          _event_id: string
+          _event_type: string
+          _payload_ref?: Json
+          _template_key: string
         }
         Returns: {
           attempt_count: number
