@@ -62,6 +62,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
 import { Route as AuthenticatedCuentaPagosExitoRouteImport } from './routes/_authenticated/cuenta/pagos.exito'
 import { Route as AuthenticatedCuentaPagosErrorRouteImport } from './routes/_authenticated/cuenta/pagos.error'
+import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId'
 import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge.expedientes.$caseId'
 import { Route as AuthenticatedCmsRegionesNuevaRouteImport } from './routes/_authenticated/cms/regiones.nueva'
 import { Route as AuthenticatedCmsRegionesEditarRouteImport } from './routes/_authenticated/cms/regiones..editar'
@@ -364,6 +365,12 @@ const AuthenticatedCuentaPagosErrorRoute =
     path: '/pagos/error',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
+const AuthenticatedCuentaConciergeCaseIdRoute =
+  AuthenticatedCuentaConciergeCaseIdRouteImport.update({
+    id: '/$caseId',
+    path: '/$caseId',
+    getParentRoute: () => AuthenticatedCuentaConciergeRoute,
+  } as any)
 const AuthenticatedConciergeExpedientesCaseIdRoute =
   AuthenticatedConciergeExpedientesCaseIdRouteImport.update({
     id: '/expedientes/$caseId',
@@ -438,7 +445,7 @@ export interface FileRoutesByFullPath {
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
-  '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRoute
+  '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRouteWithChildren
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
@@ -457,6 +464,7 @@ export interface FileRoutesByFullPath {
   '/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
+  '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRoute
   '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
@@ -496,7 +504,7 @@ export interface FileRoutesByTo {
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
-  '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRoute
+  '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRouteWithChildren
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
@@ -515,6 +523,7 @@ export interface FileRoutesByTo {
   '/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
+  '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRoute
   '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
@@ -559,7 +568,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/_authenticated/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
-  '/_authenticated/cuenta/concierge': typeof AuthenticatedCuentaConciergeRoute
+  '/_authenticated/cuenta/concierge': typeof AuthenticatedCuentaConciergeRouteWithChildren
   '/_authenticated/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/_authenticated/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/_authenticated/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
@@ -578,6 +587,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/_authenticated/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
+  '/_authenticated/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRoute
   '/_authenticated/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/_authenticated/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
@@ -641,6 +651,7 @@ export interface FileRouteTypes {
     | '/cms/regiones/editar'
     | '/cms/regiones/nueva'
     | '/concierge/expedientes/$caseId'
+    | '/cuenta/concierge/$caseId'
     | '/cuenta/pagos/error'
     | '/cuenta/pagos/exito'
     | '/portal/invitaciones/$token'
@@ -699,6 +710,7 @@ export interface FileRouteTypes {
     | '/cms/regiones/editar'
     | '/cms/regiones/nueva'
     | '/concierge/expedientes/$caseId'
+    | '/cuenta/concierge/$caseId'
     | '/cuenta/pagos/error'
     | '/cuenta/pagos/exito'
     | '/portal/invitaciones/$token'
@@ -761,6 +773,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/regiones/editar'
     | '/_authenticated/cms/regiones/nueva'
     | '/_authenticated/concierge/expedientes/$caseId'
+    | '/_authenticated/cuenta/concierge/$caseId'
     | '/_authenticated/cuenta/pagos/error'
     | '/_authenticated/cuenta/pagos/exito'
     | '/_authenticated/portal/invitaciones/$token'
@@ -1167,6 +1180,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCuentaPagosErrorRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
+    '/_authenticated/cuenta/concierge/$caseId': {
+      id: '/_authenticated/cuenta/concierge/$caseId'
+      path: '/$caseId'
+      fullPath: '/cuenta/concierge/$caseId'
+      preLoaderRoute: typeof AuthenticatedCuentaConciergeCaseIdRouteImport
+      parentRoute: typeof AuthenticatedCuentaConciergeRoute
+    }
     '/_authenticated/concierge/expedientes/$caseId': {
       id: '/_authenticated/concierge/expedientes/$caseId'
       path: '/expedientes/$caseId'
@@ -1219,10 +1239,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedCuentaConciergeRouteChildren {
+  AuthenticatedCuentaConciergeCaseIdRoute: typeof AuthenticatedCuentaConciergeCaseIdRoute
+}
+
+const AuthenticatedCuentaConciergeRouteChildren: AuthenticatedCuentaConciergeRouteChildren =
+  {
+    AuthenticatedCuentaConciergeCaseIdRoute:
+      AuthenticatedCuentaConciergeCaseIdRoute,
+  }
+
+const AuthenticatedCuentaConciergeRouteWithChildren =
+  AuthenticatedCuentaConciergeRoute._addFileChildren(
+    AuthenticatedCuentaConciergeRouteChildren,
+  )
+
 interface AuthenticatedCuentaRouteRouteChildren {
   AuthenticatedCuentaActividadRoute: typeof AuthenticatedCuentaActividadRoute
   AuthenticatedCuentaCarritoRoute: typeof AuthenticatedCuentaCarritoRoute
-  AuthenticatedCuentaConciergeRoute: typeof AuthenticatedCuentaConciergeRoute
+  AuthenticatedCuentaConciergeRoute: typeof AuthenticatedCuentaConciergeRouteWithChildren
   AuthenticatedCuentaFavoritosRoute: typeof AuthenticatedCuentaFavoritosRoute
   AuthenticatedCuentaHistorialRoute: typeof AuthenticatedCuentaHistorialRoute
   AuthenticatedCuentaNotificacionesRoute: typeof AuthenticatedCuentaNotificacionesRoute
@@ -1236,7 +1271,8 @@ const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildr
   {
     AuthenticatedCuentaActividadRoute: AuthenticatedCuentaActividadRoute,
     AuthenticatedCuentaCarritoRoute: AuthenticatedCuentaCarritoRoute,
-    AuthenticatedCuentaConciergeRoute: AuthenticatedCuentaConciergeRoute,
+    AuthenticatedCuentaConciergeRoute:
+      AuthenticatedCuentaConciergeRouteWithChildren,
     AuthenticatedCuentaFavoritosRoute: AuthenticatedCuentaFavoritosRoute,
     AuthenticatedCuentaHistorialRoute: AuthenticatedCuentaHistorialRoute,
     AuthenticatedCuentaNotificacionesRoute:
