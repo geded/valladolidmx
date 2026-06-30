@@ -208,6 +208,113 @@ export type Database = {
           },
         ]
       }
+      block_definitions: {
+        Row: {
+          capabilities: Json
+          category: Database["public"]["Enums"]["block_category"]
+          constraints: Json
+          created_at: string
+          current_version: string
+          data_sources: Json
+          description: string | null
+          display_name: string
+          i18n: Json
+          id: string
+          is_deprecated: boolean
+          responsive: Json
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          capabilities?: Json
+          category: Database["public"]["Enums"]["block_category"]
+          constraints?: Json
+          created_at?: string
+          current_version: string
+          data_sources?: Json
+          description?: string | null
+          display_name: string
+          i18n?: Json
+          id?: string
+          is_deprecated?: boolean
+          responsive?: Json
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          capabilities?: Json
+          category?: Database["public"]["Enums"]["block_category"]
+          constraints?: Json
+          created_at?: string
+          current_version?: string
+          data_sources?: Json
+          description?: string | null
+          display_name?: string
+          i18n?: Json
+          id?: string
+          is_deprecated?: boolean
+          responsive?: Json
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      block_versions: {
+        Row: {
+          block_id: string
+          capabilities: Json
+          constraints: Json
+          data_sources: Json
+          i18n: Json
+          id: string
+          notes: string | null
+          published_at: string
+          published_by: string | null
+          responsive: Json
+          schema: Json
+          status: Database["public"]["Enums"]["block_version_status"]
+          version: string
+        }
+        Insert: {
+          block_id: string
+          capabilities?: Json
+          constraints?: Json
+          data_sources?: Json
+          i18n?: Json
+          id?: string
+          notes?: string | null
+          published_at?: string
+          published_by?: string | null
+          responsive?: Json
+          schema: Json
+          status?: Database["public"]["Enums"]["block_version_status"]
+          version: string
+        }
+        Update: {
+          block_id?: string
+          capabilities?: Json
+          constraints?: Json
+          data_sources?: Json
+          i18n?: Json
+          id?: string
+          notes?: string | null
+          published_at?: string
+          published_by?: string | null
+          responsive?: Json
+          schema?: Json
+          status?: Database["public"]["Enums"]["block_version_status"]
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "block_versions_block_id_fkey"
+            columns: ["block_id"]
+            isOneToOne: false
+            referencedRelation: "block_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_categories: {
         Row: {
           created_at: string
@@ -3778,6 +3885,44 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      eb_deprecate_block: {
+        Args: { _reason?: string; _type: string }
+        Returns: undefined
+      }
+      eb_list_block_library: {
+        Args: never
+        Returns: {
+          capabilities: Json
+          category: Database["public"]["Enums"]["block_category"]
+          constraints: Json
+          current_version: string
+          data_sources: Json
+          description: string
+          display_name: string
+          i18n: Json
+          id: string
+          is_deprecated: boolean
+          responsive: Json
+          type: string
+          updated_at: string
+        }[]
+      }
+      eb_register_block: {
+        Args: {
+          _capabilities?: Json
+          _category: Database["public"]["Enums"]["block_category"]
+          _constraints?: Json
+          _data_sources?: Json
+          _description: string
+          _display_name: string
+          _i18n?: Json
+          _responsive?: Json
+          _schema: Json
+          _type: string
+          _version: string
+        }
+        Returns: string
+      }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
@@ -4353,6 +4498,8 @@ export type Database = {
         | "admin"
         | "super_admin"
         | "concierge_lead"
+      block_category: "static" | "smart"
+      block_version_status: "active" | "deprecated" | "retired"
       business_user_role: "owner" | "manager" | "editor" | "viewer"
       content_status:
         | "draft"
@@ -4379,6 +4526,7 @@ export type Database = {
         | "banner"
         | "promotion"
         | "review"
+        | "block"
       favorite_entity_kind: "business" | "product" | "promotion"
       hero_palette: "territorio" | "selva" | "cenote" | "atardecer"
       invitation_status: "pending" | "accepted" | "revoked" | "expired"
@@ -4573,6 +4721,8 @@ export const Constants = {
         "super_admin",
         "concierge_lead",
       ],
+      block_category: ["static", "smart"],
+      block_version_status: ["active", "deprecated", "retired"],
       business_user_role: ["owner", "manager", "editor", "viewer"],
       content_status: [
         "draft",
@@ -4600,6 +4750,7 @@ export const Constants = {
         "banner",
         "promotion",
         "review",
+        "block",
       ],
       favorite_entity_kind: ["business", "product", "promotion"],
       hero_palette: ["territorio", "selva", "cenote", "atardecer"],

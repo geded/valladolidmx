@@ -1,0 +1,428 @@
+/**
+ * Experience Builder · Block Library (Etapa 15.10.1)
+ *
+ * Catálogo inicial de bloques reutilizables. Cada entrada es una declaración
+ * del Block Contract — NO se construye editor ni se modifican páginas
+ * públicas en esta etapa.
+ *
+ * Esta lista es la fuente verdadera del catálogo. El servidor la sincroniza a
+ * las tablas `block_definitions` / `block_versions` vía `syncBlockLibrary`
+ * (admin only) emitiendo eventos BEA `Block.Registered` /
+ * `Block.VersionPublished` en `content_audit_log`.
+ *
+ * Agregar un nuevo bloque consiste exclusivamente en añadir una entrada
+ * aquí (Block Marketplace Readiness).
+ */
+
+import { registerBlock } from "./block-registry";
+import type { BlockContract } from "./block-contract";
+
+/* ------------------------------------------------------------------ *
+ * 1. Bloques de Layout fundacionales (Static)
+ * ------------------------------------------------------------------ */
+
+const containerBlock: BlockContract = {
+  type: "vmx.layout.container",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Contenedor",
+  description: "Contenedor base con ancho máximo y padding controlados por tokens.",
+  schema: {
+    max_width: {
+      type: "select",
+      label: "Ancho máximo",
+      default: "xl",
+      options: [
+        { value: "md", label: "Medio" },
+        { value: "lg", label: "Grande" },
+        { value: "xl", label: "Extra grande" },
+        { value: "full", label: "Completo" },
+      ],
+    },
+    padding: {
+      type: "select",
+      label: "Padding",
+      default: "normal",
+      options: [
+        { value: "tight", label: "Reducido" },
+        { value: "normal", label: "Normal" },
+        { value: "spacious", label: "Amplio" },
+      ],
+    },
+  },
+  capabilities: {
+    soporta_responsive: true,
+    soporta_preview: true,
+    soporta_cache: true,
+  },
+  constraints: {
+    surfaces: ["home", "landing", "institutional", "destination", "business", "product"],
+    max_nesting_depth: 3,
+  },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["padding"],
+  },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const sectionBlock: BlockContract = {
+  type: "vmx.layout.section",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Sección",
+  description: "Sección semántica con encabezado opcional.",
+  schema: {
+    heading: { type: "text", label: "Encabezado", translatable: true },
+    subheading: { type: "text", label: "Subencabezado", translatable: true },
+    tone: {
+      type: "select",
+      label: "Tono",
+      default: "default",
+      options: [
+        { value: "default", label: "Por defecto" },
+        { value: "muted", label: "Atenuado" },
+        { value: "accent", label: "Acentuado" },
+      ],
+    },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_seo: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  constraints: {
+    surfaces: ["home", "landing", "institutional", "destination", "business", "product"],
+  },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["tone"],
+  },
+  i18n: { translatable_fields: ["heading", "subheading"], fallback: "base_language" },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const spacerBlock: BlockContract = {
+  type: "vmx.layout.spacer",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Espaciador",
+  schema: {
+    size: {
+      type: "select",
+      label: "Tamaño",
+      default: "md",
+      options: [
+        { value: "sm", label: "Pequeño" },
+        { value: "md", label: "Medio" },
+        { value: "lg", label: "Grande" },
+      ],
+    },
+  },
+  capabilities: { soporta_responsive: true, soporta_preview: true },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["size"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const dividerBlock: BlockContract = {
+  type: "vmx.layout.divider",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Separador",
+  schema: {
+    style: {
+      type: "select",
+      label: "Estilo",
+      default: "line",
+      options: [
+        { value: "line", label: "Línea" },
+        { value: "dotted", label: "Punteado" },
+      ],
+    },
+  },
+  capabilities: { soporta_responsive: true, soporta_preview: true },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+/* ------------------------------------------------------------------ *
+ * 2. Envoltura de componentes públicos existentes (Static)
+ *    Solo declaración de contrato — NO se altera el render actual.
+ * ------------------------------------------------------------------ */
+
+const heroBlock: BlockContract = {
+  type: "vmx.hero",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Hero",
+  description: "Bloque hero principal de la Home y de Landing Pages.",
+  schema: {
+    title: { type: "text", label: "Título", required: true, translatable: true },
+    subtitle: { type: "text", label: "Subtítulo", translatable: true },
+    background_image: { type: "media", label: "Imagen de fondo", accepts: ["image/*"] },
+    cta_label: { type: "text", label: "Etiqueta CTA", translatable: true },
+    cta_href: { type: "url", label: "URL CTA" },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_seo: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["home", "landing"], unique_per_page: true },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["background_image"] },
+  i18n: { translatable_fields: ["title", "subtitle", "cta_label"], fallback: "base_language" },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const destinosBlock: BlockContract = {
+  type: "vmx.section.destinos",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Sección Destinos",
+  schema: {
+    heading: { type: "text", label: "Encabezado", translatable: true },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_seo: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["home", "landing", "institutional"] },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"] },
+  i18n: { translatable_fields: ["heading"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const categoriasBlock: BlockContract = {
+  type: "vmx.section.categorias",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Sección Categorías",
+  schema: { heading: { type: "text", label: "Encabezado", translatable: true } },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["home", "landing"] },
+  i18n: { translatable_fields: ["heading"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const rutasBlock: BlockContract = {
+  type: "vmx.section.rutas",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Sección Rutas",
+  schema: { heading: { type: "text", label: "Encabezado", translatable: true } },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["home", "landing"] },
+  i18n: { translatable_fields: ["heading"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const consejoAluxBlock: BlockContract = {
+  type: "vmx.section.consejo-alux",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Consejo Alux",
+  description: "Sección consultiva con sugerencias de Alux (modo read-only).",
+  schema: { heading: { type: "text", label: "Encabezado", translatable: true } },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+  },
+  constraints: { surfaces: ["home", "landing"] },
+  i18n: { translatable_fields: ["heading"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const armaTuViajeBlock: BlockContract = {
+  type: "vmx.section.arma-tu-viaje",
+  category: "static",
+  version: "1.0.0",
+  display_name: "CTA Arma tu Viaje",
+  schema: {
+    heading: { type: "text", label: "Encabezado", translatable: true },
+    body: { type: "rich_text", label: "Cuerpo", translatable: true },
+    cta_label: { type: "text", label: "Etiqueta CTA", translatable: true },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_seo: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+  },
+  constraints: { surfaces: ["home", "landing", "institutional"] },
+  i18n: { translatable_fields: ["heading", "body", "cta_label"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const enVivoBlock: BlockContract = {
+  type: "vmx.section.en-vivo",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Oriente Maya EN VIVO",
+  schema: { heading: { type: "text", label: "Encabezado", translatable: true } },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["home"] },
+  i18n: { translatable_fields: ["heading"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const empresasSectionBlock: BlockContract = {
+  type: "vmx.section.empresas",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Sección Empresas",
+  schema: { heading: { type: "text", label: "Encabezado", translatable: true } },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["home", "landing"] },
+  i18n: { translatable_fields: ["heading"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const resenasSectionBlock: BlockContract = {
+  type: "vmx.section.resenas",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Sección Reseñas",
+  schema: { heading: { type: "text", label: "Encabezado", translatable: true } },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["home", "landing", "destination", "business"] },
+  i18n: { translatable_fields: ["heading"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+/* ------------------------------------------------------------------ *
+ * 3. Tarjetas reutilizables (Static)
+ * ------------------------------------------------------------------ */
+
+const cardSchemaCommon = {
+  reference: {
+    type: "reference" as const,
+    label: "Referencia",
+    required: true,
+  },
+};
+
+const destinoCardBlock: BlockContract = {
+  type: "vmx.card.destino",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Tarjeta de Destino",
+  schema: { reference: { ...cardSchemaCommon.reference, references: "destination" } },
+  capabilities: { soporta_i18n: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  constraints: { surfaces: ["home", "landing", "destination", "institutional"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const empresaCardBlock: BlockContract = {
+  type: "vmx.card.empresa",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Tarjeta de Empresa",
+  schema: { reference: { ...cardSchemaCommon.reference, references: "business" } },
+  capabilities: { soporta_i18n: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  constraints: { surfaces: ["home", "landing", "business", "institutional"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const categoriaCardBlock: BlockContract = {
+  type: "vmx.card.categoria",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Tarjeta de Categoría",
+  schema: { reference: { ...cardSchemaCommon.reference, references: "business" } },
+  capabilities: { soporta_i18n: true, soporta_preview: true, soporta_responsive: true },
+  constraints: { surfaces: ["home", "landing"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const rutaCardBlock: BlockContract = {
+  type: "vmx.card.ruta",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Tarjeta de Ruta",
+  schema: { reference: { ...cardSchemaCommon.reference, references: "destination" } },
+  capabilities: { soporta_i18n: true, soporta_preview: true, soporta_responsive: true },
+  constraints: { surfaces: ["home", "landing"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const resenaCardBlock: BlockContract = {
+  type: "vmx.card.resena",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Tarjeta de Reseña",
+  schema: { reference: { ...cardSchemaCommon.reference, references: "business" } },
+  capabilities: { soporta_i18n: true, soporta_preview: true, soporta_responsive: true },
+  constraints: { surfaces: ["home", "landing", "destination", "business"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+/* ------------------------------------------------------------------ *
+ * Registro
+ * ------------------------------------------------------------------ */
+
+export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
+  containerBlock,
+  sectionBlock,
+  spacerBlock,
+  dividerBlock,
+  heroBlock,
+  destinosBlock,
+  categoriasBlock,
+  rutasBlock,
+  consejoAluxBlock,
+  armaTuViajeBlock,
+  enVivoBlock,
+  empresasSectionBlock,
+  resenasSectionBlock,
+  destinoCardBlock,
+  empresaCardBlock,
+  categoriaCardBlock,
+  rutaCardBlock,
+  resenaCardBlock,
+];
+
+let bootstrapped = false;
+
+/** Carga el catálogo inicial al Registry. Idempotente. */
+export function bootstrapBlockLibrary(): void {
+  if (bootstrapped) return;
+  for (const c of INITIAL_BLOCK_LIBRARY) registerBlock(c);
+  bootstrapped = true;
+}
+
+// Auto-bootstrap al importar el módulo. Esto NO toca la base de datos;
+// la sincronización a `block_definitions` la realiza el server function
+// `syncBlockLibrary` ejecutado por un administrador.
+bootstrapBlockLibrary();
