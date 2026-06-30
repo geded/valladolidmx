@@ -124,8 +124,11 @@ async function runAlux(
 export const getAluxContextForCase = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => CaseInput.parse(d))
-  .handler(async ({ data, context }) => {
-    return fetchContext(context.supabase, data.caseId);
+  .handler(async ({ data, context }): Promise<Record<string, unknown> | null> => {
+    const ctx = (await fetchContext(context.supabase, data.caseId)) as
+      | Record<string, unknown>
+      | null;
+    return ctx;
   });
 
 export const logAluxSuggestion = createServerFn({ method: "POST" })
