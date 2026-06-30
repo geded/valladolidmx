@@ -1,23 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { SITE } from "@/config/site";
 
 export const Route = createFileRoute("/restaurantes")({
-  head: () => ({
-    meta: [
-      { title: `Restaurantes · ${SITE.name}` },
-      { name: "description", content: "Cocina yucateca, panuchos, recados y mesas de autor." },
-      { property: "og:title", content: `Restaurantes · ${SITE.name}` },
-      { property: "og:description", content: "Cocina yucateca, panuchos, recados y mesas de autor." },
-    ],
-  }),
+  head: () =>
+    buildPublicHead({
+      title: `Restaurantes · ${SITE.name}`,
+      description: "Cocina yucateca, panuchos, recados y mesas de autor.",
+      path: "/restaurantes",
+    }),
   component: PlaceholderRoute,
 });
 
 function PlaceholderRoute() {
   return (
-    <PageShell
+    <PublicShell
       eyebrow="Categoría"
       title="Restaurantes"
       description="Cocina yucateca, panuchos, recados y mesas de autor."
@@ -31,6 +30,6 @@ function PlaceholderRoute() {
           con buscador, filtros y tarjetas detalladas.
         </p>
       </div>
-    </PageShell>
+    </PublicShell>
   );
 }
