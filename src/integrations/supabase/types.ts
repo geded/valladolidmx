@@ -854,6 +854,50 @@ export type Database = {
           },
         ]
       }
+      cc_case_evaluations: {
+        Row: {
+          case_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          nps: number | null
+          payload: Json
+          rating: number
+          traveler_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          case_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          nps?: number | null
+          payload?: Json
+          rating: number
+          traveler_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          case_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          nps?: number | null
+          payload?: Json
+          rating?: number
+          traveler_user_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cc_case_evaluations_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       concierge_assignments: {
         Row: {
           assigned_at: string
@@ -3792,6 +3836,74 @@ export type Database = {
       cart_update_qty: {
         Args: { p_item_id: string; p_quantity: number }
         Returns: undefined
+      }
+      cc_accept_proposal: { Args: { _proposal_id: string }; Returns: Json }
+      cc_case_assign: {
+        Args: { _case_id: string; _concierge_user_id: string; _reason?: string }
+        Returns: string
+      }
+      cc_case_create_from_plan: {
+        Args: { _items?: Json; _summary: string; _travel_plan_id?: string }
+        Returns: string
+      }
+      cc_case_evaluate: {
+        Args: {
+          _case_id: string
+          _comment?: string
+          _nps?: number
+          _payload?: Json
+          _rating: number
+        }
+        Returns: string
+      }
+      cc_case_set_status: {
+        Args: { _case_id: string; _reason?: string; _status: string }
+        Returns: undefined
+      }
+      cc_create_proposal: {
+        Args: {
+          _case_id: string
+          _items: Json
+          _summary?: string
+          _supersedes_proposal_id?: string
+          _terms?: string
+          _valid_until?: string
+        }
+        Returns: string
+      }
+      cc_quote_request: {
+        Args: {
+          _business_id: string
+          _request_id: string
+          _valid_for_hours?: number
+        }
+        Returns: string
+      }
+      cc_quote_submit: {
+        Args: {
+          _currency?: string
+          _notes?: string
+          _payload?: Json
+          _quote_id: string
+          _terms?: string
+          _total_amount_cents: number
+        }
+        Returns: undefined
+      }
+      cc_reject_proposal: {
+        Args: { _proposal_id: string; _reason?: string }
+        Returns: undefined
+      }
+      cc_send_proposal: { Args: { _proposal_id: string }; Returns: undefined }
+      cc_timeline_append: {
+        Args: {
+          _case_id: string
+          _event_type: string
+          _payload?: Json
+          _severity?: string
+          _summary?: string
+        }
+        Returns: string
       }
       concierge_alux_context_for_case: {
         Args: { _case_id: string }
