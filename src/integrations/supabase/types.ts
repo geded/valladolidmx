@@ -1789,6 +1789,7 @@ export type Database = {
       eb_pages: {
         Row: {
           cache: Json
+          cache_version: number
           conversion: Json
           created_at: string
           created_by: string | null
@@ -1811,9 +1812,11 @@ export type Database = {
           theme_id: string | null
           tree: Json
           updated_at: string
+          visibility: string
         }
         Insert: {
           cache?: Json
+          cache_version?: number
           conversion?: Json
           created_at?: string
           created_by?: string | null
@@ -1836,9 +1839,11 @@ export type Database = {
           theme_id?: string | null
           tree?: Json
           updated_at?: string
+          visibility?: string
         }
         Update: {
           cache?: Json
+          cache_version?: number
           conversion?: Json
           created_at?: string
           created_by?: string | null
@@ -1861,6 +1866,7 @@ export type Database = {
           theme_id?: string | null
           tree?: Json
           updated_at?: string
+          visibility?: string
         }
         Relationships: [
           {
@@ -4662,6 +4668,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      eb_cache_invalidate: {
+        Args: { _page_id: string; _reason?: string }
+        Returns: number
+      }
       eb_can_edit_scope: {
         Args: {
           _scope: Database["public"]["Enums"]["eb_scope"]
@@ -4724,9 +4734,17 @@ export type Database = {
         Args: { _note: string; _page_id: string }
         Returns: string
       }
+      eb_page_resolve_public: {
+        Args: { _ctx?: Json; _slug: string; _tenant_id?: string }
+        Returns: Json
+      }
       eb_page_restore_version: {
         Args: { _page_id: string; _version_id: string }
         Returns: undefined
+      }
+      eb_page_rollback: {
+        Args: { _note?: string; _page_id: string; _version_id: string }
+        Returns: string
       }
       eb_page_save_version: {
         Args: { _note: string; _page_id: string }
@@ -4791,6 +4809,10 @@ export type Database = {
       eb_unpublish_composition: {
         Args: { _id: string; _notes?: string }
         Returns: undefined
+      }
+      eb_variant_resolve: {
+        Args: { _ctx: Json; _page_id: string }
+        Returns: Json
       }
       eb_variant_upsert: { Args: { _payload: Json }; Returns: string }
       enqueue_email: {
@@ -5387,7 +5409,23 @@ export type Database = {
         | "restore"
         | "delete"
         | "preview_issue"
-      eb_page_kind: "landing" | "institutional" | "campaign" | "site_section"
+        | "rollback"
+        | "theme_change"
+        | "variant_change"
+        | "cache_invalidate"
+      eb_page_kind:
+        | "landing"
+        | "institutional"
+        | "campaign"
+        | "site_section"
+        | "destination"
+        | "business"
+        | "product"
+        | "event"
+        | "wedding"
+        | "promo"
+        | "microsite"
+        | "ai_generated"
       eb_publish_status: "draft" | "in_review" | "published" | "archived"
       eb_scope: "global" | "tenant" | "marketplace"
       entity_kind:
@@ -5625,8 +5663,25 @@ export const Constants = {
         "restore",
         "delete",
         "preview_issue",
+        "rollback",
+        "theme_change",
+        "variant_change",
+        "cache_invalidate",
       ],
-      eb_page_kind: ["landing", "institutional", "campaign", "site_section"],
+      eb_page_kind: [
+        "landing",
+        "institutional",
+        "campaign",
+        "site_section",
+        "destination",
+        "business",
+        "product",
+        "event",
+        "wedding",
+        "promo",
+        "microsite",
+        "ai_generated",
+      ],
       eb_publish_status: ["draft", "in_review", "published", "archived"],
       eb_scope: ["global", "tenant", "marketplace"],
       entity_kind: [
