@@ -3,6 +3,17 @@
  * Consume concierge_case_file_v1 y respeta visibilidad por rol.
  */
 import type { ReactNode } from "react";
+import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useRouter } from "@tanstack/react-router";
+import {
+  acceptConciergeProposal,
+  rejectConciergeProposal,
+  sendConciergeProposal,
+  viewConciergeProposal,
+  withdrawConciergeProposal,
+  createConciergeProposal,
+} from "@/lib/concierge/concierge.functions";
 
 type CaseFile = {
   case: {
@@ -51,6 +62,33 @@ type CaseFile = {
     terms: string | null;
     request_title: string;
     request_kind: string;
+  }>;
+  proposals?: Array<{
+    proposal_id: string;
+    status: string;
+    version: number;
+    supersedes_proposal_id: string | null;
+    currency: string;
+    total_amount_cents: number | null;
+    valid_until: string | null;
+    summary: string | null;
+    terms: string | null;
+    sent_at: string | null;
+    viewed_at: string | null;
+    responded_at: string | null;
+    created_at: string;
+    items: Array<{
+      item_id: string;
+      quote_id: string;
+      request_id: string;
+      position: number;
+      amount_cents: number;
+      currency: string;
+      notes: string | null;
+      business_id: string;
+      business_name: string | null;
+      request_title: string;
+    }>;
   }>;
 };
 
@@ -125,6 +163,8 @@ export function CaseFileView({ data, hideInternal = false }: { data: unknown; hi
           </ul>
         </Section>
       )}
+
+      <ProposalsSection f={f} internal={internal} />
 
       {internal && (
         <Section title="Enlaces internos">
