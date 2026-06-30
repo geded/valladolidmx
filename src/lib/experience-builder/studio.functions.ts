@@ -137,3 +137,34 @@ export const restoreCompositionRevision = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/* ------------------------------------------------------------------ *
+ * Etapa 15.10.3 · Publicación pública
+ *
+ * Las RPCs validan internamente que el actor tenga el rol `admin`
+ * (los editores solo pueden crear borradores y revisiones).
+ * ------------------------------------------------------------------ */
+
+export const publishComposition = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string; notes?: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ revision_id: string }> => {
+    const { data: rev_id, error } = await context.supabase.rpc(
+      "eb_publish_composition",
+      { _id: data.id, _notes: data.notes },
+    );
+    if (error) throw new Error(error.message);
+    return { revision_id: rev_id as unknown as string };
+  });
+
+export const unpublishComposition = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string; notes?: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { error } = await context.supabase.rpc("eb_unpublish_composition", {
+      _id: data.id,
+      _notes: data.notes,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

@@ -20,6 +20,15 @@ import { getBlock } from "./block-registry";
 import { isContainerBlock } from "./layout-engine";
 import type { CompositionNode, CompositionTree } from "./composition-tree";
 import { bootstrapBlockLibrary } from "./block-library";
+import { Hero } from "@/components/home/Hero";
+import { DestinosSection } from "@/components/home/DestinosSection";
+import { CategoriasSection } from "@/components/home/CategoriasSection";
+import { RutasSection } from "@/components/home/RutasSection";
+import { ConsejoAluxSection } from "@/components/home/ConsejoAluxSection";
+import { ArmaTuViajeSection } from "@/components/home/ArmaTuViajeSection";
+import { EnVivoSection } from "@/components/home/EnVivoSection";
+import { EmpresasSection } from "@/components/home/EmpresasSection";
+import { ResenasSection } from "@/components/home/ResenasSection";
 
 bootstrapBlockLibrary();
 
@@ -69,7 +78,11 @@ function RenderNode({ node, studio, wrap }: RenderNodeProps): ReactNode {
     ) : null;
   }
 
-  const Comp = COMPONENT_MAP[node.type] ?? GenericBlockPreview;
+  // Modo producción: usa los componentes reales del Home cuando existan.
+  // Modo Studio: muestra previews neutrales para conservar la diagramación
+  // editorial y los overlays de selección.
+  const map = studio ? STUDIO_PREVIEW_MAP : PRODUCTION_COMPONENT_MAP;
+  const Comp = map[node.type] ?? STUDIO_PREVIEW_MAP[node.type] ?? GenericBlockPreview;
   const content = (
     <Comp
       node={node}
@@ -239,7 +252,7 @@ function StudioErrorBlock({
   );
 }
 
-const COMPONENT_MAP: Record<string, BlockPreview> = {
+const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.layout.container": ContainerPreview,
   "vmx.layout.section": SectionPreview,
   "vmx.layout.spacer": SpacerPreview,
@@ -258,4 +271,33 @@ const COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.card.categoria": CardPreview,
   "vmx.card.ruta": CardPreview,
   "vmx.card.resena": CardPreview,
+};
+
+/* ------------------------------------------------------------------ *
+ * Mapa de producción (Etapa 15.10.3)
+ *
+ * Cuando el renderer corre en modo público (sin `studio`), las
+ * secciones del Home se sirven con los MISMOS componentes que estaba
+ * usando `/` antes de la migración, garantizando paridad visual 1:1
+ * y sin regresiones en SEO / CWV. Los bloques de layout y los bloques
+ * todavía no migrados caen al preview neutral.
+ * ------------------------------------------------------------------ */
+
+const wrap = (Component: () => ReactNode): BlockPreview => () => <Component />;
+
+const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
+  "vmx.hero": wrap(Hero),
+  "vmx.section.destinos": wrap(DestinosSection),
+  "vmx.section.categorias": wrap(CategoriasSection),
+  "vmx.section.rutas": wrap(RutasSection),
+  "vmx.section.consejo-alux": wrap(ConsejoAluxSection),
+  "vmx.section.arma-tu-viaje": wrap(ArmaTuViajeSection),
+  "vmx.section.en-vivo": wrap(EnVivoSection),
+  "vmx.section.empresas": wrap(EmpresasSection),
+  "vmx.section.resenas": wrap(ResenasSection),
+  // Layout y separadores reutilizan las previews neutrales:
+  "vmx.layout.container": ContainerPreview,
+  "vmx.layout.section": SectionPreview,
+  "vmx.layout.spacer": SpacerPreview,
+  "vmx.layout.divider": DividerPreview,
 };
