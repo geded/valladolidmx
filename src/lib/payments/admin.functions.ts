@@ -104,7 +104,7 @@ export interface AdminPaymentEvent {
   event_type: string;
   order_id: string | null;
   received_at: string;
-  processed: boolean | null;
+  processed_at: string | null;
 }
 
 /**
@@ -119,7 +119,7 @@ export const listRecentPaymentEvents = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("payment_events")
       .select(
-        "id, provider, provider_event_id, event_type, order_id, received_at, processed",
+        "id, provider, provider_event_id, event_type, order_id, received_at, processed_at",
       )
       .order("received_at", { ascending: false })
       .limit(50);
