@@ -1,78 +1,148 @@
-# Fase 0 — Fundaciones Valladolid.mx (plan final aprobado + reglas de ejecución)
+# 14.40.5 — Etapa 5 · Pagos (Stripe + Payment Provider Abstraction)
 
-## Reglas de ejecución durante el desarrollo
+## Objetivo
 
-1. Si surge una decisión importante de UX/arquitectura/estructura no cubierta por el Blueprint, **detener y consultar** antes de implementar.
-2. Componentes desacoplados y reutilizables — nada hardcodeado a "Oriente Maya" o "Valladolid"; región/destino siempre vía props/mock.
-3. Cada componente importante lleva comentario JSDoc con propósito, responsabilidades y dependencias.
-4. Arquitectura preparada para **múltiples regiones turísticas** (jerarquía País→Estado→Región→Destino, mocks tipados, rutas `/oriente-maya/...` con región como parámetro lógico).
-5. Cero deuda técnica deliberada. Si aparece una solución mejor compatible con el Blueprint, reportarla antes de implementarla.
+Habilitar el cobro en línea de órdenes confirmadas (productos con
+`conversion_mode = 'reservar_en_linea'` y `accepts_online_payment = true`)
+usando Stripe como primer proveedor, detrás de una capa de abstracción
+(`PaymentProvider`) que permita incorporar Paddle, Mercado Pago o PayPal
+sin tocar la lógica del Marketplace.
 
-## Dos ajustes finales (ya incorporados)
+## Principios (no negociables)
 
-- **Service Worker preparado pero no activo:** `src/pwa/register-sw.ts` como wrapper inerte documentado, llamado desde `__root.tsx` con guardas de preview/iframe/dev. Cero `sw.js`, cero registro real, cero rompimiento de preview. Listo para activar en fase futura cuando se requiera offline.
-- **Tipografía 100% centralizada:** `--font-display`, `--font-sans`, `--font-mono` definidos en `@theme inline`. Body y headings reciben la familia desde `@layer base` en `src/styles.css`. Cero `font-family` literal en componentes.
+- Cero `SUPABASE_SERVICE_ROLE_KEY` en flujos del viajero.
+- `supabaseAdmin` sólo dentro del webhook tras verificar la firma HMAC.
+- Revalidación server-side de elegibilidad y precios antes de crear el
+  PaymentIntent (mismos checks que `order_confirm`).
+- Idempotencia por `client_request_id` (cliente → server fn) y por
+  `event_id` (webhook → `payment_events`).
+- Metadata consistente: `order_id`, `user_id`, `client_request_id`,
+  `provider` y `provider_intent_id` en ambos lados.
+- Auditoría completa en `order_events` (`payment_initiated`,
+  `payment_succeeded`, `payment_failed`, `payment_refunded`).
+- Sin acoplamiento directo del UI/dominio a Stripe: todo pasa por el
+  contrato `PaymentProvider`.
 
-## Restricciones oficiales
+## Arquitectura — Payment Provider Abstraction
 
-- ❌ Sin Lovable Cloud, BD, RLS, auth real, CMS, paneles, Alux IA, integraciones, lógica real de Arma tu Viaje.
-- ❌ Sin imágenes IA como definitivas — placeholders sobrios con gradientes territoriales oklch preparados para reemplazo con fotografía real.
-- ❌ Sin Service Worker activo. Solo manifest.
+```text
+src/lib/payments/
+├── provider.ts                 # contrato PaymentProvider + tipos neutrales
+├── registry.server.ts          # selección por env PAYMENTS_PROVIDER
+├── stripe.server.ts            # implementación Stripe (server-only)
+└── payments.functions.ts       # server fns expuestas al cliente
+```
 
-## Orden Home (Doc 12)
+Contrato neutral (resumen):
 
-Hero → Destinos → Categorías → Rutas sugeridas → Consejo Alux → Arma tu Viaje → Oriente Maya EN VIVO → Empresas recomendadas → Reseñas → Footer. Hero inspira primero; buscador discreto.
+```ts
+interface PaymentProvider {
+  id: 'stripe' | 'paddle' | 'mercadopago' | 'paypal';
+  createIntent(input: CreateIntentInput): Promise<IntentResult>;
+  verifyWebhook(req: Request, rawBody: string): Promise<NormalizedEvent>;
+  // refund/capture se añaden en olas posteriores
+}
+```
 
-## Visible desde Fase 0
+`IntentResult` devuelve sólo lo que el cliente necesita
+(`client_secret`/`checkout_url`, `provider`, `provider_intent_id`). El
+Marketplace nunca importa `stripe` directamente.
 
-Acceso AYV, presencia Alux (flotante deshabilitado + sección + ruta), landing Empresas, breadcrumb territorial, `LanguageSwitcher` (6 idiomas UI), `UserMenu` preparado para 6 roles.
+## Cambios de base de datos (una migración)
 
-## Archivos a crear/modificar
+1. `payment_events` — nueva tabla:
+   - `id uuid PK`, `order_id uuid FK`, `provider text`,
+     `provider_event_id text`, `event_type text`, `payload jsonb`,
+     `received_at timestamptz`, `processed_at timestamptz`.
+   - `UNIQUE(provider, provider_event_id)` → idempotencia de webhook.
+   - GRANT `SELECT` a `authenticated` (sólo dueños vía RLS join con
+     `orders`), `ALL` a `service_role`. Sin `anon`.
+   - RLS: lectura sólo si `EXISTS (orders WHERE id = order_id AND user_id
+     = auth.uid())`. Sin INSERT/UPDATE/DELETE para `authenticated`.
+2. `orders` — columnas aditivas:
+   - `payment_provider text NULL`,
+   - `payment_intent_id text NULL`,
+   - `payment_status text NOT NULL DEFAULT 'unpaid'`
+     (`unpaid|processing|paid|failed|refunded`),
+   - `paid_at timestamptz NULL`.
+   - Índice parcial `UNIQUE(payment_provider, payment_intent_id)
+     WHERE payment_intent_id IS NOT NULL`.
+3. RPC `order_mark_paid(order_id, provider, intent_id, event_id)`
+   `SECURITY DEFINER`, `search_path = public`, EXECUTE sólo `service_role`.
+   Idempotente: si ya está `paid`, retorna sin error; escribe
+   `order_events` con `payment_succeeded`.
+4. RPC `order_mark_payment_failed(...)` análoga.
 
-**Design system**
-- `src/styles.css` — tokens oklch (Valladolid cálido + selva + cenote + caliza + atardecer), fuentes centralizadas, utilities `placeholder-territorio/cenote/selva`, dark mode.
+## Server functions y rutas
 
-**Shell + layout**
-- `src/routes/__root.tsx` — head con Fraunces + Inter vía `<link>`, manifest, theme-color; envuelve `I18nProvider` + `SiteHeader` + `<Outlet/>` + `SiteFooter` + `AluxFloatingTrigger`.
-- `src/router.tsx` — añadir `defaultErrorComponent`.
-- `src/components/layout/`: `SiteHeader`, `SiteFooter`, `BreadcrumbTerritorial`, `LanguageSwitcher`, `UserMenu`, `AluxFloatingTrigger`, `Container`.
+- `src/lib/payments/payments.functions.ts`
+  - `createPaymentIntent` — `requireSupabaseAuth`. Carga la orden del
+    usuario, revalida `conversion_mode`/`accepts_online_payment`/precios,
+    delega en `provider.createIntent`, persiste `payment_provider` +
+    `payment_intent_id`, marca `payment_status='processing'`, registra
+    `order_events.payment_initiated`. Idempotente por
+    `client_request_id`.
+- `src/routes/api/public/payments/$provider/webhook.ts`
+  - Server route TSS bajo `/api/public/*` (callers externos).
+  - Lee `rawBody`, llama `provider.verifyWebhook` (HMAC + timing-safe).
+  - Inserta en `payment_events` con `ON CONFLICT DO NOTHING`
+    (idempotencia por `provider_event_id`).
+  - Si nuevo: importa `supabaseAdmin` dentro del handler y llama
+    `order_mark_paid` / `order_mark_payment_failed`.
+  - Responde 200 incluso ante reintentos ya procesados.
 
-**Home**
-- `src/routes/index.tsx` — orquesta secciones.
-- `src/components/home/`: `Hero`, `DestinosSection`, `CategoriasSection`, `RutasSection`, `ConsejoAluxSection`, `ArmaTuViajeSection`, `EnVivoSection`, `EmpresasSection`, `ResenasSection`.
-- `src/components/cards/`: `DestinoCard`, `RutaCard`, `CategoriaCard`, `ResenaCard` (con botón "+ Arma tu Viaje" deshabilitado y tooltip "Disponible próximamente").
-- `src/components/common/`: `PlaceholderImage`, `PageShell`, `SectionHeader`, `ComingSoonBadge`.
+## UI (sin acoplar a Stripe)
 
-**Rutas base** (cada una con `head()` único)
-- `oriente-maya/index.tsx`, `oriente-maya/$destino.tsx`
-- `experiencias.tsx`, `hoteles.tsx`, `restaurantes.tsx`, `eventos.tsx`
-- `arma-tu-viaje.tsx`, `alux.tsx`, `empresas.tsx`, `auth.tsx`
+- `/cuenta/historial` — botón "Pagar" en órdenes `pending` con
+  `payment_status='unpaid'`. Llama `createPaymentIntent` y, según
+  `provider`, redirige a `checkout_url` o monta Stripe Elements
+  cargado dinámicamente (lazy import, sólo cliente).
+- Páginas `/cuenta/pagos/exito` y `/cuenta/pagos/error` neutrales
+  (no mencionan Stripe).
 
-**Tipos y config** (alineados a 11.5, preparados para multi-región)
-- `src/types/territory.ts` (Country/State/TourismRegion/Destination), `src/types/auth.ts` (enum 6 roles), `src/types/entities.ts`.
-- `src/config/languages.ts`, `src/config/site.ts`, `src/config/regions.ts`.
+## Secretos (vía `add_secret`, no en código)
 
-**i18n**
-- `src/i18n/context.tsx` + hook `useTranslation`.
-- `src/i18n/locales/{es,en,fr,de,it,pt}.json`.
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `PAYMENTS_PROVIDER` (default `stripe`) — `set_secret`.
 
-**Mocks (snake_case + UUID)**
-- `src/mocks/{destinos,categorias,rutas,resenas,empresas}.ts`.
+La clave publicable de Stripe se sirve al cliente mediante un server fn
+público mínimo (`getPaymentPublicConfig`) que sólo expone valores no
+sensibles del proveedor activo.
 
-**PWA**
-- `public/manifest.webmanifest`, `public/icon-192.svg`, `public/icon-512.svg`, `public/apple-touch-icon.svg`.
-- `public/robots.txt`, `public/sitemap.xml` (esqueleto).
-- `src/pwa/register-sw.ts` — wrapper inerte con guardas, documentado.
+## QA / Aceptación
 
-## Criterios de aceptación
+1. Orden no reservable → `createPaymentIntent` rechaza con
+   `product_not_reservable`.
+2. Precio alterado en cliente → revalidación server-side falla.
+3. Webhook duplicado (mismo `event_id`) → segunda ejecución no
+   duplica `order_events` ni cambia estado.
+4. Webhook con firma inválida → 401, sin escritura.
+5. Doble click en "Pagar" con mismo `client_request_id` → un único
+   PaymentIntent.
+6. Sin `SUPABASE_SERVICE_ROLE_KEY` en ningún archivo `.functions.ts` ni
+   importado desde rutas cliente.
+7. `grep` confirma que `src/components/*` y `src/routes/_authenticated/*`
+   no importan `stripe`.
 
-- Home moderna mobile-first, 10 secciones en orden Doc 12.
-- Todas las rutas con `head()` único.
-- LanguageSwitcher cambia UI entre 6 idiomas.
-- Manifest válido, iconos SVG, instalable.
-- Cero colores y fuentes hardcodeados.
-- Tipos y mocks alineados a serie 11 y a multi-región.
+## Entregables documentales
 
-## Entregable final
+- `docs/blueprint/14.40.5-WAVE-4-STAGE-5-PROGRESS-v1.0.md` al cerrar.
 
-Resumen ejecutivo · archivos creados · componentes · rutas · decisiones visuales · capturas Playwright de Home (desktop + mobile) y rutas internas · pendientes Fase 1 · observaciones técnicas y consultas pendientes para el usuario.
+## Preguntas antes de implementar
+
+1. **Modo de checkout Stripe:** ¿Stripe **Checkout** (redirección, más
+   simple, menos UI custom) o **Payment Element** embebido (UX en sitio,
+   requiere clave publicable en cliente)? Recomiendo **Checkout** para
+   Etapa 5 — más simple, igual de seguro, y la abstracción lo oculta.
+2. **Moneda:** ¿`MXN` única en Etapa 5, o multi-moneda desde el inicio?
+   El catálogo ya tiene `currency` por producto; confirmo que el
+   PaymentIntent usa el `currency` de la orden tal cual.
+3. **Provisión de claves Stripe:** ¿Procedo a solicitarlas con
+   `add_secret` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`) en cuanto
+   apruebes el plan? El webhook se configura apuntando a
+   `https://valladolidmx.lovable.app/api/public/payments/stripe/webhook`.
+
+Tras aprobación del plan + respuestas a (1) y (2), ejecuto la migración,
+la abstracción, el provider Stripe, las server fns, el webhook, el UI de
+pago y entrego el reporte `14.40.5`.
