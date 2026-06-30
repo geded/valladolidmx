@@ -14,6 +14,7 @@
  */
 import { AddToCartButton } from "@/components/marketplace/AddToCartButton";
 import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
+import { RequestConciergeButton } from "@/components/concierge/RequestConciergeButton";
 
 export interface ProductActionsProduct {
   id: string;
@@ -98,6 +99,7 @@ export function ProductActions({ product }: { product: ProductActionsProduct }) 
     <div className="flex flex-wrap items-center gap-2">
       <PrimaryButton product={product} />
       <SecondaryAction product={product} />
+      <RequestConciergeButton kind="product" productId={product.id} />
     </div>
   );
 }

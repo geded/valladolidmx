@@ -32,6 +32,7 @@ function CuentaLayout() {
       { to: "/cuenta/historial" as const, label: "Historial" },
       { to: "/cuenta/actividad" as const, label: "Actividad" },
       { to: "/cuenta/notificaciones" as const, label: "Notificaciones" },
+      { to: "/cuenta/concierge" as const, label: "Concierge" },
     ],
     [],
   );

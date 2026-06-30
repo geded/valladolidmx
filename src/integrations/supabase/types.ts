@@ -858,6 +858,73 @@ export type Database = {
           },
         ]
       }
+      concierge_case_requests: {
+        Row: {
+          business_id: string | null
+          case_id: string
+          created_at: string
+          id: string
+          kind: string
+          notes: string | null
+          product_id: string | null
+          source_ref: string | null
+          source_type: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          business_id?: string | null
+          case_id: string
+          created_at?: string
+          id?: string
+          kind?: string
+          notes?: string | null
+          product_id?: string | null
+          source_ref?: string | null
+          source_type: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string | null
+          case_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          notes?: string | null
+          product_id?: string | null
+          source_ref?: string | null
+          source_type?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_case_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_case_requests_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_case_requests_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       concierge_case_timeline: {
         Row: {
           actor_user_id: string | null
@@ -3029,6 +3096,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _concierge_publish_case_created: {
+        Args: { _case_id: string; _source: string; _traveler: string }
+        Returns: undefined
+      }
+      _concierge_publish_request_created: {
+        Args: { _case_id: string; _request_id: string }
+        Returns: undefined
+      }
       _order_recompute_totals: {
         Args: { p_order_id: string }
         Returns: undefined
@@ -3155,12 +3230,35 @@ export type Database = {
         Args: { p_item_id: string; p_quantity: number }
         Returns: undefined
       }
+      concierge_assert_can_create_for: {
+        Args: { _traveler: string }
+        Returns: undefined
+      }
       concierge_can_view_case: {
         Args: { _case_id: string; _user_id: string }
         Returns: boolean
       }
       concierge_case_create: {
         Args: { _source?: string; _summary?: string; _traveler_user_id: string }
+        Returns: string
+      }
+      concierge_case_file_v1: { Args: { _case_id: string }; Returns: Json }
+      concierge_case_from_marketplace_product: {
+        Args: {
+          _notes?: string
+          _product_id: string
+          _summary: string
+          _traveler_user_id: string
+        }
+        Returns: string
+      }
+      concierge_case_from_travel_plan: {
+        Args: {
+          _items?: Json
+          _summary: string
+          _travel_plan_id?: string
+          _traveler_user_id: string
+        }
         Returns: string
       }
       concierge_case_get: { Args: { _case_id: string }; Returns: Json }
