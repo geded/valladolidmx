@@ -25,13 +25,17 @@ import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
 import { Route as MarketplaceBuscarRouteImport } from './routes/marketplace/buscar'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
+import { Route as AuthenticatedMiViajeRouteImport } from './routes/_authenticated/mi-viaje'
+import { Route as AuthenticatedEmpresaRouteImport } from './routes/_authenticated/empresa'
 import { Route as AuthenticatedConciergeRouteImport } from './routes/_authenticated/concierge'
 import { Route as AuthenticatedCmsRouteImport } from './routes/_authenticated/cms'
 import { Route as AuthenticatedPortalRouteRouteImport } from './routes/_authenticated/portal/route'
 import { Route as AuthenticatedCuentaRouteRouteImport } from './routes/_authenticated/cuenta/route'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal/index'
 import { Route as AuthenticatedCuentaIndexRouteImport } from './routes/_authenticated/cuenta/index'
 import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticated/cms/index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedPortalPropiedadRouteImport } from './routes/_authenticated/portal/propiedad'
 import { Route as AuthenticatedPortalPresenciaRouteImport } from './routes/_authenticated/portal/presencia'
 import { Route as AuthenticatedPortalGaleriaRouteImport } from './routes/_authenticated/portal/galeria'
@@ -152,6 +156,16 @@ const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
   path: '/marketplace/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedMiViajeRoute = AuthenticatedMiViajeRouteImport.update({
+  id: '/mi-viaje',
+  path: '/mi-viaje',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedEmpresaRoute = AuthenticatedEmpresaRouteImport.update({
+  id: '/empresa',
+  path: '/empresa',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedConciergeRoute = AuthenticatedConciergeRouteImport.update({
   id: '/concierge',
   path: '/concierge',
@@ -174,6 +188,11 @@ const AuthenticatedCuentaRouteRoute =
     path: '/cuenta',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedPortalIndexRoute =
   AuthenticatedPortalIndexRouteImport.update({
     id: '/',
@@ -190,6 +209,11 @@ const AuthenticatedCmsIndexRoute = AuthenticatedCmsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedCmsRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
 const AuthenticatedPortalPropiedadRoute =
   AuthenticatedPortalPropiedadRouteImport.update({
@@ -439,10 +463,13 @@ export interface FileRoutesByFullPath {
   '/hoteles': typeof HotelesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/cms': typeof AuthenticatedCmsRouteWithChildren
   '/concierge': typeof AuthenticatedConciergeRouteWithChildren
+  '/empresa': typeof AuthenticatedEmpresaRoute
+  '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -472,6 +499,7 @@ export interface FileRoutesByFullPath {
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/cms/': typeof AuthenticatedCmsIndexRoute
   '/cuenta/': typeof AuthenticatedCuentaIndexRoute
   '/portal/': typeof AuthenticatedPortalIndexRoute
@@ -504,6 +532,8 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/concierge': typeof AuthenticatedConciergeRouteWithChildren
+  '/empresa': typeof AuthenticatedEmpresaRoute
+  '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -533,6 +563,7 @@ export interface FileRoutesByTo {
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/cms': typeof AuthenticatedCmsIndexRoute
   '/cuenta': typeof AuthenticatedCuentaIndexRoute
   '/portal': typeof AuthenticatedPortalIndexRoute
@@ -566,10 +597,13 @@ export interface FileRoutesById {
   '/hoteles': typeof HotelesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/_authenticated/cms': typeof AuthenticatedCmsRouteWithChildren
   '/_authenticated/concierge': typeof AuthenticatedConciergeRouteWithChildren
+  '/_authenticated/empresa': typeof AuthenticatedEmpresaRoute
+  '/_authenticated/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -599,6 +633,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/_authenticated/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/_authenticated/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
   '/_authenticated/cuenta/': typeof AuthenticatedCuentaIndexRoute
   '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
@@ -632,10 +667,13 @@ export interface FileRouteTypes {
     | '/hoteles'
     | '/reset-password'
     | '/restaurantes'
+    | '/admin'
     | '/cuenta'
     | '/portal'
     | '/cms'
     | '/concierge'
+    | '/empresa'
+    | '/mi-viaje'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
@@ -665,6 +703,7 @@ export interface FileRouteTypes {
     | '/portal/galeria'
     | '/portal/presencia'
     | '/portal/propiedad'
+    | '/admin/'
     | '/cms/'
     | '/cuenta/'
     | '/portal/'
@@ -697,6 +736,8 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/restaurantes'
     | '/concierge'
+    | '/empresa'
+    | '/mi-viaje'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
@@ -726,6 +767,7 @@ export interface FileRouteTypes {
     | '/portal/galeria'
     | '/portal/presencia'
     | '/portal/propiedad'
+    | '/admin'
     | '/cms'
     | '/cuenta'
     | '/portal'
@@ -758,10 +800,13 @@ export interface FileRouteTypes {
     | '/hoteles'
     | '/reset-password'
     | '/restaurantes'
+    | '/_authenticated/admin'
     | '/_authenticated/cuenta'
     | '/_authenticated/portal'
     | '/_authenticated/cms'
     | '/_authenticated/concierge'
+    | '/_authenticated/empresa'
+    | '/_authenticated/mi-viaje'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
@@ -791,6 +836,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/galeria'
     | '/_authenticated/portal/presencia'
     | '/_authenticated/portal/propiedad'
+    | '/_authenticated/admin/'
     | '/_authenticated/cms/'
     | '/_authenticated/cuenta/'
     | '/_authenticated/portal/'
@@ -947,6 +993,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/mi-viaje': {
+      id: '/_authenticated/mi-viaje'
+      path: '/mi-viaje'
+      fullPath: '/mi-viaje'
+      preLoaderRoute: typeof AuthenticatedMiViajeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/empresa': {
+      id: '/_authenticated/empresa'
+      path: '/empresa'
+      fullPath: '/empresa'
+      preLoaderRoute: typeof AuthenticatedEmpresaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/concierge': {
       id: '/_authenticated/concierge'
       path: '/concierge'
@@ -975,6 +1035,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCuentaRouteRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/portal/': {
       id: '/_authenticated/portal/'
       path: '/'
@@ -995,6 +1062,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/cms/'
       preLoaderRoute: typeof AuthenticatedCmsIndexRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/portal/propiedad': {
       id: '/_authenticated/portal/propiedad'
@@ -1279,6 +1353,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
 interface AuthenticatedCuentaConciergeRouteChildren {
   AuthenticatedCuentaConciergeCaseIdRoute: typeof AuthenticatedCuentaConciergeCaseIdRoute
 }
@@ -1426,17 +1514,23 @@ const AuthenticatedConciergeRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedCuentaRouteRoute: typeof AuthenticatedCuentaRouteRouteWithChildren
   AuthenticatedPortalRouteRoute: typeof AuthenticatedPortalRouteRouteWithChildren
   AuthenticatedCmsRoute: typeof AuthenticatedCmsRouteWithChildren
   AuthenticatedConciergeRoute: typeof AuthenticatedConciergeRouteWithChildren
+  AuthenticatedEmpresaRoute: typeof AuthenticatedEmpresaRoute
+  AuthenticatedMiViajeRoute: typeof AuthenticatedMiViajeRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedCuentaRouteRoute: AuthenticatedCuentaRouteRouteWithChildren,
   AuthenticatedPortalRouteRoute: AuthenticatedPortalRouteRouteWithChildren,
   AuthenticatedCmsRoute: AuthenticatedCmsRouteWithChildren,
   AuthenticatedConciergeRoute: AuthenticatedConciergeRouteWithChildren,
+  AuthenticatedEmpresaRoute: AuthenticatedEmpresaRoute,
+  AuthenticatedMiViajeRoute: AuthenticatedMiViajeRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

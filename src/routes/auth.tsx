@@ -5,6 +5,7 @@ import { SITE } from "@/config/site";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
+import { resolveRoleHome } from "@/types/auth";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthRoute() {
-  const { user, loading } = useAuth();
+  const { user, loading, roles } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
@@ -32,8 +33,11 @@ function AuthRoute() {
   const [info, setInfo] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!loading && user) void navigate({ to: "/" });
-  }, [loading, user, navigate]);
+    if (!loading && user) {
+      const home = resolveRoleHome(roles);
+      void navigate({ to: home });
+    }
+  }, [loading, user, roles, navigate]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,7 +48,7 @@ function AuthRoute() {
       if (mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        void navigate({ to: "/" });
+        // Redirección por rol gestionada por el effect cuando `roles` se hidrate.
       } else if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
           email,
