@@ -100,7 +100,9 @@ function CmsLayout() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Topbar móvil (visible <lg) */}
-      <header className="sticky top-0 z-40 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 border-b border-border bg-card/90 px-3 py-2 backdrop-blur lg:hidden">
+      <header className="sticky top-0 z-40 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-card/90 px-3 py-2 backdrop-blur lg:hidden">
+        <BrandLogo className="h-8 w-auto shrink-0" />
+        <span className="truncate text-center text-sm font-semibold tracking-wide">CMS Studio</span>
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
@@ -109,7 +111,6 @@ function CmsLayout() {
         >
           <span aria-hidden className="block h-[2px] w-5 bg-foreground shadow-[0_-6px_0_currentColor,0_6px_0_currentColor]" />
         </button>
-        <span className="truncate text-sm font-semibold tracking-wide">CMS Studio</span>
       </header>
 
       {/* Overlay móvil */}
