@@ -2988,6 +2988,36 @@ export type Database = {
         }
         Returns: undefined
       }
+      unc_activity_admin: {
+        Args: { _limit?: number }
+        Returns: {
+          kind: string
+          occurred_at: string
+          ref: Json
+          severity: string
+          title: string
+        }[]
+      }
+      unc_activity_business: {
+        Args: { _business_id: string; _limit?: number }
+        Returns: {
+          kind: string
+          occurred_at: string
+          ref: Json
+          severity: string
+          title: string
+        }[]
+      }
+      unc_activity_traveler: {
+        Args: { _limit?: number }
+        Returns: {
+          kind: string
+          occurred_at: string
+          ref: Json
+          severity: string
+          title: string
+        }[]
+      }
       unc_count_my_unread: { Args: never; Returns: number }
       unc_list_my_deliveries: {
         Args: { _limit?: number; _only_unread?: boolean }
@@ -3017,6 +3047,39 @@ export type Database = {
       }
       unc_mark_delivery_read: {
         Args: { _delivery_id: string }
+        Returns: {
+          attempt_count: number
+          audience: string
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          delivered_at: string | null
+          event_id: string
+          event_type: string
+          id: string
+          last_error: string | null
+          payload_ref: Json
+          read_at: string | null
+          recipient_user_id: string | null
+          status: Database["public"]["Enums"]["notification_delivery_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "notification_deliveries"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      unc_publish_in_app: {
+        Args: {
+          _audience: string
+          _category: Database["public"]["Enums"]["notification_category"]
+          _event_id: string
+          _event_type: string
+          _payload_ref?: Json
+          _recipient_user_id: string
+        }
         Returns: {
           attempt_count: number
           audience: string

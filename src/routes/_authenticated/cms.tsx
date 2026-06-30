@@ -31,7 +31,8 @@ interface NavItem {
     | "/cms/reviews"
     | "/cms/pagos"
     | "/cms/observabilidad"
-    | "/cms/alertas";
+    | "/cms/alertas"
+    | "/cms/actividad";
   label: string;
 }
 
@@ -48,6 +49,7 @@ const NAV: NavItem[] = [
   { to: "/cms/pagos", label: "Pagos" },
   { to: "/cms/observabilidad", label: "Observabilidad" },
   { to: "/cms/alertas", label: "Alertas" },
+  { to: "/cms/actividad", label: "Actividad" },
 ];
 
 export const Route = createFileRoute("/_authenticated/cms")({

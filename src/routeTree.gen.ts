@@ -48,6 +48,7 @@ import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedCmsEmpresasRouteImport } from './routes/_authenticated/cms/empresas'
 import { Route as AuthenticatedCmsDestinosRouteImport } from './routes/_authenticated/cms/destinos'
 import { Route as AuthenticatedCmsAlertasRouteImport } from './routes/_authenticated/cms/alertas'
+import { Route as AuthenticatedCmsActividadRouteImport } from './routes/_authenticated/cms/actividad'
 import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './routes/_authenticated/portal/invitaciones.index'
 import { Route as AuthenticatedCmsReviewsIndexRouteImport } from './routes/_authenticated/cms/reviews.index'
 import { Route as AuthenticatedCmsRegionesIndexRouteImport } from './routes/_authenticated/cms/regiones.index'
@@ -273,6 +274,12 @@ const AuthenticatedCmsAlertasRoute = AuthenticatedCmsAlertasRouteImport.update({
   path: '/alertas',
   getParentRoute: () => AuthenticatedCmsRoute,
 } as any)
+const AuthenticatedCmsActividadRoute =
+  AuthenticatedCmsActividadRouteImport.update({
+    id: '/actividad',
+    path: '/actividad',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedPortalInvitacionesIndexRoute =
   AuthenticatedPortalInvitacionesIndexRouteImport.update({
     id: '/invitaciones/',
@@ -371,6 +378,7 @@ export interface FileRoutesByFullPath {
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
@@ -421,6 +429,7 @@ export interface FileRoutesByTo {
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
+  '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
@@ -476,6 +485,7 @@ export interface FileRoutesById {
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/_authenticated/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/_authenticated/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/_authenticated/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/_authenticated/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
@@ -531,6 +541,7 @@ export interface FileRouteTypes {
     | '/oriente-maya/$destino'
     | '/marketplace/'
     | '/oriente-maya/'
+    | '/cms/actividad'
     | '/cms/alertas'
     | '/cms/destinos'
     | '/cms/empresas'
@@ -581,6 +592,7 @@ export interface FileRouteTypes {
     | '/oriente-maya/$destino'
     | '/marketplace'
     | '/oriente-maya'
+    | '/cms/actividad'
     | '/cms/alertas'
     | '/cms/destinos'
     | '/cms/empresas'
@@ -635,6 +647,7 @@ export interface FileRouteTypes {
     | '/oriente-maya/$destino'
     | '/marketplace/'
     | '/oriente-maya/'
+    | '/_authenticated/cms/actividad'
     | '/_authenticated/cms/alertas'
     | '/_authenticated/cms/destinos'
     | '/_authenticated/cms/empresas'
@@ -965,6 +978,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsAlertasRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/actividad': {
+      id: '/_authenticated/cms/actividad'
+      path: '/actividad'
+      fullPath: '/cms/actividad'
+      preLoaderRoute: typeof AuthenticatedCmsActividadRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/portal/invitaciones/': {
       id: '/_authenticated/portal/invitaciones/'
       path: '/invitaciones'
@@ -1116,6 +1136,7 @@ const AuthenticatedPortalRouteRouteWithChildren =
   )
 
 interface AuthenticatedCmsRouteChildren {
+  AuthenticatedCmsActividadRoute: typeof AuthenticatedCmsActividadRoute
   AuthenticatedCmsAlertasRoute: typeof AuthenticatedCmsAlertasRoute
   AuthenticatedCmsDestinosRoute: typeof AuthenticatedCmsDestinosRoute
   AuthenticatedCmsEmpresasRoute: typeof AuthenticatedCmsEmpresasRoute
@@ -1136,6 +1157,7 @@ interface AuthenticatedCmsRouteChildren {
 }
 
 const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
+  AuthenticatedCmsActividadRoute: AuthenticatedCmsActividadRoute,
   AuthenticatedCmsAlertasRoute: AuthenticatedCmsAlertasRoute,
   AuthenticatedCmsDestinosRoute: AuthenticatedCmsDestinosRoute,
   AuthenticatedCmsEmpresasRoute: AuthenticatedCmsEmpresasRoute,
