@@ -15,7 +15,6 @@ import {
   UserRound,
   LayoutDashboard,
   Bell,
-  Calendar,
   ListChecks,
   Settings,
   Inbox,
