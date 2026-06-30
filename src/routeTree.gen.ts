@@ -63,6 +63,7 @@ import { Route as AuthenticatedCmsEmpresasRouteImport } from './routes/_authenti
 import { Route as AuthenticatedCmsDestinosRouteImport } from './routes/_authenticated/cms/destinos'
 import { Route as AuthenticatedCmsAlertasRouteImport } from './routes/_authenticated/cms/alertas'
 import { Route as AuthenticatedCmsActividadRouteImport } from './routes/_authenticated/cms/actividad'
+import { Route as AuthenticatedAdminTuristasRouteImport } from './routes/_authenticated/admin/turistas'
 import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
 import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './routes/_authenticated/portal/invitaciones.index'
 import { Route as AuthenticatedPortalEmpresasIndexRouteImport } from './routes/_authenticated/portal/empresas.index'
@@ -379,6 +380,12 @@ const AuthenticatedCmsActividadRoute =
     path: '/actividad',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedAdminTuristasRoute =
+  AuthenticatedAdminTuristasRouteImport.update({
+    id: '/turistas',
+    path: '/turistas',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminEmpresasRoute =
   AuthenticatedAdminEmpresasRouteImport.update({
     id: '/empresas',
@@ -532,6 +539,7 @@ export interface FileRoutesByFullPath {
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
@@ -604,6 +612,7 @@ export interface FileRoutesByTo {
   '/marketplace': typeof MarketplaceIndexRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
@@ -682,6 +691,7 @@ export interface FileRoutesById {
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/_authenticated/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/_authenticated/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/_authenticated/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/_authenticated/cms/destinos': typeof AuthenticatedCmsDestinosRoute
@@ -760,6 +770,7 @@ export interface FileRouteTypes {
     | '/marketplace/'
     | '/oriente-maya/'
     | '/admin/empresas'
+    | '/admin/turistas'
     | '/cms/actividad'
     | '/cms/alertas'
     | '/cms/destinos'
@@ -832,6 +843,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/oriente-maya'
     | '/admin/empresas'
+    | '/admin/turistas'
     | '/cms/actividad'
     | '/cms/alertas'
     | '/cms/destinos'
@@ -909,6 +921,7 @@ export interface FileRouteTypes {
     | '/marketplace/'
     | '/oriente-maya/'
     | '/_authenticated/admin/empresas'
+    | '/_authenticated/admin/turistas'
     | '/_authenticated/cms/actividad'
     | '/_authenticated/cms/alertas'
     | '/_authenticated/cms/destinos'
@@ -1363,6 +1376,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsActividadRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/admin/turistas': {
+      id: '/_authenticated/admin/turistas'
+      path: '/turistas'
+      fullPath: '/admin/turistas'
+      preLoaderRoute: typeof AuthenticatedAdminTuristasRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/empresas': {
       id: '/_authenticated/admin/empresas'
       path: '/empresas'
@@ -1515,12 +1535,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
+  AuthenticatedAdminTuristasRoute: typeof AuthenticatedAdminTuristasRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
     AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
+    AuthenticatedAdminTuristasRoute: AuthenticatedAdminTuristasRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
 
