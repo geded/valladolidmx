@@ -18,6 +18,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   listBlockLibrary,
+  syncBlockLibrary,
 } from "@/lib/experience-builder/experience-builder.functions";
 import {
   listCompositions,
@@ -95,6 +96,7 @@ function ExperienceBuilderStudio() {
   const listRevs = useServerFn(listCompositionRevisions);
   const restore = useServerFn(restoreCompositionRevision);
   const listLib = useServerFn(listBlockLibrary);
+  const syncLib = useServerFn(syncBlockLibrary);
   const publicPublish = useServerFn(publishComposition);
   const publicUnpublish = useServerFn(unpublishComposition);
   const { roles } = useAuth();
@@ -110,6 +112,7 @@ function ExperienceBuilderStudio() {
   const [filter, setFilter] = useState<"all" | "static" | "smart">("all");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string>("Listo.");
+  const [syncing, setSyncing] = useState(false);
 
   // Modal state (replaces window.prompt/confirm — mejor UX en iPad/móvil)
   const [createOpen, setCreateOpen] = useState(false);
@@ -170,6 +173,27 @@ function ExperienceBuilderStudio() {
       }),
     [library, filter, search],
   );
+
+  const runSyncLibrary = async () => {
+    if (!isAdmin) {
+      setStatus("Solo administradores pueden sincronizar la Biblioteca.");
+      return;
+    }
+    setSyncing(true);
+    setStatus("Sincronizando Biblioteca…");
+    try {
+      const res = await syncLib();
+      const lib = await listLib();
+      setLibrary(lib as unknown as LibraryEntry[]);
+      setStatus(
+        `Biblioteca sincronizada: ${res.succeeded}/${res.total} bloques.`,
+      );
+    } catch (e) {
+      setStatus(`Error al sincronizar: ${(e as Error).message}`);
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const openComposition = async (id: string) => {
     setStatus("Cargando…");
@@ -371,6 +395,9 @@ function ExperienceBuilderStudio() {
           compositions={compositions}
           onOpen={openComposition}
           onCreate={onCreate}
+          librarySize={library.length}
+          onSyncLibrary={isAdmin ? () => void runSyncLibrary() : undefined}
+          syncing={syncing}
         />
       ) : (
         <div className="grid grid-cols-12 gap-4">
@@ -378,13 +405,26 @@ function ExperienceBuilderStudio() {
           <aside className="col-span-12 lg:col-span-3 rounded-lg border border-border bg-card/40 p-3">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-sm font-semibold">Biblioteca</h2>
-              <button
-                type="button"
-                onClick={() => setActive(null)}
-                className="text-xs text-muted-foreground hover:underline"
-              >
-                ← Lista
-              </button>
+              <div className="flex items-center gap-2">
+                {isAdmin ? (
+                  <button
+                    type="button"
+                    onClick={() => void runSyncLibrary()}
+                    disabled={syncing}
+                    className="rounded-md border border-border bg-background px-2 py-0.5 text-[10px] hover:bg-accent disabled:opacity-50"
+                    title="Vuelca el catálogo de bloques declarado en código a la base"
+                  >
+                    {syncing ? "Sincronizando…" : "Sincronizar"}
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => setActive(null)}
+                  className="text-xs text-muted-foreground hover:underline"
+                >
+                  ← Lista
+                </button>
+              </div>
             </div>
             <input
               type="search"
@@ -423,7 +463,23 @@ function ExperienceBuilderStudio() {
                 </li>
               ))}
               {filteredLibrary.length === 0 ? (
-                <li className="text-xs text-muted-foreground">Sin bloques.</li>
+                <li className="grid gap-2 rounded-md border border-dashed border-border p-3 text-xs text-muted-foreground">
+                  <span>
+                    {library.length === 0
+                      ? "La Biblioteca aún no está poblada."
+                      : "Sin bloques con ese filtro."}
+                  </span>
+                  {library.length === 0 && isAdmin ? (
+                    <button
+                      type="button"
+                      onClick={() => void runSyncLibrary()}
+                      disabled={syncing}
+                      className="rounded-md bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground disabled:opacity-50"
+                    >
+                      {syncing ? "Sincronizando…" : "Sincronizar Biblioteca"}
+                    </button>
+                  ) : null}
+                </li>
               ) : null}
             </ul>
           </aside>
@@ -598,13 +654,34 @@ function CompositionsList({
   compositions,
   onOpen,
   onCreate,
+  librarySize,
+  onSyncLibrary,
+  syncing,
 }: {
   compositions: CompositionSummary[];
   onOpen: (id: string) => void;
   onCreate: () => void;
+  librarySize: number;
+  onSyncLibrary?: () => void;
+  syncing?: boolean;
 }) {
   return (
     <div className="rounded-lg border border-border bg-card/40 p-4">
+      {librarySize === 0 && onSyncLibrary ? (
+        <div className="mb-3 flex flex-col gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-900 sm:flex-row sm:items-center sm:justify-between">
+          <span>
+            La Biblioteca de bloques está vacía. Sincronízala antes de editar.
+          </span>
+          <button
+            type="button"
+            onClick={onSyncLibrary}
+            disabled={syncing}
+            className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+          >
+            {syncing ? "Sincronizando…" : "Sincronizar Biblioteca"}
+          </button>
+        </div>
+      ) : null}
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold">Composiciones</h2>
         <button
