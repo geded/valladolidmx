@@ -41,6 +41,7 @@ import { Route as AuthenticatedCuentaFavoritosRouteImport } from './routes/_auth
 import { Route as AuthenticatedCuentaCarritoRouteImport } from './routes/_authenticated/cuenta/carrito'
 import { Route as AuthenticatedCmsZonasRouteImport } from './routes/_authenticated/cms/zonas'
 import { Route as AuthenticatedCmsProductosRouteImport } from './routes/_authenticated/cms/productos'
+import { Route as AuthenticatedCmsPagosRouteImport } from './routes/_authenticated/cms/pagos'
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
 import { Route as AuthenticatedCmsEmpresasRouteImport } from './routes/_authenticated/cms/empresas'
 import { Route as AuthenticatedCmsDestinosRouteImport } from './routes/_authenticated/cms/destinos'
@@ -230,6 +231,11 @@ const AuthenticatedCmsProductosRoute =
     path: '/productos',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsPagosRoute = AuthenticatedCmsPagosRouteImport.update({
+  id: '/pagos',
+  path: '/pagos',
+  getParentRoute: () => AuthenticatedCmsRoute,
+} as any)
 const AuthenticatedCmsMediaRoute = AuthenticatedCmsMediaRouteImport.update({
   id: '/media',
   path: '/media',
@@ -348,6 +354,7 @@ export interface FileRoutesByFullPath {
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
   '/cms/media': typeof AuthenticatedCmsMediaRoute
+  '/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -394,6 +401,7 @@ export interface FileRoutesByTo {
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
   '/cms/media': typeof AuthenticatedCmsMediaRoute
+  '/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -445,6 +453,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/_authenticated/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
+  '/_authenticated/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/_authenticated/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/_authenticated/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -496,6 +505,7 @@ export interface FileRouteTypes {
     | '/cms/destinos'
     | '/cms/empresas'
     | '/cms/media'
+    | '/cms/pagos'
     | '/cms/productos'
     | '/cms/zonas'
     | '/cuenta/carrito'
@@ -542,6 +552,7 @@ export interface FileRouteTypes {
     | '/cms/destinos'
     | '/cms/empresas'
     | '/cms/media'
+    | '/cms/pagos'
     | '/cms/productos'
     | '/cms/zonas'
     | '/cuenta/carrito'
@@ -592,6 +603,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/destinos'
     | '/_authenticated/cms/empresas'
     | '/_authenticated/cms/media'
+    | '/_authenticated/cms/pagos'
     | '/_authenticated/cms/productos'
     | '/_authenticated/cms/zonas'
     | '/_authenticated/cuenta/carrito'
@@ -866,6 +878,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsProductosRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/pagos': {
+      id: '/_authenticated/cms/pagos'
+      path: '/pagos'
+      fullPath: '/cms/pagos'
+      preLoaderRoute: typeof AuthenticatedCmsPagosRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/media': {
       id: '/_authenticated/cms/media'
       path: '/media'
@@ -1039,6 +1058,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsDestinosRoute: typeof AuthenticatedCmsDestinosRoute
   AuthenticatedCmsEmpresasRoute: typeof AuthenticatedCmsEmpresasRoute
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
+  AuthenticatedCmsPagosRoute: typeof AuthenticatedCmsPagosRoute
   AuthenticatedCmsProductosRoute: typeof AuthenticatedCmsProductosRoute
   AuthenticatedCmsZonasRoute: typeof AuthenticatedCmsZonasRoute
   AuthenticatedCmsIndexRoute: typeof AuthenticatedCmsIndexRoute
@@ -1056,6 +1076,7 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsDestinosRoute: AuthenticatedCmsDestinosRoute,
   AuthenticatedCmsEmpresasRoute: AuthenticatedCmsEmpresasRoute,
   AuthenticatedCmsMediaRoute: AuthenticatedCmsMediaRoute,
+  AuthenticatedCmsPagosRoute: AuthenticatedCmsPagosRoute,
   AuthenticatedCmsProductosRoute: AuthenticatedCmsProductosRoute,
   AuthenticatedCmsZonasRoute: AuthenticatedCmsZonasRoute,
   AuthenticatedCmsIndexRoute: AuthenticatedCmsIndexRoute,
