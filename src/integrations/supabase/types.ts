@@ -3502,43 +3502,73 @@ export type Database = {
       }
       traveler_profiles: {
         Row: {
+          accessibility: string[]
           accessibility_needs: string | null
+          budget_band: string | null
           budget_range: string | null
+          consent_personalize: boolean
+          consent_share_alux: boolean
           created_at: string
+          dietary: string[]
           dietary_restrictions: string | null
+          home_country: string | null
           id: string
           interests: Json
+          languages: string[]
           preferred_destinations: Json
           preferred_language: string | null
+          signals: Json
+          travel_party: Json
           travel_style: string | null
+          travel_style_tags: string[]
           trip_context: Json
           updated_at: string
           user_id: string
         }
         Insert: {
+          accessibility?: string[]
           accessibility_needs?: string | null
+          budget_band?: string | null
           budget_range?: string | null
+          consent_personalize?: boolean
+          consent_share_alux?: boolean
           created_at?: string
+          dietary?: string[]
           dietary_restrictions?: string | null
+          home_country?: string | null
           id?: string
           interests?: Json
+          languages?: string[]
           preferred_destinations?: Json
           preferred_language?: string | null
+          signals?: Json
+          travel_party?: Json
           travel_style?: string | null
+          travel_style_tags?: string[]
           trip_context?: Json
           updated_at?: string
           user_id: string
         }
         Update: {
+          accessibility?: string[]
           accessibility_needs?: string | null
+          budget_band?: string | null
           budget_range?: string | null
+          consent_personalize?: boolean
+          consent_share_alux?: boolean
           created_at?: string
+          dietary?: string[]
           dietary_restrictions?: string | null
+          home_country?: string | null
           id?: string
           interests?: Json
+          languages?: string[]
           preferred_destinations?: Json
           preferred_language?: string | null
+          signals?: Json
+          travel_party?: Json
           travel_style?: string | null
+          travel_style_tags?: string[]
           trip_context?: Json
           updated_at?: string
           user_id?: string
@@ -4071,6 +4101,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      founder_dashboard_kpis: { Args: never; Returns: Json }
       has_business_access: {
         Args: {
           _business_id: string
