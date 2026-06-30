@@ -86,9 +86,9 @@ export const createConciergeCaseFromTravelPlan = createServerFn({ method: "POST"
     const args = {
       _traveler_user_id: context.userId,
       _summary: data.summary,
-      _items: data.items ?? [],
+      _items: (data.items ?? []) as Json,
       ...(data.travelPlanId ? { _travel_plan_id: data.travelPlanId } : {}),
-    } as { _traveler_user_id: string; _summary: string; _travel_plan_id: string; _items?: unknown };
+    } as Parameters<typeof context.supabase.rpc<"concierge_case_from_travel_plan">>[1];
     const { data: caseId, error } = await context.supabase.rpc(
       "concierge_case_from_travel_plan",
       args,
