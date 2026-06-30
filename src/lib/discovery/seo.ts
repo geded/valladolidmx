@@ -16,6 +16,9 @@ export interface DiscoveryHeadOptions {
   ogImage?: string;
   locale?: string;
   noindex?: boolean;
+  /** Override del valor del meta `robots`. Si se omite y `noindex` es true,
+   *  se emite "noindex, nofollow"; si no, se omite el tag. */
+  robots?: string;
   jsonLd?: ReadonlyArray<Record<string, unknown>>;
 }
 
@@ -42,6 +45,7 @@ export function buildPublicHead(options: DiscoveryHeadOptions): DiscoveryHead {
     ogImage,
     locale = "es_MX",
     noindex,
+    robots,
     jsonLd,
   } = options;
 
@@ -66,8 +70,9 @@ export function buildPublicHead(options: DiscoveryHeadOptions): DiscoveryHead {
     meta.push({ name: "twitter:image", content: ogImage });
   }
 
-  if (noindex) {
-    meta.push({ name: "robots", content: "noindex, nofollow" });
+  const robotsContent = robots ?? (noindex ? "noindex, nofollow" : undefined);
+  if (robotsContent) {
+    meta.push({ name: "robots", content: robotsContent });
   }
 
   const links: Array<Record<string, string>> = [{ rel: "canonical", href: url }];
