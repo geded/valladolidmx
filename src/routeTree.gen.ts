@@ -22,6 +22,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index'
+import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
 import { Route as MarketplaceBuscarRouteImport } from './routes/marketplace/buscar'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
@@ -72,6 +73,7 @@ import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes
 import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge.expedientes.$caseId'
 import { Route as AuthenticatedCmsRegionesNuevaRouteImport } from './routes/_authenticated/cms/regiones.nueva'
 import { Route as AuthenticatedCmsRegionesEditarRouteImport } from './routes/_authenticated/cms/regiones..editar'
+import { Route as AuthenticatedCmsExperienceBuilderPagesRouteImport } from './routes/_authenticated/cms/experience-builder.pages'
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
 import { Route as AuthenticatedCmsCategoriasEditarRouteImport } from './routes/_authenticated/cms/categorias..editar'
 import { Route as ApiPublicPaymentsProviderWebhookRouteImport } from './routes/api/public/payments/$provider/webhook'
@@ -140,6 +142,11 @@ const OrienteMayaIndexRoute = OrienteMayaIndexRouteImport.update({
 const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
   id: '/marketplace/',
   path: '/marketplace/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreviewTokenRoute = PreviewTokenRouteImport.update({
+  id: '/preview/$token',
+  path: '/preview/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrienteMayaDestinoRoute = OrienteMayaDestinoRouteImport.update({
@@ -428,6 +435,12 @@ const AuthenticatedCmsRegionesEditarRoute =
     path: '/regiones/editar',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsExperienceBuilderPagesRoute =
+  AuthenticatedCmsExperienceBuilderPagesRouteImport.update({
+    id: '/pages',
+    path: '/pages',
+    getParentRoute: () => AuthenticatedCmsExperienceBuilderRoute,
+  } as any)
 const AuthenticatedCmsCategoriasNuevaRoute =
   AuthenticatedCmsCategoriasNuevaRouteImport.update({
     id: '/categorias/nueva',
@@ -480,13 +493,14 @@ export interface FileRoutesByFullPath {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/preview/$token': typeof PreviewTokenRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
-  '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRoute
+  '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
@@ -512,6 +526,7 @@ export interface FileRoutesByFullPath {
   '/portal/': typeof AuthenticatedPortalIndexRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
+  '/cms/experience-builder/pages': typeof AuthenticatedCmsExperienceBuilderPagesRoute
   '/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
@@ -545,13 +560,14 @@ export interface FileRoutesByTo {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/preview/$token': typeof PreviewTokenRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
-  '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRoute
+  '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
@@ -577,6 +593,7 @@ export interface FileRoutesByTo {
   '/portal': typeof AuthenticatedPortalIndexRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
+  '/cms/experience-builder/pages': typeof AuthenticatedCmsExperienceBuilderPagesRoute
   '/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
@@ -616,13 +633,14 @@ export interface FileRoutesById {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/preview/$token': typeof PreviewTokenRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/_authenticated/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/_authenticated/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/_authenticated/cms/destinos': typeof AuthenticatedCmsDestinosRoute
   '/_authenticated/cms/empresas': typeof AuthenticatedCmsEmpresasRoute
-  '/_authenticated/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRoute
+  '/_authenticated/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/_authenticated/cms/pagos': typeof AuthenticatedCmsPagosRoute
@@ -648,6 +666,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
   '/_authenticated/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
   '/_authenticated/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
+  '/_authenticated/cms/experience-builder/pages': typeof AuthenticatedCmsExperienceBuilderPagesRoute
   '/_authenticated/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/_authenticated/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
@@ -687,6 +706,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
+    | '/preview/$token'
     | '/marketplace/'
     | '/oriente-maya/'
     | '/cms/actividad'
@@ -719,6 +739,7 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/cms/categorias/editar'
     | '/cms/categorias/nueva'
+    | '/cms/experience-builder/pages'
     | '/cms/regiones/editar'
     | '/cms/regiones/nueva'
     | '/concierge/expedientes/$caseId'
@@ -752,6 +773,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
+    | '/preview/$token'
     | '/marketplace'
     | '/oriente-maya'
     | '/cms/actividad'
@@ -784,6 +806,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/cms/categorias/editar'
     | '/cms/categorias/nueva'
+    | '/cms/experience-builder/pages'
     | '/cms/regiones/editar'
     | '/cms/regiones/nueva'
     | '/concierge/expedientes/$caseId'
@@ -822,6 +845,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
+    | '/preview/$token'
     | '/marketplace/'
     | '/oriente-maya/'
     | '/_authenticated/cms/actividad'
@@ -854,6 +878,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/'
     | '/_authenticated/cms/categorias/editar'
     | '/_authenticated/cms/categorias/nueva'
+    | '/_authenticated/cms/experience-builder/pages'
     | '/_authenticated/cms/regiones/editar'
     | '/_authenticated/cms/regiones/nueva'
     | '/_authenticated/concierge/expedientes/$caseId'
@@ -886,6 +911,7 @@ export interface RootRouteChildren {
   MarketplaceSlugRoute: typeof MarketplaceSlugRoute
   MarketplaceBuscarRoute: typeof MarketplaceBuscarRoute
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRoute
+  PreviewTokenRoute: typeof PreviewTokenRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -983,6 +1009,13 @@ declare module '@tanstack/react-router' {
       path: '/marketplace'
       fullPath: '/marketplace/'
       preLoaderRoute: typeof MarketplaceIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/preview/$token': {
+      id: '/preview/$token'
+      path: '/preview/$token'
+      fullPath: '/preview/$token'
+      preLoaderRoute: typeof PreviewTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/oriente-maya/$destino': {
@@ -1335,6 +1368,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsRegionesEditarRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/experience-builder/pages': {
+      id: '/_authenticated/cms/experience-builder/pages'
+      path: '/pages'
+      fullPath: '/cms/experience-builder/pages'
+      preLoaderRoute: typeof AuthenticatedCmsExperienceBuilderPagesRouteImport
+      parentRoute: typeof AuthenticatedCmsExperienceBuilderRoute
+    }
     '/_authenticated/cms/categorias/nueva': {
       id: '/_authenticated/cms/categorias/nueva'
       path: '/categorias/nueva'
@@ -1485,12 +1525,27 @@ const AuthenticatedPortalRouteRouteWithChildren =
     AuthenticatedPortalRouteRouteChildren,
   )
 
+interface AuthenticatedCmsExperienceBuilderRouteChildren {
+  AuthenticatedCmsExperienceBuilderPagesRoute: typeof AuthenticatedCmsExperienceBuilderPagesRoute
+}
+
+const AuthenticatedCmsExperienceBuilderRouteChildren: AuthenticatedCmsExperienceBuilderRouteChildren =
+  {
+    AuthenticatedCmsExperienceBuilderPagesRoute:
+      AuthenticatedCmsExperienceBuilderPagesRoute,
+  }
+
+const AuthenticatedCmsExperienceBuilderRouteWithChildren =
+  AuthenticatedCmsExperienceBuilderRoute._addFileChildren(
+    AuthenticatedCmsExperienceBuilderRouteChildren,
+  )
+
 interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsActividadRoute: typeof AuthenticatedCmsActividadRoute
   AuthenticatedCmsAlertasRoute: typeof AuthenticatedCmsAlertasRoute
   AuthenticatedCmsDestinosRoute: typeof AuthenticatedCmsDestinosRoute
   AuthenticatedCmsEmpresasRoute: typeof AuthenticatedCmsEmpresasRoute
-  AuthenticatedCmsExperienceBuilderRoute: typeof AuthenticatedCmsExperienceBuilderRoute
+  AuthenticatedCmsExperienceBuilderRoute: typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
   AuthenticatedCmsObservabilidadRoute: typeof AuthenticatedCmsObservabilidadRoute
   AuthenticatedCmsPagosRoute: typeof AuthenticatedCmsPagosRoute
@@ -1513,7 +1568,7 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsDestinosRoute: AuthenticatedCmsDestinosRoute,
   AuthenticatedCmsEmpresasRoute: AuthenticatedCmsEmpresasRoute,
   AuthenticatedCmsExperienceBuilderRoute:
-    AuthenticatedCmsExperienceBuilderRoute,
+    AuthenticatedCmsExperienceBuilderRouteWithChildren,
   AuthenticatedCmsMediaRoute: AuthenticatedCmsMediaRoute,
   AuthenticatedCmsObservabilidadRoute: AuthenticatedCmsObservabilidadRoute,
   AuthenticatedCmsPagosRoute: AuthenticatedCmsPagosRoute,
@@ -1587,6 +1642,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceSlugRoute: MarketplaceSlugRoute,
   MarketplaceBuscarRoute: MarketplaceBuscarRoute,
   OrienteMayaDestinoRoute: OrienteMayaDestinoRoute,
+  PreviewTokenRoute: PreviewTokenRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
