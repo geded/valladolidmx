@@ -18,6 +18,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   listBlockLibrary,
+  syncBlockLibrary,
 } from "@/lib/experience-builder/experience-builder.functions";
 import {
   listCompositions,
@@ -95,6 +96,7 @@ function ExperienceBuilderStudio() {
   const listRevs = useServerFn(listCompositionRevisions);
   const restore = useServerFn(restoreCompositionRevision);
   const listLib = useServerFn(listBlockLibrary);
+  const syncLib = useServerFn(syncBlockLibrary);
   const publicPublish = useServerFn(publishComposition);
   const publicUnpublish = useServerFn(unpublishComposition);
   const { roles } = useAuth();
@@ -110,6 +112,7 @@ function ExperienceBuilderStudio() {
   const [filter, setFilter] = useState<"all" | "static" | "smart">("all");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string>("Listo.");
+  const [syncing, setSyncing] = useState(false);
 
   // Modal state (replaces window.prompt/confirm — mejor UX en iPad/móvil)
   const [createOpen, setCreateOpen] = useState(false);
@@ -170,6 +173,27 @@ function ExperienceBuilderStudio() {
       }),
     [library, filter, search],
   );
+
+  const runSyncLibrary = async () => {
+    if (!isAdmin) {
+      setStatus("Solo administradores pueden sincronizar la Biblioteca.");
+      return;
+    }
+    setSyncing(true);
+    setStatus("Sincronizando Biblioteca…");
+    try {
+      const res = await syncLib();
+      const lib = await listLib();
+      setLibrary(lib as unknown as LibraryEntry[]);
+      setStatus(
+        `Biblioteca sincronizada: ${res.succeeded}/${res.total} bloques.`,
+      );
+    } catch (e) {
+      setStatus(`Error al sincronizar: ${(e as Error).message}`);
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const openComposition = async (id: string) => {
     setStatus("Cargando…");
