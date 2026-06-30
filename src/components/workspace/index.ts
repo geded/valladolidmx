@@ -15,3 +15,24 @@ export { EntityCard } from "./cards/EntityCard";
 export { MetricCard } from "./cards/MetricCard";
 export { ActionCard } from "./cards/ActionCard";
 export { useWorkspaceBreakpoint } from "./hooks/useWorkspaceBreakpoint";
+
+// 15.10.5b — Contextual Layer
+export {
+  WorkspaceContextProvider,
+  useWorkspaceContext,
+  useSelection,
+  useFocusedEntity,
+  useAvailableActions,
+  useScrollPreservation,
+} from "./context/WorkspaceContextProvider";
+export { SheetStackProvider, useSheetStack } from "./sheets/SheetStackProvider";
+export {
+  EntityInspector,
+  SelectionInspector,
+  EmptyInspector,
+  registerInspectorView,
+  resolveInspector,
+} from "./inspector";
+export { useSwipeActions } from "./hooks/gestures/useSwipeActions";
+export { usePullToRefresh } from "./hooks/gestures/usePullToRefresh";
+export { useLongPress } from "./hooks/gestures/useLongPress";
