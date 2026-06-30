@@ -22,6 +22,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index'
+import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
 import { Route as MarketplaceBuscarRouteImport } from './routes/marketplace/buscar'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
@@ -141,6 +142,11 @@ const OrienteMayaIndexRoute = OrienteMayaIndexRouteImport.update({
 const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
   id: '/marketplace/',
   path: '/marketplace/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreviewTokenRoute = PreviewTokenRouteImport.update({
+  id: '/preview/$token',
+  path: '/preview/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrienteMayaDestinoRoute = OrienteMayaDestinoRouteImport.update({
@@ -487,6 +493,7 @@ export interface FileRoutesByFullPath {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/preview/$token': typeof PreviewTokenRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
@@ -553,6 +560,7 @@ export interface FileRoutesByTo {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/preview/$token': typeof PreviewTokenRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
@@ -625,6 +633,7 @@ export interface FileRoutesById {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/preview/$token': typeof PreviewTokenRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/_authenticated/cms/actividad': typeof AuthenticatedCmsActividadRoute
@@ -697,6 +706,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
+    | '/preview/$token'
     | '/marketplace/'
     | '/oriente-maya/'
     | '/cms/actividad'
@@ -763,6 +773,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
+    | '/preview/$token'
     | '/marketplace'
     | '/oriente-maya'
     | '/cms/actividad'
@@ -834,6 +845,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
+    | '/preview/$token'
     | '/marketplace/'
     | '/oriente-maya/'
     | '/_authenticated/cms/actividad'
@@ -899,6 +911,7 @@ export interface RootRouteChildren {
   MarketplaceSlugRoute: typeof MarketplaceSlugRoute
   MarketplaceBuscarRoute: typeof MarketplaceBuscarRoute
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRoute
+  PreviewTokenRoute: typeof PreviewTokenRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -996,6 +1009,13 @@ declare module '@tanstack/react-router' {
       path: '/marketplace'
       fullPath: '/marketplace/'
       preLoaderRoute: typeof MarketplaceIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/preview/$token': {
+      id: '/preview/$token'
+      path: '/preview/$token'
+      fullPath: '/preview/$token'
+      preLoaderRoute: typeof PreviewTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/oriente-maya/$destino': {
@@ -1622,6 +1642,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceSlugRoute: MarketplaceSlugRoute,
   MarketplaceBuscarRoute: MarketplaceBuscarRoute,
   OrienteMayaDestinoRoute: OrienteMayaDestinoRoute,
+  PreviewTokenRoute: PreviewTokenRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
