@@ -1,26 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Building2, BarChart3, Megaphone, ShieldCheck, ArrowRight } from "lucide-react";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { SITE } from "@/config/site";
 
 export const Route = createFileRoute("/empresas")({
-  head: () => ({
-    meta: [
-      { title: `Empresas · ${SITE.name}` },
-      {
-        name: "description",
-        content:
-          "Hoteles, restaurantes, experiencias y servicios del Oriente Maya: administra tu presencia con visibilidad real basada en confianza.",
-      },
-    ],
-  }),
+  head: () =>
+    buildPublicHead({
+      title: `Empresas · ${SITE.name}`,
+      description:
+        "Hoteles, restaurantes, experiencias y servicios del Oriente Maya: administra tu presencia con visibilidad real basada en confianza.",
+      path: "/empresas",
+    }),
   component: EmpresasLanding,
 });
 
 function EmpresasLanding() {
   return (
-    <PageShell
+    <PublicShell
       eyebrow="Para empresas"
       title="Tu negocio en el Oriente Maya"
       description="Administra tu presencia, conecta con viajeros reales y crece con un motor de visibilidad basado en confianza, no en publicidad invasiva."
@@ -58,6 +56,6 @@ function EmpresasLanding() {
           <ArrowRight className="size-4" aria-hidden />
         </Link>
       </div>
-    </PageShell>
+    </PublicShell>
   );
 }
