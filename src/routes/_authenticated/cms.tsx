@@ -100,20 +100,16 @@ function CmsLayout() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Topbar móvil (visible <lg) */}
-      <header className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-border bg-card/90 px-4 py-3 backdrop-blur lg:hidden">
+      <header className="sticky top-0 z-40 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 border-b border-border bg-card/90 px-3 py-2 backdrop-blur lg:hidden">
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
           aria-label="Abrir menú"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-background"
         >
           <span aria-hidden className="block h-[2px] w-5 bg-foreground shadow-[0_-6px_0_currentColor,0_6px_0_currentColor]" />
         </button>
-        <div className="flex min-w-0 items-center gap-2">
-          <BrandLogo className="h-7 w-auto shrink-0" />
-          <span className="truncate text-sm font-semibold">CMS Studio</span>
-        </div>
-        <div className="w-9" />
+        <span className="truncate text-sm font-semibold tracking-wide">CMS Studio</span>
       </header>
 
       {/* Overlay móvil */}
