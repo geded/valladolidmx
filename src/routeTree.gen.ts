@@ -65,6 +65,7 @@ import { Route as AuthenticatedCmsAlertasRouteImport } from './routes/_authentic
 import { Route as AuthenticatedCmsActividadRouteImport } from './routes/_authenticated/cms/actividad'
 import { Route as AuthenticatedAdminTuristasRouteImport } from './routes/_authenticated/admin/turistas'
 import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
+import { Route as AuthenticatedAdminConciergeRouteImport } from './routes/_authenticated/admin/concierge'
 import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './routes/_authenticated/portal/invitaciones.index'
 import { Route as AuthenticatedPortalEmpresasIndexRouteImport } from './routes/_authenticated/portal/empresas.index'
 import { Route as AuthenticatedCmsReviewsIndexRouteImport } from './routes/_authenticated/cms/reviews.index'
@@ -392,6 +393,12 @@ const AuthenticatedAdminEmpresasRoute =
     path: '/empresas',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminConciergeRoute =
+  AuthenticatedAdminConciergeRouteImport.update({
+    id: '/concierge',
+    path: '/concierge',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedPortalInvitacionesIndexRoute =
   AuthenticatedPortalInvitacionesIndexRouteImport.update({
     id: '/invitaciones/',
@@ -538,6 +545,7 @@ export interface FileRoutesByFullPath {
   '/preview/$token': typeof PreviewTokenRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
@@ -611,6 +619,7 @@ export interface FileRoutesByTo {
   '/preview/$token': typeof PreviewTokenRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
+  '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
@@ -690,6 +699,7 @@ export interface FileRoutesById {
   '/preview/$token': typeof PreviewTokenRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/_authenticated/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/_authenticated/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/_authenticated/cms/actividad': typeof AuthenticatedCmsActividadRoute
@@ -769,6 +779,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/marketplace/'
     | '/oriente-maya/'
+    | '/admin/concierge'
     | '/admin/empresas'
     | '/admin/turistas'
     | '/cms/actividad'
@@ -842,6 +853,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/marketplace'
     | '/oriente-maya'
+    | '/admin/concierge'
     | '/admin/empresas'
     | '/admin/turistas'
     | '/cms/actividad'
@@ -920,6 +932,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/marketplace/'
     | '/oriente-maya/'
+    | '/_authenticated/admin/concierge'
     | '/_authenticated/admin/empresas'
     | '/_authenticated/admin/turistas'
     | '/_authenticated/cms/actividad'
@@ -1390,6 +1403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminEmpresasRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/concierge': {
+      id: '/_authenticated/admin/concierge'
+      path: '/concierge'
+      fullPath: '/admin/concierge'
+      preLoaderRoute: typeof AuthenticatedAdminConciergeRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/portal/invitaciones/': {
       id: '/_authenticated/portal/invitaciones/'
       path: '/invitaciones'
@@ -1534,6 +1554,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminConciergeRoute: typeof AuthenticatedAdminConciergeRoute
   AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
   AuthenticatedAdminTuristasRoute: typeof AuthenticatedAdminTuristasRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -1541,6 +1562,7 @@ interface AuthenticatedAdminRouteRouteChildren {
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminConciergeRoute: AuthenticatedAdminConciergeRoute,
     AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
     AuthenticatedAdminTuristasRoute: AuthenticatedAdminTuristasRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
