@@ -747,6 +747,194 @@ export type Database = {
           },
         ]
       }
+      concierge_case_links: {
+        Row: {
+          case_id: string
+          created_at: string
+          id: string
+          link_type: string
+          meta: Json
+          target_id: string
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          id?: string
+          link_type: string
+          meta?: Json
+          target_id: string
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          id?: string
+          link_type?: string
+          meta?: Json
+          target_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_case_links_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concierge_case_notes: {
+        Row: {
+          author_user_id: string | null
+          body: string
+          case_id: string
+          created_at: string
+          id: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          author_user_id?: string | null
+          body: string
+          case_id: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          author_user_id?: string | null
+          body?: string
+          case_id?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_case_notes_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concierge_case_participants: {
+        Row: {
+          case_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          role: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_case_participants_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concierge_case_timeline: {
+        Row: {
+          actor_user_id: string | null
+          case_id: string
+          event_type: string
+          id: string
+          occurred_at: string
+          payload: Json
+          severity: string
+          summary: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          case_id: string
+          event_type: string
+          id?: string
+          occurred_at?: string
+          payload?: Json
+          severity?: string
+          summary?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          case_id?: string
+          event_type?: string
+          id?: string
+          occurred_at?: string
+          payload?: Json
+          severity?: string
+          summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_case_timeline_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concierge_cases: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          priority: string
+          source: string
+          status: string
+          summary: string | null
+          traveler_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          priority?: string
+          source?: string
+          status?: string
+          summary?: string | null
+          traveler_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          priority?: string
+          source?: string
+          status?: string
+          summary?: string | null
+          traveler_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       concierge_profiles: {
         Row: {
           active: boolean
@@ -2967,6 +3155,34 @@ export type Database = {
         Args: { p_item_id: string; p_quantity: number }
         Returns: undefined
       }
+      concierge_can_view_case: {
+        Args: { _case_id: string; _user_id: string }
+        Returns: boolean
+      }
+      concierge_case_create: {
+        Args: { _source?: string; _summary?: string; _traveler_user_id: string }
+        Returns: string
+      }
+      concierge_case_get: { Args: { _case_id: string }; Returns: Json }
+      concierge_case_list_for_role: {
+        Args: { _limit?: number; _scope?: string }
+        Returns: Json[]
+      }
+      concierge_case_set_status: {
+        Args: { _case_id: string; _next_status: string; _reason?: string }
+        Returns: undefined
+      }
+      concierge_case_timeline_append: {
+        Args: {
+          _case_id: string
+          _event_type: string
+          _payload?: Json
+          _severity: string
+          _summary: string
+        }
+        Returns: string
+      }
+      concierge_is_internal: { Args: { _user_id: string }; Returns: boolean }
       create_business_product: {
         Args: {
           _business_id: string
