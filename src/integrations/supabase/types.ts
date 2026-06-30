@@ -1280,6 +1280,39 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace_search_metrics: {
+        Row: {
+          category_slug: string | null
+          created_at: string
+          destination_slug: string | null
+          duration_ms: number
+          id: string
+          q: string | null
+          result_count: number
+          user_id: string | null
+        }
+        Insert: {
+          category_slug?: string | null
+          created_at?: string
+          destination_slug?: string | null
+          duration_ms?: number
+          id?: string
+          q?: string | null
+          result_count?: number
+          user_id?: string | null
+        }
+        Update: {
+          category_slug?: string | null
+          created_at?: string
+          destination_slug?: string | null
+          duration_ms?: number
+          id?: string
+          q?: string | null
+          result_count?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       media_assets: {
         Row: {
           alt_text: string | null
@@ -2216,6 +2249,57 @@ export type Database = {
           },
         ]
       }
+      system_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          first_seen_at: string
+          id: string
+          kind: string
+          last_seen_at: string
+          message: string
+          occurrences: number
+          payload: Json
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: Database["public"]["Enums"]["system_alert_severity"]
+          status: Database["public"]["Enums"]["system_alert_status"]
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          first_seen_at?: string
+          id?: string
+          kind: string
+          last_seen_at?: string
+          message: string
+          occurrences?: number
+          payload?: Json
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: Database["public"]["Enums"]["system_alert_severity"]
+          status?: Database["public"]["Enums"]["system_alert_status"]
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          first_seen_at?: string
+          id?: string
+          kind?: string
+          last_seen_at?: string
+          message?: string
+          occurrences?: number
+          payload?: Json
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: Database["public"]["Enums"]["system_alert_severity"]
+          status?: Database["public"]["Enums"]["system_alert_status"]
+        }
+        Relationships: []
+      }
       tourism_regions: {
         Row: {
           created_at: string
@@ -2446,6 +2530,97 @@ export type Database = {
         Args: { _transfer_id: string }
         Returns: Json
       }
+      admin_acknowledge_system_alert: {
+        Args: { p_id: string }
+        Returns: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          first_seen_at: string
+          id: string
+          kind: string
+          last_seen_at: string
+          message: string
+          occurrences: number
+          payload: Json
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: Database["public"]["Enums"]["system_alert_severity"]
+          status: Database["public"]["Enums"]["system_alert_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "system_alerts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_evaluate_functional_alerts: {
+        Args: { p_window_minutes?: number }
+        Returns: Json
+      }
+      admin_list_system_alerts: {
+        Args: { p_limit?: number; p_status?: string }
+        Returns: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          first_seen_at: string
+          id: string
+          kind: string
+          last_seen_at: string
+          message: string
+          occurrences: number
+          payload: Json
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: Database["public"]["Enums"]["system_alert_severity"]
+          status: Database["public"]["Enums"]["system_alert_status"]
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "system_alerts"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_marketplace_funnel: { Args: { p_days?: number }; Returns: Json }
+      admin_resolve_system_alert: {
+        Args: { p_id: string }
+        Returns: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          first_seen_at: string
+          id: string
+          kind: string
+          last_seen_at: string
+          message: string
+          occurrences: number
+          payload: Json
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: Database["public"]["Enums"]["system_alert_severity"]
+          status: Database["public"]["Enums"]["system_alert_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "system_alerts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_search_metrics_summary: { Args: { p_days?: number }; Returns: Json }
+      admin_top_products: {
+        Args: { p_days?: number; p_kind?: string; p_limit?: number }
+        Returns: {
+          business_name: string
+          metric: number
+          product_id: string
+          product_name: string
+          product_slug: string
+        }[]
+      }
       archive_business_product: {
         Args: { _product_id: string }
         Returns: undefined
@@ -2598,6 +2773,26 @@ export type Database = {
         }
       }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
+      raise_system_alert: {
+        Args: {
+          p_kind: string
+          p_message: string
+          p_payload: Json
+          p_severity: Database["public"]["Enums"]["system_alert_severity"]
+        }
+        Returns: string
+      }
+      record_search_metric: {
+        Args: {
+          p_category_slug: string
+          p_destination_slug: string
+          p_duration_ms: number
+          p_q: string
+          p_result_count: number
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       register_business_media: {
         Args: {
           _alt_text?: string
@@ -2801,6 +2996,8 @@ export type Database = {
         | "servicio"
         | "artesanal"
       product_visibility_level: "standard" | "destacado" | "premium"
+      system_alert_severity: "info" | "warning" | "critical"
+      system_alert_status: "open" | "acknowledged" | "resolved"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3012,6 +3209,8 @@ export const Constants = {
         "artesanal",
       ],
       product_visibility_level: ["standard", "destacado", "premium"],
+      system_alert_severity: ["info", "warning", "critical"],
+      system_alert_status: ["open", "acknowledged", "resolved"],
     },
   },
 } as const
