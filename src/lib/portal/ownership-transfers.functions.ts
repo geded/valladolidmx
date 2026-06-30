@@ -103,7 +103,7 @@ export const requestOwnershipTransfer = createServerFn({ method: "POST" })
       {
         _business_id: data.businessId,
         _to_user_id: data.toUserId,
-        _notes: data.notes ?? null,
+        _notes: data.notes ?? undefined,
       },
     );
     if (error) throw new Error(error.message);
@@ -146,7 +146,7 @@ export const rejectOwnershipTransfer = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { error } = await supabase.rpc(
       "reject_business_ownership_transfer",
-      { _transfer_id: data.transferId, _notes: data.notes ?? null },
+      { _transfer_id: data.transferId, _notes: data.notes ?? undefined },
     );
     if (error) throw new Error(error.message);
     return { ok: true };
