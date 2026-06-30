@@ -33,6 +33,11 @@ import { ArmaTuViajeSection } from "@/components/home/ArmaTuViajeSection";
 import { EnVivoSection } from "@/components/home/EnVivoSection";
 import { EmpresasSection } from "@/components/home/EmpresasSection";
 import { ResenasSection } from "@/components/home/ResenasSection";
+import {
+  CockpitKpiGrid,
+  CockpitAlerts,
+  CockpitActivityStream,
+} from "@/components/admin/cockpit-blocks";
 
 bootstrapBlockLibrary();
 
@@ -292,6 +297,9 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.card.categoria": CardPreview,
   "vmx.card.ruta": CardPreview,
   "vmx.card.resena": CardPreview,
+  "vmx.cockpit.kpi-grid": NamedSectionPreview,
+  "vmx.cockpit.alerts": NamedSectionPreview,
+  "vmx.cockpit.activity-stream": NamedSectionPreview,
 };
 
 /* ------------------------------------------------------------------ *
@@ -321,4 +329,24 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.layout.section": SectionPreview,
   "vmx.layout.spacer": SpacerPreview,
   "vmx.layout.divider": DividerPreview,
+  // Etapa 15.10.4c — Cockpit Fundador (Founder Cockpit Composable)
+  "vmx.cockpit.kpi-grid": ({ node }) => (
+    <CockpitKpiGrid
+      title={(node.config.title as string) ?? "Visión global"}
+      window={(node.config.window as string) ?? "30d"}
+      domain={(node.config.domain as string) ?? "all"}
+    />
+  ),
+  "vmx.cockpit.alerts": ({ node }) => (
+    <CockpitAlerts
+      title={(node.config.title as string) ?? "Alertas"}
+      limit={Number(node.config.limit ?? 10)}
+    />
+  ),
+  "vmx.cockpit.activity-stream": ({ node }) => (
+    <CockpitActivityStream
+      title={(node.config.title as string) ?? "Actividad reciente"}
+      limit={Number(node.config.limit ?? 20)}
+    />
+  ),
 };
