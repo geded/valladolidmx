@@ -29,12 +29,6 @@ import {
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
-export interface PortalLayoutContext {
-  businesses: PortalBusinessSummary[];
-  activeBusinessId: string | null;
-  setActiveBusinessId: (id: string) => void;
-}
-
 export const Route = createFileRoute("/_authenticated/portal")({
   component: PortalLayout,
 });
