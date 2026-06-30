@@ -25,6 +25,7 @@ import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
 import { Route as MarketplaceBuscarRouteImport } from './routes/marketplace/buscar'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
+import { Route as AuthenticatedConciergeRouteImport } from './routes/_authenticated/concierge'
 import { Route as AuthenticatedCmsRouteImport } from './routes/_authenticated/cms'
 import { Route as AuthenticatedPortalRouteRouteImport } from './routes/_authenticated/portal/route'
 import { Route as AuthenticatedCuentaRouteRouteImport } from './routes/_authenticated/cuenta/route'
@@ -145,6 +146,11 @@ const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
   id: '/marketplace/$slug',
   path: '/marketplace/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedConciergeRoute = AuthenticatedConciergeRouteImport.update({
+  id: '/concierge',
+  path: '/concierge',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCmsRoute = AuthenticatedCmsRouteImport.update({
   id: '/cms',
@@ -401,6 +407,7 @@ export interface FileRoutesByFullPath {
   '/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/cms': typeof AuthenticatedCmsRouteWithChildren
+  '/concierge': typeof AuthenticatedConciergeRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -456,6 +463,7 @@ export interface FileRoutesByTo {
   '/hoteles': typeof HotelesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/concierge': typeof AuthenticatedConciergeRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -516,6 +524,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/_authenticated/cms': typeof AuthenticatedCmsRouteWithChildren
+  '/_authenticated/concierge': typeof AuthenticatedConciergeRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -576,6 +585,7 @@ export interface FileRouteTypes {
     | '/cuenta'
     | '/portal'
     | '/cms'
+    | '/concierge'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
@@ -631,6 +641,7 @@ export interface FileRouteTypes {
     | '/hoteles'
     | '/reset-password'
     | '/restaurantes'
+    | '/concierge'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
@@ -690,6 +701,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta'
     | '/_authenticated/portal'
     | '/_authenticated/cms'
+    | '/_authenticated/concierge'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
@@ -869,6 +881,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/marketplace/$slug'
       preLoaderRoute: typeof MarketplaceSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/concierge': {
+      id: '/_authenticated/concierge'
+      path: '/concierge'
+      fullPath: '/concierge'
+      preLoaderRoute: typeof AuthenticatedConciergeRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/cms': {
       id: '/_authenticated/cms'
@@ -1272,12 +1291,14 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCuentaRouteRoute: typeof AuthenticatedCuentaRouteRouteWithChildren
   AuthenticatedPortalRouteRoute: typeof AuthenticatedPortalRouteRouteWithChildren
   AuthenticatedCmsRoute: typeof AuthenticatedCmsRouteWithChildren
+  AuthenticatedConciergeRoute: typeof AuthenticatedConciergeRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCuentaRouteRoute: AuthenticatedCuentaRouteRouteWithChildren,
   AuthenticatedPortalRouteRoute: AuthenticatedPortalRouteRouteWithChildren,
   AuthenticatedCmsRoute: AuthenticatedCmsRouteWithChildren,
+  AuthenticatedConciergeRoute: AuthenticatedConciergeRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
