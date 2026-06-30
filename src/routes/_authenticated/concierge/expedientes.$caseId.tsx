@@ -1,5 +1,5 @@
 /**
- * 14.60.2 — Customer Case File (vista interna concierge/lead).
+ * /concierge/expedientes/$caseId — Expediente (migrado 1:1 a 15.10.5c.2).
  */
 import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
@@ -30,12 +30,12 @@ function StaffCasePage() {
     }),
   );
   return (
-    <main className="mx-auto w-full max-w-[1100px] px-5 py-10">
+    <section className="mx-auto w-full max-w-[1100px]">
       <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
         Concierge Workspace · Expediente
       </p>
       <h1 className="mt-1 mb-6 text-2xl font-semibold">Customer Case File</h1>
       <CaseFileView data={q.data} />
-    </main>
+    </section>
   );
 }

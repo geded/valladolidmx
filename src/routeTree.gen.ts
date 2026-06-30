@@ -31,13 +31,14 @@ import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovabl
 import { Route as LSlugRouteImport } from './routes/l.$slug'
 import { Route as AuthenticatedMiViajeRouteImport } from './routes/_authenticated/mi-viaje'
 import { Route as AuthenticatedEmpresaRouteImport } from './routes/_authenticated/empresa'
-import { Route as AuthenticatedConciergeRouteImport } from './routes/_authenticated/concierge'
 import { Route as AuthenticatedCmsRouteImport } from './routes/_authenticated/cms'
 import { Route as AuthenticatedPortalRouteRouteImport } from './routes/_authenticated/portal/route'
 import { Route as AuthenticatedCuentaRouteRouteImport } from './routes/_authenticated/cuenta/route'
+import { Route as AuthenticatedConciergeRouteRouteImport } from './routes/_authenticated/concierge/route'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal/index'
 import { Route as AuthenticatedCuentaIndexRouteImport } from './routes/_authenticated/cuenta/index'
+import { Route as AuthenticatedConciergeIndexRouteImport } from './routes/_authenticated/concierge/index'
 import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticated/cms/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedPortalPropiedadRouteImport } from './routes/_authenticated/portal/propiedad'
@@ -84,7 +85,7 @@ import { Route as AuthenticatedPortalEmpresasBusinessIdRouteImport } from './rou
 import { Route as AuthenticatedCuentaPagosExitoRouteImport } from './routes/_authenticated/cuenta/pagos.exito'
 import { Route as AuthenticatedCuentaPagosErrorRouteImport } from './routes/_authenticated/cuenta/pagos.error'
 import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId'
-import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge.expedientes.$caseId'
+import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId'
 import { Route as AuthenticatedCmsRegionesNuevaRouteImport } from './routes/_authenticated/cms/regiones.nueva'
 import { Route as AuthenticatedCmsRegionesEditarRouteImport } from './routes/_authenticated/cms/regiones..editar'
 import { Route as AuthenticatedCmsExperienceBuilderPagesRouteImport } from './routes/_authenticated/cms/experience-builder.pages'
@@ -205,11 +206,6 @@ const AuthenticatedEmpresaRoute = AuthenticatedEmpresaRouteImport.update({
   path: '/empresa',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedConciergeRoute = AuthenticatedConciergeRouteImport.update({
-  id: '/concierge',
-  path: '/concierge',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedCmsRoute = AuthenticatedCmsRouteImport.update({
   id: '/cms',
   path: '/cms',
@@ -225,6 +221,12 @@ const AuthenticatedCuentaRouteRoute =
   AuthenticatedCuentaRouteRouteImport.update({
     id: '/cuenta',
     path: '/cuenta',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedConciergeRouteRoute =
+  AuthenticatedConciergeRouteRouteImport.update({
+    id: '/concierge',
+    path: '/concierge',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
@@ -243,6 +245,12 @@ const AuthenticatedCuentaIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
+const AuthenticatedConciergeIndexRoute =
+  AuthenticatedConciergeIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedConciergeRouteRoute,
   } as any)
 const AuthenticatedCmsIndexRoute = AuthenticatedCmsIndexRouteImport.update({
   id: '/',
@@ -515,7 +523,7 @@ const AuthenticatedConciergeExpedientesCaseIdRoute =
   AuthenticatedConciergeExpedientesCaseIdRouteImport.update({
     id: '/expedientes/$caseId',
     path: '/expedientes/$caseId',
-    getParentRoute: () => AuthenticatedConciergeRoute,
+    getParentRoute: () => AuthenticatedConciergeRouteRoute,
   } as any)
 const AuthenticatedCmsRegionesNuevaRoute =
   AuthenticatedCmsRegionesNuevaRouteImport.update({
@@ -584,10 +592,10 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/concierge': typeof AuthenticatedConciergeRouteRouteWithChildren
   '/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/cms': typeof AuthenticatedCmsRouteWithChildren
-  '/concierge': typeof AuthenticatedConciergeRouteWithChildren
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/l/$slug': typeof LSlugRoute
@@ -632,6 +640,7 @@ export interface FileRoutesByFullPath {
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/cms/': typeof AuthenticatedCmsIndexRoute
+  '/concierge/': typeof AuthenticatedConciergeIndexRoute
   '/cuenta/': typeof AuthenticatedCuentaIndexRoute
   '/portal/': typeof AuthenticatedPortalIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
@@ -669,7 +678,6 @@ export interface FileRoutesByTo {
   '/hoteles': typeof HotelesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
-  '/concierge': typeof AuthenticatedConciergeRouteWithChildren
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/l/$slug': typeof LSlugRoute
@@ -714,6 +722,7 @@ export interface FileRoutesByTo {
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/cms': typeof AuthenticatedCmsIndexRoute
+  '/concierge': typeof AuthenticatedConciergeIndexRoute
   '/cuenta': typeof AuthenticatedCuentaIndexRoute
   '/portal': typeof AuthenticatedPortalIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
@@ -754,10 +763,10 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/concierge': typeof AuthenticatedConciergeRouteRouteWithChildren
   '/_authenticated/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/_authenticated/cms': typeof AuthenticatedCmsRouteWithChildren
-  '/_authenticated/concierge': typeof AuthenticatedConciergeRouteWithChildren
   '/_authenticated/empresa': typeof AuthenticatedEmpresaRoute
   '/_authenticated/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/l/$slug': typeof LSlugRoute
@@ -802,6 +811,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
+  '/_authenticated/concierge/': typeof AuthenticatedConciergeIndexRoute
   '/_authenticated/cuenta/': typeof AuthenticatedCuentaIndexRoute
   '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
   '/_authenticated/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
@@ -842,10 +852,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/restaurantes'
     | '/admin'
+    | '/concierge'
     | '/cuenta'
     | '/portal'
     | '/cms'
-    | '/concierge'
     | '/empresa'
     | '/mi-viaje'
     | '/l/$slug'
@@ -890,6 +900,7 @@ export interface FileRouteTypes {
     | '/portal/propiedad'
     | '/admin/'
     | '/cms/'
+    | '/concierge/'
     | '/cuenta/'
     | '/portal/'
     | '/admin/sistema/usuarios'
@@ -927,7 +938,6 @@ export interface FileRouteTypes {
     | '/hoteles'
     | '/reset-password'
     | '/restaurantes'
-    | '/concierge'
     | '/empresa'
     | '/mi-viaje'
     | '/l/$slug'
@@ -972,6 +982,7 @@ export interface FileRouteTypes {
     | '/portal/propiedad'
     | '/admin'
     | '/cms'
+    | '/concierge'
     | '/cuenta'
     | '/portal'
     | '/admin/sistema/usuarios'
@@ -1011,10 +1022,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/restaurantes'
     | '/_authenticated/admin'
+    | '/_authenticated/concierge'
     | '/_authenticated/cuenta'
     | '/_authenticated/portal'
     | '/_authenticated/cms'
-    | '/_authenticated/concierge'
     | '/_authenticated/empresa'
     | '/_authenticated/mi-viaje'
     | '/l/$slug'
@@ -1059,6 +1070,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/propiedad'
     | '/_authenticated/admin/'
     | '/_authenticated/cms/'
+    | '/_authenticated/concierge/'
     | '/_authenticated/cuenta/'
     | '/_authenticated/portal/'
     | '/_authenticated/admin/sistema/usuarios'
@@ -1269,13 +1281,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEmpresaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/concierge': {
-      id: '/_authenticated/concierge'
-      path: '/concierge'
-      fullPath: '/concierge'
-      preLoaderRoute: typeof AuthenticatedConciergeRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/cms': {
       id: '/_authenticated/cms'
       path: '/cms'
@@ -1295,6 +1300,13 @@ declare module '@tanstack/react-router' {
       path: '/cuenta'
       fullPath: '/cuenta'
       preLoaderRoute: typeof AuthenticatedCuentaRouteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/concierge': {
+      id: '/_authenticated/concierge'
+      path: '/concierge'
+      fullPath: '/concierge'
+      preLoaderRoute: typeof AuthenticatedConciergeRouteRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin': {
@@ -1317,6 +1329,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/cuenta/'
       preLoaderRoute: typeof AuthenticatedCuentaIndexRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
+    '/_authenticated/concierge/': {
+      id: '/_authenticated/concierge/'
+      path: '/'
+      fullPath: '/concierge/'
+      preLoaderRoute: typeof AuthenticatedConciergeIndexRouteImport
+      parentRoute: typeof AuthenticatedConciergeRouteRoute
     }
     '/_authenticated/cms/': {
       id: '/_authenticated/cms/'
@@ -1645,7 +1664,7 @@ declare module '@tanstack/react-router' {
       path: '/expedientes/$caseId'
       fullPath: '/concierge/expedientes/$caseId'
       preLoaderRoute: typeof AuthenticatedConciergeExpedientesCaseIdRouteImport
-      parentRoute: typeof AuthenticatedConciergeRoute
+      parentRoute: typeof AuthenticatedConciergeRouteRoute
     }
     '/_authenticated/cms/regiones/nueva': {
       id: '/_authenticated/cms/regiones/nueva'
@@ -1752,6 +1771,23 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
 const AuthenticatedAdminRouteRouteWithChildren =
   AuthenticatedAdminRouteRoute._addFileChildren(
     AuthenticatedAdminRouteRouteChildren,
+  )
+
+interface AuthenticatedConciergeRouteRouteChildren {
+  AuthenticatedConciergeIndexRoute: typeof AuthenticatedConciergeIndexRoute
+  AuthenticatedConciergeExpedientesCaseIdRoute: typeof AuthenticatedConciergeExpedientesCaseIdRoute
+}
+
+const AuthenticatedConciergeRouteRouteChildren: AuthenticatedConciergeRouteRouteChildren =
+  {
+    AuthenticatedConciergeIndexRoute: AuthenticatedConciergeIndexRoute,
+    AuthenticatedConciergeExpedientesCaseIdRoute:
+      AuthenticatedConciergeExpedientesCaseIdRoute,
+  }
+
+const AuthenticatedConciergeRouteRouteWithChildren =
+  AuthenticatedConciergeRouteRoute._addFileChildren(
+    AuthenticatedConciergeRouteRouteChildren,
   )
 
 interface AuthenticatedCuentaConciergeCaseIdRouteChildren {
@@ -1923,37 +1959,23 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
 const AuthenticatedCmsRouteWithChildren =
   AuthenticatedCmsRoute._addFileChildren(AuthenticatedCmsRouteChildren)
 
-interface AuthenticatedConciergeRouteChildren {
-  AuthenticatedConciergeExpedientesCaseIdRoute: typeof AuthenticatedConciergeExpedientesCaseIdRoute
-}
-
-const AuthenticatedConciergeRouteChildren: AuthenticatedConciergeRouteChildren =
-  {
-    AuthenticatedConciergeExpedientesCaseIdRoute:
-      AuthenticatedConciergeExpedientesCaseIdRoute,
-  }
-
-const AuthenticatedConciergeRouteWithChildren =
-  AuthenticatedConciergeRoute._addFileChildren(
-    AuthenticatedConciergeRouteChildren,
-  )
-
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedConciergeRouteRoute: typeof AuthenticatedConciergeRouteRouteWithChildren
   AuthenticatedCuentaRouteRoute: typeof AuthenticatedCuentaRouteRouteWithChildren
   AuthenticatedPortalRouteRoute: typeof AuthenticatedPortalRouteRouteWithChildren
   AuthenticatedCmsRoute: typeof AuthenticatedCmsRouteWithChildren
-  AuthenticatedConciergeRoute: typeof AuthenticatedConciergeRouteWithChildren
   AuthenticatedEmpresaRoute: typeof AuthenticatedEmpresaRoute
   AuthenticatedMiViajeRoute: typeof AuthenticatedMiViajeRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedConciergeRouteRoute:
+    AuthenticatedConciergeRouteRouteWithChildren,
   AuthenticatedCuentaRouteRoute: AuthenticatedCuentaRouteRouteWithChildren,
   AuthenticatedPortalRouteRoute: AuthenticatedPortalRouteRouteWithChildren,
   AuthenticatedCmsRoute: AuthenticatedCmsRouteWithChildren,
-  AuthenticatedConciergeRoute: AuthenticatedConciergeRouteWithChildren,
   AuthenticatedEmpresaRoute: AuthenticatedEmpresaRoute,
   AuthenticatedMiViajeRoute: AuthenticatedMiViajeRoute,
 }

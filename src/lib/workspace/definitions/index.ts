@@ -15,7 +15,6 @@ import {
   UserRound,
   LayoutDashboard,
   Bell,
-  Calendar,
   ListChecks,
   Settings,
   Inbox,
@@ -153,14 +152,44 @@ const concierge: WorkspaceDefinition = {
   roles: ["concierge", "admin"],
   navigation: [
     { id: "concierge.inbox", workspaceId: "concierge", label: "Bandeja", icon: Inbox, to: "/concierge", group: "trabajo", order: 1, surfaces: ["sidebar", "bottom", "palette"], primary: true },
-    { id: "concierge.cases", workspaceId: "concierge", label: "Expedientes", icon: HeartHandshake, to: "/concierge", group: "trabajo", order: 2, surfaces: ["sidebar", "bottom", "palette"] },
-    { id: "concierge.calendar", workspaceId: "concierge", label: "Agenda", icon: Calendar, to: "/concierge", group: "trabajo", order: 3, surfaces: ["sidebar", "palette"] },
-    { id: "concierge.map", workspaceId: "concierge", label: "Mapa", icon: MapPin, to: "/concierge", group: "trabajo", order: 4, surfaces: ["sidebar", "palette"] },
   ],
   alux: {
     headline: "Hay 4 expedientes que requieren atención hoy.",
+    summary:
+      "Pulso de expedientes: priorización por SLA, casos sin asignar y carga personal.",
     suggestedActions: () => [
-      { id: "respond-oldest", label: "Responder el caso más antiguo sin respuesta", impact: "high", run: () => void 0 },
+      {
+        id: "respond-oldest",
+        label: "Responder el caso más antiguo sin respuesta",
+        impact: "high",
+        rationale:
+          "Reduce el riesgo de incumplimiento SLA al atender primero el expediente con mayor tiempo sin actividad.",
+        sources: [
+          { id: "src.sla", label: "Estado SLA", kind: "metric" },
+          { id: "src.idle", label: "Tiempo sin actividad", kind: "metric" },
+        ],
+        effect: "Abre el expediente con mayor antigüedad sin respuesta.",
+        reversible: true,
+        confirm: "none",
+        run: () => void 0,
+      },
+    ],
+  },
+  aluxCapabilities: [
+    { id: "concierge.cases.read", label: "Leer expedientes asignados" },
+    { id: "concierge.workload.read", label: "Leer carga personal" },
+  ],
+  context: {
+    workspaceId: "concierge",
+    entities: [
+      { type: "case", label: "Expediente" },
+      { type: "traveler", label: "Viajero" },
+      { type: "message", label: "Mensaje" },
+    ],
+    selectionModes: ["single", "multi"],
+    views: [
+      { id: "inbox", label: "Bandeja", kind: "list" },
+      { id: "case", label: "Expediente", kind: "detail" },
     ],
   },
 };

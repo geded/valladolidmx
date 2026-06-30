@@ -1,9 +1,10 @@
 /**
- * 14.60.1 — Concierge Workspace · Bandeja (lectura).
- * Vista mínima para validar el dominio: lista expedientes vía
- * concierge_case_list_for_role. RLS y autorización viven en la BD.
+ * /concierge — Bandeja de expedientes (migrado 1:1 a 15.10.5c.2).
+ *
+ * Contenido funcional idéntico al previo `concierge.tsx`; sólo se removió
+ * el contenedor `<main>` local (ahora lo aporta WorkspaceShell).
  */
-import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
+import { createFileRoute, ErrorComponent, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -28,7 +29,7 @@ type CaseRow = {
   assigned_concierge_user_id: string | null;
 };
 
-export const Route = createFileRoute("/_authenticated/concierge")({
+export const Route = createFileRoute("/_authenticated/concierge/")({
   component: ConciergeInboxPage,
   errorComponent: ErrorComponent,
   notFoundComponent: () => <div className="p-6">No encontrado.</div>,
@@ -73,7 +74,7 @@ function ConciergeInboxPage() {
   );
 
   return (
-    <main className="mx-auto w-full max-w-[1100px] px-5 py-10">
+    <section className="mx-auto w-full max-w-[1100px]">
       <header className="mb-6">
         <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
           Ola 6 · Concierge Workspace
@@ -109,7 +110,7 @@ function ConciergeInboxPage() {
       </div>
 
       <CasesSection cases={casesQ.data} empty="Sin expedientes." />
-    </main>
+    </section>
   );
 }
 
@@ -176,9 +177,13 @@ function CasesSection({ cases, empty }: { cases: CaseRow[]; empty: string }) {
                   </span>
                 </div>
               </div>
-              <a href={`/concierge/expedientes/${c.id}`} className="mt-2 block font-medium hover:underline">
+              <Link
+                to="/concierge/expedientes/$caseId"
+                params={{ caseId: c.id }}
+                className="mt-2 block font-medium hover:underline"
+              >
                 {c.summary ?? "Sin resumen"}
-              </a>
+              </Link>
               <p className="mt-1 text-xs text-muted-foreground">
                 Origen: {c.source}
                 {c.target_response_at ? ` · Objetivo ${new Date(c.target_response_at).toLocaleString()}` : ""}
