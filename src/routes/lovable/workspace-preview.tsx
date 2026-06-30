@@ -686,12 +686,3 @@ function Legend({ title, body }: { title: string; body: string }) {
     </div>
   );
 }
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/lovable/workspace-preview')({
-  component: RouteComponent,
-})
-
-function RouteComponent() {
-  return <div>Hello "/lovable/workspace-preview"!</div>
-}
