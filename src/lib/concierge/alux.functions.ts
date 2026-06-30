@@ -13,6 +13,8 @@ import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 
+type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
+
 const CaseInput = z.object({ caseId: z.string().uuid() });
 const ProposalDraftInput = z.object({
   caseId: z.string().uuid(),
@@ -124,11 +126,9 @@ async function runAlux(
 export const getAluxContextForCase = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => CaseInput.parse(d))
-  .handler(async ({ data, context }): Promise<Record<string, unknown> | null> => {
-    const ctx = (await fetchContext(context.supabase, data.caseId)) as
-      | Record<string, unknown>
-      | null;
-    return ctx;
+  .handler(async ({ data, context }) => {
+    const ctx = await fetchContext(context.supabase, data.caseId);
+    return (ctx ?? null) as Json | null;
   });
 
 export const logAluxSuggestion = createServerFn({ method: "POST" })
