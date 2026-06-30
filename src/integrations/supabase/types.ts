@@ -520,6 +520,56 @@ export type Database = {
           },
         ]
       }
+      business_ownership_transfers: {
+        Row: {
+          business_id: string
+          created_at: string
+          expires_at: string
+          from_user_id: string
+          id: string
+          notes: string | null
+          requested_at: string
+          responded_at: string | null
+          status: Database["public"]["Enums"]["ownership_transfer_status"]
+          to_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          expires_at?: string
+          from_user_id: string
+          id?: string
+          notes?: string | null
+          requested_at?: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["ownership_transfer_status"]
+          to_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          expires_at?: string
+          from_user_id?: string
+          id?: string
+          notes?: string | null
+          requested_at?: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["ownership_transfer_status"]
+          to_user_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_ownership_transfers_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_social_links: {
         Row: {
           business_id: string
@@ -2392,12 +2442,20 @@ export type Database = {
         Returns: undefined
       }
       accept_business_invitation: { Args: { _token: string }; Returns: Json }
+      accept_business_ownership_transfer: {
+        Args: { _transfer_id: string }
+        Returns: Json
+      }
       archive_business_product: {
         Args: { _product_id: string }
         Returns: undefined
       }
       archive_business_promotion: {
         Args: { _promotion_id: string }
+        Returns: undefined
+      }
+      cancel_business_ownership_transfer: {
+        Args: { _transfer_id: string }
         Returns: undefined
       }
       cart_add_item: {
@@ -2556,9 +2614,17 @@ export type Database = {
         }
         Returns: Json
       }
+      reject_business_ownership_transfer: {
+        Args: { _notes?: string; _transfer_id: string }
+        Returns: undefined
+      }
       remove_business_media: {
         Args: { _business_media_id: string }
         Returns: undefined
+      }
+      request_business_ownership_transfer: {
+        Args: { _business_id: string; _notes?: string; _to_user_id: string }
+        Returns: string
       }
       request_business_review: {
         Args: { _business_id: string; _notes?: string }
@@ -2711,6 +2777,12 @@ export type Database = {
         | "payment_failed"
         | "payment_refunded"
       order_status: "cart" | "pending" | "confirmed" | "cancelled" | "fulfilled"
+      ownership_transfer_status:
+        | "pending"
+        | "accepted"
+        | "rejected"
+        | "cancelled"
+        | "expired"
       product_conversion_mode:
         | "informacion"
         | "arma_tu_viaje"
@@ -2913,6 +2985,13 @@ export const Constants = {
         "payment_refunded",
       ],
       order_status: ["cart", "pending", "confirmed", "cancelled", "fulfilled"],
+      ownership_transfer_status: [
+        "pending",
+        "accepted",
+        "rejected",
+        "cancelled",
+        "expired",
+      ],
       product_conversion_mode: [
         "informacion",
         "arma_tu_viaje",

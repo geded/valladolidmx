@@ -31,6 +31,7 @@ import { Route as AuthenticatedCuentaRouteRouteImport } from './routes/_authenti
 import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal/index'
 import { Route as AuthenticatedCuentaIndexRouteImport } from './routes/_authenticated/cuenta/index'
 import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticated/cms/index'
+import { Route as AuthenticatedPortalPropiedadRouteImport } from './routes/_authenticated/portal/propiedad'
 import { Route as AuthenticatedPortalPresenciaRouteImport } from './routes/_authenticated/portal/presencia'
 import { Route as AuthenticatedPortalGaleriaRouteImport } from './routes/_authenticated/portal/galeria'
 import { Route as AuthenticatedPortalFichaRouteImport } from './routes/_authenticated/portal/ficha'
@@ -172,6 +173,12 @@ const AuthenticatedCmsIndexRoute = AuthenticatedCmsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedCmsRoute,
 } as any)
+const AuthenticatedPortalPropiedadRoute =
+  AuthenticatedPortalPropiedadRouteImport.update({
+    id: '/propiedad',
+    path: '/propiedad',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
 const AuthenticatedPortalPresenciaRoute =
   AuthenticatedPortalPresenciaRouteImport.update({
     id: '/presencia',
@@ -365,6 +372,7 @@ export interface FileRoutesByFullPath {
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
+  '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/cms/': typeof AuthenticatedCmsIndexRoute
   '/cuenta/': typeof AuthenticatedCuentaIndexRoute
   '/portal/': typeof AuthenticatedPortalIndexRoute
@@ -412,6 +420,7 @@ export interface FileRoutesByTo {
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
+  '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/cms': typeof AuthenticatedCmsIndexRoute
   '/cuenta': typeof AuthenticatedCuentaIndexRoute
   '/portal': typeof AuthenticatedPortalIndexRoute
@@ -464,6 +473,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/_authenticated/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/_authenticated/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
+  '/_authenticated/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
   '/_authenticated/cuenta/': typeof AuthenticatedCuentaIndexRoute
   '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
@@ -516,6 +526,7 @@ export interface FileRouteTypes {
     | '/portal/ficha'
     | '/portal/galeria'
     | '/portal/presencia'
+    | '/portal/propiedad'
     | '/cms/'
     | '/cuenta/'
     | '/portal/'
@@ -563,6 +574,7 @@ export interface FileRouteTypes {
     | '/portal/ficha'
     | '/portal/galeria'
     | '/portal/presencia'
+    | '/portal/propiedad'
     | '/cms'
     | '/cuenta'
     | '/portal'
@@ -614,6 +626,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/ficha'
     | '/_authenticated/portal/galeria'
     | '/_authenticated/portal/presencia'
+    | '/_authenticated/portal/propiedad'
     | '/_authenticated/cms/'
     | '/_authenticated/cuenta/'
     | '/_authenticated/portal/'
@@ -807,6 +820,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/cms/'
       preLoaderRoute: typeof AuthenticatedCmsIndexRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
+    }
+    '/_authenticated/portal/propiedad': {
+      id: '/_authenticated/portal/propiedad'
+      path: '/propiedad'
+      fullPath: '/portal/propiedad'
+      preLoaderRoute: typeof AuthenticatedPortalPropiedadRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
     }
     '/_authenticated/portal/presencia': {
       id: '/_authenticated/portal/presencia'
@@ -1031,6 +1051,7 @@ interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalFichaRoute: typeof AuthenticatedPortalFichaRoute
   AuthenticatedPortalGaleriaRoute: typeof AuthenticatedPortalGaleriaRoute
   AuthenticatedPortalPresenciaRoute: typeof AuthenticatedPortalPresenciaRoute
+  AuthenticatedPortalPropiedadRoute: typeof AuthenticatedPortalPropiedadRoute
   AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
   AuthenticatedPortalInvitacionesTokenRoute: typeof AuthenticatedPortalInvitacionesTokenRoute
   AuthenticatedPortalInvitacionesIndexRoute: typeof AuthenticatedPortalInvitacionesIndexRoute
@@ -1042,6 +1063,7 @@ const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildr
     AuthenticatedPortalFichaRoute: AuthenticatedPortalFichaRoute,
     AuthenticatedPortalGaleriaRoute: AuthenticatedPortalGaleriaRoute,
     AuthenticatedPortalPresenciaRoute: AuthenticatedPortalPresenciaRoute,
+    AuthenticatedPortalPropiedadRoute: AuthenticatedPortalPropiedadRoute,
     AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
     AuthenticatedPortalInvitacionesTokenRoute:
       AuthenticatedPortalInvitacionesTokenRoute,
