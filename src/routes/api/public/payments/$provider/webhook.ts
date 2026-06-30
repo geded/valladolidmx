@@ -30,6 +30,20 @@ export const Route = createFileRoute("/api/public/payments/$provider/webhook")({
           normalized = await provider.verifyWebhook(request.headers, rawBody);
         } catch (err) {
           console.error("[payments/webhook] verification failed", err);
+          // 14.40.7 — alerta crítica: firma de webhook inválida o error de verificación.
+          try {
+            const { supabaseAdmin } = await import(
+              "@/integrations/supabase/client.server"
+            );
+            await (supabaseAdmin.rpc as unknown as (
+              fn: string, args: Record<string, unknown>,
+            ) => Promise<unknown>)("raise_system_alert", {
+              p_kind: `payments.webhook.${id}.verify_failed`,
+              p_severity: "critical",
+              p_message: "Verificación de webhook de pago falló",
+              p_payload: { provider: id, error: err instanceof Error ? err.message : String(err) },
+            });
+          } catch { /* observabilidad no rompe el flujo */ }
           return new Response("Invalid signature", { status: 401 });
         }
 
