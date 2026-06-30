@@ -7,6 +7,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PageShell } from "@/components/common/PageShell";
 import { SITE } from "@/config/site";
+import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
 import {
   getMarketplaceBusinessBySlug,
   type MarketplaceBusinessDetail,
@@ -69,6 +70,9 @@ function MarketplaceBusinessPage() {
       description={b.tagline}
       crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: b.display_name }]}
     >
+      <div className="-mt-2 mb-6 flex flex-wrap items-center gap-3">
+        <FavoriteButton entityKind="business" entityId={b.id} />
+      </div>
       {b.description ? (
         <p className="max-w-3xl text-sm text-foreground/80">{b.description}</p>
       ) : null}
@@ -93,6 +97,9 @@ function MarketplaceBusinessPage() {
                     {p.price_currency} {Number(p.price_amount).toFixed(2)}
                   </p>
                 ) : null}
+                <div className="mt-3">
+                  <FavoriteButton entityKind="product" entityId={p.id} />
+                </div>
               </li>
             ))}
           </ul>
@@ -118,6 +125,9 @@ function MarketplaceBusinessPage() {
                 {p.description ? (
                   <p className="mt-1 text-sm text-muted-foreground line-clamp-3">{p.description}</p>
                 ) : null}
+                <div className="mt-3">
+                  <FavoriteButton entityKind="promotion" entityId={p.id} />
+                </div>
               </li>
             ))}
           </ul>
