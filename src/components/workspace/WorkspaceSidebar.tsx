@@ -59,7 +59,7 @@ export function WorkspaceSidebar() {
                 return (
                   <li key={it.id}>
                     <Link
-                      to={it.to}
+                      to={it.to as never}
                       title={collapsed ? it.label : undefined}
                       className={cn(
                         "flex min-h-[44px] items-center gap-3 rounded-xl px-2 text-sm transition",

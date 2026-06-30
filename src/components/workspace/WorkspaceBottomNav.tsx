@@ -35,7 +35,7 @@ export function WorkspaceBottomNav() {
           <li className="relative -mt-5 flex justify-center">
             {primary ? (
               <Link
-                to={primary.to}
+                to={primary.to as never}
                 className="grid size-14 place-items-center rounded-full bg-primary text-primary-foreground ws-shadow-raised"
                 aria-label={primary.label}
               >
@@ -84,7 +84,7 @@ export function WorkspaceBottomNav() {
             return (
               <li key={it.id}>
                 <Link
-                  to={it.to}
+                  to={it.to as never}
                   onClick={() => setMoreOpen(false)}
                   className="flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2 text-sm hover:bg-muted"
                 >
@@ -110,7 +110,7 @@ function BottomItem({
   return (
     <li>
       <Link
-        to={item.to}
+        to={item.to as never}
         className={cn(
           "flex h-14 flex-col items-center justify-center gap-0.5 text-[10px]",
           active ? "text-primary" : "text-muted-foreground",
