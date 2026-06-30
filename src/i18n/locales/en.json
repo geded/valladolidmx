@@ -55,5 +55,18 @@
     "privacy": "Privacy",
     "rights": "All rights reserved."
   },
-  "alux_floating": "View Alux"
+  "alux_floating": "View Alux",
+  "cockpit": {
+    "title": "Founder Cockpit",
+    "subtitle": "Composed via Experience Builder",
+    "window": "Window",
+    "domain": "Domain",
+    "kpis": "KPIs",
+    "alerts": "Alerts",
+    "activity": "Recent activity",
+    "export_csv": "Export CSV",
+    "export_json": "Export JSON",
+    "loading": "Loading…",
+    "no_alerts": "No active alerts."
+  }
 }
