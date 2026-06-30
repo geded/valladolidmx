@@ -70,6 +70,7 @@ import { Route as AuthenticatedCmsRegionesIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
+import { Route as AuthenticatedPortalEmpresasBusinessIdRouteImport } from './routes/_authenticated/portal/empresas.$businessId'
 import { Route as AuthenticatedCuentaPagosExitoRouteImport } from './routes/_authenticated/cuenta/pagos.exito'
 import { Route as AuthenticatedCuentaPagosErrorRouteImport } from './routes/_authenticated/cuenta/pagos.error'
 import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId'
@@ -419,6 +420,12 @@ const AuthenticatedPortalInvitacionesTokenRoute =
     path: '/invitaciones/$token',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
+const AuthenticatedPortalEmpresasBusinessIdRoute =
+  AuthenticatedPortalEmpresasBusinessIdRouteImport.update({
+    id: '/empresas/$businessId',
+    path: '/empresas/$businessId',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
 const AuthenticatedCuentaPagosExitoRoute =
   AuthenticatedCuentaPagosExitoRouteImport.update({
     id: '/pagos/exito',
@@ -555,6 +562,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
+  '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
@@ -625,6 +633,7 @@ export interface FileRoutesByTo {
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
+  '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
@@ -701,6 +710,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/_authenticated/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/_authenticated/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
+  '/_authenticated/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
@@ -777,6 +787,7 @@ export interface FileRouteTypes {
     | '/cuenta/concierge/$caseId'
     | '/cuenta/pagos/error'
     | '/cuenta/pagos/exito'
+    | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
     | '/lovable/email/queue/process'
     | '/cms/categorias/'
@@ -847,6 +858,7 @@ export interface FileRouteTypes {
     | '/cuenta/concierge/$caseId'
     | '/cuenta/pagos/error'
     | '/cuenta/pagos/exito'
+    | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
     | '/lovable/email/queue/process'
     | '/cms/categorias'
@@ -922,6 +934,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/concierge/$caseId'
     | '/_authenticated/cuenta/pagos/error'
     | '/_authenticated/cuenta/pagos/exito'
+    | '/_authenticated/portal/empresas/$businessId'
     | '/_authenticated/portal/invitaciones/$token'
     | '/lovable/email/queue/process'
     | '/_authenticated/cms/categorias/'
@@ -1386,6 +1399,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalInvitacionesTokenRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
+    '/_authenticated/portal/empresas/$businessId': {
+      id: '/_authenticated/portal/empresas/$businessId'
+      path: '/empresas/$businessId'
+      fullPath: '/portal/empresas/$businessId'
+      preLoaderRoute: typeof AuthenticatedPortalEmpresasBusinessIdRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
     '/_authenticated/cuenta/pagos/exito': {
       id: '/_authenticated/cuenta/pagos/exito'
       path: '/pagos/exito'
@@ -1561,6 +1581,7 @@ interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalPresenciaRoute: typeof AuthenticatedPortalPresenciaRoute
   AuthenticatedPortalPropiedadRoute: typeof AuthenticatedPortalPropiedadRoute
   AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
+  AuthenticatedPortalEmpresasBusinessIdRoute: typeof AuthenticatedPortalEmpresasBusinessIdRoute
   AuthenticatedPortalInvitacionesTokenRoute: typeof AuthenticatedPortalInvitacionesTokenRoute
   AuthenticatedPortalEmpresasIndexRoute: typeof AuthenticatedPortalEmpresasIndexRoute
   AuthenticatedPortalInvitacionesIndexRoute: typeof AuthenticatedPortalInvitacionesIndexRoute
@@ -1577,6 +1598,8 @@ const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildr
     AuthenticatedPortalPresenciaRoute: AuthenticatedPortalPresenciaRoute,
     AuthenticatedPortalPropiedadRoute: AuthenticatedPortalPropiedadRoute,
     AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
+    AuthenticatedPortalEmpresasBusinessIdRoute:
+      AuthenticatedPortalEmpresasBusinessIdRoute,
     AuthenticatedPortalInvitacionesTokenRoute:
       AuthenticatedPortalInvitacionesTokenRoute,
     AuthenticatedPortalEmpresasIndexRoute:

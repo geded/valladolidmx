@@ -102,6 +102,7 @@ function PortalLayout() {
   const navItems = useMemo(
     () => [
       { to: "/portal" as const, label: "Resumen" },
+      { to: "/portal/empresas" as const, label: "Empresas" },
       { to: "/portal/ficha" as const, label: "Ficha pública" },
       { to: "/portal/presencia" as const, label: "Presencia" },
       { to: "/portal/galeria" as const, label: "Galería" },
