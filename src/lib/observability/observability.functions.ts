@@ -128,7 +128,7 @@ export interface SystemAlert {
   severity: "info" | "warning" | "critical";
   status: "open" | "acknowledged" | "resolved";
   message: string;
-  payload: Record<string, unknown>;
+  payload: string;
   occurrences: number;
   first_seen_at: string;
   last_seen_at: string;
@@ -143,7 +143,7 @@ function toAlert(r: Record<string, unknown>): SystemAlert {
     severity: (r.severity as SystemAlert["severity"]) ?? "info",
     status: (r.status as SystemAlert["status"]) ?? "open",
     message: String(r.message ?? ""),
-    payload: (r.payload as Record<string, unknown>) ?? {},
+    payload: r.payload ? JSON.stringify(r.payload) : "{}",
     occurrences: Number(r.occurrences ?? 1),
     first_seen_at: String(r.first_seen_at),
     last_seen_at: String(r.last_seen_at),
@@ -210,5 +210,13 @@ export const evaluateFunctionalAlerts = createServerFn({ method: "POST" })
       { p_window_minutes: data.windowMinutes },
     );
     if (error) throw new Error(`eval_alerts_failed: ${error.message}`);
-    return (row ?? {}) as Record<string, unknown>;
+    const r = (row ?? {}) as Record<string, unknown>;
+    return {
+      window_minutes: Number(r.window_minutes ?? data.windowMinutes),
+      failed_payments: Number(r.failed_payments ?? 0),
+      stale_orders: Number(r.stale_orders ?? 0),
+      search_total: Number(r.search_total ?? 0),
+      search_zero: Number(r.search_zero ?? 0),
+      alerts_raised: Number(r.alerts_raised ?? 0),
+    };
   });
