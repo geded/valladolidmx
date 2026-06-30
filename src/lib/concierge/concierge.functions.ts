@@ -85,7 +85,7 @@ export const createConciergeCaseFromTravelPlan = createServerFn({ method: "POST"
   .handler(async ({ data, context }) => {
     const { data: caseId, error } = await context.supabase.rpc("concierge_case_from_travel_plan", {
       _traveler_user_id: context.userId,
-      _travel_plan_id: data.travelPlanId ?? null,
+      _travel_plan_id: data.travelPlanId ?? undefined,
       _summary: data.summary,
       _items: data.items ?? [],
     });
@@ -108,8 +108,8 @@ export const createConciergeCaseFromProduct = createServerFn({ method: "POST" })
       {
         _traveler_user_id: context.userId,
         _product_id: data.productId,
-        _summary: data.summary ?? null,
-        _notes: data.notes ?? null,
+        _summary: data.summary ?? undefined,
+        _notes: data.notes ?? undefined,
       },
     );
     if (error) throw new Error(error.message);
