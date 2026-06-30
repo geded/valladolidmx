@@ -163,8 +163,8 @@ export const submitConciergeQuote = createServerFn({ method: "POST" })
       _quote_id: data.quoteId,
       _total_amount_cents: data.totalAmountCents,
       _currency: data.currency,
-      _notes: data.notes ?? null,
-      _terms: data.terms ?? null,
+      _notes: data.notes ?? undefined,
+      _terms: data.terms ?? undefined,
       _payload: (data.payload ?? {}) as Json,
     });
     if (error) throw new Error(error.message);
@@ -182,7 +182,7 @@ export const withdrawConciergeQuote = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("concierge_quote_withdraw", {
       _quote_id: data.quoteId,
-      _reason: data.reason ?? null,
+      _reason: data.reason ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { ok: true as const };
