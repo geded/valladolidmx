@@ -1,0 +1,253 @@
+/**
+ * /cuenta/perfil — Editor del perfil del viajero (Ola 4 · Etapa 3).
+ * Whitelist server-side; sólo el propio `user_id` es accesible.
+ */
+import { useEffect, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  getMyTravelerProfile,
+  upsertMyTravelerProfile,
+  type TravelerProfileInput,
+} from "@/lib/traveler/traveler-account.functions";
+
+export const Route = createFileRoute("/_authenticated/cuenta/perfil")({
+  component: CuentaPerfilPage,
+});
+
+const TRAVEL_STYLES = [
+  "relax",
+  "aventura",
+  "cultura",
+  "gastronomia",
+  "naturaleza",
+  "familiar",
+  "negocios",
+  "romantico",
+];
+const BUDGET_RANGES = ["economico", "medio", "premium", "lujo"];
+const LANGS = ["es", "en", "fr", "de", "it", "pt"];
+
+function CuentaPerfilPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const fetchProfile = useServerFn(getMyTravelerProfile);
+  const saveProfile = useServerFn(upsertMyTravelerProfile);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["traveler", "profile", user?.id],
+    queryFn: () => fetchProfile(),
+    enabled: Boolean(user?.id),
+    staleTime: 60_000,
+  });
+
+  const [form, setForm] = useState<TravelerProfileInput>({
+    travel_style: null,
+    budget_range: null,
+    interests: [],
+    preferred_destinations: [],
+    preferred_language: null,
+    dietary_restrictions: null,
+    accessibility_needs: null,
+    trip_context: {},
+  });
+
+  useEffect(() => {
+    if (!data) return;
+    setForm({
+      travel_style: data.travel_style,
+      budget_range: data.budget_range,
+      interests: data.interests,
+      preferred_destinations: data.preferred_destinations,
+      preferred_language: data.preferred_language,
+      dietary_restrictions: data.dietary_restrictions,
+      accessibility_needs: data.accessibility_needs,
+      trip_context: data.trip_context,
+    });
+  }, [data]);
+
+  const mutation = useMutation({
+    mutationFn: (input: TravelerProfileInput) => saveProfile({ data: input }),
+    onSuccess: (result) => {
+      queryClient.setQueryData(["traveler", "profile", user?.id], result);
+      void navigate({ to: "/cuenta" });
+    },
+  });
+
+  if (isLoading) {
+    return <p className="text-sm text-muted-foreground">Cargando…</p>;
+  }
+
+  return (
+    <div className="max-w-3xl">
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+        Cuenta del viajero
+      </p>
+      <h1 className="mt-2 text-4xl">Mi perfil de viaje</h1>
+      <p className="mt-3 text-sm text-muted-foreground">
+        Estos datos personalizan tus recomendaciones. Puedes actualizarlos
+        cuando quieras.
+      </p>
+
+      <form
+        className="mt-8 grid gap-5"
+        onSubmit={(e) => {
+          e.preventDefault();
+          mutation.mutate(form);
+        }}
+      >
+        <SelectField
+          label="Estilo de viaje"
+          value={form.travel_style ?? ""}
+          options={TRAVEL_STYLES}
+          onChange={(v) => setForm({ ...form, travel_style: v || null })}
+        />
+        <SelectField
+          label="Rango de presupuesto"
+          value={form.budget_range ?? ""}
+          options={BUDGET_RANGES}
+          onChange={(v) => setForm({ ...form, budget_range: v || null })}
+        />
+        <SelectField
+          label="Idioma preferido"
+          value={form.preferred_language ?? ""}
+          options={LANGS}
+          onChange={(v) => setForm({ ...form, preferred_language: v || null })}
+        />
+        <ListField
+          label="Intereses (separa con comas)"
+          value={(form.interests ?? []).join(", ")}
+          onChange={(arr) => setForm({ ...form, interests: arr })}
+        />
+        <ListField
+          label="Destinos preferidos (separa con comas)"
+          value={(form.preferred_destinations ?? []).join(", ")}
+          onChange={(arr) => setForm({ ...form, preferred_destinations: arr })}
+        />
+        <TextAreaField
+          label="Restricciones alimentarias"
+          value={form.dietary_restrictions ?? ""}
+          onChange={(v) => setForm({ ...form, dietary_restrictions: v || null })}
+        />
+        <TextAreaField
+          label="Accesibilidad"
+          value={form.accessibility_needs ?? ""}
+          onChange={(v) => setForm({ ...form, accessibility_needs: v || null })}
+        />
+
+        {mutation.error ? (
+          <p className="text-sm text-destructive">
+            {String((mutation.error as Error).message)}
+          </p>
+        ) : null}
+
+        <div className="flex items-center gap-3">
+          <button
+            type="submit"
+            disabled={mutation.isPending}
+            className="rounded-md bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+          >
+            {mutation.isPending ? "Guardando…" : "Guardar"}
+          </button>
+          <button
+            type="button"
+            onClick={() => void navigate({ to: "/cuenta" })}
+            className="rounded-md border border-border px-5 py-2 text-sm font-medium hover:bg-accent"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function SelectField({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: string[];
+  onChange: (v: string) => void;
+}) {
+  return (
+    <label className="grid gap-1 text-sm">
+      <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="rounded-md border border-border bg-background px-3 py-2"
+      >
+        <option value="">—</option>
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function ListField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (arr: string[]) => void;
+}) {
+  return (
+    <label className="grid gap-1 text-sm">
+      <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </span>
+      <input
+        type="text"
+        defaultValue={value}
+        onBlur={(e) =>
+          onChange(
+            e.target.value
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean),
+          )
+        }
+        className="rounded-md border border-border bg-background px-3 py-2"
+      />
+    </label>
+  );
+}
+
+function TextAreaField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <label className="grid gap-1 text-sm">
+      <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </span>
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        rows={3}
+        className="rounded-md border border-border bg-background px-3 py-2"
+      />
+    </label>
+  );
+}
