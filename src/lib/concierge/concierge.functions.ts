@@ -83,12 +83,16 @@ export const createConciergeCaseFromTravelPlan = createServerFn({ method: "POST"
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => FromTravelPlanInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { data: caseId, error } = await context.supabase.rpc("concierge_case_from_travel_plan", {
+    const args = {
       _traveler_user_id: context.userId,
-      _travel_plan_id: data.travelPlanId ?? undefined,
       _summary: data.summary,
       _items: data.items ?? [],
-    });
+      ...(data.travelPlanId ? { _travel_plan_id: data.travelPlanId } : {}),
+    } as { _traveler_user_id: string; _summary: string; _travel_plan_id: string; _items?: unknown };
+    const { data: caseId, error } = await context.supabase.rpc(
+      "concierge_case_from_travel_plan",
+      args,
+    );
     if (error) throw new Error(error.message);
     return caseId as string;
   });
@@ -103,14 +107,15 @@ export const createConciergeCaseFromProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => FromProductInput.parse(data))
   .handler(async ({ data, context }) => {
+    const args = {
+      _traveler_user_id: context.userId,
+      _product_id: data.productId,
+      _summary: data.summary ?? "",
+      ...(data.notes ? { _notes: data.notes } : {}),
+    };
     const { data: caseId, error } = await context.supabase.rpc(
       "concierge_case_from_marketplace_product",
-      {
-        _traveler_user_id: context.userId,
-        _product_id: data.productId,
-        _summary: data.summary ?? undefined,
-        _notes: data.notes ?? undefined,
-      },
+      args,
     );
     if (error) throw new Error(error.message);
     return caseId as string;
