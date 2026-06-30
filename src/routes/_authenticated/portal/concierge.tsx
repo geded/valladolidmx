@@ -3,7 +3,7 @@
  * El negocio responde cotizaciones sin acceso al expediente ni a la
  * identidad del viajero.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -136,7 +136,7 @@ function QuoteCard({
     [quote.valid_until],
   );
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErr(null);
     const cents = Math.round(Number(amount) * 100);
