@@ -78,13 +78,18 @@ export function WorkspaceProvider({
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<Prefs>;
+        // Si el route fija un workspace inicial, no permitir que las
+        // prefs persistidas lo sobrescriban (la URL manda).
+        if (initialWorkspaceId) {
+          delete (parsed as Partial<Prefs>).activeWorkspaceId;
+        }
         setPrefs((p) => ({ ...p, ...parsed }));
       }
     } catch {
       /* noop */
     }
     setHydrated(true);
-  }, []);
+  }, [initialWorkspaceId]);
 
   // Persistir.
   useEffect(() => {

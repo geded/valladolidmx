@@ -25,6 +25,8 @@ import {
   Users,
   HeartHandshake,
   BookOpenText,
+  ShoppingCart,
+  Activity,
 } from "lucide-react";
 
 import type { WorkspaceDefinition } from "../types";
@@ -200,12 +202,50 @@ const cuenta: WorkspaceDefinition = {
   navigation: [
     { id: "cuenta.home", workspaceId: "cuenta", label: "Resumen", icon: LayoutDashboard, to: "/cuenta", group: "viaje", order: 1, surfaces: ["sidebar", "bottom", "palette"], primary: true },
     { id: "cuenta.fav", workspaceId: "cuenta", label: "Favoritos", icon: HeartHandshake, to: "/cuenta/favoritos", group: "viaje", order: 2, surfaces: ["sidebar", "bottom", "palette"] },
-    { id: "cuenta.hist", workspaceId: "cuenta", label: "Historial", icon: ListChecks, to: "/cuenta/historial", group: "viaje", order: 3, surfaces: ["sidebar", "palette"] },
-    { id: "cuenta.conc", workspaceId: "cuenta", label: "Concierge", icon: ConciergeBell, to: "/cuenta/concierge", group: "viaje", order: 4, surfaces: ["sidebar", "bottom", "palette"] },
+    { id: "cuenta.cart", workspaceId: "cuenta", label: "Carrito", icon: ShoppingCart, to: "/cuenta/carrito", group: "viaje", order: 3, surfaces: ["sidebar", "bottom", "palette"] },
+    { id: "cuenta.hist", workspaceId: "cuenta", label: "Historial", icon: ListChecks, to: "/cuenta/historial", group: "viaje", order: 4, surfaces: ["sidebar", "palette"] },
+    { id: "cuenta.act", workspaceId: "cuenta", label: "Actividad", icon: Activity, to: "/cuenta/actividad", group: "viaje", order: 5, surfaces: ["sidebar", "palette"] },
+    { id: "cuenta.conc", workspaceId: "cuenta", label: "Concierge", icon: ConciergeBell, to: "/cuenta/concierge", group: "viaje", order: 6, surfaces: ["sidebar", "bottom", "palette"] },
+    { id: "cuenta.notif", workspaceId: "cuenta", label: "Notificaciones", icon: Bell, to: "/cuenta/notificaciones", group: "config", order: 8, surfaces: ["sidebar", "palette"] },
     { id: "cuenta.perfil", workspaceId: "cuenta", label: "Perfil", icon: Users, to: "/cuenta/perfil", group: "config", order: 9, surfaces: ["sidebar", "palette"] },
   ],
   alux: {
     headline: "Tienes 1 viaje próximo. Te sugiero 2 experiencias en ruta.",
+    summary:
+      "Resumen personal: favoritos guardados, items en carrito y expedientes concierge abiertos.",
+    suggestedActions: () => [
+      {
+        id: "cuenta.review-cart",
+        label: "Revisar items en carrito",
+        impact: "medium",
+        rationale:
+          "Tienes items en tu carrito sin confirmar; revisarlos evita perder disponibilidad.",
+        sources: [{ id: "src.cart", label: "Carrito personal", kind: "entity" }],
+        effect: "Abre la vista del carrito.",
+        reversible: true,
+        confirm: "none",
+        run: () => void 0,
+      },
+    ],
+  },
+  aluxCapabilities: [
+    { id: "cuenta.profile.read", label: "Leer perfil de viajero" },
+    { id: "cuenta.favorites.read", label: "Leer favoritos" },
+  ],
+  context: {
+    workspaceId: "cuenta",
+    entities: [
+      { type: "favorite", label: "Favorito" },
+      { type: "cart-item", label: "Item de carrito" },
+      { type: "case", label: "Expediente Concierge" },
+      { type: "order", label: "Reserva/Compra" },
+    ],
+    selectionModes: ["single"],
+    views: [
+      { id: "summary", label: "Resumen", kind: "list" },
+      { id: "favorites", label: "Favoritos", kind: "list" },
+      { id: "history", label: "Historial", kind: "list" },
+    ],
   },
 };
 
