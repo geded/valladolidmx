@@ -66,6 +66,9 @@ export interface OrderSummary {
   updated_at: string;
   confirmed_at: string | null;
   cancelled_at: string | null;
+  payment_status: "unpaid" | "processing" | "paid" | "failed" | "refunded";
+  payment_provider: string | null;
+  paid_at: string | null;
   items: CartItem[];
 }
 
@@ -100,12 +103,16 @@ function mapOrder(
     updated_at: String(row.updated_at),
     confirmed_at: (row.confirmed_at as string | null) ?? null,
     cancelled_at: (row.cancelled_at as string | null) ?? null,
+    payment_status:
+      (row.payment_status as OrderSummary["payment_status"]) ?? "unpaid",
+    payment_provider: (row.payment_provider as string | null) ?? null,
+    paid_at: (row.paid_at as string | null) ?? null,
     items: items.map(mapItem),
   };
 }
 
 const ORDER_COLS =
-  "id, status, currency, subtotal_amount, total_amount, notes, created_at, updated_at, confirmed_at, cancelled_at";
+  "id, status, currency, subtotal_amount, total_amount, notes, created_at, updated_at, confirmed_at, cancelled_at, payment_status, payment_provider, paid_at";
 const ITEM_COLS =
   "id, product_id, business_id, quantity, unit_price, currency, snapshot_name, snapshot_slug";
 

@@ -12,6 +12,12 @@ import {
   type OrderStatus,
   type OrderSummary,
 } from "@/lib/marketplace/cart.functions";
+import { startPayment } from "@/lib/payments/payments.functions";
+
+function genId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
 
 interface HistorialSearch {
   highlight?: string;
@@ -37,6 +43,7 @@ function HistorialPage() {
   const queryClient = useQueryClient();
   const fetchOrders = useServerFn(listMyOrders);
   const cancel = useServerFn(cancelOrder);
+  const pay = useServerFn(startPayment);
   const { highlight } = Route.useSearch();
 
   const { data, isLoading, error } = useQuery({
@@ -50,6 +57,16 @@ function HistorialPage() {
     mutationFn: (order_id: string) => cancel({ data: { order_id } }),
     onSuccess: () =>
       void queryClient.invalidateQueries({ queryKey: ["traveler", "orders", user?.id] }),
+  });
+
+  const payMutation = useMutation({
+    mutationFn: (order_id: string) =>
+      pay({ data: { order_id, client_request_id: genId() } }),
+    onSuccess: (res) => {
+      if (res.mode === "redirect" && res.redirectUrl) {
+        window.location.href = res.redirectUrl;
+      }
+    },
   });
 
   return (
@@ -119,6 +136,23 @@ function HistorialPage() {
                     >
                       Cancelar
                     </button>
+                  ) : null}
+                  {(order.status === "pending" || order.status === "confirmed") &&
+                  order.payment_status !== "paid" &&
+                  order.payment_status !== "refunded" ? (
+                    <button
+                      type="button"
+                      onClick={() => payMutation.mutate(order.id)}
+                      disabled={payMutation.isPending}
+                      className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+                    >
+                      {payMutation.isPending ? "Procesando…" : "Pagar"}
+                    </button>
+                  ) : null}
+                  {order.payment_status === "paid" ? (
+                    <span className="rounded-md bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                      Pagada
+                    </span>
                   ) : null}
                 </div>
                 {order.items.length > 0 ? (

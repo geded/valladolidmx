@@ -49,10 +49,13 @@ import { Route as AuthenticatedCmsReviewsIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedCmsRegionesIndexRouteImport } from './routes/_authenticated/cms/regiones.index'
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
+import { Route as AuthenticatedCuentaPagosExitoRouteImport } from './routes/_authenticated/cuenta/pagos.exito'
+import { Route as AuthenticatedCuentaPagosErrorRouteImport } from './routes/_authenticated/cuenta/pagos.error'
 import { Route as AuthenticatedCmsRegionesNuevaRouteImport } from './routes/_authenticated/cms/regiones.nueva'
 import { Route as AuthenticatedCmsRegionesEditarRouteImport } from './routes/_authenticated/cms/regiones..editar'
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
 import { Route as AuthenticatedCmsCategoriasEditarRouteImport } from './routes/_authenticated/cms/categorias..editar'
+import { Route as ApiPublicPaymentsProviderWebhookRouteImport } from './routes/api/public/payments/$provider/webhook'
 import { Route as AuthenticatedCmsReviewsIdModerarRouteImport } from './routes/_authenticated/cms/reviews.$id.moderar'
 
 const RestaurantesRoute = RestaurantesRouteImport.update({
@@ -274,6 +277,18 @@ const AuthenticatedPortalInvitacionesTokenRoute =
     path: '/invitaciones/$token',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
+const AuthenticatedCuentaPagosExitoRoute =
+  AuthenticatedCuentaPagosExitoRouteImport.update({
+    id: '/pagos/exito',
+    path: '/pagos/exito',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
+const AuthenticatedCuentaPagosErrorRoute =
+  AuthenticatedCuentaPagosErrorRouteImport.update({
+    id: '/pagos/error',
+    path: '/pagos/error',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
 const AuthenticatedCmsRegionesNuevaRoute =
   AuthenticatedCmsRegionesNuevaRouteImport.update({
     id: '/regiones/nueva',
@@ -297,6 +312,12 @@ const AuthenticatedCmsCategoriasEditarRoute =
     id: '/categorias/editar',
     path: '/categorias/editar',
     getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
+const ApiPublicPaymentsProviderWebhookRoute =
+  ApiPublicPaymentsProviderWebhookRouteImport.update({
+    id: '/api/public/payments/$provider/webhook',
+    path: '/api/public/payments/$provider/webhook',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedCmsReviewsIdModerarRoute =
   AuthenticatedCmsReviewsIdModerarRouteImport.update({
@@ -344,12 +365,15 @@ export interface FileRoutesByFullPath {
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
+  '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
+  '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
   '/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
+  '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -387,12 +411,15 @@ export interface FileRoutesByTo {
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
+  '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
+  '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews': typeof AuthenticatedCmsReviewsIndexRoute
   '/portal/invitaciones': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
+  '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -435,12 +462,15 @@ export interface FileRoutesById {
   '/_authenticated/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/_authenticated/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/_authenticated/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
+  '/_authenticated/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
+  '/_authenticated/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/_authenticated/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/_authenticated/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
   '/_authenticated/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/_authenticated/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
+  '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -483,12 +513,15 @@ export interface FileRouteTypes {
     | '/cms/categorias/nueva'
     | '/cms/regiones/editar'
     | '/cms/regiones/nueva'
+    | '/cuenta/pagos/error'
+    | '/cuenta/pagos/exito'
     | '/portal/invitaciones/$token'
     | '/cms/categorias/'
     | '/cms/regiones/'
     | '/cms/reviews/'
     | '/portal/invitaciones/'
     | '/cms/reviews/$id/moderar'
+    | '/api/public/payments/$provider/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -526,12 +559,15 @@ export interface FileRouteTypes {
     | '/cms/categorias/nueva'
     | '/cms/regiones/editar'
     | '/cms/regiones/nueva'
+    | '/cuenta/pagos/error'
+    | '/cuenta/pagos/exito'
     | '/portal/invitaciones/$token'
     | '/cms/categorias'
     | '/cms/regiones'
     | '/cms/reviews'
     | '/portal/invitaciones'
     | '/cms/reviews/$id/moderar'
+    | '/api/public/payments/$provider/webhook'
   id:
     | '__root__'
     | '/'
@@ -573,12 +609,15 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/categorias/nueva'
     | '/_authenticated/cms/regiones/editar'
     | '/_authenticated/cms/regiones/nueva'
+    | '/_authenticated/cuenta/pagos/error'
+    | '/_authenticated/cuenta/pagos/exito'
     | '/_authenticated/portal/invitaciones/$token'
     | '/_authenticated/cms/categorias/'
     | '/_authenticated/cms/regiones/'
     | '/_authenticated/cms/reviews/'
     | '/_authenticated/portal/invitaciones/'
     | '/_authenticated/cms/reviews/$id/moderar'
+    | '/api/public/payments/$provider/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -598,6 +637,7 @@ export interface RootRouteChildren {
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
+  ApiPublicPaymentsProviderWebhookRoute: typeof ApiPublicPaymentsProviderWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -882,6 +922,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalInvitacionesTokenRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
+    '/_authenticated/cuenta/pagos/exito': {
+      id: '/_authenticated/cuenta/pagos/exito'
+      path: '/pagos/exito'
+      fullPath: '/cuenta/pagos/exito'
+      preLoaderRoute: typeof AuthenticatedCuentaPagosExitoRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
+    '/_authenticated/cuenta/pagos/error': {
+      id: '/_authenticated/cuenta/pagos/error'
+      path: '/pagos/error'
+      fullPath: '/cuenta/pagos/error'
+      preLoaderRoute: typeof AuthenticatedCuentaPagosErrorRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
     '/_authenticated/cms/regiones/nueva': {
       id: '/_authenticated/cms/regiones/nueva'
       path: '/regiones/nueva'
@@ -910,6 +964,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsCategoriasEditarRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/api/public/payments/$provider/webhook': {
+      id: '/api/public/payments/$provider/webhook'
+      path: '/api/public/payments/$provider/webhook'
+      fullPath: '/api/public/payments/$provider/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsProviderWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/cms/reviews/$id/moderar': {
       id: '/_authenticated/cms/reviews/$id/moderar'
       path: '/reviews/$id/moderar'
@@ -926,6 +987,8 @@ interface AuthenticatedCuentaRouteRouteChildren {
   AuthenticatedCuentaHistorialRoute: typeof AuthenticatedCuentaHistorialRoute
   AuthenticatedCuentaPerfilRoute: typeof AuthenticatedCuentaPerfilRoute
   AuthenticatedCuentaIndexRoute: typeof AuthenticatedCuentaIndexRoute
+  AuthenticatedCuentaPagosErrorRoute: typeof AuthenticatedCuentaPagosErrorRoute
+  AuthenticatedCuentaPagosExitoRoute: typeof AuthenticatedCuentaPagosExitoRoute
 }
 
 const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildren =
@@ -935,6 +998,8 @@ const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildr
     AuthenticatedCuentaHistorialRoute: AuthenticatedCuentaHistorialRoute,
     AuthenticatedCuentaPerfilRoute: AuthenticatedCuentaPerfilRoute,
     AuthenticatedCuentaIndexRoute: AuthenticatedCuentaIndexRoute,
+    AuthenticatedCuentaPagosErrorRoute: AuthenticatedCuentaPagosErrorRoute,
+    AuthenticatedCuentaPagosExitoRoute: AuthenticatedCuentaPagosExitoRoute,
   }
 
 const AuthenticatedCuentaRouteRouteWithChildren =
@@ -1040,6 +1105,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrienteMayaDestinoRoute: OrienteMayaDestinoRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
+  ApiPublicPaymentsProviderWebhookRoute: ApiPublicPaymentsProviderWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

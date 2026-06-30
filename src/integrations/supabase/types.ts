@@ -1407,6 +1407,10 @@ export type Database = {
           currency: string
           id: string
           notes: string | null
+          paid_at: string | null
+          payment_intent_id: string | null
+          payment_provider: string | null
+          payment_status: string
           status: Database["public"]["Enums"]["order_status"]
           subtotal_amount: number
           total_amount: number
@@ -1421,6 +1425,10 @@ export type Database = {
           currency?: string
           id?: string
           notes?: string | null
+          paid_at?: string | null
+          payment_intent_id?: string | null
+          payment_provider?: string | null
+          payment_status?: string
           status?: Database["public"]["Enums"]["order_status"]
           subtotal_amount?: number
           total_amount?: number
@@ -1435,6 +1443,10 @@ export type Database = {
           currency?: string
           id?: string
           notes?: string | null
+          paid_at?: string | null
+          payment_intent_id?: string | null
+          payment_provider?: string | null
+          payment_status?: string
           status?: Database["public"]["Enums"]["order_status"]
           subtotal_amount?: number
           total_amount?: number
@@ -1504,6 +1516,47 @@ export type Database = {
             columns: ["cover_media_id"]
             isOneToOne: false
             referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_events: {
+        Row: {
+          event_type: string
+          id: string
+          order_id: string | null
+          payload: Json
+          processed_at: string | null
+          provider: string
+          provider_event_id: string
+          received_at: string
+        }
+        Insert: {
+          event_type: string
+          id?: string
+          order_id?: string | null
+          payload?: Json
+          processed_at?: string | null
+          provider: string
+          provider_event_id: string
+          received_at?: string
+        }
+        Update: {
+          event_type?: string
+          id?: string
+          order_id?: string | null
+          payload?: Json
+          processed_at?: string | null
+          provider?: string
+          provider_event_id?: string
+          received_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
             referencedColumns: ["id"]
           },
         ]
@@ -2421,6 +2474,71 @@ export type Database = {
         Args: { p_client_request_id?: string; p_notes?: string }
         Returns: string
       }
+      order_mark_paid: {
+        Args: {
+          p_event_id: string
+          p_intent_id: string
+          p_order_id: string
+          p_provider: string
+        }
+        Returns: {
+          cancelled_at: string | null
+          client_request_id: string | null
+          confirmed_at: string | null
+          created_at: string
+          currency: string
+          id: string
+          notes: string | null
+          paid_at: string | null
+          payment_intent_id: string | null
+          payment_provider: string | null
+          payment_status: string
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal_amount: number
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      order_mark_payment_failed: {
+        Args: {
+          p_event_id: string
+          p_intent_id: string
+          p_order_id: string
+          p_provider: string
+          p_reason: string
+        }
+        Returns: {
+          cancelled_at: string | null
+          client_request_id: string | null
+          confirmed_at: string | null
+          created_at: string
+          currency: string
+          id: string
+          notes: string | null
+          paid_at: string | null
+          payment_intent_id: string | null
+          payment_provider: string | null
+          payment_status: string
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal_amount: number
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
       register_business_media: {
         Args: {
@@ -2588,6 +2706,10 @@ export type Database = {
         | "cancelled"
         | "fulfilled"
         | "note_added"
+        | "payment_initiated"
+        | "payment_succeeded"
+        | "payment_failed"
+        | "payment_refunded"
       order_status: "cart" | "pending" | "confirmed" | "cancelled" | "fulfilled"
       product_conversion_mode:
         | "informacion"
@@ -2785,6 +2907,10 @@ export const Constants = {
         "cancelled",
         "fulfilled",
         "note_added",
+        "payment_initiated",
+        "payment_succeeded",
+        "payment_failed",
+        "payment_refunded",
       ],
       order_status: ["cart", "pending", "confirmed", "cancelled", "fulfilled"],
       product_conversion_mode: [
