@@ -9,9 +9,9 @@
  */
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { UserRound, LogOut, ChevronDown } from "lucide-react";
+import { UserRound, LogOut, ChevronDown, Shield, LayoutDashboard, Briefcase, Headphones, Compass } from "lucide-react";
 import { useTranslation } from "@/i18n/context";
-import { ROLE_LABELS } from "@/types/auth";
+import { ROLE_LABELS, type AppRole } from "@/types/auth";
 import { useAuth } from "@/hooks/useAuth";
 
 export function UserMenu() {
@@ -31,6 +31,7 @@ export function UserMenu() {
   }
 
   if (authUser) {
+    const links = buildMenuLinks(role);
     return (
       <div className="relative">
         <button
@@ -59,6 +60,22 @@ export function UserMenu() {
               </div>
               {role ? <div className="mt-0.5">{ROLE_LABELS[role]}</div> : null}
             </div>
+            {links.length > 0 ? (
+              <div className="border-b border-border py-1">
+                {links.map((l) => (
+                  <Link
+                    key={l.to}
+                    to={l.to}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent"
+                  >
+                    <l.icon className="size-4" aria-hidden />
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+            ) : null}
             <button
               type="button"
               onMouseDown={(e) => e.preventDefault()}
