@@ -14,14 +14,19 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export type ExportFormat = "json" | "csv";
 export type CockpitPanel = "kpis" | "alerts" | "activity";
 
-interface CockpitExportPayload {
+type JsonPrimitive = string | number | boolean | null;
+type JsonValue = JsonPrimitive | JsonValue[] | { [k: string]: JsonValue };
+type Row = { [k: string]: JsonValue };
+
+export interface CockpitExportPayload {
   panel: CockpitPanel;
   format: ExportFormat;
   generated_at: string;
-  rows: Array<Record<string, unknown>>;
+  rows: Row[];
+  content: string;
 }
 
-function toCsv(rows: Array<Record<string, unknown>>): string {
+function toCsv(rows: Row[]): string {
   if (rows.length === 0) return "";
   const headers = Array.from(
     rows.reduce<Set<string>>((acc, r) => {
@@ -39,15 +44,15 @@ function toCsv(rows: Array<Record<string, unknown>>): string {
   ].join("\n");
 }
 
-function flattenKpis(data: Record<string, unknown>): Array<Record<string, unknown>> {
-  const out: Array<Record<string, unknown>> = [];
+function flattenKpis(data: Record<string, unknown>): Row[] {
+  const out: Row[] = [];
   for (const [group, value] of Object.entries(data)) {
     if (value && typeof value === "object" && !Array.isArray(value)) {
       for (const [metric, v] of Object.entries(value as Record<string, unknown>)) {
-        out.push({ group, metric, value: v });
+        out.push({ group, metric, value: v as JsonValue });
       }
     } else {
-      out.push({ group: "_meta", metric: group, value });
+      out.push({ group: "_meta", metric: group, value: value as JsonValue });
     }
   }
   return out;
@@ -59,7 +64,7 @@ export const exportCockpitPanel = createServerFn({ method: "POST" })
     panel: (input?.panel ?? "kpis") as CockpitPanel,
     format: (input?.format ?? "json") as ExportFormat,
   }))
-  .handler(async ({ data, context }): Promise<CockpitExportPayload & { content: string }> => {
+  .handler(async ({ data, context }): Promise<CockpitExportPayload> => {
     // Authorization: super_admin only
     const { data: isAdmin, error: roleErr } = await context.supabase.rpc("has_role", {
       _user_id: context.userId,
@@ -68,7 +73,7 @@ export const exportCockpitPanel = createServerFn({ method: "POST" })
     if (roleErr) throw new Error(`role_check_failed: ${roleErr.message}`);
     if (!isAdmin) throw new Error("forbidden: super_admin required");
 
-    let rows: Array<Record<string, unknown>> = [];
+    let rows: Row[] = [];
     if (data.panel === "kpis") {
       const { data: kpis, error } = await context.supabase.rpc("founder_dashboard_kpis");
       if (error) throw new Error(`kpis_export_failed: ${error.message}`);
@@ -79,19 +84,16 @@ export const exportCockpitPanel = createServerFn({ method: "POST" })
         _only_unread: false,
       });
       if (error) throw new Error(`alerts_export_failed: ${error.message}`);
-      rows = (Array.isArray(deliveries) ? deliveries : []) as Array<Record<string, unknown>>;
+      rows = (Array.isArray(deliveries) ? deliveries : []) as Row[];
     } else {
       // activity panel: placeholder — readers se conectan en 15.10.4c iteración menor.
       rows = [];
     }
 
-    const payload: CockpitExportPayload = {
-      panel: data.panel,
-      format: data.format,
-      generated_at: new Date().toISOString(),
-      rows,
-    };
+    const generated_at = new Date().toISOString();
     const content =
-      data.format === "csv" ? toCsv(rows) : JSON.stringify(payload, null, 2);
-    return { ...payload, content };
+      data.format === "csv"
+        ? toCsv(rows)
+        : JSON.stringify({ panel: data.panel, generated_at, rows }, null, 2);
+    return { panel: data.panel, format: data.format, generated_at, rows, content };
   });
