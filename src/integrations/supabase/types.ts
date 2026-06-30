@@ -3556,6 +3556,14 @@ export type Database = {
         Args: { p_item_id: string; p_quantity: number }
         Returns: undefined
       }
+      concierge_alux_context_for_case: {
+        Args: { _case_id: string }
+        Returns: Json
+      }
+      concierge_alux_log_suggestion: {
+        Args: { _capability: string; _case_id: string; _meta?: Json }
+        Returns: string
+      }
       concierge_assert_can_create_for: {
         Args: { _traveler: string }
         Returns: undefined
