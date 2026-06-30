@@ -13,6 +13,9 @@ import {
   viewConciergeProposal,
   withdrawConciergeProposal,
   createConciergeProposal,
+  assignConciergeCase,
+  releaseConciergeCase,
+  setConciergeCasePriority,
 } from "@/lib/concierge/concierge.functions";
 
 type CaseFile = {
@@ -25,6 +28,10 @@ type CaseFile = {
     created_at: string;
     updated_at: string;
     traveler_user_id: string;
+    target_response_at?: string | null;
+    last_activity_at?: string | null;
+    priority_source?: string | null;
+    priority_reason?: string | null;
   };
   viewer: { user_id: string; is_internal: boolean };
   traveler: { user_id: string; display_name?: string | null; preferred_language?: string | null };
@@ -90,6 +97,29 @@ type CaseFile = {
       request_title: string;
     }>;
   }>;
+  assignment?: {
+    id: string;
+    concierge_user_id: string;
+    assigned_at: string;
+    status: string;
+  } | null;
+  assignments?: Array<{
+    id: string;
+    concierge_user_id: string;
+    status: string;
+    assigned_at: string;
+    released_at: string | null;
+    reason: string | null;
+  }>;
+  sla?: {
+    priority: string;
+    priority_source: string | null;
+    priority_reason: string | null;
+    target_response_at: string | null;
+    last_activity_at: string | null;
+    first_response_at: string | null;
+    sla_status: "on_time" | "due_soon" | "overdue" | null;
+  } | null;
 };
 
 export function CaseFileView({ data, hideInternal = false }: { data: unknown; hideInternal?: boolean }) {
@@ -100,6 +130,7 @@ export function CaseFileView({ data, hideInternal = false }: { data: unknown; hi
   return (
     <div className="grid gap-6">
       <Header f={f} />
+      {internal && <SlaAssignmentPanel f={f} />}
       <Section title="Solicitudes">
         {f.requests.length === 0 ? (
           <Empty>Sin solicitudes registradas.</Empty>
