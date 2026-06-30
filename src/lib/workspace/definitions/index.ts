@@ -27,6 +27,7 @@ import {
   ShoppingCart,
   Activity,
 } from "lucide-react";
+import { Mail, KeyRound, Radio } from "lucide-react";
 
 import type { WorkspaceDefinition } from "../types";
 import { registerWorkspace } from "../workspace-registry";
@@ -125,18 +126,70 @@ const portal: WorkspaceDefinition = {
   rootPath: "/portal",
   roles: ["business_owner", "business_staff"],
   navigation: [
-    { id: "portal.today", workspaceId: "portal", label: "Hoy", icon: LayoutDashboard, to: "/portal", group: "pulso", order: 1, surfaces: ["sidebar", "bottom", "palette"], primary: true },
-    { id: "portal.ficha", workspaceId: "portal", label: "Ficha", icon: BookOpenText, to: "/portal/ficha", group: "presencia", order: 2, surfaces: ["sidebar", "bottom", "palette"] },
-    { id: "portal.galeria", workspaceId: "portal", label: "Galería", icon: ImageIcon, to: "/portal/galeria", group: "presencia", order: 3, surfaces: ["sidebar", "bottom", "palette"] },
-    { id: "portal.catalogo", workspaceId: "portal", label: "Catálogo", icon: ListChecks, to: "/portal/catalogo", group: "operacion", order: 4, surfaces: ["sidebar", "palette"] },
-    { id: "portal.pagos", workspaceId: "portal", label: "Pagos", icon: CreditCard, to: "/portal/pagos", group: "operacion", order: 5, surfaces: ["sidebar", "palette"] },
+    { id: "portal.today", workspaceId: "portal", label: "Resumen", icon: LayoutDashboard, to: "/portal", group: "pulso", order: 1, surfaces: ["sidebar", "bottom", "palette"], primary: true },
+    { id: "portal.empresas", workspaceId: "portal", label: "Empresas", icon: Building2, to: "/portal/empresas", group: "pulso", order: 2, surfaces: ["sidebar", "bottom", "palette"] },
+    { id: "portal.ficha", workspaceId: "portal", label: "Ficha pública", icon: BookOpenText, to: "/portal/ficha", group: "presencia", order: 3, surfaces: ["sidebar", "bottom", "palette"] },
+    { id: "portal.presencia", workspaceId: "portal", label: "Presencia", icon: Radio, to: "/portal/presencia", group: "presencia", order: 4, surfaces: ["sidebar", "palette"] },
+    { id: "portal.galeria", workspaceId: "portal", label: "Galería", icon: ImageIcon, to: "/portal/galeria", group: "presencia", order: 5, surfaces: ["sidebar", "palette"] },
+    { id: "portal.catalogo", workspaceId: "portal", label: "Catálogo", icon: ListChecks, to: "/portal/catalogo", group: "operacion", order: 6, surfaces: ["sidebar", "palette"] },
+    { id: "portal.pagos", workspaceId: "portal", label: "Pagos y visibilidad", icon: CreditCard, to: "/portal/pagos", group: "operacion", order: 7, surfaces: ["sidebar", "palette"] },
+    { id: "portal.actividad", workspaceId: "portal", label: "Actividad", icon: Activity, to: "/portal/actividad", group: "operacion", order: 8, surfaces: ["sidebar", "palette"] },
+    { id: "portal.concierge", workspaceId: "portal", label: "Concierge", icon: ConciergeBell, to: "/portal/concierge", group: "operacion", order: 9, surfaces: ["sidebar", "palette"] },
+    { id: "portal.invitaciones", workspaceId: "portal", label: "Invitaciones", icon: Mail, to: "/portal/invitaciones", group: "equipo", order: 10, surfaces: ["sidebar", "palette"] },
+    { id: "portal.propiedad", workspaceId: "portal", label: "Propiedad", icon: KeyRound, to: "/portal/propiedad", group: "equipo", order: 11, surfaces: ["sidebar", "palette"] },
   ],
   alux: {
     headline: "Tu ficha tiene 2 oportunidades de visibilidad.",
-    summary: "Sugerencias para subir tu presencia esta semana.",
+    summary:
+      "Sugerencias para subir la presencia de la empresa activa esta semana, priorizadas por impacto en descubrimiento.",
     suggestedActions: () => [
-      { id: "complete-profile", label: "Completar ficha al 100%", impact: "high", run: () => void 0 },
-      { id: "add-photos", label: "Subir 3 fotos en alta calidad", impact: "medium", run: () => void 0 },
+      {
+        id: "complete-profile",
+        label: "Completar ficha al 100%",
+        impact: "high",
+        rationale:
+          "La ficha pública influye directamente en el ranking de descubrimiento; completarla al 100% mejora visibilidad orgánica.",
+        sources: [
+          { id: "src.ficha", label: "Ficha pública", kind: "entity" },
+          { id: "src.completeness", label: "Completitud", kind: "metric" },
+        ],
+        effect: "Abre el editor de ficha pública.",
+        reversible: true,
+        confirm: "none",
+        run: () => void 0,
+      },
+      {
+        id: "add-photos",
+        label: "Subir 3 fotos en alta calidad",
+        impact: "medium",
+        rationale:
+          "Las galerías con ≥6 fotos en alta calidad multiplican el tiempo en ficha y favorecen la conversión.",
+        sources: [{ id: "src.galeria", label: "Galería", kind: "entity" }],
+        effect: "Abre el gestor de galería.",
+        reversible: true,
+        confirm: "none",
+        run: () => void 0,
+      },
+    ],
+  },
+  aluxCapabilities: [
+    { id: "portal.business.read", label: "Leer ficha de empresa activa" },
+    { id: "portal.presence.read", label: "Leer presencia y visibilidad" },
+  ],
+  context: {
+    workspaceId: "portal",
+    entities: [
+      { type: "business", label: "Empresa" },
+      { type: "product", label: "Producto" },
+      { type: "promotion", label: "Promoción" },
+      { type: "media", label: "Media" },
+      { type: "invitation", label: "Invitación" },
+    ],
+    selectionModes: ["single", "multi"],
+    views: [
+      { id: "summary", label: "Resumen", kind: "list" },
+      { id: "catalog", label: "Catálogo", kind: "list" },
+      { id: "gallery", label: "Galería", kind: "list" },
     ],
   },
 };
