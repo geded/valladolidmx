@@ -1440,6 +1440,7 @@ export type Database = {
         Row: {
           category: Database["public"]["Enums"]["notification_category"]
           channel: Database["public"]["Enums"]["notification_channel"]
+          consent_at: string | null
           created_at: string
           enabled: boolean
           id: string
@@ -1449,6 +1450,7 @@ export type Database = {
         Insert: {
           category: Database["public"]["Enums"]["notification_category"]
           channel: Database["public"]["Enums"]["notification_channel"]
+          consent_at?: string | null
           created_at?: string
           enabled?: boolean
           id?: string
@@ -1458,6 +1460,7 @@ export type Database = {
         Update: {
           category?: Database["public"]["Enums"]["notification_category"]
           channel?: Database["public"]["Enums"]["notification_channel"]
+          consent_at?: string | null
           created_at?: string
           enabled?: boolean
           id?: string
@@ -3045,6 +3048,16 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      unc_list_my_preferences: {
+        Args: never
+        Returns: {
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          consent_at: string
+          enabled: boolean
+          locked: boolean
+        }[]
+      }
       unc_mark_delivery_read: {
         Args: { _delivery_id: string }
         Returns: {
@@ -3100,6 +3113,30 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "notification_deliveries"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      unc_set_my_preference: {
+        Args: {
+          _category: Database["public"]["Enums"]["notification_category"]
+          _channel: Database["public"]["Enums"]["notification_channel"]
+          _consent?: boolean
+          _enabled: boolean
+        }
+        Returns: {
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          consent_at: string | null
+          created_at: string
+          enabled: boolean
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "notification_preferences"
           isOneToOne: true
           isSetofReturn: false
         }
