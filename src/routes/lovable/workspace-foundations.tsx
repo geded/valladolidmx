@@ -101,7 +101,7 @@ function FoundationsContent() {
               icon={w.icon}
               title={w.label}
               description={w.description}
-              tone={w.accent === "muted" ? "muted" : (w.accent ?? "primary")}
+              tone={w.accent === "caliza" || w.accent === undefined ? "muted" : w.accent}
               onClick={() => setActiveWorkspace(w.id)}
             />
           ))}

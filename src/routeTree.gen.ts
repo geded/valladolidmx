@@ -27,6 +27,7 @@ import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$d
 import { Route as MarketplaceBuscarRouteImport } from './routes/marketplace/buscar'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
 import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/workspace-preview'
+import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
 import { Route as LSlugRouteImport } from './routes/l.$slug'
 import { Route as AuthenticatedMiViajeRouteImport } from './routes/_authenticated/mi-viaje'
 import { Route as AuthenticatedEmpresaRouteImport } from './routes/_authenticated/empresa'
@@ -183,6 +184,12 @@ const LovableWorkspacePreviewRoute = LovableWorkspacePreviewRouteImport.update({
   path: '/lovable/workspace-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableWorkspaceFoundationsRoute =
+  LovableWorkspaceFoundationsRouteImport.update({
+    id: '/lovable/workspace-foundations',
+    path: '/lovable/workspace-foundations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LSlugRoute = LSlugRouteImport.update({
   id: '/l/$slug',
   path: '/l/$slug',
@@ -584,6 +591,7 @@ export interface FileRoutesByFullPath {
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/l/$slug': typeof LSlugRoute
+  '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
@@ -665,6 +673,7 @@ export interface FileRoutesByTo {
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/l/$slug': typeof LSlugRoute
+  '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
@@ -752,6 +761,7 @@ export interface FileRoutesById {
   '/_authenticated/empresa': typeof AuthenticatedEmpresaRoute
   '/_authenticated/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/l/$slug': typeof LSlugRoute
+  '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
@@ -839,6 +849,7 @@ export interface FileRouteTypes {
     | '/empresa'
     | '/mi-viaje'
     | '/l/$slug'
+    | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
@@ -920,6 +931,7 @@ export interface FileRouteTypes {
     | '/empresa'
     | '/mi-viaje'
     | '/l/$slug'
+    | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
@@ -1006,6 +1018,7 @@ export interface FileRouteTypes {
     | '/_authenticated/empresa'
     | '/_authenticated/mi-viaje'
     | '/l/$slug'
+    | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
@@ -1086,6 +1099,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   RestaurantesRoute: typeof RestaurantesRoute
   LSlugRoute: typeof LSlugRoute
+  LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
   LovableWorkspacePreviewRoute: typeof LovableWorkspacePreviewRoute
   MarketplaceSlugRoute: typeof MarketplaceSlugRoute
   MarketplaceBuscarRoute: typeof MarketplaceBuscarRoute
@@ -1225,6 +1239,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/workspace-preview'
       fullPath: '/lovable/workspace-preview'
       preLoaderRoute: typeof LovableWorkspacePreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/workspace-foundations': {
+      id: '/lovable/workspace-foundations'
+      path: '/lovable/workspace-foundations'
+      fullPath: '/lovable/workspace-foundations'
+      preLoaderRoute: typeof LovableWorkspaceFoundationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/l/$slug': {
@@ -1954,6 +1975,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   RestaurantesRoute: RestaurantesRoute,
   LSlugRoute: LSlugRoute,
+  LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,
   LovableWorkspacePreviewRoute: LovableWorkspacePreviewRoute,
   MarketplaceSlugRoute: MarketplaceSlugRoute,
   MarketplaceBuscarRoute: MarketplaceBuscarRoute,
