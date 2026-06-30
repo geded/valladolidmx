@@ -64,11 +64,13 @@ import { Route as AuthenticatedCmsDestinosRouteImport } from './routes/_authenti
 import { Route as AuthenticatedCmsAlertasRouteImport } from './routes/_authenticated/cms/alertas'
 import { Route as AuthenticatedCmsActividadRouteImport } from './routes/_authenticated/cms/actividad'
 import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './routes/_authenticated/portal/invitaciones.index'
+import { Route as AuthenticatedPortalEmpresasIndexRouteImport } from './routes/_authenticated/portal/empresas.index'
 import { Route as AuthenticatedCmsReviewsIndexRouteImport } from './routes/_authenticated/cms/reviews.index'
 import { Route as AuthenticatedCmsRegionesIndexRouteImport } from './routes/_authenticated/cms/regiones.index'
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
+import { Route as AuthenticatedPortalEmpresasBusinessIdRouteImport } from './routes/_authenticated/portal/empresas.$businessId'
 import { Route as AuthenticatedCuentaPagosExitoRouteImport } from './routes/_authenticated/cuenta/pagos.exito'
 import { Route as AuthenticatedCuentaPagosErrorRouteImport } from './routes/_authenticated/cuenta/pagos.error'
 import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId'
@@ -382,6 +384,12 @@ const AuthenticatedPortalInvitacionesIndexRoute =
     path: '/invitaciones/',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
+const AuthenticatedPortalEmpresasIndexRoute =
+  AuthenticatedPortalEmpresasIndexRouteImport.update({
+    id: '/empresas/',
+    path: '/empresas/',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
 const AuthenticatedCmsReviewsIndexRoute =
   AuthenticatedCmsReviewsIndexRouteImport.update({
     id: '/reviews/',
@@ -410,6 +418,12 @@ const AuthenticatedPortalInvitacionesTokenRoute =
   AuthenticatedPortalInvitacionesTokenRouteImport.update({
     id: '/invitaciones/$token',
     path: '/invitaciones/$token',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
+const AuthenticatedPortalEmpresasBusinessIdRoute =
+  AuthenticatedPortalEmpresasBusinessIdRouteImport.update({
+    id: '/empresas/$businessId',
+    path: '/empresas/$businessId',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
 const AuthenticatedCuentaPagosExitoRoute =
@@ -548,11 +562,13 @@ export interface FileRoutesByFullPath {
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
+  '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
+  '/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
   '/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
@@ -617,11 +633,13 @@ export interface FileRoutesByTo {
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
+  '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews': typeof AuthenticatedCmsReviewsIndexRoute
+  '/portal/empresas': typeof AuthenticatedPortalEmpresasIndexRoute
   '/portal/invitaciones': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
@@ -692,11 +710,13 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/_authenticated/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/_authenticated/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
+  '/_authenticated/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/_authenticated/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/_authenticated/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
+  '/_authenticated/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
   '/_authenticated/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/_authenticated/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/_authenticated/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
@@ -767,11 +787,13 @@ export interface FileRouteTypes {
     | '/cuenta/concierge/$caseId'
     | '/cuenta/pagos/error'
     | '/cuenta/pagos/exito'
+    | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
     | '/lovable/email/queue/process'
     | '/cms/categorias/'
     | '/cms/regiones/'
     | '/cms/reviews/'
+    | '/portal/empresas/'
     | '/portal/invitaciones/'
     | '/cms/reviews/$id/moderar'
     | '/cuenta/concierge/$caseId/evaluar'
@@ -836,11 +858,13 @@ export interface FileRouteTypes {
     | '/cuenta/concierge/$caseId'
     | '/cuenta/pagos/error'
     | '/cuenta/pagos/exito'
+    | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
     | '/lovable/email/queue/process'
     | '/cms/categorias'
     | '/cms/regiones'
     | '/cms/reviews'
+    | '/portal/empresas'
     | '/portal/invitaciones'
     | '/cms/reviews/$id/moderar'
     | '/cuenta/concierge/$caseId/evaluar'
@@ -910,11 +934,13 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/concierge/$caseId'
     | '/_authenticated/cuenta/pagos/error'
     | '/_authenticated/cuenta/pagos/exito'
+    | '/_authenticated/portal/empresas/$businessId'
     | '/_authenticated/portal/invitaciones/$token'
     | '/lovable/email/queue/process'
     | '/_authenticated/cms/categorias/'
     | '/_authenticated/cms/regiones/'
     | '/_authenticated/cms/reviews/'
+    | '/_authenticated/portal/empresas/'
     | '/_authenticated/portal/invitaciones/'
     | '/_authenticated/cms/reviews/$id/moderar'
     | '/_authenticated/cuenta/concierge/$caseId/evaluar'
@@ -1331,6 +1357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalInvitacionesIndexRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
+    '/_authenticated/portal/empresas/': {
+      id: '/_authenticated/portal/empresas/'
+      path: '/empresas'
+      fullPath: '/portal/empresas/'
+      preLoaderRoute: typeof AuthenticatedPortalEmpresasIndexRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
     '/_authenticated/cms/reviews/': {
       id: '/_authenticated/cms/reviews/'
       path: '/reviews'
@@ -1364,6 +1397,13 @@ declare module '@tanstack/react-router' {
       path: '/invitaciones/$token'
       fullPath: '/portal/invitaciones/$token'
       preLoaderRoute: typeof AuthenticatedPortalInvitacionesTokenRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
+    '/_authenticated/portal/empresas/$businessId': {
+      id: '/_authenticated/portal/empresas/$businessId'
+      path: '/empresas/$businessId'
+      fullPath: '/portal/empresas/$businessId'
+      preLoaderRoute: typeof AuthenticatedPortalEmpresasBusinessIdRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
     '/_authenticated/cuenta/pagos/exito': {
@@ -1541,7 +1581,9 @@ interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalPresenciaRoute: typeof AuthenticatedPortalPresenciaRoute
   AuthenticatedPortalPropiedadRoute: typeof AuthenticatedPortalPropiedadRoute
   AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
+  AuthenticatedPortalEmpresasBusinessIdRoute: typeof AuthenticatedPortalEmpresasBusinessIdRoute
   AuthenticatedPortalInvitacionesTokenRoute: typeof AuthenticatedPortalInvitacionesTokenRoute
+  AuthenticatedPortalEmpresasIndexRoute: typeof AuthenticatedPortalEmpresasIndexRoute
   AuthenticatedPortalInvitacionesIndexRoute: typeof AuthenticatedPortalInvitacionesIndexRoute
 }
 
@@ -1556,8 +1598,12 @@ const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildr
     AuthenticatedPortalPresenciaRoute: AuthenticatedPortalPresenciaRoute,
     AuthenticatedPortalPropiedadRoute: AuthenticatedPortalPropiedadRoute,
     AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
+    AuthenticatedPortalEmpresasBusinessIdRoute:
+      AuthenticatedPortalEmpresasBusinessIdRoute,
     AuthenticatedPortalInvitacionesTokenRoute:
       AuthenticatedPortalInvitacionesTokenRoute,
+    AuthenticatedPortalEmpresasIndexRoute:
+      AuthenticatedPortalEmpresasIndexRoute,
     AuthenticatedPortalInvitacionesIndexRoute:
       AuthenticatedPortalInvitacionesIndexRoute,
   }
@@ -1694,13 +1740,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
