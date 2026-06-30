@@ -42,6 +42,7 @@ import { Route as AuthenticatedCuentaPerfilRouteImport } from './routes/_authent
 import { Route as AuthenticatedCuentaNotificacionesRouteImport } from './routes/_authenticated/cuenta/notificaciones'
 import { Route as AuthenticatedCuentaHistorialRouteImport } from './routes/_authenticated/cuenta/historial'
 import { Route as AuthenticatedCuentaFavoritosRouteImport } from './routes/_authenticated/cuenta/favoritos'
+import { Route as AuthenticatedCuentaConciergeRouteImport } from './routes/_authenticated/cuenta/concierge'
 import { Route as AuthenticatedCuentaCarritoRouteImport } from './routes/_authenticated/cuenta/carrito'
 import { Route as AuthenticatedCuentaActividadRouteImport } from './routes/_authenticated/cuenta/actividad'
 import { Route as AuthenticatedCmsZonasRouteImport } from './routes/_authenticated/cms/zonas'
@@ -246,6 +247,12 @@ const AuthenticatedCuentaFavoritosRoute =
     path: '/favoritos',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
+const AuthenticatedCuentaConciergeRoute =
+  AuthenticatedCuentaConciergeRouteImport.update({
+    id: '/concierge',
+    path: '/concierge',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
 const AuthenticatedCuentaCarritoRoute =
   AuthenticatedCuentaCarritoRouteImport.update({
     id: '/carrito',
@@ -424,6 +431,7 @@ export interface FileRoutesByFullPath {
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
+  '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRoute
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
@@ -480,6 +488,7 @@ export interface FileRoutesByTo {
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
+  '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRoute
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
@@ -541,6 +550,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/_authenticated/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
+  '/_authenticated/cuenta/concierge': typeof AuthenticatedCuentaConciergeRoute
   '/_authenticated/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/_authenticated/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/_authenticated/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
@@ -602,6 +612,7 @@ export interface FileRouteTypes {
     | '/cms/zonas'
     | '/cuenta/actividad'
     | '/cuenta/carrito'
+    | '/cuenta/concierge'
     | '/cuenta/favoritos'
     | '/cuenta/historial'
     | '/cuenta/notificaciones'
@@ -658,6 +669,7 @@ export interface FileRouteTypes {
     | '/cms/zonas'
     | '/cuenta/actividad'
     | '/cuenta/carrito'
+    | '/cuenta/concierge'
     | '/cuenta/favoritos'
     | '/cuenta/historial'
     | '/cuenta/notificaciones'
@@ -718,6 +730,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/zonas'
     | '/_authenticated/cuenta/actividad'
     | '/_authenticated/cuenta/carrito'
+    | '/_authenticated/cuenta/concierge'
     | '/_authenticated/cuenta/favoritos'
     | '/_authenticated/cuenta/historial'
     | '/_authenticated/cuenta/notificaciones'
@@ -1001,6 +1014,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCuentaFavoritosRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
+    '/_authenticated/cuenta/concierge': {
+      id: '/_authenticated/cuenta/concierge'
+      path: '/concierge'
+      fullPath: '/cuenta/concierge'
+      preLoaderRoute: typeof AuthenticatedCuentaConciergeRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
     '/_authenticated/cuenta/carrito': {
       id: '/_authenticated/cuenta/carrito'
       path: '/carrito'
@@ -1182,6 +1202,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedCuentaRouteRouteChildren {
   AuthenticatedCuentaActividadRoute: typeof AuthenticatedCuentaActividadRoute
   AuthenticatedCuentaCarritoRoute: typeof AuthenticatedCuentaCarritoRoute
+  AuthenticatedCuentaConciergeRoute: typeof AuthenticatedCuentaConciergeRoute
   AuthenticatedCuentaFavoritosRoute: typeof AuthenticatedCuentaFavoritosRoute
   AuthenticatedCuentaHistorialRoute: typeof AuthenticatedCuentaHistorialRoute
   AuthenticatedCuentaNotificacionesRoute: typeof AuthenticatedCuentaNotificacionesRoute
@@ -1195,6 +1216,7 @@ const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildr
   {
     AuthenticatedCuentaActividadRoute: AuthenticatedCuentaActividadRoute,
     AuthenticatedCuentaCarritoRoute: AuthenticatedCuentaCarritoRoute,
+    AuthenticatedCuentaConciergeRoute: AuthenticatedCuentaConciergeRoute,
     AuthenticatedCuentaFavoritosRoute: AuthenticatedCuentaFavoritosRoute,
     AuthenticatedCuentaHistorialRoute: AuthenticatedCuentaHistorialRoute,
     AuthenticatedCuentaNotificacionesRoute:
