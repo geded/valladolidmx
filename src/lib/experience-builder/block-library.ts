@@ -411,7 +411,120 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   categoriaCardBlock,
   rutaCardBlock,
   resenaCardBlock,
+  // Etapa 15.10.4c · Founder Cockpit Composable — bloques cockpit
+  cockpitKpiGridBlock,
+  cockpitAlertsBlock,
+  cockpitActivityStreamBlock,
 ];
+
+/* ------------------------------------------------------------------ *
+ * 4. Cockpit Fundador — Smart Blocks (Etapa 15.10.4c)
+ * Principio "Founder Cockpit Composable": el Cockpit se compone vía
+ * Block Registry; nuevos widgets se añaden registrando un nuevo
+ * contrato — sin modificar código de presentación.
+ * ------------------------------------------------------------------ */
+
+const cockpitKpiGridBlock: BlockContract = {
+  type: "vmx.cockpit.kpi-grid",
+  category: "smart",
+  version: "1.0.0",
+  display_name: "Cockpit · KPIs",
+  description:
+    "Cuadrícula de KPIs globales del Fundador (empresas, viajeros, casos, ventas).",
+  schema: {
+    title: { type: "text", label: "Título", translatable: true, default: "Visión global" },
+    window: {
+      type: "select",
+      label: "Ventana temporal",
+      default: "30d",
+      options: [
+        { value: "7d", label: "7 días" },
+        { value: "30d", label: "30 días" },
+        { value: "90d", label: "90 días" },
+        { value: "ytd", label: "Año en curso" },
+      ],
+    },
+    domain: {
+      type: "select",
+      label: "Dominio",
+      default: "all",
+      options: [
+        { value: "all", label: "Todos" },
+        { value: "marketplace", label: "Marketplace" },
+        { value: "concierge", label: "Concierge" },
+        { value: "portal", label: "Portal" },
+        { value: "cms", label: "CMS" },
+      ],
+    },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_datos_dinamicos: true,
+    soporta_personalizacion: true,
+    soporta_cache: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+  },
+  data_sources: [
+    { domain: "bea", reader: "admin.getFounderKpis", read_only: true },
+  ],
+  i18n: { translatable_fields: ["title"], fallback: "base_language" },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: [] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const cockpitAlertsBlock: BlockContract = {
+  type: "vmx.cockpit.alerts",
+  category: "smart",
+  version: "1.0.0",
+  display_name: "Cockpit · Alertas",
+  description:
+    "Stream de alertas críticas del Fundador (umbral KPI, SLA, pagos, accesos).",
+  schema: {
+    title: { type: "text", label: "Título", translatable: true, default: "Alertas" },
+    limit: { type: "number", label: "Máximo de items", default: 10 },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_datos_dinamicos: true,
+    soporta_personalizacion: true,
+    soporta_cache: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+  },
+  data_sources: [
+    { domain: "bea", reader: "notifications.listMyDeliveries", read_only: true },
+  ],
+  i18n: { translatable_fields: ["title"], fallback: "base_language" },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: [] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const cockpitActivityStreamBlock: BlockContract = {
+  type: "vmx.cockpit.activity-stream",
+  category: "smart",
+  version: "1.0.0",
+  display_name: "Cockpit · Actividad",
+  description: "Flujo cronológico de eventos operativos relevantes.",
+  schema: {
+    title: { type: "text", label: "Título", translatable: true, default: "Actividad reciente" },
+    limit: { type: "number", label: "Máximo de items", default: 20 },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_datos_dinamicos: true,
+    soporta_personalizacion: true,
+    soporta_cache: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+  },
+  data_sources: [
+    { domain: "bea", reader: "observability.activityStream", read_only: true },
+  ],
+  i18n: { translatable_fields: ["title"], fallback: "base_language" },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: [] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
 
 let bootstrapped = false;
 
