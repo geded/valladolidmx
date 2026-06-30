@@ -6,7 +6,8 @@
  * head() emite título, descripción y OG/Twitter propios del listado.
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import {
   listMarketplaceBusinesses,
@@ -22,35 +23,30 @@ export const Route = createFileRoute("/marketplace/")({
     const businesses = await listMarketplaceBusinesses();
     return { businesses };
   },
-  head: () => ({
-    meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
-      { property: "og:type", content: "website" },
-      { name: "twitter:title", content: TITLE },
-      { name: "twitter:description", content: DESCRIPTION },
-    ],
-    links: [{ rel: "canonical", href: `${SITE.url}/marketplace` }],
-  }),
+  head: () =>
+    buildPublicHead({
+      title: TITLE,
+      description: DESCRIPTION,
+      path: "/marketplace",
+      ogType: "website",
+    }),
   component: MarketplaceIndex,
   errorComponent: ({ error }) => (
-    <PageShell title="Marketplace no disponible" crumbs={[{ label: "Marketplace" }]}>
+    <PublicShell title="Marketplace no disponible" crumbs={[{ label: "Marketplace" }]}>
       <p className="text-sm text-muted-foreground">{String(error.message)}</p>
-    </PageShell>
+    </PublicShell>
   ),
   notFoundComponent: () => (
-    <PageShell title="Marketplace no disponible" crumbs={[{ label: "Marketplace" }]}>
+    <PublicShell title="Marketplace no disponible" crumbs={[{ label: "Marketplace" }]}>
       <p className="text-sm text-muted-foreground">No hay empresas publicadas aún.</p>
-    </PageShell>
+    </PublicShell>
   ),
 });
 
 function MarketplaceIndex() {
   const { businesses } = Route.useLoaderData();
   return (
-    <PageShell
+    <PublicShell
       eyebrow="Marketplace"
       title="Empresas y experiencias publicadas"
       description="Vitrina pública del destino. Etapa 1 — infraestructura."
@@ -67,7 +63,7 @@ function MarketplaceIndex() {
           ))}
         </ul>
       )}
-    </PageShell>
+    </PublicShell>
   );
 }
 

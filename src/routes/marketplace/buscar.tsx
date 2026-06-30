@@ -7,7 +7,8 @@
  * paginación. Lectura read-only, sin sesión y sin acceso a tablas crudas.
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import {
   searchMarketplace,
@@ -68,29 +69,24 @@ export const Route = createFileRoute("/marketplace/buscar")({
     });
     return { result, page };
   },
-  head: () => ({
-    meta: [
-      { title: TITLE },
-      { name: "description", content: DESCRIPTION },
-      { name: "robots", content: "noindex,follow" },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESCRIPTION },
-      { property: "og:type", content: "website" },
-      { name: "twitter:title", content: TITLE },
-      { name: "twitter:description", content: DESCRIPTION },
-    ],
-    links: [{ rel: "canonical", href: `${SITE.url}/marketplace/buscar` }],
-  }),
+  head: () =>
+    buildPublicHead({
+      title: TITLE,
+      description: DESCRIPTION,
+      path: "/marketplace/buscar",
+      ogType: "website",
+      robots: "noindex,follow",
+    }),
   component: MarketplaceSearchPage,
   errorComponent: ({ error }) => (
-    <PageShell title="Búsqueda no disponible" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}>
+    <PublicShell title="Búsqueda no disponible" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}>
       <p className="text-sm text-muted-foreground">{String(error.message)}</p>
-    </PageShell>
+    </PublicShell>
   ),
   notFoundComponent: () => (
-    <PageShell title="Sin resultados" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}>
+    <PublicShell title="Sin resultados" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}>
       <p className="text-sm text-muted-foreground">No encontramos coincidencias.</p>
-    </PageShell>
+    </PublicShell>
   ),
 });
 
@@ -100,7 +96,7 @@ function MarketplaceSearchPage() {
   const totalPages = Math.max(1, Math.ceil(result.total / PAGE_SIZE));
 
   return (
-    <PageShell
+    <PublicShell
       eyebrow="Marketplace"
       title="Buscar en el catálogo"
       description="Productos, experiencias y promociones publicadas."
@@ -197,7 +193,7 @@ function MarketplaceSearchPage() {
           to={{ ...search, page: page + 1 }}
         />
       </nav>
-    </PageShell>
+    </PublicShell>
   );
 }
 

@@ -1,18 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { Hero } from "@/components/home/Hero";
-import { DestinosSection } from "@/components/home/DestinosSection";
-import { CategoriasSection } from "@/components/home/CategoriasSection";
-import { RutasSection } from "@/components/home/RutasSection";
-import { ConsejoAluxSection } from "@/components/home/ConsejoAluxSection";
-import { ArmaTuViajeSection } from "@/components/home/ArmaTuViajeSection";
-import { EnVivoSection } from "@/components/home/EnVivoSection";
-import { EmpresasSection } from "@/components/home/EmpresasSection";
-import { ResenasSection } from "@/components/home/ResenasSection";
 import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
+import {
+  getDiscoverySection,
+  type DiscoverySectionKind,
+} from "@/lib/discovery/sections-registry";
 
 const publishedHomeQuery = queryOptions({
   queryKey: ["eb", "published-home", "default"],
@@ -21,14 +18,13 @@ const publishedHomeQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: `${SITE.name} — Despierta en Valladolid y descubre el Oriente Maya` },
-      { name: "description", content: SITE.default_description },
-      { property: "og:title", content: `${SITE.name} — Despierta en Valladolid y descubre el Oriente Maya` },
-      { property: "og:description", content: SITE.default_description },
-    ],
-  }),
+  head: () =>
+    buildPublicHead({
+      title: `${SITE.name} — Despierta en Valladolid y descubre el Oriente Maya`,
+      description: SITE.default_description,
+      path: "/",
+      ogType: "website",
+    }),
   loader: async ({ context }) => {
     // Prefetch para SSR; nunca lanza — getPublishedHomeComposition cae a null
     // ante cualquier error, garantizando que la Home siempre cargue.
@@ -51,9 +47,9 @@ function HomePage() {
 
   if (published?.snapshot) {
     return (
-      <main id="main">
+      <PublicShell variant="hero">
         <CompositionRenderer tree={published.snapshot} pageType="home" />
-      </main>
+      </PublicShell>
     );
   }
 
@@ -64,18 +60,29 @@ function HomePage() {
  * LegacyHome — Fallback hardcodeado (Doc 12). Se conserva hasta que la
  * composición de Home esté publicada y validada en producción.
  */
+/**
+ * Orden canónico de bloques del fallback Home — Discovery Sections Registry
+ * es la única fuente de verdad para los componentes.
+ */
+const HOME_FALLBACK_SECTIONS: readonly DiscoverySectionKind[] = [
+  "hero",
+  "destinos",
+  "categorias",
+  "rutas",
+  "consejo-alux",
+  "arma-tu-viaje",
+  "en-vivo",
+  "empresas",
+  "resenas",
+];
+
 function LegacyHome() {
   return (
-    <main id="main">
-      <Hero />
-      <DestinosSection />
-      <CategoriasSection />
-      <RutasSection />
-      <ConsejoAluxSection />
-      <ArmaTuViajeSection />
-      <EnVivoSection />
-      <EmpresasSection />
-      <ResenasSection />
-    </main>
+    <PublicShell variant="hero">
+      {HOME_FALLBACK_SECTIONS.map((kind) => {
+        const Section = getDiscoverySection(kind).component;
+        return <Section key={kind} />;
+      })}
+    </PublicShell>
   );
 }

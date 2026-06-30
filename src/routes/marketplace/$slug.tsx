@@ -5,7 +5,8 @@
  * título/descripción propios y JSON-LD LocalBusiness derivado del loader.
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
 import { ProductActions } from "@/components/marketplace/ProductActions";
@@ -27,37 +28,32 @@ export const Route = createFileRoute("/marketplace/$slug")({
     const b = loaderData.business;
     const title = `${b.display_name} — ${SITE.name}`;
     const description = b.tagline || b.description.slice(0, 160) || `${b.display_name} en el Marketplace de ${SITE.name}.`;
-    const jsonLd = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      name: b.display_name,
+    return buildPublicHead({
+      title,
       description,
-      url: `${SITE.url}/marketplace/${b.slug}`,
-    });
-    return {
-      meta: [
-        { title },
-        { name: "description", content: description },
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
-        { property: "og:type", content: "website" },
-        { name: "twitter:title", content: title },
-        { name: "twitter:description", content: description },
+      path: `/marketplace/${b.slug}`,
+      ogType: "website",
+      jsonLd: [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          name: b.display_name,
+          description,
+          url: `${SITE.url}/marketplace/${b.slug}`,
+        },
       ],
-      links: [{ rel: "canonical", href: `${SITE.url}/marketplace/${b.slug}` }],
-      scripts: [{ type: "application/ld+json", children: jsonLd }],
-    };
+    });
   },
   component: MarketplaceBusinessPage,
   errorComponent: ({ error }) => (
-    <PageShell title="Empresa no disponible" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "—" }]}>
+    <PublicShell title="Empresa no disponible" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "—" }]}>
       <p className="text-sm text-muted-foreground">{String(error.message)}</p>
-    </PageShell>
+    </PublicShell>
   ),
   notFoundComponent: () => (
-    <PageShell title="Empresa no encontrada" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "—" }]}>
+    <PublicShell title="Empresa no encontrada" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "—" }]}>
       <p className="text-sm text-muted-foreground">No publicamos esa empresa todavía.</p>
-    </PageShell>
+    </PublicShell>
   ),
 });
 
@@ -65,7 +61,7 @@ function MarketplaceBusinessPage() {
   const { business } = Route.useLoaderData();
   const b: MarketplaceBusinessDetail = business;
   return (
-    <PageShell
+    <PublicShell
       eyebrow="Marketplace"
       title={b.display_name}
       description={b.tagline}
@@ -146,6 +142,6 @@ function MarketplaceBusinessPage() {
           </ul>
         )}
       </section>
-    </PageShell>
+    </PublicShell>
   );
 }
