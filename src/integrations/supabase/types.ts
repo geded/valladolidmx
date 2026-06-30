@@ -5053,7 +5053,7 @@ export type Database = {
         Args: {
           _business_id?: string
           _limit?: number
-          _scope?: string
+          _scope: string
           _since?: string
         }
         Returns: {
@@ -5073,7 +5073,7 @@ export type Database = {
         Args: {
           _business_id?: string
           _limit?: number
-          _scope?: string
+          _scope: string
           _since?: string
         }
         Returns: {
@@ -5089,7 +5089,7 @@ export type Database = {
         Args: {
           _bucket?: string
           _business_id?: string
-          _scope?: string
+          _scope: string
           _since?: string
         }
         Returns: {
