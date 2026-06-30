@@ -310,15 +310,17 @@ function ExperienceBuilderStudio() {
 
   return (
     <div className="flex flex-col gap-4">
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Experience Builder · Studio v0</h1>
-          <p className="text-sm text-muted-foreground">
-            Etapa 15.10.2 — Canvas agnóstico, Layout Engine, Block Registry.
+      <header className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold sm:text-2xl">
+            Experience Builder
+          </h1>
+          <p className="text-xs text-muted-foreground sm:text-sm">
+            Studio v0 · Canvas agnóstico, Layout Engine, Block Registry.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>{status}</span>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span className="truncate">{status}</span>
           {dirty ? (
             <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-amber-700">
               Sin guardar
