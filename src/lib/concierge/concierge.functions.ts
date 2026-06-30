@@ -47,5 +47,5 @@ export const getConciergeCase = createServerFn({ method: "GET" })
       _case_id: data.caseId,
     });
     if (error) throw new Error(error.message);
-    return row as unknown;
+    return (row ?? null) as Record<string, unknown> | null;
   });
