@@ -49,7 +49,7 @@ export function ActionCard({
     </div>
   );
 
-  if (to) return <Link to={to}>{body}</Link>;
+  if (to) return <Link to={to as never}>{body}</Link>;
   return (
     <button type="button" onClick={onClick} className="block w-full">
       {body}

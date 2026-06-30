@@ -71,7 +71,7 @@ export function EntityCard({
 
   if (!to) return body;
   return (
-    <Link to={to} className="block focus:outline-none">
+    <Link to={to as never} className="block focus:outline-none">
       {body}
     </Link>
   );
