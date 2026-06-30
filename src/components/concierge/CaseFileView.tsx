@@ -17,6 +17,16 @@ import {
   releaseConciergeCase,
   setConciergeCasePriority,
 } from "@/lib/concierge/concierge.functions";
+import {
+  generateAluxSummary,
+  generateAluxProducts,
+  generateAluxProposalDraft,
+  generateAluxCommsDigest,
+  generateAluxRiskDetection,
+  generateAluxOpportunityDetection,
+  type AluxSuggestion,
+  type AluxCapability,
+} from "@/lib/concierge/alux.functions";
 
 type CaseFile = {
   case: {
@@ -131,6 +141,7 @@ export function CaseFileView({ data, hideInternal = false }: { data: unknown; hi
     <div className="grid gap-6">
       <Header f={f} />
       {internal && <SlaAssignmentPanel f={f} />}
+      {internal && <AluxAssistantPanel caseId={f.case.id} />}
       <Section title="Solicitudes">
         {f.requests.length === 0 ? (
           <Empty>Sin solicitudes registradas.</Empty>
@@ -608,6 +619,133 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
             {p}
           </button>
         ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
+ * 14.60.6 — Asistente Alux (read-only, sólo internos)
+ * ============================================================ */
+type AluxState = Partial<Record<AluxCapability, AluxSuggestion>>;
+
+const ALUX_LABELS: Record<AluxCapability, string> = {
+  summary: "Resumir expediente",
+  products: "Sugerir productos",
+  proposal_draft: "Borrador de propuesta",
+  comms_digest: "Resumen de comunicaciones",
+  risk_detection: "Detectar riesgos",
+  opportunity_detection: "Detectar oportunidades",
+};
+
+function AluxAssistantPanel({ caseId }: { caseId: string }) {
+  const summaryFn = useServerFn(generateAluxSummary);
+  const productsFn = useServerFn(generateAluxProducts);
+  const draftFn = useServerFn(generateAluxProposalDraft);
+  const commsFn = useServerFn(generateAluxCommsDigest);
+  const riskFn = useServerFn(generateAluxRiskDetection);
+  const oppFn = useServerFn(generateAluxOpportunityDetection);
+
+  const [results, setResults] = useState<AluxState>({});
+  const [busy, setBusy] = useState<AluxCapability | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function run(cap: AluxCapability) {
+    setBusy(cap);
+    setError(null);
+    try {
+      let res: AluxSuggestion;
+      switch (cap) {
+        case "summary":
+          res = await summaryFn({ data: { caseId } });
+          break;
+        case "products":
+          res = await productsFn({ data: { caseId } });
+          break;
+        case "proposal_draft":
+          res = await draftFn({ data: { caseId, productIds: [] } });
+          break;
+        case "comms_digest":
+          res = await commsFn({ data: { caseId } });
+          break;
+        case "risk_detection":
+          res = await riskFn({ data: { caseId } });
+          break;
+        case "opportunity_detection":
+          res = await oppFn({ data: { caseId } });
+          break;
+      }
+      setResults((s) => ({ ...s, [cap]: res }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <section className="rounded-lg border border-border bg-card p-4">
+      <header className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="text-sm font-semibold">Asistente Alux</h3>
+          <p className="text-[11px] text-muted-foreground">
+            Copiloto operativo en modo consultivo. Toda acción la ejecutas tú.
+          </p>
+        </div>
+        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+          read-only
+        </span>
+      </header>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {(Object.keys(ALUX_LABELS) as AluxCapability[]).map((cap) => (
+          <button
+            key={cap}
+            type="button"
+            disabled={busy !== null}
+            onClick={() => run(cap)}
+            className="rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-50"
+          >
+            {busy === cap ? "Generando…" : ALUX_LABELS[cap]}
+          </button>
+        ))}
+      </div>
+      {error && (
+        <p className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive">
+          {error}
+        </p>
+      )}
+      <div className="mt-4 grid gap-3">
+        {(Object.keys(results) as AluxCapability[]).map((cap) => {
+          const r = results[cap]!;
+          return (
+            <article
+              key={cap}
+              className="rounded-md border border-dashed border-border bg-background/60 p-3"
+            >
+              <header className="mb-2 flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+                <span className="font-semibold uppercase tracking-wide text-foreground">
+                  {ALUX_LABELS[cap]}
+                </span>
+                <span>
+                  {r.model} · {r.latency_ms} ms
+                </span>
+              </header>
+              <pre className="whitespace-pre-wrap break-words text-xs text-foreground/90">
+                {r.text}
+              </pre>
+              <footer className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[10px] text-muted-foreground">
+                <span>{r.disclaimer}</span>
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard?.writeText(r.text)}
+                  className="rounded border border-border bg-card px-2 py-0.5 hover:bg-muted"
+                >
+                  Copiar
+                </button>
+              </footer>
+            </article>
+          );
+        })}
       </div>
     </section>
   );
