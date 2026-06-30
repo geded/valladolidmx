@@ -16,4 +16,3 @@
  * componente, manteniendo la API estable.
  */
 export { SiteHeader as PublicHeader } from "@/components/layout/SiteHeader";
-export type { default as PublicHeaderProps } from "@/components/layout/SiteHeader";
