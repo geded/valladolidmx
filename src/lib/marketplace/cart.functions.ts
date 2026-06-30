@@ -14,6 +14,10 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
+
+type Sb = SupabaseClient<Database>;
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -106,7 +110,7 @@ const ITEM_COLS =
   "id, product_id, business_id, quantity, unit_price, currency, snapshot_name, snapshot_slug";
 
 async function loadOrder(
-  supabase: ReturnType<typeof getSb>,
+  supabase: Sb,
   orderId: string,
   userId: string,
 ): Promise<OrderSummary | null> {
@@ -128,11 +132,6 @@ async function loadOrder(
     order as Record<string, unknown>,
     (items ?? []) as Record<string, unknown>[],
   );
-}
-
-type Sb = NonNullable<unknown>;
-function getSb(sb: Sb): Sb {
-  return sb;
 }
 
 /** Lectura del carrito activo del viajero (puede ser null). */
@@ -306,11 +305,11 @@ export const listMyOrders = createServerFn({ method: "GET" })
     const ids = rows.map((r) => String(r.id));
     const { data: items, error: iErr } = await context.supabase
       .from("order_items")
-      .select("order_id, " + ITEM_COLS)
+      .select(`order_id, ${ITEM_COLS}`)
       .in("order_id", ids);
     if (iErr) throw new Error(`orders_items_read_failed: ${iErr.message}`);
     const byOrder = new Map<string, Record<string, unknown>[]>();
-    for (const it of (items ?? []) as Record<string, unknown>[]) {
+    for (const it of ((items ?? []) as unknown as Record<string, unknown>[])) {
       const oid = String(it.order_id);
       if (!byOrder.has(oid)) byOrder.set(oid, []);
       byOrder.get(oid)!.push(it);
