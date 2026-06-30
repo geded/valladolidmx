@@ -1,26 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { SITE } from "@/config/site";
 
 export const Route = createFileRoute("/alux")({
-  head: () => ({
-    meta: [
-      { title: `Alux — Inteligencia del Oriente Maya · ${SITE.name}` },
-      {
-        name: "description",
-        content:
-          "Alux es la inteligencia que acompaña el trabajo del concierge humano en el Oriente Maya.",
-      },
-    ],
-  }),
+  head: () =>
+    buildPublicHead({
+      title: `Alux — Inteligencia del Oriente Maya · ${SITE.name}`,
+      description:
+        "Alux es la inteligencia que acompaña el trabajo del concierge humano en el Oriente Maya.",
+      path: "/alux",
+    }),
   component: AluxPage,
 });
 
 function AluxPage() {
   return (
-    <PageShell
+    <PublicShell
       eyebrow="Inteligencia"
       title="Alux"
       description="La inteligencia que acompaña el trabajo del concierge humano: resume expedientes, sugiere productos y prepara borradores revisables."
@@ -55,6 +53,6 @@ function AluxPage() {
           </Link>
         </div>
       </div>
-    </PageShell>
+    </PublicShell>
   );
 }
