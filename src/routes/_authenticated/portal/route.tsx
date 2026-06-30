@@ -1,10 +1,12 @@
 /**
- * /_authenticated/portal — Layout del Portal Empresarial (Ola 3 · Etapa 1).
+ * /_authenticated/portal — Workspace "portal" (Adenda 15.10.5c.3 · Ola 3).
  *
- * Aislado bajo _authenticated/portal/*. La autenticación dura ya está
- * cubierta por _authenticated (gate del proyecto). Aquí montamos:
- *  - Selector de empresa persistido en localStorage (clave dedicada).
- *  - Outlet para las subrutas del Portal.
+ * Migrado al Workspace Engine v2.0. Toda la estructura visual (sidebar,
+ * topbar, inspector, command palette, bottom-nav, sheets, toasts)
+ * proviene del Workspace Engine y de los Registries oficiales. El
+ * selector de empresa activa, la carga inicial de empresas y los
+ * mensajes de estado (loading / error / empty) se preservan 1:1 dentro
+ * del shell del workspace; no se introducen layouts paralelos.
  *
  * La autorización por empresa se valida server-side en cada server fn
  * vía has_business_access (Plan 14.30 §5.3).
@@ -14,12 +16,12 @@ import {
   createFileRoute,
   Link,
   Outlet,
-  useRouterState,
 } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
-import { BrandLogo } from "@/components/brand/BrandLogo";
+import { WorkspaceProvider } from "@/components/workspace/WorkspaceProvider";
+import { WorkspaceShell } from "@/components/workspace/WorkspaceShell";
 import {
   listMyBusinesses,
   type PortalBusinessSummary,
@@ -27,21 +29,12 @@ import {
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
-export interface PortalLayoutContext {
-  businesses: PortalBusinessSummary[];
-  activeBusinessId: string | null;
-  setActiveBusinessId: (id: string) => void;
-}
-
 export const Route = createFileRoute("/_authenticated/portal")({
   component: PortalLayout,
 });
 
 function PortalLayout() {
-  const { user, profile, signOut, roles } = useAuth();
-  const isAdmin = roles.includes("admin") || roles.includes("super_admin");
-  const isSuperAdmin = roles.includes("super_admin");
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { user } = useAuth();
   const fetchBusinesses = useServerFn(listMyBusinesses);
   const queryClient = useQueryClient();
 
@@ -86,8 +79,6 @@ function PortalLayout() {
         new CustomEvent("portal:active-business-changed", { detail: id }),
       );
     }
-    // Invalida contexto de la empresa anterior para que ninguna vista
-    // muestre datos de un business al que el usuario ya no apunta.
     if (previous && previous !== id) {
       queryClient.removeQueries({
         predicate: (q) =>
@@ -99,23 +90,6 @@ function PortalLayout() {
   const activeBusiness = useMemo(
     () => businesses.find((b) => b.business_id === activeBusinessId) ?? null,
     [businesses, activeBusinessId],
-  );
-
-  const navItems = useMemo(
-    () => [
-      { to: "/portal" as const, label: "Resumen" },
-      { to: "/portal/empresas" as const, label: "Empresas" },
-      { to: "/portal/ficha" as const, label: "Ficha pública" },
-      { to: "/portal/presencia" as const, label: "Presencia" },
-      { to: "/portal/galeria" as const, label: "Galería" },
-      { to: "/portal/catalogo" as const, label: "Catálogo" },
-      { to: "/portal/pagos" as const, label: "Pagos y visibilidad" },
-      { to: "/portal/actividad" as const, label: "Actividad" },
-      { to: "/portal/concierge" as const, label: "Concierge" },
-      { to: "/portal/invitaciones" as const, label: "Invitaciones" },
-      { to: "/portal/propiedad" as const, label: "Propiedad" },
-    ],
-    [],
   );
 
   if (isLoading) {
@@ -144,130 +118,62 @@ function PortalLayout() {
     );
   }
 
-  const ctx: PortalLayoutContext = {
-    businesses,
-    activeBusinessId,
-    setActiveBusinessId,
-  };
-
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col lg:flex-row">
-        <aside className="border-b border-border bg-card/60 px-5 py-6 lg:w-72 lg:shrink-0 lg:border-b-0 lg:border-r">
-          <div className="flex items-center gap-2">
-            <BrandLogo className="h-8 w-auto" />
-            <span className="text-sm font-semibold tracking-wide">
-              Portal Empresarial
-            </span>
-          </div>
-          <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-            Fase 2 · Ola 3
-          </p>
+    <WorkspaceProvider initialWorkspaceId="portal">
+      <WorkspaceShell title="Portal Empresarial">
+        <PortalBusinessSwitcher
+          businesses={businesses}
+          activeBusinessId={activeBusinessId}
+          activeBusiness={activeBusiness}
+          onChange={setActiveBusinessId}
+        />
+        <Outlet />
+      </WorkspaceShell>
+    </WorkspaceProvider>
+  );
+}
 
-          <div className="mt-6">
-            <label
-              htmlFor="portal-business-select"
-              className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground"
-            >
-              Empresa activa
-            </label>
-            <select
-              id="portal-business-select"
-              value={activeBusinessId ?? ""}
-              onChange={(e) => setActiveBusinessId(e.target.value)}
-              className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              {businesses.map((b) => (
-                <option key={b.business_id} value={b.business_id}>
-                  {b.display_name}
-                </option>
-              ))}
-            </select>
-            {activeBusiness && (
-              <p className="mt-2 text-[11px] text-muted-foreground">
-                Tu rol: <span className="font-semibold">{formatRole(activeBusiness.role)}</span>
-                {" · "}
-                Estado: <span className="font-semibold">{activeBusiness.status}</span>
-              </p>
-            )}
-          </div>
-
-          <nav className="mt-6 grid gap-1">
-            {navItems.map((item) => {
-              const active =
-                pathname === item.to || pathname === `${item.to}/`;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={[
-                    "flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors",
-                    active
-                      ? "bg-primary/10 font-semibold text-primary"
-                      : "text-foreground hover:bg-accent",
-                  ].join(" ")}
-                >
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="mt-8 rounded-lg border border-border bg-background p-3 text-xs">
-            <p className="font-semibold">
-              {profile?.display_name ?? user?.email}
-            </p>
-            <p className="mt-0.5 text-muted-foreground">Portal Empresarial</p>
-            {isAdmin ? (
-              <div className="mt-3 grid gap-1.5">
-                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  Atajos administración
-                </p>
-                <Link
-                  to="/admin"
-                  className="rounded-md border border-border bg-card px-3 py-1.5 text-center text-xs font-medium hover:bg-accent"
-                >
-                  Panel admin
-                </Link>
-                <Link
-                  to="/cms"
-                  className="rounded-md border border-border bg-card px-3 py-1.5 text-center text-xs font-medium hover:bg-accent"
-                >
-                  CMS
-                </Link>
-                {isSuperAdmin ? (
-                  <Link
-                    to="/concierge"
-                    className="rounded-md border border-border bg-card px-3 py-1.5 text-center text-xs font-medium hover:bg-accent"
-                  >
-                    Concierge
-                  </Link>
-                ) : null}
-                <Link
-                  to="/"
-                  className="rounded-md border border-border bg-card px-3 py-1.5 text-center text-xs font-medium hover:bg-accent"
-                >
-                  Inicio público
-                </Link>
-              </div>
-            ) : null}
-            <button
-              type="button"
-              onClick={() => void signOut()}
-              className="mt-3 w-full rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium hover:bg-accent"
-            >
-              Cerrar sesión
-            </button>
-          </div>
-        </aside>
-
-        <main className="flex-1 px-5 py-8 lg:px-10">
-          <Outlet />
-        </main>
+function PortalBusinessSwitcher({
+  businesses,
+  activeBusinessId,
+  activeBusiness,
+  onChange,
+}: {
+  businesses: PortalBusinessSummary[];
+  activeBusinessId: string | null;
+  activeBusiness: PortalBusinessSummary | null;
+  onChange: (id: string) => void;
+}) {
+  return (
+    <div className="mb-6 flex flex-col gap-2 rounded-lg border border-border bg-card/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-1">
+        <label
+          htmlFor="portal-business-select"
+          className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground"
+        >
+          Empresa activa
+        </label>
+        <select
+          id="portal-business-select"
+          value={activeBusinessId ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+        >
+          {businesses.map((b) => (
+            <option key={b.business_id} value={b.business_id}>
+              {b.display_name}
+            </option>
+          ))}
+        </select>
       </div>
-
-      {/* Contexto disponible para subrutas vía useRouteContext en etapas futuras */}
-      <PortalContextBridge value={ctx} />
+      {activeBusiness && (
+        <p className="text-[11px] text-muted-foreground sm:text-right">
+          Tu rol:{" "}
+          <span className="font-semibold">{formatRole(activeBusiness.role)}</span>
+          {" · "}Estado:{" "}
+          <span className="font-semibold">{activeBusiness.status}</span>
+        </p>
+      )}
     </div>
   );
 }
@@ -281,12 +187,6 @@ function formatRole(role: PortalBusinessSummary["role"]): string {
     admin: "administrador",
   };
   return labels[role] ?? role;
-}
-
-// Placeholder de bridge — en etapas posteriores se reemplazará por
-// useRouteContext / loader context. Por ahora sólo evita unused warning.
-function PortalContextBridge({ value: _value }: { value: PortalLayoutContext }) {
-  return null;
 }
 
 function PortalShellMessage({ title, body }: { title: string; body: string }) {
