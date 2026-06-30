@@ -33,6 +33,12 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Vista general",
     items: [
       { to: "/admin", label: "Visión global", hint: "KPIs y salud" },
+      { to: "/admin/empresas", label: "Empresas" },
+      { to: "/admin/turistas", label: "Turistas" },
+      { to: "/admin/concierge", label: "Concierge" },
+      { to: "/admin/operaciones", label: "Operaciones" },
+      { to: "/admin/ia", label: "Inteligencia (Alux)" },
+      { to: "/admin/sistema", label: "Sistema" },
     ],
   },
   {
