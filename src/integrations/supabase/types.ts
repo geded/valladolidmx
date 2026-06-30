@@ -2059,6 +2059,30 @@ export type Database = {
         }
         Relationships: []
       }
+      traveler_favorites: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_kind: Database["public"]["Enums"]["favorite_entity_kind"]
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_kind: Database["public"]["Enums"]["favorite_entity_kind"]
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_kind?: Database["public"]["Enums"]["favorite_entity_kind"]
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       traveler_profiles: {
         Row: {
           accessibility_needs: string | null
@@ -2355,6 +2379,7 @@ export type Database = {
         | "banner"
         | "promotion"
         | "review"
+      favorite_entity_kind: "business" | "product" | "promotion"
       hero_palette: "territorio" | "selva" | "cenote" | "atardecer"
       invitation_status: "pending" | "accepted" | "revoked" | "expired"
       locale_code: "es" | "en" | "fr" | "de" | "it" | "pt"
@@ -2532,6 +2557,7 @@ export const Constants = {
         "promotion",
         "review",
       ],
+      favorite_entity_kind: ["business", "product", "promotion"],
       hero_palette: ["territorio", "selva", "cenote", "atardecer"],
       invitation_status: ["pending", "accepted", "revoked", "expired"],
       locale_code: ["es", "en", "fr", "de", "it", "pt"],
