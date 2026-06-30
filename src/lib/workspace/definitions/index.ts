@@ -27,7 +27,17 @@ import {
   ShoppingCart,
   Activity,
 } from "lucide-react";
-import { Mail, KeyRound, Radio } from "lucide-react";
+import {
+  Mail,
+  KeyRound,
+  Radio,
+  Globe2,
+  Map as MapIcon,
+  Tag,
+  Package,
+  LineChart,
+  AlertTriangle,
+} from "lucide-react";
 
 import type { WorkspaceDefinition } from "../types";
 import { registerWorkspace } from "../workspace-registry";
@@ -258,16 +268,63 @@ const cms: WorkspaceDefinition = {
   roles: ["editor", "admin"],
   navigation: [
     { id: "cms.today", workspaceId: "cms", label: "Hoy", icon: LayoutDashboard, to: "/cms", group: "vista", order: 1, surfaces: ["sidebar", "bottom", "palette"], primary: true },
-    { id: "cms.empresas", workspaceId: "cms", label: "Empresas", icon: Building2, to: "/cms/empresas", group: "contenido", order: 2, surfaces: ["sidebar", "bottom", "palette"] },
-    { id: "cms.destinos", workspaceId: "cms", label: "Destinos", icon: MapPin, to: "/cms/destinos", group: "contenido", order: 3, surfaces: ["sidebar", "palette"] },
-    { id: "cms.reviews", workspaceId: "cms", label: "Reseñas", icon: Bell, to: "/cms/reviews", group: "moderacion", order: 4, surfaces: ["sidebar", "bottom", "palette"] },
-    { id: "cms.media", workspaceId: "cms", label: "Media", icon: ImageIcon, to: "/cms/media", group: "contenido", order: 5, surfaces: ["sidebar", "palette"] },
-    { id: "cms.eb", workspaceId: "cms", label: "Experience Builder", icon: Sparkles, to: "/cms/experience-builder", group: "estudio", order: 6, surfaces: ["sidebar", "palette"] },
+    { id: "cms.regiones", workspaceId: "cms", label: "Regiones", icon: Globe2, to: "/cms/regiones", group: "territorio", order: 2, surfaces: ["sidebar", "palette"] },
+    { id: "cms.destinos", workspaceId: "cms", label: "Destinos", icon: MapPin, to: "/cms/destinos", group: "territorio", order: 3, surfaces: ["sidebar", "palette"] },
+    { id: "cms.zonas", workspaceId: "cms", label: "Zonas", icon: MapIcon, to: "/cms/zonas", group: "territorio", order: 4, surfaces: ["sidebar", "palette"] },
+    { id: "cms.categorias", workspaceId: "cms", label: "Categorías", icon: Tag, to: "/cms/categorias", group: "territorio", order: 5, surfaces: ["sidebar", "palette"] },
+    { id: "cms.empresas", workspaceId: "cms", label: "Empresas", icon: Building2, to: "/cms/empresas", group: "contenido", order: 6, surfaces: ["sidebar", "bottom", "palette"] },
+    { id: "cms.productos", workspaceId: "cms", label: "Productos", icon: Package, to: "/cms/productos", group: "contenido", order: 7, surfaces: ["sidebar", "palette"] },
+    { id: "cms.media", workspaceId: "cms", label: "Media", icon: ImageIcon, to: "/cms/media", group: "contenido", order: 8, surfaces: ["sidebar", "bottom", "palette"] },
+    { id: "cms.reviews", workspaceId: "cms", label: "Reseñas", icon: Bell, to: "/cms/reviews", group: "moderacion", order: 9, surfaces: ["sidebar", "bottom", "palette"] },
+    { id: "cms.pagos", workspaceId: "cms", label: "Pagos", icon: CreditCard, to: "/cms/pagos", group: "operacion", order: 10, surfaces: ["sidebar", "palette"] },
+    { id: "cms.observabilidad", workspaceId: "cms", label: "Observabilidad", icon: LineChart, to: "/cms/observabilidad", group: "operacion", order: 11, surfaces: ["sidebar", "palette"] },
+    { id: "cms.alertas", workspaceId: "cms", label: "Alertas", icon: AlertTriangle, to: "/cms/alertas", group: "operacion", order: 12, surfaces: ["sidebar", "palette"] },
+    { id: "cms.actividad", workspaceId: "cms", label: "Actividad", icon: Activity, to: "/cms/actividad", group: "operacion", order: 13, surfaces: ["sidebar", "palette"] },
+    { id: "cms.eb", workspaceId: "cms", label: "Experience Builder", icon: Sparkles, to: "/cms/experience-builder", group: "estudio", order: 14, surfaces: ["sidebar", "palette"] },
   ],
   alux: {
     headline: "12 reseñas esperan moderación. 3 son urgentes.",
+    summary:
+      "Pulso editorial: cola de moderación, contenido pendiente de publicación y actividad del estudio.",
     suggestedActions: () => [
-      { id: "moderate-urgent", label: "Moderar las 3 reseñas urgentes", impact: "high", run: () => void 0 },
+      {
+        id: "moderate-urgent",
+        label: "Moderar las 3 reseñas urgentes",
+        impact: "high",
+        rationale:
+          "Tres reseñas marcadas urgentes por riesgo reputacional o sensibilidad detectada por moderación automática.",
+        sources: [
+          { id: "src.queue", label: "Cola de moderación", kind: "metric", value: 3 },
+          { id: "src.risk", label: "Riesgo detectado", kind: "rule", value: "alto" },
+        ],
+        effect: "Abre la bandeja de reseñas filtrada por urgentes.",
+        reversible: true,
+        confirm: "soft",
+        run: () => void 0,
+      },
+    ],
+  },
+  aluxCapabilities: [
+    { id: "cms.moderation.read", label: "Leer cola de moderación" },
+    { id: "cms.content.read", label: "Leer estado editorial" },
+  ],
+  context: {
+    workspaceId: "cms",
+    entities: [
+      { type: "review", label: "Reseña" },
+      { type: "business", label: "Empresa" },
+      { type: "destination", label: "Destino" },
+      { type: "region", label: "Región" },
+      { type: "category", label: "Categoría" },
+      { type: "product", label: "Producto" },
+      { type: "media", label: "Media" },
+      { type: "page", label: "Página" },
+    ],
+    selectionModes: ["single", "multi"],
+    views: [
+      { id: "list", label: "Lista", kind: "list" },
+      { id: "editor", label: "Editor", kind: "detail" },
+      { id: "studio", label: "Estudio", kind: "board" },
     ],
   },
 };
