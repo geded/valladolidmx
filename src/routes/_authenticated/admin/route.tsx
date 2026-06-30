@@ -18,16 +18,59 @@ import { ROLE_LABELS, type AppRole } from "@/types/auth";
 const ADMIN_ROLES: AppRole[] = ["super_admin", "admin"];
 
 interface NavItem {
-  to: "/admin" | "/cms" | "/concierge" | "/portal";
+  to: string;
   label: string;
-  external?: boolean;
+  hint?: string;
 }
 
-const NAV: NavItem[] = [
-  { to: "/admin", label: "Visión global" },
-  { to: "/cms", label: "CMS Studio" },
-  { to: "/concierge", label: "Concierge" },
-  { to: "/portal", label: "Portal Empresarial" },
+interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Vista general",
+    items: [
+      { to: "/admin", label: "Visión global", hint: "KPIs y salud" },
+    ],
+  },
+  {
+    label: "Operación",
+    items: [
+      { to: "/cms/pagos", label: "Pagos y órdenes" },
+      { to: "/portal/empresas", label: "Empresas (super)" },
+      { to: "/cms/observabilidad", label: "Observabilidad" },
+      { to: "/cms/alertas", label: "Alertas" },
+      { to: "/cms/actividad", label: "Centro de actividad" },
+    ],
+  },
+  {
+    label: "Contenido",
+    items: [
+      { to: "/cms/experience-builder", label: "Constructor de páginas", hint: "Editar Home" },
+      { to: "/cms/empresas", label: "Empresas (CMS)" },
+      { to: "/cms/productos", label: "Productos" },
+      { to: "/cms/destinos", label: "Destinos" },
+      { to: "/cms/regiones", label: "Regiones" },
+      { to: "/cms/categorias", label: "Categorías" },
+      { to: "/cms/media", label: "Media" },
+    ],
+  },
+  {
+    label: "Comunidad",
+    items: [
+      { to: "/cms/reviews", label: "Reseñas / moderación" },
+      { to: "/concierge", label: "Concierge" },
+    ],
+  },
+  {
+    label: "Áreas",
+    items: [
+      { to: "/cms", label: "CMS Studio (todo)" },
+      { to: "/portal", label: "Portal empresarial" },
+    ],
+  },
 ];
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -75,23 +118,40 @@ function AdminLayout() {
           </p>
 
           <nav className="mt-6 grid gap-1">
-            {NAV.map((item) => {
-              const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={[
-                    "flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors",
-                    active
-                      ? "bg-primary/10 font-semibold text-primary"
-                      : "text-foreground hover:bg-accent",
-                  ].join(" ")}
-                >
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
+            {NAV_GROUPS.map((group) => (
+              <div key={group.label} className="mb-3">
+                <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  {group.label}
+                </p>
+                <div className="grid gap-0.5">
+                  {group.items.map((item) => {
+                    const active =
+                      pathname === item.to ||
+                      (item.to !== "/admin" && pathname.startsWith(`${item.to}/`)) ||
+                      (item.to === "/admin" && pathname === "/admin");
+                    return (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        className={[
+                          "flex items-center justify-between gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
+                          active
+                            ? "bg-primary/10 font-semibold text-primary"
+                            : "text-foreground hover:bg-accent",
+                        ].join(" ")}
+                      >
+                        <span className="truncate">{item.label}</span>
+                        {item.hint ? (
+                          <span className="shrink-0 text-[10px] text-muted-foreground">
+                            {item.hint}
+                          </span>
+                        ) : null}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
 
           <div className="mt-8 rounded-lg border border-border bg-background p-3 text-xs">
