@@ -42,6 +42,13 @@ export interface MarketplaceProductCard {
   price_currency: string;
   business_slug: string;
   business_name: string;
+  conversion_mode: string;
+  primary_action_label: string | null;
+  secondary_action_mode: string | null;
+  secondary_action_label: string | null;
+  accepts_online_payment: boolean;
+  requires_availability: boolean;
+  visibility_level: string;
 }
 
 export interface MarketplacePromotionCard {
@@ -155,7 +162,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
     const [{ data: products, error: pErr }, { data: promos, error: prErr }] = await Promise.all([
       supabase
         .from("products")
-        .select("id, slug, name, tagline, product_type, price_amount, price_currency, status, deleted_at")
+        .select("id, slug, name, tagline, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level")
         .eq("business_id", biz.id)
         .eq("status", "published")
         .is("deleted_at", null)
@@ -195,6 +202,16 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         price_currency: p.price_currency,
         business_slug: biz.slug,
         business_name: biz.display_name,
+        conversion_mode: String((p as Record<string, unknown>).conversion_mode ?? "informacion"),
+        primary_action_label:
+          ((p as Record<string, unknown>).primary_action_label as string | null) ?? null,
+        secondary_action_mode:
+          ((p as Record<string, unknown>).secondary_action_mode as string | null) ?? null,
+        secondary_action_label:
+          ((p as Record<string, unknown>).secondary_action_label as string | null) ?? null,
+        accepts_online_payment: Boolean((p as Record<string, unknown>).accepts_online_payment),
+        requires_availability: Boolean((p as Record<string, unknown>).requires_availability),
+        visibility_level: String((p as Record<string, unknown>).visibility_level ?? "standard"),
       })),
       promotions: (promos ?? []).map((p) => ({
         id: p.id,
