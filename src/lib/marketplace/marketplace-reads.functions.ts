@@ -276,7 +276,9 @@ export const searchMarketplace = createServerFn({ method: "GET" })
       // 14.40.7 — alerta funcional: error crítico en API pública.
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        await supabaseAdmin.rpc("raise_system_alert", {
+        await (supabaseAdmin.rpc as unknown as (
+          fn: string, args: Record<string, unknown>,
+        ) => Promise<unknown>)("raise_system_alert", {
           p_kind: "api.search_marketplace.error",
           p_severity: "critical",
           p_message: `search_marketplace falló: ${error.message}`,
