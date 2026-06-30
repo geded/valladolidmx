@@ -395,6 +395,9 @@ function ExperienceBuilderStudio() {
           compositions={compositions}
           onOpen={openComposition}
           onCreate={onCreate}
+          librarySize={library.length}
+          onSyncLibrary={isAdmin ? () => void runSyncLibrary() : undefined}
+          syncing={syncing}
         />
       ) : (
         <div className="grid grid-cols-12 gap-4">
@@ -651,13 +654,34 @@ function CompositionsList({
   compositions,
   onOpen,
   onCreate,
+  librarySize,
+  onSyncLibrary,
+  syncing,
 }: {
   compositions: CompositionSummary[];
   onOpen: (id: string) => void;
   onCreate: () => void;
+  librarySize: number;
+  onSyncLibrary?: () => void;
+  syncing?: boolean;
 }) {
   return (
     <div className="rounded-lg border border-border bg-card/40 p-4">
+      {librarySize === 0 && onSyncLibrary ? (
+        <div className="mb-3 flex flex-col gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-900 sm:flex-row sm:items-center sm:justify-between">
+          <span>
+            La Biblioteca de bloques está vacía. Sincronízala antes de editar.
+          </span>
+          <button
+            type="button"
+            onClick={onSyncLibrary}
+            disabled={syncing}
+            className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+          >
+            {syncing ? "Sincronizando…" : "Sincronizar Biblioteca"}
+          </button>
+        </div>
+      ) : null}
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold">Composiciones</h2>
         <button
