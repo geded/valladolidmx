@@ -305,7 +305,9 @@ export const searchMarketplace = createServerFn({ method: "GET" })
     try {
       const duration = Date.now() - startedAt;
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await supabaseAdmin.rpc("record_search_metric", {
+      await (supabaseAdmin.rpc as unknown as (
+        fn: string, args: Record<string, unknown>,
+      ) => Promise<unknown>)("record_search_metric", {
         p_q: data.q,
         p_destination_slug: data.destination_slug,
         p_category_slug: data.category_slug,
