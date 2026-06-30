@@ -18,7 +18,7 @@ function getStripe(): Stripe {
   if (!key) {
     throw new Error("stripe_secret_key_missing");
   }
-  return new Stripe(key, { apiVersion: "2024-12-18.acacia" as Stripe.StripeConfig["apiVersion"] });
+  return new Stripe(key, { apiVersion: "2026-06-24.dahlia" });
 }
 
 function toMinorUnits(amount: number, currency: string): number {
