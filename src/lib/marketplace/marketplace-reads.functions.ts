@@ -254,6 +254,7 @@ export const searchMarketplace = createServerFn({ method: "GET" })
   })
   .handler(async ({ data }): Promise<MarketplaceSearchResult> => {
     const supabase = publicClient();
+    const startedAt = Date.now();
     // El tipo generado puede no haberse regenerado tras la migración;
     // se llama vía cast acotado y se valida la forma del resultado.
     const { data: rows, error } = await (supabase.rpc as unknown as (
@@ -271,7 +272,19 @@ export const searchMarketplace = createServerFn({ method: "GET" })
         p_offset: data.offset,
       },
     );
-    if (error) throw new Error(`marketplace_search_failed: ${error.message}`);
+    if (error) {
+      // 14.40.7 — alerta funcional: error crítico en API pública.
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        await supabaseAdmin.rpc("raise_system_alert", {
+          p_kind: "api.search_marketplace.error",
+          p_severity: "critical",
+          p_message: `search_marketplace falló: ${error.message}`,
+          p_payload: { q: data.q ?? null },
+        });
+      } catch { /* la observabilidad nunca rompe el flujo */ }
+      throw new Error(`marketplace_search_failed: ${error.message}`);
+    }
     const list = (Array.isArray(rows) ? rows : []) as Array<Record<string, unknown>>;
     const total = list.length > 0 ? Number(list[0].total_count ?? 0) : 0;
     const items: MarketplaceSearchHit[] = list.map((r) => ({
@@ -288,5 +301,18 @@ export const searchMarketplace = createServerFn({ method: "GET" })
       destination_slug: r.destination_slug ? String(r.destination_slug) : "",
       category_slug: r.category_slug ? String(r.category_slug) : "",
     }));
+    // 14.40.7 — telemetría de búsqueda (no bloqueante).
+    try {
+      const duration = Date.now() - startedAt;
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.rpc("record_search_metric", {
+        p_q: data.q,
+        p_destination_slug: data.destination_slug,
+        p_category_slug: data.category_slug,
+        p_result_count: total,
+        p_duration_ms: duration,
+        p_user_id: null,
+      });
+    } catch { /* la observabilidad nunca rompe el flujo */ }
     return { items, total, limit: data.limit, offset: data.offset };
   });
