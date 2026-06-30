@@ -4275,6 +4275,13 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_assign_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _target_user_id: string
+        }
+        Returns: undefined
+      }
       admin_evaluate_functional_alerts: {
         Args: { p_window_minutes?: number }
         Returns: Json
@@ -4304,6 +4311,17 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_list_users_with_roles: {
+        Args: never
+        Returns: {
+          created_at: string
+          display_name: string
+          email: string
+          last_sign_in_at: string
+          roles: Database["public"]["Enums"]["app_role"][]
+          user_id: string
+        }[]
+      }
       admin_marketplace_funnel: { Args: { p_days?: number }; Returns: Json }
       admin_resolve_system_alert: {
         Args: { p_id: string }
@@ -4329,6 +4347,13 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      admin_revoke_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _target_user_id: string
+        }
+        Returns: undefined
       }
       admin_search_metrics_summary: { Args: { p_days?: number }; Returns: Json }
       admin_top_products: {
