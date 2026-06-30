@@ -3574,6 +3574,7 @@ export type Database = {
         | "editor"
         | "admin"
         | "super_admin"
+        | "concierge_lead"
       business_user_role: "owner" | "manager" | "editor" | "viewer"
       content_status:
         | "draft"
@@ -3792,6 +3793,7 @@ export const Constants = {
         "editor",
         "admin",
         "super_admin",
+        "concierge_lead",
       ],
       business_user_role: ["owner", "manager", "editor", "viewer"],
       content_status: [
