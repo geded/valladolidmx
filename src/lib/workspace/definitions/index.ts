@@ -49,13 +49,69 @@ const founder: WorkspaceDefinition = {
     headline: "Hoy hay 3 decisiones de alto impacto esperándote.",
     summary: "Resumen del pulso del negocio: reservas, alertas y empresas pendientes de revisión.",
     suggestedActions: () => [
-      { id: "approve-pending-reviews", label: "Aprobar reseñas pendientes", impact: "high", run: () => void 0 },
-      { id: "open-today", label: "Abrir vista Hoy", impact: "low", run: () => void 0 },
+      {
+        id: "approve-pending-reviews",
+        label: "Aprobar 3 reseñas pendientes",
+        impact: "high",
+        rationale:
+          "Hay 3 reseñas con sentimiento positivo y sin riesgo detectado por moderación automática.",
+        sources: [
+          { id: "src.queue", label: "Cola de moderación", kind: "metric", value: 3 },
+          { id: "src.sent", label: "Sentimiento", kind: "rule", value: "positivo" },
+        ],
+        effect: "Las reseñas quedarán publicadas inmediatamente en el sitio.",
+        reversible: true,
+        confirm: "soft",
+        run: () => void 0,
+        undo: () => void 0,
+      },
+      {
+        id: "open-today",
+        label: "Abrir vista Hoy",
+        impact: "low",
+        rationale: "Atajo a la vista operativa principal.",
+        effect: "Navega a /admin.",
+        run: () => void 0,
+      },
     ],
   },
   aluxCapabilities: [
     { id: "founder.pulse.read", label: "Leer pulso del día" },
   ],
+  context: {
+    workspaceId: "founder",
+    entities: [
+      { type: "review", label: "Reseña" },
+      { type: "business", label: "Empresa" },
+      { type: "alert", label: "Alerta" },
+    ],
+    selectionModes: ["single", "multi"],
+    views: [
+      { id: "today", label: "Hoy", kind: "list" },
+      { id: "board", label: "Tablero", kind: "board" },
+    ],
+    inspectors: [
+      {
+        entityType: "review",
+        render: (e) => `Inspector de reseña ${e.label ?? e.id}`,
+      },
+    ],
+    quickActions: [
+      {
+        id: "founder.approve",
+        label: "Aprobar selección",
+        scope: "selection",
+        run: () => void 0,
+      },
+      {
+        id: "founder.open",
+        label: "Abrir detalle",
+        scope: "entity",
+        entityTypes: ["review", "business"],
+        run: () => void 0,
+      },
+    ],
+  },
 };
 
 const portal: WorkspaceDefinition = {

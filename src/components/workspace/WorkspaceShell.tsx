@@ -11,6 +11,9 @@ import { WorkspaceTopbar } from "./WorkspaceTopbar";
 import { WorkspaceInspector } from "./WorkspaceInspector";
 import { CommandPalette } from "./CommandPalette";
 import { useWorkspaceBreakpoint } from "./hooks/useWorkspaceBreakpoint";
+import { WorkspaceContextProvider } from "./context/WorkspaceContextProvider";
+import { SheetStackProvider } from "./sheets/SheetStackProvider";
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 
 export interface WorkspaceShellProps {
@@ -33,21 +36,26 @@ export function WorkspaceShell({
   const showSidebar = bp !== "xs" && bp !== "sm";
 
   return (
-    <div className={cn("flex h-[100dvh] w-full bg-background text-foreground", className)}>
-      {showSidebar ? <WorkspaceSidebar /> : null}
-      <div className="flex min-w-0 flex-1 flex-col">
-        <WorkspaceTopbar title={title} />
-        <main
-          id="main"
-          className="min-h-0 flex-1 overflow-y-auto"
-          style={{ paddingBottom: bp === "xs" || bp === "sm" ? "calc(56px + env(safe-area-inset-bottom))" : undefined }}
-        >
-          <div className="mx-auto w-full max-w-[1400px] p-4 md:p-6">{children}</div>
-        </main>
-      </div>
-      {showInspector ? <WorkspaceInspector>{inspector}</WorkspaceInspector> : null}
-      {!showSidebar ? <WorkspaceBottomNav /> : null}
-      <CommandPalette />
-    </div>
+    <WorkspaceContextProvider>
+      <SheetStackProvider>
+        <div className={cn("flex h-[100dvh] w-full bg-background text-foreground", className)}>
+          {showSidebar ? <WorkspaceSidebar /> : null}
+          <div className="flex min-w-0 flex-1 flex-col">
+            <WorkspaceTopbar title={title} />
+            <main
+              id="main"
+              className="min-h-0 flex-1 overflow-y-auto"
+              style={{ paddingBottom: bp === "xs" || bp === "sm" ? "calc(56px + env(safe-area-inset-bottom))" : undefined }}
+            >
+              <div className="mx-auto w-full max-w-[1400px] p-4 md:p-6">{children}</div>
+            </main>
+          </div>
+          {showInspector ? <WorkspaceInspector>{inspector}</WorkspaceInspector> : null}
+          {!showSidebar ? <WorkspaceBottomNav /> : null}
+          <CommandPalette />
+          <Toaster position="top-right" richColors closeButton />
+        </div>
+      </SheetStackProvider>
+    </WorkspaceContextProvider>
   );
 }

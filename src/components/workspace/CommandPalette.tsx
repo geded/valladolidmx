@@ -17,11 +17,14 @@ import {
 import { useWorkspace } from "./WorkspaceProvider";
 import { listWorkspaces } from "@/lib/workspace/workspace-registry";
 import { getNavItemsForWorkspace } from "@/lib/workspace/navigation-registry";
+import { useAvailableActions, useWorkspaceContext } from "./context/WorkspaceContextProvider";
 
 export function CommandPalette() {
   const { paletteOpen, setPaletteOpen, workspace, setActiveWorkspace } = useWorkspace();
   const navigate = useNavigate();
   const workspaces = listWorkspaces();
+  const contextActions = useAvailableActions();
+  const { workspaceId, selection, focused } = useWorkspaceContext();
 
   const navItems = useMemo(
     () => (workspace ? getNavItemsForWorkspace(workspace.id, "palette") : []),
@@ -90,6 +93,33 @@ export function CommandPalette() {
                     </CommandItem>
                   );
                 })}
+            </CommandGroup>
+          </>
+        ) : null}
+
+        {contextActions.length > 0 ? (
+          <>
+            <CommandSeparator />
+            <CommandGroup heading="Acciones contextuales">
+              {contextActions.map((a) => {
+                const Icon = a.icon;
+                return (
+                  <CommandItem
+                    key={a.id}
+                    value={`ctx ${a.label} ${a.scope}`}
+                    onSelect={() => {
+                      setPaletteOpen(false);
+                      void a.run({ workspaceId, selection, focused });
+                    }}
+                  >
+                    {Icon ? <Icon className="mr-2 h-4 w-4" aria-hidden /> : null}
+                    <span>{a.label}</span>
+                    <kbd className="ml-auto text-[10px] text-muted-foreground">
+                      {a.scope}
+                    </kbd>
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
           </>
         ) : null}
