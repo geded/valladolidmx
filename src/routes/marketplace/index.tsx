@@ -63,7 +63,7 @@ function MarketplaceIndex() {
           ))}
         </ul>
       )}
-    </PageShell>
+    </PublicShell>
   );
 }
 
