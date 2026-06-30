@@ -27,6 +27,8 @@ import {
   createCompositionRevision,
   listCompositionRevisions,
   restoreCompositionRevision,
+  publishComposition,
+  unpublishComposition,
   type CompositionDetail,
   type CompositionSummary,
   type CompositionRevisionSummary,
@@ -43,6 +45,7 @@ import {
   type CompositionTree,
 } from "@/lib/experience-builder/composition-tree";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/cms/experience-builder")({
   head: () => ({
@@ -92,6 +95,10 @@ function ExperienceBuilderStudio() {
   const listRevs = useServerFn(listCompositionRevisions);
   const restore = useServerFn(restoreCompositionRevision);
   const listLib = useServerFn(listBlockLibrary);
+  const publicPublish = useServerFn(publishComposition);
+  const publicUnpublish = useServerFn(unpublishComposition);
+  const { roles } = useAuth();
+  const isAdmin = roles.includes("admin");
 
   const [library, setLibrary] = useState<LibraryEntry[]>([]);
   const [compositions, setCompositions] = useState<CompositionSummary[]>([]);
@@ -258,6 +265,49 @@ function ExperienceBuilderStudio() {
     setStatus(`Revisión #${rev.revision_number} restaurada.`);
   };
 
+  const publishPublic = async () => {
+    if (!active) return;
+    if (!isAdmin) {
+      setStatus("Solo administradores pueden publicar.");
+      return;
+    }
+    const notes = window.prompt(
+      `Publicar "${active.title}" (${active.page_type})\n\nEsto reemplazará la versión pública actual del tipo "${active.page_type}". Notas de publicación (opcional):`,
+      "",
+    );
+    if (notes === null) return;
+    try {
+      await save({ data: { id: active.id, tree } });
+      const { revision_id } = await publicPublish({
+        data: { id: active.id, notes: notes || undefined },
+      });
+      const comps = await list();
+      setCompositions(comps);
+      await openComposition(active.id);
+      setStatus(`Publicada (rev ${revision_id.slice(0, 8)}).`);
+    } catch (e) {
+      setStatus(`Error al publicar: ${(e as Error).message}`);
+    }
+  };
+
+  const unpublishPublic = async () => {
+    if (!active) return;
+    if (!isAdmin) {
+      setStatus("Solo administradores pueden despublicar.");
+      return;
+    }
+    if (!window.confirm(`Despublicar "${active.title}"? La página volverá al Home legacy.`)) return;
+    try {
+      await publicUnpublish({ data: { id: active.id } });
+      const comps = await list();
+      setCompositions(comps);
+      await openComposition(active.id);
+      setStatus("Composición despublicada.");
+    } catch (e) {
+      setStatus(`Error al despublicar: ${(e as Error).message}`);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <header className="flex items-center justify-between">
@@ -362,11 +412,32 @@ function ExperienceBuilderStudio() {
                 <ToolbarButton onClick={publishRevision}>
                   Crear revisión
                 </ToolbarButton>
+                {isAdmin ? (
+                  <>
+                    {active.status === "published" ? (
+                      <ToolbarButton onClick={unpublishPublic}>
+                        Despublicar
+                      </ToolbarButton>
+                    ) : (
+                      <ToolbarButton onClick={publishPublic}>
+                        Publicar
+                      </ToolbarButton>
+                    )}
+                  </>
+                ) : null}
               </div>
             </div>
             <div className="rounded-md bg-card/30 p-3">
-              <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-amber-700">
-                Internal Draft — esta composición no se sirve al público.
+              <div
+                className={`mb-2 text-[11px] uppercase tracking-[0.18em] ${
+                  active.status === "published"
+                    ? "text-emerald-700"
+                    : "text-amber-700"
+                }`}
+              >
+                {active.status === "published"
+                  ? `Publicada · ${active.page_type} — sirviéndose al público.`
+                  : "Internal Draft — esta composición no se sirve al público."}
               </div>
               <div className="flex flex-col gap-3">
                 <CompositionRenderer
