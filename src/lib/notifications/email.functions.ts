@@ -50,7 +50,7 @@ export const publishEmailNotification = createServerFn({ method: "POST" })
       _audience: data.audience,
       _category: data.category,
       _template_key: data.templateKey,
-      _sender_identity: data.senderIdentity ?? null,
+      _sender_identity: data.senderIdentity ?? undefined,
       _payload_ref: (data.payloadRef ?? {}) as never,
     });
     if (error) throw error;
