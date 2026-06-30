@@ -145,7 +145,6 @@ export interface AdminBusinessCommercialStatus {
     status: string;
     verified: boolean;
     published_at: string | null;
-    metadata: Record<string, unknown>;
   };
   configuration: {
     visibility_plan: string | null;
@@ -175,6 +174,8 @@ export interface AdminBusinessCommercialStatus {
     currency: string;
   }>;
 }
+
+type VisibilityPackage = AdminBusinessCommercialStatus["visibility_packages"][number];
 
 function assertBusinessIdForAdmin(input: unknown): string {
   const id = (input as { businessId?: unknown } | null)?.businessId;
@@ -317,16 +318,16 @@ export const getAdminBusinessCommercialStatus = createServerFn({ method: "POST" 
       orders.find((order) => order.currency)?.currency ??
       "MXN";
 
-    const visibilityPackages = items
-      .map((item) => {
+    const visibilityPackages: VisibilityPackage[] = [];
+    for (const item of items) {
         const product = item.product_id ? productById.get(item.product_id) : undefined;
         const name = item.snapshot_name ?? product?.name ?? "Paquete";
         const level = product?.visibility_level ?? null;
         const looksLikeVisibilityPackage =
           level === "destacado" || level === "premium" || isVisibilityPackageName(name);
-        if (!looksLikeVisibilityPackage) return null;
+        if (!looksLikeVisibilityPackage) continue;
         const order = orderById.get(item.order_id);
-        return {
+        visibilityPackages.push({
           order_id: item.order_id,
           item_id: item.id,
           product_name: name,
@@ -337,13 +338,11 @@ export const getAdminBusinessCommercialStatus = createServerFn({ method: "POST" 
             (Number(item.quantity ?? 0) * Number(item.unit_price ?? 0)).toFixed(2),
           ),
           currency: item.currency ?? currency,
-        };
-      })
-      .filter((x): x is AdminBusinessCommercialStatus["visibility_packages"][number] =>
-        Boolean(x),
-      )
-      .sort((a, b) => Number(b.payment_status === "paid") - Number(a.payment_status === "paid"))
-      .slice(0, 20);
+        });
+      }
+    visibilityPackages.sort(
+      (a, b) => Number(b.payment_status === "paid") - Number(a.payment_status === "paid"),
+    );
 
     const metadata = metadataRecord(businessRow.metadata);
     return {
@@ -354,7 +353,6 @@ export const getAdminBusinessCommercialStatus = createServerFn({ method: "POST" 
         status: String(businessRow.status),
         verified: Boolean(businessRow.verified),
         published_at: businessRow.published_at,
-        metadata,
       },
       configuration: {
         visibility_plan: readVisibilityPlan(metadata),
@@ -375,6 +373,6 @@ export const getAdminBusinessCommercialStatus = createServerFn({ method: "POST" 
         paid_amount: Number(paidAmount.toFixed(2)),
         currency,
       },
-      visibility_packages: visibilityPackages,
+      visibility_packages: visibilityPackages.slice(0, 20),
     };
   });

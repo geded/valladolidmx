@@ -53,7 +53,7 @@ function PortalPaymentsPage() {
     [businesses, activeBusinessId],
   );
 
-  const statusQuery = useQuery({
+  const statusQuery = useQuery<AdminBusinessCommercialStatus>({
     queryKey: ["portal", "admin-commercial-status", activeBusinessId],
     queryFn: () =>
       fetchCommercialStatus({ data: { businessId: activeBusinessId as string } }),
