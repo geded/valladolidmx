@@ -62,6 +62,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
 import { Route as AuthenticatedCuentaPagosExitoRouteImport } from './routes/_authenticated/cuenta/pagos.exito'
 import { Route as AuthenticatedCuentaPagosErrorRouteImport } from './routes/_authenticated/cuenta/pagos.error'
+import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge.expedientes.$caseId'
 import { Route as AuthenticatedCmsRegionesNuevaRouteImport } from './routes/_authenticated/cms/regiones.nueva'
 import { Route as AuthenticatedCmsRegionesEditarRouteImport } from './routes/_authenticated/cms/regiones..editar'
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
@@ -363,6 +364,12 @@ const AuthenticatedCuentaPagosErrorRoute =
     path: '/pagos/error',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
+const AuthenticatedConciergeExpedientesCaseIdRoute =
+  AuthenticatedConciergeExpedientesCaseIdRouteImport.update({
+    id: '/expedientes/$caseId',
+    path: '/expedientes/$caseId',
+    getParentRoute: () => AuthenticatedConciergeRoute,
+  } as any)
 const AuthenticatedCmsRegionesNuevaRoute =
   AuthenticatedCmsRegionesNuevaRouteImport.update({
     id: '/regiones/nueva',
@@ -414,7 +421,7 @@ export interface FileRoutesByFullPath {
   '/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/cms': typeof AuthenticatedCmsRouteWithChildren
-  '/concierge': typeof AuthenticatedConciergeRoute
+  '/concierge': typeof AuthenticatedConciergeRouteWithChildren
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -449,6 +456,7 @@ export interface FileRoutesByFullPath {
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
+  '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
   '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
@@ -471,7 +479,7 @@ export interface FileRoutesByTo {
   '/hoteles': typeof HotelesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
-  '/concierge': typeof AuthenticatedConciergeRoute
+  '/concierge': typeof AuthenticatedConciergeRouteWithChildren
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -506,6 +514,7 @@ export interface FileRoutesByTo {
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
+  '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
   '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
@@ -533,7 +542,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/_authenticated/cms': typeof AuthenticatedCmsRouteWithChildren
-  '/_authenticated/concierge': typeof AuthenticatedConciergeRoute
+  '/_authenticated/concierge': typeof AuthenticatedConciergeRouteWithChildren
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -568,6 +577,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/_authenticated/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/_authenticated/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
+  '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
   '/_authenticated/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/_authenticated/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
@@ -630,6 +640,7 @@ export interface FileRouteTypes {
     | '/cms/categorias/nueva'
     | '/cms/regiones/editar'
     | '/cms/regiones/nueva'
+    | '/concierge/expedientes/$caseId'
     | '/cuenta/pagos/error'
     | '/cuenta/pagos/exito'
     | '/portal/invitaciones/$token'
@@ -687,6 +698,7 @@ export interface FileRouteTypes {
     | '/cms/categorias/nueva'
     | '/cms/regiones/editar'
     | '/cms/regiones/nueva'
+    | '/concierge/expedientes/$caseId'
     | '/cuenta/pagos/error'
     | '/cuenta/pagos/exito'
     | '/portal/invitaciones/$token'
@@ -748,6 +760,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/categorias/nueva'
     | '/_authenticated/cms/regiones/editar'
     | '/_authenticated/cms/regiones/nueva'
+    | '/_authenticated/concierge/expedientes/$caseId'
     | '/_authenticated/cuenta/pagos/error'
     | '/_authenticated/cuenta/pagos/exito'
     | '/_authenticated/portal/invitaciones/$token'
@@ -1154,6 +1167,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCuentaPagosErrorRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
+    '/_authenticated/concierge/expedientes/$caseId': {
+      id: '/_authenticated/concierge/expedientes/$caseId'
+      path: '/expedientes/$caseId'
+      fullPath: '/concierge/expedientes/$caseId'
+      preLoaderRoute: typeof AuthenticatedConciergeExpedientesCaseIdRouteImport
+      parentRoute: typeof AuthenticatedConciergeRoute
+    }
     '/_authenticated/cms/regiones/nueva': {
       id: '/_authenticated/cms/regiones/nueva'
       path: '/regiones/nueva'
@@ -1309,18 +1329,33 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
 const AuthenticatedCmsRouteWithChildren =
   AuthenticatedCmsRoute._addFileChildren(AuthenticatedCmsRouteChildren)
 
+interface AuthenticatedConciergeRouteChildren {
+  AuthenticatedConciergeExpedientesCaseIdRoute: typeof AuthenticatedConciergeExpedientesCaseIdRoute
+}
+
+const AuthenticatedConciergeRouteChildren: AuthenticatedConciergeRouteChildren =
+  {
+    AuthenticatedConciergeExpedientesCaseIdRoute:
+      AuthenticatedConciergeExpedientesCaseIdRoute,
+  }
+
+const AuthenticatedConciergeRouteWithChildren =
+  AuthenticatedConciergeRoute._addFileChildren(
+    AuthenticatedConciergeRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedCuentaRouteRoute: typeof AuthenticatedCuentaRouteRouteWithChildren
   AuthenticatedPortalRouteRoute: typeof AuthenticatedPortalRouteRouteWithChildren
   AuthenticatedCmsRoute: typeof AuthenticatedCmsRouteWithChildren
-  AuthenticatedConciergeRoute: typeof AuthenticatedConciergeRoute
+  AuthenticatedConciergeRoute: typeof AuthenticatedConciergeRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCuentaRouteRoute: AuthenticatedCuentaRouteRouteWithChildren,
   AuthenticatedPortalRouteRoute: AuthenticatedPortalRouteRouteWithChildren,
   AuthenticatedCmsRoute: AuthenticatedCmsRouteWithChildren,
-  AuthenticatedConciergeRoute: AuthenticatedConciergeRoute,
+  AuthenticatedConciergeRoute: AuthenticatedConciergeRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
