@@ -389,35 +389,6 @@ const resenaCardBlock: BlockContract = {
 };
 
 /* ------------------------------------------------------------------ *
- * Registro
- * ------------------------------------------------------------------ */
-
-export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
-  containerBlock,
-  sectionBlock,
-  spacerBlock,
-  dividerBlock,
-  heroBlock,
-  destinosBlock,
-  categoriasBlock,
-  rutasBlock,
-  consejoAluxBlock,
-  armaTuViajeBlock,
-  enVivoBlock,
-  empresasSectionBlock,
-  resenasSectionBlock,
-  destinoCardBlock,
-  empresaCardBlock,
-  categoriaCardBlock,
-  rutaCardBlock,
-  resenaCardBlock,
-  // Etapa 15.10.4c · Founder Cockpit Composable — bloques cockpit
-  cockpitKpiGridBlock,
-  cockpitAlertsBlock,
-  cockpitActivityStreamBlock,
-];
-
-/* ------------------------------------------------------------------ *
  * 4. Cockpit Fundador — Smart Blocks (Etapa 15.10.4c)
  * Principio "Founder Cockpit Composable": el Cockpit se compone vía
  * Block Registry; nuevos widgets se añaden registrando un nuevo
@@ -525,6 +496,35 @@ const cockpitActivityStreamBlock: BlockContract = {
   responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: [] },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
+
+/* ------------------------------------------------------------------ *
+ * Registro
+ * ------------------------------------------------------------------ */
+
+export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
+  containerBlock,
+  sectionBlock,
+  spacerBlock,
+  dividerBlock,
+  heroBlock,
+  destinosBlock,
+  categoriasBlock,
+  rutasBlock,
+  consejoAluxBlock,
+  armaTuViajeBlock,
+  enVivoBlock,
+  empresasSectionBlock,
+  resenasSectionBlock,
+  destinoCardBlock,
+  empresaCardBlock,
+  categoriaCardBlock,
+  rutaCardBlock,
+  resenaCardBlock,
+  // Etapa 15.10.4c · Founder Cockpit Composable — bloques cockpit
+  cockpitKpiGridBlock,
+  cockpitAlertsBlock,
+  cockpitActivityStreamBlock,
+];
 
 let bootstrapped = false;
 
