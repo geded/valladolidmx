@@ -75,7 +75,7 @@ export const Route = createFileRoute("/marketplace/buscar")({
       description: DESCRIPTION,
       path: "/marketplace/buscar",
       ogType: "website",
-      noindex: true,
+      robots: "noindex,follow",
     }),
   component: MarketplaceSearchPage,
   errorComponent: ({ error }) => (
