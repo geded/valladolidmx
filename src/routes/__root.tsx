@@ -142,6 +142,15 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const headerVariant = pathname === "/" ? "overlay" : "solid";
+  // Rutas con shell propio (CMS Studio, Portal Empresarial, Admin, Cuenta).
+  // No deben renderizar el header/footer/Alux públicos para evitar doble chrome.
+  const isAppShellRoute =
+    pathname.startsWith("/cms") ||
+    pathname.startsWith("/portal") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/cuenta") ||
+    pathname.startsWith("/concierge") ||
+    pathname.startsWith("/empresa");
 
   // Fase 0: limpia SWs huérfanos (PWA skill compliance). En fase futura,
   // este punto se cambia por registro real con vite-plugin-pwa.
@@ -159,10 +168,10 @@ function RootComponent() {
         >
           Saltar al contenido
         </a>
-        <SiteHeader variant={headerVariant} />
+        {!isAppShellRoute ? <SiteHeader variant={headerVariant} /> : null}
         <Outlet />
-        <SiteFooter />
-        <AluxFloatingTrigger />
+        {!isAppShellRoute ? <SiteFooter /> : null}
+        {!isAppShellRoute ? <AluxFloatingTrigger /> : null}
         </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>
