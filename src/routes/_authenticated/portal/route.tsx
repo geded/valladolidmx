@@ -38,7 +38,9 @@ export const Route = createFileRoute("/_authenticated/portal")({
 });
 
 function PortalLayout() {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, roles } = useAuth();
+  const isAdmin = roles.includes("admin") || roles.includes("super_admin");
+  const isSuperAdmin = roles.includes("super_admin");
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const fetchBusinesses = useServerFn(listMyBusinesses);
   const queryClient = useQueryClient();
@@ -216,6 +218,39 @@ function PortalLayout() {
               {profile?.display_name ?? user?.email}
             </p>
             <p className="mt-0.5 text-muted-foreground">Portal Empresarial</p>
+            {isAdmin ? (
+              <div className="mt-3 grid gap-1.5">
+                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                  Atajos administración
+                </p>
+                <Link
+                  to="/admin"
+                  className="rounded-md border border-border bg-card px-3 py-1.5 text-center text-xs font-medium hover:bg-accent"
+                >
+                  Panel admin
+                </Link>
+                <Link
+                  to="/cms"
+                  className="rounded-md border border-border bg-card px-3 py-1.5 text-center text-xs font-medium hover:bg-accent"
+                >
+                  CMS
+                </Link>
+                {isSuperAdmin ? (
+                  <Link
+                    to="/concierge"
+                    className="rounded-md border border-border bg-card px-3 py-1.5 text-center text-xs font-medium hover:bg-accent"
+                  >
+                    Concierge
+                  </Link>
+                ) : null}
+                <Link
+                  to="/"
+                  className="rounded-md border border-border bg-card px-3 py-1.5 text-center text-xs font-medium hover:bg-accent"
+                >
+                  Inicio público
+                </Link>
+              </div>
+            ) : null}
             <button
               type="button"
               onClick={() => void signOut()}
