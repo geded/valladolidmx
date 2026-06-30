@@ -515,7 +515,7 @@ export const setConciergeCaseTargetResponse = createServerFn({ method: "POST" })
       "concierge_case_set_target_response",
       {
         _case_id: data.caseId,
-        _target_response_at: data.targetResponseAt,
+        _target_response_at: data.targetResponseAt ?? (undefined as unknown as string),
         _reason: data.reason ?? undefined,
       },
     );
