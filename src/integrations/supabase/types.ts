@@ -1382,6 +1382,126 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_deliveries: {
+        Row: {
+          attempt_count: number
+          audience: string
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          delivered_at: string | null
+          event_id: string
+          event_type: string
+          id: string
+          last_error: string | null
+          payload_ref: Json
+          read_at: string | null
+          recipient_user_id: string | null
+          status: Database["public"]["Enums"]["notification_delivery_status"]
+          updated_at: string
+        }
+        Insert: {
+          attempt_count?: number
+          audience: string
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          delivered_at?: string | null
+          event_id: string
+          event_type: string
+          id?: string
+          last_error?: string | null
+          payload_ref?: Json
+          read_at?: string | null
+          recipient_user_id?: string | null
+          status?: Database["public"]["Enums"]["notification_delivery_status"]
+          updated_at?: string
+        }
+        Update: {
+          attempt_count?: number
+          audience?: string
+          category?: Database["public"]["Enums"]["notification_category"]
+          channel?: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          delivered_at?: string | null
+          event_id?: string
+          event_type?: string
+          id?: string
+          last_error?: string | null
+          payload_ref?: Json
+          read_at?: string | null
+          recipient_user_id?: string | null
+          status?: Database["public"]["Enums"]["notification_delivery_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notification_preferences: {
+        Row: {
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          enabled: boolean
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["notification_category"]
+          channel?: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notification_subscriptions: {
+        Row: {
+          audience: string
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          event_type: string
+          id: string
+          is_active: boolean
+          template_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          audience: string
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          event_type: string
+          id?: string
+          is_active?: boolean
+          template_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          audience?: string
+          category?: Database["public"]["Enums"]["notification_category"]
+          channel?: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          event_type?: string
+          id?: string
+          is_active?: boolean
+          template_key?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_events: {
         Row: {
           actor_user_id: string | null
@@ -2868,6 +2988,59 @@ export type Database = {
         }
         Returns: undefined
       }
+      unc_count_my_unread: { Args: never; Returns: number }
+      unc_list_my_deliveries: {
+        Args: { _limit?: number; _only_unread?: boolean }
+        Returns: {
+          attempt_count: number
+          audience: string
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          delivered_at: string | null
+          event_id: string
+          event_type: string
+          id: string
+          last_error: string | null
+          payload_ref: Json
+          read_at: string | null
+          recipient_user_id: string | null
+          status: Database["public"]["Enums"]["notification_delivery_status"]
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "notification_deliveries"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      unc_mark_delivery_read: {
+        Args: { _delivery_id: string }
+        Returns: {
+          attempt_count: number
+          audience: string
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          delivered_at: string | null
+          event_id: string
+          event_type: string
+          id: string
+          last_error: string | null
+          payload_ref: Json
+          read_at: string | null
+          recipient_user_id: string | null
+          status: Database["public"]["Enums"]["notification_delivery_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "notification_deliveries"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       update_business_media_meta: {
         Args: {
           _alt_text?: string
@@ -2958,6 +3131,18 @@ export type Database = {
       locale_code: "es" | "en" | "fr" | "de" | "it" | "pt"
       media_kind: "image" | "video" | "document" | "audio"
       membership_status: "active" | "suspended" | "removed"
+      notification_category:
+        | "transactional"
+        | "operational"
+        | "security"
+        | "marketing"
+      notification_channel: "in_app" | "email" | "push" | "webhook"
+      notification_delivery_status:
+        | "pending"
+        | "sent"
+        | "failed"
+        | "skipped"
+        | "dead_letter"
       order_event_type:
         | "created"
         | "item_added"
@@ -3167,6 +3352,20 @@ export const Constants = {
       locale_code: ["es", "en", "fr", "de", "it", "pt"],
       media_kind: ["image", "video", "document", "audio"],
       membership_status: ["active", "suspended", "removed"],
+      notification_category: [
+        "transactional",
+        "operational",
+        "security",
+        "marketing",
+      ],
+      notification_channel: ["in_app", "email", "push", "webhook"],
+      notification_delivery_status: [
+        "pending",
+        "sent",
+        "failed",
+        "skipped",
+        "dead_letter",
+      ],
       order_event_type: [
         "created",
         "item_added",
