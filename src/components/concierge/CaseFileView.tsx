@@ -17,6 +17,16 @@ import {
   releaseConciergeCase,
   setConciergeCasePriority,
 } from "@/lib/concierge/concierge.functions";
+import {
+  generateAluxSummary,
+  generateAluxProducts,
+  generateAluxProposalDraft,
+  generateAluxCommsDigest,
+  generateAluxRiskDetection,
+  generateAluxOpportunityDetection,
+  type AluxSuggestion,
+  type AluxCapability,
+} from "@/lib/concierge/alux.functions";
 
 type CaseFile = {
   case: {
@@ -131,6 +141,7 @@ export function CaseFileView({ data, hideInternal = false }: { data: unknown; hi
     <div className="grid gap-6">
       <Header f={f} />
       {internal && <SlaAssignmentPanel f={f} />}
+      {internal && <AluxAssistantPanel caseId={f.case.id} />}
       <Section title="Solicitudes">
         {f.requests.length === 0 ? (
           <Empty>Sin solicitudes registradas.</Empty>
