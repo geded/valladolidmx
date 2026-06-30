@@ -44,7 +44,7 @@ export const Route = createFileRoute("/api/public/payments/$provider/webhook")({
             provider_event_id: normalized.providerEventId,
             event_type: normalized.type,
             order_id: normalized.orderId,
-            payload: normalized.raw as unknown as Record<string, unknown>,
+            payload: JSON.parse(JSON.stringify(normalized.raw)),
           });
         if (insertErr) {
           if (insertErr.code === "23505") {
