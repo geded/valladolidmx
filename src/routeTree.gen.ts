@@ -37,6 +37,7 @@ import { Route as AuthenticatedPortalGaleriaRouteImport } from './routes/_authen
 import { Route as AuthenticatedPortalFichaRouteImport } from './routes/_authenticated/portal/ficha'
 import { Route as AuthenticatedPortalCatalogoRouteImport } from './routes/_authenticated/portal/catalogo'
 import { Route as AuthenticatedCuentaPerfilRouteImport } from './routes/_authenticated/cuenta/perfil'
+import { Route as AuthenticatedCuentaNotificacionesRouteImport } from './routes/_authenticated/cuenta/notificaciones'
 import { Route as AuthenticatedCuentaHistorialRouteImport } from './routes/_authenticated/cuenta/historial'
 import { Route as AuthenticatedCuentaFavoritosRouteImport } from './routes/_authenticated/cuenta/favoritos'
 import { Route as AuthenticatedCuentaCarritoRouteImport } from './routes/_authenticated/cuenta/carrito'
@@ -210,6 +211,12 @@ const AuthenticatedCuentaPerfilRoute =
   AuthenticatedCuentaPerfilRouteImport.update({
     id: '/perfil',
     path: '/perfil',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
+const AuthenticatedCuentaNotificacionesRoute =
+  AuthenticatedCuentaNotificacionesRouteImport.update({
+    id: '/notificaciones',
+    path: '/notificaciones',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
 const AuthenticatedCuentaHistorialRoute =
@@ -390,6 +397,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
+  '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
@@ -441,6 +449,7 @@ export interface FileRoutesByTo {
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
+  '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
@@ -497,6 +506,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/_authenticated/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/_authenticated/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
+  '/_authenticated/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/_authenticated/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/_authenticated/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/_authenticated/portal/ficha': typeof AuthenticatedPortalFichaRoute
@@ -553,6 +563,7 @@ export interface FileRouteTypes {
     | '/cuenta/carrito'
     | '/cuenta/favoritos'
     | '/cuenta/historial'
+    | '/cuenta/notificaciones'
     | '/cuenta/perfil'
     | '/portal/catalogo'
     | '/portal/ficha'
@@ -604,6 +615,7 @@ export interface FileRouteTypes {
     | '/cuenta/carrito'
     | '/cuenta/favoritos'
     | '/cuenta/historial'
+    | '/cuenta/notificaciones'
     | '/cuenta/perfil'
     | '/portal/catalogo'
     | '/portal/ficha'
@@ -659,6 +671,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/carrito'
     | '/_authenticated/cuenta/favoritos'
     | '/_authenticated/cuenta/historial'
+    | '/_authenticated/cuenta/notificaciones'
     | '/_authenticated/cuenta/perfil'
     | '/_authenticated/portal/catalogo'
     | '/_authenticated/portal/ficha'
@@ -901,6 +914,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCuentaPerfilRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
+    '/_authenticated/cuenta/notificaciones': {
+      id: '/_authenticated/cuenta/notificaciones'
+      path: '/notificaciones'
+      fullPath: '/cuenta/notificaciones'
+      preLoaderRoute: typeof AuthenticatedCuentaNotificacionesRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
     '/_authenticated/cuenta/historial': {
       id: '/_authenticated/cuenta/historial'
       path: '/historial'
@@ -1083,6 +1103,7 @@ interface AuthenticatedCuentaRouteRouteChildren {
   AuthenticatedCuentaCarritoRoute: typeof AuthenticatedCuentaCarritoRoute
   AuthenticatedCuentaFavoritosRoute: typeof AuthenticatedCuentaFavoritosRoute
   AuthenticatedCuentaHistorialRoute: typeof AuthenticatedCuentaHistorialRoute
+  AuthenticatedCuentaNotificacionesRoute: typeof AuthenticatedCuentaNotificacionesRoute
   AuthenticatedCuentaPerfilRoute: typeof AuthenticatedCuentaPerfilRoute
   AuthenticatedCuentaIndexRoute: typeof AuthenticatedCuentaIndexRoute
   AuthenticatedCuentaPagosErrorRoute: typeof AuthenticatedCuentaPagosErrorRoute
@@ -1094,6 +1115,8 @@ const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildr
     AuthenticatedCuentaCarritoRoute: AuthenticatedCuentaCarritoRoute,
     AuthenticatedCuentaFavoritosRoute: AuthenticatedCuentaFavoritosRoute,
     AuthenticatedCuentaHistorialRoute: AuthenticatedCuentaHistorialRoute,
+    AuthenticatedCuentaNotificacionesRoute:
+      AuthenticatedCuentaNotificacionesRoute,
     AuthenticatedCuentaPerfilRoute: AuthenticatedCuentaPerfilRoute,
     AuthenticatedCuentaIndexRoute: AuthenticatedCuentaIndexRoute,
     AuthenticatedCuentaPagosErrorRoute: AuthenticatedCuentaPagosErrorRoute,
