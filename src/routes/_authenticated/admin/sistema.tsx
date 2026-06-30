@@ -22,8 +22,18 @@ function AdminSistemaHub() {
       eyebrow="Panel Fundador · 15.10.4R"
       title="Sistema"
       description="Salud de plataforma, alertas, taxonomías y herramientas de composición. Cada enlace reutiliza una superficie existente."
-      domains={["Observabilidad", "UNC", "CMS", "Experience Builder"]}
+      domains={["Identidad", "Observabilidad", "UNC", "CMS", "Experience Builder"]}
       sections={[
+        {
+          title: "Identidad y permisos",
+          links: [
+            {
+              to: "/admin/sistema/usuarios",
+              label: "Usuarios y roles",
+              description: "Listar usuarios, asignar y revocar roles (super_admin).",
+            },
+          ],
+        },
         {
           title: "Salud y observabilidad",
           links: [
