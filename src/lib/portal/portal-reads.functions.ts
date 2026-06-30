@@ -173,6 +173,15 @@ export interface AdminBusinessCommercialStatus {
     amount: number;
     currency: string;
   }>;
+  orders: Array<{
+    id: string;
+    payment_status: string;
+    payment_provider: string | null;
+    paid_at: string | null;
+    currency: string;
+    total_amount: number;
+    items_count: number;
+  }>;
 }
 
 type VisibilityPackage = AdminBusinessCommercialStatus["visibility_packages"][number];
@@ -289,8 +298,10 @@ export const getAdminBusinessCommercialStatus = createServerFn({ method: "POST" 
     const orders = (orderRows ?? []) as Array<{
       id: string;
       payment_status: string | null;
+      payment_provider: string | null;
       paid_at: string | null;
       currency: string | null;
+      total_amount: number | null;
     }>;
     const orderById = new Map(orders.map((o) => [o.id, o]));
 
@@ -344,6 +355,26 @@ export const getAdminBusinessCommercialStatus = createServerFn({ method: "POST" 
       (a, b) => Number(b.payment_status === "paid") - Number(a.payment_status === "paid"),
     );
 
+    const itemCountByOrder = new Map<string, number>();
+    for (const item of items) {
+      itemCountByOrder.set(item.order_id, (itemCountByOrder.get(item.order_id) ?? 0) + 1);
+    }
+    const ordersDetailed = orders
+      .map((o) => ({
+        id: o.id,
+        payment_status: o.payment_status ?? "unpaid",
+        payment_provider: o.payment_provider ?? null,
+        paid_at: o.paid_at,
+        currency: o.currency ?? currency,
+        total_amount: Number(o.total_amount ?? 0),
+        items_count: itemCountByOrder.get(o.id) ?? 0,
+      }))
+      .sort((a, b) => {
+        const ta = a.paid_at ? Date.parse(a.paid_at) : 0;
+        const tb = b.paid_at ? Date.parse(b.paid_at) : 0;
+        return tb - ta;
+      });
+
     const metadata = metadataRecord(businessRow.metadata);
     return {
       business: {
@@ -374,5 +405,6 @@ export const getAdminBusinessCommercialStatus = createServerFn({ method: "POST" 
         currency,
       },
       visibility_packages: visibilityPackages.slice(0, 20),
+      orders: ordersDetailed.slice(0, 50),
     };
   });
