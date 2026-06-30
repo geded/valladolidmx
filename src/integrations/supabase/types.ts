@@ -3256,7 +3256,7 @@ export type Database = {
         Args: {
           _items?: Json
           _summary: string
-          _travel_plan_id: string
+          _travel_plan_id?: string
           _traveler_user_id: string
         }
         Returns: string
