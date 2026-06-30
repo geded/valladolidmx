@@ -2706,6 +2706,10 @@ export type Database = {
         | "cancelled"
         | "fulfilled"
         | "note_added"
+        | "payment_initiated"
+        | "payment_succeeded"
+        | "payment_failed"
+        | "payment_refunded"
       order_status: "cart" | "pending" | "confirmed" | "cancelled" | "fulfilled"
       product_conversion_mode:
         | "informacion"
@@ -2903,6 +2907,10 @@ export const Constants = {
         "cancelled",
         "fulfilled",
         "note_added",
+        "payment_initiated",
+        "payment_succeeded",
+        "payment_failed",
+        "payment_refunded",
       ],
       order_status: ["cart", "pending", "confirmed", "cancelled", "fulfilled"],
       product_conversion_mode: [
