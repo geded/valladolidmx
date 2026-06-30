@@ -36,25 +36,25 @@ type Domain = "all" | "marketplace" | "concierge" | "portal" | "cms";
 function buildCockpitTree(window: Window, domain: Domain): CompositionTree {
   return {
     root: {
-      id: "cockpit-root",
-      type: "vmx.layout.container",
-      config: { max_width: "xl", padding: "normal" },
       children: [
         {
           id: "cockpit-kpis",
           type: "vmx.cockpit.kpi-grid",
+          version: "1.0.0",
           config: { title: "Visión global", window, domain },
           children: [],
         },
         {
           id: "cockpit-alerts",
           type: "vmx.cockpit.alerts",
+          version: "1.0.0",
           config: { title: "Alertas", limit: 10 },
           children: [],
         },
         {
           id: "cockpit-activity",
           type: "vmx.cockpit.activity-stream",
+          version: "1.0.0",
           config: { title: "Actividad reciente", limit: 20 },
           children: [],
         },
