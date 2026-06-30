@@ -230,3 +230,131 @@ export const listBusinessConciergeQuotes = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return ((rows ?? []) as unknown as ConciergeBusinessQuote[]);
   });
+
+/* ============================================================
+ * 14.60.4 — Propuestas Concierge (Customer Case File ↔ Viajero)
+ * ============================================================ */
+
+const ProposalItem = z.object({
+  quote_id: z.string().uuid(),
+  notes: z.string().max(1000).optional().nullable(),
+});
+
+const ProposalCreateInput = z.object({
+  caseId: z.string().uuid(),
+  items: z.array(ProposalItem).min(1),
+  summary: z.string().max(1000).optional().nullable(),
+  terms: z.string().max(4000).optional().nullable(),
+  validUntil: z.string().datetime().optional().nullable(),
+  supersedesProposalId: z.string().uuid().optional().nullable(),
+});
+
+export const createConciergeProposal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => ProposalCreateInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: pid, error } = await context.supabase.rpc(
+      "concierge_proposal_create",
+      {
+        _case_id: data.caseId,
+        _items: data.items as unknown as Json,
+        _summary: data.summary ?? undefined,
+        _terms: data.terms ?? undefined,
+        _valid_until: data.validUntil ?? undefined,
+        _supersedes_proposal_id: data.supersedesProposalId ?? undefined,
+      },
+    );
+    if (error) throw new Error(error.message);
+    return pid as string;
+  });
+
+const ProposalIdInput = z.object({ proposalId: z.string().uuid() });
+
+export const sendConciergeProposal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => ProposalIdInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("concierge_proposal_send", {
+      _proposal_id: data.proposalId,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+export const viewConciergeProposal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => ProposalIdInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("concierge_proposal_view", {
+      _proposal_id: data.proposalId,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+export const acceptConciergeProposal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => ProposalIdInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: res, error } = await context.supabase.rpc(
+      "concierge_proposal_accept",
+      { _proposal_id: data.proposalId },
+    );
+    if (error) throw new Error(error.message);
+    return res as Json;
+  });
+
+const ProposalReasonInput = z.object({
+  proposalId: z.string().uuid(),
+  reason: z.string().max(1000).optional().nullable(),
+});
+
+export const rejectConciergeProposal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => ProposalReasonInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("concierge_proposal_reject", {
+      _proposal_id: data.proposalId,
+      _reason: data.reason ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+export const withdrawConciergeProposal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => ProposalReasonInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc(
+      "concierge_proposal_withdraw",
+      { _proposal_id: data.proposalId, _reason: data.reason ?? undefined },
+    );
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+const ProposalSupersedeInput = z.object({
+  proposalId: z.string().uuid(),
+  items: z.array(ProposalItem).min(1),
+  summary: z.string().max(1000).optional().nullable(),
+  terms: z.string().max(4000).optional().nullable(),
+  validUntil: z.string().datetime().optional().nullable(),
+});
+
+export const supersedeConciergeProposal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => ProposalSupersedeInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: pid, error } = await context.supabase.rpc(
+      "concierge_proposal_supersede",
+      {
+        _proposal_id: data.proposalId,
+        _new_items: data.items as unknown as Json,
+        _summary: data.summary ?? undefined,
+        _terms: data.terms ?? undefined,
+        _valid_until: data.validUntil ?? undefined,
+      },
+    );
+    if (error) throw new Error(error.message);
+    return pid as string;
+  });

@@ -1038,6 +1038,142 @@ export type Database = {
         }
         Relationships: []
       }
+      concierge_proposal_items: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          id: string
+          notes: string | null
+          position: number
+          proposal_id: string
+          quote_id: string
+          request_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          position?: number
+          proposal_id: string
+          quote_id: string
+          request_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          position?: number
+          proposal_id?: string
+          quote_id?: string
+          request_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_proposal_items_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_proposals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_proposal_items_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_proposal_items_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_case_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concierge_proposals: {
+        Row: {
+          case_id: string
+          created_at: string
+          created_by_user_id: string | null
+          currency: string
+          id: string
+          payload: Json
+          responded_at: string | null
+          sent_at: string | null
+          status: string
+          summary: string | null
+          supersedes_proposal_id: string | null
+          terms: string | null
+          total_amount_cents: number
+          updated_at: string
+          valid_until: string | null
+          version: number
+          viewed_at: string | null
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          created_by_user_id?: string | null
+          currency?: string
+          id?: string
+          payload?: Json
+          responded_at?: string | null
+          sent_at?: string | null
+          status?: string
+          summary?: string | null
+          supersedes_proposal_id?: string | null
+          terms?: string | null
+          total_amount_cents?: number
+          updated_at?: string
+          valid_until?: string | null
+          version?: number
+          viewed_at?: string | null
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          created_by_user_id?: string | null
+          currency?: string
+          id?: string
+          payload?: Json
+          responded_at?: string | null
+          sent_at?: string | null
+          status?: string
+          summary?: string | null
+          supersedes_proposal_id?: string | null
+          terms?: string | null
+          total_amount_cents?: number
+          updated_at?: string
+          valid_until?: string | null
+          version?: number
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_proposals_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_proposals_supersedes_proposal_id_fkey"
+            columns: ["supersedes_proposal_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       concierge_quotes: {
         Row: {
           business_id: string
@@ -3175,6 +3311,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _concierge_proposal_publish_to_traveler: {
+        Args: {
+          _case_id: string
+          _category: Database["public"]["Enums"]["notification_category"]
+          _email_template?: string
+          _event_id: string
+          _event_type: string
+          _payload: Json
+        }
+        Returns: undefined
+      }
       _concierge_publish_case_created: {
         Args: { _case_id: string; _source: string; _traveler: string }
         Returns: undefined
@@ -3367,6 +3514,10 @@ export type Database = {
         Args: { _limit?: number; _scope?: string }
         Returns: Json[]
       }
+      concierge_case_proposals_list: {
+        Args: { _case_id: string }
+        Returns: Json[]
+      }
       concierge_case_quotes_list: {
         Args: { _case_id: string }
         Returns: Json[]
@@ -3386,6 +3537,49 @@ export type Database = {
         Returns: string
       }
       concierge_is_internal: { Args: { _user_id: string }; Returns: boolean }
+      concierge_proposal_accept: {
+        Args: { _proposal_id: string }
+        Returns: Json
+      }
+      concierge_proposal_create: {
+        Args: {
+          _case_id: string
+          _items: Json
+          _summary?: string
+          _supersedes_proposal_id?: string
+          _terms?: string
+          _valid_until?: string
+        }
+        Returns: string
+      }
+      concierge_proposal_expire_due: { Args: never; Returns: number }
+      concierge_proposal_get: { Args: { _proposal_id: string }; Returns: Json }
+      concierge_proposal_reject: {
+        Args: { _proposal_id: string; _reason?: string }
+        Returns: undefined
+      }
+      concierge_proposal_send: {
+        Args: { _proposal_id: string }
+        Returns: undefined
+      }
+      concierge_proposal_supersede: {
+        Args: {
+          _new_items: Json
+          _proposal_id: string
+          _summary?: string
+          _terms?: string
+          _valid_until?: string
+        }
+        Returns: string
+      }
+      concierge_proposal_view: {
+        Args: { _proposal_id: string }
+        Returns: undefined
+      }
+      concierge_proposal_withdraw: {
+        Args: { _proposal_id: string; _reason?: string }
+        Returns: undefined
+      }
       concierge_quote_expire_due: { Args: never; Returns: number }
       concierge_quote_request: {
         Args: {

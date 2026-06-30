@@ -3,6 +3,17 @@
  * Consume concierge_case_file_v1 y respeta visibilidad por rol.
  */
 import type { ReactNode } from "react";
+import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useRouter } from "@tanstack/react-router";
+import {
+  acceptConciergeProposal,
+  rejectConciergeProposal,
+  sendConciergeProposal,
+  viewConciergeProposal,
+  withdrawConciergeProposal,
+  createConciergeProposal,
+} from "@/lib/concierge/concierge.functions";
 
 type CaseFile = {
   case: {
@@ -51,6 +62,33 @@ type CaseFile = {
     terms: string | null;
     request_title: string;
     request_kind: string;
+  }>;
+  proposals?: Array<{
+    proposal_id: string;
+    status: string;
+    version: number;
+    supersedes_proposal_id: string | null;
+    currency: string;
+    total_amount_cents: number | null;
+    valid_until: string | null;
+    summary: string | null;
+    terms: string | null;
+    sent_at: string | null;
+    viewed_at: string | null;
+    responded_at: string | null;
+    created_at: string;
+    items: Array<{
+      item_id: string;
+      quote_id: string;
+      request_id: string;
+      position: number;
+      amount_cents: number;
+      currency: string;
+      notes: string | null;
+      business_id: string;
+      business_name: string | null;
+      request_title: string;
+    }>;
   }>;
 };
 
@@ -125,6 +163,8 @@ export function CaseFileView({ data, hideInternal = false }: { data: unknown; hi
           </ul>
         </Section>
       )}
+
+      <ProposalsSection f={f} internal={internal} />
 
       {internal && (
         <Section title="Enlaces internos">
@@ -202,5 +242,236 @@ function Empty({ children }: { children: ReactNode }) {
     <p className="rounded-md border border-dashed border-border bg-card/40 p-3 text-xs text-muted-foreground">
       {children}
     </p>
+  );
+}
+
+function money(cents: number | null, currency: string) {
+  if (cents == null) return "—";
+  return (cents / 100).toLocaleString("es-MX", { style: "currency", currency });
+}
+
+function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
+  const proposals = f.proposals ?? [];
+  if (proposals.length === 0 && !internal) return null;
+
+  return (
+    <Section title="Propuestas">
+      {proposals.length === 0 ? (
+        <Empty>Sin propuestas todavía.</Empty>
+      ) : (
+        <ul className="grid gap-3">
+          {proposals.map((p) => (
+            <ProposalCard
+              key={p.proposal_id}
+              p={p}
+              caseId={f.case.id}
+              internal={internal}
+            />
+          ))}
+        </ul>
+      )}
+      {internal && f.quotes && f.quotes.some((q) => q.status === "submitted") ? (
+        <ProposalComposer caseId={f.case.id} quotes={f.quotes} />
+      ) : null}
+    </Section>
+  );
+}
+
+function ProposalCard({
+  p,
+  caseId: _caseId,
+  internal,
+}: {
+  p: NonNullable<CaseFile["proposals"]>[number];
+  caseId: string;
+  internal: boolean;
+}) {
+  const router = useRouter();
+  const sendFn = useServerFn(sendConciergeProposal);
+  const withdrawFn = useServerFn(withdrawConciergeProposal);
+  const viewFn = useServerFn(viewConciergeProposal);
+  const acceptFn = useServerFn(acceptConciergeProposal);
+  const rejectFn = useServerFn(rejectConciergeProposal);
+  const [busy, setBusy] = useState(false);
+
+  async function run(action: () => Promise<unknown>) {
+    setBusy(true);
+    try {
+      await action();
+      await router.invalidate();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // Marcar como vista al renderizar para el viajero (idempotente, server-side)
+  if (!internal && p.status === "sent") {
+    void viewFn({ data: { proposalId: p.proposal_id } }).catch(() => {});
+  }
+
+  return (
+    <li className="rounded-md border border-border bg-card p-3 text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-medium">
+          Propuesta v{p.version} · {money(p.total_amount_cents, p.currency)}
+        </span>
+        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+          {p.status}
+        </span>
+      </div>
+      {p.summary ? <p className="mt-1 text-xs text-foreground/80">{p.summary}</p> : null}
+      {p.valid_until ? (
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          Vigente hasta {new Date(p.valid_until).toLocaleString()}
+        </p>
+      ) : null}
+      {p.items.length > 0 && (
+        <ul className="mt-2 grid gap-1 text-xs">
+          {p.items.map((it) => (
+            <li
+              key={it.item_id}
+              className="flex items-center justify-between gap-2 rounded border border-border/60 bg-background/60 px-2 py-1"
+            >
+              <span>
+                {it.business_name ?? "Empresa"} · {it.request_title}
+              </span>
+              <span className="font-mono">{money(it.amount_cents, it.currency)}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {p.terms ? (
+        <p className="mt-2 whitespace-pre-line text-[11px] text-muted-foreground">{p.terms}</p>
+      ) : null}
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        {internal && p.status === "draft" && (
+          <ActionButton
+            label="Enviar al viajero"
+            disabled={busy}
+            onClick={() => run(() => sendFn({ data: { proposalId: p.proposal_id } }))}
+          />
+        )}
+        {internal && ["draft", "sent", "viewed"].includes(p.status) && (
+          <ActionButton
+            label="Retirar"
+            variant="ghost"
+            disabled={busy}
+            onClick={() => run(() => withdrawFn({ data: { proposalId: p.proposal_id, reason: null } }))}
+          />
+        )}
+        {!internal && ["sent", "viewed"].includes(p.status) && (
+          <>
+            <ActionButton
+              label="Aceptar propuesta"
+              disabled={busy}
+              onClick={() => run(() => acceptFn({ data: { proposalId: p.proposal_id } }))}
+            />
+            <ActionButton
+              label="Rechazar"
+              variant="ghost"
+              disabled={busy}
+              onClick={() => run(() => rejectFn({ data: { proposalId: p.proposal_id, reason: null } }))}
+            />
+          </>
+        )}
+      </div>
+    </li>
+  );
+}
+
+function ProposalComposer({
+  caseId,
+  quotes,
+}: {
+  caseId: string;
+  quotes: NonNullable<CaseFile["quotes"]>;
+}) {
+  const router = useRouter();
+  const createFn = useServerFn(createConciergeProposal);
+  const submittable = quotes.filter((q) => q.status === "submitted");
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [summary, setSummary] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function onCreate() {
+    const items = Object.entries(selected)
+      .filter(([, v]) => v)
+      .map(([quote_id]) => ({ quote_id }));
+    if (items.length === 0) return;
+    setBusy(true);
+    try {
+      await createFn({
+        data: { caseId, items, summary: summary || null },
+      });
+      setSelected({});
+      setSummary("");
+      await router.invalidate();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mt-4 rounded-md border border-dashed border-border bg-card/40 p-3 text-xs">
+      <p className="mb-2 font-medium uppercase tracking-wide text-muted-foreground">
+        Componer nueva propuesta
+      </p>
+      <ul className="grid gap-1">
+        {submittable.map((q) => (
+          <li key={q.quote_id} className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={!!selected[q.quote_id]}
+              onChange={(e) =>
+                setSelected((s) => ({ ...s, [q.quote_id]: e.target.checked }))
+              }
+            />
+            <span className="flex-1">
+              {q.business_name ?? "Empresa"} · {q.request_title} ·{" "}
+              {money(q.total_amount_cents, q.currency)}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <textarea
+        className="mt-2 w-full rounded border border-border bg-background p-2 text-xs"
+        rows={2}
+        placeholder="Resumen para el viajero (opcional)"
+        value={summary}
+        onChange={(e) => setSummary(e.target.value)}
+      />
+      <div className="mt-2 flex justify-end">
+        <ActionButton
+          label="Crear borrador"
+          disabled={busy || Object.values(selected).every((v) => !v)}
+          onClick={onCreate}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ActionButton({
+  label,
+  onClick,
+  disabled,
+  variant = "primary",
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  variant?: "primary" | "ghost";
+}) {
+  const base =
+    "rounded-md px-3 py-1.5 text-xs font-medium transition disabled:opacity-50";
+  const cls =
+    variant === "primary"
+      ? `${base} bg-primary text-primary-foreground hover:bg-primary/90`
+      : `${base} border border-border bg-background hover:bg-muted`;
+  return (
+    <button type="button" className={cls} onClick={onClick} disabled={disabled}>
+      {label}
+    </button>
   );
 }
