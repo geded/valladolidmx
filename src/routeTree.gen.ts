@@ -25,6 +25,7 @@ import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
 import { Route as MarketplaceBuscarRouteImport } from './routes/marketplace/buscar'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
+import { Route as AuthenticatedConciergeRouteImport } from './routes/_authenticated/concierge'
 import { Route as AuthenticatedCmsRouteImport } from './routes/_authenticated/cms'
 import { Route as AuthenticatedPortalRouteRouteImport } from './routes/_authenticated/portal/route'
 import { Route as AuthenticatedCuentaRouteRouteImport } from './routes/_authenticated/cuenta/route'
@@ -41,6 +42,7 @@ import { Route as AuthenticatedCuentaPerfilRouteImport } from './routes/_authent
 import { Route as AuthenticatedCuentaNotificacionesRouteImport } from './routes/_authenticated/cuenta/notificaciones'
 import { Route as AuthenticatedCuentaHistorialRouteImport } from './routes/_authenticated/cuenta/historial'
 import { Route as AuthenticatedCuentaFavoritosRouteImport } from './routes/_authenticated/cuenta/favoritos'
+import { Route as AuthenticatedCuentaConciergeRouteImport } from './routes/_authenticated/cuenta/concierge'
 import { Route as AuthenticatedCuentaCarritoRouteImport } from './routes/_authenticated/cuenta/carrito'
 import { Route as AuthenticatedCuentaActividadRouteImport } from './routes/_authenticated/cuenta/actividad'
 import { Route as AuthenticatedCmsZonasRouteImport } from './routes/_authenticated/cms/zonas'
@@ -146,6 +148,11 @@ const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
   path: '/marketplace/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedConciergeRoute = AuthenticatedConciergeRouteImport.update({
+  id: '/concierge',
+  path: '/concierge',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedCmsRoute = AuthenticatedCmsRouteImport.update({
   id: '/cms',
   path: '/cms',
@@ -238,6 +245,12 @@ const AuthenticatedCuentaFavoritosRoute =
   AuthenticatedCuentaFavoritosRouteImport.update({
     id: '/favoritos',
     path: '/favoritos',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
+const AuthenticatedCuentaConciergeRoute =
+  AuthenticatedCuentaConciergeRouteImport.update({
+    id: '/concierge',
+    path: '/concierge',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
 const AuthenticatedCuentaCarritoRoute =
@@ -401,6 +414,7 @@ export interface FileRoutesByFullPath {
   '/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/cms': typeof AuthenticatedCmsRouteWithChildren
+  '/concierge': typeof AuthenticatedConciergeRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -417,6 +431,7 @@ export interface FileRoutesByFullPath {
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
+  '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRoute
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
@@ -456,6 +471,7 @@ export interface FileRoutesByTo {
   '/hoteles': typeof HotelesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/concierge': typeof AuthenticatedConciergeRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -472,6 +488,7 @@ export interface FileRoutesByTo {
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
+  '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRoute
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
@@ -516,6 +533,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/_authenticated/cms': typeof AuthenticatedCmsRouteWithChildren
+  '/_authenticated/concierge': typeof AuthenticatedConciergeRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
@@ -532,6 +550,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/_authenticated/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
+  '/_authenticated/cuenta/concierge': typeof AuthenticatedCuentaConciergeRoute
   '/_authenticated/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/_authenticated/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/_authenticated/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
@@ -576,6 +595,7 @@ export interface FileRouteTypes {
     | '/cuenta'
     | '/portal'
     | '/cms'
+    | '/concierge'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
@@ -592,6 +612,7 @@ export interface FileRouteTypes {
     | '/cms/zonas'
     | '/cuenta/actividad'
     | '/cuenta/carrito'
+    | '/cuenta/concierge'
     | '/cuenta/favoritos'
     | '/cuenta/historial'
     | '/cuenta/notificaciones'
@@ -631,6 +652,7 @@ export interface FileRouteTypes {
     | '/hoteles'
     | '/reset-password'
     | '/restaurantes'
+    | '/concierge'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
@@ -647,6 +669,7 @@ export interface FileRouteTypes {
     | '/cms/zonas'
     | '/cuenta/actividad'
     | '/cuenta/carrito'
+    | '/cuenta/concierge'
     | '/cuenta/favoritos'
     | '/cuenta/historial'
     | '/cuenta/notificaciones'
@@ -690,6 +713,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta'
     | '/_authenticated/portal'
     | '/_authenticated/cms'
+    | '/_authenticated/concierge'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
@@ -706,6 +730,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/zonas'
     | '/_authenticated/cuenta/actividad'
     | '/_authenticated/cuenta/carrito'
+    | '/_authenticated/cuenta/concierge'
     | '/_authenticated/cuenta/favoritos'
     | '/_authenticated/cuenta/historial'
     | '/_authenticated/cuenta/notificaciones'
@@ -870,6 +895,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/concierge': {
+      id: '/_authenticated/concierge'
+      path: '/concierge'
+      fullPath: '/concierge'
+      preLoaderRoute: typeof AuthenticatedConciergeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/cms': {
       id: '/_authenticated/cms'
       path: '/cms'
@@ -980,6 +1012,13 @@ declare module '@tanstack/react-router' {
       path: '/favoritos'
       fullPath: '/cuenta/favoritos'
       preLoaderRoute: typeof AuthenticatedCuentaFavoritosRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
+    '/_authenticated/cuenta/concierge': {
+      id: '/_authenticated/cuenta/concierge'
+      path: '/concierge'
+      fullPath: '/cuenta/concierge'
+      preLoaderRoute: typeof AuthenticatedCuentaConciergeRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
     '/_authenticated/cuenta/carrito': {
@@ -1163,6 +1202,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedCuentaRouteRouteChildren {
   AuthenticatedCuentaActividadRoute: typeof AuthenticatedCuentaActividadRoute
   AuthenticatedCuentaCarritoRoute: typeof AuthenticatedCuentaCarritoRoute
+  AuthenticatedCuentaConciergeRoute: typeof AuthenticatedCuentaConciergeRoute
   AuthenticatedCuentaFavoritosRoute: typeof AuthenticatedCuentaFavoritosRoute
   AuthenticatedCuentaHistorialRoute: typeof AuthenticatedCuentaHistorialRoute
   AuthenticatedCuentaNotificacionesRoute: typeof AuthenticatedCuentaNotificacionesRoute
@@ -1176,6 +1216,7 @@ const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildr
   {
     AuthenticatedCuentaActividadRoute: AuthenticatedCuentaActividadRoute,
     AuthenticatedCuentaCarritoRoute: AuthenticatedCuentaCarritoRoute,
+    AuthenticatedCuentaConciergeRoute: AuthenticatedCuentaConciergeRoute,
     AuthenticatedCuentaFavoritosRoute: AuthenticatedCuentaFavoritosRoute,
     AuthenticatedCuentaHistorialRoute: AuthenticatedCuentaHistorialRoute,
     AuthenticatedCuentaNotificacionesRoute:
@@ -1272,12 +1313,14 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCuentaRouteRoute: typeof AuthenticatedCuentaRouteRouteWithChildren
   AuthenticatedPortalRouteRoute: typeof AuthenticatedPortalRouteRouteWithChildren
   AuthenticatedCmsRoute: typeof AuthenticatedCmsRouteWithChildren
+  AuthenticatedConciergeRoute: typeof AuthenticatedConciergeRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCuentaRouteRoute: AuthenticatedCuentaRouteRouteWithChildren,
   AuthenticatedPortalRouteRoute: AuthenticatedPortalRouteRouteWithChildren,
   AuthenticatedCmsRoute: AuthenticatedCmsRouteWithChildren,
+  AuthenticatedConciergeRoute: AuthenticatedConciergeRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
