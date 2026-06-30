@@ -89,7 +89,7 @@ export const createConciergeCaseFromTravelPlan = createServerFn({ method: "POST"
         _traveler_user_id: context.userId,
         _summary: data.summary,
         _items: (data.items ?? []) as Json,
-        _travel_plan_id: data.travelPlanId ?? "00000000-0000-0000-0000-000000000000",
+        ...(data.travelPlanId ? { _travel_plan_id: data.travelPlanId } : {}),
       },
     );
     if (error) throw new Error(error.message);
