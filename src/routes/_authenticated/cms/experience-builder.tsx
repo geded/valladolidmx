@@ -402,13 +402,26 @@ function ExperienceBuilderStudio() {
           <aside className="col-span-12 lg:col-span-3 rounded-lg border border-border bg-card/40 p-3">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-sm font-semibold">Biblioteca</h2>
-              <button
-                type="button"
-                onClick={() => setActive(null)}
-                className="text-xs text-muted-foreground hover:underline"
-              >
-                ← Lista
-              </button>
+              <div className="flex items-center gap-2">
+                {isAdmin ? (
+                  <button
+                    type="button"
+                    onClick={() => void runSyncLibrary()}
+                    disabled={syncing}
+                    className="rounded-md border border-border bg-background px-2 py-0.5 text-[10px] hover:bg-accent disabled:opacity-50"
+                    title="Vuelca el catálogo de bloques declarado en código a la base"
+                  >
+                    {syncing ? "Sincronizando…" : "Sincronizar"}
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => setActive(null)}
+                  className="text-xs text-muted-foreground hover:underline"
+                >
+                  ← Lista
+                </button>
+              </div>
             </div>
             <input
               type="search"
@@ -447,7 +460,23 @@ function ExperienceBuilderStudio() {
                 </li>
               ))}
               {filteredLibrary.length === 0 ? (
-                <li className="text-xs text-muted-foreground">Sin bloques.</li>
+                <li className="grid gap-2 rounded-md border border-dashed border-border p-3 text-xs text-muted-foreground">
+                  <span>
+                    {library.length === 0
+                      ? "La Biblioteca aún no está poblada."
+                      : "Sin bloques con ese filtro."}
+                  </span>
+                  {library.length === 0 && isAdmin ? (
+                    <button
+                      type="button"
+                      onClick={() => void runSyncLibrary()}
+                      disabled={syncing}
+                      className="rounded-md bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground disabled:opacity-50"
+                    >
+                      {syncing ? "Sincronizando…" : "Sincronizar Biblioteca"}
+                    </button>
+                  ) : null}
+                </li>
               ) : null}
             </ul>
           </aside>
