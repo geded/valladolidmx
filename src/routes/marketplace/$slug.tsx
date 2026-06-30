@@ -8,7 +8,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PageShell } from "@/components/common/PageShell";
 import { SITE } from "@/config/site";
 import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
-import { AddToCartButton } from "@/components/marketplace/AddToCartButton";
+import { ProductActions } from "@/components/marketplace/ProductActions";
 import {
   getMarketplaceBusinessBySlug,
   type MarketplaceBusinessDetail,
@@ -101,11 +101,18 @@ function MarketplaceBusinessPage() {
                 <div className="mt-3">
                   <FavoriteButton entityKind="product" entityId={p.id} />
                 </div>
-                {p.price_amount !== null ? (
-                  <div className="mt-2">
-                    <AddToCartButton productId={p.id} />
-                  </div>
-                ) : null}
+                <div className="mt-2">
+                  <ProductActions
+                    product={{
+                      id: p.id,
+                      conversion_mode: p.conversion_mode,
+                      primary_action_label: p.primary_action_label,
+                      secondary_action_mode: p.secondary_action_mode,
+                      secondary_action_label: p.secondary_action_label,
+                      accepts_online_payment: p.accepts_online_payment,
+                    }}
+                  />
+                </div>
               </li>
             ))}
           </ul>
