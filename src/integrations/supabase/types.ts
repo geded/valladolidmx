@@ -3233,6 +3233,56 @@ export type Database = {
           title: string
         }[]
       }
+      unc_activity_feed_for_alux: {
+        Args: {
+          _business_id?: string
+          _limit?: number
+          _scope?: string
+          _since?: string
+        }
+        Returns: {
+          category: string
+          event_id: string
+          event_type: string
+          occurred_at: string
+          payload: Json
+          read_state: string
+          severity: string
+          subject_id: string
+          subject_type: string
+          summary: string
+        }[]
+      }
+      unc_activity_group_by_subject: {
+        Args: {
+          _business_id?: string
+          _limit?: number
+          _scope?: string
+          _since?: string
+        }
+        Returns: {
+          event_count: number
+          last_occurred_at: string
+          last_severity: string
+          last_summary: string
+          subject_id: string
+          subject_type: string
+        }[]
+      }
+      unc_activity_summary_by_period: {
+        Args: {
+          _bucket?: string
+          _business_id?: string
+          _scope?: string
+          _since?: string
+        }
+        Returns: {
+          bucket_start: string
+          category: string
+          event_count: number
+          severity: string
+        }[]
+      }
       unc_activity_traveler: {
         Args: { _limit?: number }
         Returns: {

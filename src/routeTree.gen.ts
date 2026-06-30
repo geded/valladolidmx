@@ -36,11 +36,13 @@ import { Route as AuthenticatedPortalPresenciaRouteImport } from './routes/_auth
 import { Route as AuthenticatedPortalGaleriaRouteImport } from './routes/_authenticated/portal/galeria'
 import { Route as AuthenticatedPortalFichaRouteImport } from './routes/_authenticated/portal/ficha'
 import { Route as AuthenticatedPortalCatalogoRouteImport } from './routes/_authenticated/portal/catalogo'
+import { Route as AuthenticatedPortalActividadRouteImport } from './routes/_authenticated/portal/actividad'
 import { Route as AuthenticatedCuentaPerfilRouteImport } from './routes/_authenticated/cuenta/perfil'
 import { Route as AuthenticatedCuentaNotificacionesRouteImport } from './routes/_authenticated/cuenta/notificaciones'
 import { Route as AuthenticatedCuentaHistorialRouteImport } from './routes/_authenticated/cuenta/historial'
 import { Route as AuthenticatedCuentaFavoritosRouteImport } from './routes/_authenticated/cuenta/favoritos'
 import { Route as AuthenticatedCuentaCarritoRouteImport } from './routes/_authenticated/cuenta/carrito'
+import { Route as AuthenticatedCuentaActividadRouteImport } from './routes/_authenticated/cuenta/actividad'
 import { Route as AuthenticatedCmsZonasRouteImport } from './routes/_authenticated/cms/zonas'
 import { Route as AuthenticatedCmsProductosRouteImport } from './routes/_authenticated/cms/productos'
 import { Route as AuthenticatedCmsPagosRouteImport } from './routes/_authenticated/cms/pagos'
@@ -208,6 +210,12 @@ const AuthenticatedPortalCatalogoRoute =
     path: '/catalogo',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
+const AuthenticatedPortalActividadRoute =
+  AuthenticatedPortalActividadRouteImport.update({
+    id: '/actividad',
+    path: '/actividad',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
 const AuthenticatedCuentaPerfilRoute =
   AuthenticatedCuentaPerfilRouteImport.update({
     id: '/perfil',
@@ -236,6 +244,12 @@ const AuthenticatedCuentaCarritoRoute =
   AuthenticatedCuentaCarritoRouteImport.update({
     id: '/carrito',
     path: '/carrito',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
+const AuthenticatedCuentaActividadRoute =
+  AuthenticatedCuentaActividadRouteImport.update({
+    id: '/actividad',
+    path: '/actividad',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
 const AuthenticatedCmsZonasRoute = AuthenticatedCmsZonasRouteImport.update({
@@ -401,11 +415,13 @@ export interface FileRoutesByFullPath {
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
+  '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
@@ -454,11 +470,13 @@ export interface FileRoutesByTo {
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
+  '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
@@ -512,11 +530,13 @@ export interface FileRoutesById {
   '/_authenticated/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/_authenticated/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/_authenticated/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/_authenticated/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/_authenticated/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/_authenticated/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/_authenticated/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/_authenticated/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
+  '/_authenticated/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/_authenticated/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/_authenticated/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/_authenticated/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
@@ -570,11 +590,13 @@ export interface FileRouteTypes {
     | '/cms/pagos'
     | '/cms/productos'
     | '/cms/zonas'
+    | '/cuenta/actividad'
     | '/cuenta/carrito'
     | '/cuenta/favoritos'
     | '/cuenta/historial'
     | '/cuenta/notificaciones'
     | '/cuenta/perfil'
+    | '/portal/actividad'
     | '/portal/catalogo'
     | '/portal/ficha'
     | '/portal/galeria'
@@ -623,11 +645,13 @@ export interface FileRouteTypes {
     | '/cms/pagos'
     | '/cms/productos'
     | '/cms/zonas'
+    | '/cuenta/actividad'
     | '/cuenta/carrito'
     | '/cuenta/favoritos'
     | '/cuenta/historial'
     | '/cuenta/notificaciones'
     | '/cuenta/perfil'
+    | '/portal/actividad'
     | '/portal/catalogo'
     | '/portal/ficha'
     | '/portal/galeria'
@@ -680,11 +704,13 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/pagos'
     | '/_authenticated/cms/productos'
     | '/_authenticated/cms/zonas'
+    | '/_authenticated/cuenta/actividad'
     | '/_authenticated/cuenta/carrito'
     | '/_authenticated/cuenta/favoritos'
     | '/_authenticated/cuenta/historial'
     | '/_authenticated/cuenta/notificaciones'
     | '/_authenticated/cuenta/perfil'
+    | '/_authenticated/portal/actividad'
     | '/_authenticated/portal/catalogo'
     | '/_authenticated/portal/ficha'
     | '/_authenticated/portal/galeria'
@@ -921,6 +947,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalCatalogoRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
+    '/_authenticated/portal/actividad': {
+      id: '/_authenticated/portal/actividad'
+      path: '/actividad'
+      fullPath: '/portal/actividad'
+      preLoaderRoute: typeof AuthenticatedPortalActividadRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
     '/_authenticated/cuenta/perfil': {
       id: '/_authenticated/cuenta/perfil'
       path: '/perfil'
@@ -954,6 +987,13 @@ declare module '@tanstack/react-router' {
       path: '/carrito'
       fullPath: '/cuenta/carrito'
       preLoaderRoute: typeof AuthenticatedCuentaCarritoRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
+    '/_authenticated/cuenta/actividad': {
+      id: '/_authenticated/cuenta/actividad'
+      path: '/actividad'
+      fullPath: '/cuenta/actividad'
+      preLoaderRoute: typeof AuthenticatedCuentaActividadRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
     '/_authenticated/cms/zonas': {
@@ -1121,6 +1161,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedCuentaRouteRouteChildren {
+  AuthenticatedCuentaActividadRoute: typeof AuthenticatedCuentaActividadRoute
   AuthenticatedCuentaCarritoRoute: typeof AuthenticatedCuentaCarritoRoute
   AuthenticatedCuentaFavoritosRoute: typeof AuthenticatedCuentaFavoritosRoute
   AuthenticatedCuentaHistorialRoute: typeof AuthenticatedCuentaHistorialRoute
@@ -1133,6 +1174,7 @@ interface AuthenticatedCuentaRouteRouteChildren {
 
 const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildren =
   {
+    AuthenticatedCuentaActividadRoute: AuthenticatedCuentaActividadRoute,
     AuthenticatedCuentaCarritoRoute: AuthenticatedCuentaCarritoRoute,
     AuthenticatedCuentaFavoritosRoute: AuthenticatedCuentaFavoritosRoute,
     AuthenticatedCuentaHistorialRoute: AuthenticatedCuentaHistorialRoute,
@@ -1150,6 +1192,7 @@ const AuthenticatedCuentaRouteRouteWithChildren =
   )
 
 interface AuthenticatedPortalRouteRouteChildren {
+  AuthenticatedPortalActividadRoute: typeof AuthenticatedPortalActividadRoute
   AuthenticatedPortalCatalogoRoute: typeof AuthenticatedPortalCatalogoRoute
   AuthenticatedPortalFichaRoute: typeof AuthenticatedPortalFichaRoute
   AuthenticatedPortalGaleriaRoute: typeof AuthenticatedPortalGaleriaRoute
@@ -1162,6 +1205,7 @@ interface AuthenticatedPortalRouteRouteChildren {
 
 const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildren =
   {
+    AuthenticatedPortalActividadRoute: AuthenticatedPortalActividadRoute,
     AuthenticatedPortalCatalogoRoute: AuthenticatedPortalCatalogoRoute,
     AuthenticatedPortalFichaRoute: AuthenticatedPortalFichaRoute,
     AuthenticatedPortalGaleriaRoute: AuthenticatedPortalGaleriaRoute,
