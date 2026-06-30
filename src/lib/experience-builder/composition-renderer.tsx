@@ -20,6 +20,10 @@ import { getBlock } from "./block-registry";
 import { isContainerBlock } from "./layout-engine";
 import type { CompositionNode, CompositionTree } from "./composition-tree";
 import { bootstrapBlockLibrary } from "./block-library";
+import {
+  resolveVariables,
+  type VariableContext,
+} from "./dynamic-variables";
 import { Hero } from "@/components/home/Hero";
 import { DestinosSection } from "@/components/home/DestinosSection";
 import { CategoriasSection } from "@/components/home/CategoriasSection";
@@ -40,17 +44,29 @@ export interface CompositionRendererProps {
   studio?: boolean;
   /** Render-prop opcional para overlays editoriales (selección, etc.). */
   wrap?: (node: CompositionNode, content: ReactNode) => ReactNode;
+  /** Contexto de Variables Dinámicas. Si está presente, se resuelven los
+   *  tokens `${scope.field}` de la config de cada bloque ANTES del render.
+   *  El mismo renderer corre en Studio (contexto demo) y en producción
+   *  (contexto real de la superficie). */
+  variableContext?: VariableContext;
 }
 
 export function CompositionRenderer({
   tree,
   studio = false,
   wrap,
+  variableContext,
 }: CompositionRendererProps): ReactNode {
   return (
     <Fragment>
       {tree.root.children.map((node) => (
-        <RenderNode key={node.id} node={node} studio={studio} wrap={wrap} />
+        <RenderNode
+          key={node.id}
+          node={node}
+          studio={studio}
+          wrap={wrap}
+          variableContext={variableContext}
+        />
       ))}
       {studio && tree.root.children.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border bg-card/40 px-6 py-12 text-center text-sm text-muted-foreground">
@@ -65,9 +81,10 @@ interface RenderNodeProps {
   node: CompositionNode;
   studio: boolean;
   wrap?: CompositionRendererProps["wrap"];
+  variableContext?: VariableContext;
 }
 
-function RenderNode({ node, studio, wrap }: RenderNodeProps): ReactNode {
+function RenderNode({ node, studio, wrap, variableContext }: RenderNodeProps): ReactNode {
   const contract = getBlock(node.type);
   if (!contract) {
     return studio ? (
@@ -83,9 +100,12 @@ function RenderNode({ node, studio, wrap }: RenderNodeProps): ReactNode {
   // editorial y los overlays de selección.
   const map = studio ? STUDIO_PREVIEW_MAP : PRODUCTION_COMPONENT_MAP;
   const Comp = map[node.type] ?? STUDIO_PREVIEW_MAP[node.type] ?? GenericBlockPreview;
+  const resolved: CompositionNode = variableContext
+    ? { ...node, config: resolveVariables(node.config, variableContext) as CompositionNode["config"] }
+    : node;
   const content = (
     <Comp
-      node={node}
+      node={resolved}
       displayName={contract.display_name}
       studio={studio}
       renderChildren={
@@ -98,6 +118,7 @@ function RenderNode({ node, studio, wrap }: RenderNodeProps): ReactNode {
                     node={child}
                     studio={studio}
                     wrap={wrap}
+                    variableContext={variableContext}
                   />
                 ))}
               </Fragment>
