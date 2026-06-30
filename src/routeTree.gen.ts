@@ -86,6 +86,7 @@ import { Route as AuthenticatedCmsRegionesEditarRouteImport } from './routes/_au
 import { Route as AuthenticatedCmsExperienceBuilderPagesRouteImport } from './routes/_authenticated/cms/experience-builder.pages'
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
 import { Route as AuthenticatedCmsCategoriasEditarRouteImport } from './routes/_authenticated/cms/categorias..editar'
+import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/_authenticated/admin/sistema.usuarios'
 import { Route as ApiPublicPaymentsProviderWebhookRouteImport } from './routes/api/public/payments/$provider/webhook'
 import { Route as AuthenticatedCuentaConciergeCaseIdEvaluarRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId.evaluar'
 import { Route as AuthenticatedCmsReviewsIdModerarRouteImport } from './routes/_authenticated/cms/reviews.$id.moderar'
@@ -521,6 +522,12 @@ const AuthenticatedCmsCategoriasEditarRoute =
     path: '/categorias/editar',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedAdminSistemaUsuariosRoute =
+  AuthenticatedAdminSistemaUsuariosRouteImport.update({
+    id: '/usuarios',
+    path: '/usuarios',
+    getParentRoute: () => AuthenticatedAdminSistemaRoute,
+  } as any)
 const ApiPublicPaymentsProviderWebhookRoute =
   ApiPublicPaymentsProviderWebhookRouteImport.update({
     id: '/api/public/payments/$provider/webhook',
@@ -569,7 +576,7 @@ export interface FileRoutesByFullPath {
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/ia': typeof AuthenticatedAdminIaRoute
   '/admin/operaciones': typeof AuthenticatedAdminOperacionesRoute
-  '/admin/sistema': typeof AuthenticatedAdminSistemaRoute
+  '/admin/sistema': typeof AuthenticatedAdminSistemaRouteWithChildren
   '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
@@ -600,6 +607,7 @@ export interface FileRoutesByFullPath {
   '/cms/': typeof AuthenticatedCmsIndexRoute
   '/cuenta/': typeof AuthenticatedCuentaIndexRoute
   '/portal/': typeof AuthenticatedPortalIndexRoute
+  '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/experience-builder/pages': typeof AuthenticatedCmsExperienceBuilderPagesRoute
@@ -646,7 +654,7 @@ export interface FileRoutesByTo {
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/ia': typeof AuthenticatedAdminIaRoute
   '/admin/operaciones': typeof AuthenticatedAdminOperacionesRoute
-  '/admin/sistema': typeof AuthenticatedAdminSistemaRoute
+  '/admin/sistema': typeof AuthenticatedAdminSistemaRouteWithChildren
   '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
@@ -677,6 +685,7 @@ export interface FileRoutesByTo {
   '/cms': typeof AuthenticatedCmsIndexRoute
   '/cuenta': typeof AuthenticatedCuentaIndexRoute
   '/portal': typeof AuthenticatedPortalIndexRoute
+  '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/experience-builder/pages': typeof AuthenticatedCmsExperienceBuilderPagesRoute
@@ -729,7 +738,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/_authenticated/admin/ia': typeof AuthenticatedAdminIaRoute
   '/_authenticated/admin/operaciones': typeof AuthenticatedAdminOperacionesRoute
-  '/_authenticated/admin/sistema': typeof AuthenticatedAdminSistemaRoute
+  '/_authenticated/admin/sistema': typeof AuthenticatedAdminSistemaRouteWithChildren
   '/_authenticated/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/_authenticated/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/_authenticated/cms/alertas': typeof AuthenticatedCmsAlertasRoute
@@ -760,6 +769,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
   '/_authenticated/cuenta/': typeof AuthenticatedCuentaIndexRoute
   '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
+  '/_authenticated/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/_authenticated/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
   '/_authenticated/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/_authenticated/cms/experience-builder/pages': typeof AuthenticatedCmsExperienceBuilderPagesRoute
@@ -843,6 +853,7 @@ export interface FileRouteTypes {
     | '/cms/'
     | '/cuenta/'
     | '/portal/'
+    | '/admin/sistema/usuarios'
     | '/cms/categorias/editar'
     | '/cms/categorias/nueva'
     | '/cms/experience-builder/pages'
@@ -920,6 +931,7 @@ export interface FileRouteTypes {
     | '/cms'
     | '/cuenta'
     | '/portal'
+    | '/admin/sistema/usuarios'
     | '/cms/categorias/editar'
     | '/cms/categorias/nueva'
     | '/cms/experience-builder/pages'
@@ -1002,6 +1014,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/'
     | '/_authenticated/cuenta/'
     | '/_authenticated/portal/'
+    | '/_authenticated/admin/sistema/usuarios'
     | '/_authenticated/cms/categorias/editar'
     | '/_authenticated/cms/categorias/nueva'
     | '/_authenticated/cms/experience-builder/pages'
@@ -1588,6 +1601,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsCategoriasEditarRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/admin/sistema/usuarios': {
+      id: '/_authenticated/admin/sistema/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/sistema/usuarios'
+      preLoaderRoute: typeof AuthenticatedAdminSistemaUsuariosRouteImport
+      parentRoute: typeof AuthenticatedAdminSistemaRoute
+    }
     '/api/public/payments/$provider/webhook': {
       id: '/api/public/payments/$provider/webhook'
       path: '/api/public/payments/$provider/webhook'
@@ -1612,12 +1632,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminSistemaRouteChildren {
+  AuthenticatedAdminSistemaUsuariosRoute: typeof AuthenticatedAdminSistemaUsuariosRoute
+}
+
+const AuthenticatedAdminSistemaRouteChildren: AuthenticatedAdminSistemaRouteChildren =
+  {
+    AuthenticatedAdminSistemaUsuariosRoute:
+      AuthenticatedAdminSistemaUsuariosRoute,
+  }
+
+const AuthenticatedAdminSistemaRouteWithChildren =
+  AuthenticatedAdminSistemaRoute._addFileChildren(
+    AuthenticatedAdminSistemaRouteChildren,
+  )
+
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminConciergeRoute: typeof AuthenticatedAdminConciergeRoute
   AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
   AuthenticatedAdminIaRoute: typeof AuthenticatedAdminIaRoute
   AuthenticatedAdminOperacionesRoute: typeof AuthenticatedAdminOperacionesRoute
-  AuthenticatedAdminSistemaRoute: typeof AuthenticatedAdminSistemaRoute
+  AuthenticatedAdminSistemaRoute: typeof AuthenticatedAdminSistemaRouteWithChildren
   AuthenticatedAdminTuristasRoute: typeof AuthenticatedAdminTuristasRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -1628,7 +1663,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
     AuthenticatedAdminIaRoute: AuthenticatedAdminIaRoute,
     AuthenticatedAdminOperacionesRoute: AuthenticatedAdminOperacionesRoute,
-    AuthenticatedAdminSistemaRoute: AuthenticatedAdminSistemaRoute,
+    AuthenticatedAdminSistemaRoute: AuthenticatedAdminSistemaRouteWithChildren,
     AuthenticatedAdminTuristasRoute: AuthenticatedAdminTuristasRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
