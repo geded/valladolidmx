@@ -583,10 +583,10 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {!assignment && (
-            <Btn label="Asignarme" onClick={doAssignSelf} disabled={busy} />
+            <ActionButton label="Asignarme" onClick={doAssignSelf} disabled={busy} />
           )}
           {assignment && isAssignedToMe && (
-            <Btn label="Liberar" variant="ghost" onClick={doRelease} disabled={busy} />
+            <ActionButton label="Liberar" variant="ghost" onClick={doRelease} disabled={busy} />
           )}
           {assignment && !isAssignedToMe && (
             <span className="text-xs text-muted-foreground">
