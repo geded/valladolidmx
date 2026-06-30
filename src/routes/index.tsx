@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { Hero } from "@/components/home/Hero";
 import { DestinosSection } from "@/components/home/DestinosSection";
 import { CategoriasSection } from "@/components/home/CategoriasSection";
@@ -14,6 +14,12 @@ import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 
+const publishedHomeQuery = queryOptions({
+  queryKey: ["eb", "published-home", "default"],
+  queryFn: () => getPublishedHomeComposition({ data: { variant_key: "default" } }),
+  staleTime: 60_000,
+});
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -23,6 +29,11 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: SITE.default_description },
     ],
   }),
+  loader: async ({ context }) => {
+    // Prefetch para SSR; nunca lanza — getPublishedHomeComposition cae a null
+    // ante cualquier error, garantizando que la Home siempre cargue.
+    await context.queryClient.ensureQueryData(publishedHomeQuery);
+  },
   component: HomePage,
 });
 
@@ -36,12 +47,7 @@ export const Route = createFileRoute("/")({
  * activarse o revertirse de forma independiente sin afectar el sitio.
  */
 function HomePage() {
-  const fetchHome = useServerFn(getPublishedHomeComposition);
-  const { data: published } = useQuery({
-    queryKey: ["eb", "published-home", "default"],
-    queryFn: () => fetchHome({ data: { variant_key: "default" } }),
-    staleTime: 60_000,
-  });
+  const { data: published } = useQuery(publishedHomeQuery);
 
   if (published?.snapshot) {
     return (
