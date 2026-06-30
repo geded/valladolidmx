@@ -40,6 +40,7 @@ import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedPortalPropiedadRouteImport } from './routes/_authenticated/portal/propiedad'
 import { Route as AuthenticatedPortalPresenciaRouteImport } from './routes/_authenticated/portal/presencia'
+import { Route as AuthenticatedPortalPagosRouteImport } from './routes/_authenticated/portal/pagos'
 import { Route as AuthenticatedPortalGaleriaRouteImport } from './routes/_authenticated/portal/galeria'
 import { Route as AuthenticatedPortalFichaRouteImport } from './routes/_authenticated/portal/ficha'
 import { Route as AuthenticatedPortalConciergeRouteImport } from './routes/_authenticated/portal/concierge'
@@ -239,6 +240,12 @@ const AuthenticatedPortalPresenciaRoute =
   AuthenticatedPortalPresenciaRouteImport.update({
     id: '/presencia',
     path: '/presencia',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
+const AuthenticatedPortalPagosRoute =
+  AuthenticatedPortalPagosRouteImport.update({
+    id: '/pagos',
+    path: '/pagos',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
 const AuthenticatedPortalGaleriaRoute =
@@ -525,6 +532,7 @@ export interface FileRoutesByFullPath {
   '/portal/concierge': typeof AuthenticatedPortalConciergeRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
+  '/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -593,6 +601,7 @@ export interface FileRoutesByTo {
   '/portal/concierge': typeof AuthenticatedPortalConciergeRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
+  '/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -667,6 +676,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/concierge': typeof AuthenticatedPortalConciergeRoute
   '/_authenticated/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/_authenticated/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
+  '/_authenticated/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/_authenticated/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/_authenticated/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -741,6 +751,7 @@ export interface FileRouteTypes {
     | '/portal/concierge'
     | '/portal/ficha'
     | '/portal/galeria'
+    | '/portal/pagos'
     | '/portal/presencia'
     | '/portal/propiedad'
     | '/admin/'
@@ -809,6 +820,7 @@ export interface FileRouteTypes {
     | '/portal/concierge'
     | '/portal/ficha'
     | '/portal/galeria'
+    | '/portal/pagos'
     | '/portal/presencia'
     | '/portal/propiedad'
     | '/admin'
@@ -882,6 +894,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/concierge'
     | '/_authenticated/portal/ficha'
     | '/_authenticated/portal/galeria'
+    | '/_authenticated/portal/pagos'
     | '/_authenticated/portal/presencia'
     | '/_authenticated/portal/propiedad'
     | '/_authenticated/admin/'
@@ -1148,6 +1161,13 @@ declare module '@tanstack/react-router' {
       path: '/presencia'
       fullPath: '/portal/presencia'
       preLoaderRoute: typeof AuthenticatedPortalPresenciaRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
+    '/_authenticated/portal/pagos': {
+      id: '/_authenticated/portal/pagos'
+      path: '/pagos'
+      fullPath: '/portal/pagos'
+      preLoaderRoute: typeof AuthenticatedPortalPagosRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
     '/_authenticated/portal/galeria': {
@@ -1517,6 +1537,7 @@ interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalConciergeRoute: typeof AuthenticatedPortalConciergeRoute
   AuthenticatedPortalFichaRoute: typeof AuthenticatedPortalFichaRoute
   AuthenticatedPortalGaleriaRoute: typeof AuthenticatedPortalGaleriaRoute
+  AuthenticatedPortalPagosRoute: typeof AuthenticatedPortalPagosRoute
   AuthenticatedPortalPresenciaRoute: typeof AuthenticatedPortalPresenciaRoute
   AuthenticatedPortalPropiedadRoute: typeof AuthenticatedPortalPropiedadRoute
   AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
@@ -1531,6 +1552,7 @@ const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildr
     AuthenticatedPortalConciergeRoute: AuthenticatedPortalConciergeRoute,
     AuthenticatedPortalFichaRoute: AuthenticatedPortalFichaRoute,
     AuthenticatedPortalGaleriaRoute: AuthenticatedPortalGaleriaRoute,
+    AuthenticatedPortalPagosRoute: AuthenticatedPortalPagosRoute,
     AuthenticatedPortalPresenciaRoute: AuthenticatedPortalPresenciaRoute,
     AuthenticatedPortalPropiedadRoute: AuthenticatedPortalPropiedadRoute,
     AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
@@ -1672,3 +1694,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
