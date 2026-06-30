@@ -8,6 +8,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 type Scope = "admin" | "business" | "traveler";
+type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
 
 export interface AluxFeedItem {
   event_id: string;
@@ -18,7 +19,7 @@ export interface AluxFeedItem {
   subject_id: string;
   occurred_at: string;
   summary: string;
-  payload: Record<string, unknown>;
+  payload: JsonValue;
   read_state: string;
 }
 
@@ -60,8 +61,8 @@ export const getAluxActivityFeed = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase.rpc("unc_activity_feed_for_alux", {
       _scope: data.scope,
-      _business_id: data.businessId,
-      _since: data.sinceISO,
+      _business_id: data.businessId ?? undefined,
+      _since: data.sinceISO ?? undefined,
       _limit: data.limit,
     });
     if (error) throw error;
@@ -81,8 +82,8 @@ export const getActivitySummaryByPeriod = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase.rpc("unc_activity_summary_by_period", {
       _scope: data.scope,
-      _business_id: data.businessId,
-      _since: data.sinceISO,
+      _business_id: data.businessId ?? undefined,
+      _since: data.sinceISO ?? undefined,
       _bucket: data.bucket,
     });
     if (error) throw error;
@@ -102,8 +103,8 @@ export const getActivityGroupBySubject = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase.rpc("unc_activity_group_by_subject", {
       _scope: data.scope,
-      _business_id: data.businessId,
-      _since: data.sinceISO,
+      _business_id: data.businessId ?? undefined,
+      _since: data.sinceISO ?? undefined,
       _limit: data.limit,
     });
     if (error) throw error;
