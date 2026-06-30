@@ -12,6 +12,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+export interface TripContext {
+  party_size?: number;
+  travel_window?: string;
+  notes?: string;
+}
+
 export interface TravelerProfile {
   user_id: string;
   travel_style: string | null;
@@ -21,7 +27,7 @@ export interface TravelerProfile {
   preferred_language: string | null;
   dietary_restrictions: string | null;
   accessibility_needs: string | null;
-  trip_context: Record<string, unknown>;
+  trip_context: TripContext;
   created_at: string;
   updated_at: string;
 }
@@ -34,7 +40,7 @@ export interface TravelerProfileInput {
   preferred_language?: string | null;
   dietary_restrictions?: string | null;
   accessibility_needs?: string | null;
-  trip_context?: Record<string, unknown>;
+  trip_context?: TripContext;
 }
 
 const TRAVEL_STYLES = new Set([
@@ -70,29 +76,25 @@ function clampList(v: unknown, max = 24, maxItemLen = 80): string[] {
   return Array.from(seen);
 }
 
-function clampTripContext(v: unknown): Record<string, unknown> {
+function clampTripContext(v: unknown): TripContext {
   if (!v || typeof v !== "object" || Array.isArray(v)) return {};
   const src = v as Record<string, unknown>;
-  const out: Record<string, unknown> = {};
-  const allowed = ["party_size", "travel_window", "notes"] as const;
-  for (const key of allowed) {
-    if (src[key] === undefined) continue;
-    const value = src[key];
-    if (key === "party_size") {
-      const n = typeof value === "number" ? value : Number(value);
-      if (Number.isFinite(n) && n >= 1 && n <= 50) out[key] = Math.floor(n);
-    } else if (key === "travel_window") {
-      const s = clampStr(value, 80);
-      if (s) out[key] = s;
-    } else if (key === "notes") {
-      const s = clampStr(value, 600);
-      if (s) out[key] = s;
-    }
+  const out: TripContext = {};
+  if (src.party_size !== undefined) {
+    const n = typeof src.party_size === "number" ? src.party_size : Number(src.party_size);
+    if (Number.isFinite(n) && n >= 1 && n <= 50) out.party_size = Math.floor(n);
   }
+  const win = clampStr(src.travel_window, 80);
+  if (win) out.travel_window = win;
+  const notes = clampStr(src.notes, 600);
+  if (notes) out.notes = notes;
   return out;
 }
 
 function mapRow(row: Record<string, unknown>): TravelerProfile {
+  const ctx = row.trip_context && typeof row.trip_context === "object" && !Array.isArray(row.trip_context)
+    ? clampTripContext(row.trip_context)
+    : {};
   return {
     user_id: String(row.user_id),
     travel_style: (row.travel_style as string | null) ?? null,
@@ -104,10 +106,7 @@ function mapRow(row: Record<string, unknown>): TravelerProfile {
     preferred_language: (row.preferred_language as string | null) ?? null,
     dietary_restrictions: (row.dietary_restrictions as string | null) ?? null,
     accessibility_needs: (row.accessibility_needs as string | null) ?? null,
-    trip_context:
-      row.trip_context && typeof row.trip_context === "object"
-        ? (row.trip_context as Record<string, unknown>)
-        : {},
+    trip_context: ctx,
     created_at: String(row.created_at),
     updated_at: String(row.updated_at),
   };
@@ -164,7 +163,7 @@ export const upsertMyTravelerProfile = createServerFn({ method: "POST" })
       preferred_language: data.preferred_language,
       dietary_restrictions: data.dietary_restrictions,
       accessibility_needs: data.accessibility_needs,
-      trip_context: data.trip_context,
+      trip_context: data.trip_context as unknown as never,
     };
     const { data: row, error } = await context.supabase
       .from("traveler_profiles")
