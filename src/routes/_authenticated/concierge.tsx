@@ -6,19 +6,27 @@
 import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 import {
-  listConciergeCases,
-  type ConciergeCase,
-  type ConciergeCaseScope,
+  listConciergeCasesExtended,
+  getConciergeMyWorkload,
 } from "@/lib/concierge/concierge.functions";
-// Vista mínima sin PageShell para no requerir crumbs en una superficie operativa interna.
 
-function casesQueryOptions(fn: () => Promise<ConciergeCase[]>, scope: ConciergeCaseScope) {
-  return queryOptions({
-    queryKey: ["concierge", "cases", scope],
-    queryFn: fn,
-  });
-}
+type Scope = "concierge" | "unassigned" | "lead";
+type Sort = "updated_at" | "priority" | "sla_status" | "idle" | "created_at" | "trip_date" | "assigned_concierge";
+type CaseRow = {
+  id: string;
+  status: string;
+  priority: string;
+  source: string;
+  summary: string | null;
+  created_at: string;
+  updated_at: string;
+  last_activity_at: string | null;
+  target_response_at: string | null;
+  sla_status: "on_time" | "due_soon" | "overdue" | null;
+  assigned_concierge_user_id: string | null;
+};
 
 export const Route = createFileRoute("/_authenticated/concierge")({
   component: ConciergeInboxPage,
@@ -34,12 +42,35 @@ export const Route = createFileRoute("/_authenticated/concierge")({
 });
 
 function ConciergeInboxPage() {
-  const fn = useServerFn(listConciergeCases);
-  const load = (scope: ConciergeCaseScope) => () =>
-    fn({ data: { scope, limit: 100 } }) as Promise<ConciergeCase[]>;
+  const [scope, setScope] = useState<Scope>("concierge");
+  const [sort, setSort] = useState<Sort>("sla_status");
+  const [priority, setPriority] = useState<string>("");
+  const [slaStatus, setSlaStatus] = useState<string>("");
 
-  const leadQ = useSuspenseQuery(casesQueryOptions(load("lead"), "lead"));
-  const mineQ = useSuspenseQuery(casesQueryOptions(load("concierge"), "concierge"));
+  const listFn = useServerFn(listConciergeCasesExtended);
+  const workloadFn = useServerFn(getConciergeMyWorkload);
+
+  const casesQ = useSuspenseQuery(
+    queryOptions({
+      queryKey: ["concierge", "cases-ext", scope, sort, priority, slaStatus],
+      queryFn: () =>
+        listFn({
+          data: {
+            scope,
+            sort,
+            limit: 100,
+            ...(priority ? { priority: [priority as "low" | "normal" | "high" | "urgent"] } : {}),
+            ...(slaStatus ? { slaStatus: [slaStatus as "on_time" | "due_soon" | "overdue"] } : {}),
+          },
+        }) as Promise<CaseRow[]>,
+    }),
+  );
+  const wlQ = useSuspenseQuery(
+    queryOptions({
+      queryKey: ["concierge", "my-workload"],
+      queryFn: () => workloadFn() as Promise<{ active_cases: number; overdue: number; due_soon: number } | null>,
+    }),
+  );
 
   return (
     <main className="mx-auto w-full max-w-[1100px] px-5 py-10">
@@ -48,29 +79,81 @@ function ConciergeInboxPage() {
           Ola 6 · Concierge Workspace
         </p>
         <h1 className="mt-1 text-2xl font-semibold">Bandeja de expedientes</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Vista de lectura. Acciones de asignación, cotización y propuesta llegan en etapas posteriores.
-        </p>
+        {wlQ.data && (
+          <p className="mt-1 text-sm text-muted-foreground">
+            Activos: <strong className="text-foreground">{wlQ.data.active_cases}</strong>
+            {" · "}Vencidos: <strong className="text-destructive">{wlQ.data.overdue}</strong>
+            {" · "}Por vencer: <strong className="text-amber-600">{wlQ.data.due_soon}</strong>
+          </p>
+        )}
       </header>
 
-      <CasesSection title="Todos los expedientes (lead)" cases={leadQ.data} empty="Sin expedientes registrados." />
-      <CasesSection title="Mis expedientes" cases={mineQ.data} empty="Sin expedientes asignados." />
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <Tab active={scope === "concierge"} label="Mis expedientes" onClick={() => setScope("concierge")} />
+        <Tab active={scope === "unassigned"} label="Sin asignar" onClick={() => setScope("unassigned")} />
+        <Tab active={scope === "lead"} label="Todos (lead)" onClick={() => setScope("lead")} />
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-end gap-3 rounded-md border border-border bg-card/40 p-3 text-xs">
+        <Select label="Ordenar" value={sort} onChange={(v) => setSort(v as Sort)} options={[
+          ["sla_status","SLA"], ["priority","Prioridad"], ["idle","Tiempo sin actividad"],
+          ["created_at","Fecha de creación"], ["trip_date","Fecha de viaje"],
+          ["assigned_concierge","Concierge asignado"], ["updated_at","Última actualización"],
+        ]} />
+        <Select label="Prioridad" value={priority} onChange={setPriority} options={[
+          ["","Todas"], ["urgent","Urgent"], ["high","High"], ["normal","Normal"], ["low","Low"],
+        ]} />
+        <Select label="SLA" value={slaStatus} onChange={setSlaStatus} options={[
+          ["","Todos"], ["overdue","Vencidos"], ["due_soon","Por vencer"], ["on_time","En tiempo"],
+        ]} />
+      </div>
+
+      <CasesSection cases={casesQ.data} empty="Sin expedientes." />
     </main>
   );
 }
 
-function CasesSection({
-  title,
-  cases,
-  empty,
+function Tab({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
+        active ? "bg-primary text-primary-foreground" : "border border-border bg-background hover:bg-muted"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function Select({
+  label, value, onChange, options,
 }: {
-  title: string;
-  cases: ConciergeCase[];
-  empty: string;
+  label: string; value: string; onChange: (v: string) => void; options: ReadonlyArray<readonly [string, string]>;
 }) {
   return (
-    <section className="mt-8">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{title}</h2>
+    <label className="flex flex-col gap-1">
+      <span className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="rounded-md border border-border bg-background px-2 py-1 text-xs"
+      >
+        {options.map(([v, l]) => (<option key={v} value={v}>{l}</option>))}
+      </select>
+    </label>
+  );
+}
+
+function CasesSection({ cases, empty }: { cases: CaseRow[]; empty: string }) {
+  const slaCls = (s: CaseRow["sla_status"]) =>
+    s === "overdue" ? "bg-destructive/15 text-destructive"
+    : s === "due_soon" ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+    : s === "on_time" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+    : "bg-muted text-muted-foreground";
+  return (
+    <section>
       {cases.length === 0 ? (
         <p className="mt-3 rounded-md border border-dashed border-border bg-card/40 p-4 text-sm text-muted-foreground">
           {empty}
@@ -78,20 +161,29 @@ function CasesSection({
       ) : (
         <ul className="mt-3 grid gap-2">
           {cases.map((c) => (
-            <li
-              key={c.id}
-              className="rounded-md border border-border bg-card p-4 text-sm"
-            >
+            <li key={c.id} className="rounded-md border border-border bg-card p-4 text-sm">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="font-mono text-xs text-muted-foreground">{c.id.slice(0, 8)}</span>
-                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-                  {c.status}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${slaCls(c.sla_status)}`}>
+                    SLA · {c.sla_status ?? "n/a"}
+                  </span>
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium">
+                    {c.priority}
+                  </span>
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                    {c.status}
+                  </span>
+                </div>
               </div>
-              <p className="mt-2 font-medium">{c.summary ?? "Sin resumen"}</p>
+              <a href={`/concierge/expedientes/${c.id}`} className="mt-2 block font-medium hover:underline">
+                {c.summary ?? "Sin resumen"}
+              </a>
               <p className="mt-1 text-xs text-muted-foreground">
-                Origen: {c.source} · Prioridad: {c.priority} · Actualizado{" "}
-                {new Date(c.updated_at).toLocaleString()}
+                Origen: {c.source}
+                {c.target_response_at ? ` · Objetivo ${new Date(c.target_response_at).toLocaleString()}` : ""}
+                {c.last_activity_at ? ` · Última actividad ${new Date(c.last_activity_at).toLocaleString()}` : ""}
+                {c.assigned_concierge_user_id ? ` · Resp. ${c.assigned_concierge_user_id.slice(0, 8)}` : " · Sin asignar"}
               </p>
             </li>
           ))}

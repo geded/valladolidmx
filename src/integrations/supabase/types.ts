@@ -747,6 +747,56 @@ export type Database = {
           },
         ]
       }
+      concierge_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by_user_id: string
+          case_id: string
+          concierge_user_id: string
+          created_at: string
+          id: string
+          payload: Json
+          reason: string | null
+          released_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by_user_id: string
+          case_id: string
+          concierge_user_id: string
+          created_at?: string
+          id?: string
+          payload?: Json
+          reason?: string | null
+          released_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by_user_id?: string
+          case_id?: string
+          concierge_user_id?: string
+          created_at?: string
+          id?: string
+          payload?: Json
+          reason?: string | null
+          released_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_assignments_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       concierge_case_links: {
         Row: {
           case_id: string
@@ -971,10 +1021,14 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          last_activity_at: string
           priority: string
+          priority_reason: string | null
+          priority_source: string
           source: string
           status: string
           summary: string | null
+          target_response_at: string | null
           traveler_user_id: string
           updated_at: string
         }
@@ -982,10 +1036,14 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          last_activity_at?: string
           priority?: string
+          priority_reason?: string | null
+          priority_source?: string
           source?: string
           status?: string
           summary?: string | null
+          target_response_at?: string | null
           traveler_user_id: string
           updated_at?: string
         }
@@ -993,10 +1051,14 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          last_activity_at?: string
           priority?: string
+          priority_reason?: string | null
+          priority_source?: string
           source?: string
           status?: string
           summary?: string | null
+          target_response_at?: string | null
           traveler_user_id?: string
           updated_at?: string
         }
@@ -3311,6 +3373,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _concierge_first_response_at: {
+        Args: { _case_id: string }
+        Returns: string
+      }
       _concierge_proposal_publish_to_traveler: {
         Args: {
           _case_id: string
@@ -3351,6 +3417,18 @@ export type Database = {
           _payload: Json
         }
         Returns: undefined
+      }
+      _concierge_sla_status: {
+        Args: {
+          _created_at: string
+          _first_response_at: string
+          _target_response_at: string
+        }
+        Returns: string
+      }
+      _concierge_target_for_priority: {
+        Args: { _priority: string }
+        Returns: string
       }
       _order_recompute_totals: {
         Args: { p_order_id: string }
@@ -3482,9 +3560,17 @@ export type Database = {
         Args: { _traveler: string }
         Returns: undefined
       }
+      concierge_assignments_list_for_case: {
+        Args: { _case_id: string }
+        Returns: Json[]
+      }
       concierge_can_view_case: {
         Args: { _case_id: string; _user_id: string }
         Returns: boolean
+      }
+      concierge_case_assign: {
+        Args: { _case_id: string; _concierge_user_id: string; _reason?: string }
+        Returns: string
       }
       concierge_case_create: {
         Args: { _source?: string; _summary?: string; _traveler_user_id: string }
@@ -3511,7 +3597,15 @@ export type Database = {
       }
       concierge_case_get: { Args: { _case_id: string }; Returns: Json }
       concierge_case_list_for_role: {
-        Args: { _limit?: number; _scope?: string }
+        Args: {
+          _assigned_concierge_user_id?: string
+          _limit?: number
+          _min_idle_minutes?: number
+          _priority?: string[]
+          _scope?: string
+          _sla_status?: string[]
+          _sort?: string
+        }
         Returns: Json[]
       }
       concierge_case_proposals_list: {
@@ -3522,8 +3616,37 @@ export type Database = {
         Args: { _case_id: string }
         Returns: Json[]
       }
+      concierge_case_reassign: {
+        Args: {
+          _case_id: string
+          _new_concierge_user_id: string
+          _reason?: string
+        }
+        Returns: string
+      }
+      concierge_case_release: {
+        Args: { _case_id: string; _reason?: string }
+        Returns: undefined
+      }
+      concierge_case_set_priority: {
+        Args: {
+          _case_id: string
+          _priority: string
+          _reason?: string
+          _source?: string
+        }
+        Returns: undefined
+      }
       concierge_case_set_status: {
         Args: { _case_id: string; _next_status: string; _reason?: string }
+        Returns: undefined
+      }
+      concierge_case_set_target_response: {
+        Args: {
+          _case_id: string
+          _reason?: string
+          _target_response_at: string
+        }
         Returns: undefined
       }
       concierge_case_timeline_append: {
@@ -3536,7 +3659,12 @@ export type Database = {
         }
         Returns: string
       }
+      concierge_case_touch_activity: {
+        Args: { _case_id: string }
+        Returns: undefined
+      }
       concierge_is_internal: { Args: { _user_id: string }; Returns: boolean }
+      concierge_my_workload: { Args: never; Returns: Json }
       concierge_proposal_accept: {
         Args: { _proposal_id: string }
         Returns: Json
@@ -3608,6 +3736,7 @@ export type Database = {
         Args: { _business_id: string; _limit?: number; _scope?: string }
         Returns: Json[]
       }
+      concierge_workload_for_lead: { Args: never; Returns: Json[] }
       create_business_product: {
         Args: {
           _business_id: string

@@ -358,3 +358,185 @@ export const supersedeConciergeProposal = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return pid as string;
   });
+
+/* ============================================================
+ * 14.60.5 — Asignaciones, Prioridad y SLA
+ * ============================================================ */
+
+const PriorityEnum = z.enum(["low", "normal", "high", "urgent"]);
+const PrioritySource = z.enum([
+  "manual",
+  "sla",
+  "trip_date",
+  "payment",
+  "system",
+  "alux",
+  "other",
+]);
+const SlaStatus = z.enum(["on_time", "due_soon", "overdue"]);
+
+const ListExtendedInput = z.object({
+  scope: z
+    .enum(["traveler", "concierge", "lead", "admin", "unassigned"])
+    .default("traveler"),
+  limit: z.number().int().min(1).max(200).default(50),
+  sort: z
+    .enum([
+      "updated_at",
+      "priority",
+      "sla_status",
+      "idle",
+      "created_at",
+      "trip_date",
+      "assigned_concierge",
+    ])
+    .default("updated_at"),
+  priority: z.array(PriorityEnum).optional(),
+  slaStatus: z.array(SlaStatus).optional(),
+  assignedConciergeUserId: z.string().uuid().optional().nullable(),
+  minIdleMinutes: z.number().int().min(0).optional().nullable(),
+});
+
+export const listConciergeCasesExtended = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => ListExtendedInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase.rpc(
+      "concierge_case_list_for_role",
+      {
+        _scope: data.scope,
+        _limit: data.limit,
+        _sort: data.sort,
+        _priority: data.priority ?? null,
+        _sla_status: data.slaStatus ?? null,
+        _assigned_concierge_user_id: data.assignedConciergeUserId ?? null,
+        _min_idle_minutes: data.minIdleMinutes ?? null,
+      } as never,
+    );
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as unknown as Json[];
+  });
+
+const AssignInput = z.object({
+  caseId: z.string().uuid(),
+  conciergeUserId: z.string().uuid(),
+  reason: z.string().max(1000).optional().nullable(),
+});
+
+export const assignConciergeCase = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => AssignInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: id, error } = await context.supabase.rpc("concierge_case_assign", {
+      _case_id: data.caseId,
+      _concierge_user_id: data.conciergeUserId,
+      _reason: data.reason ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return id as string;
+  });
+
+export const reassignConciergeCase = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z
+      .object({
+        caseId: z.string().uuid(),
+        newConciergeUserId: z.string().uuid(),
+        reason: z.string().max(1000).optional().nullable(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: id, error } = await context.supabase.rpc(
+      "concierge_case_reassign",
+      {
+        _case_id: data.caseId,
+        _new_concierge_user_id: data.newConciergeUserId,
+        _reason: data.reason ?? undefined,
+      },
+    );
+    if (error) throw new Error(error.message);
+    return id as string;
+  });
+
+const ReleaseInput = z.object({
+  caseId: z.string().uuid(),
+  reason: z.string().max(1000).optional().nullable(),
+});
+
+export const releaseConciergeCase = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => ReleaseInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("concierge_case_release", {
+      _case_id: data.caseId,
+      _reason: data.reason ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+const SetPriorityInput = z.object({
+  caseId: z.string().uuid(),
+  priority: PriorityEnum,
+  source: PrioritySource.default("manual"),
+  reason: z.string().max(1000).optional().nullable(),
+});
+
+export const setConciergeCasePriority = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => SetPriorityInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc(
+      "concierge_case_set_priority",
+      {
+        _case_id: data.caseId,
+        _priority: data.priority,
+        _source: data.source,
+        _reason: data.reason ?? undefined,
+      },
+    );
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+const SetTargetInput = z.object({
+  caseId: z.string().uuid(),
+  targetResponseAt: z.string().datetime().nullable(),
+  reason: z.string().max(1000).optional().nullable(),
+});
+
+export const setConciergeCaseTargetResponse = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => SetTargetInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc(
+      "concierge_case_set_target_response",
+      {
+        _case_id: data.caseId,
+        _target_response_at: data.targetResponseAt ?? (undefined as unknown as string),
+        _reason: data.reason ?? undefined,
+      },
+    );
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+export const getConciergeMyWorkload = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.rpc("concierge_my_workload");
+    if (error) throw new Error(error.message);
+    return (data ?? null) as Json | null;
+  });
+
+export const getConciergeWorkloadForLead = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.rpc(
+      "concierge_workload_for_lead",
+    );
+    if (error) throw new Error(error.message);
+    return ((data ?? []) as unknown as Json[]);
+  });

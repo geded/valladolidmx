@@ -13,6 +13,9 @@ import {
   viewConciergeProposal,
   withdrawConciergeProposal,
   createConciergeProposal,
+  assignConciergeCase,
+  releaseConciergeCase,
+  setConciergeCasePriority,
 } from "@/lib/concierge/concierge.functions";
 
 type CaseFile = {
@@ -25,6 +28,10 @@ type CaseFile = {
     created_at: string;
     updated_at: string;
     traveler_user_id: string;
+    target_response_at?: string | null;
+    last_activity_at?: string | null;
+    priority_source?: string | null;
+    priority_reason?: string | null;
   };
   viewer: { user_id: string; is_internal: boolean };
   traveler: { user_id: string; display_name?: string | null; preferred_language?: string | null };
@@ -90,6 +97,29 @@ type CaseFile = {
       request_title: string;
     }>;
   }>;
+  assignment?: {
+    id: string;
+    concierge_user_id: string;
+    assigned_at: string;
+    status: string;
+  } | null;
+  assignments?: Array<{
+    id: string;
+    concierge_user_id: string;
+    status: string;
+    assigned_at: string;
+    released_at: string | null;
+    reason: string | null;
+  }>;
+  sla?: {
+    priority: string;
+    priority_source: string | null;
+    priority_reason: string | null;
+    target_response_at: string | null;
+    last_activity_at: string | null;
+    first_response_at: string | null;
+    sla_status: "on_time" | "due_soon" | "overdue" | null;
+  } | null;
 };
 
 export function CaseFileView({ data, hideInternal = false }: { data: unknown; hideInternal?: boolean }) {
@@ -100,6 +130,7 @@ export function CaseFileView({ data, hideInternal = false }: { data: unknown; hi
   return (
     <div className="grid gap-6">
       <Header f={f} />
+      {internal && <SlaAssignmentPanel f={f} />}
       <Section title="Solicitudes">
         {f.requests.length === 0 ? (
           <Empty>Sin solicitudes registradas.</Empty>
@@ -473,5 +504,111 @@ function ActionButton({
     <button type="button" className={cls} onClick={onClick} disabled={disabled}>
       {label}
     </button>
+  );
+}
+
+/* ============================================================
+ * 14.60.5 — SLA + Asignaciones (sólo visible a internos)
+ * ============================================================ */
+function SlaAssignmentPanel({ f }: { f: CaseFile }) {
+  const router = useRouter();
+  const assignFn = useServerFn(assignConciergeCase);
+  const releaseFn = useServerFn(releaseConciergeCase);
+  const setPriorityFn = useServerFn(setConciergeCasePriority);
+  const [busy, setBusy] = useState(false);
+
+  const sla = f.sla ?? null;
+  const assignment = f.assignment ?? null;
+  const viewerId = f.viewer.user_id;
+  const isAssignedToMe = assignment?.concierge_user_id === viewerId;
+
+  const slaBadge =
+    sla?.sla_status === "overdue"
+      ? "bg-destructive/15 text-destructive"
+      : sla?.sla_status === "due_soon"
+        ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+        : sla?.sla_status === "on_time"
+          ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+          : "bg-muted text-muted-foreground";
+
+  async function doAssignSelf() {
+    setBusy(true);
+    try {
+      await assignFn({ data: { caseId: f.case.id, conciergeUserId: viewerId } });
+      router.invalidate();
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function doRelease() {
+    setBusy(true);
+    try {
+      await releaseFn({ data: { caseId: f.case.id } });
+      router.invalidate();
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function changePriority(p: "low" | "normal" | "high" | "urgent") {
+    setBusy(true);
+    try {
+      await setPriorityFn({ data: { caseId: f.case.id, priority: p, source: "manual" } });
+      router.invalidate();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="rounded-lg border border-border bg-card p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className={`rounded-full px-2 py-0.5 font-medium ${slaBadge}`}>
+            SLA · {sla?.sla_status ?? "n/a"}
+          </span>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
+            Prioridad: <strong className="text-foreground">{f.case.priority}</strong>
+            {f.case.priority_source ? ` · ${f.case.priority_source}` : ""}
+          </span>
+          {sla?.target_response_at && (
+            <span className="text-muted-foreground">
+              Objetivo: {new Date(sla.target_response_at).toLocaleString()}
+            </span>
+          )}
+          {sla?.last_activity_at && (
+            <span className="text-muted-foreground">
+              Última actividad: {new Date(sla.last_activity_at).toLocaleString()}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {!assignment && (
+            <ActionButton label="Asignarme" onClick={doAssignSelf} disabled={busy} />
+          )}
+          {assignment && isAssignedToMe && (
+            <ActionButton label="Liberar" variant="ghost" onClick={doRelease} disabled={busy} />
+          )}
+          {assignment && !isAssignedToMe && (
+            <span className="text-xs text-muted-foreground">
+              Responsable: {assignment.concierge_user_id.slice(0, 8)}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+        <span className="text-muted-foreground">Cambiar prioridad:</span>
+        {(["low", "normal", "high", "urgent"] as const).map((p) => (
+          <button
+            key={p}
+            type="button"
+            disabled={busy || p === f.case.priority}
+            onClick={() => changePriority(p)}
+            className="rounded-md border border-border bg-background px-2 py-1 text-[11px] font-medium hover:bg-muted disabled:opacity-50"
+          >
+            {p}
+          </button>
+        ))}
+      </div>
+    </section>
   );
 }
