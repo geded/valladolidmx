@@ -36,6 +36,7 @@ import { Route as AuthenticatedPortalPropiedadRouteImport } from './routes/_auth
 import { Route as AuthenticatedPortalPresenciaRouteImport } from './routes/_authenticated/portal/presencia'
 import { Route as AuthenticatedPortalGaleriaRouteImport } from './routes/_authenticated/portal/galeria'
 import { Route as AuthenticatedPortalFichaRouteImport } from './routes/_authenticated/portal/ficha'
+import { Route as AuthenticatedPortalConciergeRouteImport } from './routes/_authenticated/portal/concierge'
 import { Route as AuthenticatedPortalCatalogoRouteImport } from './routes/_authenticated/portal/catalogo'
 import { Route as AuthenticatedPortalActividadRouteImport } from './routes/_authenticated/portal/actividad'
 import { Route as AuthenticatedCuentaPerfilRouteImport } from './routes/_authenticated/cuenta/perfil'
@@ -211,6 +212,12 @@ const AuthenticatedPortalFichaRoute =
   AuthenticatedPortalFichaRouteImport.update({
     id: '/ficha',
     path: '/ficha',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
+const AuthenticatedPortalConciergeRoute =
+  AuthenticatedPortalConciergeRouteImport.update({
+    id: '/concierge',
+    path: '/concierge',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
 const AuthenticatedPortalCatalogoRoute =
@@ -452,6 +459,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
+  '/portal/concierge': typeof AuthenticatedPortalConciergeRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
@@ -511,6 +519,7 @@ export interface FileRoutesByTo {
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
+  '/portal/concierge': typeof AuthenticatedPortalConciergeRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
@@ -575,6 +584,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/_authenticated/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/_authenticated/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
+  '/_authenticated/portal/concierge': typeof AuthenticatedPortalConciergeRoute
   '/_authenticated/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/_authenticated/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/_authenticated/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
@@ -639,6 +649,7 @@ export interface FileRouteTypes {
     | '/cuenta/perfil'
     | '/portal/actividad'
     | '/portal/catalogo'
+    | '/portal/concierge'
     | '/portal/ficha'
     | '/portal/galeria'
     | '/portal/presencia'
@@ -698,6 +709,7 @@ export interface FileRouteTypes {
     | '/cuenta/perfil'
     | '/portal/actividad'
     | '/portal/catalogo'
+    | '/portal/concierge'
     | '/portal/ficha'
     | '/portal/galeria'
     | '/portal/presencia'
@@ -761,6 +773,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/perfil'
     | '/_authenticated/portal/actividad'
     | '/_authenticated/portal/catalogo'
+    | '/_authenticated/portal/concierge'
     | '/_authenticated/portal/ficha'
     | '/_authenticated/portal/galeria'
     | '/_authenticated/portal/presencia'
@@ -996,6 +1009,13 @@ declare module '@tanstack/react-router' {
       path: '/ficha'
       fullPath: '/portal/ficha'
       preLoaderRoute: typeof AuthenticatedPortalFichaRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
+    '/_authenticated/portal/concierge': {
+      id: '/_authenticated/portal/concierge'
+      path: '/concierge'
+      fullPath: '/portal/concierge'
+      preLoaderRoute: typeof AuthenticatedPortalConciergeRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
     '/_authenticated/portal/catalogo': {
@@ -1291,6 +1311,7 @@ const AuthenticatedCuentaRouteRouteWithChildren =
 interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalActividadRoute: typeof AuthenticatedPortalActividadRoute
   AuthenticatedPortalCatalogoRoute: typeof AuthenticatedPortalCatalogoRoute
+  AuthenticatedPortalConciergeRoute: typeof AuthenticatedPortalConciergeRoute
   AuthenticatedPortalFichaRoute: typeof AuthenticatedPortalFichaRoute
   AuthenticatedPortalGaleriaRoute: typeof AuthenticatedPortalGaleriaRoute
   AuthenticatedPortalPresenciaRoute: typeof AuthenticatedPortalPresenciaRoute
@@ -1304,6 +1325,7 @@ const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildr
   {
     AuthenticatedPortalActividadRoute: AuthenticatedPortalActividadRoute,
     AuthenticatedPortalCatalogoRoute: AuthenticatedPortalCatalogoRoute,
+    AuthenticatedPortalConciergeRoute: AuthenticatedPortalConciergeRoute,
     AuthenticatedPortalFichaRoute: AuthenticatedPortalFichaRoute,
     AuthenticatedPortalGaleriaRoute: AuthenticatedPortalGaleriaRoute,
     AuthenticatedPortalPresenciaRoute: AuthenticatedPortalPresenciaRoute,

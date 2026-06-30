@@ -1038,6 +1038,85 @@ export type Database = {
         }
         Relationships: []
       }
+      concierge_quotes: {
+        Row: {
+          business_id: string
+          case_id: string
+          created_at: string
+          currency: string
+          expired_at: string | null
+          id: string
+          notes: string | null
+          payload: Json
+          request_id: string
+          status: string
+          submitted_at: string | null
+          submitted_by_user_id: string | null
+          terms: string | null
+          total_amount_cents: number | null
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          business_id: string
+          case_id: string
+          created_at?: string
+          currency?: string
+          expired_at?: string | null
+          id?: string
+          notes?: string | null
+          payload?: Json
+          request_id: string
+          status?: string
+          submitted_at?: string | null
+          submitted_by_user_id?: string | null
+          terms?: string | null
+          total_amount_cents?: number | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          business_id?: string
+          case_id?: string
+          created_at?: string
+          currency?: string
+          expired_at?: string | null
+          id?: string
+          notes?: string | null
+          payload?: Json
+          request_id?: string
+          status?: string
+          submitted_at?: string | null
+          submitted_by_user_id?: string | null
+          terms?: string | null
+          total_amount_cents?: number | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_quotes_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_quotes_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_quotes_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_case_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_audit_log: {
         Row: {
           action: string
@@ -3104,6 +3183,28 @@ export type Database = {
         Args: { _case_id: string; _request_id: string }
         Returns: undefined
       }
+      _concierge_quote_publish_to_business: {
+        Args: {
+          _business_id: string
+          _category: Database["public"]["Enums"]["notification_category"]
+          _email_template?: string
+          _event_id: string
+          _event_type: string
+          _payload: Json
+        }
+        Returns: undefined
+      }
+      _concierge_quote_publish_to_case_staff: {
+        Args: {
+          _case_id: string
+          _category: Database["public"]["Enums"]["notification_category"]
+          _email_template?: string
+          _event_id: string
+          _event_type: string
+          _payload: Json
+        }
+        Returns: undefined
+      }
       _order_recompute_totals: {
         Args: { p_order_id: string }
         Returns: undefined
@@ -3266,6 +3367,10 @@ export type Database = {
         Args: { _limit?: number; _scope?: string }
         Returns: Json[]
       }
+      concierge_case_quotes_list: {
+        Args: { _case_id: string }
+        Returns: Json[]
+      }
       concierge_case_set_status: {
         Args: { _case_id: string; _next_status: string; _reason?: string }
         Returns: undefined
@@ -3281,6 +3386,34 @@ export type Database = {
         Returns: string
       }
       concierge_is_internal: { Args: { _user_id: string }; Returns: boolean }
+      concierge_quote_expire_due: { Args: never; Returns: number }
+      concierge_quote_request: {
+        Args: {
+          _business_id: string
+          _request_id: string
+          _valid_for_hours?: number
+        }
+        Returns: string
+      }
+      concierge_quote_submit: {
+        Args: {
+          _currency?: string
+          _notes?: string
+          _payload?: Json
+          _quote_id: string
+          _terms?: string
+          _total_amount_cents: number
+        }
+        Returns: undefined
+      }
+      concierge_quote_withdraw: {
+        Args: { _quote_id: string; _reason?: string }
+        Returns: undefined
+      }
+      concierge_quotes_list_for_business: {
+        Args: { _business_id: string; _limit?: number; _scope?: string }
+        Returns: Json[]
+      }
       create_business_product: {
         Args: {
           _business_id: string

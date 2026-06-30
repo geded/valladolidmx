@@ -35,6 +35,23 @@ type CaseFile = {
     occurred_at: string;
     severity: string;
   }>;
+  quotes?: Array<{
+    quote_id: string;
+    request_id: string;
+    business_id: string;
+    business_name: string | null;
+    status: string;
+    currency: string;
+    total_amount_cents: number | null;
+    valid_until: string | null;
+    submitted_at: string | null;
+    expired_at: string | null;
+    created_at: string;
+    notes: string | null;
+    terms: string | null;
+    request_title: string;
+    request_kind: string;
+  }>;
 };
 
 export function CaseFileView({ data, hideInternal = false }: { data: unknown; hideInternal?: boolean }) {
@@ -77,6 +94,32 @@ export function CaseFileView({ data, hideInternal = false }: { data: unknown; hi
                 className="rounded-full border border-border bg-card px-3 py-1"
               >
                 {b.display_name}
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
+
+      {internal && f.quotes && f.quotes.length > 0 && (
+        <Section title="Cotizaciones">
+          <ul className="grid gap-2">
+            {f.quotes.map((q) => (
+              <li key={q.quote_id} className="rounded-md border border-border bg-card p-3 text-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-medium">
+                    {q.business_name ?? "Empresa"} · {q.request_title}
+                  </span>
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                    {q.status}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {q.total_amount_cents != null
+                    ? `${(q.total_amount_cents / 100).toLocaleString("es-MX", { style: "currency", currency: q.currency })}`
+                    : "Sin monto"}
+                  {q.valid_until ? ` · Vigente hasta ${new Date(q.valid_until).toLocaleString()}` : ""}
+                </p>
+                {q.notes ? <p className="mt-1 text-xs text-foreground/80">{q.notes}</p> : null}
               </li>
             ))}
           </ul>

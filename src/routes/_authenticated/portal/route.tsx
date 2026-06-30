@@ -104,6 +104,7 @@ function PortalLayout() {
       { to: "/portal/galeria" as const, label: "Galería" },
       { to: "/portal/catalogo" as const, label: "Catálogo" },
       { to: "/portal/actividad" as const, label: "Actividad" },
+      { to: "/portal/concierge" as const, label: "Concierge" },
       { to: "/portal/invitaciones" as const, label: "Invitaciones" },
       { to: "/portal/propiedad" as const, label: "Propiedad" },
     ],
