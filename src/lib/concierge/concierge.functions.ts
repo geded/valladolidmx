@@ -9,6 +9,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type ConciergeCaseScope = "traveler" | "concierge" | "lead" | "admin";
 
+type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
+
 export interface ConciergeCase {
   id: string;
   traveler_user_id: string;
@@ -47,5 +49,5 @@ export const getConciergeCase = createServerFn({ method: "GET" })
       _case_id: data.caseId,
     });
     if (error) throw new Error(error.message);
-    return (row ?? null) as Record<string, unknown> | null;
+    return (row ?? null) as Json | null;
   });
