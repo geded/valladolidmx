@@ -1478,6 +1478,7 @@ export type Database = {
           event_type: string
           id: string
           is_active: boolean
+          sender_identity: string | null
           template_key: string | null
           updated_at: string
         }
@@ -1489,6 +1490,7 @@ export type Database = {
           event_type: string
           id?: string
           is_active?: boolean
+          sender_identity?: string | null
           template_key?: string | null
           updated_at?: string
         }
@@ -1500,6 +1502,7 @@ export type Database = {
           event_type?: string
           id?: string
           is_active?: boolean
+          sender_identity?: string | null
           template_key?: string | null
           updated_at?: string
         }
@@ -3060,6 +3063,41 @@ export type Database = {
       }
       unc_mark_delivery_read: {
         Args: { _delivery_id: string }
+        Returns: {
+          attempt_count: number
+          audience: string
+          category: Database["public"]["Enums"]["notification_category"]
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          delivered_at: string | null
+          event_id: string
+          event_type: string
+          id: string
+          last_error: string | null
+          payload_ref: Json
+          read_at: string | null
+          recipient_user_id: string | null
+          status: Database["public"]["Enums"]["notification_delivery_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "notification_deliveries"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      unc_publish_email: {
+        Args: {
+          _audience: string
+          _category: Database["public"]["Enums"]["notification_category"]
+          _event_id: string
+          _event_type: string
+          _payload_ref?: Json
+          _recipient_user_id: string
+          _sender_identity?: string
+          _template_key: string
+        }
         Returns: {
           attempt_count: number
           audience: string
