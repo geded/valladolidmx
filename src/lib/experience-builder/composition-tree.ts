@@ -14,8 +14,13 @@ export interface CompositionNode {
   type: string;
   /** Versión semántica del contrato del bloque. */
   version: string;
-  /** Configuración validada contra el `schema` del Block Contract. */
-  config: Record<string, unknown>;
+  /**
+   * Configuración validada contra el `schema` del Block Contract.
+   * `any` permite que la estructura cruce la frontera de serialización
+   * de `createServerFn` sin perder tipado en su uso de dominio.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  config: Record<string, any>;
   /**
    * Hijos del bloque (solo aplica a bloques contenedor reconocidos por el
    * Layout Engine). Layout y contenido están desacoplados: cualquier bloque
@@ -115,7 +120,8 @@ export function moveRootNode(
 export function updateNodeConfig(
   tree: CompositionTree,
   id: string,
-  config: Record<string, unknown>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  config: Record<string, any>,
 ): CompositionTree {
   return mapTree(tree, (n) => (n.id === id ? { ...n, config } : n));
 }
