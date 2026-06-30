@@ -27,12 +27,17 @@ import { Route as MarketplaceBuscarRouteImport } from './routes/marketplace/busc
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
 import { Route as AuthenticatedCmsRouteImport } from './routes/_authenticated/cms'
 import { Route as AuthenticatedPortalRouteRouteImport } from './routes/_authenticated/portal/route'
+import { Route as AuthenticatedCuentaRouteRouteImport } from './routes/_authenticated/cuenta/route'
 import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal/index'
+import { Route as AuthenticatedCuentaIndexRouteImport } from './routes/_authenticated/cuenta/index'
 import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticated/cms/index'
 import { Route as AuthenticatedPortalPresenciaRouteImport } from './routes/_authenticated/portal/presencia'
 import { Route as AuthenticatedPortalGaleriaRouteImport } from './routes/_authenticated/portal/galeria'
 import { Route as AuthenticatedPortalFichaRouteImport } from './routes/_authenticated/portal/ficha'
 import { Route as AuthenticatedPortalCatalogoRouteImport } from './routes/_authenticated/portal/catalogo'
+import { Route as AuthenticatedCuentaPerfilRouteImport } from './routes/_authenticated/cuenta/perfil'
+import { Route as AuthenticatedCuentaHistorialRouteImport } from './routes/_authenticated/cuenta/historial'
+import { Route as AuthenticatedCuentaFavoritosRouteImport } from './routes/_authenticated/cuenta/favoritos'
 import { Route as AuthenticatedCmsZonasRouteImport } from './routes/_authenticated/cms/zonas'
 import { Route as AuthenticatedCmsProductosRouteImport } from './routes/_authenticated/cms/productos'
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
@@ -139,11 +144,23 @@ const AuthenticatedPortalRouteRoute =
     path: '/portal',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedCuentaRouteRoute =
+  AuthenticatedCuentaRouteRouteImport.update({
+    id: '/cuenta',
+    path: '/cuenta',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedPortalIndexRoute =
   AuthenticatedPortalIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
+const AuthenticatedCuentaIndexRoute =
+  AuthenticatedCuentaIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
 const AuthenticatedCmsIndexRoute = AuthenticatedCmsIndexRouteImport.update({
   id: '/',
@@ -173,6 +190,24 @@ const AuthenticatedPortalCatalogoRoute =
     id: '/catalogo',
     path: '/catalogo',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
+const AuthenticatedCuentaPerfilRoute =
+  AuthenticatedCuentaPerfilRouteImport.update({
+    id: '/perfil',
+    path: '/perfil',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
+const AuthenticatedCuentaHistorialRoute =
+  AuthenticatedCuentaHistorialRouteImport.update({
+    id: '/historial',
+    path: '/historial',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
+const AuthenticatedCuentaFavoritosRoute =
+  AuthenticatedCuentaFavoritosRouteImport.update({
+    id: '/favoritos',
+    path: '/favoritos',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
 const AuthenticatedCmsZonasRoute = AuthenticatedCmsZonasRouteImport.update({
   id: '/zonas',
@@ -274,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/hoteles': typeof HotelesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/cms': typeof AuthenticatedCmsRouteWithChildren
   '/marketplace/$slug': typeof MarketplaceSlugRoute
@@ -286,11 +322,15 @@ export interface FileRoutesByFullPath {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
+  '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
+  '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/cms/': typeof AuthenticatedCmsIndexRoute
+  '/cuenta/': typeof AuthenticatedCuentaIndexRoute
   '/portal/': typeof AuthenticatedPortalIndexRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
@@ -324,11 +364,15 @@ export interface FileRoutesByTo {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
+  '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
+  '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/cms': typeof AuthenticatedCmsIndexRoute
+  '/cuenta': typeof AuthenticatedCuentaIndexRoute
   '/portal': typeof AuthenticatedPortalIndexRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
@@ -354,6 +398,7 @@ export interface FileRoutesById {
   '/hoteles': typeof HotelesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/_authenticated/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRouteRouteWithChildren
   '/_authenticated/cms': typeof AuthenticatedCmsRouteWithChildren
   '/marketplace/$slug': typeof MarketplaceSlugRoute
@@ -366,11 +411,15 @@ export interface FileRoutesById {
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/productos': typeof AuthenticatedCmsProductosRoute
   '/_authenticated/cms/zonas': typeof AuthenticatedCmsZonasRoute
+  '/_authenticated/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
+  '/_authenticated/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
+  '/_authenticated/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/_authenticated/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/_authenticated/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/_authenticated/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
   '/_authenticated/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
+  '/_authenticated/cuenta/': typeof AuthenticatedCuentaIndexRoute
   '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
   '/_authenticated/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
   '/_authenticated/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
@@ -396,6 +445,7 @@ export interface FileRouteTypes {
     | '/hoteles'
     | '/reset-password'
     | '/restaurantes'
+    | '/cuenta'
     | '/portal'
     | '/cms'
     | '/marketplace/$slug'
@@ -408,11 +458,15 @@ export interface FileRouteTypes {
     | '/cms/media'
     | '/cms/productos'
     | '/cms/zonas'
+    | '/cuenta/favoritos'
+    | '/cuenta/historial'
+    | '/cuenta/perfil'
     | '/portal/catalogo'
     | '/portal/ficha'
     | '/portal/galeria'
     | '/portal/presencia'
     | '/cms/'
+    | '/cuenta/'
     | '/portal/'
     | '/cms/categorias/editar'
     | '/cms/categorias/nueva'
@@ -446,11 +500,15 @@ export interface FileRouteTypes {
     | '/cms/media'
     | '/cms/productos'
     | '/cms/zonas'
+    | '/cuenta/favoritos'
+    | '/cuenta/historial'
+    | '/cuenta/perfil'
     | '/portal/catalogo'
     | '/portal/ficha'
     | '/portal/galeria'
     | '/portal/presencia'
     | '/cms'
+    | '/cuenta'
     | '/portal'
     | '/cms/categorias/editar'
     | '/cms/categorias/nueva'
@@ -475,6 +533,7 @@ export interface FileRouteTypes {
     | '/hoteles'
     | '/reset-password'
     | '/restaurantes'
+    | '/_authenticated/cuenta'
     | '/_authenticated/portal'
     | '/_authenticated/cms'
     | '/marketplace/$slug'
@@ -487,11 +546,15 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/media'
     | '/_authenticated/cms/productos'
     | '/_authenticated/cms/zonas'
+    | '/_authenticated/cuenta/favoritos'
+    | '/_authenticated/cuenta/historial'
+    | '/_authenticated/cuenta/perfil'
     | '/_authenticated/portal/catalogo'
     | '/_authenticated/portal/ficha'
     | '/_authenticated/portal/galeria'
     | '/_authenticated/portal/presencia'
     | '/_authenticated/cms/'
+    | '/_authenticated/cuenta/'
     | '/_authenticated/portal/'
     | '/_authenticated/cms/categorias/editar'
     | '/_authenticated/cms/categorias/nueva'
@@ -652,12 +715,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalRouteRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/cuenta': {
+      id: '/_authenticated/cuenta'
+      path: '/cuenta'
+      fullPath: '/cuenta'
+      preLoaderRoute: typeof AuthenticatedCuentaRouteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/portal/': {
       id: '/_authenticated/portal/'
       path: '/'
       fullPath: '/portal/'
       preLoaderRoute: typeof AuthenticatedPortalIndexRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
+    '/_authenticated/cuenta/': {
+      id: '/_authenticated/cuenta/'
+      path: '/'
+      fullPath: '/cuenta/'
+      preLoaderRoute: typeof AuthenticatedCuentaIndexRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
     '/_authenticated/cms/': {
       id: '/_authenticated/cms/'
@@ -693,6 +770,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal/catalogo'
       preLoaderRoute: typeof AuthenticatedPortalCatalogoRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
+    '/_authenticated/cuenta/perfil': {
+      id: '/_authenticated/cuenta/perfil'
+      path: '/perfil'
+      fullPath: '/cuenta/perfil'
+      preLoaderRoute: typeof AuthenticatedCuentaPerfilRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
+    '/_authenticated/cuenta/historial': {
+      id: '/_authenticated/cuenta/historial'
+      path: '/historial'
+      fullPath: '/cuenta/historial'
+      preLoaderRoute: typeof AuthenticatedCuentaHistorialRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
+    '/_authenticated/cuenta/favoritos': {
+      id: '/_authenticated/cuenta/favoritos'
+      path: '/favoritos'
+      fullPath: '/cuenta/favoritos'
+      preLoaderRoute: typeof AuthenticatedCuentaFavoritosRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
     '/_authenticated/cms/zonas': {
       id: '/_authenticated/cms/zonas'
@@ -802,6 +900,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedCuentaRouteRouteChildren {
+  AuthenticatedCuentaFavoritosRoute: typeof AuthenticatedCuentaFavoritosRoute
+  AuthenticatedCuentaHistorialRoute: typeof AuthenticatedCuentaHistorialRoute
+  AuthenticatedCuentaPerfilRoute: typeof AuthenticatedCuentaPerfilRoute
+  AuthenticatedCuentaIndexRoute: typeof AuthenticatedCuentaIndexRoute
+}
+
+const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildren =
+  {
+    AuthenticatedCuentaFavoritosRoute: AuthenticatedCuentaFavoritosRoute,
+    AuthenticatedCuentaHistorialRoute: AuthenticatedCuentaHistorialRoute,
+    AuthenticatedCuentaPerfilRoute: AuthenticatedCuentaPerfilRoute,
+    AuthenticatedCuentaIndexRoute: AuthenticatedCuentaIndexRoute,
+  }
+
+const AuthenticatedCuentaRouteRouteWithChildren =
+  AuthenticatedCuentaRouteRoute._addFileChildren(
+    AuthenticatedCuentaRouteRouteChildren,
+  )
+
 interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalCatalogoRoute: typeof AuthenticatedPortalCatalogoRoute
   AuthenticatedPortalFichaRoute: typeof AuthenticatedPortalFichaRoute
@@ -868,11 +986,13 @@ const AuthenticatedCmsRouteWithChildren =
   AuthenticatedCmsRoute._addFileChildren(AuthenticatedCmsRouteChildren)
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedCuentaRouteRoute: typeof AuthenticatedCuentaRouteRouteWithChildren
   AuthenticatedPortalRouteRoute: typeof AuthenticatedPortalRouteRouteWithChildren
   AuthenticatedCmsRoute: typeof AuthenticatedCmsRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedCuentaRouteRoute: AuthenticatedCuentaRouteRouteWithChildren,
   AuthenticatedPortalRouteRoute: AuthenticatedPortalRouteRouteWithChildren,
   AuthenticatedCmsRoute: AuthenticatedCmsRouteWithChildren,
 }
