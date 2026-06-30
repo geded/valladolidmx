@@ -83,15 +83,14 @@ export const createConciergeCaseFromTravelPlan = createServerFn({ method: "POST"
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => FromTravelPlanInput.parse(data))
   .handler(async ({ data, context }) => {
-    const args = {
-      _traveler_user_id: context.userId,
-      _summary: data.summary,
-      _items: (data.items ?? []) as Json,
-      ...(data.travelPlanId ? { _travel_plan_id: data.travelPlanId } : {}),
-    } as Parameters<typeof context.supabase.rpc<"concierge_case_from_travel_plan">>[1];
     const { data: caseId, error } = await context.supabase.rpc(
       "concierge_case_from_travel_plan",
-      args,
+      {
+        _traveler_user_id: context.userId,
+        _summary: data.summary,
+        _items: (data.items ?? []) as Json,
+        _travel_plan_id: data.travelPlanId ?? "00000000-0000-0000-0000-000000000000",
+      },
     );
     if (error) throw new Error(error.message);
     return caseId as string;
