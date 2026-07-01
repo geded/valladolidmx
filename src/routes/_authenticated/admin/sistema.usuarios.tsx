@@ -312,9 +312,18 @@ function UsersTable({ rows, variant }: { rows: AdminUserRow[]; variant: "travele
   );
 }
 
-function UserRow({ row, assignable }: { row: AdminUserRow; assignable: AppRole[] }) {
+function UserRow({
+  row,
+  assignable,
+  customRoles,
+}: {
+  row: AdminUserRow;
+  assignable: AppRole[];
+  customRoles: Array<{ id: string; slug: string; name: string; color: string }>;
+}) {
   const qc = useQueryClient();
   const [pending, setPending] = useState<AppRole | "">("");
+  const [pendingCustom, setPendingCustom] = useState<string>("");
   const [editOpen, setEditOpen] = useState(false);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin", "users-roles"] });
@@ -337,7 +346,20 @@ function UserRow({ row, assignable }: { row: AdminUserRow; assignable: AppRole[]
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const assignCustomMut = useMutation({
+    mutationFn: (roleId: string) => assignCustomRoleRpc(row.user_id, roleId),
+    onSuccess: () => { toast.success("Rol personalizado asignado"); invalidate(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const revokeCustomMut = useMutation({
+    mutationFn: (roleId: string) => revokeCustomRoleRpc(row.user_id, roleId),
+    onSuccess: () => { toast.success("Rol personalizado revocado"); invalidate(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const available = assignable.filter((r) => !row.roles.includes(r));
+  const assignedCustomIds = new Set(row.custom_roles.map((c) => c.id));
+  const availableCustom = customRoles.filter((c) => !assignedCustomIds.has(c.id));
 
   return (
     <tr className="border-t border-border align-top">
@@ -387,10 +409,33 @@ function UserRow({ row, assignable }: { row: AdminUserRow; assignable: AppRole[]
             })
           )}
         </div>
+        {row.custom_roles.length > 0 ? (
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {row.custom_roles.map((c) => (
+              <span
+                key={c.id}
+                className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs"
+                style={{ borderColor: c.color, color: c.color }}
+              >
+                <span aria-hidden className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: c.color }} />
+                {c.name}
+                <button
+                  type="button"
+                  onClick={() => revokeCustomMut.mutate(c.id)}
+                  disabled={revokeCustomMut.isPending}
+                  className="text-destructive hover:underline"
+                  aria-label={`Revocar ${c.name}`}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        ) : null}
       </td>
       <td className="px-4 py-3">
         {available.length === 0 ? (
-          <span className="text-xs text-muted-foreground">Sin roles disponibles en esta pestaña.</span>
+          <span className="text-xs text-muted-foreground">Sin roles de sistema disponibles.</span>
         ) : (
           <div className="flex gap-2">
             <select
@@ -419,6 +464,32 @@ function UserRow({ row, assignable }: { row: AdminUserRow; assignable: AppRole[]
             </button>
           </div>
         )}
+        {availableCustom.length > 0 ? (
+          <div className="mt-2 flex gap-2">
+            <select
+              value={pendingCustom}
+              onChange={(e) => setPendingCustom(e.target.value)}
+              className="rounded-md border border-border bg-background px-2 py-1 text-xs"
+            >
+              <option value="">Rol personalizado…</option>
+              {availableCustom.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              disabled={!pendingCustom || assignCustomMut.isPending}
+              onClick={() => {
+                if (!pendingCustom) return;
+                assignCustomMut.mutate(pendingCustom);
+                setPendingCustom("");
+              }}
+              className="rounded-md border border-border px-3 py-1 text-xs font-medium hover:bg-muted disabled:opacity-50"
+            >
+              Asignar
+            </button>
+          </div>
+        ) : null}
       </td>
     </tr>
   );
