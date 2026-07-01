@@ -20,6 +20,13 @@ import {
   sendPasswordReset,
   deleteUser,
 } from "@/lib/admin/user-management.functions";
+import {
+  listPermissions,
+  listRoles,
+  createRole,
+  updateRole,
+  deleteRole,
+} from "@/lib/admin/roles-catalog.functions";
 import { toast } from "sonner";
 
 interface AdminUserRow {
