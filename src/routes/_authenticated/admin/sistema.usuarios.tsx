@@ -761,3 +761,433 @@ function InviteDialog({
     </div>
   );
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// Roles y Permisos — gestor dinámico
+// ────────────────────────────────────────────────────────────────────────────
+
+interface RoleRow {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  color: string;
+  icon: string | null;
+  is_system: boolean;
+  system_role: AppRole | null;
+  sort_order: number;
+  permissionIds: string[];
+}
+
+interface PermissionRow {
+  id: string;
+  key: string;
+  resource: string;
+  action: string;
+  category: string;
+  label: string;
+  description: string | null;
+  is_dangerous: boolean;
+}
+
+function RolesManager() {
+  const qc = useQueryClient();
+  const fetchRoles = useServerFn(listRoles);
+  const fetchPerms = useServerFn(listPermissions);
+
+  const roles = useQuery({
+    queryKey: ["admin", "roles-catalog"],
+    queryFn: () => fetchRoles() as Promise<RoleRow[]>,
+    retry: false,
+  });
+  const perms = useQuery({
+    queryKey: ["admin", "permissions-catalog"],
+    queryFn: () => fetchPerms() as Promise<PermissionRow[]>,
+    retry: false,
+  });
+
+  const [editing, setEditing] = useState<RoleRow | null>(null);
+  const [creating, setCreating] = useState(false);
+
+  if (roles.isLoading || perms.isLoading) {
+    return <p className="mt-6 text-sm text-muted-foreground">Cargando roles…</p>;
+  }
+  if (roles.error || perms.error) {
+    return (
+      <p className="mt-6 text-sm text-destructive">
+        Error: {((roles.error ?? perms.error) as Error).message}
+      </p>
+    );
+  }
+
+  const permList = perms.data ?? [];
+  const roleList = roles.data ?? [];
+
+  return (
+    <div className="mt-6 space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">
+          {roleList.length} roles ({roleList.filter((r) => r.is_system).length} de sistema,{" "}
+          {roleList.filter((r) => !r.is_system).length} personalizados) · {permList.length} permisos
+          disponibles.
+        </p>
+        <button
+          type="button"
+          onClick={() => setCreating(true)}
+          className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-medium text-primary-foreground"
+        >
+          + Crear rol personalizado
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+        {roleList.map((role) => (
+          <button
+            key={role.id}
+            type="button"
+            onClick={() => setEditing(role)}
+            className="group rounded-2xl border border-border bg-card p-4 text-left transition hover:border-primary"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span
+                  aria-hidden
+                  className="inline-block h-3 w-3 rounded-full"
+                  style={{ backgroundColor: role.color }}
+                />
+                <span className="text-sm font-medium">{role.name}</span>
+              </div>
+              {role.is_system ? (
+                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                  Sistema
+                </span>
+              ) : (
+                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-primary">
+                  Custom
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              <code className="text-[11px]">{role.slug}</code>
+            </p>
+            {role.description ? (
+              <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{role.description}</p>
+            ) : null}
+            <p className="mt-3 text-xs">
+              {role.slug === "super_admin"
+                ? "Todos los permisos (bypass)"
+                : `${role.permissionIds.length} permisos asignados`}
+            </p>
+          </button>
+        ))}
+      </div>
+
+      {editing ? (
+        <RoleEditor
+          role={editing}
+          permissions={permList}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            qc.invalidateQueries({ queryKey: ["admin", "roles-catalog"] });
+            setEditing(null);
+          }}
+        />
+      ) : null}
+      {creating ? (
+        <RoleEditor
+          role={null}
+          permissions={permList}
+          onClose={() => setCreating(false)}
+          onSaved={() => {
+            qc.invalidateQueries({ queryKey: ["admin", "roles-catalog"] });
+            setCreating(false);
+          }}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function RoleEditor({
+  role,
+  permissions,
+  onClose,
+  onSaved,
+}: {
+  role: RoleRow | null;
+  permissions: PermissionRow[];
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const isNew = role === null;
+  const isSystem = role?.is_system ?? false;
+  const isSuperAdmin = role?.slug === "super_admin";
+
+  const [name, setName] = useState(role?.name ?? "");
+  const [slug, setSlug] = useState(role?.slug ?? "");
+  const [description, setDescription] = useState(role?.description ?? "");
+  const [color, setColor] = useState(role?.color ?? "#64748b");
+  const [selected, setSelected] = useState<Set<string>>(
+    () => new Set(role?.permissionIds ?? []),
+  );
+  const [confirmDel, setConfirmDel] = useState("");
+
+  const createFn = useServerFn(createRole);
+  const updateFn = useServerFn(updateRole);
+  const deleteFn = useServerFn(deleteRole);
+
+  const createMut = useMutation({
+    mutationFn: () =>
+      createFn({
+        data: {
+          slug,
+          name,
+          description,
+          color,
+          icon: "shield",
+          permissionIds: [...selected],
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Rol creado.");
+      onSaved();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const updateMut = useMutation({
+    mutationFn: () =>
+      updateFn({
+        data: {
+          roleId: role!.id,
+          name,
+          description,
+          color,
+          permissionIds: [...selected],
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Rol actualizado.");
+      onSaved();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: () => deleteFn({ data: { roleId: role!.id } }),
+    onSuccess: () => {
+      toast.success("Rol eliminado.");
+      onSaved();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const byCategory = useMemo(() => {
+    const map = new Map<string, PermissionRow[]>();
+    for (const p of permissions) {
+      const arr = map.get(p.category) ?? [];
+      arr.push(p);
+      map.set(p.category, arr);
+    }
+    return [...map.entries()];
+  }, [permissions]);
+
+  function togglePerm(id: string) {
+    if (isSystem && !isSuperAdmin) {
+      // Permitimos editar permisos de roles de sistema (excepto super_admin)
+      // porque el linter dice "protege slug/is_system/system_role", no permisos.
+    }
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  const disabled = isSuperAdmin; // super_admin siempre tiene todo, no se edita
+  const canDelete = !isNew && !isSystem;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-xl">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-semibold">
+              {isNew ? "Crear rol personalizado" : `Editar rol: ${role!.name}`}
+            </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {isSuperAdmin
+                ? "El super administrador tiene todos los permisos por diseño. Sólo se muestra como referencia."
+                : isSystem
+                  ? "Rol de sistema. Puedes ajustar permisos pero no renombrar ni eliminar."
+                  : "Rol personalizado. Puedes editar todo o eliminarlo."}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-border px-3 py-1 text-sm"
+          >
+            Cerrar
+          </button>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+          <label className="block text-sm">
+            Nombre
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={isSystem}
+              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm disabled:opacity-60"
+            />
+          </label>
+          <label className="block text-sm">
+            Identificador (slug)
+            <input
+              value={slug}
+              onChange={(e) => setSlug(e.target.value.toLowerCase())}
+              disabled={!isNew}
+              placeholder="ej. editor_destinos"
+              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm disabled:opacity-60"
+            />
+          </label>
+          <label className="block text-sm md:col-span-2">
+            Descripción
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={isSystem}
+              rows={2}
+              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm disabled:opacity-60"
+            />
+          </label>
+          <label className="flex items-center gap-3 text-sm">
+            Color
+            <input
+              type="color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              disabled={isSystem}
+              className="h-9 w-16 rounded border border-border bg-background disabled:opacity-60"
+            />
+            <code className="text-xs text-muted-foreground">{color}</code>
+          </label>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="text-sm font-medium">Permisos</h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {disabled
+              ? "Editable sólo para roles que no son super_admin."
+              : "Marca las acciones que este rol podrá ejecutar. Los permisos marcados con ⚠ son sensibles."}
+          </p>
+          <div className="mt-3 space-y-4">
+            {byCategory.map(([cat, list]) => (
+              <div key={cat} className="rounded-xl border border-border p-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium">{cat}</h4>
+                  <button
+                    type="button"
+                    disabled={disabled}
+                    onClick={() =>
+                      setSelected((prev) => {
+                        const next = new Set(prev);
+                        const allOn = list.every((p) => next.has(p.id));
+                        for (const p of list) {
+                          if (allOn) next.delete(p.id);
+                          else next.add(p.id);
+                        }
+                        return next;
+                      })
+                    }
+                    className="text-xs text-primary underline-offset-2 hover:underline disabled:opacity-50"
+                  >
+                    {list.every((p) => selected.has(p.id)) ? "Quitar todos" : "Marcar todos"}
+                  </button>
+                </div>
+                <div className="mt-2 grid grid-cols-1 gap-1 sm:grid-cols-2">
+                  {list.map((p) => (
+                    <label
+                      key={p.id}
+                      className="flex items-start gap-2 rounded-md px-2 py-1 text-sm hover:bg-muted/40"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selected.has(p.id)}
+                        onChange={() => togglePerm(p.id)}
+                        disabled={disabled}
+                        className="mt-1"
+                      />
+                      <span>
+                        <span className="font-medium">
+                          {p.label}
+                          {p.is_dangerous ? <span className="ml-1 text-destructive">⚠</span> : null}
+                        </span>
+                        <span className="block text-[11px] text-muted-foreground">
+                          <code>{p.key}</code>
+                          {p.description ? ` · ${p.description}` : ""}
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+          {canDelete ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={confirmDel}
+                onChange={(e) => setConfirmDel(e.target.value)}
+                placeholder='Escribe "ELIMINAR" para borrar'
+                className="w-56 rounded-md border border-destructive/40 bg-background px-3 py-2 text-xs"
+              />
+              <button
+                type="button"
+                disabled={confirmDel !== "ELIMINAR" || deleteMut.isPending}
+                onClick={() => deleteMut.mutate()}
+                className="rounded-md border border-destructive px-3 py-2 text-xs text-destructive disabled:opacity-50"
+              >
+                {deleteMut.isPending ? "Eliminando…" : "Eliminar rol"}
+              </button>
+            </div>
+          ) : (
+            <span />
+          )}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-md border border-border px-3 py-2 text-sm"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              disabled={
+                disabled ||
+                createMut.isPending ||
+                updateMut.isPending ||
+                (isNew && (!name.trim() || !slug.trim()))
+              }
+              onClick={() => (isNew ? createMut.mutate() : updateMut.mutate())}
+              className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+            >
+              {createMut.isPending || updateMut.isPending
+                ? "Guardando…"
+                : isNew
+                  ? "Crear rol"
+                  : "Guardar cambios"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
