@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   listBlockLibrary,
@@ -56,6 +56,10 @@ export const Route = createFileRoute("/_authenticated/cms/experience-builder")({
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    page: typeof s.page === "string" ? s.page : undefined,
+    mode: s.mode === "professional" || s.mode === "visual" ? s.mode : undefined,
+  }),
   component: ExperienceBuilderShell,
 });
 
@@ -78,7 +82,17 @@ type StudioMode = "visual" | "professional";
 function ExperienceBuilderShell() {
   const { roles } = useAuth();
   const canAdvanced = roles.includes("admin") || roles.includes("super_admin");
-  const [mode, setMode] = useState<StudioMode>("visual");
+  const search = useSearch({ from: "/_authenticated/cms/experience-builder" }) as {
+    page?: string;
+    mode?: StudioMode;
+  };
+  const navigate = useNavigate({ from: "/_authenticated/cms/experience-builder" });
+  const mode: StudioMode = search.mode ?? "visual";
+  const page = search.page ?? null;
+  const setMode = (m: StudioMode) =>
+    void navigate({ search: (prev) => ({ ...prev, mode: m }), replace: true });
+  const setPage = (k: string | null) =>
+    void navigate({ search: (prev) => ({ ...prev, page: k ?? undefined }), replace: true });
 
   return (
     <div className="flex flex-col">
@@ -87,7 +101,9 @@ function ExperienceBuilderShell() {
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Studio
           </p>
-          <h1 className="truncate text-sm font-semibold">Experience Builder</h1>
+          <h1 className="truncate text-sm font-semibold">
+            Experience Builder{page ? ` · ${page}` : ""}
+          </h1>
         </div>
         <div className="ml-auto flex items-center gap-1 rounded-full border border-border bg-card p-0.5 text-[11px]">
           <button
@@ -118,7 +134,11 @@ function ExperienceBuilderShell() {
           </button>
         </div>
       </div>
-      {mode === "visual" ? <VisualStudio /> : <ProfessionalStudio />}
+      {mode === "visual" ? (
+        <VisualStudio page={page} onSelectPage={setPage} />
+      ) : (
+        <ProfessionalStudio />
+      )}
     </div>
   );
 }
