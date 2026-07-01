@@ -315,7 +315,19 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
 const wrap = (Component: () => ReactNode): BlockPreview => () => <Component />;
 
 const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
-  "vmx.hero": wrap(Hero),
+  "vmx.hero": ({ node }) => (
+    <Hero
+      config={{
+        eyebrow: node.config.eyebrow as string | undefined,
+        title: node.config.title as string | undefined,
+        subtitle: node.config.subtitle as string | undefined,
+        cta_label: node.config.cta_label as string | undefined,
+        cta_href: node.config.cta_href as string | undefined,
+        cta_secondary_label: node.config.cta_secondary_label as string | undefined,
+        cta_secondary_href: node.config.cta_secondary_href as string | undefined,
+      }}
+    />
+  ),
   "vmx.section.destinos": wrap(DestinosSection),
   "vmx.section.categorias": wrap(CategoriasSection),
   "vmx.section.rutas": wrap(RutasSection),

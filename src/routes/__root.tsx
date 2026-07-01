@@ -148,7 +148,8 @@ function RootComponent() {
     pathname.startsWith("/admin") ||
     pathname.startsWith("/cuenta") ||
     pathname.startsWith("/concierge") ||
-    pathname.startsWith("/empresa");
+    pathname.startsWith("/empresa") ||
+    pathname.startsWith("/paginas");
 
   // Fase 0: limpia SWs huérfanos (PWA skill compliance). En fase futura,
   // este punto se cambia por registro real con vite-plugin-pwa.

@@ -11,7 +11,6 @@
  * sin tocar layout, copy, CTAs ni degradados.
  */
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { Search, ArrowRight, Compass } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { useTranslation } from "@/i18n/context";
@@ -21,7 +20,26 @@ import heroBg02 from "@/assets/brand/hero/bg02.jpg";
 const HERO_SLIDES = [heroBg01, heroBg02] as const;
 const SLIDE_INTERVAL_MS = 7000;
 
-export function Hero() {
+/**
+ * Configuración editable del Hero (15.10.4d · US-01).
+ * Todos los campos son opcionales; cuando no vienen del Experience Builder
+ * se recurre a las cadenas i18n existentes (fallback sin regresión).
+ */
+export interface HeroConfig {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  cta_label?: string;
+  cta_href?: string;
+  cta_secondary_label?: string;
+  cta_secondary_href?: string;
+}
+
+export interface HeroProps {
+  config?: HeroConfig;
+}
+
+export function Hero({ config }: HeroProps = {}) {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
 
@@ -35,6 +53,14 @@ export function Hero() {
     );
     return () => window.clearInterval(id);
   }, []);
+
+  const eyebrow = config?.eyebrow?.trim() || t("hero.eyebrow");
+  const title = config?.title?.trim() || t("hero.title");
+  const subtitle = config?.subtitle?.trim() || t("hero.subtitle");
+  const ctaPrimaryLabel = config?.cta_label?.trim() || t("hero.cta_primary");
+  const ctaPrimaryHref = config?.cta_href?.trim() || "/oriente-maya";
+  const ctaSecondaryLabel = config?.cta_secondary_label?.trim() || t("hero.cta_secondary");
+  const ctaSecondaryHref = config?.cta_secondary_href?.trim() || "/arma-tu-viaje";
 
   return (
     <section
@@ -78,30 +104,30 @@ export function Hero() {
         className="relative flex min-h-[100svh] flex-col justify-center gap-4 pb-10 pt-20 md:min-h-[100dvh] md:justify-end md:gap-0 md:pb-28 md:pt-40"
       >
         <p className="font-script text-[1.625rem] leading-tight text-white/95 drop-shadow-sm sm:text-3xl md:text-[2.5rem]">
-          {t("hero.eyebrow")}
+          {eyebrow}
         </p>
         <h1 className="max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:text-[2.75rem] sm:leading-[1.05] md:mt-3 md:text-[3.5rem] lg:text-[4rem]">
-          {t("hero.title")}
+          {title}
         </h1>
         <p className="max-w-2xl text-pretty text-base text-white/90 drop-shadow sm:text-lg md:mt-5 md:text-lg lg:text-xl">
-          {t("hero.subtitle")}
+          {subtitle}
         </p>
 
         <div className="flex flex-wrap items-center gap-3 md:mt-8">
-          <Link
-            to="/oriente-maya"
+          <a
+            href={ctaPrimaryHref}
             className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-black/5 transition hover:scale-[1.02] hover:opacity-95 sm:px-6 sm:py-3"
           >
-            {t("hero.cta_primary")}
+            {ctaPrimaryLabel}
             <ArrowRight className="size-4" aria-hidden />
-          </Link>
-          <Link
-            to="/arma-tu-viaje"
+          </a>
+          <a
+            href={ctaSecondaryHref}
             className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/35 bg-white/5 px-5 py-2.5 text-sm font-medium text-white/95 backdrop-blur transition hover:bg-white/15 sm:px-6 sm:py-3"
           >
             <Compass className="size-4" aria-hidden />
-            {t("hero.cta_secondary")}
-          </Link>
+            {ctaSecondaryLabel}
+          </a>
         </div>
 
         {/* Buscador discreto (12C.1): secundario al mensaje inspirador. */}
