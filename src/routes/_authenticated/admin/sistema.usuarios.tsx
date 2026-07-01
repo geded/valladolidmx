@@ -9,8 +9,10 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { ROLE_LABELS, type AppRole } from "@/types/auth";
+import { inviteUser } from "@/lib/admin/user-management.functions";
 import { toast } from "sonner";
 
 interface AdminUserRow {
@@ -183,6 +185,7 @@ function AdminUsuariosPage() {
 
 function UsersTable({ rows, variant }: { rows: AdminUserRow[]; variant: "travelers" | "staff" | "business" }) {
   const [filter, setFilter] = useState("");
+  const [inviteOpen, setInviteOpen] = useState(false);
   const assignableForTab: AppRole[] =
     variant === "travelers"
       ? ["traveler"]
@@ -210,10 +213,21 @@ function UsersTable({ rows, variant }: { rows: AdminUserRow[]; variant: "travele
           onChange={(e) => setFilter(e.target.value)}
           className="w-full max-w-sm rounded-md border border-border bg-background px-3 py-2 text-sm"
         />
-        <p className="text-xs text-muted-foreground">
-          Crear nuevas cuentas (invitación por email) — próximamente.
-        </p>
+        <button
+          type="button"
+          onClick={() => setInviteOpen(true)}
+          className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-medium text-primary-foreground"
+        >
+          + Invitar usuario
+        </button>
       </div>
+      {inviteOpen ? (
+        <InviteDialog
+          defaultRole={assignableForTab[0]}
+          allowedRoles={assignableForTab}
+          onClose={() => setInviteOpen(false)}
+        />
+      ) : null}
       <div className="overflow-hidden rounded-2xl border border-border">
         <table className="w-full text-sm">
           <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
