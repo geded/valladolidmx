@@ -69,6 +69,7 @@ import { Route as AuthenticatedCmsDestinosRouteImport } from './routes/_authenti
 import { Route as AuthenticatedCmsAlertasRouteImport } from './routes/_authenticated/cms/alertas'
 import { Route as AuthenticatedCmsActividadRouteImport } from './routes/_authenticated/cms/actividad'
 import { Route as AuthenticatedAdminTuristasRouteImport } from './routes/_authenticated/admin/turistas'
+import { Route as AuthenticatedAdminSistemaRouteImport } from './routes/_authenticated/admin/sistema'
 import { Route as AuthenticatedAdminOperacionesRouteImport } from './routes/_authenticated/admin/operaciones'
 import { Route as AuthenticatedAdminIaRouteImport } from './routes/_authenticated/admin/ia'
 import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
@@ -427,6 +428,12 @@ const AuthenticatedAdminTuristasRoute =
     path: '/turistas',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminSistemaRoute =
+  AuthenticatedAdminSistemaRouteImport.update({
+    id: '/sistema',
+    path: '/sistema',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminOperacionesRoute =
   AuthenticatedAdminOperacionesRouteImport.update({
     id: '/operaciones',
@@ -482,9 +489,9 @@ const AuthenticatedCmsCategoriasIndexRoute =
   } as any)
 const AuthenticatedAdminSistemaIndexRoute =
   AuthenticatedAdminSistemaIndexRouteImport.update({
-    id: '/sistema/',
-    path: '/sistema/',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminSistemaRoute,
   } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
@@ -570,9 +577,9 @@ const AuthenticatedCmsCategoriasEditarRoute =
   } as any)
 const AuthenticatedAdminSistemaUsuariosRoute =
   AuthenticatedAdminSistemaUsuariosRouteImport.update({
-    id: '/sistema/usuarios',
-    path: '/sistema/usuarios',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
+    id: '/usuarios',
+    path: '/usuarios',
+    getParentRoute: () => AuthenticatedAdminSistemaRoute,
   } as any)
 const ApiPublicPaymentsProviderWebhookRoute =
   ApiPublicPaymentsProviderWebhookRouteImport.update({
@@ -625,6 +632,7 @@ export interface FileRoutesByFullPath {
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/ia': typeof AuthenticatedAdminIaRoute
   '/admin/operaciones': typeof AuthenticatedAdminOperacionesRoute
+  '/admin/sistema': typeof AuthenticatedAdminSistemaRouteWithChildren
   '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
@@ -800,6 +808,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/_authenticated/admin/ia': typeof AuthenticatedAdminIaRoute
   '/_authenticated/admin/operaciones': typeof AuthenticatedAdminOperacionesRoute
+  '/_authenticated/admin/sistema': typeof AuthenticatedAdminSistemaRouteWithChildren
   '/_authenticated/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/_authenticated/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/_authenticated/cms/alertas': typeof AuthenticatedCmsAlertasRoute
@@ -891,6 +900,7 @@ export interface FileRouteTypes {
     | '/admin/empresas'
     | '/admin/ia'
     | '/admin/operaciones'
+    | '/admin/sistema'
     | '/admin/turistas'
     | '/cms/actividad'
     | '/cms/alertas'
@@ -1065,6 +1075,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/empresas'
     | '/_authenticated/admin/ia'
     | '/_authenticated/admin/operaciones'
+    | '/_authenticated/admin/sistema'
     | '/_authenticated/admin/turistas'
     | '/_authenticated/cms/actividad'
     | '/_authenticated/cms/alertas'
@@ -1573,6 +1584,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTuristasRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/sistema': {
+      id: '/_authenticated/admin/sistema'
+      path: '/sistema'
+      fullPath: '/admin/sistema'
+      preLoaderRoute: typeof AuthenticatedAdminSistemaRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/operaciones': {
       id: '/_authenticated/admin/operaciones'
       path: '/operaciones'
@@ -1638,10 +1656,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/sistema/': {
       id: '/_authenticated/admin/sistema/'
-      path: '/sistema'
+      path: '/'
       fullPath: '/admin/sistema/'
       preLoaderRoute: typeof AuthenticatedAdminSistemaIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
+      parentRoute: typeof AuthenticatedAdminSistemaRoute
     }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
@@ -1743,10 +1761,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/sistema/usuarios': {
       id: '/_authenticated/admin/sistema/usuarios'
-      path: '/sistema/usuarios'
+      path: '/usuarios'
       fullPath: '/admin/sistema/usuarios'
       preLoaderRoute: typeof AuthenticatedAdminSistemaUsuariosRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
+      parentRoute: typeof AuthenticatedAdminSistemaRoute
     }
     '/api/public/payments/$provider/webhook': {
       id: '/api/public/payments/$provider/webhook'
@@ -1772,15 +1790,31 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminSistemaRouteChildren {
+  AuthenticatedAdminSistemaUsuariosRoute: typeof AuthenticatedAdminSistemaUsuariosRoute
+  AuthenticatedAdminSistemaIndexRoute: typeof AuthenticatedAdminSistemaIndexRoute
+}
+
+const AuthenticatedAdminSistemaRouteChildren: AuthenticatedAdminSistemaRouteChildren =
+  {
+    AuthenticatedAdminSistemaUsuariosRoute:
+      AuthenticatedAdminSistemaUsuariosRoute,
+    AuthenticatedAdminSistemaIndexRoute: AuthenticatedAdminSistemaIndexRoute,
+  }
+
+const AuthenticatedAdminSistemaRouteWithChildren =
+  AuthenticatedAdminSistemaRoute._addFileChildren(
+    AuthenticatedAdminSistemaRouteChildren,
+  )
+
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminConciergeRoute: typeof AuthenticatedAdminConciergeRoute
   AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
   AuthenticatedAdminIaRoute: typeof AuthenticatedAdminIaRoute
   AuthenticatedAdminOperacionesRoute: typeof AuthenticatedAdminOperacionesRoute
+  AuthenticatedAdminSistemaRoute: typeof AuthenticatedAdminSistemaRouteWithChildren
   AuthenticatedAdminTuristasRoute: typeof AuthenticatedAdminTuristasRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
-  AuthenticatedAdminSistemaUsuariosRoute: typeof AuthenticatedAdminSistemaUsuariosRoute
-  AuthenticatedAdminSistemaIndexRoute: typeof AuthenticatedAdminSistemaIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
@@ -1789,11 +1823,9 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
     AuthenticatedAdminIaRoute: AuthenticatedAdminIaRoute,
     AuthenticatedAdminOperacionesRoute: AuthenticatedAdminOperacionesRoute,
+    AuthenticatedAdminSistemaRoute: AuthenticatedAdminSistemaRouteWithChildren,
     AuthenticatedAdminTuristasRoute: AuthenticatedAdminTuristasRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
-    AuthenticatedAdminSistemaUsuariosRoute:
-      AuthenticatedAdminSistemaUsuariosRoute,
-    AuthenticatedAdminSistemaIndexRoute: AuthenticatedAdminSistemaIndexRoute,
   }
 
 const AuthenticatedAdminRouteRouteWithChildren =
