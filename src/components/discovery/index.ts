@@ -10,3 +10,4 @@ export { PublicShell, type PublicShellProps, type PublicShellVariant } from "./P
 export { PublicHeader } from "./PublicHeader";
 export { PublicFooter } from "./PublicFooter";
 export { OfflineBanner } from "./OfflineBanner";
+export { SyncStatusBanner } from "./SyncStatusBanner";
