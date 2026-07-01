@@ -38,7 +38,6 @@ import { Route as AuthenticatedCuentaRouteRouteImport } from './routes/_authenti
 import { Route as AuthenticatedConciergeRouteRouteImport } from './routes/_authenticated/concierge/route'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal/index'
-import { Route as AuthenticatedPaginasIndexRouteImport } from './routes/_authenticated/paginas.index'
 import { Route as AuthenticatedCuentaIndexRouteImport } from './routes/_authenticated/cuenta/index'
 import { Route as AuthenticatedConciergeIndexRouteImport } from './routes/_authenticated/concierge/index'
 import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticated/cms/index'
@@ -51,7 +50,6 @@ import { Route as AuthenticatedPortalFichaRouteImport } from './routes/_authenti
 import { Route as AuthenticatedPortalConciergeRouteImport } from './routes/_authenticated/portal/concierge'
 import { Route as AuthenticatedPortalCatalogoRouteImport } from './routes/_authenticated/portal/catalogo'
 import { Route as AuthenticatedPortalActividadRouteImport } from './routes/_authenticated/portal/actividad'
-import { Route as AuthenticatedPaginasInicioRouteImport } from './routes/_authenticated/paginas.inicio'
 import { Route as AuthenticatedCuentaPerfilRouteImport } from './routes/_authenticated/cuenta/perfil'
 import { Route as AuthenticatedCuentaNotificacionesRouteImport } from './routes/_authenticated/cuenta/notificaciones'
 import { Route as AuthenticatedCuentaHistorialRouteImport } from './routes/_authenticated/cuenta/historial'
@@ -248,12 +246,6 @@ const AuthenticatedPortalIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
-const AuthenticatedPaginasIndexRoute =
-  AuthenticatedPaginasIndexRouteImport.update({
-    id: '/paginas/',
-    path: '/paginas/',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedCuentaIndexRoute =
   AuthenticatedCuentaIndexRouteImport.update({
     id: '/',
@@ -323,12 +315,6 @@ const AuthenticatedPortalActividadRoute =
     id: '/actividad',
     path: '/actividad',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
-  } as any)
-const AuthenticatedPaginasInicioRoute =
-  AuthenticatedPaginasInicioRouteImport.update({
-    id: '/paginas/inicio',
-    path: '/paginas/inicio',
-    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedCuentaPerfilRoute =
   AuthenticatedCuentaPerfilRouteImport.update({
@@ -651,7 +637,6 @@ export interface FileRoutesByFullPath {
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
-  '/paginas/inicio': typeof AuthenticatedPaginasInicioRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/portal/concierge': typeof AuthenticatedPortalConciergeRoute
@@ -664,7 +649,6 @@ export interface FileRoutesByFullPath {
   '/cms/': typeof AuthenticatedCmsIndexRoute
   '/concierge/': typeof AuthenticatedConciergeIndexRoute
   '/cuenta/': typeof AuthenticatedCuentaIndexRoute
-  '/paginas/': typeof AuthenticatedPaginasIndexRoute
   '/portal/': typeof AuthenticatedPortalIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
@@ -736,7 +720,6 @@ export interface FileRoutesByTo {
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
-  '/paginas/inicio': typeof AuthenticatedPaginasInicioRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/portal/concierge': typeof AuthenticatedPortalConciergeRoute
@@ -749,7 +732,6 @@ export interface FileRoutesByTo {
   '/cms': typeof AuthenticatedCmsIndexRoute
   '/concierge': typeof AuthenticatedConciergeIndexRoute
   '/cuenta': typeof AuthenticatedCuentaIndexRoute
-  '/paginas': typeof AuthenticatedPaginasIndexRoute
   '/portal': typeof AuthenticatedPortalIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
@@ -828,7 +810,6 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
   '/_authenticated/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/_authenticated/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
-  '/_authenticated/paginas/inicio': typeof AuthenticatedPaginasInicioRoute
   '/_authenticated/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/_authenticated/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/_authenticated/portal/concierge': typeof AuthenticatedPortalConciergeRoute
@@ -841,7 +822,6 @@ export interface FileRoutesById {
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
   '/_authenticated/concierge/': typeof AuthenticatedConciergeIndexRoute
   '/_authenticated/cuenta/': typeof AuthenticatedCuentaIndexRoute
-  '/_authenticated/paginas/': typeof AuthenticatedPaginasIndexRoute
   '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
   '/_authenticated/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/_authenticated/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
@@ -920,7 +900,6 @@ export interface FileRouteTypes {
     | '/cuenta/historial'
     | '/cuenta/notificaciones'
     | '/cuenta/perfil'
-    | '/paginas/inicio'
     | '/portal/actividad'
     | '/portal/catalogo'
     | '/portal/concierge'
@@ -933,7 +912,6 @@ export interface FileRouteTypes {
     | '/cms/'
     | '/concierge/'
     | '/cuenta/'
-    | '/paginas/'
     | '/portal/'
     | '/admin/sistema/usuarios'
     | '/cms/categorias/editar'
@@ -1005,7 +983,6 @@ export interface FileRouteTypes {
     | '/cuenta/historial'
     | '/cuenta/notificaciones'
     | '/cuenta/perfil'
-    | '/paginas/inicio'
     | '/portal/actividad'
     | '/portal/catalogo'
     | '/portal/concierge'
@@ -1018,7 +995,6 @@ export interface FileRouteTypes {
     | '/cms'
     | '/concierge'
     | '/cuenta'
-    | '/paginas'
     | '/portal'
     | '/admin/sistema/usuarios'
     | '/cms/categorias/editar'
@@ -1096,7 +1072,6 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/historial'
     | '/_authenticated/cuenta/notificaciones'
     | '/_authenticated/cuenta/perfil'
-    | '/_authenticated/paginas/inicio'
     | '/_authenticated/portal/actividad'
     | '/_authenticated/portal/catalogo'
     | '/_authenticated/portal/concierge'
@@ -1109,7 +1084,6 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/'
     | '/_authenticated/concierge/'
     | '/_authenticated/cuenta/'
-    | '/_authenticated/paginas/'
     | '/_authenticated/portal/'
     | '/_authenticated/admin/sistema/usuarios'
     | '/_authenticated/cms/categorias/editar'
@@ -1369,13 +1343,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalIndexRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
-    '/_authenticated/paginas/': {
-      id: '/_authenticated/paginas/'
-      path: '/paginas'
-      fullPath: '/paginas/'
-      preLoaderRoute: typeof AuthenticatedPaginasIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/cuenta/': {
       id: '/_authenticated/cuenta/'
       path: '/'
@@ -1459,13 +1426,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal/actividad'
       preLoaderRoute: typeof AuthenticatedPortalActividadRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
-    }
-    '/_authenticated/paginas/inicio': {
-      id: '/_authenticated/paginas/inicio'
-      path: '/paginas/inicio'
-      fullPath: '/paginas/inicio'
-      preLoaderRoute: typeof AuthenticatedPaginasInicioRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/cuenta/perfil': {
       id: '/_authenticated/cuenta/perfil'
@@ -2027,8 +1987,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCmsRoute: typeof AuthenticatedCmsRouteWithChildren
   AuthenticatedEmpresaRoute: typeof AuthenticatedEmpresaRoute
   AuthenticatedMiViajeRoute: typeof AuthenticatedMiViajeRoute
-  AuthenticatedPaginasInicioRoute: typeof AuthenticatedPaginasInicioRoute
-  AuthenticatedPaginasIndexRoute: typeof AuthenticatedPaginasIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -2040,8 +1998,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCmsRoute: AuthenticatedCmsRouteWithChildren,
   AuthenticatedEmpresaRoute: AuthenticatedEmpresaRoute,
   AuthenticatedMiViajeRoute: AuthenticatedMiViajeRoute,
-  AuthenticatedPaginasInicioRoute: AuthenticatedPaginasInicioRoute,
-  AuthenticatedPaginasIndexRoute: AuthenticatedPaginasIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
