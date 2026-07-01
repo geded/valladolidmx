@@ -14,9 +14,10 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider } from "@/i18n/context";
 import { AuthProvider } from "@/hooks/useAuth";
-import { PublicHeader, PublicFooter, OfflineBanner } from "@/components/discovery";
+import { PublicHeader, PublicFooter, OfflineBanner, SyncStatusBanner } from "@/components/discovery";
 import { AluxFloatingTrigger } from "@/components/layout/AluxFloatingTrigger";
 import { registerServiceWorker } from "@/pwa/register-sw";
+import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
 
 function NotFoundComponent() {
@@ -147,6 +148,7 @@ function RootComponent() {
   // este punto se cambia por registro real con vite-plugin-pwa.
   useEffect(() => {
     void registerServiceWorker();
+    startSyncRunner();
   }, []);
 
   return (
@@ -161,6 +163,7 @@ function RootComponent() {
         </a>
         {!isAppShellRoute ? <PublicHeader variant={headerVariant} /> : null}
         {!isAppShellRoute ? <OfflineBanner /> : null}
+        <SyncStatusBanner />
         <Outlet />
         {!isAppShellRoute ? <PublicFooter /> : null}
         {!isAppShellRoute ? <AluxFloatingTrigger /> : null}
