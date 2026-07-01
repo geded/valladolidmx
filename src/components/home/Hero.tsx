@@ -11,7 +11,6 @@
  * sin tocar layout, copy, CTAs ni degradados.
  */
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { Search, ArrowRight, Compass } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { useTranslation } from "@/i18n/context";
@@ -115,20 +114,20 @@ export function Hero({ config }: HeroProps = {}) {
         </p>
 
         <div className="flex flex-wrap items-center gap-3 md:mt-8">
-          <Link
-            to={ctaPrimaryHref}
+          <a
+            href={ctaPrimaryHref}
             className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-black/5 transition hover:scale-[1.02] hover:opacity-95 sm:px-6 sm:py-3"
           >
             {ctaPrimaryLabel}
             <ArrowRight className="size-4" aria-hidden />
-          </Link>
-          <Link
-            to={ctaSecondaryHref}
+          </a>
+          <a
+            href={ctaSecondaryHref}
             className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/35 bg-white/5 px-5 py-2.5 text-sm font-medium text-white/95 backdrop-blur transition hover:bg-white/15 sm:px-6 sm:py-3"
           >
             <Compass className="size-4" aria-hidden />
             {ctaSecondaryLabel}
-          </Link>
+          </a>
         </div>
 
         {/* Buscador discreto (12C.1): secundario al mensaje inspirador. */}
