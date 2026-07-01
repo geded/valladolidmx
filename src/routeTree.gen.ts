@@ -79,6 +79,7 @@ import { Route as AuthenticatedPortalEmpresasIndexRouteImport } from './routes/_
 import { Route as AuthenticatedCmsReviewsIndexRouteImport } from './routes/_authenticated/cms/reviews.index'
 import { Route as AuthenticatedCmsRegionesIndexRouteImport } from './routes/_authenticated/cms/regiones.index'
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
+import { Route as AuthenticatedAdminSistemaIndexRouteImport } from './routes/_authenticated/admin/sistema.index'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -486,6 +487,12 @@ const AuthenticatedCmsCategoriasIndexRoute =
     path: '/categorias/',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedAdminSistemaIndexRoute =
+  AuthenticatedAdminSistemaIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminSistemaRoute,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -673,6 +680,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/admin/sistema/': typeof AuthenticatedAdminSistemaIndexRoute
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
@@ -709,7 +717,6 @@ export interface FileRoutesByTo {
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/ia': typeof AuthenticatedAdminIaRoute
   '/admin/operaciones': typeof AuthenticatedAdminOperacionesRoute
-  '/admin/sistema': typeof AuthenticatedAdminSistemaRouteWithChildren
   '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
@@ -757,6 +764,7 @@ export interface FileRoutesByTo {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/admin/sistema': typeof AuthenticatedAdminSistemaIndexRoute
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews': typeof AuthenticatedCmsReviewsIndexRoute
@@ -848,6 +856,7 @@ export interface FileRoutesById {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/_authenticated/admin/sistema/': typeof AuthenticatedAdminSistemaIndexRoute
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/_authenticated/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/_authenticated/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
@@ -939,6 +948,7 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/admin/sistema/'
     | '/cms/categorias/'
     | '/cms/regiones/'
     | '/cms/reviews/'
@@ -975,7 +985,6 @@ export interface FileRouteTypes {
     | '/admin/empresas'
     | '/admin/ia'
     | '/admin/operaciones'
-    | '/admin/sistema'
     | '/admin/turistas'
     | '/cms/actividad'
     | '/cms/alertas'
@@ -1023,6 +1032,7 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/admin/sistema'
     | '/cms/categorias'
     | '/cms/regiones'
     | '/cms/reviews'
@@ -1113,6 +1123,7 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/_authenticated/admin/sistema/'
     | '/_authenticated/cms/categorias/'
     | '/_authenticated/cms/regiones/'
     | '/_authenticated/cms/reviews/'
@@ -1643,6 +1654,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsCategoriasIndexRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/admin/sistema/': {
+      id: '/_authenticated/admin/sistema/'
+      path: '/'
+      fullPath: '/admin/sistema/'
+      preLoaderRoute: typeof AuthenticatedAdminSistemaIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminSistemaRoute
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -1774,12 +1792,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminSistemaRouteChildren {
   AuthenticatedAdminSistemaUsuariosRoute: typeof AuthenticatedAdminSistemaUsuariosRoute
+  AuthenticatedAdminSistemaIndexRoute: typeof AuthenticatedAdminSistemaIndexRoute
 }
 
 const AuthenticatedAdminSistemaRouteChildren: AuthenticatedAdminSistemaRouteChildren =
   {
     AuthenticatedAdminSistemaUsuariosRoute:
       AuthenticatedAdminSistemaUsuariosRoute,
+    AuthenticatedAdminSistemaIndexRoute: AuthenticatedAdminSistemaIndexRoute,
   }
 
 const AuthenticatedAdminSistemaRouteWithChildren =
