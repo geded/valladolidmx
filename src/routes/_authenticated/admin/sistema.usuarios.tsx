@@ -231,6 +231,13 @@ function AdminUsuariosPage() {
 function UsersTable({ rows, variant }: { rows: AdminUserRow[]; variant: "travelers" | "staff" | "business" }) {
   const [filter, setFilter] = useState("");
   const [inviteOpen, setInviteOpen] = useState(false);
+  const fetchRoles = useServerFn(listRoles);
+  const customRolesQuery = useQuery({
+    queryKey: ["admin", "roles-catalog"],
+    queryFn: () => fetchRoles() as Promise<Array<{ id: string; slug: string; name: string; color: string; is_system: boolean }>>,
+    retry: false,
+  });
+  const customRoles = (customRolesQuery.data ?? []).filter((r) => !r.is_system);
   const assignableForTab: AppRole[] =
     variant === "travelers"
       ? ["traveler"]
@@ -284,7 +291,12 @@ function UsersTable({ rows, variant }: { rows: AdminUserRow[]; variant: "travele
           </thead>
           <tbody>
             {filtered.map((row) => (
-              <UserRow key={row.user_id} row={row} assignable={assignableForTab} />
+              <UserRow
+                key={row.user_id}
+                row={row}
+                assignable={assignableForTab}
+                customRoles={customRoles}
+              />
             ))}
             {filtered.length === 0 ? (
               <tr>
