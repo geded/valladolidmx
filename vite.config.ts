@@ -26,6 +26,11 @@ export default defineConfig({
           cleanupOutdatedCaches: true,
           clientsClaim: true,
           skipWaiting: false,
+          // Adenda 15.10.6.5 · Single Update Lifecycle. Añade el listener
+          // oficial de `SKIP_WAITING` al SW generado por workbox para que
+          // `applyPendingUpdate()` pueda activar la nueva versión de
+          // forma controlada.
+          importScripts: ["/pwa-skipwaiting.js"],
           // Offline fallback: rutas navegacionales sin caché caen a /offline
           // (precacheado). El shell público sigue disponible offline si ya se
           // visitó; el resto muestra un estado offline controlado.

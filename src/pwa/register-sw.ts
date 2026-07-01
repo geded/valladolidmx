@@ -28,6 +28,8 @@ type PwaEvent =
   | "updated"
   | "controlling"
   | "error"
+  | "update-available"
+  | "update-applied"
   | "unregistered";
 
 function emit(event: PwaEvent, detail?: Record<string, unknown>): void {
@@ -93,6 +95,24 @@ async function unregisterStale(): Promise<void> {
 }
 
 let registrationPromise: Promise<void> | null = null;
+let currentRegistration: ServiceWorkerRegistration | null = null;
+let waitingWorker: ServiceWorker | null = null;
+let updateApplying = false;
+
+/** Devuelve el registro activo del SW principal (o null). */
+export function getServiceWorkerRegistration(): ServiceWorkerRegistration | null {
+  return currentRegistration;
+}
+
+/** Devuelve el worker en estado `waiting` (nueva versión lista). */
+export function getWaitingServiceWorker(): ServiceWorker | null {
+  return waitingWorker;
+}
+
+function setWaiting(worker: ServiceWorker | null): void {
+  waitingWorker = worker;
+  if (worker) emit("update-available", { state: worker.state });
+}
 
 export function registerServiceWorker(): Promise<void> {
   if (registrationPromise) return registrationPromise;
@@ -105,15 +125,23 @@ export function registerServiceWorker(): Promise<void> {
     }
     try {
       const reg = await navigator.serviceWorker.register(SW_PATH, { scope: "/" });
+      currentRegistration = reg;
       emit("registered", { scope: reg.scope });
 
       if (reg.installing) trackInstalling(reg.installing);
+      if (reg.waiting && navigator.serviceWorker.controller) setWaiting(reg.waiting);
       reg.addEventListener("updatefound", () => {
         if (reg.installing) trackInstalling(reg.installing);
       });
 
       navigator.serviceWorker.addEventListener("controllerchange", () => {
         emit("controlling");
+        if (updateApplying) {
+          emit("update-applied");
+          // Recarga controlada: única vía oficial de activar la nueva versión
+          // sin dejar la sesión en estado mixto (Version Consistency).
+          window.location.reload();
+        }
       });
     } catch (err) {
       emit("error", { phase: "register", message: (err as Error)?.message });
@@ -125,11 +153,59 @@ export function registerServiceWorker(): Promise<void> {
 function trackInstalling(worker: ServiceWorker): void {
   worker.addEventListener("statechange", () => {
     if (worker.state === "installed") {
-      emit(navigator.serviceWorker.controller ? "updated" : "installed");
+      if (navigator.serviceWorker.controller) {
+        emit("updated");
+        setWaiting(worker);
+      } else {
+        emit("installed");
+      }
     } else if (worker.state === "activated") {
       emit("activated");
     } else if (worker.state === "redundant") {
       emit("error", { phase: "install", message: "redundant" });
     }
   });
+}
+
+/**
+ * Aplica la actualización pendiente enviando `SKIP_WAITING` al worker en
+ * espera. Es el único mecanismo oficial de activación de una nueva
+ * versión (Single Update Lifecycle · 15.10.6.5). La recarga ocurre en
+ * `controllerchange` para garantizar consistencia entre HTML, assets,
+ * Service Worker y recursos cacheados (Version Consistency).
+ */
+export async function applyPendingUpdate(): Promise<boolean> {
+  const reason = { value: "" };
+  if (isForbiddenContext(reason)) {
+    emit("skipped", { reason: reason.value });
+    return false;
+  }
+  const reg = currentRegistration ?? (await navigator.serviceWorker.getRegistration());
+  const target = waitingWorker ?? reg?.waiting ?? null;
+  if (!target) return false;
+  updateApplying = true;
+  try {
+    target.postMessage({ type: "SKIP_WAITING" });
+    return true;
+  } catch (err) {
+    updateApplying = false;
+    emit("error", { phase: "apply-update", message: (err as Error)?.message });
+    return false;
+  }
+}
+
+/**
+ * Fuerza una comprobación de nueva versión (sin activarla). Útil para
+ * chequeos periódicos o al recuperar visibilidad de la pestaña.
+ */
+export async function checkForUpdate(): Promise<boolean> {
+  const reg = currentRegistration ?? (await navigator.serviceWorker.getRegistration());
+  if (!reg) return false;
+  try {
+    await reg.update();
+    return true;
+  } catch (err) {
+    emit("error", { phase: "check-update", message: (err as Error)?.message });
+    return false;
+  }
 }

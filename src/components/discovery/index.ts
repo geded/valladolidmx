@@ -11,3 +11,4 @@ export { PublicHeader } from "./PublicHeader";
 export { PublicFooter } from "./PublicFooter";
 export { OfflineBanner } from "./OfflineBanner";
 export { SyncStatusBanner } from "./SyncStatusBanner";
+export { UpdateBanner } from "./UpdateBanner";

@@ -14,9 +14,15 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider } from "@/i18n/context";
 import { AuthProvider } from "@/hooks/useAuth";
-import { PublicHeader, PublicFooter, OfflineBanner, SyncStatusBanner } from "@/components/discovery";
+import {
+  PublicHeader,
+  PublicFooter,
+  OfflineBanner,
+  SyncStatusBanner,
+  UpdateBanner,
+} from "@/components/discovery";
 import { AluxFloatingTrigger } from "@/components/layout/AluxFloatingTrigger";
-import { registerServiceWorker } from "@/pwa/register-sw";
+import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
 
@@ -149,6 +155,12 @@ function RootComponent() {
   useEffect(() => {
     void registerServiceWorker();
     startSyncRunner();
+    // Graceful Upgrade · comprobación oportunista al recuperar visibilidad.
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void checkForUpdate();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
   }, []);
 
   return (
@@ -164,6 +176,7 @@ function RootComponent() {
         {!isAppShellRoute ? <PublicHeader variant={headerVariant} /> : null}
         {!isAppShellRoute ? <OfflineBanner /> : null}
         <SyncStatusBanner />
+        <UpdateBanner />
         <Outlet />
         {!isAppShellRoute ? <PublicFooter /> : null}
         {!isAppShellRoute ? <AluxFloatingTrigger /> : null}
