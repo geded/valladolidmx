@@ -300,7 +300,9 @@ interface HeroFieldMap {
   title: string;
   subtitle: string;
   cta_label: string;
+  cta_href: string;
   cta_secondary_label: string;
+  cta_secondary_href: string;
 }
 
 function HeroPanel({
