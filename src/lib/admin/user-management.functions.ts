@@ -96,7 +96,7 @@ async function auditAdminAction(params: {
   actorId: string;
   targetId: string;
   action: string;
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, string | number | boolean | null>;
 }) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   await supabaseAdmin.from("permissions_audit_log").insert({
