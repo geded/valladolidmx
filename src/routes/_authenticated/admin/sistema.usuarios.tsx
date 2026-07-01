@@ -1,8 +1,8 @@
 /**
  * /admin/sistema/usuarios — Gestión de roles (15.10.4R · Paso E).
  *
- * Acceso exclusivo super_admin. Autorización dura en el servidor:
- * `isSuperAdmin` y RPCs SECURITY DEFINER. La UI sólo media.
+ * Acceso exclusivo super_admin. Autorización dura en backend:
+ * `has_role` y RPCs SECURITY DEFINER. La UI sólo media.
  * No usa SUPABASE_SERVICE_ROLE_KEY; toda escritura queda auditada
  * en `permissions_audit_log`.
  */
