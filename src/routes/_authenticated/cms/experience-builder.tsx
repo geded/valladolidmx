@@ -47,16 +47,81 @@ import {
 } from "@/lib/experience-builder/composition-tree";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { useAuth } from "@/hooks/useAuth";
+import { VisualStudio } from "@/components/experience-builder/VisualStudio";
 
 export const Route = createFileRoute("/_authenticated/cms/experience-builder")({
   head: () => ({
     meta: [
-      { title: "Experience Builder · Studio v0" },
+      { title: "Experience Builder · Studio" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-  component: ExperienceBuilderStudio,
+  component: ExperienceBuilderShell,
 });
+
+/**
+ * ExperienceBuilderShell — Studio único (15.10.4d).
+ *
+ * Un único editor visual para toda la plataforma con dos modos en el
+ * mismo shell:
+ *  - Modo Visual (predeterminado): WYSIWYG sobre la página real,
+ *    apto para empresarios no técnicos. Sin JSON, sin IDs, sin slugs.
+ *  - Modo Profesional (opcional, sólo admin/super_admin): canvas
+ *    avanzado con inspector técnico, biblioteca de bloques, revisiones
+ *    e historial. Es la superficie previa del Studio v0.
+ *
+ * Single Studio Principle: el tipo de página sólo determina plantilla,
+ * bloques, validaciones, SEO y permisos — nunca un editor distinto.
+ */
+type StudioMode = "visual" | "professional";
+
+function ExperienceBuilderShell() {
+  const { roles } = useAuth();
+  const canAdvanced = roles.includes("admin") || roles.includes("super_admin");
+  const [mode, setMode] = useState<StudioMode>("visual");
+
+  return (
+    <div className="flex flex-col">
+      <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
+        <div className="min-w-0">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Studio
+          </p>
+          <h1 className="truncate text-sm font-semibold">Experience Builder</h1>
+        </div>
+        <div className="ml-auto flex items-center gap-1 rounded-full border border-border bg-card p-0.5 text-[11px]">
+          <button
+            type="button"
+            onClick={() => setMode("visual")}
+            className={`rounded-full px-3 py-1 font-medium transition-colors ${
+              mode === "visual"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            aria-pressed={mode === "visual"}
+          >
+            Visual
+          </button>
+          <button
+            type="button"
+            onClick={() => canAdvanced && setMode("professional")}
+            disabled={!canAdvanced}
+            title={canAdvanced ? "Modo Profesional" : "Sólo administradores"}
+            className={`rounded-full px-3 py-1 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+              mode === "professional"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            aria-pressed={mode === "professional"}
+          >
+            Profesional
+          </button>
+        </div>
+      </div>
+      {mode === "visual" ? <VisualStudio /> : <ProfessionalStudio />}
+    </div>
+  );
+}
 
 interface LibraryEntry {
   type: string;
@@ -87,7 +152,7 @@ const PAGE_TYPES = [
   "campaign",
 ];
 
-function ExperienceBuilderStudio() {
+function ProfessionalStudio() {
   const list = useServerFn(listCompositions);
   const get = useServerFn(getComposition);
   const create = useServerFn(createComposition);
