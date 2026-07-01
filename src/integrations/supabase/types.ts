@@ -4272,6 +4272,7 @@ export type Database = {
           created_by: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
+          role_id: string | null
           scope_id: string | null
           scope_type: string | null
           user_id: string
@@ -4281,6 +4282,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           role: Database["public"]["Enums"]["app_role"]
+          role_id?: string | null
           scope_id?: string | null
           scope_type?: string | null
           user_id: string
@@ -4290,11 +4292,20 @@ export type Database = {
           created_by?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          role_id?: string | null
           scope_id?: string | null
           scope_type?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -4963,6 +4974,10 @@ export type Database = {
         Returns: number
       }
       founder_dashboard_kpis: { Args: never; Returns: Json }
+      has_any_permission: {
+        Args: { _keys: string[]; _user_id: string }
+        Returns: boolean
+      }
       has_business_access: {
         Args: {
           _business_id: string
