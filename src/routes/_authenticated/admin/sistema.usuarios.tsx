@@ -73,7 +73,7 @@ async function fetchIsSuperAdmin(): Promise<boolean> {
 async function fetchUsersWithRoles(): Promise<AdminUserRow[]> {
   const { data, error } = await supabase.rpc("admin_list_users_with_roles");
   if (error) throw new Error(`No se pudieron cargar usuarios: ${error.message}`);
-  return ((data ?? []) as Array<AdminUserRow & { custom_roles: unknown }>).map((r) => ({
+  return ((data ?? []) as unknown as Array<Omit<AdminUserRow, "custom_roles"> & { custom_roles: unknown }>).map((r) => ({
     ...r,
     custom_roles: Array.isArray(r.custom_roles) ? (r.custom_roles as CustomRoleRef[]) : [],
   }));
