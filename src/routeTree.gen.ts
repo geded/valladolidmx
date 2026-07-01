@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RestaurantesRouteImport } from './routes/restaurantes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as HotelesRouteImport } from './routes/hoteles'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
 import { Route as EventosRouteImport } from './routes/eventos'
@@ -104,6 +105,11 @@ const RestaurantesRoute = RestaurantesRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfflineRoute = OfflineRouteImport.update({
+  id: '/offline',
+  path: '/offline',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HotelesRoute = HotelesRouteImport.update({
@@ -589,6 +595,7 @@ export interface FileRoutesByFullPath {
   '/eventos': typeof EventosRoute
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/offline': typeof OfflineRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -676,6 +683,7 @@ export interface FileRoutesByTo {
   '/eventos': typeof EventosRoute
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/offline': typeof OfflineRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/empresa': typeof AuthenticatedEmpresaRoute
@@ -760,6 +768,7 @@ export interface FileRoutesById {
   '/eventos': typeof EventosRoute
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/offline': typeof OfflineRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -849,6 +858,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/offline'
     | '/reset-password'
     | '/restaurantes'
     | '/admin'
@@ -936,6 +946,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/offline'
     | '/reset-password'
     | '/restaurantes'
     | '/empresa'
@@ -1019,6 +1030,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/offline'
     | '/reset-password'
     | '/restaurantes'
     | '/_authenticated/admin'
@@ -1108,6 +1120,7 @@ export interface RootRouteChildren {
   EventosRoute: typeof EventosRoute
   ExperienciasRoute: typeof ExperienciasRoute
   HotelesRoute: typeof HotelesRoute
+  OfflineRoute: typeof OfflineRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RestaurantesRoute: typeof RestaurantesRoute
   LSlugRoute: typeof LSlugRoute
@@ -1139,6 +1152,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offline': {
+      id: '/offline'
+      path: '/offline'
+      fullPath: '/offline'
+      preLoaderRoute: typeof OfflineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hoteles': {
@@ -1994,6 +2014,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventosRoute: EventosRoute,
   ExperienciasRoute: ExperienciasRoute,
   HotelesRoute: HotelesRoute,
+  OfflineRoute: OfflineRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RestaurantesRoute: RestaurantesRoute,
   LSlugRoute: LSlugRoute,
@@ -2013,13 +2034,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
