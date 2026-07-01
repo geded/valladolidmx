@@ -26,7 +26,10 @@ export default defineConfig({
           cleanupOutdatedCaches: true,
           clientsClaim: true,
           skipWaiting: false,
-          navigateFallback: "/",
+          // Offline fallback: rutas navegacionales sin caché caen a /offline
+          // (precacheado). El shell público sigue disponible offline si ya se
+          // visitó; el resto muestra un estado offline controlado.
+          navigateFallback: "/offline",
           navigateFallbackDenylist: [
             /^\/~oauth/,
             /^\/api\//,
@@ -40,9 +43,23 @@ export default defineConfig({
           ],
           globPatterns: ["**/*.{js,css,html,ico,png,svg,webp,woff2}"],
           runtimeCaching: [
+            // Rutas sensibles / autenticadas: NUNCA cachear.
+            // Se resuelve siempre contra red; sin fallback offline.
+            {
+              urlPattern: ({ url, sameOrigin }) =>
+                sameOrigin &&
+                /^\/(?:~oauth|api|auth|cms|portal|admin|cuenta|concierge|empresa)(?:\/|$)/.test(
+                  url.pathname,
+                ),
+              handler: "NetworkOnly",
+              options: { cacheName: "no-store-sensitive" },
+            },
             {
               urlPattern: ({ request, url }) =>
-                request.mode === "navigate" && !url.pathname.startsWith("/~oauth"),
+                request.mode === "navigate" &&
+                !/^\/(?:~oauth|api|auth|cms|portal|admin|cuenta|concierge|empresa)(?:\/|$)/.test(
+                  url.pathname,
+                ),
               handler: "NetworkFirst",
               options: {
                 cacheName: "html-pages",
@@ -66,6 +83,22 @@ export default defineConfig({
               options: {
                 cacheName: "static-images",
                 expiration: { maxEntries: 128, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              },
+            },
+            // Google Fonts stylesheet — SWR: rápido y siempre revalidado.
+            {
+              urlPattern: ({ url }) => url.origin === "https://fonts.googleapis.com",
+              handler: "StaleWhileRevalidate",
+              options: { cacheName: "google-fonts-stylesheets" },
+            },
+            // Google Fonts webfont files — CacheFirst con TTL largo.
+            {
+              urlPattern: ({ url }) => url.origin === "https://fonts.gstatic.com",
+              handler: "CacheFirst",
+              options: {
+                cacheName: "google-fonts-webfonts",
+                expiration: { maxEntries: 32, maxAgeSeconds: 60 * 60 * 24 * 365 },
+                cacheableResponse: { statuses: [0, 200] },
               },
             },
           ],
