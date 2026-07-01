@@ -14,7 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider } from "@/i18n/context";
 import { AuthProvider } from "@/hooks/useAuth";
-import { PublicHeader, PublicFooter } from "@/components/discovery";
+import { PublicHeader, PublicFooter, OfflineBanner } from "@/components/discovery";
 import { AluxFloatingTrigger } from "@/components/layout/AluxFloatingTrigger";
 import { registerServiceWorker } from "@/pwa/register-sw";
 import { SITE } from "@/config/site";
@@ -160,6 +160,7 @@ function RootComponent() {
           Saltar al contenido
         </a>
         {!isAppShellRoute ? <PublicHeader variant={headerVariant} /> : null}
+        {!isAppShellRoute ? <OfflineBanner /> : null}
         <Outlet />
         {!isAppShellRoute ? <PublicFooter /> : null}
         {!isAppShellRoute ? <AluxFloatingTrigger /> : null}

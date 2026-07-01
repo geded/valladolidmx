@@ -9,3 +9,4 @@
 export { PublicShell, type PublicShellProps, type PublicShellVariant } from "./PublicShell";
 export { PublicHeader } from "./PublicHeader";
 export { PublicFooter } from "./PublicFooter";
+export { OfflineBanner } from "./OfflineBanner";
