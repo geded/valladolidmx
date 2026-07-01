@@ -4403,6 +4403,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_assign_custom_role: {
+        Args: { _role_id: string; _target_user_id: string }
+        Returns: undefined
+      }
       admin_assign_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -4443,6 +4447,7 @@ export type Database = {
         Args: never
         Returns: {
           created_at: string
+          custom_roles: Json
           display_name: string
           email: string
           last_sign_in_at: string
@@ -4475,6 +4480,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      admin_revoke_custom_role: {
+        Args: { _role_id: string; _target_user_id: string }
+        Returns: undefined
       }
       admin_revoke_role: {
         Args: {
