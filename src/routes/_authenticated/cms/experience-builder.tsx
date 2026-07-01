@@ -90,9 +90,15 @@ function ExperienceBuilderShell() {
   const mode: StudioMode = search.mode ?? "visual";
   const page = search.page ?? null;
   const setMode = (m: StudioMode) =>
-    void navigate({ search: (prev) => ({ ...prev, mode: m }), replace: true });
+    void navigate({
+      search: (prev: Record<string, unknown>) => ({ ...prev, mode: m }),
+      replace: true,
+    });
   const setPage = (k: string | null) =>
-    void navigate({ search: (prev) => ({ ...prev, page: k ?? undefined }), replace: true });
+    void navigate({
+      search: (prev: Record<string, unknown>) => ({ ...prev, page: k ?? undefined }),
+      replace: true,
+    });
 
   return (
     <div className="flex flex-col">
