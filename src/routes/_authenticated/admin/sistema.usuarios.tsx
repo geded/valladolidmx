@@ -34,13 +34,14 @@ interface AdminUserRow {
 const STAFF_ROLES: AppRole[] = ["admin", "editor", "concierge", "concierge_lead"];
 const BUSINESS_ROLES: AppRole[] = ["business_owner"];
 
-type TabKey = "travelers" | "staff" | "business" | "permissions";
+type TabKey = "travelers" | "staff" | "business" | "roles" | "permissions";
 
 const TABS: { key: TabKey; label: string; hint: string }[] = [
   { key: "travelers", label: "Viajeros", hint: "Cuentas con rol de viajero (uso final del sitio)." },
   { key: "staff", label: "Staff interno", hint: "Administradores, editores y concierge." },
   { key: "business", label: "Empresas", hint: "Dueños y colaboradores de negocios." },
-  { key: "permissions", label: "Permisos por rol", hint: "Matriz oficial derivada del Blueprint 11.2 (solo consulta)." },
+  { key: "roles", label: "Roles y permisos", hint: "Crea roles personalizados y marca qué puede hacer cada uno." },
+  { key: "permissions", label: "Matriz operativa", hint: "Matriz oficial derivada del Blueprint 11.2 (solo consulta)." },
 ];
 
 async function fetchIsSuperAdmin(): Promise<boolean> {
@@ -133,6 +134,7 @@ function AdminUsuariosPage() {
     travelers: travelers.length,
     staff: staff.length,
     business: business.length,
+    roles: null,
     permissions: null,
   };
 
@@ -176,6 +178,8 @@ function AdminUsuariosPage() {
 
       {tab === "permissions" ? (
         <PermissionsMatrix />
+      ) : tab === "roles" ? (
+        <RolesManager />
       ) : users.isLoading ? (
         <p className="mt-6 text-sm text-muted-foreground">Cargando usuarios…</p>
       ) : users.error ? (
