@@ -142,8 +142,8 @@ function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
           const cardCls = editable
             ? `${cardBase} border-primary/30 bg-primary/5 hover:bg-primary/10`
             : `${cardBase} border-border bg-card opacity-80`;
-          const inner = (
-            <>
+          return (
+            <div key={p.key} className={cardCls} aria-disabled={!editable}>
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="text-base font-semibold">{p.title}</h3>
@@ -162,7 +162,13 @@ function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
               </div>
               <div className="mt-4 flex items-center justify-between gap-2">
                 {editable ? (
-                  <span className="text-xs font-semibold text-primary">Abrir editor →</span>
+                  <button
+                    type="button"
+                    onClick={() => onOpen(p.key)}
+                    className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-95"
+                  >
+                    Abrir editor →
+                  </button>
                 ) : (
                   <span className="text-[10px] text-muted-foreground">
                     {p.soonLabel ? `Se habilita en ${p.soonLabel}` : "Se habilita pronto"}
@@ -172,25 +178,12 @@ function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
                   href={p.publicPath}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
                   className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-[10px] font-medium text-foreground hover:bg-accent"
                   aria-label={`Ver ${p.title} en el sitio`}
                 >
                   Ver <ExternalLink className="size-3" aria-hidden />
                 </a>
               </div>
-            </>
-          );
-          if (editable) {
-            return (
-              <button key={p.key} type="button" onClick={() => onOpen(p.key)} className={cardCls}>
-                {inner}
-              </button>
-            );
-          }
-          return (
-            <div key={p.key} className={cardCls} aria-disabled="true">
-              {inner}
             </div>
           );
         })}
