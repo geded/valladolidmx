@@ -9,8 +9,10 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { ROLE_LABELS, type AppRole } from "@/types/auth";
+import { inviteUser } from "@/lib/admin/user-management.functions";
 import { toast } from "sonner";
 
 interface AdminUserRow {
@@ -183,6 +185,7 @@ function AdminUsuariosPage() {
 
 function UsersTable({ rows, variant }: { rows: AdminUserRow[]; variant: "travelers" | "staff" | "business" }) {
   const [filter, setFilter] = useState("");
+  const [inviteOpen, setInviteOpen] = useState(false);
   const assignableForTab: AppRole[] =
     variant === "travelers"
       ? ["traveler"]
@@ -210,10 +213,21 @@ function UsersTable({ rows, variant }: { rows: AdminUserRow[]; variant: "travele
           onChange={(e) => setFilter(e.target.value)}
           className="w-full max-w-sm rounded-md border border-border bg-background px-3 py-2 text-sm"
         />
-        <p className="text-xs text-muted-foreground">
-          Crear nuevas cuentas (invitación por email) — próximamente.
-        </p>
+        <button
+          type="button"
+          onClick={() => setInviteOpen(true)}
+          className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-medium text-primary-foreground"
+        >
+          + Invitar usuario
+        </button>
       </div>
+      {inviteOpen ? (
+        <InviteDialog
+          defaultRole={assignableForTab[0]}
+          allowedRoles={assignableForTab}
+          onClose={() => setInviteOpen(false)}
+        />
+      ) : null}
       <div className="overflow-hidden rounded-2xl border border-border">
         <table className="w-full text-sm">
           <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -423,6 +437,125 @@ function PermissionsMatrix() {
             ))}
           </tbody>
         </table>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- Invitación por email ----------------
+
+function InviteDialog({
+  defaultRole,
+  allowedRoles,
+  onClose,
+}: {
+  defaultRole: AppRole;
+  allowedRoles: AppRole[];
+  onClose: () => void;
+}) {
+  const qc = useQueryClient();
+  const invite = useServerFn(inviteUser);
+  const [email, setEmail] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [role, setRole] = useState<AppRole>(defaultRole);
+
+  const mut = useMutation({
+    mutationFn: () =>
+      invite({
+        data: {
+          email: email.trim(),
+          role,
+          displayName: displayName.trim() || undefined,
+        },
+      }),
+    onSuccess: (res) => {
+      toast.success(`Invitación enviada a ${res.email}`);
+      qc.invalidateQueries({ queryKey: ["admin", "users-roles"] });
+      onClose();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl border border-border bg-background p-6 shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-lg font-semibold">Invitar nuevo usuario</h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Enviaremos un enlace de acceso al correo. El usuario definirá su contraseña al aceptar.
+        </p>
+
+        <form
+          className="mt-4 space-y-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!email.trim()) return;
+            mut.mutate();
+          }}
+        >
+          <label className="block text-sm">
+            Correo electrónico
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              placeholder="persona@dominio.com"
+            />
+          </label>
+
+          <label className="block text-sm">
+            Nombre a mostrar (opcional)
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              placeholder="Ej. María López"
+            />
+          </label>
+
+          <label className="block text-sm">
+            Rol inicial
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value as AppRole)}
+              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            >
+              {allowedRoles.map((r) => (
+                <option key={r} value={r}>
+                  {ROLE_LABELS[r]}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-md border border-border px-3 py-2 text-sm"
+              disabled={mut.isPending}
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={mut.isPending || !email.trim()}
+              className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+            >
+              {mut.isPending ? "Enviando…" : "Enviar invitación"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
