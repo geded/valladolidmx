@@ -35,6 +35,7 @@ import {
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { PublicHeader, PublicFooter } from "@/components/discovery";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "@/i18n/context";
 
 export const Route = createFileRoute("/_authenticated/paginas/inicio")({
   head: () => ({
@@ -311,8 +312,25 @@ function HeroPanel({
   onChange: (field: keyof HeroFieldMap, value: string) => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const cfg = node.config as Record<string, unknown>;
-  const val = (k: string) => (typeof cfg[k] === "string" ? (cfg[k] as string) : "");
+  const defaults: Record<string, string> = {
+    eyebrow: t("hero.eyebrow"),
+    title: t("hero.title"),
+    subtitle: t("hero.subtitle"),
+    cta_label: t("hero.cta_primary"),
+    cta_secondary_label: t("hero.cta_secondary"),
+    cta_href: "/oriente-maya",
+    cta_secondary_href: "/arma-tu-viaje",
+  };
+  // Muestra el texto real que ve el visitante: si el editor aún no ha
+  // sobreescrito el campo, se prefill con el texto por defecto de la Home
+  // para que "esté conectado con lo que hay".
+  const val = (k: string) => {
+    const v = cfg[k];
+    if (typeof v === "string" && v.length > 0) return v;
+    return defaults[k] ?? "";
+  };
 
   return (
     <aside
@@ -377,6 +395,15 @@ function HeroPanel({
           placeholder="Ej. Explorar destinos"
         />
       </Field>
+      <Field label="Botón principal — enlace" hint="Ruta a la que lleva el botón principal.">
+        <input
+          type="text"
+          value={val("cta_href")}
+          onChange={(e) => onChange("cta_href", e.target.value)}
+          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+          placeholder="/oriente-maya"
+        />
+      </Field>
 
       <Field label="Botón secundario — texto">
         <input
@@ -385,6 +412,15 @@ function HeroPanel({
           onChange={(e) => onChange("cta_secondary_label", e.target.value)}
           className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
           placeholder="Ej. Arma tu viaje"
+        />
+      </Field>
+      <Field label="Botón secundario — enlace" hint="Ruta a la que lleva el botón secundario.">
+        <input
+          type="text"
+          value={val("cta_secondary_href")}
+          onChange={(e) => onChange("cta_secondary_href", e.target.value)}
+          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+          placeholder="/arma-tu-viaje"
         />
       </Field>
     </aside>
