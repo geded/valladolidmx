@@ -292,7 +292,9 @@ const cms: WorkspaceDefinition = {
     { id: "cms.observabilidad", workspaceId: "cms", label: "Observabilidad", icon: LineChart, to: "/cms/observabilidad", group: "operacion", order: 11, surfaces: ["sidebar", "palette"] },
     { id: "cms.alertas", workspaceId: "cms", label: "Alertas", icon: AlertTriangle, to: "/cms/alertas", group: "operacion", order: 12, surfaces: ["sidebar", "palette"] },
     { id: "cms.actividad", workspaceId: "cms", label: "Actividad", icon: Activity, to: "/cms/actividad", group: "operacion", order: 13, surfaces: ["sidebar", "palette"] },
-    { id: "cms.eb", workspaceId: "cms", label: "Experience Builder", icon: Sparkles, to: "/cms/experience-builder", group: "estudio", order: 14, surfaces: ["sidebar", "palette"] },
+    { id: "cms.paginas", workspaceId: "cms", label: "Editor de páginas", icon: LayoutDashboard, to: "/paginas", group: "estudio", order: 13, surfaces: ["sidebar", "bottom", "palette"], primary: true },
+    { id: "cms.paginas.inicio", workspaceId: "cms", label: "Editar Inicio", icon: Sparkles, to: "/paginas/inicio", group: "estudio", order: 14, surfaces: ["sidebar", "palette"] },
+    { id: "cms.eb", workspaceId: "cms", label: "Experience Builder (avanzado)", icon: Sparkles, to: "/cms/experience-builder", group: "estudio", order: 15, surfaces: ["sidebar", "palette"] },
   ],
   alux: {
     headline: "12 reseñas esperan moderación. 3 son urgentes.",
