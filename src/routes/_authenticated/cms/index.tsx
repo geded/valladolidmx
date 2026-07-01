@@ -6,6 +6,7 @@
  * exponer datos ni mutaciones. Cumple VISUAL-GATES-CHECKLIST.
  */
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/cms/")({
   head: () => ({
@@ -97,6 +98,27 @@ function CmsDashboard() {
           alterar la línea base de la Fase 1.
         </p>
       </header>
+
+      <section className="mt-8">
+        <Link
+          to="/paginas/inicio"
+          className="group flex flex-col gap-2 rounded-2xl border border-primary/30 bg-primary/5 p-5 transition-colors hover:bg-primary/10 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
+              Editor de páginas
+            </p>
+            <h2 className="mt-1 text-lg font-semibold">Editar página de Inicio</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Cambia el texto del Hero directamente sobre la página real y
+              publica en un clic.
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1 self-start rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm group-hover:opacity-95 sm:self-auto">
+            Abrir editor →
+          </span>
+        </Link>
+      </section>
 
       <section className="mt-8">
         <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
