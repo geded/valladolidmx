@@ -6,7 +6,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AdminHub } from "@/components/admin/AdminHub";
 
-export const Route = createFileRoute("/_authenticated/admin/sistema")({
+export const Route = createFileRoute("/_authenticated/admin/sistema/")({
   component: AdminSistemaHub,
   head: () => ({
     meta: [
