@@ -1,24 +1,55 @@
 /**
  * VisualStudio — Modo Visual (WYSIWYG) del Experience Builder único.
  *
- * 15.10.4d · Unificación (post-US-01):
- *  - Un único Studio en /cms/experience-builder con dos modos.
- *  - Modo Visual (este componente) es el predeterminado para empresarios.
- *  - No expone JSON, IDs, slugs, composition, block, schema.
- *  - Reutiliza infra existente: page_compositions, CompositionRenderer,
- *    Discovery PublicHeader/PublicFooter. Cero infraestructura nueva.
- *
- * Superficies editables en esta entrega:
- *  - Home → Hero (título, subtítulo, eyebrow, CTAs). Otras secciones
- *    quedan marcadas "Próximamente" (habilitación en US-04).
- *  - Resto de páginas del sitio → placeholder "Próximamente" con
- *    enlace para verlas en el sitio (habilitación progresiva).
+ * Corrección US-01 (15.10.4d): editor visual de página completa.
+ *  - Renderiza TODA la Home dentro del canvas, no sólo el Hero.
+ *  - Cualquier bloque es seleccionable, editable y reordenable (dnd-kit).
+ *  - Inspector schema-driven vía AutoInspector (reusa infra existente).
+ *  - Añadir / duplicar / eliminar secciones sin JSON.
+ *  - Drawer de versiones con rollback (reutiliza listCompositionRevisions +
+ *    restoreCompositionRevision existentes).
+ *  - Vista previa = el propio canvas (paridad 1:1 con producción).
+ *  - Header/Pie global: visibles y marcados como "compartidos por el sitio";
+ *    edición completa se libera cuando exista store de site chrome —
+ *    fuera del alcance de esta corrección para respetar "no nueva
+ *    infraestructura".
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Check, ExternalLink, Loader2, Lock, Pencil, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  ExternalLink,
+  History,
+  Loader2,
+  Lock,
+  Pencil,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 import {
   listCompositions,
@@ -26,17 +57,21 @@ import {
   createComposition,
   saveCompositionDraft,
   publishComposition,
+  listCompositionRevisions,
+  restoreCompositionRevision,
   type CompositionDetail,
+  type CompositionRevisionSummary,
 } from "@/lib/experience-builder/studio.functions";
 import {
   updateNodeConfig,
+  newNodeId,
   type CompositionNode,
   type CompositionTree,
 } from "@/lib/experience-builder/composition-tree";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
-import { PublicHeader, PublicFooter } from "@/components/discovery";
+import { getBlock, listBlocks } from "@/lib/experience-builder/block-registry";
+import { AutoInspector } from "@/components/experience-builder/AutoInspector";
 import { useAuth } from "@/hooks/useAuth";
-import { useTranslation } from "@/i18n/context";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
@@ -68,12 +103,22 @@ const SITE_PAGES: SitePage[] = [
   { key: "oriente-maya", title: "Oriente Maya", description: "Portal territorial del Oriente Maya.", publicPath: "/oriente-maya", status: "soon", soonLabel: "US-05" },
 ];
 
-export function VisualStudio() {
-  const [openKey, setOpenKey] = useState<string | null>(null);
+export interface VisualStudioProps {
+  page?: string | null;
+  onSelectPage?: (key: string | null) => void;
+}
+
+export function VisualStudio({ page = null, onSelectPage }: VisualStudioProps = {}) {
+  const [internalKey, setInternalKey] = useState<string | null>(page);
+  const openKey = page ?? internalKey;
+  const setOpen = (k: string | null) => {
+    setInternalKey(k);
+    onSelectPage?.(k);
+  };
   if (openKey === "home") {
-    return <HomeVisualEditor onExit={() => setOpenKey(null)} />;
+    return <HomeVisualEditor onExit={() => setOpen(null)} />;
   }
-  return <PagesPicker onOpen={(k) => setOpenKey(k)} />;
+  return <PagesPicker onOpen={(k) => setOpen(k)} />;
 }
 
 /* --------------------------------------------------------------------- */
@@ -82,22 +127,18 @@ function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-4">
       <header className="max-w-2xl">
-        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
-          Elige una página
-        </p>
+        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Elige una página</p>
         <h2 className="mt-2 text-2xl font-semibold">¿Qué página quieres editar?</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Selecciona cualquier página del sitio para verla y modificarla tal como
-          la ven los visitantes. En esta entrega la <strong>página de Inicio</strong> ya
-          es editable. El resto se irá habilitando en las próximas historias del sprint.
+          Selecciona cualquier página del sitio para verla y modificarla tal como la ven los visitantes.
+          En esta entrega la <strong>página de Inicio</strong> ya es editable. El resto se irá habilitando en las próximas historias.
         </p>
       </header>
 
       <section className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {SITE_PAGES.map((p) => {
           const editable = p.status === "editable";
-          const cardBase =
-            "flex h-full flex-col justify-between rounded-2xl border p-5 text-left transition-colors";
+          const cardBase = "flex h-full flex-col justify-between rounded-2xl border p-5 text-left transition-colors";
           const cardCls = editable
             ? `${cardBase} border-primary/30 bg-primary/5 hover:bg-primary/10`
             : `${cardBase} border-border bg-card opacity-80`;
@@ -117,9 +158,7 @@ function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
                   )}
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">{p.description}</p>
-                <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-                  {p.publicPath}
-                </p>
+                <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">{p.publicPath}</p>
               </div>
               <div className="mt-4 flex items-center justify-between gap-2">
                 {editable ? (
@@ -168,6 +207,8 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
   const create = useServerFn(createComposition);
   const save = useServerFn(saveCompositionDraft);
   const publish = useServerFn(publishComposition);
+  const listRevs = useServerFn(listCompositionRevisions);
+  const restore = useServerFn(restoreCompositionRevision);
   const queryClient = useQueryClient();
   const { roles } = useAuth();
   const canPublish = roles.includes("admin") || roles.includes("super_admin");
@@ -179,6 +220,10 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
   const [publishing, setPublishing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [showVersions, setShowVersions] = useState(false);
+  const [versions, setVersions] = useState<CompositionRevisionSummary[]>([]);
+  const [previewMode, setPreviewMode] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -190,9 +235,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
         if (home) {
           detail = await get({ data: { id: home.id } });
         } else {
-          const { id } = await create({
-            data: { slug: "home", title: "Página de Inicio", page_type: "home" },
-          });
+          const { id } = await create({ data: { slug: "home", title: "Página de Inicio", page_type: "home" } });
           detail = await get({ data: { id } });
         }
         if (cancelled || !detail) return;
@@ -223,14 +266,13 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tree]);
 
-  const heroNode: CompositionNode | null = useMemo(() => {
-    if (!tree) return null;
-    return tree.root.children.find((n) => n.type === "vmx.hero") ?? null;
-  }, [tree]);
-
   const selectedNode = useMemo(
     () => (tree && selectedId ? tree.root.children.find((n) => n.id === selectedId) ?? null : null),
     [tree, selectedId],
+  );
+  const selectedContract = useMemo(
+    () => (selectedNode ? getBlock(selectedNode.type) ?? null : null),
+    [selectedNode],
   );
 
   const onPublish = async () => {
@@ -242,6 +284,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
       await publish({ data: { id: page.id, notes: "Publicado desde Modo Visual" } });
       await queryClient.invalidateQueries({ queryKey: ["eb", "published-home", "default"] });
       setMessage("Cambios publicados en el sitio.");
+      if (showVersions) void refreshVersions();
     } catch (e) {
       setMessage(`No se pudo publicar: ${(e as Error).message}`);
     } finally {
@@ -249,10 +292,92 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     }
   };
 
-  const updateHeroField = (field: keyof HeroFieldMap, value: string) => {
-    if (!heroNode || !tree) return;
-    const next = updateNodeConfig(tree, heroNode.id, { ...heroNode.config, [field]: value });
-    setTree(next);
+  const updateSelectedConfig = (nextConfig: Record<string, unknown>) => {
+    if (!selectedNode || !tree) return;
+    setTree(updateNodeConfig(tree, selectedNode.id, nextConfig));
+  };
+
+  const moveNode = (nodeId: string, dir: -1 | 1) => {
+    if (!tree) return;
+    const idx = tree.root.children.findIndex((n) => n.id === nodeId);
+    if (idx < 0) return;
+    const to = Math.max(0, Math.min(tree.root.children.length - 1, idx + dir));
+    if (to === idx) return;
+    const next = [...tree.root.children];
+    const [item] = next.splice(idx, 1);
+    next.splice(to, 0, item);
+    setTree({ root: { children: next } });
+  };
+
+  const duplicateNode = (nodeId: string) => {
+    if (!tree) return;
+    const src = tree.root.children.find((n) => n.id === nodeId);
+    if (!src) return;
+    const clone: CompositionNode = { ...src, id: newNodeId(), config: { ...src.config } };
+    const idx = tree.root.children.findIndex((n) => n.id === nodeId);
+    const next = [...tree.root.children];
+    next.splice(idx + 1, 0, clone);
+    setTree({ root: { children: next } });
+    setSelectedId(clone.id);
+  };
+
+  const removeNodeById = (nodeId: string) => {
+    if (!tree) return;
+    const next = tree.root.children.filter((n) => n.id !== nodeId);
+    setTree({ root: { children: next } });
+    if (selectedId === nodeId) setSelectedId(null);
+  };
+
+  const insertBlock = (type: string, atIndex?: number) => {
+    if (!tree) return;
+    const contract = getBlock(type);
+    if (!contract) return;
+    const config: Record<string, unknown> = {};
+    for (const [k, def] of Object.entries(contract.schema)) {
+      if (def.default !== undefined) config[k] = def.default;
+    }
+    const node: CompositionNode = { id: newNodeId(), type: contract.type, version: contract.version, config };
+    const next = [...tree.root.children];
+    const idx = atIndex ?? next.length;
+    next.splice(idx, 0, node);
+    setTree({ root: { children: next } });
+    setSelectedId(node.id);
+    setShowLibrary(false);
+  };
+
+  const refreshVersions = async () => {
+    if (!page) return;
+    const revs = await listRevs({ data: { id: page.id } });
+    setVersions(revs);
+  };
+  const openVersions = async () => {
+    setShowVersions(true);
+    await refreshVersions();
+  };
+  const doRollback = async (rev: CompositionRevisionSummary) => {
+    if (!page) return;
+    if (typeof window !== "undefined" && !window.confirm(`Restaurar la revisión #${rev.revision_number} como borrador actual?`)) return;
+    await restore({ data: { id: page.id, revision_id: rev.id } });
+    const detail = await get({ data: { id: page.id } });
+    if (detail) {
+      setPage(detail);
+      setTree(detail.current_draft);
+      setSelectedId(null);
+      setMessage(`Revisión #${rev.revision_number} restaurada como borrador.`);
+    }
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+  const onDragEnd = (e: DragEndEvent) => {
+    if (!tree || !e.over || e.active.id === e.over.id) return;
+    const oldIdx = tree.root.children.findIndex((n) => n.id === e.active.id);
+    const newIdx = tree.root.children.findIndex((n) => n.id === e.over!.id);
+    if (oldIdx < 0 || newIdx < 0) return;
+    const next = arrayMove(tree.root.children, oldIdx, newIdx);
+    setTree({ root: { children: next } });
   };
 
   if (loadError) return <FullScreenState title="No se pudo abrir el editor" detail={loadError} onExit={onExit} />;
@@ -271,13 +396,26 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
           Páginas
         </button>
         <div className="min-w-0">
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            Editando
-          </p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Editando</p>
           <h1 className="truncate text-sm font-semibold">Página de Inicio</h1>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <SaveIndicator status={saveStatus} />
+          <button
+            type="button"
+            onClick={() => setPreviewMode((v) => !v)}
+            className={`inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-accent ${previewMode ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-foreground"}`}
+          >
+            {previewMode ? "Salir de vista previa" : "Vista previa"}
+          </button>
+          <button
+            type="button"
+            onClick={() => void openVersions()}
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
+          >
+            <History className="size-3.5" aria-hidden />
+            Versiones
+          </button>
           <a
             href="/"
             target="_blank"
@@ -307,9 +445,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
               )}
             </button>
           ) : (
-            <span className="text-[11px] text-muted-foreground">
-              Sólo administradores pueden publicar.
-            </span>
+            <span className="text-[11px] text-muted-foreground">Sólo administradores pueden publicar.</span>
           )}
         </div>
       </div>
@@ -320,58 +456,102 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
         </div>
       ) : null}
 
-      <div className="relative flex-1">
-        <div className="min-h-screen">
-          <PublicHeader variant="overlay" />
+      <div className="relative flex flex-1">
+        {!previewMode ? (
+          <aside className="hidden w-72 shrink-0 border-r border-border bg-card/40 md:flex md:flex-col" aria-label="Estructura de la página">
+            <div className="border-b border-border p-3">
+              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Estructura</p>
+              <h2 className="mt-1 text-sm font-semibold">Secciones de la Home</h2>
+              <p className="mt-1 text-[10px] text-muted-foreground">Arrastra para reordenar. Clic para editar.</p>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2">
+              <ChromeItem label="Encabezado global" note="Compartido por todo el sitio · edición en historia posterior" />
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+                <SortableContext items={tree.root.children.map((n) => n.id)} strategy={verticalListSortingStrategy}>
+                  {tree.root.children.map((n) => (
+                    <SortableSectionItem key={n.id} node={n} selected={selectedId === n.id} onSelect={() => setSelectedId(n.id)} />
+                  ))}
+                </SortableContext>
+              </DndContext>
+              <ChromeItem label="Pie de página global" note="Compartido por todo el sitio · edición en historia posterior" />
+              <button
+                type="button"
+                onClick={() => setShowLibrary(true)}
+                className="mt-3 flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-border bg-background px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+              >
+                <Plus className="size-3.5" aria-hidden /> Añadir sección
+              </button>
+            </div>
+          </aside>
+        ) : null}
+
+        <div className="flex-1 overflow-y-auto">
           <main id="main" className="pb-24">
             <CompositionRenderer
               tree={tree}
               pageType="home"
-              wrap={(node, content) => {
-                if (node.type !== "vmx.hero") return content;
-                const isSelected = selectedId === node.id;
-                return (
-                  <div
-                    key={node.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedId(node.id);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setSelectedId(node.id);
-                      }
-                    }}
-                    className={`group relative cursor-pointer outline-none ring-inset transition-shadow ${
-                      isSelected ? "ring-4 ring-primary" : "hover:ring-4 hover:ring-primary/40"
-                    }`}
-                    aria-label="Editar Hero"
-                  >
-                    <span
-                      className={`pointer-events-none absolute left-4 top-4 z-30 rounded-full bg-primary px-3 py-1 text-[11px] font-semibold text-primary-foreground shadow-lg transition-opacity ${
-                        isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                      }`}
-                    >
-                      {isSelected ? "Editando: Hero" : "Editar Hero"}
-                    </span>
-                    {content}
-                  </div>
-                );
-              }}
+              wrap={
+                previewMode
+                  ? undefined
+                  : (node, content) => (
+                      <BlockOverlay
+                        key={node.id}
+                        node={node}
+                        selected={selectedId === node.id}
+                        onSelect={() => setSelectedId(node.id)}
+                        onDelete={() => removeNodeById(node.id)}
+                        onDuplicate={() => duplicateNode(node.id)}
+                        onMoveUp={() => moveNode(node.id, -1)}
+                        onMoveDown={() => moveNode(node.id, 1)}
+                      >
+                        {content}
+                      </BlockOverlay>
+                    )
+              }
             />
           </main>
-          <PublicFooter />
         </div>
 
-        {selectedNode && selectedNode.type === "vmx.hero" ? (
-          <HeroPanel
-            node={selectedNode}
-            onChange={updateHeroField}
-            onClose={() => setSelectedId(null)}
-          />
+        {!previewMode && selectedNode && selectedContract ? (
+          <aside
+            className="fixed right-0 top-[52px] z-40 flex h-[calc(100vh-52px)] w-[360px] max-w-[92vw] flex-col gap-4 overflow-y-auto border-l border-border bg-card p-4 shadow-xl"
+            aria-label="Herramientas para editar el bloque seleccionado"
+          >
+            <header className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Sección seleccionada</p>
+                <h2 className="truncate text-base font-semibold">{selectedContract.display_name}</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedId(null)}
+                className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+                aria-label="Cerrar"
+              >
+                <X className="size-4" aria-hidden />
+              </button>
+            </header>
+
+            <div className="flex flex-wrap gap-1.5">
+              <ToolBtn onClick={() => moveNode(selectedNode.id, -1)} icon={<ChevronUp className="size-3" />} label="Subir" />
+              <ToolBtn onClick={() => moveNode(selectedNode.id, 1)} icon={<ChevronDown className="size-3" />} label="Bajar" />
+              <ToolBtn onClick={() => duplicateNode(selectedNode.id)} icon={<Copy className="size-3" />} label="Duplicar" />
+              <ToolBtn onClick={() => removeNodeById(selectedNode.id)} icon={<Trash2 className="size-3" />} label="Eliminar" tone="danger" />
+            </div>
+
+            <AutoInspector
+              contract={selectedContract}
+              config={selectedNode.config as Record<string, unknown>}
+              onChange={(next) => updateSelectedConfig(next)}
+            />
+          </aside>
+        ) : null}
+
+        {showLibrary ? (
+          <BlockLibraryModal onClose={() => setShowLibrary(false)} onPick={(type) => insertBlock(type)} />
+        ) : null}
+        {showVersions ? (
+          <VersionsDrawer versions={versions} onClose={() => setShowVersions(false)} onRestore={doRollback} />
         ) : null}
       </div>
     </div>
@@ -380,117 +560,233 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
 
 /* --------------------------------------------------------------------- */
 
-interface HeroFieldMap {
-  eyebrow: string;
-  title: string;
-  subtitle: string;
-  cta_label: string;
-  cta_href: string;
-  cta_secondary_label: string;
-  cta_secondary_href: string;
+function ChromeItem({ label, note }: { label: string; note: string }) {
+  return (
+    <div className="mb-2 rounded-md border border-dashed border-border bg-muted/30 px-3 py-2">
+      <p className="text-[11px] font-semibold text-foreground">{label}</p>
+      <p className="text-[10px] text-muted-foreground">{note}</p>
+    </div>
+  );
 }
 
-function HeroPanel({
-  node,
-  onChange,
-  onClose,
+function SortableSectionItem({
+  node, selected, onSelect,
 }: {
   node: CompositionNode;
-  onChange: (field: keyof HeroFieldMap, value: string) => void;
-  onClose: () => void;
+  selected: boolean;
+  onSelect: () => void;
 }) {
-  const { t } = useTranslation();
-  const cfg = node.config as Record<string, unknown>;
-  const defaults: Record<string, string> = {
-    eyebrow: t("hero.eyebrow"),
-    title: t("hero.title"),
-    subtitle: t("hero.subtitle"),
-    cta_label: t("hero.cta_primary"),
-    cta_secondary_label: t("hero.cta_secondary"),
-    cta_href: "/oriente-maya",
-    cta_secondary_href: "/arma-tu-viaje",
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: node.id });
+  const contract = getBlock(node.type);
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
   };
-  const val = (k: string) => {
-    const v = cfg[k];
-    if (typeof v === "string" && v.length > 0) return v;
-    return defaults[k] ?? "";
-  };
-
   return (
-    <aside
-      className="fixed right-0 top-[52px] z-50 flex h-[calc(100vh-52px)] w-[360px] max-w-[92vw] flex-col gap-4 overflow-y-auto border-l border-border bg-card p-5 shadow-xl"
-      aria-label="Herramientas para editar el Hero"
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`mb-1 flex items-center gap-1 rounded-md border px-2 py-1.5 text-left text-xs ${
+        selected ? "border-primary bg-primary/10" : "border-border bg-background hover:bg-accent"
+      }`}
     >
-      <header className="flex items-start justify-between gap-2">
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        aria-label="Arrastrar para reordenar"
+        className="cursor-grab text-muted-foreground active:cursor-grabbing"
+      >
+        ⋮⋮
+      </button>
+      <button
+        type="button"
+        onClick={onSelect}
+        className="min-w-0 flex-1 truncate text-left font-medium"
+      >
+        {contract?.display_name ?? node.type}
+      </button>
+    </div>
+  );
+}
+
+function BlockOverlay({
+  node, selected, onSelect, onDelete, onDuplicate, onMoveUp, onMoveDown, children,
+}: {
+  node: CompositionNode;
+  selected: boolean;
+  onSelect: () => void;
+  onDelete: () => void;
+  onDuplicate: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  children: React.ReactNode;
+}) {
+  const contract = getBlock(node.type);
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
+      className={`group relative cursor-pointer outline-none ring-inset transition-shadow ${
+        selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"
+      }`}
+      aria-label={`Editar ${contract?.display_name ?? node.type}`}
+    >
+      <span
+        className={`pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-lg transition-opacity ${
+          selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        }`}
+      >
+        {contract?.display_name ?? node.type}
+      </span>
+      {selected ? (
+        <div className="pointer-events-auto absolute right-3 top-3 z-30 flex gap-1 rounded-full bg-background/95 p-1 shadow-lg ring-1 ring-border">
+          <IconBtn onClick={(e) => { e.stopPropagation(); onMoveUp(); }} icon={<ChevronUp className="size-3" />} label="Subir" />
+          <IconBtn onClick={(e) => { e.stopPropagation(); onMoveDown(); }} icon={<ChevronDown className="size-3" />} label="Bajar" />
+          <IconBtn onClick={(e) => { e.stopPropagation(); onDuplicate(); }} icon={<Copy className="size-3" />} label="Duplicar" />
+          <IconBtn onClick={(e) => { e.stopPropagation(); onDelete(); }} icon={<Trash2 className="size-3" />} label="Eliminar" tone="danger" />
+        </div>
+      ) : null}
+      {children}
+    </div>
+  );
+}
+
+function IconBtn({
+  onClick, icon, label, tone,
+}: { onClick: (e: React.MouseEvent) => void; icon: React.ReactNode; label: string; tone?: "danger" }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-foreground hover:bg-accent ${tone === "danger" ? "hover:text-destructive" : ""}`}
+    >
+      {icon}
+    </button>
+  );
+}
+
+function ToolBtn({
+  onClick, icon, label, tone,
+}: { onClick: () => void; icon: React.ReactNode; label: string; tone?: "danger" }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-medium hover:bg-accent ${tone === "danger" ? "hover:border-destructive hover:text-destructive" : ""}`}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
+
+function BlockLibraryModal({
+  onClose, onPick,
+}: { onClose: () => void; onPick: (type: string) => void }) {
+  const blocks = useMemo(
+    () =>
+      listBlocks()
+        .filter((b) => (b.constraints?.surfaces ?? []).includes("home"))
+        .sort((a, b) => a.display_name.localeCompare(b.display_name)),
+    [],
+  );
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-xl border border-border bg-card p-4 shadow-2xl">
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-semibold">Añadir una sección</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+            aria-label="Cerrar"
+          >
+            <X className="size-4" aria-hidden />
+          </button>
+        </div>
+        <div className="grid max-h-[60vh] gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
+          {blocks.map((b) => (
+            <button
+              key={b.type}
+              type="button"
+              onClick={() => onPick(b.type)}
+              className="rounded-md border border-border bg-background p-3 text-left hover:border-primary hover:bg-accent"
+            >
+              <p className="text-xs font-semibold">{b.display_name}</p>
+              {b.description ? (
+                <p className="mt-1 line-clamp-2 text-[10px] text-muted-foreground">{b.description}</p>
+              ) : null}
+              <p className="mt-1 text-[9px] uppercase tracking-[0.14em] text-muted-foreground">{b.category}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VersionsDrawer({
+  versions, onClose, onRestore,
+}: {
+  versions: CompositionRevisionSummary[];
+  onClose: () => void;
+  onRestore: (rev: CompositionRevisionSummary) => void | Promise<void>;
+}) {
+  return (
+    <div
+      className="fixed right-0 top-[52px] z-50 flex h-[calc(100vh-52px)] w-[380px] max-w-[92vw] flex-col gap-3 border-l border-border bg-card p-4 shadow-xl"
+      aria-label="Historial de versiones"
+    >
+      <header className="flex items-center justify-between gap-2">
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
-            Sección seleccionada
-          </p>
-          <h2 className="text-lg font-semibold">Hero</h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Cambia el texto y verás cómo queda al instante. Al terminar, pulsa{" "}
-            <span className="font-semibold">Publicar cambios</span>.
-          </p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Historial</p>
+          <h2 className="text-base font-semibold">Versiones publicadas</h2>
         </div>
         <button
           type="button"
           onClick={onClose}
           className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
-          aria-label="Cerrar herramientas"
+          aria-label="Cerrar historial"
         >
           <X className="size-4" aria-hidden />
         </button>
       </header>
-
-      <Field label="Frase superior" hint="Aparece en cursiva sobre el título.">
-        <input type="text" value={val("eyebrow")} onChange={(e) => onChange("eyebrow", e.target.value)}
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="Ej. Experiencias que emocionan" />
-      </Field>
-
-      <Field label="Título principal" hint="El mensaje más grande de la página.">
-        <textarea value={val("title")} onChange={(e) => onChange("title", e.target.value)}
-          className="min-h-[80px] w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="Ej. Descubre Valladolid…" />
-      </Field>
-
-      <Field label="Subtítulo" hint="Frase breve debajo del título.">
-        <textarea value={val("subtitle")} onChange={(e) => onChange("subtitle", e.target.value)}
-          className="min-h-[70px] w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="Ej. Cenotes, ciudades vivas…" />
-      </Field>
-
-      <Field label="Botón principal — texto">
-        <input type="text" value={val("cta_label")} onChange={(e) => onChange("cta_label", e.target.value)}
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="Ej. Explorar destinos" />
-      </Field>
-      <Field label="Botón principal — enlace" hint="Ruta a la que lleva el botón principal.">
-        <input type="text" value={val("cta_href")} onChange={(e) => onChange("cta_href", e.target.value)}
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="/oriente-maya" />
-      </Field>
-
-      <Field label="Botón secundario — texto">
-        <input type="text" value={val("cta_secondary_label")} onChange={(e) => onChange("cta_secondary_label", e.target.value)}
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="Ej. Arma tu viaje" />
-      </Field>
-      <Field label="Botón secundario — enlace" hint="Ruta a la que lleva el botón secundario.">
-        <input type="text" value={val("cta_secondary_href")} onChange={(e) => onChange("cta_secondary_href", e.target.value)}
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="/arma-tu-viaje" />
-      </Field>
-    </aside>
-  );
-}
-
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1">
-      <label className="text-xs font-semibold text-foreground">{label}</label>
-      {children}
-      {hint ? <p className="text-[10px] text-muted-foreground">{hint}</p> : null}
+      <div className="flex-1 space-y-2 overflow-y-auto">
+        {versions.length === 0 ? (
+          <p className="text-xs text-muted-foreground">Aún no hay versiones publicadas.</p>
+        ) : (
+          versions.map((v) => (
+            <div key={v.id} className="rounded-md border border-border bg-background p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs font-semibold">Revisión #{v.revision_number}</p>
+                <button
+                  type="button"
+                  onClick={() => void onRestore(v)}
+                  className="rounded-md border border-border bg-background px-2 py-1 text-[10px] font-medium hover:bg-accent"
+                >
+                  Restaurar
+                </button>
+              </div>
+              <p className="mt-1 text-[10px] text-muted-foreground">{new Date(v.created_at).toLocaleString()}</p>
+              {v.notes ? <p className="mt-1 text-[11px] text-foreground">{v.notes}</p> : null}
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
@@ -517,10 +813,7 @@ function SaveIndicator({ status }: { status: SaveStatus }) {
 }
 
 function FullScreenState({
-  title,
-  detail,
-  spinner,
-  onExit,
+  title, detail, spinner, onExit,
 }: {
   title: string;
   detail?: string;
@@ -529,9 +822,7 @@ function FullScreenState({
 }) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
-      {spinner ? (
-        <Loader2 className="mb-3 size-6 animate-spin text-muted-foreground" aria-hidden />
-      ) : null}
+      {spinner ? <Loader2 className="mb-3 size-6 animate-spin text-muted-foreground" aria-hidden /> : null}
       <h1 className="text-lg font-semibold">{title}</h1>
       {detail ? <p className="mt-2 max-w-md text-sm text-muted-foreground">{detail}</p> : null}
       <button
