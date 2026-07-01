@@ -154,15 +154,18 @@ const dividerBlock: BlockContract = {
 const heroBlock: BlockContract = {
   type: "vmx.hero",
   category: "static",
-  version: "1.0.0",
+  version: "1.1.0",
   display_name: "Hero",
   description: "Bloque hero principal de la Home y de Landing Pages.",
   schema: {
+    eyebrow: { type: "text", label: "Frase superior", translatable: true },
     title: { type: "text", label: "Título", required: true, translatable: true },
     subtitle: { type: "text", label: "Subtítulo", translatable: true },
     background_image: { type: "media", label: "Imagen de fondo", accepts: ["image/*"] },
-    cta_label: { type: "text", label: "Etiqueta CTA", translatable: true },
-    cta_href: { type: "url", label: "URL CTA" },
+    cta_label: { type: "text", label: "Botón principal — texto", translatable: true },
+    cta_href: { type: "url", label: "Botón principal — enlace" },
+    cta_secondary_label: { type: "text", label: "Botón secundario — texto", translatable: true },
+    cta_secondary_href: { type: "url", label: "Botón secundario — enlace" },
   },
   capabilities: {
     soporta_i18n: true,
@@ -173,7 +176,10 @@ const heroBlock: BlockContract = {
   },
   constraints: { surfaces: ["home", "landing"], unique_per_page: true },
   responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["background_image"] },
-  i18n: { translatable_fields: ["title", "subtitle", "cta_label"], fallback: "base_language" },
+  i18n: {
+    translatable_fields: ["eyebrow", "title", "subtitle", "cta_label", "cta_secondary_label"],
+    fallback: "base_language",
+  },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
