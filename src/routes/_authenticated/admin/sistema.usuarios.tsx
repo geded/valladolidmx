@@ -1,26 +1,69 @@
 /**
  * /admin/sistema/usuarios — Gestión de roles (15.10.4R · Paso E).
  *
- * Acceso exclusivo super_admin. Autorización dura en el servidor:
- * `isSuperAdmin` y RPCs SECURITY DEFINER. La UI sólo media.
+ * Acceso exclusivo super_admin. Autorización dura en backend:
+ * `has_role` y RPCs SECURITY DEFINER. La UI sólo media.
  * No usa SUPABASE_SERVICE_ROLE_KEY; toda escritura queda auditada
  * en `permissions_audit_log`.
  */
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import {
-  isSuperAdmin,
-  listUsersWithRoles,
-  assignRole,
-  revokeRole,
-  ASSIGNABLE_ROLES,
-  type AdminUserRow,
-  type AppRole,
-} from "@/lib/admin/users.functions";
-import { ROLE_LABELS } from "@/types/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { ROLE_LABELS, type AppRole } from "@/types/auth";
 import { toast } from "sonner";
+
+interface AdminUserRow {
+  user_id: string;
+  email: string | null;
+  display_name: string | null;
+  created_at: string;
+  last_sign_in_at: string | null;
+  roles: AppRole[];
+}
+
+const ASSIGNABLE_ROLES: AppRole[] = [
+  "traveler",
+  "business_owner",
+  "concierge",
+  "concierge_lead",
+  "editor",
+  "admin",
+];
+
+async function fetchIsSuperAdmin(): Promise<boolean> {
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError || !userData.user) return false;
+
+  const { data, error } = await supabase.rpc("has_role", {
+    _user_id: userData.user.id,
+    _role: "super_admin",
+  });
+  if (error) throw new Error(`No se pudo validar autorización: ${error.message}`);
+  return Boolean(data);
+}
+
+async function fetchUsersWithRoles(): Promise<AdminUserRow[]> {
+  const { data, error } = await supabase.rpc("admin_list_users_with_roles");
+  if (error) throw new Error(`No se pudieron cargar usuarios: ${error.message}`);
+  return (data ?? []) as AdminUserRow[];
+}
+
+async function assignUserRole(userId: string, role: AppRole) {
+  const { error } = await supabase.rpc("admin_assign_role", {
+    _target_user_id: userId,
+    _role: role,
+  });
+  if (error) throw new Error(`No se pudo asignar el rol: ${error.message}`);
+}
+
+async function revokeUserRole(userId: string, role: AppRole) {
+  const { error } = await supabase.rpc("admin_revoke_role", {
+    _target_user_id: userId,
+    _role: role,
+  });
+  if (error) throw new Error(`No se pudo revocar el rol: ${error.message}`);
+}
 
 export const Route = createFileRoute("/_authenticated/admin/sistema/usuarios")({
   component: AdminUsuariosPage,
@@ -33,18 +76,28 @@ export const Route = createFileRoute("/_authenticated/admin/sistema/usuarios")({
 });
 
 function AdminUsuariosPage() {
-  const checkSuper = useServerFn(isSuperAdmin);
-  const fetchUsers = useServerFn(listUsersWithRoles);
-
-  const gate = useQuery({ queryKey: ["admin", "is-super-admin"], queryFn: () => checkSuper() });
+  const gate = useQuery({
+    queryKey: ["admin", "is-super-admin"],
+    queryFn: fetchIsSuperAdmin,
+    retry: false,
+  });
   const users = useQuery({
     queryKey: ["admin", "users-roles"],
-    queryFn: () => fetchUsers(),
+    queryFn: fetchUsersWithRoles,
     enabled: gate.data === true,
+    retry: false,
   });
 
   if (gate.isLoading) {
     return <p className="text-sm text-muted-foreground">Verificando autorización…</p>;
+  }
+  if (gate.error) {
+    return (
+      <div className="max-w-xl rounded-2xl border border-destructive/40 bg-destructive/5 p-6">
+        <h1 className="text-lg font-semibold text-destructive">No se pudo abrir Usuarios y roles</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{(gate.error as Error).message}</p>
+      </div>
+    );
   }
   if (!gate.data) {
     return (
@@ -132,14 +185,12 @@ function UsersTable({ rows }: { rows: AdminUserRow[] }) {
 
 function UserRow({ row }: { row: AdminUserRow }) {
   const qc = useQueryClient();
-  const doAssign = useServerFn(assignRole);
-  const doRevoke = useServerFn(revokeRole);
   const [pending, setPending] = useState<AppRole | "">("");
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin", "users-roles"] });
 
   const assignMut = useMutation({
-    mutationFn: (role: AppRole) => doAssign({ data: { user_id: row.user_id, role } }),
+    mutationFn: (role: AppRole) => assignUserRole(row.user_id, role),
     onSuccess: (_d, role) => {
       toast.success(`Rol asignado: ${ROLE_LABELS[role]}`);
       invalidate();
@@ -148,7 +199,7 @@ function UserRow({ row }: { row: AdminUserRow }) {
   });
 
   const revokeMut = useMutation({
-    mutationFn: (role: AppRole) => doRevoke({ data: { user_id: row.user_id, role } }),
+    mutationFn: (role: AppRole) => revokeUserRole(row.user_id, role),
     onSuccess: (_d, role) => {
       toast.success(`Rol revocado: ${ROLE_LABELS[role]}`);
       invalidate();
