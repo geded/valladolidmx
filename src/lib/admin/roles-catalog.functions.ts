@@ -162,7 +162,12 @@ export const updateRole = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context);
 
-    const patch: Record<string, unknown> = {};
+    const patch: {
+      name?: string;
+      description?: string | null;
+      color?: string;
+      icon?: string | null;
+    } = {};
     if (data.name !== undefined) patch.name = data.name;
     if (data.description !== undefined) patch.description = data.description || null;
     if (data.color !== undefined) patch.color = data.color;
