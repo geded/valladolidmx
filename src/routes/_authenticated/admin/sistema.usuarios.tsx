@@ -36,6 +36,14 @@ interface AdminUserRow {
   created_at: string;
   last_sign_in_at: string | null;
   roles: AppRole[];
+  custom_roles: CustomRoleRef[];
+}
+
+interface CustomRoleRef {
+  id: string;
+  slug: string;
+  name: string;
+  color: string;
 }
 
 const STAFF_ROLES: AppRole[] = ["admin", "editor", "concierge", "concierge_lead"];
@@ -65,7 +73,10 @@ async function fetchIsSuperAdmin(): Promise<boolean> {
 async function fetchUsersWithRoles(): Promise<AdminUserRow[]> {
   const { data, error } = await supabase.rpc("admin_list_users_with_roles");
   if (error) throw new Error(`No se pudieron cargar usuarios: ${error.message}`);
-  return (data ?? []) as AdminUserRow[];
+  return ((data ?? []) as Array<AdminUserRow & { custom_roles: unknown }>).map((r) => ({
+    ...r,
+    custom_roles: Array.isArray(r.custom_roles) ? (r.custom_roles as CustomRoleRef[]) : [],
+  }));
 }
 
 async function assignUserRole(userId: string, role: AppRole) {
@@ -82,6 +93,22 @@ async function revokeUserRole(userId: string, role: AppRole) {
     _role: role,
   });
   if (error) throw new Error(`No se pudo revocar el rol: ${error.message}`);
+}
+
+async function assignCustomRoleRpc(userId: string, roleId: string) {
+  const { error } = await supabase.rpc("admin_assign_custom_role", {
+    _target_user_id: userId,
+    _role_id: roleId,
+  });
+  if (error) throw new Error(`No se pudo asignar el rol personalizado: ${error.message}`);
+}
+
+async function revokeCustomRoleRpc(userId: string, roleId: string) {
+  const { error } = await supabase.rpc("admin_revoke_custom_role", {
+    _target_user_id: userId,
+    _role_id: roleId,
+  });
+  if (error) throw new Error(`No se pudo revocar el rol personalizado: ${error.message}`);
 }
 
 export const Route = createFileRoute("/_authenticated/admin/sistema/usuarios")({
