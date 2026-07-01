@@ -1,4 +1,5 @@
 import { ChevronsUpDown } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +13,7 @@ import { cn } from "@/lib/utils";
 
 export function WorkspaceSwitcher({ compact = false }: { compact?: boolean }) {
   const { workspace, workspaces, setActiveWorkspace } = useWorkspace();
+  const navigate = useNavigate();
   if (!workspace) return null;
   const Icon = workspace.icon;
 
@@ -47,7 +49,15 @@ export function WorkspaceSwitcher({ compact = false }: { compact?: boolean }) {
         {workspaces.map((w) => {
           const I = w.icon;
           return (
-            <DropdownMenuItem key={w.id} onClick={() => setActiveWorkspace(w.id)}>
+            <DropdownMenuItem
+              key={w.id}
+              onClick={() => {
+                setActiveWorkspace(w.id);
+                if (w.rootPath && w.id !== workspace.id) {
+                  void navigate({ to: w.rootPath as never });
+                }
+              }}
+            >
               <I className="mr-2 h-4 w-4" aria-hidden />
               <span className="flex-1">{w.label}</span>
               {w.id === workspace.id ? (
