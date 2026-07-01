@@ -22,6 +22,15 @@ const InviteSchema = z.object({
   displayName: z.string().trim().max(120).optional(),
 });
 
+const UserIdSchema = z.object({ userId: z.string().uuid() });
+const UpdateEmailSchema = UserIdSchema.extend({ email: z.string().email() });
+const UpdatePasswordSchema = UserIdSchema.extend({
+  password: z.string().min(8).max(200),
+});
+const UpdateDisplayNameSchema = UserIdSchema.extend({
+  displayName: z.string().trim().min(1).max(120),
+});
+
 async function assertSuperAdmin(ctx: {
   supabase: import("@supabase/supabase-js").SupabaseClient;
   userId: string;
@@ -81,4 +90,122 @@ export const inviteUser = createServerFn({ method: "POST" })
       userId: invited.user.id,
       email: invited.user.email,
     };
+  });
+
+async function auditAdminAction(params: {
+  actorId: string;
+  targetId: string;
+  action: string;
+  metadata?: Record<string, string | number | boolean | null>;
+}) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  await supabaseAdmin.from("permissions_audit_log").insert({
+    actor_user_id: params.actorId,
+    target_user_id: params.targetId,
+    action: params.action,
+    metadata: params.metadata ?? { surface: "/admin/sistema/usuarios" },
+  });
+}
+
+export const updateUserEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => UpdateEmailSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin({ supabase: context.supabase, userId: context.userId });
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(data.userId, {
+      email: data.email,
+      email_confirm: true,
+    });
+    if (error) throw new Error(error.message);
+    await supabaseAdmin.from("profiles").update({ email: data.email }).eq("user_id", data.userId);
+    await auditAdminAction({
+      actorId: context.userId,
+      targetId: data.userId,
+      action: "user.email.update",
+      metadata: { new_email: data.email },
+    });
+    return { ok: true as const };
+  });
+
+export const updateUserPassword = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => UpdatePasswordSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin({ supabase: context.supabase, userId: context.userId });
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(data.userId, {
+      password: data.password,
+    });
+    if (error) throw new Error(error.message);
+    await auditAdminAction({
+      actorId: context.userId,
+      targetId: data.userId,
+      action: "user.password.update",
+    });
+    return { ok: true as const };
+  });
+
+export const sendPasswordReset = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ email: z.string().email(), userId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin({ supabase: context.supabase, userId: context.userId });
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.auth.admin.generateLink({
+      type: "recovery",
+      email: data.email,
+    });
+    if (error) throw new Error(error.message);
+    await auditAdminAction({
+      actorId: context.userId,
+      targetId: data.userId,
+      action: "user.password.reset_link",
+    });
+    return { ok: true as const };
+  });
+
+export const updateUserDisplayName = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => UpdateDisplayNameSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin({ supabase: context.supabase, userId: context.userId });
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("profiles")
+      .update({ display_name: data.displayName })
+      .eq("user_id", data.userId);
+    if (error) throw new Error(error.message);
+    await auditAdminAction({
+      actorId: context.userId,
+      targetId: data.userId,
+      action: "user.profile.update",
+      metadata: { display_name: data.displayName },
+    });
+    return { ok: true as const };
+  });
+
+export const deleteUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => UserIdSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin({ supabase: context.supabase, userId: context.userId });
+    if (data.userId === context.userId) {
+      throw new Error("No puedes eliminar tu propia cuenta desde aquí.");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Bloquea la eliminación de otro super_admin
+    const { data: isTargetSuper } = await supabaseAdmin.rpc("has_role", {
+      _user_id: data.userId,
+      _role: "super_admin",
+    });
+    if (isTargetSuper) throw new Error("No se puede eliminar una cuenta super_admin.");
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
+    if (error) throw new Error(error.message);
+    await auditAdminAction({
+      actorId: context.userId,
+      targetId: data.userId,
+      action: "user.delete",
+    });
+    return { ok: true as const };
   });

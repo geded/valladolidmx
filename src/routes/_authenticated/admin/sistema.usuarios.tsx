@@ -12,7 +12,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { ROLE_LABELS, type AppRole } from "@/types/auth";
-import { inviteUser } from "@/lib/admin/user-management.functions";
+import {
+  inviteUser,
+  updateUserEmail,
+  updateUserPassword,
+  updateUserDisplayName,
+  sendPasswordReset,
+  deleteUser,
+} from "@/lib/admin/user-management.functions";
 import { toast } from "sonner";
 
 interface AdminUserRow {
@@ -258,6 +265,7 @@ function UsersTable({ rows, variant }: { rows: AdminUserRow[]; variant: "travele
 function UserRow({ row, assignable }: { row: AdminUserRow; assignable: AppRole[] }) {
   const qc = useQueryClient();
   const [pending, setPending] = useState<AppRole | "">("");
+  const [editOpen, setEditOpen] = useState(false);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin", "users-roles"] });
 
@@ -289,6 +297,14 @@ function UserRow({ row, assignable }: { row: AdminUserRow; assignable: AppRole[]
         <div className="mt-1 text-[10px] uppercase tracking-wide text-muted-foreground">
           {new Date(row.created_at).toLocaleDateString()}
         </div>
+        <button
+          type="button"
+          onClick={() => setEditOpen(true)}
+          className="mt-2 rounded-md border border-border px-2 py-0.5 text-[11px] hover:bg-muted"
+        >
+          Editar
+        </button>
+        {editOpen ? <EditUserDialog row={row} onClose={() => setEditOpen(false)} /> : null}
       </td>
       <td className="px-4 py-3">
         <div className="flex flex-wrap gap-1.5">
@@ -355,6 +371,180 @@ function UserRow({ row, assignable }: { row: AdminUserRow; assignable: AppRole[]
         )}
       </td>
     </tr>
+  );
+}
+
+// ---------------- Edición de usuario ----------------
+
+function EditUserDialog({ row, onClose }: { row: AdminUserRow; onClose: () => void }) {
+  const qc = useQueryClient();
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["admin", "users-roles"] });
+  const isSuper = row.roles.includes("super_admin");
+
+  const emailFn = useServerFn(updateUserEmail);
+  const passFn = useServerFn(updateUserPassword);
+  const nameFn = useServerFn(updateUserDisplayName);
+  const resetFn = useServerFn(sendPasswordReset);
+  const delFn = useServerFn(deleteUser);
+
+  const [email, setEmail] = useState(row.email ?? "");
+  const [displayName, setDisplayName] = useState(row.display_name ?? "");
+  const [password, setPassword] = useState("");
+  const [confirmDel, setConfirmDel] = useState("");
+
+  const nameMut = useMutation({
+    mutationFn: () => nameFn({ data: { userId: row.user_id, displayName: displayName.trim() } }),
+    onSuccess: () => { toast.success("Nombre actualizado"); invalidate(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const emailMut = useMutation({
+    mutationFn: () => emailFn({ data: { userId: row.user_id, email: email.trim() } }),
+    onSuccess: () => { toast.success("Correo actualizado"); invalidate(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const passMut = useMutation({
+    mutationFn: () => passFn({ data: { userId: row.user_id, password } }),
+    onSuccess: () => { toast.success("Contraseña actualizada"); setPassword(""); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const resetMut = useMutation({
+    mutationFn: () => resetFn({ data: { userId: row.user_id, email: row.email ?? "" } }),
+    onSuccess: () => toast.success("Enlace de recuperación generado y enviado"),
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const delMut = useMutation({
+    mutationFn: () => delFn({ data: { userId: row.user_id } }),
+    onSuccess: () => { toast.success("Usuario eliminado"); invalidate(); onClose(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg rounded-2xl border border-border bg-background p-6 shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-semibold">Editar usuario</h2>
+            <p className="text-xs text-muted-foreground">{row.email}</p>
+          </div>
+          <button type="button" onClick={onClose} className="text-sm text-muted-foreground">✕</button>
+        </header>
+
+        {isSuper ? (
+          <div className="mt-3 rounded-md border border-amber-300/50 bg-amber-50 p-2 text-xs text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+            Cuenta super_admin: la eliminación está bloqueada por seguridad.
+          </div>
+        ) : null}
+
+        <section className="mt-4 space-y-2">
+          <label className="block text-sm">
+            Nombre a mostrar
+            <div className="mt-1 flex gap-2">
+              <input
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+              />
+              <button
+                type="button"
+                disabled={nameMut.isPending || !displayName.trim()}
+                onClick={() => nameMut.mutate()}
+                className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
+              >
+                Guardar
+              </button>
+            </div>
+          </label>
+        </section>
+
+        <section className="mt-4 space-y-2">
+          <label className="block text-sm">
+            Correo electrónico
+            <div className="mt-1 flex gap-2">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+              />
+              <button
+                type="button"
+                disabled={emailMut.isPending || !email.trim() || email.trim() === row.email}
+                onClick={() => emailMut.mutate()}
+                className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
+              >
+                Actualizar
+              </button>
+            </div>
+          </label>
+          <p className="text-[11px] text-muted-foreground">
+            El correo se marca como confirmado. Notifica al usuario del cambio.
+          </p>
+        </section>
+
+        <section className="mt-4 space-y-2">
+          <label className="block text-sm">
+            Nueva contraseña
+            <div className="mt-1 flex gap-2">
+              <input
+                type="text"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mínimo 8 caracteres"
+                className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+              />
+              <button
+                type="button"
+                disabled={passMut.isPending || password.length < 8}
+                onClick={() => passMut.mutate()}
+                className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
+              >
+                Cambiar
+              </button>
+            </div>
+          </label>
+          <button
+            type="button"
+            disabled={resetMut.isPending || !row.email}
+            onClick={() => resetMut.mutate()}
+            className="text-xs text-primary underline disabled:opacity-50"
+          >
+            …o enviar enlace de recuperación al usuario
+          </button>
+        </section>
+
+        {!isSuper ? (
+          <section className="mt-6 rounded-md border border-destructive/40 bg-destructive/5 p-3">
+            <h3 className="text-sm font-medium text-destructive">Eliminar cuenta</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Acción irreversible. Escribe <code>ELIMINAR</code> para confirmar.
+            </p>
+            <div className="mt-2 flex gap-2">
+              <input
+                value={confirmDel}
+                onChange={(e) => setConfirmDel(e.target.value)}
+                className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+              />
+              <button
+                type="button"
+                disabled={delMut.isPending || confirmDel !== "ELIMINAR"}
+                onClick={() => delMut.mutate()}
+                className="rounded-md border border-destructive bg-destructive px-3 py-2 text-xs font-medium text-destructive-foreground disabled:opacity-50"
+              >
+                Eliminar
+              </button>
+            </div>
+          </section>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
