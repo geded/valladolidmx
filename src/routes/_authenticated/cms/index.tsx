@@ -101,23 +101,24 @@ function CmsDashboard() {
 
       <section className="mt-8 grid gap-3 sm:grid-cols-2">
         <Link
-          to="/paginas"
+          to="/cms/experience-builder"
           className="group flex flex-col gap-2 rounded-2xl border border-primary/30 bg-primary/5 p-5 transition-colors hover:bg-primary/10"
         >
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
             Editor de páginas
           </p>
-          <h2 className="mt-1 text-lg font-semibold">Editar páginas del sitio</h2>
+          <h2 className="mt-1 text-lg font-semibold">Abrir Experience Builder</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Elige cualquier página pública (Inicio, Experiencias, Hoteles, etc.)
-            y edítala tal como la ven los visitantes.
+            Studio único (Modo Visual por defecto, Profesional opcional para
+            administradores). Elige cualquier página y edítala como la ven
+            los visitantes.
           </p>
           <span className="mt-2 text-xs font-semibold text-primary">
-            Ver todas las páginas →
+            Abrir Studio →
           </span>
         </Link>
         <Link
-          to="/paginas/inicio"
+          to="/cms/experience-builder"
           className="group flex flex-col gap-2 rounded-2xl border border-border bg-card p-5 transition-colors hover:bg-accent"
         >
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -125,10 +126,11 @@ function CmsDashboard() {
           </p>
           <h2 className="mt-1 text-lg font-semibold">Editar página de Inicio</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Abre directamente el editor visual de la Home y publica en un clic.
+            Abre el Studio en Modo Visual y selecciona la página de Inicio
+            para editarla y publicarla en un clic.
           </p>
           <span className="mt-2 text-xs font-semibold text-foreground">
-            Abrir editor →
+            Abrir Studio →
           </span>
         </Link>
       </section>

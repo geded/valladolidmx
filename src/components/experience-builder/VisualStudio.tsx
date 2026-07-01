@@ -1,23 +1,24 @@
 /**
- * /paginas/inicio — Editor productizado de la Página de Inicio.
+ * VisualStudio — Modo Visual (WYSIWYG) del Experience Builder único.
  *
- * 15.10.4d · US-01 · "Editar la Home real desde el Studio".
+ * 15.10.4d · Unificación (post-US-01):
+ *  - Un único Studio en /cms/experience-builder con dos modos.
+ *  - Modo Visual (este componente) es el predeterminado para empresarios.
+ *  - No expone JSON, IDs, slugs, composition, block, schema.
+ *  - Reutiliza infra existente: page_compositions, CompositionRenderer,
+ *    Discovery PublicHeader/PublicFooter. Cero infraestructura nueva.
  *
- * Principios:
- *  - WYSIWYG puro: se edita exactamente lo que el visitante ve.
- *  - Sin exponer conceptos técnicos (block, composition, slug, id, JSON).
- *  - Reutiliza infraestructura existente:
- *      · Experience Builder (composición + renderer + publish RPC).
- *      · Discovery Layer (PublicHeader / PublicFooter / PublicShell).
- *      · Lovable Cloud (page_compositions).
- *  - Nada nuevo se registra en engines/registries/providers.
+ * Superficies editables en esta entrega:
+ *  - Home → Hero (título, subtítulo, eyebrow, CTAs). Otras secciones
+ *    quedan marcadas "Próximamente" (habilitación en US-04).
+ *  - Resto de páginas del sitio → placeholder "Próximamente" con
+ *    enlace para verlas en el sitio (habilitación progresiva).
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Check, ExternalLink, Loader2, X } from "lucide-react";
+import { ArrowLeft, Check, ExternalLink, Loader2, Lock, Pencil, X } from "lucide-react";
 
 import {
   listCompositions,
@@ -37,25 +38,136 @@ import { PublicHeader, PublicFooter } from "@/components/discovery";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 
-export const Route = createFileRoute("/_authenticated/paginas/inicio")({
-  head: () => ({
-    meta: [
-      { title: "Editar página de Inicio · Valladolid.mx" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
-  }),
-  component: EditorInicio,
-});
-
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
-function EditorInicio() {
+interface SitePage {
+  key: string;
+  title: string;
+  description: string;
+  publicPath: string;
+  status: "editable" | "soon";
+  soonLabel?: string;
+}
+
+const SITE_PAGES: SitePage[] = [
+  {
+    key: "home",
+    title: "Inicio",
+    description: "Página principal que ve todo visitante al llegar a Valladolid.mx.",
+    publicPath: "/",
+    status: "editable",
+  },
+  { key: "experiencias", title: "Experiencias", description: "Catálogo de experiencias turísticas.", publicPath: "/experiencias", status: "soon", soonLabel: "US-04" },
+  { key: "hoteles", title: "Hoteles", description: "Hospedaje disponible en el destino.", publicPath: "/hoteles", status: "soon", soonLabel: "US-04" },
+  { key: "restaurantes", title: "Restaurantes", description: "Gastronomía local y recomendada.", publicPath: "/restaurantes", status: "soon", soonLabel: "US-04" },
+  { key: "eventos", title: "Eventos", description: "Agenda de eventos y actividades.", publicPath: "/eventos", status: "soon", soonLabel: "US-04" },
+  { key: "empresas", title: "Empresas", description: "Directorio de empresas locales.", publicPath: "/empresas", status: "soon", soonLabel: "US-04" },
+  { key: "marketplace", title: "Marketplace", description: "Tienda y reservaciones.", publicPath: "/marketplace", status: "soon", soonLabel: "US-05" },
+  { key: "arma-tu-viaje", title: "Arma tu viaje", description: "Planificador interactivo del viaje.", publicPath: "/arma-tu-viaje", status: "soon", soonLabel: "US-05" },
+  { key: "alux", title: "Alux (IA)", description: "Superficie de conversación con Alux.", publicPath: "/alux", status: "soon", soonLabel: "US-05" },
+  { key: "oriente-maya", title: "Oriente Maya", description: "Portal territorial del Oriente Maya.", publicPath: "/oriente-maya", status: "soon", soonLabel: "US-05" },
+];
+
+export function VisualStudio() {
+  const [openKey, setOpenKey] = useState<string | null>(null);
+  if (openKey === "home") {
+    return <HomeVisualEditor onExit={() => setOpenKey(null)} />;
+  }
+  return <PagesPicker onOpen={(k) => setOpenKey(k)} />;
+}
+
+/* --------------------------------------------------------------------- */
+
+function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
+  return (
+    <div className="mx-auto w-full max-w-5xl px-4 py-4">
+      <header className="max-w-2xl">
+        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
+          Elige una página
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold">¿Qué página quieres editar?</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Selecciona cualquier página del sitio para verla y modificarla tal como
+          la ven los visitantes. En esta entrega la <strong>página de Inicio</strong> ya
+          es editable. El resto se irá habilitando en las próximas historias del sprint.
+        </p>
+      </header>
+
+      <section className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {SITE_PAGES.map((p) => {
+          const editable = p.status === "editable";
+          const cardBase =
+            "flex h-full flex-col justify-between rounded-2xl border p-5 text-left transition-colors";
+          const cardCls = editable
+            ? `${cardBase} border-primary/30 bg-primary/5 hover:bg-primary/10`
+            : `${cardBase} border-border bg-card opacity-80`;
+          const inner = (
+            <>
+              <div>
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="text-base font-semibold">{p.title}</h3>
+                  {editable ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                      <Pencil className="size-2.5" aria-hidden /> Editable
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                      <Lock className="size-2.5" aria-hidden /> Próximamente
+                    </span>
+                  )}
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">{p.description}</p>
+                <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                  {p.publicPath}
+                </p>
+              </div>
+              <div className="mt-4 flex items-center justify-between gap-2">
+                {editable ? (
+                  <span className="text-xs font-semibold text-primary">Abrir editor →</span>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground">
+                    {p.soonLabel ? `Se habilita en ${p.soonLabel}` : "Se habilita pronto"}
+                  </span>
+                )}
+                <a
+                  href={p.publicPath}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-[10px] font-medium text-foreground hover:bg-accent"
+                  aria-label={`Ver ${p.title} en el sitio`}
+                >
+                  Ver <ExternalLink className="size-3" aria-hidden />
+                </a>
+              </div>
+            </>
+          );
+          if (editable) {
+            return (
+              <button key={p.key} type="button" onClick={() => onOpen(p.key)} className={cardCls}>
+                {inner}
+              </button>
+            );
+          }
+          return (
+            <div key={p.key} className={cardCls} aria-disabled="true">
+              {inner}
+            </div>
+          );
+        })}
+      </section>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+
+function HomeVisualEditor({ onExit }: { onExit: () => void }) {
   const list = useServerFn(listCompositions);
   const get = useServerFn(getComposition);
   const create = useServerFn(createComposition);
   const save = useServerFn(saveCompositionDraft);
   const publish = useServerFn(publishComposition);
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { roles } = useAuth();
   const canPublish = roles.includes("admin") || roles.includes("super_admin");
@@ -68,7 +180,6 @@ function EditorInicio() {
   const [message, setMessage] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Carga inicial de la composición de Inicio
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -79,14 +190,8 @@ function EditorInicio() {
         if (home) {
           detail = await get({ data: { id: home.id } });
         } else {
-          // Fallback muy defensivo: si por alguna razón no existiera,
-          // crear una composición de Inicio vacía (el seed migró antes).
           const { id } = await create({
-            data: {
-              slug: "home",
-              title: "Página de Inicio",
-              page_type: "home",
-            },
+            data: { slug: "home", title: "Página de Inicio", page_type: "home" },
           });
           detail = await get({ data: { id } });
         }
@@ -102,7 +207,6 @@ function EditorInicio() {
     };
   }, [list, get, create]);
 
-  // Auto-guardado con debounce (1s) — silencioso, "Guardado" al terminar.
   const saveTimer = useRef<number | null>(null);
   useEffect(() => {
     if (!page || !tree) return;
@@ -116,7 +220,6 @@ function EditorInicio() {
     return () => {
       if (saveTimer.current) window.clearTimeout(saveTimer.current);
     };
-    // Sólo dispara cuando cambia el árbol.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tree]);
 
@@ -135,10 +238,8 @@ function EditorInicio() {
     setPublishing(true);
     setMessage(null);
     try {
-      // Persistir borrador antes de publicar
       await save({ data: { id: page.id, tree } });
-      await publish({ data: { id: page.id, notes: "Publicado desde /paginas/inicio" } });
-      // Refrescar la Home pública
+      await publish({ data: { id: page.id, notes: "Publicado desde Modo Visual" } });
       await queryClient.invalidateQueries({ queryKey: ["eb", "published-home", "default"] });
       setMessage("Cambios publicados en el sitio.");
     } catch (e) {
@@ -150,32 +251,24 @@ function EditorInicio() {
 
   const updateHeroField = (field: keyof HeroFieldMap, value: string) => {
     if (!heroNode || !tree) return;
-    const next = updateNodeConfig(tree, heroNode.id, {
-      ...heroNode.config,
-      [field]: value,
-    });
+    const next = updateNodeConfig(tree, heroNode.id, { ...heroNode.config, [field]: value });
     setTree(next);
   };
 
-  if (loadError) {
-    return <FullScreenState title="No se pudo abrir el editor" detail={loadError} />;
-  }
-  if (!page || !tree) {
-    return <FullScreenState title="Preparando el editor…" detail="Cargando tu página de Inicio." spinner />;
-  }
+  if (loadError) return <FullScreenState title="No se pudo abrir el editor" detail={loadError} onExit={onExit} />;
+  if (!page || !tree) return <FullScreenState title="Preparando el editor…" detail="Cargando tu página de Inicio." spinner onExit={onExit} />;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {/* Barra superior del editor (chrome mínimo, no técnico) */}
       <div className="sticky top-0 z-40 flex flex-wrap items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
         <button
           type="button"
-          onClick={() => void navigate({ to: "/cms" })}
+          onClick={onExit}
           className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
-          aria-label="Volver al CMS"
+          aria-label="Volver al listado de páginas"
         >
           <ArrowLeft className="size-3.5" aria-hidden />
-          Salir
+          Páginas
         </button>
         <div className="min-w-0">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -227,9 +320,7 @@ function EditorInicio() {
         </div>
       ) : null}
 
-      {/* Área de preview WYSIWYG (visitante) + panel lateral */}
       <div className="relative flex-1">
-        {/* Preview: mismo header/footer/composición que ve un visitante */}
         <div className="min-h-screen">
           <PublicHeader variant="overlay" />
           <main id="main" className="pb-24">
@@ -237,11 +328,7 @@ function EditorInicio() {
               tree={tree}
               pageType="home"
               wrap={(node, content) => {
-                if (node.type !== "vmx.hero") {
-                  // Otras secciones se muestran tal cual, sin herramientas
-                  // (US-04 las hará editables una a una).
-                  return content;
-                }
+                if (node.type !== "vmx.hero") return content;
                 const isSelected = selectedId === node.id;
                 return (
                   <div
@@ -263,7 +350,6 @@ function EditorInicio() {
                     }`}
                     aria-label="Editar Hero"
                   >
-                    {/* Etiqueta flotante (aparece al hover / seleccionado) */}
                     <span
                       className={`pointer-events-none absolute left-4 top-4 z-30 rounded-full bg-primary px-3 py-1 text-[11px] font-semibold text-primary-foreground shadow-lg transition-opacity ${
                         isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
@@ -280,7 +366,6 @@ function EditorInicio() {
           <PublicFooter />
         </div>
 
-        {/* Panel lateral de edición del Hero — sólo cuando está seleccionado */}
         {selectedNode && selectedNode.type === "vmx.hero" ? (
           <HeroPanel
             node={selectedNode}
@@ -325,9 +410,6 @@ function HeroPanel({
     cta_href: "/oriente-maya",
     cta_secondary_href: "/arma-tu-viaje",
   };
-  // Muestra el texto real que ve el visitante: si el editor aún no ha
-  // sobreescrito el campo, se prefill con el texto por defecto de la Home
-  // para que "esté conectado con lo que hay".
   const val = (k: string) => {
     const v = cfg[k];
     if (typeof v === "string" && v.length > 0) return v;
@@ -346,8 +428,8 @@ function HeroPanel({
           </p>
           <h2 className="text-lg font-semibold">Hero</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Cambia el texto y verás cómo queda al instante. Al terminar,
-            pulsa <span className="font-semibold">Publicar cambios</span>.
+            Cambia el texto y verás cómo queda al instante. Al terminar, pulsa{" "}
+            <span className="font-semibold">Publicar cambios</span>.
           </p>
         </div>
         <button
@@ -361,83 +443,49 @@ function HeroPanel({
       </header>
 
       <Field label="Frase superior" hint="Aparece en cursiva sobre el título.">
-        <input
-          type="text"
-          value={val("eyebrow")}
-          onChange={(e) => onChange("eyebrow", e.target.value)}
+        <input type="text" value={val("eyebrow")} onChange={(e) => onChange("eyebrow", e.target.value)}
           className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="Ej. Experiencias que emocionan"
-        />
+          placeholder="Ej. Experiencias que emocionan" />
       </Field>
 
       <Field label="Título principal" hint="El mensaje más grande de la página.">
-        <textarea
-          value={val("title")}
-          onChange={(e) => onChange("title", e.target.value)}
+        <textarea value={val("title")} onChange={(e) => onChange("title", e.target.value)}
           className="min-h-[80px] w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="Ej. Descubre Valladolid…"
-        />
+          placeholder="Ej. Descubre Valladolid…" />
       </Field>
 
       <Field label="Subtítulo" hint="Frase breve debajo del título.">
-        <textarea
-          value={val("subtitle")}
-          onChange={(e) => onChange("subtitle", e.target.value)}
+        <textarea value={val("subtitle")} onChange={(e) => onChange("subtitle", e.target.value)}
           className="min-h-[70px] w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="Ej. Cenotes, ciudades vivas…"
-        />
+          placeholder="Ej. Cenotes, ciudades vivas…" />
       </Field>
 
       <Field label="Botón principal — texto">
-        <input
-          type="text"
-          value={val("cta_label")}
-          onChange={(e) => onChange("cta_label", e.target.value)}
+        <input type="text" value={val("cta_label")} onChange={(e) => onChange("cta_label", e.target.value)}
           className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="Ej. Explorar destinos"
-        />
+          placeholder="Ej. Explorar destinos" />
       </Field>
       <Field label="Botón principal — enlace" hint="Ruta a la que lleva el botón principal.">
-        <input
-          type="text"
-          value={val("cta_href")}
-          onChange={(e) => onChange("cta_href", e.target.value)}
+        <input type="text" value={val("cta_href")} onChange={(e) => onChange("cta_href", e.target.value)}
           className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="/oriente-maya"
-        />
+          placeholder="/oriente-maya" />
       </Field>
 
       <Field label="Botón secundario — texto">
-        <input
-          type="text"
-          value={val("cta_secondary_label")}
-          onChange={(e) => onChange("cta_secondary_label", e.target.value)}
+        <input type="text" value={val("cta_secondary_label")} onChange={(e) => onChange("cta_secondary_label", e.target.value)}
           className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="Ej. Arma tu viaje"
-        />
+          placeholder="Ej. Arma tu viaje" />
       </Field>
       <Field label="Botón secundario — enlace" hint="Ruta a la que lleva el botón secundario.">
-        <input
-          type="text"
-          value={val("cta_secondary_href")}
-          onChange={(e) => onChange("cta_secondary_href", e.target.value)}
+        <input type="text" value={val("cta_secondary_href")} onChange={(e) => onChange("cta_secondary_href", e.target.value)}
           className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          placeholder="/arma-tu-viaje"
-        />
+          placeholder="/arma-tu-viaje" />
       </Field>
     </aside>
   );
 }
 
-function Field({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
       <label className="text-xs font-semibold text-foreground">{label}</label>
@@ -472,10 +520,12 @@ function FullScreenState({
   title,
   detail,
   spinner,
+  onExit,
 }: {
   title: string;
   detail?: string;
   spinner?: boolean;
+  onExit: () => void;
 }) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
@@ -483,15 +533,14 @@ function FullScreenState({
         <Loader2 className="mb-3 size-6 animate-spin text-muted-foreground" aria-hidden />
       ) : null}
       <h1 className="text-lg font-semibold">{title}</h1>
-      {detail ? (
-        <p className="mt-2 max-w-md text-sm text-muted-foreground">{detail}</p>
-      ) : null}
-      <Link
-        to="/cms"
+      {detail ? <p className="mt-2 max-w-md text-sm text-muted-foreground">{detail}</p> : null}
+      <button
+        type="button"
+        onClick={onExit}
         className="mt-6 inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent"
       >
-        <ArrowLeft className="size-3.5" aria-hidden /> Volver al CMS
-      </Link>
+        <ArrowLeft className="size-3.5" aria-hidden /> Volver al listado
+      </button>
     </div>
   );
 }
