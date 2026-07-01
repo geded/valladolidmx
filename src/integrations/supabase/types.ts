@@ -3253,6 +3253,42 @@ export type Database = {
           },
         ]
       }
+      permissions: {
+        Row: {
+          action: string
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          is_dangerous: boolean
+          key: string
+          label: string
+          resource: string
+        }
+        Insert: {
+          action: string
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_dangerous?: boolean
+          key: string
+          label: string
+          resource: string
+        }
+        Update: {
+          action?: string
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_dangerous?: boolean
+          key?: string
+          label?: string
+          resource?: string
+        }
+        Relationships: []
+      }
       permissions_audit_log: {
         Row: {
           action: string
@@ -3719,6 +3755,87 @@ export type Database = {
           title?: string | null
           updated_at?: string
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      role_permissions: {
+        Row: {
+          granted_at: string
+          granted_by: string | null
+          permission_id: string
+          role_id: string
+        }
+        Insert: {
+          granted_at?: string
+          granted_by?: string | null
+          permission_id: string
+          role_id: string
+        }
+        Update: {
+          granted_at?: string
+          granted_by?: string | null
+          permission_id?: string
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roles_catalog: {
+        Row: {
+          color: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_system: boolean
+          name: string
+          slug: string
+          sort_order: number
+          system_role: Database["public"]["Enums"]["app_role"] | null
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_system?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          system_role?: Database["public"]["Enums"]["app_role"] | null
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_system?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          system_role?: Database["public"]["Enums"]["app_role"] | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -4852,6 +4969,10 @@ export type Database = {
           _min_role?: Database["public"]["Enums"]["business_user_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      has_permission: {
+        Args: { _permission_key: string; _user_id: string }
         Returns: boolean
       }
       has_role: {
