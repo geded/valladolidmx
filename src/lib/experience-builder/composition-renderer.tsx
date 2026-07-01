@@ -361,4 +361,40 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
       limit={Number(node.config.limit ?? 20)}
     />
   ),
+  // Corrección US-01 (15.10.4d) — grupo de botones (CTAs) editable.
+  "vmx.actions.buttons": ({ node }) => {
+    const alignment = (node.config.alignment as string) ?? "center";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const items = Array.isArray(node.config.items) ? (node.config.items as any[]) : [];
+    const alignCls =
+      alignment === "left"
+        ? "justify-start"
+        : alignment === "right"
+          ? "justify-end"
+          : "justify-center";
+    return (
+      <div className={`flex flex-wrap gap-3 py-6 ${alignCls}`}>
+        {items.map((it, i) => {
+          const label = typeof it?.label === "string" ? it.label : "Botón";
+          const href = typeof it?.href === "string" ? it.href : "#";
+          const variant = typeof it?.variant === "string" ? it.variant : "primary";
+          const cls =
+            variant === "secondary"
+              ? "border border-primary bg-transparent text-primary hover:bg-primary/10"
+              : variant === "ghost"
+                ? "bg-transparent text-primary hover:bg-primary/10"
+                : "bg-primary text-primary-foreground hover:opacity-95";
+          return (
+            <a
+              key={i}
+              href={href}
+              className={`inline-flex items-center rounded-full px-5 py-2 text-sm font-semibold shadow-sm transition-colors ${cls}`}
+            >
+              {label}
+            </a>
+          );
+        })}
+      </div>
+    );
+  },
 };

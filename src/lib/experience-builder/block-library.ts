@@ -504,6 +504,64 @@ const cockpitActivityStreamBlock: BlockContract = {
 };
 
 /* ------------------------------------------------------------------ *
+ * 5. Acciones — grupo de botones editable (Static)                    *
+ *    Añadido en la corrección US-01 (15.10.4d): permite al Founder    *
+ *    componer CTAs sin editar código.                                 *
+ * ------------------------------------------------------------------ */
+
+const actionsButtonsBlock: BlockContract = {
+  type: "vmx.actions.buttons",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Grupo de botones",
+  description: "Fila de botones (CTAs) editables desde el Studio.",
+  schema: {
+    alignment: {
+      type: "select",
+      label: "Alineación",
+      default: "center",
+      options: [
+        { value: "left", label: "Izquierda" },
+        { value: "center", label: "Centro" },
+        { value: "right", label: "Derecha" },
+      ],
+    },
+    items: {
+      type: "list",
+      label: "Botones",
+      item: {
+        type: "object",
+        label: "Botón",
+        fields: {
+          label: { type: "text", label: "Texto", translatable: true, required: true },
+          href: { type: "url", label: "Enlace", required: true },
+          variant: {
+            type: "select",
+            label: "Estilo",
+            default: "primary",
+            options: [
+              { value: "primary", label: "Primario" },
+              { value: "secondary", label: "Secundario" },
+              { value: "ghost", label: "Fantasma" },
+            ],
+          },
+        },
+      },
+    },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+  },
+  constraints: {
+    surfaces: ["home", "landing", "institutional", "destination", "business", "product"],
+  },
+  i18n: { translatable_fields: ["items"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+/* ------------------------------------------------------------------ *
  * Registro
  * ------------------------------------------------------------------ */
 
@@ -530,6 +588,8 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   cockpitKpiGridBlock,
   cockpitAlertsBlock,
   cockpitActivityStreamBlock,
+  // Corrección US-01 (15.10.4d)
+  actionsButtonsBlock,
 ];
 
 let bootstrapped = false;
