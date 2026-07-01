@@ -38,6 +38,7 @@ import { Route as AuthenticatedCuentaRouteRouteImport } from './routes/_authenti
 import { Route as AuthenticatedConciergeRouteRouteImport } from './routes/_authenticated/concierge/route'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal/index'
+import { Route as AuthenticatedPaginasIndexRouteImport } from './routes/_authenticated/paginas.index'
 import { Route as AuthenticatedCuentaIndexRouteImport } from './routes/_authenticated/cuenta/index'
 import { Route as AuthenticatedConciergeIndexRouteImport } from './routes/_authenticated/concierge/index'
 import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticated/cms/index'
@@ -246,6 +247,12 @@ const AuthenticatedPortalIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
+const AuthenticatedPaginasIndexRoute =
+  AuthenticatedPaginasIndexRouteImport.update({
+    id: '/paginas/',
+    path: '/paginas/',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedCuentaIndexRoute =
   AuthenticatedCuentaIndexRouteImport.update({
@@ -657,6 +664,7 @@ export interface FileRoutesByFullPath {
   '/cms/': typeof AuthenticatedCmsIndexRoute
   '/concierge/': typeof AuthenticatedConciergeIndexRoute
   '/cuenta/': typeof AuthenticatedCuentaIndexRoute
+  '/paginas/': typeof AuthenticatedPaginasIndexRoute
   '/portal/': typeof AuthenticatedPortalIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
@@ -741,6 +749,7 @@ export interface FileRoutesByTo {
   '/cms': typeof AuthenticatedCmsIndexRoute
   '/concierge': typeof AuthenticatedConciergeIndexRoute
   '/cuenta': typeof AuthenticatedCuentaIndexRoute
+  '/paginas': typeof AuthenticatedPaginasIndexRoute
   '/portal': typeof AuthenticatedPortalIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
@@ -832,6 +841,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
   '/_authenticated/concierge/': typeof AuthenticatedConciergeIndexRoute
   '/_authenticated/cuenta/': typeof AuthenticatedCuentaIndexRoute
+  '/_authenticated/paginas/': typeof AuthenticatedPaginasIndexRoute
   '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
   '/_authenticated/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/_authenticated/cms/categorias/editar': typeof AuthenticatedCmsCategoriasEditarRoute
@@ -923,6 +933,7 @@ export interface FileRouteTypes {
     | '/cms/'
     | '/concierge/'
     | '/cuenta/'
+    | '/paginas/'
     | '/portal/'
     | '/admin/sistema/usuarios'
     | '/cms/categorias/editar'
@@ -1007,6 +1018,7 @@ export interface FileRouteTypes {
     | '/cms'
     | '/concierge'
     | '/cuenta'
+    | '/paginas'
     | '/portal'
     | '/admin/sistema/usuarios'
     | '/cms/categorias/editar'
@@ -1097,6 +1109,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/'
     | '/_authenticated/concierge/'
     | '/_authenticated/cuenta/'
+    | '/_authenticated/paginas/'
     | '/_authenticated/portal/'
     | '/_authenticated/admin/sistema/usuarios'
     | '/_authenticated/cms/categorias/editar'
@@ -1355,6 +1368,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal/'
       preLoaderRoute: typeof AuthenticatedPortalIndexRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
+    '/_authenticated/paginas/': {
+      id: '/_authenticated/paginas/'
+      path: '/paginas'
+      fullPath: '/paginas/'
+      preLoaderRoute: typeof AuthenticatedPaginasIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/cuenta/': {
       id: '/_authenticated/cuenta/'
@@ -2008,6 +2028,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedEmpresaRoute: typeof AuthenticatedEmpresaRoute
   AuthenticatedMiViajeRoute: typeof AuthenticatedMiViajeRoute
   AuthenticatedPaginasInicioRoute: typeof AuthenticatedPaginasInicioRoute
+  AuthenticatedPaginasIndexRoute: typeof AuthenticatedPaginasIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -2020,6 +2041,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedEmpresaRoute: AuthenticatedEmpresaRoute,
   AuthenticatedMiViajeRoute: AuthenticatedMiViajeRoute,
   AuthenticatedPaginasInicioRoute: AuthenticatedPaginasInicioRoute,
+  AuthenticatedPaginasIndexRoute: AuthenticatedPaginasIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -2056,13 +2078,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
