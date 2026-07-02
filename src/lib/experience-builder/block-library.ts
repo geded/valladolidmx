@@ -194,7 +194,7 @@ const heroBlock: BlockContract = {
     ctas: {
       type: "list",
       label: "Botones",
-      description: "Deja vacío para ocultar todos los botones.",
+      description: "Agrega, edita, reordena o elimina los botones del hero. Si la lista queda vacía se usan los botones por defecto — para ocultarlos usa el interruptor 'Mostrar botones'.",
       item: {
         type: "object",
         label: "Botón",
@@ -213,6 +213,11 @@ const heroBlock: BlockContract = {
           },
         },
       },
+    },
+    show_ctas: {
+      type: "boolean",
+      label: "Mostrar botones",
+      default: true,
     },
     cta_alignment: {
       type: "select",
