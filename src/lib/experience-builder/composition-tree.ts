@@ -7,6 +7,16 @@
  * representar cualquier superficie pública futura.
  */
 
+export type CompositionJsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | CompositionJsonValue[]
+  | { [key: string]: CompositionJsonValue };
+
+export type CompositionJsonObject = { [key: string]: CompositionJsonValue };
+
 export interface CompositionNode {
   /** Identificador estable dentro del árbol (se genera en el Studio). */
   id: string;
@@ -34,8 +44,8 @@ export interface CompositionTree {
     children: CompositionNode[];
   };
   chrome?: {
-    header?: Record<string, unknown>;
-    footer?: Record<string, unknown>;
+    header?: CompositionJsonObject;
+    footer?: CompositionJsonObject;
   };
 }
 
