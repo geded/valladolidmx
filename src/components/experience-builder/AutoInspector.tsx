@@ -786,6 +786,7 @@ function StructuredListControl({
 }: { def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void; simple?: boolean }) {
   const rows = Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
   const fields = def.item?.fields ?? {};
+  const defaultRows = Array.isArray(def.default) ? (def.default as Record<string, unknown>[]) : [];
   const makeDefault = () =>
     Object.fromEntries(
       Object.entries(fields).map(([key, field]) => [key, field.default ?? (field.type === "boolean" ? false : "")]),
@@ -805,6 +806,16 @@ function StructuredListControl({
   };
   return (
     <div className="space-y-2">
+      {rows.length === 0 && defaultRows.length > 0 ? (
+        <button
+          type="button"
+          onClick={() => onChange(defaultRows.map((r) => ({ ...r })))}
+          className="inline-flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-primary/40 bg-primary/5 px-2 py-2 text-xs font-medium text-primary hover:bg-primary/10"
+          title="Carga los elementos por defecto para poder editarlos o guardarlos en la Biblioteca"
+        >
+          <Plus className="size-3.5" aria-hidden /> Cargar valores por defecto
+        </button>
+      ) : null}
       {rows.map((row, index) => (
         <div key={index} className="rounded-lg border border-border bg-background p-2">
           <div className="mb-2 flex items-center justify-between gap-2">
