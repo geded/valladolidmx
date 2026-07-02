@@ -18,7 +18,9 @@
     "cta_primary": "Explore destinations",
     "cta_secondary": "Plan your trip",
     "search_placeholder": "Search a destination, an experience, a flavor…",
-    "search_helper": "Only if you already know what you're looking for"
+    "search_helper": "Only if you already know what you're looking for",
+    "search_button": "Search",
+    "search_aria": "Quick search"
   },
   "sections": {
     "destinations_title": "Eastern Maya destinations",

@@ -18,7 +18,9 @@
     "cta_primary": "Explorer les destinations",
     "cta_secondary": "Compose ton voyage",
     "search_placeholder": "Cherche une destination, une expérience…",
-    "search_helper": "Uniquement si tu sais déjà ce que tu cherches"
+    "search_helper": "Uniquement si tu sais déjà ce que tu cherches",
+    "search_button": "Rechercher",
+    "search_aria": "Recherche rapide"
   },
   "sections": {
     "destinations_title": "Destinations de l'Oriente Maya",
