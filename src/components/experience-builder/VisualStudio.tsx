@@ -26,6 +26,7 @@ import {
   Copy,
   ExternalLink,
   History,
+  GripVertical,
   Loader2,
   Lock,
   Pencil,
