@@ -26,6 +26,8 @@ import {
 } from "./dynamic-variables";
 import { appearanceToStyle, hasAppearance, readAppearance } from "./appearance";
 import { buildScopedTypographyCss, type FieldTypography } from "./typography";
+import { applyI18nToNode } from "./i18n-overlay";
+import { useTranslation } from "@/i18n/context";
 import { Hero } from "@/components/home/Hero";
 import { DestinosSection } from "@/components/home/DestinosSection";
 import { CategoriasSection } from "@/components/home/CategoriasSection";
@@ -107,9 +109,16 @@ function RenderNode({ node, studio, wrap, variableContext }: RenderNodeProps): R
   // editorial y los overlays de selección.
   const map = studio ? STUDIO_PREVIEW_MAP : PRODUCTION_COMPONENT_MAP;
   const Comp = map[node.type] ?? STUDIO_PREVIEW_MAP[node.type] ?? GenericBlockPreview;
+  // 1) Overlay de traducciones automáticas por idioma activo (H3/H5 plan i18n).
+  //    En Studio no aplicamos overlay: el editor siempre muestra el idioma base
+  //    para no confundir al autor con las traducciones generadas por IA.
+  const { locale, defaultLocale } = useTranslation();
+  const localized: CompositionNode =
+    !studio && locale !== defaultLocale ? applyI18nToNode(node, locale) : node;
+  // 2) Resolución de variables dinámicas.
   const resolved: CompositionNode = variableContext
-    ? { ...node, config: resolveVariables(node.config, variableContext) as CompositionNode["config"] }
-    : node;
+    ? { ...localized, config: resolveVariables(localized.config, variableContext) as CompositionNode["config"] }
+    : localized;
   const content = (
     <Comp
       node={resolved}
