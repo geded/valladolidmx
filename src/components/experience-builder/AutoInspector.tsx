@@ -7,13 +7,22 @@
 
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Plus, Trash2, Upload } from "lucide-react";
-import { useId, type ReactNode } from "react";
+import { ChevronDown, ChevronUp, Languages, Plus, Trash2, Upload } from "lucide-react";
+import { useId, useState, type ReactNode } from "react";
 import type {
   BlockContract,
   BlockFieldSchema,
 } from "@/lib/experience-builder/block-contract";
 import { VariablePicker } from "./VariablePicker";
+
+const I18N_LANGS: Array<{ code: string; label: string }> = [
+  { code: "es", label: "Español" },
+  { code: "en", label: "English" },
+  { code: "pt", label: "Português" },
+  { code: "fr", label: "Français" },
+  { code: "it", label: "Italiano" },
+  { code: "de", label: "Deutsch" },
+];
 
 export interface AutoInspectorProps {
   contract: BlockContract;
@@ -29,6 +38,12 @@ export interface AutoInspectorProps {
 
 export function AutoInspector({ contract, config, onChange, simple = false }: AutoInspectorProps) {
   const set = (key: string, value: unknown) => onChange({ ...config, [key]: value });
+  const i18nMap = (config.__i18n as Record<string, Record<string, string>> | undefined) ?? {};
+  const setTranslation = (fieldKey: string, lang: string, value: string) => {
+    const nextField = { ...(i18nMap[fieldKey] ?? {}), [lang]: value };
+    const nextI18n = { ...i18nMap, [fieldKey]: nextField };
+    onChange({ ...config, __i18n: nextI18n });
+  };
   return (
     <div className="space-y-3">
       <header className="space-y-1">
@@ -50,6 +65,8 @@ export function AutoInspector({ contract, config, onChange, simple = false }: Au
             value={config[key]}
             onChange={(v) => set(key, v)}
             simple={simple}
+            translations={i18nMap[key]}
+            onTranslationChange={(lang, value) => setTranslation(key, lang, value)}
           />
         ))}
         {Object.keys(contract.schema).length === 0 ? (
@@ -84,21 +101,102 @@ function CapabilityChips({ contract }: { contract: BlockContract }) {
 }
 
 function FieldRow({
-  name, def, value, onChange, simple,
-}: { name: string; def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void; simple?: boolean }) {
+  name, def, value, onChange, simple, translations, onTranslationChange,
+}: {
+  name: string;
+  def: BlockFieldSchema;
+  value: unknown;
+  onChange: (v: unknown) => void;
+  simple?: boolean;
+  translations?: Record<string, string>;
+  onTranslationChange?: (lang: string, value: string) => void;
+}) {
+  const canTranslate = Boolean(def.translatable) && !simple && (def.type === "text" || def.type === "rich_text");
+  const [showI18n, setShowI18n] = useState(false);
   return (
     <div className="space-y-1">
       <label className="flex items-center gap-2 text-xs font-medium">
         <span>{def.label || name}</span>
         {def.required ? <span className="text-destructive">*</span> : null}
-        {def.translatable && !simple ? (
-          <Badge variant="outline" className="text-[9px]">i18n</Badge>
+        {canTranslate ? (
+          <button
+            type="button"
+            onClick={() => setShowI18n((v) => !v)}
+            className="ml-auto inline-flex items-center gap-1 rounded-full border border-border bg-background px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+            title="Editar traducciones"
+          >
+            <Languages className="size-2.5" aria-hidden /> i18n
+          </button>
         ) : null}
       </label>
       <FieldControl def={def} value={value} onChange={onChange} simple={simple} />
       {def.description ? (
         <p className="text-[10px] text-muted-foreground">{def.description}</p>
       ) : null}
+      {canTranslate && showI18n ? (
+        <TranslationsEditor
+          baseValue={typeof value === "string" ? value : ""}
+          translations={translations ?? {}}
+          rich={def.type === "rich_text"}
+          onChange={(lang, next) => onTranslationChange?.(lang, next)}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function TranslationsEditor({
+  baseValue, translations, rich, onChange,
+}: {
+  baseValue: string;
+  translations: Record<string, string>;
+  rich: boolean;
+  onChange: (lang: string, value: string) => void;
+}) {
+  const [lang, setLang] = useState<string>("en");
+  const value = lang === "es" ? baseValue : (translations[lang] ?? "");
+  const base = "w-full rounded-md border border-border bg-background px-2 py-1 text-xs";
+  return (
+    <div className="mt-1 space-y-1 rounded-md border border-primary/30 bg-primary/5 p-2">
+      <div className="flex flex-wrap items-center gap-1">
+        {I18N_LANGS.map((l) => {
+          const filled = l.code === "es" ? baseValue.length > 0 : (translations[l.code] ?? "").length > 0;
+          return (
+            <button
+              key={l.code}
+              type="button"
+              onClick={() => setLang(l.code)}
+              className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${
+                lang === l.code
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-background text-foreground hover:bg-accent"
+              }`}
+            >
+              {l.code.toUpperCase()} {filled ? "•" : ""}
+            </button>
+          );
+        })}
+      </div>
+      {lang === "es" ? (
+        <p className="text-[10px] text-muted-foreground">
+          Español es el idioma base. Edítalo en el campo principal de arriba.
+        </p>
+      ) : rich ? (
+        <textarea
+          className={`${base} min-h-[70px]`}
+          value={value}
+          onChange={(e) => onChange(lang, e.target.value)}
+          placeholder={`Traducción en ${lang.toUpperCase()}…`}
+        />
+      ) : (
+        <input
+          className={base}
+          type="text"
+          value={value}
+          onChange={(e) => onChange(lang, e.target.value)}
+          placeholder={`Traducción en ${lang.toUpperCase()}…`}
+        />
+      )}
     </div>
   );
 }
