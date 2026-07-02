@@ -1450,6 +1450,7 @@ function HomeCanvas({
       >
         <div
           ref={frameRef}
+          data-eb-canvas-device={deviceViewport}
           className="absolute left-0 top-0 bg-background"
           style={{
             width: frameWidth,
@@ -1457,6 +1458,7 @@ function HomeCanvas({
             transformOrigin: "top left",
           }}
         >
+          <StudioDeviceCss />
           <InertChrome label="Encabezado" selected={selectedId === HEADER_CHROME_ID} onSelect={() => onSelectChrome("header")}>
             <PublicHeader variant="overlay" config={getChromeConfig(tree, "header")} />
           </InertChrome>
@@ -1488,6 +1490,60 @@ function HomeCanvas({
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Fallback exclusivo del Studio: el canvas simula 390/768/1280px dentro de
+ * una ventana desktop. Si algún breakpoint de viewport o container-query no
+ * alcanza a recalcularse dentro del editor, estas reglas fuerzan las mismas
+ * columnas que ve el sitio público para cada dispositivo seleccionado.
+ */
+function StudioDeviceCss() {
+  return (
+    <style>{`
+      [data-eb-canvas-device="mobile"] [data-home-grid] {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+      [data-eb-canvas-device="mobile"] [data-home-layout="consejo-alux"] {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+      }
+
+      [data-eb-canvas-device="tablet"] [data-home-grid="destinos"],
+      [data-eb-canvas-device="tablet"] [data-home-grid="categorias"],
+      [data-eb-canvas-device="tablet"] [data-home-grid="empresas"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+      [data-eb-canvas-device="tablet"] [data-home-grid="rutas"],
+      [data-eb-canvas-device="tablet"] [data-home-grid="resenas"],
+      [data-eb-canvas-device="tablet"] [data-home-grid="en-vivo"] {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+      [data-eb-canvas-device="tablet"] [data-home-grid="arma-tu-viaje"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+      [data-eb-canvas-device="tablet"] [data-home-layout="consejo-alux"] {
+        flex-direction: row !important;
+        align-items: center !important;
+      }
+
+      [data-eb-canvas-device="desktop"] [data-home-grid="destinos"],
+      [data-eb-canvas-device="desktop"] [data-home-grid="rutas"],
+      [data-eb-canvas-device="desktop"] [data-home-grid="resenas"] {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+      [data-eb-canvas-device="desktop"] [data-home-grid="categorias"],
+      [data-eb-canvas-device="desktop"] [data-home-grid="empresas"] {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      }
+      [data-eb-canvas-device="desktop"] [data-home-grid="en-vivo"] {
+        grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+      }
+      [data-eb-canvas-device="desktop"] [data-home-grid="arma-tu-viaje"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+    `}</style>
   );
 }
 

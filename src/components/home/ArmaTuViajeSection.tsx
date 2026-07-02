@@ -14,7 +14,7 @@ export function ArmaTuViajeSection({ config }: { config?: Record<string, unknown
   return (
     <section id="arma-tu-viaje" className="@container py-20 md:py-28">
       <Container>
-        <div className="grid gap-8 @3xl:grid-cols-2 @3xl:items-center">
+        <div data-home-grid="arma-tu-viaje" className="grid grid-cols-1 gap-8 @3xl:grid-cols-2 @3xl:items-center">
           <div>
             <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">
               {t("nav.plan_trip")}

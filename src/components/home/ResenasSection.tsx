@@ -26,7 +26,7 @@ export function ResenasSection({ config }: { config?: Record<string, unknown> } 
     <section id="resenas" className="@container bg-secondary/40 py-20 md:py-28">
       <Container>
         <SectionHeader title={title} subtitle={t("sections.reviews_sub")} />
-        <div className="grid gap-6 @3xl:grid-cols-3">
+        <div data-home-grid="resenas" className="grid grid-cols-1 gap-6 @3xl:grid-cols-3">
           {reviews.map((r) => (
             <ResenaCard key={r.id} review={r} />
           ))}

@@ -26,7 +26,7 @@ export function CategoriasSection({ config }: { config?: Record<string, unknown>
     <section id="categorias" className="@container bg-secondary/40 py-20 md:py-28">
       <Container>
         <SectionHeader title={title} subtitle={t("sections.categories_sub")} />
-        <div className="grid gap-4 @2xl:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4">
+        <div data-home-grid="categorias" className="grid grid-cols-1 gap-4 @2xl:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4">
           {categories.map((c) => (
             <CategoriaCard key={c.id} category={c} />
           ))}

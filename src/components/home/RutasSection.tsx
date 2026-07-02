@@ -26,7 +26,7 @@ export function RutasSection({ config }: { config?: Record<string, unknown> } = 
     <section id="rutas" className="@container py-20 md:py-28">
       <Container>
         <SectionHeader title={title} subtitle={t("sections.routes_sub")} />
-        <div className="grid gap-6 @3xl:grid-cols-3">
+        <div data-home-grid="rutas" className="grid grid-cols-1 gap-6 @3xl:grid-cols-3">
           {routes.map((r) => (
             <RutaCard key={r.id} route={r} />
           ))}

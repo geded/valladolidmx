@@ -29,7 +29,7 @@ export function EnVivoSection({ config }: { config?: Record<string, unknown> } =
           subtitle={t("sections.envivo_sub")}
           actions={<ComingSoonBadge label={t("common.coming_soon")} />}
         />
-        <div className="grid gap-3 @2xl:grid-cols-3 @3xl:grid-cols-6">
+        <div data-home-grid="en-vivo" className="grid grid-cols-1 gap-3 @2xl:grid-cols-3 @3xl:grid-cols-6">
           {TILES.map((tile) => (
             <PlaceholderImage
               key={tile.label}

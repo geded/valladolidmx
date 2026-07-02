@@ -32,7 +32,7 @@ export function EmpresasSection({ config }: { config?: Record<string, unknown> }
           subtitle={t("sections.empresas_sub")}
           actions={<ComingSoonBadge label="Motor de Visibilidad · pronto" />}
         />
-        <div className="grid gap-6 @2xl:grid-cols-2 @5xl:grid-cols-4">
+        <div data-home-grid="empresas" className="grid grid-cols-1 gap-6 @2xl:grid-cols-2 @5xl:grid-cols-4">
           {businesses.map((b) => (
             <EmpresaCard key={b.id} business={b} />
           ))}

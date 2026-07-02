@@ -19,9 +19,9 @@ export function SectionHeader({ eyebrow, title, subtitle, align = "left", action
   return (
     <div
       className={cn(
-        "mb-8 flex flex-col gap-3 md:mb-12",
+        "mb-8 flex flex-col gap-3 @3xl:mb-12",
         align === "center" ? "items-center text-center" : "items-start",
-        actions ? "md:flex-row md:items-end md:justify-between" : "",
+        actions ? "@3xl:flex-row @3xl:items-end @3xl:justify-between" : "",
         className,
       )}
     >
@@ -31,9 +31,9 @@ export function SectionHeader({ eyebrow, title, subtitle, align = "left", action
             {eyebrow}
           </p>
         ) : null}
-        <h2 className="text-balance text-3xl leading-tight md:text-4xl">{title}</h2>
+        <h2 className="text-balance text-3xl leading-tight @3xl:text-4xl">{title}</h2>
         {subtitle ? (
-          <p className="mt-3 text-base text-muted-foreground md:text-lg">{subtitle}</p>
+          <p className="mt-3 text-base text-muted-foreground @3xl:text-lg">{subtitle}</p>
         ) : null}
       </div>
       {actions ? <div className="shrink-0">{actions}</div> : null}

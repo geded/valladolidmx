@@ -31,7 +31,7 @@ export function DestinosSection({ config }: { config?: Record<string, unknown> }
           title={title}
           subtitle={t("sections.destinations_sub")}
         />
-        <div className="grid gap-6 @2xl:grid-cols-2 @5xl:grid-cols-3">
+        <div data-home-grid="destinos" className="grid grid-cols-1 gap-6 @2xl:grid-cols-2 @5xl:grid-cols-3">
           {destinations.map((d) => (
             <DestinoCard key={d.id} destination={d} />
           ))}
