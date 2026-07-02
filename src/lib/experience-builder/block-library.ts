@@ -584,41 +584,7 @@ const actionsButtonsBlock: BlockContract = {
 };
 
 /* ------------------------------------------------------------------ *
- * Registro
- * ------------------------------------------------------------------ */
-
-export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
-  containerBlock,
-  sectionBlock,
-  spacerBlock,
-  dividerBlock,
-  heroBlock,
-  destinosBlock,
-  categoriasBlock,
-  rutasBlock,
-  consejoAluxBlock,
-  armaTuViajeBlock,
-  enVivoBlock,
-  empresasSectionBlock,
-  resenasSectionBlock,
-  destinoCardBlock,
-  empresaCardBlock,
-  categoriaCardBlock,
-  rutaCardBlock,
-  resenaCardBlock,
-  // Etapa 15.10.4c · Founder Cockpit Composable — bloques cockpit
-  cockpitKpiGridBlock,
-  cockpitAlertsBlock,
-  cockpitActivityStreamBlock,
-  // Corrección US-01 (15.10.4d)
-  actionsButtonsBlock,
-  customHtmlBlock,
-  customFormBlock,
-];
-
-/* ------------------------------------------------------------------ *
  * Bloques avanzados (Modo Profesional) — HTML embebido y Formulario.
- * Registrados globalmente para todas las superficies.
  * ------------------------------------------------------------------ */
 
 const customHtmlBlock: BlockContract = {
@@ -648,14 +614,14 @@ const customHtmlBlock: BlockContract = {
   },
   capabilities: { soporta_preview: true },
   constraints: {
-    surfaces: ["home", "landing", "institutional", "destination", "business", "product", "campaign"],
+    surfaces: ["home", "landing", "institutional", "destination", "business", "product"],
   },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
 const customFormBlock: BlockContract = {
   type: "vmx.custom.form",
-  category: "interactive",
+  category: "smart",
   version: "1.0.0",
   display_name: "Formulario",
   description:
@@ -707,10 +673,43 @@ const customFormBlock: BlockContract = {
   },
   capabilities: { soporta_preview: true, soporta_i18n: true },
   constraints: {
-    surfaces: ["home", "landing", "institutional", "destination", "business", "product", "campaign"],
+    surfaces: ["home", "landing", "institutional", "destination", "business", "product"],
   },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
+
+/* ------------------------------------------------------------------ *
+ * Registro
+ * ------------------------------------------------------------------ */
+
+export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
+  containerBlock,
+  sectionBlock,
+  spacerBlock,
+  dividerBlock,
+  heroBlock,
+  destinosBlock,
+  categoriasBlock,
+  rutasBlock,
+  consejoAluxBlock,
+  armaTuViajeBlock,
+  enVivoBlock,
+  empresasSectionBlock,
+  resenasSectionBlock,
+  destinoCardBlock,
+  empresaCardBlock,
+  categoriaCardBlock,
+  rutaCardBlock,
+  resenaCardBlock,
+  // Etapa 15.10.4c · Founder Cockpit Composable — bloques cockpit
+  cockpitKpiGridBlock,
+  cockpitAlertsBlock,
+  cockpitActivityStreamBlock,
+  // Corrección US-01 (15.10.4d)
+  actionsButtonsBlock,
+  customHtmlBlock,
+  customFormBlock,
+];
 
 let bootstrapped = false;
 
