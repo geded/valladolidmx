@@ -14,6 +14,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import { randomBytes } from "crypto";
+import { assertWebhookPublisher } from "./_authz";
 
 type Category = Database["public"]["Enums"]["notification_category"];
 
@@ -126,6 +127,7 @@ export const publishWebhookNotification = createServerFn({ method: "POST" })
     },
   )
   .handler(async ({ data, context }) => {
+    await assertWebhookPublisher(context, data.endpointId);
     const { data: row, error } = await context.supabase.rpc("unc_publish_webhook", {
       _event_id: data.eventId,
       _event_type: data.eventType,
