@@ -355,3 +355,88 @@ export function SiteHeader({ variant = "solid", config }: Props) {
     </>
   );
 }
+
+interface RenderCtx {
+  isOverlay: boolean;
+  open: boolean;
+  setOpen: (updater: (v: boolean) => boolean) => void;
+  menuButtonRef: React.RefObject<HTMLButtonElement | null>;
+  ctaFallback: { label: string; href: string };
+}
+
+function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
+  const key = `${btn.kind}-${idx}`;
+  const { isOverlay, open, setOpen, menuButtonRef, ctaFallback } = ctx;
+
+  if (btn.kind === "language") {
+    return <LanguageSwitcher key={key} />;
+  }
+  if (btn.kind === "user_menu") {
+    return (
+      <div key={key} className="hidden sm:block">
+        <UserMenu />
+      </div>
+    );
+  }
+  if (btn.kind === "menu_toggle") {
+    return (
+      <button
+        key={key}
+        ref={menuButtonRef}
+        type="button"
+        className={cn(
+          "lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-full border transition",
+          isOverlay
+            ? "border-white/30 bg-white/10 text-white"
+            : "border-border bg-card text-foreground",
+        )}
+        aria-label={btn.label || "Menú"}
+        aria-expanded={open}
+        aria-controls="mobile-drawer"
+        onClick={() => setOpen((v) => !v)}
+      >
+        {open ? <X className="size-5" /> : <Menu className="size-5" />}
+      </button>
+    );
+  }
+
+  // cta / custom_link → <a>
+  const href = btn.href || (btn.kind === "cta" ? ctaFallback.href : "#");
+  const label = btn.label || (btn.kind === "cta" ? ctaFallback.label : "Enlace");
+  const Icon = btn.icon && ICON_MAP[btn.icon] ? ICON_MAP[btn.icon] : null;
+  const variantClass = getVariantClass(btn.variant, isOverlay);
+  const hiddenOnMobile = btn.kind === "cta" ? "hidden sm:inline-flex" : "inline-flex";
+  return (
+    <a
+      key={key}
+      href={href}
+      className={cn(
+        hiddenOnMobile,
+        "items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition",
+        variantClass,
+      )}
+    >
+      {Icon ? <Icon className="size-4" aria-hidden /> : null}
+      {label}
+    </a>
+  );
+}
+
+function getVariantClass(variant: HeaderButton["variant"], isOverlay: boolean): string {
+  switch (variant) {
+    case "primary":
+      return "bg-primary text-primary-foreground hover:opacity-95";
+    case "secondary":
+      return isOverlay
+        ? "border border-white/50 text-white hover:bg-white/10"
+        : "border border-border text-foreground hover:bg-accent";
+    case "ghost":
+      return isOverlay
+        ? "text-white/90 hover:bg-white/10"
+        : "text-foreground hover:bg-accent";
+    case "light":
+      return isOverlay
+        ? "border border-white/40 bg-white/10 text-white backdrop-blur hover:bg-white/20"
+        : "border border-primary/40 bg-primary/10 text-primary hover:bg-primary/15";
+  }
+}
