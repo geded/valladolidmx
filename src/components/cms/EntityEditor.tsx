@@ -17,9 +17,15 @@ import {
   listEntityHistory,
   type CmsHistoryEntry,
 } from "@/lib/cms/writes.functions";
+import type { ReactNode } from "react";
 import { StatusBadge } from "@/components/cms/EntityListView";
 
-export type FieldType = "text" | "textarea" | "number";
+export type FieldType =
+  | "text"
+  | "textarea"
+  | "number"
+  | "select"
+  | "tags";
 
 export interface EditorField {
   name: string;
@@ -28,6 +34,8 @@ export interface EditorField {
   required?: boolean;
   placeholder?: string;
   helpText?: string;
+  /** Opciones para el tipo select. */
+  options?: { value: string; label: string }[];
 }
 
 interface Props {
@@ -38,6 +46,8 @@ interface Props {
   backTo: string;
   listQueryKey: string;
   fields: EditorField[];
+  /** Slot para paneles extra (imágenes, galería...) que reciben el id. */
+  renderExtras?: (args: { id?: string; entity: Record<string, unknown> | undefined; refresh: () => void }) => ReactNode;
 }
 
 type ContentStatus =
@@ -102,7 +112,13 @@ export function EntityEditor(props: Props) {
       const next: Record<string, string> = { ...initialValues };
       for (const f of fields) {
         const v = (detail.data as Record<string, unknown>)[f.name];
-        next[f.name] = v === null || v === undefined ? "" : String(v);
+        if (v === null || v === undefined) {
+          next[f.name] = "";
+        } else if (Array.isArray(v)) {
+          next[f.name] = v.join("\n");
+        } else {
+          next[f.name] = String(v);
+        }
       }
       setValues(next);
     }
@@ -120,7 +136,16 @@ export function EntityEditor(props: Props) {
           payload[f.name] = null;
           continue;
         }
-        payload[f.name] = f.type === "number" ? Number(raw) : raw;
+        if (f.type === "number") {
+          payload[f.name] = Number(raw);
+        } else if (f.type === "tags") {
+          payload[f.name] = raw
+            .split(/[\n,]+/)
+            .map((s) => s.trim())
+            .filter(Boolean);
+        } else {
+          payload[f.name] = raw;
+        }
       }
       return upsert({ data: { table, id: id ?? null, payload } });
     },
@@ -224,6 +249,18 @@ export function EntityEditor(props: Props) {
           )}
         </div>
       </form>
+
+      {isEdit && props.renderExtras && (
+        <section className="mt-6">
+          {props.renderExtras({
+            id,
+            entity: detail.data as Record<string, unknown> | undefined,
+            refresh: () => {
+              void detail.refetch();
+            },
+          })}
+        </section>
+      )}
 
       {isEdit && (
         <section className="mt-8 rounded-xl border border-border bg-card p-5">
@@ -337,6 +374,29 @@ function FieldInput(props: {
           onChange={(e) => onChange(e.target.value)}
           className={common}
         />
+      ) : field.type === "tags" ? (
+        <textarea
+          required={field.required}
+          rows={3}
+          value={value}
+          placeholder={field.placeholder ?? "Una entrada por línea"}
+          onChange={(e) => onChange(e.target.value)}
+          className={common}
+        />
+      ) : field.type === "select" ? (
+        <select
+          required={field.required}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={common}
+        >
+          <option value="">— sin seleccionar —</option>
+          {(field.options ?? []).map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
       ) : (
         <input
           required={field.required}

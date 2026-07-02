@@ -56,7 +56,19 @@ const TABLE_TO_ENTITY_KIND: Record<
 
 const EDITABLE_COLUMNS: Record<EditableTable, readonly string[]> = {
   tourism_regions: ["slug", "name", "description", "sort_order", "metadata"],
-  destinations: ["tourism_region_id", "slug", "name", "description", "metadata"],
+  destinations: [
+    "tourism_region_id",
+    "slug",
+    "name",
+    "tagline",
+    "description",
+    "highlights",
+    "hero_palette",
+    "hero_media_id",
+    "latitude",
+    "longitude",
+    "metadata",
+  ],
   destination_zones: ["destination_id", "slug", "name", "description", "metadata"],
   business_categories: [
     "parent_id",
