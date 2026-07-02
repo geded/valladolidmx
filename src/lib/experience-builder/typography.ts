@@ -52,7 +52,10 @@ export function typographyToStyle(t: FieldTypography): CSSProperties {
   if (t.line_height) s.lineHeight = t.line_height;
   if (typeof t.letter_spacing === "number") s.letterSpacing = `${t.letter_spacing}px`;
   if (t.color) s.color = t.color;
-  if (t.align) s.textAlign = t.align as CSSProperties["textAlign"];
+  // Nota (2026-07): la alineación por-campo se retiró para evitar conflictos
+  // con el control global "Posición del texto" del bloque. Los valores
+  // guardados en `align` se ignoran; la alineación se decide siempre a
+  // nivel de bloque.
   if (t.italic) s.fontStyle = "italic";
   if (t.uppercase) s.textTransform = "uppercase";
   return s;
@@ -213,7 +216,7 @@ function cssProps(t: FieldTypography): string {
   if (t.line_height) lines.push(`line-height:${t.line_height};`);
   if (typeof t.letter_spacing === "number") lines.push(`letter-spacing:${t.letter_spacing}px;`);
   if (t.color) lines.push(`color:${t.color};`);
-  if (t.align) lines.push(`text-align:${t.align};`);
+  // `align` intencionalmente ignorado — ver typographyToStyle.
   if (t.italic) lines.push(`font-style:italic;`);
   if (t.uppercase) lines.push(`text-transform:uppercase;`);
   return lines.join("");
