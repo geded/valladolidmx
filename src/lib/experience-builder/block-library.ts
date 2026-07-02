@@ -645,6 +645,22 @@ const actionsButtonsBlock: BlockContract = {
               { value: "ghost", label: "Fantasma" },
             ],
           },
+          size: {
+            type: "select",
+            label: "Tamaño",
+            default: "md",
+            options: [
+              { value: "sm", label: "Pequeño" },
+              { value: "md", label: "Medio" },
+              { value: "lg", label: "Grande" },
+              { value: "xl", label: "Extra grande" },
+            ],
+          },
+          full_width: {
+            type: "boolean",
+            label: "Ancho completo",
+            default: false,
+          },
         },
       },
     },
