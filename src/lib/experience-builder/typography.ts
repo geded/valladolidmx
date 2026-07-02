@@ -19,6 +19,59 @@ export interface FieldTypography {
   align?: string;          // left|center|right|justify
   italic?: boolean;
   uppercase?: boolean;
+  /**
+   * Overrides responsive (mobile-first).
+   *  - Los campos "planos" de arriba aplican como BASE (móvil / todos los
+   *    breakpoints por defecto).
+   *  - `md` aplica desde ≥768px (tablet).
+   *  - `lg` aplica desde ≥1024px (desktop).
+   * Un breakpoint vacío hereda del anterior.
+   */
+  md?: Omit<FieldTypography, "md" | "lg" | "align">;
+  lg?: Omit<FieldTypography, "md" | "lg" | "align">;
+}
+
+/** Breakpoints soportados por el editor visual. */
+export type TypographyBreakpoint = "base" | "md" | "lg";
+
+export const TYPOGRAPHY_BREAKPOINTS: Array<{
+  key: TypographyBreakpoint;
+  label: string;
+  minWidthPx: number | null;
+}> = [
+  { key: "base", label: "Móvil", minWidthPx: null },
+  { key: "md", label: "Tablet", minWidthPx: 768 },
+  { key: "lg", label: "Desktop", minWidthPx: 1024 },
+];
+
+/** Devuelve el sub-objeto tipográfico de un breakpoint (sin anidados). */
+export function getBreakpointTypography(
+  t: FieldTypography | undefined,
+  bp: TypographyBreakpoint,
+): FieldTypography {
+  if (!t) return {};
+  if (bp === "base") {
+    // Copia superficial excluyendo md/lg.
+    const { md: _m, lg: _l, ...base } = t;
+    void _m; void _l;
+    return base;
+  }
+  return (t[bp] as FieldTypography | undefined) ?? {};
+}
+
+/** Escribe/actualiza los valores de un breakpoint concreto sin tocar los demás. */
+export function setBreakpointTypography(
+  current: FieldTypography | undefined,
+  bp: TypographyBreakpoint,
+  next: FieldTypography,
+): FieldTypography {
+  const cur = current ?? {};
+  if (bp === "base") {
+    // Preservar md/lg del actual.
+    const { md, lg } = cur;
+    return { ...next, md, lg };
+  }
+  return { ...cur, [bp]: next };
 }
 
 export const TYPO_FAMILIES: Array<{ value: string; label: string; css?: string }> = [
@@ -61,8 +114,19 @@ export function typographyToStyle(t: FieldTypography): CSSProperties {
   return s;
 }
 
+function hasFlatTypography(t: Partial<FieldTypography> | undefined): boolean {
+  if (!t) return false;
+  return Object.entries(t).some(([k, v]) => {
+    if (k === "md" || k === "lg") return false;
+    return v !== undefined && v !== "" && v !== 0 && v !== false;
+  });
+}
+
 export function hasTypography(t: FieldTypography): boolean {
-  return Object.values(t).some((v) => v !== undefined && v !== "" && v !== 0 && v !== false);
+  if (hasFlatTypography(t)) return true;
+  if (hasFlatTypography(t.md)) return true;
+  if (hasFlatTypography(t.lg)) return true;
+  return false;
 }
 
 /**
