@@ -23,7 +23,7 @@ export function ArmaTuViajeSection({ config }: { config?: Record<string, unknown
             <p className="mt-4 text-lg text-muted-foreground">{body}</p>
             <Link
               to="/arma-tu-viaje"
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-md hover:opacity-95"
+              className="mt-6 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
             >
               <Compass className="size-4" aria-hidden />
               {ctaLabel}
