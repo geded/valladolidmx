@@ -1595,6 +1595,48 @@ export type Database = {
           },
         ]
       }
+      destination_zone_media: {
+        Row: {
+          created_at: string
+          id: string
+          media_asset_id: string
+          role: string
+          sort_order: number
+          zone_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          media_asset_id: string
+          role?: string
+          sort_order?: number
+          zone_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          media_asset_id?: string
+          role?: string
+          sort_order?: number
+          zone_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "destination_zone_media_media_asset_id_fkey"
+            columns: ["media_asset_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "destination_zone_media_zone_id_fkey"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "destination_zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       destination_zones: {
         Row: {
           created_at: string
