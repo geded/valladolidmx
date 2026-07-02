@@ -621,7 +621,7 @@ const customHtmlBlock: BlockContract = {
 
 const customFormBlock: BlockContract = {
   type: "vmx.custom.form",
-  category: "smart",
+  category: "static",
   version: "1.0.0",
   display_name: "Formulario",
   description:
