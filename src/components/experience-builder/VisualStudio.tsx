@@ -441,11 +441,19 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
     () => (tree && selectedId ? tree.root.children.find((n) => n.id === selectedId) ?? null : null),
     [tree, selectedId],
   );
-  const selectedChrome = selectedId === HEADER_CHROME_ID ? "header" : selectedId === FOOTER_CHROME_ID ? "footer" : null;
+  const selectedChrome: ChromeArea | "seo" | null =
+    selectedId === HEADER_CHROME_ID
+      ? "header"
+      : selectedId === FOOTER_CHROME_ID
+      ? "footer"
+      : selectedId === SEO_CHROME_ID
+      ? "seo"
+      : null;
   const selectedContract = useMemo(
     () => {
       if (selectedChrome === "header") return headerChromeContract;
       if (selectedChrome === "footer") return footerChromeContract;
+      if (selectedChrome === "seo") return seoChromeContract;
       return selectedNode ? getBlock(selectedNode.type) ?? null : null;
     },
     [selectedChrome, selectedNode],
@@ -453,7 +461,8 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
   const selectedConfig = useMemo(
     () => {
       if (!tree) return null;
-      if (selectedChrome) return getChromeConfig(tree, selectedChrome);
+      if (selectedChrome === "header" || selectedChrome === "footer") return getChromeConfig(tree, selectedChrome);
+      if (selectedChrome === "seo") return getSeoConfig(tree);
       return selectedNode?.config as Record<string, unknown> | null;
     },
     [selectedChrome, selectedNode, tree],
@@ -478,12 +487,22 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
 
   const updateSelectedConfig = (nextConfig: Record<string, unknown>) => {
     if (!tree) return;
-    if (selectedChrome) {
+    if (selectedChrome === "header" || selectedChrome === "footer") {
       setTree({
         ...tree,
         chrome: {
           ...(tree.chrome ?? {}),
           [selectedChrome]: nextConfig as CompositionJsonObject,
+        },
+      });
+      return;
+    }
+    if (selectedChrome === "seo") {
+      setTree({
+        ...tree,
+        chrome: {
+          ...(tree.chrome ?? {}),
+          seo: nextConfig as CompositionJsonObject,
         },
       });
       return;
