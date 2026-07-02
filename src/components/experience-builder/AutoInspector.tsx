@@ -7,10 +7,13 @@
 
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, ImageIcon, Languages, Monitor, Plus, Smartphone, Tablet, Trash2, Type, Upload } from "lucide-react";
+import { ChevronDown, ChevronUp, CloudUpload, ImageIcon, Languages, Loader2, Monitor, Plus, Smartphone, Tablet, Trash2, Type, Upload } from "lucide-react";
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { MediaPickerDialog } from "./MediaPickerDialog";
 import { ReferencePicker } from "./ReferencePicker";
+import { useServerFn } from "@tanstack/react-start";
+import { importUrlToStudioMedia } from "@/lib/experience-builder/studio-media.functions";
+import { toast } from "sonner";
 import type {
   BlockContract,
   BlockFieldSchema,
@@ -643,6 +646,25 @@ function MediaControl({
   const reactId = useId();
   const inputId = `media-${reactId.replace(/:/g, "")}`;
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const importFn = useServerFn(importUrlToStudioMedia);
+  // Detecta URLs externas que aún no viven en la Biblioteca del Studio.
+  const isExternalUrl =
+    /^https?:\/\//i.test(v) && !v.includes("/api/public/studio-media/");
+  const handleImport = async () => {
+    if (!v || importing) return;
+    setImporting(true);
+    try {
+      const res = await importFn({ data: { url: v } });
+      onChange(res.url);
+      toast.success("Imagen guardada en la Biblioteca");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Error desconocido";
+      toast.error(`No se pudo importar: ${msg}`);
+    } finally {
+      setImporting(false);
+    }
+  };
   return (
     <div className="space-y-2">
       {v ? (
@@ -704,6 +726,22 @@ function MediaControl({
           className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-destructive"
         >
           <Trash2 className="size-3" aria-hidden /> Quitar imagen
+        </button>
+      ) : null}
+      {isExternalUrl ? (
+        <button
+          type="button"
+          onClick={handleImport}
+          disabled={importing}
+          className="inline-flex w-full items-center justify-center gap-1 rounded-md border border-amber-300 bg-amber-50 px-2 py-1.5 text-[11px] font-medium text-amber-900 hover:bg-amber-100 disabled:opacity-60 dark:border-amber-700/50 dark:bg-amber-950/40 dark:text-amber-200"
+          title="Descarga esta URL y la guarda en la Biblioteca del Studio"
+        >
+          {importing ? (
+            <Loader2 className="size-3.5 animate-spin" aria-hidden />
+          ) : (
+            <CloudUpload className="size-3.5" aria-hidden />
+          )}
+          {importing ? "Importando…" : "Guardar en Biblioteca"}
         </button>
       ) : null}
       <MediaPickerDialog

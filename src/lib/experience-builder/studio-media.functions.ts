@@ -172,3 +172,77 @@ export const registerStudioMedia = createServerFn({ method: "POST" })
       url: publicProxyUrl(asset.storage_path as string),
     };
   });
+
+/* ─────────────  Importar URL externa a la Biblioteca  ───────────────── */
+
+interface ImportUrlInput {
+  url: string;
+  alt?: string | null;
+}
+
+export const importUrlToStudioMedia = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: ImportUrlInput) => {
+    if (!d?.url) throw new Error("invalid_input");
+    if (!/^https?:\/\//i.test(d.url)) throw new Error("only_http_urls");
+    return d;
+  })
+  .handler(async ({ data, context }) => {
+    await assertEditorial(context);
+
+    // Descarga server-side (evita CORS del navegador).
+    const resp = await fetch(data.url, { redirect: "follow" });
+    if (!resp.ok) throw new Error(`download_failed_${resp.status}`);
+    const mime = resp.headers.get("content-type")?.split(";")[0]?.trim() || "image/jpeg";
+    if (!mime.startsWith("image/")) throw new Error("not_an_image");
+    const buf = new Uint8Array(await resp.arrayBuffer());
+    if (buf.byteLength > 12 * 1024 * 1024) throw new Error("file_too_large");
+
+    // Nombre a partir de la URL.
+    let baseName = "importada";
+    try {
+      const u = new URL(data.url);
+      const last = u.pathname.split("/").filter(Boolean).pop();
+      if (last) baseName = last;
+    } catch { /* ignore */ }
+    const ext = mime === "image/png" ? "png"
+      : mime === "image/webp" ? "webp"
+      : mime === "image/gif" ? "gif"
+      : mime === "image/svg+xml" ? "svg"
+      : "jpg";
+    const clean = sanitizeFilename(baseName.replace(/\.[a-z0-9]+$/i, "")) + "." + ext;
+    const path = `${new Date().getFullYear()}/imported-${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}-${clean}`;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const storage = context.supabase.storage as any;
+    const { error: upErr } = await storage
+      .from(BUCKET)
+      .upload(path, buf, { contentType: mime, upsert: false });
+    if (upErr) throw upErr;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = context.supabase as any;
+    const { data: asset, error } = await db
+      .from("media_assets")
+      .insert({
+        kind: "image",
+        storage_bucket: BUCKET,
+        storage_path: path,
+        alt_text: data.alt ?? null,
+        mime_type: mime,
+        size_bytes: buf.byteLength,
+        status: "published",
+        created_by: context.userId,
+        updated_by: context.userId,
+      })
+      .select("id, storage_path")
+      .single();
+    if (error) throw error;
+
+    return {
+      id: asset.id as string,
+      url: publicProxyUrl(asset.storage_path as string),
+    };
+  });
