@@ -629,7 +629,12 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
               <p className="mt-1 text-[10px] text-muted-foreground">Arrastra para reordenar. Clic para editar.</p>
             </div>
             <div className="flex-1 overflow-y-auto p-2">
-              <ChromeItem label="Encabezado global" note="Compartido por todo el sitio · edición en historia posterior" />
+              <ChromeItem
+                label="Encabezado"
+                note="Menú, enlaces y botón destacado"
+                selected={selectedId === HEADER_CHROME_ID}
+                onSelect={() => setSelectedId(HEADER_CHROME_ID)}
+              />
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                 <SortableContext items={tree.root.children.map((n) => n.id)} strategy={verticalListSortingStrategy}>
                   {tree.root.children.map((n) => (
@@ -637,7 +642,12 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
                   ))}
                 </SortableContext>
               </DndContext>
-              <ChromeItem label="Pie de página global" note="Compartido por todo el sitio · edición en historia posterior" />
+              <ChromeItem
+                label="Pie de página"
+                note="Columnas, enlaces y textos legales"
+                selected={selectedId === FOOTER_CHROME_ID}
+                onSelect={() => setSelectedId(FOOTER_CHROME_ID)}
+              />
               <button
                 type="button"
                 onClick={() => setShowLibrary(true)}
@@ -654,12 +664,13 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
           previewMode={previewMode}
           selectedId={selectedId}
           onSelect={(id) => setSelectedId(id)}
+          onSelectChrome={(area) => setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)}
           onDelete={removeNodeById}
           onDuplicate={duplicateNode}
           onMove={moveNode}
         />
 
-        {!previewMode && selectedNode && selectedContract ? (
+        {!previewMode && selectedContract && selectedConfig ? (
           <aside
             className="fixed right-0 top-[52px] z-40 flex h-[calc(100vh-52px)] w-[360px] max-w-[92vw] flex-col gap-4 overflow-y-auto border-l border-border bg-card p-4 shadow-xl"
             aria-label="Herramientas para editar el bloque seleccionado"
@@ -679,16 +690,18 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
               </button>
             </header>
 
-            <div className="flex flex-wrap gap-1.5">
-              <ToolBtn onClick={() => moveNode(selectedNode.id, -1)} icon={<ChevronUp className="size-3" />} label="Subir" />
-              <ToolBtn onClick={() => moveNode(selectedNode.id, 1)} icon={<ChevronDown className="size-3" />} label="Bajar" />
-              <ToolBtn onClick={() => duplicateNode(selectedNode.id)} icon={<Copy className="size-3" />} label="Duplicar" />
-              <ToolBtn onClick={() => removeNodeById(selectedNode.id)} icon={<Trash2 className="size-3" />} label="Eliminar" tone="danger" />
-            </div>
+            {selectedNode ? (
+              <div className="flex flex-wrap gap-1.5">
+                <ToolBtn onClick={() => moveNode(selectedNode.id, -1)} icon={<ChevronUp className="size-3" />} label="Subir" />
+                <ToolBtn onClick={() => moveNode(selectedNode.id, 1)} icon={<ChevronDown className="size-3" />} label="Bajar" />
+                <ToolBtn onClick={() => duplicateNode(selectedNode.id)} icon={<Copy className="size-3" />} label="Duplicar" />
+                <ToolBtn onClick={() => removeNodeById(selectedNode.id)} icon={<Trash2 className="size-3" />} label="Eliminar" tone="danger" />
+              </div>
+            ) : null}
 
             <AutoInspector
               contract={selectedContract}
-              config={selectedNode.config as Record<string, unknown>}
+              config={selectedConfig}
               onChange={(next) => updateSelectedConfig(next)}
               simple
             />
