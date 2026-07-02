@@ -61,3 +61,55 @@ export function typographyToStyle(t: FieldTypography): CSSProperties {
 export function hasTypography(t: FieldTypography): boolean {
   return Object.values(t).some((v) => v !== undefined && v !== "" && v !== 0 && v !== false);
 }
+
+/**
+ * Valores tipográficos actuales por bloque y campo (heredados del CSS del
+ * componente en desktop). Se muestran en el editor de tipografía como
+ * referencia y como "usar valores actuales".
+ */
+export const BLOCK_FIELD_TYPOGRAPHY_DEFAULTS: Record<string, Record<string, FieldTypography>> = {
+  "vmx.hero": {
+    eyebrow: {
+      font_family: "script",
+      font_size: 40,
+      font_weight: 400,
+      line_height: 1.1,
+      color: "#FFFFFF",
+      align: "left",
+      italic: false,
+      uppercase: false,
+    },
+    title: {
+      font_family: "display",
+      font_size: 56,
+      font_weight: 600,
+      line_height: 1.05,
+      color: "#FFFFFF",
+      align: "left",
+      italic: false,
+      uppercase: false,
+    },
+    subtitle: {
+      font_family: "body",
+      font_size: 18,
+      font_weight: 400,
+      line_height: 1.5,
+      color: "#FFFFFF",
+      align: "left",
+      italic: false,
+      uppercase: false,
+    },
+  },
+};
+
+export function getTypographyDefaults(
+  blockType: string | undefined,
+): Record<string, FieldTypography> | undefined {
+  if (!blockType) return undefined;
+  return BLOCK_FIELD_TYPOGRAPHY_DEFAULTS[blockType];
+}
+
+export function familyLabel(key?: string): string {
+  if (!key) return "Por defecto";
+  return TYPO_FAMILIES.find((o) => o.value === key)?.label ?? key;
+}

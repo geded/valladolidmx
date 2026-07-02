@@ -16,8 +16,9 @@ import type {
 import { VariablePicker } from "./VariablePicker";
 import {
   TYPO_FAMILIES,
+  familyLabel,
+  getTypographyDefaults,
   hasTypography,
-  readFieldTypography,
   type FieldTypography,
 } from "@/lib/experience-builder/typography";
 
@@ -55,6 +56,7 @@ export function AutoInspector({ contract, config, onChange, simple = false }: Au
     const nextMap = { ...typoMap, [fieldKey]: next };
     onChange({ ...config, __typography: nextMap });
   };
+  const typoDefaults = getTypographyDefaults(contract.type) ?? {};
   return (
     <div className="space-y-3">
       <header className="space-y-1">
@@ -79,6 +81,7 @@ export function AutoInspector({ contract, config, onChange, simple = false }: Au
             translations={i18nMap[key]}
             onTranslationChange={(lang, value) => setTranslation(key, lang, value)}
             typography={typoMap[key]}
+            typographyDefault={typoDefaults[key]}
             onTypographyChange={(next) => setTypography(key, next)}
           />
         ))}
@@ -114,7 +117,7 @@ function CapabilityChips({ contract }: { contract: BlockContract }) {
 }
 
 function FieldRow({
-  name, def, value, onChange, simple, translations, onTranslationChange, typography, onTypographyChange,
+  name, def, value, onChange, simple, translations, onTranslationChange, typography, typographyDefault, onTypographyChange,
 }: {
   name: string;
   def: BlockFieldSchema;
@@ -124,6 +127,7 @@ function FieldRow({
   translations?: Record<string, string>;
   onTranslationChange?: (lang: string, value: string) => void;
   typography?: FieldTypography;
+  typographyDefault?: FieldTypography;
   onTypographyChange?: (next: FieldTypography) => void;
 }) {
   const canTranslate = Boolean(def.translatable) && !simple && (def.type === "text" || def.type === "rich_text");
@@ -167,7 +171,7 @@ function FieldRow({
         <p className="text-[10px] text-muted-foreground">{def.description}</p>
       ) : null}
       {canStyleText && showTypo ? (
-        <TypographyEditor value={typo} onChange={(next) => onTypographyChange?.(next)} />
+        <TypographyEditor value={typo} defaults={typographyDefault} onChange={(next) => onTypographyChange?.(next)} />
       ) : null}
       {canTranslate && showI18n ? (
         <TranslationsEditor
@@ -182,12 +186,15 @@ function FieldRow({
 }
 
 function TypographyEditor({
-  value, onChange,
-}: { value: FieldTypography; onChange: (next: FieldTypography) => void }) {
+  value, defaults, onChange,
+}: { value: FieldTypography; defaults?: FieldTypography; onChange: (next: FieldTypography) => void }) {
   const set = <K extends keyof FieldTypography>(k: K, v: FieldTypography[K]) => {
     const next = { ...value, [k]: v };
     onChange(next);
   };
+  const d = defaults ?? {};
+  const eff = <K extends keyof FieldTypography>(k: K): FieldTypography[K] =>
+    (value[k] !== undefined && value[k] !== "" ? value[k] : d[k]) as FieldTypography[K];
   const inp = "w-full rounded-md border border-border bg-background px-2 py-1 text-xs";
   return (
     <div className="mt-1 space-y-2 rounded-md border border-primary/30 bg-primary/5 p-2">
@@ -203,12 +210,44 @@ function TypographyEditor({
           Restablecer
         </button>
       </div>
+      {defaults ? (
+        <div className="space-y-1 rounded-md border border-border bg-background/70 p-2">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Valores actuales
+            </p>
+            <button
+              type="button"
+              onClick={() => onChange({ ...d })}
+              className="text-[10px] font-medium text-primary hover:underline"
+            >
+              Usar valores actuales
+            </button>
+          </div>
+          <ul className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px] text-muted-foreground">
+            <li><span className="text-foreground">Fuente:</span> {familyLabel(d.font_family)}</li>
+            <li><span className="text-foreground">Tamaño:</span> {d.font_size ? `${d.font_size} px` : "—"}</li>
+            <li><span className="text-foreground">Peso:</span> {d.font_weight ?? "—"}</li>
+            <li><span className="text-foreground">Interlínea:</span> {d.line_height ?? "—"}</li>
+            <li className="flex items-center gap-1">
+              <span className="text-foreground">Color:</span>
+              {d.color ? (
+                <>
+                  <span className="inline-block size-3 rounded border border-border" style={{ background: d.color }} />
+                  <span>{d.color}</span>
+                </>
+              ) : "—"}
+            </li>
+            <li><span className="text-foreground">Alineación:</span> {d.align ?? "—"}</li>
+          </ul>
+        </div>
+      ) : null}
       <div className="grid grid-cols-2 gap-2">
         <label className="col-span-2 space-y-1">
           <span className="text-[10px] text-muted-foreground">Fuente</span>
           <select
             className={inp}
-            value={value.font_family ?? ""}
+            value={eff("font_family") ?? ""}
             onChange={(e) => set("font_family", e.target.value)}
           >
             {TYPO_FAMILIES.map((o) => (
@@ -223,7 +262,8 @@ function TypographyEditor({
             min={8}
             max={200}
             className={inp}
-            value={value.font_size ?? ""}
+            value={eff("font_size") ?? ""}
+            placeholder={d.font_size ? String(d.font_size) : ""}
             onChange={(e) => set("font_size", e.target.value === "" ? undefined : Number(e.target.value))}
           />
         </label>
@@ -231,7 +271,7 @@ function TypographyEditor({
           <span className="text-[10px] text-muted-foreground">Peso</span>
           <select
             className={inp}
-            value={value.font_weight ?? ""}
+            value={eff("font_weight") ?? ""}
             onChange={(e) => set("font_weight", e.target.value === "" ? undefined : Number(e.target.value))}
           >
             <option value="">Por defecto</option>
@@ -252,7 +292,8 @@ function TypographyEditor({
             min={0.8}
             max={3}
             className={inp}
-            value={value.line_height ?? ""}
+            value={eff("line_height") ?? ""}
+            placeholder={d.line_height ? String(d.line_height) : ""}
             onChange={(e) => set("line_height", e.target.value === "" ? undefined : Number(e.target.value))}
           />
         </label>
@@ -262,7 +303,7 @@ function TypographyEditor({
             type="number"
             step="0.1"
             className={inp}
-            value={value.letter_spacing ?? ""}
+            value={eff("letter_spacing") ?? ""}
             onChange={(e) => set("letter_spacing", e.target.value === "" ? undefined : Number(e.target.value))}
           />
         </label>
@@ -271,7 +312,7 @@ function TypographyEditor({
           <input
             type="color"
             className="h-7 w-full cursor-pointer rounded border border-border bg-background"
-            value={value.color ?? "#000000"}
+            value={(eff("color") as string) ?? "#000000"}
             onChange={(e) => set("color", e.target.value)}
           />
         </label>
@@ -279,7 +320,7 @@ function TypographyEditor({
           <span className="text-[10px] text-muted-foreground">Alineación</span>
           <select
             className={inp}
-            value={value.align ?? ""}
+            value={eff("align") ?? ""}
             onChange={(e) => set("align", e.target.value)}
           >
             <option value="">Por defecto</option>
@@ -294,7 +335,7 @@ function TypographyEditor({
         <label className="flex items-center gap-1 text-[11px]">
           <input
             type="checkbox"
-            checked={Boolean(value.italic)}
+            checked={Boolean(eff("italic"))}
             onChange={(e) => set("italic", e.target.checked)}
           />
           Cursiva
@@ -302,7 +343,7 @@ function TypographyEditor({
         <label className="flex items-center gap-1 text-[11px]">
           <input
             type="checkbox"
-            checked={Boolean(value.uppercase)}
+            checked={Boolean(eff("uppercase"))}
             onChange={(e) => set("uppercase", e.target.checked)}
           />
           MAYÚSCULAS
