@@ -3409,6 +3409,42 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_locales: {
+        Row: {
+          code: string
+          created_at: string
+          flag: string
+          is_active: boolean
+          is_default: boolean
+          label: string
+          native_label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          flag?: string
+          is_active?: boolean
+          is_default?: boolean
+          label: string
+          native_label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          flag?: string
+          is_active?: boolean
+          is_default?: boolean
+          label?: string
+          native_label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       points_of_interest: {
         Row: {
           created_at: string
