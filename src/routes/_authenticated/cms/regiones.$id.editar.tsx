@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { EntityEditor } from "@/components/cms/EntityEditor";
 import { REGION_FIELDS } from "@/lib/cms/editor-fields";
 
-export const Route = createFileRoute("/_authenticated/cms/regiones/editar")({
+export const Route = createFileRoute("/_authenticated/cms/regiones/$id/editar")({
   head: () => ({
     meta: [
       { title: "Editar región · CMS Studio" },
