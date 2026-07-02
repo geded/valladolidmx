@@ -12,7 +12,7 @@ export function ConsejoAluxSection({ config }: { config?: Record<string, unknown
   const { t } = useTranslation();
   const heading = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.alux_title");
   return (
-    <section id="consejo-alux" className="@container bg-secondary/40 py-20 md:py-24">
+    <section id="consejo-alux" className="@container bg-secondary/40 py-20 @3xl:py-24">
       <Container>
         <div data-home-layout="consejo-alux" className="mx-auto flex max-w-3xl flex-col items-start gap-6 rounded-3xl border border-border bg-card p-8 shadow-sm @3xl:flex-row @3xl:items-center @3xl:p-10">
           <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-primary/15 text-primary">

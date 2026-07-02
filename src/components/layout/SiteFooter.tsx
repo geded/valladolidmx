@@ -57,8 +57,8 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
   const privacyLabel = textValue(config?.privacy_label) ?? t("footer.privacy");
   const showLanguage = boolValue(config?.show_language, true);
   return (
-    <footer className="mt-24 border-t border-border bg-secondary/40">
-      <Container className="grid gap-10 py-12 md:grid-cols-4">
+    <footer className="@container mt-24 border-t border-border bg-secondary/40">
+      <Container className="grid grid-cols-1 gap-10 py-12 @3xl:grid-cols-4">
         <div>
           <BrandLogo tone="dark" size="md" />
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">{tagline}</p>
@@ -90,7 +90,7 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
         </div> : null}
       </Container>
       <div className="border-t border-border/60">
-        <Container className="flex flex-col items-center justify-between gap-3 py-5 text-xs text-muted-foreground md:flex-row">
+        <Container className="flex flex-col items-center justify-between gap-3 py-5 text-xs text-muted-foreground @3xl:flex-row">
           <p>© {new Date().getFullYear()} {SITE.name}. {t("footer.rights")}</p>
           <div className="flex gap-4">
             <span>{legalLabel}</span>

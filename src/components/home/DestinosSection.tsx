@@ -24,7 +24,7 @@ export function DestinosSection({ config }: { config?: Record<string, unknown> }
   const destinations = data && data.length > 0 ? data : DESTINOS_MOCK;
   const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.destinations_title");
   return (
-    <section id="destinos" className="@container py-20 md:py-28">
+    <section id="destinos" className="@container py-20 @3xl:py-28">
       <Container>
         <SectionHeader
           eyebrow={t("hero.eyebrow")}

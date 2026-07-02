@@ -23,7 +23,7 @@ export function ResenasSection({ config }: { config?: Record<string, unknown> } 
   const reviews = data && data.length > 0 ? data : RESENAS_MOCK;
   const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.reviews_title");
   return (
-    <section id="resenas" className="@container bg-secondary/40 py-20 md:py-28">
+    <section id="resenas" className="@container bg-secondary/40 py-20 @3xl:py-28">
       <Container>
         <SectionHeader title={title} subtitle={t("sections.reviews_sub")} />
         <div data-home-grid="resenas" className="grid grid-cols-1 gap-6 @3xl:grid-cols-3">

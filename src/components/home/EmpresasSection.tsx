@@ -25,7 +25,7 @@ export function EmpresasSection({ config }: { config?: Record<string, unknown> }
   const businesses = data && data.length > 0 ? data : EMPRESAS_MOCK;
   const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.empresas_title");
   return (
-    <section id="empresas" className="@container py-20 md:py-28">
+    <section id="empresas" className="@container py-20 @3xl:py-28">
       <Container>
         <SectionHeader
           title={title}
