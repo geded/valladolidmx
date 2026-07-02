@@ -373,10 +373,10 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
         const home = pickCanonicalHomeComposition(all);
         let detail: CompositionDetail | null = null;
         if (home) {
-          detail = await get({ data: { id: home.id } });
+          detail = (await get({ data: { id: home.id } })) as CompositionDetail | null;
         } else {
           const { id } = await create({ data: { slug: "home", title: "Página de Inicio", page_type: "home" } });
-          detail = await get({ data: { id } });
+          detail = (await get({ data: { id } })) as CompositionDetail | null;
         }
         if (cancelled || !detail) return;
         setPage(detail);
@@ -522,7 +522,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     if (!page) return;
     if (typeof window !== "undefined" && !window.confirm(`Restaurar la revisión #${rev.revision_number} como borrador actual?`)) return;
     await restore({ data: { id: page.id, revision_id: rev.id } });
-    const detail = await get({ data: { id: page.id } });
+    const detail = (await get({ data: { id: page.id } })) as CompositionDetail | null;
     if (detail) {
       setPage(detail);
       setTree(detail.current_draft);
