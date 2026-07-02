@@ -122,20 +122,32 @@ export function Hero({ config }: HeroProps = {}) {
         : "justify-start";
 
   const textAlignment = config?.text_alignment?.trim() || "left";
+  // Alineación del bloque de texto (eyebrow + H1 + subtítulo). Se aplica
+  // como `text-*` (para justificar el texto interno) y `self-*` en cada
+  // elemento (para posicionar el bloque dentro del contenedor flex-col).
+  // NO se aplica `items-*` en el Container padre porque forzaría a los
+  // botones y al buscador a alinearse igual, rompiendo sus propios
+  // controles (`cta_alignment`, `search_alignment`).
   const textAlignClass =
     textAlignment === "center"
-      ? "text-center items-center"
+      ? "text-center"
       : textAlignment === "right"
-        ? "text-right items-end"
-        : "text-left items-start";
+        ? "text-right"
+        : "text-left";
+  const textSelfClass =
+    textAlignment === "center"
+      ? "self-center"
+      : textAlignment === "right"
+        ? "self-end"
+        : "self-start";
 
   const searchAlignment = config?.search_alignment?.trim() || "left";
-  const searchAlignClass =
+  const searchJustifyClass =
     searchAlignment === "center"
-      ? "mx-auto"
+      ? "justify-center"
       : searchAlignment === "right"
-        ? "ml-auto"
-        : "";
+        ? "justify-end"
+        : "justify-start";
 
   // Botones: sólo se respeta la lista del editor cuando trae al menos un
   // botón. Una lista vacía se trata como "no configurado" y se usan los
@@ -214,7 +226,7 @@ export function Hero({ config }: HeroProps = {}) {
         {eyebrow ? (
           <p
             suppressHydrationWarning
-            className="font-script text-[1.625rem] leading-tight text-white/95 drop-shadow-sm sm:text-3xl md:text-[2.5rem]"
+            className={`font-script text-[1.625rem] leading-tight text-white/95 drop-shadow-sm sm:text-3xl md:text-[2.5rem] ${textSelfClass}`}
             style={eyebrowStyle}
           >
             {eyebrow}
@@ -223,7 +235,7 @@ export function Hero({ config }: HeroProps = {}) {
         {title ? (
           <h1
             suppressHydrationWarning
-            className="max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:text-[2.75rem] sm:leading-[1.05] md:mt-3 md:text-[3.5rem] lg:text-[4rem]"
+            className={`max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:text-[2.75rem] sm:leading-[1.05] md:mt-3 md:text-[3.5rem] lg:text-[4rem] ${textSelfClass}`}
             style={titleStyle}
           >
             {title}
@@ -232,7 +244,7 @@ export function Hero({ config }: HeroProps = {}) {
         {subtitle ? (
           <p
             suppressHydrationWarning
-            className="max-w-2xl text-pretty text-base text-white/90 drop-shadow sm:text-lg md:mt-5 md:text-lg lg:text-xl"
+            className={`max-w-2xl text-pretty text-base text-white/90 drop-shadow sm:text-lg md:mt-5 md:text-lg lg:text-xl ${textSelfClass}`}
             style={subtitleStyle}
           >
             {subtitle}
@@ -240,7 +252,7 @@ export function Hero({ config }: HeroProps = {}) {
         ) : null}
 
         {showCtas && ctas.length > 0 ? (
-          <div className={`flex flex-wrap items-center gap-3 md:mt-8 ${ctaAlignmentClass}`}>
+          <div className={`flex w-full flex-wrap items-center gap-3 md:mt-8 ${ctaAlignmentClass}`}>
             {ctas.map((cta, i) => (
               <HeroButton key={i} cta={cta} isPrimary={i === 0} />
             ))}
@@ -249,23 +261,25 @@ export function Hero({ config }: HeroProps = {}) {
 
         {/* Buscador discreto (12C.1): secundario al mensaje inspirador. */}
         {showSearch ? (
-          <form
-            role="search"
-            aria-label="Búsqueda rápida"
-            onSubmit={(e) => e.preventDefault()}
-            className={`mt-4 flex w-full max-w-md items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 shadow-sm backdrop-blur-md sm:mt-6 md:mt-10 ${searchAlignClass}`}
-          >
-            <Search className="size-4 shrink-0 text-white/80" aria-hidden />
-            <input
-              type="search"
-              placeholder={searchPlaceholder}
-              className="w-full bg-transparent text-sm text-white placeholder:text-white/70 focus:outline-none"
-              aria-label={searchPlaceholder}
-            />
-            {searchHelper ? (
-              <span className="hidden text-[11px] text-white/60 lg:inline">{searchHelper}</span>
-            ) : null}
-          </form>
+          <div className={`mt-4 flex w-full sm:mt-6 md:mt-10 ${searchJustifyClass}`}>
+            <form
+              role="search"
+              aria-label="Búsqueda rápida"
+              onSubmit={(e) => e.preventDefault()}
+              className="flex w-full max-w-md items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 shadow-sm backdrop-blur-md"
+            >
+              <Search className="size-4 shrink-0 text-white/80" aria-hidden />
+              <input
+                type="search"
+                placeholder={searchPlaceholder}
+                className="w-full bg-transparent text-sm text-white placeholder:text-white/70 focus:outline-none"
+                aria-label={searchPlaceholder}
+              />
+              {searchHelper ? (
+                <span className="hidden text-[11px] text-white/60 lg:inline">{searchHelper}</span>
+              ) : null}
+            </form>
+          </div>
         ) : null}
       </Container>
     </section>
