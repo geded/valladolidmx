@@ -60,14 +60,10 @@ import { Route as AuthenticatedCuentaFavoritosRouteImport } from './routes/_auth
 import { Route as AuthenticatedCuentaConciergeRouteImport } from './routes/_authenticated/cuenta/concierge'
 import { Route as AuthenticatedCuentaCarritoRouteImport } from './routes/_authenticated/cuenta/carrito'
 import { Route as AuthenticatedCuentaActividadRouteImport } from './routes/_authenticated/cuenta/actividad'
-import { Route as AuthenticatedCmsZonasRouteImport } from './routes/_authenticated/cms/zonas'
-import { Route as AuthenticatedCmsProductosRouteImport } from './routes/_authenticated/cms/productos'
 import { Route as AuthenticatedCmsPagosRouteImport } from './routes/_authenticated/cms/pagos'
 import { Route as AuthenticatedCmsObservabilidadRouteImport } from './routes/_authenticated/cms/observabilidad'
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
 import { Route as AuthenticatedCmsExperienceBuilderRouteImport } from './routes/_authenticated/cms/experience-builder'
-import { Route as AuthenticatedCmsEmpresasRouteImport } from './routes/_authenticated/cms/empresas'
-import { Route as AuthenticatedCmsDestinosRouteImport } from './routes/_authenticated/cms/destinos'
 import { Route as AuthenticatedCmsAlertasRouteImport } from './routes/_authenticated/cms/alertas'
 import { Route as AuthenticatedCmsActividadRouteImport } from './routes/_authenticated/cms/actividad'
 import { Route as AuthenticatedAdminTuristasRouteImport } from './routes/_authenticated/admin/turistas'
@@ -78,8 +74,12 @@ import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminConciergeRouteImport } from './routes/_authenticated/admin/concierge'
 import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './routes/_authenticated/portal/invitaciones.index'
 import { Route as AuthenticatedPortalEmpresasIndexRouteImport } from './routes/_authenticated/portal/empresas.index'
+import { Route as AuthenticatedCmsZonasIndexRouteImport } from './routes/_authenticated/cms/zonas.index'
 import { Route as AuthenticatedCmsReviewsIndexRouteImport } from './routes/_authenticated/cms/reviews.index'
 import { Route as AuthenticatedCmsRegionesIndexRouteImport } from './routes/_authenticated/cms/regiones.index'
+import { Route as AuthenticatedCmsProductosIndexRouteImport } from './routes/_authenticated/cms/productos.index'
+import { Route as AuthenticatedCmsEmpresasIndexRouteImport } from './routes/_authenticated/cms/empresas.index'
+import { Route as AuthenticatedCmsDestinosIndexRouteImport } from './routes/_authenticated/cms/destinos.index'
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
 import { Route as AuthenticatedAdminSistemaIndexRouteImport } from './routes/_authenticated/admin/sistema.index'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -386,17 +386,6 @@ const AuthenticatedCuentaActividadRoute =
     path: '/actividad',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
-const AuthenticatedCmsZonasRoute = AuthenticatedCmsZonasRouteImport.update({
-  id: '/zonas',
-  path: '/zonas',
-  getParentRoute: () => AuthenticatedCmsRoute,
-} as any)
-const AuthenticatedCmsProductosRoute =
-  AuthenticatedCmsProductosRouteImport.update({
-    id: '/productos',
-    path: '/productos',
-    getParentRoute: () => AuthenticatedCmsRoute,
-  } as any)
 const AuthenticatedCmsPagosRoute = AuthenticatedCmsPagosRouteImport.update({
   id: '/pagos',
   path: '/pagos',
@@ -417,18 +406,6 @@ const AuthenticatedCmsExperienceBuilderRoute =
   AuthenticatedCmsExperienceBuilderRouteImport.update({
     id: '/experience-builder',
     path: '/experience-builder',
-    getParentRoute: () => AuthenticatedCmsRoute,
-  } as any)
-const AuthenticatedCmsEmpresasRoute =
-  AuthenticatedCmsEmpresasRouteImport.update({
-    id: '/empresas',
-    path: '/empresas',
-    getParentRoute: () => AuthenticatedCmsRoute,
-  } as any)
-const AuthenticatedCmsDestinosRoute =
-  AuthenticatedCmsDestinosRouteImport.update({
-    id: '/destinos',
-    path: '/destinos',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
 const AuthenticatedCmsAlertasRoute = AuthenticatedCmsAlertasRouteImport.update({
@@ -489,6 +466,12 @@ const AuthenticatedPortalEmpresasIndexRoute =
     path: '/empresas/',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
+const AuthenticatedCmsZonasIndexRoute =
+  AuthenticatedCmsZonasIndexRouteImport.update({
+    id: '/zonas/',
+    path: '/zonas/',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsReviewsIndexRoute =
   AuthenticatedCmsReviewsIndexRouteImport.update({
     id: '/reviews/',
@@ -499,6 +482,24 @@ const AuthenticatedCmsRegionesIndexRoute =
   AuthenticatedCmsRegionesIndexRouteImport.update({
     id: '/regiones/',
     path: '/regiones/',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
+const AuthenticatedCmsProductosIndexRoute =
+  AuthenticatedCmsProductosIndexRouteImport.update({
+    id: '/productos/',
+    path: '/productos/',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
+const AuthenticatedCmsEmpresasIndexRoute =
+  AuthenticatedCmsEmpresasIndexRouteImport.update({
+    id: '/empresas/',
+    path: '/empresas/',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
+const AuthenticatedCmsDestinosIndexRoute =
+  AuthenticatedCmsDestinosIndexRouteImport.update({
+    id: '/destinos/',
+    path: '/destinos/',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
 const AuthenticatedCmsCategoriasIndexRoute =
@@ -567,9 +568,9 @@ const AuthenticatedConciergeExpedientesCaseIdRoute =
   } as any)
 const AuthenticatedCmsZonasNuevaRoute =
   AuthenticatedCmsZonasNuevaRouteImport.update({
-    id: '/nueva',
-    path: '/nueva',
-    getParentRoute: () => AuthenticatedCmsZonasRoute,
+    id: '/zonas/nueva',
+    path: '/zonas/nueva',
+    getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
 const AuthenticatedCmsRegionesNuevaRoute =
   AuthenticatedCmsRegionesNuevaRouteImport.update({
@@ -579,9 +580,9 @@ const AuthenticatedCmsRegionesNuevaRoute =
   } as any)
 const AuthenticatedCmsProductosNuevaRoute =
   AuthenticatedCmsProductosNuevaRouteImport.update({
-    id: '/nueva',
-    path: '/nueva',
-    getParentRoute: () => AuthenticatedCmsProductosRoute,
+    id: '/productos/nueva',
+    path: '/productos/nueva',
+    getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
 const AuthenticatedCmsExperienceBuilderPagesRoute =
   AuthenticatedCmsExperienceBuilderPagesRouteImport.update({
@@ -591,15 +592,15 @@ const AuthenticatedCmsExperienceBuilderPagesRoute =
   } as any)
 const AuthenticatedCmsEmpresasNuevaRoute =
   AuthenticatedCmsEmpresasNuevaRouteImport.update({
-    id: '/nueva',
-    path: '/nueva',
-    getParentRoute: () => AuthenticatedCmsEmpresasRoute,
+    id: '/empresas/nueva',
+    path: '/empresas/nueva',
+    getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
 const AuthenticatedCmsDestinosNuevaRoute =
   AuthenticatedCmsDestinosNuevaRouteImport.update({
-    id: '/nueva',
-    path: '/nueva',
-    getParentRoute: () => AuthenticatedCmsDestinosRoute,
+    id: '/destinos/nueva',
+    path: '/destinos/nueva',
+    getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
 const AuthenticatedCmsCategoriasNuevaRoute =
   AuthenticatedCmsCategoriasNuevaRouteImport.update({
@@ -627,9 +628,9 @@ const AuthenticatedCuentaConciergeCaseIdEvaluarRoute =
   } as any)
 const AuthenticatedCmsZonasIdEditarRoute =
   AuthenticatedCmsZonasIdEditarRouteImport.update({
-    id: '/$id/editar',
-    path: '/$id/editar',
-    getParentRoute: () => AuthenticatedCmsZonasRoute,
+    id: '/zonas/$id/editar',
+    path: '/zonas/$id/editar',
+    getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
 const AuthenticatedCmsReviewsIdModerarRoute =
   AuthenticatedCmsReviewsIdModerarRouteImport.update({
@@ -645,21 +646,21 @@ const AuthenticatedCmsRegionesIdEditarRoute =
   } as any)
 const AuthenticatedCmsProductosProductIdEditarRoute =
   AuthenticatedCmsProductosProductIdEditarRouteImport.update({
-    id: '/$productId/editar',
-    path: '/$productId/editar',
-    getParentRoute: () => AuthenticatedCmsProductosRoute,
+    id: '/productos/$productId/editar',
+    path: '/productos/$productId/editar',
+    getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
 const AuthenticatedCmsEmpresasBusinessIdEditarRoute =
   AuthenticatedCmsEmpresasBusinessIdEditarRouteImport.update({
-    id: '/$businessId/editar',
-    path: '/$businessId/editar',
-    getParentRoute: () => AuthenticatedCmsEmpresasRoute,
+    id: '/empresas/$businessId/editar',
+    path: '/empresas/$businessId/editar',
+    getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
 const AuthenticatedCmsDestinosDestinationIdEditarRoute =
   AuthenticatedCmsDestinosDestinationIdEditarRouteImport.update({
-    id: '/$destinationId/editar',
-    path: '/$destinationId/editar',
-    getParentRoute: () => AuthenticatedCmsDestinosRoute,
+    id: '/destinos/$destinationId/editar',
+    path: '/destinos/$destinationId/editar',
+    getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
 const AuthenticatedCmsCategoriasIdEditarRoute =
   AuthenticatedCmsCategoriasIdEditarRouteImport.update({
@@ -706,14 +707,10 @@ export interface FileRoutesByFullPath {
   '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
-  '/cms/destinos': typeof AuthenticatedCmsDestinosRouteWithChildren
-  '/cms/empresas': typeof AuthenticatedCmsEmpresasRouteWithChildren
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
-  '/cms/productos': typeof AuthenticatedCmsProductosRouteWithChildren
-  '/cms/zonas': typeof AuthenticatedCmsZonasRouteWithChildren
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRouteWithChildren
@@ -754,8 +751,12 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/admin/sistema/': typeof AuthenticatedAdminSistemaIndexRoute
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
+  '/cms/destinos/': typeof AuthenticatedCmsDestinosIndexRoute
+  '/cms/empresas/': typeof AuthenticatedCmsEmpresasIndexRoute
+  '/cms/productos/': typeof AuthenticatedCmsProductosIndexRoute
   '/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
+  '/cms/zonas/': typeof AuthenticatedCmsZonasIndexRoute
   '/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
   '/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/cms/categorias/$id/editar': typeof AuthenticatedCmsCategoriasIdEditarRoute
@@ -800,14 +801,10 @@ export interface FileRoutesByTo {
   '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
-  '/cms/destinos': typeof AuthenticatedCmsDestinosRouteWithChildren
-  '/cms/empresas': typeof AuthenticatedCmsEmpresasRouteWithChildren
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
-  '/cms/productos': typeof AuthenticatedCmsProductosRouteWithChildren
-  '/cms/zonas': typeof AuthenticatedCmsZonasRouteWithChildren
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRouteWithChildren
@@ -848,8 +845,12 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/admin/sistema': typeof AuthenticatedAdminSistemaIndexRoute
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
+  '/cms/destinos': typeof AuthenticatedCmsDestinosIndexRoute
+  '/cms/empresas': typeof AuthenticatedCmsEmpresasIndexRoute
+  '/cms/productos': typeof AuthenticatedCmsProductosIndexRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesIndexRoute
   '/cms/reviews': typeof AuthenticatedCmsReviewsIndexRoute
+  '/cms/zonas': typeof AuthenticatedCmsZonasIndexRoute
   '/portal/empresas': typeof AuthenticatedPortalEmpresasIndexRoute
   '/portal/invitaciones': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/cms/categorias/$id/editar': typeof AuthenticatedCmsCategoriasIdEditarRoute
@@ -902,14 +903,10 @@ export interface FileRoutesById {
   '/_authenticated/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/_authenticated/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/_authenticated/cms/alertas': typeof AuthenticatedCmsAlertasRoute
-  '/_authenticated/cms/destinos': typeof AuthenticatedCmsDestinosRouteWithChildren
-  '/_authenticated/cms/empresas': typeof AuthenticatedCmsEmpresasRouteWithChildren
   '/_authenticated/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/_authenticated/cms/pagos': typeof AuthenticatedCmsPagosRoute
-  '/_authenticated/cms/productos': typeof AuthenticatedCmsProductosRouteWithChildren
-  '/_authenticated/cms/zonas': typeof AuthenticatedCmsZonasRouteWithChildren
   '/_authenticated/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/_authenticated/cuenta/concierge': typeof AuthenticatedCuentaConciergeRouteWithChildren
@@ -950,8 +947,12 @@ export interface FileRoutesById {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/_authenticated/admin/sistema/': typeof AuthenticatedAdminSistemaIndexRoute
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
+  '/_authenticated/cms/destinos/': typeof AuthenticatedCmsDestinosIndexRoute
+  '/_authenticated/cms/empresas/': typeof AuthenticatedCmsEmpresasIndexRoute
+  '/_authenticated/cms/productos/': typeof AuthenticatedCmsProductosIndexRoute
   '/_authenticated/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
   '/_authenticated/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
+  '/_authenticated/cms/zonas/': typeof AuthenticatedCmsZonasIndexRoute
   '/_authenticated/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
   '/_authenticated/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/_authenticated/cms/categorias/$id/editar': typeof AuthenticatedCmsCategoriasIdEditarRoute
@@ -1004,14 +1005,10 @@ export interface FileRouteTypes {
     | '/admin/turistas'
     | '/cms/actividad'
     | '/cms/alertas'
-    | '/cms/destinos'
-    | '/cms/empresas'
     | '/cms/experience-builder'
     | '/cms/media'
     | '/cms/observabilidad'
     | '/cms/pagos'
-    | '/cms/productos'
-    | '/cms/zonas'
     | '/cuenta/actividad'
     | '/cuenta/carrito'
     | '/cuenta/concierge'
@@ -1052,8 +1049,12 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/admin/sistema/'
     | '/cms/categorias/'
+    | '/cms/destinos/'
+    | '/cms/empresas/'
+    | '/cms/productos/'
     | '/cms/regiones/'
     | '/cms/reviews/'
+    | '/cms/zonas/'
     | '/portal/empresas/'
     | '/portal/invitaciones/'
     | '/cms/categorias/$id/editar'
@@ -1098,14 +1099,10 @@ export interface FileRouteTypes {
     | '/admin/turistas'
     | '/cms/actividad'
     | '/cms/alertas'
-    | '/cms/destinos'
-    | '/cms/empresas'
     | '/cms/experience-builder'
     | '/cms/media'
     | '/cms/observabilidad'
     | '/cms/pagos'
-    | '/cms/productos'
-    | '/cms/zonas'
     | '/cuenta/actividad'
     | '/cuenta/carrito'
     | '/cuenta/concierge'
@@ -1146,8 +1143,12 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/admin/sistema'
     | '/cms/categorias'
+    | '/cms/destinos'
+    | '/cms/empresas'
+    | '/cms/productos'
     | '/cms/regiones'
     | '/cms/reviews'
+    | '/cms/zonas'
     | '/portal/empresas'
     | '/portal/invitaciones'
     | '/cms/categorias/$id/editar'
@@ -1199,14 +1200,10 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/turistas'
     | '/_authenticated/cms/actividad'
     | '/_authenticated/cms/alertas'
-    | '/_authenticated/cms/destinos'
-    | '/_authenticated/cms/empresas'
     | '/_authenticated/cms/experience-builder'
     | '/_authenticated/cms/media'
     | '/_authenticated/cms/observabilidad'
     | '/_authenticated/cms/pagos'
-    | '/_authenticated/cms/productos'
-    | '/_authenticated/cms/zonas'
     | '/_authenticated/cuenta/actividad'
     | '/_authenticated/cuenta/carrito'
     | '/_authenticated/cuenta/concierge'
@@ -1247,8 +1244,12 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/_authenticated/admin/sistema/'
     | '/_authenticated/cms/categorias/'
+    | '/_authenticated/cms/destinos/'
+    | '/_authenticated/cms/empresas/'
+    | '/_authenticated/cms/productos/'
     | '/_authenticated/cms/regiones/'
     | '/_authenticated/cms/reviews/'
+    | '/_authenticated/cms/zonas/'
     | '/_authenticated/portal/empresas/'
     | '/_authenticated/portal/invitaciones/'
     | '/_authenticated/cms/categorias/$id/editar'
@@ -1650,20 +1651,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCuentaActividadRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
-    '/_authenticated/cms/zonas': {
-      id: '/_authenticated/cms/zonas'
-      path: '/zonas'
-      fullPath: '/cms/zonas'
-      preLoaderRoute: typeof AuthenticatedCmsZonasRouteImport
-      parentRoute: typeof AuthenticatedCmsRoute
-    }
-    '/_authenticated/cms/productos': {
-      id: '/_authenticated/cms/productos'
-      path: '/productos'
-      fullPath: '/cms/productos'
-      preLoaderRoute: typeof AuthenticatedCmsProductosRouteImport
-      parentRoute: typeof AuthenticatedCmsRoute
-    }
     '/_authenticated/cms/pagos': {
       id: '/_authenticated/cms/pagos'
       path: '/pagos'
@@ -1690,20 +1677,6 @@ declare module '@tanstack/react-router' {
       path: '/experience-builder'
       fullPath: '/cms/experience-builder'
       preLoaderRoute: typeof AuthenticatedCmsExperienceBuilderRouteImport
-      parentRoute: typeof AuthenticatedCmsRoute
-    }
-    '/_authenticated/cms/empresas': {
-      id: '/_authenticated/cms/empresas'
-      path: '/empresas'
-      fullPath: '/cms/empresas'
-      preLoaderRoute: typeof AuthenticatedCmsEmpresasRouteImport
-      parentRoute: typeof AuthenticatedCmsRoute
-    }
-    '/_authenticated/cms/destinos': {
-      id: '/_authenticated/cms/destinos'
-      path: '/destinos'
-      fullPath: '/cms/destinos'
-      preLoaderRoute: typeof AuthenticatedCmsDestinosRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
     '/_authenticated/cms/alertas': {
@@ -1776,6 +1749,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalEmpresasIndexRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
+    '/_authenticated/cms/zonas/': {
+      id: '/_authenticated/cms/zonas/'
+      path: '/zonas'
+      fullPath: '/cms/zonas/'
+      preLoaderRoute: typeof AuthenticatedCmsZonasIndexRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/reviews/': {
       id: '/_authenticated/cms/reviews/'
       path: '/reviews'
@@ -1788,6 +1768,27 @@ declare module '@tanstack/react-router' {
       path: '/regiones'
       fullPath: '/cms/regiones/'
       preLoaderRoute: typeof AuthenticatedCmsRegionesIndexRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
+    '/_authenticated/cms/productos/': {
+      id: '/_authenticated/cms/productos/'
+      path: '/productos'
+      fullPath: '/cms/productos/'
+      preLoaderRoute: typeof AuthenticatedCmsProductosIndexRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
+    '/_authenticated/cms/empresas/': {
+      id: '/_authenticated/cms/empresas/'
+      path: '/empresas'
+      fullPath: '/cms/empresas/'
+      preLoaderRoute: typeof AuthenticatedCmsEmpresasIndexRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
+    '/_authenticated/cms/destinos/': {
+      id: '/_authenticated/cms/destinos/'
+      path: '/destinos'
+      fullPath: '/cms/destinos/'
+      preLoaderRoute: typeof AuthenticatedCmsDestinosIndexRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
     '/_authenticated/cms/categorias/': {
@@ -1869,10 +1870,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/cms/zonas/nueva': {
       id: '/_authenticated/cms/zonas/nueva'
-      path: '/nueva'
+      path: '/zonas/nueva'
       fullPath: '/cms/zonas/nueva'
       preLoaderRoute: typeof AuthenticatedCmsZonasNuevaRouteImport
-      parentRoute: typeof AuthenticatedCmsZonasRoute
+      parentRoute: typeof AuthenticatedCmsRoute
     }
     '/_authenticated/cms/regiones/nueva': {
       id: '/_authenticated/cms/regiones/nueva'
@@ -1883,10 +1884,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/cms/productos/nueva': {
       id: '/_authenticated/cms/productos/nueva'
-      path: '/nueva'
+      path: '/productos/nueva'
       fullPath: '/cms/productos/nueva'
       preLoaderRoute: typeof AuthenticatedCmsProductosNuevaRouteImport
-      parentRoute: typeof AuthenticatedCmsProductosRoute
+      parentRoute: typeof AuthenticatedCmsRoute
     }
     '/_authenticated/cms/experience-builder/pages': {
       id: '/_authenticated/cms/experience-builder/pages'
@@ -1897,17 +1898,17 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/cms/empresas/nueva': {
       id: '/_authenticated/cms/empresas/nueva'
-      path: '/nueva'
+      path: '/empresas/nueva'
       fullPath: '/cms/empresas/nueva'
       preLoaderRoute: typeof AuthenticatedCmsEmpresasNuevaRouteImport
-      parentRoute: typeof AuthenticatedCmsEmpresasRoute
+      parentRoute: typeof AuthenticatedCmsRoute
     }
     '/_authenticated/cms/destinos/nueva': {
       id: '/_authenticated/cms/destinos/nueva'
-      path: '/nueva'
+      path: '/destinos/nueva'
       fullPath: '/cms/destinos/nueva'
       preLoaderRoute: typeof AuthenticatedCmsDestinosNuevaRouteImport
-      parentRoute: typeof AuthenticatedCmsDestinosRoute
+      parentRoute: typeof AuthenticatedCmsRoute
     }
     '/_authenticated/cms/categorias/nueva': {
       id: '/_authenticated/cms/categorias/nueva'
@@ -1939,10 +1940,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/cms/zonas/$id/editar': {
       id: '/_authenticated/cms/zonas/$id/editar'
-      path: '/$id/editar'
+      path: '/zonas/$id/editar'
       fullPath: '/cms/zonas/$id/editar'
       preLoaderRoute: typeof AuthenticatedCmsZonasIdEditarRouteImport
-      parentRoute: typeof AuthenticatedCmsZonasRoute
+      parentRoute: typeof AuthenticatedCmsRoute
     }
     '/_authenticated/cms/reviews/$id/moderar': {
       id: '/_authenticated/cms/reviews/$id/moderar'
@@ -1960,24 +1961,24 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/cms/productos/$productId/editar': {
       id: '/_authenticated/cms/productos/$productId/editar'
-      path: '/$productId/editar'
+      path: '/productos/$productId/editar'
       fullPath: '/cms/productos/$productId/editar'
       preLoaderRoute: typeof AuthenticatedCmsProductosProductIdEditarRouteImport
-      parentRoute: typeof AuthenticatedCmsProductosRoute
+      parentRoute: typeof AuthenticatedCmsRoute
     }
     '/_authenticated/cms/empresas/$businessId/editar': {
       id: '/_authenticated/cms/empresas/$businessId/editar'
-      path: '/$businessId/editar'
+      path: '/empresas/$businessId/editar'
       fullPath: '/cms/empresas/$businessId/editar'
       preLoaderRoute: typeof AuthenticatedCmsEmpresasBusinessIdEditarRouteImport
-      parentRoute: typeof AuthenticatedCmsEmpresasRoute
+      parentRoute: typeof AuthenticatedCmsRoute
     }
     '/_authenticated/cms/destinos/$destinationId/editar': {
       id: '/_authenticated/cms/destinos/$destinationId/editar'
-      path: '/$destinationId/editar'
+      path: '/destinos/$destinationId/editar'
       fullPath: '/cms/destinos/$destinationId/editar'
       preLoaderRoute: typeof AuthenticatedCmsDestinosDestinationIdEditarRouteImport
-      parentRoute: typeof AuthenticatedCmsDestinosRoute
+      parentRoute: typeof AuthenticatedCmsRoute
     }
     '/_authenticated/cms/categorias/$id/editar': {
       id: '/_authenticated/cms/categorias/$id/editar'
@@ -2155,40 +2156,6 @@ const AuthenticatedPortalRouteRouteWithChildren =
     AuthenticatedPortalRouteRouteChildren,
   )
 
-interface AuthenticatedCmsDestinosRouteChildren {
-  AuthenticatedCmsDestinosNuevaRoute: typeof AuthenticatedCmsDestinosNuevaRoute
-  AuthenticatedCmsDestinosDestinationIdEditarRoute: typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
-}
-
-const AuthenticatedCmsDestinosRouteChildren: AuthenticatedCmsDestinosRouteChildren =
-  {
-    AuthenticatedCmsDestinosNuevaRoute: AuthenticatedCmsDestinosNuevaRoute,
-    AuthenticatedCmsDestinosDestinationIdEditarRoute:
-      AuthenticatedCmsDestinosDestinationIdEditarRoute,
-  }
-
-const AuthenticatedCmsDestinosRouteWithChildren =
-  AuthenticatedCmsDestinosRoute._addFileChildren(
-    AuthenticatedCmsDestinosRouteChildren,
-  )
-
-interface AuthenticatedCmsEmpresasRouteChildren {
-  AuthenticatedCmsEmpresasNuevaRoute: typeof AuthenticatedCmsEmpresasNuevaRoute
-  AuthenticatedCmsEmpresasBusinessIdEditarRoute: typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
-}
-
-const AuthenticatedCmsEmpresasRouteChildren: AuthenticatedCmsEmpresasRouteChildren =
-  {
-    AuthenticatedCmsEmpresasNuevaRoute: AuthenticatedCmsEmpresasNuevaRoute,
-    AuthenticatedCmsEmpresasBusinessIdEditarRoute:
-      AuthenticatedCmsEmpresasBusinessIdEditarRoute,
-  }
-
-const AuthenticatedCmsEmpresasRouteWithChildren =
-  AuthenticatedCmsEmpresasRoute._addFileChildren(
-    AuthenticatedCmsEmpresasRouteChildren,
-  )
-
 interface AuthenticatedCmsExperienceBuilderRouteChildren {
   AuthenticatedCmsExperienceBuilderPagesRoute: typeof AuthenticatedCmsExperienceBuilderPagesRoute
 }
@@ -2204,82 +2171,69 @@ const AuthenticatedCmsExperienceBuilderRouteWithChildren =
     AuthenticatedCmsExperienceBuilderRouteChildren,
   )
 
-interface AuthenticatedCmsProductosRouteChildren {
-  AuthenticatedCmsProductosNuevaRoute: typeof AuthenticatedCmsProductosNuevaRoute
-  AuthenticatedCmsProductosProductIdEditarRoute: typeof AuthenticatedCmsProductosProductIdEditarRoute
-}
-
-const AuthenticatedCmsProductosRouteChildren: AuthenticatedCmsProductosRouteChildren =
-  {
-    AuthenticatedCmsProductosNuevaRoute: AuthenticatedCmsProductosNuevaRoute,
-    AuthenticatedCmsProductosProductIdEditarRoute:
-      AuthenticatedCmsProductosProductIdEditarRoute,
-  }
-
-const AuthenticatedCmsProductosRouteWithChildren =
-  AuthenticatedCmsProductosRoute._addFileChildren(
-    AuthenticatedCmsProductosRouteChildren,
-  )
-
-interface AuthenticatedCmsZonasRouteChildren {
-  AuthenticatedCmsZonasNuevaRoute: typeof AuthenticatedCmsZonasNuevaRoute
-  AuthenticatedCmsZonasIdEditarRoute: typeof AuthenticatedCmsZonasIdEditarRoute
-}
-
-const AuthenticatedCmsZonasRouteChildren: AuthenticatedCmsZonasRouteChildren = {
-  AuthenticatedCmsZonasNuevaRoute: AuthenticatedCmsZonasNuevaRoute,
-  AuthenticatedCmsZonasIdEditarRoute: AuthenticatedCmsZonasIdEditarRoute,
-}
-
-const AuthenticatedCmsZonasRouteWithChildren =
-  AuthenticatedCmsZonasRoute._addFileChildren(
-    AuthenticatedCmsZonasRouteChildren,
-  )
-
 interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsActividadRoute: typeof AuthenticatedCmsActividadRoute
   AuthenticatedCmsAlertasRoute: typeof AuthenticatedCmsAlertasRoute
-  AuthenticatedCmsDestinosRoute: typeof AuthenticatedCmsDestinosRouteWithChildren
-  AuthenticatedCmsEmpresasRoute: typeof AuthenticatedCmsEmpresasRouteWithChildren
   AuthenticatedCmsExperienceBuilderRoute: typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
   AuthenticatedCmsObservabilidadRoute: typeof AuthenticatedCmsObservabilidadRoute
   AuthenticatedCmsPagosRoute: typeof AuthenticatedCmsPagosRoute
-  AuthenticatedCmsProductosRoute: typeof AuthenticatedCmsProductosRouteWithChildren
-  AuthenticatedCmsZonasRoute: typeof AuthenticatedCmsZonasRouteWithChildren
   AuthenticatedCmsIndexRoute: typeof AuthenticatedCmsIndexRoute
   AuthenticatedCmsCategoriasNuevaRoute: typeof AuthenticatedCmsCategoriasNuevaRoute
+  AuthenticatedCmsDestinosNuevaRoute: typeof AuthenticatedCmsDestinosNuevaRoute
+  AuthenticatedCmsEmpresasNuevaRoute: typeof AuthenticatedCmsEmpresasNuevaRoute
+  AuthenticatedCmsProductosNuevaRoute: typeof AuthenticatedCmsProductosNuevaRoute
   AuthenticatedCmsRegionesNuevaRoute: typeof AuthenticatedCmsRegionesNuevaRoute
+  AuthenticatedCmsZonasNuevaRoute: typeof AuthenticatedCmsZonasNuevaRoute
   AuthenticatedCmsCategoriasIndexRoute: typeof AuthenticatedCmsCategoriasIndexRoute
+  AuthenticatedCmsDestinosIndexRoute: typeof AuthenticatedCmsDestinosIndexRoute
+  AuthenticatedCmsEmpresasIndexRoute: typeof AuthenticatedCmsEmpresasIndexRoute
+  AuthenticatedCmsProductosIndexRoute: typeof AuthenticatedCmsProductosIndexRoute
   AuthenticatedCmsRegionesIndexRoute: typeof AuthenticatedCmsRegionesIndexRoute
   AuthenticatedCmsReviewsIndexRoute: typeof AuthenticatedCmsReviewsIndexRoute
+  AuthenticatedCmsZonasIndexRoute: typeof AuthenticatedCmsZonasIndexRoute
   AuthenticatedCmsCategoriasIdEditarRoute: typeof AuthenticatedCmsCategoriasIdEditarRoute
+  AuthenticatedCmsDestinosDestinationIdEditarRoute: typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
+  AuthenticatedCmsEmpresasBusinessIdEditarRoute: typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
+  AuthenticatedCmsProductosProductIdEditarRoute: typeof AuthenticatedCmsProductosProductIdEditarRoute
   AuthenticatedCmsRegionesIdEditarRoute: typeof AuthenticatedCmsRegionesIdEditarRoute
   AuthenticatedCmsReviewsIdModerarRoute: typeof AuthenticatedCmsReviewsIdModerarRoute
+  AuthenticatedCmsZonasIdEditarRoute: typeof AuthenticatedCmsZonasIdEditarRoute
 }
 
 const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsActividadRoute: AuthenticatedCmsActividadRoute,
   AuthenticatedCmsAlertasRoute: AuthenticatedCmsAlertasRoute,
-  AuthenticatedCmsDestinosRoute: AuthenticatedCmsDestinosRouteWithChildren,
-  AuthenticatedCmsEmpresasRoute: AuthenticatedCmsEmpresasRouteWithChildren,
   AuthenticatedCmsExperienceBuilderRoute:
     AuthenticatedCmsExperienceBuilderRouteWithChildren,
   AuthenticatedCmsMediaRoute: AuthenticatedCmsMediaRoute,
   AuthenticatedCmsObservabilidadRoute: AuthenticatedCmsObservabilidadRoute,
   AuthenticatedCmsPagosRoute: AuthenticatedCmsPagosRoute,
-  AuthenticatedCmsProductosRoute: AuthenticatedCmsProductosRouteWithChildren,
-  AuthenticatedCmsZonasRoute: AuthenticatedCmsZonasRouteWithChildren,
   AuthenticatedCmsIndexRoute: AuthenticatedCmsIndexRoute,
   AuthenticatedCmsCategoriasNuevaRoute: AuthenticatedCmsCategoriasNuevaRoute,
+  AuthenticatedCmsDestinosNuevaRoute: AuthenticatedCmsDestinosNuevaRoute,
+  AuthenticatedCmsEmpresasNuevaRoute: AuthenticatedCmsEmpresasNuevaRoute,
+  AuthenticatedCmsProductosNuevaRoute: AuthenticatedCmsProductosNuevaRoute,
   AuthenticatedCmsRegionesNuevaRoute: AuthenticatedCmsRegionesNuevaRoute,
+  AuthenticatedCmsZonasNuevaRoute: AuthenticatedCmsZonasNuevaRoute,
   AuthenticatedCmsCategoriasIndexRoute: AuthenticatedCmsCategoriasIndexRoute,
+  AuthenticatedCmsDestinosIndexRoute: AuthenticatedCmsDestinosIndexRoute,
+  AuthenticatedCmsEmpresasIndexRoute: AuthenticatedCmsEmpresasIndexRoute,
+  AuthenticatedCmsProductosIndexRoute: AuthenticatedCmsProductosIndexRoute,
   AuthenticatedCmsRegionesIndexRoute: AuthenticatedCmsRegionesIndexRoute,
   AuthenticatedCmsReviewsIndexRoute: AuthenticatedCmsReviewsIndexRoute,
+  AuthenticatedCmsZonasIndexRoute: AuthenticatedCmsZonasIndexRoute,
   AuthenticatedCmsCategoriasIdEditarRoute:
     AuthenticatedCmsCategoriasIdEditarRoute,
+  AuthenticatedCmsDestinosDestinationIdEditarRoute:
+    AuthenticatedCmsDestinosDestinationIdEditarRoute,
+  AuthenticatedCmsEmpresasBusinessIdEditarRoute:
+    AuthenticatedCmsEmpresasBusinessIdEditarRoute,
+  AuthenticatedCmsProductosProductIdEditarRoute:
+    AuthenticatedCmsProductosProductIdEditarRoute,
   AuthenticatedCmsRegionesIdEditarRoute: AuthenticatedCmsRegionesIdEditarRoute,
   AuthenticatedCmsReviewsIdModerarRoute: AuthenticatedCmsReviewsIdModerarRoute,
+  AuthenticatedCmsZonasIdEditarRoute: AuthenticatedCmsZonasIdEditarRoute,
 }
 
 const AuthenticatedCmsRouteWithChildren =

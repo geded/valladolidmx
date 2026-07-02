@@ -13,7 +13,7 @@ type Row = {
   updated_at: string;
 };
 
-export const Route = createFileRoute("/_authenticated/cms/productos")({
+export const Route = createFileRoute("/_authenticated/cms/productos/")({
   head: () => ({
     meta: [
       { title: "Productos · CMS Studio" },
