@@ -12,14 +12,14 @@ export function ArmaTuViajeSection({ config }: { config?: Record<string, unknown
   const body = typeof config?.body === "string" && config.body.trim() ? config.body : t("sections.ayv_sub");
   const ctaLabel = typeof config?.cta_label === "string" && config.cta_label.trim() ? config.cta_label : t("hero.cta_secondary");
   return (
-    <section id="arma-tu-viaje" className="@container py-20 md:py-28">
+    <section id="arma-tu-viaje" className="@container py-20 @3xl:py-28">
       <Container>
-        <div className="grid gap-8 @3xl:grid-cols-2 @3xl:items-center">
+        <div data-home-grid="arma-tu-viaje" className="grid grid-cols-1 gap-8 @3xl:grid-cols-2 @3xl:items-center">
           <div>
             <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">
               {t("nav.plan_trip")}
             </p>
-            <h2 className="text-balance text-3xl md:text-4xl">{heading}</h2>
+            <h2 className="text-balance text-3xl @3xl:text-4xl">{heading}</h2>
             <p className="mt-4 text-lg text-muted-foreground">{body}</p>
             <Link
               to="/arma-tu-viaje"

@@ -210,7 +210,7 @@ export function Hero({ config }: HeroProps = {}) {
 
   return (
     <section
-      className="relative isolate overflow-hidden text-white"
+      className="@container relative isolate overflow-hidden text-white"
       // Compensar la cabecera overlay (h-16) para que la foto arranque desde el top.
       style={{ marginTop: "-4rem" }}
     >
@@ -248,13 +248,13 @@ export function Hero({ config }: HeroProps = {}) {
           en la parte baja, como referencia Airbnb/Apple/Booking.
       */}
       <Container
-        className={`relative flex min-h-[100svh] flex-col justify-center gap-4 pb-10 pt-20 md:min-h-[100dvh] md:justify-end md:gap-0 md:pb-28 md:pt-40 ${textAlignClass}`}
+        className={`relative flex min-h-[100svh] flex-col justify-center gap-4 pb-10 pt-20 @3xl:min-h-[100dvh] @3xl:justify-end @3xl:gap-0 @3xl:pb-28 @3xl:pt-40 ${textAlignClass}`}
       >
         {eyebrow ? (
           <p
             data-eb-field="eyebrow"
             suppressHydrationWarning
-            className={`font-script text-[1.625rem] leading-tight text-white/95 drop-shadow-sm sm:text-3xl md:text-[2.5rem] ${textSelfClass}`}
+            className={`font-script text-[1.625rem] leading-tight text-white/95 drop-shadow-sm @2xl:text-3xl @3xl:text-[2.5rem] ${textSelfClass}`}
             style={eyebrowStyle}
           >
             {eyebrow}
@@ -264,7 +264,7 @@ export function Hero({ config }: HeroProps = {}) {
           <h1
             data-eb-field="title"
             suppressHydrationWarning
-            className={`max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:text-[2.75rem] sm:leading-[1.05] md:mt-3 md:text-[3.5rem] lg:text-[4rem] ${textSelfClass}`}
+            className={`max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] @2xl:text-[2.75rem] @2xl:leading-[1.05] @3xl:mt-3 @3xl:text-[3.5rem] @5xl:text-[4rem] ${textSelfClass}`}
             style={titleStyle}
           >
             {title}
@@ -274,7 +274,7 @@ export function Hero({ config }: HeroProps = {}) {
           <p
             data-eb-field="subtitle"
             suppressHydrationWarning
-            className={`max-w-2xl text-pretty text-base text-white/90 drop-shadow sm:text-lg md:mt-5 md:text-lg lg:text-xl ${textSelfClass}`}
+            className={`max-w-2xl text-pretty text-base text-white/90 drop-shadow @2xl:text-lg @3xl:mt-5 @3xl:text-lg @5xl:text-xl ${textSelfClass}`}
             style={subtitleStyle}
           >
             {subtitle}
@@ -282,7 +282,7 @@ export function Hero({ config }: HeroProps = {}) {
         ) : null}
 
         {showCtas && ctas.length > 0 ? (
-          <div className={`flex w-full flex-wrap items-center gap-3 md:mt-8 ${ctaAlignmentClass}`}>
+          <div className={`flex w-full flex-wrap items-center gap-3 @3xl:mt-8 ${ctaAlignmentClass}`}>
             {ctas.map((cta, i) => (
               <HeroButton key={i} cta={cta} isPrimary={i === 0} />
             ))}
@@ -291,7 +291,7 @@ export function Hero({ config }: HeroProps = {}) {
 
         {/* Buscador discreto (12C.1): secundario al mensaje inspirador. */}
         {showSearch ? (
-          <div className={`mt-4 flex w-full sm:mt-6 md:mt-10 ${searchJustifyClass}`}>
+          <div className={`mt-4 flex w-full @2xl:mt-6 @3xl:mt-10 ${searchJustifyClass}`}>
             <form
               role="search"
               aria-label={t("hero.search_aria")}
@@ -306,7 +306,7 @@ export function Hero({ config }: HeroProps = {}) {
                 aria-label={searchPlaceholder}
               />
               {searchHelper ? (
-                <span className="hidden text-[11px] text-white/60 lg:inline mr-2">{searchHelper}</span>
+                <span className="mr-2 hidden text-[11px] text-white/60 @5xl:inline">{searchHelper}</span>
               ) : null}
               <button
                 type="submit"

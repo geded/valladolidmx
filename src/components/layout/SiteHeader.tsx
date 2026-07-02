@@ -300,7 +300,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
     <>
       <header
         className={cn(
-          "sticky top-0 z-30 transition-colors duration-300",
+          "@container sticky top-0 z-30 transition-colors duration-300",
           isOverlay
             ? "border-b border-transparent bg-transparent"
             : "border-b border-border/70 bg-background/90 backdrop-blur shadow-[0_1px_0_color-mix(in_oklab,var(--color-foreground)_4%,transparent)]",
@@ -322,7 +322,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
             <BrandLogo tone={isOverlay ? "light" : "dark"} size="md" />
           </Link>
 
-          <nav aria-label="Principal" className="hidden lg:block">
+          <nav aria-label="Principal" className="hidden @5xl:block">
             <ul className="flex items-center gap-1">
               {nav.map((n) => (
                 <li key={n.href}>
@@ -375,7 +375,7 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
   }
   if (btn.kind === "user_menu") {
     return (
-      <div key={key} className="hidden sm:block">
+      <div key={key} data-header-button-kind={btn.kind} className="hidden @2xl:block">
         <UserMenu />
       </div>
     );
@@ -387,11 +387,12 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
         ref={menuButtonRef}
         type="button"
         className={cn(
-          "lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border transition-all active:scale-[0.98]",
+          "inline-flex h-9 w-9 items-center justify-center rounded-md border transition-all active:scale-[0.98] @5xl:hidden",
           isOverlay
             ? "border-white/30 bg-white/10 text-white"
             : "border-border bg-card text-foreground",
         )}
+        data-header-button-kind={btn.kind}
         aria-label={btn.label || "Menú"}
         aria-expanded={open}
         aria-controls="mobile-drawer"
@@ -416,11 +417,12 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
         : size === "lg"
           ? "px-4 py-2 text-sm gap-2"
           : "px-3 py-1.5 text-[13px] gap-1.5";
-  const hiddenOnMobile = btn.kind === "cta" ? "hidden sm:inline-flex" : "inline-flex";
+  const hiddenOnMobile = btn.kind === "cta" ? "hidden @2xl:inline-flex" : "inline-flex";
   return (
     <a
       key={key}
       href={href}
+      data-header-button-kind={btn.kind}
       className={cn(
         hiddenOnMobile,
         "items-center rounded-md font-medium tracking-tight transition-all active:scale-[0.98]",
