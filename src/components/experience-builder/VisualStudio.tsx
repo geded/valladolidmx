@@ -67,14 +67,124 @@ import {
   newNodeId,
   type CompositionNode,
   type CompositionTree,
+  type CompositionJsonObject,
 } from "@/lib/experience-builder/composition-tree";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { getBlock, listBlocks } from "@/lib/experience-builder/block-registry";
+import type { BlockContract } from "@/lib/experience-builder/block-contract";
 import { AutoInspector } from "@/components/experience-builder/AutoInspector";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
 import { useAuth } from "@/hooks/useAuth";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
+type ChromeArea = "header" | "footer";
+
+const HEADER_CHROME_ID = "__chrome_header";
+const FOOTER_CHROME_ID = "__chrome_footer";
+
+const DEFAULT_HEADER_CONFIG: CompositionJsonObject = {
+  nav: [
+    { label: "Destinos", href: "/oriente-maya" },
+    { label: "Experiencias", href: "/experiencias" },
+    { label: "Arma tu Viaje", href: "/arma-tu-viaje" },
+    { label: "Alux", href: "/alux" },
+    { label: "Empresas", href: "/empresas" },
+  ],
+  cta_label: "Arma tu Viaje",
+  cta_href: "/arma-tu-viaje",
+  show_language: true,
+  show_user_menu: true,
+};
+
+const DEFAULT_FOOTER_CONFIG: CompositionJsonObject = {
+  tagline: "Plataforma oficial del Oriente Maya de Yucatán.",
+  explore_links: [
+    { label: "Destinos", href: "/oriente-maya" },
+    { label: "Experiencias", href: "/experiencias" },
+    { label: "Hoteles", href: "/hoteles" },
+    { label: "Restaurantes", href: "/restaurantes" },
+    { label: "Eventos", href: "/eventos" },
+  ],
+  platform_links: [
+    { label: "Arma tu Viaje", href: "/arma-tu-viaje" },
+    { label: "Alux", href: "/alux" },
+    { label: "Empresas", href: "/empresas" },
+  ],
+  legal_label: "Aviso legal",
+  privacy_label: "Privacidad",
+  show_language: true,
+};
+
+const headerChromeContract: BlockContract = {
+  type: "vmx.chrome.header",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Encabezado",
+  description: "Navegación superior pública del sitio.",
+  schema: {
+    nav: {
+      type: "list",
+      label: "Menú principal",
+      item: {
+        type: "object",
+        label: "Enlace",
+        fields: {
+          label: { type: "text", label: "Texto", required: true },
+          href: { type: "url", label: "Enlace", required: true },
+        },
+      },
+    },
+    cta_label: { type: "text", label: "Botón destacado — texto" },
+    cta_href: { type: "url", label: "Botón destacado — enlace" },
+    show_language: { type: "boolean", label: "Mostrar idiomas", default: true },
+    show_user_menu: { type: "boolean", label: "Mostrar acceso de usuario", default: true },
+  },
+  capabilities: { soporta_preview: true, soporta_i18n: true },
+};
+
+const footerChromeContract: BlockContract = {
+  type: "vmx.chrome.footer",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Pie de página",
+  description: "Contenido inferior público del sitio.",
+  schema: {
+    tagline: { type: "text", label: "Descripción" },
+    explore_links: {
+      type: "list",
+      label: "Columna Explorar",
+      item: {
+        type: "object",
+        label: "Enlace",
+        fields: {
+          label: { type: "text", label: "Texto", required: true },
+          href: { type: "url", label: "Enlace", required: true },
+        },
+      },
+    },
+    platform_links: {
+      type: "list",
+      label: "Columna Plataforma",
+      item: {
+        type: "object",
+        label: "Enlace",
+        fields: {
+          label: { type: "text", label: "Texto", required: true },
+          href: { type: "url", label: "Enlace", required: true },
+        },
+      },
+    },
+    legal_label: { type: "text", label: "Texto legal" },
+    privacy_label: { type: "text", label: "Texto privacidad" },
+    show_language: { type: "boolean", label: "Mostrar idiomas", default: true },
+  },
+  capabilities: { soporta_preview: true, soporta_i18n: true },
+};
+
+function getChromeConfig(tree: CompositionTree, area: ChromeArea): CompositionJsonObject {
+  const defaults = area === "header" ? DEFAULT_HEADER_CONFIG : DEFAULT_FOOTER_CONFIG;
+  return { ...defaults, ...(tree.chrome?.[area] ?? {}) };
+}
 
 interface SitePage {
   key: string;
