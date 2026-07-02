@@ -30,8 +30,10 @@ import {
   Lock,
   Pencil,
   Plus,
+  Redo2,
   Search,
   Trash2,
+  Undo2,
   X,
 } from "lucide-react";
 import {
@@ -843,6 +845,48 @@ function PageVisualEditor({
   const [previewMode, setPreviewMode] = useState(false);
   const skipNextAutoSave = useRef(false);
   /**
+   * Historial visual (US-14). Guardamos snapshots del árbol en `pastRef`
+   * al aplicar cada mutación desde `commitTree`. `undo` / `redo` restauran
+   * sin disparar `commitTree` de nuevo (marcan `skipHistory`). El
+   * autoguardado sigue tal cual — cuando se restaura una versión, el
+   * `setTree` normal se dispara y persiste el estado al backend.
+   */
+  const pastRef = useRef<CompositionTree[]>([]);
+  const futureRef = useRef<CompositionTree[]>([]);
+  const HISTORY_LIMIT = 50;
+  const [historyTick, setHistoryTick] = useState(0);
+  const bumpHistory = () => setHistoryTick((n) => (n + 1) % 1_000_000);
+  const resetHistory = () => {
+    pastRef.current = [];
+    futureRef.current = [];
+    bumpHistory();
+  };
+  const commitTree = (next: CompositionTree) => {
+    if (tree) {
+      pastRef.current.push(tree);
+      if (pastRef.current.length > HISTORY_LIMIT) pastRef.current.shift();
+      futureRef.current = [];
+      bumpHistory();
+    }
+    setTree(next);
+  };
+  const canUndo = pastRef.current.length > 0;
+  const canRedo = futureRef.current.length > 0;
+  const undo = () => {
+    if (!tree || pastRef.current.length === 0) return;
+    const prev = pastRef.current.pop()!;
+    futureRef.current.push(tree);
+    bumpHistory();
+    setTree(prev);
+  };
+  const redo = () => {
+    if (!tree || futureRef.current.length === 0) return;
+    const next = futureRef.current.pop()!;
+    pastRef.current.push(tree);
+    bumpHistory();
+    setTree(next);
+  };
+  /**
    * Viewport del canvas (mobile-first, coherente con la doctrina del
    * proyecto: el turismo consume mayormente en celular). Persistido
    * por usuario en localStorage.
@@ -881,6 +925,7 @@ function PageVisualEditor({
         setPage(detail);
         skipNextAutoSave.current = true;
         setTree(detail.current_draft);
+        resetHistory();
       } catch (e) {
         if (!cancelled) setLoadError((e as Error).message);
       }
@@ -967,7 +1012,7 @@ function PageVisualEditor({
   const updateSelectedConfig = (nextConfig: Record<string, unknown>) => {
     if (!tree) return;
     if (selectedChrome === "header" || selectedChrome === "footer") {
-      setTree({
+      commitTree({
         ...tree,
         chrome: {
           ...(tree.chrome ?? {}),
@@ -977,7 +1022,7 @@ function PageVisualEditor({
       return;
     }
     if (selectedChrome === "seo") {
-      setTree({
+      commitTree({
         ...tree,
         chrome: {
           ...(tree.chrome ?? {}),
@@ -987,7 +1032,7 @@ function PageVisualEditor({
       return;
     }
     if (!selectedNode) return;
-    setTree(updateNodeConfig(tree, selectedNode.id, nextConfig));
+    commitTree(updateNodeConfig(tree, selectedNode.id, nextConfig));
   };
 
   const moveNode = (nodeId: string, dir: -1 | 1) => {
@@ -999,7 +1044,7 @@ function PageVisualEditor({
     const next = [...tree.root.children];
     const [item] = next.splice(idx, 1);
     next.splice(to, 0, item);
-    setTree({ ...tree, root: { children: next } });
+    commitTree({ ...tree, root: { children: next } });
   };
 
   const duplicateNode = (nodeId: string) => {
@@ -1010,14 +1055,14 @@ function PageVisualEditor({
     const idx = tree.root.children.findIndex((n) => n.id === nodeId);
     const next = [...tree.root.children];
     next.splice(idx + 1, 0, clone);
-    setTree({ ...tree, root: { children: next } });
+    commitTree({ ...tree, root: { children: next } });
     setSelectedId(clone.id);
   };
 
   const removeNodeById = (nodeId: string) => {
     if (!tree) return;
     const next = tree.root.children.filter((n) => n.id !== nodeId);
-    setTree({ ...tree, root: { children: next } });
+    commitTree({ ...tree, root: { children: next } });
     if (selectedId === nodeId) setSelectedId(null);
   };
 
@@ -1033,7 +1078,7 @@ function PageVisualEditor({
     const next = [...tree.root.children];
     const idx = atIndex ?? next.length;
     next.splice(idx, 0, node);
-    setTree({ ...tree, root: { children: next } });
+    commitTree({ ...tree, root: { children: next } });
     setSelectedId(node.id);
     setShowLibrary(false);
   };
@@ -1047,7 +1092,7 @@ function PageVisualEditor({
       config: JSON.parse(JSON.stringify(entry.config)) as CompositionNode["config"],
     };
     const next = [...tree.root.children, node];
-    setTree({ ...tree, root: { children: next } });
+    commitTree({ ...tree, root: { children: next } });
     setSelectedId(node.id);
     setShowLibrary(false);
   };
@@ -1069,6 +1114,7 @@ function PageVisualEditor({
     if (detail) {
       setPage(detail);
       setTree(detail.current_draft);
+      resetHistory();
       setSelectedId(null);
       setMessage(`Revisión #${rev.revision_number} restaurada como borrador.`);
     }
@@ -1084,8 +1130,37 @@ function PageVisualEditor({
     const newIdx = tree.root.children.findIndex((n) => n.id === e.over!.id);
     if (oldIdx < 0 || newIdx < 0) return;
     const next = arrayMove(tree.root.children, oldIdx, newIdx);
-    setTree({ ...tree, root: { children: next } });
+    commitTree({ ...tree, root: { children: next } });
   };
+
+  // Atajos de teclado: Cmd/Ctrl+Z para deshacer, Cmd/Ctrl+Shift+Z (o Ctrl+Y)
+  // para rehacer. Se ignora cuando el foco está en un input, textarea o
+  // elemento editable para no romper el undo nativo de los campos.
+  useEffect(() => {
+    const isEditable = (el: EventTarget | null) => {
+      if (!(el instanceof HTMLElement)) return false;
+      const tag = el.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+      if (el.isContentEditable) return true;
+      return false;
+    };
+    const onKey = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (!mod) return;
+      if (isEditable(e.target)) return;
+      const key = e.key.toLowerCase();
+      if (key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      } else if ((key === "z" && e.shiftKey) || key === "y") {
+        e.preventDefault();
+        redo();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tree]);
 
   if (loadError) return <FullScreenState title="No se pudo abrir el editor" detail={loadError} onExit={onExit} />;
   if (!page || !tree) return <FullScreenState title="Preparando el editor…" detail={`Cargando ${pageDef.title}.`} spinner onExit={onExit} />;
@@ -1109,6 +1184,28 @@ function PageVisualEditor({
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <SaveIndicator status={saveStatus} />
+          <div className="inline-flex items-center gap-0.5 rounded-md border border-border bg-background p-0.5" role="group" aria-label="Historial">
+            <button
+              type="button"
+              onClick={undo}
+              disabled={!canUndo}
+              title="Deshacer (⌘Z / Ctrl+Z)"
+              aria-label="Deshacer"
+              className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-40 disabled:hover:bg-transparent"
+            >
+              <Undo2 className="size-3.5" aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={redo}
+              disabled={!canRedo}
+              title="Rehacer (⇧⌘Z / Ctrl+Y)"
+              aria-label="Rehacer"
+              className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-40 disabled:hover:bg-transparent"
+            >
+              <Redo2 className="size-3.5" aria-hidden />
+            </button>
+          </div>
           <button
             type="button"
             onClick={() => setSelectedId(HEADER_CHROME_ID)}
