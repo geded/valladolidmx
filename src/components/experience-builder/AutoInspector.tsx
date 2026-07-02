@@ -7,7 +7,7 @@
 
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, ImageIcon, Languages, Plus, Trash2, Type, Upload } from "lucide-react";
+import { ChevronDown, ChevronUp, ImageIcon, Languages, Monitor, Plus, Smartphone, Tablet, Trash2, Type, Upload } from "lucide-react";
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { MediaPickerDialog } from "./MediaPickerDialog";
 import type {
@@ -80,6 +80,17 @@ export function AutoInspector({ contract, config, onChange, simple = false, acti
         ) : null}
         {simple ? null : <CapabilityChips contract={contract} />}
       </header>
+      <DeviceVisibilityRow
+        value={
+          Array.isArray(config.__hidden_on)
+            ? ((config.__hidden_on as unknown[]).filter(
+                (v): v is "mobile" | "tablet" | "desktop" =>
+                  v === "mobile" || v === "tablet" || v === "desktop",
+              ))
+            : []
+        }
+        onChange={(next) => onChange({ ...config, __hidden_on: next })}
+      />
       <div className="space-y-3">
         {Object.entries(contract.schema).map(([key, def]) => (
           <FieldRow
