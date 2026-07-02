@@ -374,6 +374,29 @@ function FieldInput(props: {
           onChange={(e) => onChange(e.target.value)}
           className={common}
         />
+      ) : field.type === "tags" ? (
+        <textarea
+          required={field.required}
+          rows={3}
+          value={value}
+          placeholder={field.placeholder ?? "Una entrada por línea"}
+          onChange={(e) => onChange(e.target.value)}
+          className={common}
+        />
+      ) : field.type === "select" ? (
+        <select
+          required={field.required}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={common}
+        >
+          <option value="">— sin seleccionar —</option>
+          {(field.options ?? []).map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
       ) : (
         <input
           required={field.required}
