@@ -321,10 +321,13 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
         eyebrow: node.config.eyebrow as string | undefined,
         title: node.config.title as string | undefined,
         subtitle: node.config.subtitle as string | undefined,
+        background_image: node.config.background_image as string | undefined,
+        background_position: node.config.background_position as string | undefined,
         cta_label: node.config.cta_label as string | undefined,
         cta_href: node.config.cta_href as string | undefined,
         cta_secondary_label: node.config.cta_secondary_label as string | undefined,
         cta_secondary_href: node.config.cta_secondary_href as string | undefined,
+        cta_alignment: node.config.cta_alignment as string | undefined,
       }}
     />
   ),
