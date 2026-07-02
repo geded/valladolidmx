@@ -18,17 +18,29 @@ const publishedHomeQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/")({
-  head: () =>
-    buildPublicHead({
-      title: `${SITE.name} — Despierta en Valladolid y descubre el Oriente Maya`,
-      description: SITE.default_description,
-      path: "/",
+  head: (ctx) => {
+    const loaderData = ctx.loaderData as { seo?: Record<string, unknown> | null } | undefined;
+    const seo = (loaderData?.seo ?? {}) as {
+      title?: string;
+      description?: string;
+      og_image?: string;
+      canonical?: string;
+      noindex?: boolean;
+    };
+    return buildPublicHead({
+      title: seo.title?.trim() || `${SITE.name} — Despierta en Valladolid y descubre el Oriente Maya`,
+      description: seo.description?.trim() || SITE.default_description,
+      path: seo.canonical?.trim() || "/",
       ogType: "website",
-    }),
+      ogImage: seo.og_image?.trim() || undefined,
+      noindex: Boolean(seo.noindex),
+    });
+  },
   loader: async ({ context }) => {
     // Prefetch para SSR; nunca lanza — getPublishedHomeComposition cae a null
     // ante cualquier error, garantizando que la Home siempre cargue.
-    await context.queryClient.ensureQueryData(publishedHomeQuery);
+    const published = await context.queryClient.ensureQueryData(publishedHomeQuery);
+    return { seo: published?.snapshot?.chrome?.seo ?? null };
   },
   component: HomePage,
 });

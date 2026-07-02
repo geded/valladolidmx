@@ -46,6 +46,7 @@ export interface CompositionTree {
   chrome?: {
     header?: CompositionJsonObject;
     footer?: CompositionJsonObject;
+    seo?: CompositionJsonObject;
   };
 }
 

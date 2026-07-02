@@ -81,6 +81,31 @@ type ChromeArea = "header" | "footer";
 
 const HEADER_CHROME_ID = "__chrome_header";
 const FOOTER_CHROME_ID = "__chrome_footer";
+const SEO_CHROME_ID = "__chrome_seo";
+
+const DEFAULT_SEO_CONFIG: CompositionJsonObject = {
+  title: "",
+  description: "",
+  og_image: "",
+  canonical: "",
+  noindex: false,
+};
+
+const seoChromeContract: BlockContract = {
+  type: "vmx.chrome.seo",
+  category: "static",
+  version: "1.0.0",
+  display_name: "SEO de la página",
+  description: "Metadatos para buscadores y redes sociales (title, description, imagen de compartir).",
+  schema: {
+    title: { type: "text", label: "Título (title)", description: "Ideal: 50–60 caracteres." },
+    description: { type: "rich_text", label: "Descripción (meta description)", description: "Ideal: 140–160 caracteres." },
+    og_image: { type: "media", label: "Imagen de compartir (og:image)", accepts: ["image/*"] },
+    canonical: { type: "url", label: "URL canónica" },
+    noindex: { type: "boolean", label: "Ocultar de buscadores (noindex)", default: false },
+  },
+  capabilities: { soporta_seo: true },
+};
 
 const DEFAULT_HEADER_CONFIG: CompositionJsonObject = {
   nav: [
@@ -184,6 +209,10 @@ const footerChromeContract: BlockContract = {
 function getChromeConfig(tree: CompositionTree, area: ChromeArea): CompositionJsonObject {
   const defaults = area === "header" ? DEFAULT_HEADER_CONFIG : DEFAULT_FOOTER_CONFIG;
   return { ...defaults, ...(tree.chrome?.[area] ?? {}) };
+}
+
+function getSeoConfig(tree: CompositionTree): CompositionJsonObject {
+  return { ...DEFAULT_SEO_CONFIG, ...(tree.chrome?.seo ?? {}) };
 }
 
 interface SitePage {
@@ -412,11 +441,19 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
     () => (tree && selectedId ? tree.root.children.find((n) => n.id === selectedId) ?? null : null),
     [tree, selectedId],
   );
-  const selectedChrome = selectedId === HEADER_CHROME_ID ? "header" : selectedId === FOOTER_CHROME_ID ? "footer" : null;
+  const selectedChrome: ChromeArea | "seo" | null =
+    selectedId === HEADER_CHROME_ID
+      ? "header"
+      : selectedId === FOOTER_CHROME_ID
+      ? "footer"
+      : selectedId === SEO_CHROME_ID
+      ? "seo"
+      : null;
   const selectedContract = useMemo(
     () => {
       if (selectedChrome === "header") return headerChromeContract;
       if (selectedChrome === "footer") return footerChromeContract;
+      if (selectedChrome === "seo") return seoChromeContract;
       return selectedNode ? getBlock(selectedNode.type) ?? null : null;
     },
     [selectedChrome, selectedNode],
@@ -424,7 +461,8 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
   const selectedConfig = useMemo(
     () => {
       if (!tree) return null;
-      if (selectedChrome) return getChromeConfig(tree, selectedChrome);
+      if (selectedChrome === "header" || selectedChrome === "footer") return getChromeConfig(tree, selectedChrome);
+      if (selectedChrome === "seo") return getSeoConfig(tree);
       return selectedNode?.config as Record<string, unknown> | null;
     },
     [selectedChrome, selectedNode, tree],
@@ -449,12 +487,22 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
 
   const updateSelectedConfig = (nextConfig: Record<string, unknown>) => {
     if (!tree) return;
-    if (selectedChrome) {
+    if (selectedChrome === "header" || selectedChrome === "footer") {
       setTree({
         ...tree,
         chrome: {
           ...(tree.chrome ?? {}),
           [selectedChrome]: nextConfig as CompositionJsonObject,
+        },
+      });
+      return;
+    }
+    if (selectedChrome === "seo") {
+      setTree({
+        ...tree,
+        chrome: {
+          ...(tree.chrome ?? {}),
+          seo: nextConfig as CompositionJsonObject,
         },
       });
       return;
@@ -594,6 +642,13 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
             className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
           >
             Editar pie
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedId(SEO_CHROME_ID)}
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
+          >
+            Editar SEO
           </button>
           <button
             type="button"
