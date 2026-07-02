@@ -148,6 +148,7 @@ function FieldRow({
   const [showTypo, setShowTypo] = useState(false);
   const typo = typography ?? {};
   const typoActive = hasTypography(typo);
+  const displayedValue = fieldValueWithDefault(def, value);
   return (
     <div className="space-y-1">
       <label className="flex items-center gap-2 text-xs font-medium">
@@ -178,7 +179,7 @@ function FieldRow({
           </button>
         ) : null}
       </label>
-      <FieldControl def={def} value={value} onChange={onChange} simple={simple} />
+      <FieldControl def={def} value={displayedValue} onChange={onChange} simple={simple} />
       {def.description ? (
         <p className="text-[10px] text-muted-foreground">{def.description}</p>
       ) : null}
@@ -192,7 +193,7 @@ function FieldRow({
       ) : null}
       {canTranslate && showI18n ? (
         <TranslationsEditor
-          baseValue={typeof value === "string" ? value : ""}
+          baseValue={typeof displayedValue === "string" ? displayedValue : ""}
           translations={translations ?? {}}
           rich={def.type === "rich_text"}
           onChange={(lang, next) => onTranslationChange?.(lang, next)}
@@ -200,6 +201,10 @@ function FieldRow({
       ) : null}
     </div>
   );
+}
+
+function fieldValueWithDefault(def: BlockFieldSchema, value: unknown): unknown {
+  return value === undefined || value === null ? def.default : value;
 }
 
 function TypographyEditor({
@@ -494,12 +499,10 @@ function FieldControl({
   def, value, onChange, simple,
 }: { def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void; simple?: boolean }) {
   const base = "w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-primary/30";
-  const valueOrDefault = (v: unknown) =>
-    v === undefined || v === null ? def.default : v;
   switch (def.type) {
     case "text":
     case "url": {
-      const v = (valueOrDefault(value) as string) ?? "";
+      const v = (value as string) ?? "";
       return (
         <div className="flex items-center gap-1">
           <input className={base} type={def.type === "url" ? "url" : "text"} value={v} onChange={(e) => onChange(e.target.value)} />
@@ -508,7 +511,7 @@ function FieldControl({
       );
     }
     case "rich_text": {
-      const v = (valueOrDefault(value) as string) ?? "";
+      const v = (value as string) ?? "";
       return (
         <div className="space-y-1">
           <textarea className={`${base} min-h-[80px]`} value={v} onChange={(e) => onChange(e.target.value)} />
