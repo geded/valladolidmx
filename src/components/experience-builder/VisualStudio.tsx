@@ -343,7 +343,7 @@ function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
 
 /* --------------------------------------------------------------------- */
 
-function HomeVisualEditor({ onExit }: { onExit: () => void }) {
+function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; advanced?: boolean }) {
   const list = useServerFn(listCompositions);
   const get = useServerFn(getComposition);
   const create = useServerFn(createComposition);
