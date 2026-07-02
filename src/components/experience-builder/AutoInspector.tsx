@@ -836,7 +836,7 @@ function PrimitiveListControl({
               {isMedia ? (
                 <MediaControl
                   baseClass={baseClass}
-                  def={def.item ?? { type: "media" }}
+                  def={(def.item ?? { type: "media", label: def.label }) as BlockFieldSchema}
                   value={item}
                   onChange={(v) => setItem(index, v)}
                 />
