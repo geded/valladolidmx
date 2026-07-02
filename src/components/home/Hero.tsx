@@ -29,10 +29,13 @@ export interface HeroConfig {
   eyebrow?: string;
   title?: string;
   subtitle?: string;
+  background_image?: string;
+  background_position?: string;
   cta_label?: string;
   cta_href?: string;
   cta_secondary_label?: string;
   cta_secondary_href?: string;
+  cta_alignment?: string;
 }
 
 export interface HeroProps {
@@ -61,6 +64,15 @@ export function Hero({ config }: HeroProps = {}) {
   const ctaPrimaryHref = config?.cta_href?.trim() || "/oriente-maya";
   const ctaSecondaryLabel = config?.cta_secondary_label?.trim() || t("hero.cta_secondary");
   const ctaSecondaryHref = config?.cta_secondary_href?.trim() || "/arma-tu-viaje";
+  const customBackground = config?.background_image?.trim();
+  const backgroundPosition = config?.background_position?.trim() || "center";
+  const ctaAlignment = config?.cta_alignment?.trim() || "left";
+  const ctaAlignmentClass =
+    ctaAlignment === "center"
+      ? "justify-center"
+      : ctaAlignment === "right"
+        ? "justify-end"
+        : "justify-start";
 
   return (
     <section
@@ -70,20 +82,34 @@ export function Hero({ config }: HeroProps = {}) {
     >
       {/* Carrusel cinematográfico con las fotografías oficiales del Hero. */}
       <div data-hero-media aria-hidden className="absolute inset-0 -z-20 h-full w-full overflow-hidden bg-foreground">
-        {HERO_SLIDES.map((src, i) => (
+        {customBackground ? (
           <img
-            key={src}
-            src={src}
+            src={customBackground}
             alt=""
             aria-hidden
-            className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-[2000ms] ease-in-out ${
-              i === index ? "opacity-100" : "opacity-0"
-            }`}
-            loading={i === 0 ? "eager" : "lazy"}
-            fetchPriority={i === 0 ? "high" : "auto"}
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: backgroundPosition }}
+            loading="eager"
+            fetchPriority="high"
             decoding="async"
           />
-        ))}
+        ) : (
+          HERO_SLIDES.map((src, i) => (
+            <img
+              key={src}
+              src={src}
+              alt=""
+              aria-hidden
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
+                i === index ? "opacity-100" : "opacity-0"
+              }`}
+              style={{ objectPosition: backgroundPosition }}
+              loading={i === 0 ? "eager" : "lazy"}
+              fetchPriority={i === 0 ? "high" : "auto"}
+              decoding="async"
+            />
+          ))
+        )}
       </div>
       {/* Degradado editorial para legibilidad sin enturbiar la foto. */}
       <div
@@ -113,7 +139,7 @@ export function Hero({ config }: HeroProps = {}) {
           {subtitle}
         </p>
 
-        <div className="flex flex-wrap items-center gap-3 md:mt-8">
+        <div className={`flex flex-wrap items-center gap-3 md:mt-8 ${ctaAlignmentClass}`}>
           <a
             href={ctaPrimaryHref}
             className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-black/5 transition hover:scale-[1.02] hover:opacity-95 sm:px-6 sm:py-3"
