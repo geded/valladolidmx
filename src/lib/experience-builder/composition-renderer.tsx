@@ -317,22 +317,51 @@ const wrap = (Component: (props?: { config?: Record<string, unknown> }) => React
 );
 
 const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
-  "vmx.hero": ({ node }) => (
-    <Hero
-      config={{
-        eyebrow: node.config.eyebrow as string | undefined,
-        title: node.config.title as string | undefined,
-        subtitle: node.config.subtitle as string | undefined,
-        background_image: node.config.background_image as string | undefined,
-        background_position: node.config.background_position as string | undefined,
-        cta_label: node.config.cta_label as string | undefined,
-        cta_href: node.config.cta_href as string | undefined,
-        cta_secondary_label: node.config.cta_secondary_label as string | undefined,
-        cta_secondary_href: node.config.cta_secondary_href as string | undefined,
-        cta_alignment: node.config.cta_alignment as string | undefined,
-      }}
-    />
-  ),
+  "vmx.hero": ({ node }) => {
+    // Normaliza background_images (lista de {src} → string[]).
+    const rawImages = node.config.background_images;
+    const background_images = Array.isArray(rawImages)
+      ? (rawImages as Array<{ src?: string } | string>)
+          .map((it) => (typeof it === "string" ? it : (it?.src ?? "")))
+          .map((s) => (s ?? "").trim())
+          .filter(Boolean)
+      : undefined;
+    // Normaliza ctas (lista de {label,href,variant}).
+    const rawCtas = node.config.ctas;
+    const ctas = Array.isArray(rawCtas)
+      ? (rawCtas as Array<Record<string, unknown>>).map((c) => ({
+          label: typeof c?.label === "string" ? c.label : undefined,
+          href: typeof c?.href === "string" ? c.href : undefined,
+          variant: typeof c?.variant === "string" ? c.variant : undefined,
+        }))
+      : undefined;
+    return (
+      <Hero
+        config={{
+          eyebrow: node.config.eyebrow as string | undefined,
+          title: node.config.title as string | undefined,
+          subtitle: node.config.subtitle as string | undefined,
+          background_image: node.config.background_image as string | undefined,
+          background_images,
+          slide_interval_seconds:
+            typeof node.config.slide_interval_seconds === "number"
+              ? node.config.slide_interval_seconds
+              : undefined,
+          background_position: node.config.background_position as string | undefined,
+          ctas,
+          cta_label: node.config.cta_label as string | undefined,
+          cta_href: node.config.cta_href as string | undefined,
+          cta_secondary_label: node.config.cta_secondary_label as string | undefined,
+          cta_secondary_href: node.config.cta_secondary_href as string | undefined,
+          cta_alignment: node.config.cta_alignment as string | undefined,
+          show_search:
+            typeof node.config.show_search === "boolean"
+              ? (node.config.show_search as boolean)
+              : undefined,
+        }}
+      />
+    );
+  },
   "vmx.section.destinos": wrap(DestinosSection),
   "vmx.section.categorias": wrap(CategoriasSection),
   "vmx.section.rutas": wrap(RutasSection),
