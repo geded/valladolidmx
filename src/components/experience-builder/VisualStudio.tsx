@@ -728,6 +728,7 @@ function HomeCanvas({
   previewMode,
   selectedId,
   onSelect,
+  onSelectChrome,
   onDelete,
   onDuplicate,
   onMove,
@@ -736,6 +737,7 @@ function HomeCanvas({
   previewMode: boolean;
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onSelectChrome: (area: ChromeArea) => void;
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
   onMove: (id: string, dir: -1 | 1) => void;
@@ -788,8 +790,8 @@ function HomeCanvas({
             transformOrigin: "top left",
           }}
         >
-          <InertChrome label="Encabezado global · no editable aún">
-            <PublicHeader variant="overlay" />
+          <InertChrome label="Encabezado" selected={selectedId === HEADER_CHROME_ID} onSelect={() => onSelectChrome("header")}>
+            <PublicHeader variant="overlay" config={getChromeConfig(tree, "header")} />
           </InertChrome>
           <CompositionRenderer
             tree={tree}
@@ -813,8 +815,8 @@ function HomeCanvas({
                   )
             }
           />
-          <InertChrome label="Pie de página global · no editable aún">
-            <PublicFooter />
+          <InertChrome label="Pie de página" selected={selectedId === FOOTER_CHROME_ID} onSelect={() => onSelectChrome("footer")}>
+            <PublicFooter config={getChromeConfig(tree, "footer")} />
           </InertChrome>
         </div>
       </div>
@@ -824,26 +826,48 @@ function HomeCanvas({
 
 /* --------------------------------------------------------------------- */
 
-function InertChrome({ label, children }: { label: string; children: React.ReactNode }) {
+function InertChrome({
+  label, selected, onSelect, children,
+}: { label: string; selected: boolean; onSelect: () => void; children: React.ReactNode }) {
   return (
-    <div className="relative">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={(event) => {
+        event.stopPropagation();
+        onSelect();
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSelect();
+        }
+      }}
+      className={`group relative cursor-pointer outline-none ring-inset ${selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"}`}
+      aria-label={`Editar ${label}`}
+    >
       <div className="pointer-events-none select-none opacity-90" aria-hidden>
         {children}
       </div>
-      <div className="pointer-events-none absolute inset-0 ring-1 ring-dashed ring-border/60" />
-      <span className="pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-muted px-2.5 py-1 text-[10px] font-medium text-muted-foreground shadow">
+      <span className={`pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-lg transition-opacity ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
         {label}
       </span>
     </div>
   );
 }
 
-function ChromeItem({ label, note }: { label: string; note: string }) {
+function ChromeItem({
+  label, note, selected, onSelect,
+}: { label: string; note: string; selected: boolean; onSelect: () => void }) {
   return (
-    <div className="mb-2 rounded-md border border-dashed border-border bg-muted/30 px-3 py-2">
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`mb-2 w-full rounded-md border px-3 py-2 text-left transition-colors ${selected ? "border-primary bg-primary/10" : "border-dashed border-border bg-muted/30 hover:bg-accent"}`}
+    >
       <p className="text-[11px] font-semibold text-foreground">{label}</p>
       <p className="text-[10px] text-muted-foreground">{note}</p>
-    </div>
+    </button>
   );
 }
 
