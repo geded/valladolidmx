@@ -116,6 +116,59 @@ export function AutoInspector({ contract, config, onChange, simple = false, acti
   );
 }
 
+type DeviceKey = "mobile" | "tablet" | "desktop";
+
+function DeviceVisibilityRow({
+  value,
+  onChange,
+}: {
+  value: DeviceKey[];
+  onChange: (next: DeviceKey[]) => void;
+}) {
+  const items: Array<{ id: DeviceKey; label: string; Icon: typeof Smartphone }> = [
+    { id: "mobile", label: "Móvil", Icon: Smartphone },
+    { id: "tablet", label: "Tablet", Icon: Tablet },
+    { id: "desktop", label: "Desktop", Icon: Monitor },
+  ];
+  const toggle = (id: DeviceKey) => {
+    const hidden = value.includes(id);
+    const next = hidden ? value.filter((v) => v !== id) : [...value, id];
+    onChange(next);
+  };
+  return (
+    <div className="rounded-md border border-border bg-muted/30 p-2">
+      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+        Visibilidad por dispositivo
+      </p>
+      <div className="flex items-center gap-1">
+        {items.map(({ id, label, Icon }) => {
+          const visible = !value.includes(id);
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => toggle(id)}
+              aria-pressed={visible}
+              title={visible ? `Visible en ${label}` : `Oculto en ${label}`}
+              className={`inline-flex flex-1 items-center justify-center gap-1 rounded-md border px-2 py-1 text-[10px] font-medium transition ${
+                visible
+                  ? "border-primary/40 bg-primary/10 text-primary"
+                  : "border-border bg-background text-muted-foreground line-through"
+              }`}
+            >
+              <Icon className="size-3" aria-hidden />
+              {label}
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-1 text-[10px] text-muted-foreground">
+        Toca para ocultar este bloque en un dispositivo.
+      </p>
+    </div>
+  );
+}
+
 function CapabilityChips({ contract }: { contract: BlockContract }) {
   const caps = contract.capabilities ?? {};
   const bp = contract.responsive?.breakpoints ?? [];
