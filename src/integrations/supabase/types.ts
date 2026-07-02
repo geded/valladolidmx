@@ -898,6 +898,38 @@ export type Database = {
           },
         ]
       }
+      composition_preview_tokens: {
+        Row: {
+          composition_id: string
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          token: string
+        }
+        Insert: {
+          composition_id: string
+          created_at?: string
+          created_by?: string | null
+          expires_at: string
+          token: string
+        }
+        Update: {
+          composition_id?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "composition_preview_tokens_composition_id_fkey"
+            columns: ["composition_id"]
+            isOneToOne: false
+            referencedRelation: "page_compositions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       concierge_assignments: {
         Row: {
           assigned_at: string

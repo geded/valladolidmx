@@ -217,3 +217,77 @@ export const unpublishComposition = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/* Shareable draft previews (US-16) ------------------------------------- */
+
+export interface CompositionPreviewLink {
+  token: string;
+  expires_at: string;
+}
+
+/**
+ * Emite un token temporal para compartir el borrador actual de una
+ * composición como vista previa pública (sin publicar). El token queda
+ * asociado a la composición; al resolverlo se lee el `current_draft`
+ * más reciente, así el enlace se mantiene "vivo" mientras el editor
+ * sigue trabajando.
+ */
+export const issueCompositionPreviewLink = createServerFn({ method: "POST" })
+  .inputValidator((data: { composition_id: string; ttl_minutes?: number }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<CompositionPreviewLink> => {
+    const ttl = Math.max(5, Math.min(60 * 24 * 7, data.ttl_minutes ?? 60 * 24)); // 5min..7d, default 24h
+    const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "").slice(0, 8);
+    const expires_at = new Date(Date.now() + ttl * 60_000).toISOString();
+    const { error } = await context.supabase.from("composition_preview_tokens").insert({
+      token,
+      composition_id: data.composition_id,
+      created_by: context.userId,
+      expires_at,
+    });
+    if (error) throw new Error(error.message);
+    return { token, expires_at };
+  });
+
+export interface CompositionPreviewPayload {
+  tree: CompositionTree;
+  title: string;
+  page_type: string;
+  slug: string;
+  expires_at: string;
+}
+
+/**
+ * Resuelve un token público. No requiere autenticación: usa el cliente
+ * admin para bypass RLS pero valida el token y la caducidad antes de
+ * devolver el árbol.
+ */
+export const resolveCompositionPreview = createServerFn({ method: "GET" })
+  .inputValidator((data: { token: string }) => data)
+  .handler(async ({ data }): Promise<CompositionPreviewPayload | null> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: tok, error: tokErr } = await supabaseAdmin
+      .from("composition_preview_tokens")
+      .select("composition_id, expires_at")
+      .eq("token", data.token)
+      .maybeSingle();
+    if (tokErr) throw new Error(tokErr.message);
+    if (!tok) return null;
+    if (new Date(tok.expires_at).getTime() < Date.now()) return null;
+
+    const { data: comp, error: compErr } = await supabaseAdmin
+      .from("page_compositions")
+      .select("current_draft, title, page_type, slug")
+      .eq("id", tok.composition_id)
+      .maybeSingle();
+    if (compErr) throw new Error(compErr.message);
+    if (!comp) return null;
+
+    return {
+      tree: (comp.current_draft as unknown as CompositionTree) ?? EMPTY_TREE,
+      title: comp.title,
+      page_type: comp.page_type,
+      slug: comp.slug,
+      expires_at: tok.expires_at,
+    };
+  });

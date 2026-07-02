@@ -32,6 +32,7 @@ import {
   Plus,
   Redo2,
   Search,
+  Share2,
   Trash2,
   Undo2,
   X,
@@ -62,6 +63,7 @@ import {
   publishComposition,
   listCompositionRevisions,
   restoreCompositionRevision,
+  issueCompositionPreviewLink,
   type CompositionDetail,
   type CompositionRevisionSummary,
 } from "@/lib/experience-builder/studio.functions";
@@ -828,6 +830,7 @@ function PageVisualEditor({
   const publish = useServerFn(publishComposition);
   const listRevs = useServerFn(listCompositionRevisions);
   const restore = useServerFn(restoreCompositionRevision);
+  const issuePreview = useServerFn(issueCompositionPreviewLink);
   const queryClient = useQueryClient();
   const { roles } = useAuth();
   const canPublish = roles.includes("admin") || roles.includes("super_admin");
@@ -843,6 +846,8 @@ function PageVisualEditor({
   const [showVersions, setShowVersions] = useState(false);
   const [versions, setVersions] = useState<CompositionRevisionSummary[]>([]);
   const [previewMode, setPreviewMode] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [shareLink, setShareLink] = useState<{ url: string; expires_at: string } | null>(null);
   const skipNextAutoSave = useRef(false);
   /**
    * Historial visual (US-14). Guardamos snapshots del árbol en `pastRef`
@@ -1133,6 +1138,28 @@ function PageVisualEditor({
     commitTree({ ...tree, root: { children: next } });
   };
 
+  const shareDraftPreview = async () => {
+    if (!page || sharing) return;
+    setSharing(true);
+    try {
+      const { token, expires_at } = await issuePreview({
+        data: { composition_id: page.id, ttl_minutes: 60 * 24 },
+      });
+      const url = `${window.location.origin}/preview/composition/${token}`;
+      setShareLink({ url, expires_at });
+      try {
+        await navigator.clipboard.writeText(url);
+        setMessage("Enlace de vista previa copiado al portapapeles.");
+      } catch {
+        setMessage("Enlace de vista previa generado.");
+      }
+    } catch (e) {
+      setMessage(`No se pudo generar el enlace: ${(e as Error).message}`);
+    } finally {
+      setSharing(false);
+    }
+  };
+
   // Atajos de teclado: Cmd/Ctrl+Z para deshacer, Cmd/Ctrl+Shift+Z (o Ctrl+Y)
   // para rehacer. Se ignora cuando el foco está en un input, textarea o
   // elemento editable para no romper el undo nativo de los campos.
@@ -1258,6 +1285,20 @@ function PageVisualEditor({
             Ver en el sitio
             <ExternalLink className="size-3.5" aria-hidden />
           </a>
+          <button
+            type="button"
+            onClick={() => void shareDraftPreview()}
+            disabled={sharing}
+            title="Genera un enlace temporal para compartir el borrador actual sin publicarlo"
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-60"
+          >
+            {sharing ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden />
+            ) : (
+              <Share2 className="size-3.5" aria-hidden />
+            )}
+            Compartir vista previa
+          </button>
           {canPublish ? (
             <button
               type="button"
@@ -1419,6 +1460,87 @@ function PageVisualEditor({
         {showVersions ? (
           <VersionsDrawer versions={versions} onClose={() => setShowVersions(false)} onRestore={doRollback} />
         ) : null}
+        {shareLink ? (
+          <SharePreviewModal
+            url={shareLink.url}
+            expiresAt={shareLink.expires_at}
+            onClose={() => setShareLink(null)}
+          />
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function SharePreviewModal({
+  url,
+  expiresAt,
+  onClose,
+}: {
+  url: string;
+  expiresAt: string;
+  onClose: () => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  const expiresLabel = new Date(expiresAt).toLocaleString();
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* ignore */
+    }
+  };
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-label="Compartir vista previa">
+      <div className="w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-xl">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Vista previa compartible</p>
+            <h2 className="text-base font-semibold">Enlace generado</h2>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label="Cerrar">
+            <X className="size-4" aria-hidden />
+          </button>
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Cualquiera con este enlace puede ver el borrador actual sin publicarlo. Caduca el {expiresLabel}.
+        </p>
+        <div className="mt-4 flex items-center gap-2 rounded-md border border-border bg-background p-2">
+          <input
+            type="text"
+            readOnly
+            value={url}
+            className="min-w-0 flex-1 bg-transparent px-1 text-xs text-foreground outline-none"
+            onFocus={(e) => e.target.select()}
+          />
+          <button
+            type="button"
+            onClick={() => void copy()}
+            className="inline-flex items-center gap-1 rounded bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground hover:opacity-95"
+          >
+            {copied ? <Check className="size-3.5" aria-hidden /> : <Copy className="size-3.5" aria-hidden />}
+            {copied ? "Copiado" : "Copiar"}
+          </button>
+        </div>
+        <div className="mt-4 flex justify-end gap-2">
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
+          >
+            Abrir <ExternalLink className="size-3.5" aria-hidden />
+          </a>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-95"
+          >
+            Listo
+          </button>
+        </div>
       </div>
     </div>
   );
