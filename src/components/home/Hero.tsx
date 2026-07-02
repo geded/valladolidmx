@@ -225,6 +225,7 @@ export function Hero({ config }: HeroProps = {}) {
       >
         {eyebrow ? (
           <p
+            data-eb-field="eyebrow"
             suppressHydrationWarning
             className={`font-script text-[1.625rem] leading-tight text-white/95 drop-shadow-sm sm:text-3xl md:text-[2.5rem] ${textSelfClass}`}
             style={eyebrowStyle}
@@ -234,6 +235,7 @@ export function Hero({ config }: HeroProps = {}) {
         ) : null}
         {title ? (
           <h1
+            data-eb-field="title"
             suppressHydrationWarning
             className={`max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:text-[2.75rem] sm:leading-[1.05] md:mt-3 md:text-[3.5rem] lg:text-[4rem] ${textSelfClass}`}
             style={titleStyle}
@@ -243,6 +245,7 @@ export function Hero({ config }: HeroProps = {}) {
         ) : null}
         {subtitle ? (
           <p
+            data-eb-field="subtitle"
             suppressHydrationWarning
             className={`max-w-2xl text-pretty text-base text-white/90 drop-shadow sm:text-lg md:mt-5 md:text-lg lg:text-xl ${textSelfClass}`}
             style={subtitleStyle}

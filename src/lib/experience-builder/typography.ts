@@ -19,6 +19,59 @@ export interface FieldTypography {
   align?: string;          // left|center|right|justify
   italic?: boolean;
   uppercase?: boolean;
+  /**
+   * Overrides responsive (mobile-first).
+   *  - Los campos "planos" de arriba aplican como BASE (móvil / todos los
+   *    breakpoints por defecto).
+   *  - `md` aplica desde ≥768px (tablet).
+   *  - `lg` aplica desde ≥1024px (desktop).
+   * Un breakpoint vacío hereda del anterior.
+   */
+  md?: Omit<FieldTypography, "md" | "lg" | "align">;
+  lg?: Omit<FieldTypography, "md" | "lg" | "align">;
+}
+
+/** Breakpoints soportados por el editor visual. */
+export type TypographyBreakpoint = "base" | "md" | "lg";
+
+export const TYPOGRAPHY_BREAKPOINTS: Array<{
+  key: TypographyBreakpoint;
+  label: string;
+  minWidthPx: number | null;
+}> = [
+  { key: "base", label: "Móvil", minWidthPx: null },
+  { key: "md", label: "Tablet", minWidthPx: 768 },
+  { key: "lg", label: "Desktop", minWidthPx: 1024 },
+];
+
+/** Devuelve el sub-objeto tipográfico de un breakpoint (sin anidados). */
+export function getBreakpointTypography(
+  t: FieldTypography | undefined,
+  bp: TypographyBreakpoint,
+): FieldTypography {
+  if (!t) return {};
+  if (bp === "base") {
+    // Copia superficial excluyendo md/lg.
+    const { md: _m, lg: _l, ...base } = t;
+    void _m; void _l;
+    return base;
+  }
+  return (t[bp] as FieldTypography | undefined) ?? {};
+}
+
+/** Escribe/actualiza los valores de un breakpoint concreto sin tocar los demás. */
+export function setBreakpointTypography(
+  current: FieldTypography | undefined,
+  bp: TypographyBreakpoint,
+  next: FieldTypography,
+): FieldTypography {
+  const cur = current ?? {};
+  if (bp === "base") {
+    // Preservar md/lg del actual.
+    const { md, lg } = cur;
+    return { ...next, md, lg };
+  }
+  return { ...cur, [bp]: next };
 }
 
 export const TYPO_FAMILIES: Array<{ value: string; label: string; css?: string }> = [
@@ -61,8 +114,19 @@ export function typographyToStyle(t: FieldTypography): CSSProperties {
   return s;
 }
 
+function hasFlatTypography(t: Partial<FieldTypography> | undefined): boolean {
+  if (!t) return false;
+  return Object.entries(t).some(([k, v]) => {
+    if (k === "md" || k === "lg") return false;
+    return v !== undefined && v !== "" && v !== 0 && v !== false;
+  });
+}
+
 export function hasTypography(t: FieldTypography): boolean {
-  return Object.values(t).some((v) => v !== undefined && v !== "" && v !== 0 && v !== false);
+  if (hasFlatTypography(t)) return true;
+  if (hasFlatTypography(t.md)) return true;
+  if (hasFlatTypography(t.lg)) return true;
+  return false;
 }
 
 /**
@@ -184,8 +248,12 @@ export function familyLabel(key?: string): string {
  */
 export const BLOCK_FIELD_SELECTORS: Record<string, Record<string, string>> = {
   "vmx.hero": {
-    // Hero ya aplica per-field inline en su componente. Se mantiene el
-    // mapa vacío para no duplicar reglas.
+    // Hero también aplica per-field inline (base) para SSR sin flicker.
+    // Los selectores aquí sirven para override responsive (md/lg) vía
+    // CSS con !important, que gana sobre inline dentro de @media.
+    eyebrow: '[data-eb-field="eyebrow"]',
+    title: '[data-eb-field="title"]',
+    subtitle: '[data-eb-field="subtitle"]',
   },
   "vmx.layout.section": {
     heading: "h2",
@@ -207,7 +275,7 @@ export const BLOCK_FIELD_SELECTORS: Record<string, Record<string, string>> = {
   "vmx.chrome.footer":          { tagline: "p:first-of-type", legal_label: "small, .legal", privacy_label: ".privacy" },
 };
 
-function cssProps(t: FieldTypography): string {
+function cssProps(t: Partial<FieldTypography>): string {
   const lines: string[] = [];
   const fam = TYPO_FAMILIES.find((o) => o.value === t.font_family)?.css;
   if (fam) lines.push(`font-family:${fam};`);
@@ -224,7 +292,8 @@ function cssProps(t: FieldTypography): string {
 
 /**
  * Genera reglas CSS `[data-eb-typo="scopeId"] <selector> { … }` a partir de
- * los overrides tipográficos de un nodo. Devuelve "" si no hay reglas.
+ * los overrides tipográficos de un nodo, incluyendo variantes responsive
+ * (`md` ≥768px y `lg` ≥1024px). Devuelve "" si no hay reglas.
  */
 export function buildScopedTypographyCss(
   scopeId: string,
@@ -233,15 +302,36 @@ export function buildScopedTypographyCss(
 ): string {
   const map = BLOCK_FIELD_SELECTORS[blockType];
   if (!map) return "";
-  const parts: string[] = [];
+
+  const bang = (decls: string): string =>
+    decls.replace(/;$/g, "").split(";").map((d) => (d ? `${d} !important` : d)).join(";") + ";";
+
+  const baseRules: string[] = [];
+  const mdRules: string[] = [];
+  const lgRules: string[] = [];
+
   for (const [field, typo] of Object.entries(overrides)) {
     const sel = map[field];
-    if (!sel || !typo || !hasTypography(typo)) continue;
-    const decls = cssProps(typo);
-    if (!decls) continue;
-    // `!important` para vencer utilidades de Tailwind del componente.
-    const withBang = decls.replace(/;$/g, "").split(";").map((d) => (d ? `${d} !important` : d)).join(";") + ";";
-    parts.push(`[data-eb-typo="${scopeId}"] ${sel}{${withBang}}`);
+    if (!sel || !typo) continue;
+    const base = getBreakpointTypography(typo, "base");
+    if (hasFlatTypography(base)) {
+      const decls = cssProps(base);
+      if (decls) baseRules.push(`[data-eb-typo="${scopeId}"] ${sel}{${bang(decls)}}`);
+    }
+    const md = typo.md;
+    if (hasFlatTypography(md)) {
+      const decls = cssProps(md!);
+      if (decls) mdRules.push(`[data-eb-typo="${scopeId}"] ${sel}{${bang(decls)}}`);
+    }
+    const lg = typo.lg;
+    if (hasFlatTypography(lg)) {
+      const decls = cssProps(lg!);
+      if (decls) lgRules.push(`[data-eb-typo="${scopeId}"] ${sel}{${bang(decls)}}`);
+    }
   }
-  return parts.join("");
+
+  let out = baseRules.join("");
+  if (mdRules.length) out += `@media (min-width:768px){${mdRules.join("")}}`;
+  if (lgRules.length) out += `@media (min-width:1024px){${lgRules.join("")}}`;
+  return out;
 }

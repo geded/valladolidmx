@@ -19,6 +19,10 @@ import {
   familyLabel,
   getTypographyDefaults,
   hasTypography,
+  getBreakpointTypography,
+  setBreakpointTypography,
+  TYPOGRAPHY_BREAKPOINTS,
+  type TypographyBreakpoint,
   type FieldTypography,
 } from "@/lib/experience-builder/typography";
 
@@ -188,13 +192,37 @@ function FieldRow({
 function TypographyEditor({
   value, defaults, onChange,
 }: { value: FieldTypography; defaults?: FieldTypography; onChange: (next: FieldTypography) => void }) {
+  const [bp, setBp] = useState<TypographyBreakpoint>("base");
+  const active = getBreakpointTypography(value, bp);
+  const base = getBreakpointTypography(value, "base");
   const set = <K extends keyof FieldTypography>(k: K, v: FieldTypography[K]) => {
-    const next = { ...value, [k]: v };
-    onChange(next);
+    const nextForBp = { ...active, [k]: v } as FieldTypography;
+    onChange(setBreakpointTypography(value, bp, nextForBp));
+  };
+  const clearBp = () => {
+    if (bp === "base") {
+      // Preserva md/lg al restablecer base.
+      onChange(setBreakpointTypography(value, "base", {}));
+    } else {
+      const clone = { ...value };
+      delete clone[bp];
+      onChange(clone);
+    }
   };
   const d = defaults ?? {};
-  const eff = <K extends keyof FieldTypography>(k: K): FieldTypography[K] =>
-    (value[k] !== undefined && value[k] !== "" ? value[k] : d[k]) as FieldTypography[K];
+  // "Efectivo": lo definido para este breakpoint, o herencia (base para md/lg),
+  // o default del bloque.
+  const eff = <K extends keyof FieldTypography>(k: K): FieldTypography[K] => {
+    const hereRaw = active[k];
+    if (hereRaw !== undefined && hereRaw !== "") return hereRaw as FieldTypography[K];
+    if (bp !== "base") {
+      const inherited = base[k];
+      if (inherited !== undefined && inherited !== "") return inherited as FieldTypography[K];
+    }
+    return d[k] as FieldTypography[K];
+  };
+  const isOverridden = <K extends keyof FieldTypography>(k: K): boolean =>
+    active[k] !== undefined && active[k] !== "";
   const inp = "w-full rounded-md border border-border bg-background px-2 py-1 text-xs";
   return (
     <div className="mt-1 space-y-2 rounded-md border border-primary/30 bg-primary/5 p-2">
@@ -204,12 +232,46 @@ function TypographyEditor({
         </p>
         <button
           type="button"
-          onClick={() => onChange({})}
+          onClick={clearBp}
           className="text-[10px] font-medium text-muted-foreground hover:text-destructive"
         >
-          Restablecer
+          Restablecer {bp === "base" ? "móvil" : bp === "md" ? "tablet" : "desktop"}
         </button>
       </div>
+      <div className="flex items-center gap-1 rounded-md border border-border bg-background p-0.5">
+        {TYPOGRAPHY_BREAKPOINTS.map((b) => {
+          const bpVals = getBreakpointTypography(value, b.key);
+          const filled = Object.values(bpVals).some(
+            (v) => v !== undefined && v !== "" && v !== false,
+          );
+          return (
+            <button
+              key={b.key}
+              type="button"
+              onClick={() => setBp(b.key)}
+              className={`flex-1 rounded px-2 py-1 text-[10px] font-medium transition ${
+                bp === b.key
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+              }`}
+              title={
+                b.minWidthPx
+                  ? `${b.label} (≥${b.minWidthPx}px)`
+                  : `${b.label} (base, aplica a todos)`
+              }
+            >
+              {b.label} {filled ? "•" : ""}
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-[10px] text-muted-foreground">
+        {bp === "base"
+          ? "Base móvil — se aplica a todos los tamaños salvo que definas tablet o desktop."
+          : bp === "md"
+            ? "Tablet ≥768px — hereda de móvil los campos que dejes en blanco."
+            : "Desktop ≥1024px — hereda de móvil los campos que dejes en blanco."}
+      </p>
       {defaults ? (
         <div className="space-y-1 rounded-md border border-border bg-background/70 p-2">
           <div className="flex items-center justify-between">
@@ -218,7 +280,7 @@ function TypographyEditor({
             </p>
             <button
               type="button"
-              onClick={() => onChange({ ...d })}
+              onClick={() => onChange(setBreakpointTypography(value, bp, { ...d }))}
               className="text-[10px] font-medium text-primary hover:underline"
             >
               Usar valores actuales
@@ -243,7 +305,9 @@ function TypographyEditor({
       ) : null}
       <div className="grid grid-cols-2 gap-2">
         <label className="col-span-2 space-y-1">
-          <span className="text-[10px] text-muted-foreground">Fuente</span>
+          <span className="text-[10px] text-muted-foreground">
+            Fuente {isOverridden("font_family") ? "•" : ""}
+          </span>
           <select
             className={inp}
             value={eff("font_family") ?? ""}
@@ -255,22 +319,26 @@ function TypographyEditor({
           </select>
         </label>
         <label className="space-y-1">
-          <span className="text-[10px] text-muted-foreground">Tamaño (px)</span>
+          <span className="text-[10px] text-muted-foreground">
+            Tamaño (px) {isOverridden("font_size") ? "•" : ""}
+          </span>
           <input
             type="number"
             min={8}
             max={200}
             className={inp}
-            value={eff("font_size") ?? ""}
-            placeholder={d.font_size ? String(d.font_size) : ""}
+            value={active.font_size ?? ""}
+            placeholder={eff("font_size") ? String(eff("font_size")) : ""}
             onChange={(e) => set("font_size", e.target.value === "" ? undefined : Number(e.target.value))}
           />
         </label>
         <label className="space-y-1">
-          <span className="text-[10px] text-muted-foreground">Peso</span>
+          <span className="text-[10px] text-muted-foreground">
+            Peso {isOverridden("font_weight") ? "•" : ""}
+          </span>
           <select
             className={inp}
-            value={eff("font_weight") ?? ""}
+            value={active.font_weight ?? ""}
             onChange={(e) => set("font_weight", e.target.value === "" ? undefined : Number(e.target.value))}
           >
             <option value="">Por defecto</option>
@@ -284,30 +352,36 @@ function TypographyEditor({
           </select>
         </label>
         <label className="space-y-1">
-          <span className="text-[10px] text-muted-foreground">Interlínea</span>
+          <span className="text-[10px] text-muted-foreground">
+            Interlínea {isOverridden("line_height") ? "•" : ""}
+          </span>
           <input
             type="number"
             step="0.05"
             min={0.8}
             max={3}
             className={inp}
-            value={eff("line_height") ?? ""}
-            placeholder={d.line_height ? String(d.line_height) : ""}
+            value={active.line_height ?? ""}
+            placeholder={eff("line_height") ? String(eff("line_height")) : ""}
             onChange={(e) => set("line_height", e.target.value === "" ? undefined : Number(e.target.value))}
           />
         </label>
         <label className="space-y-1">
-          <span className="text-[10px] text-muted-foreground">Espaciado (px)</span>
+          <span className="text-[10px] text-muted-foreground">
+            Espaciado (px) {isOverridden("letter_spacing") ? "•" : ""}
+          </span>
           <input
             type="number"
             step="0.1"
             className={inp}
-            value={eff("letter_spacing") ?? ""}
+            value={active.letter_spacing ?? ""}
             onChange={(e) => set("letter_spacing", e.target.value === "" ? undefined : Number(e.target.value))}
           />
         </label>
         <label className="space-y-1">
-          <span className="text-[10px] text-muted-foreground">Color</span>
+          <span className="text-[10px] text-muted-foreground">
+            Color {isOverridden("color") ? "•" : ""}
+          </span>
           <input
             type="color"
             className="h-7 w-full cursor-pointer rounded border border-border bg-background"
