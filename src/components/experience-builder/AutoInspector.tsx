@@ -494,10 +494,12 @@ function FieldControl({
   def, value, onChange, simple,
 }: { def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void; simple?: boolean }) {
   const base = "w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-primary/30";
+  const valueOrDefault = (v: unknown) =>
+    v === undefined || v === null ? def.default : v;
   switch (def.type) {
     case "text":
     case "url": {
-      const v = (value as string) ?? "";
+      const v = (valueOrDefault(value) as string) ?? "";
       return (
         <div className="flex items-center gap-1">
           <input className={base} type={def.type === "url" ? "url" : "text"} value={v} onChange={(e) => onChange(e.target.value)} />
@@ -506,7 +508,7 @@ function FieldControl({
       );
     }
     case "rich_text": {
-      const v = (value as string) ?? "";
+      const v = (valueOrDefault(value) as string) ?? "";
       return (
         <div className="space-y-1">
           <textarea className={`${base} min-h-[80px]`} value={v} onChange={(e) => onChange(e.target.value)} />
