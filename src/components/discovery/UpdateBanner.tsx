@@ -51,7 +51,7 @@ export function UpdateBanner() {
           setApplying(true);
           void applyPendingUpdate();
         }}
-        className="inline-flex items-center justify-center rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground hover:opacity-95 disabled:opacity-60"
+        className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1 text-xs font-medium text-primary-foreground transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-60"
       >
         {applying ? "Actualizando…" : "Actualizar ahora"}
       </button>

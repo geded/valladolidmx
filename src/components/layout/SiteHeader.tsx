@@ -262,7 +262,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Cerrar menú"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-foreground transition-all active:scale-[0.98]"
               >
                 <X className="size-4" />
               </button>
@@ -281,7 +281,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
               <a
                 href={ctaHref}
                 onClick={() => setOpen(false)}
-                className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-[0.95rem] font-semibold text-primary-foreground"
+                className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
               >
                 <Compass className="size-4" aria-hidden />
                 {ctaLabel}
@@ -329,7 +329,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
                   <a
                     href={n.href}
                     className={cn(
-                      "rounded-full px-3 py-1.5 text-sm font-medium transition",
+                      "rounded-md px-3 py-1.5 text-sm font-medium transition-all active:scale-[0.98]",
                       isOverlay
                         ? "text-white/90 hover:bg-white/15 hover:text-white"
                         : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground",

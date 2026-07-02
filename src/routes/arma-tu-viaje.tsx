@@ -51,7 +51,7 @@ function AYVPage() {
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Link
             to="/oriente-maya"
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-5 py-2 text-sm font-semibold hover:bg-accent"
+            className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-4 py-2 text-[13px] font-medium transition-all hover:bg-accent active:scale-[0.98]"
           >
             Explorar destinos
           </Link>
