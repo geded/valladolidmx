@@ -162,10 +162,32 @@ const heroBlock: BlockContract = {
     title: { type: "text", label: "Título", required: true, translatable: true },
     subtitle: { type: "text", label: "Subtítulo", translatable: true },
     background_image: { type: "media", label: "Imagen de fondo", accepts: ["image/*"] },
+    background_position: {
+      type: "select",
+      label: "Posición de la imagen",
+      default: "center",
+      options: [
+        { value: "center", label: "Centro" },
+        { value: "top", label: "Arriba" },
+        { value: "bottom", label: "Abajo" },
+        { value: "left", label: "Izquierda" },
+        { value: "right", label: "Derecha" },
+      ],
+    },
     cta_label: { type: "text", label: "Botón principal — texto", translatable: true },
     cta_href: { type: "url", label: "Botón principal — enlace" },
     cta_secondary_label: { type: "text", label: "Botón secundario — texto", translatable: true },
     cta_secondary_href: { type: "url", label: "Botón secundario — enlace" },
+    cta_alignment: {
+      type: "select",
+      label: "Posición de botones",
+      default: "left",
+      options: [
+        { value: "left", label: "Izquierda" },
+        { value: "center", label: "Centro" },
+        { value: "right", label: "Derecha" },
+      ],
+    },
   },
   capabilities: {
     soporta_i18n: true,
@@ -175,7 +197,7 @@ const heroBlock: BlockContract = {
     soporta_cache: true,
   },
   constraints: { surfaces: ["home", "landing"], unique_per_page: true },
-  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["background_image"] },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["background_image", "background_position", "cta_alignment"] },
   i18n: {
     translatable_fields: ["eyebrow", "title", "subtitle", "cta_label", "cta_secondary_label"],
     fallback: "base_language",
