@@ -584,6 +584,101 @@ const actionsButtonsBlock: BlockContract = {
 };
 
 /* ------------------------------------------------------------------ *
+ * Bloques avanzados (Modo Profesional) — HTML embebido y Formulario.
+ * ------------------------------------------------------------------ */
+
+const customHtmlBlock: BlockContract = {
+  type: "vmx.custom.html",
+  category: "static",
+  version: "1.0.0",
+  display_name: "HTML / Código embebido",
+  description:
+    "Bloque avanzado: inserta HTML crudo (embeds, scripts de terceros, widgets).",
+  schema: {
+    html: {
+      type: "rich_text",
+      label: "HTML",
+      description:
+        "Se renderiza tal cual. Sólo pega código de fuentes en las que confíes.",
+      default: "<p>Escribe o pega tu HTML aquí.</p>",
+    },
+    max_width: {
+      type: "select",
+      label: "Ancho",
+      default: "container",
+      options: [
+        { value: "container", label: "Contenedor" },
+        { value: "full", label: "Ancho completo" },
+      ],
+    },
+  },
+  capabilities: { soporta_preview: true },
+  constraints: {
+    surfaces: ["home", "landing", "institutional", "destination", "business", "product"],
+  },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const customFormBlock: BlockContract = {
+  type: "vmx.custom.form",
+  category: "smart",
+  version: "1.0.0",
+  display_name: "Formulario",
+  description:
+    "Formulario configurable. Envía los datos a un webhook (Zapier, Make, correo…).",
+  schema: {
+    heading: { type: "text", label: "Título", default: "Contáctanos" },
+    subheading: { type: "text", label: "Subtítulo", default: "" },
+    submit_label: { type: "text", label: "Texto del botón", default: "Enviar" },
+    success_message: {
+      type: "text",
+      label: "Mensaje de éxito",
+      default: "¡Gracias! Recibimos tu mensaje.",
+    },
+    webhook_url: {
+      type: "url",
+      label: "URL de webhook (opcional)",
+      description:
+        "Recibe los datos por POST JSON. Déjalo vacío para sólo mostrar el mensaje de éxito.",
+    },
+    fields: {
+      type: "list",
+      label: "Campos",
+      default: [
+        { key: "name", label: "Nombre", type: "text", required: true },
+        { key: "email", label: "Email", type: "email", required: true },
+        { key: "message", label: "Mensaje", type: "textarea", required: false },
+      ],
+      item: {
+        type: "object",
+        label: "Campo",
+        fields: {
+          key: { type: "text", label: "Nombre técnico", required: true },
+          label: { type: "text", label: "Etiqueta visible", required: true },
+          type: {
+            type: "select",
+            label: "Tipo",
+            default: "text",
+            options: [
+              { value: "text", label: "Texto" },
+              { value: "email", label: "Email" },
+              { value: "tel", label: "Teléfono" },
+              { value: "textarea", label: "Área de texto" },
+            ],
+          },
+          required: { type: "boolean", label: "Obligatorio", default: false },
+        },
+      },
+    },
+  },
+  capabilities: { soporta_preview: true, soporta_i18n: true },
+  constraints: {
+    surfaces: ["home", "landing", "institutional", "destination", "business", "product"],
+  },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+/* ------------------------------------------------------------------ *
  * Registro
  * ------------------------------------------------------------------ */
 
@@ -612,6 +707,8 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   cockpitActivityStreamBlock,
   // Corrección US-01 (15.10.4d)
   actionsButtonsBlock,
+  customHtmlBlock,
+  customFormBlock,
 ];
 
 let bootstrapped = false;

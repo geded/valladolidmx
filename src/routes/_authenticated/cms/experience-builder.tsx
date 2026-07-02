@@ -146,11 +146,11 @@ function ExperienceBuilderShell() {
           </button>
         </div>
       </div>
-      {mode === "visual" ? (
-        <VisualStudio page={page} onSelectPage={setPage} />
-      ) : (
-        <ProfessionalStudio />
-      )}
+      <VisualStudio
+        page={page}
+        onSelectPage={setPage}
+        advanced={mode === "professional" && canAdvanced}
+      />
     </div>
   );
 }
