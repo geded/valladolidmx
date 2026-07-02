@@ -621,19 +621,15 @@ function FieldControl({
       if (def.item?.type === "object" && def.item.fields) {
         return <StructuredListControl def={def} value={value} onChange={onChange} simple={simple} />;
       }
-      return (
-        <textarea className={`${base} min-h-[80px] font-mono text-[10px]`}
-          value={value ? JSON.stringify(value, null, 2) : ""}
-          onChange={(e) => { try { onChange(e.target.value ? JSON.parse(e.target.value) : undefined); } catch { /* json inválido */ } }} />
-      );
+      return <PrimitiveListControl def={def} value={value} onChange={onChange} baseClass={base} />;
     case "object":
       if (def.fields) {
         return <ObjectControl def={def} value={value} onChange={onChange} simple={simple} />;
       }
       return (
-        <textarea className={`${base} min-h-[80px] font-mono text-[10px]`}
-          value={value ? JSON.stringify(value, null, 2) : ""}
-          onChange={(e) => { try { onChange(e.target.value ? JSON.parse(e.target.value) : undefined); } catch { /* json inválido */ } }} />
+        <p className="rounded-md border border-dashed border-border bg-muted/30 p-2 text-[11px] text-muted-foreground">
+          Este objeto no tiene campos configurables desde el editor visual.
+        </p>
       );
     default:
       return <p className="text-[10px] text-muted-foreground">Tipo no soportado.</p>;
