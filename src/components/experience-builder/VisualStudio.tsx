@@ -1392,6 +1392,14 @@ function PageVisualEditor({
           onDelete={removeNodeById}
           onDuplicate={duplicateNode}
           onMove={moveNode}
+          onReorderRoot={(activeId, overId) => {
+            if (!tree) return;
+            const oldIdx = tree.root.children.findIndex((n) => n.id === activeId);
+            const newIdx = tree.root.children.findIndex((n) => n.id === overId);
+            if (oldIdx < 0 || newIdx < 0) return;
+            const next = arrayMove(tree.root.children, oldIdx, newIdx);
+            commitTree({ ...tree, root: { children: next } });
+          }}
         />
 
         {!previewMode && selectedContract && selectedConfig ? (
