@@ -24,7 +24,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={t("common.language")}
-        className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent"
+        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-[13px] font-medium text-foreground hover:bg-accent transition-all active:scale-[0.98]"
       >
         <Globe className="size-4" aria-hidden />
         <span className="uppercase">{locale}</span>
