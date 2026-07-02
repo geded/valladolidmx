@@ -109,7 +109,7 @@ export async function translateTreeBestEffort(
   const system =
     "Eres un traductor profesional para una plataforma turística mexicana. Traduce cada campo del idioma base al idioma destino conservando estrictamente: mayúsculas iniciales, puntuación final, saltos de línea, emojis y nombres propios sin traducir (Valladolid, Oriente Maya, Yucatán, Alux, México, Chichén Itzá, Cenote). Longitud similar al original (±20%). Sin comentarios ni comillas adicionales. Devuelve exclusivamente JSON válido con la forma: {\"results\":[{\"id\":<n>,\"translations\":{\"<locale>\":{\"<path>\":\"<texto>\"}}}]}.";
   const prompt =
-    `Idioma base: ${base}. Idiomas destino: ${localeUnion.join(", ")}\.\n\n` +
+    `Idioma base: ${base}. Idiomas destino: ${localeUnion.join(", ")}.\n\n` +
     `Entradas (id → fields por dot.path):\n\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\``;
 
   let raw = "";
