@@ -645,6 +645,13 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
           </button>
           <button
             type="button"
+            onClick={() => setSelectedId(SEO_CHROME_ID)}
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
+          >
+            Editar SEO
+          </button>
+          <button
+            type="button"
             onClick={() => setPreviewMode((v) => !v)}
             className={`inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-accent ${previewMode ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-foreground"}`}
           >
