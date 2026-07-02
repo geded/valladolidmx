@@ -172,3 +172,73 @@ export function familyLabel(key?: string): string {
   if (!key) return "Por defecto";
   return TYPO_FAMILIES.find((o) => o.value === key)?.label ?? key;
 }
+
+/**
+ * Mapa por tipo de bloque: campo del schema → selector CSS que debe recibir
+ * los estilos tipográficos cuando el usuario define overrides.
+ * El renderer inserta un <style> con reglas atadas a un data-attribute único
+ * del nodo para que no se filtren entre bloques.
+ */
+export const BLOCK_FIELD_SELECTORS: Record<string, Record<string, string>> = {
+  "vmx.hero": {
+    // Hero ya aplica per-field inline en su componente. Se mantiene el
+    // mapa vacío para no duplicar reglas.
+  },
+  "vmx.layout.section": {
+    heading: "h2",
+    subheading: "header p",
+  },
+  "vmx.section.destinos":       { heading: "h2" },
+  "vmx.section.categorias":     { heading: "h2" },
+  "vmx.section.rutas":          { heading: "h2" },
+  "vmx.section.consejo-alux":   { heading: "h2" },
+  "vmx.section.en-vivo":        { heading: "h2" },
+  "vmx.section.empresas":       { heading: "h2" },
+  "vmx.section.resenas":        { heading: "h2" },
+  "vmx.section.arma-tu-viaje":  { heading: "h2", body: "p", cta_label: "a" },
+  "vmx.cockpit.kpi-grid":       { title: "h2, h3" },
+  "vmx.cockpit.alerts":         { title: "h2, h3" },
+  "vmx.cockpit.activity-stream":{ title: "h2, h3" },
+  "vmx.actions.buttons":        { heading: "h2, h3" },
+  "vmx.chrome.header":          { cta_label: "a" },
+  "vmx.chrome.footer":          { tagline: "p:first-of-type", legal_label: "small, .legal", privacy_label: ".privacy" },
+};
+
+function cssProps(t: FieldTypography): string {
+  const lines: string[] = [];
+  const fam = TYPO_FAMILIES.find((o) => o.value === t.font_family)?.css;
+  if (fam) lines.push(`font-family:${fam};`);
+  if (t.font_size) lines.push(`font-size:${t.font_size}px;`);
+  if (t.font_weight) lines.push(`font-weight:${t.font_weight};`);
+  if (t.line_height) lines.push(`line-height:${t.line_height};`);
+  if (typeof t.letter_spacing === "number") lines.push(`letter-spacing:${t.letter_spacing}px;`);
+  if (t.color) lines.push(`color:${t.color};`);
+  if (t.align) lines.push(`text-align:${t.align};`);
+  if (t.italic) lines.push(`font-style:italic;`);
+  if (t.uppercase) lines.push(`text-transform:uppercase;`);
+  return lines.join("");
+}
+
+/**
+ * Genera reglas CSS `[data-eb-typo="scopeId"] <selector> { … }` a partir de
+ * los overrides tipográficos de un nodo. Devuelve "" si no hay reglas.
+ */
+export function buildScopedTypographyCss(
+  scopeId: string,
+  blockType: string,
+  overrides: Record<string, FieldTypography>,
+): string {
+  const map = BLOCK_FIELD_SELECTORS[blockType];
+  if (!map) return "";
+  const parts: string[] = [];
+  for (const [field, typo] of Object.entries(overrides)) {
+    const sel = map[field];
+    if (!sel || !typo || !hasTypography(typo)) continue;
+    const decls = cssProps(typo);
+    if (!decls) continue;
+    // `!important` para vencer utilidades de Tailwind del componente.
+    const withBang = decls.replace(/;$/g, "").split(";").map((d) => (d ? `${d} !important` : d)).join(";") + ";";
+    parts.push(`[data-eb-typo="${scopeId}"] ${sel}{${withBang}}`);
+  }
+  return parts.join("");
+}
