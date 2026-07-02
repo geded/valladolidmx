@@ -556,6 +556,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
               contract={selectedContract}
               config={selectedNode.config as Record<string, unknown>}
               onChange={(next) => updateSelectedConfig(next)}
+              simple
             />
           </aside>
         ) : null}
