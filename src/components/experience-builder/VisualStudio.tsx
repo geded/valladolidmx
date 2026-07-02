@@ -1460,6 +1460,87 @@ function PageVisualEditor({
         {showVersions ? (
           <VersionsDrawer versions={versions} onClose={() => setShowVersions(false)} onRestore={doRollback} />
         ) : null}
+        {shareLink ? (
+          <SharePreviewModal
+            url={shareLink.url}
+            expiresAt={shareLink.expires_at}
+            onClose={() => setShareLink(null)}
+          />
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function SharePreviewModal({
+  url,
+  expiresAt,
+  onClose,
+}: {
+  url: string;
+  expiresAt: string;
+  onClose: () => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  const expiresLabel = new Date(expiresAt).toLocaleString();
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* ignore */
+    }
+  };
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-label="Compartir vista previa">
+      <div className="w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-xl">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Vista previa compartible</p>
+            <h2 className="text-base font-semibold">Enlace generado</h2>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label="Cerrar">
+            <X className="size-4" aria-hidden />
+          </button>
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Cualquiera con este enlace puede ver el borrador actual sin publicarlo. Caduca el {expiresLabel}.
+        </p>
+        <div className="mt-4 flex items-center gap-2 rounded-md border border-border bg-background p-2">
+          <input
+            type="text"
+            readOnly
+            value={url}
+            className="min-w-0 flex-1 bg-transparent px-1 text-xs text-foreground outline-none"
+            onFocus={(e) => e.target.select()}
+          />
+          <button
+            type="button"
+            onClick={() => void copy()}
+            className="inline-flex items-center gap-1 rounded bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground hover:opacity-95"
+          >
+            {copied ? <Check className="size-3.5" aria-hidden /> : <Copy className="size-3.5" aria-hidden />}
+            {copied ? "Copiado" : "Copiar"}
+          </button>
+        </div>
+        <div className="mt-4 flex justify-end gap-2">
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
+          >
+            Abrir <ExternalLink className="size-3.5" aria-hidden />
+          </a>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-95"
+          >
+            Listo
+          </button>
+        </div>
       </div>
     </div>
   );
