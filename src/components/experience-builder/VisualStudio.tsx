@@ -1069,6 +1069,12 @@ function PageVisualEditor({
                 selected={selectedId === FOOTER_CHROME_ID}
                 onSelect={() => setSelectedId(FOOTER_CHROME_ID)}
               />
+              <ChromeItem
+                label="SEO y compartir"
+                note="Título, descripción, imagen social, canonical"
+                selected={selectedId === SEO_CHROME_ID}
+                onSelect={() => setSelectedId(SEO_CHROME_ID)}
+              />
               <button
                 type="button"
                 onClick={() => setShowLibrary(true)}
