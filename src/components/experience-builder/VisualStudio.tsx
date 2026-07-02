@@ -635,7 +635,15 @@ function CreatePageModal({
 
 /* --------------------------------------------------------------------- */
 
-function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; advanced?: boolean }) {
+function PageVisualEditor({
+  pageDef,
+  onExit,
+  advanced = false,
+}: {
+  pageDef: SitePage;
+  onExit: () => void;
+  advanced?: boolean;
+}) {
   const list = useServerFn(listCompositions);
   const get = useServerFn(getComposition);
   const create = useServerFn(createComposition);
@@ -664,12 +672,19 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
     void (async () => {
       try {
         const all = await list();
-        const home = pickCanonicalHomeComposition(all);
+        const existing = pickCompositionBySlug(all, pageDef.slug, pageDef.page_type);
         let detail: CompositionDetail | null = null;
-        if (home) {
-          detail = (await get({ data: { id: home.id } })) as CompositionDetail | null;
+        if (existing) {
+          detail = (await get({ data: { id: existing.id } })) as CompositionDetail | null;
         } else {
-          const { id } = await create({ data: { slug: "home", title: "Página de Inicio", page_type: "home" } });
+          const { id } = await create({
+            data: {
+              slug: pageDef.slug,
+              title: pageDef.title,
+              page_type: pageDef.page_type,
+              description: pageDef.description,
+            },
+          });
           detail = (await get({ data: { id } })) as CompositionDetail | null;
         }
         if (cancelled || !detail) return;
@@ -682,7 +697,7 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
     return () => {
       cancelled = true;
     };
-  }, [list, get, create]);
+  }, [list, get, create, pageDef.slug, pageDef.page_type, pageDef.title, pageDef.description]);
 
   const saveTimer = useRef<number | null>(null);
   useEffect(() => {
@@ -738,8 +753,11 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
     try {
       await save({ data: { id: page.id, tree } });
       await publish({ data: { id: page.id, notes: "Publicado desde Modo Visual" } });
-      await queryClient.invalidateQueries({ queryKey: ["eb", "published-home", "default"] });
-      setMessage("Cambios publicados en el sitio.");
+      if (pageDef.page_type === "home") {
+        await queryClient.invalidateQueries({ queryKey: ["eb", "published-home", "default"] });
+      }
+      await queryClient.invalidateQueries({ queryKey: ["eb", "published-by-slug", pageDef.slug] });
+      setMessage(`Cambios publicados en ${pageDef.publicPath}.`);
       if (showVersions) void refreshVersions();
     } catch (e) {
       setMessage(`No se pudo publicar: ${(e as Error).message}`);
