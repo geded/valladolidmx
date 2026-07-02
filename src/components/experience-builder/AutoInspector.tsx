@@ -7,7 +7,7 @@
 
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, ImageIcon, Languages, Plus, Trash2, Type, Upload } from "lucide-react";
+import { ChevronDown, ChevronUp, ImageIcon, Languages, Monitor, Plus, Smartphone, Tablet, Trash2, Type, Upload } from "lucide-react";
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { MediaPickerDialog } from "./MediaPickerDialog";
 import type {
@@ -80,6 +80,17 @@ export function AutoInspector({ contract, config, onChange, simple = false, acti
         ) : null}
         {simple ? null : <CapabilityChips contract={contract} />}
       </header>
+      <DeviceVisibilityRow
+        value={
+          Array.isArray(config.__hidden_on)
+            ? ((config.__hidden_on as unknown[]).filter(
+                (v): v is "mobile" | "tablet" | "desktop" =>
+                  v === "mobile" || v === "tablet" || v === "desktop",
+              ))
+            : []
+        }
+        onChange={(next) => onChange({ ...config, __hidden_on: next })}
+      />
       <div className="space-y-3">
         {Object.entries(contract.schema).map(([key, def]) => (
           <FieldRow
@@ -101,6 +112,59 @@ export function AutoInspector({ contract, config, onChange, simple = false, acti
           <p className="text-xs text-muted-foreground">Este bloque no tiene campos editables.</p>
         ) : null}
       </div>
+    </div>
+  );
+}
+
+type DeviceKey = "mobile" | "tablet" | "desktop";
+
+function DeviceVisibilityRow({
+  value,
+  onChange,
+}: {
+  value: DeviceKey[];
+  onChange: (next: DeviceKey[]) => void;
+}) {
+  const items: Array<{ id: DeviceKey; label: string; Icon: typeof Smartphone }> = [
+    { id: "mobile", label: "Móvil", Icon: Smartphone },
+    { id: "tablet", label: "Tablet", Icon: Tablet },
+    { id: "desktop", label: "Desktop", Icon: Monitor },
+  ];
+  const toggle = (id: DeviceKey) => {
+    const hidden = value.includes(id);
+    const next = hidden ? value.filter((v) => v !== id) : [...value, id];
+    onChange(next);
+  };
+  return (
+    <div className="rounded-md border border-border bg-muted/30 p-2">
+      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+        Visibilidad por dispositivo
+      </p>
+      <div className="flex items-center gap-1">
+        {items.map(({ id, label, Icon }) => {
+          const visible = !value.includes(id);
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => toggle(id)}
+              aria-pressed={visible}
+              title={visible ? `Visible en ${label}` : `Oculto en ${label}`}
+              className={`inline-flex flex-1 items-center justify-center gap-1 rounded-md border px-2 py-1 text-[10px] font-medium transition ${
+                visible
+                  ? "border-primary/40 bg-primary/10 text-primary"
+                  : "border-border bg-background text-muted-foreground line-through"
+              }`}
+            >
+              <Icon className="size-3" aria-hidden />
+              {label}
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-1 text-[10px] text-muted-foreground">
+        Toca para ocultar este bloque en un dispositivo.
+      </p>
     </div>
   );
 }

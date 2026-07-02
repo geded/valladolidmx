@@ -26,6 +26,7 @@ import {
   Copy,
   ExternalLink,
   History,
+  GripVertical,
   Loader2,
   Lock,
   Pencil,
@@ -1391,6 +1392,14 @@ function PageVisualEditor({
           onDelete={removeNodeById}
           onDuplicate={duplicateNode}
           onMove={moveNode}
+          onReorderRoot={(activeId, overId) => {
+            if (!tree) return;
+            const oldIdx = tree.root.children.findIndex((n) => n.id === activeId);
+            const newIdx = tree.root.children.findIndex((n) => n.id === overId);
+            if (oldIdx < 0 || newIdx < 0) return;
+            const next = arrayMove(tree.root.children, oldIdx, newIdx);
+            commitTree({ ...tree, root: { children: next } });
+          }}
         />
 
         {!previewMode && selectedContract && selectedConfig ? (
@@ -1614,6 +1623,7 @@ function HomeCanvas({
   onDelete,
   onDuplicate,
   onMove,
+  onReorderRoot,
 }: {
   tree: CompositionTree;
   previewMode: boolean;
@@ -1624,11 +1634,22 @@ function HomeCanvas({
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
   onMove: (id: string, dir: -1 | 1) => void;
+  onReorderRoot: (activeId: string, overId: string) => void;
 }) {
   const outerRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<HTMLDivElement | null>(null);
   const frameWidth = DEVICE_WIDTHS[deviceViewport];
   const [metrics, setMetrics] = useState({ width: frameWidth, height: 900 });
+  const rootIds = tree.root.children.map((n) => n.id);
+  const rootIdSet = new Set(rootIds);
+  const canvasSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+  const handleCanvasDragEnd = (e: DragEndEvent) => {
+    if (!e.over || e.active.id === e.over.id) return;
+    onReorderRoot(String(e.active.id), String(e.over.id));
+  };
 
   useEffect(() => {
     const measure = () => {
@@ -1681,28 +1702,33 @@ function HomeCanvas({
           <InertChrome label="Encabezado" selected={selectedId === HEADER_CHROME_ID} onSelect={() => onSelectChrome("header")}>
             <PublicHeader variant="overlay" config={getChromeConfig(tree, "header")} />
           </InertChrome>
-          <CompositionRenderer
-            tree={tree}
-            pageType="home"
-            wrap={
-              previewMode
-                ? undefined
-                : (node, content) => (
-                    <BlockOverlay
-                      key={node.id}
-                      node={node}
-                      selected={selectedId === node.id}
-                      onSelect={() => onSelect(node.id)}
-                      onDelete={() => onDelete(node.id)}
-                      onDuplicate={() => onDuplicate(node.id)}
-                      onMoveUp={() => onMove(node.id, -1)}
-                      onMoveDown={() => onMove(node.id, 1)}
-                    >
-                      {content}
-                    </BlockOverlay>
-                  )
-            }
-          />
+          <DndContext sensors={canvasSensors} collisionDetection={closestCenter} onDragEnd={handleCanvasDragEnd}>
+            <SortableContext items={rootIds} strategy={verticalListSortingStrategy}>
+              <CompositionRenderer
+                tree={tree}
+                pageType="home"
+                wrap={
+                  previewMode
+                    ? undefined
+                    : (node, content) => (
+                        <BlockOverlay
+                          key={node.id}
+                          node={node}
+                          selected={selectedId === node.id}
+                          onSelect={() => onSelect(node.id)}
+                          onDelete={() => onDelete(node.id)}
+                          onDuplicate={() => onDuplicate(node.id)}
+                          onMoveUp={() => onMove(node.id, -1)}
+                          onMoveDown={() => onMove(node.id, 1)}
+                          sortable={rootIdSet.has(node.id)}
+                        >
+                          {content}
+                        </BlockOverlay>
+                      )
+                }
+              />
+            </SortableContext>
+          </DndContext>
           <InertChrome label="Pie de página" selected={selectedId === FOOTER_CHROME_ID} onSelect={() => onSelectChrome("footer")}>
             <PublicFooter config={getChromeConfig(tree, "footer")} />
           </InertChrome>
@@ -1856,7 +1882,7 @@ function SortableSectionItem({
 }
 
 function BlockOverlay({
-  node, selected, onSelect, onDelete, onDuplicate, onMoveUp, onMoveDown, children,
+  node, selected, onSelect, onDelete, onDuplicate, onMoveUp, onMoveDown, children, sortable = false,
 }: {
   node: CompositionNode;
   selected: boolean;
@@ -1866,18 +1892,34 @@ function BlockOverlay({
   onMoveUp: () => void;
   onMoveDown: () => void;
   children: React.ReactNode;
+  sortable?: boolean;
 }) {
   const contract = getBlock(node.type);
   const ref = useRef<HTMLDivElement | null>(null);
+  // Cuando el bloque es de nivel raíz, participa en el DnD del canvas.
+  // Los bloques anidados sólo reciben overlay/acciones.
+  const sortableApi = useSortable({ id: node.id, disabled: !sortable });
+  const dndStyle: React.CSSProperties = sortable
+    ? {
+        transform: CSS.Transform.toString(sortableApi.transform),
+        transition: sortableApi.transition,
+        opacity: sortableApi.isDragging ? 0.4 : 1,
+      }
+    : {};
   useEffect(() => {
     if (selected && ref.current) {
       ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [selected]);
+  const composedRef = (el: HTMLDivElement | null) => {
+    ref.current = el;
+    if (sortable) sortableApi.setNodeRef(el);
+  };
   return (
     <div
-      ref={ref}
+      ref={composedRef}
       data-node-id={node.id}
+      style={dndStyle}
       role="button"
       tabIndex={0}
       onClick={(e) => {
@@ -1904,6 +1946,19 @@ function BlockOverlay({
       </span>
       {selected ? (
         <div className="pointer-events-auto absolute right-3 top-3 z-30 flex gap-1 rounded-full bg-background/95 p-1 shadow-lg ring-1 ring-border">
+          {sortable ? (
+            <button
+              type="button"
+              {...sortableApi.attributes}
+              {...sortableApi.listeners}
+              onClick={(e) => e.stopPropagation()}
+              aria-label="Arrastrar para reordenar"
+              title="Arrastrar para reordenar"
+              className="inline-flex h-6 w-6 cursor-grab items-center justify-center rounded-full text-foreground hover:bg-accent active:cursor-grabbing"
+            >
+              <GripVertical className="size-3" />
+            </button>
+          ) : null}
           <IconBtn onClick={(e) => { e.stopPropagation(); onMoveUp(); }} icon={<ChevronUp className="size-3" />} label="Subir" />
           <IconBtn onClick={(e) => { e.stopPropagation(); onMoveDown(); }} icon={<ChevronDown className="size-3" />} label="Bajar" />
           <IconBtn onClick={(e) => { e.stopPropagation(); onDuplicate(); }} icon={<Copy className="size-3" />} label="Duplicar" />
