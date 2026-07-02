@@ -410,9 +410,22 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     () => (tree && selectedId ? tree.root.children.find((n) => n.id === selectedId) ?? null : null),
     [tree, selectedId],
   );
+  const selectedChrome = selectedId === HEADER_CHROME_ID ? "header" : selectedId === FOOTER_CHROME_ID ? "footer" : null;
   const selectedContract = useMemo(
-    () => (selectedNode ? getBlock(selectedNode.type) ?? null : null),
-    [selectedNode],
+    () => {
+      if (selectedChrome === "header") return headerChromeContract;
+      if (selectedChrome === "footer") return footerChromeContract;
+      return selectedNode ? getBlock(selectedNode.type) ?? null : null;
+    },
+    [selectedChrome, selectedNode],
+  );
+  const selectedConfig = useMemo(
+    () => {
+      if (!tree) return null;
+      if (selectedChrome) return getChromeConfig(tree, selectedChrome);
+      return selectedNode?.config as Record<string, unknown> | null;
+    },
+    [selectedChrome, selectedNode, tree],
   );
 
   const onPublish = async () => {
@@ -433,7 +446,18 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
   };
 
   const updateSelectedConfig = (nextConfig: Record<string, unknown>) => {
-    if (!selectedNode || !tree) return;
+    if (!tree) return;
+    if (selectedChrome) {
+      setTree({
+        ...tree,
+        chrome: {
+          ...(tree.chrome ?? {}),
+          [selectedChrome]: nextConfig as CompositionJsonObject,
+        },
+      });
+      return;
+    }
+    if (!selectedNode) return;
     setTree(updateNodeConfig(tree, selectedNode.id, nextConfig));
   };
 
@@ -446,7 +470,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     const next = [...tree.root.children];
     const [item] = next.splice(idx, 1);
     next.splice(to, 0, item);
-    setTree({ root: { children: next } });
+    setTree({ ...tree, root: { children: next } });
   };
 
   const duplicateNode = (nodeId: string) => {
@@ -457,14 +481,14 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     const idx = tree.root.children.findIndex((n) => n.id === nodeId);
     const next = [...tree.root.children];
     next.splice(idx + 1, 0, clone);
-    setTree({ root: { children: next } });
+    setTree({ ...tree, root: { children: next } });
     setSelectedId(clone.id);
   };
 
   const removeNodeById = (nodeId: string) => {
     if (!tree) return;
     const next = tree.root.children.filter((n) => n.id !== nodeId);
-    setTree({ root: { children: next } });
+    setTree({ ...tree, root: { children: next } });
     if (selectedId === nodeId) setSelectedId(null);
   };
 
@@ -480,7 +504,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     const next = [...tree.root.children];
     const idx = atIndex ?? next.length;
     next.splice(idx, 0, node);
-    setTree({ root: { children: next } });
+    setTree({ ...tree, root: { children: next } });
     setSelectedId(node.id);
     setShowLibrary(false);
   };
@@ -517,7 +541,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     const newIdx = tree.root.children.findIndex((n) => n.id === e.over!.id);
     if (oldIdx < 0 || newIdx < 0) return;
     const next = arrayMove(tree.root.children, oldIdx, newIdx);
-    setTree({ root: { children: next } });
+    setTree({ ...tree, root: { children: next } });
   };
 
   if (loadError) return <FullScreenState title="No se pudo abrir el editor" detail={loadError} onExit={onExit} />;
