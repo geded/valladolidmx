@@ -101,6 +101,7 @@ import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/
 import { Route as ApiPublicPaymentsProviderWebhookRouteImport } from './routes/api/public/payments/$provider/webhook'
 import { Route as AuthenticatedCuentaConciergeCaseIdEvaluarRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId.evaluar'
 import { Route as AuthenticatedCmsReviewsIdModerarRouteImport } from './routes/_authenticated/cms/reviews.$id.moderar'
+import { Route as AuthenticatedCmsDestinosDestinationIdEditarRouteImport } from './routes/_authenticated/cms/destinos.$destinationId.editar'
 
 const RestaurantesRoute = RestaurantesRouteImport.update({
   id: '/restaurantes',
@@ -618,6 +619,12 @@ const AuthenticatedCmsReviewsIdModerarRoute =
     path: '/reviews/$id/moderar',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsDestinosDestinationIdEditarRoute =
+  AuthenticatedCmsDestinosDestinationIdEditarRouteImport.update({
+    id: '/$destinationId/editar',
+    path: '/$destinationId/editar',
+    getParentRoute: () => AuthenticatedCmsDestinosRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -708,6 +715,7 @@ export interface FileRoutesByFullPath {
   '/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
   '/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
   '/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
+  '/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
@@ -795,6 +803,7 @@ export interface FileRoutesByTo {
   '/cms/reviews': typeof AuthenticatedCmsReviewsIndexRoute
   '/portal/empresas': typeof AuthenticatedPortalEmpresasIndexRoute
   '/portal/invitaciones': typeof AuthenticatedPortalInvitacionesIndexRoute
+  '/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
@@ -890,6 +899,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
   '/_authenticated/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
   '/_authenticated/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
+  '/_authenticated/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
   '/_authenticated/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/_authenticated/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
@@ -985,6 +995,7 @@ export interface FileRouteTypes {
     | '/cms/reviews/'
     | '/portal/empresas/'
     | '/portal/invitaciones/'
+    | '/cms/destinos/$destinationId/editar'
     | '/cms/reviews/$id/moderar'
     | '/cuenta/concierge/$caseId/evaluar'
     | '/api/public/payments/$provider/webhook'
@@ -1072,6 +1083,7 @@ export interface FileRouteTypes {
     | '/cms/reviews'
     | '/portal/empresas'
     | '/portal/invitaciones'
+    | '/cms/destinos/$destinationId/editar'
     | '/cms/reviews/$id/moderar'
     | '/cuenta/concierge/$caseId/evaluar'
     | '/api/public/payments/$provider/webhook'
@@ -1166,6 +1178,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/reviews/'
     | '/_authenticated/portal/empresas/'
     | '/_authenticated/portal/invitaciones/'
+    | '/_authenticated/cms/destinos/$destinationId/editar'
     | '/_authenticated/cms/reviews/$id/moderar'
     | '/_authenticated/cuenta/concierge/$caseId/evaluar'
     | '/api/public/payments/$provider/webhook'
@@ -1846,6 +1859,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsReviewsIdModerarRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/destinos/$destinationId/editar': {
+      id: '/_authenticated/cms/destinos/$destinationId/editar'
+      path: '/$destinationId/editar'
+      fullPath: '/cms/destinos/$destinationId/editar'
+      preLoaderRoute: typeof AuthenticatedCmsDestinosDestinationIdEditarRouteImport
+      parentRoute: typeof AuthenticatedCmsDestinosRoute
+    }
   }
 }
 
@@ -2017,11 +2037,14 @@ const AuthenticatedPortalRouteRouteWithChildren =
 
 interface AuthenticatedCmsDestinosRouteChildren {
   AuthenticatedCmsDestinosNuevaRoute: typeof AuthenticatedCmsDestinosNuevaRoute
+  AuthenticatedCmsDestinosDestinationIdEditarRoute: typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
 }
 
 const AuthenticatedCmsDestinosRouteChildren: AuthenticatedCmsDestinosRouteChildren =
   {
     AuthenticatedCmsDestinosNuevaRoute: AuthenticatedCmsDestinosNuevaRoute,
+    AuthenticatedCmsDestinosDestinationIdEditarRoute:
+      AuthenticatedCmsDestinosDestinationIdEditarRoute,
   }
 
 const AuthenticatedCmsDestinosRouteWithChildren =
