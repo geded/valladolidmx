@@ -1304,6 +1304,52 @@ const DEVICE_WIDTHS: Record<DeviceViewport, number> = {
   desktop: 1280,
 };
 
+/**
+ * Toggle segmentado Móvil / Tablet / Desktop para el canvas.
+ * Default móvil — el turismo se consume mayormente en celular y así el
+ * empresario ve la verdad del turista sin publicar.
+ */
+function DeviceToggle({
+  value,
+  onChange,
+}: {
+  value: DeviceViewport;
+  onChange: (v: DeviceViewport) => void;
+}) {
+  const items: Array<{ id: DeviceViewport; label: string; short: string }> = [
+    { id: "mobile", label: "Vista móvil (390 px)", short: "Móvil" },
+    { id: "tablet", label: "Vista tablet (768 px)", short: "Tablet" },
+    { id: "desktop", label: "Vista desktop (1280 px)", short: "Desktop" },
+  ];
+  return (
+    <div
+      role="group"
+      aria-label="Vista previa por dispositivo"
+      className="inline-flex items-center overflow-hidden rounded-md border border-border bg-background"
+    >
+      {items.map((it) => {
+        const active = it.id === value;
+        return (
+          <button
+            key={it.id}
+            type="button"
+            onClick={() => onChange(it.id)}
+            aria-pressed={active}
+            title={it.label}
+            className={`px-2.5 py-1.5 text-[11px] font-medium transition ${
+              active
+                ? "bg-primary text-primary-foreground"
+                : "text-foreground hover:bg-accent"
+            }`}
+          >
+            {it.short}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function HomeCanvas({
   tree,
   previewMode,
