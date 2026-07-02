@@ -70,5 +70,28 @@
     "export_json": "Export JSON",
     "loading": "Loading…",
     "no_alerts": "No active alerts."
+  },
+  "auth": {
+    "signin": "Sign in",
+    "signup": "Create account",
+    "forgot": "Reset password",
+    "google": "Continue with Google",
+    "or_email": "or with email",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "processing": "Processing…",
+    "enter": "Sign in",
+    "create": "Create account",
+    "send_link": "Send link",
+    "forgot_q": "Forgot your password?",
+    "create_account": "Create an account",
+    "back_to_signin": "Back to sign in",
+    "signup_info": "We sent you a confirmation email.",
+    "reset_info": "If the account exists, you'll receive a link to reset your password.",
+    "google_error": "Could not sign in with Google.",
+    "unexpected": "Unexpected error",
+    "eyebrow": "Account",
+    "subtitle": "Sign in to save trips, favorites and chat with Alux."
   }
 }

@@ -4418,6 +4418,30 @@ export type Database = {
         }
         Relationships: []
       }
+      ui_translation_cache: {
+        Row: {
+          created_at: string
+          locale: string
+          source_hash: string
+          source_text: string
+          target_text: string
+        }
+        Insert: {
+          created_at?: string
+          locale: string
+          source_hash: string
+          source_text: string
+          target_text: string
+        }
+        Update: {
+          created_at?: string
+          locale?: string
+          source_hash?: string
+          source_text?: string
+          target_text?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

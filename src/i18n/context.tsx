@@ -27,6 +27,7 @@ import fr from "./locales/fr.json";
 import de from "./locales/de.json";
 import it from "./locales/it.json";
 import pt from "./locales/pt.json";
+import type { UiAutoTranslatorHandle } from "@/lib/i18n/ui-auto-translate";
 
 type Dict = Record<string, unknown>;
 
@@ -111,6 +112,32 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     if (typeof document !== "undefined") {
       document.documentElement.lang = locale;
     }
+  }, [locale]);
+
+  // Runtime auto-translator: cubre cualquier texto que no pase por t().
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let handle: UiAutoTranslatorHandle | null = null;
+    let cancelled = false;
+    void import("@/lib/i18n/ui-auto-translate").then(({ startUiAutoTranslator }) => {
+      if (cancelled) return;
+      handle = startUiAutoTranslator(locale);
+      // Expose for setLocale below.
+      (window as unknown as { __vlxUiTr?: UiAutoTranslatorHandle }).__vlxUiTr = handle;
+    });
+    return () => {
+      cancelled = true;
+      handle?.stop();
+      delete (window as unknown as { __vlxUiTr?: UiAutoTranslatorHandle }).__vlxUiTr;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Cuando cambia el idioma, notifica al observador para re-traducir todo.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const w = window as unknown as { __vlxUiTr?: UiAutoTranslatorHandle };
+    w.__vlxUiTr?.setLocale(locale);
   }, [locale]);
 
   const t = useCallback(

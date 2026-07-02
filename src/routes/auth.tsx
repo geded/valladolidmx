@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { resolveRoleHome } from "@/types/auth";
+import { useTranslation } from "@/i18n/context";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/auth")({
 function AuthRoute() {
   const { user, loading, roles } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -59,16 +61,16 @@ function AuthRoute() {
           },
         });
         if (error) throw error;
-        setInfo("Te enviamos un correo para confirmar tu cuenta.");
+        setInfo(t("auth.signup_info"));
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
         });
         if (error) throw error;
-        setInfo("Si la cuenta existe, recibirás un enlace para restablecer la contraseña.");
+        setInfo(t("auth.reset_info"));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error inesperado");
+      setError(err instanceof Error ? err.message : t("auth.unexpected"));
     } finally {
       setBusy(false);
     }
@@ -80,22 +82,22 @@ function AuthRoute() {
       redirect_uri: window.location.origin,
     });
     if (result.error) {
-      setError(result.error.message ?? "No se pudo iniciar sesión con Google.");
+      setError(result.error.message ?? t("auth.google_error"));
     }
   }
 
   const titles: Record<Mode, string> = {
-    signin: "Iniciar sesión",
-    signup: "Crear cuenta",
-    forgot: "Recuperar contraseña",
+    signin: t("auth.signin"),
+    signup: t("auth.signup"),
+    forgot: t("auth.forgot"),
   };
 
   return (
     <PageShell
-      eyebrow="Cuenta"
+      eyebrow={t("auth.eyebrow")}
       title={titles[mode]}
-      description="Accede para guardar tus viajes, favoritos y conversar con Alux."
-      crumbs={[{ label: "Acceso" }]}
+      description={t("auth.subtitle")}
+      crumbs={[{ label: t("auth.eyebrow") }]}
     >
       <div className="mx-auto max-w-md space-y-6 rounded-2xl border border-border bg-card p-6 sm:p-8">
         {mode !== "forgot" ? (
@@ -111,10 +113,10 @@ function AuthRoute() {
                 <path fill="#FBBC05" d="M5.84 14.12A6.6 6.6 0 0 1 5.5 12c0-.74.13-1.46.34-2.12V7.04H2.18A11 11 0 0 0 1 12c0 1.78.43 3.46 1.18 4.96l3.66-2.84z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.46 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.04l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/>
               </svg>
-              Continuar con Google
+              {t("auth.google")}
             </button>
             <div className="relative text-center text-xs text-muted-foreground">
-              <span className="bg-card px-2 relative z-10">o con correo</span>
+              <span className="bg-card px-2 relative z-10">{t("auth.or_email")}</span>
               <span className="absolute left-0 right-0 top-1/2 h-px bg-border" aria-hidden />
             </div>
           </>
@@ -123,7 +125,7 @@ function AuthRoute() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === "signup" ? (
             <div>
-              <label className="text-sm font-medium" htmlFor="name">Nombre</label>
+              <label className="text-sm font-medium" htmlFor="name">{t("auth.name")}</label>
               <input
                 id="name"
                 value={name}
@@ -135,7 +137,7 @@ function AuthRoute() {
           ) : null}
 
           <div>
-            <label className="text-sm font-medium" htmlFor="email">Correo</label>
+            <label className="text-sm font-medium" htmlFor="email">{t("auth.email")}</label>
             <input
               id="email"
               type="email"
@@ -149,7 +151,7 @@ function AuthRoute() {
 
           {mode !== "forgot" ? (
             <div>
-              <label className="text-sm font-medium" htmlFor="password">Contraseña</label>
+              <label className="text-sm font-medium" htmlFor="password">{t("auth.password")}</label>
               <input
                 id="password"
                 type="password"
@@ -175,7 +177,7 @@ function AuthRoute() {
             disabled={busy}
             className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-95 disabled:opacity-60"
           >
-            {busy ? "Procesando…" : mode === "signin" ? "Entrar" : mode === "signup" ? "Crear cuenta" : "Enviar enlace"}
+            {busy ? t("auth.processing") : mode === "signin" ? t("auth.enter") : mode === "signup" ? t("auth.create") : t("auth.send_link")}
           </button>
         </form>
 
@@ -183,15 +185,15 @@ function AuthRoute() {
           {mode === "signin" ? (
             <>
               <button type="button" className="underline" onClick={() => setMode("forgot")}>
-                ¿Olvidaste tu contraseña?
+                {t("auth.forgot_q")}
               </button>
               <button type="button" className="underline" onClick={() => setMode("signup")}>
-                Crear una cuenta
+                {t("auth.create_account")}
               </button>
             </>
           ) : (
             <button type="button" className="underline" onClick={() => setMode("signin")}>
-              Volver a iniciar sesión
+              {t("auth.back_to_signin")}
             </button>
           )}
         </div>

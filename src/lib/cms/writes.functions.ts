@@ -296,6 +296,7 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
         action: "updated",
         metadata: { fields: Object.keys(clean) },
       });
+      await autoTranslateContent(data.table, row.id as string, clean, context);
       return { id: row.id as string, mode: "update" as const };
     }
 
@@ -317,8 +318,35 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
       action: "created",
       toStatus: "draft",
     });
+    await autoTranslateContent(data.table, row.id as string, clean, context);
     return { id: row.id as string, mode: "insert" as const };
   });
+
+/**
+ * Best-effort: dispara la traducción del contenido al guardar. Nunca rompe
+ * el guardado si la IA falla o el idioma destino no está disponible.
+ */
+async function autoTranslateContent(
+  table: EditableTable,
+  entityId: string,
+  payload: Record<string, unknown>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  context: { supabase: any; userId: string },
+) {
+  try {
+    const { translateEntityContentBestEffort } = await import(
+      "./translate-content.server"
+    );
+    await translateEntityContentBestEffort(context.supabase, {
+      table,
+      entityId,
+      payload,
+      userId: context.userId,
+    });
+  } catch {
+    // intencional
+  }
+}
 
 /* ──────────────────  Transición de estado editorial  ────────────────── */
 

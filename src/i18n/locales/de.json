@@ -70,5 +70,28 @@
     "export_json": "JSON exportieren",
     "loading": "Wird geladen…",
     "no_alerts": "Keine aktiven Warnungen."
+  },
+  "auth": {
+    "signin": "Anmelden",
+    "signup": "Konto erstellen",
+    "forgot": "Passwort zurücksetzen",
+    "google": "Mit Google fortfahren",
+    "or_email": "oder mit E-Mail",
+    "name": "Name",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "processing": "Wird verarbeitet…",
+    "enter": "Anmelden",
+    "create": "Konto erstellen",
+    "send_link": "Link senden",
+    "forgot_q": "Passwort vergessen?",
+    "create_account": "Konto erstellen",
+    "back_to_signin": "Zurück zur Anmeldung",
+    "signup_info": "Wir haben dir eine Bestätigungs-E-Mail gesendet.",
+    "reset_info": "Wenn das Konto existiert, erhältst du einen Link zum Zurücksetzen.",
+    "google_error": "Anmeldung mit Google fehlgeschlagen.",
+    "unexpected": "Unerwarteter Fehler",
+    "eyebrow": "Konto",
+    "subtitle": "Melde dich an, um Reisen, Favoriten zu speichern und mit Alux zu chatten."
   }
 }
