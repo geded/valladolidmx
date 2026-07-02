@@ -1213,6 +1213,7 @@ function PageVisualEditor({
         <HomeCanvas
           tree={tree}
           previewMode={previewMode}
+          deviceViewport={deviceViewport}
           selectedId={selectedId}
           onSelect={(id) => setSelectedId(id)}
           onSelectChrome={(area) => setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)}
@@ -1305,6 +1306,7 @@ const DEVICE_WIDTHS: Record<DeviceViewport, number> = {
 function HomeCanvas({
   tree,
   previewMode,
+  deviceViewport,
   selectedId,
   onSelect,
   onSelectChrome,
@@ -1314,6 +1316,7 @@ function HomeCanvas({
 }: {
   tree: CompositionTree;
   previewMode: boolean;
+  deviceViewport: DeviceViewport;
   selectedId: string | null;
   onSelect: (id: string) => void;
   onSelectChrome: (area: ChromeArea) => void;
@@ -1323,7 +1326,8 @@ function HomeCanvas({
 }) {
   const outerRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<HTMLDivElement | null>(null);
-  const [metrics, setMetrics] = useState({ width: HOME_CANVAS_WIDTH, height: 900 });
+  const frameWidth = DEVICE_WIDTHS[deviceViewport];
+  const [metrics, setMetrics] = useState({ width: frameWidth, height: 900 });
 
   useEffect(() => {
     const measure = () => {
@@ -1347,16 +1351,18 @@ function HomeCanvas({
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [tree, previewMode, selectedId]);
+  }, [tree, previewMode, selectedId, deviceViewport]);
 
-  const scale = Math.min(1, Math.max(0.45, metrics.width / HOME_CANVAS_WIDTH));
+  // Móvil y tablet caben casi siempre a 1:1; desktop se auto-escala si el
+  // contenedor del editor es más angosto que 1280.
+  const scale = Math.min(1, Math.max(0.45, metrics.width / frameWidth));
 
   return (
     <div ref={outerRef} className="flex-1 overflow-y-auto bg-muted/20 px-3 py-3">
       <div
         className="relative mx-auto overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
         style={{
-          width: HOME_CANVAS_WIDTH * scale,
+          width: frameWidth * scale,
           height: metrics.height * scale,
         }}
       >
@@ -1364,7 +1370,7 @@ function HomeCanvas({
           ref={frameRef}
           className="absolute left-0 top-0 bg-background"
           style={{
-            width: HOME_CANVAS_WIDTH,
+            width: frameWidth,
             transform: `scale(${scale})`,
             transformOrigin: "top left",
           }}
