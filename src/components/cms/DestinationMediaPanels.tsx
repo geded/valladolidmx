@@ -16,7 +16,6 @@ import {
   signDestinationImageUpload,
 } from "@/lib/cms/destinations-media.functions";
 import {
-  ACCEPTED_IMAGE_MIME,
   compressImageIfNeeded,
   validateImageFile,
   withRetry,
