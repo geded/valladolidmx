@@ -294,7 +294,7 @@ export function Hero({ config }: HeroProps = {}) {
           <div className={`mt-4 flex w-full sm:mt-6 md:mt-10 ${searchJustifyClass}`}>
             <form
               role="search"
-              aria-label="Búsqueda rápida"
+              aria-label={t("hero.search_aria")}
               onSubmit={(e) => e.preventDefault()}
               className={`relative flex w-full items-center rounded-xl border border-white/20 bg-white/5 shadow-lg backdrop-blur-xl pr-1 ${searchSizeClass} ${searchMaxWidthClass}`}
             >
@@ -311,9 +311,9 @@ export function Hero({ config }: HeroProps = {}) {
               <button
                 type="submit"
                 className="ml-1 inline-flex shrink-0 items-center gap-1 rounded-lg bg-white px-3 py-1.5 text-[12px] font-semibold text-zinc-900 shadow-md transition-all hover:bg-white/90 active:scale-[0.98]"
-                aria-label="Buscar"
+                aria-label={t("hero.search_button")}
               >
-                Buscar
+                {t("hero.search_button")}
               </button>
             </form>
           </div>
