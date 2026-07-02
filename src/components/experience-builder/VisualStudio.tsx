@@ -71,6 +71,7 @@ import {
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { getBlock, listBlocks } from "@/lib/experience-builder/block-registry";
 import { AutoInspector } from "@/components/experience-builder/AutoInspector";
+import { PublicFooter, PublicHeader } from "@/components/discovery";
 import { useAuth } from "@/hooks/useAuth";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
@@ -82,6 +83,23 @@ interface SitePage {
   publicPath: string;
   status: "editable" | "soon";
   soonLabel?: string;
+}
+
+type HomeSummary = {
+  id: string;
+  slug: string;
+  status: string;
+  page_type: string;
+};
+
+function pickCanonicalHomeComposition<T extends HomeSummary>(items: T[]): T | null {
+  return (
+    items.find((item) => item.slug === "home" && item.page_type === "home") ??
+    items.find((item) => item.slug === "home") ??
+    items.find((item) => item.page_type === "home" && item.status === "published") ??
+    items.find((item) => item.page_type === "home") ??
+    null
+  );
 }
 
 const SITE_PAGES: SitePage[] = [
@@ -242,7 +260,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     void (async () => {
       try {
         const all = await list();
-        const home = all.find((c) => c.page_type === "home") ?? null;
+        const home = pickCanonicalHomeComposition(all);
         let detail: CompositionDetail | null = null;
         if (home) {
           detail = await get({ data: { id: home.id } });
@@ -497,32 +515,15 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
           </aside>
         ) : null}
 
-        <div className="flex-1 overflow-y-auto">
-          <main id="main" className="pb-24">
-            <CompositionRenderer
-              tree={tree}
-              pageType="home"
-              wrap={
-                previewMode
-                  ? undefined
-                  : (node, content) => (
-                      <BlockOverlay
-                        key={node.id}
-                        node={node}
-                        selected={selectedId === node.id}
-                        onSelect={() => setSelectedId(node.id)}
-                        onDelete={() => removeNodeById(node.id)}
-                        onDuplicate={() => duplicateNode(node.id)}
-                        onMoveUp={() => moveNode(node.id, -1)}
-                        onMoveDown={() => moveNode(node.id, 1)}
-                      >
-                        {content}
-                      </BlockOverlay>
-                    )
-              }
-            />
-          </main>
-        </div>
+        <HomeCanvas
+          tree={tree}
+          previewMode={previewMode}
+          selectedId={selectedId}
+          onSelect={(id) => setSelectedId(id)}
+          onDelete={removeNodeById}
+          onDuplicate={duplicateNode}
+          onMove={moveNode}
+        />
 
         {!previewMode && selectedNode && selectedContract ? (
           <aside
@@ -565,6 +566,105 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
         {showVersions ? (
           <VersionsDrawer versions={versions} onClose={() => setShowVersions(false)} onRestore={doRollback} />
         ) : null}
+      </div>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+
+const HOME_CANVAS_WIDTH = 1280;
+
+function HomeCanvas({
+  tree,
+  previewMode,
+  selectedId,
+  onSelect,
+  onDelete,
+  onDuplicate,
+  onMove,
+}: {
+  tree: CompositionTree;
+  previewMode: boolean;
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+  onDelete: (id: string) => void;
+  onDuplicate: (id: string) => void;
+  onMove: (id: string, dir: -1 | 1) => void;
+}) {
+  const outerRef = useRef<HTMLDivElement | null>(null);
+  const frameRef = useRef<HTMLDivElement | null>(null);
+  const [metrics, setMetrics] = useState({ width: HOME_CANVAS_WIDTH, height: 900 });
+
+  useEffect(() => {
+    const measure = () => {
+      const width = outerRef.current?.clientWidth ?? HOME_CANVAS_WIDTH;
+      const height = frameRef.current?.scrollHeight ?? 900;
+      setMetrics((current) =>
+        Math.abs(current.width - width) > 1 || Math.abs(current.height - height) > 1
+          ? { width, height }
+          : current,
+      );
+    };
+
+    measure();
+    const frame = frameRef.current;
+    const outer = outerRef.current;
+    const observer = new ResizeObserver(measure);
+    if (frame) observer.observe(frame);
+    if (outer) observer.observe(outer);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [tree, previewMode, selectedId]);
+
+  const scale = Math.min(1, Math.max(0.45, metrics.width / HOME_CANVAS_WIDTH));
+
+  return (
+    <div ref={outerRef} className="flex-1 overflow-y-auto bg-muted/20 px-3 py-3">
+      <div
+        className="relative mx-auto overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
+        style={{
+          width: HOME_CANVAS_WIDTH * scale,
+          height: metrics.height * scale,
+        }}
+      >
+        <div
+          ref={frameRef}
+          className="absolute left-0 top-0 bg-background"
+          style={{
+            width: HOME_CANVAS_WIDTH,
+            transform: `scale(${scale})`,
+            transformOrigin: "top left",
+          }}
+        >
+          <PublicHeader variant="overlay" />
+          <CompositionRenderer
+            tree={tree}
+            pageType="home"
+            wrap={
+              previewMode
+                ? undefined
+                : (node, content) => (
+                    <BlockOverlay
+                      key={node.id}
+                      node={node}
+                      selected={selectedId === node.id}
+                      onSelect={() => onSelect(node.id)}
+                      onDelete={() => onDelete(node.id)}
+                      onDuplicate={() => onDuplicate(node.id)}
+                      onMoveUp={() => onMove(node.id, -1)}
+                      onMoveDown={() => onMove(node.id, 1)}
+                    >
+                      {content}
+                    </BlockOverlay>
+                  )
+            }
+          />
+          <PublicFooter />
+        </div>
       </div>
     </div>
   );
