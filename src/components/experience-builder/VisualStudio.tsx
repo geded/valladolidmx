@@ -30,6 +30,7 @@ import {
   Lock,
   Pencil,
   Plus,
+  Search,
   Trash2,
   X,
 } from "lucide-react";
