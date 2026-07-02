@@ -277,15 +277,27 @@ export interface VisualStudioProps {
 
 export function VisualStudio({ page = null, onSelectPage, advanced = false }: VisualStudioProps = {}) {
   const [internalKey, setInternalKey] = useState<string | null>(page);
+  const [customPages, setCustomPages] = useState<SitePage[]>([]);
   const openKey = page ?? internalKey;
   const setOpen = (k: string | null) => {
     setInternalKey(k);
     onSelectPage?.(k);
   };
-  if (openKey === "home") {
-    return <HomeVisualEditor onExit={() => setOpen(null)} advanced={advanced} />;
+  const allPages = useMemo(() => [...SITE_PAGES, ...customPages], [customPages]);
+  const activePage = openKey ? allPages.find((p) => p.key === openKey) ?? null : null;
+  if (activePage) {
+    return <PageVisualEditor pageDef={activePage} onExit={() => setOpen(null)} advanced={advanced} />;
   }
-  return <PagesPicker onOpen={(k) => setOpen(k)} />;
+  return (
+    <PagesPicker
+      customPages={customPages}
+      onOpen={(k) => setOpen(k)}
+      onCreated={(p) => {
+        setCustomPages((prev) => (prev.some((x) => x.key === p.key) ? prev : [...prev, p]));
+        setOpen(p.key);
+      }}
+    />
+  );
 }
 
 /* --------------------------------------------------------------------- */
