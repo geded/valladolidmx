@@ -400,9 +400,13 @@ type CompoSummary = {
 };
 
 function pickCompositionBySlug<T extends CompoSummary>(items: T[], slug: string, pageType: string): T | null {
+  const wantedSlug = normalizePageKey(slug);
+  const matches = items.filter((item) => normalizePageKey(item.slug) === wantedSlug);
   return (
-    items.find((item) => item.slug === slug && item.page_type === pageType) ??
-    items.find((item) => item.slug === slug) ??
+    matches.find((item) => item.page_type === pageType && item.status === "published") ??
+    matches.find((item) => item.page_type === pageType) ??
+    matches.find((item) => item.status === "published") ??
+    matches[0] ??
     null
   );
 }
