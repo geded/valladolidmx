@@ -63,6 +63,7 @@ import {
   type CompositionDetail,
   type CompositionRevisionSummary,
 } from "@/lib/experience-builder/studio.functions";
+import { translateCompositionTree } from "@/lib/experience-builder/translate.functions";
 import {
   updateNodeConfig,
   newNodeId,
@@ -824,6 +825,7 @@ function PageVisualEditor({
   const create = useServerFn(createComposition);
   const save = useServerFn(saveCompositionDraft);
   const publish = useServerFn(publishComposition);
+  const translate = useServerFn(translateCompositionTree);
   const listRevs = useServerFn(listCompositionRevisions);
   const restore = useServerFn(restoreCompositionRevision);
   const queryClient = useQueryClient();
@@ -902,7 +904,22 @@ function PageVisualEditor({
     setSaveStatus("saving");
     saveTimer.current = window.setTimeout(() => {
       void save({ data: { id: page.id, tree } })
-        .then(() => setSaveStatus("saved"))
+        .then(async () => {
+          setSaveStatus("saved");
+          // Auto-traducción a idiomas activos (H5). Falla silenciosa:
+          // si no hay clave IA, idiomas destino o parseo falla, el guardado
+          // ya está persistido y no se rompe el flujo del editor.
+          try {
+            const res = await translate({ data: { tree } });
+            if (!res.skipped && res.translated > 0) {
+              skipNextAutoSave.current = true;
+              setTree(res.tree);
+              await save({ data: { id: page.id, tree: res.tree } });
+            }
+          } catch {
+            /* silencioso: la traducción es best-effort */
+          }
+        })
         .catch(() => setSaveStatus("error"));
     }, 900);
     return () => {
