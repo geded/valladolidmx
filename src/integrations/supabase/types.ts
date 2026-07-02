@@ -1553,6 +1553,48 @@ export type Database = {
         }
         Relationships: []
       }
+      destination_media: {
+        Row: {
+          created_at: string
+          destination_id: string
+          id: string
+          media_asset_id: string
+          role: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          destination_id: string
+          id?: string
+          media_asset_id: string
+          role?: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          destination_id?: string
+          id?: string
+          media_asset_id?: string
+          role?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "destination_media_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "destination_media_media_asset_id_fkey"
+            columns: ["media_asset_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       destination_zones: {
         Row: {
           created_at: string
