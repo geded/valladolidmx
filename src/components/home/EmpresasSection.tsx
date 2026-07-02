@@ -13,7 +13,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listFeaturedBusinesses } from "@/lib/cms/public-reads.functions";
 import type { BusinessTeaser } from "@/types/entities";
 
-export function EmpresasSection() {
+export function EmpresasSection({ config }: { config?: Record<string, unknown> } = {}) {
   const { t } = useTranslation();
   const fetchBusinesses = useServerFn(listFeaturedBusinesses);
   const { data } = useQuery({
@@ -23,11 +23,12 @@ export function EmpresasSection() {
     staleTime: 5 * 60 * 1000,
   });
   const businesses = data && data.length > 0 ? data : EMPRESAS_MOCK;
+  const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.empresas_title");
   return (
     <section id="empresas" className="py-20 md:py-28">
       <Container>
         <SectionHeader
-          title={t("sections.empresas_title")}
+          title={title}
           subtitle={t("sections.empresas_sub")}
           actions={<ComingSoonBadge label="Motor de Visibilidad · pronto" />}
         />

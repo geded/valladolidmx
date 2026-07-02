@@ -24,9 +24,36 @@ import { cn } from "@/lib/utils";
  */
 interface Props {
   variant?: "solid" | "overlay";
+  config?: Record<string, unknown>;
 }
 
-export function SiteHeader({ variant = "solid" }: Props) {
+interface HeaderNavItem {
+  label: string;
+  href: string;
+}
+
+function textValue(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function boolValue(value: unknown, fallback: boolean): boolean {
+  return typeof value === "boolean" ? value : fallback;
+}
+
+function linkItems(value: unknown, fallback: HeaderNavItem[]): HeaderNavItem[] {
+  if (!Array.isArray(value)) return fallback;
+  return value
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+      const record = item as Record<string, unknown>;
+      const label = textValue(record.label);
+      const href = textValue(record.href);
+      return label && href ? { label, href } : null;
+    })
+    .filter((item): item is HeaderNavItem => Boolean(item));
+}
+
+export function SiteHeader({ variant = "solid", config }: Props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -110,13 +137,17 @@ export function SiteHeader({ variant = "solid" }: Props) {
 
   // Navegación oficial 12C.1 — priorización breve:
   // Destinos · Experiencias · Arma tu Viaje · Alux · Empresas.
-  const nav = [
-    { to: "/oriente-maya" as const, label: t("nav.destinations") },
-    { to: "/experiencias" as const, label: t("nav.experiences") },
-    { to: "/arma-tu-viaje" as const, label: t("nav.plan_trip") },
-    { to: "/alux" as const, label: t("nav.alux") },
-    { to: "/empresas" as const, label: t("nav.for_business") },
-  ];
+  const nav = linkItems(config?.nav, [
+    { href: "/oriente-maya", label: t("nav.destinations") },
+    { href: "/experiencias", label: t("nav.experiences") },
+    { href: "/arma-tu-viaje", label: t("nav.plan_trip") },
+    { href: "/alux", label: t("nav.alux") },
+    { href: "/empresas", label: t("nav.for_business") },
+  ]);
+  const ctaLabel = textValue(config?.cta_label) ?? t("nav.plan_trip");
+  const ctaHref = textValue(config?.cta_href) ?? "/arma-tu-viaje";
+  const showLanguage = boolValue(config?.show_language, true);
+  const showUserMenu = boolValue(config?.show_user_menu, true);
 
   const mobileDrawer = mounted && open
     ? createPortal(
@@ -149,26 +180,26 @@ export function SiteHeader({ variant = "solid" }: Props) {
             </div>
             <nav aria-label="Menú móvil" className="flex flex-col gap-0.5 px-4 py-5">
               {nav.map((n) => (
-                <Link
-                  key={n.to}
-                  to={n.to}
+                <a
+                  key={n.href}
+                  href={n.href}
                   onClick={() => setOpen(false)}
                   className="rounded-lg px-3 py-2.5 text-[0.95rem] font-medium leading-tight text-foreground hover:bg-accent hover:text-accent-foreground"
                 >
                   {n.label}
-                </Link>
+                </a>
               ))}
-              <Link
-                to="/arma-tu-viaje"
+              <a
+                href={ctaHref}
                 onClick={() => setOpen(false)}
                 className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-[0.95rem] font-semibold text-primary-foreground"
               >
                 <Compass className="size-4" aria-hidden />
-                {t("nav.plan_trip")}
-              </Link>
-              <div className="mt-4 border-t border-border/70 pt-4 sm:hidden">
+                {ctaLabel}
+              </a>
+              {showUserMenu ? <div className="mt-4 border-t border-border/70 pt-4 sm:hidden">
                 <UserMenu />
-              </div>
+              </div> : null}
             </nav>
           </aside>
         </>,
@@ -205,14 +236,9 @@ export function SiteHeader({ variant = "solid" }: Props) {
           <nav aria-label="Principal" className="hidden lg:block">
             <ul className="flex items-center gap-1">
               {nav.map((n) => (
-                <li key={n.to}>
-                  <Link
-                    to={n.to}
-                    activeProps={{
-                      className: isOverlay
-                        ? "!bg-white/15 !text-white ring-1 ring-white/30"
-                        : "!bg-secondary/70 !text-foreground ring-1 ring-border/70",
-                    }}
+                <li key={n.href}>
+                  <a
+                    href={n.href}
                     className={cn(
                       "rounded-full px-3 py-1.5 text-sm font-medium transition",
                       isOverlay
@@ -221,15 +247,15 @@ export function SiteHeader({ variant = "solid" }: Props) {
                     )}
                   >
                     {n.label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link
-              to="/arma-tu-viaje"
+            <a
+              href={ctaHref}
               className={cn(
                 "hidden items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition sm:inline-flex",
                 isOverlay
@@ -238,12 +264,12 @@ export function SiteHeader({ variant = "solid" }: Props) {
               )}
             >
               <Compass className="size-4" aria-hidden />
-              {t("nav.plan_trip")}
-            </Link>
-            <LanguageSwitcher />
-            <div className="hidden sm:block">
+              {ctaLabel}
+            </a>
+            {showLanguage ? <LanguageSwitcher /> : null}
+            {showUserMenu ? <div className="hidden sm:block">
               <UserMenu />
-            </div>
+            </div> : null}
             <button
               ref={menuButtonRef}
               type="button"

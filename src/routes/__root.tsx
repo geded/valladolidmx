@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, queryOptions, useQuery } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
@@ -25,6 +25,13 @@ import { AluxFloatingTrigger } from "@/components/layout/AluxFloatingTrigger";
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
+import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
+
+const rootPublishedHomeQuery = queryOptions({
+  queryKey: ["eb", "published-home", "default"],
+  queryFn: () => getPublishedHomeComposition({ data: { variant_key: "default" } }),
+  staleTime: 60_000,
+});
 
 function NotFoundComponent() {
   return (
@@ -173,15 +180,31 @@ function RootComponent() {
         >
           Saltar al contenido
         </a>
-        {!isAppShellRoute ? <PublicHeader variant={headerVariant} /> : null}
+        {!isAppShellRoute ? <PublicChrome pathname={pathname} headerVariant={headerVariant} position="header" /> : null}
         {!isAppShellRoute ? <OfflineBanner /> : null}
         <SyncStatusBanner />
         <UpdateBanner />
         <Outlet />
-        {!isAppShellRoute ? <PublicFooter /> : null}
+        {!isAppShellRoute ? <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" /> : null}
         {!isAppShellRoute ? <AluxFloatingTrigger /> : null}
         </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>
   );
+}
+
+function PublicChrome({
+  pathname, headerVariant, position,
+}: { pathname: string; headerVariant: "solid" | "overlay"; position: "header" | "footer" }) {
+  const { data: published } = useQuery({
+    ...rootPublishedHomeQuery,
+    enabled: pathname === "/",
+  });
+  const config = published?.snapshot?.chrome?.[position];
+
+  if (position === "header") {
+    return <PublicHeader variant={headerVariant} config={config} />;
+  }
+
+  return <PublicFooter config={config} />;
 }

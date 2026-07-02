@@ -67,14 +67,124 @@ import {
   newNodeId,
   type CompositionNode,
   type CompositionTree,
+  type CompositionJsonObject,
 } from "@/lib/experience-builder/composition-tree";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { getBlock, listBlocks } from "@/lib/experience-builder/block-registry";
+import type { BlockContract } from "@/lib/experience-builder/block-contract";
 import { AutoInspector } from "@/components/experience-builder/AutoInspector";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
 import { useAuth } from "@/hooks/useAuth";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
+type ChromeArea = "header" | "footer";
+
+const HEADER_CHROME_ID = "__chrome_header";
+const FOOTER_CHROME_ID = "__chrome_footer";
+
+const DEFAULT_HEADER_CONFIG: CompositionJsonObject = {
+  nav: [
+    { label: "Destinos", href: "/oriente-maya" },
+    { label: "Experiencias", href: "/experiencias" },
+    { label: "Arma tu Viaje", href: "/arma-tu-viaje" },
+    { label: "Alux", href: "/alux" },
+    { label: "Empresas", href: "/empresas" },
+  ],
+  cta_label: "Arma tu Viaje",
+  cta_href: "/arma-tu-viaje",
+  show_language: true,
+  show_user_menu: true,
+};
+
+const DEFAULT_FOOTER_CONFIG: CompositionJsonObject = {
+  tagline: "Plataforma oficial del Oriente Maya de Yucatán.",
+  explore_links: [
+    { label: "Destinos", href: "/oriente-maya" },
+    { label: "Experiencias", href: "/experiencias" },
+    { label: "Hoteles", href: "/hoteles" },
+    { label: "Restaurantes", href: "/restaurantes" },
+    { label: "Eventos", href: "/eventos" },
+  ],
+  platform_links: [
+    { label: "Arma tu Viaje", href: "/arma-tu-viaje" },
+    { label: "Alux", href: "/alux" },
+    { label: "Empresas", href: "/empresas" },
+  ],
+  legal_label: "Aviso legal",
+  privacy_label: "Privacidad",
+  show_language: true,
+};
+
+const headerChromeContract: BlockContract = {
+  type: "vmx.chrome.header",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Encabezado",
+  description: "Navegación superior pública del sitio.",
+  schema: {
+    nav: {
+      type: "list",
+      label: "Menú principal",
+      item: {
+        type: "object",
+        label: "Enlace",
+        fields: {
+          label: { type: "text", label: "Texto", required: true },
+          href: { type: "url", label: "Enlace", required: true },
+        },
+      },
+    },
+    cta_label: { type: "text", label: "Botón destacado — texto" },
+    cta_href: { type: "url", label: "Botón destacado — enlace" },
+    show_language: { type: "boolean", label: "Mostrar idiomas", default: true },
+    show_user_menu: { type: "boolean", label: "Mostrar acceso de usuario", default: true },
+  },
+  capabilities: { soporta_preview: true, soporta_i18n: true },
+};
+
+const footerChromeContract: BlockContract = {
+  type: "vmx.chrome.footer",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Pie de página",
+  description: "Contenido inferior público del sitio.",
+  schema: {
+    tagline: { type: "text", label: "Descripción" },
+    explore_links: {
+      type: "list",
+      label: "Columna Explorar",
+      item: {
+        type: "object",
+        label: "Enlace",
+        fields: {
+          label: { type: "text", label: "Texto", required: true },
+          href: { type: "url", label: "Enlace", required: true },
+        },
+      },
+    },
+    platform_links: {
+      type: "list",
+      label: "Columna Plataforma",
+      item: {
+        type: "object",
+        label: "Enlace",
+        fields: {
+          label: { type: "text", label: "Texto", required: true },
+          href: { type: "url", label: "Enlace", required: true },
+        },
+      },
+    },
+    legal_label: { type: "text", label: "Texto legal" },
+    privacy_label: { type: "text", label: "Texto privacidad" },
+    show_language: { type: "boolean", label: "Mostrar idiomas", default: true },
+  },
+  capabilities: { soporta_preview: true, soporta_i18n: true },
+};
+
+function getChromeConfig(tree: CompositionTree, area: ChromeArea): CompositionJsonObject {
+  const defaults = area === "header" ? DEFAULT_HEADER_CONFIG : DEFAULT_FOOTER_CONFIG;
+  return { ...defaults, ...(tree.chrome?.[area] ?? {}) };
+}
 
 interface SitePage {
   key: string;
@@ -263,10 +373,10 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
         const home = pickCanonicalHomeComposition(all);
         let detail: CompositionDetail | null = null;
         if (home) {
-          detail = await get({ data: { id: home.id } });
+          detail = (await get({ data: { id: home.id } })) as CompositionDetail | null;
         } else {
           const { id } = await create({ data: { slug: "home", title: "Página de Inicio", page_type: "home" } });
-          detail = await get({ data: { id } });
+          detail = (await get({ data: { id } })) as CompositionDetail | null;
         }
         if (cancelled || !detail) return;
         setPage(detail);
@@ -300,9 +410,22 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     () => (tree && selectedId ? tree.root.children.find((n) => n.id === selectedId) ?? null : null),
     [tree, selectedId],
   );
+  const selectedChrome = selectedId === HEADER_CHROME_ID ? "header" : selectedId === FOOTER_CHROME_ID ? "footer" : null;
   const selectedContract = useMemo(
-    () => (selectedNode ? getBlock(selectedNode.type) ?? null : null),
-    [selectedNode],
+    () => {
+      if (selectedChrome === "header") return headerChromeContract;
+      if (selectedChrome === "footer") return footerChromeContract;
+      return selectedNode ? getBlock(selectedNode.type) ?? null : null;
+    },
+    [selectedChrome, selectedNode],
+  );
+  const selectedConfig = useMemo(
+    () => {
+      if (!tree) return null;
+      if (selectedChrome) return getChromeConfig(tree, selectedChrome);
+      return selectedNode?.config as Record<string, unknown> | null;
+    },
+    [selectedChrome, selectedNode, tree],
   );
 
   const onPublish = async () => {
@@ -323,7 +446,18 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
   };
 
   const updateSelectedConfig = (nextConfig: Record<string, unknown>) => {
-    if (!selectedNode || !tree) return;
+    if (!tree) return;
+    if (selectedChrome) {
+      setTree({
+        ...tree,
+        chrome: {
+          ...(tree.chrome ?? {}),
+          [selectedChrome]: nextConfig as CompositionJsonObject,
+        },
+      });
+      return;
+    }
+    if (!selectedNode) return;
     setTree(updateNodeConfig(tree, selectedNode.id, nextConfig));
   };
 
@@ -336,7 +470,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     const next = [...tree.root.children];
     const [item] = next.splice(idx, 1);
     next.splice(to, 0, item);
-    setTree({ root: { children: next } });
+    setTree({ ...tree, root: { children: next } });
   };
 
   const duplicateNode = (nodeId: string) => {
@@ -347,14 +481,14 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     const idx = tree.root.children.findIndex((n) => n.id === nodeId);
     const next = [...tree.root.children];
     next.splice(idx + 1, 0, clone);
-    setTree({ root: { children: next } });
+    setTree({ ...tree, root: { children: next } });
     setSelectedId(clone.id);
   };
 
   const removeNodeById = (nodeId: string) => {
     if (!tree) return;
     const next = tree.root.children.filter((n) => n.id !== nodeId);
-    setTree({ root: { children: next } });
+    setTree({ ...tree, root: { children: next } });
     if (selectedId === nodeId) setSelectedId(null);
   };
 
@@ -370,7 +504,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     const next = [...tree.root.children];
     const idx = atIndex ?? next.length;
     next.splice(idx, 0, node);
-    setTree({ root: { children: next } });
+    setTree({ ...tree, root: { children: next } });
     setSelectedId(node.id);
     setShowLibrary(false);
   };
@@ -388,7 +522,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     if (!page) return;
     if (typeof window !== "undefined" && !window.confirm(`Restaurar la revisión #${rev.revision_number} como borrador actual?`)) return;
     await restore({ data: { id: page.id, revision_id: rev.id } });
-    const detail = await get({ data: { id: page.id } });
+    const detail = (await get({ data: { id: page.id } })) as CompositionDetail | null;
     if (detail) {
       setPage(detail);
       setTree(detail.current_draft);
@@ -407,7 +541,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     const newIdx = tree.root.children.findIndex((n) => n.id === e.over!.id);
     if (oldIdx < 0 || newIdx < 0) return;
     const next = arrayMove(tree.root.children, oldIdx, newIdx);
-    setTree({ root: { children: next } });
+    setTree({ ...tree, root: { children: next } });
   };
 
   if (loadError) return <FullScreenState title="No se pudo abrir el editor" detail={loadError} onExit={onExit} />;
@@ -495,7 +629,12 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
               <p className="mt-1 text-[10px] text-muted-foreground">Arrastra para reordenar. Clic para editar.</p>
             </div>
             <div className="flex-1 overflow-y-auto p-2">
-              <ChromeItem label="Encabezado global" note="Compartido por todo el sitio · edición en historia posterior" />
+              <ChromeItem
+                label="Encabezado"
+                note="Menú, enlaces y botón destacado"
+                selected={selectedId === HEADER_CHROME_ID}
+                onSelect={() => setSelectedId(HEADER_CHROME_ID)}
+              />
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                 <SortableContext items={tree.root.children.map((n) => n.id)} strategy={verticalListSortingStrategy}>
                   {tree.root.children.map((n) => (
@@ -503,7 +642,12 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
                   ))}
                 </SortableContext>
               </DndContext>
-              <ChromeItem label="Pie de página global" note="Compartido por todo el sitio · edición en historia posterior" />
+              <ChromeItem
+                label="Pie de página"
+                note="Columnas, enlaces y textos legales"
+                selected={selectedId === FOOTER_CHROME_ID}
+                onSelect={() => setSelectedId(FOOTER_CHROME_ID)}
+              />
               <button
                 type="button"
                 onClick={() => setShowLibrary(true)}
@@ -520,12 +664,13 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
           previewMode={previewMode}
           selectedId={selectedId}
           onSelect={(id) => setSelectedId(id)}
+          onSelectChrome={(area) => setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)}
           onDelete={removeNodeById}
           onDuplicate={duplicateNode}
           onMove={moveNode}
         />
 
-        {!previewMode && selectedNode && selectedContract ? (
+        {!previewMode && selectedContract && selectedConfig ? (
           <aside
             className="fixed right-0 top-[52px] z-40 flex h-[calc(100vh-52px)] w-[360px] max-w-[92vw] flex-col gap-4 overflow-y-auto border-l border-border bg-card p-4 shadow-xl"
             aria-label="Herramientas para editar el bloque seleccionado"
@@ -545,16 +690,18 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
               </button>
             </header>
 
-            <div className="flex flex-wrap gap-1.5">
-              <ToolBtn onClick={() => moveNode(selectedNode.id, -1)} icon={<ChevronUp className="size-3" />} label="Subir" />
-              <ToolBtn onClick={() => moveNode(selectedNode.id, 1)} icon={<ChevronDown className="size-3" />} label="Bajar" />
-              <ToolBtn onClick={() => duplicateNode(selectedNode.id)} icon={<Copy className="size-3" />} label="Duplicar" />
-              <ToolBtn onClick={() => removeNodeById(selectedNode.id)} icon={<Trash2 className="size-3" />} label="Eliminar" tone="danger" />
-            </div>
+            {selectedNode ? (
+              <div className="flex flex-wrap gap-1.5">
+                <ToolBtn onClick={() => moveNode(selectedNode.id, -1)} icon={<ChevronUp className="size-3" />} label="Subir" />
+                <ToolBtn onClick={() => moveNode(selectedNode.id, 1)} icon={<ChevronDown className="size-3" />} label="Bajar" />
+                <ToolBtn onClick={() => duplicateNode(selectedNode.id)} icon={<Copy className="size-3" />} label="Duplicar" />
+                <ToolBtn onClick={() => removeNodeById(selectedNode.id)} icon={<Trash2 className="size-3" />} label="Eliminar" tone="danger" />
+              </div>
+            ) : null}
 
             <AutoInspector
               contract={selectedContract}
-              config={selectedNode.config as Record<string, unknown>}
+              config={selectedConfig}
               onChange={(next) => updateSelectedConfig(next)}
               simple
             />
@@ -581,6 +728,7 @@ function HomeCanvas({
   previewMode,
   selectedId,
   onSelect,
+  onSelectChrome,
   onDelete,
   onDuplicate,
   onMove,
@@ -589,6 +737,7 @@ function HomeCanvas({
   previewMode: boolean;
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onSelectChrome: (area: ChromeArea) => void;
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
   onMove: (id: string, dir: -1 | 1) => void;
@@ -641,8 +790,8 @@ function HomeCanvas({
             transformOrigin: "top left",
           }}
         >
-          <InertChrome label="Encabezado global · no editable aún">
-            <PublicHeader variant="overlay" />
+          <InertChrome label="Encabezado" selected={selectedId === HEADER_CHROME_ID} onSelect={() => onSelectChrome("header")}>
+            <PublicHeader variant="overlay" config={getChromeConfig(tree, "header")} />
           </InertChrome>
           <CompositionRenderer
             tree={tree}
@@ -666,8 +815,8 @@ function HomeCanvas({
                   )
             }
           />
-          <InertChrome label="Pie de página global · no editable aún">
-            <PublicFooter />
+          <InertChrome label="Pie de página" selected={selectedId === FOOTER_CHROME_ID} onSelect={() => onSelectChrome("footer")}>
+            <PublicFooter config={getChromeConfig(tree, "footer")} />
           </InertChrome>
         </div>
       </div>
@@ -677,26 +826,48 @@ function HomeCanvas({
 
 /* --------------------------------------------------------------------- */
 
-function InertChrome({ label, children }: { label: string; children: React.ReactNode }) {
+function InertChrome({
+  label, selected, onSelect, children,
+}: { label: string; selected: boolean; onSelect: () => void; children: React.ReactNode }) {
   return (
-    <div className="relative">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={(event) => {
+        event.stopPropagation();
+        onSelect();
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSelect();
+        }
+      }}
+      className={`group relative cursor-pointer outline-none ring-inset ${selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"}`}
+      aria-label={`Editar ${label}`}
+    >
       <div className="pointer-events-none select-none opacity-90" aria-hidden>
         {children}
       </div>
-      <div className="pointer-events-none absolute inset-0 ring-1 ring-dashed ring-border/60" />
-      <span className="pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-muted px-2.5 py-1 text-[10px] font-medium text-muted-foreground shadow">
+      <span className={`pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-lg transition-opacity ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
         {label}
       </span>
     </div>
   );
 }
 
-function ChromeItem({ label, note }: { label: string; note: string }) {
+function ChromeItem({
+  label, note, selected, onSelect,
+}: { label: string; note: string; selected: boolean; onSelect: () => void }) {
   return (
-    <div className="mb-2 rounded-md border border-dashed border-border bg-muted/30 px-3 py-2">
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`mb-2 w-full rounded-md border px-3 py-2 text-left transition-colors ${selected ? "border-primary bg-primary/10" : "border-dashed border-border bg-muted/30 hover:bg-accent"}`}
+    >
       <p className="text-[11px] font-semibold text-foreground">{label}</p>
       <p className="text-[10px] text-muted-foreground">{note}</p>
-    </div>
+    </button>
   );
 }
 

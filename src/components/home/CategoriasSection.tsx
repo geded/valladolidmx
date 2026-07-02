@@ -11,7 +11,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listHomeFeaturedCategories } from "@/lib/cms/public-reads.functions";
 import type { Category } from "@/types/entities";
 
-export function CategoriasSection() {
+export function CategoriasSection({ config }: { config?: Record<string, unknown> } = {}) {
   const { t } = useTranslation();
   const fetchHomeCategories = useServerFn(listHomeFeaturedCategories);
   const { data } = useQuery({
@@ -21,10 +21,11 @@ export function CategoriasSection() {
     staleTime: 5 * 60 * 1000,
   });
   const categories = data && data.length > 0 ? data : CATEGORIAS_MOCK;
+  const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.categories_title");
   return (
     <section id="categorias" className="bg-secondary/40 py-20 md:py-28">
       <Container>
-        <SectionHeader title={t("sections.categories_title")} subtitle={t("sections.categories_sub")} />
+        <SectionHeader title={title} subtitle={t("sections.categories_sub")} />
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {categories.map((c) => (
             <CategoriaCard key={c.id} category={c} />

@@ -8,8 +8,9 @@ import { Container } from "@/components/layout/Container";
 import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { useTranslation } from "@/i18n/context";
 
-export function ConsejoAluxSection() {
+export function ConsejoAluxSection({ config }: { config?: Record<string, unknown> } = {}) {
   const { t } = useTranslation();
+  const heading = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.alux_title");
   return (
     <section id="consejo-alux" className="bg-secondary/40 py-20 md:py-24">
       <Container>
@@ -20,7 +21,7 @@ export function ConsejoAluxSection() {
           <div className="flex-1">
             <div className="mb-2 flex items-center gap-2">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
-                {t("sections.alux_title")}
+                {heading}
               </p>
               <ComingSoonBadge label={t("common.coming_soon")} />
             </div>

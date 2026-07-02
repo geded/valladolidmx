@@ -18,13 +18,14 @@ const TILES: { label: string; palette: PlaceholderPalette }[] = [
   { label: "Las Coloradas", palette: "atardecer" },
 ];
 
-export function EnVivoSection() {
+export function EnVivoSection({ config }: { config?: Record<string, unknown> } = {}) {
   const { t } = useTranslation();
+  const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.envivo_title");
   return (
     <section id="en-vivo" className="bg-secondary/40 py-20 md:py-28">
       <Container>
         <SectionHeader
-          title={t("sections.envivo_title")}
+          title={title}
           subtitle={t("sections.envivo_sub")}
           actions={<ComingSoonBadge label={t("common.coming_soon")} />}
         />

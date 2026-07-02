@@ -6,8 +6,11 @@ import { Compass, FileText, MessageCircle } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { useTranslation } from "@/i18n/context";
 
-export function ArmaTuViajeSection() {
+export function ArmaTuViajeSection({ config }: { config?: Record<string, unknown> } = {}) {
   const { t } = useTranslation();
+  const heading = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.ayv_title");
+  const body = typeof config?.body === "string" && config.body.trim() ? config.body : t("sections.ayv_sub");
+  const ctaLabel = typeof config?.cta_label === "string" && config.cta_label.trim() ? config.cta_label : t("hero.cta_secondary");
   return (
     <section id="arma-tu-viaje" className="py-20 md:py-28">
       <Container>
@@ -16,14 +19,14 @@ export function ArmaTuViajeSection() {
             <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">
               {t("nav.plan_trip")}
             </p>
-            <h2 className="text-balance text-3xl md:text-4xl">{t("sections.ayv_title")}</h2>
-            <p className="mt-4 text-lg text-muted-foreground">{t("sections.ayv_sub")}</p>
+            <h2 className="text-balance text-3xl md:text-4xl">{heading}</h2>
+            <p className="mt-4 text-lg text-muted-foreground">{body}</p>
             <Link
               to="/arma-tu-viaje"
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-md hover:opacity-95"
             >
               <Compass className="size-4" aria-hidden />
-              {t("hero.cta_secondary")}
+              {ctaLabel}
             </Link>
           </div>
           <ul className="grid gap-3">
