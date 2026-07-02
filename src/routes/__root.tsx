@@ -22,6 +22,7 @@ import {
   UpdateBanner,
 } from "@/components/discovery";
 import { AluxFloatingTrigger } from "@/components/layout/AluxFloatingTrigger";
+import { EditThisPageButton } from "@/components/experience-builder/EditThisPageButton";
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
