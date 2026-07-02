@@ -155,7 +155,17 @@ function RenderNode({ node, studio, wrap, variableContext }: RenderNodeProps): R
   const scopedCss = typoOverrides
     ? buildScopedTypographyCss(scopeId, resolved.type, typoOverrides)
     : "";
-  const needsWrap = hasAppearance(appearance) || Boolean(scopedCss);
+  // US-10 (15.10.4d): visibilidad por dispositivo. `__hidden_on` es un array
+  // de "mobile" | "tablet" | "desktop". Se emite como `data-hidden-on` y el
+  // CSS global (src/styles.css) resuelve tanto producción como Studio.
+  const rawHidden = (resolved.config as Record<string, unknown>).__hidden_on;
+  const hiddenOn = Array.isArray(rawHidden)
+    ? (rawHidden as unknown[]).filter(
+        (v): v is "mobile" | "tablet" | "desktop" =>
+          v === "mobile" || v === "tablet" || v === "desktop",
+      )
+    : [];
+  const needsWrap = hasAppearance(appearance) || Boolean(scopedCss) || hiddenOn.length > 0;
   const styled = needsWrap ? (
     <div
       style={{
@@ -167,6 +177,7 @@ function RenderNode({ node, studio, wrap, variableContext }: RenderNodeProps): R
         ...(scopedCss ? { containerType: "inline-size" } : {}),
       }}
       data-eb-typo={scopedCss ? scopeId : undefined}
+      data-hidden-on={hiddenOn.length > 0 ? hiddenOn.join(" ") : undefined}
     >
       {scopedCss ? <style dangerouslySetInnerHTML={{ __html: scopedCss }} /> : null}
       {content}
