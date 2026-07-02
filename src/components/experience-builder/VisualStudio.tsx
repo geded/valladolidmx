@@ -441,13 +441,16 @@ export interface VisualStudioProps {
 export function VisualStudio({ page = null, onSelectPage, advanced = false }: VisualStudioProps = {}) {
   const [internalKey, setInternalKey] = useState<string | null>(page);
   const [customPages, setCustomPages] = useState<SitePage[]>([]);
-  const openKey = page ?? internalKey;
+  const openKey = normalizePageKey(page ?? internalKey);
   const setOpen = (k: string | null) => {
-    setInternalKey(k);
-    onSelectPage?.(k);
+    const next = normalizePageKey(k);
+    setInternalKey(next);
+    onSelectPage?.(next);
   };
   const allPages = useMemo(() => [...SITE_PAGES, ...customPages], [customPages]);
-  const activePage = openKey ? allPages.find((p) => p.key === openKey) ?? null : null;
+  const activePage = openKey
+    ? allPages.find((p) => normalizePageKey(p.key) === openKey) ?? null
+    : null;
   if (activePage) {
     return <PageVisualEditor pageDef={activePage} onExit={() => setOpen(null)} advanced={advanced} />;
   }
@@ -481,7 +484,7 @@ function PagesPicker({
   const [createError, setCreateError] = useState<string | null>(null);
   const [dbPages, setDbPages] = useState<SitePage[]>([]);
   const knownKeys = useMemo(
-    () => new Set([...SITE_PAGES.map((p) => p.key), ...customPages.map((p) => p.key)]),
+    () => new Set([...SITE_PAGES.map((p) => normalizePageKey(p.key)), ...customPages.map((p) => normalizePageKey(p.key))]),
     [customPages],
   );
 
@@ -492,10 +495,10 @@ function PagesPicker({
         const all = await listAll();
         if (cancelled) return;
         const extras: SitePage[] = all
-          .filter((c) => !knownKeys.has(c.slug))
+          .filter((c) => !knownKeys.has(normalizePageKey(c.slug)))
           .map((c) => ({
-            key: c.slug,
-            slug: c.slug,
+            key: normalizePageKey(c.slug) ?? c.slug,
+            slug: normalizePageKey(c.slug) ?? c.slug,
             page_type: c.page_type,
             title: c.title,
             description: c.description ?? "Página personalizada creada desde el editor.",
@@ -794,6 +797,11 @@ function CreatePageModal({
       </div>
     </div>
   );
+}
+
+function normalizePageKey(key: string | null | undefined): string | null {
+  const clean = key?.trim().toLowerCase();
+  return clean || null;
 }
 
 /* --------------------------------------------------------------------- */
