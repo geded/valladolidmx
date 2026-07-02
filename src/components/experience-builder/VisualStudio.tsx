@@ -1615,6 +1615,7 @@ function HomeCanvas({
   onDelete,
   onDuplicate,
   onMove,
+  onReorderRoot,
 }: {
   tree: CompositionTree;
   previewMode: boolean;
@@ -1625,11 +1626,22 @@ function HomeCanvas({
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
   onMove: (id: string, dir: -1 | 1) => void;
+  onReorderRoot: (activeId: string, overId: string) => void;
 }) {
   const outerRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<HTMLDivElement | null>(null);
   const frameWidth = DEVICE_WIDTHS[deviceViewport];
   const [metrics, setMetrics] = useState({ width: frameWidth, height: 900 });
+  const rootIds = tree.root.children.map((n) => n.id);
+  const rootIdSet = new Set(rootIds);
+  const canvasSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+  const handleCanvasDragEnd = (e: DragEndEvent) => {
+    if (!e.over || e.active.id === e.over.id) return;
+    onReorderRoot(String(e.active.id), String(e.over.id));
+  };
 
   useEffect(() => {
     const measure = () => {
@@ -1682,28 +1694,33 @@ function HomeCanvas({
           <InertChrome label="Encabezado" selected={selectedId === HEADER_CHROME_ID} onSelect={() => onSelectChrome("header")}>
             <PublicHeader variant="overlay" config={getChromeConfig(tree, "header")} />
           </InertChrome>
-          <CompositionRenderer
-            tree={tree}
-            pageType="home"
-            wrap={
-              previewMode
-                ? undefined
-                : (node, content) => (
-                    <BlockOverlay
-                      key={node.id}
-                      node={node}
-                      selected={selectedId === node.id}
-                      onSelect={() => onSelect(node.id)}
-                      onDelete={() => onDelete(node.id)}
-                      onDuplicate={() => onDuplicate(node.id)}
-                      onMoveUp={() => onMove(node.id, -1)}
-                      onMoveDown={() => onMove(node.id, 1)}
-                    >
-                      {content}
-                    </BlockOverlay>
-                  )
-            }
-          />
+          <DndContext sensors={canvasSensors} collisionDetection={closestCenter} onDragEnd={handleCanvasDragEnd}>
+            <SortableContext items={rootIds} strategy={verticalListSortingStrategy}>
+              <CompositionRenderer
+                tree={tree}
+                pageType="home"
+                wrap={
+                  previewMode
+                    ? undefined
+                    : (node, content) => (
+                        <BlockOverlay
+                          key={node.id}
+                          node={node}
+                          selected={selectedId === node.id}
+                          onSelect={() => onSelect(node.id)}
+                          onDelete={() => onDelete(node.id)}
+                          onDuplicate={() => onDuplicate(node.id)}
+                          onMoveUp={() => onMove(node.id, -1)}
+                          onMoveDown={() => onMove(node.id, 1)}
+                          sortable={rootIdSet.has(node.id)}
+                        >
+                          {content}
+                        </BlockOverlay>
+                      )
+                }
+              />
+            </SortableContext>
+          </DndContext>
           <InertChrome label="Pie de página" selected={selectedId === FOOTER_CHROME_ID} onSelect={() => onSelectChrome("footer")}>
             <PublicFooter config={getChromeConfig(tree, "footer")} />
           </InertChrome>
