@@ -32,6 +32,7 @@ import {
   Plus,
   Redo2,
   Search,
+  Share2,
   Trash2,
   Undo2,
   X,
@@ -62,6 +63,7 @@ import {
   publishComposition,
   listCompositionRevisions,
   restoreCompositionRevision,
+  issueCompositionPreviewLink,
   type CompositionDetail,
   type CompositionRevisionSummary,
 } from "@/lib/experience-builder/studio.functions";
@@ -828,6 +830,7 @@ function PageVisualEditor({
   const publish = useServerFn(publishComposition);
   const listRevs = useServerFn(listCompositionRevisions);
   const restore = useServerFn(restoreCompositionRevision);
+  const issuePreview = useServerFn(issueCompositionPreviewLink);
   const queryClient = useQueryClient();
   const { roles } = useAuth();
   const canPublish = roles.includes("admin") || roles.includes("super_admin");
@@ -843,6 +846,8 @@ function PageVisualEditor({
   const [showVersions, setShowVersions] = useState(false);
   const [versions, setVersions] = useState<CompositionRevisionSummary[]>([]);
   const [previewMode, setPreviewMode] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [shareLink, setShareLink] = useState<{ url: string; expires_at: string } | null>(null);
   const skipNextAutoSave = useRef(false);
   /**
    * Historial visual (US-14). Guardamos snapshots del árbol en `pastRef`
@@ -1133,6 +1138,28 @@ function PageVisualEditor({
     commitTree({ ...tree, root: { children: next } });
   };
 
+  const shareDraftPreview = async () => {
+    if (!page || sharing) return;
+    setSharing(true);
+    try {
+      const { token, expires_at } = await issuePreview({
+        data: { composition_id: page.id, ttl_minutes: 60 * 24 },
+      });
+      const url = `${window.location.origin}/preview/composition/${token}`;
+      setShareLink({ url, expires_at });
+      try {
+        await navigator.clipboard.writeText(url);
+        setMessage("Enlace de vista previa copiado al portapapeles.");
+      } catch {
+        setMessage("Enlace de vista previa generado.");
+      }
+    } catch (e) {
+      setMessage(`No se pudo generar el enlace: ${(e as Error).message}`);
+    } finally {
+      setSharing(false);
+    }
+  };
+
   // Atajos de teclado: Cmd/Ctrl+Z para deshacer, Cmd/Ctrl+Shift+Z (o Ctrl+Y)
   // para rehacer. Se ignora cuando el foco está en un input, textarea o
   // elemento editable para no romper el undo nativo de los campos.
@@ -1258,6 +1285,20 @@ function PageVisualEditor({
             Ver en el sitio
             <ExternalLink className="size-3.5" aria-hidden />
           </a>
+          <button
+            type="button"
+            onClick={() => void shareDraftPreview()}
+            disabled={sharing}
+            title="Genera un enlace temporal para compartir el borrador actual sin publicarlo"
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-60"
+          >
+            {sharing ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden />
+            ) : (
+              <Share2 className="size-3.5" aria-hidden />
+            )}
+            Compartir vista previa
+          </button>
           {canPublish ? (
             <button
               type="button"
