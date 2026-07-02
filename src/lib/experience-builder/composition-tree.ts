@@ -37,6 +37,17 @@ export interface CompositionNode {
    * puede ser hijo de cualquier contenedor compatible.
    */
   children?: CompositionNode[];
+  /**
+   * Traducciones automáticas por idioma para los campos `translatable: true`.
+   * Formato:
+   *   {
+   *     "_src": { "<dot.path>": "<texto base al momento de traducir>" },
+   *     "<locale>": { "<dot.path>": "<traducción>" }
+   *   }
+   * Se resuelve al render vía `applyI18nToNode`. Los saltos de traducción
+   * (cambios en el texto base) se detectan comparando contra `_src`.
+   */
+  i18n?: Record<string, Record<string, string>>;
 }
 
 export interface CompositionTree {
