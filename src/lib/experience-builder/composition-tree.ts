@@ -33,6 +33,10 @@ export interface CompositionTree {
   root: {
     children: CompositionNode[];
   };
+  chrome?: {
+    header?: Record<string, unknown>;
+    footer?: Record<string, unknown>;
+  };
 }
 
 export const EMPTY_TREE: CompositionTree = { root: { children: [] } };
