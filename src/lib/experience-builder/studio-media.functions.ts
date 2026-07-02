@@ -184,27 +184,44 @@ export const importUrlToStudioMedia = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: ImportUrlInput) => {
     if (!d?.url) throw new Error("invalid_input");
-    if (!/^https?:\/\//i.test(d.url)) throw new Error("only_http_urls");
+    if (!/^https?:\/\//i.test(d.url) && !/^data:image\//i.test(d.url)) {
+      throw new Error("only_http_or_data_urls");
+    }
     return d;
   })
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
 
-    // Descarga server-side (evita CORS del navegador).
-    const resp = await fetch(data.url, { redirect: "follow" });
-    if (!resp.ok) throw new Error(`download_failed_${resp.status}`);
-    const mime = resp.headers.get("content-type")?.split(";")[0]?.trim() || "image/jpeg";
-    if (!mime.startsWith("image/")) throw new Error("not_an_image");
-    const buf = new Uint8Array(await resp.arrayBuffer());
+    let mime = "image/jpeg";
+    let buf: Uint8Array;
+    let baseName = "importada";
+    if (/^data:image\//i.test(data.url)) {
+      const match = data.url.match(/^data:([^;,]+)(;base64)?,(.*)$/);
+      if (!match) throw new Error("invalid_data_uri");
+      mime = match[1] || "image/jpeg";
+      const isB64 = !!match[2];
+      const payload = match[3];
+      if (isB64) {
+        const bin = atob(payload);
+        buf = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+      } else {
+        buf = new TextEncoder().encode(decodeURIComponent(payload));
+      }
+    } else {
+      const resp = await fetch(data.url, { redirect: "follow" });
+      if (!resp.ok) throw new Error(`download_failed_${resp.status}`);
+      mime = resp.headers.get("content-type")?.split(";")[0]?.trim() || "image/jpeg";
+      if (!mime.startsWith("image/")) throw new Error("not_an_image");
+      buf = new Uint8Array(await resp.arrayBuffer());
+      try {
+        const u = new URL(data.url);
+        const last = u.pathname.split("/").filter(Boolean).pop();
+        if (last) baseName = last;
+      } catch { /* ignore */ }
+    }
     if (buf.byteLength > 12 * 1024 * 1024) throw new Error("file_too_large");
 
-    // Nombre a partir de la URL.
-    let baseName = "importada";
-    try {
-      const u = new URL(data.url);
-      const last = u.pathname.split("/").filter(Boolean).pop();
-      if (last) baseName = last;
-    } catch { /* ignore */ }
     const ext = mime === "image/png" ? "png"
       : mime === "image/webp" ? "webp"
       : mime === "image/gif" ? "gif"
