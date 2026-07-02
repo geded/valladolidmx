@@ -227,8 +227,12 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
     return d;
   })
   .handler(async ({ data, context }) => {
-    await assertEditorial(context);
     assertEditableTable(data.table);
+    if (data.table === "businesses") {
+      await assertCanEditBusiness(context, data.id ?? null);
+    } else {
+      await assertEditorial(context);
+    }
     const clean = sanitizePayload(data.table, data.payload);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
