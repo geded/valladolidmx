@@ -6,6 +6,7 @@ import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
 import { ConnectivityIndicator } from "./ConnectivityIndicator";
 import { getNavItemsForWorkspace } from "@/lib/workspace/navigation-registry";
 import { cn } from "@/lib/utils";
+import { UserMenu } from "@/components/layout/UserMenu";
 
 /** Humaniza un segmento de URL para usarlo como crumb. */
 function humanizeSegment(seg: string): string {
@@ -201,6 +202,9 @@ export function WorkspaceTopbar({ title }: { title?: string }) {
       >
         <PanelRight className="h-4 w-4" aria-hidden />
       </button>
+      <div className="ml-1">
+        <UserMenu />
+      </div>
     </header>
   );
 }
