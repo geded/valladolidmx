@@ -755,8 +755,16 @@ function BlockOverlay({
   children: React.ReactNode;
 }) {
   const contract = getBlock(node.type);
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (selected && ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [selected]);
   return (
     <div
+      ref={ref}
+      data-node-id={node.id}
       role="button"
       tabIndex={0}
       onClick={(e) => {
@@ -789,7 +797,9 @@ function BlockOverlay({
           <IconBtn onClick={(e) => { e.stopPropagation(); onDelete(); }} icon={<Trash2 className="size-3" />} label="Eliminar" tone="danger" />
         </div>
       ) : null}
-      {children}
+      {/* Bloqueamos interacciones internas: en modo edición los clics
+          siempre seleccionan el bloque en vez de navegar/enviar. */}
+      <div className="pointer-events-none select-none">{children}</div>
     </div>
   );
 }
