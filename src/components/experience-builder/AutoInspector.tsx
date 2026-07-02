@@ -8,7 +8,7 @@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, Languages, Plus, Trash2, Type, Upload } from "lucide-react";
-import { useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import type {
   BlockContract,
   BlockFieldSchema,
@@ -45,9 +45,15 @@ export interface AutoInspectorProps {
    * el Modo Visual del Studio para no confundir al editor final.
    */
   simple?: boolean;
+  /**
+   * Breakpoint activo del canvas (mobile/tablet/desktop). Cuando se pasa,
+   * el editor tipográfico escribe sobre ese breakpoint automáticamente
+   * para que "lo que ves en el canvas" sea lo que editas.
+   */
+  activeBreakpoint?: TypographyBreakpoint;
 }
 
-export function AutoInspector({ contract, config, onChange, simple = false }: AutoInspectorProps) {
+export function AutoInspector({ contract, config, onChange, simple = false, activeBreakpoint }: AutoInspectorProps) {
   const set = (key: string, value: unknown) => onChange({ ...config, [key]: value });
   const i18nMap = (config.__i18n as Record<string, Record<string, string>> | undefined) ?? {};
   const setTranslation = (fieldKey: string, lang: string, value: string) => {
@@ -87,6 +93,7 @@ export function AutoInspector({ contract, config, onChange, simple = false }: Au
             typography={typoMap[key]}
             typographyDefault={typoDefaults[key]}
             onTypographyChange={(next) => setTypography(key, next)}
+          activeBreakpoint={activeBreakpoint}
           />
         ))}
         {Object.keys(contract.schema).length === 0 ? (
@@ -121,7 +128,7 @@ function CapabilityChips({ contract }: { contract: BlockContract }) {
 }
 
 function FieldRow({
-  name, def, value, onChange, simple, translations, onTranslationChange, typography, typographyDefault, onTypographyChange,
+  name, def, value, onChange, simple, translations, onTranslationChange, typography, typographyDefault, onTypographyChange, activeBreakpoint,
 }: {
   name: string;
   def: BlockFieldSchema;
@@ -133,6 +140,7 @@ function FieldRow({
   typography?: FieldTypography;
   typographyDefault?: FieldTypography;
   onTypographyChange?: (next: FieldTypography) => void;
+  activeBreakpoint?: TypographyBreakpoint;
 }) {
   const canTranslate = Boolean(def.translatable) && !simple && (def.type === "text" || def.type === "rich_text");
   const canStyleText = !simple && (def.type === "text" || def.type === "rich_text");
@@ -175,7 +183,12 @@ function FieldRow({
         <p className="text-[10px] text-muted-foreground">{def.description}</p>
       ) : null}
       {canStyleText && showTypo ? (
-        <TypographyEditor value={typo} defaults={typographyDefault} onChange={(next) => onTypographyChange?.(next)} />
+        <TypographyEditor
+          value={typo}
+          defaults={typographyDefault}
+          onChange={(next) => onTypographyChange?.(next)}
+          activeBreakpoint={activeBreakpoint}
+        />
       ) : null}
       {canTranslate && showI18n ? (
         <TranslationsEditor
@@ -190,9 +203,15 @@ function FieldRow({
 }
 
 function TypographyEditor({
-  value, defaults, onChange,
-}: { value: FieldTypography; defaults?: FieldTypography; onChange: (next: FieldTypography) => void }) {
-  const [bp, setBp] = useState<TypographyBreakpoint>("base");
+  value, defaults, onChange, activeBreakpoint,
+}: { value: FieldTypography; defaults?: FieldTypography; onChange: (next: FieldTypography) => void; activeBreakpoint?: TypographyBreakpoint }) {
+  const [bp, setBp] = useState<TypographyBreakpoint>(activeBreakpoint ?? "base");
+  // Sincroniza el tab tipográfico con el dispositivo activo del canvas:
+  // si el usuario está viendo Desktop, edita Desktop; Tablet edita Tablet;
+  // Móvil edita Base. Así "lo que ves en el canvas" es lo que se edita.
+  useEffect(() => {
+    if (activeBreakpoint) setBp(activeBreakpoint);
+  }, [activeBreakpoint]);
   const active = getBreakpointTypography(value, bp);
   const base = getBreakpointTypography(value, "base");
   const set = <K extends keyof FieldTypography>(k: K, v: FieldTypography[K]) => {
