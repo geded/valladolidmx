@@ -234,6 +234,38 @@ const heroBlock: BlockContract = {
       label: "Mostrar buscador",
       default: true,
     },
+    search_placeholder: {
+      type: "text",
+      label: "Texto del buscador (placeholder)",
+      translatable: true,
+      description: "Texto guía que se muestra dentro del buscador cuando está vacío.",
+    },
+    search_helper: {
+      type: "text",
+      label: "Ayuda del buscador",
+      translatable: true,
+      description: "Texto pequeño a la derecha del buscador (visible sólo en pantallas grandes).",
+    },
+    text_alignment: {
+      type: "select",
+      label: "Posición del texto (frase, título, subtítulo)",
+      default: "left",
+      options: [
+        { value: "left", label: "Izquierda" },
+        { value: "center", label: "Centro" },
+        { value: "right", label: "Derecha" },
+      ],
+    },
+    search_alignment: {
+      type: "select",
+      label: "Posición del buscador",
+      default: "left",
+      options: [
+        { value: "left", label: "Izquierda" },
+        { value: "center", label: "Centro" },
+        { value: "right", label: "Derecha" },
+      ],
+    },
   },
   capabilities: {
     soporta_i18n: true,
@@ -243,9 +275,9 @@ const heroBlock: BlockContract = {
     soporta_cache: true,
   },
   constraints: { surfaces: ["home", "landing"], unique_per_page: true },
-  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["background_images", "background_position", "cta_alignment"] },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["background_images", "background_position", "cta_alignment", "text_alignment", "search_alignment"] },
   i18n: {
-    translatable_fields: ["eyebrow", "title", "subtitle", "ctas"],
+    translatable_fields: ["eyebrow", "title", "subtitle", "ctas", "search_placeholder", "search_helper"],
     fallback: "base_language",
   },
   audit: ["Block.Registered", "Block.VersionPublished"],
