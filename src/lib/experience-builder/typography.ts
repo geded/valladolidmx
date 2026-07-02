@@ -331,7 +331,12 @@ export function buildScopedTypographyCss(
   }
 
   let out = baseRules.join("");
-  if (mdRules.length) out += `@media (min-width:768px){${mdRules.join("")}}`;
-  if (lgRules.length) out += `@media (min-width:1024px){${lgRules.join("")}}`;
+  // Se usan container queries (no media queries) para que los overrides
+  // respondan al ancho del propio bloque. Esto permite que el editor
+  // visual, al simular un canvas móvil dentro de una ventana desktop,
+  // muestre correctamente los estilos móviles sin que los desktop se
+  // "cuelen" por coincidir con el viewport real del navegador.
+  if (mdRules.length) out += `@container (min-width:768px){${mdRules.join("")}}`;
+  if (lgRules.length) out += `@container (min-width:1024px){${lgRules.join("")}}`;
   return out;
 }
