@@ -71,7 +71,7 @@ export function mapTree(
           : mapped;
       })
       .filter((n): n is CompositionNode => n !== null);
-  return { root: { children: walk(tree.root.children) } };
+  return { ...tree, root: { children: walk(tree.root.children) } };
 }
 
 /** Localiza un nodo por id (devuelve referencia + ruta). */
@@ -93,7 +93,7 @@ export function appendToRoot(
   tree: CompositionTree,
   node: CompositionNode,
 ): CompositionTree {
-  return { root: { children: [...tree.root.children, node] } };
+  return { ...tree, root: { children: [...tree.root.children, node] } };
 }
 
 /** Elimina un nodo por id (recursivamente). */
@@ -114,7 +114,7 @@ export function duplicateRootNode(
   const clone = cloneNodeWithNewIds(tree.root.children[idx]);
   const next = [...tree.root.children];
   next.splice(idx + 1, 0, clone);
-  return { root: { children: next } };
+  return { ...tree, root: { children: next } };
 }
 
 /** Reordena un nodo de root entre posiciones. */
@@ -127,7 +127,7 @@ export function moveRootNode(
   if (from < 0 || from >= arr.length || to < 0 || to >= arr.length) return tree;
   const [item] = arr.splice(from, 1);
   arr.splice(to, 0, item);
-  return { root: { children: arr } };
+  return { ...tree, root: { children: arr } };
 }
 
 /** Actualiza el `config` de un nodo. */
