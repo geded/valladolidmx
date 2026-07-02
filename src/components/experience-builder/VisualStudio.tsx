@@ -1036,8 +1036,13 @@ function ToolBtn({
 }
 
 function BlockLibraryModal({
-  onClose, onPick,
-}: { onClose: () => void; onPick: (type: string) => void }) {
+  onClose, onPick, advanced = false, onPickReusable,
+}: {
+  onClose: () => void;
+  onPick: (type: string) => void;
+  advanced?: boolean;
+  onPickReusable?: (entry: ReusableBlock) => void;
+}) {
   const blocks = useMemo(
     () =>
       listBlocks()
@@ -1045,6 +1050,12 @@ function BlockLibraryModal({
         .sort((a, b) => a.display_name.localeCompare(b.display_name)),
     [],
   );
+  const [reusable, setReusable] = useState<ReusableBlock[]>(() => loadReusableBlocks());
+  const removeReusable = (id: string) => {
+    const next = reusable.filter((r) => r.id !== id);
+    saveReusableBlocks(next);
+    setReusable(next);
+  };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm">
       <div className="w-full max-w-lg rounded-xl border border-border bg-card p-4 shadow-2xl">
@@ -1059,6 +1070,35 @@ function BlockLibraryModal({
             <X className="size-4" aria-hidden />
           </button>
         </div>
+        {advanced && reusable.length > 0 ? (
+          <div className="mb-3 rounded-md border border-primary/30 bg-primary/5 p-2">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+              Bloques reutilizables
+            </p>
+            <div className="grid gap-1.5 sm:grid-cols-2">
+              {reusable.map((r) => (
+                <div key={r.id} className="flex items-center gap-1 rounded-md border border-border bg-background p-2">
+                  <button
+                    type="button"
+                    onClick={() => onPickReusable?.(r)}
+                    className="min-w-0 flex-1 truncate text-left text-xs font-medium"
+                    title={r.name}
+                  >
+                    {r.name}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeReusable(r.id)}
+                    aria-label="Eliminar"
+                    className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-destructive"
+                  >
+                    <Trash2 className="size-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
         <div className="grid max-h-[60vh] gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
           {blocks.map((b) => (
             <button
@@ -1077,6 +1117,142 @@ function BlockLibraryModal({
         </div>
       </div>
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Modo Profesional — panel avanzado + biblioteca de reutilizables
+ * ------------------------------------------------------------------ */
+
+interface ReusableBlock {
+  id: string;
+  name: string;
+  type: string;
+  version: string;
+  config: Record<string, unknown>;
+}
+
+const REUSABLE_STORAGE_KEY = "vmx.eb.reusable_blocks";
+
+function loadReusableBlocks(): ReusableBlock[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(REUSABLE_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveReusableBlocks(list: ReusableBlock[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(REUSABLE_STORAGE_KEY, JSON.stringify(list));
+  } catch {
+    /* ignore */
+  }
+}
+
+function AdvancedPanel({
+  node,
+  config,
+  onChange,
+}: {
+  node: CompositionNode;
+  config: Record<string, unknown>;
+  onChange: (next: Record<string, unknown>) => void;
+}) {
+  const [jsonText, setJsonText] = useState(() => JSON.stringify(config, null, 2));
+  const [jsonError, setJsonError] = useState<string | null>(null);
+  const [savedNote, setSavedNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    setJsonText(JSON.stringify(config, null, 2));
+    setJsonError(null);
+  }, [node.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const applyJson = () => {
+    try {
+      const parsed = JSON.parse(jsonText);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        setJsonError("La configuración debe ser un objeto JSON.");
+        return;
+      }
+      onChange(parsed as Record<string, unknown>);
+      setJsonError(null);
+    } catch (e) {
+      setJsonError((e as Error).message);
+    }
+  };
+
+  const saveAsReusable = () => {
+    const defaultName =
+      (config.heading as string) ||
+      (config.title as string) ||
+      node.type.replace(/^vmx\./, "");
+    const name = typeof window !== "undefined"
+      ? window.prompt("Nombre del bloque reutilizable", defaultName)
+      : defaultName;
+    if (!name) return;
+    const entry: ReusableBlock = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      name,
+      type: node.type,
+      version: node.version,
+      config: JSON.parse(JSON.stringify(config)) as Record<string, unknown>,
+    };
+    const next = [...loadReusableBlocks(), entry];
+    saveReusableBlocks(next);
+    setSavedNote(`Guardado como "${name}". Disponible en "Añadir sección".`);
+    window.setTimeout(() => setSavedNote(null), 3000);
+  };
+
+  return (
+    <section className="space-y-2 rounded-md border border-dashed border-primary/40 bg-primary/5 p-3">
+      <header className="flex items-center justify-between gap-2">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+          Modo Profesional
+        </p>
+        <button
+          type="button"
+          onClick={saveAsReusable}
+          className="rounded-md border border-primary/40 bg-background px-2 py-1 text-[10px] font-medium text-primary hover:bg-primary/10"
+        >
+          Guardar como reutilizable
+        </button>
+      </header>
+      {savedNote ? (
+        <p className="text-[10px] text-emerald-600">{savedNote}</p>
+      ) : null}
+      <div>
+        <label className="mb-1 block text-[11px] font-semibold">
+          Configuración JSON del bloque
+        </label>
+        <textarea
+          value={jsonText}
+          onChange={(e) => setJsonText(e.target.value)}
+          className="min-h-[160px] w-full rounded-md border border-border bg-background px-2 py-1 font-mono text-[10px]"
+          spellCheck={false}
+        />
+        {jsonError ? (
+          <p className="mt-1 text-[10px] text-destructive">{jsonError}</p>
+        ) : null}
+        <div className="mt-1 flex justify-end">
+          <button
+            type="button"
+            onClick={applyJson}
+            className="rounded-md bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground hover:opacity-95"
+          >
+            Aplicar JSON
+          </button>
+        </div>
+      </div>
+      <p className="text-[10px] text-muted-foreground">
+        Tipo <code className="rounded bg-background px-1">{node.type}</code> · v{node.version}
+      </p>
+    </section>
   );
 }
 
