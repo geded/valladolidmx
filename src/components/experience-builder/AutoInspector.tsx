@@ -240,10 +240,10 @@ function TypographyEditor({
       </div>
       <div className="flex items-center gap-1 rounded-md border border-border bg-background p-0.5">
         {TYPOGRAPHY_BREAKPOINTS.map((b) => {
-          const filled =
-            b.key === "base"
-              ? Object.keys(getBreakpointTypography(value, "base")).length > 0
-              : Boolean(value[b.key] && Object.keys(value[b.key] ?? {}).length > 0);
+          const bpVals = getBreakpointTypography(value, b.key);
+          const filled = Object.values(bpVals).some(
+            (v) => v !== undefined && v !== "" && v !== false,
+          );
           return (
             <button
               key={b.key}
