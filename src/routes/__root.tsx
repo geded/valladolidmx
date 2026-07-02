@@ -196,10 +196,12 @@ function RootComponent() {
 function PublicChrome({
   pathname, headerVariant, position,
 }: { pathname: string; headerVariant: "solid" | "overlay"; position: "header" | "footer" }) {
-  const { data: published } = useQuery({
-    ...rootPublishedHomeQuery,
-    enabled: pathname === "/",
-  });
+  // El encabezado y pie del sitio se leen desde la composición publicada de la
+  // Home y se reutilizan en TODAS las páginas públicas. Esto permite editar
+  // menú, botón destacado y columnas del footer una sola vez desde el
+  // Experience Builder y verlo aplicado en cualquier ruta.
+  void pathname;
+  const { data: published } = useQuery(rootPublishedHomeQuery);
   const config = published?.snapshot?.chrome?.[position];
 
   if (position === "header") {

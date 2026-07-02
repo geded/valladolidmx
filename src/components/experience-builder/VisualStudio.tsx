@@ -75,6 +75,7 @@ import type { BlockContract } from "@/lib/experience-builder/block-contract";
 import { AutoInspector } from "@/components/experience-builder/AutoInspector";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
 import { useAuth } from "@/hooks/useAuth";
+import { FONT_FAMILY_OPTIONS, type BlockAppearance } from "@/lib/experience-builder/appearance";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 type ChromeArea = "header" | "footer";
@@ -797,6 +798,13 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
               simple={!advanced}
             />
 
+            {selectedNode ? (
+              <AppearancePanel
+                config={selectedConfig}
+                onChange={(next: Record<string, unknown>) => updateSelectedConfig(next)}
+              />
+            ) : null}
+
             {advanced && selectedNode ? (
               <AdvancedPanel
                 node={selectedNode}
@@ -1402,6 +1410,176 @@ function SaveIndicator({ status }: { status: SaveStatus }) {
     return <span className="text-[11px] text-destructive">No se pudo guardar.</span>;
   }
   return null;
+}
+
+function AppearancePanel({
+  config,
+  onChange,
+}: {
+  config: Record<string, unknown>;
+  onChange: (next: Record<string, unknown>) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const appearance = (config.__appearance as BlockAppearance | undefined) ?? {};
+  const set = (key: keyof BlockAppearance, value: unknown) => {
+    const next: BlockAppearance = { ...appearance, [key]: value };
+    // Limpia claves vacías/cero para que no persistan overrides inertes.
+    Object.keys(next).forEach((k) => {
+      const v = (next as Record<string, unknown>)[k];
+      if (v === "" || v === undefined || v === null || (typeof v === "number" && !Number.isFinite(v))) {
+        delete (next as Record<string, unknown>)[k];
+      }
+    });
+    onChange({ ...config, __appearance: next });
+  };
+  const reset = () => {
+    const rest = { ...config };
+    delete (rest as Record<string, unknown>).__appearance;
+    onChange(rest);
+  };
+  const input = "w-full rounded-md border border-border bg-background px-2 py-1 text-xs";
+  const num = (v: number | undefined) => (v === undefined ? "" : String(v));
+  return (
+    <section className="space-y-2 rounded-md border border-border bg-muted/30 p-3">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+      >
+        <span>Apariencia · tipografía y tamaño</span>
+        <span>{open ? "−" : "+"}</span>
+      </button>
+      {open ? (
+        <div className="space-y-2 pt-1">
+          <label className="block text-[11px] font-medium">
+            Tipo de letra
+            <select
+              value={appearance.font_family ?? ""}
+              onChange={(e) => set("font_family", e.target.value)}
+              className={input}
+            >
+              {FONT_FAMILY_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-[11px] font-medium">
+            Escala del texto ({appearance.font_scale ?? 1}×)
+            <input
+              type="range"
+              min={0.6}
+              max={2.4}
+              step={0.05}
+              value={appearance.font_scale ?? 1}
+              onChange={(e) => set("font_scale", Number(e.target.value))}
+              className="w-full"
+            />
+          </label>
+          <label className="block text-[11px] font-medium">
+            Alineación
+            <select
+              value={appearance.text_align ?? ""}
+              onChange={(e) => set("text_align", e.target.value)}
+              className={input}
+            >
+              <option value="">Por defecto</option>
+              <option value="left">Izquierda</option>
+              <option value="center">Centro</option>
+              <option value="right">Derecha</option>
+            </select>
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="block text-[11px] font-medium">
+              Color texto
+              <input
+                type="color"
+                value={appearance.text_color ?? "#111111"}
+                onChange={(e) => set("text_color", e.target.value)}
+                className="h-7 w-full cursor-pointer rounded border border-border bg-background"
+              />
+            </label>
+            <label className="block text-[11px] font-medium">
+              Fondo
+              <input
+                type="color"
+                value={appearance.bg_color ?? "#ffffff"}
+                onChange={(e) => set("bg_color", e.target.value)}
+                className="h-7 w-full cursor-pointer rounded border border-border bg-background"
+              />
+            </label>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="block text-[11px] font-medium">
+              Padding vertical (px)
+              <input
+                type="number"
+                min={0}
+                max={400}
+                value={num(appearance.padding_y)}
+                onChange={(e) => set("padding_y", e.target.value === "" ? undefined : Number(e.target.value))}
+                className={input}
+              />
+            </label>
+            <label className="block text-[11px] font-medium">
+              Padding horizontal (px)
+              <input
+                type="number"
+                min={0}
+                max={400}
+                value={num(appearance.padding_x)}
+                onChange={(e) => set("padding_x", e.target.value === "" ? undefined : Number(e.target.value))}
+                className={input}
+              />
+            </label>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="block text-[11px] font-medium">
+              Alto mínimo (px)
+              <input
+                type="number"
+                min={0}
+                max={2000}
+                value={num(appearance.min_height)}
+                onChange={(e) => set("min_height", e.target.value === "" ? undefined : Number(e.target.value))}
+                className={input}
+              />
+            </label>
+            <label className="block text-[11px] font-medium">
+              Ancho máximo (px)
+              <input
+                type="number"
+                min={0}
+                max={2400}
+                value={num(appearance.max_width)}
+                onChange={(e) => set("max_width", e.target.value === "" ? undefined : Number(e.target.value))}
+                className={input}
+              />
+            </label>
+          </div>
+          <label className="block text-[11px] font-medium">
+            Bordes redondeados (px)
+            <input
+              type="number"
+              min={0}
+              max={80}
+              value={num(appearance.radius)}
+              onChange={(e) => set("radius", e.target.value === "" ? undefined : Number(e.target.value))}
+              className={input}
+            />
+          </label>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={reset}
+              className="rounded-md border border-border bg-background px-2 py-1 text-[10px] font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+            >
+              Restablecer apariencia
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </section>
+  );
 }
 
 function FullScreenState({

@@ -168,17 +168,26 @@ export function Hero({ config }: HeroProps = {}) {
         className="relative flex min-h-[100svh] flex-col justify-center gap-4 pb-10 pt-20 md:min-h-[100dvh] md:justify-end md:gap-0 md:pb-28 md:pt-40"
       >
         {eyebrow ? (
-          <p className="font-script text-[1.625rem] leading-tight text-white/95 drop-shadow-sm sm:text-3xl md:text-[2.5rem]">
+          <p
+            suppressHydrationWarning
+            className="font-script text-[1.625rem] leading-tight text-white/95 drop-shadow-sm sm:text-3xl md:text-[2.5rem]"
+          >
             {eyebrow}
           </p>
         ) : null}
         {title ? (
-          <h1 className="max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:text-[2.75rem] sm:leading-[1.05] md:mt-3 md:text-[3.5rem] lg:text-[4rem]">
+          <h1
+            suppressHydrationWarning
+            className="max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:text-[2.75rem] sm:leading-[1.05] md:mt-3 md:text-[3.5rem] lg:text-[4rem]"
+          >
             {title}
           </h1>
         ) : null}
         {subtitle ? (
-          <p className="max-w-2xl text-pretty text-base text-white/90 drop-shadow sm:text-lg md:mt-5 md:text-lg lg:text-xl">
+          <p
+            suppressHydrationWarning
+            className="max-w-2xl text-pretty text-base text-white/90 drop-shadow sm:text-lg md:mt-5 md:text-lg lg:text-xl"
+          >
             {subtitle}
           </p>
         ) : null}

@@ -24,6 +24,7 @@ import {
   resolveVariables,
   type VariableContext,
 } from "./dynamic-variables";
+import { appearanceToStyle, hasAppearance, readAppearance } from "./appearance";
 import { Hero } from "@/components/home/Hero";
 import { DestinosSection } from "@/components/home/DestinosSection";
 import { CategoriasSection } from "@/components/home/CategoriasSection";
@@ -133,7 +134,16 @@ function RenderNode({ node, studio, wrap, variableContext }: RenderNodeProps): R
     />
   );
 
-  return wrap ? wrap(node, content) : content;
+  // Aplica overrides visuales (tipografía, tamaño, colores) definidos en el
+  // Inspector → `config.__appearance`. Sin overrides no se envuelve nada.
+  const appearance = readAppearance(resolved.config);
+  const styled = hasAppearance(appearance) ? (
+    <div style={appearanceToStyle(appearance)}>{content}</div>
+  ) : (
+    content
+  );
+
+  return wrap ? wrap(node, styled) : styled;
 }
 
 /* ------------------------------------------------------------------ *
