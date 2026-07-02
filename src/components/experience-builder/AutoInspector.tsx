@@ -238,7 +238,6 @@ function TypographyEditor({
                 </>
               ) : "—"}
             </li>
-            <li><span className="text-foreground">Alineación:</span> {d.align ?? "—"}</li>
           </ul>
         </div>
       ) : null}
@@ -316,21 +315,10 @@ function TypographyEditor({
             onChange={(e) => set("color", e.target.value)}
           />
         </label>
-        <label className="space-y-1">
-          <span className="text-[10px] text-muted-foreground">Alineación</span>
-          <select
-            className={inp}
-            value={eff("align") ?? ""}
-            onChange={(e) => set("align", e.target.value)}
-          >
-            <option value="">Por defecto</option>
-            <option value="left">Izquierda</option>
-            <option value="center">Centro</option>
-            <option value="right">Derecha</option>
-            <option value="justify">Justificado</option>
-          </select>
-        </label>
       </div>
+      <p className="text-[10px] text-muted-foreground">
+        La alineación se controla desde <strong>«Posición del texto»</strong> del bloque, no por campo.
+      </p>
       <div className="flex items-center gap-4 pt-1">
         <label className="flex items-center gap-1 text-[11px]">
           <input
