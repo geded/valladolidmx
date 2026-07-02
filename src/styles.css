@@ -350,3 +350,31 @@
     radial-gradient(color-mix(in oklab, var(--color-foreground) 4%, transparent) 1px, transparent 1px);
   background-size: 18px 18px;
 }
+
+/*
+ * Experience Builder · Visibilidad por dispositivo (US-10, 15.10.4d)
+ *
+ * Cualquier bloque puede declarar `__hidden_on: ["mobile"|"tablet"|"desktop"]`
+ * en su config. En producción, se oculta con media-queries alineadas al
+ * canvas del Studio (mobile <768, tablet 768-1023, desktop ≥1024). En el
+ * Studio se muestra atenuado con contorno para que el editor no lo pierda.
+ */
+@media (max-width: 767px) {
+  [data-hidden-on~="mobile"] { display: none !important; }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  [data-hidden-on~="tablet"] { display: none !important; }
+}
+@media (min-width: 1024px) {
+  [data-hidden-on~="desktop"] { display: none !important; }
+}
+/* Studio: forzar visible pero atenuado según el dispositivo simulado. */
+[data-eb-canvas-device="mobile"] [data-hidden-on~="mobile"],
+[data-eb-canvas-device="tablet"] [data-hidden-on~="tablet"],
+[data-eb-canvas-device="desktop"] [data-hidden-on~="desktop"] {
+  display: block !important;
+  opacity: 0.35;
+  outline: 2px dashed color-mix(in oklab, var(--color-muted-foreground) 60%, transparent);
+  outline-offset: -4px;
+  position: relative;
+}
