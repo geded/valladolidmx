@@ -121,6 +121,40 @@ const DEFAULT_HEADER_CONFIG: CompositionJsonObject = {
   cta_href: "/arma-tu-viaje",
   show_language: true,
   show_user_menu: true,
+  buttons: [
+    {
+      kind: "cta",
+      label: "Arma tu Viaje",
+      href: "/arma-tu-viaje",
+      icon: "Compass",
+      variant: "primary",
+      visible: true,
+    },
+    {
+      kind: "language",
+      label: "Idioma",
+      href: "",
+      icon: "",
+      variant: "ghost",
+      visible: true,
+    },
+    {
+      kind: "user_menu",
+      label: "Iniciar sesión",
+      href: "",
+      icon: "User",
+      variant: "primary",
+      visible: true,
+    },
+    {
+      kind: "menu_toggle",
+      label: "Menú",
+      href: "",
+      icon: "Menu",
+      variant: "ghost",
+      visible: true,
+    },
+  ],
 };
 
 const DEFAULT_FOOTER_CONFIG: CompositionJsonObject = {
@@ -150,6 +184,82 @@ const headerChromeContract: BlockContract = {
   description:
     "Barra superior del sitio. Compartida por todas las páginas. Cada campo aquí abajo indica dónde aparece.",
   schema: {
+    buttons: {
+      type: "list",
+      label: "Botones del header (orden de izquierda a derecha)",
+      description:
+        "Arrastra ▲/▼ para reordenar. Puedes ocultar cualquier botón sin borrarlo, o agregar botones nuevos. Los botones de sistema (Idioma, Menú, Sesión) sólo se pueden ocultar/reordenar; los CTA y enlaces personalizados también se pueden borrar.",
+      item: {
+        type: "object",
+        label: "Botón",
+        fields: {
+          kind: {
+            type: "select",
+            label: "Tipo",
+            description:
+              "CTA = botón destacado con enlace. Enlace = botón simple. Los de sistema conectan idioma, sesión o menú móvil.",
+            default: "cta",
+            options: [
+              { value: "cta", label: "Botón destacado (CTA)" },
+              { value: "custom_link", label: "Enlace personalizado" },
+              { value: "language", label: "Sistema · Selector de idioma" },
+              { value: "user_menu", label: "Sistema · Sesión / Iniciar sesión" },
+              { value: "menu_toggle", label: "Sistema · Menú móvil (hamburguesa)" },
+            ],
+          },
+          label: {
+            type: "text",
+            label: "Texto visible",
+            description: "Etiqueta del botón. Los de sistema usan su texto propio si lo dejas vacío.",
+          },
+          href: {
+            type: "url",
+            label: "Enlace",
+            description: "Sólo aplica a CTA y enlaces personalizados.",
+          },
+          icon: {
+            type: "select",
+            label: "Ícono",
+            description: "Ícono opcional a la izquierda del texto.",
+            default: "",
+            options: [
+              { value: "", label: "Sin ícono" },
+              { value: "Compass", label: "Brújula (Arma tu viaje)" },
+              { value: "Globe", label: "Globo (Idiomas)" },
+              { value: "User", label: "Usuario" },
+              { value: "Menu", label: "Menú (hamburguesa)" },
+              { value: "MapPin", label: "Pin de mapa" },
+              { value: "Phone", label: "Teléfono" },
+              { value: "Mail", label: "Correo" },
+              { value: "ShoppingBag", label: "Bolsa (Comprar)" },
+              { value: "Heart", label: "Corazón (Favoritos)" },
+              { value: "Sparkles", label: "Chispas" },
+              { value: "Calendar", label: "Calendario" },
+              { value: "Search", label: "Búsqueda" },
+              { value: "Info", label: "Info" },
+            ],
+          },
+          variant: {
+            type: "select",
+            label: "Estilo",
+            description: "Primario = color de marca. Secundario = borde. Fantasma = sólo texto.",
+            default: "primary",
+            options: [
+              { value: "primary", label: "Primario (sólido)" },
+              { value: "secondary", label: "Secundario (contorno)" },
+              { value: "ghost", label: "Fantasma (sin fondo)" },
+              { value: "light", label: "Claro (translúcido sobre foto)" },
+            ],
+          },
+          visible: {
+            type: "boolean",
+            label: "Visible",
+            default: true,
+            description: "Desactiva para ocultar el botón sin borrarlo.",
+          },
+        },
+      },
+    },
     nav: {
       type: "list",
       label: "Menú principal (enlaces del centro/derecha del header)",
