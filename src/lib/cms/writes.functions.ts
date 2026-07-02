@@ -270,6 +270,8 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
     assertEditableTable(data.table);
     if (data.table === "businesses") {
       await assertCanEditBusiness(context, data.id ?? null);
+    } else if (data.table === "products") {
+      await assertCanEditProduct(context, data.id ?? null, data.payload);
     } else {
       await assertEditorial(context);
     }
