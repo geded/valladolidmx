@@ -71,6 +71,7 @@ import {
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { getBlock, listBlocks } from "@/lib/experience-builder/block-registry";
 import { AutoInspector } from "@/components/experience-builder/AutoInspector";
+import { PublicFooter, PublicHeader } from "@/components/discovery";
 import { useAuth } from "@/hooks/useAuth";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
@@ -82,6 +83,23 @@ interface SitePage {
   publicPath: string;
   status: "editable" | "soon";
   soonLabel?: string;
+}
+
+type HomeSummary = {
+  id: string;
+  slug: string;
+  status: string;
+  page_type: string;
+};
+
+function pickCanonicalHomeComposition<T extends HomeSummary>(items: T[]): T | null {
+  return (
+    items.find((item) => item.slug === "home" && item.page_type === "home") ??
+    items.find((item) => item.slug === "home") ??
+    items.find((item) => item.page_type === "home" && item.status === "published") ??
+    items.find((item) => item.page_type === "home") ??
+    null
+  );
 }
 
 const SITE_PAGES: SitePage[] = [
@@ -242,7 +260,7 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
     void (async () => {
       try {
         const all = await list();
-        const home = all.find((c) => c.page_type === "home") ?? null;
+        const home = pickCanonicalHomeComposition(all);
         let detail: CompositionDetail | null = null;
         if (home) {
           detail = await get({ data: { id: home.id } });
@@ -497,8 +515,9 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
           </aside>
         ) : null}
 
-        <div className="flex-1 overflow-y-auto">
-          <main id="main" className="pb-24">
+        <div className="flex-1 overflow-auto bg-muted/20">
+          <div className="bg-background shadow-sm" style={{ width: "100vw", minWidth: "48rem" }}>
+            <PublicHeader variant="overlay" />
             <CompositionRenderer
               tree={tree}
               pageType="home"
@@ -521,7 +540,8 @@ function HomeVisualEditor({ onExit }: { onExit: () => void }) {
                     )
               }
             />
-          </main>
+            <PublicFooter />
+          </div>
         </div>
 
         {!previewMode && selectedNode && selectedContract ? (
