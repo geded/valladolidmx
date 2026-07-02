@@ -621,19 +621,15 @@ function FieldControl({
       if (def.item?.type === "object" && def.item.fields) {
         return <StructuredListControl def={def} value={value} onChange={onChange} simple={simple} />;
       }
-      return (
-        <textarea className={`${base} min-h-[80px] font-mono text-[10px]`}
-          value={value ? JSON.stringify(value, null, 2) : ""}
-          onChange={(e) => { try { onChange(e.target.value ? JSON.parse(e.target.value) : undefined); } catch { /* json inválido */ } }} />
-      );
+      return <PrimitiveListControl def={def} value={value} onChange={onChange} baseClass={base} />;
     case "object":
       if (def.fields) {
         return <ObjectControl def={def} value={value} onChange={onChange} simple={simple} />;
       }
       return (
-        <textarea className={`${base} min-h-[80px] font-mono text-[10px]`}
-          value={value ? JSON.stringify(value, null, 2) : ""}
-          onChange={(e) => { try { onChange(e.target.value ? JSON.parse(e.target.value) : undefined); } catch { /* json inválido */ } }} />
+        <p className="rounded-md border border-dashed border-border bg-muted/30 p-2 text-[11px] text-muted-foreground">
+          Este objeto no tiene campos configurables desde el editor visual.
+        </p>
       );
     default:
       return <p className="text-[10px] text-muted-foreground">Tipo no soportado.</p>;
@@ -800,6 +796,81 @@ function ObjectControl({
           simple={simple}
         />
       ))}
+    </div>
+  );
+}
+
+function PrimitiveListControl({
+  def, value, onChange, baseClass,
+}: { def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void; baseClass: string }) {
+  const items = Array.isArray(value) ? (value as unknown[]) : [];
+  const itemType = def.item?.type ?? "text";
+  const isNumber = itemType === "number";
+  const isMedia = itemType === "media";
+  const setItem = (idx: number, next: unknown) => {
+    const arr = [...items];
+    arr[idx] = next;
+    onChange(arr);
+  };
+  const move = (idx: number, dir: -1 | 1) => {
+    const t = idx + dir;
+    if (t < 0 || t >= items.length) return;
+    const arr = [...items];
+    const [it] = arr.splice(idx, 1);
+    arr.splice(t, 0, it);
+    onChange(arr);
+  };
+  const remove = (idx: number) => onChange(items.filter((_, i) => i !== idx));
+  const addDefault = () => onChange([...items, isNumber ? 0 : ""]);
+  return (
+    <div className="space-y-2">
+      {items.length === 0 ? (
+        <p className="rounded-md border border-dashed border-border bg-muted/30 p-2 text-[11px] text-muted-foreground">
+          Aún no hay elementos.
+        </p>
+      ) : (
+        <ul className="space-y-1.5">
+          {items.map((item, index) => (
+            <li key={index} className="flex items-center gap-1">
+              <span className="w-5 text-center text-[10px] font-semibold text-muted-foreground">{index + 1}</span>
+              {isMedia ? (
+                <MediaControl
+                  baseClass={baseClass}
+                  def={(def.item ?? { type: "media", label: def.label }) as BlockFieldSchema}
+                  value={item}
+                  onChange={(v) => setItem(index, v)}
+                />
+              ) : isNumber ? (
+                <input
+                  className={baseClass}
+                  type="number"
+                  value={item === undefined || item === null ? "" : Number(item as number)}
+                  onChange={(e) => setItem(index, e.target.value === "" ? undefined : Number(e.target.value))}
+                />
+              ) : (
+                <input
+                  className={baseClass}
+                  type="text"
+                  value={(item as string) ?? ""}
+                  onChange={(e) => setItem(index, e.target.value)}
+                />
+              )}
+              <div className="flex items-center gap-0.5">
+                <MiniIconButton label="Subir" disabled={index === 0} onClick={() => move(index, -1)} icon={<ChevronUp className="size-3" />} />
+                <MiniIconButton label="Bajar" disabled={index === items.length - 1} onClick={() => move(index, 1)} icon={<ChevronDown className="size-3" />} />
+                <MiniIconButton label="Eliminar" tone="danger" onClick={() => remove(index)} icon={<Trash2 className="size-3" />} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      <button
+        type="button"
+        onClick={addDefault}
+        className="inline-flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-border bg-background px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+      >
+        <Plus className="size-3.5" aria-hidden /> Agregar {def.item?.label?.toLowerCase() ?? "elemento"}
+      </button>
     </div>
   );
 }
