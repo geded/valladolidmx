@@ -1,148 +1,59 @@
-# 14.40.5 — Etapa 5 · Pagos (Stripe + Payment Provider Abstraction)
 
-## Objetivo
+# Segunda iteración del editor: Hero completo, botones flexibles, chips útiles y drag & drop real
 
-Habilitar el cobro en línea de órdenes confirmadas (productos con
-`conversion_mode = 'reservar_en_linea'` y `accepts_online_payment = true`)
-usando Stripe como primer proveedor, detrás de una capa de abstracción
-(`PaymentProvider`) que permita incorporar Paddle, Mercado Pago o PayPal
-sin tocar la lógica del Marketplace.
+## Diagnóstico rápido de lo que reportas
 
-## Principios (no negociables)
+1. **Hero:** los textos ya son editables pero se ven "fijos" — no puedes vaciar el eslogan/eyebrow (cae al valor por defecto en cuanto lo borras). Y los **botones no se pueden eliminar** ni reordenar — están hardcodeados en el componente aunque escondas la etiqueta.
+2. **Chips `i18n` / `SEO` en Profesional:** aparecen como badges pero **no abren nada**. Son sólo un letrero. Falta la acción real (idiomas alternos, meta title/description por bloque).
+3. **Drag & drop:** hoy sólo reordena **secciones completas** (arriba/abajo). No mueve botones ni tarjetas dentro de una sección.
+4. **Header:** ya es editable (menú y CTA), pero está escondido — sólo se selecciona haciendo click en la zona superior, y no hay indicador claro de "esto es el header, click para editar".
 
-- Cero `SUPABASE_SERVICE_ROLE_KEY` en flujos del viajero.
-- `supabaseAdmin` sólo dentro del webhook tras verificar la firma HMAC.
-- Revalidación server-side de elegibilidad y precios antes de crear el
-  PaymentIntent (mismos checks que `order_confirm`).
-- Idempotencia por `client_request_id` (cliente → server fn) y por
-  `event_id` (webhook → `payment_events`).
-- Metadata consistente: `order_id`, `user_id`, `client_request_id`,
-  `provider` y `provider_intent_id` en ambos lados.
-- Auditoría completa en `order_events` (`payment_initiated`,
-  `payment_succeeded`, `payment_failed`, `payment_refunded`).
-- Sin acoplamiento directo del UI/dominio a Stripe: todo pasa por el
-  contrato `PaymentProvider`.
+## Fixes de esta historia
 
-## Arquitectura — Payment Provider Abstraction
+### 1) Hero totalmente maleable
+- Convertir "eyebrow / title / subtitle" en **campos vacíos-permitidos**: si borras el contenido, se queda vacío (no vuelve al default).
+- **CTAs como lista** (0 a 3 botones), cada uno con: etiqueta, enlace, estilo (`primario | secundario | fantasma`), ícono opcional, orden.
+- **Buscador del Hero** con toggle "mostrar / ocultar".
+- El componente `Hero.tsx` renderiza los CTAs desde `config.ctas[]`; fallback a los 2 actuales sólo cuando el array es `undefined` (retrocompatible).
 
-```text
-src/lib/payments/
-├── provider.ts                 # contrato PaymentProvider + tipos neutrales
-├── registry.server.ts          # selección por env PAYMENTS_PROVIDER
-├── stripe.server.ts            # implementación Stripe (server-only)
-└── payments.functions.ts       # server fns expuestas al cliente
-```
+### 2) Chips `i18n` y `SEO` reales en Profesional
+- **i18n:** al pulsar el chip de un campo `translatable`, abre un mini-panel con pestañas de idiomas (es/en/pt/fr/it/de) para escribir la traducción. Se guarda en un objeto `{ es: "...", en: "..." }` y el renderer elige según el locale activo.
+- **SEO:** en Profesional aparece una sección "SEO de esta página" con `title`, `description`, `og:image`. Se guarda en `tree.chrome.seo` y `__root.tsx` ya soporta head dinámico.
+- Chip que no tiene acción (por ahora, `datos`, `cache`) se convierte en tooltip informativo, no botón.
 
-Contrato neutral (resumen):
+### 3) Drag & drop más fino
+- Extender `SortableContext` a los **elementos hijos** de listas estructuradas del inspector (por ejemplo la lista de CTAs del Hero o los items de menú del header) — hoy sólo tienen flechas ↑↓, agrego handle de arrastre.
+- Añadir **drop-hints visuales** (línea azul) al arrastrar secciones para que se vea claramente dónde va a caer.
+- No implemento "arrastrar bloque del canvas a otra sección" (requiere refactor del árbol) — queda documentado para siguiente historia.
 
-```ts
-interface PaymentProvider {
-  id: 'stripe' | 'paddle' | 'mercadopago' | 'paypal';
-  createIntent(input: CreateIntentInput): Promise<IntentResult>;
-  verifyWebhook(req: Request, rawBody: string): Promise<NormalizedEvent>;
-  // refund/capture se añaden en olas posteriores
-}
-```
+### 4) Header y Footer visibles y editables
+- Envolver header/footer del canvas en un **contorno punteado + etiqueta flotante** ("Encabezado del sitio · click para editar" / "Pie de página · click para editar") que aparece al hover.
+- Al hacer click, abre el inspector con el contrato que ya existe (menú, CTA, idioma).
+- Añadir un botón directo en la barra superior del studio: "Editar encabezado" y "Editar pie" para acceso rápido sin buscar.
 
-`IntentResult` devuelve sólo lo que el cliente necesita
-(`client_secret`/`checkout_url`, `provider`, `provider_intent_id`). El
-Marketplace nunca importa `stripe` directamente.
+### 5) Hydration mismatch del eslogan
+Se corrige de paso: normalizo `hero.eyebrow` a "Experiencias que emocionan" en `es.json` (hoy tiene texto con extras que no coinciden con SSR).
 
-## Cambios de base de datos (una migración)
+## Fuera de alcance (explícito)
+- Editor visual DENTRO del canvas (in-place editing de texto sin abrir inspector).
+- Arrastrar bloques entre secciones distintas.
+- Constructor de formularios con lógica condicional (el bloque form ya existe, mejoras avanzadas después).
+- Historial visual con thumbnails (queda como lista).
 
-1. `payment_events` — nueva tabla:
-   - `id uuid PK`, `order_id uuid FK`, `provider text`,
-     `provider_event_id text`, `event_type text`, `payload jsonb`,
-     `received_at timestamptz`, `processed_at timestamptz`.
-   - `UNIQUE(provider, provider_event_id)` → idempotencia de webhook.
-   - GRANT `SELECT` a `authenticated` (sólo dueños vía RLS join con
-     `orders`), `ALL` a `service_role`. Sin `anon`.
-   - RLS: lectura sólo si `EXISTS (orders WHERE id = order_id AND user_id
-     = auth.uid())`. Sin INSERT/UPDATE/DELETE para `authenticated`.
-2. `orders` — columnas aditivas:
-   - `payment_provider text NULL`,
-   - `payment_intent_id text NULL`,
-   - `payment_status text NOT NULL DEFAULT 'unpaid'`
-     (`unpaid|processing|paid|failed|refunded`),
-   - `paid_at timestamptz NULL`.
-   - Índice parcial `UNIQUE(payment_provider, payment_intent_id)
-     WHERE payment_intent_id IS NOT NULL`.
-3. RPC `order_mark_paid(order_id, provider, intent_id, event_id)`
-   `SECURITY DEFINER`, `search_path = public`, EXECUTE sólo `service_role`.
-   Idempotente: si ya está `paid`, retorna sin error; escribe
-   `order_events` con `payment_succeeded`.
-4. RPC `order_mark_payment_failed(...)` análoga.
+## Archivos que voy a tocar
+- `src/components/home/Hero.tsx` — CTAs como lista, toggle buscador, campos vacíos-permitidos.
+- `src/lib/experience-builder/block-library.ts` — contrato Hero extendido; SEO fields en chrome.
+- `src/lib/experience-builder/composition-renderer.tsx` — mapear ctas y toggle buscador.
+- `src/components/experience-builder/AutoInspector.tsx` — chip i18n abre panel de idiomas, drag handles en listas.
+- `src/components/experience-builder/VisualStudio.tsx` — botones "Editar header/footer", contornos hover, panel SEO en profesional.
+- `src/i18n/locales/es.json` — normalizar `hero.eyebrow`.
 
-## Server functions y rutas
+## Verificación
+1. En el Hero puedes eliminar los dos botones y guardar → se ve el Hero sin botones.
+2. Puedes agregar un tercer botón "Reservar" con estilo fantasma y aparece en la web.
+3. En Profesional, click en chip `i18n` de "eyebrow" abre pestañas de idiomas.
+4. En Profesional, aparece panel SEO con title/description que edita el `<head>` publicado.
+5. Al hover del header en el canvas, ves el contorno y puedes hacer click para editar el menú.
+6. Al arrastrar items del menú, se ve una línea azul indicando el drop.
 
-- `src/lib/payments/payments.functions.ts`
-  - `createPaymentIntent` — `requireSupabaseAuth`. Carga la orden del
-    usuario, revalida `conversion_mode`/`accepts_online_payment`/precios,
-    delega en `provider.createIntent`, persiste `payment_provider` +
-    `payment_intent_id`, marca `payment_status='processing'`, registra
-    `order_events.payment_initiated`. Idempotente por
-    `client_request_id`.
-- `src/routes/api/public/payments/$provider/webhook.ts`
-  - Server route TSS bajo `/api/public/*` (callers externos).
-  - Lee `rawBody`, llama `provider.verifyWebhook` (HMAC + timing-safe).
-  - Inserta en `payment_events` con `ON CONFLICT DO NOTHING`
-    (idempotencia por `provider_event_id`).
-  - Si nuevo: importa `supabaseAdmin` dentro del handler y llama
-    `order_mark_paid` / `order_mark_payment_failed`.
-  - Responde 200 incluso ante reintentos ya procesados.
-
-## UI (sin acoplar a Stripe)
-
-- `/cuenta/historial` — botón "Pagar" en órdenes `pending` con
-  `payment_status='unpaid'`. Llama `createPaymentIntent` y, según
-  `provider`, redirige a `checkout_url` o monta Stripe Elements
-  cargado dinámicamente (lazy import, sólo cliente).
-- Páginas `/cuenta/pagos/exito` y `/cuenta/pagos/error` neutrales
-  (no mencionan Stripe).
-
-## Secretos (vía `add_secret`, no en código)
-
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-- `PAYMENTS_PROVIDER` (default `stripe`) — `set_secret`.
-
-La clave publicable de Stripe se sirve al cliente mediante un server fn
-público mínimo (`getPaymentPublicConfig`) que sólo expone valores no
-sensibles del proveedor activo.
-
-## QA / Aceptación
-
-1. Orden no reservable → `createPaymentIntent` rechaza con
-   `product_not_reservable`.
-2. Precio alterado en cliente → revalidación server-side falla.
-3. Webhook duplicado (mismo `event_id`) → segunda ejecución no
-   duplica `order_events` ni cambia estado.
-4. Webhook con firma inválida → 401, sin escritura.
-5. Doble click en "Pagar" con mismo `client_request_id` → un único
-   PaymentIntent.
-6. Sin `SUPABASE_SERVICE_ROLE_KEY` en ningún archivo `.functions.ts` ni
-   importado desde rutas cliente.
-7. `grep` confirma que `src/components/*` y `src/routes/_authenticated/*`
-   no importan `stripe`.
-
-## Entregables documentales
-
-- `docs/blueprint/14.40.5-WAVE-4-STAGE-5-PROGRESS-v1.0.md` al cerrar.
-
-## Preguntas antes de implementar
-
-1. **Modo de checkout Stripe:** ¿Stripe **Checkout** (redirección, más
-   simple, menos UI custom) o **Payment Element** embebido (UX en sitio,
-   requiere clave publicable en cliente)? Recomiendo **Checkout** para
-   Etapa 5 — más simple, igual de seguro, y la abstracción lo oculta.
-2. **Moneda:** ¿`MXN` única en Etapa 5, o multi-moneda desde el inicio?
-   El catálogo ya tiene `currency` por producto; confirmo que el
-   PaymentIntent usa el `currency` de la orden tal cual.
-3. **Provisión de claves Stripe:** ¿Procedo a solicitarlas con
-   `add_secret` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`) en cuanto
-   apruebes el plan? El webhook se configura apuntando a
-   `https://valladolidmx.lovable.app/api/public/payments/stripe/webhook`.
-
-Tras aprobación del plan + respuestas a (1) y (2), ejecuto la migración,
-la abstracción, el provider Stripe, las server fns, el webhook, el UI de
-pago y entrego el reporte `14.40.5`.
+¿Sigo con esto o quieres recortar/agregar algo antes de que lo implemente?
