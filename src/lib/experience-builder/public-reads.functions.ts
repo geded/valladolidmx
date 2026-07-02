@@ -61,3 +61,25 @@ export const getPublishedHomeComposition = createServerFn({ method: "GET" })
       return null;
     }
   });
+
+/**
+ * Devuelve la composición publicada asociada a un slug arbitrario. Se usa
+ * para renderizar públicamente cualquier página creada desde el
+ * Experience Builder en `/p/<slug>`. Falla cerrada: cualquier error
+ * devuelve `null`.
+ */
+export const getPublishedCompositionBySlug = createServerFn({ method: "GET" })
+  .inputValidator((data: { slug: string; variant_key?: string }) => data)
+  .handler(async ({ data }): Promise<PublishedComposition | null> => {
+    try {
+      const client = getPublicClient();
+      const { data: rows, error } = await client.rpc("eb_get_published_by_slug", {
+        _slug: data.slug,
+        _variant_key: data.variant_key ?? "default",
+      });
+      if (error || !rows || rows.length === 0) return null;
+      return rows[0] as unknown as PublishedComposition;
+    } catch {
+      return null;
+    }
+  });
