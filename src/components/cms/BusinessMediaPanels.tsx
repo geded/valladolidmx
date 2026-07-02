@@ -6,6 +6,7 @@
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
   listBusinessMedia,
@@ -14,6 +15,11 @@ import {
   reorderBusinessGallery,
   signBusinessImageUpload,
 } from "@/lib/cms/businesses-media.functions";
+import {
+  compressImageIfNeeded,
+  validateImageFile,
+  withRetry,
+} from "@/lib/cms/image-upload";
 
 type MediaRow = Awaited<ReturnType<typeof listBusinessMedia>>[number];
 
@@ -46,43 +52,81 @@ export function BusinessMediaPanels({ businessId, onChanged }: Props) {
     file: File,
     role: "logo" | "cover" | "gallery",
   ) => {
-    const signed = await signFn({
-      data: { businessId, filename: file.name, contentType: file.type },
-    });
-    const { error: upErr } = await supabase.storage
-      .from(signed.bucket)
-      .uploadToSignedUrl(signed.path, signed.token, file, {
-        contentType: file.type,
-        upsert: false,
+    const invalid = validateImageFile(file);
+    if (invalid) throw new Error(invalid.reason);
+    const prepared = await compressImageIfNeeded(file);
+    await withRetry(async () => {
+      const signed = await signFn({
+        data: {
+          businessId,
+          filename: prepared.name,
+          contentType: prepared.type,
+        },
       });
-    if (upErr) throw upErr;
-    await registerFn({
-      data: {
-        businessId,
-        storagePath: signed.path,
-        role,
-        alt: file.name,
-        mime: file.type,
-        sizeBytes: file.size,
-      },
+      const { error: upErr } = await supabase.storage
+        .from(signed.bucket)
+        .uploadToSignedUrl(signed.path, signed.token, prepared, {
+          contentType: prepared.type,
+          upsert: false,
+        });
+      if (upErr) throw upErr;
+      await registerFn({
+        data: {
+          businessId,
+          storagePath: signed.path,
+          role,
+          alt: file.name,
+          mime: prepared.type,
+          sizeBytes: prepared.size,
+        },
+      });
     });
   };
 
   const singleUpload = useMutation({
     mutationFn: async (v: { file: File; role: "logo" | "cover" }) =>
       uploadOne(v.file, v.role),
-    onSuccess: invalidate,
+    onSuccess: (_res, v) => {
+      invalidate();
+      toast.success(`${v.role === "logo" ? "Logo" : "Portada"} actualizada.`);
+    },
+    onError: (e) =>
+      toast.error(e instanceof Error ? e.message : "No se pudo subir."),
   });
   const galleryUpload = useMutation({
     mutationFn: async (files: File[]) => {
-      for (const f of files) await uploadOne(f, "gallery");
+      let ok = 0;
+      const errors: string[] = [];
+      for (const f of files) {
+        try {
+          await uploadOne(f, "gallery");
+          ok += 1;
+        } catch (err) {
+          errors.push(
+            `${f.name}: ${err instanceof Error ? err.message : "error"}`,
+          );
+        }
+      }
+      return { ok, errors };
     },
-    onSuccess: invalidate,
+    onSuccess: (res) => {
+      invalidate();
+      if (res.ok > 0)
+        toast.success(`${res.ok} imagen${res.ok === 1 ? "" : "es"} subida${res.ok === 1 ? "" : "s"}.`);
+      for (const msg of res.errors) toast.error(msg);
+    },
+    onError: (e) =>
+      toast.error(e instanceof Error ? e.message : "No se pudo subir."),
   });
   const removeMut = useMutation({
     mutationFn: (businessMediaId: string) =>
       removeFn({ data: { businessMediaId } }),
-    onSuccess: invalidate,
+    onSuccess: () => {
+      invalidate();
+      toast.success("Imagen eliminada.");
+    },
+    onError: (e) =>
+      toast.error(e instanceof Error ? e.message : "No se pudo eliminar."),
   });
   const reorderMut = useMutation({
     mutationFn: (orderedIds: string[]) =>
