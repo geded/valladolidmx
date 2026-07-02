@@ -906,7 +906,8 @@ function PageVisualEditor({
         </button>
         <div className="min-w-0">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Editando</p>
-          <h1 className="truncate text-sm font-semibold">Página de Inicio</h1>
+          <h1 className="truncate text-sm font-semibold">{pageDef.title}</h1>
+          <p className="truncate text-[10px] text-muted-foreground">{pageDef.publicPath}</p>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <SaveIndicator status={saveStatus} />
@@ -947,7 +948,7 @@ function PageVisualEditor({
             Versiones
           </button>
           <a
-            href="/"
+            href={pageDef.publicPath}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
