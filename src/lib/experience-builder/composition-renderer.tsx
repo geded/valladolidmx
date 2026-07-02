@@ -25,6 +25,7 @@ import {
   type VariableContext,
 } from "./dynamic-variables";
 import { appearanceToStyle, hasAppearance, readAppearance } from "./appearance";
+import { buildScopedTypographyCss, type FieldTypography } from "./typography";
 import { Hero } from "@/components/home/Hero";
 import { DestinosSection } from "@/components/home/DestinosSection";
 import { CategoriasSection } from "@/components/home/CategoriasSection";
@@ -137,8 +138,20 @@ function RenderNode({ node, studio, wrap, variableContext }: RenderNodeProps): R
   // Aplica overrides visuales (tipografía, tamaño, colores) definidos en el
   // Inspector → `config.__appearance`. Sin overrides no se envuelve nada.
   const appearance = readAppearance(resolved.config);
-  const styled = hasAppearance(appearance) ? (
-    <div style={appearanceToStyle(appearance)}>{content}</div>
+  const typoOverrides =
+    (resolved.config as Record<string, unknown>).__typography as
+      | Record<string, FieldTypography>
+      | undefined;
+  const scopeId = resolved.id;
+  const scopedCss = typoOverrides
+    ? buildScopedTypographyCss(scopeId, resolved.type, typoOverrides)
+    : "";
+  const needsWrap = hasAppearance(appearance) || Boolean(scopedCss);
+  const styled = needsWrap ? (
+    <div style={hasAppearance(appearance) ? appearanceToStyle(appearance) : undefined} data-eb-typo={scopedCss ? scopeId : undefined}>
+      {scopedCss ? <style dangerouslySetInnerHTML={{ __html: scopedCss }} /> : null}
+      {content}
+    </div>
   ) : (
     content
   );
