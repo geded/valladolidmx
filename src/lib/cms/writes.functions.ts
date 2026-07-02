@@ -141,6 +141,40 @@ async function assertCanEditBusiness(
   if (!owns) throw new Error("forbidden");
 }
 
+/**
+ * assertCanEditProduct — Admite admins/editores O dueños (≥editor) de la
+ * empresa asociada. Para creación deriva business_id del payload; para
+ * actualización lo resuelve leyendo la fila.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function assertCanEditProduct(
+  context: { supabase: any; userId: string },
+  productId: string | null,
+  payload: Record<string, unknown>,
+) {
+  const { data: editorial } = await context.supabase.rpc(
+    "is_editor_or_admin",
+    { _user_id: context.userId },
+  );
+  if (editorial) return;
+  let businessId = (payload.business_id as string | undefined) ?? null;
+  if (!businessId && productId) {
+    const { data: row } = await context.supabase
+      .from("products")
+      .select("business_id")
+      .eq("id", productId)
+      .maybeSingle();
+    businessId = (row?.business_id as string | undefined) ?? null;
+  }
+  if (!businessId) throw new Error("forbidden");
+  const { data: owns } = await context.supabase.rpc("has_business_access", {
+    _user_id: context.userId,
+    _business_id: businessId,
+    _min_role: "editor",
+  });
+  if (!owns) throw new Error("forbidden");
+}
+
 function assertEditableTable(t: string): asserts t is EditableTable {
   if (!(EDITABLE_TABLES as readonly string[]).includes(t)) {
     throw new Error(`table_not_editable:${t}`);
