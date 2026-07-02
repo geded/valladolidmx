@@ -1882,7 +1882,7 @@ function SortableSectionItem({
 }
 
 function BlockOverlay({
-  node, selected, onSelect, onDelete, onDuplicate, onMoveUp, onMoveDown, children,
+  node, selected, onSelect, onDelete, onDuplicate, onMoveUp, onMoveDown, children, sortable = false,
 }: {
   node: CompositionNode;
   selected: boolean;
@@ -1892,18 +1892,34 @@ function BlockOverlay({
   onMoveUp: () => void;
   onMoveDown: () => void;
   children: React.ReactNode;
+  sortable?: boolean;
 }) {
   const contract = getBlock(node.type);
   const ref = useRef<HTMLDivElement | null>(null);
+  // Cuando el bloque es de nivel raíz, participa en el DnD del canvas.
+  // Los bloques anidados sólo reciben overlay/acciones.
+  const sortableApi = useSortable({ id: node.id, disabled: !sortable });
+  const dndStyle: React.CSSProperties = sortable
+    ? {
+        transform: CSS.Transform.toString(sortableApi.transform),
+        transition: sortableApi.transition,
+        opacity: sortableApi.isDragging ? 0.4 : 1,
+      }
+    : {};
   useEffect(() => {
     if (selected && ref.current) {
       ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [selected]);
+  const composedRef = (el: HTMLDivElement | null) => {
+    ref.current = el;
+    if (sortable) sortableApi.setNodeRef(el);
+  };
   return (
     <div
-      ref={ref}
+      ref={composedRef}
       data-node-id={node.id}
+      style={dndStyle}
       role="button"
       tabIndex={0}
       onClick={(e) => {
@@ -1930,6 +1946,19 @@ function BlockOverlay({
       </span>
       {selected ? (
         <div className="pointer-events-auto absolute right-3 top-3 z-30 flex gap-1 rounded-full bg-background/95 p-1 shadow-lg ring-1 ring-border">
+          {sortable ? (
+            <button
+              type="button"
+              {...sortableApi.attributes}
+              {...sortableApi.listeners}
+              onClick={(e) => e.stopPropagation()}
+              aria-label="Arrastrar para reordenar"
+              title="Arrastrar para reordenar"
+              className="inline-flex h-6 w-6 cursor-grab items-center justify-center rounded-full text-foreground hover:bg-accent active:cursor-grabbing"
+            >
+              <GripVertical className="size-3" />
+            </button>
+          ) : null}
           <IconBtn onClick={(e) => { e.stopPropagation(); onMoveUp(); }} icon={<ChevronUp className="size-3" />} label="Subir" />
           <IconBtn onClick={(e) => { e.stopPropagation(); onMoveDown(); }} icon={<ChevronDown className="size-3" />} label="Bajar" />
           <IconBtn onClick={(e) => { e.stopPropagation(); onDuplicate(); }} icon={<Copy className="size-3" />} label="Duplicar" />
