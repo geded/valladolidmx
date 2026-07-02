@@ -312,7 +312,9 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
  * todavía no migrados caen al preview neutral.
  * ------------------------------------------------------------------ */
 
-const wrap = (Component: () => ReactNode): BlockPreview => () => <Component />;
+const wrap = (Component: (props?: { config?: Record<string, unknown> }) => ReactNode): BlockPreview => ({ node }) => (
+  <Component config={node.config as Record<string, unknown>} />
+);
 
 const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.hero": ({ node }) => (
