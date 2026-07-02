@@ -7,8 +7,9 @@
 
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Languages, Plus, Trash2, Type, Upload } from "lucide-react";
+import { ChevronDown, ChevronUp, ImageIcon, Languages, Plus, Trash2, Type, Upload } from "lucide-react";
 import { useEffect, useId, useState, type ReactNode } from "react";
+import { MediaPickerDialog } from "./MediaPickerDialog";
 import type {
   BlockContract,
   BlockFieldSchema,
