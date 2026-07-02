@@ -75,6 +75,7 @@ import type { BlockContract } from "@/lib/experience-builder/block-contract";
 import { AutoInspector } from "@/components/experience-builder/AutoInspector";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
 import { useAuth } from "@/hooks/useAuth";
+import { FONT_FAMILY_OPTIONS, type BlockAppearance } from "@/lib/experience-builder/appearance";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 type ChromeArea = "header" | "footer";
@@ -796,6 +797,13 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
               onChange={(next) => updateSelectedConfig(next)}
               simple={!advanced}
             />
+
+            {selectedNode ? (
+              <AppearancePanel
+                config={selectedConfig}
+                onChange={(next) => updateSelectedConfig(next)}
+              />
+            ) : null}
 
             {advanced && selectedNode ? (
               <AdvancedPanel
