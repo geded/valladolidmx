@@ -18,7 +18,8 @@ const publishedHomeQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/")({
-  head: ({ loaderData }) => {
+  head: (ctx) => {
+    const loaderData = ctx.loaderData as { seo?: Record<string, unknown> | null } | undefined;
     const seo = (loaderData?.seo ?? {}) as {
       title?: string;
       description?: string;
