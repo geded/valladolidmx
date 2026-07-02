@@ -14,7 +14,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Search, ArrowRight, Compass } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { useTranslation } from "@/i18n/context";
-import { readFieldTypography, typographyToStyle } from "@/lib/experience-builder/typography";
+import { readFieldTypography, typographyToStyle, type FieldTypography } from "@/lib/experience-builder/typography";
 import heroBg01 from "@/assets/brand/hero/bg01.jpg";
 import heroBg02 from "@/assets/brand/hero/bg02.jpg";
 
@@ -55,6 +55,8 @@ export interface HeroConfig {
   cta_alignment?: string;
   /** Mostrar u ocultar el buscador rápido del hero. Default: true. */
   show_search?: boolean;
+  /** Overrides tipográficos por campo, guardados por el Experience Builder. */
+  __typography?: Record<string, FieldTypography>;
 }
 
 export interface HeroProps {
