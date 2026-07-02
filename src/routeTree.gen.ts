@@ -86,6 +86,7 @@ import { Route as AuthenticatedAdminSistemaIndexRouteImport } from './routes/_au
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicStudioMediaSplatRouteImport } from './routes/api/public/studio-media.$'
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
 import { Route as AuthenticatedPortalEmpresasBusinessIdRouteImport } from './routes/_authenticated/portal/empresas.$businessId'
 import { Route as AuthenticatedCuentaPagosExitoRouteImport } from './routes/_authenticated/cuenta/pagos.exito'
@@ -536,6 +537,12 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicStudioMediaSplatRoute =
+  ApiPublicStudioMediaSplatRouteImport.update({
+    id: '/api/public/studio-media/$',
+    path: '/api/public/studio-media/$',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedPortalInvitacionesTokenRoute =
   AuthenticatedPortalInvitacionesTokenRouteImport.update({
     id: '/invitaciones/$token',
@@ -753,6 +760,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -848,6 +856,7 @@ export interface FileRoutesByTo {
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -951,6 +960,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/_authenticated/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1054,6 +1064,7 @@ export interface FileRouteTypes {
     | '/cuenta/pagos/exito'
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
+    | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1149,6 +1160,7 @@ export interface FileRouteTypes {
     | '/cuenta/pagos/exito'
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
+    | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1251,6 +1263,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/pagos/exito'
     | '/_authenticated/portal/empresas/$businessId'
     | '/_authenticated/portal/invitaciones/$token'
+    | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1299,6 +1312,7 @@ export interface RootRouteChildren {
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
+  ApiPublicStudioMediaSplatRoute: typeof ApiPublicStudioMediaSplatRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -1846,6 +1860,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/studio-media/$': {
+      id: '/api/public/studio-media/$'
+      path: '/api/public/studio-media/$'
+      fullPath: '/api/public/studio-media/$'
+      preLoaderRoute: typeof ApiPublicStudioMediaSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/portal/invitaciones/$token': {
       id: '/_authenticated/portal/invitaciones/$token'
       path: '/invitaciones/$token'
@@ -2321,6 +2342,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
+  ApiPublicStudioMediaSplatRoute: ApiPublicStudioMediaSplatRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,

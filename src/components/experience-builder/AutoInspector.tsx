@@ -7,8 +7,9 @@
 
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Languages, Plus, Trash2, Type, Upload } from "lucide-react";
+import { ChevronDown, ChevronUp, ImageIcon, Languages, Plus, Trash2, Type, Upload } from "lucide-react";
 import { useEffect, useId, useState, type ReactNode } from "react";
+import { MediaPickerDialog } from "./MediaPickerDialog";
 import type {
   BlockContract,
   BlockFieldSchema,
@@ -576,6 +577,7 @@ function MediaControl({
   const v = (value as string) ?? "";
   const reactId = useId();
   const inputId = `media-${reactId.replace(/:/g, "")}`;
+  const [pickerOpen, setPickerOpen] = useState(false);
   return (
     <div className="space-y-2">
       {v ? (
@@ -583,6 +585,18 @@ function MediaControl({
           <img src={v} alt="Vista previa" className="max-h-36 w-full object-cover" />
         </div>
       ) : null}
+      <div className="flex flex-wrap items-center gap-1">
+        <button
+          type="button"
+          onClick={() => setPickerOpen(true)}
+          className="inline-flex h-7 items-center gap-1 rounded-md border border-primary/40 bg-primary/5 px-2 text-xs font-medium text-primary hover:bg-primary/10"
+          title="Elegir de la biblioteca de imágenes"
+        >
+          <ImageIcon className="size-3.5" aria-hidden />
+          Biblioteca
+        </button>
+        <span className="text-[10px] text-muted-foreground">o</span>
+      </div>
       <div className="flex items-center gap-1">
         <input
           className={baseClass}
@@ -627,6 +641,12 @@ function MediaControl({
           <Trash2 className="size-3" aria-hidden /> Quitar imagen
         </button>
       ) : null}
+      <MediaPickerDialog
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        onPick={(url) => onChange(url)}
+        role="gallery"
+      />
     </div>
   );
 }
