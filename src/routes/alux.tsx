@@ -46,7 +46,7 @@ function AluxPage() {
           </p>
           <Link
             to="/concierge"
-            className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+            className="mt-6 inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90 active:scale-[0.98]"
           >
             Abrir Concierge Workspace
             <ArrowRight className="size-4" aria-hidden />
