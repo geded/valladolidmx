@@ -234,9 +234,11 @@ const SITE_PAGES: SitePage[] = [
 export interface VisualStudioProps {
   page?: string | null;
   onSelectPage?: (key: string | null) => void;
+  /** Modo Profesional: revela editor JSON, biblioteca de reutilizables y metadatos técnicos. */
+  advanced?: boolean;
 }
 
-export function VisualStudio({ page = null, onSelectPage }: VisualStudioProps = {}) {
+export function VisualStudio({ page = null, onSelectPage, advanced = false }: VisualStudioProps = {}) {
   const [internalKey, setInternalKey] = useState<string | null>(page);
   const openKey = page ?? internalKey;
   const setOpen = (k: string | null) => {
@@ -244,7 +246,7 @@ export function VisualStudio({ page = null, onSelectPage }: VisualStudioProps = 
     onSelectPage?.(k);
   };
   if (openKey === "home") {
-    return <HomeVisualEditor onExit={() => setOpen(null)} />;
+    return <HomeVisualEditor onExit={() => setOpen(null)} advanced={advanced} />;
   }
   return <PagesPicker onOpen={(k) => setOpen(k)} />;
 }
