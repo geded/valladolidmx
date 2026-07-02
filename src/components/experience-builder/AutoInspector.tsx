@@ -8,6 +8,7 @@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, Plus, Trash2, Upload } from "lucide-react";
+import { useId, type ReactNode } from "react";
 import type {
   BlockContract,
   BlockFieldSchema,
@@ -181,7 +182,8 @@ function MediaControl({
   baseClass, def, value, onChange,
 }: { baseClass: string; def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void }) {
   const v = (value as string) ?? "";
-  const inputId = `media-${def.label.replace(/\W+/g, "-").toLowerCase()}`;
+  const reactId = useId();
+  const inputId = `media-${reactId.replace(/:/g, "")}`;
   return (
     <div className="space-y-2">
       {v ? (
@@ -323,7 +325,7 @@ function ObjectControl({
 
 function MiniIconButton({
   label, icon, onClick, disabled, tone,
-}: { label: string; icon: React.ReactNode; onClick: () => void; disabled?: boolean; tone?: "danger" }) {
+}: { label: string; icon: ReactNode; onClick: () => void; disabled?: boolean; tone?: "danger" }) {
   return (
     <button
       type="button"
