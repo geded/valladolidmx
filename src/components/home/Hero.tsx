@@ -296,7 +296,7 @@ export function Hero({ config }: HeroProps = {}) {
               role="search"
               aria-label="Búsqueda rápida"
               onSubmit={(e) => e.preventDefault()}
-              className={`flex w-full items-center rounded-xl border border-white/20 bg-white/5 shadow-lg backdrop-blur-xl ${searchSizeClass} ${searchMaxWidthClass}`}
+              className={`relative flex w-full items-center rounded-xl border border-white/20 bg-white/5 shadow-lg backdrop-blur-xl pr-1 ${searchSizeClass} ${searchMaxWidthClass}`}
             >
               <Search className="shrink-0 text-white/80 size-4" aria-hidden />
               <input
@@ -306,8 +306,15 @@ export function Hero({ config }: HeroProps = {}) {
                 aria-label={searchPlaceholder}
               />
               {searchHelper ? (
-                <span className="hidden text-[11px] text-white/60 lg:inline">{searchHelper}</span>
+                <span className="hidden text-[11px] text-white/60 lg:inline mr-2">{searchHelper}</span>
               ) : null}
+              <button
+                type="submit"
+                className="ml-1 inline-flex shrink-0 items-center gap-1 rounded-lg bg-white px-3 py-1.5 text-[12px] font-semibold text-zinc-900 shadow-md transition-all hover:bg-white/90 active:scale-[0.98]"
+                aria-label="Buscar"
+              >
+                Buscar
+              </button>
             </form>
           </div>
         ) : null}
