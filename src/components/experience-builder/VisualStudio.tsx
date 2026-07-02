@@ -641,7 +641,9 @@ function HomeCanvas({
             transformOrigin: "top left",
           }}
         >
-          <PublicHeader variant="overlay" />
+          <InertChrome label="Encabezado global · no editable aún">
+            <PublicHeader variant="overlay" />
+          </InertChrome>
           <CompositionRenderer
             tree={tree}
             pageType="home"
@@ -664,7 +666,9 @@ function HomeCanvas({
                   )
             }
           />
-          <PublicFooter />
+          <InertChrome label="Pie de página global · no editable aún">
+            <PublicFooter />
+          </InertChrome>
         </div>
       </div>
     </div>
@@ -672,6 +676,20 @@ function HomeCanvas({
 }
 
 /* --------------------------------------------------------------------- */
+
+function InertChrome({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="relative">
+      <div className="pointer-events-none select-none opacity-90" aria-hidden>
+        {children}
+      </div>
+      <div className="pointer-events-none absolute inset-0 ring-1 ring-dashed ring-border/60" />
+      <span className="pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-muted px-2.5 py-1 text-[10px] font-medium text-muted-foreground shadow">
+        {label}
+      </span>
+    </div>
+  );
+}
 
 function ChromeItem({ label, note }: { label: string; note: string }) {
   return (
