@@ -818,6 +818,20 @@ function PageVisualEditor({
   const [showVersions, setShowVersions] = useState(false);
   const [versions, setVersions] = useState<CompositionRevisionSummary[]>([]);
   const [previewMode, setPreviewMode] = useState(false);
+  /**
+   * Viewport del canvas (mobile-first, coherente con la doctrina del
+   * proyecto: el turismo consume mayormente en celular). Persistido
+   * por usuario en localStorage.
+   */
+  const [deviceViewport, setDeviceViewport] = useState<DeviceViewport>(() => {
+    if (typeof window === "undefined") return "mobile";
+    const stored = window.localStorage.getItem("eb.canvas.device");
+    return stored === "tablet" || stored === "desktop" ? stored : "mobile";
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("eb.canvas.device", deviceViewport);
+  }, [deviceViewport]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1097,6 +1111,7 @@ function PageVisualEditor({
           >
             {previewMode ? "Salir de vista previa" : "Vista previa"}
           </button>
+          <DeviceToggle value={deviceViewport} onChange={setDeviceViewport} />
           <button
             type="button"
             onClick={() => void openVersions()}
@@ -1199,6 +1214,7 @@ function PageVisualEditor({
         <HomeCanvas
           tree={tree}
           previewMode={previewMode}
+          deviceViewport={deviceViewport}
           selectedId={selectedId}
           onSelect={(id) => setSelectedId(id)}
           onSelectChrome={(area) => setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)}
@@ -1280,9 +1296,64 @@ function PageVisualEditor({
 
 const HOME_CANVAS_WIDTH = 1280;
 
+/** Anchos de canvas por dispositivo (px CSS reales, no escalados). */
+export type DeviceViewport = "mobile" | "tablet" | "desktop";
+const DEVICE_WIDTHS: Record<DeviceViewport, number> = {
+  mobile: 390,
+  tablet: 768,
+  desktop: 1280,
+};
+
+/**
+ * Toggle segmentado Móvil / Tablet / Desktop para el canvas.
+ * Default móvil — el turismo se consume mayormente en celular y así el
+ * empresario ve la verdad del turista sin publicar.
+ */
+function DeviceToggle({
+  value,
+  onChange,
+}: {
+  value: DeviceViewport;
+  onChange: (v: DeviceViewport) => void;
+}) {
+  const items: Array<{ id: DeviceViewport; label: string; short: string }> = [
+    { id: "mobile", label: "Vista móvil (390 px)", short: "Móvil" },
+    { id: "tablet", label: "Vista tablet (768 px)", short: "Tablet" },
+    { id: "desktop", label: "Vista desktop (1280 px)", short: "Desktop" },
+  ];
+  return (
+    <div
+      role="group"
+      aria-label="Vista previa por dispositivo"
+      className="inline-flex items-center overflow-hidden rounded-md border border-border bg-background"
+    >
+      {items.map((it) => {
+        const active = it.id === value;
+        return (
+          <button
+            key={it.id}
+            type="button"
+            onClick={() => onChange(it.id)}
+            aria-pressed={active}
+            title={it.label}
+            className={`px-2.5 py-1.5 text-[11px] font-medium transition ${
+              active
+                ? "bg-primary text-primary-foreground"
+                : "text-foreground hover:bg-accent"
+            }`}
+          >
+            {it.short}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function HomeCanvas({
   tree,
   previewMode,
+  deviceViewport,
   selectedId,
   onSelect,
   onSelectChrome,
@@ -1292,6 +1363,7 @@ function HomeCanvas({
 }: {
   tree: CompositionTree;
   previewMode: boolean;
+  deviceViewport: DeviceViewport;
   selectedId: string | null;
   onSelect: (id: string) => void;
   onSelectChrome: (area: ChromeArea) => void;
@@ -1301,7 +1373,8 @@ function HomeCanvas({
 }) {
   const outerRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<HTMLDivElement | null>(null);
-  const [metrics, setMetrics] = useState({ width: HOME_CANVAS_WIDTH, height: 900 });
+  const frameWidth = DEVICE_WIDTHS[deviceViewport];
+  const [metrics, setMetrics] = useState({ width: frameWidth, height: 900 });
 
   useEffect(() => {
     const measure = () => {
@@ -1325,16 +1398,18 @@ function HomeCanvas({
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [tree, previewMode, selectedId]);
+  }, [tree, previewMode, selectedId, deviceViewport]);
 
-  const scale = Math.min(1, Math.max(0.45, metrics.width / HOME_CANVAS_WIDTH));
+  // Móvil y tablet caben casi siempre a 1:1; desktop se auto-escala si el
+  // contenedor del editor es más angosto que 1280.
+  const scale = Math.min(1, Math.max(0.45, metrics.width / frameWidth));
 
   return (
     <div ref={outerRef} className="flex-1 overflow-y-auto bg-muted/20 px-3 py-3">
       <div
         className="relative mx-auto overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
         style={{
-          width: HOME_CANVAS_WIDTH * scale,
+          width: frameWidth * scale,
           height: metrics.height * scale,
         }}
       >
@@ -1342,7 +1417,7 @@ function HomeCanvas({
           ref={frameRef}
           className="absolute left-0 top-0 bg-background"
           style={{
-            width: HOME_CANVAS_WIDTH,
+            width: frameWidth,
             transform: `scale(${scale})`,
             transformOrigin: "top left",
           }}
