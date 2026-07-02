@@ -890,7 +890,7 @@ function PageVisualEditor({
   };
 
   if (loadError) return <FullScreenState title="No se pudo abrir el editor" detail={loadError} onExit={onExit} />;
-  if (!page || !tree) return <FullScreenState title="Preparando el editor…" detail="Cargando tu página de Inicio." spinner onExit={onExit} />;
+  if (!page || !tree) return <FullScreenState title="Preparando el editor…" detail={`Cargando ${pageDef.title}.`} spinner onExit={onExit} />;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
