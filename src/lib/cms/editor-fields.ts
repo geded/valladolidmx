@@ -112,14 +112,4 @@ export const BUSINESS_FIELDS: EditorField[] = [
     helpText: "Una línea que resume la propuesta de la empresa.",
   },
   { name: "description", label: "Descripción", type: "textarea" },
-  {
-    name: "verified",
-    label: "Empresa verificada",
-    type: "select",
-    options: [
-      { value: "false", label: "No verificada" },
-      { value: "true", label: "Verificada" },
-    ],
-    helpText: "Sólo cambia esto si validaste documentación.",
-  },
 ];
