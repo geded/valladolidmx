@@ -9,13 +9,21 @@ export const REGION_FIELDS: EditorField[] = [
     required: true,
     helpText: "Identificador URL (sin espacios, sólo minúsculas y guiones).",
   },
-  { name: "description", label: "Descripción", type: "textarea" },
   {
-    name: "sort_order",
-    label: "Orden",
-    type: "number",
-    helpText: "Posición relativa en listados.",
+    name: "state_id",
+    label: "Estado",
+    type: "select",
+    required: true,
+    options: [],
+    helpText: "Estado principal al que pertenece la región turística.",
   },
+  {
+    name: "tagline",
+    label: "Frase corta",
+    type: "text",
+    helpText: "Una línea evocadora que resume la región.",
+  },
+  { name: "description", label: "Descripción", type: "textarea" },
 ];
 
 export const CATEGORY_FIELDS: EditorField[] = [

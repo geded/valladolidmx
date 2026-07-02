@@ -55,7 +55,7 @@ const TABLE_TO_ENTITY_KIND: Record<
 };
 
 const EDITABLE_COLUMNS: Record<EditableTable, readonly string[]> = {
-  tourism_regions: ["slug", "name", "description", "sort_order", "metadata"],
+  tourism_regions: ["state_id", "slug", "name", "tagline", "description", "metadata"],
   destinations: [
     "tourism_region_id",
     "slug",
