@@ -381,6 +381,8 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
             typeof node.config.show_search === "boolean"
               ? (node.config.show_search as boolean)
               : undefined,
+          __typography:
+            (node.config.__typography as Record<string, FieldTypography> | undefined) ?? undefined,
         }}
       />
     );
