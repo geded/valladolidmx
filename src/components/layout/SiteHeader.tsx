@@ -341,38 +341,13 @@ export function SiteHeader({ variant = "solid", config }: Props) {
           </nav>
 
           <div className="flex items-center gap-2">
-            <a
-              href={ctaHref}
-              className={cn(
-                "hidden items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition sm:inline-flex",
-                isOverlay
-                  ? "border border-white/40 bg-white/10 text-white backdrop-blur hover:bg-white/20"
-                  : "border border-primary/40 bg-primary/10 text-primary hover:bg-primary/15",
-              )}
-            >
-              <Compass className="size-4" aria-hidden />
-              {ctaLabel}
-            </a>
-            {showLanguage ? <LanguageSwitcher /> : null}
-            {showUserMenu ? <div className="hidden sm:block">
-              <UserMenu />
-            </div> : null}
-            <button
-              ref={menuButtonRef}
-              type="button"
-              className={cn(
-                "lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-full border transition",
-                isOverlay
-                  ? "border-white/30 bg-white/10 text-white"
-                  : "border-border bg-card text-foreground",
-              )}
-              aria-label="Menú"
-              aria-expanded={open}
-              aria-controls="mobile-drawer"
-              onClick={() => setOpen((v) => !v)}
-            >
-              {open ? <X className="size-5" /> : <Menu className="size-5" />}
-            </button>
+            {visibleButtons.map((btn, idx) => renderHeaderButton(btn, idx, {
+              isOverlay,
+              open,
+              setOpen,
+              menuButtonRef,
+              ctaFallback: { label: ctaLabel, href: ctaHref },
+            }))}
           </div>
         </Container>
       </header>
