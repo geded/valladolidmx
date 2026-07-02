@@ -180,14 +180,14 @@ export function SiteHeader({ variant = "solid", config }: Props) {
             </div>
             <nav aria-label="Menú móvil" className="flex flex-col gap-0.5 px-4 py-5">
               {nav.map((n) => (
-                <Link
+                <a
                   key={n.href}
-                  to={n.href}
+                  href={n.href}
                   onClick={() => setOpen(false)}
                   className="rounded-lg px-3 py-2.5 text-[0.95rem] font-medium leading-tight text-foreground hover:bg-accent hover:text-accent-foreground"
                 >
                   {n.label}
-                </Link>
+                </a>
               ))}
               <a
                 href={ctaHref}
