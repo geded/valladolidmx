@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { EntityEditor } from "@/components/cms/EntityEditor";
-import { REGION_FIELDS } from "@/lib/cms/editor-fields";
+import { RegionEditor } from "@/components/cms/RegionEditor";
 
 export const Route = createFileRoute("/_authenticated/cms/regiones/nueva")({
   head: () => ({
@@ -9,13 +8,5 @@ export const Route = createFileRoute("/_authenticated/cms/regiones/nueva")({
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-  component: () => (
-    <EntityEditor
-      table="tourism_regions"
-      title="Región turística"
-      backTo="/cms/regiones"
-      listQueryKey="regions"
-      fields={REGION_FIELDS}
-    />
-  ),
+  component: () => <RegionEditor />,
 });
