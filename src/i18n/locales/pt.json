@@ -18,7 +18,9 @@
     "cta_primary": "Explorar destinos",
     "cta_secondary": "Monta a tua viagem",
     "search_placeholder": "Procura destino, experiência ou sabor…",
-    "search_helper": "Só se já souberes o que procuras"
+    "search_helper": "Só se já souberes o que procuras",
+    "search_button": "Buscar",
+    "search_aria": "Pesquisa rápida"
   },
   "sections": {
     "destinations_title": "Destinos do Oriente Maia",

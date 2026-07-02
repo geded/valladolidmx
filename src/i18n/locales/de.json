@@ -18,7 +18,9 @@
     "cta_primary": "Reiseziele entdecken",
     "cta_secondary": "Reise planen",
     "search_placeholder": "Suche Ziel, Erlebnis oder Geschmack…",
-    "search_helper": "Nur wenn du schon weißt, was du suchst"
+    "search_helper": "Nur wenn du schon weißt, was du suchst",
+    "search_button": "Suchen",
+    "search_aria": "Schnellsuche"
   },
   "sections": {
     "destinations_title": "Reiseziele im östlichen Maya-Land",

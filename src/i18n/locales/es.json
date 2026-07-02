@@ -18,7 +18,9 @@
     "cta_primary": "Explorar destinos",
     "cta_secondary": "Arma tu viaje",
     "search_placeholder": "Busca un destino, una experiencia, un sabor…",
-    "search_helper": "Sólo si ya sabes qué buscar"
+    "search_helper": "Sólo si ya sabes qué buscar",
+    "search_button": "Buscar",
+    "search_aria": "Búsqueda rápida"
   },
   "sections": {
     "destinations_title": "Destinos del Oriente Maya",
