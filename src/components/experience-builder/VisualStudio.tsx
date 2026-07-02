@@ -801,7 +801,7 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
             {selectedNode ? (
               <AppearancePanel
                 config={selectedConfig}
-                onChange={(next) => updateSelectedConfig(next)}
+                onChange={(next: Record<string, unknown>) => updateSelectedConfig(next)}
               />
             ) : null}
 
