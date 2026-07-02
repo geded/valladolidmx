@@ -158,9 +158,25 @@ const heroBlock: BlockContract = {
   display_name: "Hero",
   description: "Bloque hero principal de la Home y de Landing Pages.",
   schema: {
-    eyebrow: { type: "text", label: "Frase superior", translatable: true },
-    title: { type: "text", label: "Título", required: true, translatable: true },
-    subtitle: { type: "text", label: "Subtítulo", translatable: true },
+    eyebrow: {
+      type: "text",
+      label: "Frase superior",
+      translatable: true,
+      default: "Experiencias que emocionan",
+    },
+    title: {
+      type: "text",
+      label: "Título",
+      required: true,
+      translatable: true,
+      default: "Despierta en Valladolid y descubre el Oriente Maya de Yucatán.",
+    },
+    subtitle: {
+      type: "text",
+      label: "Subtítulo",
+      translatable: true,
+      default: "Cenotes, ciudades vivas y rutas auténticas más allá de la costumbre.",
+    },
     background_images: {
       type: "list",
       label: "Imágenes de fondo (carrusel)",
@@ -255,12 +271,14 @@ const heroBlock: BlockContract = {
       type: "text",
       label: "Texto del buscador (placeholder)",
       translatable: true,
+      default: "Busca un destino, una experiencia, un sabor…",
       description: "Texto guía que se muestra dentro del buscador cuando está vacío.",
     },
     search_helper: {
       type: "text",
       label: "Ayuda del buscador",
       translatable: true,
+      default: "Sólo si ya sabes qué buscar",
       description: "Texto pequeño a la derecha del buscador (visible sólo en pantallas grandes).",
     },
     search_size: {
@@ -329,7 +347,7 @@ const destinosBlock: BlockContract = {
   version: "1.0.0",
   display_name: "Sección Destinos",
   schema: {
-    heading: { type: "text", label: "Encabezado", translatable: true },
+    heading: { type: "text", label: "Encabezado", translatable: true, default: "Destinos del Oriente Maya" },
   },
   capabilities: {
     soporta_i18n: true,
@@ -349,7 +367,7 @@ const categoriasBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Sección Categorías",
-  schema: { heading: { type: "text", label: "Encabezado", translatable: true } },
+  schema: { heading: { type: "text", label: "Encabezado", translatable: true, default: "Qué te mueve" } },
   capabilities: {
     soporta_i18n: true,
     soporta_preview: true,
@@ -366,7 +384,7 @@ const rutasBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Sección Rutas",
-  schema: { heading: { type: "text", label: "Encabezado", translatable: true } },
+  schema: { heading: { type: "text", label: "Encabezado", translatable: true, default: "Rutas sugeridas" } },
   capabilities: {
     soporta_i18n: true,
     soporta_preview: true,
@@ -384,7 +402,7 @@ const consejoAluxBlock: BlockContract = {
   version: "1.0.0",
   display_name: "Consejo Alux",
   description: "Sección consultiva con sugerencias de Alux (modo read-only).",
-  schema: { heading: { type: "text", label: "Encabezado", translatable: true } },
+  schema: { heading: { type: "text", label: "Encabezado", translatable: true, default: "Un consejo de Alux" } },
   capabilities: {
     soporta_i18n: true,
     soporta_preview: true,
@@ -401,9 +419,14 @@ const armaTuViajeBlock: BlockContract = {
   version: "1.0.0",
   display_name: "CTA Arma tu Viaje",
   schema: {
-    heading: { type: "text", label: "Encabezado", translatable: true },
-    body: { type: "rich_text", label: "Cuerpo", translatable: true },
-    cta_label: { type: "text", label: "Etiqueta CTA", translatable: true },
+    heading: { type: "text", label: "Encabezado", translatable: true, default: "Arma tu Viaje" },
+    body: {
+      type: "rich_text",
+      label: "Cuerpo",
+      translatable: true,
+      default: "Tu expediente personal. Guarda destinos, experiencias y notas. Tu concierge humano lo recibe cuando estés listo.",
+    },
+    cta_label: { type: "text", label: "Etiqueta CTA", translatable: true, default: "Arma tu viaje" },
   },
   capabilities: {
     soporta_i18n: true,
@@ -421,7 +444,7 @@ const enVivoBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Oriente Maya EN VIVO",
-  schema: { heading: { type: "text", label: "Encabezado", translatable: true } },
+  schema: { heading: { type: "text", label: "Encabezado", translatable: true, default: "Oriente Maya en vivo" } },
   capabilities: {
     soporta_i18n: true,
     soporta_preview: true,
@@ -438,7 +461,7 @@ const empresasSectionBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Sección Empresas",
-  schema: { heading: { type: "text", label: "Encabezado", translatable: true } },
+  schema: { heading: { type: "text", label: "Encabezado", translatable: true, default: "Empresas recomendadas" } },
   capabilities: {
     soporta_i18n: true,
     soporta_preview: true,
@@ -455,7 +478,7 @@ const resenasSectionBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Sección Reseñas",
-  schema: { heading: { type: "text", label: "Encabezado", translatable: true } },
+  schema: { heading: { type: "text", label: "Encabezado", translatable: true, default: "Lo que cuentan quienes ya vinieron" } },
   capabilities: {
     soporta_i18n: true,
     soporta_preview: true,
