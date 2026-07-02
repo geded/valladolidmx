@@ -5,6 +5,7 @@ import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { PublicShell } from "@/components/discovery";
+import { useSectionEditWrap } from "@/components/experience-builder/SectionEditOverlay";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import {
   getDiscoverySection,
@@ -56,11 +57,12 @@ export const Route = createFileRoute("/")({
  */
 function HomePage() {
   const { data: published } = useQuery(publishedHomeQuery);
+  const editWrap = useSectionEditWrap({ pageSlug: "home" });
 
   if (published?.snapshot) {
     return (
       <PublicShell variant="hero">
-        <CompositionRenderer tree={published.snapshot} pageType="home" />
+        <CompositionRenderer tree={published.snapshot} pageType="home" wrap={editWrap} />
       </PublicShell>
     );
   }
