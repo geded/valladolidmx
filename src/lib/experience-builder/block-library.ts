@@ -182,7 +182,8 @@ const heroBlock: BlockContract = {
     background_images: {
       type: "list",
       label: "Imágenes de fondo (carrusel)",
-      description: "Agrega una o varias. Si dejas vacío, se usan las imágenes por defecto.",
+      description: "Agrega, edita o elimina imágenes del carrusel. Cada imagen tiene su botón para guardarla en la Biblioteca.",
+      default: [{ src: heroBg01Url }, { src: heroBg02Url }],
       item: {
         type: "object",
         label: "Imagen",
