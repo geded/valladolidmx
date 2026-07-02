@@ -138,12 +138,27 @@ function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
       <section className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {SITE_PAGES.map((p) => {
           const editable = p.status === "editable";
+          const openPage = () => editable && onOpen(p.key);
           const cardBase = "flex h-full flex-col justify-between rounded-2xl border p-5 text-left transition-colors";
           const cardCls = editable
-            ? `${cardBase} border-primary/30 bg-primary/5 hover:bg-primary/10`
+            ? `${cardBase} cursor-pointer border-primary/30 bg-primary/5 hover:bg-primary/10`
             : `${cardBase} border-border bg-card opacity-80`;
           return (
-            <div key={p.key} className={cardCls} aria-disabled={!editable}>
+            <div
+              key={p.key}
+              className={cardCls}
+              aria-disabled={!editable}
+              role={editable ? "button" : undefined}
+              tabIndex={editable ? 0 : undefined}
+              onClick={openPage}
+              onKeyDown={(event) => {
+                if (!editable) return;
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  openPage();
+                }
+              }}
+            >
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="text-base font-semibold">{p.title}</h3>
@@ -164,7 +179,10 @@ function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
                 {editable ? (
                   <button
                     type="button"
-                    onClick={() => onOpen(p.key)}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onOpen(p.key);
+                    }}
                     className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-95 active:opacity-90"
                   >
                     Abrir editor →
@@ -178,6 +196,7 @@ function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
                   href={p.publicPath}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(event) => event.stopPropagation()}
                   className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-[10px] font-medium text-foreground hover:bg-accent"
                   aria-label={`Ver ${p.title} en el sitio`}
                 >

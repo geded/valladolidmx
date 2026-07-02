@@ -30,6 +30,7 @@ import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
 import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/workspace-preview'
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
 import { Route as LSlugRouteImport } from './routes/l.$slug'
+import { Route as AuthenticatedPaginasRouteImport } from './routes/_authenticated/paginas'
 import { Route as AuthenticatedMiViajeRouteImport } from './routes/_authenticated/mi-viaje'
 import { Route as AuthenticatedEmpresaRouteImport } from './routes/_authenticated/empresa'
 import { Route as AuthenticatedCmsRouteImport } from './routes/_authenticated/cms'
@@ -204,6 +205,11 @@ const LSlugRoute = LSlugRouteImport.update({
   path: '/l/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPaginasRoute = AuthenticatedPaginasRouteImport.update({
+  id: '/paginas',
+  path: '/paginas',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedMiViajeRoute = AuthenticatedMiViajeRouteImport.update({
   id: '/mi-viaje',
   path: '/mi-viaje',
@@ -320,9 +326,9 @@ const AuthenticatedPortalActividadRoute =
   } as any)
 const AuthenticatedPaginasSplatRoute =
   AuthenticatedPaginasSplatRouteImport.update({
-    id: '/paginas/$',
-    path: '/paginas/$',
-    getParentRoute: () => AuthenticatedRoute,
+    id: '/$',
+    path: '/$',
+    getParentRoute: () => AuthenticatedPaginasRoute,
   } as any)
 const AuthenticatedCuentaPerfilRoute =
   AuthenticatedCuentaPerfilRouteImport.update({
@@ -619,6 +625,7 @@ export interface FileRoutesByFullPath {
   '/cms': typeof AuthenticatedCmsRouteWithChildren
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
+  '/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/l/$slug': typeof LSlugRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -704,6 +711,7 @@ export interface FileRoutesByTo {
   '/restaurantes': typeof RestaurantesRoute
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
+  '/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/l/$slug': typeof LSlugRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -795,6 +803,7 @@ export interface FileRoutesById {
   '/_authenticated/cms': typeof AuthenticatedCmsRouteWithChildren
   '/_authenticated/empresa': typeof AuthenticatedEmpresaRoute
   '/_authenticated/mi-viaje': typeof AuthenticatedMiViajeRoute
+  '/_authenticated/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/l/$slug': typeof LSlugRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -887,6 +896,7 @@ export interface FileRouteTypes {
     | '/cms'
     | '/empresa'
     | '/mi-viaje'
+    | '/paginas'
     | '/l/$slug'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -972,6 +982,7 @@ export interface FileRouteTypes {
     | '/restaurantes'
     | '/empresa'
     | '/mi-viaje'
+    | '/paginas'
     | '/l/$slug'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -1062,6 +1073,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms'
     | '/_authenticated/empresa'
     | '/_authenticated/mi-viaje'
+    | '/_authenticated/paginas'
     | '/l/$slug'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -1311,6 +1323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/paginas': {
+      id: '/_authenticated/paginas'
+      path: '/paginas'
+      fullPath: '/paginas'
+      preLoaderRoute: typeof AuthenticatedPaginasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/mi-viaje': {
       id: '/_authenticated/mi-viaje'
       path: '/mi-viaje'
@@ -1453,10 +1472,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/paginas/$': {
       id: '/_authenticated/paginas/$'
-      path: '/paginas/$'
+      path: '/$'
       fullPath: '/paginas/$'
       preLoaderRoute: typeof AuthenticatedPaginasSplatRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedPaginasRoute
     }
     '/_authenticated/cuenta/perfil': {
       id: '/_authenticated/cuenta/perfil'
@@ -2019,6 +2038,17 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
 const AuthenticatedCmsRouteWithChildren =
   AuthenticatedCmsRoute._addFileChildren(AuthenticatedCmsRouteChildren)
 
+interface AuthenticatedPaginasRouteChildren {
+  AuthenticatedPaginasSplatRoute: typeof AuthenticatedPaginasSplatRoute
+}
+
+const AuthenticatedPaginasRouteChildren: AuthenticatedPaginasRouteChildren = {
+  AuthenticatedPaginasSplatRoute: AuthenticatedPaginasSplatRoute,
+}
+
+const AuthenticatedPaginasRouteWithChildren =
+  AuthenticatedPaginasRoute._addFileChildren(AuthenticatedPaginasRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedConciergeRouteRoute: typeof AuthenticatedConciergeRouteRouteWithChildren
@@ -2027,7 +2057,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCmsRoute: typeof AuthenticatedCmsRouteWithChildren
   AuthenticatedEmpresaRoute: typeof AuthenticatedEmpresaRoute
   AuthenticatedMiViajeRoute: typeof AuthenticatedMiViajeRoute
-  AuthenticatedPaginasSplatRoute: typeof AuthenticatedPaginasSplatRoute
+  AuthenticatedPaginasRoute: typeof AuthenticatedPaginasRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -2039,7 +2069,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCmsRoute: AuthenticatedCmsRouteWithChildren,
   AuthenticatedEmpresaRoute: AuthenticatedEmpresaRoute,
   AuthenticatedMiViajeRoute: AuthenticatedMiViajeRoute,
-  AuthenticatedPaginasSplatRoute: AuthenticatedPaginasSplatRoute,
+  AuthenticatedPaginasRoute: AuthenticatedPaginasRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

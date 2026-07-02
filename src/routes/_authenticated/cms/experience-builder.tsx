@@ -91,12 +91,18 @@ function ExperienceBuilderShell() {
   const page = search.page ?? null;
   const setMode = (m: StudioMode) =>
     void navigate({
+      to: "/cms/experience-builder",
       search: (prev: Record<string, unknown>) => ({ ...prev, mode: m }),
       replace: true,
     });
   const setPage = (k: string | null) =>
     void navigate({
-      search: (prev: Record<string, unknown>) => ({ ...prev, page: k ?? undefined }),
+      to: "/cms/experience-builder",
+      search: (prev: Record<string, unknown>) => ({
+        ...prev,
+        mode: prev.mode === "professional" ? prev.mode : "visual",
+        page: k ?? undefined,
+      }),
       replace: true,
     });
 

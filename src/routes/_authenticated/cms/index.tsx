@@ -119,6 +119,7 @@ function CmsDashboard() {
         </Link>
         <Link
           to="/cms/experience-builder"
+          search={{ mode: "visual", page: "home" }}
           className="group flex flex-col gap-2 rounded-2xl border border-border bg-card p-5 transition-colors hover:bg-accent"
         >
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
