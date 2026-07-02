@@ -28,10 +28,24 @@ export const listTourismRegionsForSelect = createServerFn({ method: "GET" })
       .from("tourism_regions")
       .select("id, name, slug")
       .is("deleted_at", null)
-      .order("sort_order", { ascending: true })
       .order("name", { ascending: true });
     if (error) throw error;
     return (data ?? []) as { id: string; name: string; slug: string }[];
+  });
+
+/* ─────────────────────  Selector de estados  ──────────────────────── */
+
+export const listStatesForSelect = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertEditorial(context);
+    const { data, error } = await context.supabase
+      .from("states")
+      .select("id, name, iso_code")
+      .is("deleted_at", null)
+      .order("name", { ascending: true });
+    if (error) throw error;
+    return (data ?? []) as { id: string; name: string; iso_code: string }[];
   });
 
 /* ─────────────────────  Firma de subida  ──────────────────────────── */
