@@ -203,9 +203,15 @@ function FieldRow({
 }
 
 function TypographyEditor({
-  value, defaults, onChange,
-}: { value: FieldTypography; defaults?: FieldTypography; onChange: (next: FieldTypography) => void }) {
-  const [bp, setBp] = useState<TypographyBreakpoint>("base");
+  value, defaults, onChange, activeBreakpoint,
+}: { value: FieldTypography; defaults?: FieldTypography; onChange: (next: FieldTypography) => void; activeBreakpoint?: TypographyBreakpoint }) {
+  const [bp, setBp] = useState<TypographyBreakpoint>(activeBreakpoint ?? "base");
+  // Sincroniza el tab tipográfico con el dispositivo activo del canvas:
+  // si el usuario está viendo Desktop, edita Desktop; Tablet edita Tablet;
+  // Móvil edita Base. Así "lo que ves en el canvas" es lo que se edita.
+  useEffect(() => {
+    if (activeBreakpoint) setBp(activeBreakpoint);
+  }, [activeBreakpoint]);
   const active = getBreakpointTypography(value, bp);
   const base = getBreakpointTypography(value, "base");
   const set = <K extends keyof FieldTypography>(k: K, v: FieldTypography[K]) => {
