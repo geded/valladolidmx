@@ -128,7 +128,7 @@ function CapabilityChips({ contract }: { contract: BlockContract }) {
 }
 
 function FieldRow({
-  name, def, value, onChange, simple, translations, onTranslationChange, typography, typographyDefault, onTypographyChange,
+  name, def, value, onChange, simple, translations, onTranslationChange, typography, typographyDefault, onTypographyChange, activeBreakpoint,
 }: {
   name: string;
   def: BlockFieldSchema;
@@ -140,6 +140,7 @@ function FieldRow({
   typography?: FieldTypography;
   typographyDefault?: FieldTypography;
   onTypographyChange?: (next: FieldTypography) => void;
+  activeBreakpoint?: TypographyBreakpoint;
 }) {
   const canTranslate = Boolean(def.translatable) && !simple && (def.type === "text" || def.type === "rich_text");
   const canStyleText = !simple && (def.type === "text" || def.type === "rich_text");
@@ -182,7 +183,12 @@ function FieldRow({
         <p className="text-[10px] text-muted-foreground">{def.description}</p>
       ) : null}
       {canStyleText && showTypo ? (
-        <TypographyEditor value={typo} defaults={typographyDefault} onChange={(next) => onTypographyChange?.(next)} />
+        <TypographyEditor
+          value={typo}
+          defaults={typographyDefault}
+          onChange={(next) => onTypographyChange?.(next)}
+          activeBreakpoint={activeBreakpoint}
+        />
       ) : null}
       {canTranslate && showI18n ? (
         <TranslationsEditor
