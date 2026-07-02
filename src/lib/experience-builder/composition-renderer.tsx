@@ -402,4 +402,96 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
       </div>
     );
   },
+  // Bloques avanzados (Modo Profesional)
+  "vmx.custom.html": ({ node }) => {
+    const html = typeof node.config.html === "string" ? node.config.html : "";
+    const maxWidth = (node.config.max_width as string) ?? "container";
+    const wrapper = maxWidth === "full" ? "w-full" : "mx-auto w-full max-w-6xl px-4";
+    return (
+      <div className={`py-6 ${wrapper}`}>
+        {/* eslint-disable-next-line react/no-danger */}
+        <div dangerouslySetInnerHTML={{ __html: html }} />
+      </div>
+    );
+  },
+  "vmx.custom.form": ({ node }) => <CustomFormBlock config={node.config} />,
 };
+
+/* ------------------------------------------------------------------ *
+ * Bloque formulario configurable
+ * ------------------------------------------------------------------ */
+
+interface FormFieldCfg { key: string; label: string; type: string; required?: boolean }
+
+function CustomFormBlock({ config }: { config: Record<string, unknown> }) {
+  const heading = (config.heading as string) ?? "Contáctanos";
+  const subheading = (config.subheading as string) ?? "";
+  const submitLabel = (config.submit_label as string) ?? "Enviar";
+  const successMessage = (config.success_message as string) ?? "¡Gracias! Recibimos tu mensaje.";
+  const webhookUrl = (config.webhook_url as string) ?? "";
+  const fields = Array.isArray(config.fields) ? (config.fields as FormFieldCfg[]) : [];
+  return (
+    <section className="mx-auto w-full max-w-2xl px-4 py-10">
+      <header className="mb-4">
+        <h2 className="text-2xl font-semibold">{heading}</h2>
+        {subheading ? <p className="mt-1 text-sm text-muted-foreground">{subheading}</p> : null}
+      </header>
+      <form
+        className="space-y-3"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const form = e.currentTarget;
+          const data = new FormData(form);
+          const payload: Record<string, unknown> = {};
+          for (const [k, v] of data.entries()) payload[k] = v;
+          const success = form.querySelector("[data-form-success]") as HTMLElement | null;
+          try {
+            if (webhookUrl) {
+              await fetch(webhookUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+            }
+            if (success) success.classList.remove("hidden");
+            form.reset();
+          } catch {
+            if (success) {
+              success.textContent = "No se pudo enviar. Intenta más tarde.";
+              success.classList.remove("hidden");
+            }
+          }
+        }}
+      >
+        {fields.map((f, i) => (
+          <label key={i} className="block text-sm">
+            <span className="mb-1 block font-medium">
+              {f.label} {f.required ? <span className="text-destructive">*</span> : null}
+            </span>
+            {f.type === "textarea" ? (
+              <textarea
+                name={f.key}
+                required={f.required}
+                className="min-h-[100px] w-full rounded-md border border-border bg-background px-3 py-2"
+              />
+            ) : (
+              <input
+                name={f.key}
+                type={f.type === "email" ? "email" : f.type === "tel" ? "tel" : "text"}
+                required={f.required}
+                className="w-full rounded-md border border-border bg-background px-3 py-2"
+              />
+            )}
+          </label>
+        ))}
+        <button
+          type="submit"
+          className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-95"
+        >
+          {submitLabel}
+        </button>
+        <p data-form-success className="hidden text-sm text-emerald-600">{successMessage}</p>
+      </form>
+    </section>
+  );
+}
