@@ -57,6 +57,14 @@ export interface HeroConfig {
   show_search?: boolean;
   /** Mostrar u ocultar los botones del hero. Default: true. */
   show_ctas?: boolean;
+  /** Placeholder del buscador. Si no se define usa el i18n por defecto. */
+  search_placeholder?: string;
+  /** Texto auxiliar del buscador (visible en pantallas grandes). */
+  search_helper?: string;
+  /** Alineación del bloque de texto (eyebrow, título, subtítulo). */
+  text_alignment?: string;
+  /** Alineación del buscador. */
+  search_alignment?: string;
   /** Overrides tipográficos por campo, guardados por el Experience Builder. */
   __typography?: Record<string, FieldTypography>;
 }
@@ -113,6 +121,22 @@ export function Hero({ config }: HeroProps = {}) {
         ? "justify-end"
         : "justify-start";
 
+  const textAlignment = config?.text_alignment?.trim() || "left";
+  const textAlignClass =
+    textAlignment === "center"
+      ? "text-center items-center"
+      : textAlignment === "right"
+        ? "text-right items-end"
+        : "text-left items-start";
+
+  const searchAlignment = config?.search_alignment?.trim() || "left";
+  const searchAlignClass =
+    searchAlignment === "center"
+      ? "mx-auto"
+      : searchAlignment === "right"
+        ? "ml-auto"
+        : "";
+
   // Botones: sólo se respeta la lista del editor cuando trae al menos un
   // botón. Una lista vacía se trata como "no configurado" y se usan los
   // botones legacy/por defecto (evita que la web quede sin CTAs si el editor
@@ -136,6 +160,8 @@ export function Hero({ config }: HeroProps = {}) {
         ];
   const showCtas = config?.show_ctas !== false;
   const showSearch = config?.show_search !== false;
+  const searchPlaceholder = pickText(config?.search_placeholder, t("hero.search_placeholder"));
+  const searchHelper = pickText(config?.search_helper, t("hero.search_helper"));
 
   // Typography por campo (config.__typography[fieldKey]).
   const cfgRecord = (config ?? {}) as unknown as Record<string, unknown>;
@@ -183,7 +209,7 @@ export function Hero({ config }: HeroProps = {}) {
           en la parte baja, como referencia Airbnb/Apple/Booking.
       */}
       <Container
-        className="relative flex min-h-[100svh] flex-col justify-center gap-4 pb-10 pt-20 md:min-h-[100dvh] md:justify-end md:gap-0 md:pb-28 md:pt-40"
+        className={`relative flex min-h-[100svh] flex-col justify-center gap-4 pb-10 pt-20 md:min-h-[100dvh] md:justify-end md:gap-0 md:pb-28 md:pt-40 ${textAlignClass}`}
       >
         {eyebrow ? (
           <p
@@ -227,16 +253,18 @@ export function Hero({ config }: HeroProps = {}) {
             role="search"
             aria-label="Búsqueda rápida"
             onSubmit={(e) => e.preventDefault()}
-            className="mt-4 flex max-w-md items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 shadow-sm backdrop-blur-md sm:mt-6 md:mt-10"
+            className={`mt-4 flex w-full max-w-md items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 shadow-sm backdrop-blur-md sm:mt-6 md:mt-10 ${searchAlignClass}`}
           >
             <Search className="size-4 shrink-0 text-white/80" aria-hidden />
             <input
               type="search"
-              placeholder={t("hero.search_placeholder")}
+              placeholder={searchPlaceholder}
               className="w-full bg-transparent text-sm text-white placeholder:text-white/70 focus:outline-none"
-              aria-label={t("hero.search_placeholder")}
+              aria-label={searchPlaceholder}
             />
-            <span className="hidden text-[11px] text-white/60 lg:inline">{t("hero.search_helper")}</span>
+            {searchHelper ? (
+              <span className="hidden text-[11px] text-white/60 lg:inline">{searchHelper}</span>
+            ) : null}
           </form>
         ) : null}
       </Container>
