@@ -27,6 +27,29 @@ export const CATEGORY_FIELDS: EditorField[] = [
 ];
 
 /**
+ * ZONE_FIELDS — usado por `ZoneEditor` (Ola 1 · Etapa 4).
+ * El selector de destino se inyecta en tiempo de render.
+ */
+export const ZONE_FIELDS: EditorField[] = [
+  { name: "name", label: "Nombre", type: "text", required: true },
+  {
+    name: "slug",
+    label: "Slug",
+    type: "text",
+    required: true,
+    helpText: "Identificador URL (sin espacios, sólo minúsculas y guiones).",
+  },
+  {
+    name: "destination_id",
+    label: "Destino",
+    type: "select",
+    required: true,
+    options: [],
+  },
+  { name: "description", label: "Descripción", type: "textarea" },
+];
+
+/**
  * DESTINATION_FIELDS — usado por el editor de Destinos (Ola 1 · Etapa 4).
  * El selector de región turística se inyecta en tiempo de render por
  * `DestinationEditor` (necesita cargar la lista desde el servidor), por eso
