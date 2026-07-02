@@ -93,6 +93,7 @@ import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes
 import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId'
 import { Route as AuthenticatedCmsRegionesNuevaRouteImport } from './routes/_authenticated/cms/regiones.nueva'
 import { Route as AuthenticatedCmsRegionesEditarRouteImport } from './routes/_authenticated/cms/regiones..editar'
+import { Route as AuthenticatedCmsProductosNuevaRouteImport } from './routes/_authenticated/cms/productos.nueva'
 import { Route as AuthenticatedCmsExperienceBuilderPagesRouteImport } from './routes/_authenticated/cms/experience-builder.pages'
 import { Route as AuthenticatedCmsEmpresasNuevaRouteImport } from './routes/_authenticated/cms/empresas.nueva'
 import { Route as AuthenticatedCmsDestinosNuevaRouteImport } from './routes/_authenticated/cms/destinos.nueva'
@@ -102,6 +103,7 @@ import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/
 import { Route as ApiPublicPaymentsProviderWebhookRouteImport } from './routes/api/public/payments/$provider/webhook'
 import { Route as AuthenticatedCuentaConciergeCaseIdEvaluarRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId.evaluar'
 import { Route as AuthenticatedCmsReviewsIdModerarRouteImport } from './routes/_authenticated/cms/reviews.$id.moderar'
+import { Route as AuthenticatedCmsProductosProductIdEditarRouteImport } from './routes/_authenticated/cms/productos.$productId.editar'
 import { Route as AuthenticatedCmsEmpresasBusinessIdEditarRouteImport } from './routes/_authenticated/cms/empresas.$businessId.editar'
 import { Route as AuthenticatedCmsDestinosDestinationIdEditarRouteImport } from './routes/_authenticated/cms/destinos.$destinationId.editar'
 
@@ -573,6 +575,12 @@ const AuthenticatedCmsRegionesEditarRoute =
     path: '/regiones/editar',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsProductosNuevaRoute =
+  AuthenticatedCmsProductosNuevaRouteImport.update({
+    id: '/nueva',
+    path: '/nueva',
+    getParentRoute: () => AuthenticatedCmsProductosRoute,
+  } as any)
 const AuthenticatedCmsExperienceBuilderPagesRoute =
   AuthenticatedCmsExperienceBuilderPagesRouteImport.update({
     id: '/pages',
@@ -626,6 +634,12 @@ const AuthenticatedCmsReviewsIdModerarRoute =
     id: '/reviews/$id/moderar',
     path: '/reviews/$id/moderar',
     getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
+const AuthenticatedCmsProductosProductIdEditarRoute =
+  AuthenticatedCmsProductosProductIdEditarRouteImport.update({
+    id: '/$productId/editar',
+    path: '/$productId/editar',
+    getParentRoute: () => AuthenticatedCmsProductosRoute,
   } as any)
 const AuthenticatedCmsEmpresasBusinessIdEditarRoute =
   AuthenticatedCmsEmpresasBusinessIdEditarRouteImport.update({
@@ -684,7 +698,7 @@ export interface FileRoutesByFullPath {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
-  '/cms/productos': typeof AuthenticatedCmsProductosRoute
+  '/cms/productos': typeof AuthenticatedCmsProductosRouteWithChildren
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -713,6 +727,7 @@ export interface FileRoutesByFullPath {
   '/cms/destinos/nueva': typeof AuthenticatedCmsDestinosNuevaRoute
   '/cms/empresas/nueva': typeof AuthenticatedCmsEmpresasNuevaRoute
   '/cms/experience-builder/pages': typeof AuthenticatedCmsExperienceBuilderPagesRoute
+  '/cms/productos/nueva': typeof AuthenticatedCmsProductosNuevaRoute
   '/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
@@ -732,6 +747,7 @@ export interface FileRoutesByFullPath {
   '/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
   '/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
+  '/cms/productos/$productId/editar': typeof AuthenticatedCmsProductosProductIdEditarRoute
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
@@ -774,7 +790,7 @@ export interface FileRoutesByTo {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
-  '/cms/productos': typeof AuthenticatedCmsProductosRoute
+  '/cms/productos': typeof AuthenticatedCmsProductosRouteWithChildren
   '/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -803,6 +819,7 @@ export interface FileRoutesByTo {
   '/cms/destinos/nueva': typeof AuthenticatedCmsDestinosNuevaRoute
   '/cms/empresas/nueva': typeof AuthenticatedCmsEmpresasNuevaRoute
   '/cms/experience-builder/pages': typeof AuthenticatedCmsExperienceBuilderPagesRoute
+  '/cms/productos/nueva': typeof AuthenticatedCmsProductosNuevaRoute
   '/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
@@ -822,6 +839,7 @@ export interface FileRoutesByTo {
   '/portal/invitaciones': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
   '/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
+  '/cms/productos/$productId/editar': typeof AuthenticatedCmsProductosProductIdEditarRoute
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
@@ -872,7 +890,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/_authenticated/cms/pagos': typeof AuthenticatedCmsPagosRoute
-  '/_authenticated/cms/productos': typeof AuthenticatedCmsProductosRoute
+  '/_authenticated/cms/productos': typeof AuthenticatedCmsProductosRouteWithChildren
   '/_authenticated/cms/zonas': typeof AuthenticatedCmsZonasRoute
   '/_authenticated/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -901,6 +919,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/destinos/nueva': typeof AuthenticatedCmsDestinosNuevaRoute
   '/_authenticated/cms/empresas/nueva': typeof AuthenticatedCmsEmpresasNuevaRoute
   '/_authenticated/cms/experience-builder/pages': typeof AuthenticatedCmsExperienceBuilderPagesRoute
+  '/_authenticated/cms/productos/nueva': typeof AuthenticatedCmsProductosNuevaRoute
   '/_authenticated/cms/regiones/editar': typeof AuthenticatedCmsRegionesEditarRoute
   '/_authenticated/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
@@ -920,6 +939,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/_authenticated/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
   '/_authenticated/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
+  '/_authenticated/cms/productos/$productId/editar': typeof AuthenticatedCmsProductosProductIdEditarRoute
   '/_authenticated/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/_authenticated/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
@@ -999,6 +1019,7 @@ export interface FileRouteTypes {
     | '/cms/destinos/nueva'
     | '/cms/empresas/nueva'
     | '/cms/experience-builder/pages'
+    | '/cms/productos/nueva'
     | '/cms/regiones/editar'
     | '/cms/regiones/nueva'
     | '/concierge/expedientes/$caseId'
@@ -1018,6 +1039,7 @@ export interface FileRouteTypes {
     | '/portal/invitaciones/'
     | '/cms/destinos/$destinationId/editar'
     | '/cms/empresas/$businessId/editar'
+    | '/cms/productos/$productId/editar'
     | '/cms/reviews/$id/moderar'
     | '/cuenta/concierge/$caseId/evaluar'
     | '/api/public/payments/$provider/webhook'
@@ -1089,6 +1111,7 @@ export interface FileRouteTypes {
     | '/cms/destinos/nueva'
     | '/cms/empresas/nueva'
     | '/cms/experience-builder/pages'
+    | '/cms/productos/nueva'
     | '/cms/regiones/editar'
     | '/cms/regiones/nueva'
     | '/concierge/expedientes/$caseId'
@@ -1108,6 +1131,7 @@ export interface FileRouteTypes {
     | '/portal/invitaciones'
     | '/cms/destinos/$destinationId/editar'
     | '/cms/empresas/$businessId/editar'
+    | '/cms/productos/$productId/editar'
     | '/cms/reviews/$id/moderar'
     | '/cuenta/concierge/$caseId/evaluar'
     | '/api/public/payments/$provider/webhook'
@@ -1186,6 +1210,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/destinos/nueva'
     | '/_authenticated/cms/empresas/nueva'
     | '/_authenticated/cms/experience-builder/pages'
+    | '/_authenticated/cms/productos/nueva'
     | '/_authenticated/cms/regiones/editar'
     | '/_authenticated/cms/regiones/nueva'
     | '/_authenticated/concierge/expedientes/$caseId'
@@ -1205,6 +1230,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/invitaciones/'
     | '/_authenticated/cms/destinos/$destinationId/editar'
     | '/_authenticated/cms/empresas/$businessId/editar'
+    | '/_authenticated/cms/productos/$productId/editar'
     | '/_authenticated/cms/reviews/$id/moderar'
     | '/_authenticated/cuenta/concierge/$caseId/evaluar'
     | '/api/public/payments/$provider/webhook'
@@ -1829,6 +1855,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsRegionesEditarRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/productos/nueva': {
+      id: '/_authenticated/cms/productos/nueva'
+      path: '/nueva'
+      fullPath: '/cms/productos/nueva'
+      preLoaderRoute: typeof AuthenticatedCmsProductosNuevaRouteImport
+      parentRoute: typeof AuthenticatedCmsProductosRoute
+    }
     '/_authenticated/cms/experience-builder/pages': {
       id: '/_authenticated/cms/experience-builder/pages'
       path: '/pages'
@@ -1891,6 +1924,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/cms/reviews/$id/moderar'
       preLoaderRoute: typeof AuthenticatedCmsReviewsIdModerarRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
+    }
+    '/_authenticated/cms/productos/$productId/editar': {
+      id: '/_authenticated/cms/productos/$productId/editar'
+      path: '/$productId/editar'
+      fullPath: '/cms/productos/$productId/editar'
+      preLoaderRoute: typeof AuthenticatedCmsProductosProductIdEditarRouteImport
+      parentRoute: typeof AuthenticatedCmsProductosRoute
     }
     '/_authenticated/cms/empresas/$businessId/editar': {
       id: '/_authenticated/cms/empresas/$businessId/editar'
@@ -2124,6 +2164,23 @@ const AuthenticatedCmsExperienceBuilderRouteWithChildren =
     AuthenticatedCmsExperienceBuilderRouteChildren,
   )
 
+interface AuthenticatedCmsProductosRouteChildren {
+  AuthenticatedCmsProductosNuevaRoute: typeof AuthenticatedCmsProductosNuevaRoute
+  AuthenticatedCmsProductosProductIdEditarRoute: typeof AuthenticatedCmsProductosProductIdEditarRoute
+}
+
+const AuthenticatedCmsProductosRouteChildren: AuthenticatedCmsProductosRouteChildren =
+  {
+    AuthenticatedCmsProductosNuevaRoute: AuthenticatedCmsProductosNuevaRoute,
+    AuthenticatedCmsProductosProductIdEditarRoute:
+      AuthenticatedCmsProductosProductIdEditarRoute,
+  }
+
+const AuthenticatedCmsProductosRouteWithChildren =
+  AuthenticatedCmsProductosRoute._addFileChildren(
+    AuthenticatedCmsProductosRouteChildren,
+  )
+
 interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsActividadRoute: typeof AuthenticatedCmsActividadRoute
   AuthenticatedCmsAlertasRoute: typeof AuthenticatedCmsAlertasRoute
@@ -2133,7 +2190,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
   AuthenticatedCmsObservabilidadRoute: typeof AuthenticatedCmsObservabilidadRoute
   AuthenticatedCmsPagosRoute: typeof AuthenticatedCmsPagosRoute
-  AuthenticatedCmsProductosRoute: typeof AuthenticatedCmsProductosRoute
+  AuthenticatedCmsProductosRoute: typeof AuthenticatedCmsProductosRouteWithChildren
   AuthenticatedCmsZonasRoute: typeof AuthenticatedCmsZonasRoute
   AuthenticatedCmsIndexRoute: typeof AuthenticatedCmsIndexRoute
   AuthenticatedCmsCategoriasEditarRoute: typeof AuthenticatedCmsCategoriasEditarRoute
@@ -2156,7 +2213,7 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsMediaRoute: AuthenticatedCmsMediaRoute,
   AuthenticatedCmsObservabilidadRoute: AuthenticatedCmsObservabilidadRoute,
   AuthenticatedCmsPagosRoute: AuthenticatedCmsPagosRoute,
-  AuthenticatedCmsProductosRoute: AuthenticatedCmsProductosRoute,
+  AuthenticatedCmsProductosRoute: AuthenticatedCmsProductosRouteWithChildren,
   AuthenticatedCmsZonasRoute: AuthenticatedCmsZonasRoute,
   AuthenticatedCmsIndexRoute: AuthenticatedCmsIndexRoute,
   AuthenticatedCmsCategoriasEditarRoute: AuthenticatedCmsCategoriasEditarRoute,
