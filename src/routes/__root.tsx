@@ -22,6 +22,7 @@ import {
   UpdateBanner,
 } from "@/components/discovery";
 import { AluxFloatingTrigger } from "@/components/layout/AluxFloatingTrigger";
+import { EditThisPageButton } from "@/components/experience-builder/EditThisPageButton";
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
@@ -187,6 +188,7 @@ function RootComponent() {
         <Outlet />
         {!isAppShellRoute ? <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" /> : null}
         {!isAppShellRoute ? <AluxFloatingTrigger /> : null}
+        {!isAppShellRoute ? <EditThisPageButton pathname={pathname} /> : null}
         </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>
