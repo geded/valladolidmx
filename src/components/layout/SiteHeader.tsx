@@ -412,10 +412,10 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
     size === "xs"
       ? "px-2 py-0.5 text-[11px] gap-1"
       : size === "sm"
-        ? "px-2.5 py-1 text-xs gap-1"
+        ? "px-2.5 py-1 text-[12px] gap-1"
         : size === "lg"
-          ? "px-4 py-2 text-base gap-2"
-          : "px-3.5 py-1.5 text-sm gap-1.5";
+          ? "px-4 py-2 text-sm gap-2"
+          : "px-3 py-1.5 text-[13px] gap-1.5";
   const hiddenOnMobile = btn.kind === "cta" ? "hidden sm:inline-flex" : "inline-flex";
   return (
     <a
@@ -423,7 +423,7 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
       href={href}
       className={cn(
         hiddenOnMobile,
-        "items-center rounded-full font-semibold transition",
+        "items-center rounded-md font-medium tracking-tight transition-all active:scale-[0.98]",
         sizeClass,
         variantClass,
       )}
