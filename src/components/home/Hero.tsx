@@ -55,6 +55,8 @@ export interface HeroConfig {
   cta_alignment?: string;
   /** Mostrar u ocultar el buscador rápido del hero. Default: true. */
   show_search?: boolean;
+  /** Mostrar u ocultar los botones del hero. Default: true. */
+  show_ctas?: boolean;
   /** Overrides tipográficos por campo, guardados por el Experience Builder. */
   __typography?: Record<string, FieldTypography>;
 }
@@ -111,21 +113,28 @@ export function Hero({ config }: HeroProps = {}) {
         ? "justify-end"
         : "justify-start";
 
-  // Botones: si viene `ctas` (aun vacío), respeta al editor. Si no, usa legacy/defaults.
-  const ctas: HeroCta[] = Array.isArray(config?.ctas)
-    ? config!.ctas!
-    : [
-        {
-          label: config?.cta_label ?? t("hero.cta_primary"),
-          href: config?.cta_href || "/oriente-maya",
-          variant: "primary",
-        },
-        {
-          label: config?.cta_secondary_label ?? t("hero.cta_secondary"),
-          href: config?.cta_secondary_href || "/arma-tu-viaje",
-          variant: "secondary",
-        },
-      ];
+  // Botones: sólo se respeta la lista del editor cuando trae al menos un
+  // botón. Una lista vacía se trata como "no configurado" y se usan los
+  // botones legacy/por defecto (evita que la web quede sin CTAs si el editor
+  // guardó `ctas: []` por accidente). Para ocultarlos deliberadamente usar
+  // el toggle `show_ctas`.
+  const editorCtas = Array.isArray(config?.ctas) ? config!.ctas! : null;
+  const ctas: HeroCta[] =
+    editorCtas && editorCtas.length > 0
+      ? editorCtas
+      : [
+          {
+            label: config?.cta_label ?? t("hero.cta_primary"),
+            href: config?.cta_href || "/oriente-maya",
+            variant: "primary",
+          },
+          {
+            label: config?.cta_secondary_label ?? t("hero.cta_secondary"),
+            href: config?.cta_secondary_href || "/arma-tu-viaje",
+            variant: "secondary",
+          },
+        ];
+  const showCtas = config?.show_ctas !== false;
   const showSearch = config?.show_search !== false;
 
   // Typography por campo (config.__typography[fieldKey]).
@@ -204,7 +213,7 @@ export function Hero({ config }: HeroProps = {}) {
           </p>
         ) : null}
 
-        {ctas.length > 0 ? (
+        {showCtas && ctas.length > 0 ? (
           <div className={`flex flex-wrap items-center gap-3 md:mt-8 ${ctaAlignmentClass}`}>
             {ctas.map((cta, i) => (
               <HeroButton key={i} cta={cta} isPrimary={i === 0} />
