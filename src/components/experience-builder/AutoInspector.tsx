@@ -17,19 +17,27 @@ export interface AutoInspectorProps {
   contract: BlockContract;
   config: Record<string, unknown>;
   onChange: (next: Record<string, unknown>) => void;
+  /**
+   * Modo simple: oculta metadatos técnicos (tipo, versión, chips de
+   * capacidades, badges i18n y selector de variables `{ }`). Se usa en
+   * el Modo Visual del Studio para no confundir al editor final.
+   */
+  simple?: boolean;
 }
 
-export function AutoInspector({ contract, config, onChange }: AutoInspectorProps) {
+export function AutoInspector({ contract, config, onChange, simple = false }: AutoInspectorProps) {
   const set = (key: string, value: unknown) => onChange({ ...config, [key]: value });
   return (
     <div className="space-y-3">
       <header className="space-y-1">
         <h3 className="text-sm font-semibold">{contract.display_name}</h3>
-        <p className="text-[11px] text-muted-foreground">{contract.type} · v{contract.version}</p>
+        {simple ? null : (
+          <p className="text-[11px] text-muted-foreground">{contract.type} · v{contract.version}</p>
+        )}
         {contract.description ? (
           <p className="text-xs text-muted-foreground">{contract.description}</p>
         ) : null}
-        <CapabilityChips contract={contract} />
+        {simple ? null : <CapabilityChips contract={contract} />}
       </header>
       <div className="space-y-3">
         {Object.entries(contract.schema).map(([key, def]) => (
@@ -39,6 +47,7 @@ export function AutoInspector({ contract, config, onChange }: AutoInspectorProps
             def={def}
             value={config[key]}
             onChange={(v) => set(key, v)}
+            simple={simple}
           />
         ))}
         {Object.keys(contract.schema).length === 0 ? (
@@ -73,18 +82,18 @@ function CapabilityChips({ contract }: { contract: BlockContract }) {
 }
 
 function FieldRow({
-  name, def, value, onChange,
-}: { name: string; def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void }) {
+  name, def, value, onChange, simple,
+}: { name: string; def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void; simple?: boolean }) {
   return (
     <div className="space-y-1">
       <label className="flex items-center gap-2 text-xs font-medium">
         <span>{def.label || name}</span>
         {def.required ? <span className="text-destructive">*</span> : null}
-        {def.translatable ? (
+        {def.translatable && !simple ? (
           <Badge variant="outline" className="text-[9px]">i18n</Badge>
         ) : null}
       </label>
-      <FieldControl def={def} value={value} onChange={onChange} />
+      <FieldControl def={def} value={value} onChange={onChange} simple={simple} />
       {def.description ? (
         <p className="text-[10px] text-muted-foreground">{def.description}</p>
       ) : null}
@@ -93,8 +102,8 @@ function FieldRow({
 }
 
 function FieldControl({
-  def, value, onChange,
-}: { def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void }) {
+  def, value, onChange, simple,
+}: { def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void; simple?: boolean }) {
   const base = "w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-primary/30";
   switch (def.type) {
     case "text":
@@ -103,7 +112,7 @@ function FieldControl({
       return (
         <div className="flex items-center gap-1">
           <input className={base} type={def.type === "url" ? "url" : "text"} value={v} onChange={(e) => onChange(e.target.value)} />
-          <VariablePicker onPick={(token) => onChange(`${v}${token}`)} />
+          {simple ? null : <VariablePicker onPick={(token) => onChange(`${v}${token}`)} />}
         </div>
       );
     }
@@ -112,7 +121,7 @@ function FieldControl({
       return (
         <div className="space-y-1">
           <textarea className={`${base} min-h-[80px]`} value={v} onChange={(e) => onChange(e.target.value)} />
-          <VariablePicker onPick={(token) => onChange(`${v}${token}`)} />
+          {simple ? null : <VariablePicker onPick={(token) => onChange(`${v}${token}`)} />}
         </div>
       );
     }
