@@ -818,6 +818,20 @@ function PageVisualEditor({
   const [showVersions, setShowVersions] = useState(false);
   const [versions, setVersions] = useState<CompositionRevisionSummary[]>([]);
   const [previewMode, setPreviewMode] = useState(false);
+  /**
+   * Viewport del canvas (mobile-first, coherente con la doctrina del
+   * proyecto: el turismo consume mayormente en celular). Persistido
+   * por usuario en localStorage.
+   */
+  const [deviceViewport, setDeviceViewport] = useState<DeviceViewport>(() => {
+    if (typeof window === "undefined") return "mobile";
+    const stored = window.localStorage.getItem("eb.canvas.device");
+    return stored === "tablet" || stored === "desktop" ? stored : "mobile";
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("eb.canvas.device", deviceViewport);
+  }, [deviceViewport]);
 
   useEffect(() => {
     let cancelled = false;
