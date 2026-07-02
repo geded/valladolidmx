@@ -16,6 +16,8 @@
 
 import { registerBlock } from "./block-registry";
 import type { BlockContract } from "./block-contract";
+import heroBg01Url from "@/assets/brand/hero/bg01.jpg";
+import heroBg02Url from "@/assets/brand/hero/bg02.jpg";
 
 /* ------------------------------------------------------------------ *
  * 1. Bloques de Layout fundacionales (Static)
