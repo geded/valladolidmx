@@ -15,7 +15,7 @@ export function AluxFloatingTrigger() {
       <Link
         to="/alux"
         title={t("alux_floating")}
-        className="pointer-events-auto group flex items-center gap-2 rounded-full border border-border bg-card/90 px-4 py-3 text-sm font-medium text-foreground shadow-lg backdrop-blur transition hover:bg-card"
+        className="pointer-events-auto group flex items-center gap-2 rounded-md border border-border bg-card/90 px-3.5 py-2 text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-all hover:bg-card active:scale-[0.98]"
       >
         <span className="grid size-6 place-items-center rounded-full bg-primary/15 text-primary">
           <Sparkles className="size-3.5" aria-hidden />
