@@ -4858,6 +4858,21 @@ export type Database = {
         Args: { _reason?: string; _type: string }
         Returns: undefined
       }
+      eb_get_published_by_slug: {
+        Args: { _slug: string; _variant_key?: string }
+        Returns: {
+          description: string
+          id: string
+          page_type: string
+          published_at: string
+          revision_id: string
+          revision_number: number
+          slug: string
+          snapshot: Json
+          title: string
+          variant_key: string
+        }[]
+      }
       eb_get_published_home: {
         Args: { _variant_key?: string }
         Returns: {
