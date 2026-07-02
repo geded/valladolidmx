@@ -964,7 +964,19 @@ function PageVisualEditor({
     setPublishing(true);
     setMessage(null);
     try {
-      await save({ data: { id: page.id, tree } });
+      // Antes de publicar, sella traducciones para todos los idiomas activos.
+      let treeToPublish = tree;
+      try {
+        const res = await translate({ data: { tree } });
+        if (!res.skipped && res.translated > 0) {
+          treeToPublish = res.tree;
+          skipNextAutoSave.current = true;
+          setTree(res.tree);
+        }
+      } catch {
+        /* traducción best-effort — no bloquea publicación */
+      }
+      await save({ data: { id: page.id, tree: treeToPublish } });
       await publish({ data: { id: page.id, notes: "Publicado desde Modo Visual" } });
       if (pageDef.page_type === "home") {
         await queryClient.invalidateQueries({ queryKey: ["eb", "published-home", "default"] });
