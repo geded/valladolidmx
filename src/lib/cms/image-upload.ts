@@ -24,6 +24,28 @@ export const MAX_DIMENSION = 2000;
 /** Calidad de JPEG/WebP (0-1). */
 export const OUTPUT_QUALITY = 0.82;
 
+/**
+ * Roles de imagen soportados por el pipeline. Cada rol define:
+ *  - `ratio`: proporción destino (ancho / alto). null = mantener original.
+ *  - `maxLongSide`: lado mayor máximo tras redimensionar (px).
+ *  - `quality`: calidad de salida (0-1).
+ */
+export type ImageRole = "hero" | "cover" | "gallery" | "logo" | "thumbnail";
+
+interface RoleSpec {
+  ratio: number | null;
+  maxLongSide: number;
+  quality: number;
+}
+
+export const ROLE_SPECS: Record<ImageRole, RoleSpec> = {
+  hero: { ratio: 21 / 9, maxLongSide: 2400, quality: 0.82 },
+  cover: { ratio: 4 / 3, maxLongSide: 1600, quality: 0.82 },
+  gallery: { ratio: 4 / 3, maxLongSide: 1600, quality: 0.82 },
+  logo: { ratio: 1, maxLongSide: 512, quality: 0.9 },
+  thumbnail: { ratio: 1, maxLongSide: 400, quality: 0.82 },
+};
+
 export interface ImageValidationError {
   file: string;
   reason: string;
@@ -129,6 +151,123 @@ export async function compressImageIfNeeded(file: File): Promise<File> {
     lastModified: Date.now(),
   });
   return compressed;
+}
+
+/**
+ * Detecta si un PNG probablemente tiene canal alfa (transparencia).
+ * Se lee el header + chunk IHDR (byte 25 = colorType). Bit 2 (valor 4)
+ * indica canal alfa. Fallback: si no se puede leer, asume que sí.
+ */
+async function pngHasAlpha(file: File): Promise<boolean> {
+  try {
+    const buf = await file.slice(0, 32).arrayBuffer();
+    const view = new Uint8Array(buf);
+    // colorType en offset 25 tras firma PNG (8) + IHDR len(4)+type(4)+width(4)+height(4)+depth(1)
+    const colorType = view[25];
+    // 4 = grayscale+alpha, 6 = rgb+alpha
+    return colorType === 4 || colorType === 6;
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Pipeline canónico para preparar una imagen antes de subirla al bucket:
+ *  1) Valida formato / tamaño (mensaje en español si falla).
+ *  2) Auto-recorta al ratio del rol usando el centro (cover crop).
+ *     — Garantiza que las galerías se vean uniformes aunque el
+ *       empresario suba fotos verticales, cuadradas o panorámicas.
+ *  3) Redimensiona al `maxLongSide` del rol.
+ *  4) Convierte a WebP (o JPEG si el original era JPEG; PNG con alfa
+ *     se preserva como PNG para no perder transparencia — logos).
+ *  5) Si el resultado pesa más que el original, devuelve el original
+ *     ya validado.
+ *
+ * GIF y AVIF se dejan intactos (canvas no preserva animación / encoder
+ * AVIF no está garantizado en el navegador).
+ */
+export async function prepareImageForRole(
+  file: File,
+  role: ImageRole,
+): Promise<File> {
+  const invalid = validateImageFile(file);
+  if (invalid) throw new Error(invalid.reason);
+
+  if (file.type === "image/gif" || file.type === "image/avif") return file;
+
+  const spec = ROLE_SPECS[role];
+  const img = await loadImage(file);
+  const srcW = img.naturalWidth;
+  const srcH = img.naturalHeight;
+  if (!srcW || !srcH) return file;
+
+  // 1) Determinar rectángulo fuente para el crop (cover-center).
+  let cropW = srcW;
+  let cropH = srcH;
+  let cropX = 0;
+  let cropY = 0;
+  if (spec.ratio !== null) {
+    const srcRatio = srcW / srcH;
+    if (srcRatio > spec.ratio) {
+      // Fuente más ancha → recortar laterales.
+      cropW = Math.round(srcH * spec.ratio);
+      cropH = srcH;
+      cropX = Math.round((srcW - cropW) / 2);
+    } else if (srcRatio < spec.ratio) {
+      // Fuente más alta → recortar arriba/abajo.
+      cropW = srcW;
+      cropH = Math.round(srcW / spec.ratio);
+      cropY = Math.round((srcH - cropH) / 2);
+    }
+  }
+
+  // 2) Escala al maxLongSide del rol.
+  const longest = Math.max(cropW, cropH);
+  const scale = longest > spec.maxLongSide ? spec.maxLongSide / longest : 1;
+  const targetW = Math.max(1, Math.round(cropW * scale));
+  const targetH = Math.max(1, Math.round(cropH * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = targetW;
+  canvas.height = targetH;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return file;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, targetW, targetH);
+
+  // 3) Elegir formato de salida.
+  const isPng = file.type === "image/png";
+  const keepPng = isPng && (await pngHasAlpha(file));
+  const outType = keepPng
+    ? "image/png"
+    : file.type === "image/jpeg"
+      ? "image/jpeg"
+      : "image/webp";
+
+  const blob = await canvasToBlob(
+    canvas,
+    outType,
+    outType === "image/png" ? 1 : spec.quality,
+  );
+
+  // Si tras procesar sigue pesando más que el original Y ya está dentro
+  // de los límites de dimensión, devuelve el original.
+  if (
+    blob.size >= file.size &&
+    Math.max(srcW, srcH) <= spec.maxLongSide &&
+    spec.ratio === null
+  ) {
+    return file;
+  }
+
+  const ext =
+    outType === "image/jpeg" ? "jpg" : outType === "image/png" ? "png" : "webp";
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "imagen";
+  return new File([blob], `${baseName}.${ext}`, {
+    type: outType,
+    lastModified: Date.now(),
+  });
 }
 
 export interface RetryOptions {
