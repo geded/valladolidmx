@@ -185,12 +185,12 @@ export function Hero({ config }: HeroProps = {}) {
   const searchMaxWidth = (config?.search_max_width ?? "md").toLowerCase();
   const searchSizeClass =
     searchSize === "sm"
-      ? "px-3 py-1.5 text-xs gap-1.5"
+      ? "px-3 py-2 text-xs gap-2"
       : searchSize === "lg"
-        ? "px-5 py-3 text-base gap-3"
+        ? "px-4 py-3 text-sm gap-3"
         : searchSize === "xl"
-          ? "px-6 py-4 text-lg gap-3"
-          : "px-4 py-2 text-sm gap-2";
+          ? "px-5 py-4 text-base gap-3"
+          : "px-4 py-2.5 text-[13px] gap-2";
   const searchMaxWidthClass =
     searchMaxWidth === "sm"
       ? "max-w-xs"
@@ -296,13 +296,13 @@ export function Hero({ config }: HeroProps = {}) {
               role="search"
               aria-label="Búsqueda rápida"
               onSubmit={(e) => e.preventDefault()}
-              className={`flex w-full items-center rounded-full border border-white/25 bg-white/10 shadow-sm backdrop-blur-md ${searchSizeClass} ${searchMaxWidthClass}`}
+              className={`flex w-full items-center rounded-xl border border-white/20 bg-white/5 shadow-lg backdrop-blur-xl ${searchSizeClass} ${searchMaxWidthClass}`}
             >
               <Search className="shrink-0 text-white/80 size-4" aria-hidden />
               <input
                 type="search"
                 placeholder={searchPlaceholder}
-                className="w-full bg-transparent text-inherit text-white placeholder:text-white/70 focus:outline-none"
+                className="w-full bg-transparent text-inherit text-white placeholder:text-white/40 focus:outline-none"
                 aria-label={searchPlaceholder}
               />
               {searchHelper ? (
@@ -325,25 +325,25 @@ function HeroButton({ cta, isPrimary }: { cta: HeroCta; isPrimary: boolean }) {
   if (!label) return null;
   const sizeCls =
     size === "xs"
-      ? "px-2.5 py-1 text-xs gap-1"
+      ? "px-2.5 py-1 text-[11px] gap-1"
       : size === "sm"
-        ? "px-3 py-1.5 text-xs gap-1.5"
+        ? "px-3 py-1.5 text-[12px] gap-1.5"
         : size === "lg"
-          ? "px-6 py-3 text-base gap-2"
+          ? "px-5 py-2.5 text-sm gap-2"
           : size === "xl"
-            ? "px-8 py-4 text-lg gap-2.5"
-            : "px-5 py-2.5 text-sm gap-2 sm:px-6 sm:py-3";
-  let cls = `inline-flex items-center rounded-full font-semibold transition ${sizeCls}${
+            ? "px-6 py-3 text-base gap-2.5"
+            : "px-4 py-2 text-[13px] gap-2";
+  let cls = `inline-flex items-center rounded-md font-medium tracking-tight transition-all active:scale-[0.98] ${sizeCls}${
     fullWidth ? " w-full justify-center" : ""
   }`;
   let icon: ReactNode = null;
   if (variant === "primary") {
     cls +=
-      " bg-primary text-primary-foreground shadow-[0_10px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-black/5 hover:scale-[1.02] hover:opacity-95";
+      " bg-primary text-primary-foreground shadow-md hover:opacity-95";
     icon = <ArrowRight className="size-4" aria-hidden />;
   } else if (variant === "secondary") {
     cls +=
-      " border border-white/35 bg-white/5 font-medium text-white/95 backdrop-blur hover:bg-white/15";
+      " border border-white/20 bg-white/5 text-white/95 backdrop-blur-md hover:bg-white/15";
     icon = <Compass className="size-4" aria-hidden />;
   } else {
     cls += " bg-transparent font-medium text-white/95 hover:text-white";
