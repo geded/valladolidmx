@@ -58,6 +58,7 @@ interface HeaderButton {
   icon: string;
   variant: ButtonVariant;
   visible: boolean;
+  size?: string;
 }
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -95,6 +96,7 @@ function parseButtons(value: unknown): HeaderButton[] | null {
       icon: typeof rec.icon === "string" ? rec.icon : "",
       variant,
       visible: rec.visible !== false,
+      size: typeof rec.size === "string" ? rec.size : "md",
     });
   }
   return out;
@@ -405,6 +407,15 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
   const label = btn.label || (btn.kind === "cta" ? ctaFallback.label : "Enlace");
   const Icon = btn.icon && ICON_MAP[btn.icon] ? ICON_MAP[btn.icon] : null;
   const variantClass = getVariantClass(btn.variant, isOverlay);
+  const size = (btn.size ?? "md").toLowerCase();
+  const sizeClass =
+    size === "xs"
+      ? "px-2 py-0.5 text-[11px] gap-1"
+      : size === "sm"
+        ? "px-2.5 py-1 text-xs gap-1"
+        : size === "lg"
+          ? "px-4 py-2 text-base gap-2"
+          : "px-3.5 py-1.5 text-sm gap-1.5";
   const hiddenOnMobile = btn.kind === "cta" ? "hidden sm:inline-flex" : "inline-flex";
   return (
     <a
@@ -412,7 +423,8 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
       href={href}
       className={cn(
         hiddenOnMobile,
-        "items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition",
+        "items-center rounded-full font-semibold transition",
+        sizeClass,
         variantClass,
       )}
     >
