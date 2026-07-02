@@ -57,6 +57,29 @@ const TABLE_TO_ENTITY_KIND: Record<
 const EDITABLE_COLUMNS: Record<EditableTable, readonly string[]> = {
   tourism_regions: ["slug", "name", "description", "sort_order", "metadata"],
   destinations: ["tourism_region_id", "slug", "name", "description", "metadata"],
+  // destinations extendido (galería + campos hero) — Ola 1 · Etapa 4.
+  // "highlights" es text[] y "hero_palette" es enum: la validación de tipo
+  // efectiva sigue siendo server-side (Postgres) al hacer el UPDATE/INSERT.
+  //
+  // eslint-disable-next-line
+  // @ts-expect-error — redefinido a continuación en el mismo bloque.
+  _skip: [],
+} as any;
+// Redefinimos destinations con la lista extendida para no romper el resto.
+(EDITABLE_COLUMNS as any).destinations = [
+  "tourism_region_id",
+  "slug",
+  "name",
+  "tagline",
+  "description",
+  "highlights",
+  "hero_palette",
+  "hero_media_id",
+  "latitude",
+  "longitude",
+  "metadata",
+];
+const _EDITABLE_COLUMNS_REST: Record<string, readonly string[]> = {
   destination_zones: ["destination_id", "slug", "name", "description", "metadata"],
   business_categories: [
     "parent_id",
