@@ -1,57 +1,81 @@
-Habilitar en el CMS Studio la creación, edición y galería múltiple de **Destinos**. Después replicamos el mismo patrón en Empresas y Productos como historias separadas.
+# Auto-traducción al guardar + idiomas configurables
 
-## Alcance de esta historia (solo Destinos)
+## Contexto
 
-1. Botón **"Nuevo destino"** en `/cms/destinos` y enlace **Editar** por fila.
-2. Formulario completo con: nombre, slug, región (selector), frase corta, descripción, coordenadas, colores del hero, highlights.
-3. **Imagen destacada** (hero) — subir/reemplazar/quitar.
-4. **Galería múltiple** — subir varias imágenes, reordenar drag & drop, borrar.
-5. Flujo editorial existente: borrador → revisión → aprobado → publicado.
+Hoy los textos del constructor viven como strings sueltos y algunos locales estáticos (`de/fr/it/pt`) traen el nombre de la marca hardcodeado. Además la lista de idiomas está fija en `src/config/languages.ts` — no es administrable.
 
-## Quién puede editar
+## Solución en dos capas
 
-- `super_admin`, `admin` y **editor de contenido** (`is_editor_or_admin` ya cubre estos roles vía política RLS existente).
-- Los dueños de empresa no aplican a Destinos (son entidad territorial, no de negocio); su acceso llegará en la historia de Empresas.
+### 1) Fuente única de idiomas activos (administrable)
 
-## Detalles técnicos
+Nueva tabla `platform_locales` en la BD:
 
-### Base de datos (una migración)
+```text
+code (pk)   | label        | native_label | flag | is_default | is_active | sort_order
+"es"        | "Español"    | "Español"    | 🇲🇽  | true       | true      | 0
+"en"        | "English"    | "English"    | 🇺🇸  | false      | true      | 1
+...
+```
 
-- Nueva tabla `public.destination_media` (mismo patrón que `business_media`): `destination_id`, `media_asset_id`, `role` ('gallery'|'hero'), `sort_order`. GRANTs + RLS (`is_editor_or_admin` para escritura, público para lectura de destinos publicados).
-- Políticas nuevas en `storage.objects` sobre el bucket **`destinations`** (ya existe, privado): SELECT público (para que las imágenes se vean en la web) y INSERT/UPDATE/DELETE para `is_editor_or_admin`.
-- Ampliar la whitelist `EDITABLE_COLUMNS.destinations` en `src/lib/cms/writes.functions.ts` para incluir: `tagline`, `hero_palette`, `highlights`, `hero_media_id`, `latitude`, `longitude`.
+- Server fn público `listActiveLocales()` — lo consumen constructor, traductor, `LanguageSwitcher` e `I18nProvider`.
+- Server fn admin `upsertLocale` / `deactivateLocale` (super_admin/admin).
+- UI mínima en `/cms/sistema/idiomas` para activar/desactivar y marcar el default.
+- `src/config/languages.ts` queda como fallback SSR y se marca deprecated.
 
-### Server functions nuevas (`src/lib/cms/destinations-media.functions.ts`)
+### 2) Auto-traducción al guardar en el Experience Builder
 
-Todas con `requireSupabaseAuth` + `assertEditorial`:
+- Idioma base = `is_default` (hoy `es`). El constructor **sólo edita en el idioma base** (se elimina cualquier selector por idioma en el `AutoInspector`).
+- Schema de campos de texto en `page_compositions.blocks` migra a:
 
-- `listTourismRegionsForSelect()` — combo de regiones (id + nombre).
-- `signDestinationImageUpload({ destinationId, filename, contentType })` — devuelve URL firmada de subida al bucket `destinations`.
-- `registerDestinationMedia({ destinationId, storagePath, role, alt, mime, size, width, height })` — crea `media_assets` + fila `destination_media`. Si `role='hero'`, además hace UPDATE de `destinations.hero_media_id`.
-- `reorderDestinationGallery({ destinationId, orderedIds })` — reasigna `sort_order`.
-- `removeDestinationMedia({ destinationMediaId })` — borra la fila y opcionalmente el asset huérfano.
+```json
+{ "base": "es", "values": { "es": "...", "en": "...", "de": "..." }, "hashes": { "es": "..." } }
+```
 
-### UI (frontend)
+- Al guardar la composición, un server fn `translatePageComposition` (auth):
+  1. Carga los idiomas activos vía `listActiveLocales()`.
+  2. Para cada campo cuyo `hashes[base]` cambió, pide traducción por lotes a **Lovable AI Gateway** (`google/gemini-3-flash-preview`) devolviendo JSON con `{ locale: { fieldPath: "texto" } }`.
+  3. Rellena `values` para cada idioma activo excepto el base.
+  4. Si falla la traducción, guarda igual y muestra toast "Traducciones pendientes". Nunca bloquea el guardado.
+- Renderer público: helper `resolveText(field, activeLocale)` con fallback `values[activeLocale] ?? values[base]`.
+- **Formato consistente en todos los idiomas**: el prompt instruye preservar mayúsculas iniciales, puntuación final, saltos de línea, emojis, y nombres propios (`Valladolid`, `Oriente Maya`, `Yucatán`, `Alux`) sin traducir. Longitud limitada al ±20% del original para no romper layouts.
 
-- `src/components/cms/DestinationEditor.tsx` — envuelve `EntityEditor` con el `select` de región + panel de imagen destacada + panel de galería (grid con miniaturas, reordenar por botones arriba/abajo/eliminar, input de subida múltiple).
-- `src/components/cms/ImageUploader.tsx` — componente reutilizable: subida directa al bucket vía URL firmada, muestra progreso, valida tamaño/tipo.
-- Ampliar `EditorField` con tipo `"select"` (opciones estáticas) para el hero_palette.
-- `src/lib/cms/editor-fields.ts` → añadir `DESTINATION_FIELDS`.
-- Rutas nuevas:
-  - `src/routes/_authenticated/cms/destinos.nueva.tsx`
-  - `src/routes/_authenticated/cms/destinos.$id.editar.tsx`
-- `src/routes/_authenticated/cms/destinos.tsx` → añadir `headerActions` con enlace "Nuevo destino" y columna con enlace "Editar".
+### Auditoría de locales estáticos
 
-## Fuera de alcance (historias separadas)
+Corregir en `src/i18n/locales/{de,fr,it,pt}.json` cualquier valor hardcodeado con "Oriente Maya · Yucatán" u otras cadenas ES que deberían estar traducidas (hero eyebrow ya, más los que aparezcan al revisar).
 
-- Empresas y Productos con el mismo tratamiento.
-- Componente reutilizable de galería con drag & drop nativo (aquí uso subir/borrar/reordenar por botones, más simple y accesible).
-- Recorte y optimización server-side de imágenes.
-- Editor rich text para `description` (por ahora textarea plano).
+## Migración de datos
 
-## Verificación
+Migración idempotente que recorre `page_compositions.blocks` y envuelve strings en `{ base, values: { <base>: <string> }, hashes: { <base>: sha1 } }`. Los renderers ya toleran ambos formatos durante la transición.
 
-1. Aprobar migración → typecheck automático.
-2. Como admin: crear destino de prueba, subir hero, subir 3 imágenes, reordenar, borrar una, publicar.
-3. Verificar en la Home que el destino aparece con su hero.
-4. Como usuario anónimo: intentar escribir en `destinations` vía Data API debe fallar.
+## Archivos afectados
+
+- **Nuevo**: tabla `platform_locales` (migración + GRANTs + RLS pública SELECT, escritura sólo admin).
+- **Nuevo**: `src/lib/i18n/locales.functions.ts` (list/upsert/deactivate).
+- **Nuevo**: `src/lib/cms/translate-composition.functions.ts` (Lovable AI Gateway).
+- **Nuevo**: ruta `/cms/sistema/idiomas` (admin CRUD).
+- **Modificado**: `src/lib/experience-builder/schema.ts` — tipo `LocalizedText`.
+- **Modificado**: `src/components/experience-builder/AutoInspector.tsx` — quitar selector de idioma.
+- **Modificado**: `src/lib/experience-builder/composition-renderer.tsx` — `resolveText`.
+- **Modificado**: `src/lib/cms/eb-studio.functions.ts` / save — invocar traductor tras guardar.
+- **Modificado**: `src/i18n/context.tsx` + `LanguageSwitcher.tsx` — leer idiomas activos.
+- **Modificado**: `src/i18n/locales/{de,fr,it,pt}.json` — limpieza.
+
+## Orden de entrega (una historia a la vez)
+
+1. **H1** Tabla `platform_locales` + `listActiveLocales()` + fallback → consumen `I18nProvider` y `LanguageSwitcher`.
+2. **H2** UI admin `/cms/sistema/idiomas`.
+3. **H3** Schema `LocalizedText` + migración de datos + `resolveText` en renderer (retrocompatible).
+4. **H4** Quitar selector de idioma del `AutoInspector`; forzar edición en idioma base.
+5. **H5** Server fn `translatePageComposition` + integración en save.
+6. **H6** Auditoría y limpieza de `de/fr/it/pt.json`.
+
+Cada historia entrega: implementación + smoke visible + rollback + reporte.
+
+## Riesgos
+
+- Costo/latencia por save → mitigado con hash por campo (sólo traduce cambios).
+- Traducciones cortas pueden sonar raras → se puede añadir override manual por idioma como mejora futura (no en este alcance).
+
+## Aprobación
+
+¿Arranco por **H1** (tabla + fn + consumo en I18nProvider y switcher)? Confirma y avanzo.
