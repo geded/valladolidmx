@@ -445,17 +445,28 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
           const label = typeof it?.label === "string" ? it.label : "Botón";
           const href = typeof it?.href === "string" ? it.href : "#";
           const variant = typeof it?.variant === "string" ? it.variant : "primary";
+          const size = typeof it?.size === "string" ? it.size : "md";
+          const fullWidth = it?.full_width === true;
           const cls =
             variant === "secondary"
               ? "border border-primary bg-transparent text-primary hover:bg-primary/10"
               : variant === "ghost"
                 ? "bg-transparent text-primary hover:bg-primary/10"
                 : "bg-primary text-primary-foreground hover:opacity-95";
+          const sizeCls =
+            size === "sm"
+              ? "px-3 py-1.5 text-xs"
+              : size === "lg"
+                ? "px-6 py-3 text-base"
+                : size === "xl"
+                  ? "px-8 py-4 text-lg"
+                  : "px-5 py-2 text-sm";
+          const widthCls = fullWidth ? "w-full justify-center" : "";
           return (
             <a
               key={i}
               href={href}
-              className={`inline-flex items-center rounded-full px-5 py-2 text-sm font-semibold shadow-sm transition-colors ${cls}`}
+              className={`inline-flex items-center rounded-full font-semibold shadow-sm transition-colors ${sizeCls} ${widthCls} ${cls}`}
             >
               {label}
             </a>
