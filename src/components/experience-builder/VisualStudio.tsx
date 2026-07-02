@@ -583,6 +583,20 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
           <SaveIndicator status={saveStatus} />
           <button
             type="button"
+            onClick={() => setSelectedId(HEADER_CHROME_ID)}
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
+          >
+            Editar encabezado
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedId(FOOTER_CHROME_ID)}
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
+          >
+            Editar pie
+          </button>
+          <button
+            type="button"
             onClick={() => setPreviewMode((v) => !v)}
             className={`inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-accent ${previewMode ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-foreground"}`}
           >
@@ -629,6 +643,12 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
           )}
         </div>
       </div>
+
+      {advanced ? (
+        <div className="border-b border-amber-300/60 bg-amber-50 px-4 py-1.5 text-center text-[11px] font-medium text-amber-900">
+          Modo Profesional activo · se muestran controles avanzados (JSON, variables dinámicas, bloques reutilizables).
+        </div>
+      ) : null}
 
       {message ? (
         <div className="border-b border-border bg-primary/5 px-4 py-2 text-center text-xs text-foreground">

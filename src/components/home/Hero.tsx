@@ -10,32 +10,50 @@
  * sustituir el bloque `<div data-hero-media>` por un `<img src={…} />`
  * sin tocar layout, copy, CTAs ni degradados.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Search, ArrowRight, Compass } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { useTranslation } from "@/i18n/context";
 import heroBg01 from "@/assets/brand/hero/bg01.jpg";
 import heroBg02 from "@/assets/brand/hero/bg02.jpg";
 
-const HERO_SLIDES = [heroBg01, heroBg02] as const;
-const SLIDE_INTERVAL_MS = 7000;
+const DEFAULT_SLIDES = [heroBg01, heroBg02] as const;
+const DEFAULT_SLIDE_INTERVAL_MS = 7000;
 
 /**
  * Configuración editable del Hero (15.10.4d · US-01).
  * Todos los campos son opcionales; cuando no vienen del Experience Builder
  * se recurre a las cadenas i18n existentes (fallback sin regresión).
  */
+export interface HeroCta {
+  label?: string;
+  href?: string;
+  /** "primary" | "secondary" | "ghost" */
+  variant?: string;
+}
+
 export interface HeroConfig {
   eyebrow?: string;
   title?: string;
   subtitle?: string;
   background_image?: string;
+  /**
+   * Lista de imágenes para carrusel. Cuando está definida (incluso vacía),
+   * anula al `background_image` legado y a los defaults.
+   */
+  background_images?: string[];
+  slide_interval_seconds?: number;
   background_position?: string;
+  /** Lista de botones. Cuando está definida (incluso []), anula los CTAs legados. */
+  ctas?: HeroCta[];
+  /** Legacy — se conservan como fallback. */
   cta_label?: string;
   cta_href?: string;
   cta_secondary_label?: string;
   cta_secondary_href?: string;
   cta_alignment?: string;
+  /** Mostrar u ocultar el buscador rápido del hero. Default: true. */
+  show_search?: boolean;
 }
 
 export interface HeroProps {
@@ -46,25 +64,41 @@ export function Hero({ config }: HeroProps = {}) {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
 
+  // Determinar galería (soporta lista nueva, fallback al legacy o defaults).
+  const configSlides = Array.isArray(config?.background_images)
+    ? config!.background_images!.map((s) => (s ?? "").trim()).filter(Boolean)
+    : null;
+  const legacyBg = config?.background_image?.trim();
+  const slides: readonly string[] =
+    configSlides && configSlides.length > 0
+      ? configSlides
+      : legacyBg
+        ? [legacyBg]
+        : DEFAULT_SLIDES;
+
+  const intervalMs = Math.max(
+    2000,
+    (config?.slide_interval_seconds ?? DEFAULT_SLIDE_INTERVAL_MS / 1000) * 1000,
+  );
+
   useEffect(() => {
-    if (HERO_SLIDES.length < 2) return;
+    if (slides.length < 2) return;
     const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (prefersReduced) return;
     const id = window.setInterval(
-      () => setIndex((i) => (i + 1) % HERO_SLIDES.length),
-      SLIDE_INTERVAL_MS,
+      () => setIndex((i) => (i + 1) % slides.length),
+      intervalMs,
     );
     return () => window.clearInterval(id);
-  }, []);
+  }, [slides.length, intervalMs]);
 
-  const eyebrow = config?.eyebrow?.trim() || t("hero.eyebrow");
-  const title = config?.title?.trim() || t("hero.title");
-  const subtitle = config?.subtitle?.trim() || t("hero.subtitle");
-  const ctaPrimaryLabel = config?.cta_label?.trim() || t("hero.cta_primary");
-  const ctaPrimaryHref = config?.cta_href?.trim() || "/oriente-maya";
-  const ctaSecondaryLabel = config?.cta_secondary_label?.trim() || t("hero.cta_secondary");
-  const ctaSecondaryHref = config?.cta_secondary_href?.trim() || "/arma-tu-viaje";
-  const customBackground = config?.background_image?.trim();
+  // Textos: undefined → default i18n; string (incluso "") → respeta al editor.
+  const pickText = (value: string | undefined, fallback: string) =>
+    value === undefined ? fallback : value;
+  const eyebrow = pickText(config?.eyebrow, t("hero.eyebrow"));
+  const title = pickText(config?.title, t("hero.title"));
+  const subtitle = pickText(config?.subtitle, t("hero.subtitle"));
+
   const backgroundPosition = config?.background_position?.trim() || "center";
   const ctaAlignment = config?.cta_alignment?.trim() || "left";
   const ctaAlignmentClass =
@@ -74,6 +108,23 @@ export function Hero({ config }: HeroProps = {}) {
         ? "justify-end"
         : "justify-start";
 
+  // Botones: si viene `ctas` (aun vacío), respeta al editor. Si no, usa legacy/defaults.
+  const ctas: HeroCta[] = Array.isArray(config?.ctas)
+    ? config!.ctas!
+    : [
+        {
+          label: config?.cta_label ?? t("hero.cta_primary"),
+          href: config?.cta_href || "/oriente-maya",
+          variant: "primary",
+        },
+        {
+          label: config?.cta_secondary_label ?? t("hero.cta_secondary"),
+          href: config?.cta_secondary_href || "/arma-tu-viaje",
+          variant: "secondary",
+        },
+      ];
+  const showSearch = config?.show_search !== false;
+
   return (
     <section
       className="relative isolate overflow-hidden text-white"
@@ -82,34 +133,21 @@ export function Hero({ config }: HeroProps = {}) {
     >
       {/* Carrusel cinematográfico con las fotografías oficiales del Hero. */}
       <div data-hero-media aria-hidden className="absolute inset-0 -z-20 h-full w-full overflow-hidden bg-foreground">
-        {customBackground ? (
+        {slides.map((src, i) => (
           <img
-            src={customBackground}
+            key={`${src}-${i}`}
+            src={src}
             alt=""
             aria-hidden
-            className="absolute inset-0 h-full w-full object-cover"
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
+              slides.length === 1 || i === index % slides.length ? "opacity-100" : "opacity-0"
+            }`}
             style={{ objectPosition: backgroundPosition }}
-            loading="eager"
-            fetchPriority="high"
+            loading={i === 0 ? "eager" : "lazy"}
+            fetchPriority={i === 0 ? "high" : "auto"}
             decoding="async"
           />
-        ) : (
-          HERO_SLIDES.map((src, i) => (
-            <img
-              key={src}
-              src={src}
-              alt=""
-              aria-hidden
-              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
-                i === index ? "opacity-100" : "opacity-0"
-              }`}
-              style={{ objectPosition: backgroundPosition }}
-              loading={i === 0 ? "eager" : "lazy"}
-              fetchPriority={i === 0 ? "high" : "auto"}
-              decoding="async"
-            />
-          ))
-        )}
+        ))}
       </div>
       {/* Degradado editorial para legibilidad sin enturbiar la foto. */}
       <div
@@ -129,50 +167,77 @@ export function Hero({ config }: HeroProps = {}) {
       <Container
         className="relative flex min-h-[100svh] flex-col justify-center gap-4 pb-10 pt-20 md:min-h-[100dvh] md:justify-end md:gap-0 md:pb-28 md:pt-40"
       >
-        <p className="font-script text-[1.625rem] leading-tight text-white/95 drop-shadow-sm sm:text-3xl md:text-[2.5rem]">
-          {eyebrow}
-        </p>
-        <h1 className="max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:text-[2.75rem] sm:leading-[1.05] md:mt-3 md:text-[3.5rem] lg:text-[4rem]">
-          {title}
-        </h1>
-        <p className="max-w-2xl text-pretty text-base text-white/90 drop-shadow sm:text-lg md:mt-5 md:text-lg lg:text-xl">
-          {subtitle}
-        </p>
+        {eyebrow ? (
+          <p className="font-script text-[1.625rem] leading-tight text-white/95 drop-shadow-sm sm:text-3xl md:text-[2.5rem]">
+            {eyebrow}
+          </p>
+        ) : null}
+        {title ? (
+          <h1 className="max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:text-[2.75rem] sm:leading-[1.05] md:mt-3 md:text-[3.5rem] lg:text-[4rem]">
+            {title}
+          </h1>
+        ) : null}
+        {subtitle ? (
+          <p className="max-w-2xl text-pretty text-base text-white/90 drop-shadow sm:text-lg md:mt-5 md:text-lg lg:text-xl">
+            {subtitle}
+          </p>
+        ) : null}
 
-        <div className={`flex flex-wrap items-center gap-3 md:mt-8 ${ctaAlignmentClass}`}>
-          <a
-            href={ctaPrimaryHref}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-black/5 transition hover:scale-[1.02] hover:opacity-95 sm:px-6 sm:py-3"
-          >
-            {ctaPrimaryLabel}
-            <ArrowRight className="size-4" aria-hidden />
-          </a>
-          <a
-            href={ctaSecondaryHref}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/35 bg-white/5 px-5 py-2.5 text-sm font-medium text-white/95 backdrop-blur transition hover:bg-white/15 sm:px-6 sm:py-3"
-          >
-            <Compass className="size-4" aria-hidden />
-            {ctaSecondaryLabel}
-          </a>
-        </div>
+        {ctas.length > 0 ? (
+          <div className={`flex flex-wrap items-center gap-3 md:mt-8 ${ctaAlignmentClass}`}>
+            {ctas.map((cta, i) => (
+              <HeroButton key={i} cta={cta} isPrimary={i === 0} />
+            ))}
+          </div>
+        ) : null}
 
         {/* Buscador discreto (12C.1): secundario al mensaje inspirador. */}
-        <form
-          role="search"
-          aria-label="Búsqueda rápida"
-          onSubmit={(e) => e.preventDefault()}
-          className="mt-4 flex max-w-md items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 shadow-sm backdrop-blur-md sm:mt-6 md:mt-10"
-        >
-          <Search className="size-4 shrink-0 text-white/80" aria-hidden />
-          <input
-            type="search"
-            placeholder={t("hero.search_placeholder")}
-            className="w-full bg-transparent text-sm text-white placeholder:text-white/70 focus:outline-none"
-            aria-label={t("hero.search_placeholder")}
-          />
-          <span className="hidden text-[11px] text-white/60 lg:inline">{t("hero.search_helper")}</span>
-        </form>
+        {showSearch ? (
+          <form
+            role="search"
+            aria-label="Búsqueda rápida"
+            onSubmit={(e) => e.preventDefault()}
+            className="mt-4 flex max-w-md items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 shadow-sm backdrop-blur-md sm:mt-6 md:mt-10"
+          >
+            <Search className="size-4 shrink-0 text-white/80" aria-hidden />
+            <input
+              type="search"
+              placeholder={t("hero.search_placeholder")}
+              className="w-full bg-transparent text-sm text-white placeholder:text-white/70 focus:outline-none"
+              aria-label={t("hero.search_placeholder")}
+            />
+            <span className="hidden text-[11px] text-white/60 lg:inline">{t("hero.search_helper")}</span>
+          </form>
+        ) : null}
       </Container>
     </section>
+  );
+}
+
+function HeroButton({ cta, isPrimary }: { cta: HeroCta; isPrimary: boolean }) {
+  const label = cta.label ?? "";
+  const href = cta.href || "#";
+  const variant = cta.variant ?? (isPrimary ? "primary" : "secondary");
+  if (!label) return null;
+  let cls =
+    "inline-flex min-h-11 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition sm:px-6 sm:py-3";
+  let icon: ReactNode = null;
+  if (variant === "primary") {
+    cls +=
+      " bg-primary text-primary-foreground shadow-[0_10px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-black/5 hover:scale-[1.02] hover:opacity-95";
+    icon = <ArrowRight className="size-4" aria-hidden />;
+  } else if (variant === "secondary") {
+    cls +=
+      " border border-white/35 bg-white/5 font-medium text-white/95 backdrop-blur hover:bg-white/15";
+    icon = <Compass className="size-4" aria-hidden />;
+  } else {
+    cls += " bg-transparent font-medium text-white/95 hover:text-white";
+  }
+  return (
+    <a href={href} className={cls}>
+      {variant === "secondary" ? icon : null}
+      {label}
+      {variant === "primary" ? icon : null}
+    </a>
   );
 }

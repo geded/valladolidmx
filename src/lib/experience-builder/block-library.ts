@@ -154,14 +154,31 @@ const dividerBlock: BlockContract = {
 const heroBlock: BlockContract = {
   type: "vmx.hero",
   category: "static",
-  version: "1.1.0",
+  version: "1.2.0",
   display_name: "Hero",
   description: "Bloque hero principal de la Home y de Landing Pages.",
   schema: {
     eyebrow: { type: "text", label: "Frase superior", translatable: true },
     title: { type: "text", label: "Título", required: true, translatable: true },
     subtitle: { type: "text", label: "Subtítulo", translatable: true },
-    background_image: { type: "media", label: "Imagen de fondo", accepts: ["image/*"] },
+    background_images: {
+      type: "list",
+      label: "Imágenes de fondo (carrusel)",
+      description: "Agrega una o varias. Si dejas vacío, se usan las imágenes por defecto.",
+      item: {
+        type: "object",
+        label: "Imagen",
+        fields: {
+          src: { type: "media", label: "Imagen", accepts: ["image/*"] },
+        },
+      },
+    },
+    slide_interval_seconds: {
+      type: "number",
+      label: "Segundos por imagen",
+      default: 7,
+      description: "Duración de cada imagen del carrusel (mínimo 2 s).",
+    },
     background_position: {
       type: "select",
       label: "Posición de la imagen",
@@ -174,10 +191,29 @@ const heroBlock: BlockContract = {
         { value: "right", label: "Derecha" },
       ],
     },
-    cta_label: { type: "text", label: "Botón principal — texto", translatable: true },
-    cta_href: { type: "url", label: "Botón principal — enlace" },
-    cta_secondary_label: { type: "text", label: "Botón secundario — texto", translatable: true },
-    cta_secondary_href: { type: "url", label: "Botón secundario — enlace" },
+    ctas: {
+      type: "list",
+      label: "Botones",
+      description: "Deja vacío para ocultar todos los botones.",
+      item: {
+        type: "object",
+        label: "Botón",
+        fields: {
+          label: { type: "text", label: "Texto", translatable: true },
+          href: { type: "url", label: "Enlace" },
+          variant: {
+            type: "select",
+            label: "Estilo",
+            default: "primary",
+            options: [
+              { value: "primary", label: "Primario" },
+              { value: "secondary", label: "Secundario" },
+              { value: "ghost", label: "Fantasma" },
+            ],
+          },
+        },
+      },
+    },
     cta_alignment: {
       type: "select",
       label: "Posición de botones",
@@ -188,6 +224,11 @@ const heroBlock: BlockContract = {
         { value: "right", label: "Derecha" },
       ],
     },
+    show_search: {
+      type: "boolean",
+      label: "Mostrar buscador",
+      default: true,
+    },
   },
   capabilities: {
     soporta_i18n: true,
@@ -197,9 +238,9 @@ const heroBlock: BlockContract = {
     soporta_cache: true,
   },
   constraints: { surfaces: ["home", "landing"], unique_per_page: true },
-  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["background_image", "background_position", "cta_alignment"] },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["background_images", "background_position", "cta_alignment"] },
   i18n: {
-    translatable_fields: ["eyebrow", "title", "subtitle", "cta_label", "cta_secondary_label"],
+    translatable_fields: ["eyebrow", "title", "subtitle", "ctas"],
     fallback: "base_language",
   },
   audit: ["Block.Registered", "Block.VersionPublished"],
