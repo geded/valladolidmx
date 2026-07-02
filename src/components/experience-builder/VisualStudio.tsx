@@ -251,6 +251,17 @@ const headerChromeContract: BlockContract = {
               { value: "light", label: "Claro (translúcido sobre foto)" },
             ],
           },
+          size: {
+            type: "select",
+            label: "Tamaño",
+            default: "md",
+            options: [
+              { value: "xs", label: "Extra pequeño" },
+              { value: "sm", label: "Pequeño" },
+              { value: "md", label: "Mediano (por defecto)" },
+              { value: "lg", label: "Grande" },
+            ],
+          },
           visible: {
             type: "boolean",
             label: "Visible",

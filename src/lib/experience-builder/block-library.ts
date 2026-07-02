@@ -211,6 +211,23 @@ const heroBlock: BlockContract = {
               { value: "ghost", label: "Fantasma" },
             ],
           },
+          size: {
+            type: "select",
+            label: "Tamaño",
+            default: "md",
+            options: [
+              { value: "xs", label: "Extra pequeño" },
+              { value: "sm", label: "Pequeño" },
+              { value: "md", label: "Mediano (por defecto)" },
+              { value: "lg", label: "Grande" },
+              { value: "xl", label: "Extra grande" },
+            ],
+          },
+          full_width: {
+            type: "boolean",
+            label: "Ancho completo",
+            default: false,
+          },
         },
       },
     },
@@ -245,6 +262,29 @@ const heroBlock: BlockContract = {
       label: "Ayuda del buscador",
       translatable: true,
       description: "Texto pequeño a la derecha del buscador (visible sólo en pantallas grandes).",
+    },
+    search_size: {
+      type: "select",
+      label: "Tamaño del buscador",
+      default: "md",
+      options: [
+        { value: "sm", label: "Pequeño" },
+        { value: "md", label: "Mediano (por defecto)" },
+        { value: "lg", label: "Grande" },
+        { value: "xl", label: "Extra grande" },
+      ],
+    },
+    search_max_width: {
+      type: "select",
+      label: "Ancho máximo del buscador",
+      default: "md",
+      options: [
+        { value: "sm", label: "Angosto" },
+        { value: "md", label: "Medio (por defecto)" },
+        { value: "lg", label: "Ancho" },
+        { value: "xl", label: "Muy ancho" },
+        { value: "full", label: "Ancho completo" },
+      ],
     },
     text_alignment: {
       type: "select",
