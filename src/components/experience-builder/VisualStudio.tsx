@@ -705,13 +705,26 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
               contract={selectedContract}
               config={selectedConfig}
               onChange={(next) => updateSelectedConfig(next)}
-              simple
+              simple={!advanced}
             />
+
+            {advanced && selectedNode ? (
+              <AdvancedPanel
+                node={selectedNode}
+                config={selectedConfig}
+                onChange={(next) => updateSelectedConfig(next)}
+              />
+            ) : null}
           </aside>
         ) : null}
 
         {showLibrary ? (
-          <BlockLibraryModal onClose={() => setShowLibrary(false)} onPick={(type) => insertBlock(type)} />
+          <BlockLibraryModal
+            advanced={advanced}
+            onClose={() => setShowLibrary(false)}
+            onPick={(type) => insertBlock(type)}
+            onPickReusable={(entry) => insertReusable(entry)}
+          />
         ) : null}
         {showVersions ? (
           <VersionsDrawer versions={versions} onClose={() => setShowVersions(false)} onRestore={doRollback} />
