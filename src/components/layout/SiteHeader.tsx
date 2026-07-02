@@ -122,6 +122,10 @@ function linkItems(value: unknown, fallback: HeaderNavItem[]): HeaderNavItem[] {
 }
 
 export function SiteHeader({ variant = "solid", config }: Props) {
+  return <SiteHeaderInner variant={variant} config={config} />;
+}
+
+function SiteHeaderInner({ variant = "solid", config }: Props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
