@@ -87,6 +87,9 @@ const EDITABLE_COLUMNS: Record<EditableTable, readonly string[]> = {
     "display_name",
     "tagline",
     "description",
+    "verified",
+    "logo_media_id",
+    "cover_media_id",
     "metadata",
   ],
   products: [
@@ -106,6 +109,30 @@ async function assertEditorial(context: { supabase: any; userId: string }) {
   });
   if (error) throw new Error(`role_check_failed: ${error.message}`);
   if (!data) throw new Error("forbidden");
+}
+
+/**
+ * assertCanEditBusiness — Autoriza a admins/editores O a dueños (>= editor
+ * en `business_users`) para operar sobre una empresa existente. Para
+ * creación (`businessId` ausente) sólo permite admins/editores.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function assertCanEditBusiness(
+  context: { supabase: any; userId: string },
+  businessId?: string | null,
+) {
+  const { data: editorial } = await context.supabase.rpc(
+    "is_editor_or_admin",
+    { _user_id: context.userId },
+  );
+  if (editorial) return;
+  if (!businessId) throw new Error("forbidden");
+  const { data: owns } = await context.supabase.rpc("has_business_access", {
+    _user_id: context.userId,
+    _business_id: businessId,
+    _min_role: "editor",
+  });
+  if (!owns) throw new Error("forbidden");
 }
 
 function assertEditableTable(t: string): asserts t is EditableTable {
@@ -200,8 +227,12 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
     return d;
   })
   .handler(async ({ data, context }) => {
-    await assertEditorial(context);
     assertEditableTable(data.table);
+    if (data.table === "businesses") {
+      await assertCanEditBusiness(context, data.id ?? null);
+    } else {
+      await assertEditorial(context);
+    }
     const clean = sanitizePayload(data.table, data.payload);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
