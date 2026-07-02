@@ -211,7 +211,7 @@ function SinglePanel(props: {
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
@@ -277,7 +277,7 @@ function GalleryPanel(props: {
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
           multiple
           className="hidden"
           onChange={(e) => {
