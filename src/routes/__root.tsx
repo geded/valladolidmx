@@ -187,6 +187,7 @@ function RootComponent() {
         <Outlet />
         {!isAppShellRoute ? <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" /> : null}
         {!isAppShellRoute ? <AluxFloatingTrigger /> : null}
+        {!isAppShellRoute ? <EditThisPageButton pathname={pathname} /> : null}
         </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>
