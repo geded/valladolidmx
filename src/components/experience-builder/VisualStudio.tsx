@@ -841,6 +841,7 @@ function PageVisualEditor({
   const [showVersions, setShowVersions] = useState(false);
   const [versions, setVersions] = useState<CompositionRevisionSummary[]>([]);
   const [previewMode, setPreviewMode] = useState(false);
+  const skipNextAutoSave = useRef(false);
   /**
    * Viewport del canvas (mobile-first, coherente con la doctrina del
    * proyecto: el turismo consume mayormente en celular). Persistido
@@ -878,6 +879,7 @@ function PageVisualEditor({
         }
         if (cancelled || !detail) return;
         setPage(detail);
+        skipNextAutoSave.current = true;
         setTree(detail.current_draft);
       } catch (e) {
         if (!cancelled) setLoadError((e as Error).message);
@@ -891,6 +893,11 @@ function PageVisualEditor({
   const saveTimer = useRef<number | null>(null);
   useEffect(() => {
     if (!page || !tree) return;
+    if (skipNextAutoSave.current) {
+      skipNextAutoSave.current = false;
+      setSaveStatus("idle");
+      return;
+    }
     if (saveTimer.current) window.clearTimeout(saveTimer.current);
     setSaveStatus("saving");
     saveTimer.current = window.setTimeout(() => {
