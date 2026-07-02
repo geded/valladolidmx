@@ -14,6 +14,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Search, ArrowRight, Compass } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { useTranslation } from "@/i18n/context";
+import { readFieldTypography, typographyToStyle } from "@/lib/experience-builder/typography";
 import heroBg01 from "@/assets/brand/hero/bg01.jpg";
 import heroBg02 from "@/assets/brand/hero/bg02.jpg";
 
@@ -125,6 +126,12 @@ export function Hero({ config }: HeroProps = {}) {
       ];
   const showSearch = config?.show_search !== false;
 
+  // Typography por campo (config.__typography[fieldKey]).
+  const cfgRecord = (config ?? {}) as unknown as Record<string, unknown>;
+  const eyebrowStyle = typographyToStyle(readFieldTypography(cfgRecord, "eyebrow"));
+  const titleStyle = typographyToStyle(readFieldTypography(cfgRecord, "title"));
+  const subtitleStyle = typographyToStyle(readFieldTypography(cfgRecord, "subtitle"));
+
   return (
     <section
       className="relative isolate overflow-hidden text-white"
@@ -171,6 +178,7 @@ export function Hero({ config }: HeroProps = {}) {
           <p
             suppressHydrationWarning
             className="font-script text-[1.625rem] leading-tight text-white/95 drop-shadow-sm sm:text-3xl md:text-[2.5rem]"
+            style={eyebrowStyle}
           >
             {eyebrow}
           </p>
@@ -179,6 +187,7 @@ export function Hero({ config }: HeroProps = {}) {
           <h1
             suppressHydrationWarning
             className="max-w-4xl text-balance text-[1.875rem] leading-[1.1] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:text-[2.75rem] sm:leading-[1.05] md:mt-3 md:text-[3.5rem] lg:text-[4rem]"
+            style={titleStyle}
           >
             {title}
           </h1>
@@ -187,6 +196,7 @@ export function Hero({ config }: HeroProps = {}) {
           <p
             suppressHydrationWarning
             className="max-w-2xl text-pretty text-base text-white/90 drop-shadow sm:text-lg md:mt-5 md:text-lg lg:text-xl"
+            style={subtitleStyle}
           >
             {subtitle}
           </p>

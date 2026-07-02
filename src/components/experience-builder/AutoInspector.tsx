@@ -7,13 +7,19 @@
 
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Languages, Plus, Trash2, Upload } from "lucide-react";
+import { ChevronDown, ChevronUp, Languages, Plus, Trash2, Type, Upload } from "lucide-react";
 import { useId, useState, type ReactNode } from "react";
 import type {
   BlockContract,
   BlockFieldSchema,
 } from "@/lib/experience-builder/block-contract";
 import { VariablePicker } from "./VariablePicker";
+import {
+  TYPO_FAMILIES,
+  hasTypography,
+  readFieldTypography,
+  type FieldTypography,
+} from "@/lib/experience-builder/typography";
 
 const I18N_LANGS: Array<{ code: string; label: string }> = [
   { code: "es", label: "Español" },
@@ -44,6 +50,11 @@ export function AutoInspector({ contract, config, onChange, simple = false }: Au
     const nextI18n = { ...i18nMap, [fieldKey]: nextField };
     onChange({ ...config, __i18n: nextI18n });
   };
+  const typoMap = (config.__typography as Record<string, FieldTypography> | undefined) ?? {};
+  const setTypography = (fieldKey: string, next: FieldTypography) => {
+    const nextMap = { ...typoMap, [fieldKey]: next };
+    onChange({ ...config, __typography: nextMap });
+  };
   return (
     <div className="space-y-3">
       <header className="space-y-1">
@@ -67,6 +78,8 @@ export function AutoInspector({ contract, config, onChange, simple = false }: Au
             simple={simple}
             translations={i18nMap[key]}
             onTranslationChange={(lang, value) => setTranslation(key, lang, value)}
+            typography={typoMap[key]}
+            onTypographyChange={(next) => setTypography(key, next)}
           />
         ))}
         {Object.keys(contract.schema).length === 0 ? (
@@ -101,7 +114,7 @@ function CapabilityChips({ contract }: { contract: BlockContract }) {
 }
 
 function FieldRow({
-  name, def, value, onChange, simple, translations, onTranslationChange,
+  name, def, value, onChange, simple, translations, onTranslationChange, typography, onTypographyChange,
 }: {
   name: string;
   def: BlockFieldSchema;
@@ -110,19 +123,39 @@ function FieldRow({
   simple?: boolean;
   translations?: Record<string, string>;
   onTranslationChange?: (lang: string, value: string) => void;
+  typography?: FieldTypography;
+  onTypographyChange?: (next: FieldTypography) => void;
 }) {
   const canTranslate = Boolean(def.translatable) && !simple && (def.type === "text" || def.type === "rich_text");
+  const canStyleText = !simple && (def.type === "text" || def.type === "rich_text");
   const [showI18n, setShowI18n] = useState(false);
+  const [showTypo, setShowTypo] = useState(false);
+  const typo = typography ?? {};
+  const typoActive = hasTypography(typo);
   return (
     <div className="space-y-1">
       <label className="flex items-center gap-2 text-xs font-medium">
         <span>{def.label || name}</span>
         {def.required ? <span className="text-destructive">*</span> : null}
+        {canStyleText ? (
+          <button
+            type="button"
+            onClick={() => setShowTypo((v) => !v)}
+            className={`ml-auto inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[9px] font-medium hover:bg-accent hover:text-foreground ${
+              typoActive
+                ? "border-primary/50 bg-primary/10 text-primary"
+                : "border-border bg-background text-muted-foreground"
+            }`}
+            title="Tipografía de este texto"
+          >
+            <Type className="size-2.5" aria-hidden /> Aa {typoActive ? "•" : ""}
+          </button>
+        ) : null}
         {canTranslate ? (
           <button
             type="button"
             onClick={() => setShowI18n((v) => !v)}
-            className="ml-auto inline-flex items-center gap-1 rounded-full border border-border bg-background px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+            className={`${canStyleText ? "" : "ml-auto "}inline-flex items-center gap-1 rounded-full border border-border bg-background px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground hover:bg-accent hover:text-foreground`}
             title="Editar traducciones"
           >
             <Languages className="size-2.5" aria-hidden /> i18n
@@ -133,6 +166,9 @@ function FieldRow({
       {def.description ? (
         <p className="text-[10px] text-muted-foreground">{def.description}</p>
       ) : null}
+      {canStyleText && showTypo ? (
+        <TypographyEditor value={typo} onChange={(next) => onTypographyChange?.(next)} />
+      ) : null}
       {canTranslate && showI18n ? (
         <TranslationsEditor
           baseValue={typeof value === "string" ? value : ""}
@@ -141,6 +177,137 @@ function FieldRow({
           onChange={(lang, next) => onTranslationChange?.(lang, next)}
         />
       ) : null}
+    </div>
+  );
+}
+
+function TypographyEditor({
+  value, onChange,
+}: { value: FieldTypography; onChange: (next: FieldTypography) => void }) {
+  const set = <K extends keyof FieldTypography>(k: K, v: FieldTypography[K]) => {
+    const next = { ...value, [k]: v };
+    onChange(next);
+  };
+  const inp = "w-full rounded-md border border-border bg-background px-2 py-1 text-xs";
+  return (
+    <div className="mt-1 space-y-2 rounded-md border border-primary/30 bg-primary/5 p-2">
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">
+          Tipografía de este texto
+        </p>
+        <button
+          type="button"
+          onClick={() => onChange({})}
+          className="text-[10px] font-medium text-muted-foreground hover:text-destructive"
+        >
+          Restablecer
+        </button>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <label className="col-span-2 space-y-1">
+          <span className="text-[10px] text-muted-foreground">Fuente</span>
+          <select
+            className={inp}
+            value={value.font_family ?? ""}
+            onChange={(e) => set("font_family", e.target.value)}
+          >
+            {TYPO_FAMILIES.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </label>
+        <label className="space-y-1">
+          <span className="text-[10px] text-muted-foreground">Tamaño (px)</span>
+          <input
+            type="number"
+            min={8}
+            max={200}
+            className={inp}
+            value={value.font_size ?? ""}
+            onChange={(e) => set("font_size", e.target.value === "" ? undefined : Number(e.target.value))}
+          />
+        </label>
+        <label className="space-y-1">
+          <span className="text-[10px] text-muted-foreground">Peso</span>
+          <select
+            className={inp}
+            value={value.font_weight ?? ""}
+            onChange={(e) => set("font_weight", e.target.value === "" ? undefined : Number(e.target.value))}
+          >
+            <option value="">Por defecto</option>
+            <option value="300">300 · Light</option>
+            <option value="400">400 · Regular</option>
+            <option value="500">500 · Medium</option>
+            <option value="600">600 · Semibold</option>
+            <option value="700">700 · Bold</option>
+            <option value="800">800 · Extra</option>
+            <option value="900">900 · Black</option>
+          </select>
+        </label>
+        <label className="space-y-1">
+          <span className="text-[10px] text-muted-foreground">Interlínea</span>
+          <input
+            type="number"
+            step="0.05"
+            min={0.8}
+            max={3}
+            className={inp}
+            value={value.line_height ?? ""}
+            onChange={(e) => set("line_height", e.target.value === "" ? undefined : Number(e.target.value))}
+          />
+        </label>
+        <label className="space-y-1">
+          <span className="text-[10px] text-muted-foreground">Espaciado (px)</span>
+          <input
+            type="number"
+            step="0.1"
+            className={inp}
+            value={value.letter_spacing ?? ""}
+            onChange={(e) => set("letter_spacing", e.target.value === "" ? undefined : Number(e.target.value))}
+          />
+        </label>
+        <label className="space-y-1">
+          <span className="text-[10px] text-muted-foreground">Color</span>
+          <input
+            type="color"
+            className="h-7 w-full cursor-pointer rounded border border-border bg-background"
+            value={value.color ?? "#000000"}
+            onChange={(e) => set("color", e.target.value)}
+          />
+        </label>
+        <label className="space-y-1">
+          <span className="text-[10px] text-muted-foreground">Alineación</span>
+          <select
+            className={inp}
+            value={value.align ?? ""}
+            onChange={(e) => set("align", e.target.value)}
+          >
+            <option value="">Por defecto</option>
+            <option value="left">Izquierda</option>
+            <option value="center">Centro</option>
+            <option value="right">Derecha</option>
+            <option value="justify">Justificado</option>
+          </select>
+        </label>
+      </div>
+      <div className="flex items-center gap-4 pt-1">
+        <label className="flex items-center gap-1 text-[11px]">
+          <input
+            type="checkbox"
+            checked={Boolean(value.italic)}
+            onChange={(e) => set("italic", e.target.checked)}
+          />
+          Cursiva
+        </label>
+        <label className="flex items-center gap-1 text-[11px]">
+          <input
+            type="checkbox"
+            checked={Boolean(value.uppercase)}
+            onChange={(e) => set("uppercase", e.target.checked)}
+          />
+          MAYÚSCULAS
+        </label>
+      </div>
     </div>
   );
 }
