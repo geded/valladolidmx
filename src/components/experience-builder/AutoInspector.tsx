@@ -8,7 +8,7 @@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, Languages, Plus, Trash2, Type, Upload } from "lucide-react";
-import { useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import type {
   BlockContract,
   BlockFieldSchema,
@@ -45,9 +45,15 @@ export interface AutoInspectorProps {
    * el Modo Visual del Studio para no confundir al editor final.
    */
   simple?: boolean;
+  /**
+   * Breakpoint activo del canvas (mobile/tablet/desktop). Cuando se pasa,
+   * el editor tipográfico escribe sobre ese breakpoint automáticamente
+   * para que "lo que ves en el canvas" sea lo que editas.
+   */
+  activeBreakpoint?: TypographyBreakpoint;
 }
 
-export function AutoInspector({ contract, config, onChange, simple = false }: AutoInspectorProps) {
+export function AutoInspector({ contract, config, onChange, simple = false, activeBreakpoint }: AutoInspectorProps) {
   const set = (key: string, value: unknown) => onChange({ ...config, [key]: value });
   const i18nMap = (config.__i18n as Record<string, Record<string, string>> | undefined) ?? {};
   const setTranslation = (fieldKey: string, lang: string, value: string) => {
@@ -87,6 +93,7 @@ export function AutoInspector({ contract, config, onChange, simple = false }: Au
             typography={typoMap[key]}
             typographyDefault={typoDefaults[key]}
             onTypographyChange={(next) => setTypography(key, next)}
+          activeBreakpoint={activeBreakpoint}
           />
         ))}
         {Object.keys(contract.schema).length === 0 ? (
