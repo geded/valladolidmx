@@ -9,7 +9,23 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
-import { Menu, X, Compass } from "lucide-react";
+import {
+  Menu,
+  X,
+  Compass,
+  Globe,
+  User,
+  MapPin,
+  Phone,
+  Mail,
+  ShoppingBag,
+  Heart,
+  Sparkles,
+  Calendar,
+  Search,
+  Info,
+  type LucideIcon,
+} from "lucide-react";
 import { Container } from "./Container";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { UserMenu } from "./UserMenu";
@@ -30,6 +46,58 @@ interface Props {
 interface HeaderNavItem {
   label: string;
   href: string;
+}
+
+type ButtonKind = "cta" | "custom_link" | "language" | "user_menu" | "menu_toggle";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "light";
+
+interface HeaderButton {
+  kind: ButtonKind;
+  label: string;
+  href: string;
+  icon: string;
+  variant: ButtonVariant;
+  visible: boolean;
+}
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  Compass,
+  Globe,
+  User,
+  Menu,
+  MapPin,
+  Phone,
+  Mail,
+  ShoppingBag,
+  Heart,
+  Sparkles,
+  Calendar,
+  Search,
+  Info,
+};
+
+function parseButtons(value: unknown): HeaderButton[] | null {
+  if (!Array.isArray(value)) return null;
+  const kinds: ButtonKind[] = ["cta", "custom_link", "language", "user_menu", "menu_toggle"];
+  const variants: ButtonVariant[] = ["primary", "secondary", "ghost", "light"];
+  const out: HeaderButton[] = [];
+  for (const raw of value) {
+    if (!raw || typeof raw !== "object") continue;
+    const rec = raw as Record<string, unknown>;
+    const kind = kinds.includes(rec.kind as ButtonKind) ? (rec.kind as ButtonKind) : "custom_link";
+    const variant = variants.includes(rec.variant as ButtonVariant)
+      ? (rec.variant as ButtonVariant)
+      : "primary";
+    out.push({
+      kind,
+      label: typeof rec.label === "string" ? rec.label : "",
+      href: typeof rec.href === "string" ? rec.href : "",
+      icon: typeof rec.icon === "string" ? rec.icon : "",
+      variant,
+      visible: rec.visible !== false,
+    });
+  }
+  return out;
 }
 
 function textValue(value: unknown): string | undefined {
@@ -148,6 +216,25 @@ export function SiteHeader({ variant = "solid", config }: Props) {
   const ctaHref = textValue(config?.cta_href) ?? "/arma-tu-viaje";
   const showLanguage = boolValue(config?.show_language, true);
   const showUserMenu = boolValue(config?.show_user_menu, true);
+
+  // Nuevo modelo declarativo: `buttons[]` reordenable/configurable desde el
+  // Studio. Si no viene, se sintetiza uno equivalente a la barra legacy
+  // para no romper composiciones publicadas antes de esta versión.
+  const configuredButtons = parseButtons(config?.buttons);
+  const buttons: HeaderButton[] = configuredButtons ?? [
+    {
+      kind: "cta",
+      label: ctaLabel,
+      href: ctaHref,
+      icon: "Compass",
+      variant: "light",
+      visible: true,
+    },
+    { kind: "language", label: "", href: "", icon: "", variant: "ghost", visible: showLanguage },
+    { kind: "user_menu", label: "Iniciar sesión", href: "", icon: "User", variant: "primary", visible: showUserMenu },
+    { kind: "menu_toggle", label: "", href: "", icon: "Menu", variant: "ghost", visible: true },
+  ];
+  const visibleButtons = buttons.filter((b) => b.visible);
 
   const mobileDrawer = mounted && open
     ? createPortal(
