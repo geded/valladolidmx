@@ -1111,6 +1111,7 @@ function PageVisualEditor({
           >
             {previewMode ? "Salir de vista previa" : "Vista previa"}
           </button>
+          <DeviceToggle value={deviceViewport} onChange={setDeviceViewport} />
           <button
             type="button"
             onClick={() => void openVersions()}
