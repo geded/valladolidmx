@@ -87,6 +87,9 @@ const EDITABLE_COLUMNS: Record<EditableTable, readonly string[]> = {
     "display_name",
     "tagline",
     "description",
+    "verified",
+    "logo_media_id",
+    "cover_media_id",
     "metadata",
   ],
   products: [
