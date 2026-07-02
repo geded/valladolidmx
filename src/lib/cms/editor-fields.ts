@@ -76,3 +76,50 @@ export const DESTINATION_FIELDS: EditorField[] = [
   { name: "latitude", label: "Latitud", type: "number" },
   { name: "longitude", label: "Longitud", type: "number" },
 ];
+
+/**
+ * BUSINESS_FIELDS — usado por `BusinessEditor` (Ola 1 · Etapa 4).
+ * Los selects de destino y categoría se inyectan en tiempo de render
+ * (necesitan cargar la lista desde el servidor).
+ */
+export const BUSINESS_FIELDS: EditorField[] = [
+  { name: "display_name", label: "Nombre público", type: "text", required: true },
+  { name: "legal_name", label: "Razón social", type: "text" },
+  {
+    name: "slug",
+    label: "Slug",
+    type: "text",
+    required: true,
+    helpText: "Identificador URL (sin espacios, sólo minúsculas y guiones).",
+  },
+  {
+    name: "destination_id",
+    label: "Destino",
+    type: "select",
+    required: true,
+    options: [],
+  },
+  {
+    name: "primary_category_id",
+    label: "Categoría principal",
+    type: "select",
+    options: [],
+  },
+  {
+    name: "tagline",
+    label: "Frase corta",
+    type: "text",
+    helpText: "Una línea que resume la propuesta de la empresa.",
+  },
+  { name: "description", label: "Descripción", type: "textarea" },
+  {
+    name: "verified",
+    label: "Empresa verificada",
+    type: "select",
+    options: [
+      { value: "false", label: "No verificada" },
+      { value: "true", label: "Verificada" },
+    ],
+    helpText: "Sólo cambia esto si validaste documentación.",
+  },
+];
