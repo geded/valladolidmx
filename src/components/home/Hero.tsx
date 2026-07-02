@@ -31,6 +31,9 @@ export interface HeroCta {
   href?: string;
   /** "primary" | "secondary" | "ghost" */
   variant?: string;
+  /** "xs" | "sm" | "md" | "lg" | "xl" */
+  size?: string;
+  full_width?: boolean;
 }
 
 export interface HeroConfig {
@@ -65,6 +68,10 @@ export interface HeroConfig {
   text_alignment?: string;
   /** Alineación del buscador. */
   search_alignment?: string;
+  /** "sm" | "md" | "lg" | "xl" */
+  search_size?: string;
+  /** "sm" | "md" | "lg" | "xl" | "full" */
+  search_max_width?: string;
   /** Overrides tipográficos por campo, guardados por el Experience Builder. */
   __typography?: Record<string, FieldTypography>;
 }
@@ -174,6 +181,26 @@ export function Hero({ config }: HeroProps = {}) {
   const showSearch = config?.show_search !== false;
   const searchPlaceholder = pickText(config?.search_placeholder, t("hero.search_placeholder"));
   const searchHelper = pickText(config?.search_helper, t("hero.search_helper"));
+  const searchSize = (config?.search_size ?? "md").toLowerCase();
+  const searchMaxWidth = (config?.search_max_width ?? "md").toLowerCase();
+  const searchSizeClass =
+    searchSize === "sm"
+      ? "px-3 py-1.5 text-xs gap-1.5"
+      : searchSize === "lg"
+        ? "px-5 py-3 text-base gap-3"
+        : searchSize === "xl"
+          ? "px-6 py-4 text-lg gap-3"
+          : "px-4 py-2 text-sm gap-2";
+  const searchMaxWidthClass =
+    searchMaxWidth === "sm"
+      ? "max-w-xs"
+      : searchMaxWidth === "lg"
+        ? "max-w-lg"
+        : searchMaxWidth === "xl"
+          ? "max-w-xl"
+          : searchMaxWidth === "full"
+            ? "max-w-none"
+            : "max-w-md";
 
   // Typography por campo (config.__typography[fieldKey]).
   const cfgRecord = (config ?? {}) as unknown as Record<string, unknown>;
@@ -269,13 +296,13 @@ export function Hero({ config }: HeroProps = {}) {
               role="search"
               aria-label="Búsqueda rápida"
               onSubmit={(e) => e.preventDefault()}
-              className="flex w-full max-w-md items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 shadow-sm backdrop-blur-md"
+              className={`flex w-full items-center rounded-full border border-white/25 bg-white/10 shadow-sm backdrop-blur-md ${searchSizeClass} ${searchMaxWidthClass}`}
             >
-              <Search className="size-4 shrink-0 text-white/80" aria-hidden />
+              <Search className="shrink-0 text-white/80 size-4" aria-hidden />
               <input
                 type="search"
                 placeholder={searchPlaceholder}
-                className="w-full bg-transparent text-sm text-white placeholder:text-white/70 focus:outline-none"
+                className="w-full bg-transparent text-inherit text-white placeholder:text-white/70 focus:outline-none"
                 aria-label={searchPlaceholder}
               />
               {searchHelper ? (
@@ -293,9 +320,22 @@ function HeroButton({ cta, isPrimary }: { cta: HeroCta; isPrimary: boolean }) {
   const label = cta.label ?? "";
   const href = cta.href || "#";
   const variant = cta.variant ?? (isPrimary ? "primary" : "secondary");
+  const size = (cta.size ?? "md").toLowerCase();
+  const fullWidth = cta.full_width === true;
   if (!label) return null;
-  let cls =
-    "inline-flex min-h-11 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition sm:px-6 sm:py-3";
+  const sizeCls =
+    size === "xs"
+      ? "px-2.5 py-1 text-xs gap-1"
+      : size === "sm"
+        ? "px-3 py-1.5 text-xs gap-1.5"
+        : size === "lg"
+          ? "px-6 py-3 text-base gap-2"
+          : size === "xl"
+            ? "px-8 py-4 text-lg gap-2.5"
+            : "px-5 py-2.5 text-sm gap-2 sm:px-6 sm:py-3";
+  let cls = `inline-flex items-center rounded-full font-semibold transition ${sizeCls}${
+    fullWidth ? " w-full justify-center" : ""
+  }`;
   let icon: ReactNode = null;
   if (variant === "primary") {
     cls +=
