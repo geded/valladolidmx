@@ -1,49 +1,49 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
 import { StatusBadge } from "@/components/cms/EntityListView";
-import { listBusinessesCms } from "@/lib/cms/reads.functions";
+import { listProductsCms } from "@/lib/cms/reads.functions";
 
 type Row = {
   id: string;
   slug: string;
-  display_name: string;
+  name: string;
+  product_type: string | null;
   status: string | null;
-  verified: boolean | null;
-  destination_id: string | null;
+  business_id: string | null;
   updated_at: string;
 };
 
-export const Route = createFileRoute("/_authenticated/cms/empresas")({
+export const Route = createFileRoute("/_authenticated/cms/productos/")({
   head: () => ({
     meta: [
-      { title: "Empresas · CMS Studio" },
+      { title: "Productos · CMS Studio" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-  component: EmpresasPage,
+  component: ProductosPage,
 });
 
-function EmpresasPage() {
+function ProductosPage() {
   return (
     <CmsEntityPage<Row>
-      queryKey="businesses"
-      fn={listBusinessesCms}
-      title="Empresas"
+      queryKey="products"
+      fn={listProductsCms}
+      title="Productos"
       stage="Ola 1 · Etapa 2 · Lecturas"
-      description="Fichas editoriales de empresas locales."
+      description="Experiencias, hoteles, restaurantes, eventos, tours y más."
       rowKey={(r) => r.id}
       headerActions={
         <Link
-          to="/cms/empresas/nueva"
+          to="/cms/productos/nueva"
           className="inline-flex h-9 items-center rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:bg-primary/90"
         >
-          + Nueva empresa
+          + Nuevo producto
         </Link>
       }
       columns={[
-        { key: "name", header: "Nombre", render: (r) => <span className="font-medium">{r.display_name}</span> },
+        { key: "name", header: "Nombre", render: (r) => <span className="font-medium">{r.name}</span> },
+        { key: "type", header: "Tipo", render: (r) => <span className="text-xs text-muted-foreground">{r.product_type ?? "—"}</span> },
         { key: "slug", header: "Slug", render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code> },
-        { key: "verified", header: "Verificada", render: (r) => <span className="text-xs text-muted-foreground">{r.verified ? "Sí" : "No"}</span> },
         { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
         { key: "updated", header: "Actualizado", render: (r) => <span className="text-xs text-muted-foreground">{new Date(r.updated_at).toLocaleDateString("es-MX")}</span> },
         {
@@ -51,8 +51,8 @@ function EmpresasPage() {
           header: "",
           render: (r) => (
             <Link
-              to="/cms/empresas/$businessId/editar"
-              params={{ businessId: r.id }}
+              to="/cms/productos/$productId/editar"
+              params={{ productId: r.id }}
               className="text-xs font-medium text-primary hover:underline"
             >
               Editar →
