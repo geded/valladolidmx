@@ -14,8 +14,9 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { CompositionTree } from "./composition-tree";
+import type { CompositionNode, CompositionTree } from "./composition-tree";
 import { EMPTY_TREE } from "./composition-tree";
+import { translateTreeBestEffort } from "./translate.functions";
 
 export interface CompositionSummary {
   id: string;
@@ -38,6 +39,37 @@ export interface CompositionRevisionSummary {
   revision_number: number;
   notes: string | null;
   created_at: string;
+}
+
+function mergeExistingNodeI18n(
+  incoming: CompositionNode,
+  existingById: Map<string, CompositionNode>,
+): CompositionNode {
+  const existing = existingById.get(incoming.id);
+  return {
+    ...incoming,
+    i18n: incoming.i18n ?? existing?.i18n,
+    children: incoming.children?.map((child) => mergeExistingNodeI18n(child, existingById)),
+  };
+}
+
+function mergeExistingI18n(incoming: CompositionTree, existing?: CompositionTree | null): CompositionTree {
+  if (!existing?.root?.children?.length) return incoming;
+  const existingById = new Map<string, CompositionNode>();
+  const visit = (nodes: CompositionNode[]) => {
+    for (const node of nodes) {
+      existingById.set(node.id, node);
+      if (node.children?.length) visit(node.children);
+    }
+  };
+  visit(existing.root.children);
+  return {
+    ...incoming,
+    root: {
+      ...incoming.root,
+      children: (incoming.root.children ?? []).map((node) => mergeExistingNodeI18n(node, existingById)),
+    },
+  };
 }
 
 export const listCompositions = createServerFn({ method: "GET" })
@@ -93,9 +125,26 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string; tree: CompositionTree }) => data)
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { data: existingRow } = await context.supabase
+      .from("page_compositions")
+      .select("current_draft")
+      .eq("id", data.id)
+      .maybeSingle();
+    let treeToSave = mergeExistingI18n(
+      data.tree,
+      (existingRow?.current_draft as CompositionTree | undefined) ?? null,
+    );
+
+    try {
+      const translated = await translateTreeBestEffort(treeToSave, context.supabase);
+      treeToSave = translated.tree;
+    } catch {
+      // La traducción automática nunca debe romper ni bloquear el guardado.
+    }
+
     const { error } = await context.supabase.rpc("eb_save_composition_draft", {
       _id: data.id,
-      _tree: data.tree as never,
+      _tree: treeToSave as never,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
