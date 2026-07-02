@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, ImageIcon, Languages, Monitor, Plus, Smartphone, Tablet, Trash2, Type, Upload } from "lucide-react";
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { MediaPickerDialog } from "./MediaPickerDialog";
+import { ReferencePicker } from "./ReferencePicker";
 import type {
   BlockContract,
   BlockFieldSchema,
@@ -609,8 +610,12 @@ function FieldControl({
       return <MediaControl baseClass={base} def={def} value={value} onChange={onChange} />;
     case "reference":
       return (
-        <input className={base} placeholder={`ID de ${def.references ?? "referencia"} (combobox en 15.10.5)`}
-          value={(value as string) ?? ""} onChange={(e) => onChange(e.target.value)} />
+        <ReferencePicker
+          className={base}
+          kind={def.references}
+          value={(value as string) ?? undefined}
+          onChange={(id) => onChange(id ?? "")}
+        />
       );
     case "list":
       if (def.item?.type === "object" && def.item.fields) {
