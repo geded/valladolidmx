@@ -100,6 +100,65 @@ export const BLOCK_FIELD_TYPOGRAPHY_DEFAULTS: Record<string, Record<string, Fiel
       uppercase: false,
     },
   },
+
+  // Sección genérica (layout.section) y todas las secciones vmx.section.*
+  // usan SectionHeader (h2 36px desktop, subtitle 18px).
+  "vmx.layout.section": {
+    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+    subheading: { font_family: "body", font_size: 18, font_weight: 400, line_height: 1.5, color: "#4B5563", align: "left" },
+  },
+  "vmx.section.destinos": {
+    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+  },
+  "vmx.section.categorias": {
+    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+  },
+  "vmx.section.rutas": {
+    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+  },
+  "vmx.section.consejo-alux": {
+    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+  },
+  "vmx.section.en-vivo": {
+    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+  },
+  "vmx.section.empresas": {
+    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+  },
+  "vmx.section.resenas": {
+    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+  },
+  "vmx.section.arma-tu-viaje": {
+    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#FFFFFF", align: "left" },
+    body: { font_family: "body", font_size: 18, font_weight: 400, line_height: 1.6, color: "#F5F5F5", align: "left" },
+    cta_label: { font_family: "body", font_size: 14, font_weight: 600, color: "#FFFFFF" },
+  },
+
+  // Cockpit (títulos de KPI grid, alerts y activity stream)
+  "vmx.cockpit.kpi-grid": {
+    title: { font_family: "display", font_size: 22, font_weight: 600, line_height: 1.25, color: "#0A0A0A", align: "left" },
+  },
+  "vmx.cockpit.alerts": {
+    title: { font_family: "display", font_size: 22, font_weight: 600, line_height: 1.25, color: "#0A0A0A", align: "left" },
+  },
+  "vmx.cockpit.activity-stream": {
+    title: { font_family: "display", font_size: 22, font_weight: 600, line_height: 1.25, color: "#0A0A0A", align: "left" },
+  },
+
+  // Bloque genérico de botones — label del botón
+  "vmx.actions.buttons": {
+    heading: { font_family: "display", font_size: 24, font_weight: 600, line_height: 1.2, color: "#0A0A0A", align: "left" },
+  },
+
+  // Chrome global (header / footer)
+  "vmx.chrome.header": {
+    cta_label: { font_family: "body", font_size: 14, font_weight: 600, color: "#FFFFFF" },
+  },
+  "vmx.chrome.footer": {
+    tagline: { font_family: "body", font_size: 14, font_weight: 400, line_height: 1.5, color: "#9CA3AF", align: "left" },
+    legal_label: { font_family: "body", font_size: 12, font_weight: 400, color: "#9CA3AF" },
+    privacy_label: { font_family: "body", font_size: 12, font_weight: 400, color: "#9CA3AF" },
+  },
 };
 
 export function getTypographyDefaults(
