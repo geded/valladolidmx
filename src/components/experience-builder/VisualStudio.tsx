@@ -511,6 +511,20 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
     setShowLibrary(false);
   };
 
+  const insertReusable = (entry: ReusableBlock) => {
+    if (!tree) return;
+    const node: CompositionNode = {
+      id: newNodeId(),
+      type: entry.type,
+      version: entry.version,
+      config: JSON.parse(JSON.stringify(entry.config)) as CompositionNode["config"],
+    };
+    const next = [...tree.root.children, node];
+    setTree({ ...tree, root: { children: next } });
+    setSelectedId(node.id);
+    setShowLibrary(false);
+  };
+
   const refreshVersions = async () => {
     if (!page) return;
     const revs = await listRevs({ data: { id: page.id } });
