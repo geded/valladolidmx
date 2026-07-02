@@ -111,6 +111,30 @@ async function assertEditorial(context: { supabase: any; userId: string }) {
   if (!data) throw new Error("forbidden");
 }
 
+/**
+ * assertCanEditBusiness — Autoriza a admins/editores O a dueños (>= editor
+ * en `business_users`) para operar sobre una empresa existente. Para
+ * creación (`businessId` ausente) sólo permite admins/editores.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function assertCanEditBusiness(
+  context: { supabase: any; userId: string },
+  businessId?: string | null,
+) {
+  const { data: editorial } = await context.supabase.rpc(
+    "is_editor_or_admin",
+    { _user_id: context.userId },
+  );
+  if (editorial) return;
+  if (!businessId) throw new Error("forbidden");
+  const { data: owns } = await context.supabase.rpc("has_business_access", {
+    _user_id: context.userId,
+    _business_id: businessId,
+    _min_role: "editor",
+  });
+  if (!owns) throw new Error("forbidden");
+}
+
 function assertEditableTable(t: string): asserts t is EditableTable {
   if (!(EDITABLE_TABLES as readonly string[]).includes(t)) {
     throw new Error(`table_not_editable:${t}`);
