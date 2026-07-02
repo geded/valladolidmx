@@ -218,47 +218,54 @@ function getSeoConfig(tree: CompositionTree): CompositionJsonObject {
 
 interface SitePage {
   key: string;
+  slug: string;
+  page_type: string;
   title: string;
   description: string;
   publicPath: string;
   status: "editable" | "soon";
   soonLabel?: string;
+  custom?: boolean;
 }
 
-type HomeSummary = {
+type CompoSummary = {
   id: string;
   slug: string;
   status: string;
   page_type: string;
+  title?: string;
 };
 
-function pickCanonicalHomeComposition<T extends HomeSummary>(items: T[]): T | null {
+function pickCompositionBySlug<T extends CompoSummary>(items: T[], slug: string, pageType: string): T | null {
   return (
-    items.find((item) => item.slug === "home" && item.page_type === "home") ??
-    items.find((item) => item.slug === "home") ??
-    items.find((item) => item.page_type === "home" && item.status === "published") ??
-    items.find((item) => item.page_type === "home") ??
+    items.find((item) => item.slug === slug && item.page_type === pageType) ??
+    items.find((item) => item.slug === slug) ??
     null
   );
 }
 
 const SITE_PAGES: SitePage[] = [
-  {
-    key: "home",
-    title: "Inicio",
+  { key: "home", slug: "home", page_type: "home", title: "Inicio",
     description: "Página principal que ve todo visitante al llegar a Valladolid.mx.",
-    publicPath: "/",
-    status: "editable",
-  },
-  { key: "experiencias", title: "Experiencias", description: "Catálogo de experiencias turísticas.", publicPath: "/experiencias", status: "soon", soonLabel: "US-04" },
-  { key: "hoteles", title: "Hoteles", description: "Hospedaje disponible en el destino.", publicPath: "/hoteles", status: "soon", soonLabel: "US-04" },
-  { key: "restaurantes", title: "Restaurantes", description: "Gastronomía local y recomendada.", publicPath: "/restaurantes", status: "soon", soonLabel: "US-04" },
-  { key: "eventos", title: "Eventos", description: "Agenda de eventos y actividades.", publicPath: "/eventos", status: "soon", soonLabel: "US-04" },
-  { key: "empresas", title: "Empresas", description: "Directorio de empresas locales.", publicPath: "/empresas", status: "soon", soonLabel: "US-04" },
-  { key: "marketplace", title: "Marketplace", description: "Tienda y reservaciones.", publicPath: "/marketplace", status: "soon", soonLabel: "US-05" },
-  { key: "arma-tu-viaje", title: "Arma tu viaje", description: "Planificador interactivo del viaje.", publicPath: "/arma-tu-viaje", status: "soon", soonLabel: "US-05" },
-  { key: "alux", title: "Alux (IA)", description: "Superficie de conversación con Alux.", publicPath: "/alux", status: "soon", soonLabel: "US-05" },
-  { key: "oriente-maya", title: "Oriente Maya", description: "Portal territorial del Oriente Maya.", publicPath: "/oriente-maya", status: "soon", soonLabel: "US-05" },
+    publicPath: "/", status: "editable" },
+  { key: "experiencias", slug: "experiencias", page_type: "landing", title: "Experiencias",
+    description: "Catálogo de experiencias turísticas.", publicPath: "/p/experiencias", status: "editable" },
+  { key: "hoteles", slug: "hoteles", page_type: "landing", title: "Hoteles",
+    description: "Hospedaje disponible en el destino.", publicPath: "/p/hoteles", status: "editable" },
+  { key: "restaurantes", slug: "restaurantes", page_type: "landing", title: "Restaurantes",
+    description: "Gastronomía local y recomendada.", publicPath: "/p/restaurantes", status: "editable" },
+  { key: "eventos", slug: "eventos", page_type: "landing", title: "Eventos",
+    description: "Agenda de eventos y actividades.", publicPath: "/p/eventos", status: "editable" },
+  { key: "empresas", slug: "empresas", page_type: "landing", title: "Empresas",
+    description: "Directorio de empresas locales.", publicPath: "/p/empresas", status: "editable" },
+  { key: "marketplace", slug: "marketplace", page_type: "landing", title: "Marketplace",
+    description: "Tienda y reservaciones.", publicPath: "/p/marketplace", status: "editable" },
+  { key: "arma-tu-viaje", slug: "arma-tu-viaje", page_type: "landing", title: "Arma tu viaje",
+    description: "Planificador interactivo del viaje.", publicPath: "/p/arma-tu-viaje", status: "editable" },
+  { key: "alux", slug: "alux", page_type: "landing", title: "Alux (IA)",
+    description: "Superficie de conversación con Alux.", publicPath: "/p/alux", status: "editable" },
+  { key: "oriente-maya", slug: "oriente-maya", page_type: "landing", title: "Oriente Maya",
+    description: "Portal territorial del Oriente Maya.", publicPath: "/p/oriente-maya", status: "editable" },
 ];
 
 export interface VisualStudioProps {
