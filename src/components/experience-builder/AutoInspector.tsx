@@ -648,16 +648,30 @@ function MediaControl({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [importing, setImporting] = useState(false);
   const importFn = useServerFn(importUrlToStudioMedia);
-  // Detecta imágenes que aún no viven en la Biblioteca del Studio:
-  // URLs http(s) externas, assets del bundle (/assets/…, /__l5e/…),
-  // rutas relativas del proyecto (/img.jpg) y data: URIs.
-  // Excluye las que ya son del bucket studio-media.
+  // El botón "Guardar en Biblioteca" SÓLO aparece cuando la imagen viene
+  // desde el código del sitio (assets del bundle: /assets/…, /__l5e/…,
+  // /src/assets/…). No aparece para URLs externas pegadas por el usuario,
+  // para `data:` URIs recién subidas, ni para archivos que ya viven en el
+  // bucket studio-media (biblioteca).
+  const isBundleAssetPath = (raw: string): boolean => {
+    let path = raw;
+    if (/^https?:\/\//i.test(raw)) {
+      try {
+        const u = new URL(raw);
+        if (typeof window !== "undefined" && u.origin !== window.location.origin) {
+          return false;
+        }
+        path = u.pathname;
+      } catch {
+        return false;
+      }
+    }
+    return /^\/(assets|__l5e|src\/assets)\//i.test(path);
+  };
   const isImportable =
     !!v &&
     !v.includes("/api/public/studio-media/") &&
-    (/^https?:\/\//i.test(v) ||
-      /^data:image\//i.test(v) ||
-      /^\/(?!api\/public\/studio-media\/)/i.test(v));
+    isBundleAssetPath(v);
   const handleImport = async () => {
     if (!v || importing) return;
     setImporting(true);
