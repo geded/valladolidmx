@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { EntityEditor } from "@/components/cms/EntityEditor";
 import { CATEGORY_FIELDS } from "@/lib/cms/editor-fields";
 
-export const Route = createFileRoute("/_authenticated/cms/categorias/editar")({
+export const Route = createFileRoute("/_authenticated/cms/categorias/$id/editar")({
   head: () => ({
     meta: [
       { title: "Editar categoría · CMS Studio" },
