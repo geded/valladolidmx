@@ -146,24 +146,45 @@ const headerChromeContract: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Encabezado",
-  description: "Navegación superior pública del sitio.",
+  description:
+    "Barra superior del sitio. Compartida por todas las páginas. Cada campo aquí abajo indica dónde aparece.",
   schema: {
     nav: {
       type: "list",
-      label: "Menú principal",
+      label: "Menú principal (enlaces del centro/derecha del header)",
+      description:
+        "Los enlaces que se ven en la barra superior, junto al logotipo. Se muestran de izquierda a derecha en el orden de esta lista.",
       item: {
         type: "object",
         label: "Enlace",
         fields: {
-          label: { type: "text", label: "Texto", required: true },
-          href: { type: "url", label: "Enlace", required: true },
+          label: { type: "text", label: "Texto visible", required: true, description: "Lo que lee el visitante (ej. \"Destinos\")." },
+          href: { type: "url", label: "A dónde va", required: true, description: "URL destino (ej. /destinos)." },
         },
       },
     },
-    cta_label: { type: "text", label: "Botón destacado — texto" },
-    cta_href: { type: "url", label: "Botón destacado — enlace" },
-    show_language: { type: "boolean", label: "Mostrar idiomas", default: true },
-    show_user_menu: { type: "boolean", label: "Mostrar acceso de usuario", default: true },
+    cta_label: {
+      type: "text",
+      label: "Botón destacado — texto",
+      description: "Botón resaltado a la derecha del header. Ej.: \"Arma tu viaje\". Déjalo vacío para ocultarlo.",
+    },
+    cta_href: {
+      type: "url",
+      label: "Botón destacado — enlace",
+      description: "Enlace del botón destacado del header.",
+    },
+    show_language: {
+      type: "boolean",
+      label: "Mostrar selector de idiomas",
+      default: true,
+      description: "Muestra el globo de idiomas en el extremo derecho del header.",
+    },
+    show_user_menu: {
+      type: "boolean",
+      label: "Mostrar acceso de usuario",
+      default: true,
+      description: "Muestra el avatar/menú de sesión (Iniciar sesión / Mi cuenta) a la derecha del header.",
+    },
   },
   capabilities: { soporta_preview: true, soporta_i18n: true },
 };
@@ -173,36 +194,56 @@ const footerChromeContract: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Pie de página",
-  description: "Contenido inferior público del sitio.",
+  description:
+    "Franja inferior del sitio. Compartida por todas las páginas. Cada campo aquí abajo indica en qué parte del pie aparece.",
   schema: {
-    tagline: { type: "text", label: "Descripción" },
+    tagline: {
+      type: "text",
+      label: "Descripción bajo el logotipo",
+      description: "Frase corta que aparece debajo del logotipo, en la primera columna del pie.",
+    },
     explore_links: {
       type: "list",
-      label: "Columna Explorar",
+      label: "Columna \"Explorar\" (2ª columna)",
+      description: "Enlaces de la segunda columna del pie. Se listan verticalmente.",
       item: {
         type: "object",
         label: "Enlace",
         fields: {
-          label: { type: "text", label: "Texto", required: true },
-          href: { type: "url", label: "Enlace", required: true },
+          label: { type: "text", label: "Texto visible", required: true },
+          href: { type: "url", label: "A dónde va", required: true },
         },
       },
     },
     platform_links: {
       type: "list",
-      label: "Columna Plataforma",
+      label: "Columna \"Plataforma\" (3ª columna)",
+      description: "Enlaces de la tercera columna del pie.",
       item: {
         type: "object",
         label: "Enlace",
         fields: {
-          label: { type: "text", label: "Texto", required: true },
-          href: { type: "url", label: "Enlace", required: true },
+          label: { type: "text", label: "Texto visible", required: true },
+          href: { type: "url", label: "A dónde va", required: true },
         },
       },
     },
-    legal_label: { type: "text", label: "Texto legal" },
-    privacy_label: { type: "text", label: "Texto privacidad" },
-    show_language: { type: "boolean", label: "Mostrar idiomas", default: true },
+    legal_label: {
+      type: "text",
+      label: "Texto legal (barra inferior · izquierda)",
+      description: "Aparece en la franja inferior del pie, a la izquierda (ej. \"© 2026 Valladolid.mx\").",
+    },
+    privacy_label: {
+      type: "text",
+      label: "Texto privacidad (barra inferior · derecha)",
+      description: "Enlace corto de la franja inferior a la derecha (ej. \"Privacidad\").",
+    },
+    show_language: {
+      type: "boolean",
+      label: "Mostrar selector de idiomas",
+      default: true,
+      description: "Muestra el selector de idiomas en la barra inferior del pie.",
+    },
   },
   capabilities: { soporta_preview: true, soporta_i18n: true },
 };
