@@ -1294,6 +1294,14 @@ function PageVisualEditor({
 
 const HOME_CANVAS_WIDTH = 1280;
 
+/** Anchos de canvas por dispositivo (px CSS reales, no escalados). */
+export type DeviceViewport = "mobile" | "tablet" | "desktop";
+const DEVICE_WIDTHS: Record<DeviceViewport, number> = {
+  mobile: 390,
+  tablet: 768,
+  desktop: 1280,
+};
+
 function HomeCanvas({
   tree,
   previewMode,
