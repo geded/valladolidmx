@@ -24,6 +24,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index'
 import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
+import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
 import { Route as MarketplaceBuscarRouteImport } from './routes/marketplace/buscar'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
@@ -172,6 +173,11 @@ const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
 const PreviewTokenRoute = PreviewTokenRouteImport.update({
   id: '/preview/$token',
   path: '/preview/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PSlugRoute = PSlugRouteImport.update({
+  id: '/p/$slug',
+  path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrienteMayaDestinoRoute = OrienteMayaDestinoRouteImport.update({
@@ -632,6 +638,7 @@ export interface FileRoutesByFullPath {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
@@ -718,6 +725,7 @@ export interface FileRoutesByTo {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
@@ -810,6 +818,7 @@ export interface FileRoutesById {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
@@ -903,6 +912,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
+    | '/p/$slug'
     | '/preview/$token'
     | '/marketplace/'
     | '/oriente-maya/'
@@ -989,6 +999,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
+    | '/p/$slug'
     | '/preview/$token'
     | '/marketplace'
     | '/oriente-maya'
@@ -1080,6 +1091,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/marketplace/buscar'
     | '/oriente-maya/$destino'
+    | '/p/$slug'
     | '/preview/$token'
     | '/marketplace/'
     | '/oriente-maya/'
@@ -1165,6 +1177,7 @@ export interface RootRouteChildren {
   MarketplaceSlugRoute: typeof MarketplaceSlugRoute
   MarketplaceBuscarRoute: typeof MarketplaceBuscarRoute
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRoute
+  PSlugRoute: typeof PSlugRoute
   PreviewTokenRoute: typeof PreviewTokenRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
@@ -1279,6 +1292,13 @@ declare module '@tanstack/react-router' {
       path: '/preview/$token'
       fullPath: '/preview/$token'
       preLoaderRoute: typeof PreviewTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/p/$slug': {
+      id: '/p/$slug'
+      path: '/p/$slug'
+      fullPath: '/p/$slug'
+      preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/oriente-maya/$destino': {
@@ -2095,6 +2115,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceSlugRoute: MarketplaceSlugRoute,
   MarketplaceBuscarRoute: MarketplaceBuscarRoute,
   OrienteMayaDestinoRoute: OrienteMayaDestinoRoute,
+  PSlugRoute: PSlugRoute,
   PreviewTokenRoute: PreviewTokenRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,

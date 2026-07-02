@@ -218,47 +218,54 @@ function getSeoConfig(tree: CompositionTree): CompositionJsonObject {
 
 interface SitePage {
   key: string;
+  slug: string;
+  page_type: string;
   title: string;
   description: string;
   publicPath: string;
   status: "editable" | "soon";
   soonLabel?: string;
+  custom?: boolean;
 }
 
-type HomeSummary = {
+type CompoSummary = {
   id: string;
   slug: string;
   status: string;
   page_type: string;
+  title?: string;
 };
 
-function pickCanonicalHomeComposition<T extends HomeSummary>(items: T[]): T | null {
+function pickCompositionBySlug<T extends CompoSummary>(items: T[], slug: string, pageType: string): T | null {
   return (
-    items.find((item) => item.slug === "home" && item.page_type === "home") ??
-    items.find((item) => item.slug === "home") ??
-    items.find((item) => item.page_type === "home" && item.status === "published") ??
-    items.find((item) => item.page_type === "home") ??
+    items.find((item) => item.slug === slug && item.page_type === pageType) ??
+    items.find((item) => item.slug === slug) ??
     null
   );
 }
 
 const SITE_PAGES: SitePage[] = [
-  {
-    key: "home",
-    title: "Inicio",
+  { key: "home", slug: "home", page_type: "home", title: "Inicio",
     description: "Página principal que ve todo visitante al llegar a Valladolid.mx.",
-    publicPath: "/",
-    status: "editable",
-  },
-  { key: "experiencias", title: "Experiencias", description: "Catálogo de experiencias turísticas.", publicPath: "/experiencias", status: "soon", soonLabel: "US-04" },
-  { key: "hoteles", title: "Hoteles", description: "Hospedaje disponible en el destino.", publicPath: "/hoteles", status: "soon", soonLabel: "US-04" },
-  { key: "restaurantes", title: "Restaurantes", description: "Gastronomía local y recomendada.", publicPath: "/restaurantes", status: "soon", soonLabel: "US-04" },
-  { key: "eventos", title: "Eventos", description: "Agenda de eventos y actividades.", publicPath: "/eventos", status: "soon", soonLabel: "US-04" },
-  { key: "empresas", title: "Empresas", description: "Directorio de empresas locales.", publicPath: "/empresas", status: "soon", soonLabel: "US-04" },
-  { key: "marketplace", title: "Marketplace", description: "Tienda y reservaciones.", publicPath: "/marketplace", status: "soon", soonLabel: "US-05" },
-  { key: "arma-tu-viaje", title: "Arma tu viaje", description: "Planificador interactivo del viaje.", publicPath: "/arma-tu-viaje", status: "soon", soonLabel: "US-05" },
-  { key: "alux", title: "Alux (IA)", description: "Superficie de conversación con Alux.", publicPath: "/alux", status: "soon", soonLabel: "US-05" },
-  { key: "oriente-maya", title: "Oriente Maya", description: "Portal territorial del Oriente Maya.", publicPath: "/oriente-maya", status: "soon", soonLabel: "US-05" },
+    publicPath: "/", status: "editable" },
+  { key: "experiencias", slug: "experiencias", page_type: "landing", title: "Experiencias",
+    description: "Catálogo de experiencias turísticas.", publicPath: "/p/experiencias", status: "editable" },
+  { key: "hoteles", slug: "hoteles", page_type: "landing", title: "Hoteles",
+    description: "Hospedaje disponible en el destino.", publicPath: "/p/hoteles", status: "editable" },
+  { key: "restaurantes", slug: "restaurantes", page_type: "landing", title: "Restaurantes",
+    description: "Gastronomía local y recomendada.", publicPath: "/p/restaurantes", status: "editable" },
+  { key: "eventos", slug: "eventos", page_type: "landing", title: "Eventos",
+    description: "Agenda de eventos y actividades.", publicPath: "/p/eventos", status: "editable" },
+  { key: "empresas", slug: "empresas", page_type: "landing", title: "Empresas",
+    description: "Directorio de empresas locales.", publicPath: "/p/empresas", status: "editable" },
+  { key: "marketplace", slug: "marketplace", page_type: "landing", title: "Marketplace",
+    description: "Tienda y reservaciones.", publicPath: "/p/marketplace", status: "editable" },
+  { key: "arma-tu-viaje", slug: "arma-tu-viaje", page_type: "landing", title: "Arma tu viaje",
+    description: "Planificador interactivo del viaje.", publicPath: "/p/arma-tu-viaje", status: "editable" },
+  { key: "alux", slug: "alux", page_type: "landing", title: "Alux (IA)",
+    description: "Superficie de conversación con Alux.", publicPath: "/p/alux", status: "editable" },
+  { key: "oriente-maya", slug: "oriente-maya", page_type: "landing", title: "Oriente Maya",
+    description: "Portal territorial del Oriente Maya.", publicPath: "/p/oriente-maya", status: "editable" },
 ];
 
 export interface VisualStudioProps {
@@ -270,33 +277,153 @@ export interface VisualStudioProps {
 
 export function VisualStudio({ page = null, onSelectPage, advanced = false }: VisualStudioProps = {}) {
   const [internalKey, setInternalKey] = useState<string | null>(page);
+  const [customPages, setCustomPages] = useState<SitePage[]>([]);
   const openKey = page ?? internalKey;
   const setOpen = (k: string | null) => {
     setInternalKey(k);
     onSelectPage?.(k);
   };
-  if (openKey === "home") {
-    return <HomeVisualEditor onExit={() => setOpen(null)} advanced={advanced} />;
+  const allPages = useMemo(() => [...SITE_PAGES, ...customPages], [customPages]);
+  const activePage = openKey ? allPages.find((p) => p.key === openKey) ?? null : null;
+  if (activePage) {
+    return <PageVisualEditor pageDef={activePage} onExit={() => setOpen(null)} advanced={advanced} />;
   }
-  return <PagesPicker onOpen={(k) => setOpen(k)} />;
+  return (
+    <PagesPicker
+      customPages={customPages}
+      onOpen={(k) => setOpen(k)}
+      onCreated={(p) => {
+        setCustomPages((prev) => (prev.some((x) => x.key === p.key) ? prev : [...prev, p]));
+        setOpen(p.key);
+      }}
+    />
+  );
 }
 
 /* --------------------------------------------------------------------- */
 
-function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
+function PagesPicker({
+  onOpen,
+  customPages,
+  onCreated,
+}: {
+  onOpen: (key: string) => void;
+  customPages: SitePage[];
+  onCreated: (page: SitePage) => void;
+}) {
+  const listAll = useServerFn(listCompositions);
+  const create = useServerFn(createComposition);
+  const [showCreate, setShowCreate] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [dbPages, setDbPages] = useState<SitePage[]>([]);
+  const knownKeys = useMemo(
+    () => new Set([...SITE_PAGES.map((p) => p.key), ...customPages.map((p) => p.key)]),
+    [customPages],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const all = await listAll();
+        if (cancelled) return;
+        const extras: SitePage[] = all
+          .filter((c) => !knownKeys.has(c.slug))
+          .map((c) => ({
+            key: c.slug,
+            slug: c.slug,
+            page_type: c.page_type,
+            title: c.title,
+            description: c.description ?? "Página personalizada creada desde el editor.",
+            publicPath: `/p/${c.slug}`,
+            status: "editable" as const,
+            custom: true,
+          }));
+        setDbPages(extras);
+      } catch {
+        /* silencioso — el picker sigue funcionando */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [listAll, knownKeys]);
+
+  const allPages = useMemo(
+    () => [...SITE_PAGES, ...customPages, ...dbPages],
+    [customPages, dbPages],
+  );
+
+  const handleCreate = async (form: { title: string; slug: string; description: string }) => {
+    setCreating(true);
+    setCreateError(null);
+    try {
+      const cleanSlug = form.slug
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9-]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      if (!cleanSlug) {
+        setCreateError("El identificador (slug) no puede quedar vacío.");
+        setCreating(false);
+        return;
+      }
+      if (allPages.some((p) => p.slug === cleanSlug)) {
+        setCreateError(`Ya existe una página con el identificador "${cleanSlug}".`);
+        setCreating(false);
+        return;
+      }
+      await create({
+        data: {
+          slug: cleanSlug,
+          title: form.title.trim() || cleanSlug,
+          description: form.description.trim() || undefined,
+          page_type: "landing",
+        },
+      });
+      const created: SitePage = {
+        key: cleanSlug,
+        slug: cleanSlug,
+        page_type: "landing",
+        title: form.title.trim() || cleanSlug,
+        description: form.description.trim() || "Página personalizada creada desde el editor.",
+        publicPath: `/p/${cleanSlug}`,
+        status: "editable",
+        custom: true,
+      };
+      setShowCreate(false);
+      onCreated(created);
+    } catch (e) {
+      setCreateError((e as Error).message);
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-4">
-      <header className="max-w-2xl">
-        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Elige una página</p>
-        <h2 className="mt-2 text-2xl font-semibold">¿Qué página quieres editar?</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Selecciona cualquier página del sitio para verla y modificarla tal como la ven los visitantes.
-          En esta entrega la <strong>página de Inicio</strong> ya es editable. El resto se irá habilitando en las próximas historias.
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div className="max-w-2xl">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Elige una página</p>
+          <h2 className="mt-2 text-2xl font-semibold">¿Qué página quieres editar?</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Selecciona cualquier página del sitio para verla y modificarla tal como la ven los visitantes.
+            Todas las secciones ya son editables desde aquí; también puedes crear nuevas landing pages
+            (videomapping, campañas, eventos especiales) y publicarlas en <code>/p/&lt;identificador&gt;</code>.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowCreate(true)}
+          className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:opacity-95"
+        >
+          <Plus className="size-3.5" aria-hidden /> Crear nueva página
+        </button>
       </header>
 
       <section className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {SITE_PAGES.map((p) => {
+        {allPages.map((p) => {
           const editable = p.status === "editable";
           const openPage = () => editable && onOpen(p.key);
           const cardBase = "flex h-full flex-col justify-between rounded-2xl border p-5 text-left transition-colors";
@@ -322,7 +449,11 @@ function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="text-base font-semibold">{p.title}</h3>
-                  {editable ? (
+                  {p.custom ? (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-background px-2 py-0.5 text-[10px] font-semibold text-primary">
+                      Nueva
+                    </span>
+                  ) : editable ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
                       <Pencil className="size-2.5" aria-hidden /> Editable
                     </span>
@@ -366,14 +497,153 @@ function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
             </div>
           );
         })}
+        <button
+          type="button"
+          onClick={() => setShowCreate(true)}
+          className="flex h-full min-h-[180px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-primary/40 bg-background p-5 text-center transition-colors hover:bg-primary/5"
+        >
+          <span className="inline-flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground">
+            <Plus className="size-4" aria-hidden />
+          </span>
+          <span className="text-sm font-semibold">Crear nueva página</span>
+          <span className="max-w-[220px] text-[11px] text-muted-foreground">
+            Landing pages para videomapping, campañas, eventos especiales, promociones…
+          </span>
+        </button>
       </section>
+      {showCreate ? (
+        <CreatePageModal
+          busy={creating}
+          error={createError}
+          onCancel={() => setShowCreate(false)}
+          onSubmit={handleCreate}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function CreatePageModal({
+  busy, error, onCancel, onSubmit,
+}: {
+  busy: boolean;
+  error: string | null;
+  onCancel: () => void;
+  onSubmit: (form: { title: string; slug: string; description: string }) => void | Promise<void>;
+}) {
+  const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
+  const [description, setDescription] = useState("");
+  const slugTouched = useRef(false);
+  const slugify = (value: string) =>
+    value
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-xl border border-border bg-card p-4 shadow-2xl">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Nueva página</p>
+            <h3 className="text-sm font-semibold">Crear una landing page</h3>
+          </div>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+            aria-label="Cerrar"
+          >
+            <X className="size-4" aria-hidden />
+          </button>
+        </div>
+        <form
+          className="space-y-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void onSubmit({ title, slug, description });
+          }}
+        >
+          <label className="block text-xs font-medium">
+            Título
+            <input
+              type="text"
+              value={title}
+              placeholder="Ej. Videomapping Centro Histórico"
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (!slugTouched.current) setSlug(slugify(e.target.value));
+              }}
+              className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+              required
+              autoFocus
+            />
+          </label>
+          <label className="block text-xs font-medium">
+            Identificador (URL)
+            <div className="mt-1 flex items-center gap-1">
+              <span className="rounded-md bg-muted px-2 py-1.5 text-xs text-muted-foreground">/p/</span>
+              <input
+                type="text"
+                value={slug}
+                placeholder="videomapping-centro"
+                onChange={(e) => {
+                  slugTouched.current = true;
+                  setSlug(slugify(e.target.value));
+                }}
+                className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm font-mono"
+                required
+              />
+            </div>
+            <span className="mt-1 block text-[10px] text-muted-foreground">
+              Solo minúsculas, números y guiones. Ejemplo: <code>videomapping-centro</code>.
+            </span>
+          </label>
+          <label className="block text-xs font-medium">
+            Descripción interna (opcional)
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="mt-1 min-h-[70px] w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+            />
+          </label>
+          {error ? <p className="text-xs text-destructive">{error}</p> : null}
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={busy}
+              className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:opacity-95 disabled:opacity-60"
+            >
+              {busy ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : <Plus className="size-3.5" aria-hidden />}
+              Crear y abrir editor
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
 
 /* --------------------------------------------------------------------- */
 
-function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; advanced?: boolean }) {
+function PageVisualEditor({
+  pageDef,
+  onExit,
+  advanced = false,
+}: {
+  pageDef: SitePage;
+  onExit: () => void;
+  advanced?: boolean;
+}) {
   const list = useServerFn(listCompositions);
   const get = useServerFn(getComposition);
   const create = useServerFn(createComposition);
@@ -402,12 +672,19 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
     void (async () => {
       try {
         const all = await list();
-        const home = pickCanonicalHomeComposition(all);
+        const existing = pickCompositionBySlug(all, pageDef.slug, pageDef.page_type);
         let detail: CompositionDetail | null = null;
-        if (home) {
-          detail = (await get({ data: { id: home.id } })) as CompositionDetail | null;
+        if (existing) {
+          detail = (await get({ data: { id: existing.id } })) as CompositionDetail | null;
         } else {
-          const { id } = await create({ data: { slug: "home", title: "Página de Inicio", page_type: "home" } });
+          const { id } = await create({
+            data: {
+              slug: pageDef.slug,
+              title: pageDef.title,
+              page_type: pageDef.page_type,
+              description: pageDef.description,
+            },
+          });
           detail = (await get({ data: { id } })) as CompositionDetail | null;
         }
         if (cancelled || !detail) return;
@@ -420,7 +697,7 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
     return () => {
       cancelled = true;
     };
-  }, [list, get, create]);
+  }, [list, get, create, pageDef.slug, pageDef.page_type, pageDef.title, pageDef.description]);
 
   const saveTimer = useRef<number | null>(null);
   useEffect(() => {
@@ -476,8 +753,11 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
     try {
       await save({ data: { id: page.id, tree } });
       await publish({ data: { id: page.id, notes: "Publicado desde Modo Visual" } });
-      await queryClient.invalidateQueries({ queryKey: ["eb", "published-home", "default"] });
-      setMessage("Cambios publicados en el sitio.");
+      if (pageDef.page_type === "home") {
+        await queryClient.invalidateQueries({ queryKey: ["eb", "published-home", "default"] });
+      }
+      await queryClient.invalidateQueries({ queryKey: ["eb", "published-by-slug", pageDef.slug] });
+      setMessage(`Cambios publicados en ${pageDef.publicPath}.`);
       if (showVersions) void refreshVersions();
     } catch (e) {
       setMessage(`No se pudo publicar: ${(e as Error).message}`);
@@ -610,7 +890,7 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
   };
 
   if (loadError) return <FullScreenState title="No se pudo abrir el editor" detail={loadError} onExit={onExit} />;
-  if (!page || !tree) return <FullScreenState title="Preparando el editor…" detail="Cargando tu página de Inicio." spinner onExit={onExit} />;
+  if (!page || !tree) return <FullScreenState title="Preparando el editor…" detail={`Cargando ${pageDef.title}.`} spinner onExit={onExit} />;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -626,7 +906,8 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
         </button>
         <div className="min-w-0">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Editando</p>
-          <h1 className="truncate text-sm font-semibold">Página de Inicio</h1>
+          <h1 className="truncate text-sm font-semibold">{pageDef.title}</h1>
+          <p className="truncate text-[10px] text-muted-foreground">{pageDef.publicPath}</p>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <SaveIndicator status={saveStatus} />
@@ -667,7 +948,7 @@ function HomeVisualEditor({ onExit, advanced = false }: { onExit: () => void; ad
             Versiones
           </button>
           <a
-            href="/"
+            href={pageDef.publicPath}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
