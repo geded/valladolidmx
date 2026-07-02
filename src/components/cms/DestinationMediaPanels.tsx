@@ -16,8 +16,7 @@ import {
   signDestinationImageUpload,
 } from "@/lib/cms/destinations-media.functions";
 import {
-  compressImageIfNeeded,
-  validateImageFile,
+  prepareImageForRole,
   withRetry,
 } from "@/lib/cms/image-upload";
 
@@ -49,9 +48,7 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
   };
 
   const uploadOne = async (file: File, role: "hero" | "gallery") => {
-    const invalid = validateImageFile(file);
-    if (invalid) throw new Error(invalid.reason);
-    const prepared = await compressImageIfNeeded(file);
+    const prepared = await prepareImageForRole(file, role);
     await withRetry(async () => {
       const signed = await signFn({
         data: {
