@@ -102,6 +102,7 @@ import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/
 import { Route as ApiPublicPaymentsProviderWebhookRouteImport } from './routes/api/public/payments/$provider/webhook'
 import { Route as AuthenticatedCuentaConciergeCaseIdEvaluarRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId.evaluar'
 import { Route as AuthenticatedCmsReviewsIdModerarRouteImport } from './routes/_authenticated/cms/reviews.$id.moderar'
+import { Route as AuthenticatedCmsEmpresasBusinessIdEditarRouteImport } from './routes/_authenticated/cms/empresas.$businessId.editar'
 import { Route as AuthenticatedCmsDestinosDestinationIdEditarRouteImport } from './routes/_authenticated/cms/destinos.$destinationId.editar'
 
 const RestaurantesRoute = RestaurantesRouteImport.update({
@@ -626,6 +627,12 @@ const AuthenticatedCmsReviewsIdModerarRoute =
     path: '/reviews/$id/moderar',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsEmpresasBusinessIdEditarRoute =
+  AuthenticatedCmsEmpresasBusinessIdEditarRouteImport.update({
+    id: '/$businessId/editar',
+    path: '/$businessId/editar',
+    getParentRoute: () => AuthenticatedCmsEmpresasRoute,
+  } as any)
 const AuthenticatedCmsDestinosDestinationIdEditarRoute =
   AuthenticatedCmsDestinosDestinationIdEditarRouteImport.update({
     id: '/$destinationId/editar',
@@ -724,6 +731,7 @@ export interface FileRoutesByFullPath {
   '/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
   '/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
+  '/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
@@ -813,6 +821,7 @@ export interface FileRoutesByTo {
   '/portal/empresas': typeof AuthenticatedPortalEmpresasIndexRoute
   '/portal/invitaciones': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
+  '/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
@@ -910,6 +919,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
   '/_authenticated/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/_authenticated/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
+  '/_authenticated/cms/empresas/$businessId/editar': typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
   '/_authenticated/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/_authenticated/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
@@ -1007,6 +1017,7 @@ export interface FileRouteTypes {
     | '/portal/empresas/'
     | '/portal/invitaciones/'
     | '/cms/destinos/$destinationId/editar'
+    | '/cms/empresas/$businessId/editar'
     | '/cms/reviews/$id/moderar'
     | '/cuenta/concierge/$caseId/evaluar'
     | '/api/public/payments/$provider/webhook'
@@ -1096,6 +1107,7 @@ export interface FileRouteTypes {
     | '/portal/empresas'
     | '/portal/invitaciones'
     | '/cms/destinos/$destinationId/editar'
+    | '/cms/empresas/$businessId/editar'
     | '/cms/reviews/$id/moderar'
     | '/cuenta/concierge/$caseId/evaluar'
     | '/api/public/payments/$provider/webhook'
@@ -1192,6 +1204,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/empresas/'
     | '/_authenticated/portal/invitaciones/'
     | '/_authenticated/cms/destinos/$destinationId/editar'
+    | '/_authenticated/cms/empresas/$businessId/editar'
     | '/_authenticated/cms/reviews/$id/moderar'
     | '/_authenticated/cuenta/concierge/$caseId/evaluar'
     | '/api/public/payments/$provider/webhook'
@@ -1879,6 +1892,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsReviewsIdModerarRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/empresas/$businessId/editar': {
+      id: '/_authenticated/cms/empresas/$businessId/editar'
+      path: '/$businessId/editar'
+      fullPath: '/cms/empresas/$businessId/editar'
+      preLoaderRoute: typeof AuthenticatedCmsEmpresasBusinessIdEditarRouteImport
+      parentRoute: typeof AuthenticatedCmsEmpresasRoute
+    }
     '/_authenticated/cms/destinos/$destinationId/editar': {
       id: '/_authenticated/cms/destinos/$destinationId/editar'
       path: '/$destinationId/editar'
@@ -2074,11 +2094,14 @@ const AuthenticatedCmsDestinosRouteWithChildren =
 
 interface AuthenticatedCmsEmpresasRouteChildren {
   AuthenticatedCmsEmpresasNuevaRoute: typeof AuthenticatedCmsEmpresasNuevaRoute
+  AuthenticatedCmsEmpresasBusinessIdEditarRoute: typeof AuthenticatedCmsEmpresasBusinessIdEditarRoute
 }
 
 const AuthenticatedCmsEmpresasRouteChildren: AuthenticatedCmsEmpresasRouteChildren =
   {
     AuthenticatedCmsEmpresasNuevaRoute: AuthenticatedCmsEmpresasNuevaRoute,
+    AuthenticatedCmsEmpresasBusinessIdEditarRoute:
+      AuthenticatedCmsEmpresasBusinessIdEditarRoute,
   }
 
 const AuthenticatedCmsEmpresasRouteWithChildren =
