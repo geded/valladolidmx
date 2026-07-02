@@ -648,14 +648,27 @@ function MediaControl({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [importing, setImporting] = useState(false);
   const importFn = useServerFn(importUrlToStudioMedia);
-  // Detecta URLs externas que aún no viven en la Biblioteca del Studio.
-  const isExternalUrl =
-    /^https?:\/\//i.test(v) && !v.includes("/api/public/studio-media/");
+  // Detecta imágenes que aún no viven en la Biblioteca del Studio:
+  // URLs http(s) externas, assets del bundle (/assets/…, /__l5e/…),
+  // rutas relativas del proyecto (/img.jpg) y data: URIs.
+  // Excluye las que ya son del bucket studio-media.
+  const isImportable =
+    !!v &&
+    !v.includes("/api/public/studio-media/") &&
+    (/^https?:\/\//i.test(v) ||
+      /^data:image\//i.test(v) ||
+      /^\/(?!api\/public\/studio-media\/)/i.test(v));
   const handleImport = async () => {
     if (!v || importing) return;
     setImporting(true);
     try {
-      const res = await importFn({ data: { url: v } });
+      // Si es una ruta relativa del sitio, la convertimos a absoluta para
+      // que el server pueda descargarla desde el propio origen.
+      let url = v;
+      if (url.startsWith("/") && typeof window !== "undefined") {
+        url = `${window.location.origin}${url}`;
+      }
+      const res = await importFn({ data: { url } });
       onChange(res.url);
       toast.success("Imagen guardada en la Biblioteca");
     } catch (err) {
@@ -728,7 +741,7 @@ function MediaControl({
           <Trash2 className="size-3" aria-hidden /> Quitar imagen
         </button>
       ) : null}
-      {isExternalUrl ? (
+      {isImportable ? (
         <button
           type="button"
           onClick={handleImport}
