@@ -70,5 +70,28 @@
     "export_json": "Esporta JSON",
     "loading": "Caricamento…",
     "no_alerts": "Nessun avviso attivo."
+  },
+  "auth": {
+    "signin": "Accedi",
+    "signup": "Crea account",
+    "forgot": "Recupera password",
+    "google": "Continua con Google",
+    "or_email": "oppure con e-mail",
+    "name": "Nome",
+    "email": "E-mail",
+    "password": "Password",
+    "processing": "Elaborazione…",
+    "enter": "Accedi",
+    "create": "Crea account",
+    "send_link": "Invia link",
+    "forgot_q": "Password dimenticata?",
+    "create_account": "Crea un account",
+    "back_to_signin": "Torna all'accesso",
+    "signup_info": "Ti abbiamo inviato un'e-mail di conferma.",
+    "reset_info": "Se l'account esiste, riceverai un link per reimpostare la password.",
+    "google_error": "Impossibile accedere con Google.",
+    "unexpected": "Errore inatteso",
+    "eyebrow": "Account",
+    "subtitle": "Accedi per salvare viaggi, preferiti e parlare con Alux."
   }
 }

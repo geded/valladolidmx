@@ -70,5 +70,28 @@
     "export_json": "Exportar JSON",
     "loading": "Carregando…",
     "no_alerts": "Sem alertas ativos."
+  },
+  "auth": {
+    "signin": "Entrar",
+    "signup": "Criar conta",
+    "forgot": "Recuperar palavra-passe",
+    "google": "Continuar com Google",
+    "or_email": "ou por e-mail",
+    "name": "Nome",
+    "email": "E-mail",
+    "password": "Palavra-passe",
+    "processing": "A processar…",
+    "enter": "Entrar",
+    "create": "Criar conta",
+    "send_link": "Enviar link",
+    "forgot_q": "Esqueceste a palavra-passe?",
+    "create_account": "Criar uma conta",
+    "back_to_signin": "Voltar ao início de sessão",
+    "signup_info": "Enviámos-te um e-mail de confirmação.",
+    "reset_info": "Se a conta existir, receberás um link para redefinir a palavra-passe.",
+    "google_error": "Não foi possível entrar com Google.",
+    "unexpected": "Erro inesperado",
+    "eyebrow": "Conta",
+    "subtitle": "Entra para guardar viagens, favoritos e conversar com Alux."
   }
 }
