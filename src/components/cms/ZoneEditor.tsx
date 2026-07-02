@@ -8,6 +8,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { EntityEditor } from "@/components/cms/EntityEditor";
 import { ZONE_FIELDS } from "@/lib/cms/editor-fields";
 import { listDestinationsForSelect } from "@/lib/cms/businesses-media.functions";
+import { ZoneMediaPanels } from "@/components/cms/ZoneMediaPanels";
 
 interface Props {
   id?: string;
@@ -42,6 +43,9 @@ export function ZoneEditor({ id }: Props) {
       backTo="/cms/zonas"
       listQueryKey="zones"
       fields={fields}
+      renderExtras={({ id: entityId }) =>
+        entityId ? <ZoneMediaPanels zoneId={entityId} /> : null
+      }
     />
   );
 }
