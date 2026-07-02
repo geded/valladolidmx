@@ -30,6 +30,7 @@ import {
   Lock,
   Pencil,
   Plus,
+  Search,
   Trash2,
   X,
 } from "lucide-react";
@@ -969,9 +970,15 @@ function PageVisualEditor({
           <button
             type="button"
             onClick={() => setSelectedId(SEO_CHROME_ID)}
-            className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
+            className={`inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-semibold hover:bg-accent ${
+              selectedId === SEO_CHROME_ID
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-primary/40 bg-primary/5 text-primary"
+            }`}
+            title="Título, descripción, imagen social y buscadores"
           >
-            Editar SEO
+            <Search className="size-3.5" aria-hidden />
+            SEO y compartir
           </button>
           <button
             type="button"
@@ -1061,6 +1068,12 @@ function PageVisualEditor({
                 note="Columnas, enlaces y textos legales"
                 selected={selectedId === FOOTER_CHROME_ID}
                 onSelect={() => setSelectedId(FOOTER_CHROME_ID)}
+              />
+              <ChromeItem
+                label="SEO y compartir"
+                note="Título, descripción, imagen social, canonical"
+                selected={selectedId === SEO_CHROME_ID}
+                onSelect={() => setSelectedId(SEO_CHROME_ID)}
               />
               <button
                 type="button"
