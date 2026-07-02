@@ -113,3 +113,53 @@ export const BUSINESS_FIELDS: EditorField[] = [
   },
   { name: "description", label: "Descripción", type: "textarea" },
 ];
+
+/**
+ * PRODUCT_FIELDS — usado por `ProductEditor` (Ola 1 · Etapa 4).
+ * El selector de empresa se inyecta en tiempo de render.
+ */
+export const PRODUCT_FIELDS: EditorField[] = [
+  { name: "name", label: "Nombre", type: "text", required: true },
+  {
+    name: "slug",
+    label: "Slug",
+    type: "text",
+    required: true,
+    helpText: "Identificador URL (sin espacios, sólo minúsculas y guiones).",
+  },
+  {
+    name: "business_id",
+    label: "Empresa",
+    type: "select",
+    required: true,
+    options: [],
+  },
+  {
+    name: "product_type",
+    label: "Tipo",
+    type: "select",
+    required: true,
+    options: [
+      { value: "experiencia", label: "Experiencia" },
+      { value: "hotel", label: "Hotel" },
+      { value: "restaurante", label: "Restaurante" },
+      { value: "evento", label: "Evento" },
+      { value: "tour", label: "Tour" },
+      { value: "transporte", label: "Transporte" },
+      { value: "servicio", label: "Servicio" },
+      { value: "artesanal", label: "Artesanal" },
+    ],
+  },
+  { name: "tagline", label: "Frase corta", type: "text" },
+  { name: "description", label: "Descripción", type: "textarea" },
+  { name: "price_amount", label: "Precio", type: "number" },
+  {
+    name: "price_currency",
+    label: "Moneda",
+    type: "text",
+    placeholder: "MXN",
+    helpText: "Código ISO (MXN, USD, EUR…).",
+  },
+  { name: "duration_minutes", label: "Duración (min)", type: "number" },
+  { name: "capacity", label: "Capacidad", type: "number" },
+];
