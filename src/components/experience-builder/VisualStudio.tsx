@@ -302,20 +302,128 @@ export function VisualStudio({ page = null, onSelectPage, advanced = false }: Vi
 
 /* --------------------------------------------------------------------- */
 
-function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
+function PagesPicker({
+  onOpen,
+  customPages,
+  onCreated,
+}: {
+  onOpen: (key: string) => void;
+  customPages: SitePage[];
+  onCreated: (page: SitePage) => void;
+}) {
+  const listAll = useServerFn(listCompositions);
+  const create = useServerFn(createComposition);
+  const [showCreate, setShowCreate] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [dbPages, setDbPages] = useState<SitePage[]>([]);
+  const knownKeys = useMemo(
+    () => new Set([...SITE_PAGES.map((p) => p.key), ...customPages.map((p) => p.key)]),
+    [customPages],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const all = await listAll();
+        if (cancelled) return;
+        const extras: SitePage[] = all
+          .filter((c) => !knownKeys.has(c.slug))
+          .map((c) => ({
+            key: c.slug,
+            slug: c.slug,
+            page_type: c.page_type,
+            title: c.title,
+            description: c.description ?? "Página personalizada creada desde el editor.",
+            publicPath: `/p/${c.slug}`,
+            status: "editable" as const,
+            custom: true,
+          }));
+        setDbPages(extras);
+      } catch {
+        /* silencioso — el picker sigue funcionando */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [listAll, knownKeys]);
+
+  const allPages = useMemo(
+    () => [...SITE_PAGES, ...customPages, ...dbPages],
+    [customPages, dbPages],
+  );
+
+  const handleCreate = async (form: { title: string; slug: string; description: string }) => {
+    setCreating(true);
+    setCreateError(null);
+    try {
+      const cleanSlug = form.slug
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9-]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      if (!cleanSlug) {
+        setCreateError("El identificador (slug) no puede quedar vacío.");
+        setCreating(false);
+        return;
+      }
+      if (allPages.some((p) => p.slug === cleanSlug)) {
+        setCreateError(`Ya existe una página con el identificador "${cleanSlug}".`);
+        setCreating(false);
+        return;
+      }
+      await create({
+        data: {
+          slug: cleanSlug,
+          title: form.title.trim() || cleanSlug,
+          description: form.description.trim() || undefined,
+          page_type: "landing",
+        },
+      });
+      const created: SitePage = {
+        key: cleanSlug,
+        slug: cleanSlug,
+        page_type: "landing",
+        title: form.title.trim() || cleanSlug,
+        description: form.description.trim() || "Página personalizada creada desde el editor.",
+        publicPath: `/p/${cleanSlug}`,
+        status: "editable",
+        custom: true,
+      };
+      setShowCreate(false);
+      onCreated(created);
+    } catch (e) {
+      setCreateError((e as Error).message);
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-4">
-      <header className="max-w-2xl">
-        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Elige una página</p>
-        <h2 className="mt-2 text-2xl font-semibold">¿Qué página quieres editar?</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Selecciona cualquier página del sitio para verla y modificarla tal como la ven los visitantes.
-          En esta entrega la <strong>página de Inicio</strong> ya es editable. El resto se irá habilitando en las próximas historias.
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div className="max-w-2xl">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Elige una página</p>
+          <h2 className="mt-2 text-2xl font-semibold">¿Qué página quieres editar?</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Selecciona cualquier página del sitio para verla y modificarla tal como la ven los visitantes.
+            Todas las secciones ya son editables desde aquí; también puedes crear nuevas landing pages
+            (videomapping, campañas, eventos especiales) y publicarlas en <code>/p/&lt;identificador&gt;</code>.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowCreate(true)}
+          className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:opacity-95"
+        >
+          <Plus className="size-3.5" aria-hidden /> Crear nueva página
+        </button>
       </header>
 
       <section className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {SITE_PAGES.map((p) => {
+        {allPages.map((p) => {
           const editable = p.status === "editable";
           const openPage = () => editable && onOpen(p.key);
           const cardBase = "flex h-full flex-col justify-between rounded-2xl border p-5 text-left transition-colors";
@@ -341,7 +449,11 @@ function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="text-base font-semibold">{p.title}</h3>
-                  {editable ? (
+                  {p.custom ? (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-background px-2 py-0.5 text-[10px] font-semibold text-primary">
+                      Nueva
+                    </span>
+                  ) : editable ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
                       <Pencil className="size-2.5" aria-hidden /> Editable
                     </span>
@@ -385,7 +497,138 @@ function PagesPicker({ onOpen }: { onOpen: (key: string) => void }) {
             </div>
           );
         })}
+        <button
+          type="button"
+          onClick={() => setShowCreate(true)}
+          className="flex h-full min-h-[180px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-primary/40 bg-background p-5 text-center transition-colors hover:bg-primary/5"
+        >
+          <span className="inline-flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground">
+            <Plus className="size-4" aria-hidden />
+          </span>
+          <span className="text-sm font-semibold">Crear nueva página</span>
+          <span className="max-w-[220px] text-[11px] text-muted-foreground">
+            Landing pages para videomapping, campañas, eventos especiales, promociones…
+          </span>
+        </button>
       </section>
+      {showCreate ? (
+        <CreatePageModal
+          busy={creating}
+          error={createError}
+          onCancel={() => setShowCreate(false)}
+          onSubmit={handleCreate}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function CreatePageModal({
+  busy, error, onCancel, onSubmit,
+}: {
+  busy: boolean;
+  error: string | null;
+  onCancel: () => void;
+  onSubmit: (form: { title: string; slug: string; description: string }) => void | Promise<void>;
+}) {
+  const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
+  const [description, setDescription] = useState("");
+  const slugTouched = useRef(false);
+  const slugify = (value: string) =>
+    value
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-xl border border-border bg-card p-4 shadow-2xl">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Nueva página</p>
+            <h3 className="text-sm font-semibold">Crear una landing page</h3>
+          </div>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+            aria-label="Cerrar"
+          >
+            <X className="size-4" aria-hidden />
+          </button>
+        </div>
+        <form
+          className="space-y-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void onSubmit({ title, slug, description });
+          }}
+        >
+          <label className="block text-xs font-medium">
+            Título
+            <input
+              type="text"
+              value={title}
+              placeholder="Ej. Videomapping Centro Histórico"
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (!slugTouched.current) setSlug(slugify(e.target.value));
+              }}
+              className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+              required
+              autoFocus
+            />
+          </label>
+          <label className="block text-xs font-medium">
+            Identificador (URL)
+            <div className="mt-1 flex items-center gap-1">
+              <span className="rounded-md bg-muted px-2 py-1.5 text-xs text-muted-foreground">/p/</span>
+              <input
+                type="text"
+                value={slug}
+                placeholder="videomapping-centro"
+                onChange={(e) => {
+                  slugTouched.current = true;
+                  setSlug(slugify(e.target.value));
+                }}
+                className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm font-mono"
+                required
+              />
+            </div>
+            <span className="mt-1 block text-[10px] text-muted-foreground">
+              Solo minúsculas, números y guiones. Ejemplo: <code>videomapping-centro</code>.
+            </span>
+          </label>
+          <label className="block text-xs font-medium">
+            Descripción interna (opcional)
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="mt-1 min-h-[70px] w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+            />
+          </label>
+          {error ? <p className="text-xs text-destructive">{error}</p> : null}
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={busy}
+              className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:opacity-95 disabled:opacity-60"
+            >
+              {busy ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : <Plus className="size-3.5" aria-hidden />}
+              Crear y abrir editor
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
