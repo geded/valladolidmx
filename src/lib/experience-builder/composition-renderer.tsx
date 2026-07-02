@@ -148,7 +148,17 @@ function RenderNode({ node, studio, wrap, variableContext }: RenderNodeProps): R
     : "";
   const needsWrap = hasAppearance(appearance) || Boolean(scopedCss);
   const styled = needsWrap ? (
-    <div style={hasAppearance(appearance) ? appearanceToStyle(appearance) : undefined} data-eb-typo={scopedCss ? scopeId : undefined}>
+    <div
+      style={{
+        ...(hasAppearance(appearance) ? appearanceToStyle(appearance) : {}),
+        // Container queries: los overrides tipográficos responsivos se
+        // evalúan contra el ancho del propio bloque, no del viewport del
+        // navegador. Esto es imprescindible en el editor visual, donde
+        // el canvas simula un ancho móvil dentro de una ventana desktop.
+        ...(scopedCss ? { containerType: "inline-size" } : {}),
+      }}
+      data-eb-typo={scopedCss ? scopeId : undefined}
+    >
       {scopedCss ? <style dangerouslySetInnerHTML={{ __html: scopedCss }} /> : null}
       {content}
     </div>
