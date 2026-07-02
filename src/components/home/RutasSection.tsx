@@ -23,10 +23,10 @@ export function RutasSection({ config }: { config?: Record<string, unknown> } = 
   const routes = data && data.length > 0 ? data : RUTAS_MOCK;
   const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.routes_title");
   return (
-    <section id="rutas" className="py-20 md:py-28">
+    <section id="rutas" className="@container py-20 md:py-28">
       <Container>
         <SectionHeader title={title} subtitle={t("sections.routes_sub")} />
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 @3xl:grid-cols-3">
           {routes.map((r) => (
             <RutaCard key={r.id} route={r} />
           ))}

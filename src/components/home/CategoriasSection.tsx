@@ -23,10 +23,10 @@ export function CategoriasSection({ config }: { config?: Record<string, unknown>
   const categories = data && data.length > 0 ? data : CATEGORIAS_MOCK;
   const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.categories_title");
   return (
-    <section id="categorias" className="bg-secondary/40 py-20 md:py-28">
+    <section id="categorias" className="@container bg-secondary/40 py-20 md:py-28">
       <Container>
         <SectionHeader title={title} subtitle={t("sections.categories_sub")} />
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid gap-4 @2xl:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4">
           {categories.map((c) => (
             <CategoriaCard key={c.id} category={c} />
           ))}
