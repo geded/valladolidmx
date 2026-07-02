@@ -12,7 +12,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
 import type { Destination } from "@/types/territory";
 
-export function DestinosSection() {
+export function DestinosSection({ config }: { config?: Record<string, unknown> } = {}) {
   const { t } = useTranslation();
   const fetchDestinations = useServerFn(listPublishedDestinations);
   const { data } = useQuery({
@@ -22,12 +22,13 @@ export function DestinosSection() {
     staleTime: 5 * 60 * 1000,
   });
   const destinations = data && data.length > 0 ? data : DESTINOS_MOCK;
+  const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.destinations_title");
   return (
     <section id="destinos" className="py-20 md:py-28">
       <Container>
         <SectionHeader
           eyebrow={t("hero.eyebrow")}
-          title={t("sections.destinations_title")}
+          title={title}
           subtitle={t("sections.destinations_sub")}
         />
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
