@@ -850,10 +850,32 @@ function PageVisualEditor({
   const listRevs = useServerFn(listCompositionRevisions);
   const restore = useServerFn(restoreCompositionRevision);
   const issuePreview = useServerFn(issueCompositionPreviewLink);
+  const setWorkflow = useServerFn(setCompositionWorkflowState);
   const queryClient = useQueryClient();
   const { roles } = useAuth();
   const canPublish = roles.includes("admin") || roles.includes("super_admin");
   const canForceLock = canPublish;
+  const [workflowBusy, setWorkflowBusy] = useState(false);
+
+  const changeWorkflow = async (next: "draft" | "in_review" | "approved") => {
+    if (!page) return;
+    setWorkflowBusy(true);
+    try {
+      const res = await setWorkflow({ data: { id: page.id, next_state: next } });
+      setPage((p) => (p ? { ...p, workflow_state: res.workflow_state as CompositionDetail["workflow_state"], workflow_updated_at: new Date().toISOString() } : p));
+      const labels: Record<string, string> = { draft: "Borrador", in_review: "En revisión", approved: "Aprobado" };
+      toast.success(`Estado actualizado: ${labels[res.workflow_state] ?? res.workflow_state}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes("forbidden_approve")) {
+        toast.error("Sólo un administrador puede aprobar la página.");
+      } else {
+        toast.error(`No se pudo actualizar el estado: ${msg}`);
+      }
+    } finally {
+      setWorkflowBusy(false);
+    }
+  };
 
   const [page, setPage] = useState<CompositionDetail | null>(null);
   const [tree, setTree] = useState<CompositionTree | null>(null);
