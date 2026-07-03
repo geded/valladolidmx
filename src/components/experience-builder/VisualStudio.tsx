@@ -1629,6 +1629,35 @@ function PageVisualEditor({
         </div>
       ) : null}
 
+      {lock.blockedBy ? (
+        <div className="flex flex-wrap items-center justify-center gap-3 border-b border-amber-300/70 bg-amber-100/70 px-4 py-2 text-[12px] text-amber-900">
+          <Lock className="size-3.5" aria-hidden />
+          <span>
+            <strong>{lock.blockedBy.user_name}</strong> está editando esta página
+            {" · "}
+            última actividad {formatRelativeSince(lock.blockedBy.heartbeat_at)}
+          </span>
+          <span className="text-amber-800/80">Tus cambios podrían sobrescribirse.</span>
+          <button
+            type="button"
+            onClick={() => void lock.refresh()}
+            className="rounded-md border border-amber-400 bg-white px-2 py-0.5 text-[11px] font-medium text-amber-900 hover:bg-amber-50"
+          >
+            Reintentar
+          </button>
+          {canForceLock ? (
+            <button
+              type="button"
+              onClick={() => void lock.forceAcquire()}
+              className="rounded-md border border-amber-500 bg-amber-500 px-2 py-0.5 text-[11px] font-semibold text-white hover:bg-amber-600"
+              title="Toma el control de la edición (solo administradores). Se registra en la bitácora."
+            >
+              Forzar edición
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
       {message ? (
         <div className="border-b border-border bg-primary/5 px-4 py-2 text-center text-xs text-foreground">
           {message}
