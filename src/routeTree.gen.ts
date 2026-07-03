@@ -20,6 +20,7 @@ import { Route as HotelesRouteImport } from './routes/hoteles'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as ContactoRouteImport } from './routes/contacto'
 import { Route as CasasDeVacacionesRouteImport } from './routes/casas-de-vacaciones'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -175,6 +176,11 @@ const EventosRoute = EventosRouteImport.update({
 const EmpresasRoute = EmpresasRouteImport.update({
   id: '/empresas',
   path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactoRoute = ContactoRouteImport.update({
+  id: '/contacto',
+  path: '/contacto',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CasasDeVacacionesRoute = CasasDeVacacionesRouteImport.update({
@@ -758,6 +764,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRoute
   '/casas-de-vacaciones': typeof CasasDeVacacionesRoute
+  '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
@@ -871,6 +878,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRoute
   '/casas-de-vacaciones': typeof CasasDeVacacionesRoute
+  '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
@@ -980,6 +988,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRoute
   '/casas-de-vacaciones': typeof CasasDeVacacionesRoute
+  '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
@@ -1095,6 +1104,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/blog'
     | '/casas-de-vacaciones'
+    | '/contacto'
     | '/empresas'
     | '/eventos'
     | '/experiencias'
@@ -1208,6 +1218,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/blog'
     | '/casas-de-vacaciones'
+    | '/contacto'
     | '/empresas'
     | '/eventos'
     | '/experiencias'
@@ -1316,6 +1327,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/blog'
     | '/casas-de-vacaciones'
+    | '/contacto'
     | '/empresas'
     | '/eventos'
     | '/experiencias'
@@ -1431,6 +1443,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BlogRoute: typeof BlogRoute
   CasasDeVacacionesRoute: typeof CasasDeVacacionesRoute
+  ContactoRoute: typeof ContactoRoute
   EmpresasRoute: typeof EmpresasRoute
   EventosRoute: typeof EventosRouteWithChildren
   ExperienciasRoute: typeof ExperienciasRoute
@@ -1539,6 +1552,13 @@ declare module '@tanstack/react-router' {
       path: '/empresas'
       fullPath: '/empresas'
       preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contacto': {
+      id: '/contacto'
+      path: '/contacto'
+      fullPath: '/contacto'
+      preLoaderRoute: typeof ContactoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/casas-de-vacaciones': {
@@ -2562,6 +2582,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BlogRoute: BlogRoute,
   CasasDeVacacionesRoute: CasasDeVacacionesRoute,
+  ContactoRoute: ContactoRoute,
   EmpresasRoute: EmpresasRoute,
   EventosRoute: EventosRouteWithChildren,
   ExperienciasRoute: ExperienciasRoute,
