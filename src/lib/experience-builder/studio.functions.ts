@@ -132,6 +132,34 @@ export const getComposition = createServerFn({ method: "GET" })
   });
 
 /**
+ * Devuelve el árbol de la revisión activa (snapshot publicado) de una
+ * composición, o `null` si nunca se publicó. Se usa en el Studio para
+ * generar un diff resumen entre el borrador en edición y lo público
+ * antes de confirmar "Publicar cambios" (US-C).
+ */
+export const getPublishedTree = createServerFn({ method: "GET" })
+  .inputValidator((data: { id: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<CompositionTree | null> => {
+    const { data: row, error } = await context.supabase
+      .from("page_compositions")
+      .select("active_revision_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    const activeId = (row as { active_revision_id: string | null } | null)?.active_revision_id ?? null;
+    if (!activeId) return null;
+    const { data: rev, error: revErr } = await context.supabase
+      .from("page_revisions")
+      .select("snapshot")
+      .eq("id", activeId)
+      .maybeSingle();
+    if (revErr) throw new Error(revErr.message);
+    if (!rev?.snapshot) return null;
+    return rev.snapshot as unknown as CompositionTree;
+  });
+
+/**
  * Serialización determinista (keys ordenadas) para que el hash del árbol
  * sea estable frente a diferencias de orden de propiedades introducidas
  * por el editor o el pipeline de traducción.
