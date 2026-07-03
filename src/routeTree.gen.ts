@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RestaurantesRouteImport } from './routes/restaurantes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as OfflineRouteImport } from './routes/offline'
@@ -111,6 +112,11 @@ import { Route as AuthenticatedCmsEmpresasBusinessIdEditarRouteImport } from './
 import { Route as AuthenticatedCmsDestinosDestinationIdEditarRouteImport } from './routes/_authenticated/cms/destinos.$destinationId.editar'
 import { Route as AuthenticatedCmsCategoriasIdEditarRouteImport } from './routes/_authenticated/cms/categorias.$id.editar'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RestaurantesRoute = RestaurantesRouteImport.update({
   id: '/restaurantes',
   path: '/restaurantes',
@@ -694,6 +700,7 @@ export interface FileRoutesByFullPath {
   '/offline': typeof OfflineRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/concierge': typeof AuthenticatedConciergeRouteRouteWithChildren
   '/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
@@ -796,6 +803,7 @@ export interface FileRoutesByTo {
   '/offline': typeof OfflineRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
@@ -894,6 +902,7 @@ export interface FileRoutesById {
   '/offline': typeof OfflineRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/concierge': typeof AuthenticatedConciergeRouteRouteWithChildren
   '/_authenticated/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
@@ -998,6 +1007,7 @@ export interface FileRouteTypes {
     | '/offline'
     | '/reset-password'
     | '/restaurantes'
+    | '/sitemap.xml'
     | '/admin'
     | '/concierge'
     | '/cuenta'
@@ -1100,6 +1110,7 @@ export interface FileRouteTypes {
     | '/offline'
     | '/reset-password'
     | '/restaurantes'
+    | '/sitemap.xml'
     | '/empresa'
     | '/mi-viaje'
     | '/paginas'
@@ -1197,6 +1208,7 @@ export interface FileRouteTypes {
     | '/offline'
     | '/reset-password'
     | '/restaurantes'
+    | '/sitemap.xml'
     | '/_authenticated/admin'
     | '/_authenticated/concierge'
     | '/_authenticated/cuenta'
@@ -1301,6 +1313,7 @@ export interface RootRouteChildren {
   OfflineRoute: typeof OfflineRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RestaurantesRoute: typeof RestaurantesRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   LSlugRoute: typeof LSlugRoute
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
   LovableWorkspacePreviewRoute: typeof LovableWorkspacePreviewRoute
@@ -1321,6 +1334,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/restaurantes': {
       id: '/restaurantes'
       path: '/restaurantes'
@@ -2331,6 +2351,7 @@ const rootRouteChildren: RootRouteChildren = {
   OfflineRoute: OfflineRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RestaurantesRoute: RestaurantesRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   LSlugRoute: LSlugRoute,
   LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,
   LovableWorkspacePreviewRoute: LovableWorkspacePreviewRoute,
