@@ -13,8 +13,6 @@ import { buildPublicHead } from "@/lib/discovery/seo";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
-import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
-import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { DestinationSurface } from "@/components/surfaces/DestinationSurface";
 import { getPublicDestinationBySlug } from "@/lib/destinations/public-reads.functions";
 
@@ -23,10 +21,7 @@ export const Route = createFileRoute("/oriente-maya/$destino")({
     const mock = DESTINOS_MOCK.find(
       (d) => d.slug === params.destino && d.region_slug === ORIENTE_MAYA.slug,
     );
-    const [db, composition] = await Promise.all([
-      getPublicDestinationBySlug({ data: { slug: params.destino } }).catch(() => null),
-      getPublishedCompositionBySlug({ data: { slug: "__tpl_destination__" } }).catch(() => null),
-    ]);
+    const db = await getPublicDestinationBySlug({ data: { slug: params.destino } }).catch(() => null);
     if (!mock && !db) throw notFound();
     const dest = {
       slug: params.destino,
@@ -36,7 +31,7 @@ export const Route = createFileRoute("/oriente-maya/$destino")({
         "territorio" | "selva" | "cenote" | "atardecer",
       highlights: (db?.highlights?.length ? db.highlights : mock?.highlights ?? []) as string[],
     };
-    return { dest, db, composition };
+    return { dest, db };
   },
   head: ({ loaderData, params }) =>
     loaderData
@@ -59,10 +54,6 @@ export const Route = createFileRoute("/oriente-maya/$destino")({
 });
 
 function DestinoPage() {
-  const { composition, db } = Route.useLoaderData();
-  return composition ? (
-    <CompositionRenderer tree={composition.snapshot} />
-  ) : (
-    <DestinationSurface dbData={db ?? undefined} />
-  );
+  const { db } = Route.useLoaderData();
+  return <DestinationSurface dbData={db ?? undefined} />;
 }
