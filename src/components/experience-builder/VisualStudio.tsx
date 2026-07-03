@@ -851,6 +851,7 @@ function PageVisualEditor({
   const queryClient = useQueryClient();
   const { roles } = useAuth();
   const canPublish = roles.includes("admin") || roles.includes("super_admin");
+  const canForceLock = canPublish;
 
   const [page, setPage] = useState<CompositionDetail | null>(null);
   const [tree, setTree] = useState<CompositionTree | null>(null);
