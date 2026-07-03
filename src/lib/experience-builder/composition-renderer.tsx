@@ -42,6 +42,7 @@ import {
   CockpitAlerts,
   CockpitActivityStream,
 } from "@/components/admin/cockpit-blocks";
+import { SmartBlockRuntime } from "@/components/experience-builder/smart-blocks";
 
 bootstrapBlockLibrary();
 
@@ -357,6 +358,10 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.cockpit.kpi-grid": NamedSectionPreview,
   "vmx.cockpit.alerts": NamedSectionPreview,
   "vmx.cockpit.activity-stream": NamedSectionPreview,
+  "vmx.smart.destinations-grid": NamedSectionPreview,
+  "vmx.smart.businesses-grid": NamedSectionPreview,
+  "vmx.smart.products-grid": NamedSectionPreview,
+  "vmx.smart.events-list": NamedSectionPreview,
 };
 
 /* ------------------------------------------------------------------ *
@@ -526,6 +531,11 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
     );
   },
   "vmx.custom.form": ({ node }) => <CustomFormBlock config={node.config} />,
+  // Etapa 15.10.8 · Smart Blocks v1 — datos reales resueltos server-side.
+  "vmx.smart.destinations-grid": ({ node }) => <SmartBlockRuntime node={node} />,
+  "vmx.smart.businesses-grid": ({ node }) => <SmartBlockRuntime node={node} />,
+  "vmx.smart.products-grid": ({ node }) => <SmartBlockRuntime node={node} />,
+  "vmx.smart.events-list": ({ node }) => <SmartBlockRuntime node={node} />,
 };
 
 /* ------------------------------------------------------------------ *
