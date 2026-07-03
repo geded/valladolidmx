@@ -1,4 +1,5 @@
 import { SmartCard, SmartGrid, SmartEmpty } from "./SmartCard";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 
 export interface SmartBusinessItem {
   id?: string;
@@ -29,6 +30,18 @@ export function SmartBusinessesGrid({
             description={b.short_description ?? null}
             imageUrl={b.cover_image_url ?? b.logo_url ?? null}
             href={b.slug ? `/empresa/${b.slug}` : null}
+            actions={
+              b.id ? (
+                <AddToTravelPlanButton
+                  kind="business"
+                  targetId={String(b.id)}
+                  title={String(b.name ?? "Empresa")}
+                  slug={b.slug ?? null}
+                  imageUrl={b.cover_image_url ?? b.logo_url ?? null}
+                  subtitle={b.short_description ?? null}
+                />
+              ) : null
+            }
           />
         ))}
       </SmartGrid>
