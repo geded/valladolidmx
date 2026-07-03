@@ -1,5 +1,5 @@
 /**
- * /_authenticated/cms/pagos — Panel administrativo de Pagos (Ola 4 · Etapa 5).
+ * /_authenticated/cms/pagos — Panel administrativo de Pagos (Pagos).
  *
  * Vista de estado del proveedor de pagos activo, configuración de webhook
  * y auditoría de eventos recibidos. Las llaves API NO se administran aquí:
@@ -58,7 +58,7 @@ function PaymentsAdminPage() {
     <div className="mx-auto max-w-5xl">
       <header className="border-b border-border pb-6">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          Ola 4 · Etapa 5
+          Pagos
         </p>
         <h1 className="mt-2 text-3xl font-semibold">Pagos del Marketplace</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
