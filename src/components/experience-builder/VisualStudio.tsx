@@ -1813,6 +1813,80 @@ function PageVisualEditor({
         />
       ) : null}
       {confirmUnpublish ? (
+        null
+      ) : null}
+      {scheduleOpen ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="schedule-title"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm"
+        >
+          <div className="w-full max-w-md overflow-hidden rounded-lg border border-border bg-card shadow-xl">
+            <header className="border-b border-border px-4 py-3">
+              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                Programar publicación
+              </p>
+              <h2 id="schedule-title" className="mt-0.5 text-base font-semibold">
+                ¿Cuándo publicar esta página?
+              </h2>
+            </header>
+            <div className="space-y-3 px-4 py-3 text-xs text-muted-foreground">
+              <p>
+                Guardaremos el borrador actual y la publicaremos automáticamente
+                en la fecha y hora que elijas. Puedes cancelar la programación en
+                cualquier momento antes de esa fecha.
+              </p>
+              <label className="block">
+                <span className="mb-1 block text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                  Fecha y hora
+                </span>
+                <input
+                  type="datetime-local"
+                  value={scheduleValue}
+                  min={new Date(Date.now() + 60_000)
+                    .toISOString()
+                    .slice(0, 16)}
+                  onChange={(e) => setScheduleValue(e.target.value)}
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-xs text-foreground"
+                />
+              </label>
+              {scheduleError ? (
+                <p className="text-rose-600">{scheduleError}</p>
+              ) : null}
+            </div>
+            <footer className="flex items-center justify-end gap-2 border-t border-border bg-muted/30 px-4 py-3">
+              <button
+                type="button"
+                onClick={() => setScheduleOpen(false)}
+                disabled={scheduling}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => void onSchedule()}
+                disabled={scheduling || !scheduleValue}
+                className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:opacity-95 disabled:opacity-60"
+              >
+                {scheduling ? (
+                  <>
+                    <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                    Programando…
+                  </>
+                ) : (
+                  <>
+                    <CalendarClock className="size-3.5" aria-hidden />
+                    Programar publicación
+                  </>
+                )}
+              </button>
+            </footer>
+          </div>
+        </div>
+      ) : null}
+      {confirmUnpublish ? (
         <div
           role="dialog"
           aria-modal="true"
