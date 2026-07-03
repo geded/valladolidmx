@@ -18,6 +18,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
+import { SeoPreview } from "./SeoPreview";
 import {
   ArrowLeft,
   Check,
@@ -1507,6 +1508,13 @@ function PageVisualEditor({
                   tone="danger"
                 />
               </div>
+            ) : null}
+
+            {selectedChrome === "seo" ? (
+              <SeoPreview
+                config={selectedConfig as Parameters<typeof SeoPreview>[0]["config"]}
+                slug={pageDef.slug}
+              />
             ) : null}
 
             <AutoInspector
