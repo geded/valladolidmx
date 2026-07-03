@@ -48,6 +48,7 @@ import { AluxSurface } from "@/components/surfaces/AluxSurface";
 import { TripPlannerSurface } from "@/components/surfaces/TripPlannerSurface";
 import { RegionSurface } from "@/components/surfaces/RegionSurface";
 import { DestinationSurface } from "@/components/surfaces/DestinationSurface";
+import { BusinessSurface } from "@/components/surfaces/BusinessSurface";
 
 bootstrapBlockLibrary();
 
@@ -373,6 +374,8 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   // US-R3 · Ola 2 · Sub-ola 2.1 — Region + Destination (preview)
   "vmx.surface.region": NamedSectionPreview,
   "vmx.surface.destination": NamedSectionPreview,
+  // US-R3 · Ola 2 · Sub-ola 2.2 — Plantilla Madre Business
+  "vmx.surface.business": NamedSectionPreview,
 };
 
 /* ------------------------------------------------------------------ *
@@ -555,6 +558,10 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   // El slug se resuelve dentro de la superficie (useParams del router).
   "vmx.surface.region": () => <RegionSurface />,
   "vmx.surface.destination": () => <DestinationSurface />,
+  // US-R3 · Ola 2 · Sub-ola 2.2 — Business surface (universal).
+  // El detalle del negocio se recibe vía `BusinessSurfaceProvider`
+  // desde la ruta pública; en Studio se muestra placeholder.
+  "vmx.surface.business": () => <BusinessSurface />,
 };
 
 /* ------------------------------------------------------------------ *
