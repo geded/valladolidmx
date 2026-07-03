@@ -869,6 +869,11 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   actionsButtonsBlock,
   customHtmlBlock,
   customFormBlock,
+  // Etapa 15.10.8 · Smart Blocks v1
+  smartDestinationsGridBlock,
+  smartBusinessesGridBlock,
+  smartProductsGridBlock,
+  smartEventsListBlock,
 ];
 
 let bootstrapped = false;
