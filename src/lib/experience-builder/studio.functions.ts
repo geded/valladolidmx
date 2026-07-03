@@ -515,7 +515,7 @@ export const setCompositionWorkflowState = createServerFn({ method: "POST" })
     const { data: result, error } = await context.supabase.rpc("eb_set_workflow_state", {
       _composition_id: data.id,
       _next_state: data.next_state,
-      _notes: data.notes ?? null,
+      _notes: data.notes ?? undefined,
     });
     if (error) throw new Error(error.message);
     return result as { workflow_state: string; changed: boolean };
