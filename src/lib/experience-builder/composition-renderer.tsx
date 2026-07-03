@@ -104,6 +104,10 @@ function RenderNode({ node, studio, wrap, variableContext }: RenderNodeProps): R
     ) : null;
   }
 
+  // Bloque oculto: en producción no se renderiza; en Studio se muestra
+  // atenuado con un badge "Oculto" para que el editor lo siga viendo.
+  if (node.hidden && !studio) return null;
+
   // Modo producción: usa los componentes reales del Home cuando existan.
   // Modo Studio: muestra previews neutrales para conservar la diagramación
   // editorial y los overlays de selección.
