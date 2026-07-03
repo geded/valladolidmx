@@ -1778,6 +1778,7 @@ function HomeCanvas({
                           onSelect={() => onSelect(node.id)}
                           onDelete={() => onDelete(node.id)}
                           onDuplicate={() => onDuplicate(node.id)}
+                          onToggleHidden={() => onToggleHidden(node.id)}
                           onMoveUp={() => onMove(node.id, -1)}
                           onMoveDown={() => onMove(node.id, 1)}
                           sortable={rootIdSet.has(node.id)}
