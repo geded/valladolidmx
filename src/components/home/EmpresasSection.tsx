@@ -5,7 +5,6 @@
 import { Container } from "@/components/layout/Container";
 import { SectionHeader } from "@/components/common/SectionHeader";
 import { EmpresaCard } from "@/components/cards/EmpresaCard";
-import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { EMPRESAS_MOCK } from "@/mocks/empresas";
 import { useTranslation } from "@/i18n/context";
 import { useQuery } from "@tanstack/react-query";
@@ -30,7 +29,6 @@ export function EmpresasSection({ config }: { config?: Record<string, unknown> }
         <SectionHeader
           title={title}
           subtitle={t("sections.empresas_sub")}
-          actions={<ComingSoonBadge label="Motor de Visibilidad · pronto" />}
         />
         <div data-home-grid="empresas" className="grid grid-cols-1 gap-6 @2xl:grid-cols-2 @5xl:grid-cols-4">
           {businesses.map((b) => (
