@@ -1509,6 +1509,10 @@ function PageVisualEditor({
               </div>
             ) : null}
 
+            {selectedChrome === "seo" ? (
+              <SeoPreview config={selectedConfig as SeoPreviewConfig} slug={pageDef.slug} />
+            ) : null}
+
             <AutoInspector
               contract={selectedContract}
               config={selectedConfig}
