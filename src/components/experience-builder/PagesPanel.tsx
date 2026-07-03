@@ -184,6 +184,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
 
   const list = useServerFn(listStudioPages);
   const create = useServerFn(createComposition);
+  const saveDraft = useServerFn(saveCompositionDraft);
   const dupe = useServerFn(duplicateComposition);
   const rename = useServerFn(renameComposition);
   const updSlug = useServerFn(updateCompositionSlug);
