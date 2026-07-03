@@ -1439,8 +1439,16 @@ function PageVisualEditor({
           selectedId={selectedId}
           onSelect={(id) => setSelectedId(id)}
           onSelectChrome={(area) => setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)}
-          onDelete={removeNodeById}
+          onDelete={(id) => {
+            if (typeof window !== "undefined") {
+              const node = tree?.root.children.find((n) => n.id === id);
+              const label = node ? getBlock(node.type)?.display_name ?? node.type : "esta sección";
+              if (!window.confirm(`¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`)) return;
+            }
+            removeNodeById(id);
+          }}
           onDuplicate={duplicateNode}
+          onToggleHidden={toggleHiddenNode}
           onMove={moveNode}
           onReorderRoot={(activeId, overId) => {
             if (!tree) return;
