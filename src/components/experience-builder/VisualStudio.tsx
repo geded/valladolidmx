@@ -1680,6 +1680,7 @@ function HomeCanvas({
   onSelectChrome,
   onDelete,
   onDuplicate,
+  onToggleHidden,
   onMove,
   onReorderRoot,
 }: {
@@ -1691,6 +1692,7 @@ function HomeCanvas({
   onSelectChrome: (area: ChromeArea) => void;
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
+  onToggleHidden: (id: string) => void;
   onMove: (id: string, dir: -1 | 1) => void;
   onReorderRoot: (activeId: string, overId: string) => void;
 }) {
