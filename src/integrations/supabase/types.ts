@@ -3997,6 +3997,115 @@ export type Database = {
         }
         Relationships: []
       }
+      travel_plan_items: {
+        Row: {
+          created_at: string
+          day_index: number | null
+          id: string
+          item_kind: Database["public"]["Enums"]["travel_item_kind"]
+          notes: string | null
+          plan_id: string
+          position: number
+          snapshot: Json
+          target_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_index?: number | null
+          id?: string
+          item_kind: Database["public"]["Enums"]["travel_item_kind"]
+          notes?: string | null
+          plan_id: string
+          position?: number
+          snapshot?: Json
+          target_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_index?: number | null
+          id?: string
+          item_kind?: Database["public"]["Enums"]["travel_item_kind"]
+          notes?: string | null
+          plan_id?: string
+          position?: number
+          snapshot?: Json
+          target_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "travel_plan_items_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "travel_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      travel_plans: {
+        Row: {
+          archived_at: string | null
+          case_id: string | null
+          cover_image_url: string | null
+          created_at: string
+          end_date: string | null
+          id: string
+          meta: Json
+          notes: string | null
+          party_size: number | null
+          source: Database["public"]["Enums"]["travel_plan_source"]
+          start_date: string | null
+          status: Database["public"]["Enums"]["travel_plan_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          case_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          meta?: Json
+          notes?: string | null
+          party_size?: number | null
+          source?: Database["public"]["Enums"]["travel_plan_source"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["travel_plan_status"]
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          case_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          meta?: Json
+          notes?: string | null
+          party_size?: number | null
+          source?: Database["public"]["Enums"]["travel_plan_source"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["travel_plan_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "travel_plans_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       traveler_favorites: {
         Row: {
           created_at: string
@@ -5158,6 +5267,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      travel_plan_build_snapshot: { Args: { _plan_id: string }; Returns: Json }
+      travel_plan_ensure_active: { Args: never; Returns: string }
+      travel_plan_import_favorites: {
+        Args: { _plan_id: string }
+        Returns: number
+      }
+      travel_plan_is_concierge_reader: {
+        Args: { _plan_id: string; _user_id: string }
+        Returns: boolean
+      }
       unc_activity_admin: {
         Args: { _limit?: number }
         Returns: {
@@ -5657,6 +5776,18 @@ export type Database = {
       product_visibility_level: "standard" | "destacado" | "premium"
       system_alert_severity: "info" | "warning" | "critical"
       system_alert_status: "open" | "acknowledged" | "resolved"
+      travel_item_kind:
+        | "destination"
+        | "business"
+        | "product"
+        | "event"
+        | "note"
+      travel_plan_source: "web" | "import" | "concierge" | "alux"
+      travel_plan_status:
+        | "draft"
+        | "active"
+        | "shared_with_concierge"
+        | "archived"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -5914,6 +6045,14 @@ export const Constants = {
       product_visibility_level: ["standard", "destacado", "premium"],
       system_alert_severity: ["info", "warning", "critical"],
       system_alert_status: ["open", "acknowledged", "resolved"],
+      travel_item_kind: ["destination", "business", "product", "event", "note"],
+      travel_plan_source: ["web", "import", "concierge", "alux"],
+      travel_plan_status: [
+        "draft",
+        "active",
+        "shared_with_concierge",
+        "archived",
+      ],
     },
   },
 } as const
