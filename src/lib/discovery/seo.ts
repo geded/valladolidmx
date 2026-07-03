@@ -122,6 +122,33 @@ export function pickFirstMediaUrl(tree: unknown): string | undefined {
   return undefined;
 }
 
+/**
+ * Recorre el árbol de composición y devuelve el primer nodo cuyo `type`
+ * comience con `vmx.smart.` — utilidad para hidratar OG image desde la
+ * primera imagen resuelta por un Smart Block cuando el editor no dejó
+ * `og_image` explícito ni imágenes estáticas en la página (15.10.8.5).
+ */
+export function findFirstSmartBlockNode(tree: unknown): { type: string; config: Record<string, unknown> } | undefined {
+  const seen = new WeakSet<object>();
+  const stack: unknown[] = [tree];
+  while (stack.length) {
+    const cur = stack.pop();
+    if (!cur || typeof cur !== "object" || seen.has(cur as object)) continue;
+    seen.add(cur as object);
+    if (Array.isArray(cur)) {
+      for (const v of cur) stack.push(v);
+      continue;
+    }
+    const obj = cur as Record<string, unknown>;
+    const type = obj.type;
+    if (typeof type === "string" && type.startsWith("vmx.smart.")) {
+      return { type, config: (obj.config as Record<string, unknown>) ?? {} };
+    }
+    for (const v of Object.values(obj)) if (v && typeof v === "object") stack.push(v);
+  }
+  return undefined;
+}
+
 function looksLikeImage(value: string): boolean {
   const v = value.trim();
   if (!v) return false;
