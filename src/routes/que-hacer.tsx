@@ -9,7 +9,8 @@ import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
-import { listPublishedEvents } from "@/lib/events/public-reads.functions";
+import { listPublishedEvents, type PublicEventCard } from "@/lib/events/public-reads.functions";
+import type { Destination } from "@/types/territory";
 
 const TEMAS = [
   { slug: "cultura", label: "Cultura", description: "Museos, cenotes sagrados, comunidades mayas y rituales vivos." },
@@ -76,7 +77,7 @@ function QueHacerRoute() {
         <section className="mt-12">
           <h2 className="mb-4 text-xl font-semibold">Elige un destino</h2>
           <ul className="flex flex-wrap gap-2">
-            {destinos.slice(0, 24).map((d) => (
+            {destinos.slice(0, 24).map((d: Destination) => (
               <li key={d.slug}>
                 <Link
                   to="/oriente-maya/$destino"
@@ -95,7 +96,7 @@ function QueHacerRoute() {
         <section className="mt-12">
           <h2 className="mb-4 text-xl font-semibold">Próximos eventos</h2>
           <ul className="grid gap-3 sm:grid-cols-2">
-            {eventos.map((e) => (
+            {eventos.map((e: PublicEventCard) => (
               <li key={e.id}>
                 <Link
                   to="/eventos/$slug"
