@@ -520,3 +520,85 @@ export const setCompositionWorkflowState = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return result as { workflow_state: string; changed: boolean };
   });
+
+/* US-03 · Comentarios inline por bloque ---------------------------------- */
+
+export interface BlockComment {
+  id: string;
+  composition_id: string;
+  block_id: string;
+  author_id: string;
+  author_name: string | null;
+  body: string;
+  resolved_at: string | null;
+  resolved_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const listBlockComments = createServerFn({ method: "GET" })
+  .inputValidator((data: { composition_id: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<BlockComment[]> => {
+    const { data: rows, error } = await context.supabase
+      .from("eb_block_comments")
+      .select("id, composition_id, block_id, author_id, body, resolved_at, resolved_by, created_at, updated_at")
+      .eq("composition_id", data.composition_id)
+      .order("created_at", { ascending: true });
+    if (error) throw new Error(error.message);
+    const list = (rows ?? []) as Omit<BlockComment, "author_name">[];
+    // Resolver nombres de autores en un solo lote (best-effort).
+    const ids = Array.from(new Set(list.map((r) => r.author_id)));
+    let nameMap = new Map<string, string | null>();
+    if (ids.length) {
+      const { data: profs } = await context.supabase
+        .from("profiles")
+        .select("id, display_name")
+        .in("id", ids);
+      nameMap = new Map((profs ?? []).map((p: { id: string; display_name: string | null }) => [p.id, p.display_name]));
+    }
+    return list.map((r) => ({ ...r, author_name: nameMap.get(r.author_id) ?? null }));
+  });
+
+export const createBlockComment = createServerFn({ method: "POST" })
+  .inputValidator((data: { composition_id: string; block_id: string; body: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ id: string }> => {
+    const body = data.body.trim();
+    if (!body) throw new Error("El comentario está vacío");
+    if (body.length > 4000) throw new Error("Comentario demasiado largo");
+    const { data: id, error } = await context.supabase.rpc("eb_comment_create", {
+      _composition_id: data.composition_id,
+      _block_id: data.block_id,
+      _body: body,
+    });
+    if (error) throw new Error(error.message);
+    return { id: id as unknown as string };
+  });
+
+export const resolveBlockComment = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("eb_comment_resolve", { _comment_id: data.id });
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+export const reopenBlockComment = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("eb_comment_reopen", { _comment_id: data.id });
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+export const deleteBlockComment = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("eb_block_comments").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
