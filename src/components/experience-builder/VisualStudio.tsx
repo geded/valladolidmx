@@ -1572,6 +1572,7 @@ function PageVisualEditor({
           />
         ) : null}
       </div>
+      <OnboardingTour open={showTour} onClose={() => setShowTour(false)} />
     </div>
   );
 }
