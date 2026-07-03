@@ -9,7 +9,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead } from "@/lib/discovery/seo";
+import { buildPublicHead, pickFirstMediaUrl, webPageJsonLd } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 
 function pageQuery(slug: string) {
@@ -36,13 +36,19 @@ export const Route = createFileRoute("/p/$slug")({
       canonical?: string;
       noindex?: boolean;
     };
+    const title = seo.title?.trim() || page?.title || `${SITE.name}`;
+    const description = seo.description?.trim() || page?.description || SITE.default_description;
+    const path = seo.canonical?.trim() || `/p/${ctx.params.slug}`;
+    const fallbackImage = page?.snapshot ? pickFirstMediaUrl(page.snapshot) : undefined;
+    const ogImage = seo.og_image?.trim() || fallbackImage || undefined;
     return buildPublicHead({
-      title: seo.title?.trim() || page?.title || `${SITE.name}`,
-      description: seo.description?.trim() || page?.description || SITE.default_description,
-      path: seo.canonical?.trim() || `/p/${ctx.params.slug}`,
+      title,
+      description,
+      path,
       ogType: "website",
-      ogImage: seo.og_image?.trim() || undefined,
+      ogImage,
       noindex: Boolean(seo.noindex),
+      jsonLd: seo.noindex ? undefined : [webPageJsonLd({ title, description, path, image: ogImage })],
     });
   },
   notFoundComponent: NotFoundPage,
