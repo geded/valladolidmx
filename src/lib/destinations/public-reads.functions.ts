@@ -5,6 +5,7 @@
  * caller can use the static mock.
  */
 import { createServerFn } from "@tanstack/react-start";
+import type { MarketplaceBusinessCard, MarketplaceProductCard } from "@/lib/marketplace/marketplace-reads.functions";
 
 export interface PublicDestinationDTO {
   slug: string;
@@ -69,4 +70,108 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
       latitude: row.latitude ?? null,
       longitude: row.longitude ?? null,
     };
+  });
+
+export interface DestinationRelatedDTO {
+  hoteles: MarketplaceBusinessCard[];
+  restaurantes: MarketplaceBusinessCard[];
+  experiencias: MarketplaceBusinessCard[];
+  otras: MarketplaceBusinessCard[];
+  productos: MarketplaceProductCard[];
+}
+
+const HOTEL_CATS = new Set(["hoteles", "hospedaje"]);
+const RESTO_CATS = new Set(["restaurantes", "gastronomia"]);
+const EXP_CATS = new Set(["experiencias", "experiencias-tours", "tours"]);
+
+/**
+ * getDestinationRelated — Devuelve empresas y productos publicados
+ * asociados a un destino, agrupados por categoría. Reutiliza el mismo
+ * publishable client (anon + RLS) y proyecta sólo columnas seguras.
+ * No introduce backend nuevo: consulta directa a `businesses`/`products`
+ * con los mismos filtros públicos que `listMarketplaceBusinesses`.
+ */
+export const getDestinationRelated = createServerFn({ method: "GET" })
+  .inputValidator((input: { slug: string }) => {
+    if (!input || typeof input.slug !== "string" || !/^[a-z0-9-]{1,80}$/.test(input.slug)) {
+      throw new Error("Invalid slug");
+    }
+    return input;
+  })
+  .handler(async ({ data }): Promise<DestinationRelatedDTO> => {
+    const { createClient } = await import("@supabase/supabase-js");
+    const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const empty: DestinationRelatedDTO = { hoteles: [], restaurantes: [], experiencias: [], otras: [], productos: [] };
+    const { data: dest, error: dErr } = await sb
+      .from("destinations").select("id, slug").eq("slug", data.slug).maybeSingle();
+    if (dErr || !dest) return empty;
+
+    const { data: biz, error: bErr } = await sb
+      .from("businesses")
+      .select("id, slug, display_name, tagline, verified, status, deleted_at, business_categories!businesses_primary_category_id_fkey ( slug )")
+      .eq("destination_id", dest.id)
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .order("display_name", { ascending: true })
+      .limit(60);
+    if (bErr) { console.error("[getDestinationRelated] biz", bErr); return empty; }
+
+    const cards: MarketplaceBusinessCard[] = (biz ?? []).map((row) => {
+      const cat = (row.business_categories as { slug?: unknown } | null)?.slug;
+      return {
+        id: row.id,
+        slug: row.slug,
+        display_name: row.display_name,
+        tagline: row.tagline ?? "",
+        verified: Boolean(row.verified),
+        destination_slug: dest.slug,
+        category_slug: typeof cat === "string" ? cat : "",
+      };
+    });
+    const grouped: DestinationRelatedDTO = { hoteles: [], restaurantes: [], experiencias: [], otras: [], productos: [] };
+    for (const c of cards) {
+      if (HOTEL_CATS.has(c.category_slug)) grouped.hoteles.push(c);
+      else if (RESTO_CATS.has(c.category_slug)) grouped.restaurantes.push(c);
+      else if (EXP_CATS.has(c.category_slug)) grouped.experiencias.push(c);
+      else grouped.otras.push(c);
+    }
+
+    const bizIds = cards.map((c) => c.id);
+    if (bizIds.length > 0) {
+      const { data: prods, error: pErr } = await sb
+        .from("products")
+        .select("id, slug, name, tagline, product_type, price_amount, price_currency, business_id, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, status, deleted_at")
+        .in("business_id", bizIds)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("name", { ascending: true })
+        .limit(24);
+      if (!pErr && prods) {
+        const bizById = new Map(cards.map((c) => [c.id, c] as const));
+        grouped.productos = prods.map((p) => {
+          const parent = bizById.get(p.business_id as string);
+          return {
+            id: p.id,
+            slug: p.slug,
+            name: p.name,
+            tagline: p.tagline ?? "",
+            product_type: String(p.product_type),
+            price_amount: p.price_amount,
+            price_currency: p.price_currency,
+            business_slug: parent?.slug ?? "",
+            business_name: parent?.display_name ?? "",
+            conversion_mode: String((p as Record<string, unknown>).conversion_mode ?? "informacion"),
+            primary_action_label: ((p as Record<string, unknown>).primary_action_label as string | null) ?? null,
+            secondary_action_mode: ((p as Record<string, unknown>).secondary_action_mode as string | null) ?? null,
+            secondary_action_label: ((p as Record<string, unknown>).secondary_action_label as string | null) ?? null,
+            accepts_online_payment: Boolean((p as Record<string, unknown>).accepts_online_payment),
+            requires_availability: Boolean((p as Record<string, unknown>).requires_availability),
+            visibility_level: String((p as Record<string, unknown>).visibility_level ?? "standard"),
+          };
+        });
+      }
+    }
+    return grouped;
   });
