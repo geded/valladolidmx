@@ -1569,6 +1569,33 @@ function PageVisualEditor({
           ) : (
             <span className="text-[11px] text-muted-foreground">Sólo administradores pueden publicar.</span>
           )}
+          {canPublish ? (
+            page?.scheduled_publish_at ? (
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-300 bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-900">
+                <Clock className="size-3" aria-hidden />
+                Programada · {new Date(page.scheduled_publish_at).toLocaleString()}
+                <button
+                  type="button"
+                  onClick={() => void onCancelSchedule()}
+                  disabled={scheduling}
+                  className="ml-1 rounded px-1.5 py-0.5 text-[10px] font-semibold text-amber-900 underline-offset-2 hover:underline disabled:opacity-60"
+                >
+                  Cancelar
+                </button>
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={openScheduleDialog}
+                disabled={publishing || scheduling}
+                title="Publica esta página automáticamente en una fecha futura"
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-60"
+              >
+                <CalendarClock className="size-3.5" aria-hidden />
+                Programar
+              </button>
+            )
+          ) : null}
           {canPublish && publishState !== "never" ? (
             <button
               type="button"
