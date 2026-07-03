@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RestaurantesRouteImport } from './routes/restaurantes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as QueHacerRouteImport } from './routes/que-hacer'
+import { Route as PromocionesRouteImport } from './routes/promociones'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as HotelesRouteImport } from './routes/hoteles'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
@@ -137,6 +138,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const QueHacerRoute = QueHacerRouteImport.update({
   id: '/que-hacer',
   path: '/que-hacer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromocionesRoute = PromocionesRouteImport.update({
+  id: '/promociones',
+  path: '/promociones',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OfflineRoute = OfflineRouteImport.update({
@@ -744,6 +750,7 @@ export interface FileRoutesByFullPath {
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
   '/offline': typeof OfflineRoute
+  '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
@@ -854,6 +861,7 @@ export interface FileRoutesByTo {
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
   '/offline': typeof OfflineRoute
+  '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
@@ -960,6 +968,7 @@ export interface FileRoutesById {
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
   '/offline': typeof OfflineRoute
+  '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
@@ -1072,6 +1081,7 @@ export interface FileRouteTypes {
     | '/experiencias'
     | '/hoteles'
     | '/offline'
+    | '/promociones'
     | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
@@ -1182,6 +1192,7 @@ export interface FileRouteTypes {
     | '/experiencias'
     | '/hoteles'
     | '/offline'
+    | '/promociones'
     | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
@@ -1287,6 +1298,7 @@ export interface FileRouteTypes {
     | '/experiencias'
     | '/hoteles'
     | '/offline'
+    | '/promociones'
     | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
@@ -1399,6 +1411,7 @@ export interface RootRouteChildren {
   ExperienciasRoute: typeof ExperienciasRoute
   HotelesRoute: typeof HotelesRoute
   OfflineRoute: typeof OfflineRoute
+  PromocionesRoute: typeof PromocionesRoute
   QueHacerRoute: typeof QueHacerRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RestaurantesRoute: typeof RestaurantesRoute
@@ -1451,6 +1464,13 @@ declare module '@tanstack/react-router' {
       path: '/que-hacer'
       fullPath: '/que-hacer'
       preLoaderRoute: typeof QueHacerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promociones': {
+      id: '/promociones'
+      path: '/promociones'
+      fullPath: '/promociones'
+      preLoaderRoute: typeof PromocionesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/offline': {
@@ -2506,6 +2526,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExperienciasRoute: ExperienciasRoute,
   HotelesRoute: HotelesRoute,
   OfflineRoute: OfflineRoute,
+  PromocionesRoute: PromocionesRoute,
   QueHacerRoute: QueHacerRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RestaurantesRoute: RestaurantesRoute,
