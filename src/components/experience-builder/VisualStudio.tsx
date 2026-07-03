@@ -874,6 +874,14 @@ function PageVisualEditor({
   const [sharing, setSharing] = useState(false);
   const [shareLink, setShareLink] = useState<{ url: string; expires_at: string } | null>(null);
   const [showTour, setShowTour] = useState(false);
+  /** US-01 · Soft lock por página. */
+  const lock = useEditingLock(page?.id ?? null);
+  const [, forceLockTick] = useState(0);
+  useEffect(() => {
+    if (!lock.blockedBy) return;
+    const t = window.setInterval(() => forceLockTick((n) => n + 1), 15_000);
+    return () => window.clearInterval(t);
+  }, [lock.blockedBy]);
   /** US-C · Diff resumen antes de publicar. */
   const [publishDiff, setPublishDiff] = useState<{
     open: boolean;
