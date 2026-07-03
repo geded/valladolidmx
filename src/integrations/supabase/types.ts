@@ -3174,6 +3174,9 @@ export type Database = {
           page_type: string
           published_at: string | null
           published_by: string | null
+          scheduled_publish_at: string | null
+          scheduled_publish_by: string | null
+          scheduled_publish_notes: string | null
           slug: string
           status: string
           title: string
@@ -3191,6 +3194,9 @@ export type Database = {
           page_type?: string
           published_at?: string | null
           published_by?: string | null
+          scheduled_publish_at?: string | null
+          scheduled_publish_by?: string | null
+          scheduled_publish_notes?: string | null
           slug: string
           status?: string
           title: string
@@ -3208,6 +3214,9 @@ export type Database = {
           page_type?: string
           published_at?: string | null
           published_by?: string | null
+          scheduled_publish_at?: string | null
+          scheduled_publish_by?: string | null
+          scheduled_publish_notes?: string | null
           slug?: string
           status?: string
           title?: string
@@ -5063,6 +5072,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      eb_cancel_scheduled_publish: {
+        Args: { _id: string; _notes?: string }
+        Returns: undefined
+      }
       eb_create_composition: {
         Args: {
           _description?: string
@@ -5161,6 +5174,13 @@ export type Database = {
         }
         Returns: string
       }
+      eb_process_scheduled_publishes: {
+        Args: never
+        Returns: {
+          composition_id: string
+          revision_id: string
+        }[]
+      }
       eb_publish_composition: {
         Args: { _id: string; _notes?: string }
         Returns: string
@@ -5187,6 +5207,10 @@ export type Database = {
       }
       eb_save_composition_draft: {
         Args: { _id: string; _tree: Json }
+        Returns: undefined
+      }
+      eb_schedule_publish_composition: {
+        Args: { _id: string; _notes?: string; _when: string }
         Returns: undefined
       }
       eb_section_publish: {

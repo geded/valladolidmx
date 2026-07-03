@@ -39,6 +39,11 @@ export interface CompositionDetail extends CompositionSummary {
    */
   published_hash: string | null;
   published_at: string | null;
+  /**
+   * US-D · Fecha ISO en que la página se publicará automáticamente. `null`
+   * si no hay publicación programada.
+   */
+  scheduled_publish_at: string | null;
 }
 
 export interface CompositionRevisionSummary {
@@ -105,7 +110,7 @@ export const getComposition = createServerFn({ method: "GET" })
     const { data: row, error } = await context.supabase
       .from("page_compositions")
       .select(
-        "id, slug, title, description, status, page_type, active_revision_id, updated_at, current_draft, published_at",
+        "id, slug, title, description, status, page_type, active_revision_id, updated_at, current_draft, published_at, scheduled_publish_at",
       )
       .eq("id", data.id)
       .maybeSingle();
@@ -128,6 +133,8 @@ export const getComposition = createServerFn({ method: "GET" })
       current_draft: ((row as { current_draft: unknown }).current_draft as CompositionTree) ?? EMPTY_TREE,
       published_hash,
       published_at: (row as { published_at: string | null }).published_at ?? null,
+      scheduled_publish_at:
+        (row as { scheduled_publish_at: string | null }).scheduled_publish_at ?? null,
     };
   });
 
@@ -329,6 +336,35 @@ export const unpublishComposition = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const { error } = await context.supabase.rpc("eb_unpublish_composition", {
+      _id: data.id,
+      _notes: data.notes,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/**
+ * US-D · Programa una publicación futura. La ejecuta el sistema (cron)
+ * cuando llega la fecha; el estado queda en 'draft' hasta ese momento.
+ */
+export const schedulePublishComposition = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string; scheduled_at: string; notes?: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { error } = await context.supabase.rpc("eb_schedule_publish_composition", {
+      _id: data.id,
+      _when: data.scheduled_at,
+      _notes: data.notes,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const cancelScheduledPublish = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string; notes?: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { error } = await context.supabase.rpc("eb_cancel_scheduled_publish", {
       _id: data.id,
       _notes: data.notes,
     });
