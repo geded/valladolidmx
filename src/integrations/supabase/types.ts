@@ -1845,6 +1845,50 @@ export type Database = {
         }
         Relationships: []
       }
+      eb_block_comments: {
+        Row: {
+          author_id: string
+          block_id: string
+          body: string
+          composition_id: string
+          created_at: string
+          id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          block_id: string
+          body: string
+          composition_id: string
+          created_at?: string
+          id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          block_id?: string
+          body?: string
+          composition_id?: string
+          created_at?: string
+          id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eb_block_comments_composition_id_fkey"
+            columns: ["composition_id"]
+            isOneToOne: false
+            referencedRelation: "page_compositions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       eb_page_versions: {
         Row: {
           created_at: string
@@ -5095,6 +5139,12 @@ export type Database = {
         Args: { _id: string; _notes?: string }
         Returns: undefined
       }
+      eb_comment_create: {
+        Args: { _block_id: string; _body: string; _composition_id: string }
+        Returns: string
+      }
+      eb_comment_reopen: { Args: { _comment_id: string }; Returns: undefined }
+      eb_comment_resolve: { Args: { _comment_id: string }; Returns: undefined }
       eb_create_composition: {
         Args: {
           _description?: string

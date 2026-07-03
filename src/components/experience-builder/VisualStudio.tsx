@@ -92,6 +92,7 @@ import { getBlock, listBlocks } from "@/lib/experience-builder/block-registry";
 import type { BlockContract } from "@/lib/experience-builder/block-contract";
 import { diffCompositions, type SectionChange } from "@/lib/experience-builder/composition-diff";
 import { AutoInspector } from "@/components/experience-builder/AutoInspector";
+import { BlockCommentsPanel } from "@/components/experience-builder/BlockCommentsPanel";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
 import { useAuth } from "@/hooks/useAuth";
 import { FONT_FAMILY_OPTIONS, type BlockAppearance } from "@/lib/experience-builder/appearance";
@@ -852,10 +853,13 @@ function PageVisualEditor({
   const issuePreview = useServerFn(issueCompositionPreviewLink);
   const setWorkflow = useServerFn(setCompositionWorkflowState);
   const queryClient = useQueryClient();
-  const { roles } = useAuth();
+  const { roles, user } = useAuth();
   const canPublish = roles.includes("admin") || roles.includes("super_admin");
+  const isAdmin = canPublish;
   const canForceLock = canPublish;
   const [workflowBusy, setWorkflowBusy] = useState(false);
+  // US-03 · Conteo de comentarios abiertos por bloque (para badge en overlay).
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
 
   const changeWorkflow = async (next: "draft" | "in_review" | "approved") => {
     if (!page) return;
@@ -1772,6 +1776,7 @@ function PageVisualEditor({
             const next = arrayMove(tree.root.children, oldIdx, newIdx);
             commitTree({ ...tree, root: { children: next } });
           }}
+          commentCounts={commentCounts}
         />
 
         {!previewMode && selectedContract && selectedConfig ? (
@@ -1846,6 +1851,17 @@ function PageVisualEditor({
                 node={selectedNode}
                 config={selectedConfig}
                 onChange={(next) => updateSelectedConfig(next)}
+              />
+            ) : null}
+
+            {selectedNode && page ? (
+              <BlockCommentsPanel
+                compositionId={page.id}
+                blockId={selectedNode.id}
+                blockLabel={selectedContract?.display_name ?? selectedNode.type}
+                currentUserId={user?.id ?? null}
+                isAdmin={isAdmin}
+                onCountsChange={setCommentCounts}
               />
             ) : null}
           </aside>
@@ -2155,6 +2171,7 @@ function HomeCanvas({
   onToggleHidden,
   onMove,
   onReorderRoot,
+  commentCounts,
 }: {
   tree: CompositionTree;
   previewMode: boolean;
@@ -2167,6 +2184,7 @@ function HomeCanvas({
   onToggleHidden: (id: string) => void;
   onMove: (id: string, dir: -1 | 1) => void;
   onReorderRoot: (activeId: string, overId: string) => void;
+  commentCounts?: Record<string, number>;
 }) {
   const outerRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<HTMLDivElement | null>(null);
@@ -2254,6 +2272,7 @@ function HomeCanvas({
                           onMoveUp={() => onMove(node.id, -1)}
                           onMoveDown={() => onMove(node.id, 1)}
                           sortable={rootIdSet.has(node.id)}
+                          commentCount={commentCounts?.[node.id] ?? 0}
                         >
                           {content}
                         </BlockOverlay>
@@ -2425,7 +2444,7 @@ function SortableSectionItem({
 }
 
 function BlockOverlay({
-  node, selected, onSelect, onDelete, onDuplicate, onToggleHidden, onMoveUp, onMoveDown, children, sortable = false,
+  node, selected, onSelect, onDelete, onDuplicate, onToggleHidden, onMoveUp, onMoveDown, children, sortable = false, commentCount = 0,
 }: {
   node: CompositionNode;
   selected: boolean;
@@ -2437,6 +2456,7 @@ function BlockOverlay({
   onMoveDown: () => void;
   children: React.ReactNode;
   sortable?: boolean;
+  commentCount?: number;
 }) {
   const contract = getBlock(node.type);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -2507,6 +2527,14 @@ function BlockOverlay({
       >
         {contract?.display_name ?? node.type}
       </span>
+      {commentCount > 0 ? (
+        <span
+          className="pointer-events-none absolute left-3 top-10 z-30 inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg"
+          title={`${commentCount} comentario(s) abierto(s)`}
+        >
+          💬 {commentCount}
+        </span>
+      ) : null}
       {selected ? (
         <div className="pointer-events-auto absolute right-3 top-3 z-30 flex gap-1 rounded-full bg-background/95 p-1 shadow-lg ring-1 ring-border">
           {sortable ? (
