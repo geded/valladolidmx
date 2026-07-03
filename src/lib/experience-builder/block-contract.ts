@@ -83,8 +83,65 @@ export interface BlockDataSource {
     | "reviews"
     | "bea"
     | "alux";
-  reader: string;
+  /**
+   * Server function read-only ya aprobada. Opcional cuando el Smart Block
+   * declara una `query` declarativa resuelta por `resolveSmartBlock`.
+   */
+  reader?: string;
   read_only: true;
+  /**
+   * Query declarativa (15.10.8.1). Cuando está presente, el resolver
+   * server-side (`resolveSmartBlock`, 15.10.8.2) ejecuta la consulta sobre
+   * la tabla pública indicada respetando RLS `anon`. Se ignora si además
+   * se provee `reader` explícito.
+   */
+  query?: SmartBlockQuery;
+}
+
+/**
+ * Operadores de filtro permitidos para queries declarativas de Smart Blocks.
+ * Espejo estrecho de PostgREST — solo lectura, sin joins arbitrarios.
+ */
+export type SmartBlockFilterOp =
+  | "eq"
+  | "neq"
+  | "gt"
+  | "gte"
+  | "lt"
+  | "lte"
+  | "in"
+  | "contains"
+  | "ilike";
+
+export interface SmartBlockFilter {
+  column: string;
+  op: SmartBlockFilterOp;
+  value: string | number | boolean | Array<string | number>;
+}
+
+export interface SmartBlockOrderBy {
+  column: string;
+  direction?: "asc" | "desc";
+}
+
+/**
+ * Query declarativa read-only para Smart Blocks. La tabla debe estar
+ * expuesta por Data API con política `TO anon` de solo SELECT.
+ */
+export interface SmartBlockQuery {
+  table:
+    | "destinations"
+    | "destination_zones"
+    | "businesses"
+    | "products"
+    | "events"
+    | "promotions"
+    | "articles";
+  /** Columnas seguras a proyectar. `*` NO permitido. */
+  select: string[];
+  filters?: SmartBlockFilter[];
+  order_by?: SmartBlockOrderBy[];
+  limit?: number;
 }
 
 /** Restricciones declarativas del bloque dentro de una composición. */
@@ -187,6 +244,21 @@ export function validateBlockContract(c: BlockContract): BlockContractValidation
     } else {
       for (const ds of c.data_sources) {
         if (ds.read_only !== true) errors.push(`data source "${ds.reader}" must be read_only`);
+        if (!ds.reader && !ds.query) {
+          errors.push(`data source in domain "${ds.domain}" must declare either "reader" or "query"`);
+        }
+        if (ds.query) {
+          const q = ds.query;
+          if (!q.table) errors.push(`data source query must declare "table"`);
+          if (!Array.isArray(q.select) || q.select.length === 0) {
+            errors.push(`data source query must declare a non-empty "select" projection`);
+          } else if (q.select.includes("*")) {
+            errors.push(`data source query "select" must not include "*"`);
+          }
+          if (q.limit !== undefined && (!Number.isInteger(q.limit) || q.limit <= 0 || q.limit > 100)) {
+            errors.push(`data source query "limit" must be an integer between 1 and 100`);
+          }
+        }
       }
     }
     if (c.capabilities.soporta_datos_dinamicos !== true) {
