@@ -76,6 +76,7 @@ import {
   restoreCompositionRevision,
   issueCompositionPreviewLink,
   getPublishedTree,
+  setCompositionWorkflowState,
   type CompositionDetail,
   type CompositionRevisionSummary,
 } from "@/lib/experience-builder/studio.functions";
