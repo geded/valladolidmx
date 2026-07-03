@@ -244,6 +244,21 @@ export function validateBlockContract(c: BlockContract): BlockContractValidation
     } else {
       for (const ds of c.data_sources) {
         if (ds.read_only !== true) errors.push(`data source "${ds.reader}" must be read_only`);
+        if (!ds.reader && !ds.query) {
+          errors.push(`data source in domain "${ds.domain}" must declare either "reader" or "query"`);
+        }
+        if (ds.query) {
+          const q = ds.query;
+          if (!q.table) errors.push(`data source query must declare "table"`);
+          if (!Array.isArray(q.select) || q.select.length === 0) {
+            errors.push(`data source query must declare a non-empty "select" projection`);
+          } else if (q.select.includes("*")) {
+            errors.push(`data source query "select" must not include "*"`);
+          }
+          if (q.limit !== undefined && (!Number.isInteger(q.limit) || q.limit <= 0 || q.limit > 100)) {
+            errors.push(`data source query "limit" must be an integer between 1 and 100`);
+          }
+        }
       }
     }
     if (c.capabilities.soporta_datos_dinamicos !== true) {
