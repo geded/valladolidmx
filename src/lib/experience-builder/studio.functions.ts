@@ -602,3 +602,241 @@ export const deleteBlockComment = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
+/* ==================================================================== *
+ * US-R2 · Panel de Páginas — server functions
+ *
+ * Contrato R2.1–R2.24. Reutiliza RPCs `SECURITY DEFINER` de la
+ * migración US-R2. No modifica renderer, publicación, workflow ni
+ * ciclo de lock.
+ * ==================================================================== */
+
+import type { PageKind } from "./page-kind-registry";
+
+export interface StudioPageRow {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  status: "draft" | "published" | "archived";
+  page_type: string;
+  kind: PageKind;
+  is_template: boolean;
+  template_of_kind: PageKind | null;
+  active_revision_id: string | null;
+  workflow_state: "draft" | "in_review" | "approved";
+  scheduled_publish_at: string | null;
+  published_at: string | null;
+  updated_at: string;
+  updated_by: string | null;
+  author_name: string | null;
+  has_unpublished_changes: boolean;
+  editing_lock: {
+    user_id: string;
+    user_name: string;
+    acquired_at: string;
+    heartbeat_at: string;
+  } | null;
+}
+
+/**
+ * Lista enriquecida usada por el Panel de Páginas (US-R2). Devuelve
+ * `kind`, `is_template`, estado de workflow, programación pendiente,
+ * autor legible y flag de cambios sin publicar sin exigir un fetch
+ * adicional por fila.
+ */
+export const listStudioPages = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<StudioPageRow[]> => {
+    const { data, error } = await context.supabase
+      .from("page_compositions")
+      .select(
+        [
+          "id",
+          "slug",
+          "title",
+          "description",
+          "status",
+          "page_type",
+          "kind",
+          "is_template",
+          "template_of_kind",
+          "active_revision_id",
+          "workflow_state",
+          "scheduled_publish_at",
+          "published_at",
+          "updated_at",
+          "updated_by",
+          "editing_lock",
+          "current_draft",
+        ].join(", "),
+      )
+      .order("updated_at", { ascending: false })
+      .limit(500);
+    if (error) throw new Error(error.message);
+    const rows = (data ?? []) as Array<Record<string, unknown>>;
+
+    // Autor: batch lookup en profiles (best-effort, RLS puede filtrar).
+    const authorIds = Array.from(
+      new Set(
+        rows
+          .map((r) => (r.updated_by as string | null) ?? null)
+          .filter((x): x is string => !!x),
+      ),
+    );
+    const nameById = new Map<string, string>();
+    if (authorIds.length > 0) {
+      const { data: profs } = await context.supabase
+        .from("profiles")
+        .select("user_id, display_name, email")
+        .in("user_id", authorIds);
+      for (const p of (profs ?? []) as Array<{
+        user_id: string;
+        display_name: string | null;
+        email: string | null;
+      }>) {
+        nameById.set(p.user_id, p.display_name || p.email || "");
+      }
+    }
+
+    // Hash del snapshot activo para detectar "cambios sin publicar".
+    const activeIds = rows
+      .map((r) => r.active_revision_id as string | null)
+      .filter((x): x is string => !!x);
+    const publishedHashById = new Map<string, string>();
+    if (activeIds.length > 0) {
+      const { data: revs } = await context.supabase
+        .from("page_revisions")
+        .select("id, snapshot")
+        .in("id", activeIds);
+      for (const rev of (revs ?? []) as Array<{ id: string; snapshot: unknown }>) {
+        if (rev.snapshot) {
+          publishedHashById.set(rev.id, await sha256Hex(canonicalize(rev.snapshot)));
+        }
+      }
+    }
+
+    const out: StudioPageRow[] = [];
+    for (const r of rows) {
+      const activeId = (r.active_revision_id as string | null) ?? null;
+      const draftHash = await sha256Hex(canonicalize(r.current_draft));
+      const publishedHash = activeId ? publishedHashById.get(activeId) ?? null : null;
+      const hasChanges = publishedHash ? publishedHash !== draftHash : Boolean(r.current_draft);
+      out.push({
+        id: String(r.id),
+        slug: String(r.slug),
+        title: String(r.title),
+        description: (r.description as string | null) ?? null,
+        status: (r.status as StudioPageRow["status"]) ?? "draft",
+        page_type: String(r.page_type ?? "generic"),
+        kind: (r.kind as PageKind) ?? ("custom" as PageKind),
+        is_template: Boolean(r.is_template),
+        template_of_kind: (r.template_of_kind as PageKind | null) ?? null,
+        active_revision_id: activeId,
+        workflow_state:
+          (r.workflow_state as StudioPageRow["workflow_state"]) ?? "draft",
+        scheduled_publish_at: (r.scheduled_publish_at as string | null) ?? null,
+        published_at: (r.published_at as string | null) ?? null,
+        updated_at: String(r.updated_at),
+        updated_by: (r.updated_by as string | null) ?? null,
+        author_name:
+          (r.updated_by as string | null) && nameById.has(r.updated_by as string)
+            ? nameById.get(r.updated_by as string) ?? null
+            : null,
+        has_unpublished_changes: hasChanges,
+        editing_lock: (r.editing_lock as StudioPageRow["editing_lock"]) ?? null,
+      });
+    }
+    return out;
+  });
+
+export const duplicateComposition = createServerFn({ method: "POST" })
+  .inputValidator(
+    (data: { id: string; new_slug: string; new_title?: string | null }) => data,
+  )
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ id: string }> => {
+    const { data: id, error } = await context.supabase.rpc("eb_duplicate_composition", {
+      _id: data.id,
+      _new_slug: data.new_slug,
+      _new_title: data.new_title ?? null,
+    });
+    if (error) throw new Error(error.message);
+    return { id: id as unknown as string };
+  });
+
+export const renameComposition = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string; new_title: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { error } = await context.supabase.rpc("eb_rename_composition", {
+      _id: data.id,
+      _new_title: data.new_title,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const updateCompositionSlug = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string; new_slug: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { error } = await context.supabase.rpc("eb_update_composition_slug", {
+      _id: data.id,
+      _new_slug: data.new_slug,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const archiveComposition = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { error } = await context.supabase.rpc("eb_archive_composition", {
+      _id: data.id,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const unarchiveComposition = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { error } = await context.supabase.rpc("eb_unarchive_composition", {
+      _id: data.id,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteComposition = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { error } = await context.supabase.rpc("eb_delete_composition", {
+      _id: data.id,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const markCompositionAsTemplate = createServerFn({ method: "POST" })
+  .inputValidator(
+    (data: {
+      id: string;
+      is_template: boolean;
+      template_of_kind?: PageKind | null;
+    }) => data,
+  )
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { error } = await context.supabase.rpc("eb_mark_composition_as_template", {
+      _id: data.id,
+      _is_template: data.is_template,
+      _template_of_kind: data.template_of_kind ?? null,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
