@@ -83,8 +83,65 @@ export interface BlockDataSource {
     | "reviews"
     | "bea"
     | "alux";
-  reader: string;
+  /**
+   * Server function read-only ya aprobada. Opcional cuando el Smart Block
+   * declara una `query` declarativa resuelta por `resolveSmartBlock`.
+   */
+  reader?: string;
   read_only: true;
+  /**
+   * Query declarativa (15.10.8.1). Cuando está presente, el resolver
+   * server-side (`resolveSmartBlock`, 15.10.8.2) ejecuta la consulta sobre
+   * la tabla pública indicada respetando RLS `anon`. Se ignora si además
+   * se provee `reader` explícito.
+   */
+  query?: SmartBlockQuery;
+}
+
+/**
+ * Operadores de filtro permitidos para queries declarativas de Smart Blocks.
+ * Espejo estrecho de PostgREST — solo lectura, sin joins arbitrarios.
+ */
+export type SmartBlockFilterOp =
+  | "eq"
+  | "neq"
+  | "gt"
+  | "gte"
+  | "lt"
+  | "lte"
+  | "in"
+  | "contains"
+  | "ilike";
+
+export interface SmartBlockFilter {
+  column: string;
+  op: SmartBlockFilterOp;
+  value: string | number | boolean | Array<string | number>;
+}
+
+export interface SmartBlockOrderBy {
+  column: string;
+  direction?: "asc" | "desc";
+}
+
+/**
+ * Query declarativa read-only para Smart Blocks. La tabla debe estar
+ * expuesta por Data API con política `TO anon` de solo SELECT.
+ */
+export interface SmartBlockQuery {
+  table:
+    | "destinations"
+    | "destination_zones"
+    | "businesses"
+    | "products"
+    | "events"
+    | "promotions"
+    | "articles";
+  /** Columnas seguras a proyectar. `*` NO permitido. */
+  select: string[];
+  filters?: SmartBlockFilter[];
+  order_by?: SmartBlockOrderBy[];
+  limit?: number;
 }
 
 /** Restricciones declarativas del bloque dentro de una composición. */
