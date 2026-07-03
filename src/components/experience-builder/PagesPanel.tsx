@@ -996,7 +996,14 @@ function CreatePageDialog({
                   kind === k.kind ? "border-primary bg-primary/5" : "border-border bg-background"
                 }`}
               >
-                <div className="text-sm font-semibold">{k.label}</div>
+                <div className="flex items-center gap-2">
+                  <div className="text-sm font-semibold">{k.label}</div>
+                  {getKitSeed(k.kind) ? (
+                    <span className="rounded-full border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wide text-primary">
+                      Kit
+                    </span>
+                  ) : null}
+                </div>
                 <div className="mt-1 text-[11px] text-muted-foreground">{k.description}</div>
                 <div className="mt-1 font-mono text-[10px] text-muted-foreground">
                   {k.slugPattern}
