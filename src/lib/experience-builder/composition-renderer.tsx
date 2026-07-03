@@ -71,6 +71,21 @@ import {
   ProductFaqBlock,
   ProductRelatedBlock,
 } from "@/components/surfaces/product-blocks";
+import { KIT_BLOCK_RENDERERS } from "./kit-blocks";
+
+/**
+ * US-R3 · Sub-ola 2.5d — mapa de renderers `vmx.kit.*`. Se expande de
+ * forma controlada en ambos mapas (Studio + producción) SIN reemplazar
+ * ninguna entrada existente. Los bloques del Kit son neutros: se
+ * renderizan idénticos en Studio y producción a partir de `node.config`,
+ * sin depender de ningún SurfaceContext.
+ */
+const KIT_MAP: Record<string, BlockPreview> = Object.fromEntries(
+  Object.entries(KIT_BLOCK_RENDERERS).map(([type, render]) => [
+    type,
+    (({ node }) => render(node)) as BlockPreview,
+  ]),
+);
 
 bootstrapBlockLibrary();
 
@@ -426,6 +441,8 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.product.reviews": () => <ProductReviewsBlock />,
   "vmx.product.faq": () => <ProductFaqBlock />,
   "vmx.product.related": () => <ProductRelatedBlock />,
+  // US-R3 · Sub-ola 2.5d — vmx.kit.* neutros (Studio).
+  ...KIT_MAP,
 };
 
 /* ------------------------------------------------------------------ *
@@ -638,6 +655,8 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.product.reviews": () => <ProductReviewsBlock />,
   "vmx.product.faq": () => <ProductFaqBlock />,
   "vmx.product.related": () => <ProductRelatedBlock />,
+  // US-R3 · Sub-ola 2.5d — vmx.kit.* neutros (producción).
+  ...KIT_MAP,
 };
 
 /* ------------------------------------------------------------------ *

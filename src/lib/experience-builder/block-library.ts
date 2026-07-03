@@ -16,6 +16,7 @@
 
 import { registerBlock } from "./block-registry";
 import type { BlockContract } from "./block-contract";
+import { KIT_BLOCK_CONTRACTS } from "./kit-blocks";
 import heroBg01Url from "@/assets/brand/hero/bg01.jpg";
 import heroBg02Url from "@/assets/brand/hero/bg02.jpg";
 
@@ -1359,6 +1360,9 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   productReviewsBlock,
   productFaqBlock,
   productRelatedBlock,
+  // US-R3 · Sub-ola 2.5d — Surface Kit neutro (nueva capacidad, sin
+  // sustituir bloques existentes). Spread al final del catálogo.
+  ...KIT_BLOCK_CONTRACTS,
 ];
 
 let bootstrapped = false;
