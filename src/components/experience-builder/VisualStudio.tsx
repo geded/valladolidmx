@@ -1907,11 +1907,12 @@ function ChromeItem({
 }
 
 function SortableSectionItem({
-  node, selected, onSelect,
+  node, selected, onSelect, onToggleHidden,
 }: {
   node: CompositionNode;
   selected: boolean;
   onSelect: () => void;
+  onToggleHidden: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: node.id });
   const contract = getBlock(node.type);
@@ -1926,7 +1927,7 @@ function SortableSectionItem({
       style={style}
       className={`mb-1 flex items-center gap-1 rounded-md border px-2 py-1.5 text-left text-xs ${
         selected ? "border-primary bg-primary/10" : "border-border bg-background hover:bg-accent"
-      }`}
+      } ${node.hidden ? "opacity-60" : ""}`}
     >
       <button
         type="button"
@@ -1940,9 +1941,18 @@ function SortableSectionItem({
       <button
         type="button"
         onClick={onSelect}
-        className="min-w-0 flex-1 truncate text-left font-medium"
+        className={`min-w-0 flex-1 truncate text-left font-medium ${node.hidden ? "line-through" : ""}`}
       >
         {contract?.display_name ?? node.type}
+      </button>
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onToggleHidden(); }}
+        aria-label={node.hidden ? "Mostrar en el sitio" : "Ocultar en el sitio"}
+        title={node.hidden ? "Mostrar en el sitio" : "Ocultar en el sitio"}
+        className="inline-flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+      >
+        {node.hidden ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
       </button>
     </div>
   );
