@@ -86,6 +86,12 @@ export const Route = createFileRoute("/sitemap.xml")({
             changefreq: "weekly" as const,
             priority: "0.6",
           })),
+          ...entities.eventos.map((r) => ({
+            path: `/eventos/${r.slug}`,
+            lastmod: r.updated_at ?? undefined,
+            changefreq: "daily" as const,
+            priority: "0.7",
+          })),
         ];
         const entries = [...STATIC_ENTRIES, ...dynamicEntries, ...entityEntries];
         const urls = entries.map((e) =>
