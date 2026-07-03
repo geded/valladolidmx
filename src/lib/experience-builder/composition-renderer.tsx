@@ -59,6 +59,18 @@ import {
   BusinessPromotionsBlock,
   BusinessContactBlock,
 } from "@/components/surfaces/business-blocks";
+import {
+  ProductShellBlock,
+  ProductHeroBlock,
+  ProductGalleryBlock,
+  ProductPriceCtaBlock,
+  ProductDescriptionBlock,
+  ProductBusinessContextBlock,
+  ProductPromosBlock,
+  ProductReviewsBlock,
+  ProductFaqBlock,
+  ProductRelatedBlock,
+} from "@/components/surfaces/product-blocks";
 
 bootstrapBlockLibrary();
 
