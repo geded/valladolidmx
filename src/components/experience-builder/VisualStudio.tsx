@@ -1441,7 +1441,7 @@ function PageVisualEditor({
           {canPublish ? (
             <button
               type="button"
-              onClick={() => void onPublish()}
+              onClick={() => void openPublishDialog()}
               disabled={publishing}
               className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:opacity-95 disabled:opacity-60"
             >
