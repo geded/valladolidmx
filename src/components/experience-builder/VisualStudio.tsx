@@ -70,6 +70,7 @@ import {
   listCompositionRevisions,
   restoreCompositionRevision,
   issueCompositionPreviewLink,
+  getPublishedTree,
   type CompositionDetail,
   type CompositionRevisionSummary,
 } from "@/lib/experience-builder/studio.functions";
@@ -83,6 +84,7 @@ import {
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { getBlock, listBlocks } from "@/lib/experience-builder/block-registry";
 import type { BlockContract } from "@/lib/experience-builder/block-contract";
+import { diffCompositions, type SectionChange } from "@/lib/experience-builder/composition-diff";
 import { AutoInspector } from "@/components/experience-builder/AutoInspector";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
 import { useAuth } from "@/hooks/useAuth";
