@@ -93,6 +93,7 @@ import type { BlockContract } from "@/lib/experience-builder/block-contract";
 import { diffCompositions, type SectionChange } from "@/lib/experience-builder/composition-diff";
 import { AutoInspector } from "@/components/experience-builder/AutoInspector";
 import { BlockCommentsPanel } from "@/components/experience-builder/BlockCommentsPanel";
+import { PagesPanel } from "@/components/experience-builder/PagesPanel";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
 import { useAuth } from "@/hooks/useAuth";
 import { FONT_FAMILY_OPTIONS, type BlockAppearance } from "@/lib/experience-builder/appearance";
@@ -479,12 +480,24 @@ export function VisualStudio({ page = null, onSelectPage, advanced = false }: Vi
     return <PageVisualEditor pageDef={activePage} onExit={() => setOpen(null)} advanced={advanced} />;
   }
   return (
-    <PagesPicker
-      customPages={customPages}
-      onOpen={(k) => setOpen(k)}
-      onCreated={(p) => {
-        setCustomPages((prev) => (prev.some((x) => x.key === p.key) ? prev : [...prev, p]));
-        setOpen(p.key);
+    <PagesPanel
+      onOpenPage={(p) => {
+        const sitePage: SitePage = {
+          key: p.key,
+          slug: p.slug,
+          title: p.title,
+          description: p.description,
+          page_type: p.page_type,
+          publicPath: p.publicPath,
+          status: "editable",
+          custom: p.custom,
+        };
+        setCustomPages((prev) =>
+          prev.some((x) => normalizePageKey(x.key) === normalizePageKey(sitePage.key))
+            ? prev
+            : [...prev, sitePage],
+        );
+        setOpen(sitePage.key);
       }}
     />
   );

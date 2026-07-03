@@ -5133,6 +5133,7 @@ export type Database = {
         Args: { _composition_id: string; _force?: boolean }
         Returns: Json
       }
+      eb_archive_composition: { Args: { _id: string }; Returns: undefined }
       eb_cache_invalidate: {
         Args: { _page_id: string; _reason?: string }
         Returns: number
@@ -5167,9 +5168,14 @@ export type Database = {
         Args: { _id: string; _notes?: string }
         Returns: string
       }
+      eb_delete_composition: { Args: { _id: string }; Returns: undefined }
       eb_deprecate_block: {
         Args: { _reason?: string; _type: string }
         Returns: undefined
+      }
+      eb_duplicate_composition: {
+        Args: { _id: string; _new_slug: string; _new_title?: string }
+        Returns: string
       }
       eb_get_published_by_slug: {
         Args: { _slug: string; _variant_key?: string }
@@ -5224,6 +5230,14 @@ export type Database = {
         }[]
       }
       eb_lock_is_active: { Args: { lock: Json }; Returns: boolean }
+      eb_mark_composition_as_template: {
+        Args: {
+          _id: string
+          _is_template: boolean
+          _template_of_kind?: Database["public"]["Enums"]["eb_page_kind"]
+        }
+        Returns: undefined
+      }
       eb_page_delete: { Args: { _page_id: string }; Returns: undefined }
       eb_page_publish: {
         Args: { _note: string; _page_id: string }
@@ -5268,6 +5282,10 @@ export type Database = {
         Args: { _id: string; _notes?: string }
         Returns: string
       }
+      eb_r2_authz: {
+        Args: { _id: string; _need_delete?: boolean }
+        Returns: undefined
+      }
       eb_register_block: {
         Args: {
           _capabilities?: Json
@@ -5285,6 +5303,10 @@ export type Database = {
         Returns: string
       }
       eb_release_edit_lock: { Args: { _composition_id: string }; Returns: Json }
+      eb_rename_composition: {
+        Args: { _id: string; _new_title: string }
+        Returns: undefined
+      }
       eb_restore_revision: {
         Args: { _id: string; _revision_id: string }
         Returns: undefined
@@ -5317,8 +5339,13 @@ export type Database = {
       }
       eb_template_upsert: { Args: { _payload: Json }; Returns: string }
       eb_theme_upsert: { Args: { _payload: Json }; Returns: string }
+      eb_unarchive_composition: { Args: { _id: string }; Returns: undefined }
       eb_unpublish_composition: {
         Args: { _id: string; _notes?: string }
+        Returns: undefined
+      }
+      eb_update_composition_slug: {
+        Args: { _id: string; _new_slug: string }
         Returns: undefined
       }
       eb_variant_resolve: {
