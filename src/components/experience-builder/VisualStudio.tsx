@@ -1146,6 +1146,71 @@ function PageVisualEditor({
     }
   };
 
+  /**
+   * US-D · Programar publicación. Guarda el borrador actual y agenda una
+   * publicación futura vía RPC. Un job de sistema (cada 5 min) publica
+   * automáticamente cuando llega la fecha.
+   */
+  const openScheduleDialog = () => {
+    // Valor por defecto: dentro de 1 hora, redondeado a minutos, formato datetime-local
+    const d = new Date(Date.now() + 60 * 60 * 1000);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    setScheduleValue(
+      `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`,
+    );
+    setScheduleError(null);
+    setScheduleOpen(true);
+  };
+
+  const onSchedule = async () => {
+    if (!page || !tree) return;
+    setScheduling(true);
+    setScheduleError(null);
+    try {
+      const when = new Date(scheduleValue);
+      if (isNaN(when.getTime()) || when.getTime() <= Date.now()) {
+        setScheduleError("Elige una fecha y hora en el futuro.");
+        setScheduling(false);
+        return;
+      }
+      await save({ data: { id: page.id, tree } });
+      await schedulePublish({
+        data: {
+          id: page.id,
+          scheduled_at: when.toISOString(),
+          notes: "Programado desde Modo Visual",
+        },
+      });
+      setMessage(`Publicación programada para ${when.toLocaleString()}.`);
+      setScheduleOpen(false);
+      try {
+        const refreshed = (await get({ data: { id: page.id } })) as CompositionDetail | null;
+        if (refreshed) setPage(refreshed);
+      } catch {
+        /* best-effort */
+      }
+    } catch (e) {
+      setScheduleError((e as Error).message);
+    } finally {
+      setScheduling(false);
+    }
+  };
+
+  const onCancelSchedule = async () => {
+    if (!page) return;
+    setScheduling(true);
+    try {
+      await cancelSchedule({ data: { id: page.id, notes: "Cancelado desde Modo Visual" } });
+      setMessage("Publicación programada cancelada.");
+      const refreshed = (await get({ data: { id: page.id } })) as CompositionDetail | null;
+      if (refreshed) setPage(refreshed);
+    } catch (e) {
+      setMessage(`No se pudo cancelar la programación: ${(e as Error).message}`);
+    } finally {
+      setScheduling(false);
+    }
+  };
+
   const updateSelectedConfig = (nextConfig: Record<string, unknown>) => {
     if (!tree) return;
     if (selectedChrome === "header" || selectedChrome === "footer") {
