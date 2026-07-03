@@ -157,6 +157,7 @@ export interface BlockConstraints {
     | "marketplace"
     | "alux"
     | "trip_builder"
+    | "region"
   >;
   /** Profundidad máxima de anidación dentro de contenedores. */
   max_nesting_depth?: number;
