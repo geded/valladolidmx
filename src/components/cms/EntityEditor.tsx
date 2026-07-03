@@ -178,7 +178,7 @@ export function EntityEditor(props: Props) {
       <header className="flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-            Ola 1 · Etapa 3 · Edición
+            Edición
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">
             {isEdit ? title : `Nuevo · ${title}`}
