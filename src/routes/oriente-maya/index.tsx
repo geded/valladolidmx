@@ -1,12 +1,27 @@
+/**
+ * /oriente-maya — Región Oriente Maya (SSR).
+ *
+ * US-R3 · Ola 2 · Sub-ola 2.1: la vista de la Región ahora se sirve
+ * desde el Experience Builder resolviendo la plantilla oficial por
+ * `kind = region` (slug interno `__tpl_region__`). Fallback seguro
+ * a `<RegionSurface />` (misma UI) si la composición no está publicada.
+ */
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
-import { DestinoCard } from "@/components/cards/DestinoCard";
-import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
+import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
+import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import { RegionSurface } from "@/components/surfaces/RegionSurface";
 
 export const Route = createFileRoute("/oriente-maya/")({
+  loader: async () => {
+    const composition = await getPublishedCompositionBySlug({
+      data: { slug: "__tpl_region__" },
+    }).catch(() => null);
+    return { composition };
+  },
   head: () =>
     buildPublicHead({
       title: `Oriente Maya — Destinos · ${SITE.name}`,
@@ -14,21 +29,18 @@ export const Route = createFileRoute("/oriente-maya/")({
       path: "/oriente-maya",
     }),
   component: OrienteMayaIndex,
+  errorComponent: () => (
+    <PublicShell title={ORIENTE_MAYA.name} crumbs={[{ label: ORIENTE_MAYA.name }]}>
+      <RegionSurface />
+    </PublicShell>
+  ),
 });
 
 function OrienteMayaIndex() {
-  return (
-    <PublicShell
-      eyebrow="Región turística"
-      title={ORIENTE_MAYA.name}
-      description={ORIENTE_MAYA.short_description}
-      crumbs={[{ label: ORIENTE_MAYA.name }]}
-    >
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {DESTINOS_MOCK.filter((d) => d.region_slug === ORIENTE_MAYA.slug).map((d) => (
-          <DestinoCard key={d.id} destination={d} />
-        ))}
-      </div>
-    </PublicShell>
+  const { composition } = Route.useLoaderData();
+  return composition ? (
+    <CompositionRenderer tree={composition.snapshot} />
+  ) : (
+    <RegionSurface />
   );
 }
