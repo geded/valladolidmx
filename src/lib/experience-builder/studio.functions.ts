@@ -44,6 +44,13 @@ export interface CompositionDetail extends CompositionSummary {
    * si no hay publicación programada.
    */
   scheduled_publish_at: string | null;
+  /**
+   * US-02 · Estado del flujo editorial independiente del ciclo de
+   * publicación. Valores: `draft`, `in_review`, `approved`.
+   */
+  workflow_state: "draft" | "in_review" | "approved";
+  workflow_updated_at: string | null;
+  workflow_notes: string | null;
 }
 
 export interface CompositionRevisionSummary {
