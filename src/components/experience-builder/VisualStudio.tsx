@@ -1020,6 +1020,13 @@ function PageVisualEditor({
       await queryClient.invalidateQueries({ queryKey: ["eb", "published-by-slug", pageDef.slug] });
       setMessage(`Cambios publicados en ${pageDef.publicPath}.`);
       if (showVersions) void refreshVersions();
+      // Refrescar `published_hash` para que el badge pase a "Todo publicado".
+      try {
+        const refreshed = (await get({ data: { id: page.id } })) as CompositionDetail | null;
+        if (refreshed) setPage(refreshed);
+      } catch {
+        /* best-effort */
+      }
     } catch (e) {
       setMessage(`No se pudo publicar: ${(e as Error).message}`);
     } finally {
