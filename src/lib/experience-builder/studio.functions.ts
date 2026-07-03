@@ -31,6 +31,14 @@ export interface CompositionSummary {
 
 export interface CompositionDetail extends CompositionSummary {
   current_draft: CompositionTree;
+  /**
+   * SHA-256 hex del snapshot de la revisión activa (si existe). Permite
+   * al Studio comparar contra el hash del árbol en edición para mostrar
+   * el badge "Cambios sin publicar" sin descargar el snapshot completo.
+   * `null` cuando la página nunca se publicó.
+   */
+  published_hash: string | null;
+  published_at: string | null;
 }
 
 export interface CompositionRevisionSummary {
@@ -97,17 +105,52 @@ export const getComposition = createServerFn({ method: "GET" })
     const { data: row, error } = await context.supabase
       .from("page_compositions")
       .select(
-        "id, slug, title, description, status, page_type, active_revision_id, updated_at, current_draft",
+        "id, slug, title, description, status, page_type, active_revision_id, updated_at, current_draft, published_at",
       )
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) return null;
+    const activeId = (row as { active_revision_id: string | null }).active_revision_id;
+    let published_hash: string | null = null;
+    if (activeId) {
+      const { data: rev } = await context.supabase
+        .from("page_revisions")
+        .select("snapshot")
+        .eq("id", activeId)
+        .maybeSingle();
+      if (rev?.snapshot) {
+        published_hash = await sha256Hex(canonicalize(rev.snapshot));
+      }
+    }
     return {
-      ...(row as Omit<CompositionDetail, "current_draft">),
+      ...(row as Omit<CompositionDetail, "current_draft" | "published_hash" | "published_at">),
       current_draft: ((row as { current_draft: unknown }).current_draft as CompositionTree) ?? EMPTY_TREE,
+      published_hash,
+      published_at: (row as { published_at: string | null }).published_at ?? null,
     };
   });
+
+/**
+ * Serialización determinista (keys ordenadas) para que el hash del árbol
+ * sea estable frente a diferencias de orden de propiedades introducidas
+ * por el editor o el pipeline de traducción.
+ */
+function canonicalize(value: unknown): string {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalize).join(",")}]`;
+  const obj = value as Record<string, unknown>;
+  const keys = Object.keys(obj).sort();
+  return `{${keys.map((k) => `${JSON.stringify(k)}:${canonicalize(obj[k])}`).join(",")}}`;
+}
+
+async function sha256Hex(input: string): Promise<string> {
+  const bytes = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
 
 export const createComposition = createServerFn({ method: "POST" })
   .inputValidator(
