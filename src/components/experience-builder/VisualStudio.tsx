@@ -1372,6 +1372,7 @@ function PageVisualEditor({
             <History className="size-3.5" aria-hidden />
             Versiones
           </button>
+          <PublishStateBadge state={publishState} publishedAt={page?.published_at ?? null} />
           <HelpButton onOpen={() => setShowTour(true)} />
           <a
             href={pageDef.publicPath}
