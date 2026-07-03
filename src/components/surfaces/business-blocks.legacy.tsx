@@ -1,5 +1,11 @@
 /**
- * Bloques granulares de la Plantilla Madre Business (US-R3 · Sub-ola 2.2b).
+ * Snapshot legacy (pre Sub-ola 2.5c) de los bloques `vmx.business.*`.
+ *
+ * Usado UNICAMENTE por `scripts/business-shim-regression.tsx` como fuente
+ * de verdad para verificar que la migracion a shims no introduce
+ * diferencias visuales. No importar desde produccion.
+ *
+ * Original: Sub-ola 2.2b — ver historial git para detalles.
  *
  * Rompen el monolito `<BusinessSurface />` en piezas editoriales que se
  * dibujan en el árbol lateral del Studio. Todos los bloques leen el
