@@ -1943,13 +1943,14 @@ function SortableSectionItem({
 }
 
 function BlockOverlay({
-  node, selected, onSelect, onDelete, onDuplicate, onMoveUp, onMoveDown, children, sortable = false,
+  node, selected, onSelect, onDelete, onDuplicate, onToggleHidden, onMoveUp, onMoveDown, children, sortable = false,
 }: {
   node: CompositionNode;
   selected: boolean;
   onSelect: () => void;
   onDelete: () => void;
   onDuplicate: () => void;
+  onToggleHidden: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   children: React.ReactNode;
@@ -2010,6 +2011,13 @@ function BlockOverlay({
       }`}
       aria-label={`Editar ${contract?.display_name ?? node.type}`}
     >
+      {node.hidden ? (
+        <span
+          className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-center gap-1 bg-muted-foreground/90 py-1 text-[10px] font-semibold uppercase tracking-wider text-background"
+        >
+          <EyeOff className="size-3" aria-hidden /> Oculto en el sitio publicado
+        </span>
+      ) : null}
       <span
         className={`pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-lg transition-opacity ${
           selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
@@ -2035,12 +2043,17 @@ function BlockOverlay({
           <IconBtn onClick={(e) => { e.stopPropagation(); onMoveUp(); }} icon={<ChevronUp className="size-3" />} label="Subir" />
           <IconBtn onClick={(e) => { e.stopPropagation(); onMoveDown(); }} icon={<ChevronDown className="size-3" />} label="Bajar" />
           <IconBtn onClick={(e) => { e.stopPropagation(); onDuplicate(); }} icon={<Copy className="size-3" />} label="Duplicar" />
+          <IconBtn
+            onClick={(e) => { e.stopPropagation(); onToggleHidden(); }}
+            icon={node.hidden ? <Eye className="size-3" /> : <EyeOff className="size-3" />}
+            label={node.hidden ? "Mostrar en el sitio" : "Ocultar en el sitio"}
+          />
           <IconBtn onClick={(e) => { e.stopPropagation(); onDelete(); }} icon={<Trash2 className="size-3" />} label="Eliminar" tone="danger" />
         </div>
       ) : null}
       {/* Bloqueamos interacciones internas: en modo edición los clics
           siempre seleccionan el bloque en vez de navegar/enviar. */}
-      <div className="pointer-events-none select-none">{children}</div>
+      <div className={`pointer-events-none select-none ${node.hidden ? "opacity-40 grayscale" : ""}`}>{children}</div>
     </div>
   );
 }
