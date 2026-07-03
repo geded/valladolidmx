@@ -23,6 +23,7 @@ import {
   type ProductType,
 } from "@/lib/portal/business-catalog.functions";
 import { listMyBusinesses } from "@/lib/portal/portal-reads.functions";
+import { ProductAdvancedPanel } from "@/components/portal/ProductAdvancedPanel";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 const PRODUCT_TYPES: ProductType[] = [
@@ -308,6 +309,7 @@ function ProductsPanel({ businessId }: { businessId: string }) {
             onWithdrawReview={() =>
               wdRevFn({ data: { productId: p.id } }).then(refresh)
             }
+            onRefresh={refresh}
           />
         ))}
       </ul>
@@ -321,6 +323,7 @@ function ProductRow({
   onArchive,
   onRequestReview,
   onWithdrawReview,
+  onRefresh,
 }: {
   product: PortalProduct;
   onUpdate: (patch: {
@@ -332,6 +335,7 @@ function ProductRow({
   onArchive: () => Promise<unknown>;
   onRequestReview: () => Promise<unknown>;
   onWithdrawReview: () => Promise<unknown>;
+  onRefresh: () => void;
 }) {
   const [name, setName] = useState(product.name);
   const [tagline, setTagline] = useState(product.tagline ?? "");
@@ -449,6 +453,11 @@ function ProductRow({
           Archivar
         </button>
       </div>
+      <ProductAdvancedPanel
+        productId={product.id}
+        productStatus={product.status}
+        onStatusChanged={onRefresh}
+      />
     </li>
   );
 }

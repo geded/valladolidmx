@@ -758,6 +758,7 @@ export type Database = {
       }
       businesses: {
         Row: {
+          can_self_publish: boolean
           cover_media_id: string | null
           created_at: string
           created_by: string | null
@@ -780,6 +781,7 @@ export type Database = {
           verified: boolean
         }
         Insert: {
+          can_self_publish?: boolean
           cover_media_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -802,6 +804,7 @@ export type Database = {
           verified?: boolean
         }
         Update: {
+          can_self_publish?: boolean
           cover_media_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -5165,6 +5168,16 @@ export type Database = {
         }
         Returns: string
       }
+      create_business_product_faq: {
+        Args: {
+          _answer: string
+          _position?: number
+          _product_id: string
+          _publish?: boolean
+          _question: string
+        }
+        Returns: string
+      }
       create_business_promotion: {
         Args: {
           _business_id: string
@@ -5178,6 +5191,10 @@ export type Database = {
           _title: string
         }
         Returns: string
+      }
+      delete_business_product_faq: {
+        Args: { _faq_id: string }
+        Returns: undefined
       }
       delete_email: {
         Args: { message_id: number; queue_name: string }
@@ -5557,6 +5574,7 @@ export type Database = {
         }
       }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
+      publish_business_product: { Args: { _product_id: string }; Returns: Json }
       raise_system_alert: {
         Args: {
           p_kind: string
@@ -5607,6 +5625,10 @@ export type Database = {
       }
       remove_business_media: {
         Args: { _business_media_id: string }
+        Returns: undefined
+      }
+      reorder_business_product_faqs: {
+        Args: { _ordered_ids: string[]; _product_id: string }
         Returns: undefined
       }
       request_business_ownership_transfer: {
@@ -5964,6 +5986,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      unpublish_business_product: {
+        Args: { _product_id: string }
+        Returns: undefined
+      }
       update_business_media_meta: {
         Args: {
           _alt_text?: string
@@ -5984,6 +6010,15 @@ export type Database = {
           _price_currency?: string
           _product_id: string
           _tagline?: string
+        }
+        Returns: undefined
+      }
+      update_business_product_faq: {
+        Args: {
+          _answer?: string
+          _faq_id: string
+          _publish?: boolean
+          _question?: string
         }
         Returns: undefined
       }
