@@ -1,20 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
-import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { SITE } from "@/config/site";
+import { listMarketplaceBusinesses } from "@/lib/marketplace/marketplace-reads.functions";
+import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
+
+const CATEGORY_SLUGS = new Set(["restaurantes", "gastronomia"]);
 
 export const Route = createFileRoute("/restaurantes")({
+  loader: async () => {
+    const all = await listMarketplaceBusinesses();
+    return { businesses: all.filter((b) => CATEGORY_SLUGS.has(b.category_slug)) };
+  },
   head: () =>
     buildPublicHead({
       title: `Restaurantes · ${SITE.name}`,
       description: "Cocina yucateca, panuchos, recados y mesas de autor.",
       path: "/restaurantes",
     }),
-  component: PlaceholderRoute,
+  component: RestaurantesRoute,
 });
 
-function PlaceholderRoute() {
+function RestaurantesRoute() {
+  const { businesses } = Route.useLoaderData();
   return (
     <PublicShell
       eyebrow="Categoría"
@@ -22,14 +30,10 @@ function PlaceholderRoute() {
       description="Cocina yucateca, panuchos, recados y mesas de autor."
       crumbs={[{ label: "Restaurantes" }]}
     >
-      <div className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center">
-        <ComingSoonBadge label="Llega en Fase 1" />
-        <h2 className="mt-4 text-2xl">Estamos preparando esta vista</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          La estructura ya está lista. Pronto encontrarás aquí el contenido completo
-          con buscador, filtros y tarjetas detalladas.
-        </p>
-      </div>
+      <MarketplaceSurface
+        items={businesses}
+        emptyMessage="Aún no hay restaurantes publicados. Vuelve pronto para descubrir cocineras y mesas locales."
+      />
     </PublicShell>
   );
 }
