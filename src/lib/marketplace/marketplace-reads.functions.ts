@@ -94,6 +94,378 @@ export interface MarketplaceSearchResult {
   offset: number;
 }
 
+/* ------------------------------------------------------------------ *
+ * Product Detail (US-R3 · Sub-ola 2.3a — Product Surface v1)
+ * ------------------------------------------------------------------ */
+
+export interface ProductMediaItem {
+  id: string;
+  role: "cover" | "gallery" | string;
+  url: string | null;
+  alt: string | null;
+  width: number | null;
+  height: number | null;
+  sort_order: number;
+}
+
+export interface ProductBusinessContext {
+  id: string;
+  slug: string;
+  display_name: string;
+  tagline: string;
+  verified: boolean;
+  destination_slug: string;
+  category_slug: string;
+  plan_tier: "free" | "starter" | "pro" | "premium";
+  primary_contact: { type: string; value: string; label: string | null } | null;
+  primary_location: {
+    label: string | null;
+    address_line1: string | null;
+    address_line2: string | null;
+    latitude: number | null;
+    longitude: number | null;
+  } | null;
+}
+
+export interface ProductFaqItem {
+  id: string;
+  question: string;
+  answer: string;
+  position: number;
+}
+
+export interface ProductReviewItem {
+  id: string;
+  author_display_name: string;
+  rating: number;
+  title: string | null;
+  body: string;
+  published_at: string | null;
+}
+
+export interface MarketplaceProductDetail {
+  id: string;
+  slug: string;
+  name: string;
+  tagline: string;
+  description: string;
+  product_type: string;
+  price_amount: number | null;
+  price_currency: string;
+  conversion_mode: string;
+  primary_action_label: string | null;
+  secondary_action_mode: string | null;
+  secondary_action_label: string | null;
+  accepts_online_payment: boolean;
+  requires_availability: boolean;
+  visibility_level: string;
+  cover_url: string | null;
+  media: ProductMediaItem[];
+  business: ProductBusinessContext;
+  related: MarketplaceProductCard[];
+  promotions: MarketplacePromotionCard[];
+  reviews: ProductReviewItem[];
+  faqs: ProductFaqItem[];
+}
+
+/**
+ * getMarketplaceProductBySlug — Detalle público de un producto publicado.
+ * Join a empresa padre (contexto mínimo: contacto + ubicación pública),
+ * portada + galería (via product_media/media_assets con signed URLs),
+ * promociones vigentes de la empresa, reviews aprobadas, FAQs
+ * publicadas y hasta 6 productos relacionados de la misma empresa.
+ *
+ * - Publishable client + RLS TO anon (products/product_media/promotions
+ *   /reviews/faqs ya tienen policies TO anon SELECT filtradas por
+ *   status='published').
+ * - Signed URLs de media se firman server-side con supabaseAdmin
+ *   (import dentro del handler) porque el bucket `products` es privado.
+ * - Sólo columnas seguras. Sin escrituras. Sin PII.
+ */
+export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
+  .inputValidator((input: { slug: string }) => {
+    if (
+      !input ||
+      typeof input.slug !== "string" ||
+      input.slug.length === 0 ||
+      input.slug.length > 200
+    ) {
+      throw new Error("invalid_slug");
+    }
+    return { slug: input.slug };
+  })
+  .handler(async ({ data }): Promise<MarketplaceProductDetail | null> => {
+    const supabase = publicClient();
+    const { data: prod, error } = await supabase
+      .from("products")
+      .select(
+        "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id",
+      )
+      .eq("slug", data.slug)
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (error) throw new Error(`marketplace_product_failed: ${error.message}`);
+    if (!prod) return null;
+
+    const businessId = prod.business_id as string;
+
+    const [
+      { data: biz, error: bErr },
+      { data: mediaRows, error: mErr },
+      { data: contacts },
+      { data: locations },
+      { data: promos },
+      { data: reviews },
+      { data: faqs },
+      { data: relatedRows },
+    ] = await Promise.all([
+      supabase
+        .from("businesses")
+        .select(
+          "id, slug, display_name, tagline, verified, status, deleted_at, metadata, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug )",
+        )
+        .eq("id", businessId)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .maybeSingle(),
+      supabase
+        .from("product_media")
+        .select(
+          "id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, alt_text, width, height )",
+        )
+        .eq("product_id", prod.id)
+        .order("sort_order", { ascending: true })
+        .limit(24),
+      supabase
+        .from("business_contacts")
+        .select("contact_type, value, label, is_public, sort_order, deleted_at")
+        .eq("business_id", businessId)
+        .eq("is_public", true)
+        .is("deleted_at", null)
+        .order("sort_order", { ascending: true })
+        .limit(4),
+      supabase
+        .from("business_locations")
+        .select("label, address_line1, address_line2, latitude, longitude, is_primary, deleted_at")
+        .eq("business_id", businessId)
+        .is("deleted_at", null)
+        .order("is_primary", { ascending: false })
+        .limit(1),
+      supabase
+        .from("promotions")
+        .select("id, slug, title, description, discount_percent, starts_at, ends_at, status, deleted_at")
+        .eq("business_id", businessId)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("ends_at", { ascending: true, nullsFirst: false })
+        .limit(6),
+      supabase
+        .from("reviews")
+        .select("id, author_display_name, rating, title, body, published_at, status, deleted_at, subject_kind, subject_id")
+        .eq("subject_kind", "product")
+        .eq("subject_id", prod.id)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("published_at", { ascending: false })
+        .limit(6),
+      supabase
+        .from("faqs")
+        .select("id, question, answer, position, status, deleted_at, entity_kind, entity_id, locale")
+        .eq("entity_kind", "product")
+        .eq("entity_id", prod.id)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("position", { ascending: true })
+        .limit(12),
+      supabase
+        .from("products")
+        .select(
+          "id, slug, name, tagline, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level",
+        )
+        .eq("business_id", businessId)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .neq("id", prod.id)
+        .order("name", { ascending: true })
+        .limit(6),
+    ]);
+
+    if (bErr) throw new Error(`marketplace_product_biz_failed: ${bErr.message}`);
+    if (mErr) throw new Error(`marketplace_product_media_failed: ${mErr.message}`);
+    if (!biz) return null;
+
+    // Firma de URLs de media (bucket privado). Best-effort: si algún
+    // asset no puede firmarse, cae a null y el bloque muestra placeholder.
+    let media: ProductMediaItem[] = [];
+    const rows = (mediaRows ?? []) as Array<{
+      id: string;
+      role: string;
+      sort_order: number | null;
+      media_assets: {
+        id: string;
+        storage_bucket: string;
+        storage_path: string;
+        alt_text: string | null;
+        width: number | null;
+        height: number | null;
+      } | null;
+    }>;
+    if (rows.length > 0) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const signed = await Promise.all(
+          rows.map(async (r) => {
+            const a = r.media_assets;
+            if (!a) return { row: r, url: null as string | null };
+            const { data: s } = await supabaseAdmin.storage
+              .from(a.storage_bucket)
+              .createSignedUrl(a.storage_path, 3600);
+            return { row: r, url: s?.signedUrl ?? null };
+          }),
+        );
+        media = signed.map(({ row, url }) => ({
+          id: row.id,
+          role: row.role,
+          url,
+          alt: row.media_assets?.alt_text ?? null,
+          width: row.media_assets?.width ?? null,
+          height: row.media_assets?.height ?? null,
+          sort_order: Number(row.sort_order ?? 0),
+        }));
+      } catch {
+        // Si el admin client no está disponible o storage falla,
+        // exponemos la lista sin URLs — la UI muestra placeholder.
+        media = rows.map((r) => ({
+          id: r.id,
+          role: r.role,
+          url: null,
+          alt: r.media_assets?.alt_text ?? null,
+          width: r.media_assets?.width ?? null,
+          height: r.media_assets?.height ?? null,
+          sort_order: Number(r.sort_order ?? 0),
+        }));
+      }
+    }
+
+    const cover = media.find((m) => m.role === "cover") ?? media[0] ?? null;
+
+    const destSlug = (biz.destinations as { slug?: unknown } | null)?.slug;
+    const catSlug = (biz.business_categories as { slug?: unknown } | null)?.slug;
+    const planTier = resolveBusinessPlanTier(
+      (biz as { metadata?: Record<string, unknown> | null }).metadata ?? null,
+    );
+
+    const contactRows = (contacts ?? []) as Array<{
+      contact_type: string;
+      value: string;
+      label: string | null;
+    }>;
+    const primaryContact = contactRows[0]
+      ? {
+          type: contactRows[0].contact_type,
+          value: contactRows[0].value,
+          label: contactRows[0].label,
+        }
+      : null;
+
+    const locRow = ((locations ?? []) as Array<{
+      label: string | null;
+      address_line1: string | null;
+      address_line2: string | null;
+      latitude: number | string | null;
+      longitude: number | string | null;
+    }>)[0];
+    const primaryLocation = locRow
+      ? {
+          label: locRow.label,
+          address_line1: locRow.address_line1,
+          address_line2: locRow.address_line2,
+          latitude: locRow.latitude !== null ? Number(locRow.latitude) : null,
+          longitude: locRow.longitude !== null ? Number(locRow.longitude) : null,
+        }
+      : null;
+
+    const related: MarketplaceProductCard[] = ((relatedRows ?? []) as Array<Record<string, unknown>>).map(
+      (p) => ({
+        id: String(p.id),
+        slug: String(p.slug),
+        name: String(p.name),
+        tagline: (p.tagline as string) ?? "",
+        product_type: String(p.product_type),
+        price_amount: p.price_amount !== null && p.price_amount !== undefined ? Number(p.price_amount) : null,
+        price_currency: String(p.price_currency ?? "MXN"),
+        business_slug: biz.slug,
+        business_name: biz.display_name,
+        conversion_mode: String(p.conversion_mode ?? "informacion"),
+        primary_action_label: (p.primary_action_label as string | null) ?? null,
+        secondary_action_mode: (p.secondary_action_mode as string | null) ?? null,
+        secondary_action_label: (p.secondary_action_label as string | null) ?? null,
+        accepts_online_payment: Boolean(p.accepts_online_payment),
+        requires_availability: Boolean(p.requires_availability),
+        visibility_level: String(p.visibility_level ?? "standard"),
+      }),
+    );
+
+    return {
+      id: prod.id,
+      slug: prod.slug,
+      name: prod.name,
+      tagline: prod.tagline ?? "",
+      description: prod.description ?? "",
+      product_type: String(prod.product_type),
+      price_amount: prod.price_amount !== null ? Number(prod.price_amount) : null,
+      price_currency: String(prod.price_currency ?? "MXN"),
+      conversion_mode: String((prod as Record<string, unknown>).conversion_mode ?? "informacion"),
+      primary_action_label: ((prod as Record<string, unknown>).primary_action_label as string | null) ?? null,
+      secondary_action_mode: ((prod as Record<string, unknown>).secondary_action_mode as string | null) ?? null,
+      secondary_action_label: ((prod as Record<string, unknown>).secondary_action_label as string | null) ?? null,
+      accepts_online_payment: Boolean((prod as Record<string, unknown>).accepts_online_payment),
+      requires_availability: Boolean((prod as Record<string, unknown>).requires_availability),
+      visibility_level: String((prod as Record<string, unknown>).visibility_level ?? "standard"),
+      cover_url: cover?.url ?? null,
+      media,
+      business: {
+        id: biz.id,
+        slug: biz.slug,
+        display_name: biz.display_name,
+        tagline: biz.tagline ?? "",
+        verified: Boolean(biz.verified),
+        destination_slug: typeof destSlug === "string" ? destSlug : "",
+        category_slug: typeof catSlug === "string" ? catSlug : "",
+        plan_tier: planTier,
+        primary_contact: primaryContact,
+        primary_location: primaryLocation,
+      },
+      related,
+      promotions: (promos ?? []).map((p) => ({
+        id: p.id as string,
+        slug: p.slug as string,
+        title: p.title as string,
+        description: (p.description as string) ?? "",
+        discount_percent: p.discount_percent !== null ? Number(p.discount_percent) : null,
+        starts_at: p.starts_at as string | null,
+        ends_at: p.ends_at as string | null,
+        business_slug: biz.slug,
+        business_name: biz.display_name,
+      })),
+      reviews: (reviews ?? []).map((r) => ({
+        id: r.id as string,
+        author_display_name: (r.author_display_name as string) ?? "Viajero",
+        rating: Number(r.rating ?? 0),
+        title: (r.title as string | null) ?? null,
+        body: (r.body as string) ?? "",
+        published_at: (r.published_at as string | null) ?? null,
+      })),
+      faqs: (faqs ?? []).map((f) => ({
+        id: f.id as string,
+        question: (f.question as string) ?? "",
+        answer: (f.answer as string) ?? "",
+        position: Number(f.position ?? 0),
+      })),
+    };
+  });
+
 export interface MarketplaceSearchInput {
   q?: string | null;
   destination_slug?: string | null;
