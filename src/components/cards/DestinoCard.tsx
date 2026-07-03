@@ -9,7 +9,7 @@
  * un mapa region_slug → ruta sin tocar el resto del componente.
  */
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight } from "lucide-react";
+import { Plus, ArrowUpRight } from "lucide-react";
 import { PlaceholderImage } from "@/components/common/PlaceholderImage";
 import type { Destination } from "@/types/territory";
 import { useTranslation } from "@/i18n/context";
@@ -68,9 +68,20 @@ export function DestinoCard({ destination }: { destination: Destination }) {
             </li>
           ))}
         </ul>
-        <div className="mt-auto flex items-center gap-1 pt-2 text-sm font-semibold text-primary">
-          {t("common.explore")}
-          <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
+        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
+          <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
+            {t("common.explore")}
+            <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
+          </span>
+          <Link
+            to="/arma-tu-viaje"
+            search={{ destino: destination.slug }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative z-10 inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+          >
+            <Plus className="size-3.5" aria-hidden />
+            {t("common.add_to_trip")}
+          </Link>
         </div>
       </div>
     </>
