@@ -32,6 +32,12 @@ export interface CompositionNode {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   config: Record<string, any>;
   /**
+   * Si `true`, el bloque queda oculto en producción (no se renderiza) pero
+   * permanece en el árbol y sigue siendo editable en el Studio. Se muestra
+   * atenuado con un badge "Oculto" en la vista previa del editor.
+   */
+  hidden?: boolean;
+  /**
    * Hijos del bloque (solo aplica a bloques contenedor reconocidos por el
    * Layout Engine). Layout y contenido están desacoplados: cualquier bloque
    * puede ser hijo de cualquier contenedor compatible.
