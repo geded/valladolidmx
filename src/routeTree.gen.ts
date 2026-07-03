@@ -58,6 +58,7 @@ import { Route as AuthenticatedPortalActividadRouteImport } from './routes/_auth
 import { Route as AuthenticatedPaginasSplatRouteImport } from './routes/_authenticated/paginas.$'
 import { Route as AuthenticatedCuentaPerfilRouteImport } from './routes/_authenticated/cuenta/perfil'
 import { Route as AuthenticatedCuentaNotificacionesRouteImport } from './routes/_authenticated/cuenta/notificaciones'
+import { Route as AuthenticatedCuentaMiViajeRouteImport } from './routes/_authenticated/cuenta/mi-viaje'
 import { Route as AuthenticatedCuentaHistorialRouteImport } from './routes/_authenticated/cuenta/historial'
 import { Route as AuthenticatedCuentaFavoritosRouteImport } from './routes/_authenticated/cuenta/favoritos'
 import { Route as AuthenticatedCuentaConciergeRouteImport } from './routes/_authenticated/cuenta/concierge'
@@ -375,6 +376,12 @@ const AuthenticatedCuentaNotificacionesRoute =
   AuthenticatedCuentaNotificacionesRouteImport.update({
     id: '/notificaciones',
     path: '/notificaciones',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
+const AuthenticatedCuentaMiViajeRoute =
+  AuthenticatedCuentaMiViajeRouteImport.update({
+    id: '/mi-viaje',
+    path: '/mi-viaje',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
 const AuthenticatedCuentaHistorialRoute =
@@ -757,6 +764,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRouteWithChildren
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
+  '/cuenta/mi-viaje': typeof AuthenticatedCuentaMiViajeRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/paginas/$': typeof AuthenticatedPaginasSplatRoute
@@ -857,6 +865,7 @@ export interface FileRoutesByTo {
   '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRouteWithChildren
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
+  '/cuenta/mi-viaje': typeof AuthenticatedCuentaMiViajeRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/paginas/$': typeof AuthenticatedPaginasSplatRoute
@@ -965,6 +974,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/concierge': typeof AuthenticatedCuentaConciergeRouteWithChildren
   '/_authenticated/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
   '/_authenticated/cuenta/historial': typeof AuthenticatedCuentaHistorialRoute
+  '/_authenticated/cuenta/mi-viaje': typeof AuthenticatedCuentaMiViajeRoute
   '/_authenticated/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/_authenticated/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/_authenticated/paginas/$': typeof AuthenticatedPaginasSplatRoute
@@ -1073,6 +1083,7 @@ export interface FileRouteTypes {
     | '/cuenta/concierge'
     | '/cuenta/favoritos'
     | '/cuenta/historial'
+    | '/cuenta/mi-viaje'
     | '/cuenta/notificaciones'
     | '/cuenta/perfil'
     | '/paginas/$'
@@ -1173,6 +1184,7 @@ export interface FileRouteTypes {
     | '/cuenta/concierge'
     | '/cuenta/favoritos'
     | '/cuenta/historial'
+    | '/cuenta/mi-viaje'
     | '/cuenta/notificaciones'
     | '/cuenta/perfil'
     | '/paginas/$'
@@ -1280,6 +1292,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/concierge'
     | '/_authenticated/cuenta/favoritos'
     | '/_authenticated/cuenta/historial'
+    | '/_authenticated/cuenta/mi-viaje'
     | '/_authenticated/cuenta/notificaciones'
     | '/_authenticated/cuenta/perfil'
     | '/_authenticated/paginas/$'
@@ -1715,6 +1728,13 @@ declare module '@tanstack/react-router' {
       path: '/notificaciones'
       fullPath: '/cuenta/notificaciones'
       preLoaderRoute: typeof AuthenticatedCuentaNotificacionesRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
+    '/_authenticated/cuenta/mi-viaje': {
+      id: '/_authenticated/cuenta/mi-viaje'
+      path: '/mi-viaje'
+      fullPath: '/cuenta/mi-viaje'
+      preLoaderRoute: typeof AuthenticatedCuentaMiViajeRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
     '/_authenticated/cuenta/historial': {
@@ -2208,6 +2228,7 @@ interface AuthenticatedCuentaRouteRouteChildren {
   AuthenticatedCuentaConciergeRoute: typeof AuthenticatedCuentaConciergeRouteWithChildren
   AuthenticatedCuentaFavoritosRoute: typeof AuthenticatedCuentaFavoritosRoute
   AuthenticatedCuentaHistorialRoute: typeof AuthenticatedCuentaHistorialRoute
+  AuthenticatedCuentaMiViajeRoute: typeof AuthenticatedCuentaMiViajeRoute
   AuthenticatedCuentaNotificacionesRoute: typeof AuthenticatedCuentaNotificacionesRoute
   AuthenticatedCuentaPerfilRoute: typeof AuthenticatedCuentaPerfilRoute
   AuthenticatedCuentaIndexRoute: typeof AuthenticatedCuentaIndexRoute
@@ -2223,6 +2244,7 @@ const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildr
       AuthenticatedCuentaConciergeRouteWithChildren,
     AuthenticatedCuentaFavoritosRoute: AuthenticatedCuentaFavoritosRoute,
     AuthenticatedCuentaHistorialRoute: AuthenticatedCuentaHistorialRoute,
+    AuthenticatedCuentaMiViajeRoute: AuthenticatedCuentaMiViajeRoute,
     AuthenticatedCuentaNotificacionesRoute:
       AuthenticatedCuentaNotificacionesRoute,
     AuthenticatedCuentaPerfilRoute: AuthenticatedCuentaPerfilRoute,
