@@ -502,3 +502,21 @@ export const resolveCompositionPreview = createServerFn({ method: "GET" })
       expires_at: tok.expires_at,
     };
   });
+/**
+ * US-02 · Cambia el estado del flujo editorial.
+ * - draft → in_review: cualquier editor autenticado.
+ * - in_review → approved: sólo admin / super_admin (validado en RPC).
+ * - approved → draft: cualquier editor (para reabrir el ciclo).
+ */
+export const setCompositionWorkflowState = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string; next_state: "draft" | "in_review" | "approved"; notes?: string | null }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }) => {
+    const { data: result, error } = await context.supabase.rpc("eb_set_workflow_state", {
+      _composition_id: data.id,
+      _next_state: data.next_state,
+      _notes: data.notes ?? null,
+    });
+    if (error) throw new Error(error.message);
+    return result as { workflow_state: string; changed: boolean };
+  });
