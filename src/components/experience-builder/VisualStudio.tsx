@@ -855,6 +855,35 @@ function PageVisualEditor({
   const [sharing, setSharing] = useState(false);
   const [shareLink, setShareLink] = useState<{ url: string; expires_at: string } | null>(null);
   const [showTour, setShowTour] = useState(false);
+  /**
+   * Hash canónico del `tree` en edición para comparar contra
+   * `page.published_hash` (calculado en el servidor sobre el snapshot de
+   * la revisión activa). Alimenta el badge "Cambios sin publicar".
+   */
+  const [draftHash, setDraftHash] = useState<string | null>(null);
+  useEffect(() => {
+    if (!tree) {
+      setDraftHash(null);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const hex = await hashTreeClient(tree);
+        if (!cancelled) setDraftHash(hex);
+      } catch {
+        if (!cancelled) setDraftHash(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [tree]);
+  const publishState: "never" | "dirty" | "clean" = !page?.published_hash
+    ? "never"
+    : draftHash && draftHash === page.published_hash
+      ? "clean"
+      : "dirty";
   useEffect(() => {
     if (!hasSeenOnboarding()) {
       const t = window.setTimeout(() => setShowTour(true), 500);
