@@ -43,6 +43,9 @@ import {
   CockpitActivityStream,
 } from "@/components/admin/cockpit-blocks";
 import { SmartBlockRuntime } from "@/components/experience-builder/smart-blocks";
+import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
+import { AluxSurface } from "@/components/surfaces/AluxSurface";
+import { TripPlannerSurface } from "@/components/surfaces/TripPlannerSurface";
 
 bootstrapBlockLibrary();
 
