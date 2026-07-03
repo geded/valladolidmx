@@ -32,7 +32,7 @@ function MediaPage() {
       queryKey="media"
       fn={listMediaCms}
       title="Biblioteca multimedia"
-      stage="Ola 1 · Etapa 2 · Lecturas"
+
       description="Activos almacenados en los buckets oficiales de Storage."
       rowKey={(r) => r.id}
       emptyMessage="Sin activos. La carga se habilitará en Etapa 3."

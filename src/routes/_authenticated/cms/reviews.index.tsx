@@ -31,7 +31,7 @@ function ReviewsPage() {
       queryKey="reviews"
       fn={listReviewsCms}
       title="Reseñas"
-      stage="Ola 1 · Etapa 5 · Moderación"
+
       description="Listado de reseñas con acceso directo al panel de moderación."
       rowKey={(r) => r.id}
       columns={[
