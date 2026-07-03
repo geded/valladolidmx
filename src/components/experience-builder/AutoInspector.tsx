@@ -8,7 +8,7 @@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, CloudUpload, ImageIcon, Languages, Loader2, Monitor, Plus, Smartphone, Tablet, Trash2, Type, Upload } from "lucide-react";
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { MediaPickerDialog } from "./MediaPickerDialog";
 import { ReferencePicker } from "./ReferencePicker";
 import { useServerFn } from "@tanstack/react-start";
@@ -60,6 +60,30 @@ export interface AutoInspectorProps {
 
 export function AutoInspector({ contract, config, onChange, simple = false, activeBreakpoint }: AutoInspectorProps) {
   const set = (key: string, value: unknown) => onChange({ ...config, [key]: value });
+  const formRef = useRef<HTMLDivElement | null>(null);
+  // US-10: al hacer doble-clic sobre un bloque en el canvas, enfocamos el
+  // primer campo de texto del inspector y seleccionamos su contenido para
+  // permitir edición inmediata sin romper la arquitectura existente.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = () => {
+      // Pequeño delay para asegurar que el inspector ya renderizó el bloque.
+      window.setTimeout(() => {
+        const root = formRef.current;
+        if (!root) return;
+        const target = root.querySelector<HTMLInputElement | HTMLTextAreaElement>(
+          'input[type="text"], input:not([type]), textarea',
+        );
+        if (target) {
+          target.focus();
+          try { target.select(); } catch { /* noop */ }
+          target.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 60);
+    };
+    window.addEventListener("eb:inline-edit", handler as EventListener);
+    return () => window.removeEventListener("eb:inline-edit", handler as EventListener);
+  }, [contract.type]);
   const i18nMap = (config.__i18n as Record<string, Record<string, string>> | undefined) ?? {};
   const setTranslation = (fieldKey: string, lang: string, value: string) => {
     const nextField = { ...(i18nMap[fieldKey] ?? {}), [lang]: value };
@@ -73,7 +97,7 @@ export function AutoInspector({ contract, config, onChange, simple = false, acti
   };
   const typoDefaults = getTypographyDefaults(contract.type) ?? {};
   return (
-    <div className="space-y-3">
+    <div ref={formRef} className="space-y-3">
       <header className="space-y-1">
         <h3 className="text-sm font-semibold">{contract.display_name}</h3>
         {simple ? null : (
