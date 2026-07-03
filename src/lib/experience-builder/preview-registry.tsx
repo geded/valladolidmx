@@ -26,6 +26,12 @@ import {
   type MarketplaceBusinessDetail,
 } from "@/lib/marketplace/marketplace-reads.functions";
 import { BusinessSurfaceProvider } from "@/components/surfaces/BusinessSurface";
+import {
+  getMarketplaceProductBySlug,
+  searchMarketplace,
+  type MarketplaceProductDetail,
+} from "@/lib/marketplace/marketplace-reads.functions";
+import { ProductSurfaceProvider } from "@/components/surfaces/ProductSurface";
 
 /** Candidato ligero para poblar el selector "Vista previa con…". */
 export interface PreviewCandidate {
@@ -73,6 +79,62 @@ function BusinessDataProvider({
   children: ReactNode;
 }) {
   return <BusinessSurfaceProvider business={data}>{children}</BusinessSurfaceProvider>;
+}
+
+function ProductDataProvider({
+  data,
+  children,
+}: {
+  data: MarketplaceProductDetail | null;
+  children: ReactNode;
+}) {
+  return <ProductSurfaceProvider product={data}>{children}</ProductSurfaceProvider>;
+}
+
+/** Producto demo estable — evita "Producto no disponible" en Studio. */
+function demoProduct(): MarketplaceProductDetail {
+  return {
+    id: "demo-product",
+    slug: "producto-demo",
+    name: "Producto demo · Valladolid.mx",
+    tagline: "Ficha de ejemplo para editar la Plantilla Madre Producto.",
+    description:
+      "Este es un producto de ejemplo. Reemplaza los textos, elige un producto real desde la barra superior o previsualiza con otro slug antes de publicar.",
+    product_type: "experience",
+    price_amount: 1450,
+    price_currency: "MXN",
+    conversion_mode: "reservar_en_linea",
+    primary_action_label: "Reservar ahora",
+    secondary_action_mode: "whatsapp",
+    secondary_action_label: "Preguntar por WhatsApp",
+    accepts_online_payment: true,
+    requires_availability: true,
+    visibility_level: "public",
+    cover_url: null,
+    media: [],
+    business: {
+      id: "demo-biz",
+      slug: "empresa-demo",
+      display_name: "Empresa demo · Valladolid.mx",
+      tagline: "Empresa asociada de ejemplo.",
+      verified: true,
+      destination_slug: "valladolid",
+      category_slug: "hotel",
+      plan_tier: "pro",
+      primary_contact: { type: "whatsapp", value: "+52 985 000 0000", label: "Reservaciones" },
+      primary_location: {
+        label: "Sede",
+        address_line1: "Calle 41 s/n",
+        address_line2: "Centro, Valladolid, Yuc.",
+        latitude: 20.6893,
+        longitude: -88.2011,
+      },
+    },
+    related: [],
+    promotions: [],
+    reviews: [],
+    faqs: [],
+  };
 }
 
 /** Empresa demo estable — evita "Empresa no disponible" en Studio. */
@@ -194,10 +256,35 @@ const REGISTRY: TemplatePreviewProvider<any>[] = [
     demoData: demoBusiness,
     Provider: BusinessDataProvider,
   } satisfies TemplatePreviewProvider<MarketplaceBusinessDetail>,
-  // NOTA: `region`, `destination`, `product`, `event`, `experience`,
-  // `restaurant` se registrarán aquí cuando su superficie exponga un
-  // `SurfaceProvider` equivalente. El Studio no requiere cambios:
-  // consulta este registry por `kind`.
+  /**
+   * `product` — Plantilla Madre Producto (Sub-ola 2.3a). El Studio
+   * lista productos reales publicados vía RPC `search_marketplace` y
+   * los inyecta en `ProductSurfaceProvider`. Añadir productos nuevos
+   * no requiere tocar el Studio.
+   */
+  {
+    kind: "product",
+    label: "Vista previa con producto",
+    placeholder: "Selecciona un producto…",
+    async loadCandidates() {
+      const { items } = await searchMarketplace({
+        data: { limit: 40, offset: 0 },
+      });
+      return items.map((it) => ({
+        slug: it.product_slug,
+        label: it.product_name,
+        secondary: it.business_name || it.product_type || undefined,
+      }));
+    },
+    async loadDetail(slug) {
+      return await getMarketplaceProductBySlug({ data: { slug } });
+    },
+    demoData: demoProduct,
+    Provider: ProductDataProvider,
+  } satisfies TemplatePreviewProvider<MarketplaceProductDetail>,
+  // NOTA: `region`, `destination`, `event`, `experience`, `restaurant`
+  // se registrarán aquí cuando expongan un `SurfaceProvider` equivalente.
+  // El Studio no requiere cambios: consulta este registry por `kind`.
 ];
 
 export function getPreviewProvider(
