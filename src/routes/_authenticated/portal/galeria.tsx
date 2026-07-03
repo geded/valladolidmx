@@ -97,7 +97,7 @@ function GaleriaPage() {
     <div className="mx-auto max-w-5xl">
       <header className="mb-6">
         <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-          Portal Empresarial · Etapa 5
+          Portal Empresarial
         </p>
         <h1 className="mt-1 text-3xl font-semibold">Galería</h1>
         <p className="mt-2 text-sm text-muted-foreground">
