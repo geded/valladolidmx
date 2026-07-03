@@ -42,7 +42,9 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const [published, entities] = await Promise.all([
           listPublishedPagesForSitemap().catch(() => []),
-          fetchPublicEntities().catch(() => ({ destinos: [], empresas: [], productos: [] })),
+          fetchPublicEntities().catch(
+            () => ({ destinos: [], empresas: [], productos: [], eventos: [] }) as PublicEntities,
+          ),
         ]);
         const dynamicEntries: SitemapEntry[] = published.map((row) => {
           const priority =
