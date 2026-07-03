@@ -1070,9 +1070,45 @@ function PageVisualEditor({
 
   const removeNodeById = (nodeId: string) => {
     if (!tree) return;
+    const idx = tree.root.children.findIndex((n) => n.id === nodeId);
+    if (idx < 0) return;
+    const removed = tree.root.children[idx];
+    const contract = getBlock(removed.type);
+    const label = contract?.display_name ?? removed.type;
     const next = tree.root.children.filter((n) => n.id !== nodeId);
+    const treeBefore = tree;
     commitTree({ ...tree, root: { children: next } });
     if (selectedId === nodeId) setSelectedId(null);
+    // Undo (10 s): restaura el árbol previo — funciona también con hijos
+    // anidados en un futuro porque restauramos el snapshot completo.
+    toast.success(`Sección "${label}" eliminada`, {
+      duration: 10000,
+      action: {
+        label: "Deshacer",
+        onClick: () => {
+          commitTree(treeBefore);
+          setSelectedId(removed.id);
+        },
+      },
+    });
+  };
+
+  const toggleHiddenNode = (nodeId: string) => {
+    if (!tree) return;
+    let becameHidden = false;
+    let label = "";
+    const nextChildren = tree.root.children.map((n) => {
+      if (n.id !== nodeId) return n;
+      becameHidden = !n.hidden;
+      label = getBlock(n.type)?.display_name ?? n.type;
+      return { ...n, hidden: !n.hidden };
+    });
+    commitTree({ ...tree, root: { children: nextChildren } });
+    toast(becameHidden ? `"${label}" oculto en el sitio publicado` : `"${label}" visible`, {
+      description: becameHidden
+        ? "Sigue visible en el editor, pero no aparece en el sitio."
+        : undefined,
+    });
   };
 
   const insertBlock = (type: string, atIndex?: number) => {
