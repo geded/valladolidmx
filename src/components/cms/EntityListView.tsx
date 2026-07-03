@@ -158,10 +158,6 @@ export function EntityListView<Row>(props: Props<Row>) {
         </div>
       </div>
 
-      <p className="mt-3 text-[11px] text-muted-foreground">
-        Etapa 2 · Lecturas tipadas. Edición y workflow se habilitarán en etapas
-        posteriores tras aprobación documental.
-      </p>
     </section>
   );
 }
