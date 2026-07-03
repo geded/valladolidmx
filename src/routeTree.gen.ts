@@ -21,6 +21,7 @@ import { Route as ExperienciasRouteImport } from './routes/experiencias'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as CasasDeVacacionesRouteImport } from './routes/casas-de-vacaciones'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArmaTuViajeRouteImport } from './routes/arma-tu-viaje'
 import { Route as AluxRouteImport } from './routes/alux'
@@ -179,6 +180,11 @@ const EmpresasRoute = EmpresasRouteImport.update({
 const CasasDeVacacionesRoute = CasasDeVacacionesRouteImport.update({
   id: '/casas-de-vacaciones',
   path: '/casas-de-vacaciones',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -750,6 +756,7 @@ export interface FileRoutesByFullPath {
   '/alux': typeof AluxRoute
   '/arma-tu-viaje': typeof ArmaTuViajeRoute
   '/auth': typeof AuthRoute
+  '/blog': typeof BlogRoute
   '/casas-de-vacaciones': typeof CasasDeVacacionesRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRouteWithChildren
@@ -862,6 +869,7 @@ export interface FileRoutesByTo {
   '/alux': typeof AluxRoute
   '/arma-tu-viaje': typeof ArmaTuViajeRoute
   '/auth': typeof AuthRoute
+  '/blog': typeof BlogRoute
   '/casas-de-vacaciones': typeof CasasDeVacacionesRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRouteWithChildren
@@ -970,6 +978,7 @@ export interface FileRoutesById {
   '/alux': typeof AluxRoute
   '/arma-tu-viaje': typeof ArmaTuViajeRoute
   '/auth': typeof AuthRoute
+  '/blog': typeof BlogRoute
   '/casas-de-vacaciones': typeof CasasDeVacacionesRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRouteWithChildren
@@ -1084,6 +1093,7 @@ export interface FileRouteTypes {
     | '/alux'
     | '/arma-tu-viaje'
     | '/auth'
+    | '/blog'
     | '/casas-de-vacaciones'
     | '/empresas'
     | '/eventos'
@@ -1196,6 +1206,7 @@ export interface FileRouteTypes {
     | '/alux'
     | '/arma-tu-viaje'
     | '/auth'
+    | '/blog'
     | '/casas-de-vacaciones'
     | '/empresas'
     | '/eventos'
@@ -1303,6 +1314,7 @@ export interface FileRouteTypes {
     | '/alux'
     | '/arma-tu-viaje'
     | '/auth'
+    | '/blog'
     | '/casas-de-vacaciones'
     | '/empresas'
     | '/eventos'
@@ -1417,6 +1429,7 @@ export interface RootRouteChildren {
   AluxRoute: typeof AluxRoute
   ArmaTuViajeRoute: typeof ArmaTuViajeRoute
   AuthRoute: typeof AuthRoute
+  BlogRoute: typeof BlogRoute
   CasasDeVacacionesRoute: typeof CasasDeVacacionesRoute
   EmpresasRoute: typeof EmpresasRoute
   EventosRoute: typeof EventosRouteWithChildren
@@ -1533,6 +1546,13 @@ declare module '@tanstack/react-router' {
       path: '/casas-de-vacaciones'
       fullPath: '/casas-de-vacaciones'
       preLoaderRoute: typeof CasasDeVacacionesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -2540,6 +2560,7 @@ const rootRouteChildren: RootRouteChildren = {
   AluxRoute: AluxRoute,
   ArmaTuViajeRoute: ArmaTuViajeRoute,
   AuthRoute: AuthRoute,
+  BlogRoute: BlogRoute,
   CasasDeVacacionesRoute: CasasDeVacacionesRoute,
   EmpresasRoute: EmpresasRoute,
   EventosRoute: EventosRouteWithChildren,
