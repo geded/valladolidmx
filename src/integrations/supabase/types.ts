@@ -44,6 +44,41 @@ export type Database = {
         }
         Relationships: []
       }
+      alux_traveler_suggestions: {
+        Row: {
+          capability: string
+          created_at: string
+          id: string
+          meta: Json
+          plan_id: string | null
+          user_id: string
+        }
+        Insert: {
+          capability: string
+          created_at?: string
+          id?: string
+          meta?: Json
+          plan_id?: string | null
+          user_id: string
+        }
+        Update: {
+          capability?: string
+          created_at?: string
+          id?: string
+          meta?: Json
+          plan_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alux_traveler_suggestions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "travel_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       articles: {
         Row: {
           author_user_id: string | null
@@ -4509,6 +4544,10 @@ export type Database = {
           product_slug: string
         }[]
       }
+      alux_traveler_log_suggestion: {
+        Args: { _capability: string; _meta?: Json; _plan_id?: string }
+        Returns: string
+      }
       archive_business_product: {
         Args: { _product_id: string }
         Returns: undefined
@@ -5277,6 +5316,7 @@ export type Database = {
         Args: { _plan_id: string; _user_id: string }
         Returns: boolean
       }
+      traveler_alux_context_for_user: { Args: never; Returns: Json }
       unc_activity_admin: {
         Args: { _limit?: number }
         Returns: {
