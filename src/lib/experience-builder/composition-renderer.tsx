@@ -386,6 +386,8 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
           label: typeof c?.label === "string" ? c.label : undefined,
           href: typeof c?.href === "string" ? c.href : undefined,
           variant: typeof c?.variant === "string" ? c.variant : undefined,
+          size: typeof c?.size === "string" ? c.size : undefined,
+          full_width: typeof c?.full_width === "boolean" ? c.full_width : undefined,
         }))
       : undefined;
     return (
@@ -417,6 +419,8 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
               : undefined,
           search_placeholder: node.config.search_placeholder as string | undefined,
           search_helper: node.config.search_helper as string | undefined,
+          search_size: node.config.search_size as string | undefined,
+          search_max_width: node.config.search_max_width as string | undefined,
           text_alignment: node.config.text_alignment as string | undefined,
           search_alignment: node.config.search_alignment as string | undefined,
           __typography:
