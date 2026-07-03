@@ -75,7 +75,7 @@ function ObservabilityPage() {
     <div className="mx-auto w-full max-w-6xl space-y-10">
       <header className="border-b border-border pb-6">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          Fase 2 · Ola 4 · Etapa 7
+          Observabilidad
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">
           Observabilidad y Hardening

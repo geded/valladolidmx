@@ -8,7 +8,6 @@
  */
 import { Link } from "@tanstack/react-router";
 import { Compass, FileText, MessageCircle } from "lucide-react";
-import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { RequestConciergeButton } from "@/components/concierge/RequestConciergeButton";
 
 export function TripPlannerSurface() {
@@ -31,7 +30,7 @@ export function TripPlannerSurface() {
       </div>
 
       <div className="mt-10 rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center">
-        <ComingSoonBadge label="Llega en Fase 4" />
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/60 px-2.5 py-0.5 text-xs font-medium text-muted-foreground"><span className="size-1.5 rounded-full bg-primary" aria-hidden />En preparación</span>
         <h2 className="mt-4 text-2xl">Tu expediente vive aquí</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
           Pronto podrás agregar destinos y experiencias desde cualquier tarjeta y

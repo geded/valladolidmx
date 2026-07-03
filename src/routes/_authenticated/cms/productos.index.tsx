@@ -29,7 +29,7 @@ function ProductosPage() {
       queryKey="products"
       fn={listProductsCms}
       title="Productos"
-      stage="Ola 1 · Etapa 2 · Lecturas"
+
       description="Experiencias, hoteles, restaurantes, eventos, tours y más."
       rowKey={(r) => r.id}
       headerActions={

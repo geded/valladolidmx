@@ -73,7 +73,7 @@ function AlertsPage() {
     <div className="mx-auto w-full max-w-5xl space-y-8">
       <header className="border-b border-border pb-6">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          Fase 2 · Ola 4 · Etapa 7
+          Observabilidad
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">Alertas</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">

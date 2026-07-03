@@ -54,7 +54,7 @@ function MarketplaceIndex() {
     <PublicShell
       eyebrow="Marketplace"
       title="Empresas y experiencias publicadas"
-      description="Vitrina pública del destino. Etapa 1 — infraestructura."
+      description="Vitrina pública del destino con empresas verificadas del Oriente Maya."
       crumbs={[{ label: "Marketplace" }]}
     >
       {composition ? (

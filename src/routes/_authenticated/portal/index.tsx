@@ -10,18 +10,19 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listMyBusinesses } from "@/lib/portal/portal-reads.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/portal/")({
   component: PortalIndex,
 });
 
-const UPCOMING = [
-  { stage: "Etapa 2", label: "Onboarding e invitaciones" },
-  { stage: "Etapa 3", label: "Ficha pública + workflow editorial" },
-  { stage: "Etapa 4", label: "Contactos, ubicaciones, horarios, redes" },
-  { stage: "Etapa 5", label: "Galería de empresa" },
-  { stage: "Etapa 6", label: "Productos + promociones" },
-  { stage: "Etapa 7", label: "Usuarios internos de la empresa" },
+const SHORTCUTS = [
+  { to: "/portal/ficha" as const, label: "Ficha pública" },
+  { to: "/portal/presencia" as const, label: "Contactos, ubicaciones, horarios, redes" },
+  { to: "/portal/galeria" as const, label: "Galería de empresa" },
+  { to: "/portal/catalogo" as const, label: "Productos y promociones" },
+  { to: "/portal/invitaciones" as const, label: "Invitaciones y usuarios" },
+  { to: "/portal/propiedad" as const, label: "Propiedad y transferencia" },
 ];
 
 function PortalIndex() {
@@ -38,12 +39,11 @@ function PortalIndex() {
     <div className="mx-auto max-w-3xl">
       <header>
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-          Portal Empresarial · Etapa 1
+          Portal Empresarial
         </p>
         <h1 className="mt-2 text-3xl">Resumen</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Infraestructura de autorización del Portal disponible. Las
-          siguientes etapas habilitarán las capacidades de edición.
+          Administra la presencia pública, el catálogo y la operación de tus empresas.
         </p>
       </header>
 
@@ -81,18 +81,18 @@ function PortalIndex() {
 
       <section className="mt-10">
         <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Próximas etapas
+          Accesos rápidos
         </h2>
         <ul className="mt-3 grid gap-2">
-          {UPCOMING.map((u) => (
-            <li
-              key={u.stage}
-              className="flex items-center justify-between rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              <span>{u.label}</span>
-              <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-                {u.stage}
-              </span>
+          {SHORTCUTS.map((s) => (
+            <li key={s.to}>
+              <Link
+                to={s.to}
+                className="flex items-center justify-between rounded-md border border-border bg-background px-3 py-2 text-sm transition-colors hover:bg-accent"
+              >
+                <span>{s.label}</span>
+                <span aria-hidden className="text-muted-foreground">→</span>
+              </Link>
             </li>
           ))}
         </ul>

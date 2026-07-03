@@ -126,7 +126,7 @@ function PropiedadPage() {
     <div className="mx-auto max-w-3xl">
       <header className="mb-6">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          Portal Empresarial · Etapa 6
+          Portal Empresarial
         </p>
         <h1 className="mt-1 text-2xl font-semibold">
           Transferencia de propiedad

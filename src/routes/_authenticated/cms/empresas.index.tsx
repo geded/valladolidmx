@@ -29,7 +29,7 @@ function EmpresasPage() {
       queryKey="businesses"
       fn={listBusinessesCms}
       title="Empresas"
-      stage="Ola 1 · Etapa 2 · Lecturas"
+
       description="Fichas editoriales de empresas locales."
       rowKey={(r) => r.id}
       headerActions={

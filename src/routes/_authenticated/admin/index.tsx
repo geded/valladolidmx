@@ -1,5 +1,5 @@
 /**
- * /admin — Cockpit Fundador (Etapa 15.10.4c · Founder Cockpit Composable).
+ * /admin — Cockpit Fundador (Cockpit del Fundador).
  *
  * El Cockpit se renderiza íntegramente vía Experience Builder
  * (`CompositionRenderer`) sobre un árbol declarativo de bloques
@@ -93,7 +93,7 @@ function AdminCockpit() {
     <div className="max-w-6xl space-y-6">
       <header>
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-          Etapa 15.10.4c · Founder Cockpit Composable
+          Cockpit del Fundador
         </p>
         <h1 className="mt-2 text-3xl">Cockpit del Fundador</h1>
         <p className="mt-2 text-sm text-muted-foreground">

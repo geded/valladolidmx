@@ -28,7 +28,7 @@ function CategoriasPage() {
       queryKey="categories"
       fn={listCategoriesCms}
       title="Categorías"
-      stage="Ola 1 · Etapa 3 · Edición"
+
       description="Taxonomía oficial de empresas y productos."
       rowKey={(r) => r.id}
       headerActions={

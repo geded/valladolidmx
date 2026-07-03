@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
-import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { SITE } from "@/config/site";
 
 export const Route = createFileRoute("/eventos")({
@@ -23,11 +22,11 @@ function PlaceholderRoute() {
       crumbs={[{ label: "Eventos" }]}
     >
       <div className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center">
-        <ComingSoonBadge label="Llega en Fase 1" />
-        <h2 className="mt-4 text-2xl">Estamos preparando esta vista</h2>
+        <h2 className="text-2xl">Calendario en preparación</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          La estructura ya está lista. Pronto encontrarás aquí el contenido completo
-          con buscador, filtros y tarjetas detalladas.
+          Estamos integrando el calendario de fiestas, festivales y celebraciones del
+          Oriente Maya. Mientras tanto, explora los hoteles, restaurantes y experiencias
+          publicadas.
         </p>
       </div>
     </PublicShell>

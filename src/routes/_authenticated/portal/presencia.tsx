@@ -79,7 +79,7 @@ function PresenciaPage() {
     <div className="space-y-6">
       <header>
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          Portal Empresarial · Etapa 4
+          Portal Empresarial
         </p>
         <h1 className="mt-1 text-3xl font-semibold">Presencia de la empresa</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">

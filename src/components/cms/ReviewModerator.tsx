@@ -108,7 +108,7 @@ export function ReviewModerator({ id }: { id: string }) {
       <header className="flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-            Ola 1 · Etapa 5 · Moderación
+            Moderación
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">
             {r.title ?? "(reseña sin título)"}

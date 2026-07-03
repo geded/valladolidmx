@@ -1,40 +1,54 @@
 /**
  * MarketplaceSurface — plantilla oficial del Marketplace público.
  *
- * US-R3 · Ola 1 (Singletons). Contenido del cuerpo de `/marketplace`,
- * desacoplado de la ruta para poder ser renderizado como bloque
- * `vmx.surface.marketplace` desde una composición del Experience
- * Builder. Adopción reproductiva: paridad visual y funcional 1:1 con
- * la implementación previa; el rediseño se realiza en US-R4+.
- *
- * Los datos (`businesses`) provienen del loader de la ruta pública
- * `/marketplace/`, no de la configuración del bloque, para preservar
- * el modelo SSR read-only actual (RLS TO anon).
+ * Reutilizada por `/marketplace` (loader → todos los negocios publicados)
+ * y por las categorías (`/hoteles`, `/restaurantes`, `/experiencias`),
+ * que pasan `items` ya filtrado por `category_slug`. Sin duplicación
+ * de componentes: la tarjeta `BusinessTile` se exporta para reuso.
  */
 import { Link, getRouteApi } from "@tanstack/react-router";
 import type { MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
 
 const marketplaceRouteApi = getRouteApi("/marketplace/");
 
-export function MarketplaceSurface() {
+export interface MarketplaceSurfaceProps {
+  /** Colección explícita a renderizar; si se omite, se lee del loader de `/marketplace`. */
+  items?: MarketplaceBusinessCard[];
+  /** Mensaje mostrado cuando la lista está vacía. */
+  emptyMessage?: string;
+}
+
+export function MarketplaceSurface(props: MarketplaceSurfaceProps = {}) {
+  if (props.items !== undefined) {
+    return <MarketplaceSurfaceList items={props.items} emptyMessage={props.emptyMessage} />;
+  }
+  return <MarketplaceSurfaceFromLoader emptyMessage={props.emptyMessage} />;
+}
+
+function MarketplaceSurfaceFromLoader({ emptyMessage }: { emptyMessage?: string }) {
   const { businesses } = marketplaceRouteApi.useLoaderData();
-  if (!businesses || businesses.length === 0) {
+  return <MarketplaceSurfaceList items={businesses ?? []} emptyMessage={emptyMessage} />;
+}
+
+function MarketplaceSurfaceList({ items, emptyMessage }: { items: MarketplaceBusinessCard[]; emptyMessage?: string }) {
+  const list = items;
+  if (list.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        Aún no hay empresas publicadas. Vuelve pronto.
+        {emptyMessage ?? "Aún no hay empresas publicadas. Vuelve pronto."}
       </p>
     );
   }
   return (
     <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {businesses.map((b: MarketplaceBusinessCard) => (
+      {list.map((b: MarketplaceBusinessCard) => (
         <BusinessTile key={b.id} item={b} />
       ))}
     </ul>
   );
 }
 
-function BusinessTile({ item }: { item: MarketplaceBusinessCard }) {
+export function BusinessTile({ item }: { item: MarketplaceBusinessCard }) {
   return (
     <li className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary">
       <Link to="/marketplace/$slug" params={{ slug: item.slug }} className="block">

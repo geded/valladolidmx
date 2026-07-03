@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/cms/")({
       {
         name: "description",
         content:
-          "Panel administrativo del CMS Studio de Valladolid.mx (Ola 1, Fase 2).",
+          "Panel administrativo del CMS Studio de Valladolid.mx.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
@@ -27,58 +27,17 @@ interface EntityCard {
   key: string;
   name: string;
   description: string;
-  stage: string;
 }
 
 const ENTITIES: EntityCard[] = [
-  {
-    key: "tourism_regions",
-    name: "Regiones turísticas",
-    description: "Regiones que agrupan destinos del territorio.",
-    stage: "Etapa 2 · Lecturas",
-  },
-  {
-    key: "destinations",
-    name: "Destinos",
-    description: "Pueblos, ciudades y enclaves del Oriente Maya.",
-    stage: "Etapa 2 · Lecturas",
-  },
-  {
-    key: "destination_zones",
-    name: "Zonas de destino",
-    description: "Sub-áreas y barrios dentro de cada destino.",
-    stage: "Etapa 2 · Lecturas",
-  },
-  {
-    key: "business_categories",
-    name: "Categorías",
-    description: "Taxonomía oficial de empresas y productos.",
-    stage: "Etapa 3 · Edición",
-  },
-  {
-    key: "businesses",
-    name: "Empresas",
-    description: "Fichas editoriales de empresas locales.",
-    stage: "Etapa 3 · Edición",
-  },
-  {
-    key: "products",
-    name: "Productos",
-    description: "Experiencias, hoteles, restaurantes, eventos y más.",
-    stage: "Etapa 3 · Edición",
-  },
-  {
-    key: "media_assets",
-    name: "Media",
-    description: "Biblioteca multimedia compartida.",
-    stage: "Etapa 3 · Selector",
-  },
-  {
-    key: "reviews",
-    name: "Reseñas",
-    description: "Moderación de reseñas y respuestas.",
-    stage: "Etapa 5 · Moderación",
-  },
+  { key: "tourism_regions", name: "Regiones turísticas", description: "Regiones que agrupan destinos del territorio." },
+  { key: "destinations", name: "Destinos", description: "Pueblos, ciudades y enclaves del Oriente Maya." },
+  { key: "destination_zones", name: "Zonas de destino", description: "Sub-áreas y barrios dentro de cada destino." },
+  { key: "business_categories", name: "Categorías", description: "Taxonomía oficial de empresas y productos." },
+  { key: "businesses", name: "Empresas", description: "Fichas editoriales de empresas locales." },
+  { key: "products", name: "Productos", description: "Experiencias, hoteles, restaurantes, eventos y más." },
+  { key: "media_assets", name: "Media", description: "Biblioteca multimedia compartida." },
+  { key: "reviews", name: "Reseñas", description: "Moderación de reseñas y respuestas." },
 ];
 
 function CmsDashboard() {
@@ -86,16 +45,14 @@ function CmsDashboard() {
     <div className="mx-auto w-full max-w-5xl">
       <header className="border-b border-border pb-6">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          Fase 2 · Ola 1 · Etapa 1
+          Administración editorial
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">
           CMS Studio
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Panel administrativo de Valladolid.mx. Este shell habilita el
-          acceso editorial; las capacidades de lectura, edición y workflow
-          se incorporan en las etapas siguientes del plan 14.10, sin
-          alterar la línea base de la Fase 1.
+          Panel administrativo de Valladolid.mx. Gobierna el contenido editorial,
+          la taxonomía y la moderación desde un único lugar.
         </p>
       </header>
 
@@ -149,9 +106,6 @@ function CmsDashboard() {
               <h3 className="text-base font-semibold">{e.name}</h3>
               <p className="mt-1 text-xs text-muted-foreground">
                 {e.description}
-              </p>
-              <p className="mt-3 text-[10px] font-medium uppercase tracking-[0.16em] text-primary">
-                {e.stage}
               </p>
             </article>
           ))}

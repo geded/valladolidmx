@@ -32,10 +32,10 @@ function MediaPage() {
       queryKey="media"
       fn={listMediaCms}
       title="Biblioteca multimedia"
-      stage="Ola 1 · Etapa 2 · Lecturas"
+
       description="Activos almacenados en los buckets oficiales de Storage."
       rowKey={(r) => r.id}
-      emptyMessage="Sin activos. La carga se habilitará en Etapa 3."
+      emptyMessage="Sin activos multimedia todavía."
       columns={[
         { key: "alt", header: "Descripción", render: (r) => <span className="font-medium">{r.alt_text ?? "(sin alt)"}</span> },
         { key: "kind", header: "Tipo", render: (r) => <span className="text-xs text-muted-foreground">{r.kind ?? "—"}</span> },

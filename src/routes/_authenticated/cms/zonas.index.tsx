@@ -28,7 +28,7 @@ function ZonasPage() {
       queryKey="zones"
       fn={listZonesCms}
       title="Zonas de destino"
-      stage="Ola 1 · Etapa 2 · Lecturas"
+
       description="Sub-áreas y barrios dentro de cada destino."
       rowKey={(r) => r.id}
       headerActions={

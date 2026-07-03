@@ -28,7 +28,7 @@ function DestinosPage() {
       queryKey="destinations"
       fn={listDestinationsCms}
       title="Destinos"
-      stage="Ola 1 · Etapa 2 · Lecturas"
+
       description="Pueblos, ciudades y enclaves del Oriente Maya."
       rowKey={(r) => r.id}
       headerActions={

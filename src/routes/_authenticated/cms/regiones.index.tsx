@@ -27,7 +27,7 @@ function RegionesPage() {
       queryKey="regions"
       fn={listRegionsCms}
       title="Regiones turísticas"
-      stage="Ola 1 · Etapa 3 · Edición"
+
       description="Regiones que agrupan los destinos del territorio."
       rowKey={(r) => r.id}
       headerActions={
