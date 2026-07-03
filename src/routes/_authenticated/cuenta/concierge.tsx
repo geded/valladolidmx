@@ -36,11 +36,11 @@ function TravelerConciergePage() {
     <section>
       <header>
         <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-          Ola 6 · Concierge
+          Concierge
         </p>
         <h1 className="mt-1 text-2xl font-semibold">Mis expedientes Concierge</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Vista de lectura. Próximamente podrás revisar propuestas y aceptar cotizaciones desde aquí.
+          Revisa el estado de tus expedientes y las propuestas del equipo Concierge.
         </p>
       </header>
 
