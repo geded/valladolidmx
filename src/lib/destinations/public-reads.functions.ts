@@ -26,24 +26,35 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
     return input;
   })
   .handler(async ({ data }): Promise<PublicDestinationDTO | null> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row, error } = await supabaseAdmin
+    const { createClient } = await import("@supabase/supabase-js");
+    const url = process.env.SUPABASE_URL!;
+    const publishable = process.env.SUPABASE_PUBLISHABLE_KEY!;
+    const sb = createClient(url, publishable, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: row, error } = await sb
       .from("destinations")
       .select(
         "slug, name, tagline, description, highlights, hero_palette, latitude, longitude, hero_media_id, media_assets:hero_media_id ( storage_bucket, storage_path )",
       )
       .eq("slug", data.slug)
       .maybeSingle();
-    if (error || !row) return null;
+    if (error) {
+      console.error("[getPublicDestinationBySlug] read error", error);
+      return null;
+    }
+    if (!row) return null;
 
     let hero_url: string | null = null;
     const media = (row as unknown as {
       media_assets?: { storage_bucket: string; storage_path: string } | null;
     }).media_assets;
     if (media?.storage_bucket && media?.storage_path) {
-      const { data: signed } = await supabaseAdmin.storage
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: signed, error: signErr } = await supabaseAdmin.storage
         .from(media.storage_bucket)
         .createSignedUrl(media.storage_path, 60 * 60);
+      if (signErr) console.error("[getPublicDestinationBySlug] sign error", signErr);
       hero_url = signed?.signedUrl ?? null;
     }
 
