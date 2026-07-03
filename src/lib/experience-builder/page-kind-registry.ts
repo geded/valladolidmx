@@ -54,6 +54,29 @@ export interface PageKindDefinition {
    * no cambia.
    */
   readonly allowedBlockCategories: readonly string[] | null;
+  /**
+   * Defaults SEO/sitemap por kind (US-R3 · R3.15, R3.19, R3.26). Los
+   * editores pueden sobreescribir por composición desde el Studio.
+   */
+  readonly defaults?: {
+    /** JSON-LD @type por defecto (WebPage, Product, Place, Event…). */
+    readonly jsonLdType?: string;
+    /** `changefreq` sugerida para el sitemap. */
+    readonly sitemapChangefreq?:
+      | "always"
+      | "hourly"
+      | "daily"
+      | "weekly"
+      | "monthly"
+      | "yearly"
+      | "never";
+    /** Prioridad 0..1 sugerida para el sitemap. */
+    readonly sitemapPriority?: number;
+    /** `Cache-Control` sugerido para SSR. */
+    readonly cacheControl?: string;
+    /** Ruta padre para redirect por defecto al despublicar (R3.22). */
+    readonly unpublishFallbackPath?: string;
+  };
 }
 
 /**
