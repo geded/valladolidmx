@@ -1215,6 +1215,93 @@ const businessContactBlock = businessBlock(
   "Datos de contacto y reservación tomados del CMS.",
 );
 
+/* ------------------------------------------------------------------ *
+ * US-R3 · Sub-ola 2.3a — Plantilla Madre Producto (bloques granulares).
+ *
+ * Ficha individual de un producto (NO catálogo dentro de una empresa).
+ * Cada bloque consume `ProductSurfaceContext`. Registro editorial:
+ * shell (contenedor), hero, gallery, price-cta, description,
+ * business-context, promos, reviews, faq y related. Añadir un bloque
+ * nuevo = añadir una entrada aquí; el renderer y el Studio no cambian.
+ * ------------------------------------------------------------------ */
+
+function productBlock(
+  type: string,
+  display_name: string,
+  description: string,
+  extra: Partial<BlockContract> = {},
+): BlockContract {
+  return {
+    type,
+    category: "static",
+    version: "1.0.0",
+    display_name,
+    description,
+    schema: {},
+    capabilities: {
+      soporta_preview: true,
+      soporta_responsive: true,
+      soporta_seo: false,
+      soporta_cache: true,
+    },
+    constraints: { surfaces: ["product"] },
+    responsive: { breakpoints: ["desktop", "tablet", "mobile"] },
+    audit: ["Block.Registered", "Block.VersionPublished"],
+    ...extra,
+  };
+}
+
+const productShellBlock = productBlock(
+  "vmx.product.shell",
+  "Producto · Shell",
+  "Contenedor oficial de la ficha de producto (PublicShell con breadcrumbs jerárquicos).",
+);
+const productHeroBlock = productBlock(
+  "vmx.product.hero",
+  "Producto · Hero",
+  "Tipo, título, tagline y favorito bajo el encabezado del producto.",
+);
+const productGalleryBlock = productBlock(
+  "vmx.product.gallery",
+  "Producto · Galería",
+  "Portada + galería. Scroll-snap mobile, grid en tablet/desktop.",
+);
+const productPriceCtaBlock = productBlock(
+  "vmx.product.price-cta",
+  "Producto · Precio + CTA",
+  "Precio prominente y Estrategia de Conversión (comprar/reservar/cotizar/contactar).",
+);
+const productDescriptionBlock = productBlock(
+  "vmx.product.description",
+  "Producto · Descripción",
+  "Descripción larga del producto tomada del CMS.",
+);
+const productBusinessContextBlock = productBlock(
+  "vmx.product.business-context",
+  "Producto · Empresa oferente",
+  "Empresa padre + link, contacto y ubicación pública.",
+);
+const productPromosBlock = productBlock(
+  "vmx.product.promos",
+  "Producto · Promociones",
+  "Promociones vigentes de la empresa que ofrece el producto.",
+);
+const productReviewsBlock = productBlock(
+  "vmx.product.reviews",
+  "Producto · Opiniones",
+  "Opiniones publicadas por viajeros sobre este producto.",
+);
+const productFaqBlock = productBlock(
+  "vmx.product.faq",
+  "Producto · Preguntas frecuentes",
+  "FAQs publicadas asociadas al producto.",
+);
+const productRelatedBlock = productBlock(
+  "vmx.product.related",
+  "Producto · Relacionados",
+  "Otros productos publicados por la misma empresa.",
+);
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
@@ -1261,6 +1348,17 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   businessProductsBlock,
   businessPromotionsBlock,
   businessContactBlock,
+  // US-R3 · Sub-ola 2.3a — Plantilla Madre Producto (bloques granulares)
+  productShellBlock,
+  productHeroBlock,
+  productGalleryBlock,
+  productPriceCtaBlock,
+  productDescriptionBlock,
+  productBusinessContextBlock,
+  productPromosBlock,
+  productReviewsBlock,
+  productFaqBlock,
+  productRelatedBlock,
 ];
 
 let bootstrapped = false;

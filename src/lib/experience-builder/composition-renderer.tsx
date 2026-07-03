@@ -59,6 +59,18 @@ import {
   BusinessPromotionsBlock,
   BusinessContactBlock,
 } from "@/components/surfaces/business-blocks";
+import {
+  ProductShellBlock,
+  ProductHeroBlock,
+  ProductGalleryBlock,
+  ProductPriceCtaBlock,
+  ProductDescriptionBlock,
+  ProductBusinessContextBlock,
+  ProductPromosBlock,
+  ProductReviewsBlock,
+  ProductFaqBlock,
+  ProductRelatedBlock,
+} from "@/components/surfaces/product-blocks";
 
 bootstrapBlockLibrary();
 
@@ -399,6 +411,21 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.business.products": () => <BusinessProductsBlock />,
   "vmx.business.promotions": () => <BusinessPromotionsBlock />,
   "vmx.business.contact": () => <BusinessContactBlock />,
+  // US-R3 · Sub-ola 2.3a — Product granular. Mismos componentes en
+  // Studio y producción: leen `ProductSurfaceContext` (poblado por el
+  // preview-registry en Studio y por la ruta pública en producción).
+  "vmx.product.shell": ({ renderChildren }) => (
+    <ProductShellBlock renderChildren={renderChildren} />
+  ),
+  "vmx.product.hero": () => <ProductHeroBlock />,
+  "vmx.product.gallery": () => <ProductGalleryBlock />,
+  "vmx.product.price-cta": () => <ProductPriceCtaBlock />,
+  "vmx.product.description": () => <ProductDescriptionBlock />,
+  "vmx.product.business-context": () => <ProductBusinessContextBlock />,
+  "vmx.product.promos": () => <ProductPromosBlock />,
+  "vmx.product.reviews": () => <ProductReviewsBlock />,
+  "vmx.product.faq": () => <ProductFaqBlock />,
+  "vmx.product.related": () => <ProductRelatedBlock />,
 };
 
 /* ------------------------------------------------------------------ *
@@ -598,11 +625,26 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.business.products": () => <BusinessProductsBlock />,
   "vmx.business.promotions": () => <BusinessPromotionsBlock />,
   "vmx.business.contact": () => <BusinessContactBlock />,
+  // US-R3 · Sub-ola 2.3a — Product granular (producción).
+  "vmx.product.shell": ({ renderChildren }) => (
+    <ProductShellBlock renderChildren={renderChildren} />
+  ),
+  "vmx.product.hero": () => <ProductHeroBlock />,
+  "vmx.product.gallery": () => <ProductGalleryBlock />,
+  "vmx.product.price-cta": () => <ProductPriceCtaBlock />,
+  "vmx.product.description": () => <ProductDescriptionBlock />,
+  "vmx.product.business-context": () => <ProductBusinessContextBlock />,
+  "vmx.product.promos": () => <ProductPromosBlock />,
+  "vmx.product.reviews": () => <ProductReviewsBlock />,
+  "vmx.product.faq": () => <ProductFaqBlock />,
+  "vmx.product.related": () => <ProductRelatedBlock />,
 };
 
 /* ------------------------------------------------------------------ *
  * Bloque formulario configurable
  * ------------------------------------------------------------------ */
+// (Los renderers de `vmx.product.*` se inyectan también en PRODUCTION_COMPONENT_MAP
+//  arriba, reutilizando los mismos componentes de Studio.)
 
 interface FormFieldCfg { key: string; label: string; type: string; required?: boolean }
 

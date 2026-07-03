@@ -241,10 +241,10 @@ export const PAGE_KIND_REGISTRY: readonly PageKindDefinition[] = [
     kind: "product",
     label: "Producto",
     description: "Ficha editorial de producto del marketplace.",
-    slugPattern: "/marketplace/{slug}",
+    slugPattern: "/producto/{slug}",
     singleton: false,
     requiredRoles: ["admin", "super_admin", "editor"],
-    publicRoutePattern: "/marketplace/{slug}",
+    publicRoutePattern: "/producto/{slug}",
     allowedBlockCategories: null,
   },
   {
