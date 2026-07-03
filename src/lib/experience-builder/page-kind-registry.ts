@@ -1,0 +1,295 @@
+/**
+ * Experience Builder · Page Kind Registry (US-R1 · Recovery Plan §1)
+ *
+ * Fuente única declarativa de los tipos de página gestionables desde el
+ * Studio. NO es un engine: sólo describe metadatos (label, alcance de
+ * bloques, patrón de slug, plantilla semilla, rol requerido, singleton).
+ *
+ * Reglas vinculantes (Single Studio + Product Vision Rule):
+ *  - El `kind` NO determina un editor distinto. Determina qué plantilla
+ *    y qué subset de bloques ve el editor dentro del mismo VisualStudio.
+ *  - Ninguna capacidad existente puede reducirse por añadir un kind.
+ *  - Añadir un kind = añadir una entrada aquí + valor al enum
+ *    `eb_page_kind` en migración. Sin código nuevo del editor.
+ */
+
+import type { Database } from "@/integrations/supabase/types";
+
+/** Enum canónico de kinds gestionados por el Experience Builder. */
+export type PageKind = Database["public"]["Enums"]["eb_page_kind"];
+
+export type PageKindRole = "admin" | "super_admin" | "editor";
+
+export interface PageKindDefinition {
+  /** Enum id — debe existir en `public.eb_page_kind`. */
+  readonly kind: PageKind;
+  /** Etiqueta corta para el Studio. */
+  readonly label: string;
+  /** Descripción breve para el diálogo "Nueva página". */
+  readonly description: string;
+  /**
+   * Patrón de slug del `kind` (informativo).
+   *   - `{slug}` para composiciones parametrizadas.
+   *   - Cadena literal (p. ej. `"/"`, `"/marketplace"`) para singletons.
+   */
+  readonly slugPattern: string;
+  /**
+   * Sólo puede existir una composición publicada de este kind (Home,
+   * Marketplace, /alux, /arma-tu-viaje, secciones globales).
+   */
+  readonly singleton: boolean;
+  /**
+   * Roles autorizados para crear/editar páginas de este kind desde el
+   * Studio. Los empresarios NO editan aquí (Product Vision).
+   */
+  readonly requiredRoles: readonly PageKindRole[];
+  /**
+   * Ruta pública que servirá la composición (para el diálogo de "Ver").
+   * Puede contener `{slug}` como marcador.
+   */
+  readonly publicRoutePattern: string;
+  /**
+   * Familias/categorías de la Block Library permitidas. `null` = todas.
+   * Se aplica como filtro visual en la biblioteca; el contrato de bloques
+   * no cambia.
+   */
+  readonly allowedBlockCategories: readonly string[] | null;
+}
+
+/**
+ * Catálogo canónico de kinds del Experience Builder. El orden se usa
+ * como orden por defecto en el panel de páginas.
+ */
+export const PAGE_KIND_REGISTRY: readonly PageKindDefinition[] = [
+  {
+    kind: "home",
+    label: "Home",
+    description: "Portada pública de Valladolid.mx.",
+    slugPattern: "/",
+    singleton: true,
+    requiredRoles: ["admin", "super_admin"],
+    publicRoutePattern: "/",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "marketplace",
+    label: "Marketplace",
+    description: "Catálogo público del marketplace y sus secciones.",
+    slugPattern: "/marketplace",
+    singleton: true,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/marketplace",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "landing",
+    label: "Landing",
+    description: "Landing de campaña o producto editorial.",
+    slugPattern: "/l/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/l/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "campaign",
+    label: "Campaña",
+    description: "Composición de campaña multiformato.",
+    slugPattern: "/l/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/l/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "microsite",
+    label: "Micrositio",
+    description: "Micrositio institucional o de aliado.",
+    slugPattern: "/p/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/p/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "institutional",
+    label: "Institucional",
+    description: "Páginas institucionales (aviso, términos, prensa…).",
+    slugPattern: "/p/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/p/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "promo",
+    label: "Promoción",
+    description: "Landing de promoción editorial.",
+    slugPattern: "/l/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/l/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "destination",
+    label: "Destino",
+    description: "Composición editorial de un destino de Oriente Maya.",
+    slugPattern: "/oriente-maya/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/oriente-maya/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "route",
+    label: "Ruta",
+    description: "Ruta editorial (itinerario, ruta gastronómica, etc.).",
+    slugPattern: "/p/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/p/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "experience",
+    label: "Experiencia",
+    description: "Página editorial de experiencia turística.",
+    slugPattern: "/experiencias/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/experiencias/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "hotel",
+    label: "Hotel",
+    description: "Ficha editorial de hotel.",
+    slugPattern: "/hoteles/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/hoteles/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "restaurant",
+    label: "Restaurante",
+    description: "Ficha editorial de restaurante.",
+    slugPattern: "/restaurantes/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/restaurantes/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "event",
+    label: "Evento",
+    description: "Ficha editorial de evento.",
+    slugPattern: "/eventos/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/eventos/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "business",
+    label: "Empresa",
+    description: "Ficha editorial de empresa (zonas editables por dueño).",
+    slugPattern: "/empresas/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/empresas/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "product",
+    label: "Producto",
+    description: "Ficha editorial de producto del marketplace.",
+    slugPattern: "/marketplace/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/marketplace/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "alux",
+    label: "Alux",
+    description: "Página pública consultiva del concierge Alux.",
+    slugPattern: "/alux",
+    singleton: true,
+    requiredRoles: ["admin", "super_admin"],
+    publicRoutePattern: "/alux",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "trip_builder",
+    label: "Arma tu viaje",
+    description: "Composición editorial del constructor de viajes.",
+    slugPattern: "/arma-tu-viaje",
+    singleton: true,
+    requiredRoles: ["admin", "super_admin"],
+    publicRoutePattern: "/arma-tu-viaje",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "site_section",
+    label: "Sección global",
+    description: "Cabeceras, secciones globales o navegación editorial.",
+    slugPattern: "internal:{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin"],
+    publicRoutePattern: "",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "wedding",
+    label: "Boda destino",
+    description: "Landing editorial de bodas destino.",
+    slugPattern: "/l/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/l/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "ai_generated",
+    label: "Generada por Alux",
+    description: "Composición generada asistida por Alux (revisar antes de publicar).",
+    slugPattern: "/p/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin"],
+    publicRoutePattern: "/p/{slug}",
+    allowedBlockCategories: null,
+  },
+  {
+    kind: "custom",
+    label: "Personalizada",
+    description: "Composición personalizada sin plantilla predefinida.",
+    slugPattern: "/p/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/p/{slug}",
+    allowedBlockCategories: null,
+  },
+] as const;
+
+const REGISTRY_BY_KIND: ReadonlyMap<PageKind, PageKindDefinition> = new Map(
+  PAGE_KIND_REGISTRY.map((entry) => [entry.kind, entry] as const),
+);
+
+/** Devuelve la definición canónica de un kind, o `undefined` si no existe. */
+export function getPageKindDefinition(kind: PageKind | string): PageKindDefinition | undefined {
+  return REGISTRY_BY_KIND.get(kind as PageKind);
+}
+
+/** Lista ordenada de kinds registrados. */
+export function listPageKinds(): readonly PageKindDefinition[] {
+  return PAGE_KIND_REGISTRY;
+}
+
+/** ¿El rol puede crear/editar este kind desde el Studio? */
+export function canEditPageKind(kind: PageKind | string, roles: readonly string[]): boolean {
+  const def = getPageKindDefinition(kind);
+  if (!def) return false;
+  return def.requiredRoles.some((r) => roles.includes(r));
+}

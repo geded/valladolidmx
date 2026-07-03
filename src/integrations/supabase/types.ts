@@ -3216,6 +3216,8 @@ export type Database = {
           description: string | null
           editing_lock: Json | null
           id: string
+          is_template: boolean
+          kind: Database["public"]["Enums"]["eb_page_kind"]
           page_type: string
           published_at: string | null
           published_by: string | null
@@ -3224,6 +3226,7 @@ export type Database = {
           scheduled_publish_notes: string | null
           slug: string
           status: string
+          template_of_kind: Database["public"]["Enums"]["eb_page_kind"] | null
           title: string
           updated_at: string
           updated_by: string | null
@@ -3241,6 +3244,8 @@ export type Database = {
           description?: string | null
           editing_lock?: Json | null
           id?: string
+          is_template?: boolean
+          kind?: Database["public"]["Enums"]["eb_page_kind"]
           page_type?: string
           published_at?: string | null
           published_by?: string | null
@@ -3249,6 +3254,7 @@ export type Database = {
           scheduled_publish_notes?: string | null
           slug: string
           status?: string
+          template_of_kind?: Database["public"]["Enums"]["eb_page_kind"] | null
           title: string
           updated_at?: string
           updated_by?: string | null
@@ -3266,6 +3272,8 @@ export type Database = {
           description?: string | null
           editing_lock?: Json | null
           id?: string
+          is_template?: boolean
+          kind?: Database["public"]["Enums"]["eb_page_kind"]
           page_type?: string
           published_at?: string | null
           published_by?: string | null
@@ -3274,6 +3282,7 @@ export type Database = {
           scheduled_publish_notes?: string | null
           slug?: string
           status?: string
+          template_of_kind?: Database["public"]["Enums"]["eb_page_kind"] | null
           title?: string
           updated_at?: string
           updated_by?: string | null
@@ -5959,6 +5968,15 @@ export type Database = {
         | "promo"
         | "microsite"
         | "ai_generated"
+        | "home"
+        | "marketplace"
+        | "experience"
+        | "hotel"
+        | "restaurant"
+        | "route"
+        | "alux"
+        | "trip_builder"
+        | "custom"
       eb_publish_status: "draft" | "in_review" | "published" | "archived"
       eb_scope: "global" | "tenant" | "marketplace"
       entity_kind:
@@ -6214,6 +6232,15 @@ export const Constants = {
         "promo",
         "microsite",
         "ai_generated",
+        "home",
+        "marketplace",
+        "experience",
+        "hotel",
+        "restaurant",
+        "route",
+        "alux",
+        "trip_builder",
+        "custom",
       ],
       eb_publish_status: ["draft", "in_review", "published", "archived"],
       eb_scope: ["global", "tenant", "marketplace"],
