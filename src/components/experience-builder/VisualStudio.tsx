@@ -25,6 +25,8 @@ import {
   ChevronUp,
   Copy,
   ExternalLink,
+  Eye,
+  EyeOff,
   History,
   GripVertical,
   Loader2,
@@ -55,6 +57,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { toast } from "sonner";
 
 import {
   listCompositions,
@@ -1067,9 +1070,45 @@ function PageVisualEditor({
 
   const removeNodeById = (nodeId: string) => {
     if (!tree) return;
+    const idx = tree.root.children.findIndex((n) => n.id === nodeId);
+    if (idx < 0) return;
+    const removed = tree.root.children[idx];
+    const contract = getBlock(removed.type);
+    const label = contract?.display_name ?? removed.type;
     const next = tree.root.children.filter((n) => n.id !== nodeId);
+    const treeBefore = tree;
     commitTree({ ...tree, root: { children: next } });
     if (selectedId === nodeId) setSelectedId(null);
+    // Undo (10 s): restaura el árbol previo — funciona también con hijos
+    // anidados en un futuro porque restauramos el snapshot completo.
+    toast.success(`Sección "${label}" eliminada`, {
+      duration: 10000,
+      action: {
+        label: "Deshacer",
+        onClick: () => {
+          commitTree(treeBefore);
+          setSelectedId(removed.id);
+        },
+      },
+    });
+  };
+
+  const toggleHiddenNode = (nodeId: string) => {
+    if (!tree) return;
+    let becameHidden = false;
+    let label = "";
+    const nextChildren = tree.root.children.map((n) => {
+      if (n.id !== nodeId) return n;
+      becameHidden = !n.hidden;
+      label = getBlock(n.type)?.display_name ?? n.type;
+      return { ...n, hidden: !n.hidden };
+    });
+    commitTree({ ...tree, root: { children: nextChildren } });
+    toast(becameHidden ? `"${label}" oculto en el sitio publicado` : `"${label}" visible`, {
+      description: becameHidden
+        ? "Sigue visible en el editor, pero no aparece en el sitio."
+        : undefined,
+    });
   };
 
   const insertBlock = (type: string, atIndex?: number) => {
@@ -1366,7 +1405,13 @@ function PageVisualEditor({
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                 <SortableContext items={tree.root.children.map((n) => n.id)} strategy={verticalListSortingStrategy}>
                   {tree.root.children.map((n) => (
-                    <SortableSectionItem key={n.id} node={n} selected={selectedId === n.id} onSelect={() => setSelectedId(n.id)} />
+                    <SortableSectionItem
+                      key={n.id}
+                      node={n}
+                      selected={selectedId === n.id}
+                      onSelect={() => setSelectedId(n.id)}
+                      onToggleHidden={() => toggleHiddenNode(n.id)}
+                    />
                   ))}
                 </SortableContext>
               </DndContext>
@@ -1400,8 +1445,16 @@ function PageVisualEditor({
           selectedId={selectedId}
           onSelect={(id) => setSelectedId(id)}
           onSelectChrome={(area) => setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)}
-          onDelete={removeNodeById}
+          onDelete={(id) => {
+            if (typeof window !== "undefined") {
+              const node = tree?.root.children.find((n) => n.id === id);
+              const label = node ? getBlock(node.type)?.display_name ?? node.type : "esta sección";
+              if (!window.confirm(`¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`)) return;
+            }
+            removeNodeById(id);
+          }}
           onDuplicate={duplicateNode}
+          onToggleHidden={toggleHiddenNode}
           onMove={moveNode}
           onReorderRoot={(activeId, overId) => {
             if (!tree) return;
@@ -1438,7 +1491,21 @@ function PageVisualEditor({
                 <ToolBtn onClick={() => moveNode(selectedNode.id, -1)} icon={<ChevronUp className="size-3" />} label="Subir" />
                 <ToolBtn onClick={() => moveNode(selectedNode.id, 1)} icon={<ChevronDown className="size-3" />} label="Bajar" />
                 <ToolBtn onClick={() => duplicateNode(selectedNode.id)} icon={<Copy className="size-3" />} label="Duplicar" />
-                <ToolBtn onClick={() => removeNodeById(selectedNode.id)} icon={<Trash2 className="size-3" />} label="Eliminar" tone="danger" />
+                <ToolBtn
+                  onClick={() => toggleHiddenNode(selectedNode.id)}
+                  icon={selectedNode.hidden ? <Eye className="size-3" /> : <EyeOff className="size-3" />}
+                  label={selectedNode.hidden ? "Mostrar" : "Ocultar"}
+                />
+                <ToolBtn
+                  onClick={() => {
+                    const label = getBlock(selectedNode.type)?.display_name ?? selectedNode.type;
+                    if (typeof window !== "undefined" && !window.confirm(`¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`)) return;
+                    removeNodeById(selectedNode.id);
+                  }}
+                  icon={<Trash2 className="size-3" />}
+                  label="Eliminar"
+                  tone="danger"
+                />
               </div>
             ) : null}
 
@@ -1633,6 +1700,7 @@ function HomeCanvas({
   onSelectChrome,
   onDelete,
   onDuplicate,
+  onToggleHidden,
   onMove,
   onReorderRoot,
 }: {
@@ -1644,6 +1712,7 @@ function HomeCanvas({
   onSelectChrome: (area: ChromeArea) => void;
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
+  onToggleHidden: (id: string) => void;
   onMove: (id: string, dir: -1 | 1) => void;
   onReorderRoot: (activeId: string, overId: string) => void;
 }) {
@@ -1729,6 +1798,7 @@ function HomeCanvas({
                           onSelect={() => onSelect(node.id)}
                           onDelete={() => onDelete(node.id)}
                           onDuplicate={() => onDuplicate(node.id)}
+                          onToggleHidden={() => onToggleHidden(node.id)}
                           onMoveUp={() => onMove(node.id, -1)}
                           onMoveDown={() => onMove(node.id, 1)}
                           sortable={rootIdSet.has(node.id)}
@@ -1851,11 +1921,12 @@ function ChromeItem({
 }
 
 function SortableSectionItem({
-  node, selected, onSelect,
+  node, selected, onSelect, onToggleHidden,
 }: {
   node: CompositionNode;
   selected: boolean;
   onSelect: () => void;
+  onToggleHidden: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: node.id });
   const contract = getBlock(node.type);
@@ -1870,7 +1941,7 @@ function SortableSectionItem({
       style={style}
       className={`mb-1 flex items-center gap-1 rounded-md border px-2 py-1.5 text-left text-xs ${
         selected ? "border-primary bg-primary/10" : "border-border bg-background hover:bg-accent"
-      }`}
+      } ${node.hidden ? "opacity-60" : ""}`}
     >
       <button
         type="button"
@@ -1884,22 +1955,32 @@ function SortableSectionItem({
       <button
         type="button"
         onClick={onSelect}
-        className="min-w-0 flex-1 truncate text-left font-medium"
+        className={`min-w-0 flex-1 truncate text-left font-medium ${node.hidden ? "line-through" : ""}`}
       >
         {contract?.display_name ?? node.type}
+      </button>
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onToggleHidden(); }}
+        aria-label={node.hidden ? "Mostrar en el sitio" : "Ocultar en el sitio"}
+        title={node.hidden ? "Mostrar en el sitio" : "Ocultar en el sitio"}
+        className="inline-flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+      >
+        {node.hidden ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
       </button>
     </div>
   );
 }
 
 function BlockOverlay({
-  node, selected, onSelect, onDelete, onDuplicate, onMoveUp, onMoveDown, children, sortable = false,
+  node, selected, onSelect, onDelete, onDuplicate, onToggleHidden, onMoveUp, onMoveDown, children, sortable = false,
 }: {
   node: CompositionNode;
   selected: boolean;
   onSelect: () => void;
   onDelete: () => void;
   onDuplicate: () => void;
+  onToggleHidden: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   children: React.ReactNode;
@@ -1960,6 +2041,13 @@ function BlockOverlay({
       }`}
       aria-label={`Editar ${contract?.display_name ?? node.type}`}
     >
+      {node.hidden ? (
+        <span
+          className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-center gap-1 bg-muted-foreground/90 py-1 text-[10px] font-semibold uppercase tracking-wider text-background"
+        >
+          <EyeOff className="size-3" aria-hidden /> Oculto en el sitio publicado
+        </span>
+      ) : null}
       <span
         className={`pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-lg transition-opacity ${
           selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
@@ -1985,12 +2073,17 @@ function BlockOverlay({
           <IconBtn onClick={(e) => { e.stopPropagation(); onMoveUp(); }} icon={<ChevronUp className="size-3" />} label="Subir" />
           <IconBtn onClick={(e) => { e.stopPropagation(); onMoveDown(); }} icon={<ChevronDown className="size-3" />} label="Bajar" />
           <IconBtn onClick={(e) => { e.stopPropagation(); onDuplicate(); }} icon={<Copy className="size-3" />} label="Duplicar" />
+          <IconBtn
+            onClick={(e) => { e.stopPropagation(); onToggleHidden(); }}
+            icon={node.hidden ? <Eye className="size-3" /> : <EyeOff className="size-3" />}
+            label={node.hidden ? "Mostrar en el sitio" : "Ocultar en el sitio"}
+          />
           <IconBtn onClick={(e) => { e.stopPropagation(); onDelete(); }} icon={<Trash2 className="size-3" />} label="Eliminar" tone="danger" />
         </div>
       ) : null}
       {/* Bloqueamos interacciones internas: en modo edición los clics
           siempre seleccionan el bloque en vez de navegar/enviar. */}
-      <div className="pointer-events-none select-none">{children}</div>
+      <div className={`pointer-events-none select-none ${node.hidden ? "opacity-40 grayscale" : ""}`}>{children}</div>
     </div>
   );
 }
