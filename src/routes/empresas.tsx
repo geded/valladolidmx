@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Building2, BarChart3, Megaphone, ShieldCheck, ArrowRight } from "lucide-react";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
-import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { SITE } from "@/config/site";
 
 export const Route = createFileRoute("/empresas")({
@@ -42,7 +41,10 @@ function EmpresasLanding() {
       </div>
 
       <div className="mt-10 rounded-2xl border border-border bg-card/60 p-10 text-center">
-        <ComingSoonBadge label="Portal Empresarial activo" />
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+          <span className="size-1.5 rounded-full bg-primary" aria-hidden />
+          Portal Empresarial activo
+        </span>
         <h2 className="mt-4 text-2xl">Gestiona tu empresa</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
           Accede a ficha pública, presencia, galería, catálogo, pagos,
