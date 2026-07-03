@@ -88,6 +88,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicStudioMediaSplatRouteImport } from './routes/api/public/studio-media.$'
+import { Route as ApiPublicHooksEbProcessScheduledPublishRouteImport } from './routes/api/public/hooks/eb-process-scheduled-publish'
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
 import { Route as AuthenticatedPortalEmpresasBusinessIdRouteImport } from './routes/_authenticated/portal/empresas.$businessId'
 import { Route as AuthenticatedCuentaPagosExitoRouteImport } from './routes/_authenticated/cuenta/pagos.exito'
@@ -549,6 +550,12 @@ const ApiPublicStudioMediaSplatRoute =
     path: '/api/public/studio-media/$',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksEbProcessScheduledPublishRoute =
+  ApiPublicHooksEbProcessScheduledPublishRouteImport.update({
+    id: '/api/public/hooks/eb-process-scheduled-publish',
+    path: '/api/public/hooks/eb-process-scheduled-publish',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedPortalInvitacionesTokenRoute =
   AuthenticatedPortalInvitacionesTokenRouteImport.update({
     id: '/invitaciones/$token',
@@ -767,6 +774,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -864,6 +872,7 @@ export interface FileRoutesByTo {
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -969,6 +978,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/_authenticated/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -1074,6 +1084,7 @@ export interface FileRouteTypes {
     | '/cuenta/pagos/exito'
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
+    | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1171,6 +1182,7 @@ export interface FileRouteTypes {
     | '/cuenta/pagos/exito'
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
+    | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1275,6 +1287,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/pagos/exito'
     | '/_authenticated/portal/empresas/$businessId'
     | '/_authenticated/portal/invitaciones/$token'
+    | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1325,6 +1338,7 @@ export interface RootRouteChildren {
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
+  ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
   ApiPublicStudioMediaSplatRoute: typeof ApiPublicStudioMediaSplatRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -1887,6 +1901,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStudioMediaSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/eb-process-scheduled-publish': {
+      id: '/api/public/hooks/eb-process-scheduled-publish'
+      path: '/api/public/hooks/eb-process-scheduled-publish'
+      fullPath: '/api/public/hooks/eb-process-scheduled-publish'
+      preLoaderRoute: typeof ApiPublicHooksEbProcessScheduledPublishRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/portal/invitaciones/$token': {
       id: '/_authenticated/portal/invitaciones/$token'
       path: '/invitaciones/$token'
@@ -2363,6 +2384,8 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
+  ApiPublicHooksEbProcessScheduledPublishRoute:
+    ApiPublicHooksEbProcessScheduledPublishRoute,
   ApiPublicStudioMediaSplatRoute: ApiPublicStudioMediaSplatRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
