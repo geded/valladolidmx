@@ -2255,18 +2255,43 @@ function VersionsDrawer({
           <p className="text-xs text-muted-foreground">Aún no hay versiones publicadas.</p>
         ) : (
           versions.map((v) => (
-            <div key={v.id} className="rounded-md border border-border bg-background p-3">
+            <div
+              key={v.id}
+              className={`rounded-md border p-3 ${
+                v.is_active
+                  ? "border-emerald-500/60 bg-emerald-500/5"
+                  : "border-border bg-background"
+              }`}
+            >
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold">Revisión #{v.revision_number}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-semibold">Versión #{v.revision_number}</p>
+                  {v.is_active ? (
+                    <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-emerald-700">
+                      Publicada
+                    </span>
+                  ) : null}
+                </div>
                 <button
                   type="button"
                   onClick={() => void onRestore(v)}
-                  className="rounded-md border border-border bg-background px-2 py-1 text-[10px] font-medium hover:bg-accent"
+                  disabled={v.is_active}
+                  className="rounded-md border border-border bg-background px-2 py-1 text-[10px] font-medium hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
+                  title={v.is_active ? "Esta es la versión publicada actualmente" : "Restaurar esta versión como borrador"}
                 >
                   Restaurar
                 </button>
               </div>
-              <p className="mt-1 text-[10px] text-muted-foreground">{new Date(v.created_at).toLocaleString()}</p>
+              <p className="mt-1 text-[10px] text-muted-foreground">
+                {new Date(v.created_at).toLocaleString(undefined, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
+                {v.author_name ? ` · ${v.author_name}` : ""}
+              </p>
+              <p className="mt-0.5 text-[10px] text-muted-foreground">
+                {v.section_count} {v.section_count === 1 ? "sección" : "secciones"}
+              </p>
               {v.notes ? <p className="mt-1 text-[11px] text-foreground">{v.notes}</p> : null}
             </div>
           ))
