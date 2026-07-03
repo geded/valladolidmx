@@ -1,10 +1,29 @@
 /**
- * Experience Builder · Server Functions del Studio (Etapa 15.10.4b · Fase 2)
+ * @deprecated (Iniciativa 3 · Fase 3.3a — Soft freeze de v2)
  *
- * Capa de RPC autenticada que respalda al Studio editorial sobre el modelo
- * `eb_*` introducido en la Fase 1. Toda escritura pasa por RPCs
- * SECURITY DEFINER — el cliente NUNCA escribe directamente.
+ * Este módulo respalda al Studio editorial legado sobre el modelo `eb_*`
+ * (v2) introducido en 15.10.4b. Desde 15.10.4d el Studio operativo
+ * trabaja exclusivamente sobre `page_compositions` (v1) y ningún
+ * componente, ruta ni Studio importa estas server fns.
+ *
+ * Congelado por Fase 3.3a. Sub-fases futuras:
+ *   3.3b — borrar este archivo tras verificar cero call-sites.
+ *   3.3c — DROP de las tablas `eb_*` (todas en 0 filas).
+ *
+ * Prohibido añadir nuevas importaciones de `eb-studio` fuera de este
+ * módulo. El guard `scripts/assert-no-v2-imports.sh` falla si aparece.
+ *
+ * Ver: docs/blueprint/15.10.4d-INICIATIVA-3-FASE-3.3-PLAN-UNIFICACION-V1-V2.md
  */
+
+// Warning único por proceso: deja evidencia si alguien reactiva v2.
+if (typeof process !== "undefined" && !(globalThis as any).__EB_V2_DEPRECATED_WARNED__) {
+  (globalThis as any).__EB_V2_DEPRECATED_WARNED__ = true;
+  console.warn(
+    "[eb-studio] DEPRECATED (v2 soft freeze · Fase 3.3a). " +
+      "Usa page_compositions (v1). Ver 15.10.4d-INICIATIVA-3-FASE-3.3.",
+  );
+}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
