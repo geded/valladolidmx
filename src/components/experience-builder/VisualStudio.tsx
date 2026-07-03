@@ -917,6 +917,18 @@ function PageVisualEditor({
   const [sharing, setSharing] = useState(false);
   const [shareLink, setShareLink] = useState<{ url: string; expires_at: string } | null>(null);
   const [showTour, setShowTour] = useState(false);
+  // US-R3 · Sub-ola 2.2b — Preview data para plantillas dinámicas.
+  // Se resuelve por `page_type`/`slug` desde el Preview Registry. Cuando
+  // no aplica (Home, landings estáticos), `previewProvider` es null y ni
+  // la barra ni el Provider se pintan — cero impacto en flujo existente.
+  const previewProvider = useMemo(
+    () => getPreviewProvider(pageDef.page_type, pageDef.slug),
+    [pageDef.page_type, pageDef.slug],
+  );
+  const [previewData, setPreviewData] = useState<unknown>(null);
+  const handlePreviewDataChange = useCallback((data: unknown) => {
+    setPreviewData(data);
+  }, []);
   /** US-01 · Soft lock por página. */
   const lock = useEditingLock(page?.id ?? null);
   const [, forceLockTick] = useState(0);
