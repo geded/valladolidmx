@@ -853,10 +853,13 @@ function PageVisualEditor({
   const issuePreview = useServerFn(issueCompositionPreviewLink);
   const setWorkflow = useServerFn(setCompositionWorkflowState);
   const queryClient = useQueryClient();
-  const { roles } = useAuth();
+  const { roles, user } = useAuth();
   const canPublish = roles.includes("admin") || roles.includes("super_admin");
+  const isAdmin = canPublish;
   const canForceLock = canPublish;
   const [workflowBusy, setWorkflowBusy] = useState(false);
+  // US-03 · Conteo de comentarios abiertos por bloque (para badge en overlay).
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
 
   const changeWorkflow = async (next: "draft" | "in_review" | "approved") => {
     if (!page) return;
