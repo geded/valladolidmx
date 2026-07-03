@@ -1,4 +1,13 @@
 /**
+ * LEGACY · Snapshot pre-Sub-ola-2.5b de los bloques `vmx.product.*` antes
+ * de migrarlos a shims del Surface Kit. Se conserva EXCLUSIVAMENTE como
+ * referencia para la prueba de regresión (`product-shim-regression.tsx`)
+ * que compara HTML antes/después.
+ *
+ * No se importa desde el runtime público ni desde el preview-registry.
+ * No editar salvo para reflejar el estado previo a la migración.
+ *
+ * Original doc:
  * Bloques granulares de la Plantilla Madre Producto (US-R3 · Sub-ola 2.3a).
  *
  * Todos los bloques leen el producto activo de `ProductSurfaceContext`
