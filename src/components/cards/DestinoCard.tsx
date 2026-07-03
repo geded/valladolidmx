@@ -9,7 +9,7 @@
  * un mapa region_slug → ruta sin tocar el resto del componente.
  */
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight } from "lucide-react";
+import { Plus, ArrowUpRight } from "lucide-react";
 import { PlaceholderImage } from "@/components/common/PlaceholderImage";
 import type { Destination } from "@/types/territory";
 import { useTranslation } from "@/i18n/context";
@@ -53,12 +53,35 @@ export function DestinoCard({ destination }: { destination: Destination }) {
   const { t } = useTranslation();
   const route = REGION_TO_ROUTE[destination.region_slug];
 
-  const body = (
-    <>
-      <DestinoMedia destination={destination} />
+  return (
+    <article className="group relative flex flex-col overflow-hidden rounded-3xl border border-border/70 bg-card shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl">
+      {route ? (
+        <Link
+          to={route}
+          params={{ destino: destination.slug }}
+          aria-label={`${destination.name} — ${destination.tagline}`}
+          className="block focus:outline-none"
+        >
+          <DestinoMedia destination={destination} />
+        </Link>
+      ) : (
+        <DestinoMedia destination={destination} />
+      )}
       <div className="flex flex-1 flex-col gap-3 p-6">
         <div>
-          <h3 className="text-2xl font-semibold tracking-tight">{destination.name}</h3>
+          {route ? (
+            <Link
+              to={route}
+              params={{ destino: destination.slug }}
+              className="focus:outline-none"
+            >
+              <h3 className="text-2xl font-semibold tracking-tight hover:text-primary">
+                {destination.name}
+              </h3>
+            </Link>
+          ) : (
+            <h3 className="text-2xl font-semibold tracking-tight">{destination.name}</h3>
+          )}
           <p className="mt-1 text-sm text-muted-foreground">{destination.tagline}</p>
         </div>
         <ul className="flex flex-wrap gap-1.5">
@@ -68,30 +91,29 @@ export function DestinoCard({ destination }: { destination: Destination }) {
             </li>
           ))}
         </ul>
-        <div className="mt-auto flex items-center gap-1 pt-2 text-sm font-semibold text-primary">
-          {t("common.explore")}
-          <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
+        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
+          {route ? (
+            <Link
+              to={route}
+              params={{ destino: destination.slug }}
+              className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+            >
+              {t("common.explore")}
+              <ArrowUpRight className="size-3.5" aria-hidden />
+            </Link>
+          ) : (
+            <span className="text-xs text-muted-foreground">{t("common.coming_soon")}</span>
+          )}
+          <Link
+            to="/arma-tu-viaje"
+            search={{ destino: destination.slug }}
+            className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+          >
+            <Plus className="size-3.5" aria-hidden />
+            {t("common.add_to_trip")}
+          </Link>
         </div>
       </div>
-    </>
-  );
-
-  if (!route) {
-    return (
-      <article className="group relative flex flex-col overflow-hidden rounded-3xl border border-border/70 bg-card shadow-sm">
-        {body}
-      </article>
-    );
-  }
-
-  return (
-    <Link
-      to={route}
-      params={{ destino: destination.slug }}
-      aria-label={`${destination.name} — ${destination.tagline}`}
-      className="group relative flex flex-col overflow-hidden rounded-3xl border border-border/70 bg-card shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl"
-    >
-      {body}
-    </Link>
+    </article>
   );
 }
