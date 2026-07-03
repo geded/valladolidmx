@@ -764,10 +764,13 @@ export type Database = {
           created_by: string | null
           deleted_at: string | null
           deleted_by: string | null
+          demo_seed_batch: string | null
+          demo_source_url: string | null
           description: string | null
           destination_id: string
           display_name: string
           id: string
+          is_demo_seed: boolean
           legal_name: string | null
           logo_media_id: string | null
           metadata: Json
@@ -787,10 +790,13 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           description?: string | null
           destination_id: string
           display_name: string
           id?: string
+          is_demo_seed?: boolean
           legal_name?: string | null
           logo_media_id?: string | null
           metadata?: Json
@@ -810,10 +816,13 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           description?: string | null
           destination_id?: string
           display_name?: string
           id?: string
+          is_demo_seed?: boolean
           legal_name?: string | null
           logo_media_id?: string | null
           metadata?: Json
@@ -1678,9 +1687,12 @@ export type Database = {
           created_by: string | null
           deleted_at: string | null
           deleted_by: string | null
+          demo_seed_batch: string | null
+          demo_source_url: string | null
           description: string | null
           destination_id: string
           id: string
+          is_demo_seed: boolean
           metadata: Json
           name: string
           slug: string
@@ -1693,9 +1705,12 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           description?: string | null
           destination_id: string
           id?: string
+          is_demo_seed?: boolean
           metadata?: Json
           name: string
           slug: string
@@ -1708,9 +1723,12 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           description?: string | null
           destination_id?: string
           id?: string
+          is_demo_seed?: boolean
           metadata?: Json
           name?: string
           slug?: string
@@ -1734,11 +1752,14 @@ export type Database = {
           created_by: string | null
           deleted_at: string | null
           deleted_by: string | null
+          demo_seed_batch: string | null
+          demo_source_url: string | null
           description: string | null
           hero_media_id: string | null
           hero_palette: Database["public"]["Enums"]["hero_palette"]
           highlights: string[]
           id: string
+          is_demo_seed: boolean
           latitude: number | null
           longitude: number | null
           metadata: Json
@@ -1756,11 +1777,14 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           description?: string | null
           hero_media_id?: string | null
           hero_palette?: Database["public"]["Enums"]["hero_palette"]
           highlights?: string[]
           id?: string
+          is_demo_seed?: boolean
           latitude?: number | null
           longitude?: number | null
           metadata?: Json
@@ -1778,11 +1802,14 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           description?: string | null
           hero_media_id?: string | null
           hero_palette?: Database["public"]["Enums"]["hero_palette"]
           highlights?: string[]
           id?: string
+          is_demo_seed?: boolean
           latitude?: number | null
           longitude?: number | null
           metadata?: Json
@@ -2023,10 +2050,13 @@ export type Database = {
           created_by: string | null
           deleted_at: string | null
           deleted_by: string | null
+          demo_seed_batch: string | null
+          demo_source_url: string | null
           destination_id: string | null
           ends_at: string | null
           external_url: string | null
           id: string
+          is_demo_seed: boolean
           is_free: boolean
           locale: Database["public"]["Enums"]["locale_code"]
           published_at: string | null
@@ -2047,10 +2077,13 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           destination_id?: string | null
           ends_at?: string | null
           external_url?: string | null
           id?: string
+          is_demo_seed?: boolean
           is_free?: boolean
           locale?: Database["public"]["Enums"]["locale_code"]
           published_at?: string | null
@@ -2071,10 +2104,13 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           destination_id?: string | null
           ends_at?: string | null
           external_url?: string | null
           id?: string
+          is_demo_seed?: boolean
           is_free?: boolean
           locale?: Database["public"]["Enums"]["locale_code"]
           published_at?: string | null
@@ -2255,9 +2291,12 @@ export type Database = {
           credit: string | null
           deleted_at: string | null
           deleted_by: string | null
+          demo_seed_batch: string | null
+          demo_source_url: string | null
           duration_seconds: number | null
           height: number | null
           id: string
+          is_demo_seed: boolean
           kind: Database["public"]["Enums"]["media_kind"]
           metadata: Json
           mime_type: string | null
@@ -2277,9 +2316,12 @@ export type Database = {
           credit?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           duration_seconds?: number | null
           height?: number | null
           id?: string
+          is_demo_seed?: boolean
           kind: Database["public"]["Enums"]["media_kind"]
           metadata?: Json
           mime_type?: string | null
@@ -2299,9 +2341,12 @@ export type Database = {
           credit?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           duration_seconds?: number | null
           height?: number | null
           id?: string
+          is_demo_seed?: boolean
           kind?: Database["public"]["Enums"]["media_kind"]
           metadata?: Json
           mime_type?: string | null
@@ -3098,10 +3143,13 @@ export type Database = {
           created_by: string | null
           deleted_at: string | null
           deleted_by: string | null
+          demo_seed_batch: string | null
+          demo_source_url: string | null
           description: string | null
           destination_id: string
           destination_zone_id: string | null
           id: string
+          is_demo_seed: boolean
           latitude: number | null
           longitude: number | null
           metadata: Json
@@ -3116,10 +3164,13 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           description?: string | null
           destination_id: string
           destination_zone_id?: string | null
           id?: string
+          is_demo_seed?: boolean
           latitude?: number | null
           longitude?: number | null
           metadata?: Json
@@ -3134,10 +3185,13 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           description?: string | null
           destination_id?: string
           destination_zone_id?: string | null
           id?: string
+          is_demo_seed?: boolean
           latitude?: number | null
           longitude?: number | null
           metadata?: Json
@@ -3217,11 +3271,14 @@ export type Database = {
           created_by: string | null
           deleted_at: string | null
           deleted_by: string | null
+          demo_seed_batch: string | null
+          demo_source_url: string | null
           description: string | null
           duration_minutes: number | null
           eligible_for_ems_campaigns: boolean
           generates_commission: boolean
           id: string
+          is_demo_seed: boolean
           metadata: Json
           name: string
           price_amount: number | null
@@ -3249,11 +3306,14 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           description?: string | null
           duration_minutes?: number | null
           eligible_for_ems_campaigns?: boolean
           generates_commission?: boolean
           id?: string
+          is_demo_seed?: boolean
           metadata?: Json
           name: string
           price_amount?: number | null
@@ -3281,11 +3341,14 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          demo_seed_batch?: string | null
+          demo_source_url?: string | null
           description?: string | null
           duration_minutes?: number | null
           eligible_for_ems_campaigns?: boolean
           generates_commission?: boolean
           id?: string
+          is_demo_seed?: boolean
           metadata?: Json
           name?: string
           price_amount?: number | null
@@ -4136,7 +4199,14 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      demo_seed_inventory: {
+        Row: {
+          demo_seed_batch: string | null
+          entity: string | null
+          total: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       _concierge_first_response_at: {
@@ -4973,6 +5043,13 @@ export type Database = {
       }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
       publish_business_product: { Args: { _product_id: string }; Returns: Json }
+      purge_demo_seed: {
+        Args: { _batch: string }
+        Returns: {
+          deleted: number
+          entity: string
+        }[]
+      }
       raise_system_alert: {
         Args: {
           p_kind: string
