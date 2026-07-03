@@ -1073,6 +1073,37 @@ function PageVisualEditor({
     }
   };
 
+  /**
+   * US-C · Abre el modal de diff resumen. Si la página nunca se ha
+   * publicado saltamos el diff y publicamos directamente.
+   */
+  const openPublishDialog = async () => {
+    if (!page || !tree) return;
+    if (!page.published_hash) {
+      void onPublish();
+      return;
+    }
+    setPublishDiff({ open: true, loading: true, changes: [], error: null });
+    try {
+      const published = (await fetchPublishedTree({ data: { id: page.id } })) as CompositionTree | null;
+      const labelFor = (t: string) => getBlock(t)?.display_name ?? t;
+      const changes = diffCompositions(published, tree, labelFor);
+      setPublishDiff({ open: true, loading: false, changes, error: null });
+    } catch (e) {
+      setPublishDiff({
+        open: true,
+        loading: false,
+        changes: [],
+        error: (e as Error).message,
+      });
+    }
+  };
+
+  const confirmPublishFromDialog = async () => {
+    setPublishDiff((s) => ({ ...s, open: false }));
+    await onPublish();
+  };
+
   const updateSelectedConfig = (nextConfig: Record<string, unknown>) => {
     if (!tree) return;
     if (selectedChrome === "header" || selectedChrome === "footer") {
