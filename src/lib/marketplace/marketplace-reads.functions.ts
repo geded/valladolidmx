@@ -65,6 +65,8 @@ export interface MarketplacePromotionCard {
 
 export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
   description: string;
+  /** Plan comercial contratado. Resuelto vía Catálogo Central de Planes. */
+  plan_tier: "free" | "starter" | "pro" | "premium";
   products: MarketplaceProductCard[];
   promotions: MarketplacePromotionCard[];
 }
