@@ -19,6 +19,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { SeoPreview } from "./SeoPreview";
+import { OnboardingTour, HelpButton, hasSeenOnboarding } from "./OnboardingTour";
 import {
   ArrowLeft,
   Check,
