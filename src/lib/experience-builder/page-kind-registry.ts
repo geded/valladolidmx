@@ -369,7 +369,8 @@ const GENERIC_DEFAULTS: ResolvedKindDefaults = {
 
 export function resolvePageKindDefaults(kind: PageKind | string): ResolvedKindDefaults {
   const def = getPageKindDefinition(kind);
-  const fallback = (kind && FALLBACK_BY_KIND[kind as PageKind]) ?? GENERIC_DEFAULTS;
+  const fallback: ResolvedKindDefaults =
+    FALLBACK_BY_KIND[kind as PageKind] ?? GENERIC_DEFAULTS;
   const declared = def?.defaults;
   if (!declared) return fallback;
   return {
