@@ -1812,9 +1812,6 @@ function PageVisualEditor({
           onConfirm={() => void confirmPublishFromDialog()}
         />
       ) : null}
-      {confirmUnpublish ? (
-        null
-      ) : null}
       {scheduleOpen ? (
         <div
           role="dialog"
