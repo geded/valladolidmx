@@ -14,13 +14,15 @@ import { SITE } from "@/config/site";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { RegionSurface } from "@/components/surfaces/RegionSurface";
+import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
 
 export const Route = createFileRoute("/oriente-maya/")({
   loader: async () => {
-    const composition = await getPublishedCompositionBySlug({
-      data: { slug: "__tpl_region__" },
-    }).catch(() => null);
-    return { composition };
+    const [composition, destinations] = await Promise.all([
+      getPublishedCompositionBySlug({ data: { slug: "__tpl_region__" } }).catch(() => null),
+      listPublishedDestinations().catch(() => []),
+    ]);
+    return { composition, destinations };
   },
   head: () =>
     buildPublicHead({
@@ -37,10 +39,10 @@ export const Route = createFileRoute("/oriente-maya/")({
 });
 
 function OrienteMayaIndex() {
-  const { composition } = Route.useLoaderData();
+  const { composition, destinations } = Route.useLoaderData();
   return composition ? (
     <CompositionRenderer tree={composition.snapshot} />
   ) : (
-    <RegionSurface />
+    <RegionSurface destinations={destinations} />
   );
 }
