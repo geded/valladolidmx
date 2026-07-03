@@ -18,6 +18,7 @@ import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-r
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { buildPublicHead, webPageJsonLd } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
+import { PublicShell } from "@/components/discovery";
 
 function landingQuery(slug: string) {
   return queryOptions({
@@ -93,8 +94,10 @@ function PublicLanding() {
   const { data: page } = useQuery(landingQuery(slug));
   if (!page?.snapshot) return null;
   return (
-    <main className="min-h-screen" data-eb-page={page.id}>
-      <CompositionRenderer tree={page.snapshot} pageType={page.page_type} />
-    </main>
+    <PublicShell variant="minimal" className="min-h-screen">
+      <div data-eb-page={page.id}>
+        <CompositionRenderer tree={page.snapshot} pageType={page.page_type} />
+      </div>
+    </PublicShell>
   );
 }
