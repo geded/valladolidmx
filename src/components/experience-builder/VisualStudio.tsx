@@ -2042,6 +2042,44 @@ function BlockLibraryModal({
     [],
   );
   const [reusable, setReusable] = useState<ReusableBlock[]>(() => loadReusableBlocks());
+  const [query, setQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    blocks.forEach((b) => set.add(b.category));
+    return ["all", ...Array.from(set).sort()];
+  }, [blocks]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return blocks.filter((b) => {
+      if (activeCategory !== "all" && b.category !== activeCategory) return false;
+      if (!q) return true;
+      return (
+        b.display_name.toLowerCase().includes(q) ||
+        (b.description ?? "").toLowerCase().includes(q) ||
+        b.type.toLowerCase().includes(q)
+      );
+    });
+  }, [blocks, query, activeCategory]);
+
+  const categoryLabel: Record<string, string> = {
+    all: "Todas",
+    smart: "Inteligentes",
+    static: "Estáticas",
+    layout: "Estructura",
+    interactive: "Interactivas",
+    media: "Multimedia",
+  };
+  const categoryEmoji: Record<string, string> = {
+    smart: "✨",
+    static: "📝",
+    layout: "🧱",
+    interactive: "🎛️",
+    media: "🖼️",
+  };
+
   const removeReusable = (id: string) => {
     const next = reusable.filter((r) => r.id !== id);
     saveReusableBlocks(next);
@@ -2049,9 +2087,14 @@ function BlockLibraryModal({
   };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-xl border border-border bg-card p-4 shadow-2xl">
+      <div className="flex max-h-[85vh] w-full max-w-3xl flex-col rounded-xl border border-border bg-card p-4 shadow-2xl">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold">Añadir una sección</h3>
+          <div>
+            <h3 className="text-sm font-semibold">Añadir una sección</h3>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              Elige un tipo de sección para insertarlo al final de la página.
+            </p>
+          </div>
           <button
             type="button"
             onClick={onClose}
@@ -2060,6 +2103,35 @@ function BlockLibraryModal({
           >
             <X className="size-4" aria-hidden />
           </button>
+        </div>
+        <div className="mb-3 flex flex-col gap-2">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Buscar sección…"
+              className="w-full rounded-md border border-border bg-background py-1.5 pl-7 pr-2 text-xs outline-none focus:border-primary"
+              autoFocus
+            />
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {categories.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setActiveCategory(c)}
+                className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] transition ${
+                  activeCategory === c
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
+                }`}
+              >
+                {categoryLabel[c] ?? c}
+              </button>
+            ))}
+          </div>
         </div>
         {advanced && reusable.length > 0 ? (
           <div className="mb-3 rounded-md border border-primary/30 bg-primary/5 p-2">
@@ -2090,21 +2162,41 @@ function BlockLibraryModal({
             </div>
           </div>
         ) : null}
-        <div className="grid max-h-[60vh] gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
-          {blocks.map((b) => (
-            <button
-              key={b.type}
-              type="button"
-              onClick={() => onPick(b.type)}
-              className="rounded-md border border-border bg-background p-3 text-left hover:border-primary hover:bg-accent"
-            >
-              <p className="text-xs font-semibold">{b.display_name}</p>
-              {b.description ? (
-                <p className="mt-1 line-clamp-2 text-[10px] text-muted-foreground">{b.description}</p>
-              ) : null}
-              <p className="mt-1 text-[9px] uppercase tracking-[0.14em] text-muted-foreground">{b.category}</p>
-            </button>
-          ))}
+        <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+          {filtered.length === 0 ? (
+            <div className="grid place-items-center py-10 text-center text-xs text-muted-foreground">
+              <p>No hay secciones que coincidan con “{query}”.</p>
+              <button
+                type="button"
+                onClick={() => { setQuery(""); setActiveCategory("all"); }}
+                className="mt-2 rounded-md border border-border bg-background px-2 py-1 text-[11px] hover:bg-accent"
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          ) : (
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((b) => (
+                <button
+                  key={b.type}
+                  type="button"
+                  onClick={() => onPick(b.type)}
+                  className="group flex flex-col rounded-lg border border-border bg-background p-3 text-left transition hover:-translate-y-0.5 hover:border-primary hover:bg-accent hover:shadow-md"
+                >
+                  <div className="mb-2 flex h-16 items-center justify-center rounded-md bg-gradient-to-br from-primary/10 via-primary/5 to-transparent text-2xl">
+                    <span aria-hidden>{categoryEmoji[b.category] ?? "🧩"}</span>
+                  </div>
+                  <p className="text-xs font-semibold group-hover:text-primary">{b.display_name}</p>
+                  {b.description ? (
+                    <p className="mt-1 line-clamp-2 text-[10px] text-muted-foreground">{b.description}</p>
+                  ) : null}
+                  <p className="mt-auto pt-2 text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+                    {categoryLabel[b.category] ?? b.category}
+                  </p>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
