@@ -1,46 +1,23 @@
 /**
- * Bloques `vmx.business.*` (US-R3 · Sub-ola 2.5c · Business Shims).
+ * Snapshot legacy (pre Sub-ola 2.5c) de los bloques `vmx.business.*`.
  *
- * Estos bloques son SHIMS del Surface Kit: leen el negocio activo del
- * `BusinessSurfaceContext`, mapean a ViewModels neutros vía
- * `businessToKitVM`, y delegan el render a primitives del Kit cuando
- * existe equivalencia visual 1:1.
+ * Usado UNICAMENTE por `scripts/business-shim-regression.tsx` como fuente
+ * de verdad para verificar que la migracion a shims no introduce
+ * diferencias visuales. No importar desde produccion.
  *
- * Reglas Sub-ola 2.5c:
- *  - IDs de bloque preservados (mismos exports que 2.2b).
- *  - `BusinessSurfaceProvider` intacto.
- *  - Mapeo vive FUERA del Kit (`./business/business-to-kit-vm.ts`).
- *  - `FavoriteButton` y `ProductActions` NO viven en el Kit — se
- *    inyectan como slots (o encapsulados en composites justificados).
- *  - Cuando un bloque no tiene primitive equivalente sin pérdida
- *    visual, se mantiene como composite documentado (no forzado).
- *  - Sin regresiones visuales (validado por
- *    `scripts/business-shim-regression.tsx`).
+ * Original: Sub-ola 2.2b — ver historial git para detalles.
  *
- * Estado de migración por bloque:
- *  1. shell           → KitShell delegado.
- *  2. header-badges   → composite (Favorite + span pill inline; DOM
- *                        idéntico al legacy — pill sin `inline-flex`).
- *  3. description     → composite (párrafo suelto sin section wrapper;
- *                        KitRichText añade section/mt-10).
- *  4. gallery         → composite (placeholder gated por plan; sin
- *                        media real todavía, KitGallery no aplica).
- *  5. info            → composite (dl con `justify-between` por fila;
- *                        KitInfoTable apila dt/dd).
- *  6. products        → composite (formato de precio legacy + slots
- *                        FavoriteButton/ProductActions por card).
- *  7. promotions      → composite (FavoriteButton por promo; KitPromos
- *                        no expone slot por item).
- *  8. contact         → composite (placeholder estático; KitContact
- *                        exige valor real).
+ * Rompen el monolito `<BusinessSurface />` en piezas editoriales que se
+ * dibujan en el árbol lateral del Studio. Todos los bloques leen el
+ * negocio activo del mismo `BusinessSurfaceContext` — así comparten datos
+ * en Studio (preview) y en producción (ruta pública), sin duplicar
+ * lógica y sin romper paridad visual 1:1.
  *
- * Las 7 composites consumen los mismos mappers `businessToKitVM` que la
- * shim de Shell, dejando el terreno preparado para que primitives del
- * Kit futuros (ej. `KitPill` con slot, `KitInfoTableRows`, `KitPromos`
- * con actions por item) absorban estos bloques sin cambiar los IDs
- * `vmx.business.*` ni tocar el `CompositionRenderer`.
+ * Los gates por plan consultan EXCLUSIVAMENTE el Catálogo Central de
+ * Planes (`@/lib/plans/plans-catalog`).
  */
 import { useContext } from "react";
+import { PublicShell } from "@/components/discovery";
 import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
 import { ProductActions } from "@/components/marketplace/ProductActions";
 import { planAllows } from "@/lib/plans/plans-catalog";
@@ -52,14 +29,17 @@ import type {
   MarketplaceProductCard,
   MarketplacePromotionCard,
 } from "@/lib/marketplace/marketplace-reads.functions";
-import { EmptyHint, KitShell } from "@/components/surfaces/kit";
-import {
-  businessToInfoRowVMs,
-  businessToShellVM,
-} from "@/components/surfaces/business/business-to-kit-vm";
 
 function useBusiness() {
   return useContext(BusinessSurfaceContext);
+}
+
+function EmptyHint({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-md border border-dashed border-border bg-muted/30 px-4 py-6 text-center text-xs text-muted-foreground">
+      {children}
+    </div>
+  );
 }
 
 /* ------------------------------------------------------------------ *
@@ -75,20 +55,25 @@ export function BusinessShellBlock({
   const b = useBusiness();
   if (!b) {
     return (
-      <KitShell
-        vm={{
-          title: "Empresa (previsualiza con datos reales o demo)",
-          crumbs: [
-            { label: "Marketplace", href: "/marketplace" },
-            { label: "—" },
-          ],
-        }}
+      <PublicShell
+        title="Empresa (previsualiza con datos reales o demo)"
+        crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "—" }]}
       >
         {renderChildren?.()}
-      </KitShell>
+      </PublicShell>
     );
   }
-  return <KitShell vm={businessToShellVM(b)}>{renderChildren?.()}</KitShell>;
+  const variant = resolveBusinessVariant(b.category_slug);
+  return (
+    <PublicShell
+      eyebrow={variant.eyebrow}
+      title={b.display_name}
+      description={b.tagline}
+      crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: b.display_name }]}
+    >
+      {renderChildren?.()}
+    </PublicShell>
+  );
 }
 
 /* ------------------------------------------------------------------ *
@@ -165,15 +150,20 @@ export function BusinessGalleryBlock() {
 export function BusinessInfoBlock() {
   const b = useBusiness();
   if (!b) return <EmptyHint>Ficha rápida: destino, categoría, plan.</EmptyHint>;
-  const rows = businessToInfoRowVMs(b);
+  const rows: Array<[string, string]> = [
+    ["Destino", b.destination_slug || "—"],
+    ["Categoría", b.category_slug || "—"],
+    ["Verificado", b.verified ? "Sí" : "No"],
+    ["Plan", b.plan_tier],
+  ];
   return (
     <section className="mt-10">
       <h2 className="text-xl font-semibold">Información</h2>
       <dl className="mt-3 grid gap-2 rounded-2xl border border-border bg-card p-4 sm:grid-cols-2">
-        {rows.map((row) => (
-          <div key={row.label} className="flex items-baseline justify-between gap-4 text-sm">
-            <dt className="text-muted-foreground">{row.label}</dt>
-            <dd className="font-medium">{row.value}</dd>
+        {rows.map(([k, v]) => (
+          <div key={k} className="flex items-baseline justify-between gap-4 text-sm">
+            <dt className="text-muted-foreground">{k}</dt>
+            <dd className="font-medium">{v}</dd>
           </div>
         ))}
       </dl>
