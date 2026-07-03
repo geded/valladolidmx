@@ -147,7 +147,17 @@ export interface SmartBlockQuery {
 /** Restricciones declarativas del bloque dentro de una composición. */
 export interface BlockConstraints {
   /** Superficies en las que el bloque puede colocarse. */
-  surfaces?: Array<"home" | "landing" | "institutional" | "destination" | "business" | "product">;
+  surfaces?: Array<
+    | "home"
+    | "landing"
+    | "institutional"
+    | "destination"
+    | "business"
+    | "product"
+    | "marketplace"
+    | "alux"
+    | "trip_builder"
+  >;
   /** Profundidad máxima de anidación dentro de contenedores. */
   max_nesting_depth?: number;
   /** Mínimo / máximo de hijos cuando el bloque es contenedor. */
