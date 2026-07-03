@@ -27,7 +27,7 @@ export function MarketplaceSurface() {
   }
   return (
     <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {businesses.map((b) => (
+      {businesses.map((b: MarketplaceBusinessCard) => (
         <BusinessTile key={b.id} item={b} />
       ))}
     </ul>
