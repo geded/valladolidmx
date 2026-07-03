@@ -8,6 +8,7 @@
  */
 import { Link, getRouteApi } from "@tanstack/react-router";
 import type { MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 
 const marketplaceRouteApi = getRouteApi("/marketplace/");
 
@@ -67,6 +68,15 @@ export function BusinessTile({ item }: { item: MarketplaceBusinessCard }) {
           {item.category_slug || "—"} · {item.destination_slug || "—"}
         </p>
       </Link>
+      <div className="mt-3">
+        <AddToTravelPlanButton
+          kind="business"
+          targetId={item.id}
+          title={item.display_name}
+          slug={item.slug}
+          subtitle={item.category_slug || item.destination_slug || null}
+        />
+      </div>
     </li>
   );
 }

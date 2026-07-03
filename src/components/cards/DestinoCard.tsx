@@ -9,10 +9,11 @@
  * un mapa region_slug → ruta sin tocar el resto del componente.
  */
 import { Link } from "@tanstack/react-router";
-import { Plus, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { PlaceholderImage } from "@/components/common/PlaceholderImage";
 import type { Destination } from "@/types/territory";
 import { useTranslation } from "@/i18n/context";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 
 // Multi-región ready: añadir aquí nuevas regiones cuando existan.
 const REGION_TO_ROUTE: Record<string, "/oriente-maya/$destino"> = {
@@ -104,14 +105,14 @@ export function DestinoCard({ destination }: { destination: Destination }) {
           ) : (
             <span className="text-xs text-muted-foreground">{t("common.coming_soon")}</span>
           )}
-          <Link
-            to="/arma-tu-viaje"
-            search={{ destino: destination.slug }}
-            className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
-          >
-            <Plus className="size-3.5" aria-hidden />
-            {t("common.add_to_trip")}
-          </Link>
+          <AddToTravelPlanButton
+            kind="destination"
+            targetId={destination.id}
+            title={destination.name}
+            slug={destination.slug}
+            imageUrl={destination.image_url ?? null}
+            subtitle={destination.tagline}
+          />
         </div>
       </div>
     </article>

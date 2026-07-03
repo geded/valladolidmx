@@ -42,6 +42,7 @@
  */
 import { useContext } from "react";
 import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { ProductActions } from "@/components/marketplace/ProductActions";
 import { planAllows } from "@/lib/plans/plans-catalog";
 import {
@@ -101,6 +102,13 @@ export function BusinessHeaderBadgesBlock() {
   return (
     <div className="-mt-2 mb-6 flex flex-wrap items-center gap-3">
       <FavoriteButton entityKind="business" entityId={b.id} />
+      <AddToTravelPlanButton
+        kind="business"
+        targetId={b.id}
+        title={b.display_name}
+        slug={b.slug}
+        subtitle={b.category_slug || b.destination_slug || null}
+      />
       {b.verified ? (
         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
           Verificado
@@ -212,6 +220,15 @@ export function BusinessProductsBlock() {
               ) : null}
               <div className="mt-3">
                 <FavoriteButton entityKind="product" entityId={p.id} />
+              </div>
+              <div className="mt-2">
+                <AddToTravelPlanButton
+                  kind="product"
+                  targetId={p.id}
+                  title={p.name}
+                  slug={p.slug}
+                  subtitle={p.product_type}
+                />
               </div>
               <div className="mt-2">
                 <ProductActions

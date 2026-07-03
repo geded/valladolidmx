@@ -20,6 +20,7 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { ProductActions } from "@/components/marketplace/ProductActions";
 import { SITE } from "@/config/site";
 import { useProduct } from "@/components/surfaces/ProductSurface";
@@ -84,7 +85,18 @@ export function ProductHeroBlock() {
     <KitHero
       vm={{
         ...productToHeroVM(p),
-        actions: <FavoriteButton entityKind="product" entityId={p.id} />,
+        actions: (
+          <div className="flex flex-wrap items-center gap-2">
+            <FavoriteButton entityKind="product" entityId={p.id} />
+            <AddToTravelPlanButton
+              kind="product"
+              targetId={p.id}
+              title={p.name}
+              slug={p.slug}
+              subtitle={p.product_type}
+            />
+          </div>
+        ),
       }}
     />
   );
