@@ -1,237 +1,137 @@
 /**
- * Bloques granulares de la Plantilla Madre Producto (US-R3 · Sub-ola 2.3a).
+ * Bloques `vmx.product.*` (US-R3 · Sub-ola 2.5b · Product Shims).
  *
- * Todos los bloques leen el producto activo de `ProductSurfaceContext`
- * (poblado por la ruta pública o por el Studio vía preview-registry).
- * Sin datos: cada bloque muestra un hint editorial reversible; nunca
- * rompe el canvas.
+ * Estos bloques son SHIMS: leen el producto activo del contexto
+ * (`ProductSurfaceContext`), mapean a ViewModels neutros vía
+ * `productToKitVM`, y delegan el render a los primitives del Surface Kit.
  *
- * CRÍTICO: Product tiene superficie propia. Estos bloques NO son un
- * reciclaje del `BusinessProductsBlock` (que es catálogo dentro de una
- * empresa). Ficha ≠ Catálogo.
+ * Reglas Sub-ola 2.5b:
+ *  - IDs de bloque preservados (mismos exports que 2.3a).
+ *  - `__tpl_product__` intacto.
+ *  - Mapeo vive FUERA del Kit (`./product/product-to-kit-vm.ts`).
+ *  - `ProductActions` y `FavoriteButton` NO viven en el Kit — se inyectan
+ *    como slots (`actions`) en `KitHero` y `KitPriceCta`.
+ *  - `vmx.product.business-context` conserva su render específico (no hay
+ *    primitive de Kit equivalente sin perder atributos semánticos como
+ *    la insignia "Verificado"); su lógica queda encapsulada aquí para
+ *    migrarse en 2.5c cuando el Kit incorpore composición de "authored-by".
+ *  - Sin regresiones visuales (validado por `product-shim-regression.tsx`).
  */
+import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { PublicShell } from "@/components/discovery";
 import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
 import { ProductActions } from "@/components/marketplace/ProductActions";
 import { SITE } from "@/config/site";
 import { useProduct } from "@/components/surfaces/ProductSurface";
-import type {
-  MarketplaceProductCard,
-  MarketplaceProductDetail,
-  ProductMediaItem,
-} from "@/lib/marketplace/marketplace-reads.functions";
-
-function EmptyHint({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="rounded-md border border-dashed border-border bg-muted/30 px-4 py-6 text-center text-xs text-muted-foreground">
-      {children}
-    </div>
-  );
-}
-
-function formatPrice(amount: number | null, currency: string): string | null {
-  if (amount == null) return null;
-  try {
-    return new Intl.NumberFormat("es-MX", {
-      style: "currency",
-      currency: currency || "MXN",
-      maximumFractionDigits: 0,
-    }).format(amount);
-  } catch {
-    return `${currency} ${amount}`;
-  }
-}
+import {
+  EmptyHint,
+  KitFaq,
+  KitGallery,
+  KitHero,
+  KitPriceCta,
+  KitPromos,
+  KitReviews,
+  KitRichText,
+  KitShell,
+  KitCardGrid,
+} from "@/components/surfaces/kit";
+import {
+  productToDescriptionVM,
+  productToFaqVMs,
+  productToGalleryVM,
+  productToHeroVM,
+  productToPriceCtaVM,
+  productToPromoVMs,
+  productToRelatedCardVMs,
+  productToReviewVMs,
+  productToShellVM,
+} from "@/components/surfaces/product/product-to-kit-vm";
 
 /* ------------------------------------------------------------------ *
- * 1) Shell — Contenedor con PublicShell + breadcrumbs canónicos.
+ * 1) Shell — KitShell + breadcrumbs canónicos.
  * ------------------------------------------------------------------ */
-
 export function ProductShellBlock({
   renderChildren,
 }: {
-  renderChildren?: () => React.ReactNode;
+  renderChildren?: () => ReactNode;
 }) {
   const p = useProduct();
   if (!p) {
     return (
-      <PublicShell
-        title="Producto (previsualiza con datos reales o demo)"
-        crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "—" }]}
+      <KitShell
+        vm={{
+          title: "Producto (previsualiza con datos reales o demo)",
+          crumbs: [
+            { label: "Marketplace", href: "/marketplace" },
+            { label: "—" },
+          ],
+        }}
       >
         {renderChildren?.()}
-      </PublicShell>
+      </KitShell>
     );
   }
-  return (
-    <PublicShell
-      crumbs={[
-        { label: "Marketplace", to: "/marketplace" },
-        { label: p.business.display_name, to: `/marketplace/${p.business.slug}` },
-        { label: p.name },
-      ]}
-    >
-      {renderChildren?.()}
-    </PublicShell>
-  );
+  return <KitShell vm={productToShellVM(p)}>{renderChildren?.()}</KitShell>;
 }
 
 /* ------------------------------------------------------------------ *
- * 2) Hero — Eyebrow (tipo), título, tagline, favorito.
+ * 2) Hero — KitHero + FavoriteButton en slot `actions`.
  * ------------------------------------------------------------------ */
-
 export function ProductHeroBlock() {
   const p = useProduct();
   if (!p) return <EmptyHint>Hero del producto: tipo, título y tagline.</EmptyHint>;
   return (
-    <header className="mb-8">
-      <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">
-        {p.product_type}
-      </p>
-      <h1 className="text-balance text-3xl md:text-4xl font-semibold">{p.name}</h1>
-      {p.tagline ? (
-        <p className="mt-3 max-w-2xl text-lg text-muted-foreground">{p.tagline}</p>
-      ) : null}
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <FavoriteButton entityKind="product" entityId={p.id} />
-      </div>
-    </header>
+    <KitHero
+      vm={{
+        ...productToHeroVM(p),
+        actions: <FavoriteButton entityKind="product" entityId={p.id} />,
+      }}
+    />
   );
 }
 
 /* ------------------------------------------------------------------ *
- * 3) Gallery — Portada + galería con scroll-snap mobile.
+ * 3) Gallery — KitGallery.
  * ------------------------------------------------------------------ */
-
-function coverAndGallery(p: MarketplaceProductDetail): {
-  cover: ProductMediaItem | null;
-  gallery: ProductMediaItem[];
-} {
-  const cover = p.media.find((m) => m.role === "cover") ?? p.media[0] ?? null;
-  const gallery = p.media.filter((m) => m.id !== cover?.id);
-  return { cover, gallery };
-}
-
 export function ProductGalleryBlock() {
   const p = useProduct();
   if (!p) return <EmptyHint>Portada + galería del producto.</EmptyHint>;
-  const { cover, gallery } = coverAndGallery(p);
-  if (!cover && gallery.length === 0) {
-    return (
-      <section className="mt-8">
-        <div className="aspect-[16/9] rounded-2xl bg-gradient-to-br from-muted to-muted/60 ring-1 ring-border" aria-hidden />
-        <p className="mt-2 text-[11px] text-muted-foreground">
-          Sin fotografías. Súbelas desde el CMS de producto.
-        </p>
-      </section>
-    );
-  }
-  return (
-    <section className="mt-8 space-y-3">
-      {cover?.url ? (
-        <img
-          src={cover.url}
-          alt={cover.alt ?? p.name}
-          className="aspect-[16/9] w-full rounded-2xl object-cover ring-1 ring-border"
-          loading="eager"
-        />
-      ) : (
-        <div className="aspect-[16/9] rounded-2xl bg-gradient-to-br from-muted to-muted/60 ring-1 ring-border" aria-hidden />
-      )}
-      {gallery.length > 0 ? (
-        <ul className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible sm:px-0">
-          {gallery.map((m) => (
-            <li
-              key={m.id}
-              className="w-[72%] shrink-0 snap-center overflow-hidden rounded-xl ring-1 ring-border sm:w-auto"
-            >
-              {m.url ? (
-                <img
-                  src={m.url}
-                  alt={m.alt ?? ""}
-                  className="aspect-[4/3] w-full object-cover"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="aspect-[4/3] w-full bg-muted" aria-hidden />
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </section>
-  );
+  return <KitGallery vm={productToGalleryVM(p)} />;
 }
 
 /* ------------------------------------------------------------------ *
- * 4) Price + CTA — Precio prominente + ProductActions.
+ * 4) Price + CTA — KitPriceCta + ProductActions en slot `actions`.
  * ------------------------------------------------------------------ */
-
 export function ProductPriceCtaBlock() {
   const p = useProduct();
   if (!p) return <EmptyHint>Precio + acciones de conversión.</EmptyHint>;
-  const price = formatPrice(p.price_amount, p.price_currency);
-  return (
-    <section className="mt-8 rounded-2xl border border-border bg-card p-5 md:sticky md:top-20">
-      <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <div>
-          {price ? (
-            <p className="text-2xl font-semibold">{price}</p>
-          ) : (
-            <p className="text-sm text-muted-foreground">Precio bajo consulta</p>
-          )}
-          <p className="mt-1 text-[11px] uppercase tracking-wide text-muted-foreground">
-            {p.conversion_mode.replace(/_/g, " ")}
-          </p>
-        </div>
-      </div>
-      <div className="mt-4">
-        <ProductActions
-          product={{
-            id: p.id,
-            conversion_mode: p.conversion_mode,
-            primary_action_label: p.primary_action_label,
-            secondary_action_mode: p.secondary_action_mode,
-            secondary_action_label: p.secondary_action_label,
-            accepts_online_payment: p.accepts_online_payment,
-          }}
-        />
-      </div>
-    </section>
+  const actions = (
+    <ProductActions
+      product={{
+        id: p.id,
+        conversion_mode: p.conversion_mode,
+        primary_action_label: p.primary_action_label,
+        secondary_action_mode: p.secondary_action_mode,
+        secondary_action_label: p.secondary_action_label,
+        accepts_online_payment: p.accepts_online_payment,
+      }}
+    />
   );
+  return <KitPriceCta vm={productToPriceCtaVM(p, actions)} />;
 }
 
 /* ------------------------------------------------------------------ *
- * 5) Description — Descripción larga.
+ * 5) Description — KitRichText.
  * ------------------------------------------------------------------ */
-
 export function ProductDescriptionBlock() {
   const p = useProduct();
   if (!p) return <EmptyHint>Descripción larga del producto.</EmptyHint>;
-  if (!p.description) {
-    return (
-      <section className="mt-10">
-        <h2 className="text-xl font-semibold">Descripción</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Sin descripción. Añádela desde el CMS de producto.
-        </p>
-      </section>
-    );
-  }
-  return (
-    <section className="mt-10">
-      <h2 className="text-xl font-semibold">Descripción</h2>
-      <div className="mt-3 max-w-3xl whitespace-pre-line text-sm text-foreground/85">
-        {p.description}
-      </div>
-    </section>
-  );
+  return <KitRichText vm={productToDescriptionVM(p)} />;
 }
 
 /* ------------------------------------------------------------------ *
- * 6) Business Context — Empresa padre + link + contacto + ubicación.
+ * 6) Business Context — composite Product-specific (sin equivalente Kit).
  * ------------------------------------------------------------------ */
-
 export function ProductBusinessContextBlock() {
   const p = useProduct();
   if (!p) return <EmptyHint>Contexto de la empresa que ofrece el producto.</EmptyHint>;
@@ -295,144 +195,52 @@ export function ProductBusinessContextBlock() {
 }
 
 /* ------------------------------------------------------------------ *
- * 7) Promos — Promociones vigentes de la empresa padre.
+ * 7) Promos — KitPromos.
  * ------------------------------------------------------------------ */
-
 export function ProductPromosBlock() {
   const p = useProduct();
   if (!p) return <EmptyHint>Promociones vigentes de la empresa.</EmptyHint>;
-  if (p.promotions.length === 0) return null;
-  return (
-    <section className="mt-10">
-      <h2 className="text-xl font-semibold">Promociones vigentes</h2>
-      <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-        {p.promotions.map((pr) => (
-          <li key={pr.id} className="rounded-2xl border border-border bg-card p-5">
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="font-semibold">{pr.title}</h3>
-              {pr.discount_percent !== null ? (
-                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                  −{pr.discount_percent}%
-                </span>
-              ) : null}
-            </div>
-            {pr.description ? (
-              <p className="mt-1 text-sm text-muted-foreground line-clamp-3">{pr.description}</p>
-            ) : null}
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
+  return <KitPromos promotions={productToPromoVMs(p)} />;
 }
 
 /* ------------------------------------------------------------------ *
- * 8) Reviews — Opiniones publicadas.
+ * 8) Reviews — KitReviews (con emptyLabel acentuado).
  * ------------------------------------------------------------------ */
-
-function Stars({ rating }: { rating: number }) {
-  const full = Math.max(0, Math.min(5, Math.round(rating)));
-  return (
-    <span aria-label={`${full} de 5`} className="text-primary">
-      {"★".repeat(full)}
-      <span className="text-muted-foreground">{"★".repeat(5 - full)}</span>
-    </span>
-  );
-}
-
 export function ProductReviewsBlock() {
   const p = useProduct();
   if (!p) return <EmptyHint>Opiniones de viajeros.</EmptyHint>;
-  if (p.reviews.length === 0) {
-    return (
-      <section className="mt-10">
-        <h2 className="text-xl font-semibold">Opiniones</h2>
-        <p className="mt-2 text-sm text-muted-foreground">Sin opiniones publicadas todavía.</p>
-      </section>
-    );
-  }
   return (
-    <section className="mt-10">
-      <h2 className="text-xl font-semibold">Opiniones</h2>
-      <ul className="mt-4 space-y-4">
-        {p.reviews.map((r) => (
-          <li key={r.id} className="rounded-2xl border border-border bg-card p-5">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <p className="text-sm font-semibold">{r.author_display_name}</p>
-              <Stars rating={r.rating} />
-            </div>
-            {r.title ? <p className="mt-1 font-medium">{r.title}</p> : null}
-            <p className="mt-1 whitespace-pre-line text-sm text-foreground/85">{r.body}</p>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <KitReviews
+      reviews={productToReviewVMs(p)}
+      emptyLabel="Sin opiniones publicadas todavía."
+    />
   );
 }
 
 /* ------------------------------------------------------------------ *
- * 9) FAQ — Preguntas frecuentes.
+ * 9) FAQ — KitFaq.
  * ------------------------------------------------------------------ */
-
 export function ProductFaqBlock() {
   const p = useProduct();
   if (!p) return <EmptyHint>Preguntas frecuentes del producto.</EmptyHint>;
-  if (p.faqs.length === 0) return null;
-  return (
-    <section className="mt-10">
-      <h2 className="text-xl font-semibold">Preguntas frecuentes</h2>
-      <ul className="mt-4 divide-y divide-border rounded-2xl border border-border bg-card">
-        {p.faqs.map((f) => (
-          <li key={f.id} className="p-4">
-            <details>
-              <summary className="cursor-pointer text-sm font-semibold">{f.question}</summary>
-              <p className="mt-2 whitespace-pre-line text-sm text-foreground/85">{f.answer}</p>
-            </details>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
+  return <KitFaq faqs={productToFaqVMs(p)} />;
 }
 
 /* ------------------------------------------------------------------ *
- * 10) Related — Otros productos de la misma empresa.
+ * 10) Related — KitCardGrid (encabezado wrapping section).
  * ------------------------------------------------------------------ */
-
 export function ProductRelatedBlock() {
   const p = useProduct();
   if (!p) return <EmptyHint>Otros productos de la misma empresa.</EmptyHint>;
   if (p.related.length === 0) return null;
   return (
     <section className="mt-10">
-      <h2 className="text-xl font-semibold">Otros productos de {p.business.display_name}</h2>
-      <ul className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-        {p.related.map((r: MarketplaceProductCard) => (
-          <li key={r.id} className="rounded-2xl border border-border bg-card p-5">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-              {r.product_type}
-            </p>
-            <Link
-              to="/producto/$slug"
-              params={{ slug: r.slug }}
-              className="mt-1 block font-semibold hover:underline"
-            >
-              {r.name}
-            </Link>
-            {r.tagline ? (
-              <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{r.tagline}</p>
-            ) : null}
-            {r.price_amount !== null ? (
-              <p className="mt-2 text-sm font-medium">
-                {formatPrice(r.price_amount, r.price_currency)}
-              </p>
-            ) : null}
-          </li>
-        ))}
-      </ul>
+      <h2 className="text-xl font-semibold">
+        Otros productos de {p.business.display_name}
+      </h2>
+      <KitCardGrid vm={{ items: productToRelatedCardVMs(p), columns: 3 }} />
     </section>
   );
 }
 
-// Exportamos SITE para posibles usos downstream (SEO en head loader).
 export { SITE };
