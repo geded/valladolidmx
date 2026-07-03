@@ -1108,6 +1108,36 @@ function PageVisualEditor({
     await onPublish();
   };
 
+  /**
+   * US-E · Despublicar la página desde el Studio. Invoca el RPC
+   * `eb_unpublish_composition` (ya existente) y refresca el estado local
+   * para que el badge pase a "Sin publicar" y el diff quede desactivado.
+   */
+  const onUnpublish = async () => {
+    if (!page) return;
+    setUnpublishing(true);
+    setMessage(null);
+    try {
+      await unpublish({ data: { id: page.id, notes: "Despublicado desde Modo Visual" } });
+      if (pageDef.page_type === "home") {
+        await queryClient.invalidateQueries({ queryKey: ["eb", "published-home", "default"] });
+      }
+      await queryClient.invalidateQueries({ queryKey: ["eb", "published-by-slug", pageDef.slug] });
+      setMessage(`Página despublicada. ${pageDef.publicPath} ya no está disponible al público.`);
+      try {
+        const refreshed = (await get({ data: { id: page.id } })) as CompositionDetail | null;
+        if (refreshed) setPage(refreshed);
+      } catch {
+        /* best-effort */
+      }
+    } catch (e) {
+      setMessage(`No se pudo despublicar: ${(e as Error).message}`);
+    } finally {
+      setUnpublishing(false);
+      setConfirmUnpublish(false);
+    }
+  };
+
   const updateSelectedConfig = (nextConfig: Record<string, unknown>) => {
     if (!tree) return;
     if (selectedChrome === "header" || selectedChrome === "footer") {
