@@ -672,6 +672,15 @@ function MediaControl({
     !!v &&
     !v.includes("/api/public/studio-media/") &&
     isBundleAssetPath(v);
+  // Sugerencia: cuando el campo está vacío pero el bloque tiene una imagen
+  // por defecto declarada en código (ruta del bundle), la ofrecemos con un
+  // botón "Usar imagen sugerida" para que el editor no tenga que copiarla a
+  // mano. Al aceptar, el valor se materializa en el campo y aparece el
+  // botón "Guardar en Biblioteca" para importarla al bucket.
+  const suggested =
+    !v && typeof def.default === "string" && isBundleAssetPath(def.default)
+      ? (def.default as string)
+      : "";
   const handleImport = async () => {
     if (!v || importing) return;
     setImporting(true);
@@ -697,6 +706,21 @@ function MediaControl({
       {v ? (
         <div className="overflow-hidden rounded-md border border-border bg-muted/30">
           <img src={v} alt="Vista previa" className="max-h-36 w-full object-cover" />
+        </div>
+      ) : null}
+      {!v && suggested ? (
+        <div className="space-y-1 rounded-md border border-dashed border-amber-300 bg-amber-50/60 p-2 dark:border-amber-700/50 dark:bg-amber-950/30">
+          <div className="overflow-hidden rounded">
+            <img src={suggested} alt="Sugerida" className="max-h-28 w-full object-cover" />
+          </div>
+          <button
+            type="button"
+            onClick={() => onChange(suggested)}
+            className="inline-flex w-full items-center justify-center gap-1 rounded-md border border-amber-300 bg-amber-100 px-2 py-1 text-[11px] font-medium text-amber-900 hover:bg-amber-200 dark:border-amber-700/50 dark:bg-amber-900/40 dark:text-amber-100"
+            title="Usa la imagen que el bloque trae por defecto en el código"
+          >
+            Usar imagen sugerida
+          </button>
         </div>
       ) : null}
       <div className="flex flex-wrap items-center gap-1">
