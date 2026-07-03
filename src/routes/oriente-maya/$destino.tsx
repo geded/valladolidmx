@@ -16,19 +16,27 @@ import { SITE } from "@/config/site";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { DestinationSurface } from "@/components/surfaces/DestinationSurface";
+import { getPublicDestinationBySlug } from "@/lib/destinations/public-reads.functions";
 
 export const Route = createFileRoute("/oriente-maya/$destino")({
   loader: async ({ params }) => {
-    // Resolución por slug (H-R3-2 · Ola 2): validamos que el destino
-    // exista antes de renderizar la plantilla; devuelve 404 real si no.
-    const dest = DESTINOS_MOCK.find(
+    const mock = DESTINOS_MOCK.find(
       (d) => d.slug === params.destino && d.region_slug === ORIENTE_MAYA.slug,
     );
-    if (!dest) throw notFound();
-    const composition = await getPublishedCompositionBySlug({
-      data: { slug: "__tpl_destination__" },
-    }).catch(() => null);
-    return { dest, composition };
+    const [db, composition] = await Promise.all([
+      getPublicDestinationBySlug({ data: { slug: params.destino } }).catch(() => null),
+      getPublishedCompositionBySlug({ data: { slug: "__tpl_destination__" } }).catch(() => null),
+    ]);
+    if (!mock && !db) throw notFound();
+    const dest = {
+      slug: params.destino,
+      name: db?.name ?? mock?.name ?? params.destino,
+      tagline: db?.tagline ?? mock?.tagline ?? "",
+      hero_palette: (db?.hero_palette ?? mock?.hero_palette ?? "territorio") as
+        "territorio" | "selva" | "cenote" | "atardecer",
+      highlights: (db?.highlights?.length ? db.highlights : mock?.highlights ?? []) as string[],
+    };
+    return { dest, db, composition };
   },
   head: ({ loaderData, params }) =>
     loaderData
@@ -51,10 +59,10 @@ export const Route = createFileRoute("/oriente-maya/$destino")({
 });
 
 function DestinoPage() {
-  const { composition } = Route.useLoaderData();
+  const { composition, db } = Route.useLoaderData();
   return composition ? (
     <CompositionRenderer tree={composition.snapshot} />
   ) : (
-    <DestinationSurface />
+    <DestinationSurface dbData={db ?? undefined} />
   );
 }
