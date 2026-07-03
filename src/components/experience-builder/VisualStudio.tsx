@@ -19,6 +19,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { SeoPreview } from "./SeoPreview";
+import { OnboardingTour, HelpButton, hasSeenOnboarding } from "./OnboardingTour";
 import {
   ArrowLeft,
   Check,
@@ -853,6 +854,13 @@ function PageVisualEditor({
   const [previewMode, setPreviewMode] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [shareLink, setShareLink] = useState<{ url: string; expires_at: string } | null>(null);
+  const [showTour, setShowTour] = useState(false);
+  useEffect(() => {
+    if (!hasSeenOnboarding()) {
+      const t = window.setTimeout(() => setShowTour(true), 500);
+      return () => window.clearTimeout(t);
+    }
+  }, []);
   const skipNextAutoSave = useRef(false);
   /**
    * Historial visual (US-14). Guardamos snapshots del árbol en `pastRef`
@@ -1328,6 +1336,7 @@ function PageVisualEditor({
             <History className="size-3.5" aria-hidden />
             Versiones
           </button>
+          <HelpButton onOpen={() => setShowTour(true)} />
           <a
             href={pageDef.publicPath}
             target="_blank"
@@ -1563,6 +1572,7 @@ function PageVisualEditor({
           />
         ) : null}
       </div>
+      <OnboardingTour open={showTour} onClose={() => setShowTour(false)} />
     </div>
   );
 }
