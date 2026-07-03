@@ -1937,6 +1937,18 @@ function BlockOverlay({
         e.stopPropagation();
         onSelect();
       }}
+      onDoubleClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onSelect();
+        // Notifica al Inspector para enfocar el primer campo de texto
+        // (edición inline "estilo doble-clic" — US-10).
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(
+            new CustomEvent("eb:inline-edit", { detail: { nodeId: node.id } }),
+          );
+        }
+      }}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
