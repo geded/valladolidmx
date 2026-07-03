@@ -12,6 +12,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { resolveBusinessPlanTier } from "@/lib/plans/plans-catalog";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -65,6 +66,8 @@ export interface MarketplacePromotionCard {
 
 export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
   description: string;
+  /** Plan comercial contratado. Resuelto vía Catálogo Central de Planes. */
+  plan_tier: "free" | "starter" | "pro" | "premium";
   products: MarketplaceProductCard[];
   promotions: MarketplacePromotionCard[];
 }
@@ -150,7 +153,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
     const { data: biz, error } = await supabase
       .from("businesses")
       .select(
-        "id, slug, display_name, tagline, description, verified, status, deleted_at, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug )",
+        "id, slug, display_name, tagline, description, verified, status, deleted_at, metadata, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug )",
       )
       .eq("slug", data.slug)
       .eq("status", "published")
@@ -182,6 +185,9 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
 
     const destSlug = (biz.destinations as { slug?: unknown } | null)?.slug;
     const catSlug = (biz.business_categories as { slug?: unknown } | null)?.slug;
+    const planTier = resolveBusinessPlanTier(
+      (biz as { metadata?: Record<string, unknown> | null }).metadata ?? null,
+    );
 
     return {
       id: biz.id,
@@ -192,6 +198,7 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       verified: Boolean(biz.verified),
       destination_slug: typeof destSlug === "string" ? destSlug : "",
       category_slug: typeof catSlug === "string" ? catSlug : "",
+      plan_tier: planTier,
       products: (products ?? []).map((p) => ({
         id: p.id,
         slug: p.slug,

@@ -1110,6 +1110,35 @@ const surfaceDestinationBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+/* ------------------------------------------------------------------ *
+ * US-R3 · Ola 2 · Sub-ola 2.2 — Plantilla Madre Business.
+ *
+ * Bloque universal para toda ficha pública de negocio (empresas,
+ * hoteles, restaurantes, cenotes, museos, agencias, tours,
+ * transportistas, tiendas, servicios y futuras categorías). Los gates
+ * de capacidades se resuelven vía Catálogo Central de Planes; el
+ * bloque no codifica límites propios.
+ * ------------------------------------------------------------------ */
+
+const surfaceBusinessBlock: BlockContract = {
+  type: "vmx.surface.business",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Superficie · Empresa",
+  description:
+    "Plantilla madre oficial para toda ficha pública de negocio. La categoría define variantes; el plan contratado habilita capacidades vía Catálogo Central de Planes.",
+  schema: {},
+  capabilities: {
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_seo: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["business"] },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
@@ -1145,6 +1174,8 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   // US-R3 · Ola 2 · Sub-ola 2.1 — Region + Destination
   surfaceRegionBlock,
   surfaceDestinationBlock,
+  // US-R3 · Ola 2 · Sub-ola 2.2 — Plantilla Madre Business
+  surfaceBusinessBlock,
 ];
 
 let bootstrapped = false;
