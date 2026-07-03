@@ -1336,6 +1336,7 @@ function PageVisualEditor({
             <History className="size-3.5" aria-hidden />
             Versiones
           </button>
+          <HelpButton onOpen={() => setShowTour(true)} />
           <a
             href={pageDef.publicPath}
             target="_blank"
