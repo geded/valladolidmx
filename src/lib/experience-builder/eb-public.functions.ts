@@ -1,17 +1,22 @@
 /**
- * Experience Builder · Server Functions PÚBLICAS (Etapa 15.10.4b · Fase 3)
+ * @deprecated (Iniciativa 3 · Fase 3.3a — Soft freeze de v2)
  *
- * Punto único de resolución pública para CUALQUIER superficie del
- * Experience Builder. Hoy resuelve Landings; en etapas posteriores
- * resolverá destinos, empresas, productos, eventos, bodas, promociones,
- * micrositios y contenido generado por IA — sin modificar su arquitectura.
+ * Resolución pública sobre el modelo `eb_*` (v2). Reemplazado por
+ * `getPublishedCompositionBySlug` + `eb_resolve_public_route` sobre
+ * `page_compositions` (v1). Ninguna ruta pública actual invoca
+ * `ebResolvePublicPage`.
  *
- * - No requiere autenticación (las RPCs detrás ya filtran por
- *   status='published' + visibility='public').
- * - Usa el cliente publishable de servidor (NO supabaseAdmin).
- * - Devuelve también `cache_version` para que cliente/CDN puedan
- *   invalidar sin recargar el documento.
+ * Congelado por Fase 3.3a. Prohibido añadir nuevos consumidores.
+ * Ver: docs/blueprint/15.10.4d-INICIATIVA-3-FASE-3.3-PLAN-UNIFICACION-V1-V2.md
  */
+
+if (typeof process !== "undefined" && !(globalThis as any).__EB_V2_PUBLIC_WARNED__) {
+  (globalThis as any).__EB_V2_PUBLIC_WARNED__ = true;
+  console.warn(
+    "[eb-public] DEPRECATED (v2 soft freeze · Fase 3.3a). " +
+      "Usa page_compositions (v1).",
+  );
+}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
