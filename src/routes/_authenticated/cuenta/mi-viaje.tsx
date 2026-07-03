@@ -574,21 +574,40 @@ interface CaseSummary {
 }
 
 function ConciergeSection({
-  planId: _planId,
+  data,
   cases,
+  onChanged,
 }: {
-  planId: string;
+  data: TravelPlanWithItems;
   cases: CaseSummary[];
+  onChanged: () => void;
 }) {
   const qc = useQueryClient();
-  const createCase = useServerFn(ccCreateCaseFromPlan);
+  const promote = useServerFn(promotePlanToCase);
+  const { plan, items } = data;
   const [summary, setSummary] = useState("");
+
+  const hasContent =
+    items.length > 0 || Boolean((plan.notes ?? "").trim().length >= 8);
+  const alreadyShared =
+    plan.status === "shared_with_concierge" && Boolean(plan.case_id);
+
   const send = useMutation({
-    mutationFn: (s: string) => createCase({ data: { summary: s, items: [] } }),
-    onSuccess: () => {
+    mutationFn: (s: string) =>
+      promote({ data: { planId: plan.id, summary: s } }),
+    onSuccess: (res) => {
       setSummary("");
       qc.invalidateQueries({ queryKey: ["cc", "my-cases"] });
-      toast.success("Solicitud enviada al Concierge");
+      onChanged();
+      toast.success("Expediente enviado al Concierge", {
+        description: "Un concierge humano revisará tu viaje.",
+        action: {
+          label: "Ver caso",
+          onClick: () => {
+            window.location.href = `/cuenta/concierge/${res.caseId}`;
+          },
+        },
+      });
     },
     onError: (e) =>
       toast.error("No se pudo enviar", {
@@ -596,39 +615,83 @@ function ConciergeSection({
       }),
   });
 
+  const derivedSummary =
+    summary.trim() ||
+    `Viaje "${plan.title}" · ${items.length} elemento${items.length === 1 ? "" : "s"}${
+      plan.party_size ? ` · ${plan.party_size} personas` : ""
+    }${plan.start_date ? ` · desde ${plan.start_date}` : ""}`;
+  const canSend =
+    !alreadyShared && hasContent && derivedSummary.length >= 8 && !send.isPending;
+
   return (
     <section className="rounded-lg border bg-card p-5">
       <h2 className="text-lg font-medium">Enviar al Concierge</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Cuando estés listo, un concierge humano revisa tu expediente y te
-        propone cotizaciones y ajustes.
+        Tu expediente completo (destinos, empresas, productos, eventos, notas,
+        fechas y personas) viaja como snapshot al concierge humano.
       </p>
-      <form
-        className="mt-4 space-y-3"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (summary.trim().length >= 8) send.mutate(summary.trim());
-        }}
-      >
-        <textarea
-          value={summary}
-          onChange={(e) => setSummary(e.target.value)}
-          rows={3}
-          maxLength={500}
-          placeholder="Cuéntanos qué buscas y cualquier detalle importante…"
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-        />
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{summary.length}/500 · mínimo 8 caracteres</span>
-          <button
-            type="submit"
-            disabled={send.isPending || summary.trim().length < 8}
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
-          >
-            {send.isPending ? "Enviando…" : "Enviar al Concierge"}
-          </button>
+
+      {alreadyShared ? (
+        <div className="mt-4 rounded-md border border-primary/30 bg-primary/5 p-3 text-sm">
+          <p className="font-medium">Ya enviaste este viaje al Concierge.</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            El caso está en proceso. Puedes seguir agregando elementos y volver a enviar cuando quieras revisar contigo tu concierge.
+          </p>
+          {plan.case_id ? (
+            <Link
+              to="/cuenta/concierge/$caseId"
+              params={{ caseId: plan.case_id }}
+              className="mt-2 inline-block text-xs font-medium text-primary hover:underline"
+            >
+              Ver mi caso →
+            </Link>
+          ) : null}
         </div>
-      </form>
+      ) : !hasContent ? (
+        <div className="mt-4 rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+          Agrega al menos un destino, empresa, producto o evento — o escribe
+          notas generales del viaje — para poder enviarlo.
+        </div>
+      ) : (
+        <form
+          className="mt-4 space-y-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (canSend) send.mutate(derivedSummary);
+          }}
+        >
+          <textarea
+            value={summary}
+            onChange={(e) => setSummary(e.target.value)}
+            rows={3}
+            maxLength={500}
+            placeholder="Mensaje opcional para tu concierge (fechas flexibles, presupuesto, restricciones…)"
+            className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+          />
+          <p className="text-xs text-muted-foreground">
+            Adjuntaremos automáticamente: {items.length} elemento
+            {items.length === 1 ? "" : "s"}
+            {plan.party_size ? ` · ${plan.party_size} personas` : ""}
+            {plan.start_date ? ` · ${plan.start_date}` : ""}
+            {plan.end_date ? ` → ${plan.end_date}` : ""}.
+          </p>
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>{summary.length}/500</span>
+            <button
+              type="submit"
+              disabled={!canSend}
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+            >
+              {send.isPending ? "Enviando…" : "Enviar al Concierge"}
+            </button>
+          </div>
+          {send.isError ? (
+            <p className="text-xs text-destructive">
+              {send.error instanceof Error ? send.error.message : "Error al enviar"}
+            </p>
+          ) : null}
+        </form>
+      )}
 
       <div className="mt-6">
         <div className="flex items-center justify-between">
