@@ -14,6 +14,8 @@ export interface SmartCardProps {
   href?: string | null;
   badge?: string | null;
   aspect?: "4/3" | "16/9" | "1/1";
+  /** Slot opcional para acciones auxiliares (p.ej. "+ Mi Viaje"). */
+  actions?: React.ReactNode;
 }
 
 export function SmartCard({
@@ -24,6 +26,7 @@ export function SmartCard({
   href,
   badge,
   aspect = "4/3",
+  actions,
 }: SmartCardProps) {
   const Wrapper: any = href ? "a" : "div";
   const wrapperProps = href ? { href, className: "group block" } : { className: "block" };
@@ -56,11 +59,16 @@ export function SmartCard({
               {badge}
             </span>
           ) : null}
-          {href ? (
-            <span className="mt-auto inline-flex items-center gap-1 pt-2 text-sm font-medium text-primary">
-              Ver más <ArrowUpRight className="h-3.5 w-3.5" />
-            </span>
-          ) : null}
+          <div className="mt-auto flex items-center justify-between gap-2 pt-2">
+            {href ? (
+              <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
+                Ver más <ArrowUpRight className="h-3.5 w-3.5" />
+              </span>
+            ) : (
+              <span />
+            )}
+            {actions ? <div className="shrink-0">{actions}</div> : null}
+          </div>
         </div>
       </article>
     </Wrapper>
