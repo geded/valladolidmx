@@ -2171,6 +2171,7 @@ function HomeCanvas({
   onToggleHidden,
   onMove,
   onReorderRoot,
+  commentCounts,
 }: {
   tree: CompositionTree;
   previewMode: boolean;
@@ -2183,6 +2184,7 @@ function HomeCanvas({
   onToggleHidden: (id: string) => void;
   onMove: (id: string, dir: -1 | 1) => void;
   onReorderRoot: (activeId: string, overId: string) => void;
+  commentCounts?: Record<string, number>;
 }) {
   const outerRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<HTMLDivElement | null>(null);
