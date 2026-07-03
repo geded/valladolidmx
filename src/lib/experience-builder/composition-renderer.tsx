@@ -625,6 +625,19 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.business.products": () => <BusinessProductsBlock />,
   "vmx.business.promotions": () => <BusinessPromotionsBlock />,
   "vmx.business.contact": () => <BusinessContactBlock />,
+  // US-R3 · Sub-ola 2.3a — Product granular (producción).
+  "vmx.product.shell": ({ renderChildren }) => (
+    <ProductShellBlock renderChildren={renderChildren} />
+  ),
+  "vmx.product.hero": () => <ProductHeroBlock />,
+  "vmx.product.gallery": () => <ProductGalleryBlock />,
+  "vmx.product.price-cta": () => <ProductPriceCtaBlock />,
+  "vmx.product.description": () => <ProductDescriptionBlock />,
+  "vmx.product.business-context": () => <ProductBusinessContextBlock />,
+  "vmx.product.promos": () => <ProductPromosBlock />,
+  "vmx.product.reviews": () => <ProductReviewsBlock />,
+  "vmx.product.faq": () => <ProductFaqBlock />,
+  "vmx.product.related": () => <ProductRelatedBlock />,
 };
 
 /* ------------------------------------------------------------------ *
