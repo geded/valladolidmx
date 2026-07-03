@@ -372,6 +372,56 @@ export const cancelScheduledPublish = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/* Soft edit lock (US-01) --------------------------------------------- */
+
+export interface EditingLock {
+  user_id: string;
+  user_name: string;
+  acquired_at: string;
+  heartbeat_at: string;
+}
+
+export interface AcquireLockResult {
+  acquired: boolean;
+  lock: EditingLock | null;
+}
+
+export const acquireEditLock = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string; force?: boolean }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<AcquireLockResult> => {
+    const { data: res, error } = await context.supabase.rpc("eb_acquire_edit_lock", {
+      _composition_id: data.id,
+      _force: data.force ?? false,
+    });
+    if (error) throw new Error(error.message);
+    const payload = (res ?? {}) as { acquired?: boolean; lock?: EditingLock | null };
+    return { acquired: Boolean(payload.acquired), lock: payload.lock ?? null };
+  });
+
+export const heartbeatEditLock = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: boolean; lock: EditingLock | null }> => {
+    const { data: res, error } = await context.supabase.rpc("eb_heartbeat_edit_lock", {
+      _composition_id: data.id,
+    });
+    if (error) throw new Error(error.message);
+    const payload = (res ?? {}) as { ok?: boolean; lock?: EditingLock | null };
+    return { ok: Boolean(payload.ok), lock: payload.lock ?? null };
+  });
+
+export const releaseEditLock = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ released: boolean }> => {
+    const { data: res, error } = await context.supabase.rpc("eb_release_edit_lock", {
+      _composition_id: data.id,
+    });
+    if (error) throw new Error(error.message);
+    return { released: Boolean((res as { released?: boolean } | null)?.released) };
+  });
+
 /* Shareable draft previews (US-16) ------------------------------------- */
 
 export interface CompositionPreviewLink {

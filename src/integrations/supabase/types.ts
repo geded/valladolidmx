@@ -3170,6 +3170,7 @@ export type Database = {
           created_by: string | null
           current_draft: Json
           description: string | null
+          editing_lock: Json | null
           id: string
           page_type: string
           published_at: string | null
@@ -3190,6 +3191,7 @@ export type Database = {
           created_by?: string | null
           current_draft?: Json
           description?: string | null
+          editing_lock?: Json | null
           id?: string
           page_type?: string
           published_at?: string | null
@@ -3210,6 +3212,7 @@ export type Database = {
           created_by?: string | null
           current_draft?: Json
           description?: string | null
+          editing_lock?: Json | null
           id?: string
           page_type?: string
           published_at?: string | null
@@ -5061,6 +5064,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      eb_acquire_edit_lock: {
+        Args: { _composition_id: string; _force?: boolean }
+        Returns: Json
+      }
       eb_cache_invalidate: {
         Args: { _page_id: string; _reason?: string }
         Returns: number
@@ -5123,6 +5130,10 @@ export type Database = {
           variant_key: string
         }[]
       }
+      eb_heartbeat_edit_lock: {
+        Args: { _composition_id: string }
+        Returns: Json
+      }
       eb_list_block_library: {
         Args: never
         Returns: {
@@ -5141,6 +5152,7 @@ export type Database = {
           updated_at: string
         }[]
       }
+      eb_lock_is_active: { Args: { lock: Json }; Returns: boolean }
       eb_page_delete: { Args: { _page_id: string }; Returns: undefined }
       eb_page_publish: {
         Args: { _note: string; _page_id: string }
@@ -5201,6 +5213,7 @@ export type Database = {
         }
         Returns: string
       }
+      eb_release_edit_lock: { Args: { _composition_id: string }; Returns: Json }
       eb_restore_revision: {
         Args: { _id: string; _revision_id: string }
         Returns: undefined
