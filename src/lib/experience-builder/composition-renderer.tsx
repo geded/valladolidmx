@@ -46,6 +46,8 @@ import { SmartBlockRuntime } from "@/components/experience-builder/smart-blocks"
 import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
 import { AluxSurface } from "@/components/surfaces/AluxSurface";
 import { TripPlannerSurface } from "@/components/surfaces/TripPlannerSurface";
+import { RegionSurface } from "@/components/surfaces/RegionSurface";
+import { DestinationSurface } from "@/components/surfaces/DestinationSurface";
 
 bootstrapBlockLibrary();
 
@@ -368,6 +370,9 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.surface.marketplace": NamedSectionPreview,
   "vmx.surface.alux": NamedSectionPreview,
   "vmx.surface.trip-planner": NamedSectionPreview,
+  // US-R3 · Ola 2 · Sub-ola 2.1 — Region + Destination (preview)
+  "vmx.surface.region": NamedSectionPreview,
+  "vmx.surface.destination": NamedSectionPreview,
 };
 
 /* ------------------------------------------------------------------ *
@@ -546,6 +551,10 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.surface.marketplace": () => <MarketplaceSurface />,
   "vmx.surface.alux": () => <AluxSurface />,
   "vmx.surface.trip-planner": () => <TripPlannerSurface />,
+  // US-R3 · Ola 2 · Sub-ola 2.1 — plantillas dinámicas por slug.
+  // El slug se resuelve dentro de la superficie (useParams del router).
+  "vmx.surface.region": () => <RegionSurface />,
+  "vmx.surface.destination": () => <DestinationSurface />,
 };
 
 /* ------------------------------------------------------------------ *

@@ -1062,6 +1062,54 @@ const surfaceTripPlannerBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+/* ------------------------------------------------------------------ *
+ * US-R3 · Ola 2 · Sub-ola 2.1 — Superficies dinámicas por slug.
+ *
+ * `vmx.surface.region` reproduce la ficha de una Región turística.
+ * `vmx.surface.destination` reproduce la ficha de un Destino. Ambas
+ * plantillas se cargan por kind (1 plantilla por kind + resolución por
+ * slug en la ruta; 0 composiciones por registro). No aceptan
+ * configuración editorial en esta sub-ola (adopción reproductiva).
+ * ------------------------------------------------------------------ */
+
+const surfaceRegionBlock: BlockContract = {
+  type: "vmx.surface.region",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Superficie · Región",
+  description:
+    "Plantilla oficial de la ficha de una Región turística. Renderiza el índice de destinos publicados de la región activa.",
+  schema: {},
+  capabilities: {
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_seo: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["region"] },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const surfaceDestinationBlock: BlockContract = {
+  type: "vmx.surface.destination",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Superficie · Destino",
+  description:
+    "Plantilla oficial de la ficha pública de un Destino. Renderiza la vista del destino resuelto por slug.",
+  schema: {},
+  capabilities: {
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_seo: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["destination"] },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
@@ -1094,6 +1142,9 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   smartBusinessesGridBlock,
   smartProductsGridBlock,
   smartEventsListBlock,
+  // US-R3 · Ola 2 · Sub-ola 2.1 — Region + Destination
+  surfaceRegionBlock,
+  surfaceDestinationBlock,
 ];
 
 let bootstrapped = false;

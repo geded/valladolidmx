@@ -165,6 +165,19 @@ export const PAGE_KIND_REGISTRY: readonly PageKindDefinition[] = [
     allowedBlockCategories: null,
   },
   {
+    // US-R3 · Ola 2 · Sub-ola 2.1 — H-R3-4 (Region como kind oficial).
+    // Aunque Oriente Maya es hoy la única región publicada, la ruta
+    // pública sigue el patrón `/{regionSlug}` para futuras regiones.
+    kind: "region",
+    label: "Región",
+    description: "Ficha oficial de una Región turística (índice de destinos).",
+    slugPattern: "/{regionSlug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/{regionSlug}",
+    allowedBlockCategories: null,
+  },
+  {
     kind: "route",
     label: "Ruta",
     description: "Ruta editorial (itinerario, ruta gastronómica, etc.).",
@@ -339,6 +352,7 @@ const FALLBACK_BY_KIND: Partial<Record<PageKind, ResolvedKindDefaults>> = {
   home:         { jsonLdType: "WebSite",  sitemapChangefreq: "daily",   sitemapPriority: 1.0, cacheControl: "public, max-age=60, s-maxage=120",  unpublishFallbackPath: "/" },
   marketplace:  { jsonLdType: "WebPage",  sitemapChangefreq: "hourly",  sitemapPriority: 0.9, cacheControl: "public, max-age=60, s-maxage=120",  unpublishFallbackPath: "/marketplace" },
   destination:  { jsonLdType: "Place",    sitemapChangefreq: "weekly",  sitemapPriority: 0.8, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/oriente-maya" },
+  region:       { jsonLdType: "Place",    sitemapChangefreq: "weekly",  sitemapPriority: 0.8, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/" },
   experience:   { jsonLdType: "TouristAttraction", sitemapChangefreq: "weekly",  sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/experiencias" },
   hotel:        { jsonLdType: "Hotel",    sitemapChangefreq: "weekly",  sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/hoteles" },
   restaurant:   { jsonLdType: "Restaurant", sitemapChangefreq: "weekly", sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/restaurantes" },

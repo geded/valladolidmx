@@ -1,19 +1,34 @@
+/**
+ * /oriente-maya/{destino} — Ficha pública de Destino (SSR).
+ *
+ * US-R3 · Ola 2 · Sub-ola 2.1: la ficha se sirve desde el Experience
+ * Builder resolviendo la plantilla oficial por `kind = destination`
+ * (slug interno `__tpl_destination__`). El slug del destino se lee
+ * dentro de la superficie desde el router. Fallback seguro a
+ * `<DestinationSurface />` (misma UI) si la composición no existe.
+ */
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
-import { PlaceholderImage } from "@/components/common/PlaceholderImage";
-import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
+import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
+import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import { DestinationSurface } from "@/components/surfaces/DestinationSurface";
 
 export const Route = createFileRoute("/oriente-maya/$destino")({
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
+    // Resolución por slug (H-R3-2 · Ola 2): validamos que el destino
+    // exista antes de renderizar la plantilla; devuelve 404 real si no.
     const dest = DESTINOS_MOCK.find(
       (d) => d.slug === params.destino && d.region_slug === ORIENTE_MAYA.slug,
     );
     if (!dest) throw notFound();
-    return { dest };
+    const composition = await getPublishedCompositionBySlug({
+      data: { slug: "__tpl_destination__" },
+    }).catch(() => null);
+    return { dest, composition };
   },
   head: ({ loaderData, params }) =>
     loaderData
@@ -36,49 +51,10 @@ export const Route = createFileRoute("/oriente-maya/$destino")({
 });
 
 function DestinoPage() {
-  const { dest } = Route.useLoaderData();
-  return (
-    <PublicShell
-      eyebrow={ORIENTE_MAYA.name}
-      title={dest.name}
-      description={dest.tagline}
-      crumbs={[
-        { label: ORIENTE_MAYA.name, to: "/oriente-maya" },
-        { label: dest.name },
-      ]}
-    >
-      <div className="grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <PlaceholderImage palette={dest.hero_palette} label={dest.name} aspect="video" />
-          <div className="mt-8">
-            <h2 className="text-2xl">Lo esencial</h2>
-            <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-              {dest.highlights.map((h: string) => (
-                <li
-                  key={h}
-                  className="rounded-xl border border-border bg-card px-4 py-3 text-sm"
-                >
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        <aside className="space-y-4">
-          <div className="rounded-2xl border border-border bg-card p-5">
-            <p className="text-sm font-semibold">Próximamente en este destino</p>
-            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li>· Hoteles del destino</li>
-              <li>· Restaurantes recomendados</li>
-              <li>· Experiencias y rutas</li>
-              <li>· Reseñas resumidas por Alux</li>
-            </ul>
-            <div className="mt-4">
-              <ComingSoonBadge label="Fase 1" />
-            </div>
-          </div>
-        </aside>
-      </div>
-    </PublicShell>
+  const { composition } = Route.useLoaderData();
+  return composition ? (
+    <CompositionRenderer tree={composition.snapshot} />
+  ) : (
+    <DestinationSurface />
   );
 }

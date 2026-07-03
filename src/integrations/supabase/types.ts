@@ -6079,6 +6079,7 @@ export type Database = {
         | "alux"
         | "trip_builder"
         | "custom"
+        | "region"
       eb_publish_status: "draft" | "in_review" | "published" | "archived"
       eb_scope: "global" | "tenant" | "marketplace"
       entity_kind:
@@ -6343,6 +6344,7 @@ export const Constants = {
         "alux",
         "trip_builder",
         "custom",
+        "region",
       ],
       eb_publish_status: ["draft", "in_review", "published", "archived"],
       eb_scope: ["global", "tenant", "marketplace"],
