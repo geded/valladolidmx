@@ -1126,7 +1126,17 @@ function PageVisualEditor({
       // Refrescar `published_hash` para que el badge pase a "Todo publicado".
       try {
         const refreshed = (await get({ data: { id: page.id } })) as CompositionDetail | null;
-        if (refreshed) setPage(refreshed);
+        if (refreshed) {
+          setPage(refreshed);
+          // El servidor inyecta traducciones automáticas al guardar. Sin
+          // resincronizar el árbol local, el hash del borrador queda
+          // desalineado con `published_hash` y el badge se queda en
+          // "Cambios sin publicar" aun después de publicar.
+          if (refreshed.current_draft) {
+            skipNextAutoSave.current = true;
+            setTree(refreshed.current_draft);
+          }
+        }
       } catch {
         /* best-effort */
       }
