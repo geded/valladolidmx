@@ -5959,6 +5959,15 @@ export type Database = {
         | "promo"
         | "microsite"
         | "ai_generated"
+        | "home"
+        | "marketplace"
+        | "experience"
+        | "hotel"
+        | "restaurant"
+        | "route"
+        | "alux"
+        | "trip_builder"
+        | "custom"
       eb_publish_status: "draft" | "in_review" | "published" | "archived"
       eb_scope: "global" | "tenant" | "marketplace"
       entity_kind:
@@ -6214,6 +6223,15 @@ export const Constants = {
         "promo",
         "microsite",
         "ai_generated",
+        "home",
+        "marketplace",
+        "experience",
+        "hotel",
+        "restaurant",
+        "route",
+        "alux",
+        "trip_builder",
+        "custom",
       ],
       eb_publish_status: ["draft", "in_review", "published", "archived"],
       eb_scope: ["global", "tenant", "marketplace"],
