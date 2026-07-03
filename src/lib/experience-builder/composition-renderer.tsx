@@ -365,6 +365,9 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.smart.businesses-grid": NamedSectionPreview,
   "vmx.smart.products-grid": NamedSectionPreview,
   "vmx.smart.events-list": NamedSectionPreview,
+  "vmx.surface.marketplace": NamedSectionPreview,
+  "vmx.surface.alux": NamedSectionPreview,
+  "vmx.surface.trip-planner": NamedSectionPreview,
 };
 
 /* ------------------------------------------------------------------ *
