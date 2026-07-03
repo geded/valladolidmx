@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
-import { listMarketplaceBusinesses } from "@/lib/marketplace/marketplace-reads.functions";
+import { listMarketplaceBusinesses, type MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
 import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
 
 const CATEGORY_SLUGS = new Set(["hoteles", "hospedaje"]);
@@ -28,7 +28,9 @@ export const Route = createFileRoute("/hoteles")({
 function HotelesRoute() {
   const { businesses } = Route.useLoaderData();
   const { destino } = Route.useSearch();
-  const filtered = destino ? businesses.filter((b) => b.destination_slug === destino) : businesses;
+  const filtered = destino
+    ? businesses.filter((b: MarketplaceBusinessCard) => b.destination_slug === destino)
+    : businesses;
   return (
     <PublicShell
       eyebrow="Categoría"
