@@ -17,22 +17,25 @@ import { PlaceholderImage } from "@/components/common/PlaceholderImage";
 import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
+import type { PublicDestinationDTO } from "@/lib/destinations/public-reads.functions";
 
 export interface DestinationSurfaceProps {
   /** Slug del destino a renderizar. Cuando falta, se lee del router. */
   destinationSlug?: string;
+  /** Datos enriquecidos desde la BD (Fase 4.1b). */
+  dbData?: PublicDestinationDTO;
 }
 
-export function DestinationSurface({ destinationSlug }: DestinationSurfaceProps = {}) {
+export function DestinationSurface({ destinationSlug, dbData }: DestinationSurfaceProps = {}) {
   const params = useParams({ strict: false }) as { destino?: string };
   const slug = destinationSlug ?? params.destino;
-  const dest = slug
+  const mock = slug
     ? DESTINOS_MOCK.find(
         (d) => d.slug === slug && d.region_slug === ORIENTE_MAYA.slug,
       )
     : undefined;
 
-  if (!dest) {
+  if (!dbData && !mock) {
     return (
       <PublicShell
         title="Destino no disponible"
@@ -45,27 +48,45 @@ export function DestinationSurface({ destinationSlug }: DestinationSurfaceProps 
     );
   }
 
+  const name = dbData?.name ?? mock!.name;
+  const tagline = dbData?.tagline ?? mock?.tagline ?? "";
+  const description = dbData?.description ?? null;
+  const highlights = (dbData?.highlights?.length ? dbData.highlights : mock?.highlights ?? []) as string[];
+  const heroPalette = (dbData?.hero_palette ?? mock?.hero_palette ?? "territorio") as
+    "territorio" | "selva" | "cenote" | "atardecer";
+  const heroUrl = dbData?.hero_url ?? null;
+
   return (
     <PublicShell
       eyebrow={ORIENTE_MAYA.name}
-      title={dest.name}
-      description={dest.tagline}
+      title={name}
+      description={tagline}
       crumbs={[
         { label: ORIENTE_MAYA.name, to: "/oriente-maya" },
-        { label: dest.name },
+        { label: name },
       ]}
     >
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <PlaceholderImage
-            palette={dest.hero_palette}
-            label={dest.name}
-            aspect="video"
-          />
+          {heroUrl ? (
+            <img
+              src={heroUrl}
+              alt={name}
+              className="aspect-video w-full rounded-2xl border border-border/60 object-cover"
+              loading="eager"
+            />
+          ) : (
+            <PlaceholderImage palette={heroPalette} label={name} aspect="video" />
+          )}
+          {description ? (
+            <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-foreground/90">
+              {description}
+            </p>
+          ) : null}
           <div className="mt-8">
             <h2 className="text-2xl">Lo esencial</h2>
             <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-              {dest.highlights.map((h: string) => (
+              {highlights.map((h: string) => (
                 <li
                   key={h}
                   className="rounded-xl border border-border bg-card px-4 py-3 text-sm"
