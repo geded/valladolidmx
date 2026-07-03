@@ -61,7 +61,9 @@ export function productToGalleryVM(p: MarketplaceProductDetail): GalleryVM {
   return {
     cover: coverVM,
     // Mantener alt="" cuando el media original no lo trae (no aplicar fallback).
-    items: gallery.map((m) => ({ id: m.id, url: m.url, alt: m.alt ?? "" })),
+    items: gallery
+      .filter((m): m is ProductMediaItem & { url: string } => !!m.url)
+      .map((m) => ({ id: m.id, url: m.url, alt: m.alt ?? "" })),
     emptyLabel: "Sin fotografías. Súbelas desde el CMS de producto.",
   };
 }
