@@ -46,6 +46,7 @@ import {
 import {
   listStudioPages,
   createComposition,
+  saveCompositionDraft,
   duplicateComposition,
   renameComposition,
   updateCompositionSlug,
@@ -61,6 +62,7 @@ import {
   type PageKind,
   type PageKindDefinition,
 } from "@/lib/experience-builder/page-kind-registry";
+import { getKitSeed } from "@/lib/experience-builder/kit-seeds";
 import { useAuth } from "@/hooks/useAuth";
 
 /* -------------------------------------------------------------------- */
@@ -182,6 +184,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
 
   const list = useServerFn(listStudioPages);
   const create = useServerFn(createComposition);
+  const saveDraft = useServerFn(saveCompositionDraft);
   const dupe = useServerFn(duplicateComposition);
   const rename = useServerFn(renameComposition);
   const updSlug = useServerFn(updateCompositionSlug);
@@ -515,7 +518,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
               if (rows.some((r) => r.slug === clean)) {
                 throw new Error(`Ya existe una página con la dirección "${clean}".`);
               }
-              await create({
+              const created = await create({
                 data: {
                   slug: clean,
                   title: form.title.trim() || clean,
@@ -523,7 +526,25 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
                   page_type: form.kind,
                 },
               });
-              toast.success("Página creada.");
+              // Sub-ola 2.6b · Si el kind tiene semilla oficial en el
+              // Surface Kit (Event / Experience / Hotel / Restaurant /
+              // Destination / Region), sembramos el borrador inicial
+              // usando `getKitSeed(kind).build()`. Persistimos con el
+              // flujo existente (`saveCompositionDraft`) — sin tocar
+              // Business / Product ni renderers.
+              const seed = getKitSeed(form.kind);
+              if (seed && created?.id) {
+                try {
+                  await saveDraft({ data: { id: created.id, tree: seed.build() } });
+                  toast.success("Página creada con semilla del Kit.");
+                } catch (seedErr) {
+                  // No bloqueamos la creación por un fallo de semilla.
+                  console.warn("[PagesPanel] seed inicial falló:", seedErr);
+                  toast.success("Página creada (semilla vacía).");
+                }
+              } else {
+                toast.success("Página creada.");
+              }
               setShowCreate(false);
               await reload();
               const def = getPageKindDefinition(form.kind);
@@ -975,7 +996,14 @@ function CreatePageDialog({
                   kind === k.kind ? "border-primary bg-primary/5" : "border-border bg-background"
                 }`}
               >
-                <div className="text-sm font-semibold">{k.label}</div>
+                <div className="flex items-center gap-2">
+                  <div className="text-sm font-semibold">{k.label}</div>
+                  {getKitSeed(k.kind) ? (
+                    <span className="rounded-full border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wide text-primary">
+                      Kit
+                    </span>
+                  ) : null}
+                </div>
                 <div className="mt-1 text-[11px] text-muted-foreground">{k.description}</div>
                 <div className="mt-1 font-mono text-[10px] text-muted-foreground">
                   {k.slugPattern}
