@@ -542,6 +542,10 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.smart.businesses-grid": ({ node }) => <SmartBlockRuntime node={node} />,
   "vmx.smart.products-grid": ({ node }) => <SmartBlockRuntime node={node} />,
   "vmx.smart.events-list": ({ node }) => <SmartBlockRuntime node={node} />,
+  // US-R3 · Ola 1 — Superficies singleton oficiales adoptadas por el EB.
+  "vmx.surface.marketplace": () => <MarketplaceSurface />,
+  "vmx.surface.alux": () => <AluxSurface />,
+  "vmx.surface.trip-planner": () => <TripPlannerSurface />,
 };
 
 /* ------------------------------------------------------------------ *
