@@ -3184,6 +3184,10 @@ export type Database = {
           updated_at: string
           updated_by: string | null
           variant_key: string
+          workflow_notes: string | null
+          workflow_state: string
+          workflow_updated_at: string | null
+          workflow_updated_by: string | null
         }
         Insert: {
           active_revision_id?: string | null
@@ -3205,6 +3209,10 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           variant_key?: string
+          workflow_notes?: string | null
+          workflow_state?: string
+          workflow_updated_at?: string | null
+          workflow_updated_by?: string | null
         }
         Update: {
           active_revision_id?: string | null
@@ -3226,6 +3234,10 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           variant_key?: string
+          workflow_notes?: string | null
+          workflow_state?: string
+          workflow_updated_at?: string | null
+          workflow_updated_by?: string | null
         }
         Relationships: [
           {
@@ -5231,6 +5243,10 @@ export type Database = {
         Returns: string
       }
       eb_section_upsert: { Args: { _payload: Json }; Returns: string }
+      eb_set_workflow_state: {
+        Args: { _composition_id: string; _next_state: string; _notes?: string }
+        Returns: Json
+      }
       eb_template_clone: {
         Args: {
           _new_slug: string

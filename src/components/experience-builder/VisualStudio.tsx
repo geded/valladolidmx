@@ -76,6 +76,7 @@ import {
   restoreCompositionRevision,
   issueCompositionPreviewLink,
   getPublishedTree,
+  setCompositionWorkflowState,
   type CompositionDetail,
   type CompositionRevisionSummary,
 } from "@/lib/experience-builder/studio.functions";
@@ -849,10 +850,32 @@ function PageVisualEditor({
   const listRevs = useServerFn(listCompositionRevisions);
   const restore = useServerFn(restoreCompositionRevision);
   const issuePreview = useServerFn(issueCompositionPreviewLink);
+  const setWorkflow = useServerFn(setCompositionWorkflowState);
   const queryClient = useQueryClient();
   const { roles } = useAuth();
   const canPublish = roles.includes("admin") || roles.includes("super_admin");
   const canForceLock = canPublish;
+  const [workflowBusy, setWorkflowBusy] = useState(false);
+
+  const changeWorkflow = async (next: "draft" | "in_review" | "approved") => {
+    if (!page) return;
+    setWorkflowBusy(true);
+    try {
+      const res = await setWorkflow({ data: { id: page.id, next_state: next } });
+      setPage((p) => (p ? { ...p, workflow_state: res.workflow_state as CompositionDetail["workflow_state"], workflow_updated_at: new Date().toISOString() } : p));
+      const labels: Record<string, string> = { draft: "Borrador", in_review: "En revisión", approved: "Aprobado" };
+      toast.success(`Estado actualizado: ${labels[res.workflow_state] ?? res.workflow_state}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes("forbidden_approve")) {
+        toast.error("Sólo un administrador puede aprobar la página.");
+      } else {
+        toast.error(`No se pudo actualizar el estado: ${msg}`);
+      }
+    } finally {
+      setWorkflowBusy(false);
+    }
+  };
 
   const [page, setPage] = useState<CompositionDetail | null>(null);
   const [tree, setTree] = useState<CompositionTree | null>(null);
@@ -1533,6 +1556,14 @@ function PageVisualEditor({
             Versiones
           </button>
           <PublishStateBadge state={publishState} publishedAt={page?.published_at ?? null} />
+          {page ? (
+            <WorkflowChip
+              state={page.workflow_state ?? "draft"}
+              busy={workflowBusy}
+              canApprove={canPublish}
+              onChange={changeWorkflow}
+            />
+          ) : null}
           <HelpButton onOpen={() => setShowTour(true)} />
           <a
             href={pageDef.publicPath}
@@ -3165,6 +3196,80 @@ function SaveIndicator({ status }: { status: SaveStatus }) {
     return <span className="text-[11px] text-destructive">No se pudo guardar.</span>;
   }
   return null;
+}
+
+function WorkflowChip({
+  state,
+  busy,
+  canApprove,
+  onChange,
+}: {
+  state: "draft" | "in_review" | "approved";
+  busy: boolean;
+  canApprove: boolean;
+  onChange: (next: "draft" | "in_review" | "approved") => void | Promise<void>;
+}) {
+  const styles: Record<string, string> = {
+    draft: "border-border bg-muted text-foreground",
+    in_review: "border-amber-300 bg-amber-50 text-amber-900",
+    approved: "border-emerald-300 bg-emerald-50 text-emerald-800",
+  };
+  const labels: Record<string, string> = {
+    draft: "Borrador",
+    in_review: "En revisión",
+    approved: "Aprobado",
+  };
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        disabled={busy}
+        className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[11px] font-semibold ${styles[state]} disabled:opacity-60`}
+        title="Flujo editorial de la página"
+      >
+        {busy ? <Loader2 className="size-3 animate-spin" aria-hidden /> : null}
+        Flujo: {labels[state]}
+      </button>
+      {open ? (
+        <div
+          className="absolute right-0 top-full z-50 mt-1 w-52 rounded-md border border-border bg-popover p-1 shadow-md"
+          onMouseLeave={() => setOpen(false)}
+        >
+          {state !== "draft" ? (
+            <button
+              type="button"
+              onClick={() => { setOpen(false); void onChange("draft"); }}
+              className="block w-full rounded px-2 py-1.5 text-left text-xs hover:bg-accent"
+            >
+              Regresar a borrador
+            </button>
+          ) : null}
+          {state !== "in_review" ? (
+            <button
+              type="button"
+              onClick={() => { setOpen(false); void onChange("in_review"); }}
+              className="block w-full rounded px-2 py-1.5 text-left text-xs hover:bg-accent"
+            >
+              Enviar a revisión
+            </button>
+          ) : null}
+          {state !== "approved" ? (
+            <button
+              type="button"
+              onClick={() => { setOpen(false); void onChange("approved"); }}
+              disabled={!canApprove}
+              title={canApprove ? "Marcar como aprobado" : "Sólo administradores pueden aprobar"}
+              className="block w-full rounded px-2 py-1.5 text-left text-xs hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Aprobar
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 function AppearancePanel({

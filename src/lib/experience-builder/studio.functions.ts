@@ -44,6 +44,13 @@ export interface CompositionDetail extends CompositionSummary {
    * si no hay publicación programada.
    */
   scheduled_publish_at: string | null;
+  /**
+   * US-02 · Estado del flujo editorial independiente del ciclo de
+   * publicación. Valores: `draft`, `in_review`, `approved`.
+   */
+  workflow_state: "draft" | "in_review" | "approved";
+  workflow_updated_at: string | null;
+  workflow_notes: string | null;
 }
 
 export interface CompositionRevisionSummary {
@@ -110,7 +117,7 @@ export const getComposition = createServerFn({ method: "GET" })
     const { data: row, error } = await context.supabase
       .from("page_compositions")
       .select(
-        "id, slug, title, description, status, page_type, active_revision_id, updated_at, current_draft, published_at, scheduled_publish_at",
+        "id, slug, title, description, status, page_type, active_revision_id, updated_at, current_draft, published_at, scheduled_publish_at, workflow_state, workflow_updated_at, workflow_notes",
       )
       .eq("id", data.id)
       .maybeSingle();
@@ -129,7 +136,7 @@ export const getComposition = createServerFn({ method: "GET" })
       }
     }
     return {
-      ...(row as Omit<CompositionDetail, "current_draft" | "published_hash" | "published_at">),
+      ...(row as unknown as Omit<CompositionDetail, "current_draft" | "published_hash" | "published_at">),
       current_draft: ((row as { current_draft: unknown }).current_draft as CompositionTree) ?? EMPTY_TREE,
       published_hash,
       published_at: (row as { published_at: string | null }).published_at ?? null,
@@ -494,4 +501,22 @@ export const resolveCompositionPreview = createServerFn({ method: "GET" })
       slug: comp.slug,
       expires_at: tok.expires_at,
     };
+  });
+/**
+ * US-02 · Cambia el estado del flujo editorial.
+ * - draft → in_review: cualquier editor autenticado.
+ * - in_review → approved: sólo admin / super_admin (validado en RPC).
+ * - approved → draft: cualquier editor (para reabrir el ciclo).
+ */
+export const setCompositionWorkflowState = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string; next_state: "draft" | "in_review" | "approved"; notes?: string | null }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }) => {
+    const { data: result, error } = await context.supabase.rpc("eb_set_workflow_state", {
+      _composition_id: data.id,
+      _next_state: data.next_state,
+      _notes: data.notes ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return result as { workflow_state: string; changed: boolean };
   });
