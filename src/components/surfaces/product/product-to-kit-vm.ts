@@ -6,6 +6,7 @@
  * Los shims `vmx.product.*` importan estas funciones para construir los
  * VMs y pasarlos a los primitives del Kit.
  */
+import type { ReactNode } from "react";
 import type {
   CardVM,
   CrumbVM,
@@ -74,7 +75,7 @@ function priceOf(p: MarketplaceProductDetail): PriceVM | null {
 
 export function productToPriceCtaVM(
   p: MarketplaceProductDetail,
-  actions: React.ReactNode,
+  actions: ReactNode,
 ): PriceCtaVM {
   return {
     price: priceOf(p),

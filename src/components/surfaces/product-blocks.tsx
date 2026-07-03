@@ -17,6 +17,7 @@
  *    migrarse en 2.5c cuando el Kit incorpore composición de "authored-by".
  *  - Sin regresiones visuales (validado por `product-shim-regression.tsx`).
  */
+import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
 import { ProductActions } from "@/components/marketplace/ProductActions";
@@ -52,7 +53,7 @@ import {
 export function ProductShellBlock({
   renderChildren,
 }: {
-  renderChildren?: () => React.ReactNode;
+  renderChildren?: () => ReactNode;
 }) {
   const p = useProduct();
   if (!p) {
