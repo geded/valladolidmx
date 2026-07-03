@@ -343,6 +343,35 @@ export const unpublishComposition = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/**
+ * US-D · Programa una publicación futura. La ejecuta el sistema (cron)
+ * cuando llega la fecha; el estado queda en 'draft' hasta ese momento.
+ */
+export const schedulePublishComposition = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string; scheduled_at: string; notes?: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { error } = await context.supabase.rpc("eb_schedule_publish_composition", {
+      _id: data.id,
+      _when: data.scheduled_at,
+      _notes: data.notes,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const cancelScheduledPublish = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string; notes?: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { error } = await context.supabase.rpc("eb_cancel_scheduled_publish", {
+      _id: data.id,
+      _notes: data.notes,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 /* Shareable draft previews (US-16) ------------------------------------- */
 
 export interface CompositionPreviewLink {
