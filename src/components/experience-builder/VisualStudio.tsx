@@ -1710,6 +1710,60 @@ function PageVisualEditor({
           onConfirm={() => void confirmPublishFromDialog()}
         />
       ) : null}
+      {confirmUnpublish ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="unpublish-title"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm"
+        >
+          <div className="w-full max-w-md overflow-hidden rounded-lg border border-border bg-card shadow-xl">
+            <header className="border-b border-border px-4 py-3">
+              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                Despublicar página
+              </p>
+              <h2 id="unpublish-title" className="mt-0.5 text-base font-semibold">
+                ¿Retirar del sitio público?
+              </h2>
+            </header>
+            <div className="space-y-2 px-4 py-3 text-xs text-muted-foreground">
+              <p>
+                <span className="font-mono">{pageDef.publicPath}</span> dejará de estar
+                disponible para los visitantes y responderá 404.
+              </p>
+              <p>
+                El borrador y el historial de versiones se conservan. Puedes volver a
+                publicar cuando quieras.
+              </p>
+            </div>
+            <footer className="flex items-center justify-end gap-2 border-t border-border bg-muted/30 px-4 py-3">
+              <button
+                type="button"
+                onClick={() => setConfirmUnpublish(false)}
+                disabled={unpublishing}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => void onUnpublish()}
+                disabled={unpublishing}
+                className="inline-flex items-center gap-1 rounded-md bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-rose-700 disabled:opacity-60"
+              >
+                {unpublishing ? (
+                  <>
+                    <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                    Despublicando…
+                  </>
+                ) : (
+                  "Despublicar"
+                )}
+              </button>
+            </footer>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
