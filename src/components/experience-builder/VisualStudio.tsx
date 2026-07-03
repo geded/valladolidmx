@@ -15,7 +15,7 @@
  *    infraestructura".
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { SeoPreview } from "./SeoPreview";
@@ -95,6 +95,9 @@ import { AutoInspector } from "@/components/experience-builder/AutoInspector";
 import { BlockCommentsPanel } from "@/components/experience-builder/BlockCommentsPanel";
 import { PagesPanel } from "@/components/experience-builder/PagesPanel";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
+// US-R3 · Sub-ola 2.2b — selector reutilizable "Vista previa con…".
+import { StudioPreviewContextBar } from "@/components/experience-builder/StudioPreviewContextBar";
+import { getPreviewProvider } from "@/lib/experience-builder/preview-registry";
 import { useAuth } from "@/hooks/useAuth";
 import { FONT_FAMILY_OPTIONS, type BlockAppearance } from "@/lib/experience-builder/appearance";
 import { useEditingLock, formatRelativeSince } from "./useEditingLock";
@@ -914,6 +917,18 @@ function PageVisualEditor({
   const [sharing, setSharing] = useState(false);
   const [shareLink, setShareLink] = useState<{ url: string; expires_at: string } | null>(null);
   const [showTour, setShowTour] = useState(false);
+  // US-R3 · Sub-ola 2.2b — Preview data para plantillas dinámicas.
+  // Se resuelve por `page_type`/`slug` desde el Preview Registry. Cuando
+  // no aplica (Home, landings estáticos), `previewProvider` es null y ni
+  // la barra ni el Provider se pintan — cero impacto en flujo existente.
+  const previewProvider = useMemo(
+    () => getPreviewProvider(pageDef.page_type, pageDef.slug),
+    [pageDef.page_type, pageDef.slug],
+  );
+  const [previewData, setPreviewData] = useState<unknown>(null);
+  const handlePreviewDataChange = useCallback((data: unknown) => {
+    setPreviewData(data);
+  }, []);
   /** US-01 · Soft lock por página. */
   const lock = useEditingLock(page?.id ?? null);
   const [, forceLockTick] = useState(0);
@@ -1773,14 +1788,16 @@ function PageVisualEditor({
           </aside>
         ) : null}
 
-        <HomeCanvas
-          tree={tree}
-          previewMode={previewMode}
-          deviceViewport={deviceViewport}
-          selectedId={selectedId}
-          onSelect={(id) => setSelectedId(id)}
-          onSelectChrome={(area) => setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)}
-          onDelete={(id) => {
+        {(() => {
+          const canvas = (
+            <HomeCanvas
+              tree={tree}
+              previewMode={previewMode}
+              deviceViewport={deviceViewport}
+              selectedId={selectedId}
+              onSelect={(id) => setSelectedId(id)}
+              onSelectChrome={(area) => setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)}
+              onDelete={(id) => {
             if (typeof window !== "undefined") {
               const node = tree?.root.children.find((n) => n.id === id);
               const label = node ? getBlock(node.type)?.display_name ?? node.type : "esta sección";
@@ -1800,7 +1817,20 @@ function PageVisualEditor({
             commitTree({ ...tree, root: { children: next } });
           }}
           commentCounts={commentCounts}
-        />
+            />
+          );
+          if (!previewProvider) return canvas;
+          const Provider = previewProvider.Provider;
+          return (
+            <div className="flex min-w-0 flex-1 flex-col">
+              <StudioPreviewContextBar
+                provider={previewProvider}
+                onDataChange={handlePreviewDataChange}
+              />
+              <Provider data={previewData as never}>{canvas}</Provider>
+            </div>
+          );
+        })()}
 
         {!previewMode && selectedContract && selectedConfig ? (
           <aside

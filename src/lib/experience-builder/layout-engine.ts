@@ -15,6 +15,8 @@
 const CONTAINER_BLOCK_TYPES = new Set<string>([
   "vmx.layout.container",
   "vmx.layout.section",
+  // US-R3 · Sub-ola 2.2b — Shell de la Plantilla Madre Business.
+  "vmx.business.shell",
 ]);
 
 /** ¿Este tipo de bloque acepta hijos del Layout Engine? */
