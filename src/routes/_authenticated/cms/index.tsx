@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/cms/")({
       {
         name: "description",
         content:
-          "Panel administrativo del CMS Studio de Valladolid.mx (Ola 1, Fase 2).",
+          "Panel administrativo del CMS Studio de Valladolid.mx.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],

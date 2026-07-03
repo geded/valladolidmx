@@ -668,7 +668,7 @@ function PagesPicker({
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                      <Lock className="size-2.5" aria-hidden /> Próximamente
+                      <Lock className="size-2.5" aria-hidden /> En preparación
                     </span>
                   )}
                 </div>

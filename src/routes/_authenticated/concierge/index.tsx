@@ -77,7 +77,7 @@ function ConciergeInboxPage() {
     <section className="mx-auto w-full max-w-[1100px]">
       <header className="mb-6">
         <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-          Ola 6 · Concierge Workspace
+          Concierge Workspace
         </p>
         <h1 className="mt-1 text-2xl font-semibold">Bandeja de expedientes</h1>
         {wlQ.data && (
