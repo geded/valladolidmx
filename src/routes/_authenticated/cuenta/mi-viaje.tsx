@@ -37,6 +37,7 @@ import {
   type GuestQueueItem,
 } from "@/lib/traveler/guest-queue";
 import { ccListMyCases } from "@/lib/concierge/cc.functions";
+import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   component: MiViajePage,
@@ -93,6 +94,7 @@ function MiViajePage() {
         <>
           <PlanMetaEditor data={activeQ.data} onSaved={invalidatePlan} />
           <PlanItemsSection data={activeQ.data} onChanged={invalidatePlan} />
+          <AluxTravelerPanel />
           <ConciergeSection data={activeQ.data} cases={cases} onChanged={invalidatePlan} />
         </>
       ) : (

@@ -382,6 +382,13 @@ const cuenta: WorkspaceDefinition = {
   aluxCapabilities: [
     { id: "cuenta.profile.read", label: "Leer perfil de viajero" },
     { id: "cuenta.favorites.read", label: "Leer favoritos" },
+    // Sub-ola H · Alux Traveler (contexto oficial vía traveler_alux_context_for_user)
+    { id: "cuenta.travel.improve", label: "Mejorar mi viaje" },
+    { id: "cuenta.travel.detect_gaps", label: "Detectar huecos del plan" },
+    { id: "cuenta.travel.suggest_hotels", label: "Recomendar hoteles" },
+    { id: "cuenta.travel.suggest_restaurants", label: "Recomendar restaurantes" },
+    { id: "cuenta.travel.suggest_experiences", label: "Recomendar experiencias" },
+    { id: "cuenta.travel.draft_concierge", label: "Preparar mensaje para Concierge" },
   ],
   context: {
     workspaceId: "cuenta",
