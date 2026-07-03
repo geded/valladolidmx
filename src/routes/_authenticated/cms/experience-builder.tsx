@@ -13,39 +13,7 @@
  *  - CMS First, BEA, Customer Case File, Alux read-only.
  */
 
-import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import {
-  listBlockLibrary,
-  syncBlockLibrary,
-} from "@/lib/experience-builder/experience-builder.functions";
-import {
-  listCompositions,
-  getComposition,
-  createComposition,
-  saveCompositionDraft,
-  createCompositionRevision,
-  listCompositionRevisions,
-  restoreCompositionRevision,
-  publishComposition,
-  unpublishComposition,
-  type CompositionDetail,
-  type CompositionSummary,
-  type CompositionRevisionSummary,
-} from "@/lib/experience-builder/studio.functions";
-import {
-  EMPTY_TREE,
-  appendToRoot,
-  duplicateRootNode,
-  moveRootNode,
-  newNodeId,
-  removeNode,
-  updateNodeConfig,
-  type CompositionNode,
-  type CompositionTree,
-} from "@/lib/experience-builder/composition-tree";
-import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { useAuth } from "@/hooks/useAuth";
 import { VisualStudio } from "@/components/experience-builder/VisualStudio";
 
