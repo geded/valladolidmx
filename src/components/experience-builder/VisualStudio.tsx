@@ -95,6 +95,9 @@ import { AutoInspector } from "@/components/experience-builder/AutoInspector";
 import { BlockCommentsPanel } from "@/components/experience-builder/BlockCommentsPanel";
 import { PagesPanel } from "@/components/experience-builder/PagesPanel";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
+// US-R3 · Sub-ola 2.2b — selector reutilizable "Vista previa con…".
+import { StudioPreviewContextBar } from "@/components/experience-builder/StudioPreviewContextBar";
+import { getPreviewProvider } from "@/lib/experience-builder/preview-registry";
 import { useAuth } from "@/hooks/useAuth";
 import { FONT_FAMILY_OPTIONS, type BlockAppearance } from "@/lib/experience-builder/appearance";
 import { useEditingLock, formatRelativeSince } from "./useEditingLock";
