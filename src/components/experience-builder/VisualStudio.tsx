@@ -1491,7 +1491,21 @@ function PageVisualEditor({
                 <ToolBtn onClick={() => moveNode(selectedNode.id, -1)} icon={<ChevronUp className="size-3" />} label="Subir" />
                 <ToolBtn onClick={() => moveNode(selectedNode.id, 1)} icon={<ChevronDown className="size-3" />} label="Bajar" />
                 <ToolBtn onClick={() => duplicateNode(selectedNode.id)} icon={<Copy className="size-3" />} label="Duplicar" />
-                <ToolBtn onClick={() => removeNodeById(selectedNode.id)} icon={<Trash2 className="size-3" />} label="Eliminar" tone="danger" />
+                <ToolBtn
+                  onClick={() => toggleHiddenNode(selectedNode.id)}
+                  icon={selectedNode.hidden ? <Eye className="size-3" /> : <EyeOff className="size-3" />}
+                  label={selectedNode.hidden ? "Mostrar" : "Ocultar"}
+                />
+                <ToolBtn
+                  onClick={() => {
+                    const label = getBlock(selectedNode.type)?.display_name ?? selectedNode.type;
+                    if (typeof window !== "undefined" && !window.confirm(`¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`)) return;
+                    removeNodeById(selectedNode.id);
+                  }}
+                  icon={<Trash2 className="size-3" />}
+                  label="Eliminar"
+                  tone="danger"
+                />
               </div>
             ) : null}
 
