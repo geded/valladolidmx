@@ -68,6 +68,8 @@ import {
   saveCompositionDraft,
   publishComposition,
   unpublishComposition,
+  schedulePublishComposition,
+  cancelScheduledPublish,
   listCompositionRevisions,
   restoreCompositionRevision,
   issueCompositionPreviewLink,
