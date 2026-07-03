@@ -6,7 +6,7 @@ import { getPublishedHomeComposition } from "@/lib/experience-builder/public-rea
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { PublicShell } from "@/components/discovery";
 import { useSectionEditWrap } from "@/components/experience-builder/SectionEditOverlay";
-import { buildPublicHead } from "@/lib/discovery/seo";
+import { buildPublicHead, pickFirstMediaUrl, webPageJsonLd } from "@/lib/discovery/seo";
 import {
   getDiscoverySection,
   type DiscoverySectionKind,
@@ -20,7 +20,7 @@ const publishedHomeQuery = queryOptions({
 
 export const Route = createFileRoute("/")({
   head: (ctx) => {
-    const loaderData = ctx.loaderData as { seo?: Record<string, unknown> | null } | undefined;
+    const loaderData = ctx.loaderData as { seo?: Record<string, unknown> | null; fallbackImage?: string | null } | undefined;
     const seo = (loaderData?.seo ?? {}) as {
       title?: string;
       description?: string;
@@ -28,20 +28,28 @@ export const Route = createFileRoute("/")({
       canonical?: string;
       noindex?: boolean;
     };
+    const title = seo.title?.trim() || `${SITE.name} — Despierta en Valladolid y descubre el Oriente Maya`;
+    const description = seo.description?.trim() || SITE.default_description;
+    const path = seo.canonical?.trim() || "/";
+    const ogImage = seo.og_image?.trim() || loaderData?.fallbackImage || undefined;
     return buildPublicHead({
-      title: seo.title?.trim() || `${SITE.name} — Despierta en Valladolid y descubre el Oriente Maya`,
-      description: seo.description?.trim() || SITE.default_description,
-      path: seo.canonical?.trim() || "/",
+      title,
+      description,
+      path,
       ogType: "website",
-      ogImage: seo.og_image?.trim() || undefined,
+      ogImage,
       noindex: Boolean(seo.noindex),
+      jsonLd: seo.noindex ? undefined : [webPageJsonLd({ title, description, path, image: ogImage })],
     });
   },
   loader: async ({ context }) => {
     // Prefetch para SSR; nunca lanza — getPublishedHomeComposition cae a null
     // ante cualquier error, garantizando que la Home siempre cargue.
     const published = await context.queryClient.ensureQueryData(publishedHomeQuery);
-    return { seo: published?.snapshot?.chrome?.seo ?? null };
+    return {
+      seo: published?.snapshot?.chrome?.seo ?? null,
+      fallbackImage: published?.snapshot ? pickFirstMediaUrl(published.snapshot) ?? null : null,
+    };
   },
   component: HomePage,
 });
