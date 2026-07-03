@@ -2444,7 +2444,7 @@ function SortableSectionItem({
 }
 
 function BlockOverlay({
-  node, selected, onSelect, onDelete, onDuplicate, onToggleHidden, onMoveUp, onMoveDown, children, sortable = false,
+  node, selected, onSelect, onDelete, onDuplicate, onToggleHidden, onMoveUp, onMoveDown, children, sortable = false, commentCount = 0,
 }: {
   node: CompositionNode;
   selected: boolean;
@@ -2456,6 +2456,7 @@ function BlockOverlay({
   onMoveDown: () => void;
   children: React.ReactNode;
   sortable?: boolean;
+  commentCount?: number;
 }) {
   const contract = getBlock(node.type);
   const ref = useRef<HTMLDivElement | null>(null);
