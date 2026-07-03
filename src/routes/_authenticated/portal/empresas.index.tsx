@@ -7,6 +7,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listMyBusinesses } from "@/lib/portal/portal-reads.functions";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/portal/empresas/")({
   component: BusinessesIndex,
@@ -14,6 +15,10 @@ export const Route = createFileRoute("/_authenticated/portal/empresas/")({
 
 function BusinessesIndex() {
   const fetchBusinesses = useServerFn(listMyBusinesses);
+  const { roles } = useAuth();
+  const canCreateBusiness = roles.some((r) =>
+    r === "admin" || r === "super_admin" || r === "editor",
+  );
   const { data: businesses = [], isLoading, error } = useQuery({
     queryKey: ["portal", "my-businesses"],
     queryFn: () => fetchBusinesses(),
@@ -46,17 +51,27 @@ function BusinessesIndex() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <header>
-        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          Portal Empresarial · Empresas
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold">
-          {isAdminContext ? "Todas las empresas" : "Tus empresas"}
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Selecciona una empresa para ver su configuración, paquetes de
-          visibilidad detectados y sus órdenes y pagos.
-        </p>
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+            Portal Empresarial · Empresas
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold">
+            {isAdminContext ? "Todas las empresas" : "Tus empresas"}
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Selecciona una empresa para ver su configuración, paquetes de
+            visibilidad detectados y sus órdenes y pagos.
+          </p>
+        </div>
+        {canCreateBusiness ? (
+          <Link
+            to="/cms/empresas/nueva"
+            className="inline-flex items-center justify-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-95"
+          >
+            + Registrar nueva empresa
+          </Link>
+        ) : null}
       </header>
 
       <div>
