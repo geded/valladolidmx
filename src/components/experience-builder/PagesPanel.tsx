@@ -46,6 +46,7 @@ import {
 import {
   listStudioPages,
   createComposition,
+  saveCompositionDraft,
   duplicateComposition,
   renameComposition,
   updateCompositionSlug,
@@ -61,6 +62,7 @@ import {
   type PageKind,
   type PageKindDefinition,
 } from "@/lib/experience-builder/page-kind-registry";
+import { getKitSeed } from "@/lib/experience-builder/kit-seeds";
 import { useAuth } from "@/hooks/useAuth";
 
 /* -------------------------------------------------------------------- */
