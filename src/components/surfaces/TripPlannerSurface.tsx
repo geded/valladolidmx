@@ -8,7 +8,6 @@
  */
 import { Link } from "@tanstack/react-router";
 import { Compass, FileText, MessageCircle } from "lucide-react";
-import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { RequestConciergeButton } from "@/components/concierge/RequestConciergeButton";
 
 export function TripPlannerSurface() {
