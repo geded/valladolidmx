@@ -25,6 +25,8 @@ import {
   ChevronUp,
   Copy,
   ExternalLink,
+  Eye,
+  EyeOff,
   History,
   GripVertical,
   Loader2,
@@ -55,6 +57,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { toast } from "sonner";
 
 import {
   listCompositions,
