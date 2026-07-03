@@ -441,6 +441,8 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.product.reviews": () => <ProductReviewsBlock />,
   "vmx.product.faq": () => <ProductFaqBlock />,
   "vmx.product.related": () => <ProductRelatedBlock />,
+  // US-R3 · Sub-ola 2.5d — vmx.kit.* neutros (Studio).
+  ...KIT_MAP,
 };
 
 /* ------------------------------------------------------------------ *
@@ -653,6 +655,8 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.product.reviews": () => <ProductReviewsBlock />,
   "vmx.product.faq": () => <ProductFaqBlock />,
   "vmx.product.related": () => <ProductRelatedBlock />,
+  // US-R3 · Sub-ola 2.5d — vmx.kit.* neutros (producción).
+  ...KIT_MAP,
 };
 
 /* ------------------------------------------------------------------ *
