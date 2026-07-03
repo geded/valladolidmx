@@ -2527,6 +2527,14 @@ function BlockOverlay({
       >
         {contract?.display_name ?? node.type}
       </span>
+      {commentCount > 0 ? (
+        <span
+          className="pointer-events-none absolute left-3 top-10 z-30 inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg"
+          title={`${commentCount} comentario(s) abierto(s)`}
+        >
+          💬 {commentCount}
+        </span>
+      ) : null}
       {selected ? (
         <div className="pointer-events-auto absolute right-3 top-3 z-30 flex gap-1 rounded-full bg-background/95 p-1 shadow-lg ring-1 ring-border">
           {sortable ? (
