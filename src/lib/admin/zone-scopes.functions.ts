@@ -65,7 +65,7 @@ export const assignUserZoneScope = createServerFn({ method: "POST" })
         _scope_type: data.scopeType,
         _scope_id: data.scopeId,
         _role: data.role,
-        _notes: data.notes ?? null,
+        _notes: data.notes ?? undefined,
       },
     );
     if (error) throw new Error(error.message);
