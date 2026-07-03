@@ -22,6 +22,7 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import type { Json } from "@/integrations/supabase/types";
 
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 
@@ -199,7 +200,7 @@ export const getAluxTravelerContext = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => EmptyInput.parse(d ?? {}))
   .handler(async ({ context }) => {
     const ctx = await fetchTravelerContext(context.supabase);
-    return (ctx ?? null) as unknown;
+    return (ctx ?? null) as Json | null;
   });
 
 /**
