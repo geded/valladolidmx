@@ -305,7 +305,7 @@ function ProfessionalStudio() {
     setDirty(false);
     const revs = await listRevs({ data: { id } });
     setRevisions(revs);
-    setStatus("Composición cargada.");
+    setStatus("Página cargada.");
   };
 
   const onCreate = () => setCreateOpen(true);
@@ -458,7 +458,7 @@ function ProfessionalStudio() {
           const comps = await list();
           setCompositions(comps);
           await openComposition(active.id);
-          setStatus("Composición despublicada.");
+          setStatus("Página despublicada.");
         } catch (e) {
           setStatus(`Error al despublicar: ${(e as Error).message}`);
         }
@@ -629,7 +629,7 @@ function ProfessionalStudio() {
               >
                 {active.status === "published"
                   ? `Publicada · ${active.page_type} — sirviéndose al público.`
-                  : "Internal Draft — esta composición no se sirve al público."}
+                  : "Borrador — esta página aún no se publica al público."}
               </div>
               <div className="flex flex-col gap-3">
                 <CompositionRenderer
@@ -780,23 +780,23 @@ function CompositionsList({
         </div>
       ) : null}
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Composiciones</h2>
+        <h2 className="text-lg font-semibold">Páginas</h2>
         <button
           type="button"
           onClick={onCreate}
           className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-95"
         >
-          Nueva composición
+          Nueva página
         </button>
       </div>
       {compositions.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          Aún no hay composiciones. Crea la primera para empezar.
+          Aún no hay páginas. Crea la primera para empezar.
         </p>
       ) : (
         <>
         <p className="mb-2 text-xs text-muted-foreground">
-          Toca una composición para abrirla y editarla.
+          Toca una página para abrirla y editarla.
         </p>
         <ul className="grid gap-2">
           {compositions.map((c) => (
@@ -809,7 +809,7 @@ function CompositionsList({
                 <div>
                   <div className="font-semibold">{c.title}</div>
                   <div className="text-xs text-muted-foreground">
-                    {c.slug} · {c.page_type} · {c.status}
+                    /{c.slug} · {c.status === "published" ? "publicada" : "borrador"}
                   </div>
                 </div>
                 <span className="text-[10px] text-muted-foreground">
@@ -887,10 +887,10 @@ function CreateCompositionModal({
   };
 
   return (
-    <ModalShell title="Nueva composición" onClose={onClose}>
+    <ModalShell title="Nueva página" onClose={onClose}>
       <form onSubmit={submit} className="grid gap-3">
         <label className="grid gap-1 text-xs">
-          <span className="font-semibold">Slug interno (único)</span>
+          <span className="font-semibold">Dirección web (única)</span>
           <input
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
@@ -900,7 +900,7 @@ function CreateCompositionModal({
           />
         </label>
         <label className="grid gap-1 text-xs">
-          <span className="font-semibold">Título editorial</span>
+          <span className="font-semibold">Título</span>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}

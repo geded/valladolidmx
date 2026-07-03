@@ -544,12 +544,12 @@ function PagesPicker({
         .replace(/[^a-z0-9-]+/g, "-")
         .replace(/^-+|-+$/g, "");
       if (!cleanSlug) {
-        setCreateError("El identificador (slug) no puede quedar vacío.");
+        setCreateError("La dirección web no puede quedar vacía.");
         setCreating(false);
         return;
       }
       if (allPages.some((p) => p.slug === cleanSlug)) {
-        setCreateError(`Ya existe una página con el identificador "${cleanSlug}".`);
+        setCreateError(`Ya existe una página con la dirección "${cleanSlug}".`);
         setCreating(false);
         return;
       }
@@ -761,7 +761,7 @@ function CreatePageModal({
             />
           </label>
           <label className="block text-xs font-medium">
-            Identificador (URL)
+            Dirección web
             <div className="mt-1 flex items-center gap-1">
               <span className="rounded-md bg-muted px-2 py-1.5 text-xs text-muted-foreground">/p/</span>
               <input
@@ -777,11 +777,11 @@ function CreatePageModal({
               />
             </div>
             <span className="mt-1 block text-[10px] text-muted-foreground">
-              Solo minúsculas, números y guiones. Ejemplo: <code>videomapping-centro</code>.
+              Se usa en el enlace público. Solo minúsculas, números y guiones. Ejemplo: <code>videomapping-centro</code>.
             </span>
           </label>
           <label className="block text-xs font-medium">
-            Descripción interna (opcional)
+            Descripción (opcional)
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
