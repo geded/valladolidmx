@@ -518,7 +518,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
               if (rows.some((r) => r.slug === clean)) {
                 throw new Error(`Ya existe una página con la dirección "${clean}".`);
               }
-              await create({
+              const created = await create({
                 data: {
                   slug: clean,
                   title: form.title.trim() || clean,
@@ -526,7 +526,25 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
                   page_type: form.kind,
                 },
               });
-              toast.success("Página creada.");
+              // Sub-ola 2.6b · Si el kind tiene semilla oficial en el
+              // Surface Kit (Event / Experience / Hotel / Restaurant /
+              // Destination / Region), sembramos el borrador inicial
+              // usando `getKitSeed(kind).build()`. Persistimos con el
+              // flujo existente (`saveCompositionDraft`) — sin tocar
+              // Business / Product ni renderers.
+              const seed = getKitSeed(form.kind);
+              if (seed && created?.id) {
+                try {
+                  await saveDraft({ data: { id: created.id, tree: seed.build() } });
+                  toast.success("Página creada con semilla del Kit.");
+                } catch (seedErr) {
+                  // No bloqueamos la creación por un fallo de semilla.
+                  console.warn("[PagesPanel] seed inicial falló:", seedErr);
+                  toast.success("Página creada (semilla vacía).");
+                }
+              } else {
+                toast.success("Página creada.");
+              }
               setShowCreate(false);
               await reload();
               const def = getPageKindDefinition(form.kind);
