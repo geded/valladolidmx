@@ -28,6 +28,7 @@ import {
   deleteRole,
 } from "@/lib/admin/roles-catalog.functions";
 import { toast } from "sonner";
+import { ZoneScopesDialog } from "@/components/admin/ZoneScopesDialog";
 
 interface AdminUserRow {
   user_id: string;
@@ -325,6 +326,7 @@ function UserRow({
   const [pending, setPending] = useState<AppRole | "">("");
   const [pendingCustom, setPendingCustom] = useState<string>("");
   const [editOpen, setEditOpen] = useState(false);
+  const [zonesOpen, setZonesOpen] = useState(false);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin", "users-roles"] });
 
@@ -377,6 +379,20 @@ function UserRow({
           Editar
         </button>
         {editOpen ? <EditUserDialog row={row} onClose={() => setEditOpen(false)} /> : null}
+        <button
+          type="button"
+          onClick={() => setZonesOpen(true)}
+          className="mt-2 ml-1 rounded-md border border-border px-2 py-0.5 text-[11px] hover:bg-muted"
+        >
+          Zonas
+        </button>
+        {zonesOpen ? (
+          <ZoneScopesDialog
+            userId={row.user_id}
+            userLabel={row.display_name ?? row.email ?? row.user_id}
+            onClose={() => setZonesOpen(false)}
+          />
+        ) : null}
       </td>
       <td className="px-4 py-3">
         <div className="flex flex-wrap gap-1.5">

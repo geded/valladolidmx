@@ -1,81 +1,62 @@
-# Auto-traducción al guardar + idiomas configurables
+## Estado del roadmap
 
-## Contexto
+Cerradas: 15.10.4b (Fases 1–4), 15.10.4c, 15.10.4d (US-01…US-16), 15.10.5a/b/c/d, 15.10.6 (PWA).
 
-Hoy los textos del constructor viven como strings sueltos y algunos locales estáticos (`de/fr/it/pt`) traen el nombre de la marca hardcodeado. Además la lista de idiomas está fija en `src/config/languages.ts` — no es administrable.
+**Siguiente etapa oficial:** `15.10.7 — Empresas y productos: permisos por zona · onboarding multiempresa` (Plan 15.10 v1.0 §8, sólo la dimensión funcional; la administrativa la absorbió 15.10.4R).
 
-## Solución en dos capas
+## Alcance funcional pendiente
 
-### 1) Fuente única de idiomas activos (administrable)
+Dos capacidades, ambas empresariales, ambas reutilizan infraestructura existente (Workspace Engine, `user_roles`, `businesses`, `business_users`, `zones/regions`).
 
-Nueva tabla `platform_locales` en la BD:
+### A. Permisos por zona
+Hoy un `admin` regional puede ver todo. Faltan permisos acotados a una o varias zonas geográficas para roles editoriales/operativos que sólo deben gestionar contenido/empresas de su zona.
 
-```text
-code (pk)   | label        | native_label | flag | is_default | is_active | sort_order
-"es"        | "Español"    | "Español"    | 🇲🇽  | true       | true      | 0
-"en"        | "English"    | "English"    | 🇺🇸  | false      | true      | 1
-...
-```
+- Nueva tabla `user_zone_scopes(user_id, zone_id, role, created_by, created_at)` + GRANTs + RLS.
+- `has_zone_scope(_user_id, _zone_id, _role)` `SECURITY DEFINER`.
+- Extender helpers `eb_can_edit_scope`, `business_can_manage`, `cms_can_edit` para respetar zona cuando el rol lo requiera.
+- Filtros por zona en listados CMS/Portal/Admin (composición sobre queries existentes, sin duplicar UI).
+- UI mínima en `/admin/sistema/usuarios`: asignar/revocar zonas por usuario (drawer del Workspace Inspector, cero nuevos layouts).
 
-- Server fn público `listActiveLocales()` — lo consumen constructor, traductor, `LanguageSwitcher` e `I18nProvider`.
-- Server fn admin `upsertLocale` / `deactivateLocale` (super_admin/admin).
-- UI mínima en `/cms/sistema/idiomas` para activar/desactivar y marcar el default.
-- `src/config/languages.ts` queda como fallback SSR y se marca deprecated.
+### B. Onboarding multiempresa
+Un empresario con varias empresas hoy sólo opera una por sesión. Faltan:
 
-### 2) Auto-traducción al guardar en el Experience Builder
+- Selector "Empresa activa" en la Topbar del Workspace Portal (reutiliza `WorkspaceContextSwitcher` existente).
+- Persistir `active_business_id` en `user_preferences` o `localStorage` con fallback.
+- Onboarding contextual (reutiliza `OnboardingTour` de US-16) para el flujo "Agregar otra empresa" desde `/portal`.
+- RPC `portal_register_additional_business` reutilizando el registro existente + auto-vínculo `business_users(role='owner')`.
+- Invariante: todas las server fn del Portal ya reciben `business_id`; sólo el selector cambia el contexto activo.
 
-- Idioma base = `is_default` (hoy `es`). El constructor **sólo edita en el idioma base** (se elimina cualquier selector por idioma en el `AutoInspector`).
-- Schema de campos de texto en `page_compositions.blocks` migra a:
+## No incluye (fuera de 15.10.7)
 
-```json
-{ "base": "es", "values": { "es": "...", "en": "...", "de": "..." }, "hashes": { "es": "..." } }
-```
+- Smart Blocks (15.10.8), Responsive Builder avanzado (15.10.9), Recomendaciones Alux (15.10.10).
+- Nuevos engines, layouts, sidebars o registries (Infrastructure Freeze).
+- Cambios en BEA, Auth, Design System o Workspace Engine.
 
-- Al guardar la composición, un server fn `translatePageComposition` (auth):
-  1. Carga los idiomas activos vía `listActiveLocales()`.
-  2. Para cada campo cuyo `hashes[base]` cambió, pide traducción por lotes a **Lovable AI Gateway** (`google/gemini-3-flash-preview`) devolviendo JSON con `{ locale: { fieldPath: "texto" } }`.
-  3. Rellena `values` para cada idioma activo excepto el base.
-  4. Si falla la traducción, guarda igual y muestra toast "Traducciones pendientes". Nunca bloquea el guardado.
-- Renderer público: helper `resolveText(field, activeLocale)` con fallback `values[activeLocale] ?? values[base]`.
-- **Formato consistente en todos los idiomas**: el prompt instruye preservar mayúsculas iniciales, puntuación final, saltos de línea, emojis, y nombres propios (`Valladolid`, `Oriente Maya`, `Yucatán`, `Alux`) sin traducir. Longitud limitada al ±20% del original para no romper layouts.
+## Entregables
 
-### Auditoría de locales estáticos
+1. `15.10.7-BLUEPRINT-v1.0.md` — alcance, invariantes, matriz de permisos, delta vs Baseline v1.0.
+2. Sprint plan en 2 sub-adendas:
+   - **15.10.7.1** · Permisos por zona (tabla + helpers + filtros + UI de asignación).
+   - **15.10.7.2** · Onboarding multiempresa (selector + persistencia + registro adicional).
+3. Migración SQL con GRANTs y RLS obligatorios.
+4. Sub-adendas se implementan **una historia a la vez** (regla Product Construction Mode) con Completion Report por cada una.
 
-Corregir en `src/i18n/locales/{de,fr,it,pt}.json` cualquier valor hardcodeado con "Oriente Maya · Yucatán" u otras cadenas ES que deberían estar traducidas (hero eyebrow ya, más los que aparezcan al revisar).
+## Detalles técnicos
 
-## Migración de datos
+- Rutas nuevas: cero. Todo se compone sobre `/admin/sistema/usuarios`, `/portal/*`, Topbar del Workspace.
+- Server fns nuevas: `assignUserZoneScope`, `revokeUserZoneScope`, `listUserZoneScopes`, `setActiveBusiness`, `registerAdditionalBusiness` — todas `createServerFn` + `requireSupabaseAuth` en `src/lib/admin/*.functions.ts` y `src/lib/portal/*.functions.ts`.
+- RPC nuevas: `has_zone_scope`, `assign_zone_scope`, `revoke_zone_scope`, `portal_register_additional_business` — `SECURITY DEFINER`, `search_path=public`.
+- Tabla nueva: `user_zone_scopes` con `UNIQUE(user_id, zone_id, role)`.
+- RLS: sólo `super_admin`/`admin` pueden asignar/revocar; el usuario ve sus propios scopes.
+- Reutiliza: `has_role`, `user_roles`, `business_users`, `WorkspaceInspector`, `WorkspaceContextSwitcher`, `OnboardingTour`.
 
-Migración idempotente que recorre `page_compositions.blocks` y envuelve strings en `{ base, values: { <base>: <string> }, hashes: { <base>: sha1 } }`. Los renderers ya toleran ambos formatos durante la transición.
+## Validación
 
-## Archivos afectados
+- `tsgo --noEmit` verde.
+- Migraciones con GRANTs por tabla nueva.
+- Prueba funcional con cuenta Fundador: crear scope zonal a un editor → editor sólo ve empresas de su zona → registrar segunda empresa desde `/portal` → cambiar contexto → operar sin recargar.
+- Completion Report por sub-adenda + `15.10.7-CLOSURE-REPORT`.
 
-- **Nuevo**: tabla `platform_locales` (migración + GRANTs + RLS pública SELECT, escritura sólo admin).
-- **Nuevo**: `src/lib/i18n/locales.functions.ts` (list/upsert/deactivate).
-- **Nuevo**: `src/lib/cms/translate-composition.functions.ts` (Lovable AI Gateway).
-- **Nuevo**: ruta `/cms/sistema/idiomas` (admin CRUD).
-- **Modificado**: `src/lib/experience-builder/schema.ts` — tipo `LocalizedText`.
-- **Modificado**: `src/components/experience-builder/AutoInspector.tsx` — quitar selector de idioma.
-- **Modificado**: `src/lib/experience-builder/composition-renderer.tsx` — `resolveText`.
-- **Modificado**: `src/lib/cms/eb-studio.functions.ts` / save — invocar traductor tras guardar.
-- **Modificado**: `src/i18n/context.tsx` + `LanguageSwitcher.tsx` — leer idiomas activos.
-- **Modificado**: `src/i18n/locales/{de,fr,it,pt}.json` — limpieza.
+## Aprobación solicitada
 
-## Orden de entrega (una historia a la vez)
-
-1. **H1** Tabla `platform_locales` + `listActiveLocales()` + fallback → consumen `I18nProvider` y `LanguageSwitcher`.
-2. **H2** UI admin `/cms/sistema/idiomas`.
-3. **H3** Schema `LocalizedText` + migración de datos + `resolveText` en renderer (retrocompatible).
-4. **H4** Quitar selector de idioma del `AutoInspector`; forzar edición en idioma base.
-5. **H5** Server fn `translatePageComposition` + integración en save.
-6. **H6** Auditoría y limpieza de `de/fr/it/pt.json`.
-
-Cada historia entrega: implementación + smoke visible + rollback + reporte.
-
-## Riesgos
-
-- Costo/latencia por save → mitigado con hash por campo (sólo traduce cambios).
-- Traducciones cortas pueden sonar raras → se puede añadir override manual por idioma como mejora futura (no en este alcance).
-
-## Aprobación
-
-¿Arranco por **H1** (tabla + fn + consumo en I18nProvider y switcher)? Confirma y avanzo.
+¿Autorizas arrancar por **15.10.7.1 · Permisos por zona** (empezando por la migración SQL + RPCs) y dejar 15.10.7.2 para después de su cierre?

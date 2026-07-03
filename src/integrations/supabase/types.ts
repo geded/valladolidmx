@@ -4483,6 +4483,42 @@ export type Database = {
           },
         ]
       }
+      user_zone_scopes: {
+        Row: {
+          created_at: string
+          granted_by: string | null
+          id: string
+          notes: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          scope_id: string
+          scope_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          notes?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          scope_id: string
+          scope_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          notes?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          scope_id?: string
+          scope_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -4686,6 +4722,16 @@ export type Database = {
       archive_business_promotion: {
         Args: { _promotion_id: string }
         Returns: undefined
+      }
+      assign_zone_scope: {
+        Args: {
+          _notes?: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _scope_id: string
+          _scope_type: string
+          _user_id: string
+        }
+        Returns: string
       }
       cancel_business_ownership_transfer: {
         Args: { _transfer_id: string }
@@ -5197,6 +5243,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_zone_scope: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _scope_id: string
+          _scope_type: string
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_concierge: { Args: { _user_id: string }; Returns: boolean }
       is_concierge_assigned: {
@@ -5356,6 +5411,7 @@ export type Database = {
         Args: { _notes?: string; _promotion_id: string }
         Returns: undefined
       }
+      revoke_zone_scope: { Args: { _scope_id: string }; Returns: boolean }
       search_marketplace: {
         Args: {
           p_category_slug?: string
@@ -5730,6 +5786,18 @@ export type Database = {
           _title?: string
         }
         Returns: undefined
+      }
+      user_zone_scopes_for: {
+        Args: { _user_id: string }
+        Returns: {
+          created_at: string
+          granted_by: string
+          id: string
+          notes: string
+          role: Database["public"]["Enums"]["app_role"]
+          scope_id: string
+          scope_type: string
+        }[]
       }
       withdraw_business_review: {
         Args: { _business_id: string; _notes?: string }
