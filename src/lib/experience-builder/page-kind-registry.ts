@@ -54,6 +54,29 @@ export interface PageKindDefinition {
    * no cambia.
    */
   readonly allowedBlockCategories: readonly string[] | null;
+  /**
+   * Defaults SEO/sitemap por kind (US-R3 · R3.15, R3.19, R3.26). Los
+   * editores pueden sobreescribir por composición desde el Studio.
+   */
+  readonly defaults?: {
+    /** JSON-LD @type por defecto (WebPage, Product, Place, Event…). */
+    readonly jsonLdType?: string;
+    /** `changefreq` sugerida para el sitemap. */
+    readonly sitemapChangefreq?:
+      | "always"
+      | "hourly"
+      | "daily"
+      | "weekly"
+      | "monthly"
+      | "yearly"
+      | "never";
+    /** Prioridad 0..1 sugerida para el sitemap. */
+    readonly sitemapPriority?: number;
+    /** `Cache-Control` sugerido para SSR. */
+    readonly cacheControl?: string;
+    /** Ruta padre para redirect por defecto al despublicar (R3.22). */
+    readonly unpublishFallbackPath?: string;
+  };
 }
 
 /**
@@ -292,4 +315,86 @@ export function canEditPageKind(kind: PageKind | string, roles: readonly string[
   const def = getPageKindDefinition(kind);
   if (!def) return false;
   return def.requiredRoles.some((r) => roles.includes(r));
+}
+
+/**
+ * Defaults SEO/sitemap/cache por kind (US-R3 · R3.15, R3.19, R3.22, R3.26).
+ *
+ * Devuelve la combinación de `def.defaults` (si el kind los declaró
+ * explícitamente) con un fallback conservador coherente con la
+ * naturaleza del kind (singleton → mayor prioridad, ficha → Place/Event
+ * schema). Nunca lanza: para kinds desconocidos devuelve defaults
+ * genéricos.
+ */
+export interface ResolvedKindDefaults {
+  readonly jsonLdType: string;
+  readonly sitemapChangefreq:
+    | "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
+  readonly sitemapPriority: number;
+  readonly cacheControl: string;
+  readonly unpublishFallbackPath: string;
+}
+
+const FALLBACK_BY_KIND: Partial<Record<PageKind, ResolvedKindDefaults>> = {
+  home:         { jsonLdType: "WebSite",  sitemapChangefreq: "daily",   sitemapPriority: 1.0, cacheControl: "public, max-age=60, s-maxage=120",  unpublishFallbackPath: "/" },
+  marketplace:  { jsonLdType: "WebPage",  sitemapChangefreq: "hourly",  sitemapPriority: 0.9, cacheControl: "public, max-age=60, s-maxage=120",  unpublishFallbackPath: "/marketplace" },
+  destination:  { jsonLdType: "Place",    sitemapChangefreq: "weekly",  sitemapPriority: 0.8, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/oriente-maya" },
+  experience:   { jsonLdType: "TouristAttraction", sitemapChangefreq: "weekly",  sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/experiencias" },
+  hotel:        { jsonLdType: "Hotel",    sitemapChangefreq: "weekly",  sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/hoteles" },
+  restaurant:   { jsonLdType: "Restaurant", sitemapChangefreq: "weekly", sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/restaurantes" },
+  event:        { jsonLdType: "Event",    sitemapChangefreq: "daily",   sitemapPriority: 0.7, cacheControl: "public, max-age=120, s-maxage=300", unpublishFallbackPath: "/eventos" },
+  business:     { jsonLdType: "LocalBusiness", sitemapChangefreq: "weekly", sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/empresas" },
+  product:      { jsonLdType: "Product",  sitemapChangefreq: "weekly",  sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/marketplace" },
+  landing:      { jsonLdType: "WebPage",  sitemapChangefreq: "monthly", sitemapPriority: 0.6, cacheControl: "public, max-age=300, s-maxage=900", unpublishFallbackPath: "/" },
+  campaign:     { jsonLdType: "WebPage",  sitemapChangefreq: "weekly",  sitemapPriority: 0.6, cacheControl: "public, max-age=300, s-maxage=900", unpublishFallbackPath: "/" },
+  promo:        { jsonLdType: "WebPage",  sitemapChangefreq: "weekly",  sitemapPriority: 0.6, cacheControl: "public, max-age=300, s-maxage=900", unpublishFallbackPath: "/" },
+  microsite:    { jsonLdType: "WebPage",  sitemapChangefreq: "monthly", sitemapPriority: 0.5, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
+  institutional:{ jsonLdType: "WebPage",  sitemapChangefreq: "yearly",  sitemapPriority: 0.3, cacheControl: "public, max-age=3600, s-maxage=86400", unpublishFallbackPath: "/" },
+  route:        { jsonLdType: "TouristTrip", sitemapChangefreq: "monthly", sitemapPriority: 0.6, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
+  alux:         { jsonLdType: "WebPage",  sitemapChangefreq: "monthly", sitemapPriority: 0.5, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
+  trip_builder: { jsonLdType: "WebPage",  sitemapChangefreq: "monthly", sitemapPriority: 0.5, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
+  wedding:      { jsonLdType: "WebPage",  sitemapChangefreq: "monthly", sitemapPriority: 0.5, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
+  ai_generated: { jsonLdType: "WebPage",  sitemapChangefreq: "weekly",  sitemapPriority: 0.4, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
+  custom:       { jsonLdType: "WebPage",  sitemapChangefreq: "monthly", sitemapPriority: 0.5, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
+  site_section: { jsonLdType: "WebPage",  sitemapChangefreq: "yearly",  sitemapPriority: 0.1, cacheControl: "public, max-age=3600, s-maxage=86400", unpublishFallbackPath: "/" },
+};
+
+const GENERIC_DEFAULTS: ResolvedKindDefaults = {
+  jsonLdType: "WebPage",
+  sitemapChangefreq: "monthly",
+  sitemapPriority: 0.5,
+  cacheControl: "public, max-age=600, s-maxage=1800",
+  unpublishFallbackPath: "/",
+};
+
+export function resolvePageKindDefaults(kind: PageKind | string): ResolvedKindDefaults {
+  const def = getPageKindDefinition(kind);
+  const fallback: ResolvedKindDefaults =
+    FALLBACK_BY_KIND[kind as PageKind] ?? GENERIC_DEFAULTS;
+  const declared = def?.defaults;
+  if (!declared) return fallback;
+  return {
+    jsonLdType: declared.jsonLdType ?? fallback.jsonLdType,
+    sitemapChangefreq: declared.sitemapChangefreq ?? fallback.sitemapChangefreq,
+    sitemapPriority: declared.sitemapPriority ?? fallback.sitemapPriority,
+    cacheControl: declared.cacheControl ?? fallback.cacheControl,
+    unpublishFallbackPath: declared.unpublishFallbackPath ?? fallback.unpublishFallbackPath,
+  };
+}
+
+/**
+ * R3.43 · Toda superficie pública presente o futura debe registrarse
+ * en el Page Kind Registry. Este helper valida que un `kind` propuesto
+ * exista antes de crear una composición; los flujos de "Nueva página"
+ * ya lo consultan indirectamente vía `listPageKinds()`.
+ */
+export function assertRegisteredKind(kind: PageKind | string): PageKindDefinition {
+  const def = getPageKindDefinition(kind);
+  if (!def) {
+    throw new Error(
+      `El kind "${kind}" no está registrado en el Page Kind Registry. ` +
+        `US-R3 R3.43: toda superficie pública debe registrarse aquí antes de crearse.`,
+    );
+  }
+  return def;
 }

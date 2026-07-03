@@ -3210,6 +3210,7 @@ export type Database = {
       page_compositions: {
         Row: {
           active_revision_id: string | null
+          canonical_override: string | null
           created_at: string
           created_by: string | null
           current_draft: Json
@@ -3219,11 +3220,15 @@ export type Database = {
           is_template: boolean
           kind: Database["public"]["Enums"]["eb_page_kind"]
           page_type: string
+          previous_slug: string | null
           published_at: string | null
           published_by: string | null
+          robots_directive: string
           scheduled_publish_at: string | null
           scheduled_publish_by: string | null
           scheduled_publish_notes: string | null
+          sitemap_changefreq: string | null
+          sitemap_priority: number | null
           slug: string
           status: string
           template_of_kind: Database["public"]["Enums"]["eb_page_kind"] | null
@@ -3238,6 +3243,7 @@ export type Database = {
         }
         Insert: {
           active_revision_id?: string | null
+          canonical_override?: string | null
           created_at?: string
           created_by?: string | null
           current_draft?: Json
@@ -3247,11 +3253,15 @@ export type Database = {
           is_template?: boolean
           kind?: Database["public"]["Enums"]["eb_page_kind"]
           page_type?: string
+          previous_slug?: string | null
           published_at?: string | null
           published_by?: string | null
+          robots_directive?: string
           scheduled_publish_at?: string | null
           scheduled_publish_by?: string | null
           scheduled_publish_notes?: string | null
+          sitemap_changefreq?: string | null
+          sitemap_priority?: number | null
           slug: string
           status?: string
           template_of_kind?: Database["public"]["Enums"]["eb_page_kind"] | null
@@ -3266,6 +3276,7 @@ export type Database = {
         }
         Update: {
           active_revision_id?: string | null
+          canonical_override?: string | null
           created_at?: string
           created_by?: string | null
           current_draft?: Json
@@ -3275,11 +3286,15 @@ export type Database = {
           is_template?: boolean
           kind?: Database["public"]["Enums"]["eb_page_kind"]
           page_type?: string
+          previous_slug?: string | null
           published_at?: string | null
           published_by?: string | null
+          robots_directive?: string
           scheduled_publish_at?: string | null
           scheduled_publish_by?: string | null
           scheduled_publish_notes?: string | null
+          sitemap_changefreq?: string | null
+          sitemap_priority?: number | null
           slug?: string
           status?: string
           template_of_kind?: Database["public"]["Enums"]["eb_page_kind"] | null
@@ -3298,6 +3313,56 @@ export type Database = {
             columns: ["active_revision_id"]
             isOneToOne: false
             referencedRelation: "page_revisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      page_redirects: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          from_path: string
+          http_status: number
+          id: string
+          page_composition_id: string | null
+          reason: string | null
+          to_path: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          from_path: string
+          http_status?: number
+          id?: string
+          page_composition_id?: string | null
+          reason?: string | null
+          to_path: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          from_path?: string
+          http_status?: number
+          id?: string
+          page_composition_id?: string | null
+          reason?: string | null
+          to_path?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_redirects_page_composition_id_fkey"
+            columns: ["page_composition_id"]
+            isOneToOne: false
+            referencedRelation: "page_compositions"
             referencedColumns: ["id"]
           },
         ]
@@ -5306,6 +5371,16 @@ export type Database = {
       eb_rename_composition: {
         Args: { _id: string; _new_title: string }
         Returns: undefined
+      }
+      eb_resolve_public_route: {
+        Args: { _path: string }
+        Returns: {
+          composition_id: string
+          http_status: number
+          is_redirect: boolean
+          resolved_kind: string
+          target_path: string
+        }[]
       }
       eb_restore_revision: {
         Args: { _id: string; _revision_id: string }
