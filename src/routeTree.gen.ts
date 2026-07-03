@@ -15,6 +15,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as QueHacerRouteImport } from './routes/que-hacer'
 import { Route as PromocionesRouteImport } from './routes/promociones'
 import { Route as OfflineRouteImport } from './routes/offline'
+import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as HotelesRouteImport } from './routes/hoteles'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
 import { Route as EventosRouteImport } from './routes/eventos'
@@ -148,6 +149,11 @@ const PromocionesRoute = PromocionesRouteImport.update({
 const OfflineRoute = OfflineRouteImport.update({
   id: '/offline',
   path: '/offline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapaRoute = MapaRouteImport.update({
+  id: '/mapa',
+  path: '/mapa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HotelesRoute = HotelesRouteImport.update({
@@ -749,6 +755,7 @@ export interface FileRoutesByFullPath {
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/mapa': typeof MapaRoute
   '/offline': typeof OfflineRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
@@ -860,6 +867,7 @@ export interface FileRoutesByTo {
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/mapa': typeof MapaRoute
   '/offline': typeof OfflineRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
@@ -967,6 +975,7 @@ export interface FileRoutesById {
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/mapa': typeof MapaRoute
   '/offline': typeof OfflineRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
@@ -1080,6 +1089,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/mapa'
     | '/offline'
     | '/promociones'
     | '/que-hacer'
@@ -1191,6 +1201,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/mapa'
     | '/offline'
     | '/promociones'
     | '/que-hacer'
@@ -1297,6 +1308,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/mapa'
     | '/offline'
     | '/promociones'
     | '/que-hacer'
@@ -1410,6 +1422,7 @@ export interface RootRouteChildren {
   EventosRoute: typeof EventosRouteWithChildren
   ExperienciasRoute: typeof ExperienciasRoute
   HotelesRoute: typeof HotelesRoute
+  MapaRoute: typeof MapaRoute
   OfflineRoute: typeof OfflineRoute
   PromocionesRoute: typeof PromocionesRoute
   QueHacerRoute: typeof QueHacerRoute
@@ -1478,6 +1491,13 @@ declare module '@tanstack/react-router' {
       path: '/offline'
       fullPath: '/offline'
       preLoaderRoute: typeof OfflineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mapa': {
+      id: '/mapa'
+      path: '/mapa'
+      fullPath: '/mapa'
+      preLoaderRoute: typeof MapaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hoteles': {
@@ -2525,6 +2545,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventosRoute: EventosRouteWithChildren,
   ExperienciasRoute: ExperienciasRoute,
   HotelesRoute: HotelesRoute,
+  MapaRoute: MapaRoute,
   OfflineRoute: OfflineRoute,
   PromocionesRoute: PromocionesRoute,
   QueHacerRoute: QueHacerRoute,
