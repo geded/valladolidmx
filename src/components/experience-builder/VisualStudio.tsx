@@ -1852,6 +1852,17 @@ function PageVisualEditor({
                 onChange={(next) => updateSelectedConfig(next)}
               />
             ) : null}
+
+            {selectedNode && page ? (
+              <BlockCommentsPanel
+                compositionId={page.id}
+                blockId={selectedNode.id}
+                blockLabel={selectedContract?.display_name ?? selectedNode.type}
+                currentUserId={user?.id ?? null}
+                isAdmin={isAdmin}
+                onCountsChange={setCommentCounts}
+              />
+            ) : null}
           </aside>
         ) : null}
 
