@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { supabase } from "@/integrations/supabase/client";
 import { SITE } from "@/config/site";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({
-    meta: [
-      { title: `Restablecer contraseña · ${SITE.name}` },
-      { name: "description", content: "Define una nueva contraseña para tu cuenta." },
-      { name: "robots", content: "noindex,nofollow" },
-    ],
-  }),
+  head: () =>
+    buildPublicHead({
+      title: `Restablecer contraseña · ${SITE.name}`,
+      description: "Define una nueva contraseña para tu cuenta.",
+      path: "/reset-password",
+      noindex: true,
+    }),
   component: ResetPasswordRoute,
 });
 
@@ -48,7 +49,7 @@ function ResetPasswordRoute() {
   }
 
   return (
-    <PageShell
+    <PublicShell
       eyebrow="Cuenta"
       title="Restablecer contraseña"
       description="Elige una contraseña nueva para continuar."
@@ -100,6 +101,6 @@ function ResetPasswordRoute() {
           </form>
         )}
       </div>
-    </PageShell>
+    </PublicShell>
   );
 }
