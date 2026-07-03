@@ -15,7 +15,6 @@
  * product/event). Alux nunca modifica el plan por su cuenta.
  */
 import { Sparkles, ShieldCheck, Info } from "lucide-react";
-import ReactMarkdown from "react-markdown";
 import type {
   AluxTravelerSource,
   AluxTravelerSuggestion,
@@ -71,8 +70,8 @@ export function AluxSuggestionCard({
       </header>
 
       {/* 1. Recomendación */}
-      <div className="prose prose-sm max-w-none text-sm text-foreground [&_h2]:mt-3 [&_h2]:text-sm [&_h2]:font-semibold [&_ul]:my-2 [&_p]:my-1.5">
-        <ReactMarkdown>{suggestion.text || "(sin contenido)"}</ReactMarkdown>
+      <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+        {suggestion.text || "(sin contenido)"}
       </div>
 
       {/* 2. Rationale */}
@@ -81,9 +80,9 @@ export function AluxSuggestionCard({
           <p className="mb-1 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
             <Info className="size-3" aria-hidden /> Por qué te lo recomiendo
           </p>
-          <div className="prose prose-sm max-w-none text-xs text-muted-foreground [&_p]:my-1">
-            <ReactMarkdown>{suggestion.rationale}</ReactMarkdown>
-          </div>
+          <p className="whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">
+            {suggestion.rationale}
+          </p>
         </div>
       ) : null}
 
