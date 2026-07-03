@@ -90,10 +90,11 @@ const HOME_FALLBACK_SECTIONS: readonly DiscoverySectionKind[] = [
   "hero",
   "destinos",
   "categorias",
+  "eventos",
+  "promociones",
   "rutas",
   "consejo-alux",
   "arma-tu-viaje",
-  "en-vivo",
   "empresas",
   "resenas",
 ];
