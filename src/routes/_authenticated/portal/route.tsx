@@ -144,6 +144,10 @@ function PortalBusinessSwitcher({
   activeBusiness: PortalBusinessSummary | null;
   onChange: (id: string) => void;
 }) {
+  const { roles } = useAuth();
+  const canCreateBusiness = roles.some((r) =>
+    r === "admin" || r === "super_admin" || r === "editor",
+  );
   return (
     <div className="mb-6 flex flex-col gap-2 rounded-lg border border-border bg-card/60 p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-col gap-1">
@@ -166,14 +170,24 @@ function PortalBusinessSwitcher({
           ))}
         </select>
       </div>
-      {activeBusiness && (
-        <p className="text-[11px] text-muted-foreground sm:text-right">
-          Tu rol:{" "}
-          <span className="font-semibold">{formatRole(activeBusiness.role)}</span>
-          {" · "}Estado:{" "}
-          <span className="font-semibold">{activeBusiness.status}</span>
-        </p>
-      )}
+      <div className="flex flex-col gap-2 sm:items-end">
+        {activeBusiness && (
+          <p className="text-[11px] text-muted-foreground sm:text-right">
+            Tu rol:{" "}
+            <span className="font-semibold">{formatRole(activeBusiness.role)}</span>
+            {" · "}Estado:{" "}
+            <span className="font-semibold">{activeBusiness.status}</span>
+          </p>
+        )}
+        {canCreateBusiness ? (
+          <Link
+            to="/cms/empresas/nueva"
+            className="inline-flex items-center gap-1 rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20"
+          >
+            + Registrar nueva empresa
+          </Link>
+        ) : null}
+      </div>
     </div>
   );
 }
