@@ -1651,6 +1651,17 @@ function PageVisualEditor({
         ) : null}
       </div>
       <OnboardingTour open={showTour} onClose={() => setShowTour(false)} />
+      {publishDiff.open ? (
+        <PublishDiffModal
+          loading={publishDiff.loading}
+          changes={publishDiff.changes}
+          error={publishDiff.error}
+          publishing={publishing}
+          publicPath={pageDef.publicPath}
+          onCancel={() => setPublishDiff((s) => ({ ...s, open: false }))}
+          onConfirm={() => void confirmPublishFromDialog()}
+        />
+      ) : null}
     </div>
   );
 }
