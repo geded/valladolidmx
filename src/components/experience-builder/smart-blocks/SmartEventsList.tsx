@@ -1,4 +1,5 @@
 import { SmartEmpty } from "./SmartCard";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 
 export interface SmartEventItem {
   id?: string;
@@ -70,6 +71,18 @@ export function SmartEventsList({
                     </p>
                   ) : null}
                 </div>
+                {e.id ? (
+                  <div className="shrink-0">
+                    <AddToTravelPlanButton
+                      kind="event"
+                      targetId={String(e.id)}
+                      title={String(e.name ?? "Evento")}
+                      slug={e.slug ?? null}
+                      imageUrl={e.cover_image_url ?? null}
+                      subtitle={e.starts_at ? formatDate(e.starts_at) : null}
+                    />
+                  </div>
+                ) : null}
               </Wrapper>
             </li>
           );
