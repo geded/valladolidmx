@@ -993,6 +993,75 @@ const smartEventsListBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+/* ------------------------------------------------------------------ *
+ * US-R3 · Ola 1 (Singletons) — Bloques de Superficie oficiales.
+ *
+ * Cada bloque `vmx.surface.*` representa la plantilla oficial de una
+ * superficie pública singleton (Home ya cuenta con composición por
+ * secciones; aquí se registran las 3 restantes de la Ola 1). Estos
+ * contratos son la identidad permanente de la plantilla — evolucionan
+ * en versión, no se sustituyen. No aceptan configuración editorial en
+ * esta ola (adopción reproductiva). US-R4+ agrega schema editable
+ * sobre estos mismos tipos preservando compatibilidad.
+ * ------------------------------------------------------------------ */
+
+const surfaceMarketplaceBlock: BlockContract = {
+  type: "vmx.surface.marketplace",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Superficie · Marketplace",
+  description:
+    "Plantilla oficial del Marketplace público (/marketplace). Renderiza el catálogo de empresas publicadas.",
+  schema: {},
+  capabilities: {
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_seo: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["marketplace"] },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const surfaceAluxBlock: BlockContract = {
+  type: "vmx.surface.alux",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Superficie · Alux",
+  description:
+    "Plantilla oficial de la página pública consultiva de Alux (/alux).",
+  schema: {},
+  capabilities: {
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_seo: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["alux"] },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const surfaceTripPlannerBlock: BlockContract = {
+  type: "vmx.surface.trip-planner",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Superficie · Arma tu Viaje",
+  description:
+    "Plantilla oficial del constructor de viajes (/arma-tu-viaje).",
+  schema: {},
+  capabilities: {
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_seo: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["trip_builder"] },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
