@@ -1812,42 +1812,6 @@ export type Database = {
           },
         ]
       }
-      eb_audit_log: {
-        Row: {
-          action: Database["public"]["Enums"]["eb_audit_action"]
-          actor_id: string | null
-          created_at: string
-          entity: string
-          entity_id: string
-          id: string
-          metadata: Json
-          scope: Database["public"]["Enums"]["eb_scope"] | null
-          tenant_id: string | null
-        }
-        Insert: {
-          action: Database["public"]["Enums"]["eb_audit_action"]
-          actor_id?: string | null
-          created_at?: string
-          entity: string
-          entity_id: string
-          id?: string
-          metadata?: Json
-          scope?: Database["public"]["Enums"]["eb_scope"] | null
-          tenant_id?: string | null
-        }
-        Update: {
-          action?: Database["public"]["Enums"]["eb_audit_action"]
-          actor_id?: string | null
-          created_at?: string
-          entity?: string
-          entity_id?: string
-          id?: string
-          metadata?: Json
-          scope?: Database["public"]["Enums"]["eb_scope"] | null
-          tenant_id?: string | null
-        }
-        Relationships: []
-      }
       eb_block_comments: {
         Row: {
           author_id: string
@@ -1888,500 +1852,6 @@ export type Database = {
             columns: ["composition_id"]
             isOneToOne: false
             referencedRelation: "page_compositions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      eb_page_versions: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          id: string
-          marketing: Json | null
-          note: string | null
-          open_graph: Json | null
-          page_id: string
-          parent_version_id: string | null
-          schema_org: Json | null
-          seo: Json | null
-          tree: Json
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          marketing?: Json | null
-          note?: string | null
-          open_graph?: Json | null
-          page_id: string
-          parent_version_id?: string | null
-          schema_org?: Json | null
-          seo?: Json | null
-          tree: Json
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          marketing?: Json | null
-          note?: string | null
-          open_graph?: Json | null
-          page_id?: string
-          parent_version_id?: string | null
-          schema_org?: Json | null
-          seo?: Json | null
-          tree?: Json
-        }
-        Relationships: [
-          {
-            foreignKeyName: "eb_page_versions_page_id_fkey"
-            columns: ["page_id"]
-            isOneToOne: false
-            referencedRelation: "eb_pages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "eb_page_versions_parent_version_id_fkey"
-            columns: ["parent_version_id"]
-            isOneToOne: false
-            referencedRelation: "eb_page_versions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      eb_pages: {
-        Row: {
-          cache: Json
-          cache_version: number
-          conversion: Json
-          created_at: string
-          created_by: string | null
-          current_version_id: string | null
-          experiments: Json
-          id: string
-          kind: Database["public"]["Enums"]["eb_page_kind"]
-          marketing: Json
-          name: string
-          open_graph: Json
-          published_at: string | null
-          published_version_id: string | null
-          schema_org: Json
-          scope: Database["public"]["Enums"]["eb_scope"]
-          seo: Json
-          slug: string
-          status: Database["public"]["Enums"]["eb_publish_status"]
-          template_id: string | null
-          tenant_id: string | null
-          theme_id: string | null
-          tree: Json
-          updated_at: string
-          visibility: string
-        }
-        Insert: {
-          cache?: Json
-          cache_version?: number
-          conversion?: Json
-          created_at?: string
-          created_by?: string | null
-          current_version_id?: string | null
-          experiments?: Json
-          id?: string
-          kind?: Database["public"]["Enums"]["eb_page_kind"]
-          marketing?: Json
-          name: string
-          open_graph?: Json
-          published_at?: string | null
-          published_version_id?: string | null
-          schema_org?: Json
-          scope?: Database["public"]["Enums"]["eb_scope"]
-          seo?: Json
-          slug: string
-          status?: Database["public"]["Enums"]["eb_publish_status"]
-          template_id?: string | null
-          tenant_id?: string | null
-          theme_id?: string | null
-          tree?: Json
-          updated_at?: string
-          visibility?: string
-        }
-        Update: {
-          cache?: Json
-          cache_version?: number
-          conversion?: Json
-          created_at?: string
-          created_by?: string | null
-          current_version_id?: string | null
-          experiments?: Json
-          id?: string
-          kind?: Database["public"]["Enums"]["eb_page_kind"]
-          marketing?: Json
-          name?: string
-          open_graph?: Json
-          published_at?: string | null
-          published_version_id?: string | null
-          schema_org?: Json
-          scope?: Database["public"]["Enums"]["eb_scope"]
-          seo?: Json
-          slug?: string
-          status?: Database["public"]["Enums"]["eb_publish_status"]
-          template_id?: string | null
-          tenant_id?: string | null
-          theme_id?: string | null
-          tree?: Json
-          updated_at?: string
-          visibility?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "eb_pages_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "eb_templates"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "eb_pages_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "eb_pages_theme_id_fkey"
-            columns: ["theme_id"]
-            isOneToOne: false
-            referencedRelation: "eb_themes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      eb_preview_tokens: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          expires_at: string
-          page_id: string
-          token: string
-          variant_id: string | null
-          version_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          expires_at: string
-          page_id: string
-          token: string
-          variant_id?: string | null
-          version_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          expires_at?: string
-          page_id?: string
-          token?: string
-          variant_id?: string | null
-          version_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "eb_preview_tokens_page_id_fkey"
-            columns: ["page_id"]
-            isOneToOne: false
-            referencedRelation: "eb_pages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "eb_preview_tokens_variant_id_fkey"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "eb_variants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "eb_preview_tokens_version_id_fkey"
-            columns: ["version_id"]
-            isOneToOne: false
-            referencedRelation: "eb_page_versions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      eb_section_versions: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          id: string
-          note: string | null
-          parent_version_id: string | null
-          section_id: string
-          tree: Json
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          note?: string | null
-          parent_version_id?: string | null
-          section_id: string
-          tree: Json
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          note?: string | null
-          parent_version_id?: string | null
-          section_id?: string
-          tree?: Json
-        }
-        Relationships: [
-          {
-            foreignKeyName: "eb_section_versions_parent_version_id_fkey"
-            columns: ["parent_version_id"]
-            isOneToOne: false
-            referencedRelation: "eb_section_versions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "eb_section_versions_section_id_fkey"
-            columns: ["section_id"]
-            isOneToOne: false
-            referencedRelation: "eb_sections"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      eb_sections: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          current_version_id: string | null
-          description: string | null
-          id: string
-          name: string
-          scope: Database["public"]["Enums"]["eb_scope"]
-          slug: string
-          status: Database["public"]["Enums"]["eb_publish_status"]
-          tenant_id: string | null
-          tree: Json
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          current_version_id?: string | null
-          description?: string | null
-          id?: string
-          name: string
-          scope?: Database["public"]["Enums"]["eb_scope"]
-          slug: string
-          status?: Database["public"]["Enums"]["eb_publish_status"]
-          tenant_id?: string | null
-          tree?: Json
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          current_version_id?: string | null
-          description?: string | null
-          id?: string
-          name?: string
-          scope?: Database["public"]["Enums"]["eb_scope"]
-          slug?: string
-          status?: Database["public"]["Enums"]["eb_publish_status"]
-          tenant_id?: string | null
-          tree?: Json
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "eb_sections_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      eb_templates: {
-        Row: {
-          assets: Json
-          category: string | null
-          config: Json
-          cover_url: string | null
-          created_at: string
-          created_by: string | null
-          description: string | null
-          id: string
-          is_listed: boolean
-          name: string
-          navigation: Json
-          pages: Json
-          recommended_blocks: Json
-          scope: Database["public"]["Enums"]["eb_scope"]
-          seo_defaults: Json
-          slug: string
-          status: Database["public"]["Enums"]["eb_publish_status"]
-          tenant_id: string | null
-          theme_id: string | null
-          updated_at: string
-          variables: Json
-          version: string
-        }
-        Insert: {
-          assets?: Json
-          category?: string | null
-          config?: Json
-          cover_url?: string | null
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          is_listed?: boolean
-          name: string
-          navigation?: Json
-          pages?: Json
-          recommended_blocks?: Json
-          scope?: Database["public"]["Enums"]["eb_scope"]
-          seo_defaults?: Json
-          slug: string
-          status?: Database["public"]["Enums"]["eb_publish_status"]
-          tenant_id?: string | null
-          theme_id?: string | null
-          updated_at?: string
-          variables?: Json
-          version?: string
-        }
-        Update: {
-          assets?: Json
-          category?: string | null
-          config?: Json
-          cover_url?: string | null
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          is_listed?: boolean
-          name?: string
-          navigation?: Json
-          pages?: Json
-          recommended_blocks?: Json
-          scope?: Database["public"]["Enums"]["eb_scope"]
-          seo_defaults?: Json
-          slug?: string
-          status?: Database["public"]["Enums"]["eb_publish_status"]
-          tenant_id?: string | null
-          theme_id?: string | null
-          updated_at?: string
-          variables?: Json
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "eb_templates_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "eb_templates_theme_id_fkey"
-            columns: ["theme_id"]
-            isOneToOne: false
-            referencedRelation: "eb_themes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      eb_themes: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          id: string
-          is_default: boolean
-          name: string
-          scope: Database["public"]["Enums"]["eb_scope"]
-          slug: string
-          tenant_id: string | null
-          tokens: Json
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          is_default?: boolean
-          name: string
-          scope?: Database["public"]["Enums"]["eb_scope"]
-          slug: string
-          tenant_id?: string | null
-          tokens?: Json
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          is_default?: boolean
-          name?: string
-          scope?: Database["public"]["Enums"]["eb_scope"]
-          slug?: string
-          tenant_id?: string | null
-          tokens?: Json
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "eb_themes_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      eb_variants: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          id: string
-          is_active: boolean
-          name: string
-          overrides: Json
-          page_id: string
-          predicate: Json
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          is_active?: boolean
-          name: string
-          overrides?: Json
-          page_id: string
-          predicate?: Json
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          is_active?: boolean
-          name?: string
-          overrides?: Json
-          page_id?: string
-          predicate?: Json
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "eb_variants_page_id_fkey"
-            columns: ["page_id"]
-            isOneToOne: false
-            referencedRelation: "eb_pages"
             referencedColumns: ["id"]
           },
         ]
@@ -5200,17 +4670,6 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
-      eb__audit: {
-        Args: {
-          _action: Database["public"]["Enums"]["eb_audit_action"]
-          _entity: string
-          _entity_id: string
-          _metadata: Json
-          _scope: Database["public"]["Enums"]["eb_scope"]
-          _tenant_id: string
-        }
-        Returns: undefined
-      }
       eb_acquire_edit_lock: {
         Args: { _composition_id: string; _force?: boolean }
         Returns: Json
@@ -5219,13 +4678,6 @@ export type Database = {
       eb_cache_invalidate: {
         Args: { _page_id: string; _reason?: string }
         Returns: number
-      }
-      eb_can_edit_scope: {
-        Args: {
-          _scope: Database["public"]["Enums"]["eb_scope"]
-          _tenant_id: string
-        }
-        Returns: boolean
       }
       eb_cancel_scheduled_publish: {
         Args: { _id: string; _notes?: string }
@@ -5320,39 +4772,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      eb_page_delete: { Args: { _page_id: string }; Returns: undefined }
-      eb_page_publish: {
-        Args: { _note: string; _page_id: string }
-        Returns: string
-      }
-      eb_page_resolve_public: {
-        Args: { _ctx?: Json; _slug: string; _tenant_id?: string }
-        Returns: Json
-      }
-      eb_page_restore_version: {
-        Args: { _page_id: string; _version_id: string }
-        Returns: undefined
-      }
-      eb_page_rollback: {
-        Args: { _note?: string; _page_id: string; _version_id: string }
-        Returns: string
-      }
-      eb_page_save_version: {
-        Args: { _note: string; _page_id: string }
-        Returns: string
-      }
-      eb_page_unpublish: { Args: { _page_id: string }; Returns: undefined }
-      eb_page_upsert: { Args: { _payload: Json }; Returns: string }
-      eb_preview_resolve: { Args: { _token: string }; Returns: Json }
-      eb_preview_token_issue: {
-        Args: {
-          _page_id: string
-          _ttl_minutes: number
-          _variant_id: string
-          _version_id: string
-        }
-        Returns: string
-      }
       eb_process_scheduled_publishes: {
         Args: never
         Returns: {
@@ -5411,26 +4830,10 @@ export type Database = {
         Args: { _id: string; _notes?: string; _when: string }
         Returns: undefined
       }
-      eb_section_publish: {
-        Args: { _note: string; _section_id: string }
-        Returns: string
-      }
-      eb_section_upsert: { Args: { _payload: Json }; Returns: string }
       eb_set_workflow_state: {
         Args: { _composition_id: string; _next_state: string; _notes?: string }
         Returns: Json
       }
-      eb_template_clone: {
-        Args: {
-          _new_slug: string
-          _target_scope: Database["public"]["Enums"]["eb_scope"]
-          _target_tenant: string
-          _template_id: string
-        }
-        Returns: string
-      }
-      eb_template_upsert: { Args: { _payload: Json }; Returns: string }
-      eb_theme_upsert: { Args: { _payload: Json }; Returns: string }
       eb_unarchive_composition: { Args: { _id: string }; Returns: undefined }
       eb_unpublish_composition: {
         Args: { _id: string; _notes?: string }
@@ -5440,11 +4843,6 @@ export type Database = {
         Args: { _id: string; _new_slug: string }
         Returns: undefined
       }
-      eb_variant_resolve: {
-        Args: { _ctx: Json; _page_id: string }
-        Returns: Json
-      }
-      eb_variant_upsert: { Args: { _payload: Json }; Returns: string }
       email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
@@ -6079,19 +5477,6 @@ export type Database = {
         | "approved"
         | "published"
         | "archived"
-      eb_audit_action:
-        | "create"
-        | "update"
-        | "clone"
-        | "publish"
-        | "unpublish"
-        | "restore"
-        | "delete"
-        | "preview_issue"
-        | "rollback"
-        | "theme_change"
-        | "variant_change"
-        | "cache_invalidate"
       eb_page_kind:
         | "landing"
         | "institutional"
@@ -6115,8 +5500,6 @@ export type Database = {
         | "trip_builder"
         | "custom"
         | "region"
-      eb_publish_status: "draft" | "in_review" | "published" | "archived"
-      eb_scope: "global" | "tenant" | "marketplace"
       entity_kind:
         | "country"
         | "state"
@@ -6343,20 +5726,6 @@ export const Constants = {
         "published",
         "archived",
       ],
-      eb_audit_action: [
-        "create",
-        "update",
-        "clone",
-        "publish",
-        "unpublish",
-        "restore",
-        "delete",
-        "preview_issue",
-        "rollback",
-        "theme_change",
-        "variant_change",
-        "cache_invalidate",
-      ],
       eb_page_kind: [
         "landing",
         "institutional",
@@ -6381,8 +5750,6 @@ export const Constants = {
         "custom",
         "region",
       ],
-      eb_publish_status: ["draft", "in_review", "published", "archived"],
-      eb_scope: ["global", "tenant", "marketplace"],
       entity_kind: [
         "country",
         "state",
