@@ -630,6 +630,8 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
 /* ------------------------------------------------------------------ *
  * Bloque formulario configurable
  * ------------------------------------------------------------------ */
+// (Los renderers de `vmx.product.*` se inyectan también en PRODUCTION_COMPONENT_MAP
+//  arriba, reutilizando los mismos componentes de Studio.)
 
 interface FormFieldCfg { key: string; label: string; type: string; required?: boolean }
 
