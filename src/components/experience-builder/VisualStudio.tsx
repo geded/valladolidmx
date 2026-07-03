@@ -1114,7 +1114,15 @@ function PageVisualEditor({
   };
   const doRollback = async (rev: CompositionRevisionSummary) => {
     if (!page) return;
-    if (typeof window !== "undefined" && !window.confirm(`Restaurar la revisión #${rev.revision_number} como borrador actual?`)) return;
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm(
+        `Restaurar la versión #${rev.revision_number} como borrador actual?\n\n` +
+          "Tu borrador actual se reemplazará por esta versión. El historial no se elimina: " +
+          "cuando publiques se creará una nueva versión.",
+      )
+    )
+      return;
     await restore({ data: { id: page.id, revision_id: rev.id } });
     const detail = (await get({ data: { id: page.id } })) as CompositionDetail | null;
     if (detail) {
@@ -1122,7 +1130,10 @@ function PageVisualEditor({
       setTree(detail.current_draft);
       resetHistory();
       setSelectedId(null);
-      setMessage(`Revisión #${rev.revision_number} restaurada como borrador.`);
+      setMessage(
+        `Versión #${rev.revision_number} restaurada como borrador. Publica para hacerla la versión activa.`,
+      );
+      void refreshVersions();
     }
   };
 
