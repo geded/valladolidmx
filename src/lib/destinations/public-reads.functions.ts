@@ -6,6 +6,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import type { MarketplaceBusinessCard, MarketplaceProductCard } from "@/lib/marketplace/marketplace-reads.functions";
+import type { PublicEventCard } from "@/lib/events/public-reads.functions";
 
 export interface PublicDestinationDTO {
   slug: string;
@@ -78,6 +79,7 @@ export interface DestinationRelatedDTO {
   experiencias: MarketplaceBusinessCard[];
   otras: MarketplaceBusinessCard[];
   productos: MarketplaceProductCard[];
+  eventos: PublicEventCard[];
 }
 
 const HOTEL_CATS = new Set(["hoteles", "hospedaje"]);
@@ -103,7 +105,7 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
     const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const empty: DestinationRelatedDTO = { hoteles: [], restaurantes: [], experiencias: [], otras: [], productos: [] };
+    const empty: DestinationRelatedDTO = { hoteles: [], restaurantes: [], experiencias: [], otras: [], productos: [], eventos: [] };
     const { data: dest, error: dErr } = await sb
       .from("destinations").select("id, slug").eq("slug", data.slug).maybeSingle();
     if (dErr || !dest) return empty;
@@ -130,7 +132,7 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         category_slug: typeof cat === "string" ? cat : "",
       };
     });
-    const grouped: DestinationRelatedDTO = { hoteles: [], restaurantes: [], experiencias: [], otras: [], productos: [] };
+    const grouped: DestinationRelatedDTO = { hoteles: [], restaurantes: [], experiencias: [], otras: [], productos: [], eventos: [] };
     for (const c of cards) {
       if (HOTEL_CATS.has(c.category_slug)) grouped.hoteles.push(c);
       else if (RESTO_CATS.has(c.category_slug)) grouped.restaurantes.push(c);
@@ -172,6 +174,31 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
           };
         });
       }
+    }
+
+    // Eventos próximos publicados asociados al destino.
+    const { data: evs, error: eErr } = await sb
+      .from("events")
+      .select("id, slug, title, summary, starts_at, ends_at, venue_name, is_free, destination_id")
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .eq("destination_id", dest.id)
+      .gte("starts_at", new Date().toISOString())
+      .order("starts_at", { ascending: true })
+      .limit(6);
+    if (!eErr && evs) {
+      grouped.eventos = evs.map((e) => ({
+        id: e.id as string,
+        slug: e.slug as string,
+        title: e.title as string,
+        summary: (e.summary as string | null) ?? null,
+        starts_at: e.starts_at as string,
+        ends_at: (e.ends_at as string | null) ?? null,
+        venue_name: (e.venue_name as string | null) ?? null,
+        is_free: Boolean(e.is_free),
+        destination_slug: dest.slug,
+        cover_url: null,
+      }));
     }
     return grouped;
   });

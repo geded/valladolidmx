@@ -42,7 +42,9 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const [published, entities] = await Promise.all([
           listPublishedPagesForSitemap().catch(() => []),
-          fetchPublicEntities().catch(() => ({ destinos: [], empresas: [], productos: [] })),
+          fetchPublicEntities().catch(
+            () => ({ destinos: [], empresas: [], productos: [], eventos: [] }) as PublicEntities,
+          ),
         ]);
         const dynamicEntries: SitemapEntry[] = published.map((row) => {
           const priority =
@@ -86,6 +88,12 @@ export const Route = createFileRoute("/sitemap.xml")({
             changefreq: "weekly" as const,
             priority: "0.6",
           })),
+          ...entities.eventos.map((r) => ({
+            path: `/eventos/${r.slug}`,
+            lastmod: r.updated_at ?? undefined,
+            changefreq: "daily" as const,
+            priority: "0.7",
+          })),
         ];
         const entries = [...STATIC_ENTRIES, ...dynamicEntries, ...entityEntries];
         const urls = entries.map((e) =>
@@ -125,19 +133,20 @@ function clamp01(n: number): number {
 }
 
 interface EntityRow { slug: string; updated_at: string | null }
-interface PublicEntities { destinos: EntityRow[]; empresas: EntityRow[]; productos: EntityRow[] }
+interface PublicEntities { destinos: EntityRow[]; empresas: EntityRow[]; productos: EntityRow[]; eventos: EntityRow[] }
 
 async function fetchPublicEntities(): Promise<PublicEntities> {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) return { destinos: [], empresas: [], productos: [] };
+  if (!url || !key) return { destinos: [], empresas: [], productos: [], eventos: [] };
   const sb = createClient<Database>(url, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
-  const [d, b, p] = await Promise.all([
+  const [d, b, p, e] = await Promise.all([
     sb.from("destinations").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(500),
     sb.from("businesses").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(1000),
     sb.from("products").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(2000),
+    sb.from("events").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(1000),
   ]);
   const norm = (rows: { slug: string; updated_at: string | null }[] | null) =>
     (rows ?? []).filter((r) => typeof r.slug === "string" && r.slug.length > 0);
@@ -145,5 +154,6 @@ async function fetchPublicEntities(): Promise<PublicEntities> {
     destinos: norm(d.data as EntityRow[] | null),
     empresas: norm(b.data as EntityRow[] | null),
     productos: norm(p.data as EntityRow[] | null),
+    eventos: norm(e.data as EntityRow[] | null),
   };
 }

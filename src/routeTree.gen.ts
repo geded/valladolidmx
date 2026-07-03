@@ -33,6 +33,7 @@ import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
 import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/workspace-preview'
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
 import { Route as LSlugRouteImport } from './routes/l.$slug'
+import { Route as EventosSlugRouteImport } from './routes/eventos.$slug'
 import { Route as AuthenticatedPaginasRouteImport } from './routes/_authenticated/paginas'
 import { Route as AuthenticatedMiViajeRouteImport } from './routes/_authenticated/mi-viaje'
 import { Route as AuthenticatedEmpresaRouteImport } from './routes/_authenticated/empresa'
@@ -235,6 +236,11 @@ const LSlugRoute = LSlugRouteImport.update({
   id: '/l/$slug',
   path: '/l/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const EventosSlugRoute = EventosSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => EventosRoute,
 } as any)
 const AuthenticatedPaginasRoute = AuthenticatedPaginasRouteImport.update({
   id: '/paginas',
@@ -721,7 +727,7 @@ export interface FileRoutesByFullPath {
   '/arma-tu-viaje': typeof ArmaTuViajeRoute
   '/auth': typeof AuthRoute
   '/empresas': typeof EmpresasRoute
-  '/eventos': typeof EventosRoute
+  '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
   '/offline': typeof OfflineRoute
@@ -736,6 +742,7 @@ export interface FileRoutesByFullPath {
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
+  '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -828,7 +835,7 @@ export interface FileRoutesByTo {
   '/arma-tu-viaje': typeof ArmaTuViajeRoute
   '/auth': typeof AuthRoute
   '/empresas': typeof EmpresasRoute
-  '/eventos': typeof EventosRoute
+  '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
   '/offline': typeof OfflineRoute
@@ -838,6 +845,7 @@ export interface FileRoutesByTo {
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
+  '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -931,7 +939,7 @@ export interface FileRoutesById {
   '/arma-tu-viaje': typeof ArmaTuViajeRoute
   '/auth': typeof AuthRoute
   '/empresas': typeof EmpresasRoute
-  '/eventos': typeof EventosRoute
+  '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
   '/offline': typeof OfflineRoute
@@ -946,6 +954,7 @@ export interface FileRoutesById {
   '/_authenticated/empresa': typeof AuthenticatedEmpresaRoute
   '/_authenticated/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/_authenticated/paginas': typeof AuthenticatedPaginasRouteWithChildren
+  '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -1055,6 +1064,7 @@ export interface FileRouteTypes {
     | '/empresa'
     | '/mi-viaje'
     | '/paginas'
+    | '/eventos/$slug'
     | '/l/$slug'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -1157,6 +1167,7 @@ export interface FileRouteTypes {
     | '/empresa'
     | '/mi-viaje'
     | '/paginas'
+    | '/eventos/$slug'
     | '/l/$slug'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -1264,6 +1275,7 @@ export interface FileRouteTypes {
     | '/_authenticated/empresa'
     | '/_authenticated/mi-viaje'
     | '/_authenticated/paginas'
+    | '/eventos/$slug'
     | '/l/$slug'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -1358,7 +1370,7 @@ export interface RootRouteChildren {
   ArmaTuViajeRoute: typeof ArmaTuViajeRoute
   AuthRoute: typeof AuthRoute
   EmpresasRoute: typeof EmpresasRoute
-  EventosRoute: typeof EventosRoute
+  EventosRoute: typeof EventosRouteWithChildren
   ExperienciasRoute: typeof ExperienciasRoute
   HotelesRoute: typeof HotelesRoute
   OfflineRoute: typeof OfflineRoute
@@ -1554,6 +1566,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/l/$slug'
       preLoaderRoute: typeof LSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/eventos/$slug': {
+      id: '/eventos/$slug'
+      path: '/$slug'
+      fullPath: '/eventos/$slug'
+      preLoaderRoute: typeof EventosSlugRouteImport
+      parentRoute: typeof EventosRoute
     }
     '/_authenticated/paginas': {
       id: '/_authenticated/paginas'
@@ -2424,6 +2443,17 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface EventosRouteChildren {
+  EventosSlugRoute: typeof EventosSlugRoute
+}
+
+const EventosRouteChildren: EventosRouteChildren = {
+  EventosSlugRoute: EventosSlugRoute,
+}
+
+const EventosRouteWithChildren =
+  EventosRoute._addFileChildren(EventosRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -2431,7 +2461,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArmaTuViajeRoute: ArmaTuViajeRoute,
   AuthRoute: AuthRoute,
   EmpresasRoute: EmpresasRoute,
-  EventosRoute: EventosRoute,
+  EventosRoute: EventosRouteWithChildren,
   ExperienciasRoute: ExperienciasRoute,
   HotelesRoute: HotelesRoute,
   OfflineRoute: OfflineRoute,
@@ -2461,3 +2491,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

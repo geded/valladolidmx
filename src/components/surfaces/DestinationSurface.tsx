@@ -60,7 +60,7 @@ export function DestinationSurface({ destinationSlug, dbData, related }: Destina
   const heroUrl = dbData?.hero_url ?? null;
   const rel = related;
   const totalRelated = rel
-    ? rel.hoteles.length + rel.restaurantes.length + rel.experiencias.length + rel.otras.length + rel.productos.length
+    ? rel.hoteles.length + rel.restaurantes.length + rel.experiencias.length + rel.otras.length + rel.productos.length + (rel.eventos?.length ?? 0)
     : 0;
 
   return (
@@ -109,6 +109,29 @@ export function DestinationSurface({ destinationSlug, dbData, related }: Destina
               <RelatedSection title="Restaurantes" items={rel.restaurantes} />
               <RelatedSection title="Experiencias y rutas" items={rel.experiencias} />
               <RelatedSection title="Otras empresas del destino" items={rel.otras} />
+              {rel.eventos && rel.eventos.length > 0 ? (
+                <section>
+                  <h2 className="text-2xl">Próximos eventos</h2>
+                  <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+                    {rel.eventos.slice(0, 6).map((e) => (
+                      <li key={e.id} className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary">
+                        <Link to="/eventos/$slug" params={{ slug: e.slug }} className="block">
+                          <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                            {new Date(e.starts_at).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}
+                          </p>
+                          <h3 className="mt-1 text-base font-semibold">{e.title}</h3>
+                          {e.summary ? (
+                            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{e.summary}</p>
+                          ) : null}
+                          {e.venue_name ? (
+                            <p className="mt-2 text-xs text-muted-foreground">{e.venue_name}</p>
+                          ) : null}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
               {rel.productos.length > 0 ? (
                 <section>
                   <h2 className="text-2xl">Productos destacados</h2>

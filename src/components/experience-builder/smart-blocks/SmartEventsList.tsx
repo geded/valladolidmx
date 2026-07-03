@@ -37,7 +37,7 @@ export function SmartEventsList({
       {title ? <h2 className="text-xl font-semibold">{title}</h2> : null}
       <ul className="divide-y divide-border rounded-2xl border border-border bg-card">
         {items.map((e, i) => {
-          const href = e.slug ? `/evento/${e.slug}` : null;
+          const href = e.slug ? `/eventos/${e.slug}` : null;
           const Wrapper: any = href ? "a" : "div";
           const wrapperProps = href ? { href } : {};
           return (
