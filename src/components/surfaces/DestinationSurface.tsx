@@ -16,16 +16,20 @@ import { PublicShell } from "@/components/discovery";
 import { PlaceholderImage } from "@/components/common/PlaceholderImage";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
-import type { PublicDestinationDTO } from "@/lib/destinations/public-reads.functions";
+import type { PublicDestinationDTO, DestinationRelatedDTO } from "@/lib/destinations/public-reads.functions";
+import { BusinessTile } from "@/components/surfaces/MarketplaceSurface";
+import type { MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
 
 export interface DestinationSurfaceProps {
   /** Slug del destino a renderizar. Cuando falta, se lee del router. */
   destinationSlug?: string;
   /** Datos enriquecidos desde la BD (Fase 4.1b). */
   dbData?: PublicDestinationDTO;
+  /** Contenido relacionado (empresas y productos publicados del destino). */
+  related?: DestinationRelatedDTO;
 }
 
-export function DestinationSurface({ destinationSlug, dbData }: DestinationSurfaceProps = {}) {
+export function DestinationSurface({ destinationSlug, dbData, related }: DestinationSurfaceProps = {}) {
   const params = useParams({ strict: false }) as { destino?: string };
   const slug = destinationSlug ?? params.destino;
   const mock = slug
@@ -54,6 +58,10 @@ export function DestinationSurface({ destinationSlug, dbData }: DestinationSurfa
   const heroPalette = (dbData?.hero_palette ?? mock?.hero_palette ?? "territorio") as
     "territorio" | "selva" | "cenote" | "atardecer";
   const heroUrl = dbData?.hero_url ?? null;
+  const rel = related;
+  const totalRelated = rel
+    ? rel.hoteles.length + rel.restaurantes.length + rel.experiencias.length + rel.otras.length + rel.productos.length
+    : 0;
 
   return (
     <PublicShell
@@ -95,6 +103,40 @@ export function DestinationSurface({ destinationSlug, dbData }: DestinationSurfa
               ))}
             </ul>
           </div>
+          {rel ? (
+            <div className="mt-10 space-y-10">
+              <RelatedSection title="Hoteles y hospedajes" items={rel.hoteles} />
+              <RelatedSection title="Restaurantes" items={rel.restaurantes} />
+              <RelatedSection title="Experiencias y rutas" items={rel.experiencias} />
+              <RelatedSection title="Otras empresas del destino" items={rel.otras} />
+              {rel.productos.length > 0 ? (
+                <section>
+                  <h2 className="text-2xl">Productos destacados</h2>
+                  <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+                    {rel.productos.slice(0, 8).map((p) => (
+                      <li key={p.id} className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary">
+                        <Link to="/producto/$slug" params={{ slug: p.slug }} className="block">
+                          <h3 className="text-base font-semibold">{p.name}</h3>
+                          {p.tagline ? (
+                            <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.tagline}</p>
+                          ) : null}
+                          <p className="mt-3 text-xs text-muted-foreground">
+                            {p.business_name}
+                            {p.price_amount != null ? ` · ${p.price_currency} ${p.price_amount}` : ""}
+                          </p>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+              {totalRelated === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Aún no hay negocios ni experiencias publicadas para este destino.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
         </div>
         <aside className="space-y-4">
           <div className="rounded-2xl border border-border bg-card p-5">
@@ -125,5 +167,19 @@ export function DestinationSurface({ destinationSlug, dbData }: DestinationSurfa
         </aside>
       </div>
     </PublicShell>
+  );
+}
+
+function RelatedSection({ title, items }: { title: string; items: MarketplaceBusinessCard[] }) {
+  if (items.length === 0) return null;
+  return (
+    <section>
+      <h2 className="text-2xl">{title}</h2>
+      <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+        {items.slice(0, 6).map((b) => (
+          <BusinessTile key={b.id} item={b} />
+        ))}
+      </ul>
+    </section>
   );
 }
