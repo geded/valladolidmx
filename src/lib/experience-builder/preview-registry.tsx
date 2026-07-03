@@ -19,7 +19,7 @@
  * Añadir una plantilla madre nueva = registrar aquí, sin tocar el Studio.
  */
 
-import type { ComponentType, ReactNode } from "react";
+import { Component, type ComponentType, type ErrorInfo, type ReactNode } from "react";
 import {
   getMarketplaceBusinessBySlug,
   listMarketplaceBusinesses,
@@ -40,14 +40,17 @@ export interface PreviewCandidate {
  * contexto que consumen los bloques `vmx.<kind>.*`.
  */
 export interface TemplatePreviewProvider<TData> {
-  /** Enum `page_kind` (coincide con `page_compositions.kind`). */
+  /**
+   * Enum `page_kind` (coincide con `page_compositions.kind`). Es la
+   * ÚNICA fuente de verdad para elegir el provider — el registry NO
+   * hace matching por slug de plantilla (`__tpl_*__`) para evitar
+   * textos quemados en la plataforma.
+   */
   readonly kind: string;
   /** Etiqueta corta en la barra ("Vista previa con empresa"). */
   readonly label: string;
   /** Placeholder del combo ("Selecciona una empresa…"). */
   readonly placeholder: string;
-  /** ¿Debe listarse este selector cuando el editor abre este kind? */
-  matches(pageType: string, slug: string): boolean;
   /** Lista de candidatos reales publicados. */
   loadCandidates(): Promise<PreviewCandidate[]>;
   /** Carga el detalle real por slug (o `null` si no existe). */
@@ -149,8 +152,6 @@ const REGISTRY: TemplatePreviewProvider<any>[] = [
     kind: "business",
     label: "Vista previa con empresa",
     placeholder: "Selecciona una empresa…",
-    matches: (pageType, slug) =>
-      pageType === "business" || slug === "__tpl_business__",
     async loadCandidates() {
       const items = await listMarketplaceBusinesses();
       return items.map((b) => ({
@@ -165,21 +166,47 @@ const REGISTRY: TemplatePreviewProvider<any>[] = [
     demoData: demoBusiness,
     Provider: BusinessDataProvider,
   } satisfies TemplatePreviewProvider<MarketplaceBusinessDetail>,
+  /**
+   * `hotel` — DUMMY de extensibilidad (Sub-ola 2.2c · criterio de
+   * aprobación). Reutiliza `BusinessSurfaceProvider` porque, por
+   * resolución H-R3-2, hoteles/restaurantes/experiencias comparten
+   * el modelo de datos de `businesses`. Sirve como prueba viva de
+   * que un nuevo kind entra al sistema registrando SÓLO aquí — sin
+   * modificar `CompositionRenderer`, rutas públicas ni `VisualStudio`.
+   */
+  {
+    kind: "hotel",
+    label: "Vista previa con hotel",
+    placeholder: "Selecciona un hotel…",
+    async loadCandidates() {
+      const items = await listMarketplaceBusinesses();
+      return items
+        .filter((b) => (b.category_slug ?? "").toLowerCase().includes("hotel"))
+        .map((b) => ({
+          slug: b.slug,
+          label: b.display_name,
+          secondary: b.destination_slug || undefined,
+        }));
+    },
+    async loadDetail(slug) {
+      return await getMarketplaceBusinessBySlug({ data: { slug } });
+    },
+    demoData: demoBusiness,
+    Provider: BusinessDataProvider,
+  } satisfies TemplatePreviewProvider<MarketplaceBusinessDetail>,
   // NOTA: `region`, `destination`, `product`, `event`, `experience`,
-  // `hotel`, `restaurant` se registrarán aquí cuando su superficie
-  // exponga un `SurfaceProvider` equivalente. El Studio no requiere
-  // cambios: consulta este registry por kind.
+  // `restaurant` se registrarán aquí cuando su superficie exponga un
+  // `SurfaceProvider` equivalente. El Studio no requiere cambios:
+  // consulta este registry por `kind`.
 ];
 
 export function getPreviewProvider(
   pageType: string | null | undefined,
-  slug: string | null | undefined,
+  _slug: string | null | undefined,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): TemplatePreviewProvider<any> | null {
-  if (!pageType && !slug) return null;
-  return (
-    REGISTRY.find((p) => p.matches(pageType ?? "", slug ?? "")) ?? null
-  );
+  if (!pageType) return null;
+  return REGISTRY.find((p) => p.kind === pageType) ?? null;
 }
 
 export function listPreviewProviders(): readonly TemplatePreviewProvider<unknown>[] {
@@ -206,5 +233,52 @@ export function writeStoredPreviewSlug(kind: string, slug: string | null): void 
     else window.localStorage.removeItem(`eb.preview.${kind}.slug`);
   } catch {
     /* noop */
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Fallback controlado (Sub-ola 2.2c · requisito 5)
+ *
+ * Boundary que aísla fallos de un provider concreto. Si el `Provider`
+ * de una plantilla lanza en render, el Studio sigue vivo: el canvas
+ * se pinta sin hidratación de contexto y muestra un aviso reversible.
+ * ------------------------------------------------------------------ */
+
+interface BoundaryProps {
+  kind: string;
+  children: ReactNode;
+}
+interface BoundaryState {
+  error: Error | null;
+}
+
+export class PreviewProviderBoundary extends Component<BoundaryProps, BoundaryState> {
+  state: BoundaryState = { error: null };
+  static getDerivedStateFromError(error: Error): BoundaryState {
+    return { error };
+  }
+  componentDidCatch(error: Error, info: ErrorInfo): void {
+    if (typeof console !== "undefined") {
+      console.warn(
+        `[preview-registry] Provider "${this.props.kind}" falló en render — se muestra el canvas sin hidratación.`,
+        error,
+        info.componentStack,
+      );
+    }
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="space-y-2">
+          <div className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+            La vista previa del kind <b>{this.props.kind}</b> falló al hidratar
+            datos. El canvas se muestra sin contexto para que puedas seguir
+            editando la plantilla.
+          </div>
+          {this.props.children}
+        </div>
+      );
+    }
+    return this.props.children;
   }
 }
