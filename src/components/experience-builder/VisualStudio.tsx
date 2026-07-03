@@ -67,6 +67,7 @@ import {
   createComposition,
   saveCompositionDraft,
   publishComposition,
+  unpublishComposition,
   listCompositionRevisions,
   restoreCompositionRevision,
   issueCompositionPreviewLink,
@@ -836,6 +837,7 @@ function PageVisualEditor({
   const create = useServerFn(createComposition);
   const save = useServerFn(saveCompositionDraft);
   const publish = useServerFn(publishComposition);
+  const unpublish = useServerFn(unpublishComposition);
   const fetchPublishedTree = useServerFn(getPublishedTree);
   const listRevs = useServerFn(listCompositionRevisions);
   const restore = useServerFn(restoreCompositionRevision);
@@ -849,6 +851,8 @@ function PageVisualEditor({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [publishing, setPublishing] = useState(false);
+  const [unpublishing, setUnpublishing] = useState(false);
+  const [confirmUnpublish, setConfirmUnpublish] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showLibrary, setShowLibrary] = useState(false);
@@ -1102,6 +1106,36 @@ function PageVisualEditor({
   const confirmPublishFromDialog = async () => {
     setPublishDiff((s) => ({ ...s, open: false }));
     await onPublish();
+  };
+
+  /**
+   * US-E · Despublicar la página desde el Studio. Invoca el RPC
+   * `eb_unpublish_composition` (ya existente) y refresca el estado local
+   * para que el badge pase a "Sin publicar" y el diff quede desactivado.
+   */
+  const onUnpublish = async () => {
+    if (!page) return;
+    setUnpublishing(true);
+    setMessage(null);
+    try {
+      await unpublish({ data: { id: page.id, notes: "Despublicado desde Modo Visual" } });
+      if (pageDef.page_type === "home") {
+        await queryClient.invalidateQueries({ queryKey: ["eb", "published-home", "default"] });
+      }
+      await queryClient.invalidateQueries({ queryKey: ["eb", "published-by-slug", pageDef.slug] });
+      setMessage(`Página despublicada. ${pageDef.publicPath} ya no está disponible al público.`);
+      try {
+        const refreshed = (await get({ data: { id: page.id } })) as CompositionDetail | null;
+        if (refreshed) setPage(refreshed);
+      } catch {
+        /* best-effort */
+      }
+    } catch (e) {
+      setMessage(`No se pudo despublicar: ${(e as Error).message}`);
+    } finally {
+      setUnpublishing(false);
+      setConfirmUnpublish(false);
+    }
   };
 
   const updateSelectedConfig = (nextConfig: Record<string, unknown>) => {
@@ -1460,6 +1494,20 @@ function PageVisualEditor({
           ) : (
             <span className="text-[11px] text-muted-foreground">Sólo administradores pueden publicar.</span>
           )}
+          {canPublish && publishState !== "never" ? (
+            <button
+              type="button"
+              onClick={() => setConfirmUnpublish(true)}
+              disabled={unpublishing || publishing}
+              title="Retira la página del sitio público. El borrador se conserva."
+              className="inline-flex items-center gap-1 rounded-md border border-rose-300 bg-background px-3 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-50 disabled:opacity-60"
+            >
+              {unpublishing ? (
+                <Loader2 className="size-3.5 animate-spin" aria-hidden />
+              ) : null}
+              Despublicar
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -1661,6 +1709,60 @@ function PageVisualEditor({
           onCancel={() => setPublishDiff((s) => ({ ...s, open: false }))}
           onConfirm={() => void confirmPublishFromDialog()}
         />
+      ) : null}
+      {confirmUnpublish ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="unpublish-title"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm"
+        >
+          <div className="w-full max-w-md overflow-hidden rounded-lg border border-border bg-card shadow-xl">
+            <header className="border-b border-border px-4 py-3">
+              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                Despublicar página
+              </p>
+              <h2 id="unpublish-title" className="mt-0.5 text-base font-semibold">
+                ¿Retirar del sitio público?
+              </h2>
+            </header>
+            <div className="space-y-2 px-4 py-3 text-xs text-muted-foreground">
+              <p>
+                <span className="font-mono">{pageDef.publicPath}</span> dejará de estar
+                disponible para los visitantes y responderá 404.
+              </p>
+              <p>
+                El borrador y el historial de versiones se conservan. Puedes volver a
+                publicar cuando quieras.
+              </p>
+            </div>
+            <footer className="flex items-center justify-end gap-2 border-t border-border bg-muted/30 px-4 py-3">
+              <button
+                type="button"
+                onClick={() => setConfirmUnpublish(false)}
+                disabled={unpublishing}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => void onUnpublish()}
+                disabled={unpublishing}
+                className="inline-flex items-center gap-1 rounded-md bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-rose-700 disabled:opacity-60"
+              >
+                {unpublishing ? (
+                  <>
+                    <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                    Despublicando…
+                  </>
+                ) : (
+                  "Despublicar"
+                )}
+              </button>
+            </footer>
+          </div>
+        </div>
       ) : null}
     </div>
   );
