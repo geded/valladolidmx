@@ -13,7 +13,10 @@
  *    `eb_page_kind` en migración. Sin código nuevo del editor.
  */
 
-import type { PageKind } from "./block-contract";
+import type { Database } from "@/integrations/supabase/types";
+
+/** Enum canónico de kinds gestionados por el Experience Builder. */
+export type PageKind = Database["public"]["Enums"]["eb_page_kind"];
 
 export type PageKindRole = "admin" | "super_admin" | "editor";
 
