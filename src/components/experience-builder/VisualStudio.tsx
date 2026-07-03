@@ -837,6 +837,7 @@ function PageVisualEditor({
   const create = useServerFn(createComposition);
   const save = useServerFn(saveCompositionDraft);
   const publish = useServerFn(publishComposition);
+  const unpublish = useServerFn(unpublishComposition);
   const fetchPublishedTree = useServerFn(getPublishedTree);
   const listRevs = useServerFn(listCompositionRevisions);
   const restore = useServerFn(restoreCompositionRevision);
@@ -850,6 +851,8 @@ function PageVisualEditor({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [publishing, setPublishing] = useState(false);
+  const [unpublishing, setUnpublishing] = useState(false);
+  const [confirmUnpublish, setConfirmUnpublish] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showLibrary, setShowLibrary] = useState(false);
