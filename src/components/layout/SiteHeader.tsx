@@ -29,6 +29,7 @@ import {
 import { Container } from "./Container";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { UserMenu } from "./UserMenu";
+import { PrimaryMegaMenu } from "./PrimaryMegaMenu";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { useTranslation } from "@/i18n/context";
 import { cn } from "@/lib/utils";
@@ -206,14 +207,13 @@ export function SiteHeader({ variant = "solid", config }: Props) {
   const isOverlay = variant === "overlay" && !scrolled && !open;
 
   // Navegación oficial 12C.1 — priorización breve:
-  // Destinos · Experiencias · Arma tu Viaje · Alux · Empresas.
-  const nav = linkItems(config?.nav, [
-    { href: "/oriente-maya", label: t("nav.destinations") },
-    { href: "/experiencias", label: t("nav.experiences") },
-    { href: "/arma-tu-viaje", label: t("nav.plan_trip") },
-    { href: "/alux", label: t("nav.alux") },
-    { href: "/empresas", label: t("nav.for_business") },
-  ]);
+  // Sprint de Reconciliación 5 · Menú principal conectado al motor.
+  // El menú público ya no depende de `config.nav` (composición EB): se
+  // renderiza vía `PrimaryMegaMenu` con dropdowns tipo destino turístico,
+  // consumiendo destinos reales publicados. `config.nav` legacy se ignora
+  // deliberadamente para garantizar una navegación consistente.
+  void linkItems;
+  void t;
   const ctaLabel = textValue(config?.cta_label) ?? t("nav.plan_trip");
   const ctaHref = textValue(config?.cta_href) ?? "/arma-tu-viaje";
   const showLanguage = boolValue(config?.show_language, true);
@@ -268,16 +268,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
               </button>
             </div>
             <nav aria-label="Menú móvil" className="flex flex-col gap-0.5 px-4 py-5">
-              {nav.map((n) => (
-                <a
-                  key={n.href}
-                  href={n.href}
-                  onClick={() => setOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-[0.95rem] font-medium leading-tight text-foreground hover:bg-accent hover:text-accent-foreground"
-                >
-                  {n.label}
-                </a>
-              ))}
+              <PrimaryMegaMenu variant="mobile" onNavigate={() => setOpen(false)} />
               <a
                 href={ctaHref}
                 onClick={() => setOpen(false)}
@@ -322,25 +313,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
             <BrandLogo tone={isOverlay ? "light" : "dark"} size="md" />
           </Link>
 
-          <nav aria-label="Principal" className="hidden @5xl:block">
-            <ul className="flex items-center gap-1">
-              {nav.map((n) => (
-                <li key={n.href}>
-                  <a
-                    href={n.href}
-                    className={cn(
-                      "rounded-md px-3 py-1.5 text-sm font-medium transition-all active:scale-[0.98]",
-                      isOverlay
-                        ? "text-white/90 hover:bg-white/15 hover:text-white"
-                        : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground",
-                    )}
-                  >
-                    {n.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <PrimaryMegaMenu variant="desktop" isOverlay={isOverlay} />
 
           <div className="flex items-center gap-2">
             {visibleButtons.map((btn, idx) => renderHeaderButton(btn, idx, {
