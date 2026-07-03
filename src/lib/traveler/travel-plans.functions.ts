@@ -387,7 +387,7 @@ export const addPlanItem = createServerFn({ method: "POST" })
             position: nextPos,
             day_index: data.dayIndex,
             notes: data.notes,
-            snapshot: data.snapshot,
+            snapshot: data.snapshot as unknown as Json,
           })
           .select("*")
           .single();
@@ -416,7 +416,7 @@ export const addPlanItem = createServerFn({ method: "POST" })
           position: nextPos,
           day_index: data.dayIndex,
           notes: data.notes,
-          snapshot: data.snapshot,
+          snapshot: data.snapshot as unknown as Json,
         })
         .select("*")
         .single();
@@ -474,11 +474,12 @@ export const updatePlanItem = createServerFn({ method: "POST" })
     };
     const patch: {
       notes?: string | null;
-      snapshot?: TravelPlanItemSnapshot;
+      snapshot?: Json;
       day_index?: number | null;
     } = {};
     if ("notes" in src) patch.notes = clampStr(src.notes, 2000);
-    if ("snapshot" in src) patch.snapshot = clampSnapshot(src.snapshot);
+    if ("snapshot" in src)
+      patch.snapshot = clampSnapshot(src.snapshot) as unknown as Json;
     if ("dayIndex" in src) {
       patch.day_index =
         src.dayIndex === null || src.dayIndex === undefined
@@ -574,7 +575,7 @@ export const updatePlanMeta = createServerFn({ method: "POST" })
       party_size?: number | null;
       notes?: string | null;
       cover_image_url?: string | null;
-      meta?: Record<string, unknown>;
+      meta?: Json;
     } = {};
     if ("title" in src) {
       const t = clampStr(src.title, 160);
@@ -595,7 +596,7 @@ export const updatePlanMeta = createServerFn({ method: "POST" })
       ) {
         throw new Error("invalid_meta");
       }
-      patch.meta = src.meta as Record<string, unknown>;
+      patch.meta = src.meta as Json;
     }
     return { planId: assertUuid(src.planId, "plan_id"), patch };
   })
