@@ -9,6 +9,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { listPublishedPagesForSitemap } from "@/lib/experience-builder/eb-sitemap.functions";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
 const BASE_URL = "https://valladolidmx.lovable.app";
 
@@ -32,11 +34,16 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/marketplace", changefreq: "weekly", priority: "0.7" },
 ];
 
+const LANDING_KINDS = new Set(["landing", "campaign", "micrositio", "promotion"]);
+
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const published = await listPublishedPagesForSitemap();
+        const [published, entities] = await Promise.all([
+          listPublishedPagesForSitemap().catch(() => []),
+          fetchPublicEntities().catch(() => ({ destinos: [], empresas: [], productos: [] })),
+        ]);
         const dynamicEntries: SitemapEntry[] = published.map((row) => {
           const priority =
             typeof row.priority === "number"
@@ -44,8 +51,9 @@ export const Route = createFileRoute("/sitemap.xml")({
               : row.featured
                 ? 0.8
                 : 0.6;
+          const prefix = LANDING_KINDS.has(row.page_type) ? "/l" : "/p";
           return {
-            path: `/p/${row.slug}`,
+            path: `${prefix}/${row.slug}`,
             lastmod: row.updated_at ?? row.published_at ?? undefined,
             changefreq: "weekly",
             priority: priority.toFixed(1),
@@ -59,7 +67,27 @@ export const Route = createFileRoute("/sitemap.xml")({
           return (b.lastmod ?? "").localeCompare(a.lastmod ?? "");
         });
 
-        const entries = [...STATIC_ENTRIES, ...dynamicEntries];
+        const entityEntries: SitemapEntry[] = [
+          ...entities.destinos.map((r) => ({
+            path: `/oriente-maya/${r.slug}`,
+            lastmod: r.updated_at ?? undefined,
+            changefreq: "weekly" as const,
+            priority: "0.8",
+          })),
+          ...entities.empresas.map((r) => ({
+            path: `/marketplace/${r.slug}`,
+            lastmod: r.updated_at ?? undefined,
+            changefreq: "weekly" as const,
+            priority: "0.7",
+          })),
+          ...entities.productos.map((r) => ({
+            path: `/producto/${r.slug}`,
+            lastmod: r.updated_at ?? undefined,
+            changefreq: "weekly" as const,
+            priority: "0.6",
+          })),
+        ];
+        const entries = [...STATIC_ENTRIES, ...dynamicEntries, ...entityEntries];
         const urls = entries.map((e) =>
           [
             `  <url>`,
@@ -94,4 +122,28 @@ function clamp01(n: number): number {
   if (n < 0) return 0;
   if (n > 1) return 1;
   return n;
+}
+
+interface EntityRow { slug: string; updated_at: string | null }
+interface PublicEntities { destinos: EntityRow[]; empresas: EntityRow[]; productos: EntityRow[] }
+
+async function fetchPublicEntities(): Promise<PublicEntities> {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) return { destinos: [], empresas: [], productos: [] };
+  const sb = createClient<Database>(url, key, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
+  const [d, b, p] = await Promise.all([
+    sb.from("destinations").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(500),
+    sb.from("businesses").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(1000),
+    sb.from("products").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(2000),
+  ]);
+  const norm = (rows: { slug: string; updated_at: string | null }[] | null) =>
+    (rows ?? []).filter((r) => typeof r.slug === "string" && r.slug.length > 0);
+  return {
+    destinos: norm(d.data as EntityRow[] | null),
+    empresas: norm(b.data as EntityRow[] | null),
+    productos: norm(p.data as EntityRow[] | null),
+  };
 }
