@@ -105,6 +105,7 @@ import { Route as AuthenticatedCmsDestinosNuevaRouteImport } from './routes/_aut
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
 import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/_authenticated/admin/sistema.usuarios'
 import { Route as ApiPublicPaymentsProviderWebhookRouteImport } from './routes/api/public/payments/$provider/webhook'
+import { Route as AuthenticatedPortalProductosProductIdPreviewRouteImport } from './routes/_authenticated/portal/productos.$productId.preview'
 import { Route as AuthenticatedCuentaConciergeCaseIdEvaluarRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId.evaluar'
 import { Route as AuthenticatedCmsZonasIdEditarRouteImport } from './routes/_authenticated/cms/zonas.$id.editar'
 import { Route as AuthenticatedCmsReviewsIdModerarRouteImport } from './routes/_authenticated/cms/reviews.$id.moderar'
@@ -652,6 +653,12 @@ const ApiPublicPaymentsProviderWebhookRoute =
     path: '/api/public/payments/$provider/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedPortalProductosProductIdPreviewRoute =
+  AuthenticatedPortalProductosProductIdPreviewRouteImport.update({
+    id: '/productos/$productId/preview',
+    path: '/productos/$productId/preview',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
 const AuthenticatedCuentaConciergeCaseIdEvaluarRoute =
   AuthenticatedCuentaConciergeCaseIdEvaluarRouteImport.update({
     id: '/evaluar',
@@ -804,6 +811,7 @@ export interface FileRoutesByFullPath {
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cms/zonas/$id/editar': typeof AuthenticatedCmsZonasIdEditarRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
+  '/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -903,6 +911,7 @@ export interface FileRoutesByTo {
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cms/zonas/$id/editar': typeof AuthenticatedCmsZonasIdEditarRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
+  '/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
 }
 export interface FileRoutesById {
@@ -1010,6 +1019,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/_authenticated/cms/zonas/$id/editar': typeof AuthenticatedCmsZonasIdEditarRoute
   '/_authenticated/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
+  '/_authenticated/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
 }
 export interface FileRouteTypes {
@@ -1117,6 +1127,7 @@ export interface FileRouteTypes {
     | '/cms/reviews/$id/moderar'
     | '/cms/zonas/$id/editar'
     | '/cuenta/concierge/$caseId/evaluar'
+    | '/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -1216,6 +1227,7 @@ export interface FileRouteTypes {
     | '/cms/reviews/$id/moderar'
     | '/cms/zonas/$id/editar'
     | '/cuenta/concierge/$caseId/evaluar'
+    | '/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
   id:
     | '__root__'
@@ -1322,6 +1334,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/reviews/$id/moderar'
     | '/_authenticated/cms/zonas/$id/editar'
     | '/_authenticated/cuenta/concierge/$caseId/evaluar'
+    | '/_authenticated/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -2033,6 +2046,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsProviderWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/portal/productos/$productId/preview': {
+      id: '/_authenticated/portal/productos/$productId/preview'
+      path: '/productos/$productId/preview'
+      fullPath: '/portal/productos/$productId/preview'
+      preLoaderRoute: typeof AuthenticatedPortalProductosProductIdPreviewRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
     '/_authenticated/cuenta/concierge/$caseId/evaluar': {
       id: '/_authenticated/cuenta/concierge/$caseId/evaluar'
       path: '/evaluar'
@@ -2230,6 +2250,7 @@ interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalInvitacionesTokenRoute: typeof AuthenticatedPortalInvitacionesTokenRoute
   AuthenticatedPortalEmpresasIndexRoute: typeof AuthenticatedPortalEmpresasIndexRoute
   AuthenticatedPortalInvitacionesIndexRoute: typeof AuthenticatedPortalInvitacionesIndexRoute
+  AuthenticatedPortalProductosProductIdPreviewRoute: typeof AuthenticatedPortalProductosProductIdPreviewRoute
 }
 
 const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildren =
@@ -2251,6 +2272,8 @@ const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildr
       AuthenticatedPortalEmpresasIndexRoute,
     AuthenticatedPortalInvitacionesIndexRoute:
       AuthenticatedPortalInvitacionesIndexRoute,
+    AuthenticatedPortalProductosProductIdPreviewRoute:
+      AuthenticatedPortalProductosProductIdPreviewRoute,
   }
 
 const AuthenticatedPortalRouteRouteWithChildren =

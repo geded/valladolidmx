@@ -75,19 +75,10 @@ function PortalProductPreview() {
     );
   }
 
-  const isPublished = /* runtime hint, no state coupling */
-    // @ts-expect-error runtime signal, no schema change
-    (data.product as { status?: string }).status === "published";
-
   return (
     <div className="relative">
       <div className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-border bg-amber-500/10 px-4 py-2 text-[11px] font-medium uppercase tracking-wider text-amber-800 dark:text-amber-200">
-        <span>
-          Vista previa —{" "}
-          {isPublished
-            ? "el producto ya está publicado"
-            : "aún no está publicado"}
-        </span>
+        <span>Vista previa privada — sólo visible para tu equipo</span>
         <a
           href="/portal/catalogo"
           className="rounded border border-amber-600/40 px-2 py-0.5 hover:bg-amber-500/20"
