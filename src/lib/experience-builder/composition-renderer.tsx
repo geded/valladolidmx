@@ -49,6 +49,16 @@ import { TripPlannerSurface } from "@/components/surfaces/TripPlannerSurface";
 import { RegionSurface } from "@/components/surfaces/RegionSurface";
 import { DestinationSurface } from "@/components/surfaces/DestinationSurface";
 import { BusinessSurface } from "@/components/surfaces/BusinessSurface";
+import {
+  BusinessShellBlock,
+  BusinessHeaderBadgesBlock,
+  BusinessDescriptionBlock,
+  BusinessGalleryBlock,
+  BusinessInfoBlock,
+  BusinessProductsBlock,
+  BusinessPromotionsBlock,
+  BusinessContactBlock,
+} from "@/components/surfaces/business-blocks";
 
 bootstrapBlockLibrary();
 
@@ -376,6 +386,15 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.surface.destination": NamedSectionPreview,
   // US-R3 · Ola 2 · Sub-ola 2.2 — Plantilla Madre Business
   "vmx.surface.business": NamedSectionPreview,
+  // US-R3 · Sub-ola 2.2b — Business granular
+  "vmx.business.shell": NamedSectionPreview,
+  "vmx.business.header-badges": NamedSectionPreview,
+  "vmx.business.description": NamedSectionPreview,
+  "vmx.business.gallery": NamedSectionPreview,
+  "vmx.business.info": NamedSectionPreview,
+  "vmx.business.products": NamedSectionPreview,
+  "vmx.business.promotions": NamedSectionPreview,
+  "vmx.business.contact": NamedSectionPreview,
 };
 
 /* ------------------------------------------------------------------ *
@@ -562,6 +581,19 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   // El detalle del negocio se recibe vía `BusinessSurfaceProvider`
   // desde la ruta pública; en Studio se muestra placeholder.
   "vmx.surface.business": () => <BusinessSurface />,
+  // US-R3 · Sub-ola 2.2b — Business granular. El shell es contenedor
+  // (registrado en layout-engine) y expone `renderChildren` para el
+  // resto de bloques del árbol.
+  "vmx.business.shell": ({ renderChildren }) => (
+    <BusinessShellBlock renderChildren={renderChildren} />
+  ),
+  "vmx.business.header-badges": () => <BusinessHeaderBadgesBlock />,
+  "vmx.business.description": () => <BusinessDescriptionBlock />,
+  "vmx.business.gallery": () => <BusinessGalleryBlock />,
+  "vmx.business.info": () => <BusinessInfoBlock />,
+  "vmx.business.products": () => <BusinessProductsBlock />,
+  "vmx.business.promotions": () => <BusinessPromotionsBlock />,
+  "vmx.business.contact": () => <BusinessContactBlock />,
 };
 
 /* ------------------------------------------------------------------ *
