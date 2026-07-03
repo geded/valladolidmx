@@ -1776,6 +1776,7 @@ function PageVisualEditor({
             const next = arrayMove(tree.root.children, oldIdx, newIdx);
             commitTree({ ...tree, root: { children: next } });
           }}
+          commentCounts={commentCounts}
         />
 
         {!previewMode && selectedContract && selectedConfig ? (
