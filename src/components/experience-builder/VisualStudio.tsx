@@ -94,6 +94,7 @@ import { AutoInspector } from "@/components/experience-builder/AutoInspector";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
 import { useAuth } from "@/hooks/useAuth";
 import { FONT_FAMILY_OPTIONS, type BlockAppearance } from "@/lib/experience-builder/appearance";
+import { useEditingLock, formatRelativeSince } from "./useEditingLock";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 type ChromeArea = "header" | "footer";
