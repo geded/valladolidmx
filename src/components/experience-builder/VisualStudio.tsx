@@ -2272,6 +2272,7 @@ function HomeCanvas({
                           onMoveUp={() => onMove(node.id, -1)}
                           onMoveDown={() => onMove(node.id, 1)}
                           sortable={rootIdSet.has(node.id)}
+                          commentCount={commentCounts?.[node.id] ?? 0}
                         >
                           {content}
                         </BlockOverlay>
