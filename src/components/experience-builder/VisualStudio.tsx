@@ -836,6 +836,7 @@ function PageVisualEditor({
   const create = useServerFn(createComposition);
   const save = useServerFn(saveCompositionDraft);
   const publish = useServerFn(publishComposition);
+  const fetchPublishedTree = useServerFn(getPublishedTree);
   const listRevs = useServerFn(listCompositionRevisions);
   const restore = useServerFn(restoreCompositionRevision);
   const issuePreview = useServerFn(issueCompositionPreviewLink);
@@ -857,6 +858,13 @@ function PageVisualEditor({
   const [sharing, setSharing] = useState(false);
   const [shareLink, setShareLink] = useState<{ url: string; expires_at: string } | null>(null);
   const [showTour, setShowTour] = useState(false);
+  /** US-C · Diff resumen antes de publicar. */
+  const [publishDiff, setPublishDiff] = useState<{
+    open: boolean;
+    loading: boolean;
+    changes: SectionChange[];
+    error: string | null;
+  }>({ open: false, loading: false, changes: [], error: null });
   /**
    * Hash canónico del `tree` en edición para comparar contra
    * `page.published_hash` (calculado en el servidor sobre el snapshot de
