@@ -117,7 +117,7 @@ export const getComposition = createServerFn({ method: "GET" })
     const { data: row, error } = await context.supabase
       .from("page_compositions")
       .select(
-        "id, slug, title, description, status, page_type, active_revision_id, updated_at, current_draft, published_at, scheduled_publish_at",
+        "id, slug, title, description, status, page_type, active_revision_id, updated_at, current_draft, published_at, scheduled_publish_at, workflow_state, workflow_updated_at, workflow_notes",
       )
       .eq("id", data.id)
       .maybeSingle();
@@ -136,7 +136,7 @@ export const getComposition = createServerFn({ method: "GET" })
       }
     }
     return {
-      ...(row as Omit<CompositionDetail, "current_draft" | "published_hash" | "published_at">),
+      ...(row as unknown as Omit<CompositionDetail, "current_draft" | "published_hash" | "published_at">),
       current_draft: ((row as { current_draft: unknown }).current_draft as CompositionTree) ?? EMPTY_TREE,
       published_hash,
       published_at: (row as { published_at: string | null }).published_at ?? null,
