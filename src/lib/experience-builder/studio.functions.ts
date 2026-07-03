@@ -674,7 +674,7 @@ export const listStudioPages = createServerFn({ method: "GET" })
       .order("updated_at", { ascending: false })
       .limit(500);
     if (error) throw new Error(error.message);
-    const rows = (data ?? []) as Array<Record<string, unknown>>;
+    const rows = ((data ?? []) as unknown) as Array<Record<string, unknown>>;
 
     // Autor: batch lookup en profiles (best-effort, RLS puede filtrar).
     const authorIds = Array.from(
@@ -759,7 +759,7 @@ export const duplicateComposition = createServerFn({ method: "POST" })
     const { data: id, error } = await context.supabase.rpc("eb_duplicate_composition", {
       _id: data.id,
       _new_slug: data.new_slug,
-      _new_title: data.new_title ?? null,
+      _new_title: data.new_title ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { id: id as unknown as string };
@@ -835,7 +835,7 @@ export const markCompositionAsTemplate = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("eb_mark_composition_as_template", {
       _id: data.id,
       _is_template: data.is_template,
-      _template_of_kind: data.template_of_kind ?? null,
+      _template_of_kind: data.template_of_kind ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
