@@ -854,6 +854,13 @@ function PageVisualEditor({
   const [previewMode, setPreviewMode] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [shareLink, setShareLink] = useState<{ url: string; expires_at: string } | null>(null);
+  const [showTour, setShowTour] = useState(false);
+  useEffect(() => {
+    if (!hasSeenOnboarding()) {
+      const t = window.setTimeout(() => setShowTour(true), 500);
+      return () => window.clearTimeout(t);
+    }
+  }, []);
   const skipNextAutoSave = useRef(false);
   /**
    * Historial visual (US-14). Guardamos snapshots del árbol en `pastRef`
