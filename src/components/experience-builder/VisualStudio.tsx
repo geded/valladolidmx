@@ -1556,6 +1556,14 @@ function PageVisualEditor({
             Versiones
           </button>
           <PublishStateBadge state={publishState} publishedAt={page?.published_at ?? null} />
+          {page ? (
+            <WorkflowChip
+              state={page.workflow_state ?? "draft"}
+              busy={workflowBusy}
+              canApprove={canPublish}
+              onChange={changeWorkflow}
+            />
+          ) : null}
           <HelpButton onOpen={() => setShowTour(true)} />
           <a
             href={pageDef.publicPath}
