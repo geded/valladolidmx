@@ -43,6 +43,9 @@ import {
   CockpitActivityStream,
 } from "@/components/admin/cockpit-blocks";
 import { SmartBlockRuntime } from "@/components/experience-builder/smart-blocks";
+import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
+import { AluxSurface } from "@/components/surfaces/AluxSurface";
+import { TripPlannerSurface } from "@/components/surfaces/TripPlannerSurface";
 
 bootstrapBlockLibrary();
 
@@ -362,6 +365,9 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.smart.businesses-grid": NamedSectionPreview,
   "vmx.smart.products-grid": NamedSectionPreview,
   "vmx.smart.events-list": NamedSectionPreview,
+  "vmx.surface.marketplace": NamedSectionPreview,
+  "vmx.surface.alux": NamedSectionPreview,
+  "vmx.surface.trip-planner": NamedSectionPreview,
 };
 
 /* ------------------------------------------------------------------ *
@@ -536,6 +542,10 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.smart.businesses-grid": ({ node }) => <SmartBlockRuntime node={node} />,
   "vmx.smart.products-grid": ({ node }) => <SmartBlockRuntime node={node} />,
   "vmx.smart.events-list": ({ node }) => <SmartBlockRuntime node={node} />,
+  // US-R3 · Ola 1 — Superficies singleton oficiales adoptadas por el EB.
+  "vmx.surface.marketplace": () => <MarketplaceSurface />,
+  "vmx.surface.alux": () => <AluxSurface />,
+  "vmx.surface.trip-planner": () => <TripPlannerSurface />,
 };
 
 /* ------------------------------------------------------------------ *
