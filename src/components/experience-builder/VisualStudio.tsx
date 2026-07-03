@@ -1788,14 +1788,16 @@ function PageVisualEditor({
           </aside>
         ) : null}
 
-        <HomeCanvas
-          tree={tree}
-          previewMode={previewMode}
-          deviceViewport={deviceViewport}
-          selectedId={selectedId}
-          onSelect={(id) => setSelectedId(id)}
-          onSelectChrome={(area) => setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)}
-          onDelete={(id) => {
+        {(() => {
+          const canvas = (
+            <HomeCanvas
+              tree={tree}
+              previewMode={previewMode}
+              deviceViewport={deviceViewport}
+              selectedId={selectedId}
+              onSelect={(id) => setSelectedId(id)}
+              onSelectChrome={(area) => setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)}
+              onDelete={(id) => {
             if (typeof window !== "undefined") {
               const node = tree?.root.children.find((n) => n.id === id);
               const label = node ? getBlock(node.type)?.display_name ?? node.type : "esta sección";
@@ -1815,7 +1817,20 @@ function PageVisualEditor({
             commitTree({ ...tree, root: { children: next } });
           }}
           commentCounts={commentCounts}
-        />
+            />
+          );
+          if (!previewProvider) return canvas;
+          const Provider = previewProvider.Provider;
+          return (
+            <div className="flex min-w-0 flex-1 flex-col">
+              <StudioPreviewContextBar
+                provider={previewProvider}
+                onDataChange={handlePreviewDataChange}
+              />
+              <Provider data={previewData as never}>{canvas}</Provider>
+            </div>
+          );
+        })()}
 
         {!previewMode && selectedContract && selectedConfig ? (
           <aside
