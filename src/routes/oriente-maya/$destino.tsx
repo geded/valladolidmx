@@ -14,14 +14,17 @@ import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
 import { DestinationSurface } from "@/components/surfaces/DestinationSurface";
-import { getPublicDestinationBySlug } from "@/lib/destinations/public-reads.functions";
+import { getPublicDestinationBySlug, getDestinationRelated } from "@/lib/destinations/public-reads.functions";
 
 export const Route = createFileRoute("/oriente-maya/$destino")({
   loader: async ({ params }) => {
     const mock = DESTINOS_MOCK.find(
       (d) => d.slug === params.destino && d.region_slug === ORIENTE_MAYA.slug,
     );
-    const db = await getPublicDestinationBySlug({ data: { slug: params.destino } }).catch(() => null);
+    const [db, related] = await Promise.all([
+      getPublicDestinationBySlug({ data: { slug: params.destino } }).catch(() => null),
+      getDestinationRelated({ data: { slug: params.destino } }).catch(() => null),
+    ]);
     if (!mock && !db) throw notFound();
     const dest = {
       slug: params.destino,
@@ -31,7 +34,7 @@ export const Route = createFileRoute("/oriente-maya/$destino")({
         "territorio" | "selva" | "cenote" | "atardecer",
       highlights: (db?.highlights?.length ? db.highlights : mock?.highlights ?? []) as string[],
     };
-    return { dest, db };
+    return { dest, db, related };
   },
   head: ({ loaderData, params }) =>
     loaderData
@@ -54,6 +57,6 @@ export const Route = createFileRoute("/oriente-maya/$destino")({
 });
 
 function DestinoPage() {
-  const { db } = Route.useLoaderData();
-  return <DestinationSurface dbData={db ?? undefined} />;
+  const { db, related } = Route.useLoaderData();
+  return <DestinationSurface dbData={db ?? undefined} related={related ?? undefined} />;
 }
