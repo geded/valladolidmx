@@ -84,3 +84,71 @@ export function buildPublicHead(options: DiscoveryHeadOptions): DiscoveryHead {
 
   return { meta, links, scripts };
 }
+
+/**
+ * Recorre una composición publicada y devuelve la primera URL de imagen
+ * "compartible" que encuentre (hero, portada, media, image, background).
+ * Sirve como fallback de `og:image` cuando el editor no capturó una en el
+ * bloque SEO. Nunca lanza — si no encuentra nada devuelve `undefined`.
+ */
+export function pickFirstMediaUrl(tree: unknown): string | undefined {
+  const IMG_KEYS = new Set([
+    "og_image", "ogImage",
+    "image", "image_url", "imageUrl",
+    "media", "media_url", "mediaUrl",
+    "cover", "cover_url", "coverUrl",
+    "hero", "hero_url", "heroUrl",
+    "background", "background_url", "backgroundUrl",
+    "src", "url", "poster",
+  ]);
+  const seen = new WeakSet<object>();
+  const stack: unknown[] = [tree];
+  while (stack.length) {
+    const cur = stack.pop();
+    if (!cur || typeof cur !== "object") continue;
+    if (seen.has(cur as object)) continue;
+    seen.add(cur as object);
+    if (Array.isArray(cur)) {
+      for (const v of cur) stack.push(v);
+      continue;
+    }
+    for (const [k, v] of Object.entries(cur as Record<string, unknown>)) {
+      if (typeof v === "string" && IMG_KEYS.has(k) && looksLikeImage(v)) {
+        return v;
+      }
+      if (v && typeof v === "object") stack.push(v);
+    }
+  }
+  return undefined;
+}
+
+function looksLikeImage(value: string): boolean {
+  const v = value.trim();
+  if (!v) return false;
+  if (v.startsWith("data:image/")) return true;
+  if (/^(https?:)?\/\//i.test(v) || v.startsWith("/")) {
+    return /\.(png|jpe?g|webp|avif|gif|svg)(\?|#|$)/i.test(v) || /supabase|cloudinary|images|storage|cdn/i.test(v);
+  }
+  return false;
+}
+
+/** JSON-LD mínimo (WebPage) para páginas del Studio; útil para snippets. */
+export function webPageJsonLd(input: {
+  title: string;
+  description: string;
+  path: string;
+  image?: string;
+}): Record<string, unknown> {
+  const url = absoluteUrl(input.path);
+  const jsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: input.title,
+    description: input.description,
+    url,
+    inLanguage: "es-MX",
+    isPartOf: { "@type": "WebSite", name: SITE.name, url: DISCOVERY_ORIGIN },
+  };
+  if (input.image) jsonLd.primaryImageOfPage = { "@type": "ImageObject", url: input.image };
+  return jsonLd;
+}
