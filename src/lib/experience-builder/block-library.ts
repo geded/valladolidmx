@@ -842,6 +842,157 @@ const customFormBlock: BlockContract = {
  * Registro
  * ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ *
+ * Etapa 15.10.8 · Smart Blocks v1
+ * Bloques que consumen datos reales (destinos, empresas, productos,
+ * eventos) vía `SmartBlockQuery` declarativa resuelta server-side por
+ * `resolveSmartBlock` (RLS anon + lista blanca de tablas/columnas).
+ * ------------------------------------------------------------------ */
+
+const smartCommonSchema = {
+  title: {
+    type: "text",
+    label: "Título",
+    translatable: true,
+  },
+  limit: {
+    type: "number",
+    label: "Cantidad de elementos",
+    default: 6,
+  },
+  only_featured: {
+    type: "boolean",
+    label: "Solo destacados",
+    default: false,
+  },
+} as const;
+
+const smartDestinationsGridBlock: BlockContract = {
+  type: "vmx.smart.destinations-grid",
+  category: "smart",
+  version: "1.0.0",
+  display_name: "Destinos (Smart)",
+  description: "Grid dinámico de destinos publicados.",
+  schema: { ...smartCommonSchema },
+  capabilities: {
+    soporta_datos_dinamicos: true,
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  data_sources: [
+    {
+      domain: "destinations",
+      read_only: true,
+      query: {
+        table: "destinations",
+        select: ["id", "slug", "name", "short_description", "hero_image_url", "is_featured", "sort_order"],
+        filters: [{ column: "status", op: "eq", value: "published" }],
+        order_by: [{ column: "sort_order", direction: "asc" }],
+        limit: 6,
+      },
+    },
+  ],
+  constraints: { surfaces: ["home", "landing", "institutional", "destination"] },
+  i18n: { translatable_fields: ["title"], fallback: "base_language" },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const smartBusinessesGridBlock: BlockContract = {
+  type: "vmx.smart.businesses-grid",
+  category: "smart",
+  version: "1.0.0",
+  display_name: "Empresas (Smart)",
+  description: "Grid dinámico de empresas publicadas.",
+  schema: { ...smartCommonSchema },
+  capabilities: {
+    soporta_datos_dinamicos: true,
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  data_sources: [
+    {
+      domain: "businesses",
+      read_only: true,
+      query: {
+        table: "businesses",
+        select: ["id", "slug", "name", "short_description", "cover_image_url", "logo_url", "is_featured"],
+        filters: [{ column: "status", op: "eq", value: "published" }],
+        limit: 6,
+      },
+    },
+  ],
+  constraints: { surfaces: ["home", "landing", "destination", "business"] },
+  i18n: { translatable_fields: ["title"], fallback: "base_language" },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const smartProductsGridBlock: BlockContract = {
+  type: "vmx.smart.products-grid",
+  category: "smart",
+  version: "1.0.0",
+  display_name: "Productos (Smart)",
+  description: "Grid dinámico de productos publicados.",
+  schema: { ...smartCommonSchema },
+  capabilities: {
+    soporta_datos_dinamicos: true,
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  data_sources: [
+    {
+      domain: "marketplace",
+      read_only: true,
+      query: {
+        table: "products",
+        select: ["id", "slug", "name", "short_description", "cover_image_url", "price", "currency", "is_featured"],
+        filters: [{ column: "status", op: "eq", value: "published" }],
+        limit: 6,
+      },
+    },
+  ],
+  constraints: { surfaces: ["home", "landing", "destination", "business", "product"] },
+  i18n: { translatable_fields: ["title"], fallback: "base_language" },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const smartEventsListBlock: BlockContract = {
+  type: "vmx.smart.events-list",
+  category: "smart",
+  version: "1.0.0",
+  display_name: "Eventos (Smart)",
+  description: "Lista de eventos publicados por fecha.",
+  schema: { ...smartCommonSchema },
+  capabilities: {
+    soporta_datos_dinamicos: true,
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  data_sources: [
+    {
+      domain: "events",
+      read_only: true,
+      query: {
+        table: "events",
+        select: ["id", "slug", "name", "short_description", "cover_image_url", "starts_at", "ends_at", "is_featured"],
+        filters: [{ column: "status", op: "eq", value: "published" }],
+        order_by: [{ column: "starts_at", direction: "asc" }],
+        limit: 6,
+      },
+    },
+  ],
+  constraints: { surfaces: ["home", "landing", "destination"] },
+  i18n: { translatable_fields: ["title"], fallback: "base_language" },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
@@ -869,6 +1020,11 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   actionsButtonsBlock,
   customHtmlBlock,
   customFormBlock,
+  // Etapa 15.10.8 · Smart Blocks v1
+  smartDestinationsGridBlock,
+  smartBusinessesGridBlock,
+  smartProductsGridBlock,
+  smartEventsListBlock,
 ];
 
 let bootstrapped = false;
