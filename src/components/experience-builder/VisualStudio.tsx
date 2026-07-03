@@ -2622,6 +2622,139 @@ function formatRelative(iso: string): string {
   return `hace ${days} d`;
 }
 
+/**
+ * US-C · Modal de confirmación con diff resumen antes de publicar.
+ * Muestra en agrupaciones lo que se añadió, modificó, ocultó/mostró,
+ * reordenó o eliminó respecto a la versión activa en producción.
+ */
+function PublishDiffModal({
+  loading,
+  changes,
+  error,
+  publishing,
+  publicPath,
+  onCancel,
+  onConfirm,
+}: {
+  loading: boolean;
+  changes: SectionChange[];
+  error: string | null;
+  publishing: boolean;
+  publicPath: string;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  const groups: Array<{ key: SectionChange["kind"]; label: string; tone: string }> = [
+    { key: "added", label: "Añadidos", tone: "text-emerald-700 bg-emerald-50 border-emerald-200" },
+    { key: "modified", label: "Modificados", tone: "text-amber-800 bg-amber-50 border-amber-200" },
+    { key: "visibility", label: "Visibilidad cambiada", tone: "text-sky-800 bg-sky-50 border-sky-200" },
+    { key: "reordered", label: "Reordenados", tone: "text-slate-700 bg-slate-50 border-slate-200" },
+    { key: "removed", label: "Eliminados", tone: "text-rose-800 bg-rose-50 border-rose-200" },
+  ];
+  const grouped = groups
+    .map((g) => ({ ...g, items: changes.filter((c) => c.kind === g.key) }))
+    .filter((g) => g.items.length > 0);
+  const total = changes.length;
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="publish-diff-title"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm"
+    >
+      <div className="w-full max-w-lg overflow-hidden rounded-lg border border-border bg-card shadow-xl">
+        <header className="flex items-start justify-between gap-3 border-b border-border px-4 py-3">
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Confirmar publicación
+            </p>
+            <h2 id="publish-diff-title" className="mt-0.5 text-base font-semibold">
+              Cambios que se publicarán
+            </h2>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              Se aplicarán a <span className="font-mono">{publicPath}</span>
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+            aria-label="Cerrar"
+          >
+            <X className="size-4" aria-hidden />
+          </button>
+        </header>
+        <div className="max-h-[60vh] space-y-3 overflow-y-auto px-4 py-3">
+          {loading ? (
+            <p className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Loader2 className="size-3.5 animate-spin" aria-hidden />
+              Calculando diferencias…
+            </p>
+          ) : error ? (
+            <p className="text-xs text-rose-700">No se pudo calcular el diff: {error}</p>
+          ) : total === 0 ? (
+            <p className="text-xs text-muted-foreground">
+              El borrador es idéntico a la versión publicada. Aún así puedes publicar para actualizar la marca de tiempo.
+            </p>
+          ) : (
+            grouped.map((g) => (
+              <section key={g.key} className="space-y-1.5">
+                <h3 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  {g.label} · {g.items.length}
+                </h3>
+                <ul className="space-y-1">
+                  {g.items.map((c) => (
+                    <li
+                      key={`${c.kind}:${c.id}`}
+                      className={`flex items-center justify-between gap-2 rounded-md border px-2.5 py-1.5 text-xs ${g.tone}`}
+                    >
+                      <span className="truncate font-medium">{c.label}</span>
+                      <span className="shrink-0 text-[10px] opacity-70">
+                        {c.kind === "visibility"
+                          ? c.hidden ? "ocultado" : "visible"
+                          : c.kind === "reordered"
+                            ? `pos ${(c.from ?? 0) + 1} → ${(c.to ?? 0) + 1}`
+                            : c.type}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))
+          )}
+        </div>
+        <footer className="flex items-center justify-end gap-2 border-t border-border bg-muted/30 px-4 py-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={publishing || loading}
+            className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:opacity-95 disabled:opacity-60"
+          >
+            {publishing ? (
+              <>
+                <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                Publicando…
+              </>
+            ) : (
+              <>
+                <Check className="size-3.5" aria-hidden />
+                Confirmar y publicar
+              </>
+            )}
+          </button>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
 function _VersionsDrawerImpl({
   versions, onClose, onRestore,
 }: {
