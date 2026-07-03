@@ -386,15 +386,19 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.surface.destination": NamedSectionPreview,
   // US-R3 · Ola 2 · Sub-ola 2.2 — Plantilla Madre Business
   "vmx.surface.business": NamedSectionPreview,
-  // US-R3 · Sub-ola 2.2b — Business granular
-  "vmx.business.shell": NamedSectionPreview,
-  "vmx.business.header-badges": NamedSectionPreview,
-  "vmx.business.description": NamedSectionPreview,
-  "vmx.business.gallery": NamedSectionPreview,
-  "vmx.business.info": NamedSectionPreview,
-  "vmx.business.products": NamedSectionPreview,
-  "vmx.business.promotions": NamedSectionPreview,
-  "vmx.business.contact": NamedSectionPreview,
+  // US-R3 · Sub-ola 2.2b — Business granular. En Studio queremos ver
+  // el bloque HIDRATADO con el contexto de preview (BusinessSurfaceProvider),
+  // no un placeholder — mismo componente de producción.
+  "vmx.business.shell": ({ renderChildren }) => (
+    <BusinessShellBlock renderChildren={renderChildren} />
+  ),
+  "vmx.business.header-badges": () => <BusinessHeaderBadgesBlock />,
+  "vmx.business.description": () => <BusinessDescriptionBlock />,
+  "vmx.business.gallery": () => <BusinessGalleryBlock />,
+  "vmx.business.info": () => <BusinessInfoBlock />,
+  "vmx.business.products": () => <BusinessProductsBlock />,
+  "vmx.business.promotions": () => <BusinessPromotionsBlock />,
+  "vmx.business.contact": () => <BusinessContactBlock />,
 };
 
 /* ------------------------------------------------------------------ *
