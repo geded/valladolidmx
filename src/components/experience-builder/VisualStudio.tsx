@@ -2494,6 +2494,89 @@ function VersionsDrawer({
   onClose: () => void;
   onRestore: (rev: CompositionRevisionSummary) => void | Promise<void>;
 }) {
+  return _VersionsDrawerImpl({ versions, onClose, onRestore });
+}
+
+/**
+ * Serialización determinista (keys ordenadas) para hashear el árbol de
+ * composición de forma estable, con el mismo criterio que el servidor
+ * en `studio.functions.ts#canonicalize`.
+ */
+function canonicalizeClient(value: unknown): string {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalizeClient).join(",")}]`;
+  const obj = value as Record<string, unknown>;
+  const keys = Object.keys(obj).sort();
+  return `{${keys.map((k) => `${JSON.stringify(k)}:${canonicalizeClient(obj[k])}`).join(",")}}`;
+}
+
+async function hashTreeClient(tree: unknown): Promise<string> {
+  const bytes = new TextEncoder().encode(canonicalizeClient(tree));
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function PublishStateBadge({
+  state,
+  publishedAt,
+}: {
+  state: "never" | "dirty" | "clean";
+  publishedAt: string | null;
+}) {
+  const relative = publishedAt ? formatRelative(publishedAt) : null;
+  if (state === "never") {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-md border border-muted-foreground/30 bg-muted/40 px-2 py-1 text-[11px] font-medium text-muted-foreground"
+        title="Esta página aún no ha sido publicada"
+      >
+        <span className="size-1.5 rounded-full bg-muted-foreground" aria-hidden />
+        Sin publicar
+      </span>
+    );
+  }
+  if (state === "dirty") {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-md border border-amber-400/60 bg-amber-50 px-2 py-1 text-[11px] font-medium text-amber-900"
+        title={relative ? `Última publicación: ${relative}` : "Hay cambios en el borrador"}
+      >
+        <span className="size-1.5 rounded-full bg-amber-500" aria-hidden />
+        Cambios sin publicar
+      </span>
+    );
+  }
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-md border border-emerald-400/60 bg-emerald-50 px-2 py-1 text-[11px] font-medium text-emerald-900"
+      title={relative ? `Publicada ${relative}` : "Publicada"}
+    >
+      <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden />
+      Todo publicado
+    </span>
+  );
+}
+
+function formatRelative(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.round(diff / 60_000);
+  if (mins < 1) return "hace unos segundos";
+  if (mins < 60) return `hace ${mins} min`;
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return `hace ${hrs} h`;
+  const days = Math.round(hrs / 24);
+  return `hace ${days} d`;
+}
+
+function _VersionsDrawerImpl({
+  versions, onClose, onRestore,
+}: {
+  versions: CompositionRevisionSummary[];
+  onClose: () => void;
+  onRestore: (rev: CompositionRevisionSummary) => void | Promise<void>;
+}) {
   return (
     <div
       className="fixed right-0 top-[52px] z-50 flex h-[calc(100vh-52px)] w-[380px] max-w-[92vw] flex-col gap-3 border-l border-border bg-card p-4 shadow-xl"
