@@ -18,11 +18,20 @@ export interface MarketplaceSurfaceProps {
   emptyMessage?: string;
 }
 
-export function MarketplaceSurface({ items, emptyMessage }: MarketplaceSurfaceProps = {}) {
-  const fromLoader = items === undefined
-    ? marketplaceRouteApi.useLoaderData().businesses
-    : items;
-  const list = fromLoader ?? [];
+export function MarketplaceSurface(props: MarketplaceSurfaceProps = {}) {
+  if (props.items !== undefined) {
+    return <MarketplaceSurfaceList items={props.items} emptyMessage={props.emptyMessage} />;
+  }
+  return <MarketplaceSurfaceFromLoader emptyMessage={props.emptyMessage} />;
+}
+
+function MarketplaceSurfaceFromLoader({ emptyMessage }: { emptyMessage?: string }) {
+  const { businesses } = marketplaceRouteApi.useLoaderData();
+  return <MarketplaceSurfaceList items={businesses ?? []} emptyMessage={emptyMessage} />;
+}
+
+function MarketplaceSurfaceList({ items, emptyMessage }: { items: MarketplaceBusinessCard[]; emptyMessage?: string }) {
+  const list = items;
   if (list.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
