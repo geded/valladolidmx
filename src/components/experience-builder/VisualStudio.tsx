@@ -92,6 +92,7 @@ import { getBlock, listBlocks } from "@/lib/experience-builder/block-registry";
 import type { BlockContract } from "@/lib/experience-builder/block-contract";
 import { diffCompositions, type SectionChange } from "@/lib/experience-builder/composition-diff";
 import { AutoInspector } from "@/components/experience-builder/AutoInspector";
+import { BlockCommentsPanel } from "@/components/experience-builder/BlockCommentsPanel";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
 import { useAuth } from "@/hooks/useAuth";
 import { FONT_FAMILY_OPTIONS, type BlockAppearance } from "@/lib/experience-builder/appearance";
