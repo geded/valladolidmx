@@ -1139,6 +1139,82 @@ const surfaceBusinessBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+/* ------------------------------------------------------------------ *
+ * US-R3 · Sub-ola 2.2b — Plantilla Madre Business (bloques granulares).
+ *
+ * El editor ya no ve un bloque monolítico: el árbol lateral expone la
+ * estructura editorial completa. Cada bloque es reutilizable, respeta
+ * gates por plan (vía Catálogo Central de Planes) y hereda el contexto
+ * `BusinessSurfaceContext` inyectado por el Studio o por la ruta pública.
+ * ------------------------------------------------------------------ */
+
+function businessBlock(
+  type: string,
+  display_name: string,
+  description: string,
+  extra: Partial<BlockContract> = {},
+): BlockContract {
+  return {
+    type,
+    category: "static",
+    version: "1.0.0",
+    display_name,
+    description,
+    schema: {},
+    capabilities: {
+      soporta_preview: true,
+      soporta_responsive: true,
+      soporta_seo: false,
+      soporta_cache: true,
+    },
+    constraints: { surfaces: ["business"] },
+    responsive: { breakpoints: ["desktop", "tablet", "mobile"] },
+    audit: ["Block.Registered", "Block.VersionPublished"],
+    ...extra,
+  };
+}
+
+const businessShellBlock = businessBlock(
+  "vmx.business.shell",
+  "Empresa · Shell",
+  "Contenedor oficial de la ficha de negocio (PublicShell con eyebrow, título, descripción y breadcrumbs).",
+);
+const businessHeaderBadgesBlock = businessBlock(
+  "vmx.business.header-badges",
+  "Empresa · Badges de encabezado",
+  "Favorito y sello de verificación bajo el título del negocio.",
+);
+const businessDescriptionBlock = businessBlock(
+  "vmx.business.description",
+  "Empresa · Descripción",
+  "Descripción larga tomada del CMS del negocio.",
+);
+const businessGalleryBlock = businessBlock(
+  "vmx.business.gallery",
+  "Empresa · Galería",
+  "Galería de fotografías del negocio (gated por plan).",
+);
+const businessInfoBlock = businessBlock(
+  "vmx.business.info",
+  "Empresa · Información",
+  "Ficha rápida: destino, categoría, verificación y plan.",
+);
+const businessProductsBlock = businessBlock(
+  "vmx.business.products",
+  "Empresa · Productos",
+  "Listado de productos, habitaciones, menú, tours o servicios según categoría.",
+);
+const businessPromotionsBlock = businessBlock(
+  "vmx.business.promotions",
+  "Empresa · Promociones",
+  "Promociones vigentes (gated por plan vía Catálogo Central).",
+);
+const businessContactBlock = businessBlock(
+  "vmx.business.contact",
+  "Empresa · Contacto",
+  "Datos de contacto y reservación tomados del CMS.",
+);
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
@@ -1176,6 +1252,15 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   surfaceDestinationBlock,
   // US-R3 · Ola 2 · Sub-ola 2.2 — Plantilla Madre Business
   surfaceBusinessBlock,
+  // US-R3 · Sub-ola 2.2b — Business granular (Plantilla Editable)
+  businessShellBlock,
+  businessHeaderBadgesBlock,
+  businessDescriptionBlock,
+  businessGalleryBlock,
+  businessInfoBlock,
+  businessProductsBlock,
+  businessPromotionsBlock,
+  businessContactBlock,
 ];
 
 let bootstrapped = false;
