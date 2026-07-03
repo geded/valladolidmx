@@ -67,6 +67,7 @@ import {
   createComposition,
   saveCompositionDraft,
   publishComposition,
+  unpublishComposition,
   listCompositionRevisions,
   restoreCompositionRevision,
   issueCompositionPreviewLink,
