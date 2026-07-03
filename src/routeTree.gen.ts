@@ -12,11 +12,17 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RestaurantesRouteImport } from './routes/restaurantes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as QueHacerRouteImport } from './routes/que-hacer'
+import { Route as PromocionesRouteImport } from './routes/promociones'
 import { Route as OfflineRouteImport } from './routes/offline'
+import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as HotelesRouteImport } from './routes/hoteles'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as ContactoRouteImport } from './routes/contacto'
+import { Route as CasasDeVacacionesRouteImport } from './routes/casas-de-vacaciones'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArmaTuViajeRouteImport } from './routes/arma-tu-viaje'
 import { Route as AluxRouteImport } from './routes/alux'
@@ -132,9 +138,24 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QueHacerRoute = QueHacerRouteImport.update({
+  id: '/que-hacer',
+  path: '/que-hacer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromocionesRoute = PromocionesRouteImport.update({
+  id: '/promociones',
+  path: '/promociones',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OfflineRoute = OfflineRouteImport.update({
   id: '/offline',
   path: '/offline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapaRoute = MapaRouteImport.update({
+  id: '/mapa',
+  path: '/mapa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HotelesRoute = HotelesRouteImport.update({
@@ -155,6 +176,21 @@ const EventosRoute = EventosRouteImport.update({
 const EmpresasRoute = EmpresasRouteImport.update({
   id: '/empresas',
   path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactoRoute = ContactoRouteImport.update({
+  id: '/contacto',
+  path: '/contacto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CasasDeVacacionesRoute = CasasDeVacacionesRouteImport.update({
+  id: '/casas-de-vacaciones',
+  path: '/casas-de-vacaciones',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -726,11 +762,17 @@ export interface FileRoutesByFullPath {
   '/alux': typeof AluxRoute
   '/arma-tu-viaje': typeof ArmaTuViajeRoute
   '/auth': typeof AuthRoute
+  '/blog': typeof BlogRoute
+  '/casas-de-vacaciones': typeof CasasDeVacacionesRoute
+  '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/mapa': typeof MapaRoute
   '/offline': typeof OfflineRoute
+  '/promociones': typeof PromocionesRoute
+  '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -834,11 +876,17 @@ export interface FileRoutesByTo {
   '/alux': typeof AluxRoute
   '/arma-tu-viaje': typeof ArmaTuViajeRoute
   '/auth': typeof AuthRoute
+  '/blog': typeof BlogRoute
+  '/casas-de-vacaciones': typeof CasasDeVacacionesRoute
+  '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/mapa': typeof MapaRoute
   '/offline': typeof OfflineRoute
+  '/promociones': typeof PromocionesRoute
+  '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -938,11 +986,17 @@ export interface FileRoutesById {
   '/alux': typeof AluxRoute
   '/arma-tu-viaje': typeof ArmaTuViajeRoute
   '/auth': typeof AuthRoute
+  '/blog': typeof BlogRoute
+  '/casas-de-vacaciones': typeof CasasDeVacacionesRoute
+  '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/mapa': typeof MapaRoute
   '/offline': typeof OfflineRoute
+  '/promociones': typeof PromocionesRoute
+  '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1048,11 +1102,17 @@ export interface FileRouteTypes {
     | '/alux'
     | '/arma-tu-viaje'
     | '/auth'
+    | '/blog'
+    | '/casas-de-vacaciones'
+    | '/contacto'
     | '/empresas'
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/mapa'
     | '/offline'
+    | '/promociones'
+    | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
     | '/sitemap.xml'
@@ -1156,11 +1216,17 @@ export interface FileRouteTypes {
     | '/alux'
     | '/arma-tu-viaje'
     | '/auth'
+    | '/blog'
+    | '/casas-de-vacaciones'
+    | '/contacto'
     | '/empresas'
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/mapa'
     | '/offline'
+    | '/promociones'
+    | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
     | '/sitemap.xml'
@@ -1259,11 +1325,17 @@ export interface FileRouteTypes {
     | '/alux'
     | '/arma-tu-viaje'
     | '/auth'
+    | '/blog'
+    | '/casas-de-vacaciones'
+    | '/contacto'
     | '/empresas'
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/mapa'
     | '/offline'
+    | '/promociones'
+    | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
     | '/sitemap.xml'
@@ -1369,11 +1441,17 @@ export interface RootRouteChildren {
   AluxRoute: typeof AluxRoute
   ArmaTuViajeRoute: typeof ArmaTuViajeRoute
   AuthRoute: typeof AuthRoute
+  BlogRoute: typeof BlogRoute
+  CasasDeVacacionesRoute: typeof CasasDeVacacionesRoute
+  ContactoRoute: typeof ContactoRoute
   EmpresasRoute: typeof EmpresasRoute
   EventosRoute: typeof EventosRouteWithChildren
   ExperienciasRoute: typeof ExperienciasRoute
   HotelesRoute: typeof HotelesRoute
+  MapaRoute: typeof MapaRoute
   OfflineRoute: typeof OfflineRoute
+  PromocionesRoute: typeof PromocionesRoute
+  QueHacerRoute: typeof QueHacerRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RestaurantesRoute: typeof RestaurantesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -1420,11 +1498,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/que-hacer': {
+      id: '/que-hacer'
+      path: '/que-hacer'
+      fullPath: '/que-hacer'
+      preLoaderRoute: typeof QueHacerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promociones': {
+      id: '/promociones'
+      path: '/promociones'
+      fullPath: '/promociones'
+      preLoaderRoute: typeof PromocionesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/offline': {
       id: '/offline'
       path: '/offline'
       fullPath: '/offline'
       preLoaderRoute: typeof OfflineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mapa': {
+      id: '/mapa'
+      path: '/mapa'
+      fullPath: '/mapa'
+      preLoaderRoute: typeof MapaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hoteles': {
@@ -1453,6 +1552,27 @@ declare module '@tanstack/react-router' {
       path: '/empresas'
       fullPath: '/empresas'
       preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contacto': {
+      id: '/contacto'
+      path: '/contacto'
+      fullPath: '/contacto'
+      preLoaderRoute: typeof ContactoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/casas-de-vacaciones': {
+      id: '/casas-de-vacaciones'
+      path: '/casas-de-vacaciones'
+      fullPath: '/casas-de-vacaciones'
+      preLoaderRoute: typeof CasasDeVacacionesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -2460,11 +2580,17 @@ const rootRouteChildren: RootRouteChildren = {
   AluxRoute: AluxRoute,
   ArmaTuViajeRoute: ArmaTuViajeRoute,
   AuthRoute: AuthRoute,
+  BlogRoute: BlogRoute,
+  CasasDeVacacionesRoute: CasasDeVacacionesRoute,
+  ContactoRoute: ContactoRoute,
   EmpresasRoute: EmpresasRoute,
   EventosRoute: EventosRouteWithChildren,
   ExperienciasRoute: ExperienciasRoute,
   HotelesRoute: HotelesRoute,
+  MapaRoute: MapaRoute,
   OfflineRoute: OfflineRoute,
+  PromocionesRoute: PromocionesRoute,
+  QueHacerRoute: QueHacerRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RestaurantesRoute: RestaurantesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -2491,13 +2617,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
