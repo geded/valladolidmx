@@ -18,6 +18,8 @@ import { ResenasSection } from "@/components/home/ResenasSection";
 import { ArmaTuViajeSection } from "@/components/home/ArmaTuViajeSection";
 import { ConsejoAluxSection } from "@/components/home/ConsejoAluxSection";
 import { EnVivoSection } from "@/components/home/EnVivoSection";
+import { EventosSection } from "@/components/home/EventosSection";
+import { PromocionesSection } from "@/components/home/PromocionesSection";
 
 export type DiscoverySectionKind =
   | "hero"
@@ -28,7 +30,9 @@ export type DiscoverySectionKind =
   | "resenas"
   | "arma-tu-viaje"
   | "consejo-alux"
-  | "en-vivo";
+  | "en-vivo"
+  | "eventos"
+  | "promociones";
 
 export interface DiscoverySectionDefinition<TProps = any> {
   kind: DiscoverySectionKind;
@@ -94,6 +98,18 @@ export const DISCOVERY_SECTIONS_REGISTRY: Readonly<
     component: EnVivoSection as ComponentType<any>,
     description: "Eventos y momentos en vivo.",
     surfaces: ["home", "eventos", "landing"],
+  },
+  eventos: {
+    kind: "eventos",
+    component: EventosSection as ComponentType<any>,
+    description: "Próximos eventos publicados.",
+    surfaces: ["home", "eventos", "landing"],
+  },
+  promociones: {
+    kind: "promociones",
+    component: PromocionesSection as ComponentType<any>,
+    description: "Campañas y ofertas vigentes.",
+    surfaces: ["home", "marketplace", "landing"],
   },
 });
 
