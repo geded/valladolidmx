@@ -19,8 +19,16 @@ import type {
   SmartBlockQuery,
 } from "./block-contract";
 
+export type SmartBlockJsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | SmartBlockJsonValue[]
+  | { [k: string]: SmartBlockJsonValue };
+
 export interface SmartBlockResolveResult {
-  items: Array<Record<string, unknown>>;
+  items: Array<Record<string, SmartBlockJsonValue>>;
   count: number;
   cached: boolean;
   error?: string;
@@ -148,7 +156,7 @@ export const resolveSmartBlock = createServerFn({ method: "POST" })
         return { items: [], count: 0, cached: false, error: error.message };
       }
       const value: SmartBlockResolveResult = {
-        items: (rows ?? []) as Array<Record<string, unknown>>,
+        items: (rows ?? []) as Array<Record<string, SmartBlockJsonValue>>,
         count: rows?.length ?? 0,
         cached: false,
       };
