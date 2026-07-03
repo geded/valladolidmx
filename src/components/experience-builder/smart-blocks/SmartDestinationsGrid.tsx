@@ -1,4 +1,5 @@
 import { SmartCard, SmartGrid, SmartEmpty } from "./SmartCard";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 
 export interface SmartDestinationItem {
   id?: string;
@@ -28,6 +29,18 @@ export function SmartDestinationsGrid({
             description={d.short_description ?? null}
             imageUrl={d.hero_image_url ?? null}
             href={d.slug ? `/destino/${d.slug}` : null}
+            actions={
+              d.id ? (
+                <AddToTravelPlanButton
+                  kind="destination"
+                  targetId={String(d.id)}
+                  title={String(d.name ?? "Destino")}
+                  slug={d.slug ?? null}
+                  imageUrl={d.hero_image_url ?? null}
+                  subtitle={d.short_description ?? null}
+                />
+              ) : null
+            }
           />
         ))}
       </SmartGrid>
