@@ -37,7 +37,7 @@ import { planAllows } from "@/lib/plans/plans-catalog";
  * Contexto — poblado por la ruta pública (SSR-safe).
  * ------------------------------------------------------------------ */
 
-const BusinessSurfaceContext = createContext<MarketplaceBusinessDetail | null>(null);
+export const BusinessSurfaceContext = createContext<MarketplaceBusinessDetail | null>(null);
 
 export function BusinessSurfaceProvider({
   business,
@@ -78,7 +78,7 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
   servicio:     { eyebrow: "Servicio",    productsHeading: "Servicios",                      productsEmpty: "Sin servicios publicados." },
 };
 
-function resolveVariant(categorySlug: string): CategoryVariant {
+export function resolveBusinessVariant(categorySlug: string): CategoryVariant {
   return (
     CATEGORY_VARIANTS[categorySlug] ?? {
       eyebrow: "Marketplace",
@@ -114,7 +114,7 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
     );
   }
 
-  const variant = resolveVariant(b.category_slug);
+  const variant = resolveBusinessVariant(b.category_slug);
   const tier = b.plan_tier;
   const showPromotions = planAllows(tier, "promotions") && b.promotions.length > 0;
 
