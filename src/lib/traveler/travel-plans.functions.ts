@@ -21,7 +21,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { Database } from "@/integrations/supabase/types";
+import type { Database, Json } from "@/integrations/supabase/types";
 
 // -------------------------------------------------------------------------
 // Contrato público (estable)
@@ -64,7 +64,6 @@ export interface TravelPlanItemSnapshot {
   slug?: string | null;
   image_url?: string | null;
   subtitle?: string | null;
-  [k: string]: unknown;
 }
 
 export interface TravelPlanItem {
@@ -91,7 +90,7 @@ export interface TravelPlan {
   notes: string | null;
   cover_image_url: string | null;
   source: TravelPlanSource;
-  meta: Record<string, unknown>;
+  meta: Json;
   case_id: string | null;
   created_at: string;
   updated_at: string;
@@ -185,7 +184,7 @@ function mapPlan(r: PlanRow): TravelPlan {
     notes: r.notes,
     cover_image_url: r.cover_image_url,
     source: r.source as TravelPlanSource,
-    meta: (r.meta as Record<string, unknown>) ?? {},
+    meta: (r.meta as Json) ?? {},
     case_id: r.case_id,
     created_at: r.created_at,
     updated_at: r.updated_at,
@@ -202,7 +201,7 @@ function mapItem(r: ItemRow): TravelPlanItem {
     position: r.position,
     day_index: r.day_index,
     notes: r.notes,
-    snapshot: (r.snapshot as TravelPlanItemSnapshot) ?? {},
+    snapshot: ((r.snapshot as unknown) as TravelPlanItemSnapshot) ?? {},
     created_at: r.created_at,
     updated_at: r.updated_at,
   };
