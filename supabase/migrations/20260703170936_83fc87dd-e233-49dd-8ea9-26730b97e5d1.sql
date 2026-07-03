@@ -1,0 +1,1 @@
+ALTER VIEW public.demo_seed_inventory SET (security_invoker = true);
