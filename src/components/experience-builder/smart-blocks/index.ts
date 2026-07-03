@@ -8,3 +8,4 @@ export { SmartDestinationsGrid } from "./SmartDestinationsGrid";
 export { SmartBusinessesGrid } from "./SmartBusinessesGrid";
 export { SmartProductsGrid } from "./SmartProductsGrid";
 export { SmartEventsList } from "./SmartEventsList";
+export { SmartBlockRuntime } from "./SmartBlockRuntime";
