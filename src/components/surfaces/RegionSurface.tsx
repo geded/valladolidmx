@@ -14,16 +14,22 @@ import { PublicShell } from "@/components/discovery";
 import { DestinoCard } from "@/components/cards/DestinoCard";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA, TOURISM_REGIONS } from "@/config/regions";
+import type { Destination } from "@/types/territory";
 
 export interface RegionSurfaceProps {
   /** Slug de la región a renderizar. Default: Oriente Maya. */
   regionSlug?: string;
+  /** Destinos publicados provenientes de BD (fuente primaria). */
+  destinations?: Destination[];
 }
 
-export function RegionSurface({ regionSlug }: RegionSurfaceProps = {}) {
+export function RegionSurface({ regionSlug, destinations }: RegionSurfaceProps = {}) {
   const region =
     TOURISM_REGIONS.find((r) => r.slug === regionSlug) ?? ORIENTE_MAYA;
-  const destinos = DESTINOS_MOCK.filter((d) => d.region_slug === region.slug);
+  const fromDb = (destinations ?? []).filter((d) => d.region_slug === region.slug);
+  const destinos = fromDb.length > 0
+    ? fromDb
+    : DESTINOS_MOCK.filter((d) => d.region_slug === region.slug);
   return (
     <PublicShell
       eyebrow="Región turística"
@@ -31,11 +37,17 @@ export function RegionSurface({ regionSlug }: RegionSurfaceProps = {}) {
       description={region.short_description}
       crumbs={[{ label: region.name }]}
     >
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {destinos.map((d) => (
-          <DestinoCard key={d.id} destination={d} />
-        ))}
-      </div>
+      {destinos.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          Aún no hay destinos publicados para esta región.
+        </p>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {destinos.map((d) => (
+            <DestinoCard key={d.id} destination={d} />
+          ))}
+        </div>
+      )}
     </PublicShell>
   );
 }
