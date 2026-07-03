@@ -1405,7 +1405,13 @@ function PageVisualEditor({
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                 <SortableContext items={tree.root.children.map((n) => n.id)} strategy={verticalListSortingStrategy}>
                   {tree.root.children.map((n) => (
-                    <SortableSectionItem key={n.id} node={n} selected={selectedId === n.id} onSelect={() => setSelectedId(n.id)} />
+                    <SortableSectionItem
+                      key={n.id}
+                      node={n}
+                      selected={selectedId === n.id}
+                      onSelect={() => setSelectedId(n.id)}
+                      onToggleHidden={() => toggleHiddenNode(n.id)}
+                    />
                   ))}
                 </SortableContext>
               </DndContext>
