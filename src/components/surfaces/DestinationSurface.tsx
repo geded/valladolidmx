@@ -11,10 +11,9 @@
  * destino, muestra el vacío editorial acordado — nunca revienta el
  * árbol de la página.
  */
-import { useParams } from "@tanstack/react-router";
+import { useParams, Link } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { PlaceholderImage } from "@/components/common/PlaceholderImage";
-import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import type { PublicDestinationDTO } from "@/lib/destinations/public-reads.functions";
@@ -99,16 +98,29 @@ export function DestinationSurface({ destinationSlug, dbData }: DestinationSurfa
         </div>
         <aside className="space-y-4">
           <div className="rounded-2xl border border-border bg-card p-5">
-            <p className="text-sm font-semibold">Próximamente en este destino</p>
-            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li>· Hoteles del destino</li>
-              <li>· Restaurantes recomendados</li>
-              <li>· Experiencias y rutas</li>
-              <li>· Reseñas resumidas por Alux</li>
+            <p className="text-sm font-semibold">Explora más del destino</p>
+            <ul className="mt-3 space-y-2 text-sm">
+              <li>
+                <Link to="/hoteles" className="text-primary hover:underline">
+                  Hoteles y hospedajes
+                </Link>
+              </li>
+              <li>
+                <Link to="/restaurantes" className="text-primary hover:underline">
+                  Restaurantes recomendados
+                </Link>
+              </li>
+              <li>
+                <Link to="/experiencias" className="text-primary hover:underline">
+                  Experiencias y rutas
+                </Link>
+              </li>
+              <li>
+                <Link to="/marketplace" className="text-primary hover:underline">
+                  Todo el Marketplace
+                </Link>
+              </li>
             </ul>
-            <div className="mt-4">
-              <ComingSoonBadge label="Fase 1" />
-            </div>
           </div>
         </aside>
       </div>
