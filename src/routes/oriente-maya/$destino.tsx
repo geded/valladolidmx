@@ -59,10 +59,6 @@ export const Route = createFileRoute("/oriente-maya/$destino")({
 });
 
 function DestinoPage() {
-  const { composition, db } = Route.useLoaderData();
-  return composition ? (
-    <CompositionRenderer tree={composition.snapshot} />
-  ) : (
-    <DestinationSurface dbData={db ?? undefined} />
-  );
+  const { db } = Route.useLoaderData();
+  return <DestinationSurface dbData={db ?? undefined} />;
 }
