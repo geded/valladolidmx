@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { PageShell } from "@/components/common/PageShell";
+import { PublicShell } from "@/components/discovery";
+import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -11,14 +12,13 @@ import { useTranslation } from "@/i18n/context";
 type Mode = "signin" | "signup" | "forgot";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({
-    meta: [
-      { title: `Acceso · ${SITE.name}` },
-      { name: "description", content: "Inicia sesión o crea tu cuenta en Valladolid.mx." },
-      { property: "og:title", content: `Acceso · ${SITE.name}` },
-      { property: "og:description", content: "Inicia sesión o crea tu cuenta en Valladolid.mx." },
-    ],
-  }),
+  head: () =>
+    buildPublicHead({
+      title: `Acceso · ${SITE.name}`,
+      description: "Inicia sesión o crea tu cuenta en Valladolid.mx.",
+      path: "/auth",
+      noindex: true,
+    }),
   component: AuthRoute,
 });
 
@@ -93,7 +93,7 @@ function AuthRoute() {
   };
 
   return (
-    <PageShell
+    <PublicShell
       eyebrow={t("auth.eyebrow")}
       title={titles[mode]}
       description={t("auth.subtitle")}
@@ -198,6 +198,6 @@ function AuthRoute() {
           )}
         </div>
       </div>
-    </PageShell>
+    </PublicShell>
   );
 }

@@ -25,8 +25,7 @@ import {
 } from "@/lib/experience-builder/eb-public.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { buildDemoContext } from "@/lib/experience-builder/dynamic-variables";
-
-const SITE_URL = "https://valladolidmx.lovable.app";
+import { buildPublicHead, DISCOVERY_ORIGIN } from "@/lib/discovery/seo";
 
 function resolveLandingQuery(slug: string) {
   return {
@@ -50,62 +49,57 @@ export const Route = createFileRoute("/l/$slug")({
   head: ({ params, loaderData }) => {
     const page = loaderData?.page;
     if (!page) {
-      return { meta: [{ title: "Página no encontrada" }, { name: "robots", content: "noindex" }] };
+      return buildPublicHead({
+        title: "Página no encontrada",
+        description: "Esta página no existe o aún no ha sido publicada.",
+        path: `/l/${params.slug}`,
+        noindex: true,
+      });
     }
     const seo = page.seo ?? {};
     const og = page.open_graph ?? {};
     const title = (seo.title as string) ?? page.name;
     const description = (seo.description as string) ?? "";
     const ogImage = (og.image as string) ?? (seo.image as string) ?? null;
-    const robots = (seo.robots as string) ?? "index, follow";
-    const url = `${SITE_URL}/l/${params.slug}`;
+    const robots = (seo.robots as string) ?? undefined;
+    const path = `/l/${params.slug}`;
+    const url = `${DISCOVERY_ORIGIN}${path}`;
 
-    const meta: Array<Record<string, string>> = [
-      { title },
-      { name: "description", content: description },
-      { name: "robots", content: robots },
-      { property: "og:type", content: (og.type as string) ?? "website" },
-      { property: "og:title", content: (og.title as string) ?? title },
-      { property: "og:description", content: (og.description as string) ?? description },
-      { property: "og:url", content: url },
-    ];
-    if (ogImage) {
-      meta.push({ property: "og:image", content: ogImage });
-      meta.push({ name: "twitter:image", content: ogImage });
-    }
-    meta.push({ name: "twitter:card", content: ogImage ? "summary_large_image" : "summary" });
-    meta.push({ name: "twitter:title", content: title });
-    meta.push({ name: "twitter:description", content: description });
+    const jsonLd: Array<Record<string, unknown>> = [];
+    const customSchema = (page.schema_org ?? null) as Record<string, unknown> | null;
+    if (customSchema && Object.keys(customSchema).length > 0) jsonLd.push(customSchema);
+    jsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Inicio", item: DISCOVERY_ORIGIN },
+        { "@type": "ListItem", position: 2, name: page.name, item: url },
+      ],
+    });
 
-    // hreflang (extensible): si seo.hreflang = { es: "/l/x", en: "/l/x-en" }
-    const links: Array<Record<string, string>> = [{ rel: "canonical", href: url }];
+    const head = buildPublicHead({
+      title: (og.title as string) ?? title,
+      description: (og.description as string) ?? description,
+      path,
+      ogType: ((og.type as string) ?? "website") as never,
+      ogImage: ogImage ?? undefined,
+      robots,
+      jsonLd,
+    });
+
+    // hreflang alternates (extensibles vía seo.hreflang)
     const hreflang = (seo.hreflang as Record<string, string> | undefined) ?? null;
     if (hreflang && typeof hreflang === "object") {
       for (const [lang, href] of Object.entries(hreflang)) {
-        links.push({ rel: "alternate", hreflang: lang, href: href.startsWith("http") ? href : `${SITE_URL}${href}` });
+        head.links.push({
+          rel: "alternate",
+          hreflang: lang,
+          href: href.startsWith("http") ? href : `${DISCOVERY_ORIGIN}${href}`,
+        });
       }
     }
 
-    // JSON-LD: parte del campo schema_org (por tipo de contenido) +
-    // BreadcrumbList automático.
-    const scripts: Array<{ type: string; children: string }> = [];
-    const customSchema = (page.schema_org ?? null) as Record<string, unknown> | null;
-    if (customSchema && Object.keys(customSchema).length > 0) {
-      scripts.push({ type: "application/ld+json", children: JSON.stringify(customSchema) });
-    }
-    scripts.push({
-      type: "application/ld+json",
-      children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Inicio", item: SITE_URL },
-          { "@type": "ListItem", position: 2, name: page.name, item: url },
-        ],
-      }),
-    });
-
-    return { meta, links, scripts };
+    return head;
   },
   notFoundComponent: NotFoundLanding,
   errorComponent: ({ error }) => (

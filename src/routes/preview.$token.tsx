@@ -15,9 +15,16 @@ import {
 } from "@/lib/experience-builder/eb-studio.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { buildDemoContext } from "@/lib/experience-builder/dynamic-variables";
+import { buildPublicHead } from "@/lib/discovery/seo";
 
 export const Route = createFileRoute("/preview/$token")({
-  head: () => ({ meta: [{ name: "robots", content: "noindex, nofollow" }, { title: "Vista previa" }] }),
+  head: ({ params }) =>
+    buildPublicHead({
+      title: "Vista previa",
+      description: "Vista previa no indexable emitida por token.",
+      path: `/preview/${params?.token ?? ""}`,
+      noindex: true,
+    }),
   component: PreviewView,
 });
 

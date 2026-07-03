@@ -14,14 +14,16 @@ import {
 } from "@/lib/experience-builder/studio.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { buildDemoContext } from "@/lib/experience-builder/dynamic-variables";
+import { buildPublicHead } from "@/lib/discovery/seo";
 
 export const Route = createFileRoute("/preview/composition/$token")({
-  head: () => ({
-    meta: [
-      { name: "robots", content: "noindex, nofollow" },
-      { title: "Vista previa · Borrador" },
-    ],
-  }),
+  head: ({ params }) =>
+    buildPublicHead({
+      title: "Vista previa · Borrador",
+      description: "Vista previa del borrador — enlace privado, no indexable.",
+      path: `/preview/composition/${params?.token ?? ""}`,
+      noindex: true,
+    }),
   component: PreviewCompositionView,
 });
 
