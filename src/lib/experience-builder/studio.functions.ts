@@ -39,6 +39,10 @@ export interface CompositionRevisionSummary {
   revision_number: number;
   notes: string | null;
   created_at: string;
+  created_by: string | null;
+  author_name: string | null;
+  section_count: number;
+  is_active: boolean;
 }
 
 function mergeExistingNodeI18n(
@@ -168,11 +172,54 @@ export const listCompositionRevisions = createServerFn({ method: "GET" })
   .handler(async ({ data, context }): Promise<CompositionRevisionSummary[]> => {
     const { data: rows, error } = await context.supabase
       .from("page_revisions")
-      .select("id, composition_id, revision_number, notes, created_at")
+      .select("id, composition_id, revision_number, notes, created_at, created_by, snapshot")
       .eq("composition_id", data.id)
       .order("revision_number", { ascending: false });
     if (error) throw new Error(error.message);
-    return (rows ?? []) as CompositionRevisionSummary[];
+    const list = rows ?? [];
+
+    // Autor: batch lookup en profiles (best-effort; RLS puede filtrar).
+    const authorIds = Array.from(
+      new Set(list.map((r) => (r as { created_by: string | null }).created_by).filter((x): x is string => !!x)),
+    );
+    const nameById = new Map<string, string>();
+    if (authorIds.length > 0) {
+      const { data: profs } = await context.supabase
+        .from("profiles")
+        .select("user_id, display_name, email")
+        .in("user_id", authorIds);
+      for (const p of (profs ?? []) as Array<{ user_id: string; display_name: string | null; email: string | null }>) {
+        nameById.set(p.user_id, p.display_name || p.email || "");
+      }
+    }
+
+    // Revisión activa
+    const { data: comp } = await context.supabase
+      .from("page_compositions")
+      .select("active_revision_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    const activeId = (comp as { active_revision_id: string | null } | null)?.active_revision_id ?? null;
+
+    return list.map((r) => {
+      const snap = (r as { snapshot: unknown }).snapshot as
+        | { root?: { children?: unknown[] } }
+        | null;
+      const sectionCount = Array.isArray(snap?.root?.children) ? snap!.root!.children!.length : 0;
+      return {
+        id: r.id,
+        composition_id: r.composition_id,
+        revision_number: r.revision_number,
+        notes: r.notes,
+        created_at: r.created_at,
+        created_by: (r as { created_by: string | null }).created_by,
+        author_name: (r as { created_by: string | null }).created_by
+          ? nameById.get((r as { created_by: string }).created_by) ?? null
+          : null,
+        section_count: sectionCount,
+        is_active: activeId === r.id,
+      } as CompositionRevisionSummary;
+    });
   });
 
 export const restoreCompositionRevision = createServerFn({ method: "POST" })
