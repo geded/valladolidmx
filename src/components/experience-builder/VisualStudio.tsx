@@ -1494,6 +1494,20 @@ function PageVisualEditor({
           ) : (
             <span className="text-[11px] text-muted-foreground">Sólo administradores pueden publicar.</span>
           )}
+          {canPublish && publishState !== "never" ? (
+            <button
+              type="button"
+              onClick={() => setConfirmUnpublish(true)}
+              disabled={unpublishing || publishing}
+              title="Retira la página del sitio público. El borrador se conserva."
+              className="inline-flex items-center gap-1 rounded-md border border-rose-300 bg-background px-3 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-50 disabled:opacity-60"
+            >
+              {unpublishing ? (
+                <Loader2 className="size-3.5 animate-spin" aria-hidden />
+              ) : null}
+              Despublicar
+            </button>
+          ) : null}
         </div>
       </div>
 
