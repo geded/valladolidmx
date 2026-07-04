@@ -124,6 +124,7 @@ import { Route as AuthenticatedCmsEmpresasNuevaRouteImport } from './routes/_aut
 import { Route as AuthenticatedCmsDestinosNuevaRouteImport } from './routes/_authenticated/cms/destinos.nueva'
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
 import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/_authenticated/admin/sistema.usuarios'
+import { Route as OrienteMayaDestinoCategoriaEmpresaProductoRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa.$producto'
 import { Route as ApiPublicPaymentsProviderWebhookRouteImport } from './routes/api/public/payments/$provider/webhook'
 import { Route as AuthenticatedPortalProductosProductIdPreviewRouteImport } from './routes/_authenticated/portal/productos.$productId.preview'
 import { Route as AuthenticatedCuentaConciergeCaseIdEvaluarRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId.evaluar'
@@ -780,6 +781,12 @@ const AuthenticatedAdminSistemaUsuariosRoute =
     path: '/usuarios',
     getParentRoute: () => AuthenticatedAdminSistemaRoute,
   } as any)
+const OrienteMayaDestinoCategoriaEmpresaProductoRoute =
+  OrienteMayaDestinoCategoriaEmpresaProductoRouteImport.update({
+    id: '/$producto',
+    path: '/$producto',
+    getParentRoute: () => OrienteMayaDestinoCategoriaEmpresaRoute,
+  } as any)
 const ApiPublicPaymentsProviderWebhookRoute =
   ApiPublicPaymentsProviderWebhookRouteImport.update({
     id: '/api/public/payments/$provider/webhook',
@@ -945,7 +952,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
-  '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaRoute
+  '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaRouteWithChildren
   '/admin/sistema/': typeof AuthenticatedAdminSistemaIndexRoute
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/destinos/': typeof AuthenticatedCmsDestinosIndexRoute
@@ -966,6 +973,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
+  '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -1065,7 +1073,7 @@ export interface FileRoutesByTo {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
-  '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaRoute
+  '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaRouteWithChildren
   '/admin/sistema': typeof AuthenticatedAdminSistemaIndexRoute
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosIndexRoute
@@ -1086,6 +1094,7 @@ export interface FileRoutesByTo {
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
+  '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1193,7 +1202,7 @@ export interface FileRoutesById {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
-  '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaRoute
+  '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaRouteWithChildren
   '/_authenticated/admin/sistema/': typeof AuthenticatedAdminSistemaIndexRoute
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/_authenticated/cms/destinos/': typeof AuthenticatedCmsDestinosIndexRoute
@@ -1214,6 +1223,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/_authenticated/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
+  '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1342,6 +1352,7 @@ export interface FileRouteTypes {
     | '/cuenta/concierge/$caseId/evaluar'
     | '/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
+    | '/oriente-maya/$destino/$categoria/$empresa/$producto'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1462,6 +1473,7 @@ export interface FileRouteTypes {
     | '/cuenta/concierge/$caseId/evaluar'
     | '/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
+    | '/oriente-maya/$destino/$categoria/$empresa/$producto'
   id:
     | '__root__'
     | '/'
@@ -1589,6 +1601,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/concierge/$caseId/evaluar'
     | '/_authenticated/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
+    | '/oriente-maya/$destino/$categoria/$empresa/$producto'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -2448,6 +2461,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSistemaUsuariosRouteImport
       parentRoute: typeof AuthenticatedAdminSistemaRoute
     }
+    '/oriente-maya/$destino/$categoria/$empresa/$producto': {
+      id: '/oriente-maya/$destino/$categoria/$empresa/$producto'
+      path: '/$producto'
+      fullPath: '/oriente-maya/$destino/$categoria/$empresa/$producto'
+      preLoaderRoute: typeof OrienteMayaDestinoCategoriaEmpresaProductoRouteImport
+      parentRoute: typeof OrienteMayaDestinoCategoriaEmpresaRoute
+    }
     '/api/public/payments/$provider/webhook': {
       id: '/api/public/payments/$provider/webhook'
       path: '/api/public/payments/$provider/webhook'
@@ -2824,14 +2844,29 @@ const EventosRouteChildren: EventosRouteChildren = {
 const EventosRouteWithChildren =
   EventosRoute._addFileChildren(EventosRouteChildren)
 
+interface OrienteMayaDestinoCategoriaEmpresaRouteChildren {
+  OrienteMayaDestinoCategoriaEmpresaProductoRoute: typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
+}
+
+const OrienteMayaDestinoCategoriaEmpresaRouteChildren: OrienteMayaDestinoCategoriaEmpresaRouteChildren =
+  {
+    OrienteMayaDestinoCategoriaEmpresaProductoRoute:
+      OrienteMayaDestinoCategoriaEmpresaProductoRoute,
+  }
+
+const OrienteMayaDestinoCategoriaEmpresaRouteWithChildren =
+  OrienteMayaDestinoCategoriaEmpresaRoute._addFileChildren(
+    OrienteMayaDestinoCategoriaEmpresaRouteChildren,
+  )
+
 interface OrienteMayaDestinoCategoriaRouteChildren {
-  OrienteMayaDestinoCategoriaEmpresaRoute: typeof OrienteMayaDestinoCategoriaEmpresaRoute
+  OrienteMayaDestinoCategoriaEmpresaRoute: typeof OrienteMayaDestinoCategoriaEmpresaRouteWithChildren
 }
 
 const OrienteMayaDestinoCategoriaRouteChildren: OrienteMayaDestinoCategoriaRouteChildren =
   {
     OrienteMayaDestinoCategoriaEmpresaRoute:
-      OrienteMayaDestinoCategoriaEmpresaRoute,
+      OrienteMayaDestinoCategoriaEmpresaRouteWithChildren,
   }
 
 const OrienteMayaDestinoCategoriaRouteWithChildren =
