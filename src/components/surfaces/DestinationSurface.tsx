@@ -1,25 +1,82 @@
 /**
- * US-R3 · Ola 2 · Sub-ola 2.1 — DestinationSurface
+ * H-03 · Ola I3.a — DestinationSurface (Plantilla Madre)
  *
- * Superficie oficial reproductiva de la ficha pública de un Destino
- * (`/oriente-maya/{slug}`). Adopción 1:1 del componente que vivía en
- * `src/routes/oriente-maya/$destino.tsx`. Sin nueva lógica ni rediseño.
+ * Segunda Plantilla Madre de referencia, tras BusinessSurface (I2.d).
+ * Sigue el mismo patrón arquitectónico aprobado por el Founder:
  *
- * El slug se toma del prop `destinationSlug` (cuando la ruta lo pasa)
- * o de los path params del router (cuando la superficie se renderiza
- * desde una composición cargada por kind). Falla cerrada: si no hay
- * destino, muestra el vacío editorial acordado — nunca revienta el
- * árbol de la página.
+ *   1. Provider de contexto (`DestinationSurfaceProvider`).
+ *   2. Adaptadores de datos (`destination-to-blocks.ts`).
+ *   3. Composición de bloques oficiales del Experience Builder.
+ *   4. Cero lógica visual propia.
+ *   5. Orquestación pura.
+ *
+ * Regla de Herencia de Plantillas (Founder, tras I2.d): las Plantillas
+ * Madre orquestan; los bloques presentan; los motores deciden. Ningún
+ * componente presentacional se dibuja aquí — se compone desde la
+ * Biblioteca Oficial del Experience Builder.
+ *
+ * EXCEPCIÓN ARQUITECTÓNICA DOCUMENTADA (transitoria, I3.b):
+ * las secciones "Empresas del destino / Eventos próximos / Productos
+ * destacados" aún se renderizan con `<section>` + tiles porque la
+ * Biblioteca no expone todavía `vmx.experience.related-collection`
+ * (bloque candidato — evolucionar antes de duplicar Products/Events).
+ * Este JSX transitorio queda aislado en `LegacyRelatedComposition`,
+ * marcado con TODO y se elimina al cerrar I3.b.
  */
+import { createContext, useContext } from "react";
 import { useParams, Link } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { PlaceholderImage } from "@/components/common/PlaceholderImage";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
-import type { PublicDestinationDTO, DestinationRelatedDTO } from "@/lib/destinations/public-reads.functions";
+import type {
+  PublicDestinationDTO,
+  DestinationRelatedDTO,
+} from "@/lib/destinations/public-reads.functions";
 import { BusinessTile } from "@/components/surfaces/MarketplaceSurface";
-import type { MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
 import { DiscoveryNavigatorBlock } from "@/components/experience-builder/blocks/DiscoveryNavigatorBlock";
+import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
+import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
+import { ExperienceSection } from "@/components/experience-builder/blocks/experience-section/ExperienceSection";
+import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGrid";
+import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar";
+import {
+  toDestinationBlockInput,
+  destinationToHeroDTO,
+  destinationToSubnavDTO,
+  destinationToDescriptionSectionDTO,
+  destinationToHighlightsInfoGridDTO,
+  destinationToCtaBarDTO,
+} from "@/lib/experience-builder/adapters/destination-to-blocks";
+
+/* ------------------------------------------------------------------ *
+ * Contexto — poblado por la ruta pública (SSR-safe).
+ * ------------------------------------------------------------------ */
+
+export interface DestinationSurfaceContextValue {
+  db: PublicDestinationDTO | null;
+  related: DestinationRelatedDTO | null;
+  slug: string | null;
+}
+
+export const DestinationSurfaceContext =
+  createContext<DestinationSurfaceContextValue | null>(null);
+
+export function DestinationSurfaceProvider({
+  db,
+  related,
+  slug,
+  children,
+}: DestinationSurfaceContextValue & { children: React.ReactNode }) {
+  return (
+    <DestinationSurfaceContext.Provider value={{ db, related, slug }}>
+      {children}
+    </DestinationSurfaceContext.Provider>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Surface
+ * ------------------------------------------------------------------ */
 
 export interface DestinationSurfaceProps {
   /** Slug del destino a renderizar. Cuando falta, se lee del router. */
@@ -30,16 +87,23 @@ export interface DestinationSurfaceProps {
   related?: DestinationRelatedDTO;
 }
 
-export function DestinationSurface({ destinationSlug, dbData, related }: DestinationSurfaceProps = {}) {
+export function DestinationSurface({
+  destinationSlug,
+  dbData,
+  related,
+}: DestinationSurfaceProps = {}) {
   const params = useParams({ strict: false }) as { destino?: string };
-  const slug = destinationSlug ?? params.destino;
+  const ctx = useContext(DestinationSurfaceContext);
+  const slug = destinationSlug ?? params.destino ?? ctx?.slug ?? undefined;
+  const db = dbData ?? ctx?.db ?? null;
+  const rel = related ?? ctx?.related ?? null;
   const mock = slug
     ? DESTINOS_MOCK.find(
         (d) => d.slug === slug && d.region_slug === ORIENTE_MAYA.slug,
       )
     : undefined;
 
-  if (!dbData && !mock) {
+  if (!db && !mock) {
     return (
       <PublicShell
         title="Destino no disponible"
@@ -52,169 +116,176 @@ export function DestinationSurface({ destinationSlug, dbData, related }: Destina
     );
   }
 
-  const name = dbData?.name ?? mock!.name;
-  const tagline = dbData?.tagline ?? mock?.tagline ?? "";
-  const description = dbData?.description ?? null;
-  const highlights = (dbData?.highlights?.length ? dbData.highlights : mock?.highlights ?? []) as string[];
-  const heroPalette = (dbData?.hero_palette ?? mock?.hero_palette ?? "territorio") as
-    "territorio" | "selva" | "cenote" | "atardecer";
-  const heroUrl = dbData?.hero_url ?? null;
-  const rel = related;
-  const totalRelated = rel
-    ? rel.hoteles.length + rel.restaurantes.length + rel.experiencias.length + rel.otras.length + rel.productos.length + (rel.eventos?.length ?? 0)
-    : 0;
+  const input = toDestinationBlockInput(db, mock ?? null, {
+    slug: slug ?? "",
+    regionSlug: ORIENTE_MAYA.slug,
+    regionName: ORIENTE_MAYA.name,
+    counts: {
+      hoteles: rel?.hoteles.length ?? 0,
+      restaurantes: rel?.restaurantes.length ?? 0,
+      experiencias: rel?.experiencias.length ?? 0,
+      otras: rel?.otras.length ?? 0,
+      productos: rel?.productos.length ?? 0,
+      eventos: rel?.eventos?.length ?? 0,
+    },
+  });
+
+  const heroDto = destinationToHeroDTO(input);
+  const subnavDto = destinationToSubnavDTO(input);
+  const descriptionSection = destinationToDescriptionSectionDTO(input);
+  const highlightsInfoGrid = destinationToHighlightsInfoGridDTO(input);
+  const ctaBarDto = destinationToCtaBarDTO(input);
 
   return (
     <PublicShell
-      eyebrow={ORIENTE_MAYA.name}
-      title={name}
-      description={tagline}
       crumbs={[
         { label: ORIENTE_MAYA.name, to: "/oriente-maya" },
-        { label: name },
+        { label: input.name },
       ]}
       useContextCrumbs
     >
+      <ExperienceHero dto={heroDto} headingLevel="h1" />
+
+      <ExperienceSubnav dto={subnavDto} className="mt-6 mb-6" />
+
       <div className="grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          {heroUrl ? (
-            <img
-              src={heroUrl}
-              alt={name}
-              className="aspect-video w-full rounded-2xl border border-border/60 object-cover"
-              loading="eager"
-            />
-          ) : (
-            <PlaceholderImage palette={heroPalette} label={name} aspect="video" />
-          )}
-          {description ? (
-            <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-foreground/90">
-              {description}
-            </p>
+        <div className="lg:col-span-2 space-y-10">
+          {descriptionSection || highlightsInfoGrid ? (
+            <section id="resumen" data-eb-anchor className="scroll-mt-24">
+              {descriptionSection ? <ExperienceSection dto={descriptionSection} /> : null}
+              {highlightsInfoGrid ? (
+                <ExperienceInfoGrid dto={highlightsInfoGrid} className="mt-6" />
+              ) : null}
+            </section>
           ) : null}
-          <div className="mt-8">
-            <h2 className="text-2xl">Lo esencial</h2>
-            <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-              {highlights.map((h: string) => (
-                <li
-                  key={h}
-                  className="rounded-xl border border-border bg-card px-4 py-3 text-sm"
-                >
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          {rel ? (
-            <div className="mt-10 space-y-10">
-              <RelatedSection title="Hoteles y hospedajes" items={rel.hoteles} />
-              <RelatedSection title="Restaurantes" items={rel.restaurantes} />
-              <RelatedSection title="Experiencias y rutas" items={rel.experiencias} />
-              <RelatedSection title="Otras empresas del destino" items={rel.otras} />
-              {rel.eventos && rel.eventos.length > 0 ? (
-                <section>
-                  <h2 className="text-2xl">Próximos eventos</h2>
-                  <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-                    {rel.eventos.slice(0, 6).map((e) => (
-                      <li key={e.id} className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary">
-                        <Link to="/eventos/$slug" params={{ slug: e.slug }} className="block">
-                          <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                            {new Date(e.starts_at).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}
-                          </p>
-                          <h3 className="mt-1 text-base font-semibold">{e.title}</h3>
-                          {e.summary ? (
-                            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{e.summary}</p>
-                          ) : null}
-                          {e.venue_name ? (
-                            <p className="mt-2 text-xs text-muted-foreground">{e.venue_name}</p>
-                          ) : null}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ) : null}
-              {rel.productos.length > 0 ? (
-                <section>
-                  <h2 className="text-2xl">Productos destacados</h2>
-                  <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-                    {rel.productos.slice(0, 8).map((p) => (
-                      <li key={p.id} className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary">
-                        <Link to="/producto/$slug" params={{ slug: p.slug }} className="block">
-                          <h3 className="text-base font-semibold">{p.name}</h3>
-                          {p.tagline ? (
-                            <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.tagline}</p>
-                          ) : null}
-                          <p className="mt-3 text-xs text-muted-foreground">
-                            {p.business_name}
-                            {p.price_amount != null ? ` · ${p.price_currency} ${p.price_amount}` : ""}
-                          </p>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ) : null}
-              {totalRelated === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Aún no hay negocios ni experiencias publicadas para este destino.
-                </p>
-              ) : null}
-            </div>
-          ) : null}
+
+          {rel ? <LegacyRelatedComposition related={rel} /> : null}
         </div>
         <aside className="space-y-4">
-          {/*
-            H-02 · Iniciativa 2 — Discovery Navigator.
-            Reemplaza el panel estático "Explora más del destino"
-            manteniendo paridad funcional (mismos accesos: hoteles,
-            restaurantes, experiencias, marketplace) y añadiendo
-            categorías dinámicas + conteos reales.
-            El fallback legacy queda debajo como red de seguridad.
-          */}
           <DiscoveryNavigatorBlock
             config={{
-              title: `Explora ${dbData?.name ?? mock?.name ?? "el destino"}`,
+              title: `Explora ${input.name}`,
               scope: "destination",
               manualDestinationSlug: slug ?? undefined,
               ctaLabel: "Ver todo el Marketplace",
-              ctaHref: slug ? `/marketplace?destino=${encodeURIComponent(slug)}` : "/marketplace",
+              ctaHref: slug
+                ? `/marketplace?destino=${encodeURIComponent(slug)}`
+                : "/marketplace",
             }}
           />
-          <noscript>
-            <div className="rounded-2xl border border-border bg-card p-5">
-              <p className="text-sm font-semibold">Explora más del destino</p>
-              <ul className="mt-3 space-y-2 text-sm">
-                <li>
-                  <Link to="/hoteles" search={{ destino: slug }} className="text-primary hover:underline">
-                    Hoteles y hospedajes
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/restaurantes" search={{ destino: slug }} className="text-primary hover:underline">
-                    Restaurantes recomendados
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/experiencias" search={{ destino: slug, tema: undefined }} className="text-primary hover:underline">
-                    Experiencias y rutas
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/marketplace" search={{ destino: slug }} className="text-primary hover:underline">
-                    Todo el Marketplace
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </noscript>
         </aside>
       </div>
+
+      <ExperienceCtaBar dto={ctaBarDto} />
     </PublicShell>
   );
 }
 
-function RelatedSection({ title, items }: { title: string; items: MarketplaceBusinessCard[] }) {
+/* ------------------------------------------------------------------ *
+ * EXCEPCIÓN ARQUITECTÓNICA DOCUMENTADA (transitoria, retirar en I3.b)
+ *
+ * Razón: la Biblioteca Oficial no expone todavía un bloque
+ * `vmx.experience.related-collection` capaz de renderizar colecciones
+ * heterogéneas (empresas + eventos + productos) con tiles del
+ * marketplace. Crear ese bloque debe ser una evolución cuidadosa (no
+ * duplicar Products/Events), por lo que se pospone a I3.b tras
+ * aprobación explícita del Founder. Mientras tanto, este JSX se
+ * mantiene aislado — nunca en el árbol de orquestación principal — y
+ * respeta el contrato visual actual (cero regresión).
+ * ------------------------------------------------------------------ */
+function LegacyRelatedComposition({ related }: { related: DestinationRelatedDTO }) {
+  const totalRelated =
+    related.hoteles.length +
+    related.restaurantes.length +
+    related.experiencias.length +
+    related.otras.length +
+    related.productos.length +
+    (related.eventos?.length ?? 0);
+
+  return (
+    <div className="space-y-10">
+      <section id="empresas" data-eb-anchor className="scroll-mt-24 space-y-10">
+        <LegacyBusinessGroup title="Hoteles y hospedajes" items={related.hoteles} />
+        <LegacyBusinessGroup title="Restaurantes" items={related.restaurantes} />
+        <LegacyBusinessGroup title="Experiencias y rutas" items={related.experiencias} />
+        <LegacyBusinessGroup title="Otras empresas del destino" items={related.otras} />
+      </section>
+      {related.eventos && related.eventos.length > 0 ? (
+        <section id="eventos" data-eb-anchor className="scroll-mt-24">
+          <h2 className="text-2xl">Próximos eventos</h2>
+          <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+            {related.eventos.slice(0, 6).map((e) => (
+              <li
+                key={e.id}
+                className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary"
+              >
+                <Link to="/eventos/$slug" params={{ slug: e.slug }} className="block">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {new Date(e.starts_at).toLocaleDateString("es-MX", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </p>
+                  <h3 className="mt-1 text-base font-semibold">{e.title}</h3>
+                  {e.summary ? (
+                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                      {e.summary}
+                    </p>
+                  ) : null}
+                  {e.venue_name ? (
+                    <p className="mt-2 text-xs text-muted-foreground">{e.venue_name}</p>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      {related.productos.length > 0 ? (
+        <section id="productos" data-eb-anchor className="scroll-mt-24">
+          <h2 className="text-2xl">Productos destacados</h2>
+          <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+            {related.productos.slice(0, 8).map((p) => (
+              <li
+                key={p.id}
+                className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary"
+              >
+                <Link to="/producto/$slug" params={{ slug: p.slug }} className="block">
+                  <h3 className="text-base font-semibold">{p.name}</h3>
+                  {p.tagline ? (
+                    <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                      {p.tagline}
+                    </p>
+                  ) : null}
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    {p.business_name}
+                    {p.price_amount != null
+                      ? ` · ${p.price_currency} ${p.price_amount}`
+                      : ""}
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      {totalRelated === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          Aún no hay negocios ni experiencias publicadas para este destino.
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function LegacyBusinessGroup({
+  title,
+  items,
+}: {
+  title: string;
+  items: DestinationRelatedDTO["hoteles"];
+}) {
   if (items.length === 0) return null;
   return (
     <section>
