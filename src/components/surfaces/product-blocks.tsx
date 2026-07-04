@@ -148,6 +148,17 @@ export function ProductBusinessContextBlock() {
   const p = useProduct();
   if (!p) return <EmptyHint>Contexto de la empresa que ofrece el producto.</EmptyHint>;
   const b = p.business;
+  const destSlug = p.destination_slug;
+  const catSlug = p.category_slug;
+  const businessHref =
+    destSlug && catSlug
+      ? resolveCanonicalPath({
+          kind: "business",
+          slug: b.slug,
+          category: catSlug,
+          destination: destSlug,
+        })
+      : `/marketplace/${b.slug}`;
   return (
     <section className="mt-10 rounded-2xl border border-border bg-card p-5">
       <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -156,8 +167,7 @@ export function ProductBusinessContextBlock() {
       <div className="mt-1 flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <Link
-            to="/marketplace/$slug"
-            params={{ slug: b.slug }}
+            to={businessHref}
             className="text-lg font-semibold text-foreground hover:underline"
           >
             {b.display_name}
