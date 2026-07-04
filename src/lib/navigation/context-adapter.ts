@@ -24,7 +24,7 @@ function navKindToContextKind(kind: NavEntityKind): ContextEntityKind {
     case "destination":
       return "destination";
     case "zone":
-      return "zone";
+      return "destination";
     case "category":
       return "category";
     case "business":
@@ -32,11 +32,12 @@ function navKindToContextKind(kind: NavEntityKind): ContextEntityKind {
     case "restaurant":
       return "business";
     case "product":
-    case "experience":
     case "tour":
     case "service":
     case "craft":
       return "product";
+    case "experience":
+      return "experience";
     case "event":
       return "event";
     default:
