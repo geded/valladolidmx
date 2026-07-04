@@ -18,6 +18,7 @@
 import { useContext, useMemo } from "react";
 import { ExperienceRelatedCollection } from "./ExperienceRelatedCollection";
 import { DestinationSurfaceContext } from "@/components/surfaces/DestinationSurface";
+import { BusinessSurfaceRelatedContext } from "@/components/surfaces/BusinessSurface";
 import {
   buildExperienceRelatedCollectionPreviewDTO,
   dedupeItems,
@@ -33,7 +34,9 @@ import {
   destinationRelatedProductsToItems,
   destinationRelatedEventsToItems,
 } from "@/lib/experience-builder/adapters/destination-related-to-block";
+import { businessRelatedToItems } from "@/lib/experience-builder/adapters/business-related-to-block";
 import type { DestinationRelatedDTO } from "@/lib/destinations/public-reads.functions";
+import type { BusinessRelatedDTO } from "@/lib/marketplace/business-related.functions";
 
 function safeParse(raw: unknown): ExperienceRelatedCollectionConfig {
   const r = experienceRelatedCollectionConfigSchema.safeParse(raw ?? {});
@@ -79,6 +82,32 @@ function resolveDestinationGroupItems(
     default:
       return [];
   }
+}
+
+function resolveBusinessGroupItems(
+  groupId: string,
+  related: BusinessRelatedDTO,
+): ExperienceRelatedItem[] {
+  if (groupId === "misma-categoria") {
+    return businessRelatedToItems(
+      related.sameCategory,
+      "business",
+      "Otras opciones de la misma categoría en el destino",
+    );
+  }
+  if (groupId === "otras-categorias") {
+    return businessRelatedToItems(
+      related.sameDestinationOther,
+      "business",
+      "Otras experiencias del mismo destino",
+    );
+  }
+  // Fallback: todas las hermanas del destino, deduplicadas.
+  return businessRelatedToItems(
+    [...related.sameCategory, ...related.sameDestinationOther],
+    "business",
+    "Empresas hermanas del destino",
+  );
 }
 
 function buildDTO(
@@ -140,6 +169,7 @@ export function ExperienceRelatedCollectionBlock({
 }: ExperienceRelatedCollectionBlockProps) {
   const cfg = safeParse(config);
   const destination = useContext(DestinationSurfaceContext);
+  const businessRelated = useContext(BusinessSurfaceRelatedContext);
 
   const resolvedGroups = useMemo<ExperienceRelatedGroup[]>(() => {
     // Sin grupos explícitos: usar `items` de nivel superior como un solo grupo.
@@ -173,13 +203,16 @@ export function ExperienceRelatedCollectionBlock({
           g.categorySlug,
         );
       }
+      if (cfg.source === "business" && businessRelated) {
+        items = resolveBusinessGroupItems(g.id, businessRelated);
+      }
       // (Fuentes reservadas: region/category/business/product/context/alux
       //  se conectarán en olas siguientes sin cambiar el contrato.)
 
       if (cfg.capabilities.dedupe ?? true) items = dedupeItems(items);
       return { ...g, items };
     });
-  }, [cfg, destination]);
+  }, [cfg, destination, businessRelated]);
 
   const dto = useMemo(() => buildDTO(cfg, resolvedGroups), [cfg, resolvedGroups]);
 
