@@ -97,7 +97,7 @@ function CategoriaEnDestinoPage() {
         </p>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
-          {items.map((b) => (
+          {items.map((b: MarketplaceBusinessCard) => (
             <li
               key={b.id}
               className="rounded-lg border border-border bg-card p-4 shadow-sm"
