@@ -217,18 +217,22 @@ export const updateMyPublicProfile = createServerFn({ method: "POST" })
       if (!handle) throw new Error("handle_required_to_publish");
     }
 
-    const payload: Record<string, unknown> = { user_id: context.userId };
-    if (data.public_handle !== undefined) payload.public_handle = data.public_handle;
-    if (data.is_public !== undefined) payload.is_public = data.is_public;
-    if (data.public_display_name !== undefined) payload.public_display_name = data.public_display_name;
-    if (data.public_bio !== undefined) payload.public_bio = data.public_bio;
-    if (data.avatar_url !== undefined) payload.avatar_url = data.avatar_url;
-    if (data.home_country !== undefined) payload.home_country = data.home_country;
-    if (data.languages !== undefined) payload.languages = data.languages;
+    const payload = {
+      user_id: context.userId,
+      ...(data.public_handle !== undefined ? { public_handle: data.public_handle } : {}),
+      ...(data.is_public !== undefined ? { is_public: data.is_public } : {}),
+      ...(data.public_display_name !== undefined
+        ? { public_display_name: data.public_display_name }
+        : {}),
+      ...(data.public_bio !== undefined ? { public_bio: data.public_bio } : {}),
+      ...(data.avatar_url !== undefined ? { avatar_url: data.avatar_url } : {}),
+      ...(data.home_country !== undefined ? { home_country: data.home_country } : {}),
+      ...(data.languages !== undefined ? { languages: data.languages } : {}),
+    };
 
     const { data: row, error } = await context.supabase
       .from("traveler_profiles")
-      .upsert(payload, { onConflict: "user_id" })
+      .upsert(payload as never, { onConflict: "user_id" })
       .select(
         "public_handle, is_public, public_display_name, public_bio, avatar_url, home_country, languages",
       )
