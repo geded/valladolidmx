@@ -83,7 +83,9 @@ function CategoriaEnDestinoPage() {
   const { resolution, items } = Route.useLoaderData();
   const { destino, categoria } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
-  const crumbs = buildBreadcrumbs(ctx).map((c) => ({
+  // `BreadcrumbTerritorial` renderiza el ícono/Home por sí mismo, así
+  // que evitamos duplicarlo pidiéndole a `buildBreadcrumbs` que lo omita.
+  const crumbs = buildBreadcrumbs(ctx, { includeHome: false }).map((c) => ({
     label: c.label,
     to: c.href,
   }));
