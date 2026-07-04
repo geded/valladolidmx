@@ -1529,6 +1529,177 @@ const experienceHeroBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+/* ------------------------------------------------------------------ *
+ * H-03 · Ola I1.b — Experience Subnav (`vmx.experience.subnav`)
+ *   Sub-nav sticky con anclas manuales, auto-detectadas o presets.
+ *   Reutilizable en business/product/event/destination/region/landing.
+ * ------------------------------------------------------------------ */
+const experienceSubnavBlock: BlockContract = {
+  type: "vmx.experience.subnav",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Experience Subnav",
+  description:
+    "Sub-nav horizontal sticky para saltar entre secciones de la ficha. Reutilizable en cualquier Experience Page.",
+  schema: {
+    source: {
+      type: "select",
+      label: "Fuente de anclas",
+      default: "manual",
+      options: [
+        { value: "manual", label: "Manual" },
+        { value: "auto", label: "Auto (detecta secciones)" },
+        { value: "business", label: "Preset ficha empresa" },
+        { value: "product", label: "Preset ficha producto" },
+        { value: "destination", label: "Preset destino" },
+        { value: "event", label: "Preset evento" },
+      ],
+    },
+    variant: {
+      type: "select",
+      label: "Variante",
+      default: "pill",
+      options: [
+        { value: "pill", label: "Chips (pill)" },
+        { value: "tabs", label: "Tabs con underline" },
+        { value: "underline", label: "Editorial (underline)" },
+      ],
+    },
+    sticky: { type: "boolean", label: "Fija arriba al hacer scroll", default: true },
+    scrollOffset: { type: "number", label: "Offset de scroll (px)", default: 80 },
+    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Secciones de la página", translatable: true },
+    anchors: {
+      type: "list",
+      label: "Anclas",
+      item: {
+        type: "object",
+        label: "Ancla",
+        fields: {
+          id: { type: "text", label: "ID (destino del anchor)", required: true },
+          label: { type: "text", label: "Etiqueta", required: true, translatable: true },
+          iconKey: { type: "text", label: "Icono (Lucide key)" },
+        },
+      },
+    },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  // Sin `constraints.surfaces` → utilizable en cualquier Experience Page.
+  constraints: { unique_per_page: true },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["variant", "sticky"],
+  },
+  i18n: { translatable_fields: ["ariaLabel", "anchors"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+/* ------------------------------------------------------------------ *
+ * H-03 · Ola I1.b — Experience CTA Bar (`vmx.experience.cta-bar`)
+ *   Barra flotante persistente con acciones (reservar/contactar/…).
+ *   Reutilizable en cualquier Experience Page.
+ * ------------------------------------------------------------------ */
+const experienceCtaBarBlock: BlockContract = {
+  type: "vmx.experience.cta-bar",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Experience CTA Bar",
+  description:
+    "Barra flotante persistente con acciones (reservar, contactar, guardar, compartir). Aparece tras el scroll y respeta safe-area en móvil.",
+  schema: {
+    source: {
+      type: "select",
+      label: "Fuente",
+      default: "manual",
+      options: [
+        { value: "manual", label: "Manual" },
+        { value: "business", label: "Ficha empresa (auto)" },
+        { value: "product", label: "Ficha producto (reservado)" },
+        { value: "event", label: "Evento (reservado)" },
+        { value: "destination", label: "Destino (reservado)" },
+      ],
+    },
+    variant: {
+      type: "select",
+      label: "Variante",
+      default: "bar",
+      options: [
+        { value: "bar", label: "Barra full-width" },
+        { value: "floating", label: "Píldora flotante" },
+        { value: "inline", label: "Inline (no sticky)" },
+      ],
+    },
+    desktopPosition: {
+      type: "select",
+      label: "Posición en desktop",
+      default: "bottom",
+      options: [
+        { value: "bottom", label: "Abajo" },
+        { value: "top", label: "Arriba" },
+      ],
+    },
+    label: { type: "text", label: "Título", translatable: true },
+    meta: { type: "text", label: "Subtítulo / precio", translatable: true },
+    revealAfterScroll: { type: "number", label: "Aparecer tras scroll (px)", default: 320 },
+    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Acciones principales", translatable: true },
+    actions: {
+      type: "list",
+      label: "Acciones",
+      item: {
+        type: "object",
+        label: "Acción",
+        fields: {
+          label: { type: "text", label: "Texto", translatable: true },
+          href: { type: "url", label: "URL" },
+          iconKey: { type: "text", label: "Icono (Lucide key)" },
+          action: {
+            type: "select",
+            label: "Acción",
+            default: "navigate",
+            options: [
+              { value: "navigate", label: "Navegar" },
+              { value: "favorite", label: "Guardar" },
+              { value: "contact", label: "Contactar" },
+              { value: "book", label: "Reservar" },
+              { value: "share", label: "Compartir" },
+              { value: "phone", label: "Llamar" },
+              { value: "whatsapp", label: "WhatsApp" },
+            ],
+          },
+          emphasis: {
+            type: "select",
+            label: "Énfasis",
+            default: "secondary",
+            options: [
+              { value: "primary", label: "Primario" },
+              { value: "secondary", label: "Secundario" },
+              { value: "ghost", label: "Fantasma" },
+            ],
+          },
+        },
+      },
+    },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  // Sin `constraints.surfaces` → reutilizable en TODAS las Experience Pages.
+  constraints: { unique_per_page: true },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["variant", "desktopPosition"],
+  },
+  i18n: { translatable_fields: ["label", "meta", "ariaLabel", "actions"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
@@ -1593,6 +1764,9 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   discoveryNavigatorBlock,
   // H-03 · Ola I1.a — Experience Hero (fundacional Experience Pages).
   experienceHeroBlock,
+  // H-03 · Ola I1.b — Experience Subnav + CTA Bar (fundacionales).
+  experienceSubnavBlock,
+  experienceCtaBarBlock,
 ];
 
 let bootstrapped = false;

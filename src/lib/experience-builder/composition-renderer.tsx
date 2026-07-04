@@ -80,6 +80,14 @@ import {
   ExperienceHeroBlock,
   ExperienceHeroPreview,
 } from "@/components/experience-builder/blocks/experience-hero/ExperienceHeroBlock";
+import {
+  ExperienceSubnavBlock,
+  ExperienceSubnavPreview,
+} from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnavBlock";
+import {
+  ExperienceCtaBarBlock,
+  ExperienceCtaBarPreview,
+} from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBarBlock";
 
 /**
  * US-R3 · Sub-ola 2.5d — mapa de renderers `vmx.kit.*`. Se expande de
@@ -465,6 +473,16 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   <ExperienceHeroPreview />
 );
 
+// H-03 · Ola I1.b — Experience Subnav + CTA Bar (Studio preview neutral).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.subnav"] = () => (
+  <ExperienceSubnavPreview />
+);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.cta-bar"] = () => (
+  <ExperienceCtaBarPreview />
+);
+
 /* ------------------------------------------------------------------ *
  * Mapa de producción (Etapa 15.10.3)
  *
@@ -690,6 +708,15 @@ PRODUCTION_COMPONENT_MAP["vmx.discovery.navigator"] = ({ node }) => (
 // cuando `source !== 'manual'`).
 PRODUCTION_COMPONENT_MAP["vmx.experience.hero"] = ({ node }) => (
   <ExperienceHeroBlock config={node.config} />
+);
+
+// H-03 · Ola I1.b — Experience Subnav (producción: manual/auto/preset).
+PRODUCTION_COMPONENT_MAP["vmx.experience.subnav"] = ({ node }) => (
+  <ExperienceSubnavBlock config={node.config} />
+);
+// H-03 · Ola I1.b — Experience CTA Bar (producción: manual/business…).
+PRODUCTION_COMPONENT_MAP["vmx.experience.cta-bar"] = ({ node }) => (
+  <ExperienceCtaBarBlock config={node.config} />
 );
 
 /* ------------------------------------------------------------------ *
