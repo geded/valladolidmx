@@ -23,6 +23,8 @@ import {
   defineRouteContext,
   type RouteContextDeclaration,
 } from "@/lib/context-engine";
+import { resolveCanonicalPath } from "@/lib/navigation";
+import { DISCOVERY_ORIGIN } from "@/lib/discovery/seo";
 
 /**
  * H-02 · I6 — Declaración de contexto de la ficha de empresa.
@@ -67,7 +69,7 @@ export const Route = createFileRoute("/marketplace/$slug")({
     const b = loaderData.business;
     const title = `${b.display_name} — ${SITE.name}`;
     const description = b.tagline || b.description.slice(0, 160) || `${b.display_name} en el Marketplace de ${SITE.name}.`;
-    return buildPublicHead({
+    const head = buildPublicHead({
       title,
       description,
       path: `/marketplace/${b.slug}`,
@@ -82,6 +84,25 @@ export const Route = createFileRoute("/marketplace/$slug")({
         },
       ],
     });
+
+    // Sub-ola N2.3 · Fase 1 — Canonicalización territorial.
+    // La ruta legacy sigue 200 OK; no se emite 301 en esta fase.
+    if (b.destination_slug && b.category_slug) {
+      const territorialPath = resolveCanonicalPath({
+        kind: "business",
+        slug: b.slug,
+        category: b.category_slug,
+        destination: b.destination_slug,
+      });
+      const territorialUrl = `${DISCOVERY_ORIGIN}${territorialPath}`;
+      for (const link of head.links) {
+        if (link.rel === "canonical") link.href = territorialUrl;
+      }
+      for (const m of head.meta) {
+        if (m.property === "og:url") m.content = territorialUrl;
+      }
+    }
+    return head;
   },
   component: MarketplaceBusinessPage,
   errorComponent: ({ error }) => (
