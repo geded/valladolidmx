@@ -15,6 +15,39 @@ import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
 import { DestinationSurface } from "@/components/surfaces/DestinationSurface";
 import { getPublicDestinationBySlug, getDestinationRelated } from "@/lib/destinations/public-reads.functions";
+import {
+  ContextEngineProvider,
+  defineRouteContext,
+  type RouteContextDeclaration,
+} from "@/lib/context-engine";
+
+/**
+ * H-02 · I3 — Construye la declaración de contexto de la ficha de
+ * destino. Se ejecuta en render (no en loader) para que la etiqueta
+ * refleje siempre el nombre resuelto (BD > mock > slug crudo).
+ */
+function buildDestinationContext(
+  slug: string,
+  displayName: string,
+): RouteContextDeclaration {
+  return defineRouteContext({
+    current: {
+      kind: "destination",
+      slug,
+      label: displayName,
+      href: `/oriente-maya/${slug}`,
+    },
+    ancestors: [
+      {
+        kind: "region",
+        slug: ORIENTE_MAYA.slug,
+        label: ORIENTE_MAYA.name,
+        href: "/oriente-maya",
+      },
+    ],
+    canonical: `/oriente-maya/${slug}`,
+  });
+}
 
 export const Route = createFileRoute("/oriente-maya/$destino")({
   loader: async ({ params }) => {
@@ -46,17 +79,48 @@ export const Route = createFileRoute("/oriente-maya/$destino")({
         })
       : { meta: [], links: [], scripts: [] },
   component: DestinoPage,
-  notFoundComponent: () => (
-    <PublicShell
-      title="Destino no disponible"
-      crumbs={[{ label: ORIENTE_MAYA.name, to: "/oriente-maya" }, { label: "—" }]}
-    >
-      <p className="text-muted-foreground">Aún no publicamos esta página de destino.</p>
-    </PublicShell>
-  ),
+  notFoundComponent: DestinoNotFound,
 });
 
 function DestinoPage() {
-  const { db, related } = Route.useLoaderData();
-  return <DestinationSurface dbData={db ?? undefined} related={related ?? undefined} />;
+  const { dest, db, related } = Route.useLoaderData();
+  const declaration = buildDestinationContext(dest.slug, dest.name);
+  // H-02 · I3 — Sólo la RUTA monta el provider. La superficie
+  // (`DestinationSurface`) mantiene su propio `PublicShell` intacto —
+  // el breadcrumb visible NO cambia. Este provider persiste `previous`
+  // en `sessionStorage` para habilitar herencia en I4 (categorías).
+  return (
+    <ContextEngineProvider declaration={declaration}>
+      <DestinationSurface dbData={db ?? undefined} related={related ?? undefined} />
+    </ContextEngineProvider>
+  );
+}
+
+function DestinoNotFound() {
+  // Fallback defensivo: se construye contexto mínimo con el slug crudo
+  // (el router no expone params tipados en notFoundComponent). El
+  // breadcrumb visible sigue el `crumbs` legacy si el contexto no
+  // aporta más — comportamiento idéntico al previo.
+  const fallbackDeclaration = defineRouteContext({
+    current: { kind: "destination", label: "—", href: undefined },
+    ancestors: [
+      {
+        kind: "region",
+        slug: ORIENTE_MAYA.slug,
+        label: ORIENTE_MAYA.name,
+        href: "/oriente-maya",
+      },
+    ],
+    canonical: "/oriente-maya",
+  });
+  return (
+    <PublicShell
+      title="Destino no disponible"
+      crumbs={[{ label: ORIENTE_MAYA.name, to: "/oriente-maya" }, { label: "—" }]}
+      contextDeclaration={fallbackDeclaration}
+      useContextCrumbs={false}
+    >
+      <p className="text-muted-foreground">Aún no publicamos esta página de destino.</p>
+    </PublicShell>
+  );
 }
