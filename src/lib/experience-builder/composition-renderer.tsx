@@ -499,6 +499,16 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   <ExperienceCtaBarPreview />
 );
 
+// H-03 · Ola I1.c — Gallery / Info-Grid / Section / Features (Studio).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.gallery"] = () => <ExperienceGalleryPreview />;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.info-grid"] = () => <ExperienceInfoGridPreview />;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.section"] = () => <ExperienceSectionPreview />;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.features"] = () => <ExperienceFeaturesPreview />;
+
 /* ------------------------------------------------------------------ *
  * Mapa de producción (Etapa 15.10.3)
  *
@@ -733,6 +743,20 @@ PRODUCTION_COMPONENT_MAP["vmx.experience.subnav"] = ({ node }) => (
 // H-03 · Ola I1.b — Experience CTA Bar (producción: manual/business…).
 PRODUCTION_COMPONENT_MAP["vmx.experience.cta-bar"] = ({ node }) => (
   <ExperienceCtaBarBlock config={node.config} />
+);
+
+// H-03 · Ola I1.c — Producción (mismo blockType; hidrata Surface cuando aplica).
+PRODUCTION_COMPONENT_MAP["vmx.experience.gallery"] = ({ node }) => (
+  <ExperienceGalleryBlock config={node.config} />
+);
+PRODUCTION_COMPONENT_MAP["vmx.experience.info-grid"] = ({ node }) => (
+  <ExperienceInfoGridBlock config={node.config} />
+);
+PRODUCTION_COMPONENT_MAP["vmx.experience.section"] = ({ node }) => (
+  <ExperienceSectionBlock config={node.config} />
+);
+PRODUCTION_COMPONENT_MAP["vmx.experience.features"] = ({ node }) => (
+  <ExperienceFeaturesBlock config={node.config} />
 );
 
 /* ------------------------------------------------------------------ *
