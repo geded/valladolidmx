@@ -43,6 +43,7 @@ import { Route as LovableExperienceSubnavCtabarPreviewRouteImport } from './rout
 import { Route as LovableExperienceI1cPreviewRouteImport } from './routes/lovable/experience-i1c-preview'
 import { Route as LovableExperienceHeroPreviewRouteImport } from './routes/lovable/experience-hero-preview'
 import { Route as LovableContextEnginePreviewRouteImport } from './routes/lovable/context-engine-preview'
+import { Route as LovableBusinessMotherTemplatePreviewRouteImport } from './routes/lovable/business-mother-template-preview'
 import { Route as LSlugRouteImport } from './routes/l.$slug'
 import { Route as EventosSlugRouteImport } from './routes/eventos.$slug'
 import { Route as AuthenticatedPaginasRouteImport } from './routes/_authenticated/paginas'
@@ -301,6 +302,12 @@ const LovableContextEnginePreviewRoute =
   LovableContextEnginePreviewRouteImport.update({
     id: '/lovable/context-engine-preview',
     path: '/lovable/context-engine-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableBusinessMotherTemplatePreviewRoute =
+  LovableBusinessMotherTemplatePreviewRouteImport.update({
+    id: '/lovable/business-mother-template-preview',
+    path: '/lovable/business-mother-template-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LSlugRoute = LSlugRouteImport.update({
@@ -821,6 +828,7 @@ export interface FileRoutesByFullPath {
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
+  '/lovable/business-mother-template-preview': typeof LovableBusinessMotherTemplatePreviewRoute
   '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
   '/lovable/experience-hero-preview': typeof LovableExperienceHeroPreviewRoute
   '/lovable/experience-i1c-preview': typeof LovableExperienceI1cPreviewRoute
@@ -935,6 +943,7 @@ export interface FileRoutesByTo {
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
+  '/lovable/business-mother-template-preview': typeof LovableBusinessMotherTemplatePreviewRoute
   '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
   '/lovable/experience-hero-preview': typeof LovableExperienceHeroPreviewRoute
   '/lovable/experience-i1c-preview': typeof LovableExperienceI1cPreviewRoute
@@ -1055,6 +1064,7 @@ export interface FileRoutesById {
   '/_authenticated/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
+  '/lovable/business-mother-template-preview': typeof LovableBusinessMotherTemplatePreviewRoute
   '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
   '/lovable/experience-hero-preview': typeof LovableExperienceHeroPreviewRoute
   '/lovable/experience-i1c-preview': typeof LovableExperienceI1cPreviewRoute
@@ -1176,6 +1186,7 @@ export interface FileRouteTypes {
     | '/paginas'
     | '/eventos/$slug'
     | '/l/$slug'
+    | '/lovable/business-mother-template-preview'
     | '/lovable/context-engine-preview'
     | '/lovable/experience-hero-preview'
     | '/lovable/experience-i1c-preview'
@@ -1290,6 +1301,7 @@ export interface FileRouteTypes {
     | '/paginas'
     | '/eventos/$slug'
     | '/l/$slug'
+    | '/lovable/business-mother-template-preview'
     | '/lovable/context-engine-preview'
     | '/lovable/experience-hero-preview'
     | '/lovable/experience-i1c-preview'
@@ -1409,6 +1421,7 @@ export interface FileRouteTypes {
     | '/_authenticated/paginas'
     | '/eventos/$slug'
     | '/l/$slug'
+    | '/lovable/business-mother-template-preview'
     | '/lovable/context-engine-preview'
     | '/lovable/experience-hero-preview'
     | '/lovable/experience-i1c-preview'
@@ -1521,6 +1534,7 @@ export interface RootRouteChildren {
   RestaurantesRoute: typeof RestaurantesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   LSlugRoute: typeof LSlugRoute
+  LovableBusinessMotherTemplatePreviewRoute: typeof LovableBusinessMotherTemplatePreviewRoute
   LovableContextEnginePreviewRoute: typeof LovableContextEnginePreviewRoute
   LovableExperienceHeroPreviewRoute: typeof LovableExperienceHeroPreviewRoute
   LovableExperienceI1cPreviewRoute: typeof LovableExperienceI1cPreviewRoute
@@ -1783,6 +1797,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/context-engine-preview'
       fullPath: '/lovable/context-engine-preview'
       preLoaderRoute: typeof LovableContextEnginePreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/business-mother-template-preview': {
+      id: '/lovable/business-mother-template-preview'
+      path: '/lovable/business-mother-template-preview'
+      fullPath: '/lovable/business-mother-template-preview'
+      preLoaderRoute: typeof LovableBusinessMotherTemplatePreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/l/$slug': {
@@ -2700,6 +2721,8 @@ const rootRouteChildren: RootRouteChildren = {
   RestaurantesRoute: RestaurantesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   LSlugRoute: LSlugRoute,
+  LovableBusinessMotherTemplatePreviewRoute:
+    LovableBusinessMotherTemplatePreviewRoute,
   LovableContextEnginePreviewRoute: LovableContextEnginePreviewRoute,
   LovableExperienceHeroPreviewRoute: LovableExperienceHeroPreviewRoute,
   LovableExperienceI1cPreviewRoute: LovableExperienceI1cPreviewRoute,
