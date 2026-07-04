@@ -10,6 +10,8 @@
 import { createContext, useContext } from "react";
 import { PublicShell } from "@/components/discovery";
 import type { MarketplaceProductDetail } from "@/lib/marketplace/marketplace-reads.functions";
+import type { ProductRelatedDTO } from "@/lib/marketplace/product-related.functions";
+import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 
 export const ProductSurfaceContext = createContext<MarketplaceProductDetail | null>(null);
 
@@ -17,16 +19,28 @@ export function useProduct(): MarketplaceProductDetail | null {
   return useContext(ProductSurfaceContext);
 }
 
+/**
+ * E2 · US-E2.2 — Contexto complementario para Related Collection.
+ * Se mantiene independiente para no romper consumidores existentes
+ * de `ProductSurfaceContext`.
+ */
+export const ProductSurfaceRelatedContext =
+  createContext<ProductRelatedDTO | null>(null);
+
 export function ProductSurfaceProvider({
   product,
+  related,
   children,
 }: {
   product: MarketplaceProductDetail | null;
+  related?: ProductRelatedDTO | null;
   children: React.ReactNode;
 }) {
   return (
     <ProductSurfaceContext.Provider value={product}>
-      {children}
+      <ProductSurfaceRelatedContext.Provider value={related ?? null}>
+        {children}
+      </ProductSurfaceRelatedContext.Provider>
     </ProductSurfaceContext.Provider>
   );
 }
@@ -43,6 +57,7 @@ export function ProductSurface({
 } = {}) {
   const ctxProduct = useContext(ProductSurfaceContext);
   const p = propProduct ?? ctxProduct;
+  const related = useContext(ProductSurfaceRelatedContext);
   if (!p) {
     return (
       <PublicShell
@@ -55,6 +70,11 @@ export function ProductSurface({
       </PublicShell>
     );
   }
+
+  const hasSameBusiness = (p.related?.length ?? 0) > 0;
+  const hasSameCatDest = (related?.sameCategoryInDestination.length ?? 0) > 0;
+  const showDescubre = hasSameBusiness || hasSameCatDest;
+
   return (
     <PublicShell
       eyebrow={p.product_type}
@@ -69,6 +89,66 @@ export function ProductSurface({
     >
       {p.description ? (
         <p className="max-w-3xl text-sm text-foreground/80">{p.description}</p>
+      ) : null}
+
+      {showDescubre ? (
+        <section id="descubre" data-eb-anchor className="mt-10 scroll-mt-24">
+          <ExperienceRelatedCollectionBlock
+            config={{
+              source: "product",
+              entityKind: "product",
+              variant: "grid",
+              columns: 2,
+              heading: "Sigue descubriendo",
+              subheading: `Más opciones desde ${p.business.display_name} y otras experiencias en el mismo destino.`,
+              emptyMessage: "Aún no hay productos hermanos publicados.",
+              ariaLabel: `Descubrimiento contextual desde ${p.name}`,
+              groups: [
+                {
+                  id: "misma-empresa",
+                  entityKind: "product",
+                  heading: `Más de ${p.business.display_name}`,
+                  maxItems: 6,
+                  variant: "grid",
+                  seeAllHref:
+                    p.business.destination_slug && p.business.category_slug
+                      ? `/oriente-maya/${encodeURIComponent(p.business.destination_slug)}/${encodeURIComponent(p.business.category_slug)}/${encodeURIComponent(p.business.slug)}`
+                      : `/marketplace/${p.business.slug}`,
+                  seeAllLabel: "Ver empresa",
+                },
+                {
+                  id: "misma-categoria-destino",
+                  entityKind: "product",
+                  heading: p.business.category_slug
+                    ? `Otras opciones de ${p.business.category_slug} en el destino`
+                    : "Otras opciones en el destino",
+                  maxItems: 6,
+                  variant: "grid",
+                  seeAllHref:
+                    p.business.destination_slug && p.business.category_slug
+                      ? `/oriente-maya/${encodeURIComponent(p.business.destination_slug)}/${encodeURIComponent(p.business.category_slug)}`
+                      : `/oriente-maya/${encodeURIComponent(p.business.destination_slug || "")}`,
+                  seeAllLabel: "Ver categoría",
+                },
+              ],
+              capabilities: {
+                showImage: true,
+                showMeta: true,
+                showBadges: true,
+                showPrice: true,
+                showKindBadge: true,
+                dedupe: true,
+                showRationale: true,
+              },
+              contextRefs: {
+                destinationSlug: p.business.destination_slug || null,
+                categorySlug: p.business.category_slug || null,
+                businessSlug: p.business.slug || null,
+                productSlug: p.slug || null,
+              },
+            }}
+          />
+        </section>
       ) : null}
     </PublicShell>
   );
