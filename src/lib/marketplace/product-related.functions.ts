@@ -21,6 +21,10 @@ import type { MarketplaceProductCard } from "./marketplace-reads.functions";
 
 export interface ProductRelatedDTO {
   sameCategoryInDestination: MarketplaceProductCard[];
+  /** Fallback: otros productos del mismo destino (cualquier categoría),
+   *  excluyendo la empresa actual y los ya incluidos en `sameCategoryInDestination`.
+   *  Útil cuando la matriz destino×categoría es escasa. */
+  otherInDestination: MarketplaceProductCard[];
 }
 
 function publicClient() {
@@ -73,7 +77,9 @@ export const getProductRelated = createServerFn({ method: "GET" })
       .limit(120);
     if (error) throw new Error(`product_related_failed: ${error.message}`);
 
-    const items: MarketplaceProductCard[] = [];
+    const inDestination: MarketplaceProductCard[] = [];
+    const sameCat: MarketplaceProductCard[] = [];
+    const otherCat: MarketplaceProductCard[] = [];
     for (const row of rows ?? []) {
       const biz = row.business as
         | {
@@ -92,8 +98,7 @@ export const getProductRelated = createServerFn({ method: "GET" })
       const destSlug = (biz.destinations as { slug?: unknown } | null)?.slug;
       const catSlug = (biz.business_categories as { slug?: unknown } | null)?.slug;
       if (typeof destSlug !== "string" || destSlug !== data.destinationSlug) continue;
-      if (data.categorySlug && (typeof catSlug !== "string" || catSlug !== data.categorySlug)) continue;
-      items.push({
+      const card: MarketplaceProductCard = {
         id: row.id,
         slug: row.slug,
         name: row.name,
@@ -113,9 +118,18 @@ export const getProductRelated = createServerFn({ method: "GET" })
         accepts_online_payment: Boolean((row as Record<string, unknown>).accepts_online_payment),
         requires_availability: Boolean((row as Record<string, unknown>).requires_availability),
         visibility_level: String((row as Record<string, unknown>).visibility_level ?? "standard"),
-      });
-      if (items.length >= 12) break;
+      };
+      inDestination.push(card);
+      if (data.categorySlug && typeof catSlug === "string" && catSlug === data.categorySlug) {
+        sameCat.push(card);
+      } else {
+        otherCat.push(card);
+      }
+      if (inDestination.length >= 24) break;
     }
 
-    return { sameCategoryInDestination: items.slice(0, 6) };
+    return {
+      sameCategoryInDestination: sameCat.slice(0, 6),
+      otherInDestination: otherCat.slice(0, 6),
+    };
   });
