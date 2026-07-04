@@ -2053,6 +2053,73 @@ const experiencePromotionsBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+const experienceReviewsBlock: BlockContract = {
+  type: "vmx.experience.reviews",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Experience Reviews",
+  description:
+    "Confianza y prueba social — reputación agregada + reseñas multi-fuente (Google, TripAdvisor, propias, Alux, futuras) con respuestas del negocio y moderación.",
+  schema: {
+    source: {
+      type: "select", label: "Fuente", default: "manual",
+      options: [
+        { value: "manual", label: "Manual" },
+        { value: "business", label: "Ficha empresa (contexto)" },
+        { value: "product", label: "Ficha producto (reservado)" },
+        { value: "destination", label: "Destino (reservado)" },
+        { value: "region", label: "Región (reservado)" },
+        { value: "category", label: "Categoría (reservado)" },
+        { value: "context", label: "Context Engine (reservado)" },
+        { value: "aggregator", label: "Agregador externo (reservado)" },
+      ],
+    },
+    variant: {
+      type: "select", label: "Variante", default: "list",
+      options: [
+        { value: "summary", label: "Sólo resumen" },
+        { value: "list", label: "Lista" },
+        { value: "grid", label: "Grid" },
+        { value: "carousel", label: "Carrusel" },
+        { value: "featured", label: "Destacada" },
+        { value: "wall", label: "Muro" },
+        { value: "compact", label: "Compacto (widget)" },
+      ],
+    },
+    heading: { type: "text", label: "Encabezado", translatable: true },
+    subheading: { type: "text", label: "Subencabezado", translatable: true },
+    emptyMessage: { type: "text", label: "Mensaje vacío", translatable: true, default: "Aún no hay reseñas publicadas." },
+    columns: { type: "number", label: "Columnas", default: 2 },
+    maxItems: { type: "number", label: "Máximo de items" },
+    groupBy: {
+      type: "select", label: "Agrupar por", default: "none",
+      options: [
+        { value: "none", label: "Sin agrupar" },
+        { value: "platform", label: "Fuente" },
+        { value: "language", label: "Idioma" },
+        { value: "travelerType", label: "Tipo de viajero" },
+        { value: "rating", label: "Puntuación" },
+      ],
+    },
+    sortBy: {
+      type: "select", label: "Ordenar por", default: "recent",
+      options: [
+        { value: "recent", label: "Más recientes" },
+        { value: "highest", label: "Mejor puntuadas" },
+        { value: "lowest", label: "Peor puntuadas" },
+        { value: "helpful", label: "Más útiles" },
+        { value: "recommendedByAlux", label: "Recomendadas por Alux (reservado)" },
+      ],
+    },
+    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Opiniones y reseñas", translatable: true },
+  },
+  capabilities: { soporta_i18n: true, soporta_seo: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  constraints: {},
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "columns"] },
+  i18n: { translatable_fields: ["heading", "subheading", "emptyMessage", "ariaLabel"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
@@ -2129,6 +2196,8 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   experienceProductsBlock,
   // H-03 · Ola I2.b — Experience Promotions.
   experiencePromotionsBlock,
+  // H-03 · Ola I2.c — Experience Reviews.
+  experienceReviewsBlock,
 ];
 
 let bootstrapped = false;
