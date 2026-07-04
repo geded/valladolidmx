@@ -4090,6 +4090,8 @@ export type Database = {
           meta: Json
           notes: string | null
           party_size: number | null
+          share_token: string | null
+          shared_at: string | null
           source: Database["public"]["Enums"]["travel_plan_source"]
           start_date: string | null
           status: Database["public"]["Enums"]["travel_plan_status"]
@@ -4107,6 +4109,8 @@ export type Database = {
           meta?: Json
           notes?: string | null
           party_size?: number | null
+          share_token?: string | null
+          shared_at?: string | null
           source?: Database["public"]["Enums"]["travel_plan_source"]
           start_date?: string | null
           status?: Database["public"]["Enums"]["travel_plan_status"]
@@ -4124,6 +4128,8 @@ export type Database = {
           meta?: Json
           notes?: string | null
           party_size?: number | null
+          share_token?: string | null
+          shared_at?: string | null
           source?: Database["public"]["Enums"]["travel_plan_source"]
           start_date?: string | null
           status?: Database["public"]["Enums"]["travel_plan_status"]
@@ -5308,6 +5314,7 @@ export type Database = {
       }
       travel_plan_build_snapshot: { Args: { _plan_id: string }; Returns: Json }
       travel_plan_ensure_active: { Args: never; Returns: string }
+      travel_plan_get_shared: { Args: { _token: string }; Returns: Json }
       travel_plan_import_favorites: {
         Args: { _plan_id: string }
         Returns: number

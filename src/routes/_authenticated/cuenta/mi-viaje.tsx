@@ -18,10 +18,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Trash2, Save, Users, Calendar, MapPin, Building2, ShoppingBag, Ticket, StickyNote, Plus } from "lucide-react";
+import { Trash2, Save, Users, Calendar, MapPin, Building2, ShoppingBag, Ticket, StickyNote, Plus, Share2, Copy, ExternalLink, Printer } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   addPlanItem,
+  disableShareLink,
+  enableShareLink,
   getMyActivePlan,
   promotePlanToCase,
   removePlanItem,
@@ -94,6 +96,7 @@ function MiViajePage() {
         <>
           <PlanMetaEditor data={activeQ.data} onSaved={invalidatePlan} />
           <PlanItemsSection data={activeQ.data} onChanged={invalidatePlan} />
+          <ShareExportSection data={activeQ.data} onChanged={invalidatePlan} />
           <AluxTravelerPanel />
           <ConciergeSection data={activeQ.data} cases={cases} onChanged={invalidatePlan} />
         </>
@@ -321,6 +324,157 @@ function PlanMetaEditor({
           {mut.isPending ? "Guardando…" : "Guardar cambios"}
         </button>
       </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Compartir + exportar (US-E4.3)                                     */
+/* ------------------------------------------------------------------ */
+
+function ShareExportSection({
+  data,
+  onChanged,
+}: {
+  data: TravelPlanWithItems;
+  onChanged: () => void;
+}) {
+  const enableFn = useServerFn(enableShareLink);
+  const disableFn = useServerFn(disableShareLink);
+  const { plan } = data;
+  const [copied, setCopied] = useState(false);
+
+  const shareUrl =
+    typeof window !== "undefined" && plan.share_token
+      ? `${window.location.origin}/viaje-compartido/${plan.share_token}`
+      : null;
+
+  const enableMut = useMutation({
+    mutationFn: () => enableFn({ data: { planId: plan.id } }),
+    onSuccess: () => {
+      onChanged();
+      toast.success("Link de compartir activado");
+    },
+    onError: (e) =>
+      toast.error("No se pudo activar el link", {
+        description: e instanceof Error ? e.message : undefined,
+      }),
+  });
+
+  const disableMut = useMutation({
+    mutationFn: () => disableFn({ data: { planId: plan.id } }),
+    onSuccess: () => {
+      onChanged();
+      toast.success("Link revocado");
+    },
+    onError: (e) =>
+      toast.error("No se pudo revocar el link", {
+        description: e instanceof Error ? e.message : undefined,
+      }),
+  });
+
+  async function copyToClipboard() {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      toast.success("Link copiado");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("No se pudo copiar. Copia manualmente.");
+    }
+  }
+
+  return (
+    <section className="rounded-lg border bg-card p-5">
+      <h2 className="flex items-center gap-2 text-lg font-medium">
+        <Share2 className="size-4 text-primary" /> Compartir y exportar
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Genera un link público read-only para compartir tu expediente con
+        familia, amigos o tu concierge. Puedes revocarlo en cualquier momento.
+      </p>
+
+      {plan.share_token && shareUrl ? (
+        <div className="mt-4 space-y-3">
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-primary">
+              Link activo
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <input
+                readOnly
+                value={shareUrl}
+                onFocus={(e) => e.currentTarget.select()}
+                className="min-w-0 flex-1 rounded-md border bg-background px-3 py-2 text-xs"
+              />
+              <button
+                type="button"
+                onClick={copyToClipboard}
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-95"
+              >
+                <Copy className="size-3.5" />
+                {copied ? "Copiado" : "Copiar"}
+              </button>
+              <a
+                href={shareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-md border px-3 py-2 text-xs font-medium hover:bg-accent"
+              >
+                <ExternalLink className="size-3.5" />
+                Ver
+              </a>
+            </div>
+            {plan.shared_at ? (
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                Activado el{" "}
+                {new Date(plan.shared_at).toLocaleDateString("es-MX", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <a
+              href={shareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md border px-3 py-2 text-sm hover:bg-accent"
+            >
+              <Printer className="size-3.5" />
+              Imprimir / Guardar PDF
+            </a>
+            <button
+              type="button"
+              onClick={() => disableMut.mutate()}
+              disabled={disableMut.isPending}
+              className="inline-flex items-center gap-1.5 rounded-md border border-destructive/40 px-3 py-2 text-sm text-destructive hover:bg-destructive/5 disabled:opacity-50"
+            >
+              {disableMut.isPending ? "Revocando…" : "Revocar link"}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={() => enableMut.mutate()}
+            disabled={enableMut.isPending}
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-95 disabled:opacity-50"
+          >
+            <Share2 className="size-4" />
+            {enableMut.isPending ? "Generando…" : "Generar link de compartir"}
+          </button>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Cualquier persona con el link podrá ver tu expediente (sin tu correo
+            ni notas privadas). Podrás revocarlo cuando quieras.
+          </p>
+        </div>
+      )}
     </section>
   );
 }
