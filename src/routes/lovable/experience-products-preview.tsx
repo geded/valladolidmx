@@ -13,7 +13,7 @@ import {
   type ExperienceProductsDTO,
 } from "@/lib/experience-builder/blocks/experience-products/contract";
 import { BusinessSurfaceProvider } from "@/components/surfaces/BusinessSurface";
-import type { MarketplaceBusinessDetail } from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
 
 export const Route = createFileRoute("/lovable/experience-products-preview")({
   head: () => ({

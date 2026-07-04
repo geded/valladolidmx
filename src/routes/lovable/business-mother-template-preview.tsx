@@ -10,7 +10,7 @@ import {
   BusinessSurface,
   BusinessSurfaceProvider,
 } from "@/components/surfaces/BusinessSurface";
-import type { MarketplaceBusinessDetail } from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
 
 const MOCK_HOTEL: MarketplaceBusinessDetail = {
   id: "demo-hotel",

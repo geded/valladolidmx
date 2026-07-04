@@ -18,8 +18,8 @@
  */
 import { useContext } from "react";
 import { PublicShell } from "@/components/discovery";
-import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
-import { ProductActions } from "@/components/marketplace/ProductActions";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { ProductActions } from "@/components/commerce/ProductActions";
 import { planAllows } from "@/lib/plans/plans-catalog";
 import {
   BusinessSurfaceContext,
@@ -28,7 +28,7 @@ import {
 import type {
   MarketplaceProductCard,
   MarketplacePromotionCard,
-} from "@/lib/marketplace/marketplace-reads.functions";
+} from "@/lib/catalog/marketplace-reads.functions";
 
 function useBusiness() {
   return useContext(BusinessSurfaceContext);

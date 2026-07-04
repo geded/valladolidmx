@@ -19,9 +19,9 @@
  */
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
-import { ProductActions } from "@/components/marketplace/ProductActions";
+import { ProductActions } from "@/components/commerce/ProductActions";
 import { SITE } from "@/config/site";
 import { resolveCanonicalPath } from "@/lib/navigation";
 import { useProduct } from "@/components/surfaces/ProductSurface";

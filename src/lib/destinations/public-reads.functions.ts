@@ -5,7 +5,7 @@
  * caller can use the static mock.
  */
 import { createServerFn } from "@tanstack/react-start";
-import type { MarketplaceBusinessCard, MarketplaceProductCard } from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplaceBusinessCard, MarketplaceProductCard } from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
 
 export interface PublicDestinationDTO {

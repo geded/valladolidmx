@@ -25,7 +25,7 @@ import type {
   MarketplaceProductCard,
   MarketplaceProductDetail,
   ProductMediaItem,
-} from "@/lib/marketplace/marketplace-reads.functions";
+} from "@/lib/catalog/marketplace-reads.functions";
 
 export function productToShellVM(p: MarketplaceProductDetail): ShellVM {
   return {

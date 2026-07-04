@@ -24,9 +24,9 @@
  */
 import { createContext, useContext } from "react";
 import { PublicShell } from "@/components/discovery";
-import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
-import type { MarketplaceBusinessDetail } from "@/lib/marketplace/marketplace-reads.functions";
-import type { BusinessRelatedDTO } from "@/lib/marketplace/business-related.functions";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
+import type { BusinessRelatedDTO } from "@/lib/catalog/business-related.functions";
 import { planAllows } from "@/lib/plans/plans-catalog";
 import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
 import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";

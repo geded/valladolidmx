@@ -13,13 +13,13 @@
  */
 import { useContext, useMemo } from "react";
 import { ExperienceProducts } from "./ExperienceProducts";
-import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import {
   ProductActions,
   type ProductActionsProduct,
-} from "@/components/marketplace/ProductActions";
+} from "@/components/commerce/ProductActions";
 import { BusinessSurfaceContext } from "@/components/surfaces/BusinessSurface";
-import type { MarketplaceProductCard } from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplaceProductCard } from "@/lib/catalog/marketplace-reads.functions";
 import {
   buildExperienceProductsPreviewDTO,
   experienceProductsConfigSchema,

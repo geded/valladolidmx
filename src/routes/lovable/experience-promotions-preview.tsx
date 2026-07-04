@@ -15,7 +15,7 @@ import {
   type ExperiencePromotionsDTO,
 } from "@/lib/experience-builder/blocks/experience-promotions/contract";
 import { BusinessSurfaceProvider } from "@/components/surfaces/BusinessSurface";
-import type { MarketplaceBusinessDetail } from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
 
 export const Route = createFileRoute("/lovable/experience-promotions-preview")({
   head: () => ({

@@ -9,8 +9,8 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
-import { getMarketplaceProductBySlug } from "@/lib/marketplace/marketplace-reads.functions";
-import { getProductRelated } from "@/lib/marketplace/product-related.functions";
+import { getMarketplaceProductBySlug } from "@/lib/catalog/marketplace-reads.functions";
+import { getProductRelated } from "@/lib/catalog/product-related.functions";
 import {
   resolveTerritorialPath,
   resolutionToNavigationContext,

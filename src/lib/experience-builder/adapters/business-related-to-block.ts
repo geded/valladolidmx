@@ -9,7 +9,7 @@
  * URLs canónicas territoriales (Navigation Contract v1.0):
  *   /oriente-maya/:destino/:categoria/:empresa
  */
-import type { MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplaceBusinessCard } from "@/lib/catalog/marketplace-reads.functions";
 import type {
   ExperienceRelatedEntityKind,
   ExperienceRelatedItem,

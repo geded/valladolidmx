@@ -9,7 +9,7 @@
 import type {
   MarketplaceBusinessCard,
   MarketplaceProductCard,
-} from "@/lib/marketplace/marketplace-reads.functions";
+} from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
 import type {
   ExperienceRelatedEntityKind,

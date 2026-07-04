@@ -11,7 +11,7 @@ import {
   listMyOrders,
   type OrderStatus,
   type OrderSummary,
-} from "@/lib/marketplace/cart.functions";
+} from "@/lib/catalog/cart.functions";
 import { startPayment } from "@/lib/payments/payments.functions";
 
 function genId() {

@@ -21,15 +21,15 @@
  */
 import { Link } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
-import { ProductActions } from "@/components/marketplace/ProductActions";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { ProductActions } from "@/components/commerce/ProductActions";
 import { SITE } from "@/config/site";
 import { useProduct } from "@/components/surfaces/ProductSurface";
 import type {
   MarketplaceProductCard,
   MarketplaceProductDetail,
   ProductMediaItem,
-} from "@/lib/marketplace/marketplace-reads.functions";
+} from "@/lib/catalog/marketplace-reads.functions";
 
 function EmptyHint({ children }: { children: React.ReactNode }) {
   return (

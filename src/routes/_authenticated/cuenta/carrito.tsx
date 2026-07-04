@@ -15,7 +15,7 @@ import {
   updateCartQty,
   type CartItem,
   type OrderSummary,
-} from "@/lib/marketplace/cart.functions";
+} from "@/lib/catalog/cart.functions";
 
 export const Route = createFileRoute("/_authenticated/cuenta/carrito")({
   component: CarritoPage,

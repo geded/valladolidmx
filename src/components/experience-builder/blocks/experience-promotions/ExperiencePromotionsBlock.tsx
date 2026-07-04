@@ -11,9 +11,9 @@
  */
 import { useContext, useMemo } from "react";
 import { ExperiencePromotions } from "./ExperiencePromotions";
-import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { BusinessSurfaceContext } from "@/components/surfaces/BusinessSurface";
-import type { MarketplacePromotionCard } from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplacePromotionCard } from "@/lib/catalog/marketplace-reads.functions";
 import {
   buildExperiencePromotionsPreviewDTO,
   computeUrgencyDays,

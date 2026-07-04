@@ -38,9 +38,9 @@ import {
 import { businessRelatedToItems } from "@/lib/experience-builder/adapters/business-related-to-block";
 import { productRelatedToItems } from "@/lib/experience-builder/adapters/product-related-to-block";
 import type { DestinationRelatedDTO } from "@/lib/destinations/public-reads.functions";
-import type { BusinessRelatedDTO } from "@/lib/marketplace/business-related.functions";
-import type { ProductRelatedDTO } from "@/lib/marketplace/product-related.functions";
-import type { MarketplaceProductDetail } from "@/lib/marketplace/marketplace-reads.functions";
+import type { BusinessRelatedDTO } from "@/lib/catalog/business-related.functions";
+import type { ProductRelatedDTO } from "@/lib/catalog/product-related.functions";
+import type { MarketplaceProductDetail } from "@/lib/catalog/marketplace-reads.functions";
 
 function safeParse(raw: unknown): ExperienceRelatedCollectionConfig {
   const r = experienceRelatedCollectionConfigSchema.safeParse(raw ?? {});
