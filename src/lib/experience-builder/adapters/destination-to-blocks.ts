@@ -100,11 +100,13 @@ export function destinationToSubnavDTO(d: DestinationBlockInput): ExperienceSubn
     anchors.push({ id: "resumen", label: "Resumen" });
   }
   const c = d.relatedCounts;
-  if (c.hoteles + c.restaurantes + c.experiencias + c.otras > 0) {
-    anchors.push({ id: "empresas", label: "Empresas" });
+  const total =
+    c.hoteles + c.restaurantes + c.experiencias + c.otras + c.eventos + c.productos;
+  if (total > 0) {
+    // H-03 · I3.b — sección unificada de descubrimiento contextual
+    // orquestada por `vmx.experience.related-collection`.
+    anchors.push({ id: "descubre", label: "Sigue descubriendo" });
   }
-  if (c.eventos > 0) anchors.push({ id: "eventos", label: "Eventos" });
-  if (c.productos > 0) anchors.push({ id: "productos", label: "Productos" });
   return {
     variant: "pill",
     sticky: true,
