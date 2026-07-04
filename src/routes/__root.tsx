@@ -28,6 +28,7 @@ import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { ProtectedActionResumeRunner } from "@/lib/protected-actions";
+import { SignInPromptSheet } from "@/components/protected-actions/SignInPromptSheet";
 
 const rootPublishedHomeQuery = queryOptions({
   queryKey: ["eb", "published-home", "default"],
@@ -192,6 +193,8 @@ function RootComponent() {
         {!isAppShellRoute ? <EditThisPageButton pathname={pathname} /> : null}
         {/* OLA H-01 · Épica 1 · I1 — no-op mientras no haya consumidores. */}
         <ProtectedActionResumeRunner />
+        {/* OLA H-01 · Épica 1 · I2 — host global del gate de identidad. */}
+        <SignInPromptSheet />
         </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>

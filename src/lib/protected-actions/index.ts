@@ -10,3 +10,10 @@ export {
   subscribeProtectedActionEvents,
 } from "./observability";
 export { ProtectedActionResumeRunner } from "./resume-runner";
+export { SheetController } from "./sheet-controller";
+export type { ActiveGate, GateCopy } from "./sheet-controller";
+export {
+  useProtectedAction,
+  type UseProtectedActionConfig,
+  type UseProtectedActionResult,
+} from "./use-protected-action";
