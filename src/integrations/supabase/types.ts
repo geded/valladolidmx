@@ -4175,6 +4175,7 @@ export type Database = {
         Row: {
           accessibility: string[]
           accessibility_needs: string | null
+          avatar_url: string | null
           budget_band: string | null
           budget_range: string | null
           consent_personalize: boolean
@@ -4185,9 +4186,13 @@ export type Database = {
           home_country: string | null
           id: string
           interests: Json
+          is_public: boolean
           languages: string[]
           preferred_destinations: Json
           preferred_language: string | null
+          public_bio: string | null
+          public_display_name: string | null
+          public_handle: string | null
           signals: Json
           travel_party: Json
           travel_style: string | null
@@ -4199,6 +4204,7 @@ export type Database = {
         Insert: {
           accessibility?: string[]
           accessibility_needs?: string | null
+          avatar_url?: string | null
           budget_band?: string | null
           budget_range?: string | null
           consent_personalize?: boolean
@@ -4209,9 +4215,13 @@ export type Database = {
           home_country?: string | null
           id?: string
           interests?: Json
+          is_public?: boolean
           languages?: string[]
           preferred_destinations?: Json
           preferred_language?: string | null
+          public_bio?: string | null
+          public_display_name?: string | null
+          public_handle?: string | null
           signals?: Json
           travel_party?: Json
           travel_style?: string | null
@@ -4223,6 +4233,7 @@ export type Database = {
         Update: {
           accessibility?: string[]
           accessibility_needs?: string | null
+          avatar_url?: string | null
           budget_band?: string | null
           budget_range?: string | null
           consent_personalize?: boolean
@@ -4233,9 +4244,13 @@ export type Database = {
           home_country?: string | null
           id?: string
           interests?: Json
+          is_public?: boolean
           languages?: string[]
           preferred_destinations?: Json
           preferred_language?: string | null
+          public_bio?: string | null
+          public_display_name?: string | null
+          public_handle?: string | null
           signals?: Json
           travel_party?: Json
           travel_style?: string | null
@@ -4658,6 +4673,10 @@ export type Database = {
         }
         Returns: string
       }
+      check_traveler_handle_available: {
+        Args: { _handle: string }
+        Returns: Json
+      }
       concierge_alux_context_for_case: {
         Args: { _case_id: string }
         Returns: Json
@@ -5073,6 +5092,7 @@ export type Database = {
         Returns: number
       }
       founder_dashboard_kpis: { Args: never; Returns: Json }
+      get_public_traveler_profile: { Args: { _handle: string }; Returns: Json }
       has_any_permission: {
         Args: { _keys: string[]; _user_id: string }
         Returns: boolean
@@ -5112,6 +5132,10 @@ export type Database = {
         Returns: boolean
       }
       is_editor_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_reserved_traveler_handle: {
+        Args: { _handle: string }
+        Returns: boolean
+      }
       log_business_presence_audit: {
         Args: { _action: string; _business_id: string; _notes?: string }
         Returns: undefined

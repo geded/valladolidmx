@@ -1,147 +1,54 @@
+## E5 · Perfil Público del Viajero (v2.5, Programa A, Carril A)
 
-# Épica E3 · Retiro Total de "Marketplace" (Programa A · Carril A · v0.63.0)
+Perfil público opt-in en `/viajero/:handle` con handle elegido por el viajero. V1 minimalista: identidad básica (nombre, avatar, país, idiomas). Base para futuros Trust Signals sin comprometer privacidad.
 
-**Prioridad:** ANTES de US-E2.3 (E2.3 queda pausada hasta cerrar E3).
-**Autorización:** Founder 2026-07-04 (respuesta afirmativa a alcance C + prioridad "antes").
-**Referencias vinculantes:** `mem://roadmap/retire-marketplace-terminology.md`, `docs/blueprint/15.11-NAVIGATION-BLUEPRINT-v1.0.md`, `docs/blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.0.md`.
+### Historias (4)
 
-## Objetivo
+**US-E5.1 · Migración: handle + visibilidad**
+- Añadir a `traveler_profiles`: `public_handle text unique`, `is_public boolean default false`, `public_display_name text`, `public_bio text` (200 char), `avatar_url text`.
+- Índice único case-insensitive (`lower(public_handle)`).
+- Trigger de validación: handle 3–24 chars, `^[a-z0-9_]+$`, lista de reservados (`admin`, `staff`, `alux`, `valladolid`, etc.).
+- RLS: policy pública `TO anon` SELECT sólo columnas seguras cuando `is_public = true` (vía RPC `get_public_traveler_profile`, no SELECT directo).
+- GRANT `SELECT` mínimo + `EXECUTE` a `anon`/`authenticated` sobre la RPC.
 
-Eliminar por completo el término **"Marketplace"** del ecosistema Valladolid.mx y sustituirlo por lenguaje territorial-turístico (Oriente Maya, Catálogo, Explorar, Descubre). Esto incluye rutas públicas, breadcrumbs, CTAs, copies, SEO, sitemap, código fuente y carpetas.
+**US-E5.2 · Server fns + validaciones**
+- `checkHandleAvailability({ handle })` — pública, rate-limitable.
+- `updatePublicProfile` (protegida, `requireSupabaseAuth`) — handle, display_name, bio, is_public.
+- `getPublicTravelerProfile({ handle })` — pública vía server publishable client + RPC.
+- Zod schemas compartidos con reglas del trigger para feedback inmediato.
 
-Justificación de producto: "Marketplace" es lenguaje SaaS/comercio digital que no significa nada para un turista y rompe la narrativa territorial del proyecto (Oriente Maya, Pueblos Mágicos, patrimonio).
+**US-E5.3 · Superficie pública `/viajero/:handle`**
+- Ruta pública SSR con `head()` dinámico (title `@handle · Viajero en Valladolid`, description desde bio, `robots: noindex` si `!is_public`).
+- Componente `TravelerPublicProfileSurface` usando Discovery Layer (PublicShell). Renderiza:
+  - Avatar + nombre público + `@handle`
+  - Chips: home_country (bandera), idiomas
+  - Bio corta si existe
+  - Estado vacío elegante si `!is_public` → 404 semántico con `notFound()`.
+- OG image: usar avatar cuando existe; omitir de lo contrario (regla del blueprint).
+- Zero business logic nueva: reusa cards/tokens del DSL colonial.
 
-## Alcance (Opción C confirmada)
+**US-E5.4 · Panel de gestión en `/cuenta`**
+- Nueva pestaña "Perfil público" en `/cuenta` (dentro del Workspace autenticado, no Discovery).
+- Form con: toggle `is_public`, campo handle (con `checkHandleAvailability` debounced), display_name, bio, upload de avatar (Supabase Storage bucket `avatars`, ya existe o crearlo si falta — verificar en implementación).
+- CTA "Ver mi perfil público" → `Link to /viajero/:handle` cuando `is_public`.
+- Aviso claro: "Tu perfil es privado por defecto. Actívalo cuando quieras compartir."
 
-Retiro completo en 3 sub-olas encadenadas:
+### Decisiones fijadas
+- Visibilidad: privada por defecto (opt-in explícito).
+- URL: `/viajero/:handle` elegido por el usuario, unicidad case-insensitive.
+- V1 no muestra: intereses, favoritos, plan de viaje. Se reservan para épicas posteriores (E5.5+ o Trust Signals) con sus propios toggles granulares.
 
-- **E3.1 — Lenguaje visible + SEO** (bajo riesgo, valor inmediato)
-- **E3.2 — Rutas públicas + 301** (Fase 2 de Navigation Blueprint)
-- **E3.3 — Código legacy** (carpeta `src/routes/marketplace/`, componentes marcados, fallbacks internos)
+### Reglas
+- Cero infra nueva: reusa `traveler_profiles`, PublicShell, Workspace Engine, Storage.
+- Navegación pública respeta Navigation Blueprint (nueva rama `/viajero/*` fuera del árbol `/oriente-maya/*`, coexiste).
+- Loader público llama server fn pública (no `requireSupabaseAuth`) — cumple regla SSR/prerender.
+- Completion Report + Demo Pack (≥3 handles sembrados con perfiles públicos realistas) + Product Changelog al cierre.
 
-Cada sub-ola cierra con Completion Report, Demo Pack y validación Founder antes de arrancar la siguiente.
+### Detalles técnicos
+- Migración en una sola llamada: CREATE columns + índice + trigger de validación + RPC `get_public_traveler_profile(text) RETURNS jsonb` (SECURITY DEFINER, `SET search_path = public`) + GRANT + policy anon.
+- Handle en minúsculas persistido; UI acepta mayúsculas y las normaliza.
+- Reservados almacenados en función, no en tabla, para v1.
+- 4 archivos nuevos aprox: `traveler-public.functions.ts`, `src/routes/viajero.$handle.tsx`, `src/components/traveler/PublicProfileForm.tsx`, `src/components/surfaces/TravelerPublicProfileSurface.tsx`.
 
----
-
-## E3.1 — Lenguaje visible + SEO
-
-**Toca solo capa de presentación y metadata. Cero cambios de rutas ni de código de negocio.**
-
-### Inventario a modificar
-
-1. **Header / Mega Menú** (`src/components/layout/PrimaryMegaMenu.tsx`, `SiteHeader.tsx`)
-   - "Marketplace" → "Catálogo Oriente Maya" (o "Explorar")
-2. **Footer** (`src/components/layout/SiteFooter.tsx`, `src/components/discovery/PublicFooter.tsx`)
-   - Links y secciones nombradas "Marketplace"
-3. **Breadcrumbs territoriales** (`src/components/layout/BreadcrumbTerritorial.tsx`, `src/lib/navigation/breadcrumbs.ts`)
-   - Etiquetas "Marketplace" en trail legacy
-4. **Home** (`src/components/home/EmpresasSection.tsx`, `ResenasSection.tsx`, CTAs)
-5. **CTAs** en Business/Product/Destination/Category surfaces
-6. **Copies i18n** (`src/i18n/locales/{es,en,de,fr,it,pt}.json`)
-   - Claves con "marketplace" → renombradas a `catalog.*` / `explore.*` (mantener retrocompatibilidad de claves durante ciclo)
-7. **SEO** (`src/lib/discovery/seo.ts`, `head()` de rutas legacy `/marketplace/*`)
-   - Titles/descriptions/OG que mencionan "Marketplace" → "Catálogo Oriente Maya"
-8. **Copies de Studio / Experience Builder** visibles al empresario
-   - Solo lo que aparece en UI del CMS/Portal, no nombres técnicos internos
-9. **Alux prompts / mensajes** que digan "marketplace"
-
-### Reglas de sustitución
-
-| Antes | Después |
-|---|---|
-| Marketplace | Catálogo Oriente Maya · Explorar · Descubre |
-| "Ver en Marketplace" | "Ver ficha completa" · "Explorar" |
-| "Marketplace de Valladolid" | "Catálogo Oriente Maya" |
-| "/marketplace" (label) | "Catálogo" (label; ruta se conserva en E3.1) |
-
-### DoR / DoD E3.1
-
-- DoR: inventario cerrado, tabla de sustitución aprobada, cero cambios de rutas.
-- DoD: typecheck ✅, build ✅, smoke visual en Home / Business / Product / Destination / Category / Search, sin cadena "Marketplace" en UI pública ni en `<title>`/`og:*`, Completion Report `16.05-E3-US-E3.1-COMPLETION-REPORT-v1.0.md`, Demo Pack con screenshots antes/después.
-
----
-
-## E3.2 — Rutas públicas + 301 (Fase 2 Navigation Blueprint)
-
-**Activa la Fase 2 de redirecciones legacy → territorial que quedó pausada en N2.**
-
-### Cambios
-
-1. **Redirecciones 301**
-   - `/marketplace` → `/oriente-maya`
-   - `/marketplace/buscar` → `/oriente-maya/buscar` (nueva o alias)
-   - `/marketplace/$slug` → resolución territorial `/oriente-maya/:destino/:categoria/:empresa` vía `resolvePublicRoute` + `page_redirects`
-   - Implementación: server route `src/routes/marketplace/$.tsx` que emite 301 permanente hacia el path territorial resuelto por `resolveCanonicalPath` / `resolvePublicRoute`.
-2. **Sitemap** (`src/routes/sitemap[.]xml.ts`)
-   - Eliminar entradas `/marketplace/*`, dejar solo `/oriente-maya/*` como canónicas.
-3. **Canonicals**
-   - Ninguna URL pública debe emitir `<link rel="canonical" href=".../marketplace/...">`. Toda ficha usa canonical territorial (ya cubierto por N2, verificar).
-4. **Enlaces internos**
-   - Auditar `href` / `<Link to>` restantes hacia `/marketplace/*` en superficies públicas y migrar a `resolveCanonicalPath`.
-5. **`robots.txt`** — sin cambios (no bloquear las URLs legacy, se resuelven vía 301).
-
-### DoR / DoD E3.2
-
-- DoR: E3.1 cerrada y validada, matriz de redirecciones aprobada, Founder autoriza activar Fase 2.
-- DoD: typecheck ✅, build ✅, tests Playwright E2E confirmando 301 correctos + canonicals + sitemap limpio, cero enlaces internos vivos hacia `/marketplace/*` en superficies públicas, Completion Report `16.06-E3-US-E3.2-COMPLETION-REPORT-v1.0.md`, Demo Pack con curl HTTP mostrando 301.
-
----
-
-## E3.3 — Código legacy
-
-**Retiro físico de la carpeta `src/routes/marketplace/` y componentes marcados como legacy tras confirmar que E3.2 lleva ≥ 1 ciclo estable.**
-
-### Cambios
-
-1. **Rutas legacy**
-   - Sustituir `src/routes/marketplace/{index,buscar,$slug}.tsx` por un único catch-all `src/routes/marketplace/$.tsx` que emita 301 (movido desde E3.2) — o bien retirar la carpeta y mover el 301 a un handler equivalente bajo `/api/public/redirect` + fallback en `not-found`.
-   - Decisión técnica: **conservar** un único `src/routes/marketplace/$.tsx` catch-all como puente 301 permanente (compatibilidad con backlinks externos, buscadores y bookmarks). El resto de archivos de la carpeta se eliminan.
-2. **Componentes**
-   - `src/components/marketplace/*` — evaluar cada uno:
-     - `AddToCartButton`, `ProductActions`, `FavoriteButton` → renombrar carpeta a `src/components/commerce/` o `src/components/product-actions/` (funcionalidad se conserva).
-   - Actualizar todos los imports.
-3. **Server functions**
-   - `src/lib/marketplace/*.functions.ts` → mover a `src/lib/catalog/` o `src/lib/oriente-maya/` (funcionalidad idéntica, solo naming).
-   - Actualizar imports en surfaces, adapters y loaders.
-4. **Adapters**
-   - `src/lib/experience-builder/adapters/business-related-to-block.ts` y `product-related-to-block.ts` — ajustar imports y fallback href (`/marketplace/${slug}` → resolver a `/oriente-maya/...` con warning si falta destino/categoría).
-5. **Docs blueprint**
-   - No modificar reportes históricos (14.40.*, 15.10.5d.3, H-03/I2.d). Se mantienen como registro histórico. Solo se agrega nota al pie en 16.00 marcando la deuda como cerrada.
-6. **Memoria**
-   - Actualizar `mem://roadmap/retire-marketplace-terminology.md` con estado "IMPLEMENTADA".
-
-### DoR / DoD E3.3
-
-- DoR: E3.2 estable ≥ 1 ciclo, sin regresiones reportadas, Founder autoriza retiro físico.
-- DoD: typecheck ✅, build ✅, `rg -i "marketplace" src/` solo devuelve el catch-all 301 y comentarios de compatibilidad, Playwright confirma que `/marketplace/*` sigue emitiendo 301 correctos, Completion Report `16.07-E3-US-E3.3-COMPLETION-REPORT-v1.0.md`.
-
----
-
-## Detalles técnicos (para el implementador)
-
-- **Naming oficial adoptado:** "Catálogo Oriente Maya" para la superficie global; "Explorar" para el CTA compacto; "Descubre" en secciones contextuales.
-- **Contrato de navegación:** solo `resolveCanonicalPath` de `@/lib/navigation/canonical-paths`. Prohibido hardcodear `/marketplace/...` fuera del catch-all 301.
-- **Retrocompatibilidad de claves i18n:** durante E3.1 se duplican claves (`nav.marketplace` + `nav.catalog`) apuntando al mismo texto nuevo; en E3.3 se elimina la clave legacy.
-- **`page_redirects`:** las 301 de `/marketplace/$slug` → territorial se registran vía la infraestructura existente de N2 (US-R3), no vía middleware ad-hoc.
-- **SEO:** verificar `robots.txt`, `sitemap.xml`, canonicals con Playwright + curl.
-- **Cero cambios en RLS, Cloud, Portal Empresarial o CMS Studio funcional.** Solo naming y navegación.
-
-## Registro en el Roadmap
-
-- Añadir épica **E3 · Retiro Marketplace** a `docs/blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.0.md`:
-  - Programa: A (Visitor)
-  - Carril: A (Producto)
-  - Versión objetivo: v0.63.0
-  - Dependencias: N2 cerrada ✅, Navigation Blueprint v1.0 ✅
-  - Valor: coherencia narrativa, cierre de deuda documentada, prepara Header Builder futuro
-- **US-E2.3 (Related Category Surface)** se re-agenda a **v0.64.0**, después de E3.
-
-## Fuera de alcance
-
-- Retiro de "Marketplace" en documentación histórica del blueprint (se conserva como registro).
-- Renombrado de tablas Supabase o RPCs con "marketplace" en el nombre (naming técnico interno; se evalúa en una épica de hardening B posterior).
-- Cambios funcionales al carrito, órdenes o pagos.
-
-## Confirmación
-
-¿Apruebas este plan (E3.1 → E3.2 → E3.3, una sub-ola por ciclo con validación Founder entre cada una) para arrancar de inmediato con **US-E3.1 · Lenguaje visible + SEO**?
+### Orden de entrega
+US-E5.1 → US-E5.2 → US-E5.3 → US-E5.4. Cada historia con typecheck + build + smoke + Completion Report antes de la siguiente.

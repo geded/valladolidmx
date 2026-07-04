@@ -30,6 +30,7 @@ import { Route as AluxRouteImport } from './routes/alux'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
+import { Route as ViajeroHandleRouteImport } from './routes/viajero.$handle'
 import { Route as ViajeCompartidoTokenRouteImport } from './routes/viaje-compartido.$token'
 import { Route as ProductoSlugRouteImport } from './routes/producto.$slug'
 import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
@@ -75,6 +76,7 @@ import { Route as AuthenticatedPortalConciergeRouteImport } from './routes/_auth
 import { Route as AuthenticatedPortalCatalogoRouteImport } from './routes/_authenticated/portal/catalogo'
 import { Route as AuthenticatedPortalActividadRouteImport } from './routes/_authenticated/portal/actividad'
 import { Route as AuthenticatedPaginasSplatRouteImport } from './routes/_authenticated/paginas.$'
+import { Route as AuthenticatedCuentaPerfilPublicoRouteImport } from './routes/_authenticated/cuenta/perfil-publico'
 import { Route as AuthenticatedCuentaPerfilRouteImport } from './routes/_authenticated/cuenta/perfil'
 import { Route as AuthenticatedCuentaNotificacionesRouteImport } from './routes/_authenticated/cuenta/notificaciones'
 import { Route as AuthenticatedCuentaMiViajeRouteImport } from './routes/_authenticated/cuenta/mi-viaje'
@@ -241,6 +243,11 @@ const IndexRoute = IndexRouteImport.update({
 const OrienteMayaIndexRoute = OrienteMayaIndexRouteImport.update({
   id: '/oriente-maya/',
   path: '/oriente-maya/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ViajeroHandleRoute = ViajeroHandleRouteImport.update({
+  id: '/viajero/$handle',
+  path: '/viajero/$handle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ViajeCompartidoTokenRoute = ViajeCompartidoTokenRouteImport.update({
@@ -494,6 +501,12 @@ const AuthenticatedPaginasSplatRoute =
     id: '/$',
     path: '/$',
     getParentRoute: () => AuthenticatedPaginasRoute,
+  } as any)
+const AuthenticatedCuentaPerfilPublicoRoute =
+  AuthenticatedCuentaPerfilPublicoRouteImport.update({
+    id: '/perfil-publico',
+    path: '/perfil-publico',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
 const AuthenticatedCuentaPerfilRoute =
   AuthenticatedCuentaPerfilRouteImport.update({
@@ -916,6 +929,7 @@ export interface FileRoutesByFullPath {
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
+  '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -937,6 +951,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/mi-viaje': typeof AuthenticatedCuentaMiViajeRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
+  '/cuenta/perfil-publico': typeof AuthenticatedCuentaPerfilPublicoRoute
   '/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
@@ -1040,6 +1055,7 @@ export interface FileRoutesByTo {
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
+  '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1060,6 +1076,7 @@ export interface FileRoutesByTo {
   '/cuenta/mi-viaje': typeof AuthenticatedCuentaMiViajeRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
+  '/cuenta/perfil-publico': typeof AuthenticatedCuentaPerfilPublicoRoute
   '/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
@@ -1169,6 +1186,7 @@ export interface FileRoutesById {
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
+  '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/_authenticated/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1190,6 +1208,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/mi-viaje': typeof AuthenticatedCuentaMiViajeRoute
   '/_authenticated/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/_authenticated/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
+  '/_authenticated/cuenta/perfil-publico': typeof AuthenticatedCuentaPerfilPublicoRoute
   '/_authenticated/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/_authenticated/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/_authenticated/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
@@ -1301,6 +1320,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/producto/$slug'
     | '/viaje-compartido/$token'
+    | '/viajero/$handle'
     | '/oriente-maya/'
     | '/admin/concierge'
     | '/admin/empresas'
@@ -1322,6 +1342,7 @@ export interface FileRouteTypes {
     | '/cuenta/mi-viaje'
     | '/cuenta/notificaciones'
     | '/cuenta/perfil'
+    | '/cuenta/perfil-publico'
     | '/paginas/$'
     | '/portal/actividad'
     | '/portal/catalogo'
@@ -1425,6 +1446,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/producto/$slug'
     | '/viaje-compartido/$token'
+    | '/viajero/$handle'
     | '/oriente-maya'
     | '/admin/concierge'
     | '/admin/empresas'
@@ -1445,6 +1467,7 @@ export interface FileRouteTypes {
     | '/cuenta/mi-viaje'
     | '/cuenta/notificaciones'
     | '/cuenta/perfil'
+    | '/cuenta/perfil-publico'
     | '/paginas/$'
     | '/portal/actividad'
     | '/portal/catalogo'
@@ -1553,6 +1576,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/producto/$slug'
     | '/viaje-compartido/$token'
+    | '/viajero/$handle'
     | '/oriente-maya/'
     | '/_authenticated/admin/concierge'
     | '/_authenticated/admin/empresas'
@@ -1574,6 +1598,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/mi-viaje'
     | '/_authenticated/cuenta/notificaciones'
     | '/_authenticated/cuenta/perfil'
+    | '/_authenticated/cuenta/perfil-publico'
     | '/_authenticated/paginas/$'
     | '/_authenticated/portal/actividad'
     | '/_authenticated/portal/catalogo'
@@ -1675,6 +1700,7 @@ export interface RootRouteChildren {
   PreviewTokenRoute: typeof PreviewTokenRoute
   ProductoSlugRoute: typeof ProductoSlugRoute
   ViajeCompartidoTokenRoute: typeof ViajeCompartidoTokenRoute
+  ViajeroHandleRoute: typeof ViajeroHandleRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
@@ -1832,6 +1858,13 @@ declare module '@tanstack/react-router' {
       path: '/oriente-maya'
       fullPath: '/oriente-maya/'
       preLoaderRoute: typeof OrienteMayaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/viajero/$handle': {
+      id: '/viajero/$handle'
+      path: '/viajero/$handle'
+      fullPath: '/viajero/$handle'
+      preLoaderRoute: typeof ViajeroHandleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/viaje-compartido/$token': {
@@ -2148,6 +2181,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/paginas/$'
       preLoaderRoute: typeof AuthenticatedPaginasSplatRouteImport
       parentRoute: typeof AuthenticatedPaginasRoute
+    }
+    '/_authenticated/cuenta/perfil-publico': {
+      id: '/_authenticated/cuenta/perfil-publico'
+      path: '/perfil-publico'
+      fullPath: '/cuenta/perfil-publico'
+      preLoaderRoute: typeof AuthenticatedCuentaPerfilPublicoRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
     '/_authenticated/cuenta/perfil': {
       id: '/_authenticated/cuenta/perfil'
@@ -2692,6 +2732,7 @@ interface AuthenticatedCuentaRouteRouteChildren {
   AuthenticatedCuentaMiViajeRoute: typeof AuthenticatedCuentaMiViajeRoute
   AuthenticatedCuentaNotificacionesRoute: typeof AuthenticatedCuentaNotificacionesRoute
   AuthenticatedCuentaPerfilRoute: typeof AuthenticatedCuentaPerfilRoute
+  AuthenticatedCuentaPerfilPublicoRoute: typeof AuthenticatedCuentaPerfilPublicoRoute
   AuthenticatedCuentaIndexRoute: typeof AuthenticatedCuentaIndexRoute
   AuthenticatedCuentaPagosErrorRoute: typeof AuthenticatedCuentaPagosErrorRoute
   AuthenticatedCuentaPagosExitoRoute: typeof AuthenticatedCuentaPagosExitoRoute
@@ -2709,6 +2750,8 @@ const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildr
     AuthenticatedCuentaNotificacionesRoute:
       AuthenticatedCuentaNotificacionesRoute,
     AuthenticatedCuentaPerfilRoute: AuthenticatedCuentaPerfilRoute,
+    AuthenticatedCuentaPerfilPublicoRoute:
+      AuthenticatedCuentaPerfilPublicoRoute,
     AuthenticatedCuentaIndexRoute: AuthenticatedCuentaIndexRoute,
     AuthenticatedCuentaPagosErrorRoute: AuthenticatedCuentaPagosErrorRoute,
     AuthenticatedCuentaPagosExitoRoute: AuthenticatedCuentaPagosExitoRoute,
@@ -3001,6 +3044,7 @@ const rootRouteChildren: RootRouteChildren = {
   PreviewTokenRoute: PreviewTokenRoute,
   ProductoSlugRoute: ProductoSlugRoute,
   ViajeCompartidoTokenRoute: ViajeCompartidoTokenRoute,
+  ViajeroHandleRoute: ViajeroHandleRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:
@@ -3014,13 +3058,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
