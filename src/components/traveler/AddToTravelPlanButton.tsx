@@ -9,9 +9,16 @@
  * Reglas:
  *  - No escribe directo a Supabase. Toda operación pasa por
  *    `addPlanItem()` (Sub-ola B) que a su vez respeta RLS y auth.
- *  - Si el usuario no está autenticado, guarda la intención en
- *    localStorage (`travel_plan_guest_queue`) y sugiere iniciar sesión.
- *    La cola queda disponible para el próximo flush post-login.
+ *  - Mi Viaje forma parte del perfil permanente del viajero (decisión
+ *    de negocio, OLA H-01 · Épica 1 · I4). La persistencia del
+ *    itinerario es exclusiva para usuarios autenticados. Si el usuario
+ *    no tiene sesión, se abre el `SignInPromptSheet` global mediante
+ *    `useProtectedAction` (kind `travel_plan.add_item`) y la acción se
+ *    reanuda automáticamente tras el login (ResumeRunner).
+ *  - La navegación pública NO cambia. El botón sigue visible siempre.
+ *  - `guest-queue` (localStorage) queda intacto pero ya no se escribe
+ *    desde este componente. Candidato a retiro documentado para una
+ *    futura ola de Product Hardening — NO eliminar en I4.
  *  - Idempotente: el servidor detecta duplicados por
  *    `(plan_id, item_kind, target_id)` y devuelve `created:false`.
  *  - No rediseña la tarjeta contenedora. Se inserta como acción compacta.
@@ -29,40 +36,7 @@ import {
   getMyActivePlan,
   type TravelItemKind,
 } from "@/lib/traveler/travel-plans.functions";
-
-const GUEST_QUEUE_KEY = "travel_plan_guest_queue";
-
-interface GuestQueueItem {
-  kind: TravelItemKind;
-  targetId: string | null;
-  title?: string | null;
-  slug?: string | null;
-  imageUrl?: string | null;
-  subtitle?: string | null;
-  notes?: string | null;
-  ts: number;
-}
-
-function readGuestQueue(): GuestQueueItem[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(GUEST_QUEUE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as GuestQueueItem[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeGuestQueue(items: GuestQueueItem[]) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(GUEST_QUEUE_KEY, JSON.stringify(items));
-  } catch {
-    // storage lleno / bloqueado → silencioso, el UX degrada a "prompt login".
-  }
-}
+import { useProtectedAction } from "@/lib/protected-actions";
 
 export interface AddToTravelPlanButtonProps {
   kind: TravelItemKind;
@@ -151,37 +125,29 @@ export function AddToTravelPlanButton({
     },
   });
 
-  function handleGuest() {
-    const queue = readGuestQueue();
-    const dup = queue.some(
-      (it) => it.kind === kind && it.targetId === targetId,
-    );
-    if (!dup) {
-      queue.push({
-        kind,
-        targetId,
-        title,
-        slug: slug ?? null,
-        imageUrl: imageUrl ?? null,
-        subtitle: subtitle ?? null,
-        notes: notes ?? null,
-        ts: Date.now(),
-      });
-      writeGuestQueue(queue);
-    }
-    setPhase("added");
-    toast("Guardado provisionalmente en tu dispositivo", {
-      description: "Inicia sesión para sincronizarlo con Mi Viaje.",
-      action: {
-        label: "Iniciar sesión",
-        onClick: () => {
-          if (typeof window !== "undefined") window.location.href = "/auth";
-        },
-      },
-    });
-  }
+  // Envuelve la mutación en el sistema global de acciones protegidas.
+  // - `mode: "gate"` (default) → si no hay sesión abre `SignInPromptSheet`.
+  // - Tras auth exitoso, `ResumeRunner` re-ejecuta `action()` con el
+  //   payload original y dispara `mutation.mutate()` normalmente.
+  const protectedRun = useProtectedAction<void, void>({
+    kind: "travel_plan.add_item",
+    reason: "travel_plan.add_item",
+    gateCopy: {
+      title: "Inicia sesión para guardar en Mi Viaje",
+      description:
+        "Mi Viaje se sincroniza entre tus dispositivos. Necesitamos identificarte para conservar tu itinerario.",
+      primaryCta: "Iniciar sesión",
+      dismissCta: "Ahora no",
+    },
+    action: async () => {
+      // Delega en la mutación existente (mismos toasts, mismo estado,
+      // misma invalidación). No se duplica lógica.
+      await mutation.mutateAsync();
+    },
+  });
 
-  const busy = phase === "adding" || mutation.isPending;
+  const busy =
+    phase === "adding" || mutation.isPending || protectedRun.pending;
   const done = phase === "added" || phase === "exists";
 
   const base =
@@ -203,11 +169,7 @@ export function AddToTravelPlanButton({
         e.preventDefault();
         e.stopPropagation();
         if (busy || done) return;
-        if (!user) {
-          handleGuest();
-          return;
-        }
-        mutation.mutate();
+        protectedRun.run();
       }}
       title={done ? "Ya está en Mi Viaje" : "Agregar a Mi Viaje"}
       className={[base, skin, className ?? ""].join(" ")}
