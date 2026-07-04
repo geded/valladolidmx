@@ -3,6 +3,11 @@
  *
  * Superficie editorial que combina destinos publicados y eventos próximos
  * reutilizando lecturas ya existentes. Sin backend nuevo.
+ *
+ * @context-engine legacy — editorial sin territorio. Declarada como
+ * excepción documentada en I5 y ratificada en I7 (Reconciliation Report
+ * §2, fila 6). No monta `ContextEngineProvider`. Sin `previous`
+ * relevante, sin herencia y sin necesidad de crumbs consolidados.
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";

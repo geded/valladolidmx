@@ -6,6 +6,21 @@ import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { createServerFn } from "@tanstack/react-start";
+import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
+
+/**
+ * H-02 · I7 · Fila 3 — Categoría plana `promociones`.
+ * Mismo contrato consolidado que `/hoteles` (I4). Sin ancestros
+ * explícitos, hereda territorio si hay `previous`. SEO intacto.
+ */
+function buildPromocionesContext(): RouteContextDeclaration {
+  return defineRouteContext({
+    current: { kind: "category", slug: "promociones", label: "Promociones", href: "/promociones" },
+    ancestors: [],
+    inherit: ["region", "destination"],
+    canonical: "/promociones",
+  });
+}
 
 interface PromoCard {
   slug: string;
@@ -53,6 +68,8 @@ function PromosRoute() {
       title="Promociones"
       description="Campañas y ofertas vigentes de hoteles, restaurantes y experiencias del Oriente Maya."
       crumbs={[{ label: "Promociones" }]}
+      contextDeclaration={buildPromocionesContext()}
+      useContextCrumbs
     >
       {promos.length === 0 ? (
         <p className="text-sm text-muted-foreground">

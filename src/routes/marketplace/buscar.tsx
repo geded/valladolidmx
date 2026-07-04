@@ -14,6 +14,8 @@ import {
   searchMarketplace,
   type MarketplaceSearchHit,
 } from "@/lib/marketplace/marketplace-reads.functions";
+import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
+import { ORIENTE_MAYA } from "@/config/regions";
 
 interface SearchParams {
   q?: string;
@@ -28,6 +30,31 @@ const PAGE_SIZE = 24;
 const TITLE = `Buscar en el Marketplace — ${SITE.name}`;
 const DESCRIPTION =
   "Busca productos, experiencias y promociones publicadas por destino, categoría y rango de precio.";
+
+/**
+ * H-02 · I7 · Fila 5 — Búsqueda del Marketplace.
+ * Mismo patrón condicional aprobado para `/experiencias` con `?tema=`:
+ *  · Sin filtros de contenido → hereda territorio (previous + inherit).
+ *  · Con `?destino=` explícito → ancestros territoriales explícitos.
+ *  · Con filtros de contenido (q / categoria / pmin / pmax) → conserva
+ *    breadcrumb legacy `Marketplace › Buscar` (no queremos que el
+ *    territorio implícito contradiga el filtro activo).
+ * SEO intacto (`canonical = /marketplace/buscar`, robots noindex,follow).
+ */
+function buildBuscarContext(destino: string | undefined): RouteContextDeclaration {
+  const explicitAncestors = destino
+    ? [
+        { kind: "region" as const, slug: ORIENTE_MAYA.slug, label: ORIENTE_MAYA.name, href: "/oriente-maya" },
+        { kind: "destination" as const, slug: destino, label: destino.replace(/-/g, " "), href: `/oriente-maya/${destino}` },
+      ]
+    : [];
+  return defineRouteContext({
+    current: { kind: "category", slug: "marketplace-buscar", label: "Buscar", href: "/marketplace/buscar" },
+    ancestors: explicitAncestors,
+    inherit: destino ? [] : ["region", "destination"],
+    canonical: "/marketplace/buscar",
+  });
+}
 
 function clampString(v: unknown, max = 120): string | undefined {
   if (typeof v !== "string") return undefined;
@@ -79,12 +106,22 @@ export const Route = createFileRoute("/marketplace/buscar")({
     }),
   component: MarketplaceSearchPage,
   errorComponent: ({ error }) => (
-    <PublicShell title="Búsqueda no disponible" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}>
+    <PublicShell
+      title="Búsqueda no disponible"
+      crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}
+      contextDeclaration={buildBuscarContext(undefined)}
+      useContextCrumbs
+    >
       <p className="text-sm text-muted-foreground">{String(error.message)}</p>
     </PublicShell>
   ),
   notFoundComponent: () => (
-    <PublicShell title="Sin resultados" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}>
+    <PublicShell
+      title="Sin resultados"
+      crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}
+      contextDeclaration={buildBuscarContext(undefined)}
+      useContextCrumbs
+    >
       <p className="text-sm text-muted-foreground">No encontramos coincidencias.</p>
     </PublicShell>
   ),
@@ -94,6 +131,14 @@ function MarketplaceSearchPage() {
   const { result, page } = Route.useLoaderData();
   const search = Route.useSearch();
   const totalPages = Math.max(1, Math.ceil(result.total / PAGE_SIZE));
+  // Filtros de contenido (no territoriales) — desactivan herencia de
+  // migas para no colgar territorio bajo un resultado ya restringido.
+  const hasContentFilter = Boolean(
+    (search.q && search.q.length > 0) ||
+      (search.categoria && search.categoria.length > 0) ||
+      typeof search.pmin === "number" ||
+      typeof search.pmax === "number",
+  );
 
   return (
     <PublicShell
@@ -101,6 +146,8 @@ function MarketplaceSearchPage() {
       title="Buscar en el catálogo"
       description="Productos, experiencias y promociones publicadas."
       crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}
+      contextDeclaration={buildBuscarContext(search.destino)}
+      useContextCrumbs={!hasContentFilter}
     >
       <form method="get" className="grid gap-3 rounded-2xl border border-border bg-card p-4 md:grid-cols-5">
         <label className="flex flex-col gap-1 text-xs md:col-span-2">

@@ -1,5 +1,9 @@
 /**
  * /mapa — Mapa territorial (Sprint 5).
+ *
+ * @context-engine legacy — herramienta transversal (I7 · fila 10).
+ * Candidato a evaluación en H-02 · Épica 2 (posible slot territorial).
+ * No monta `ContextEngineProvider` en I7.
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";

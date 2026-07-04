@@ -15,6 +15,21 @@ import {
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
+import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
+
+/**
+ * H-02 · I7 · Fila 4 — Hub `/marketplace`.
+ * Trato como categoría raíz de marketplace. Hereda territorio si hay
+ * `previous`. Sin ancestros explícitos. SEO intacto.
+ */
+function buildMarketplaceContext(): RouteContextDeclaration {
+  return defineRouteContext({
+    current: { kind: "category", slug: "marketplace", label: "Marketplace", href: "/marketplace" },
+    ancestors: [],
+    inherit: ["region", "destination"],
+    canonical: "/marketplace",
+  });
+}
 
 const TITLE = `Marketplace — ${SITE.name}`;
 const DESCRIPTION =
@@ -56,6 +71,8 @@ function MarketplaceIndex() {
       title="Empresas y experiencias publicadas"
       description="Vitrina pública del destino con empresas verificadas del Oriente Maya."
       crumbs={[{ label: "Marketplace" }]}
+      contextDeclaration={buildMarketplaceContext()}
+      useContextCrumbs
     >
       {composition ? (
         <CompositionRenderer tree={composition.snapshot} />

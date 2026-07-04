@@ -3,6 +3,22 @@ import { Building2, BarChart3, Megaphone, ShieldCheck, ArrowRight } from "lucide
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
+import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
+
+/**
+ * H-02 · I7 · Fila 2 — Categoría plana `empresas`.
+ * Reutiliza el contrato consolidado (patrón I4 `hoteles`): sin ancestros
+ * explícitos, hereda `region + destination` cuando existe `previous`.
+ * `canonical` = `/empresas` (SEO intacto).
+ */
+function buildEmpresasContext(): RouteContextDeclaration {
+  return defineRouteContext({
+    current: { kind: "category", slug: "empresas", label: "Empresas", href: "/empresas" },
+    ancestors: [],
+    inherit: ["region", "destination"],
+    canonical: "/empresas",
+  });
+}
 
 export const Route = createFileRoute("/empresas")({
   head: () =>
@@ -22,6 +38,8 @@ function EmpresasLanding() {
       title="Tu negocio en el Oriente Maya"
       description="Administra tu presencia, conecta con viajeros reales y crece con un motor de visibilidad basado en confianza, no en publicidad invasiva."
       crumbs={[{ label: "Empresas" }]}
+      contextDeclaration={buildEmpresasContext()}
+      useContextCrumbs
     >
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {[

@@ -1,5 +1,8 @@
 /**
  * /blog — Índice editorial (Sprint 5).
+ *
+ * @context-engine legacy — editorial sin territorio (I7 · fila 7).
+ * No monta `ContextEngineProvider`; conserva breadcrumb legacy plano.
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
