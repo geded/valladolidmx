@@ -32,6 +32,18 @@ import type {
   MarketplacePromotionCard,
 } from "@/lib/marketplace/marketplace-reads.functions";
 import { planAllows } from "@/lib/plans/plans-catalog";
+import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
+import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
+import { ExperienceSection } from "@/components/experience-builder/blocks/experience-section/ExperienceSection";
+import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGrid";
+import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar";
+import {
+  businessToHeroDTO,
+  businessToSubnavDTO,
+  businessToDescriptionSectionDTO,
+  businessToInfoGridDTO,
+  businessToCtaBarDTO,
+} from "@/lib/experience-builder/adapters/business-to-blocks";
 
 /* ------------------------------------------------------------------ *
  * Contexto — poblado por la ruta pública (SSR-safe).
@@ -118,15 +130,24 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
   const tier = b.plan_tier;
   const showPromotions = planAllows(tier, "promotions") && b.promotions.length > 0;
 
+  // H-03 · Ola I1.d — Migración a bloques oficiales de la Biblioteca EB.
+  // Hero / Subnav / Section / Info-Grid / CTA-Bar reemplazan al layout
+  // ad-hoc previo. Products y Promotions se conservan como composites
+  // pendientes de migración (evaluación en Closure Report I1.d).
+  const heroDto = businessToHeroDTO(b);
+  const subnavDto = businessToSubnavDTO(b);
+  const descriptionSection = businessToDescriptionSectionDTO(b);
+  const infoGridDto = businessToInfoGridDTO(b);
+  const ctaBarDto = businessToCtaBarDTO(b);
+
   return (
     <PublicShell
-      eyebrow={variant.eyebrow}
-      title={b.display_name}
-      description={b.tagline}
       crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: b.display_name }]}
       useContextCrumbs
     >
-      <div className="-mt-2 mb-6 flex flex-wrap items-center gap-3">
+      <ExperienceHero dto={heroDto} headingLevel="h1" />
+
+      <div className="mt-4 mb-6 flex flex-wrap items-center gap-3">
         <FavoriteButton entityKind="business" entityId={b.id} />
         {b.verified ? (
           <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
@@ -135,11 +156,18 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
         ) : null}
       </div>
 
-      {b.description ? (
-        <p className="max-w-3xl text-sm text-foreground/80">{b.description}</p>
-      ) : null}
+      <ExperienceSubnav dto={subnavDto} className="mb-6" />
 
-      <section className="mt-10">
+      <section id="resumen" data-eb-anchor className="scroll-mt-24">
+        {descriptionSection ? (
+          <ExperienceSection dto={descriptionSection} />
+        ) : b.tagline ? (
+          <p className="max-w-3xl text-sm text-foreground/80">{b.tagline}</p>
+        ) : null}
+        {infoGridDto ? <ExperienceInfoGrid dto={infoGridDto} className="mt-6" /> : null}
+      </section>
+
+      <section id="servicios" data-eb-anchor className="mt-10 scroll-mt-24">
         <h2 className="text-xl font-semibold">{variant.productsHeading}</h2>
         {b.products.length === 0 ? (
           <p className="mt-2 text-sm text-muted-foreground">{variant.productsEmpty}</p>
@@ -181,7 +209,7 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
       </section>
 
       {showPromotions ? (
-        <section className="mt-10">
+        <section id="promociones" data-eb-anchor className="mt-10 scroll-mt-24">
           <h2 className="text-xl font-semibold">Promociones vigentes</h2>
           <ul className="mt-4 grid gap-4 sm:grid-cols-2">
             {b.promotions.map((p: MarketplacePromotionCard) => (
@@ -205,6 +233,8 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
           </ul>
         </section>
       ) : null}
+
+      <ExperienceCtaBar dto={ctaBarDto} />
     </PublicShell>
   );
 }
