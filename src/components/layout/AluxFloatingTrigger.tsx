@@ -93,7 +93,7 @@ export function AluxFloatingTrigger() {
           </span>
           <span className="hidden sm:inline">Alux</span>
           <span className="hidden text-xs text-muted-foreground sm:inline">
-            · acompaña tu recorrido
+            · Concierge IA
           </span>
           <span className="ml-1 truncate text-xs text-muted-foreground sm:hidden">
             {current?.label}
@@ -112,9 +112,9 @@ export function AluxFloatingTrigger() {
                 <Sparkles className="size-4" aria-hidden />
               </span>
               <div>
-                <SheetTitle className="text-lg">Alux · Concierge del Oriente Maya</SheetTitle>
+                <SheetTitle className="text-lg">Alux · Concierge IA del Oriente Maya</SheetTitle>
                 <SheetDescription className="text-xs text-muted-foreground">
-                  {originLabel} · te acompaña mientras exploras.
+                  {originLabel} · te acompaña mientras exploras el destino.
                 </SheetDescription>
               </div>
             </div>
