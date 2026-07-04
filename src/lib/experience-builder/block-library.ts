@@ -2345,6 +2345,8 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   experienceInfoGridBlock,
   experienceSectionBlock,
   experienceFeaturesBlock,
+  // H-03 · Ola I3.c — Institutional Badges (único bloque oficial).
+  experienceInstitutionalBadgesBlock,
   // H-03 · Ola I2.a — Experience Products.
   experienceProductsBlock,
   // H-03 · Ola I2.b — Experience Promotions.
