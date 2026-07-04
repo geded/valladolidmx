@@ -28,7 +28,7 @@ import {
   type MarketplaceBusinessCard,
 } from "@/lib/marketplace/marketplace-reads.functions";
 
-export const Route = createFileRoute("/oriente-maya/$destino/$categoria")({
+export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
   loader: async ({ params }) => {
     const resolution = await resolveTerritorialPath({
       data: { destino: params.destino, categoria: params.categoria },

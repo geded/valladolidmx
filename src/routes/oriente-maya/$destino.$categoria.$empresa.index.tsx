@@ -20,7 +20,7 @@ import { ContextEngineProvider } from "@/lib/context-engine";
 import { BusinessSurface, BusinessSurfaceProvider } from "@/components/surfaces/BusinessSurface";
 
 export const Route = createFileRoute(
-  "/oriente-maya/$destino/$categoria/$empresa",
+  "/oriente-maya/$destino/$categoria/$empresa/",
 )({
   loader: async ({ params }) => {
     const resolution = await resolveTerritorialPath({
