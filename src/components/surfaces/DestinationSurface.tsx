@@ -177,7 +177,7 @@ export function DestinationSurface({
                       heading: "Hoteles y hospedajes",
                       maxItems: 6,
                       variant: "grid",
-                      seeAllHref: `/marketplace?destino=${encodeURIComponent(slug ?? "")}&categoria=hoteles`,
+                      seeAllHref: `/oriente-maya/${encodeURIComponent(slug ?? "")}/hoteles`,
                       seeAllLabel: "Ver hoteles",
                     },
                     {
@@ -186,7 +186,7 @@ export function DestinationSurface({
                       heading: "Restaurantes",
                       maxItems: 6,
                       variant: "grid",
-                      seeAllHref: `/marketplace?destino=${encodeURIComponent(slug ?? "")}&categoria=restaurantes`,
+                      seeAllHref: `/oriente-maya/${encodeURIComponent(slug ?? "")}/restaurantes`,
                       seeAllLabel: "Ver restaurantes",
                     },
                     {
@@ -195,7 +195,7 @@ export function DestinationSurface({
                       heading: "Experiencias y rutas",
                       maxItems: 6,
                       variant: "grid",
-                      seeAllHref: `/marketplace?destino=${encodeURIComponent(slug ?? "")}&categoria=experiencias`,
+                      seeAllHref: `/oriente-maya/${encodeURIComponent(slug ?? "")}/experiencias`,
                       seeAllLabel: "Ver experiencias",
                     },
                     {
@@ -213,8 +213,8 @@ export function DestinationSurface({
                       heading: "Productos destacados",
                       maxItems: 8,
                       variant: "grid",
-                      seeAllHref: `/marketplace?destino=${encodeURIComponent(slug ?? "")}`,
-                      seeAllLabel: "Ver marketplace",
+                      seeAllHref: `/oriente-maya/${encodeURIComponent(slug ?? "")}`,
+                      seeAllLabel: "Ver catálogo",
                     },
                   ],
                   capabilities: {
