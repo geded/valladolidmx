@@ -15,11 +15,8 @@ import {
   resolveTerritorialPath,
   resolutionToNavigationContext,
 } from "@/lib/navigation/territorial-resolver.functions";
-import { buildBreadcrumbs } from "@/lib/navigation";
-import {
-  ContextEngineProvider,
-  defineRouteContext,
-} from "@/lib/context-engine";
+import { navigationContextToDeclaration } from "@/lib/navigation";
+import { ContextEngineProvider } from "@/lib/context-engine";
 import { BusinessSurface, BusinessSurfaceProvider } from "@/components/surfaces/BusinessSurface";
 
 export const Route = createFileRoute(
@@ -65,38 +62,14 @@ export const Route = createFileRoute(
 
 function EmpresaTerritorialPage() {
   const { resolution, business } = Route.useLoaderData();
-  const { destino, categoria, empresa } = Route.useParams();
+  const { destino } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
-  // NOTA (N2.1): los breadcrumbs territoriales se derivan aquí y quedan
-  // disponibles vía Context Engine. `BusinessSurface` los renderizará
-  // desde el contexto en N2.2 (usa hoy su `useContextCrumbs` interno).
-  void buildBreadcrumbs(ctx);
-
-  // ContextEngine para consumidores actuales (breadcrumbs contextuales,
-  // Alux, related). Registra ancestros territoriales completos.
-  const declaration = defineRouteContext({
-    current: {
-      kind: "business",
-      slug: empresa,
-      label: business.display_name,
-      href: `/oriente-maya/${destino}/${categoria}/${empresa}`,
-    },
-    ancestors: [
-      { kind: "region", slug: "oriente-maya", label: "Oriente Maya", href: "/oriente-maya" },
-      {
-        kind: "destination",
-        slug: destino,
-        label: resolution.destination?.label ?? destino,
-        href: `/oriente-maya/${destino}`,
-      },
-      {
-        kind: "category",
-        slug: categoria,
-        label: resolution.category?.label ?? categoria,
-        href: `/oriente-maya/${destino}/${categoria}`,
-      },
-    ],
-    canonical: `/oriente-maya/${destino}/${categoria}/${empresa}`,
+  // N2.2: fuente única = Navigation Contract. El adapter deriva
+  // ancestros + hoja desde el contexto ya resuelto; `BusinessSurface`
+  // (vía `useContextCrumbs`) renderiza la cadena territorial completa
+  // Inicio → Oriente Maya → Destino → Categoría → Empresa.
+  const declaration = navigationContextToDeclaration(ctx, {
+    currentLabel: business.display_name,
   });
 
   return (
