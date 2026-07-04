@@ -59,6 +59,7 @@ function CmsDashboard() {
       <section className="mt-8 grid gap-3 sm:grid-cols-2">
         <Link
           to="/cms/experience-builder"
+          search={{ mode: "visual", page: undefined, block: undefined }}
           className="group flex flex-col gap-2 rounded-2xl border border-primary/30 bg-primary/5 p-5 transition-colors hover:bg-primary/10"
         >
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">

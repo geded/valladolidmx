@@ -187,7 +187,7 @@ export function DestinationSurface({ destinationSlug, dbData, related }: Destina
               <li>
                 <Link
                   to="/experiencias"
-                  search={{ destino: slug }}
+                  search={{ destino: slug, tema: undefined }}
                   className="text-primary hover:underline"
                 >
                   Experiencias y rutas

@@ -390,6 +390,7 @@ function PlanItemsSection({
             </Link>
             <Link
               to="/experiencias"
+              search={{ destino: undefined, tema: undefined }}
               className="rounded-md border px-3 py-1.5 text-sm hover:bg-accent"
             >
               Ver experiencias

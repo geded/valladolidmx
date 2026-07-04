@@ -40,8 +40,8 @@ function buildExperienciasContext(destino: string | undefined): RouteContextDecl
 
 export const Route = createFileRoute("/experiencias")({
   validateSearch: (search: Record<string, unknown>) => ({
-    destino: typeof search.destino === "string" ? search.destino : undefined,
-    tema: typeof search.tema === "string" ? search.tema : undefined,
+    ...(typeof search.destino === "string" ? { destino: search.destino } : {}),
+    ...(typeof search.tema === "string" ? { tema: search.tema } : {}),
   }),
   loader: async () => {
     const all = await listMarketplaceBusinesses();
