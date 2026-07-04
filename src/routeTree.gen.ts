@@ -34,6 +34,7 @@ import { Route as ProductoSlugRouteImport } from './routes/producto.$slug'
 import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
+import { Route as MarketplaceBuscarRouteImport } from './routes/marketplace/buscar'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
 import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/workspace-preview'
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
@@ -260,6 +261,11 @@ const PSlugRoute = PSlugRouteImport.update({
 const OrienteMayaDestinoRoute = OrienteMayaDestinoRouteImport.update({
   id: '/oriente-maya/$destino',
   path: '/oriente-maya/$destino',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceBuscarRoute = MarketplaceBuscarRouteImport.update({
+  id: '/marketplace/buscar',
+  path: '/marketplace/buscar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
@@ -904,6 +910,7 @@ export interface FileRoutesByFullPath {
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
+  '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRouteWithChildren
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
@@ -1028,6 +1035,7 @@ export interface FileRoutesByTo {
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
+  '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
@@ -1155,6 +1163,7 @@ export interface FileRoutesById {
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
+  '/marketplace/buscar': typeof MarketplaceBuscarRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRouteWithChildren
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
@@ -1286,6 +1295,7 @@ export interface FileRouteTypes {
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
     | '/marketplace/$slug'
+    | '/marketplace/buscar'
     | '/oriente-maya/$destino'
     | '/p/$slug'
     | '/preview/$token'
@@ -1410,6 +1420,7 @@ export interface FileRouteTypes {
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
     | '/marketplace/$slug'
+    | '/marketplace/buscar'
     | '/p/$slug'
     | '/preview/$token'
     | '/producto/$slug'
@@ -1536,6 +1547,7 @@ export interface FileRouteTypes {
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
     | '/marketplace/$slug'
+    | '/marketplace/buscar'
     | '/oriente-maya/$destino'
     | '/p/$slug'
     | '/preview/$token'
@@ -1658,6 +1670,7 @@ export interface RootRouteChildren {
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
   LovableWorkspacePreviewRoute: typeof LovableWorkspacePreviewRoute
   MarketplaceSlugRoute: typeof MarketplaceSlugRoute
+  MarketplaceBuscarRoute: typeof MarketplaceBuscarRoute
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRouteWithChildren
   PSlugRoute: typeof PSlugRoute
   PreviewTokenRoute: typeof PreviewTokenRoute
@@ -1848,6 +1861,13 @@ declare module '@tanstack/react-router' {
       path: '/oriente-maya/$destino'
       fullPath: '/oriente-maya/$destino'
       preLoaderRoute: typeof OrienteMayaDestinoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/buscar': {
+      id: '/marketplace/buscar'
+      path: '/marketplace/buscar'
+      fullPath: '/marketplace/buscar'
+      preLoaderRoute: typeof MarketplaceBuscarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace/$slug': {
@@ -2965,6 +2985,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,
   LovableWorkspacePreviewRoute: LovableWorkspacePreviewRoute,
   MarketplaceSlugRoute: MarketplaceSlugRoute,
+  MarketplaceBuscarRoute: MarketplaceBuscarRoute,
   OrienteMayaDestinoRoute: OrienteMayaDestinoRouteWithChildren,
   PSlugRoute: PSlugRoute,
   PreviewTokenRoute: PreviewTokenRoute,
