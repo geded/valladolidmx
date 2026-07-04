@@ -73,7 +73,8 @@ export function ProductSurface({
 
   const hasSameBusiness = (p.related?.length ?? 0) > 0;
   const hasSameCatDest = (related?.sameCategoryInDestination.length ?? 0) > 0;
-  const showDescubre = hasSameBusiness || hasSameCatDest;
+  const hasOtherDest = (related?.otherInDestination.length ?? 0) > 0;
+  const showDescubre = hasSameBusiness || hasSameCatDest || hasOtherDest;
 
   return (
     <PublicShell
@@ -129,6 +130,15 @@ export function ProductSurface({
                       ? `/oriente-maya/${encodeURIComponent(p.business.destination_slug)}/${encodeURIComponent(p.business.category_slug)}`
                       : `/oriente-maya/${encodeURIComponent(p.business.destination_slug || "")}`,
                   seeAllLabel: "Ver categoría",
+                },
+                {
+                  id: "otros-en-destino",
+                  entityKind: "product",
+                  heading: "Otras experiencias del destino",
+                  maxItems: 6,
+                  variant: "grid",
+                  seeAllHref: `/oriente-maya/${encodeURIComponent(p.business.destination_slug || "")}`,
+                  seeAllLabel: "Ver destino",
                 },
               ],
               capabilities: {
