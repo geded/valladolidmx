@@ -25,10 +25,7 @@
 import { createContext, useContext } from "react";
 import { PublicShell } from "@/components/discovery";
 import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
-import type {
-  MarketplaceBusinessDetail,
-  MarketplacePromotionCard,
-} from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplaceBusinessDetail } from "@/lib/marketplace/marketplace-reads.functions";
 import { planAllows } from "@/lib/plans/plans-catalog";
 import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
 import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
@@ -36,6 +33,7 @@ import { ExperienceSection } from "@/components/experience-builder/blocks/experi
 import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGrid";
 import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar";
 import { ExperienceProductsBlock } from "@/components/experience-builder/blocks/experience-products/ExperienceProductsBlock";
+import { ExperiencePromotionsBlock } from "@/components/experience-builder/blocks/experience-promotions/ExperiencePromotionsBlock";
 import {
   businessToHeroDTO,
   businessToSubnavDTO,
@@ -181,27 +179,14 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
 
       {showPromotions ? (
         <section id="promociones" data-eb-anchor className="mt-10 scroll-mt-24">
-          <h2 className="text-xl font-semibold">Promociones vigentes</h2>
-          <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-            {b.promotions.map((p: MarketplacePromotionCard) => (
-              <li key={p.id} className="rounded-2xl border border-border bg-card p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold">{p.title}</h3>
-                  {p.discount_percent !== null ? (
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                      −{p.discount_percent}%
-                    </span>
-                  ) : null}
-                </div>
-                {p.description ? (
-                  <p className="mt-1 text-sm text-muted-foreground line-clamp-3">{p.description}</p>
-                ) : null}
-                <div className="mt-3">
-                  <FavoriteButton entityKind="promotion" entityId={p.id} />
-                </div>
-              </li>
-            ))}
-          </ul>
+          <ExperiencePromotionsBlock
+            config={{
+              source: "business",
+              variant: "grid",
+              heading: "Promociones vigentes",
+              columns: 2,
+            }}
+          />
         </section>
       ) : null}
 
