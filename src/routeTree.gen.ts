@@ -33,6 +33,7 @@ import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index
 import { Route as ProductoSlugRouteImport } from './routes/producto.$slug'
 import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
+import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
 import { Route as MarketplaceBuscarRouteImport } from './routes/marketplace/buscar'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
 import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/workspace-preview'
@@ -255,6 +256,11 @@ const PSlugRoute = PSlugRouteImport.update({
   path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrienteMayaDestinoRoute = OrienteMayaDestinoRouteImport.update({
+  id: '/oriente-maya/$destino',
+  path: '/oriente-maya/$destino',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MarketplaceBuscarRoute = MarketplaceBuscarRouteImport.update({
   id: '/marketplace/buscar',
   path: '/marketplace/buscar',
@@ -390,9 +396,9 @@ const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const OrienteMayaDestinoIndexRoute = OrienteMayaDestinoIndexRouteImport.update({
-  id: '/oriente-maya/$destino/',
-  path: '/oriente-maya/$destino/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => OrienteMayaDestinoRoute,
 } as any)
 const AuthenticatedPortalIndexRoute =
   AuthenticatedPortalIndexRouteImport.update({
@@ -429,9 +435,9 @@ const PreviewCompositionTokenRoute = PreviewCompositionTokenRouteImport.update({
 } as any)
 const OrienteMayaDestinoCategoriaRoute =
   OrienteMayaDestinoCategoriaRouteImport.update({
-    id: '/oriente-maya/$destino/$categoria',
-    path: '/oriente-maya/$destino/$categoria',
-    getParentRoute: () => rootRouteImport,
+    id: '/$categoria',
+    path: '/$categoria',
+    getParentRoute: () => OrienteMayaDestinoRoute,
   } as any)
 const AuthenticatedPortalPropiedadRoute =
   AuthenticatedPortalPropiedadRouteImport.update({
@@ -891,6 +897,7 @@ export interface FileRoutesByFullPath {
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
+  '/oriente-maya/$destino': typeof OrienteMayaDestinoRouteWithChildren
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
@@ -1141,6 +1148,7 @@ export interface FileRoutesById {
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
+  '/oriente-maya/$destino': typeof OrienteMayaDestinoRouteWithChildren
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
@@ -1270,6 +1278,7 @@ export interface FileRouteTypes {
     | '/lovable/workspace-preview'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
+    | '/oriente-maya/$destino'
     | '/p/$slug'
     | '/preview/$token'
     | '/producto/$slug'
@@ -1519,6 +1528,7 @@ export interface FileRouteTypes {
     | '/lovable/workspace-preview'
     | '/marketplace/$slug'
     | '/marketplace/buscar'
+    | '/oriente-maya/$destino'
     | '/p/$slug'
     | '/preview/$token'
     | '/producto/$slug'
@@ -1639,14 +1649,13 @@ export interface RootRouteChildren {
   LovableWorkspacePreviewRoute: typeof LovableWorkspacePreviewRoute
   MarketplaceSlugRoute: typeof MarketplaceSlugRoute
   MarketplaceBuscarRoute: typeof MarketplaceBuscarRoute
+  OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRouteWithChildren
   PSlugRoute: typeof PSlugRoute
   PreviewTokenRoute: typeof PreviewTokenRoute
   ProductoSlugRoute: typeof ProductoSlugRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
-  OrienteMayaDestinoCategoriaRoute: typeof OrienteMayaDestinoCategoriaRouteWithChildren
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
-  OrienteMayaDestinoIndexRoute: typeof OrienteMayaDestinoIndexRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
   ApiPublicStudioMediaSplatRoute: typeof ApiPublicStudioMediaSplatRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -1825,6 +1834,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/oriente-maya/$destino': {
+      id: '/oriente-maya/$destino'
+      path: '/oriente-maya/$destino'
+      fullPath: '/oriente-maya/$destino'
+      preLoaderRoute: typeof OrienteMayaDestinoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/marketplace/buscar': {
       id: '/marketplace/buscar'
       path: '/marketplace/buscar'
@@ -1995,10 +2011,10 @@ declare module '@tanstack/react-router' {
     }
     '/oriente-maya/$destino/': {
       id: '/oriente-maya/$destino/'
-      path: '/oriente-maya/$destino'
+      path: '/'
       fullPath: '/oriente-maya/$destino/'
       preLoaderRoute: typeof OrienteMayaDestinoIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof OrienteMayaDestinoRoute
     }
     '/_authenticated/portal/': {
       id: '/_authenticated/portal/'
@@ -2044,10 +2060,10 @@ declare module '@tanstack/react-router' {
     }
     '/oriente-maya/$destino/$categoria': {
       id: '/oriente-maya/$destino/$categoria'
-      path: '/oriente-maya/$destino/$categoria'
+      path: '/$categoria'
       fullPath: '/oriente-maya/$destino/$categoria'
       preLoaderRoute: typeof OrienteMayaDestinoCategoriaRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof OrienteMayaDestinoRoute
     }
     '/_authenticated/portal/propiedad': {
       id: '/_authenticated/portal/propiedad'
@@ -2875,6 +2891,20 @@ const OrienteMayaDestinoCategoriaRouteWithChildren =
     OrienteMayaDestinoCategoriaRouteChildren,
   )
 
+interface OrienteMayaDestinoRouteChildren {
+  OrienteMayaDestinoCategoriaRoute: typeof OrienteMayaDestinoCategoriaRouteWithChildren
+  OrienteMayaDestinoIndexRoute: typeof OrienteMayaDestinoIndexRoute
+}
+
+const OrienteMayaDestinoRouteChildren: OrienteMayaDestinoRouteChildren = {
+  OrienteMayaDestinoCategoriaRoute:
+    OrienteMayaDestinoCategoriaRouteWithChildren,
+  OrienteMayaDestinoIndexRoute: OrienteMayaDestinoIndexRoute,
+}
+
+const OrienteMayaDestinoRouteWithChildren =
+  OrienteMayaDestinoRoute._addFileChildren(OrienteMayaDestinoRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -2914,15 +2944,13 @@ const rootRouteChildren: RootRouteChildren = {
   LovableWorkspacePreviewRoute: LovableWorkspacePreviewRoute,
   MarketplaceSlugRoute: MarketplaceSlugRoute,
   MarketplaceBuscarRoute: MarketplaceBuscarRoute,
+  OrienteMayaDestinoRoute: OrienteMayaDestinoRouteWithChildren,
   PSlugRoute: PSlugRoute,
   PreviewTokenRoute: PreviewTokenRoute,
   ProductoSlugRoute: ProductoSlugRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
-  OrienteMayaDestinoCategoriaRoute:
-    OrienteMayaDestinoCategoriaRouteWithChildren,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
-  OrienteMayaDestinoIndexRoute: OrienteMayaDestinoIndexRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:
     ApiPublicHooksEbProcessScheduledPublishRoute,
   ApiPublicStudioMediaSplatRoute: ApiPublicStudioMediaSplatRoute,
