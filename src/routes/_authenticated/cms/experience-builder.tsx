@@ -27,6 +27,7 @@ export const Route = createFileRoute("/_authenticated/cms/experience-builder")({
   validateSearch: (s: Record<string, unknown>) => ({
     page: typeof s.page === "string" ? s.page : undefined,
     mode: s.mode === "professional" || s.mode === "visual" ? s.mode : undefined,
+    block: typeof s.block === "string" ? s.block : undefined,
   }),
   component: ExperienceBuilderShell,
 });
@@ -50,27 +51,28 @@ type StudioMode = "visual" | "professional";
 function ExperienceBuilderShell() {
   const { roles } = useAuth();
   const canAdvanced = roles.includes("admin") || roles.includes("super_admin");
-  const search = useSearch({ from: "/_authenticated/cms/experience-builder" }) as {
+  const search = useSearch({ strict: false }) as {
     page?: string;
     mode?: StudioMode;
+    block?: string;
   };
-  const navigate = useNavigate({ from: "/_authenticated/cms/experience-builder" });
+  const navigate = useNavigate();
   const mode: StudioMode = search.mode ?? "visual";
   const page = search.page ?? null;
   const setMode = (m: StudioMode) =>
     void navigate({
       to: "/cms/experience-builder",
-      search: (prev: Record<string, unknown>) => ({ ...prev, mode: m }),
+      search: { page: search.page, mode: m, block: search.block },
       replace: true,
     });
   const setPage = (k: string | null) =>
     void navigate({
       to: "/cms/experience-builder",
-      search: (prev: Record<string, unknown>) => ({
-        ...prev,
-        mode: prev.mode === "professional" ? prev.mode : "visual",
+      search: {
+        mode: search.mode === "professional" ? search.mode : "visual",
         page: k ?? undefined,
-      }),
+        block: undefined,
+      },
       replace: true,
     });
 

@@ -43,7 +43,7 @@ export function EditThisPageButton({ pathname }: { pathname: string }) {
   return (
     <Link
       to="/cms/experience-builder"
-      search={{ mode: "visual", page: pageSlug }}
+      search={{ mode: "visual", page: pageSlug, block: undefined }}
       aria-label="Editar esta página en el Experience Builder"
       className="fixed bottom-6 left-6 z-40 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-lg ring-1 ring-black/5 transition hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
     >

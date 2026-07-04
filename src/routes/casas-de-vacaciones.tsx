@@ -16,6 +16,7 @@ import {
 } from "@/lib/marketplace/marketplace-reads.functions";
 import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
 import { ORIENTE_MAYA } from "@/config/regions";
+import { DESTINOS_MOCK } from "@/mocks/destinos";
 import {
   defineRouteContext,
   type RouteContextDeclaration,
@@ -30,12 +31,16 @@ const CATEGORY_SLUGS = new Set([
   "casas",
 ]);
 
+function destinationLabel(slug: string): string {
+  return DESTINOS_MOCK.find((d) => d.slug === slug)?.name ?? slug.replace(/-/g, " ");
+}
+
 /** H-02 · I5 — Declaración de contexto (patrón I4). */
 function buildCasasContext(destino: string | undefined): RouteContextDeclaration {
   const explicitAncestors = destino
     ? [
         { kind: "region" as const, slug: ORIENTE_MAYA.slug, label: ORIENTE_MAYA.name, href: "/oriente-maya" },
-        { kind: "destination" as const, slug: destino, label: destino.replace(/-/g, " "), href: `/oriente-maya/${destino}` },
+        { kind: "destination" as const, slug: destino, label: destinationLabel(destino), href: `/oriente-maya/${destino}` },
       ]
     : [];
   return defineRouteContext({
@@ -78,12 +83,12 @@ function CasasRoute() {
   const contextDeclaration = buildCasasContext(destino);
   const legacyCrumbs = [
     { label: "Casas de vacaciones", to: "/casas-de-vacaciones" },
-    ...(destino ? [{ label: destino.replace(/-/g, " ") }] : []),
+    ...(destino ? [{ label: destinationLabel(destino) }] : []),
   ];
   return (
     <PublicShell
       eyebrow="Hospedaje"
-      title={destino ? `Casas de vacaciones en ${destino.replace(/-/g, " ")}` : "Casas de vacaciones"}
+      title={destino ? `Casas de vacaciones en ${destinationLabel(destino)}` : "Casas de vacaciones"}
       description="Casas, villas y rentas vacacionales para explorar el Oriente Maya a tu ritmo."
       crumbs={legacyCrumbs}
       contextDeclaration={contextDeclaration}
