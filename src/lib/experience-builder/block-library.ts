@@ -1363,6 +1363,8 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   // US-R3 · Sub-ola 2.5d — Surface Kit neutro (nueva capacidad, sin
   // sustituir bloques existentes). Spread al final del catálogo.
   ...KIT_BLOCK_CONTRACTS,
+  // H-02 · Iniciativa 2 — Discovery Navigator (centro de descubrimiento).
+  discoveryNavigatorBlock,
 ];
 
 let bootstrapped = false;
