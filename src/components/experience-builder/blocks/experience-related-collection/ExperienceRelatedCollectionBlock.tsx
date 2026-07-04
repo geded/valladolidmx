@@ -19,6 +19,7 @@ import { useContext, useMemo } from "react";
 import { ExperienceRelatedCollection } from "./ExperienceRelatedCollection";
 import { DestinationSurfaceContext } from "@/components/surfaces/DestinationSurface";
 import { BusinessSurfaceRelatedContext } from "@/components/surfaces/BusinessSurface";
+import { ProductSurfaceContext, ProductSurfaceRelatedContext } from "@/components/surfaces/ProductSurface";
 import {
   buildExperienceRelatedCollectionPreviewDTO,
   dedupeItems,
@@ -35,8 +36,11 @@ import {
   destinationRelatedEventsToItems,
 } from "@/lib/experience-builder/adapters/destination-related-to-block";
 import { businessRelatedToItems } from "@/lib/experience-builder/adapters/business-related-to-block";
+import { productRelatedToItems } from "@/lib/experience-builder/adapters/product-related-to-block";
 import type { DestinationRelatedDTO } from "@/lib/destinations/public-reads.functions";
 import type { BusinessRelatedDTO } from "@/lib/marketplace/business-related.functions";
+import type { ProductRelatedDTO } from "@/lib/marketplace/product-related.functions";
+import type { MarketplaceProductDetail } from "@/lib/marketplace/marketplace-reads.functions";
 
 function safeParse(raw: unknown): ExperienceRelatedCollectionConfig {
   const r = experienceRelatedCollectionConfigSchema.safeParse(raw ?? {});
