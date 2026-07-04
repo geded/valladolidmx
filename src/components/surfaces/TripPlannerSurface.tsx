@@ -39,6 +39,7 @@ import { getMyActivePlan } from "@/lib/traveler/travel-plans.functions";
 import { readGuestQueue } from "@/lib/traveler/guest-queue";
 import { useAluxContext } from "@/lib/alux/use-alux-context";
 import { GuestPlanPreview } from "@/components/traveler/GuestPlanPreview";
+import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 
 export function TripPlannerSurface() {
   const { user } = useAuth();
@@ -92,6 +93,9 @@ export function TripPlannerSurface() {
         />
       ) : null}
       {state === "authed-empty" ? <AuthedEmptySection /> : null}
+
+      {state === "authed-active" ? <AluxTravelerPanel /> : null}
+      {state !== "authed-active" ? <AluxTeaserSection authed={Boolean(user)} /> : null}
 
       <HowItWorksSection />
 
@@ -424,6 +428,43 @@ function HowItWorksSection() {
 /* ------------------------------------------------------------------ */
 /* Cierre: siguiente paso                                             */
 /* ------------------------------------------------------------------ */
+
+function AluxTeaserSection({ authed }: { authed: boolean }) {
+  return (
+    <section
+      aria-labelledby="ayv-alux-teaser-h"
+      className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card p-6 sm:p-8"
+    >
+      <div className="flex items-start gap-3">
+        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
+          <Sparkles className="size-5" aria-hidden />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2
+            id="ayv-alux-teaser-h"
+            className="text-xl font-semibold sm:text-2xl"
+          >
+            Alux, tu copiloto de viaje
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            {authed
+              ? "Cuando tu expediente tenga al menos un elemento, Alux analiza el ritmo, detecta huecos y sugiere hoteles, restaurantes y experiencias del catálogo — sin modificar nada sin tu confirmación."
+              : "Al iniciar sesión y armar tu expediente, Alux analiza tu plan, detecta huecos y sugiere hoteles, restaurantes y experiencias del catálogo. Nunca modifica tu viaje sin tu confirmación."}
+          </p>
+          <div className="mt-4">
+            <Link
+              to={authed ? "/oriente-maya" : "/auth"}
+              className="inline-flex items-center gap-2 rounded-md border border-primary/30 bg-background px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5"
+            >
+              {authed ? "Empezar a explorar" : "Iniciar sesión"}
+              <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function NextStepSection({
   state,
