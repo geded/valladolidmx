@@ -16,6 +16,10 @@ import type { ReactNode } from "react";
 import { Container } from "@/components/layout/Container";
 import { BreadcrumbTerritorial } from "@/components/layout/BreadcrumbTerritorial";
 import type { BreadcrumbCrumb } from "@/types/territory";
+import {
+  ContextEngineProvider,
+  type RouteContextDeclaration,
+} from "@/lib/context-engine";
 import { cn } from "@/lib/utils";
 
 export type PublicShellVariant = "default" | "hero" | "minimal";
@@ -28,6 +32,20 @@ export interface PublicShellProps {
   variant?: PublicShellVariant;
   className?: string;
   children: ReactNode;
+  /**
+   * H-02 · I2 — Declaración de contexto opcional. Si se provee, el
+   * shell monta `<ContextEngineProvider>` para su subárbol. Cuando es
+   * `undefined` (default), el shell se comporta exactamente igual que
+   * antes de H-02 — cero cambios observables.
+   */
+  contextDeclaration?: RouteContextDeclaration;
+  /**
+   * H-02 · I2 — Cuando es `true`, el breadcrumb interno deriva sus
+   * migas del Context Engine. Sólo tiene efecto si además se provee
+   * `contextDeclaration` (o si un provider externo está montado).
+   * Default `false`: la prop `crumbs` sigue siendo la fuente.
+   */
+  useContextCrumbs?: boolean;
 }
 
 export function PublicShell({
@@ -38,7 +56,54 @@ export function PublicShell({
   variant = "default",
   className,
   children,
+  contextDeclaration,
+  useContextCrumbs = false,
 }: PublicShellProps) {
+  const body = (
+    <PublicShellBody
+      title={title}
+      eyebrow={eyebrow}
+      description={description}
+      crumbs={crumbs}
+      variant={variant}
+      className={className}
+      useContextCrumbs={useContextCrumbs}
+    >
+      {children}
+    </PublicShellBody>
+  );
+
+  if (contextDeclaration) {
+    return (
+      <ContextEngineProvider declaration={contextDeclaration}>
+        {body}
+      </ContextEngineProvider>
+    );
+  }
+  return body;
+}
+
+interface PublicShellBodyProps {
+  title?: string;
+  eyebrow?: string;
+  description?: string;
+  crumbs?: readonly BreadcrumbCrumb[];
+  variant: PublicShellVariant;
+  className?: string;
+  useContextCrumbs: boolean;
+  children: ReactNode;
+}
+
+function PublicShellBody({
+  title,
+  eyebrow,
+  description,
+  crumbs,
+  variant,
+  className,
+  useContextCrumbs,
+  children,
+}: PublicShellBodyProps) {
   if (variant === "minimal" || variant === "hero") {
     return (
       <main id="main" className={cn("pb-24", className)}>
@@ -48,12 +113,17 @@ export function PublicShell({
   }
 
   const hasHeader = Boolean(title || eyebrow || description);
-  const hasCrumbs = Boolean(crumbs && crumbs.length > 0);
+  const hasCrumbs = useContextCrumbs || Boolean(crumbs && crumbs.length > 0);
 
   return (
     <main id="main" className={cn("pb-24 pt-8 md:pt-12", className)}>
       <Container>
-        {hasCrumbs ? <BreadcrumbTerritorial crumbs={crumbs!} /> : null}
+        {hasCrumbs ? (
+          <BreadcrumbTerritorial
+            crumbs={crumbs}
+            useContextCrumbs={useContextCrumbs}
+          />
+        ) : null}
         {hasHeader ? (
           <header className={cn("max-w-3xl", hasCrumbs ? "mt-6" : null)}>
             {eyebrow ? (
