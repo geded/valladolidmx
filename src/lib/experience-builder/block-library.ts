@@ -1531,7 +1531,6 @@ const experienceHeroBlock: BlockContract = {
 
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
-  // placeholder marker
   sectionBlock,
   spacerBlock,
   dividerBlock,
