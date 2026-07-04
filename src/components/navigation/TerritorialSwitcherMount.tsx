@@ -37,9 +37,17 @@ export interface TerritorialSwitcherMountProps {
 function useContextFrom(): SwitchFromRef | null {
   const ctx = useResolvedContext();
   if (!ctx) return null;
-  const destination = ctx.destination?.slug ?? null;
+  // En la ficha del destino, el destino ES `current` y no aparece en
+  // `ctx.destination` (que sólo se llena desde `ancestors`). Cubrimos
+  // ese caso explícitamente para que el switcher también monte en la
+  // superficie del destino.
+  const destination =
+    ctx.destination?.slug
+    ?? (ctx.current.kind === "destination" ? ctx.current.slug ?? null : null);
   if (!destination) return null;
-  const category = ctx.category?.slug ?? null;
+  const category =
+    ctx.category?.slug
+    ?? (ctx.current.kind === "category" ? ctx.current.slug ?? null : null);
   const business = ctx.ancestors.find((n) => n.kind === "business")?.slug
     ?? (ctx.current.kind === "business" ? ctx.current.slug ?? null : null);
   const product = ctx.current.kind === "product" ? ctx.current.slug ?? null : null;
