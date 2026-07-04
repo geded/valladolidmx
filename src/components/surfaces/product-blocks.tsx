@@ -148,8 +148,8 @@ export function ProductBusinessContextBlock() {
   const p = useProduct();
   if (!p) return <EmptyHint>Contexto de la empresa que ofrece el producto.</EmptyHint>;
   const b = p.business;
-  const destSlug = p.destination_slug;
-  const catSlug = p.category_slug;
+  const destSlug = b.destination_slug;
+  const catSlug = b.category_slug;
   const businessHref =
     destSlug && catSlug
       ? resolveCanonicalPath({
