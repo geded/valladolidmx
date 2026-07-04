@@ -106,12 +106,22 @@ export const Route = createFileRoute("/marketplace/buscar")({
     }),
   component: MarketplaceSearchPage,
   errorComponent: ({ error }) => (
-    <PublicShell title="Búsqueda no disponible" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}>
+    <PublicShell
+      title="Búsqueda no disponible"
+      crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}
+      contextDeclaration={buildBuscarContext(undefined)}
+      useContextCrumbs
+    >
       <p className="text-sm text-muted-foreground">{String(error.message)}</p>
     </PublicShell>
   ),
   notFoundComponent: () => (
-    <PublicShell title="Sin resultados" crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}>
+    <PublicShell
+      title="Sin resultados"
+      crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}
+      contextDeclaration={buildBuscarContext(undefined)}
+      useContextCrumbs
+    >
       <p className="text-sm text-muted-foreground">No encontramos coincidencias.</p>
     </PublicShell>
   ),
