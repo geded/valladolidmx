@@ -98,7 +98,7 @@ function buildProductContext(p: MarketplaceProductDetail): RouteContextDeclarati
         },
       ]
     : [
-        { kind: "marketplace" as const, label: "Catálogo", href: "/marketplace" },
+        { kind: "marketplace" as const, label: "Catálogo", href: "/oriente-maya" },
         {
           kind: "business" as const,
           slug: p.business.slug,
@@ -208,7 +208,7 @@ export const Route = createFileRoute("/producto/$slug")({
   errorComponent: ({ error }) => (
     <PublicShell
       title="Producto no disponible"
-      crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: "—" }]}
+      crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: "—" }]}
     >
       <p className="text-sm text-muted-foreground">{String(error.message)}</p>
     </PublicShell>
@@ -216,7 +216,7 @@ export const Route = createFileRoute("/producto/$slug")({
   notFoundComponent: () => (
     <PublicShell
       title="Producto no encontrado"
-      crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: "—" }]}
+      crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: "—" }]}
     >
       <p className="text-sm text-muted-foreground">No publicamos ese producto todavía.</p>
     </PublicShell>

@@ -72,7 +72,7 @@ function buildBusinessContext(b: MarketplaceBusinessDetail): RouteContextDeclara
           }),
         },
       ]
-    : [{ kind: "marketplace" as const, label: "Catálogo", href: "/marketplace" }];
+    : [{ kind: "marketplace" as const, label: "Catálogo", href: "/oriente-maya" }];
   return defineRouteContext({
     current: {
       kind: "business",
@@ -156,12 +156,12 @@ export const Route = createFileRoute("/marketplace/$slug")({
   },
   component: MarketplaceBusinessPage,
   errorComponent: ({ error }) => (
-    <PublicShell title="Empresa no disponible" crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: "—" }]}>
+    <PublicShell title="Empresa no disponible" crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: "—" }]}>
       <p className="text-sm text-muted-foreground">{String(error.message)}</p>
     </PublicShell>
   ),
   notFoundComponent: () => (
-    <PublicShell title="Empresa no encontrada" crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: "—" }]}>
+    <PublicShell title="Empresa no encontrada" crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: "—" }]}>
       <p className="text-sm text-muted-foreground">No publicamos esa empresa todavía.</p>
     </PublicShell>
   ),

@@ -62,7 +62,7 @@ export function ProductSurface({
     return (
       <PublicShell
         title="Producto no disponible"
-        crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: "—" }]}
+        crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: "—" }]}
       >
         <p className="text-sm text-muted-foreground">
           Aún no publicamos esta ficha.
@@ -82,7 +82,7 @@ export function ProductSurface({
       title={p.name}
       description={p.tagline}
       crumbs={[
-        { label: "Catálogo", to: "/marketplace" },
+        { label: "Catálogo", to: "/oriente-maya" },
         { label: p.business.display_name, to: `/marketplace/${p.business.slug}` },
         { label: p.name },
       ]}

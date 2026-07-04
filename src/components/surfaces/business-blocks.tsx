@@ -80,7 +80,7 @@ export function BusinessShellBlock({
         vm={{
           title: "Empresa (previsualiza con datos reales o demo)",
           crumbs: [
-            { label: "Catálogo", href: "/marketplace" },
+            { label: "Catálogo", href: "/oriente-maya" },
             { label: "—" },
           ],
         }}

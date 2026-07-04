@@ -225,7 +225,7 @@ function hrefWithActiveDestination(href: string, activeDestination: string | nul
     "/restaurantes",
     "/experiencias",
     "/casas-de-vacaciones",
-    "/marketplace",
+    "/oriente-maya",
   ]);
   if (!territorialCategoryHrefs.has(href)) return href;
   return `${href}?destino=${encodeURIComponent(activeDestination)}`;

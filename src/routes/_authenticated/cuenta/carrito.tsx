@@ -98,7 +98,7 @@ function CarritoPage() {
             experiencias.
           </p>
           <Link
-            to="/marketplace"
+            to="/oriente-maya"
             className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
           >
             Ir al Marketplace

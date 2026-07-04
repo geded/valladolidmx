@@ -30,7 +30,7 @@ export interface PageKindDefinition {
   /**
    * Patrón de slug del `kind` (informativo).
    *   - `{slug}` para composiciones parametrizadas.
-   *   - Cadena literal (p. ej. `"/"`, `"/marketplace"`) para singletons.
+   *   - Cadena literal (p. ej. `"/"`, `"/oriente-maya"`) para singletons.
    */
   readonly slugPattern: string;
   /**
@@ -98,10 +98,10 @@ export const PAGE_KIND_REGISTRY: readonly PageKindDefinition[] = [
     kind: "marketplace",
     label: "Catálogo Oriente Maya",
     description: "Catálogo público del marketplace y sus secciones.",
-    slugPattern: "/marketplace",
+    slugPattern: "/oriente-maya",
     singleton: true,
     requiredRoles: ["admin", "super_admin", "editor"],
-    publicRoutePattern: "/marketplace",
+    publicRoutePattern: "/oriente-maya",
     allowedBlockCategories: null,
   },
   {
@@ -350,7 +350,7 @@ export interface ResolvedKindDefaults {
 
 const FALLBACK_BY_KIND: Partial<Record<PageKind, ResolvedKindDefaults>> = {
   home:         { jsonLdType: "WebSite",  sitemapChangefreq: "daily",   sitemapPriority: 1.0, cacheControl: "public, max-age=60, s-maxage=120",  unpublishFallbackPath: "/" },
-  marketplace:  { jsonLdType: "WebPage",  sitemapChangefreq: "hourly",  sitemapPriority: 0.9, cacheControl: "public, max-age=60, s-maxage=120",  unpublishFallbackPath: "/marketplace" },
+  marketplace:  { jsonLdType: "WebPage",  sitemapChangefreq: "hourly",  sitemapPriority: 0.9, cacheControl: "public, max-age=60, s-maxage=120",  unpublishFallbackPath: "/oriente-maya" },
   destination:  { jsonLdType: "Place",    sitemapChangefreq: "weekly",  sitemapPriority: 0.8, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/oriente-maya" },
   region:       { jsonLdType: "Place",    sitemapChangefreq: "weekly",  sitemapPriority: 0.8, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/" },
   experience:   { jsonLdType: "TouristAttraction", sitemapChangefreq: "weekly",  sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/experiencias" },
@@ -358,7 +358,7 @@ const FALLBACK_BY_KIND: Partial<Record<PageKind, ResolvedKindDefaults>> = {
   restaurant:   { jsonLdType: "Restaurant", sitemapChangefreq: "weekly", sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/restaurantes" },
   event:        { jsonLdType: "Event",    sitemapChangefreq: "daily",   sitemapPriority: 0.7, cacheControl: "public, max-age=120, s-maxage=300", unpublishFallbackPath: "/eventos" },
   business:     { jsonLdType: "LocalBusiness", sitemapChangefreq: "weekly", sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/empresas" },
-  product:      { jsonLdType: "Product",  sitemapChangefreq: "weekly",  sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/marketplace" },
+  product:      { jsonLdType: "Product",  sitemapChangefreq: "weekly",  sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/oriente-maya" },
   landing:      { jsonLdType: "WebPage",  sitemapChangefreq: "monthly", sitemapPriority: 0.6, cacheControl: "public, max-age=300, s-maxage=900", unpublishFallbackPath: "/" },
   campaign:     { jsonLdType: "WebPage",  sitemapChangefreq: "weekly",  sitemapPriority: 0.6, cacheControl: "public, max-age=300, s-maxage=900", unpublishFallbackPath: "/" },
   promo:        { jsonLdType: "WebPage",  sitemapChangefreq: "weekly",  sitemapPriority: 0.6, cacheControl: "public, max-age=300, s-maxage=900", unpublishFallbackPath: "/" },

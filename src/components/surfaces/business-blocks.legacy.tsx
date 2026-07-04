@@ -57,7 +57,7 @@ export function BusinessShellBlock({
     return (
       <PublicShell
         title="Empresa (previsualiza con datos reales o demo)"
-        crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: "—" }]}
+        crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: "—" }]}
       >
         {renderChildren?.()}
       </PublicShell>
@@ -69,7 +69,7 @@ export function BusinessShellBlock({
       eyebrow={variant.eyebrow}
       title={b.display_name}
       description={b.tagline}
-      crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: b.display_name }]}
+      crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: b.display_name }]}
     >
       {renderChildren?.()}
     </PublicShell>

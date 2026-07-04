@@ -74,7 +74,7 @@ function PromosRoute() {
       {promos.length === 0 ? (
         <p className="text-sm text-muted-foreground">
           Aún no hay promociones activas. Explora el{" "}
-          <Link to="/marketplace" className="text-primary hover:underline">Catálogo Oriente Maya</Link>{" "}
+          <Link to="/oriente-maya" className="text-primary hover:underline">Catálogo Oriente Maya</Link>{" "}
           para ver todas las empresas verificadas.
         </p>
       ) : (
