@@ -24,3 +24,12 @@ export {
   navigationContextToDeclaration,
   type NavigationContextDeclarationOptions,
 } from "./context-adapter";
+export {
+  readNavigationSession,
+  writeNavigationSession,
+  clearNavigationSession,
+  snapshotFromContext,
+  useNavigationSession,
+  type NavigationSessionSnapshot,
+  type NavigationSessionSlot,
+} from "./session-context";
