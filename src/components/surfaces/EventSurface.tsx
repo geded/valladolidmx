@@ -30,6 +30,7 @@ export function EventSurface({ event }: { event: PublicEventDetail }) {
       title={event.title}
       description={event.summary ?? undefined}
       crumbs={[{ label: "Eventos", to: "/eventos" }, { label: event.title }]}
+      useContextCrumbs
     >
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">

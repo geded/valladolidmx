@@ -65,6 +65,7 @@ export function ProductSurface({
         { label: p.business.display_name, to: `/marketplace/${p.business.slug}` },
         { label: p.name },
       ]}
+      useContextCrumbs
     >
       {p.description ? (
         <p className="max-w-3xl text-sm text-foreground/80">{p.description}</p>
