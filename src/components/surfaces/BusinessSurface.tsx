@@ -26,6 +26,7 @@ import { createContext, useContext } from "react";
 import { PublicShell } from "@/components/discovery";
 import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
 import type { MarketplaceBusinessDetail } from "@/lib/marketplace/marketplace-reads.functions";
+import type { BusinessRelatedDTO } from "@/lib/marketplace/business-related.functions";
 import { planAllows } from "@/lib/plans/plans-catalog";
 import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
 import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
@@ -35,6 +36,7 @@ import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experie
 import { ExperienceProductsBlock } from "@/components/experience-builder/blocks/experience-products/ExperienceProductsBlock";
 import { ExperiencePromotionsBlock } from "@/components/experience-builder/blocks/experience-promotions/ExperiencePromotionsBlock";
 import { ExperienceReviewsBlock } from "@/components/experience-builder/blocks/experience-reviews/ExperienceReviewsBlock";
+import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 import {
   businessToHeroDTO,
   businessToSubnavDTO,
@@ -49,16 +51,28 @@ import {
 
 export const BusinessSurfaceContext = createContext<MarketplaceBusinessDetail | null>(null);
 
+/**
+ * E2 · US-E2.1 — Contexto complementario para Related Collection.
+ * Se mantiene independiente para no romper consumidores existentes
+ * de `BusinessSurfaceContext` (Section/Reviews/Products/…).
+ */
+export const BusinessSurfaceRelatedContext =
+  createContext<BusinessRelatedDTO | null>(null);
+
 export function BusinessSurfaceProvider({
   business,
+  related,
   children,
 }: {
   business: MarketplaceBusinessDetail | null;
+  related?: BusinessRelatedDTO | null;
   children: React.ReactNode;
 }) {
   return (
     <BusinessSurfaceContext.Provider value={business}>
-      {children}
+      <BusinessSurfaceRelatedContext.Provider value={related ?? null}>
+        {children}
+      </BusinessSurfaceRelatedContext.Provider>
     </BusinessSurfaceContext.Provider>
   );
 }
@@ -110,6 +124,7 @@ export interface BusinessSurfaceProps {
 export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps = {}) {
   const ctxBusiness = useContext(BusinessSurfaceContext);
   const b = propBusiness ?? ctxBusiness;
+  const related = useContext(BusinessSurfaceRelatedContext);
 
   if (!b) {
     return (
@@ -200,6 +215,60 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
           }}
         />
       </section>
+
+      {related &&
+      (related.sameCategory.length > 0 ||
+        related.sameDestinationOther.length > 0) ? (
+        <section id="descubre" data-eb-anchor className="mt-10 scroll-mt-24">
+          <ExperienceRelatedCollectionBlock
+            config={{
+              source: "business",
+              entityKind: "mixed",
+              variant: "grid",
+              columns: 2,
+              heading: "Sigue descubriendo",
+              subheading: `Otras opciones en ${b.destination_slug || "el destino"} para continuar armando tu viaje.`,
+              emptyMessage:
+                "Aún no hay empresas hermanas publicadas en este destino.",
+              ariaLabel: `Descubrimiento contextual desde ${b.display_name}`,
+              groups: [
+                {
+                  id: "misma-categoria",
+                  entityKind: "business",
+                  heading: `Más de ${variant.eyebrow.toLowerCase()} en el destino`,
+                  maxItems: 6,
+                  variant: "grid",
+                  categorySlug: b.category_slug || null,
+                  seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}/${encodeURIComponent(b.category_slug || "")}`,
+                  seeAllLabel: "Ver todas",
+                },
+                {
+                  id: "otras-categorias",
+                  entityKind: "business",
+                  heading: "Otras experiencias del destino",
+                  maxItems: 6,
+                  variant: "grid",
+                  seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}`,
+                  seeAllLabel: "Ver destino",
+                },
+              ],
+              capabilities: {
+                showImage: true,
+                showMeta: true,
+                showBadges: true,
+                showKindBadge: true,
+                dedupe: true,
+                showRationale: true,
+              },
+              contextRefs: {
+                destinationSlug: b.destination_slug || null,
+                categorySlug: b.category_slug || null,
+                businessSlug: b.slug || null,
+              },
+            }}
+          />
+        </section>
+      ) : null}
 
       <ExperienceCtaBar dto={ctaBarDto} />
     </PublicShell>
