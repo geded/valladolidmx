@@ -30,6 +30,7 @@ import { Route as AluxRouteImport } from './routes/alux'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
+import { Route as ViajeCompartidoTokenRouteImport } from './routes/viaje-compartido.$token'
 import { Route as ProductoSlugRouteImport } from './routes/producto.$slug'
 import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
@@ -240,6 +241,11 @@ const IndexRoute = IndexRouteImport.update({
 const OrienteMayaIndexRoute = OrienteMayaIndexRouteImport.update({
   id: '/oriente-maya/',
   path: '/oriente-maya/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ViajeCompartidoTokenRoute = ViajeCompartidoTokenRouteImport.update({
+  id: '/viaje-compartido/$token',
+  path: '/viaje-compartido/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductoSlugRoute = ProductoSlugRouteImport.update({
@@ -909,6 +915,7 @@ export interface FileRoutesByFullPath {
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
+  '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1032,6 +1039,7 @@ export interface FileRoutesByTo {
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
+  '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1160,6 +1168,7 @@ export interface FileRoutesById {
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
+  '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/_authenticated/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1291,6 +1300,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/preview/$token'
     | '/producto/$slug'
+    | '/viaje-compartido/$token'
     | '/oriente-maya/'
     | '/admin/concierge'
     | '/admin/empresas'
@@ -1414,6 +1424,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/preview/$token'
     | '/producto/$slug'
+    | '/viaje-compartido/$token'
     | '/oriente-maya'
     | '/admin/concierge'
     | '/admin/empresas'
@@ -1541,6 +1552,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/preview/$token'
     | '/producto/$slug'
+    | '/viaje-compartido/$token'
     | '/oriente-maya/'
     | '/_authenticated/admin/concierge'
     | '/_authenticated/admin/empresas'
@@ -1662,6 +1674,7 @@ export interface RootRouteChildren {
   PSlugRoute: typeof PSlugRoute
   PreviewTokenRoute: typeof PreviewTokenRoute
   ProductoSlugRoute: typeof ProductoSlugRoute
+  ViajeCompartidoTokenRoute: typeof ViajeCompartidoTokenRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
@@ -1819,6 +1832,13 @@ declare module '@tanstack/react-router' {
       path: '/oriente-maya'
       fullPath: '/oriente-maya/'
       preLoaderRoute: typeof OrienteMayaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/viaje-compartido/$token': {
+      id: '/viaje-compartido/$token'
+      path: '/viaje-compartido/$token'
+      fullPath: '/viaje-compartido/$token'
+      preLoaderRoute: typeof ViajeCompartidoTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/producto/$slug': {
@@ -2980,6 +3000,7 @@ const rootRouteChildren: RootRouteChildren = {
   PSlugRoute: PSlugRoute,
   PreviewTokenRoute: PreviewTokenRoute,
   ProductoSlugRoute: ProductoSlugRoute,
+  ViajeCompartidoTokenRoute: ViajeCompartidoTokenRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:
