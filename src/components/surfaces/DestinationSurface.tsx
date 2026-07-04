@@ -167,22 +167,38 @@ export function DestinationSurface({ destinationSlug, dbData, related }: Destina
             <p className="text-sm font-semibold">Explora más del destino</p>
             <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <Link to="/hoteles" className="text-primary hover:underline">
+                <Link
+                  to="/hoteles"
+                  search={{ destino: slug }}
+                  className="text-primary hover:underline"
+                >
                   Hoteles y hospedajes
                 </Link>
               </li>
               <li>
-                <Link to="/restaurantes" className="text-primary hover:underline">
+                <Link
+                  to="/restaurantes"
+                  search={{ destino: slug }}
+                  className="text-primary hover:underline"
+                >
                   Restaurantes recomendados
                 </Link>
               </li>
               <li>
-                <Link to="/experiencias" className="text-primary hover:underline">
+                <Link
+                  to="/experiencias"
+                  search={{ destino: slug }}
+                  className="text-primary hover:underline"
+                >
                   Experiencias y rutas
                 </Link>
               </li>
               <li>
-                <Link to="/marketplace" className="text-primary hover:underline">
+                <Link
+                  to="/marketplace"
+                  search={{ destino: slug }}
+                  className="text-primary hover:underline"
+                >
                   Todo el Marketplace
                 </Link>
               </li>
