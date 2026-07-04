@@ -18,6 +18,37 @@ import {
   BusinessSurface,
   BusinessSurfaceProvider,
 } from "@/components/surfaces/BusinessSurface";
+import {
+  ContextEngineProvider,
+  defineRouteContext,
+  type RouteContextDeclaration,
+} from "@/lib/context-engine";
+
+/**
+ * H-02 · I6 — Declaración de contexto de la ficha de empresa.
+ *
+ * · `inherit: ["region","destination","category"]` habilita el
+ *   enriquecimiento territorial cuando el visitante llega desde una
+ *   región, destino o categoría dentro del TTL de `previous`.
+ * · `kindDefaults` preserva el breadcrumb legacy en el acceso directo
+ *   / deep link (sin `previous`): "Inicio › Marketplace › [Empresa]".
+ * · `canonical` = URL de la ficha; la herencia jamás toca SEO.
+ */
+function buildBusinessContext(b: MarketplaceBusinessDetail): RouteContextDeclaration {
+  return defineRouteContext({
+    current: {
+      kind: "business",
+      slug: b.slug,
+      label: b.display_name,
+      href: `/marketplace/${b.slug}`,
+    },
+    inherit: ["region", "destination", "category"],
+    canonical: `/marketplace/${b.slug}`,
+    kindDefaults: [
+      { kind: "marketplace", label: "Marketplace", href: "/marketplace" },
+    ],
+  });
+}
 
 export const Route = createFileRoute("/marketplace/$slug")({
   loader: async ({ params }) => {
@@ -68,13 +99,16 @@ export const Route = createFileRoute("/marketplace/$slug")({
 function MarketplaceBusinessPage() {
   const { business, composition } = Route.useLoaderData();
   const b: MarketplaceBusinessDetail = business;
+  const declaration = buildBusinessContext(b);
   return (
-    <BusinessSurfaceProvider business={b}>
-      {composition ? (
-        <CompositionRenderer tree={composition.snapshot} />
-      ) : (
-        <BusinessSurface />
-      )}
-    </BusinessSurfaceProvider>
+    <ContextEngineProvider declaration={declaration}>
+      <BusinessSurfaceProvider business={b}>
+        {composition ? (
+          <CompositionRenderer tree={composition.snapshot} />
+        ) : (
+          <BusinessSurface />
+        )}
+      </BusinessSurfaceProvider>
+    </ContextEngineProvider>
   );
 }

@@ -24,6 +24,42 @@ import {
   ProductSurface,
   ProductSurfaceProvider,
 } from "@/components/surfaces/ProductSurface";
+import {
+  ContextEngineProvider,
+  defineRouteContext,
+  type RouteContextDeclaration,
+} from "@/lib/context-engine";
+
+/**
+ * H-02 · I6 — Declaración de contexto de la ficha de producto.
+ *
+ * · `inherit: ["region","destination","category"]` enriquece el
+ *   breadcrumb cuando el usuario llega desde una categoría o destino.
+ * · `kindDefaults` preserva el breadcrumb legacy en el acceso directo:
+ *   "Inicio › Marketplace › [Empresa] › [Producto]".
+ * · `canonical` = URL del producto; la herencia jamás toca SEO.
+ */
+function buildProductContext(p: MarketplaceProductDetail): RouteContextDeclaration {
+  return defineRouteContext({
+    current: {
+      kind: "product",
+      slug: p.slug,
+      label: p.name,
+      href: `/producto/${p.slug}`,
+    },
+    inherit: ["region", "destination", "category"],
+    canonical: `/producto/${p.slug}`,
+    kindDefaults: [
+      { kind: "marketplace", label: "Marketplace", href: "/marketplace" },
+      {
+        kind: "business",
+        slug: p.business.slug,
+        label: p.business.display_name,
+        href: `/marketplace/${p.business.slug}`,
+      },
+    ],
+  });
+}
 
 export const Route = createFileRoute("/producto/$slug")({
   loader: async ({ params }) => {
@@ -107,13 +143,16 @@ export const Route = createFileRoute("/producto/$slug")({
 
 function MarketplaceProductPage() {
   const { product, composition } = Route.useLoaderData();
+  const declaration = buildProductContext(product);
   return (
-    <ProductSurfaceProvider product={product}>
-      {composition ? (
-        <CompositionRenderer tree={composition.snapshot} />
-      ) : (
-        <ProductSurface />
-      )}
-    </ProductSurfaceProvider>
+    <ContextEngineProvider declaration={declaration}>
+      <ProductSurfaceProvider product={product}>
+        {composition ? (
+          <CompositionRenderer tree={composition.snapshot} />
+        ) : (
+          <ProductSurface />
+        )}
+      </ProductSurfaceProvider>
+    </ContextEngineProvider>
   );
 }
