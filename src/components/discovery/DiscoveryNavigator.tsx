@@ -10,7 +10,6 @@
  * secciones futuras (promociones, eventos, Alux) sin romper API.
  */
 import type { ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
 import {
   BedDouble,
   Binoculars,
@@ -90,8 +89,8 @@ export function DiscoveryNavigator({
             const Icon = ICONS[c.iconKey] ?? Layers;
             return (
               <li key={c.slug}>
-                <Link
-                  to={c.href}
+                <a
+                  href={c.href}
                   className="group flex items-center gap-3 rounded-xl border border-transparent px-3 py-2 transition hover:border-border hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -113,7 +112,7 @@ export function DiscoveryNavigator({
                   >
                     →
                   </span>
-                </Link>
+                </a>
               </li>
             );
           })}
@@ -122,12 +121,9 @@ export function DiscoveryNavigator({
 
       {ctaHref && ctaLabel ? (
         <div className="mt-4 border-t border-border pt-4">
-          <Link
-            to={ctaHref}
-            className="text-sm font-medium text-primary hover:underline"
-          >
+          <a href={ctaHref} className="text-sm font-medium text-primary hover:underline">
             {ctaLabel} →
-          </Link>
+          </a>
         </div>
       ) : null}
 
