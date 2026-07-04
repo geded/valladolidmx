@@ -65,15 +65,21 @@ interface ContextEngineProviderProps {
  * · Sin `useSyncExternalStore` no reaparece el warning
  *   "getSnapshot should be cached to avoid an infinite loop".
  */
-function useClientPrevious(): PreviousContext | undefined {
-  const [previous, setPrevious] = useState<PreviousContext | undefined>(undefined);
+function useClientPrevious(): {
+  readonly previous: PreviousContext | undefined;
+  readonly hydrated: boolean;
+} {
+  const [state, setState] = useState<{
+    readonly previous: PreviousContext | undefined;
+    readonly hydrated: boolean;
+  }>({ previous: undefined, hydrated: false });
   useEffect(() => {
-    setPrevious(readPreviousContext());
+    setState({ previous: readPreviousContext(), hydrated: true });
     // Snapshot único al montar la ruta; cambios posteriores en
     // sessionStorage no re-disparan este provider (se leen al montar
     // el provider de la próxima ruta).
   }, []);
-  return previous;
+  return state;
 }
 
 export function ContextEngineProvider({
@@ -82,7 +88,7 @@ export function ContextEngineProvider({
   persistOnMount = true,
   children,
 }: ContextEngineProviderProps) {
-  const previous = useClientPrevious();
+  const { previous, hydrated: previousHydrated } = useClientPrevious();
 
   const result = useMemo(
     () => resolveContext({ declaration, previous, rules }),
@@ -119,6 +125,14 @@ export function ContextEngineProvider({
   }, [result, previous]);
 
   // Persistir current como próximo `previous` — sólo cliente.
+  // Nunca persistimos antes de hidratar el snapshot de `previous`.
+  // En React StrictMode, los effects de montaje pueden ejecutarse dos
+  // veces; si escribimos el fallback antes de leer `previous`, una ficha
+  // de detalle puede auto-sobrescribir el contexto Categoría→Ficha con
+  // `Marketplace→Ficha` y perder territorio. Esperar a
+  // `previousHydrated` preserva el contrato consolidado sin hardcodes:
+  // si existe contexto previo, se hereda primero; si no existe, entonces
+  // se persiste el fallback legacy.
   // La dependencia incluye un fingerprint de ancestors: la primera
   // hidratación calcula ancestors=[] (previous aún undefined) y
   // escribiría un previous "plano" que rompe la cadena
@@ -130,6 +144,7 @@ export function ContextEngineProvider({
     .join("|");
   useEffect(() => {
     if (!persistOnMount) return;
+    if (!previousHydrated) return;
     writePreviousContext(result.context.current, result.context.ancestors);
     emitContextEngineEvent("context_engine.previous_saved", {
       kind: result.context.current.kind,
@@ -137,7 +152,7 @@ export function ContextEngineProvider({
     });
     // sólo al cambiar de canonical
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result.context.canonical, ancestorsFingerprint, persistOnMount]);
+  }, [result.context.canonical, ancestorsFingerprint, persistOnMount, previousHydrated]);
 
   return (
     <ResolvedContextCtx.Provider value={result.context}>
