@@ -1,3 +1,9 @@
+/**
+ * /arma-tu-viaje — Herramienta transversal (Sprint 5).
+ *
+ * @context-engine legacy — herramienta transversal sin territorio
+ * (I7 · fila 9). No monta `ContextEngineProvider`.
+ */
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";

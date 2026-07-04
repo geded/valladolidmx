@@ -1,5 +1,8 @@
 /**
  * /contacto — Página de contacto (Sprint 5).
+ *
+ * @context-engine legacy — institucional sin territorio (I7 · fila 8).
+ * No monta `ContextEngineProvider`.
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
