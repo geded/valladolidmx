@@ -76,6 +76,7 @@ import { Route as AuthenticatedPortalConciergeRouteImport } from './routes/_auth
 import { Route as AuthenticatedPortalCatalogoRouteImport } from './routes/_authenticated/portal/catalogo'
 import { Route as AuthenticatedPortalActividadRouteImport } from './routes/_authenticated/portal/actividad'
 import { Route as AuthenticatedPaginasSplatRouteImport } from './routes/_authenticated/paginas.$'
+import { Route as AuthenticatedCuentaPerfilPublicoRouteImport } from './routes/_authenticated/cuenta/perfil-publico'
 import { Route as AuthenticatedCuentaPerfilRouteImport } from './routes/_authenticated/cuenta/perfil'
 import { Route as AuthenticatedCuentaNotificacionesRouteImport } from './routes/_authenticated/cuenta/notificaciones'
 import { Route as AuthenticatedCuentaMiViajeRouteImport } from './routes/_authenticated/cuenta/mi-viaje'
@@ -500,6 +501,12 @@ const AuthenticatedPaginasSplatRoute =
     id: '/$',
     path: '/$',
     getParentRoute: () => AuthenticatedPaginasRoute,
+  } as any)
+const AuthenticatedCuentaPerfilPublicoRoute =
+  AuthenticatedCuentaPerfilPublicoRouteImport.update({
+    id: '/perfil-publico',
+    path: '/perfil-publico',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
 const AuthenticatedCuentaPerfilRoute =
   AuthenticatedCuentaPerfilRouteImport.update({
@@ -944,6 +951,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/mi-viaje': typeof AuthenticatedCuentaMiViajeRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
+  '/cuenta/perfil-publico': typeof AuthenticatedCuentaPerfilPublicoRoute
   '/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
@@ -1068,6 +1076,7 @@ export interface FileRoutesByTo {
   '/cuenta/mi-viaje': typeof AuthenticatedCuentaMiViajeRoute
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
+  '/cuenta/perfil-publico': typeof AuthenticatedCuentaPerfilPublicoRoute
   '/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
@@ -1199,6 +1208,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/mi-viaje': typeof AuthenticatedCuentaMiViajeRoute
   '/_authenticated/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/_authenticated/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
+  '/_authenticated/cuenta/perfil-publico': typeof AuthenticatedCuentaPerfilPublicoRoute
   '/_authenticated/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/_authenticated/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/_authenticated/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
@@ -1332,6 +1342,7 @@ export interface FileRouteTypes {
     | '/cuenta/mi-viaje'
     | '/cuenta/notificaciones'
     | '/cuenta/perfil'
+    | '/cuenta/perfil-publico'
     | '/paginas/$'
     | '/portal/actividad'
     | '/portal/catalogo'
@@ -1456,6 +1467,7 @@ export interface FileRouteTypes {
     | '/cuenta/mi-viaje'
     | '/cuenta/notificaciones'
     | '/cuenta/perfil'
+    | '/cuenta/perfil-publico'
     | '/paginas/$'
     | '/portal/actividad'
     | '/portal/catalogo'
@@ -1586,6 +1598,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/mi-viaje'
     | '/_authenticated/cuenta/notificaciones'
     | '/_authenticated/cuenta/perfil'
+    | '/_authenticated/cuenta/perfil-publico'
     | '/_authenticated/paginas/$'
     | '/_authenticated/portal/actividad'
     | '/_authenticated/portal/catalogo'
@@ -2169,6 +2182,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPaginasSplatRouteImport
       parentRoute: typeof AuthenticatedPaginasRoute
     }
+    '/_authenticated/cuenta/perfil-publico': {
+      id: '/_authenticated/cuenta/perfil-publico'
+      path: '/perfil-publico'
+      fullPath: '/cuenta/perfil-publico'
+      preLoaderRoute: typeof AuthenticatedCuentaPerfilPublicoRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
     '/_authenticated/cuenta/perfil': {
       id: '/_authenticated/cuenta/perfil'
       path: '/perfil'
@@ -2712,6 +2732,7 @@ interface AuthenticatedCuentaRouteRouteChildren {
   AuthenticatedCuentaMiViajeRoute: typeof AuthenticatedCuentaMiViajeRoute
   AuthenticatedCuentaNotificacionesRoute: typeof AuthenticatedCuentaNotificacionesRoute
   AuthenticatedCuentaPerfilRoute: typeof AuthenticatedCuentaPerfilRoute
+  AuthenticatedCuentaPerfilPublicoRoute: typeof AuthenticatedCuentaPerfilPublicoRoute
   AuthenticatedCuentaIndexRoute: typeof AuthenticatedCuentaIndexRoute
   AuthenticatedCuentaPagosErrorRoute: typeof AuthenticatedCuentaPagosErrorRoute
   AuthenticatedCuentaPagosExitoRoute: typeof AuthenticatedCuentaPagosExitoRoute
@@ -2729,6 +2750,8 @@ const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildr
     AuthenticatedCuentaNotificacionesRoute:
       AuthenticatedCuentaNotificacionesRoute,
     AuthenticatedCuentaPerfilRoute: AuthenticatedCuentaPerfilRoute,
+    AuthenticatedCuentaPerfilPublicoRoute:
+      AuthenticatedCuentaPerfilPublicoRoute,
     AuthenticatedCuentaIndexRoute: AuthenticatedCuentaIndexRoute,
     AuthenticatedCuentaPagosErrorRoute: AuthenticatedCuentaPagosErrorRoute,
     AuthenticatedCuentaPagosExitoRoute: AuthenticatedCuentaPagosExitoRoute,
