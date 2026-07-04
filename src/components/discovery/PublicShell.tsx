@@ -20,7 +20,6 @@ import {
   ContextEngineProvider,
   type RouteContextDeclaration,
 } from "@/lib/context-engine";
-import { NavigationSessionBridge } from "@/components/navigation/NavigationSessionBridge";
 import { cn } from "@/lib/utils";
 
 export type PublicShellVariant = "default" | "hero" | "minimal";
@@ -77,7 +76,6 @@ export function PublicShell({
   if (contextDeclaration) {
     return (
       <ContextEngineProvider declaration={contextDeclaration}>
-        <NavigationSessionBridge />
         {body}
       </ContextEngineProvider>
     );
