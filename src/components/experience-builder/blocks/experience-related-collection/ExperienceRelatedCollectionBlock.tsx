@@ -137,6 +137,13 @@ function resolveProductGroupItems(
         : "Otras opciones en el mismo destino",
     });
   }
+  if (groupId === "otros-en-destino") {
+    return productRelatedToItems(related?.otherInDestination ?? [], {
+      destinationSlug: dest,
+      categorySlug: null,
+      rationale: "Otras experiencias del mismo destino",
+    });
+  }
   return productRelatedToItems(
     [...(product.related ?? []), ...(related?.sameCategoryInDestination ?? [])],
     { destinationSlug: dest, categorySlug: cat },
