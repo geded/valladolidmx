@@ -18,10 +18,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Trash2, Save, Users, Calendar, MapPin, Building2, ShoppingBag, Ticket, StickyNote, Plus } from "lucide-react";
+import { Trash2, Save, Users, Calendar, MapPin, Building2, ShoppingBag, Ticket, StickyNote, Plus, Share2, Copy, ExternalLink, Printer } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   addPlanItem,
+  disableShareLink,
+  enableShareLink,
   getMyActivePlan,
   promotePlanToCase,
   removePlanItem,
@@ -94,6 +96,7 @@ function MiViajePage() {
         <>
           <PlanMetaEditor data={activeQ.data} onSaved={invalidatePlan} />
           <PlanItemsSection data={activeQ.data} onChanged={invalidatePlan} />
+          <ShareExportSection data={activeQ.data} onChanged={invalidatePlan} />
           <AluxTravelerPanel />
           <ConciergeSection data={activeQ.data} cases={cases} onChanged={invalidatePlan} />
         </>
