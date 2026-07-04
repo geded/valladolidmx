@@ -77,10 +77,12 @@ export function businessToDescriptionSectionDTO(
     lead: null,
     body: b.description,
     media: null,
-    ctaPrimary: null,
-    ctaSecondary: null,
-    headingLevel: "h2",
-    anchorId: "resumen",
+    attribution: null,
+    ctas: [],
+    align: "left",
+    tone: "default",
+    ariaLabel: `Sobre ${b.display_name}`,
+    capabilities: { anchor: true, seoHeading: true, richText: false },
   };
 }
 
