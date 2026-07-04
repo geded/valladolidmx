@@ -46,7 +46,10 @@ export interface DestinationBlockInput {
 
 export function toDestinationBlockInput(
   dbData: PublicDestinationDTO | null | undefined,
-  mock: { name?: string; tagline?: string | null; highlights?: string[] } | null | undefined,
+  mock:
+    | { name?: string; tagline?: string | null; highlights?: readonly string[] }
+    | null
+    | undefined,
   ctx: {
     slug: string;
     regionSlug: string;
