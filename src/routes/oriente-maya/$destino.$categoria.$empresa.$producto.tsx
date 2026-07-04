@@ -10,6 +10,7 @@ import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getMarketplaceProductBySlug } from "@/lib/marketplace/marketplace-reads.functions";
+import { getProductRelated } from "@/lib/marketplace/product-related.functions";
 import {
   resolveTerritorialPath,
   resolutionToNavigationContext,
@@ -38,7 +39,22 @@ export const Route = createFileRoute(
       data: { slug: params.producto },
     });
     if (!product) throw notFound();
-    return { resolution, product };
+    // E2 · US-E2.2 — Related Collection contextual del producto.
+    // Fallback silencioso: no debe romper el render de la ficha.
+    let related = null as Awaited<ReturnType<typeof getProductRelated>> | null;
+    try {
+      related = await getProductRelated({
+        data: {
+          productId: product.id,
+          businessId: product.business.id,
+          destinationSlug: product.business.destination_slug,
+          categorySlug: product.business.category_slug,
+        },
+      });
+    } catch {
+      related = null;
+    }
+    return { resolution, product, related };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
@@ -66,7 +82,7 @@ export const Route = createFileRoute(
 });
 
 function ProductoTerritorialPage() {
-  const { resolution, product } = Route.useLoaderData();
+  const { resolution, product, related } = Route.useLoaderData();
   const { destino } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
   // N2.2: fuente única = Navigation Contract. El adapter deriva
@@ -79,7 +95,7 @@ function ProductoTerritorialPage() {
 
   return (
     <ContextEngineProvider declaration={declaration}>
-      <ProductSurfaceProvider product={product}>
+      <ProductSurfaceProvider product={product} related={related}>
         <ProductSurface />
       </ProductSurfaceProvider>
     </ContextEngineProvider>
