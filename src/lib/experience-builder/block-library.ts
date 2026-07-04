@@ -1700,6 +1700,257 @@ const experienceCtaBarBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+/* ------------------------------------------------------------------ *
+ * H-03 · Ola I1.c — Fundacionales: Gallery, Info-Grid, Section, Features.
+ *   Reutilizables en todas las Experience Pages (sin `constraints.surfaces`).
+ *   Evolución sólo por `variant` / `capabilities` / `extensions[]`.
+ * ------------------------------------------------------------------ */
+const experienceGalleryBlock: BlockContract = {
+  type: "vmx.experience.gallery",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Experience Gallery",
+  description:
+    "Galería de medios (imágenes, video futuro, 360°, 3D, AR) para cualquier Experience Page.",
+  schema: {
+    source: {
+      type: "select", label: "Fuente", default: "manual",
+      options: [
+        { value: "manual", label: "Manual" },
+        { value: "business", label: "Ficha empresa (reservado)" },
+        { value: "product", label: "Ficha producto (reservado)" },
+        { value: "destination", label: "Destino (reservado)" },
+        { value: "event", label: "Evento (reservado)" },
+      ],
+    },
+    variant: {
+      type: "select", label: "Variante", default: "mosaic",
+      options: [
+        { value: "mosaic", label: "Mosaico editorial" },
+        { value: "grid", label: "Grid uniforme" },
+        { value: "carousel", label: "Carrusel" },
+        { value: "strip", label: "Tira compacta" },
+      ],
+    },
+    aspect: {
+      type: "select", label: "Proporción", default: "landscape",
+      options: [
+        { value: "landscape", label: "Horizontal" },
+        { value: "square", label: "Cuadrada" },
+        { value: "portrait", label: "Vertical" },
+        { value: "auto", label: "Automática" },
+      ],
+    },
+    heading: { type: "text", label: "Encabezado", translatable: true },
+    subheading: { type: "text", label: "Subencabezado", translatable: true },
+    maxVisible: { type: "number", label: "Máximo visible", default: 9 },
+    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Galería", translatable: true },
+    items: {
+      type: "list", label: "Elementos",
+      item: {
+        type: "object", label: "Elemento",
+        fields: {
+          url: { type: "media", label: "Imagen", accepts: ["image/*"] },
+          alt: { type: "text", label: "Alt", translatable: true },
+          caption: { type: "text", label: "Pie", translatable: true },
+        },
+      },
+    },
+  },
+  capabilities: {
+    soporta_i18n: true, soporta_seo: true, soporta_preview: true,
+    soporta_responsive: true, soporta_cache: true,
+  },
+  constraints: {},
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "aspect", "maxVisible"] },
+  i18n: { translatable_fields: ["heading", "subheading", "ariaLabel", "items"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const experienceInfoGridBlock: BlockContract = {
+  type: "vmx.experience.info-grid",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Experience Info Grid",
+  description: "Rejilla de datos clave (horario, ubicación, teléfono, categoría, aforo…) reutilizable.",
+  schema: {
+    source: {
+      type: "select", label: "Fuente", default: "manual",
+      options: [
+        { value: "manual", label: "Manual" },
+        { value: "business", label: "Ficha empresa (auto)" },
+        { value: "product", label: "Ficha producto (reservado)" },
+        { value: "destination", label: "Destino (reservado)" },
+        { value: "event", label: "Evento (reservado)" },
+      ],
+    },
+    variant: {
+      type: "select", label: "Variante", default: "cards",
+      options: [
+        { value: "cards", label: "Tarjetas" },
+        { value: "list", label: "Lista" },
+        { value: "inline", label: "Chips inline" },
+      ],
+    },
+    heading: { type: "text", label: "Encabezado", translatable: true },
+    columns: { type: "number", label: "Columnas", default: 3 },
+    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Información clave", translatable: true },
+    items: {
+      type: "list", label: "Datos",
+      item: {
+        type: "object", label: "Dato",
+        fields: {
+          iconKey: { type: "text", label: "Icono (Lucide key)" },
+          label: { type: "text", label: "Etiqueta", translatable: true },
+          value: { type: "text", label: "Valor", translatable: true },
+          href: { type: "url", label: "Enlace" },
+          tone: {
+            type: "select", label: "Tono", default: "default",
+            options: [
+              { value: "default", label: "Neutro" },
+              { value: "primary", label: "Primario" },
+              { value: "accent", label: "Acentuado" },
+              { value: "warning", label: "Aviso" },
+            ],
+          },
+        },
+      },
+    },
+  },
+  capabilities: { soporta_i18n: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  constraints: {},
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "columns"] },
+  i18n: { translatable_fields: ["heading", "ariaLabel", "items"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const experienceSectionBlock: BlockContract = {
+  type: "vmx.experience.section",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Experience Section",
+  description:
+    "Sección editorial avanzada (eyebrow, título, lead, cuerpo, media, CTAs). Evolución del layout section, con jerarquía SEO y anclas.",
+  schema: {
+    source: {
+      type: "select", label: "Fuente", default: "manual",
+      options: [
+        { value: "manual", label: "Manual" },
+        { value: "business", label: "Ficha empresa (auto)" },
+        { value: "product", label: "Producto (reservado)" },
+        { value: "destination", label: "Destino (reservado)" },
+        { value: "event", label: "Evento (reservado)" },
+      ],
+    },
+    variant: {
+      type: "select", label: "Variante", default: "editorial",
+      options: [
+        { value: "editorial", label: "Editorial" },
+        { value: "split", label: "Texto + media" },
+        { value: "centered", label: "Centrada" },
+        { value: "quote", label: "Cita" },
+      ],
+    },
+    eyebrow: { type: "text", label: "Frase superior", translatable: true },
+    title: { type: "text", label: "Título", translatable: true },
+    lead: { type: "text", label: "Lead", translatable: true },
+    body: { type: "rich_text", label: "Cuerpo", translatable: true },
+    mediaUrl: { type: "media", label: "Imagen", accepts: ["image/*"] },
+    mediaAlt: { type: "text", label: "Alt de imagen", translatable: true },
+    attribution: { type: "text", label: "Atribución (cita)", translatable: true },
+    align: {
+      type: "select", label: "Alineación", default: "left",
+      options: [
+        { value: "left", label: "Izquierda" },
+        { value: "center", label: "Centrada" },
+      ],
+    },
+    tone: {
+      type: "select", label: "Tono", default: "default",
+      options: [
+        { value: "default", label: "Por defecto" },
+        { value: "muted", label: "Atenuado" },
+        { value: "accent", label: "Acentuado" },
+      ],
+    },
+    ctas: {
+      type: "list", label: "Botones",
+      item: {
+        type: "object", label: "Botón",
+        fields: {
+          label: { type: "text", label: "Texto", translatable: true },
+          href: { type: "url", label: "URL" },
+          emphasis: {
+            type: "select", label: "Énfasis", default: "primary",
+            options: [
+              { value: "primary", label: "Primario" },
+              { value: "secondary", label: "Secundario" },
+              { value: "ghost", label: "Fantasma" },
+              { value: "link", label: "Enlace" },
+            ],
+          },
+        },
+      },
+    },
+  },
+  capabilities: { soporta_i18n: true, soporta_seo: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  constraints: {},
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "align", "tone"] },
+  i18n: { translatable_fields: ["eyebrow", "title", "lead", "body", "attribution", "ctas"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
+const experienceFeaturesBlock: BlockContract = {
+  type: "vmx.experience.features",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Experience Features",
+  description: "Lista de características / amenities / servicios reutilizable en cualquier Experience Page.",
+  schema: {
+    source: {
+      type: "select", label: "Fuente", default: "manual",
+      options: [
+        { value: "manual", label: "Manual" },
+        { value: "business", label: "Ficha empresa (reservado)" },
+        { value: "product", label: "Producto (reservado)" },
+        { value: "destination", label: "Destino (reservado)" },
+        { value: "event", label: "Evento (reservado)" },
+      ],
+    },
+    variant: {
+      type: "select", label: "Variante", default: "grid",
+      options: [
+        { value: "grid", label: "Grid con icono" },
+        { value: "checklist", label: "Checklist" },
+        { value: "chips", label: "Chips compactos" },
+        { value: "columns", label: "Columnas editorial" },
+      ],
+    },
+    heading: { type: "text", label: "Encabezado", translatable: true },
+    subheading: { type: "text", label: "Subencabezado", translatable: true },
+    columns: { type: "number", label: "Columnas", default: 3 },
+    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Características", translatable: true },
+    items: {
+      type: "list", label: "Características",
+      item: {
+        type: "object", label: "Característica",
+        fields: {
+          iconKey: { type: "text", label: "Icono (Lucide key)" },
+          title: { type: "text", label: "Título", translatable: true },
+          description: { type: "text", label: "Descripción", translatable: true },
+          available: { type: "boolean", label: "Disponible", default: true },
+          href: { type: "url", label: "Enlace" },
+        },
+      },
+    },
+  },
+  capabilities: { soporta_i18n: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  constraints: {},
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "columns"] },
+  i18n: { translatable_fields: ["heading", "subheading", "ariaLabel", "items"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
