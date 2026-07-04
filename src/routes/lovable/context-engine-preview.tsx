@@ -18,6 +18,7 @@ import {
   type ContextEngineEventMeta,
   type RouteContextDeclaration,
 } from "@/lib/context-engine";
+import { PublicShell } from "@/components/discovery";
 
 export const Route = createFileRoute("/lovable/context-engine-preview")({
   head: () => ({
@@ -145,6 +146,30 @@ function PlaygroundPage() {
       <ContextEngineProvider declaration={declaration}>
         <ContextDebugPanel />
       </ContextEngineProvider>
+
+      <section className="mt-8">
+        <h2 className="mb-2 text-sm font-semibold">
+          PublicShell real · <code>useContextCrumbs</code>
+        </h2>
+        <p className="mb-3 text-xs text-muted-foreground">
+          Este bloque monta un <code>PublicShell</code> de producción con
+          <code> contextDeclaration</code> y <code>useContextCrumbs</code>.
+          El breadcrumb refleja ancestros + herencia del recorrido previo.
+        </p>
+        <div className="rounded-lg border">
+          <PublicShell
+            eyebrow="Playground"
+            title={declaration.current.label}
+            description="Breadcrumb derivado del Context Engine."
+            contextDeclaration={declaration}
+            useContextCrumbs
+          >
+            <p className="text-sm text-muted-foreground">
+              Cambia de escenario arriba y observa cómo cambian las migas.
+            </p>
+          </PublicShell>
+        </div>
+      </section>
 
       <section className="mt-8">
         <h2 className="mb-2 text-sm font-semibold">Eventos emitidos</h2>
