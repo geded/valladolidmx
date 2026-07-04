@@ -11,6 +11,7 @@
  * Modo `mobile`  → acordeón vertical apto para el drawer existente.
  */
 import { useEffect, useRef, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -212,17 +213,57 @@ function useSections(): MenuSection[] {
   return buildSections(data ?? []);
 }
 
+function activeDestinationFromPath(pathname: string): string | null {
+  const match = pathname.match(/^\/oriente-maya\/([^/?#]+)/);
+  return match?.[1] ?? null;
+}
+
+function hrefWithActiveDestination(href: string, activeDestination: string | null): string {
+  if (!activeDestination) return href;
+  const territorialCategoryHrefs = new Set([
+    "/hoteles",
+    "/restaurantes",
+    "/experiencias",
+    "/casas-de-vacaciones",
+    "/marketplace",
+  ]);
+  if (!territorialCategoryHrefs.has(href)) return href;
+  return `${href}?destino=${encodeURIComponent(activeDestination)}`;
+}
+
 export function PrimaryMegaMenu(props: PrimaryMegaMenuProps) {
   const sections = useSections();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const activeDestination = activeDestinationFromPath(pathname);
   if (props.variant === "desktop") {
-    return <DesktopMenu sections={sections} isOverlay={Boolean(props.isOverlay)} />;
+    return (
+      <DesktopMenu
+        sections={sections}
+        isOverlay={Boolean(props.isOverlay)}
+        activeDestination={activeDestination}
+      />
+    );
   }
-  return <MobileMenu sections={sections} onNavigate={props.onNavigate} />;
+  return (
+    <MobileMenu
+      sections={sections}
+      activeDestination={activeDestination}
+      onNavigate={props.onNavigate}
+    />
+  );
 }
 
 /* ─────────────────────────── Desktop ─────────────────────────── */
 
-function DesktopMenu({ sections, isOverlay }: { sections: MenuSection[]; isOverlay: boolean }) {
+function DesktopMenu({
+  sections,
+  isOverlay,
+  activeDestination,
+}: {
+  sections: MenuSection[];
+  isOverlay: boolean;
+  activeDestination: string | null;
+}) {
   const [open, setOpen] = useState<string | null>(null);
   const rootRef = useRef<HTMLElement | null>(null);
 
@@ -257,7 +298,7 @@ function DesktopMenu({ sections, isOverlay }: { sections: MenuSection[]; isOverl
           return (
             <li key={section.id} className="relative" onMouseEnter={() => setOpen(section.id)}>
               <a
-                href={section.href}
+                href={hrefWithActiveDestination(section.href, activeDestination)}
                 aria-haspopup="true"
                 aria-expanded={isOpen}
                 onClick={(e) => {
@@ -305,7 +346,7 @@ function DesktopMenu({ sections, isOverlay }: { sections: MenuSection[]; isOverl
                           {col.links.map((link) => (
                             <li key={link.href + link.label}>
                               <a
-                                href={link.href}
+                                href={hrefWithActiveDestination(link.href, activeDestination)}
                                 role="menuitem"
                                 className="block rounded-md px-2 py-1.5 text-sm text-foreground hover:bg-accent hover:text-accent-foreground"
                               >
@@ -329,7 +370,15 @@ function DesktopMenu({ sections, isOverlay }: { sections: MenuSection[]; isOverl
 
 /* ─────────────────────────── Mobile ─────────────────────────── */
 
-function MobileMenu({ sections, onNavigate }: { sections: MenuSection[]; onNavigate?: () => void }) {
+function MobileMenu({
+  sections,
+  activeDestination,
+  onNavigate,
+}: {
+  sections: MenuSection[];
+  activeDestination: string | null;
+  onNavigate?: () => void;
+}) {
   const [open, setOpen] = useState<string | null>(null);
   return (
     <ul className="flex flex-col gap-0.5">
@@ -340,7 +389,7 @@ function MobileMenu({ sections, onNavigate }: { sections: MenuSection[]; onNavig
           <li key={section.id} className="border-b border-border/40 last:border-b-0">
             <div className="flex items-stretch">
               <a
-                href={section.href}
+                href={hrefWithActiveDestination(section.href, activeDestination)}
                 onClick={() => onNavigate?.()}
                 className="flex-1 rounded-lg px-3 py-2.5 text-[0.95rem] font-medium leading-tight text-foreground hover:bg-accent hover:text-accent-foreground"
               >
@@ -369,7 +418,7 @@ function MobileMenu({ sections, onNavigate }: { sections: MenuSection[]; onNavig
                       {col.links.map((link) => (
                         <li key={link.href + link.label}>
                           <a
-                            href={link.href}
+                            href={hrefWithActiveDestination(link.href, activeDestination)}
                             onClick={() => onNavigate?.()}
                             className="block rounded-md px-3 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground"
                           >
