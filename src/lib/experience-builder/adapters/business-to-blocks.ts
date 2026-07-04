@@ -22,6 +22,10 @@ import type {
   ExperienceProductsDTO,
 } from "@/lib/experience-builder/blocks/experience-products/contract";
 import { marketplaceProductToItem } from "@/components/experience-builder/blocks/experience-products/ExperienceProductsBlock";
+import type {
+  ExperiencePromotionsDTO,
+} from "@/lib/experience-builder/blocks/experience-promotions/contract";
+import { marketplacePromotionToItem } from "@/components/experience-builder/blocks/experience-promotions/ExperiencePromotionsBlock";
 
 /* ------------------------------------------------------------------ *
  * Hero
@@ -184,6 +188,47 @@ export function businessToProductsDTO(
       contextAware: false,
       livePricing: false,
       liveAvailability: false,
+    },
+    contextRefs: {
+      businessSlug: b.slug,
+      destinationSlug: b.destination_slug ?? null,
+      categorySlug: b.category_slug ?? null,
+    },
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * H-03 · Ola I2.b — Promotions
+ *
+ * Adapter neutro: mapea las promociones del negocio a un DTO
+ * consumible por `vmx.experience.promotions`. La Plantilla Business no
+ * vuelve a pintar `<ul>` — sólo orquesta bloques oficiales.
+ * ------------------------------------------------------------------ */
+export function businessToPromotionsDTO(
+  b: MarketplaceBusinessDetail,
+): ExperiencePromotionsDTO {
+  return {
+    variant: "grid",
+    heading: "Promociones vigentes",
+    subheading: null,
+    emptyMessage: "Sin promociones vigentes por ahora.",
+    columns: 2,
+    groupBy: "none",
+    ariaLabel: "Promociones y oportunidades",
+    items: b.promotions.map(marketplacePromotionToItem),
+    capabilities: {
+      showDiscount: true,
+      showExpiry: true,
+      showFavorite: true,
+      showActions: true,
+      showBusiness: false,
+      showMedia: false,
+      showCouponCode: true,
+      urgencyAware: true,
+      compact: false,
+      contextAware: false,
+      liveDiscount: false,
+      audienceAware: false,
     },
     contextRefs: {
       businessSlug: b.slug,
