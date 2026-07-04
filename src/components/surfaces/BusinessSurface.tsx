@@ -25,10 +25,8 @@
 import { createContext, useContext } from "react";
 import { PublicShell } from "@/components/discovery";
 import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
-import { ProductActions } from "@/components/marketplace/ProductActions";
 import type {
   MarketplaceBusinessDetail,
-  MarketplaceProductCard,
   MarketplacePromotionCard,
 } from "@/lib/marketplace/marketplace-reads.functions";
 import { planAllows } from "@/lib/plans/plans-catalog";
@@ -37,6 +35,7 @@ import { ExperienceSubnav } from "@/components/experience-builder/blocks/experie
 import { ExperienceSection } from "@/components/experience-builder/blocks/experience-section/ExperienceSection";
 import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGrid";
 import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar";
+import { ExperienceProductsBlock } from "@/components/experience-builder/blocks/experience-products/ExperienceProductsBlock";
 import {
   businessToHeroDTO,
   businessToSubnavDTO,
@@ -131,9 +130,10 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
   const showPromotions = planAllows(tier, "promotions") && b.promotions.length > 0;
 
   // H-03 · Ola I1.d — Migración a bloques oficiales de la Biblioteca EB.
-  // Hero / Subnav / Section / Info-Grid / CTA-Bar reemplazan al layout
-  // ad-hoc previo. Products y Promotions se conservan como composites
-  // pendientes de migración (evaluación en Closure Report I1.d).
+  // H-03 · Ola I2.a — Products migrado a `vmx.experience.products`.
+  // La plantilla es orquestador puro: sólo declara qué bloques usa,
+  // en qué orden y con qué configuración. Cero JSX propio de listing.
+  // Promotions y Reviews se migrarán en Ola I2.b/I2.c.
   const heroDto = businessToHeroDTO(b);
   const subnavDto = businessToSubnavDTO(b);
   const descriptionSection = businessToDescriptionSectionDTO(b);
@@ -168,44 +168,15 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
       </section>
 
       <section id="servicios" data-eb-anchor className="mt-10 scroll-mt-24">
-        <h2 className="text-xl font-semibold">{variant.productsHeading}</h2>
-        {b.products.length === 0 ? (
-          <p className="mt-2 text-sm text-muted-foreground">{variant.productsEmpty}</p>
-        ) : (
-          <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-            {b.products.map((p: MarketplaceProductCard) => (
-              <li key={p.id} className="rounded-2xl border border-border bg-card p-5">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  {p.product_type}
-                </p>
-                <h3 className="mt-1 font-semibold">{p.name}</h3>
-                {p.tagline ? (
-                  <p className="mt-1 text-sm text-muted-foreground line-clamp-3">{p.tagline}</p>
-                ) : null}
-                {p.price_amount !== null ? (
-                  <p className="mt-2 text-sm font-medium">
-                    {p.price_currency} {Number(p.price_amount).toFixed(2)}
-                  </p>
-                ) : null}
-                <div className="mt-3">
-                  <FavoriteButton entityKind="product" entityId={p.id} />
-                </div>
-                <div className="mt-2">
-                  <ProductActions
-                    product={{
-                      id: p.id,
-                      conversion_mode: p.conversion_mode,
-                      primary_action_label: p.primary_action_label,
-                      secondary_action_mode: p.secondary_action_mode,
-                      secondary_action_label: p.secondary_action_label,
-                      accepts_online_payment: p.accepts_online_payment,
-                    }}
-                  />
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        <ExperienceProductsBlock
+          config={{
+            source: "business",
+            variant: "grid",
+            heading: variant.productsHeading,
+            emptyMessage: variant.productsEmpty,
+            columns: 2,
+          }}
+        />
       </section>
 
       {showPromotions ? (
