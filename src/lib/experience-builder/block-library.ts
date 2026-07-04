@@ -2000,6 +2000,59 @@ const experienceProductsBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+const experiencePromotionsBlock: BlockContract = {
+  type: "vmx.experience.promotions",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Experience Promotions",
+  description:
+    "Oportunidades comerciales reutilizables (promociones, ofertas, descuentos, paquetes, campañas, cupones). Complementa a `vmx.experience.products` sin depender de él.",
+  schema: {
+    source: {
+      type: "select", label: "Fuente", default: "manual",
+      options: [
+        { value: "manual", label: "Manual" },
+        { value: "business", label: "Ficha empresa (contexto)" },
+        { value: "destination", label: "Destino (reservado)" },
+        { value: "region", label: "Región (reservado)" },
+        { value: "category", label: "Categoría (reservado)" },
+        { value: "context", label: "Context Engine (reservado)" },
+        { value: "campaign", label: "Campaña (reservado)" },
+      ],
+    },
+    variant: {
+      type: "select", label: "Variante", default: "grid",
+      options: [
+        { value: "strip", label: "Franja compacta" },
+        { value: "grid", label: "Grid" },
+        { value: "list", label: "Lista" },
+        { value: "carousel", label: "Carrusel" },
+        { value: "featured", label: "Destacada" },
+        { value: "banner", label: "Banner único" },
+      ],
+    },
+    heading: { type: "text", label: "Encabezado", translatable: true },
+    subheading: { type: "text", label: "Subencabezado", translatable: true },
+    emptyMessage: { type: "text", label: "Mensaje vacío", translatable: true, default: "Sin promociones vigentes por ahora." },
+    columns: { type: "number", label: "Columnas", default: 2 },
+    maxItems: { type: "number", label: "Máximo de items" },
+    groupBy: {
+      type: "select", label: "Agrupar por", default: "none",
+      options: [
+        { value: "none", label: "Sin agrupar" },
+        { value: "business", label: "Negocio" },
+        { value: "urgency", label: "Urgencia" },
+      ],
+    },
+    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Promociones y oportunidades", translatable: true },
+  },
+  capabilities: { soporta_i18n: true, soporta_seo: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  constraints: {},
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "columns"] },
+  i18n: { translatable_fields: ["heading", "subheading", "emptyMessage", "ariaLabel"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
@@ -2074,6 +2127,8 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   experienceFeaturesBlock,
   // H-03 · Ola I2.a — Experience Products.
   experienceProductsBlock,
+  // H-03 · Ola I2.b — Experience Promotions.
+  experiencePromotionsBlock,
 ];
 
 let bootstrapped = false;
