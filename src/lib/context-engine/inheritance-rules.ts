@@ -46,6 +46,17 @@ export const DEFAULT_INHERITANCE_RULES: readonly InheritanceRule[] = [
   { from: "restaurant", to: "restaurant", slots: ["region", "destination", "category"] },
   { from: "experience", to: "experience", slots: ["region", "destination", "category"] },
   { from: "destination", to: "destination", slots: ["region"] },
+  // Back-navigation — el usuario regresa (browser back o link) desde
+  // una ficha de detalle a una categoría/superficie plana. Sin estas
+  // reglas el `previous` (= detalle recién visto) rompe la cadena y
+  // se pierde el territorio ya conocido. Sólo heredamos territorio,
+  // nunca la ficha como ancestro.
+  { from: "business", to: "category", slots: ["region", "destination"] },
+  { from: "product", to: "category", slots: ["region", "destination"] },
+  { from: "event", to: "category", slots: ["region", "destination"] },
+  { from: "hotel", to: "category", slots: ["region", "destination"] },
+  { from: "restaurant", to: "category", slots: ["region", "destination"] },
+  { from: "experience", to: "category", slots: ["region", "destination"] },
 ];
 
 export function findInheritanceRule(
