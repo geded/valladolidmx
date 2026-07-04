@@ -29,6 +29,7 @@ import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { ProtectedActionResumeRunner } from "@/lib/protected-actions";
 import { SignInPromptSheet } from "@/components/protected-actions/SignInPromptSheet";
+import { GlobalNavigationSessionBridge } from "@/components/navigation/NavigationSessionBridge";
 
 const rootPublishedHomeQuery = queryOptions({
   queryKey: ["eb", "published-home", "default"],
@@ -195,6 +196,12 @@ function RootComponent() {
         <ProtectedActionResumeRunner />
         {/* OLA H-01 · Épica 1 · I2 — host global del gate de identidad. */}
         <SignInPromptSheet />
+        {/*
+          Navigation Blueprint · N3 — Único punto de suscripción global
+          al Context Engine para persistir la cadena territorial en
+          sessionStorage (deep-links, refresh, back/forward).
+        */}
+        <GlobalNavigationSessionBridge />
         </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>

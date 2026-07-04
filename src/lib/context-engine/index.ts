@@ -24,3 +24,8 @@ export {
   subscribeContextEngineEvents,
   emitContextEngineEvent,
 } from "./events";
+export {
+  publishResolvedContext,
+  subscribeResolvedContext,
+  getLatestResolvedContext,
+} from "./live-context";

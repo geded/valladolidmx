@@ -24,6 +24,7 @@ import {
   type ReactNode,
 } from "react";
 import { emitContextEngineEvent } from "./events";
+import { publishResolvedContext } from "./live-context";
 import {
   readPreviousContext,
   writePreviousContext,
@@ -105,6 +106,8 @@ export function ContextEngineProvider({
     const href = result.context.canonical;
     if (lastEmittedHref.current === href) return;
     lastEmittedHref.current = href;
+
+    publishResolvedContext(result.context);
 
     emitContextEngineEvent("context_engine.resolved", {
       kind: result.context.current.kind,
