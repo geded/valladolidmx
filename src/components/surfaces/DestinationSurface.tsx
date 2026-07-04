@@ -1,5 +1,5 @@
 /**
- * H-03 · Ola I3.a — DestinationSurface (Plantilla Madre)
+ * H-03 · Ola I3.a/I3.b — DestinationSurface (Plantilla Madre)
  *
  * Segunda Plantilla Madre de referencia, tras BusinessSurface (I2.d).
  * Sigue el mismo patrón arquitectónico aprobado por el Founder:
@@ -15,16 +15,14 @@
  * componente presentacional se dibuja aquí — se compone desde la
  * Biblioteca Oficial del Experience Builder.
  *
- * EXCEPCIÓN ARQUITECTÓNICA DOCUMENTADA (transitoria, I3.b):
- * las secciones "Empresas del destino / Eventos próximos / Productos
- * destacados" aún se renderizan con `<section>` + tiles porque la
- * Biblioteca no expone todavía `vmx.experience.related-collection`
- * (bloque candidato — evolucionar antes de duplicar Products/Events).
- * Este JSX transitorio queda aislado en `LegacyRelatedComposition`,
- * marcado con TODO y se elimina al cerrar I3.b.
+ * I3.b — La excepción transitoria `LegacyRelatedComposition` queda
+ * ELIMINADA. Empresas, eventos y productos del destino se orquestan
+ * ahora a través del bloque oficial `vmx.experience.related-collection`
+ * (Motor de Descubrimiento) declarado con `source: "destination"` y
+ * `groups[]` heterogéneos (business/event/product).
  */
 import { createContext, useContext } from "react";
-import { useParams, Link } from "@tanstack/react-router";
+import { useParams } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
@@ -32,13 +30,13 @@ import type {
   PublicDestinationDTO,
   DestinationRelatedDTO,
 } from "@/lib/destinations/public-reads.functions";
-import { BusinessTile } from "@/components/surfaces/MarketplaceSurface";
 import { DiscoveryNavigatorBlock } from "@/components/experience-builder/blocks/DiscoveryNavigatorBlock";
 import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
 import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
 import { ExperienceSection } from "@/components/experience-builder/blocks/experience-section/ExperienceSection";
 import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGrid";
 import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar";
+import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 import {
   toDestinationBlockInput,
   destinationToHeroDTO,
@@ -159,7 +157,83 @@ export function DestinationSurface({
             </section>
           ) : null}
 
-          {rel ? <LegacyRelatedComposition related={rel} /> : null}
+          {rel ? (
+            <section id="descubre" data-eb-anchor className="scroll-mt-24">
+              <ExperienceRelatedCollectionBlock
+                config={{
+                  source: "destination",
+                  entityKind: "mixed",
+                  variant: "grid",
+                  columns: 2,
+                  heading: "Sigue descubriendo",
+                  subheading: `Empresas, eventos y experiencias de ${input.name} para continuar construyendo tu viaje.`,
+                  emptyMessage:
+                    "Aún no hay negocios ni experiencias publicadas para este destino.",
+                  ariaLabel: `Descubrimiento contextual en ${input.name}`,
+                  groups: [
+                    {
+                      id: "hoteles",
+                      entityKind: "hotel",
+                      heading: "Hoteles y hospedajes",
+                      maxItems: 6,
+                      variant: "grid",
+                      seeAllHref: `/marketplace?destino=${encodeURIComponent(slug ?? "")}&categoria=hoteles`,
+                      seeAllLabel: "Ver hoteles",
+                    },
+                    {
+                      id: "restaurantes",
+                      entityKind: "restaurant",
+                      heading: "Restaurantes",
+                      maxItems: 6,
+                      variant: "grid",
+                      seeAllHref: `/marketplace?destino=${encodeURIComponent(slug ?? "")}&categoria=restaurantes`,
+                      seeAllLabel: "Ver restaurantes",
+                    },
+                    {
+                      id: "experiencias",
+                      entityKind: "experience",
+                      heading: "Experiencias y rutas",
+                      maxItems: 6,
+                      variant: "grid",
+                      seeAllHref: `/marketplace?destino=${encodeURIComponent(slug ?? "")}&categoria=experiencias`,
+                      seeAllLabel: "Ver experiencias",
+                    },
+                    {
+                      id: "eventos",
+                      entityKind: "event",
+                      heading: "Próximos eventos",
+                      maxItems: 6,
+                      variant: "list",
+                      seeAllHref: "/eventos",
+                      seeAllLabel: "Ver agenda",
+                    },
+                    {
+                      id: "productos",
+                      entityKind: "product",
+                      heading: "Productos destacados",
+                      maxItems: 8,
+                      variant: "grid",
+                      seeAllHref: `/marketplace?destino=${encodeURIComponent(slug ?? "")}`,
+                      seeAllLabel: "Ver marketplace",
+                    },
+                  ],
+                  capabilities: {
+                    showImage: true,
+                    showMeta: true,
+                    showBadges: true,
+                    showPrice: true,
+                    showDate: true,
+                    showKindBadge: true,
+                    dedupe: true,
+                  },
+                  contextRefs: {
+                    destinationSlug: slug ?? null,
+                    regionSlug: ORIENTE_MAYA.slug,
+                  },
+                }}
+              />
+            </section>
+          ) : null}
         </div>
         <aside className="space-y-4">
           <DiscoveryNavigatorBlock
@@ -178,123 +252,5 @@ export function DestinationSurface({
 
       <ExperienceCtaBar dto={ctaBarDto} />
     </PublicShell>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * EXCEPCIÓN ARQUITECTÓNICA DOCUMENTADA (transitoria, retirar en I3.b)
- *
- * Razón: la Biblioteca Oficial no expone todavía un bloque
- * `vmx.experience.related-collection` capaz de renderizar colecciones
- * heterogéneas (empresas + eventos + productos) con tiles del
- * marketplace. Crear ese bloque debe ser una evolución cuidadosa (no
- * duplicar Products/Events), por lo que se pospone a I3.b tras
- * aprobación explícita del Founder. Mientras tanto, este JSX se
- * mantiene aislado — nunca en el árbol de orquestación principal — y
- * respeta el contrato visual actual (cero regresión).
- * ------------------------------------------------------------------ */
-function LegacyRelatedComposition({ related }: { related: DestinationRelatedDTO }) {
-  const totalRelated =
-    related.hoteles.length +
-    related.restaurantes.length +
-    related.experiencias.length +
-    related.otras.length +
-    related.productos.length +
-    (related.eventos?.length ?? 0);
-
-  return (
-    <div className="space-y-10">
-      <section id="empresas" data-eb-anchor className="scroll-mt-24 space-y-10">
-        <LegacyBusinessGroup title="Hoteles y hospedajes" items={related.hoteles} />
-        <LegacyBusinessGroup title="Restaurantes" items={related.restaurantes} />
-        <LegacyBusinessGroup title="Experiencias y rutas" items={related.experiencias} />
-        <LegacyBusinessGroup title="Otras empresas del destino" items={related.otras} />
-      </section>
-      {related.eventos && related.eventos.length > 0 ? (
-        <section id="eventos" data-eb-anchor className="scroll-mt-24">
-          <h2 className="text-2xl">Próximos eventos</h2>
-          <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-            {related.eventos.slice(0, 6).map((e) => (
-              <li
-                key={e.id}
-                className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary"
-              >
-                <Link to="/eventos/$slug" params={{ slug: e.slug }} className="block">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                    {new Date(e.starts_at).toLocaleDateString("es-MX", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </p>
-                  <h3 className="mt-1 text-base font-semibold">{e.title}</h3>
-                  {e.summary ? (
-                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                      {e.summary}
-                    </p>
-                  ) : null}
-                  {e.venue_name ? (
-                    <p className="mt-2 text-xs text-muted-foreground">{e.venue_name}</p>
-                  ) : null}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-      {related.productos.length > 0 ? (
-        <section id="productos" data-eb-anchor className="scroll-mt-24">
-          <h2 className="text-2xl">Productos destacados</h2>
-          <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-            {related.productos.slice(0, 8).map((p) => (
-              <li
-                key={p.id}
-                className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary"
-              >
-                <Link to="/producto/$slug" params={{ slug: p.slug }} className="block">
-                  <h3 className="text-base font-semibold">{p.name}</h3>
-                  {p.tagline ? (
-                    <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                      {p.tagline}
-                    </p>
-                  ) : null}
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    {p.business_name}
-                    {p.price_amount != null
-                      ? ` · ${p.price_currency} ${p.price_amount}`
-                      : ""}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-      {totalRelated === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          Aún no hay negocios ni experiencias publicadas para este destino.
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
-function LegacyBusinessGroup({
-  title,
-  items,
-}: {
-  title: string;
-  items: DestinationRelatedDTO["hoteles"];
-}) {
-  if (items.length === 0) return null;
-  return (
-    <section>
-      <h2 className="text-2xl">{title}</h2>
-      <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-        {items.slice(0, 6).map((b) => (
-          <BusinessTile key={b.id} item={b} />
-        ))}
-      </ul>
-    </section>
   );
 }
