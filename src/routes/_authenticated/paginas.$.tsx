@@ -9,6 +9,6 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/paginas/$")({
   beforeLoad: () => {
-    throw redirect({ to: "/cms/experience-builder", search: { mode: "visual", page: "home" } });
+    throw redirect({ to: "/cms/experience-builder", search: { mode: "visual", page: "home", block: undefined } });
   },
 });
