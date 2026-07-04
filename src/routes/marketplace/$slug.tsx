@@ -4,7 +4,7 @@
  * Lectura read-only vía marketplace-reads.functions.ts. head() emite
  * título/descripción propios y JSON-LD LocalBusiness derivado del loader.
  */
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
@@ -90,6 +90,22 @@ export const Route = createFileRoute("/marketplace/$slug")({
   loader: async ({ params }) => {
     const business = await getMarketplaceBusinessBySlug({ data: { slug: params.slug } });
     if (!business) throw notFound();
+    // US-E3.2 · Fase A — retiro terminología Marketplace.
+    // Si la empresa ya tiene destino y categoría publicados, la ruta
+    // canónica es territorial: emitimos 301 hacia
+    // `/oriente-maya/:destino/:categoria/:empresa`. Sólo servimos la
+    // vista legacy cuando aún falta migración territorial (backfill).
+    if (business.destination_slug && business.category_slug) {
+      throw redirect({
+        href: resolveCanonicalPath({
+          kind: "business",
+          slug: business.slug,
+          category: business.category_slug,
+          destination: business.destination_slug,
+        }),
+        code: 301,
+      });
+    }
     // US-R3 · Ola 2 · Sub-ola 2.2 — la ficha se sirve desde la
     // Plantilla Madre Business (`__tpl_business__`). Fallback seguro a
     // `<BusinessSurface />` si la composición no existe todavía.

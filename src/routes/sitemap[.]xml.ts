@@ -32,7 +32,6 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/arma-tu-viaje", changefreq: "monthly", priority: "0.9" },
   { path: "/alux", changefreq: "monthly", priority: "0.7" },
   { path: "/empresas", changefreq: "monthly", priority: "0.7" },
-  { path: "/marketplace", changefreq: "weekly", priority: "0.7" },
 ];
 
 const LANDING_KINDS = new Set(["landing", "campaign", "micrositio", "promotion"]);
@@ -77,40 +76,36 @@ export const Route = createFileRoute("/sitemap.xml")({
             changefreq: "weekly" as const,
             priority: "0.8",
           })),
-          // Sub-ola N2.3 · Fase 1 — sitemap emite la URL territorial
-          // cuando la empresa tiene destino y categoría publicados.
-          // Fallback a la URL legacy (`/marketplace/:slug`,
-          // `/producto/:slug`) sólo si falta destino o categoría.
-          // Rutas legacy siguen 200 OK; no se emiten 301 todavía.
-          ...entities.empresas.map((r) => ({
-            path:
-              r.destination_slug && r.category_slug
-                ? resolveCanonicalPath({
-                    kind: "business",
-                    slug: r.slug,
-                    category: r.category_slug,
-                    destination: r.destination_slug,
-                  })
-                : `/marketplace/${r.slug}`,
-            lastmod: r.updated_at ?? undefined,
-            changefreq: "weekly" as const,
-            priority: "0.7",
-          })),
-          ...entities.productos.map((r) => ({
-            path:
-              r.destination_slug && r.category_slug && r.business_slug
-                ? resolveCanonicalPath({
-                    kind: "product",
-                    slug: r.slug,
-                    business: r.business_slug,
-                    category: r.category_slug,
-                    destination: r.destination_slug,
-                  })
-                : `/producto/${r.slug}`,
-            lastmod: r.updated_at ?? undefined,
-            changefreq: "weekly" as const,
-            priority: "0.6",
-          })),
+          // US-E3.2 · Fase A — sólo emitimos URLs canónicas territoriales.
+          // Empresas y productos sin destino/categoría publicados se
+          // omiten del sitemap (evitamos listar rutas que redirigen 301).
+          ...entities.empresas
+            .filter((r) => r.destination_slug && r.category_slug)
+            .map((r) => ({
+              path: resolveCanonicalPath({
+                kind: "business",
+                slug: r.slug,
+                category: r.category_slug!,
+                destination: r.destination_slug!,
+              }),
+              lastmod: r.updated_at ?? undefined,
+              changefreq: "weekly" as const,
+              priority: "0.7",
+            })),
+          ...entities.productos
+            .filter((r) => r.destination_slug && r.category_slug && r.business_slug)
+            .map((r) => ({
+              path: resolveCanonicalPath({
+                kind: "product",
+                slug: r.slug,
+                business: r.business_slug!,
+                category: r.category_slug!,
+                destination: r.destination_slug!,
+              }),
+              lastmod: r.updated_at ?? undefined,
+              changefreq: "weekly" as const,
+              priority: "0.6",
+            })),
           ...entities.eventos.map((r) => ({
             path: `/eventos/${r.slug}`,
             lastmod: r.updated_at ?? undefined,
