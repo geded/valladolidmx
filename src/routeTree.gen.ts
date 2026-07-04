@@ -65,6 +65,7 @@ import { Route as AuthenticatedConciergeIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticated/cms/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as PreviewCompositionTokenRouteImport } from './routes/preview/composition.$token'
+import { Route as OrienteMayaDestinoCategoriaRouteImport } from './routes/oriente-maya/$destino.$categoria'
 import { Route as AuthenticatedPortalPropiedadRouteImport } from './routes/_authenticated/portal/propiedad'
 import { Route as AuthenticatedPortalPresenciaRouteImport } from './routes/_authenticated/portal/presencia'
 import { Route as AuthenticatedPortalPagosRouteImport } from './routes/_authenticated/portal/pagos'
@@ -433,6 +434,12 @@ const PreviewCompositionTokenRoute = PreviewCompositionTokenRouteImport.update({
   path: '/preview/composition/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrienteMayaDestinoCategoriaRoute =
+  OrienteMayaDestinoCategoriaRouteImport.update({
+    id: '/$categoria',
+    path: '/$categoria',
+    getParentRoute: () => OrienteMayaDestinoRoute,
+  } as any)
 const AuthenticatedPortalPropiedadRoute =
   AuthenticatedPortalPropiedadRouteImport.update({
     id: '/propiedad',
@@ -605,9 +612,9 @@ const AuthenticatedAdminConciergeRoute =
   } as any)
 const OrienteMayaDestinoCategoriaIndexRoute =
   OrienteMayaDestinoCategoriaIndexRouteImport.update({
-    id: '/$categoria/',
-    path: '/$categoria/',
-    getParentRoute: () => OrienteMayaDestinoRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => OrienteMayaDestinoCategoriaRoute,
   } as any)
 const AuthenticatedPortalInvitacionesIndexRoute =
   AuthenticatedPortalInvitacionesIndexRouteImport.update({
@@ -783,15 +790,15 @@ const AuthenticatedAdminSistemaUsuariosRoute =
   } as any)
 const OrienteMayaDestinoCategoriaEmpresaIndexRoute =
   OrienteMayaDestinoCategoriaEmpresaIndexRouteImport.update({
-    id: '/$categoria/$empresa/',
-    path: '/$categoria/$empresa/',
-    getParentRoute: () => OrienteMayaDestinoRoute,
+    id: '/$empresa/',
+    path: '/$empresa/',
+    getParentRoute: () => OrienteMayaDestinoCategoriaRoute,
   } as any)
 const OrienteMayaDestinoCategoriaEmpresaProductoRoute =
   OrienteMayaDestinoCategoriaEmpresaProductoRouteImport.update({
-    id: '/$categoria/$empresa/$producto',
-    path: '/$categoria/$empresa/$producto',
-    getParentRoute: () => OrienteMayaDestinoRoute,
+    id: '/$empresa/$producto',
+    path: '/$empresa/$producto',
+    getParentRoute: () => OrienteMayaDestinoCategoriaRoute,
   } as any)
 const ApiPublicPaymentsProviderWebhookRoute =
   ApiPublicPaymentsProviderWebhookRouteImport.update({
@@ -932,6 +939,7 @@ export interface FileRoutesByFullPath {
   '/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
+  '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/cms/': typeof AuthenticatedCmsIndexRoute
@@ -1183,6 +1191,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/_authenticated/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/_authenticated/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
+  '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
@@ -1313,6 +1322,7 @@ export interface FileRouteTypes {
     | '/portal/pagos'
     | '/portal/presencia'
     | '/portal/propiedad'
+    | '/oriente-maya/$destino/$categoria'
     | '/preview/composition/$token'
     | '/admin/'
     | '/cms/'
@@ -1563,6 +1573,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/pagos'
     | '/_authenticated/portal/presencia'
     | '/_authenticated/portal/propiedad'
+    | '/oriente-maya/$destino/$categoria'
     | '/preview/composition/$token'
     | '/_authenticated/admin/'
     | '/_authenticated/cms/'
@@ -2058,6 +2069,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PreviewCompositionTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/oriente-maya/$destino/$categoria': {
+      id: '/oriente-maya/$destino/$categoria'
+      path: '/$categoria'
+      fullPath: '/oriente-maya/$destino/$categoria'
+      preLoaderRoute: typeof OrienteMayaDestinoCategoriaRouteImport
+      parentRoute: typeof OrienteMayaDestinoRoute
+    }
     '/_authenticated/portal/propiedad': {
       id: '/_authenticated/portal/propiedad'
       path: '/propiedad'
@@ -2263,10 +2281,10 @@ declare module '@tanstack/react-router' {
     }
     '/oriente-maya/$destino/$categoria/': {
       id: '/oriente-maya/$destino/$categoria/'
-      path: '/$categoria'
+      path: '/'
       fullPath: '/oriente-maya/$destino/$categoria/'
       preLoaderRoute: typeof OrienteMayaDestinoCategoriaIndexRouteImport
-      parentRoute: typeof OrienteMayaDestinoRoute
+      parentRoute: typeof OrienteMayaDestinoCategoriaRoute
     }
     '/_authenticated/portal/invitaciones/': {
       id: '/_authenticated/portal/invitaciones/'
@@ -2473,17 +2491,17 @@ declare module '@tanstack/react-router' {
     }
     '/oriente-maya/$destino/$categoria/$empresa/': {
       id: '/oriente-maya/$destino/$categoria/$empresa/'
-      path: '/$categoria/$empresa'
+      path: '/$empresa'
       fullPath: '/oriente-maya/$destino/$categoria/$empresa/'
       preLoaderRoute: typeof OrienteMayaDestinoCategoriaEmpresaIndexRouteImport
-      parentRoute: typeof OrienteMayaDestinoRoute
+      parentRoute: typeof OrienteMayaDestinoCategoriaRoute
     }
     '/oriente-maya/$destino/$categoria/$empresa/$producto': {
       id: '/oriente-maya/$destino/$categoria/$empresa/$producto'
-      path: '/$categoria/$empresa/$producto'
+      path: '/$empresa/$producto'
       fullPath: '/oriente-maya/$destino/$categoria/$empresa/$producto'
       preLoaderRoute: typeof OrienteMayaDestinoCategoriaEmpresaProductoRouteImport
-      parentRoute: typeof OrienteMayaDestinoRoute
+      parentRoute: typeof OrienteMayaDestinoCategoriaRoute
     }
     '/api/public/payments/$provider/webhook': {
       id: '/api/public/payments/$provider/webhook'
@@ -2861,20 +2879,36 @@ const EventosRouteChildren: EventosRouteChildren = {
 const EventosRouteWithChildren =
   EventosRoute._addFileChildren(EventosRouteChildren)
 
-interface OrienteMayaDestinoRouteChildren {
-  OrienteMayaDestinoIndexRoute: typeof OrienteMayaDestinoIndexRoute
+interface OrienteMayaDestinoCategoriaRouteChildren {
   OrienteMayaDestinoCategoriaIndexRoute: typeof OrienteMayaDestinoCategoriaIndexRoute
   OrienteMayaDestinoCategoriaEmpresaProductoRoute: typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
   OrienteMayaDestinoCategoriaEmpresaIndexRoute: typeof OrienteMayaDestinoCategoriaEmpresaIndexRoute
 }
 
+const OrienteMayaDestinoCategoriaRouteChildren: OrienteMayaDestinoCategoriaRouteChildren =
+  {
+    OrienteMayaDestinoCategoriaIndexRoute:
+      OrienteMayaDestinoCategoriaIndexRoute,
+    OrienteMayaDestinoCategoriaEmpresaProductoRoute:
+      OrienteMayaDestinoCategoriaEmpresaProductoRoute,
+    OrienteMayaDestinoCategoriaEmpresaIndexRoute:
+      OrienteMayaDestinoCategoriaEmpresaIndexRoute,
+  }
+
+const OrienteMayaDestinoCategoriaRouteWithChildren =
+  OrienteMayaDestinoCategoriaRoute._addFileChildren(
+    OrienteMayaDestinoCategoriaRouteChildren,
+  )
+
+interface OrienteMayaDestinoRouteChildren {
+  OrienteMayaDestinoCategoriaRoute: typeof OrienteMayaDestinoCategoriaRouteWithChildren
+  OrienteMayaDestinoIndexRoute: typeof OrienteMayaDestinoIndexRoute
+}
+
 const OrienteMayaDestinoRouteChildren: OrienteMayaDestinoRouteChildren = {
+  OrienteMayaDestinoCategoriaRoute:
+    OrienteMayaDestinoCategoriaRouteWithChildren,
   OrienteMayaDestinoIndexRoute: OrienteMayaDestinoIndexRoute,
-  OrienteMayaDestinoCategoriaIndexRoute: OrienteMayaDestinoCategoriaIndexRoute,
-  OrienteMayaDestinoCategoriaEmpresaProductoRoute:
-    OrienteMayaDestinoCategoriaEmpresaProductoRoute,
-  OrienteMayaDestinoCategoriaEmpresaIndexRoute:
-    OrienteMayaDestinoCategoriaEmpresaIndexRoute,
 }
 
 const OrienteMayaDestinoRouteWithChildren =
