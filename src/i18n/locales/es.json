@@ -93,5 +93,14 @@
     "unexpected": "Error inesperado",
     "eyebrow": "Cuenta",
     "subtitle": "Accede para guardar tus viajes, favoritos y conversar con Alux."
+  },
+  "protected_actions": {
+    "title": "Necesitas iniciar sesión",
+    "description": "Continúa donde lo dejaste después de identificarte.",
+    "dismiss": "Ahora no",
+    "magic_cta": "Enviarme enlace mágico",
+    "magic_sent": "Revisa tu correo",
+    "email_required": "Escribe tu correo",
+    "go_full_auth": "Prefiero la página de acceso"
   }
 }
