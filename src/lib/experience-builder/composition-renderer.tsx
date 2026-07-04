@@ -88,6 +88,22 @@ import {
   ExperienceCtaBarBlock,
   ExperienceCtaBarPreview,
 } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBarBlock";
+import {
+  ExperienceGalleryBlock,
+  ExperienceGalleryPreview,
+} from "@/components/experience-builder/blocks/experience-gallery/ExperienceGalleryBlock";
+import {
+  ExperienceInfoGridBlock,
+  ExperienceInfoGridPreview,
+} from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGridBlock";
+import {
+  ExperienceSectionBlock,
+  ExperienceSectionPreview,
+} from "@/components/experience-builder/blocks/experience-section/ExperienceSectionBlock";
+import {
+  ExperienceFeaturesBlock,
+  ExperienceFeaturesPreview,
+} from "@/components/experience-builder/blocks/experience-features/ExperienceFeaturesBlock";
 
 /**
  * US-R3 · Sub-ola 2.5d — mapa de renderers `vmx.kit.*`. Se expande de
