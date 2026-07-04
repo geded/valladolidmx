@@ -15,6 +15,35 @@ import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-r
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { RegionSurface } from "@/components/surfaces/RegionSurface";
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
+import {
+  ContextEngineProvider,
+  defineRouteContext,
+  type RouteContextDeclaration,
+} from "@/lib/context-engine";
+
+/**
+ * H-02 · I7 · Fila 1 — Región-hub declara contexto raíz.
+ *
+ * Sin ancestros ni herencia (es la raíz territorial). El provider se
+ * monta a nivel de ruta y envuelve tanto la composición EB como el
+ * fallback `RegionSurface`. Su función principal aquí es persistir
+ * `previous = region:oriente-maya` en sessionStorage para que rutas
+ * hijas (categorías planas, fichas) puedan heredar territorio.
+ *
+ * `canonical` = `/oriente-maya` (idéntico al legacy — no toca SEO).
+ */
+function buildRegionContext(): RouteContextDeclaration {
+  return defineRouteContext({
+    current: {
+      kind: "region",
+      slug: ORIENTE_MAYA.slug,
+      label: ORIENTE_MAYA.name,
+      href: "/oriente-maya",
+    },
+    ancestors: [],
+    canonical: "/oriente-maya",
+  });
+}
 
 export const Route = createFileRoute("/oriente-maya/")({
   loader: async () => {
@@ -40,9 +69,16 @@ export const Route = createFileRoute("/oriente-maya/")({
 
 function OrienteMayaIndex() {
   const { composition, destinations } = Route.useLoaderData();
-  return composition ? (
-    <CompositionRenderer tree={composition.snapshot} />
-  ) : (
-    <RegionSurface destinations={destinations} />
+  const declaration = buildRegionContext();
+  // Provider a nivel de ruta — igual patrón que I3 en `/oriente-maya/$destino`.
+  // Cubre las dos ramas de render (EB y fallback) sin tocar sus shells.
+  return (
+    <ContextEngineProvider declaration={declaration}>
+      {composition ? (
+        <CompositionRenderer tree={composition.snapshot} />
+      ) : (
+        <RegionSurface destinations={destinations} />
+      )}
+    </ContextEngineProvider>
   );
 }
