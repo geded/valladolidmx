@@ -40,6 +40,7 @@ import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/wo
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
 import { Route as LovableProtectedActionsPreviewRouteImport } from './routes/lovable/protected-actions-preview'
 import { Route as LovableExperienceSubnavCtabarPreviewRouteImport } from './routes/lovable/experience-subnav-ctabar-preview'
+import { Route as LovableExperienceI1cPreviewRouteImport } from './routes/lovable/experience-i1c-preview'
 import { Route as LovableExperienceHeroPreviewRouteImport } from './routes/lovable/experience-hero-preview'
 import { Route as LovableContextEnginePreviewRouteImport } from './routes/lovable/context-engine-preview'
 import { Route as LSlugRouteImport } from './routes/l.$slug'
@@ -282,6 +283,12 @@ const LovableExperienceSubnavCtabarPreviewRoute =
   LovableExperienceSubnavCtabarPreviewRouteImport.update({
     id: '/lovable/experience-subnav-ctabar-preview',
     path: '/lovable/experience-subnav-ctabar-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableExperienceI1cPreviewRoute =
+  LovableExperienceI1cPreviewRouteImport.update({
+    id: '/lovable/experience-i1c-preview',
+    path: '/lovable/experience-i1c-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableExperienceHeroPreviewRoute =
@@ -816,6 +823,7 @@ export interface FileRoutesByFullPath {
   '/l/$slug': typeof LSlugRoute
   '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
   '/lovable/experience-hero-preview': typeof LovableExperienceHeroPreviewRoute
+  '/lovable/experience-i1c-preview': typeof LovableExperienceI1cPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -929,6 +937,7 @@ export interface FileRoutesByTo {
   '/l/$slug': typeof LSlugRoute
   '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
   '/lovable/experience-hero-preview': typeof LovableExperienceHeroPreviewRoute
+  '/lovable/experience-i1c-preview': typeof LovableExperienceI1cPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1048,6 +1057,7 @@ export interface FileRoutesById {
   '/l/$slug': typeof LSlugRoute
   '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
   '/lovable/experience-hero-preview': typeof LovableExperienceHeroPreviewRoute
+  '/lovable/experience-i1c-preview': typeof LovableExperienceI1cPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1168,6 +1178,7 @@ export interface FileRouteTypes {
     | '/l/$slug'
     | '/lovable/context-engine-preview'
     | '/lovable/experience-hero-preview'
+    | '/lovable/experience-i1c-preview'
     | '/lovable/experience-subnav-ctabar-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/workspace-foundations'
@@ -1281,6 +1292,7 @@ export interface FileRouteTypes {
     | '/l/$slug'
     | '/lovable/context-engine-preview'
     | '/lovable/experience-hero-preview'
+    | '/lovable/experience-i1c-preview'
     | '/lovable/experience-subnav-ctabar-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/workspace-foundations'
@@ -1399,6 +1411,7 @@ export interface FileRouteTypes {
     | '/l/$slug'
     | '/lovable/context-engine-preview'
     | '/lovable/experience-hero-preview'
+    | '/lovable/experience-i1c-preview'
     | '/lovable/experience-subnav-ctabar-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/workspace-foundations'
@@ -1510,6 +1523,7 @@ export interface RootRouteChildren {
   LSlugRoute: typeof LSlugRoute
   LovableContextEnginePreviewRoute: typeof LovableContextEnginePreviewRoute
   LovableExperienceHeroPreviewRoute: typeof LovableExperienceHeroPreviewRoute
+  LovableExperienceI1cPreviewRoute: typeof LovableExperienceI1cPreviewRoute
   LovableExperienceSubnavCtabarPreviewRoute: typeof LovableExperienceSubnavCtabarPreviewRoute
   LovableProtectedActionsPreviewRoute: typeof LovableProtectedActionsPreviewRoute
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
@@ -1748,6 +1762,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/experience-subnav-ctabar-preview'
       fullPath: '/lovable/experience-subnav-ctabar-preview'
       preLoaderRoute: typeof LovableExperienceSubnavCtabarPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/experience-i1c-preview': {
+      id: '/lovable/experience-i1c-preview'
+      path: '/lovable/experience-i1c-preview'
+      fullPath: '/lovable/experience-i1c-preview'
+      preLoaderRoute: typeof LovableExperienceI1cPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/experience-hero-preview': {
@@ -2681,6 +2702,7 @@ const rootRouteChildren: RootRouteChildren = {
   LSlugRoute: LSlugRoute,
   LovableContextEnginePreviewRoute: LovableContextEnginePreviewRoute,
   LovableExperienceHeroPreviewRoute: LovableExperienceHeroPreviewRoute,
+  LovableExperienceI1cPreviewRoute: LovableExperienceI1cPreviewRoute,
   LovableExperienceSubnavCtabarPreviewRoute:
     LovableExperienceSubnavCtabarPreviewRoute,
   LovableProtectedActionsPreviewRoute: LovableProtectedActionsPreviewRoute,
