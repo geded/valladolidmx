@@ -64,6 +64,7 @@ import { Route as AuthenticatedConciergeIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticated/cms/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as PreviewCompositionTokenRouteImport } from './routes/preview/composition.$token'
+import { Route as OrienteMayaDestinoCategoriaRouteImport } from './routes/oriente-maya/$destino.$categoria'
 import { Route as AuthenticatedPortalPropiedadRouteImport } from './routes/_authenticated/portal/propiedad'
 import { Route as AuthenticatedPortalPresenciaRouteImport } from './routes/_authenticated/portal/presencia'
 import { Route as AuthenticatedPortalPagosRouteImport } from './routes/_authenticated/portal/pagos'
@@ -103,6 +104,7 @@ import { Route as AuthenticatedCmsEmpresasIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedCmsDestinosIndexRouteImport } from './routes/_authenticated/cms/destinos.index'
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
 import { Route as AuthenticatedAdminSistemaIndexRouteImport } from './routes/_authenticated/admin/sistema.index'
+import { Route as OrienteMayaDestinoCategoriaEmpresaRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -122,6 +124,7 @@ import { Route as AuthenticatedCmsEmpresasNuevaRouteImport } from './routes/_aut
 import { Route as AuthenticatedCmsDestinosNuevaRouteImport } from './routes/_authenticated/cms/destinos.nueva'
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
 import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/_authenticated/admin/sistema.usuarios'
+import { Route as OrienteMayaDestinoCategoriaEmpresaProductoRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa.$producto'
 import { Route as ApiPublicPaymentsProviderWebhookRouteImport } from './routes/api/public/payments/$provider/webhook'
 import { Route as AuthenticatedPortalProductosProductIdPreviewRouteImport } from './routes/_authenticated/portal/productos.$productId.preview'
 import { Route as AuthenticatedCuentaConciergeCaseIdEvaluarRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId.evaluar'
@@ -424,6 +427,12 @@ const PreviewCompositionTokenRoute = PreviewCompositionTokenRouteImport.update({
   path: '/preview/composition/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrienteMayaDestinoCategoriaRoute =
+  OrienteMayaDestinoCategoriaRouteImport.update({
+    id: '/$categoria',
+    path: '/$categoria',
+    getParentRoute: () => OrienteMayaDestinoRoute,
+  } as any)
 const AuthenticatedPortalPropiedadRoute =
   AuthenticatedPortalPropiedadRouteImport.update({
     id: '/propiedad',
@@ -654,6 +663,12 @@ const AuthenticatedAdminSistemaIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAdminSistemaRoute,
   } as any)
+const OrienteMayaDestinoCategoriaEmpresaRoute =
+  OrienteMayaDestinoCategoriaEmpresaRouteImport.update({
+    id: '/$empresa',
+    path: '/$empresa',
+    getParentRoute: () => OrienteMayaDestinoCategoriaRoute,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -766,6 +781,12 @@ const AuthenticatedAdminSistemaUsuariosRoute =
     path: '/usuarios',
     getParentRoute: () => AuthenticatedAdminSistemaRoute,
   } as any)
+const OrienteMayaDestinoCategoriaEmpresaProductoRoute =
+  OrienteMayaDestinoCategoriaEmpresaProductoRouteImport.update({
+    id: '/$producto',
+    path: '/$producto',
+    getParentRoute: () => OrienteMayaDestinoCategoriaEmpresaRoute,
+  } as any)
 const ApiPublicPaymentsProviderWebhookRoute =
   ApiPublicPaymentsProviderWebhookRouteImport.update({
     id: '/api/public/payments/$provider/webhook',
@@ -870,7 +891,7 @@ export interface FileRoutesByFullPath {
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
-  '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/oriente-maya/$destino': typeof OrienteMayaDestinoRouteWithChildren
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
@@ -905,6 +926,7 @@ export interface FileRoutesByFullPath {
   '/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
+  '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/cms/': typeof AuthenticatedCmsIndexRoute
@@ -930,6 +952,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaRouteWithChildren
   '/admin/sistema/': typeof AuthenticatedAdminSistemaIndexRoute
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/destinos/': typeof AuthenticatedCmsDestinosIndexRoute
@@ -950,6 +973,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
+  '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -989,7 +1013,7 @@ export interface FileRoutesByTo {
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
-  '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/oriente-maya/$destino': typeof OrienteMayaDestinoRouteWithChildren
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
@@ -1023,6 +1047,7 @@ export interface FileRoutesByTo {
   '/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
+  '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/cms': typeof AuthenticatedCmsIndexRoute
@@ -1048,6 +1073,7 @@ export interface FileRoutesByTo {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaRouteWithChildren
   '/admin/sistema': typeof AuthenticatedAdminSistemaIndexRoute
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosIndexRoute
@@ -1068,6 +1094,7 @@ export interface FileRoutesByTo {
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
+  '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1114,7 +1141,7 @@ export interface FileRoutesById {
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/buscar': typeof MarketplaceBuscarRoute
-  '/oriente-maya/$destino': typeof OrienteMayaDestinoRoute
+  '/oriente-maya/$destino': typeof OrienteMayaDestinoRouteWithChildren
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
@@ -1149,6 +1176,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/_authenticated/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/_authenticated/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
+  '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
@@ -1174,6 +1202,7 @@ export interface FileRoutesById {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaRouteWithChildren
   '/_authenticated/admin/sistema/': typeof AuthenticatedAdminSistemaIndexRoute
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/_authenticated/cms/destinos/': typeof AuthenticatedCmsDestinosIndexRoute
@@ -1194,6 +1223,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
   '/_authenticated/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
+  '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1275,6 +1305,7 @@ export interface FileRouteTypes {
     | '/portal/pagos'
     | '/portal/presencia'
     | '/portal/propiedad'
+    | '/oriente-maya/$destino/$categoria'
     | '/preview/composition/$token'
     | '/admin/'
     | '/cms/'
@@ -1300,6 +1331,7 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/oriente-maya/$destino/$categoria/$empresa'
     | '/admin/sistema/'
     | '/cms/categorias/'
     | '/cms/destinos/'
@@ -1320,6 +1352,7 @@ export interface FileRouteTypes {
     | '/cuenta/concierge/$caseId/evaluar'
     | '/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
+    | '/oriente-maya/$destino/$categoria/$empresa/$producto'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1393,6 +1426,7 @@ export interface FileRouteTypes {
     | '/portal/pagos'
     | '/portal/presencia'
     | '/portal/propiedad'
+    | '/oriente-maya/$destino/$categoria'
     | '/preview/composition/$token'
     | '/admin'
     | '/cms'
@@ -1418,6 +1452,7 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/oriente-maya/$destino/$categoria/$empresa'
     | '/admin/sistema'
     | '/cms/categorias'
     | '/cms/destinos'
@@ -1438,6 +1473,7 @@ export interface FileRouteTypes {
     | '/cuenta/concierge/$caseId/evaluar'
     | '/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
+    | '/oriente-maya/$destino/$categoria/$empresa/$producto'
   id:
     | '__root__'
     | '/'
@@ -1518,6 +1554,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/pagos'
     | '/_authenticated/portal/presencia'
     | '/_authenticated/portal/propiedad'
+    | '/oriente-maya/$destino/$categoria'
     | '/preview/composition/$token'
     | '/_authenticated/admin/'
     | '/_authenticated/cms/'
@@ -1543,6 +1580,7 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/oriente-maya/$destino/$categoria/$empresa'
     | '/_authenticated/admin/sistema/'
     | '/_authenticated/cms/categorias/'
     | '/_authenticated/cms/destinos/'
@@ -1563,6 +1601,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/concierge/$caseId/evaluar'
     | '/_authenticated/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
+    | '/oriente-maya/$destino/$categoria/$empresa/$producto'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1600,7 +1639,7 @@ export interface RootRouteChildren {
   LovableWorkspacePreviewRoute: typeof LovableWorkspacePreviewRoute
   MarketplaceSlugRoute: typeof MarketplaceSlugRoute
   MarketplaceBuscarRoute: typeof MarketplaceBuscarRoute
-  OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRoute
+  OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRouteWithChildren
   PSlugRoute: typeof PSlugRoute
   PreviewTokenRoute: typeof PreviewTokenRoute
   ProductoSlugRoute: typeof ProductoSlugRoute
@@ -2002,6 +2041,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PreviewCompositionTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/oriente-maya/$destino/$categoria': {
+      id: '/oriente-maya/$destino/$categoria'
+      path: '/$categoria'
+      fullPath: '/oriente-maya/$destino/$categoria'
+      preLoaderRoute: typeof OrienteMayaDestinoCategoriaRouteImport
+      parentRoute: typeof OrienteMayaDestinoRoute
+    }
     '/_authenticated/portal/propiedad': {
       id: '/_authenticated/portal/propiedad'
       path: '/propiedad'
@@ -2275,6 +2321,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSistemaIndexRouteImport
       parentRoute: typeof AuthenticatedAdminSistemaRoute
     }
+    '/oriente-maya/$destino/$categoria/$empresa': {
+      id: '/oriente-maya/$destino/$categoria/$empresa'
+      path: '/$empresa'
+      fullPath: '/oriente-maya/$destino/$categoria/$empresa'
+      preLoaderRoute: typeof OrienteMayaDestinoCategoriaEmpresaRouteImport
+      parentRoute: typeof OrienteMayaDestinoCategoriaRoute
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -2407,6 +2460,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/sistema/usuarios'
       preLoaderRoute: typeof AuthenticatedAdminSistemaUsuariosRouteImport
       parentRoute: typeof AuthenticatedAdminSistemaRoute
+    }
+    '/oriente-maya/$destino/$categoria/$empresa/$producto': {
+      id: '/oriente-maya/$destino/$categoria/$empresa/$producto'
+      path: '/$producto'
+      fullPath: '/oriente-maya/$destino/$categoria/$empresa/$producto'
+      preLoaderRoute: typeof OrienteMayaDestinoCategoriaEmpresaProductoRouteImport
+      parentRoute: typeof OrienteMayaDestinoCategoriaEmpresaRoute
     }
     '/api/public/payments/$provider/webhook': {
       id: '/api/public/payments/$provider/webhook'
@@ -2784,6 +2844,48 @@ const EventosRouteChildren: EventosRouteChildren = {
 const EventosRouteWithChildren =
   EventosRoute._addFileChildren(EventosRouteChildren)
 
+interface OrienteMayaDestinoCategoriaEmpresaRouteChildren {
+  OrienteMayaDestinoCategoriaEmpresaProductoRoute: typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
+}
+
+const OrienteMayaDestinoCategoriaEmpresaRouteChildren: OrienteMayaDestinoCategoriaEmpresaRouteChildren =
+  {
+    OrienteMayaDestinoCategoriaEmpresaProductoRoute:
+      OrienteMayaDestinoCategoriaEmpresaProductoRoute,
+  }
+
+const OrienteMayaDestinoCategoriaEmpresaRouteWithChildren =
+  OrienteMayaDestinoCategoriaEmpresaRoute._addFileChildren(
+    OrienteMayaDestinoCategoriaEmpresaRouteChildren,
+  )
+
+interface OrienteMayaDestinoCategoriaRouteChildren {
+  OrienteMayaDestinoCategoriaEmpresaRoute: typeof OrienteMayaDestinoCategoriaEmpresaRouteWithChildren
+}
+
+const OrienteMayaDestinoCategoriaRouteChildren: OrienteMayaDestinoCategoriaRouteChildren =
+  {
+    OrienteMayaDestinoCategoriaEmpresaRoute:
+      OrienteMayaDestinoCategoriaEmpresaRouteWithChildren,
+  }
+
+const OrienteMayaDestinoCategoriaRouteWithChildren =
+  OrienteMayaDestinoCategoriaRoute._addFileChildren(
+    OrienteMayaDestinoCategoriaRouteChildren,
+  )
+
+interface OrienteMayaDestinoRouteChildren {
+  OrienteMayaDestinoCategoriaRoute: typeof OrienteMayaDestinoCategoriaRouteWithChildren
+}
+
+const OrienteMayaDestinoRouteChildren: OrienteMayaDestinoRouteChildren = {
+  OrienteMayaDestinoCategoriaRoute:
+    OrienteMayaDestinoCategoriaRouteWithChildren,
+}
+
+const OrienteMayaDestinoRouteWithChildren =
+  OrienteMayaDestinoRoute._addFileChildren(OrienteMayaDestinoRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -2823,7 +2925,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableWorkspacePreviewRoute: LovableWorkspacePreviewRoute,
   MarketplaceSlugRoute: MarketplaceSlugRoute,
   MarketplaceBuscarRoute: MarketplaceBuscarRoute,
-  OrienteMayaDestinoRoute: OrienteMayaDestinoRoute,
+  OrienteMayaDestinoRoute: OrienteMayaDestinoRouteWithChildren,
   PSlugRoute: PSlugRoute,
   PreviewTokenRoute: PreviewTokenRoute,
   ProductoSlugRoute: ProductoSlugRoute,
