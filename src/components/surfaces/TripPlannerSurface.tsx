@@ -429,16 +429,6 @@ function HowItWorksSection() {
 /* Cierre: siguiente paso                                             */
 /* ------------------------------------------------------------------ */
 
-function NextStepSection({
-  state,
-}: {
-  state: "empty" | "guest" | "authed-empty" | "authed-active";
-}) {
-  // placeholder to satisfy patcher — real fn below
-  void state;
-  return null;
-}
-
 function AluxTeaserSection({ authed }: { authed: boolean }) {
   return (
     <section
@@ -476,7 +466,7 @@ function AluxTeaserSection({ authed }: { authed: boolean }) {
   );
 }
 
-function NextStepSectionReal({
+function NextStepSection({
   state,
 }: {
   state: "empty" | "guest" | "authed-empty" | "authed-active";
