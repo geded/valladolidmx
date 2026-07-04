@@ -114,6 +114,35 @@ function resolveBusinessGroupItems(
   );
 }
 
+function resolveProductGroupItems(
+  groupId: string,
+  product: MarketplaceProductDetail,
+  related: ProductRelatedDTO | null,
+): ExperienceRelatedItem[] {
+  const dest = product.business.destination_slug || null;
+  const cat = product.business.category_slug || null;
+  if (groupId === "misma-empresa") {
+    return productRelatedToItems(product.related ?? [], {
+      destinationSlug: dest,
+      categorySlug: cat,
+      rationale: `Otras opciones publicadas por ${product.business.display_name}`,
+    });
+  }
+  if (groupId === "misma-categoria-destino") {
+    return productRelatedToItems(related?.sameCategoryInDestination ?? [], {
+      destinationSlug: dest,
+      categorySlug: cat,
+      rationale: cat
+        ? `Otras opciones de ${cat} en el mismo destino`
+        : "Otras opciones en el mismo destino",
+    });
+  }
+  return productRelatedToItems(
+    [...(product.related ?? []), ...(related?.sameCategoryInDestination ?? [])],
+    { destinationSlug: dest, categorySlug: cat },
+  );
+}
+
 function buildDTO(
   cfg: ExperienceRelatedCollectionConfig,
   groups: ExperienceRelatedGroup[],
