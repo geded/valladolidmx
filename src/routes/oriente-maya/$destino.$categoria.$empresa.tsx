@@ -67,7 +67,10 @@ function EmpresaTerritorialPage() {
   const { resolution, business } = Route.useLoaderData();
   const { destino, categoria, empresa } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
-  const crumbs = buildBreadcrumbs(ctx);
+  // NOTA (N2.1): los breadcrumbs territoriales se derivan aquí y quedan
+  // disponibles vía Context Engine. `BusinessSurface` los renderizará
+  // desde el contexto en N2.2 (usa hoy su `useContextCrumbs` interno).
+  void buildBreadcrumbs(ctx);
 
   // ContextEngine para consumidores actuales (breadcrumbs contextuales,
   // Alux, related). Registra ancestros territoriales completos.
@@ -99,9 +102,7 @@ function EmpresaTerritorialPage() {
   return (
     <ContextEngineProvider declaration={declaration}>
       <BusinessSurfaceProvider business={business}>
-        <BusinessSurface
-          crumbsOverride={crumbs.map((c) => ({ label: c.label, to: c.href }))}
-        />
+        <BusinessSurface />
       </BusinessSurfaceProvider>
     </ContextEngineProvider>
   );
