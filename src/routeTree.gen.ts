@@ -41,6 +41,7 @@ import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovabl
 import { Route as LovableProtectedActionsPreviewRouteImport } from './routes/lovable/protected-actions-preview'
 import { Route as LovableExperienceSubnavCtabarPreviewRouteImport } from './routes/lovable/experience-subnav-ctabar-preview'
 import { Route as LovableExperienceReviewsPreviewRouteImport } from './routes/lovable/experience-reviews-preview'
+import { Route as LovableExperienceRelatedCollectionPreviewRouteImport } from './routes/lovable/experience-related-collection-preview'
 import { Route as LovableExperiencePromotionsPreviewRouteImport } from './routes/lovable/experience-promotions-preview'
 import { Route as LovableExperienceProductsPreviewRouteImport } from './routes/lovable/experience-products-preview'
 import { Route as LovableExperienceI1cPreviewRouteImport } from './routes/lovable/experience-i1c-preview'
@@ -293,6 +294,12 @@ const LovableExperienceReviewsPreviewRoute =
   LovableExperienceReviewsPreviewRouteImport.update({
     id: '/lovable/experience-reviews-preview',
     path: '/lovable/experience-reviews-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableExperienceRelatedCollectionPreviewRoute =
+  LovableExperienceRelatedCollectionPreviewRouteImport.update({
+    id: '/lovable/experience-related-collection-preview',
+    path: '/lovable/experience-related-collection-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableExperiencePromotionsPreviewRoute =
@@ -855,6 +862,7 @@ export interface FileRoutesByFullPath {
   '/lovable/experience-i1c-preview': typeof LovableExperienceI1cPreviewRoute
   '/lovable/experience-products-preview': typeof LovableExperienceProductsPreviewRoute
   '/lovable/experience-promotions-preview': typeof LovableExperiencePromotionsPreviewRoute
+  '/lovable/experience-related-collection-preview': typeof LovableExperienceRelatedCollectionPreviewRoute
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
@@ -973,6 +981,7 @@ export interface FileRoutesByTo {
   '/lovable/experience-i1c-preview': typeof LovableExperienceI1cPreviewRoute
   '/lovable/experience-products-preview': typeof LovableExperienceProductsPreviewRoute
   '/lovable/experience-promotions-preview': typeof LovableExperiencePromotionsPreviewRoute
+  '/lovable/experience-related-collection-preview': typeof LovableExperienceRelatedCollectionPreviewRoute
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
@@ -1097,6 +1106,7 @@ export interface FileRoutesById {
   '/lovable/experience-i1c-preview': typeof LovableExperienceI1cPreviewRoute
   '/lovable/experience-products-preview': typeof LovableExperienceProductsPreviewRoute
   '/lovable/experience-promotions-preview': typeof LovableExperiencePromotionsPreviewRoute
+  '/lovable/experience-related-collection-preview': typeof LovableExperienceRelatedCollectionPreviewRoute
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
@@ -1222,6 +1232,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-i1c-preview'
     | '/lovable/experience-products-preview'
     | '/lovable/experience-promotions-preview'
+    | '/lovable/experience-related-collection-preview'
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
     | '/lovable/protected-actions-preview'
@@ -1340,6 +1351,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-i1c-preview'
     | '/lovable/experience-products-preview'
     | '/lovable/experience-promotions-preview'
+    | '/lovable/experience-related-collection-preview'
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
     | '/lovable/protected-actions-preview'
@@ -1463,6 +1475,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-i1c-preview'
     | '/lovable/experience-products-preview'
     | '/lovable/experience-promotions-preview'
+    | '/lovable/experience-related-collection-preview'
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
     | '/lovable/protected-actions-preview'
@@ -1579,6 +1592,7 @@ export interface RootRouteChildren {
   LovableExperienceI1cPreviewRoute: typeof LovableExperienceI1cPreviewRoute
   LovableExperienceProductsPreviewRoute: typeof LovableExperienceProductsPreviewRoute
   LovableExperiencePromotionsPreviewRoute: typeof LovableExperiencePromotionsPreviewRoute
+  LovableExperienceRelatedCollectionPreviewRoute: typeof LovableExperienceRelatedCollectionPreviewRoute
   LovableExperienceReviewsPreviewRoute: typeof LovableExperienceReviewsPreviewRoute
   LovableExperienceSubnavCtabarPreviewRoute: typeof LovableExperienceSubnavCtabarPreviewRoute
   LovableProtectedActionsPreviewRoute: typeof LovableProtectedActionsPreviewRoute
@@ -1825,6 +1839,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/experience-reviews-preview'
       fullPath: '/lovable/experience-reviews-preview'
       preLoaderRoute: typeof LovableExperienceReviewsPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/experience-related-collection-preview': {
+      id: '/lovable/experience-related-collection-preview'
+      path: '/lovable/experience-related-collection-preview'
+      fullPath: '/lovable/experience-related-collection-preview'
+      preLoaderRoute: typeof LovableExperienceRelatedCollectionPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/experience-promotions-preview': {
@@ -2792,6 +2813,8 @@ const rootRouteChildren: RootRouteChildren = {
   LovableExperienceProductsPreviewRoute: LovableExperienceProductsPreviewRoute,
   LovableExperiencePromotionsPreviewRoute:
     LovableExperiencePromotionsPreviewRoute,
+  LovableExperienceRelatedCollectionPreviewRoute:
+    LovableExperienceRelatedCollectionPreviewRoute,
   LovableExperienceReviewsPreviewRoute: LovableExperienceReviewsPreviewRoute,
   LovableExperienceSubnavCtabarPreviewRoute:
     LovableExperienceSubnavCtabarPreviewRoute,
