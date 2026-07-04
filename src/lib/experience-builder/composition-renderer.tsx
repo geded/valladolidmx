@@ -88,6 +88,22 @@ import {
   ExperienceCtaBarBlock,
   ExperienceCtaBarPreview,
 } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBarBlock";
+import {
+  ExperienceGalleryBlock,
+  ExperienceGalleryPreview,
+} from "@/components/experience-builder/blocks/experience-gallery/ExperienceGalleryBlock";
+import {
+  ExperienceInfoGridBlock,
+  ExperienceInfoGridPreview,
+} from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGridBlock";
+import {
+  ExperienceSectionBlock,
+  ExperienceSectionPreview,
+} from "@/components/experience-builder/blocks/experience-section/ExperienceSectionBlock";
+import {
+  ExperienceFeaturesBlock,
+  ExperienceFeaturesPreview,
+} from "@/components/experience-builder/blocks/experience-features/ExperienceFeaturesBlock";
 
 /**
  * US-R3 · Sub-ola 2.5d — mapa de renderers `vmx.kit.*`. Se expande de
@@ -483,6 +499,16 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   <ExperienceCtaBarPreview />
 );
 
+// H-03 · Ola I1.c — Gallery / Info-Grid / Section / Features (Studio).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.gallery"] = () => <ExperienceGalleryPreview />;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.info-grid"] = () => <ExperienceInfoGridPreview />;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.section"] = () => <ExperienceSectionPreview />;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.features"] = () => <ExperienceFeaturesPreview />;
+
 /* ------------------------------------------------------------------ *
  * Mapa de producción (Etapa 15.10.3)
  *
@@ -717,6 +743,20 @@ PRODUCTION_COMPONENT_MAP["vmx.experience.subnav"] = ({ node }) => (
 // H-03 · Ola I1.b — Experience CTA Bar (producción: manual/business…).
 PRODUCTION_COMPONENT_MAP["vmx.experience.cta-bar"] = ({ node }) => (
   <ExperienceCtaBarBlock config={node.config} />
+);
+
+// H-03 · Ola I1.c — Producción (mismo blockType; hidrata Surface cuando aplica).
+PRODUCTION_COMPONENT_MAP["vmx.experience.gallery"] = ({ node }) => (
+  <ExperienceGalleryBlock config={node.config} />
+);
+PRODUCTION_COMPONENT_MAP["vmx.experience.info-grid"] = ({ node }) => (
+  <ExperienceInfoGridBlock config={node.config} />
+);
+PRODUCTION_COMPONENT_MAP["vmx.experience.section"] = ({ node }) => (
+  <ExperienceSectionBlock config={node.config} />
+);
+PRODUCTION_COMPONENT_MAP["vmx.experience.features"] = ({ node }) => (
+  <ExperienceFeaturesBlock config={node.config} />
 );
 
 /* ------------------------------------------------------------------ *
