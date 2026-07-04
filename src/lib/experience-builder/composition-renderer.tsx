@@ -72,6 +72,10 @@ import {
   ProductRelatedBlock,
 } from "@/components/surfaces/product-blocks";
 import { KIT_BLOCK_RENDERERS } from "./kit-blocks";
+import {
+  DiscoveryNavigatorBlock,
+  DiscoveryNavigatorPreview,
+} from "@/components/experience-builder/blocks/DiscoveryNavigatorBlock";
 
 /**
  * US-R3 · Sub-ola 2.5d — mapa de renderers `vmx.kit.*`. Se expande de
