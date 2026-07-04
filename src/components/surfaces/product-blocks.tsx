@@ -23,6 +23,7 @@ import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { ProductActions } from "@/components/marketplace/ProductActions";
 import { SITE } from "@/config/site";
+import { resolveCanonicalPath } from "@/lib/navigation";
 import { useProduct } from "@/components/surfaces/ProductSurface";
 import {
   EmptyHint,
@@ -63,7 +64,7 @@ export function ProductShellBlock({
         vm={{
           title: "Producto (previsualiza con datos reales o demo)",
           crumbs: [
-            { label: "Catálogo", href: "/marketplace" },
+            { label: "Catálogo", href: "/oriente-maya" },
             { label: "—" },
           ],
         }}
@@ -148,6 +149,17 @@ export function ProductBusinessContextBlock() {
   const p = useProduct();
   if (!p) return <EmptyHint>Contexto de la empresa que ofrece el producto.</EmptyHint>;
   const b = p.business;
+  const destSlug = b.destination_slug;
+  const catSlug = b.category_slug;
+  const businessHref =
+    destSlug && catSlug
+      ? resolveCanonicalPath({
+          kind: "business",
+          slug: b.slug,
+          category: catSlug,
+          destination: destSlug,
+        })
+      : `/marketplace/${b.slug}`;
   return (
     <section className="mt-10 rounded-2xl border border-border bg-card p-5">
       <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -156,8 +168,7 @@ export function ProductBusinessContextBlock() {
       <div className="mt-1 flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <Link
-            to="/marketplace/$slug"
-            params={{ slug: b.slug }}
+            to={businessHref}
             className="text-lg font-semibold text-foreground hover:underline"
           >
             {b.display_name}

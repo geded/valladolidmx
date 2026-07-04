@@ -6,11 +6,10 @@
  * que pasan `items` ya filtrado por `category_slug`. Sin duplicación
  * de componentes: la tarjeta `BusinessTile` se exporta para reuso.
  */
-import { Link, getRouteApi } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import type { MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
-
-const marketplaceRouteApi = getRouteApi("/marketplace/");
+import { resolveCanonicalPath } from "@/lib/navigation";
 
 export interface MarketplaceSurfaceProps {
   /** Colección explícita a renderizar; si se omite, se lee del loader de `/marketplace`. */
@@ -20,15 +19,10 @@ export interface MarketplaceSurfaceProps {
 }
 
 export function MarketplaceSurface(props: MarketplaceSurfaceProps = {}) {
-  if (props.items !== undefined) {
-    return <MarketplaceSurfaceList items={props.items} emptyMessage={props.emptyMessage} />;
-  }
-  return <MarketplaceSurfaceFromLoader emptyMessage={props.emptyMessage} />;
-}
-
-function MarketplaceSurfaceFromLoader({ emptyMessage }: { emptyMessage?: string }) {
-  const { businesses } = marketplaceRouteApi.useLoaderData();
-  return <MarketplaceSurfaceList items={businesses ?? []} emptyMessage={emptyMessage} />;
+  // US-E3.2 · Fase B — el hub `/marketplace` se retiró (301 → /oriente-maya).
+  // Ahora `items` es requerido en la práctica: quien monte esta superficie
+  // debe suministrar el listado desde su propio loader.
+  return <MarketplaceSurfaceList items={props.items ?? []} emptyMessage={props.emptyMessage} />;
 }
 
 function MarketplaceSurfaceList({ items, emptyMessage }: { items: MarketplaceBusinessCard[]; emptyMessage?: string }) {
@@ -50,9 +44,42 @@ function MarketplaceSurfaceList({ items, emptyMessage }: { items: MarketplaceBus
 }
 
 export function BusinessTile({ item }: { item: MarketplaceBusinessCard }) {
+  const territorial =
+    item.destination_slug && item.category_slug
+      ? resolveCanonicalPath({
+          kind: "business",
+          slug: item.slug,
+          category: item.category_slug,
+          destination: item.destination_slug,
+        })
+      : null;
   return (
     <li className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary">
-      <Link to="/marketplace/$slug" params={{ slug: item.slug }} className="block">
+      {territorial ? (
+        <Link to={territorial} className="block">
+          <BusinessTileHeader item={item} />
+        </Link>
+      ) : (
+        <Link to="/marketplace/$slug" params={{ slug: item.slug }} className="block">
+          <BusinessTileHeader item={item} />
+        </Link>
+      )}
+      <div className="mt-3">
+        <AddToTravelPlanButton
+          kind="business"
+          targetId={item.id}
+          title={item.display_name}
+          slug={item.slug}
+          subtitle={item.category_slug || item.destination_slug || null}
+        />
+      </div>
+    </li>
+  );
+}
+
+function BusinessTileHeader({ item }: { item: MarketplaceBusinessCard }) {
+  return (
+    <>
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-lg font-semibold">{item.display_name}</h2>
           {item.verified ? (
@@ -67,16 +94,6 @@ export function BusinessTile({ item }: { item: MarketplaceBusinessCard }) {
         <p className="mt-3 text-xs text-muted-foreground">
           {item.category_slug || "—"} · {item.destination_slug || "—"}
         </p>
-      </Link>
-      <div className="mt-3">
-        <AddToTravelPlanButton
-          kind="business"
-          targetId={item.id}
-          title={item.display_name}
-          slug={item.slug}
-          subtitle={item.category_slug || item.destination_slug || null}
-        />
-      </div>
-    </li>
+    </>
   );
 }

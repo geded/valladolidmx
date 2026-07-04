@@ -6,12 +6,23 @@ import { PlaceholderImage } from "@/components/common/PlaceholderImage";
 import type { BusinessTeaser } from "@/types/entities";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
+import { resolveCanonicalPath } from "@/lib/navigation";
 
 export function EmpresaCard({ business }: { business: BusinessTeaser }) {
+  // US-E3.2 · Fase B — canonical territorial. Fallback a /marketplace/$slug
+  // (que 301 al canonical) sólo si aún no hay destino/categoría publicados.
+  const href =
+    business.destination_slug && business.category_slug
+      ? resolveCanonicalPath({
+          kind: "business",
+          slug: business.slug,
+          category: business.category_slug,
+          destination: business.destination_slug,
+        })
+      : `/marketplace/${business.slug}`;
   return (
     <Link
-      to="/marketplace/$slug"
-      params={{ slug: business.slug }}
+      to={href}
       className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg"
     >
       <PlaceholderImage palette={business.palette} label={business.name} aspect="4/3" className="rounded-none border-0" />

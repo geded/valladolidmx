@@ -130,7 +130,7 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
     return (
       <PublicShell
         title="Empresa no disponible"
-        crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: "—" }]}
+        crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: "—" }]}
       >
         <p className="text-sm text-muted-foreground">
           Aún no publicamos esta empresa.
@@ -157,7 +157,7 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
 
   return (
     <PublicShell
-      crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: b.display_name }]}
+      crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: b.display_name }]}
       useContextCrumbs
     >
       <ExperienceHero
