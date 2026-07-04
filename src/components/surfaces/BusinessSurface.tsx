@@ -105,7 +105,7 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
 export function resolveBusinessVariant(categorySlug: string): CategoryVariant {
   return (
     CATEGORY_VARIANTS[categorySlug] ?? {
-      eyebrow: "Marketplace",
+      eyebrow: "Catálogo Oriente Maya",
       productsHeading: "Productos y experiencias",
       productsEmpty: "Sin productos publicados.",
     }
@@ -130,7 +130,7 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
     return (
       <PublicShell
         title="Empresa no disponible"
-        crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "—" }]}
+        crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: "—" }]}
       >
         <p className="text-sm text-muted-foreground">
           Aún no publicamos esta empresa.
@@ -157,7 +157,7 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
 
   return (
     <PublicShell
-      crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: b.display_name }]}
+      crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: b.display_name }]}
       useContextCrumbs
     >
       <ExperienceHero

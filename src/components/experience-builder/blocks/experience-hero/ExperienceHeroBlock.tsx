@@ -78,7 +78,7 @@ function useExperienceHeroDTO(config: ExperienceHeroConfig): ExperienceHeroDTO {
 }
 
 function categoryToEyebrow(slug: string): string {
-  if (!slug) return "Marketplace";
+  if (!slug) return "Catálogo";
   return humanize(slug);
 }
 

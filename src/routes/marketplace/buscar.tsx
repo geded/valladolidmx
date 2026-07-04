@@ -27,7 +27,7 @@ interface SearchParams {
 }
 
 const PAGE_SIZE = 24;
-const TITLE = `Buscar en el Marketplace — ${SITE.name}`;
+const TITLE = `Buscar en el Catálogo — ${SITE.name}`;
 const DESCRIPTION =
   "Busca productos, experiencias y promociones publicadas por destino, categoría y rango de precio.";
 
@@ -108,7 +108,7 @@ export const Route = createFileRoute("/marketplace/buscar")({
   errorComponent: ({ error }) => (
     <PublicShell
       title="Búsqueda no disponible"
-      crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}
+      crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: "Buscar" }]}
       contextDeclaration={buildBuscarContext(undefined)}
       useContextCrumbs
     >
@@ -118,7 +118,7 @@ export const Route = createFileRoute("/marketplace/buscar")({
   notFoundComponent: () => (
     <PublicShell
       title="Sin resultados"
-      crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}
+      crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: "Buscar" }]}
       contextDeclaration={buildBuscarContext(undefined)}
       useContextCrumbs
     >
@@ -142,10 +142,10 @@ function MarketplaceSearchPage() {
 
   return (
     <PublicShell
-      eyebrow="Marketplace"
+      eyebrow="Catálogo Oriente Maya"
       title="Buscar en el catálogo"
       description="Productos, experiencias y promociones publicadas."
-      crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "Buscar" }]}
+      crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: "Buscar" }]}
       contextDeclaration={buildBuscarContext(search.destino)}
       useContextCrumbs={!hasContentFilter}
     >

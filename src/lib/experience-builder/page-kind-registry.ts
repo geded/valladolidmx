@@ -96,7 +96,7 @@ export const PAGE_KIND_REGISTRY: readonly PageKindDefinition[] = [
   },
   {
     kind: "marketplace",
-    label: "Marketplace",
+    label: "Catálogo Oriente Maya",
     description: "Catálogo público del marketplace y sus secciones.",
     slugPattern: "/marketplace",
     singleton: true,
