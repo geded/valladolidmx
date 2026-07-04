@@ -19,7 +19,7 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useSyncExternalStore,
+  useState,
   type ReactNode,
 } from "react";
 import { emitContextEngineEvent } from "./events";
@@ -50,36 +50,30 @@ interface ContextEngineProviderProps {
 }
 
 /**
- * Hook interno SSR-safe. Devuelve `undefined` en servidor y en el
- * primer render de cliente; el efecto rellena tras hidratación
- * para evitar hydration mismatch.
+ * Hook interno SSR-safe. Captura `previous` UNA sola vez al montar,
+ * después de la hidratación. Esto es crítico:
  *
- * IMPORTANTE: `useSyncExternalStore` exige que `getSnapshot` devuelva
- * una referencia estable mientras el estado subyacente no cambie.
- * `readPreviousContext()` parsea JSON en cada llamada y retorna un
- * objeto nuevo cada vez → sin caché, React lanza
- * "getSnapshot should be cached to avoid an infinite loop" y
- * "Maximum update depth exceeded" al hidratar cualquier ruta con
- * provider. Cacheamos por JSON serializado a nivel de módulo (single
- * store, sin fuga entre requests SSR porque el snapshot server es
- * siempre `undefined`).
+ * · El primer render (SSR + primera hidratación cliente) usa
+ *   `undefined` → sin herencia → HTML server = HTML cliente inicial
+ *   (cero hydration mismatch por este dato).
+ * · Un `useEffect` de montaje lee `sessionStorage` UNA vez y setea
+ *   el snapshot. Trigger un re-render con `previous` real → resolver
+ *   aplica herencia y el breadcrumb se enriquece.
+ * · El `useEffect` que persiste el NUEVO `previous` (esta ruta) para
+ *   la próxima navegación NO afecta el snapshot capturado, evitando
+ *   la auto-sobrescritura que anulaba la herencia en I3–I5.
+ * · Sin `useSyncExternalStore` no reaparece el warning
+ *   "getSnapshot should be cached to avoid an infinite loop".
  */
-let __cachedRaw: string | null = null;
-let __cachedValue: PreviousContext | undefined;
-function cachedSnapshot(): PreviousContext | undefined {
-  const next = readPreviousContext();
-  const raw = next ? JSON.stringify(next) : null;
-  if (raw === __cachedRaw) return __cachedValue;
-  __cachedRaw = raw;
-  __cachedValue = next;
-  return __cachedValue;
-}
-
 function useClientPrevious(): PreviousContext | undefined {
-  const subscribe = () => () => {}; // no re-suscripción; leemos on-demand
-  const getSnapshot = () => cachedSnapshot();
-  const getServerSnapshot = () => undefined;
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [previous, setPrevious] = useState<PreviousContext | undefined>(undefined);
+  useEffect(() => {
+    setPrevious(readPreviousContext());
+    // Snapshot único al montar la ruta; cambios posteriores en
+    // sessionStorage no re-disparan este provider (se leen al montar
+    // el provider de la próxima ruta).
+  }, []);
+  return previous;
 }
 
 export function ContextEngineProvider({
