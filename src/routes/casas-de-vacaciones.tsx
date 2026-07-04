@@ -15,6 +15,11 @@ import {
   type MarketplaceBusinessCard,
 } from "@/lib/marketplace/marketplace-reads.functions";
 import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
+import { ORIENTE_MAYA } from "@/config/regions";
+import {
+  defineRouteContext,
+  type RouteContextDeclaration,
+} from "@/lib/context-engine";
 
 const CATEGORY_SLUGS = new Set([
   "casas-de-vacaciones",
@@ -24,6 +29,27 @@ const CATEGORY_SLUGS = new Set([
   "airbnb",
   "casas",
 ]);
+
+/** H-02 · I5 — Declaración de contexto (patrón I4). */
+function buildCasasContext(destino: string | undefined): RouteContextDeclaration {
+  const explicitAncestors = destino
+    ? [
+        { kind: "region" as const, slug: ORIENTE_MAYA.slug, label: ORIENTE_MAYA.name, href: "/oriente-maya" },
+        { kind: "destination" as const, slug: destino, label: destino.replace(/-/g, " "), href: `/oriente-maya/${destino}` },
+      ]
+    : [];
+  return defineRouteContext({
+    current: {
+      kind: "category",
+      slug: "casas-de-vacaciones",
+      label: "Casas de vacaciones",
+      href: "/casas-de-vacaciones",
+    },
+    ancestors: explicitAncestors,
+    inherit: destino ? [] : ["region", "destination"],
+    canonical: "/casas-de-vacaciones",
+  });
+}
 
 export const Route = createFileRoute("/casas-de-vacaciones")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -49,15 +75,19 @@ function CasasRoute() {
   const filtered = destino
     ? businesses.filter((b: MarketplaceBusinessCard) => b.destination_slug === destino)
     : businesses;
+  const contextDeclaration = buildCasasContext(destino);
+  const legacyCrumbs = [
+    { label: "Casas de vacaciones", to: "/casas-de-vacaciones" },
+    ...(destino ? [{ label: destino.replace(/-/g, " ") }] : []),
+  ];
   return (
     <PublicShell
       eyebrow="Hospedaje"
       title={destino ? `Casas de vacaciones en ${destino.replace(/-/g, " ")}` : "Casas de vacaciones"}
       description="Casas, villas y rentas vacacionales para explorar el Oriente Maya a tu ritmo."
-      crumbs={[
-        { label: "Casas de vacaciones", to: "/casas-de-vacaciones" },
-        ...(destino ? [{ label: destino.replace(/-/g, " ") }] : []),
-      ]}
+      crumbs={legacyCrumbs}
+      contextDeclaration={contextDeclaration}
+      useContextCrumbs
     >
       <MarketplaceSurface
         items={filtered}
