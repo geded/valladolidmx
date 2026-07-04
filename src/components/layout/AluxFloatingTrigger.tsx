@@ -7,12 +7,15 @@
  * territorial vivo, el trigger cae al modo informativo clásico
  * (enlace a /alux).
  *
- * Fuente única: `useAluxContext()` → Context Engine + Navigation
- * Session. Sin llamadas al backend en esta ola.
+ * Fuente única del contexto: `useAluxContext()` → Context Engine +
+ * Navigation Session. Las sugerencias contextuales las provee la server
+ * fn pública `aluxContextualSuggest` (US-E1.2), sin motor paralelo.
  */
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Compass, MapPin, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   Sheet,
   SheetContent,
@@ -21,6 +24,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useAluxContext, type AluxContextSlot } from "@/lib/alux/use-alux-context";
+import {
+  aluxContextualSuggest,
+  type AluxContextualSuggestion,
+} from "@/lib/alux/contextual-suggest.functions";
 import { useTranslation } from "@/i18n/context";
 
 function ContextChip({ slot }: { slot: AluxContextSlot }) {
