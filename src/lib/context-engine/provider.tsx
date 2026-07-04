@@ -17,6 +17,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -36,6 +37,9 @@ import type {
 } from "./types";
 
 const ResolvedContextCtx = createContext<ResolvedContext | null>(null);
+
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 interface ContextEngineProviderProps {
   readonly declaration: RouteContextDeclaration;
@@ -73,7 +77,7 @@ function useClientPrevious(): {
     readonly previous: PreviousContext | undefined;
     readonly hydrated: boolean;
   }>({ previous: undefined, hydrated: false });
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     setState({ previous: readPreviousContext(), hydrated: true });
     // Snapshot único al montar la ruta; cambios posteriores en
     // sessionStorage no re-disparan este provider (se leen al montar
@@ -145,7 +149,7 @@ export function ContextEngineProvider({
   const canPersistBeforePreviousHydrated =
     (declaration.inherit?.length ?? 0) === 0 &&
     (declaration.kindDefaults?.length ?? 0) === 0;
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!persistOnMount) return;
     if (!previousHydrated && !canPersistBeforePreviousHydrated) return;
     writePreviousContext(result.context.current, result.context.ancestors);
