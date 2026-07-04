@@ -1303,6 +1303,91 @@ const productRelatedBlock = productBlock(
   "Otros productos publicados por la misma empresa.",
 );
 
+/* ------------------------------------------------------------------ *
+ * H-02 · Iniciativa 2 — Discovery Navigator
+ *
+ * Bloque oficial de descubrimiento territorial. Su misión es ser el
+ * punto de entrada hacia toda la oferta turística del contexto activo
+ * (destino, región, micrositio, landing). Diseñado para evolucionar
+ * hacia promociones, eventos, experiencias destacadas, Alux y campañas
+ * sin cambiar la firma del contrato.
+ * ------------------------------------------------------------------ */
+const discoveryNavigatorBlock: BlockContract = {
+  type: "vmx.discovery.navigator",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Discovery Navigator",
+  description:
+    "Centro de descubrimiento territorial. Muestra las categorías disponibles del destino con conteos dinámicos y las conecta con las superficies del portal.",
+  schema: {
+    title: {
+      type: "text",
+      label: "Título",
+      translatable: true,
+      default: "Explora el destino",
+    },
+    variant: {
+      type: "select",
+      label: "Variante",
+      default: "panel",
+      options: [
+        { value: "panel", label: "Panel" },
+        { value: "list", label: "Lista" },
+        { value: "grid", label: "Grid" },
+      ],
+    },
+    showCounts: {
+      type: "boolean",
+      label: "Mostrar conteos",
+      default: true,
+    },
+    ctaLabel: {
+      type: "text",
+      label: "Texto del enlace inferior",
+      translatable: true,
+      default: "Ver todo el Marketplace",
+    },
+    ctaHref: {
+      type: "url",
+      label: "URL del enlace inferior",
+    },
+    emptyLabel: {
+      type: "text",
+      label: "Mensaje vacío",
+      translatable: true,
+      default: "Aún no hay categorías publicadas.",
+    },
+    scope: {
+      type: "select",
+      label: "Alcance",
+      default: "auto",
+      options: [
+        { value: "auto", label: "Automático (contexto de la ruta)" },
+        { value: "destination", label: "Destino específico" },
+        { value: "region", label: "Región" },
+      ],
+    },
+    manualDestinationSlug: {
+      type: "text",
+      label: "Slug de destino (manual)",
+    },
+    manualRegionSlug: {
+      type: "text",
+      label: "Slug de región (manual)",
+    },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  // Sin `constraints.surfaces` → utilizable en cualquier página pública.
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"] },
+  i18n: { translatable_fields: ["title", "ctaLabel", "emptyLabel"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
@@ -1363,6 +1448,8 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   // US-R3 · Sub-ola 2.5d — Surface Kit neutro (nueva capacidad, sin
   // sustituir bloques existentes). Spread al final del catálogo.
   ...KIT_BLOCK_CONTRACTS,
+  // H-02 · Iniciativa 2 — Discovery Navigator (centro de descubrimiento).
+  discoveryNavigatorBlock,
 ];
 
 let bootstrapped = false;

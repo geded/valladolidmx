@@ -19,6 +19,7 @@ import { ORIENTE_MAYA } from "@/config/regions";
 import type { PublicDestinationDTO, DestinationRelatedDTO } from "@/lib/destinations/public-reads.functions";
 import { BusinessTile } from "@/components/surfaces/MarketplaceSurface";
 import type { MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
+import { DiscoveryNavigatorBlock } from "@/components/experience-builder/blocks/DiscoveryNavigatorBlock";
 
 export interface DestinationSurfaceProps {
   /** Slug del destino a renderizar. Cuando falta, se lee del router. */
@@ -163,47 +164,50 @@ export function DestinationSurface({ destinationSlug, dbData, related }: Destina
           ) : null}
         </div>
         <aside className="space-y-4">
-          <div className="rounded-2xl border border-border bg-card p-5">
-            <p className="text-sm font-semibold">Explora más del destino</p>
-            <ul className="mt-3 space-y-2 text-sm">
-              <li>
-                <Link
-                  to="/hoteles"
-                  search={{ destino: slug }}
-                  className="text-primary hover:underline"
-                >
-                  Hoteles y hospedajes
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/restaurantes"
-                  search={{ destino: slug }}
-                  className="text-primary hover:underline"
-                >
-                  Restaurantes recomendados
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/experiencias"
-                  search={{ destino: slug, tema: undefined }}
-                  className="text-primary hover:underline"
-                >
-                  Experiencias y rutas
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/marketplace"
-                  search={{ destino: slug }}
-                  className="text-primary hover:underline"
-                >
-                  Todo el Marketplace
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {/*
+            H-02 · Iniciativa 2 — Discovery Navigator.
+            Reemplaza el panel estático "Explora más del destino"
+            manteniendo paridad funcional (mismos accesos: hoteles,
+            restaurantes, experiencias, marketplace) y añadiendo
+            categorías dinámicas + conteos reales.
+            El fallback legacy queda debajo como red de seguridad.
+          */}
+          <DiscoveryNavigatorBlock
+            config={{
+              title: `Explora ${dbData?.name ?? mock?.name ?? "el destino"}`,
+              scope: "destination",
+              manualDestinationSlug: slug ?? undefined,
+              ctaLabel: "Ver todo el Marketplace",
+              ctaHref: slug ? `/marketplace?destino=${encodeURIComponent(slug)}` : "/marketplace",
+            }}
+          />
+          <noscript>
+            <div className="rounded-2xl border border-border bg-card p-5">
+              <p className="text-sm font-semibold">Explora más del destino</p>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li>
+                  <Link to="/hoteles" search={{ destino: slug }} className="text-primary hover:underline">
+                    Hoteles y hospedajes
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/restaurantes" search={{ destino: slug }} className="text-primary hover:underline">
+                    Restaurantes recomendados
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/experiencias" search={{ destino: slug, tema: undefined }} className="text-primary hover:underline">
+                    Experiencias y rutas
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/marketplace" search={{ destino: slug }} className="text-primary hover:underline">
+                    Todo el Marketplace
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </noscript>
         </aside>
       </div>
     </PublicShell>

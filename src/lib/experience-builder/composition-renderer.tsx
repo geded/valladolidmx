@@ -72,6 +72,10 @@ import {
   ProductRelatedBlock,
 } from "@/components/surfaces/product-blocks";
 import { KIT_BLOCK_RENDERERS } from "./kit-blocks";
+import {
+  DiscoveryNavigatorBlock,
+  DiscoveryNavigatorPreview,
+} from "@/components/experience-builder/blocks/DiscoveryNavigatorBlock";
 
 /**
  * US-R3 · Sub-ola 2.5d — mapa de renderers `vmx.kit.*`. Se expande de
@@ -445,6 +449,12 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   ...KIT_MAP,
 };
 
+// H-02 · Iniciativa 2 — Discovery Navigator (Studio preview neutral).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.discovery.navigator"] = () => (
+  <DiscoveryNavigatorPreview />
+);
+
 /* ------------------------------------------------------------------ *
  * Mapa de producción (Etapa 15.10.3)
  *
@@ -658,6 +668,13 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   // US-R3 · Sub-ola 2.5d — vmx.kit.* neutros (producción).
   ...KIT_MAP,
 };
+
+// H-02 · Iniciativa 2 — Discovery Navigator (producción: hidrata desde
+// Context/Params + TanStack Query).
+PRODUCTION_COMPONENT_MAP["vmx.discovery.navigator"] = ({ node }) => (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  <DiscoveryNavigatorBlock config={node.config as any} />
+);
 
 /* ------------------------------------------------------------------ *
  * Bloque formulario configurable
