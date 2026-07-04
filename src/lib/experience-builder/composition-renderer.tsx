@@ -116,6 +116,10 @@ import {
   ExperienceReviewsBlock,
   ExperienceReviewsPreview,
 } from "@/components/experience-builder/blocks/experience-reviews/ExperienceReviewsBlock";
+import {
+  ExperienceRelatedCollectionBlock,
+  ExperienceRelatedCollectionPreview,
+} from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 
 /**
  * US-R3 · Sub-ola 2.5d — mapa de renderers `vmx.kit.*`. Se expande de
@@ -529,6 +533,9 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
 // H-03 · Ola I2.c — Experience Reviews (Studio).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (STUDIO_PREVIEW_MAP as any)["vmx.experience.reviews"] = () => <ExperienceReviewsPreview />;
+// H-03 · Ola I3.b — Experience Related Collection (Studio).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.related-collection"] = () => <ExperienceRelatedCollectionPreview />;
 
 /* ------------------------------------------------------------------ *
  * Mapa de producción (Etapa 15.10.3)
@@ -790,6 +797,10 @@ PRODUCTION_COMPONENT_MAP["vmx.experience.promotions"] = ({ node }) => (
 // H-03 · Ola I2.c — Experience Reviews (Producción).
 PRODUCTION_COMPONENT_MAP["vmx.experience.reviews"] = ({ node }) => (
   <ExperienceReviewsBlock config={node.config} />
+);
+// H-03 · Ola I3.b — Experience Related Collection (Producción).
+PRODUCTION_COMPONENT_MAP["vmx.experience.related-collection"] = ({ node }) => (
+  <ExperienceRelatedCollectionBlock config={node.config} />
 );
 
 /* ------------------------------------------------------------------ *
