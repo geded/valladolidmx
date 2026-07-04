@@ -72,6 +72,7 @@ export function DestinationSurface({ destinationSlug, dbData, related }: Destina
         { label: ORIENTE_MAYA.name, to: "/oriente-maya" },
         { label: name },
       ]}
+      useContextCrumbs
     >
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">

@@ -4,8 +4,34 @@ import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { listMarketplaceBusinesses, type MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
 import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
+import { ORIENTE_MAYA } from "@/config/regions";
+import {
+  defineRouteContext,
+  type RouteContextDeclaration,
+} from "@/lib/context-engine";
 
 const CATEGORY_SLUGS = new Set(["experiencias", "experiencias-tours", "tours"]);
+
+/**
+ * H-02 · I5 — Declaración de contexto (patrón I4).
+ * El filtro editorial `?tema=` NO participa en el contexto jerárquico
+ * (no es una entidad territorial ni una categoría). Sigue reflejándose
+ * únicamente en el breadcrumb legacy como etiqueta hoja.
+ */
+function buildExperienciasContext(destino: string | undefined): RouteContextDeclaration {
+  const explicitAncestors = destino
+    ? [
+        { kind: "region" as const, slug: ORIENTE_MAYA.slug, label: ORIENTE_MAYA.name, href: "/oriente-maya" },
+        { kind: "destination" as const, slug: destino, label: destino.replace(/-/g, " "), href: `/oriente-maya/${destino}` },
+      ]
+    : [];
+  return defineRouteContext({
+    current: { kind: "category", slug: "experiencias", label: "Experiencias", href: "/experiencias" },
+    ancestors: explicitAncestors,
+    inherit: destino ? [] : ["region", "destination"],
+    canonical: "/experiencias",
+  });
+}
 
 export const Route = createFileRoute("/experiencias")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -33,6 +59,12 @@ function ExperienciasRoute() {
     ? businesses.filter((b: MarketplaceBusinessCard) => b.destination_slug === destino)
     : businesses;
   const humanTema = tema ? tema.replace(/-/g, " ") : null;
+  const contextDeclaration = buildExperienciasContext(destino);
+  const legacyCrumbs = [
+    { label: "Experiencias", to: "/experiencias" },
+    ...(destino ? [{ label: destino.replace(/-/g, " ") }] : []),
+    ...(humanTema && !destino ? [{ label: humanTema }] : []),
+  ];
   return (
     <PublicShell
       eyebrow="Categoría"
@@ -44,11 +76,9 @@ function ExperienciasRoute() {
             : "Experiencias"
       }
       description="Vivencias auténticas con comunidades, cocineros y guías locales del Oriente Maya."
-      crumbs={[
-        { label: "Experiencias", to: "/experiencias" },
-        ...(destino ? [{ label: destino.replace(/-/g, " ") }] : []),
-        ...(humanTema && !destino ? [{ label: humanTema }] : []),
-      ]}
+      crumbs={legacyCrumbs}
+      contextDeclaration={contextDeclaration}
+      useContextCrumbs={!humanTema || !!destino}
     >
       <MarketplaceSurface
         items={filtered}

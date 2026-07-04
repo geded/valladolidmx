@@ -4,8 +4,32 @@ import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { listMarketplaceBusinesses, type MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
 import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
+import { ORIENTE_MAYA } from "@/config/regions";
+import {
+  defineRouteContext,
+  type RouteContextDeclaration,
+} from "@/lib/context-engine";
 
 const CATEGORY_SLUGS = new Set(["restaurantes", "gastronomia"]);
+
+/**
+ * H-02 · I5 — Declaración de contexto (patrón I4).
+ * `canonical` siempre `/restaurantes` (SEO intacto).
+ */
+function buildRestaurantesContext(destino: string | undefined): RouteContextDeclaration {
+  const explicitAncestors = destino
+    ? [
+        { kind: "region" as const, slug: ORIENTE_MAYA.slug, label: ORIENTE_MAYA.name, href: "/oriente-maya" },
+        { kind: "destination" as const, slug: destino, label: destino.replace(/-/g, " "), href: `/oriente-maya/${destino}` },
+      ]
+    : [];
+  return defineRouteContext({
+    current: { kind: "category", slug: "restaurantes", label: "Restaurantes", href: "/restaurantes" },
+    ancestors: explicitAncestors,
+    inherit: destino ? [] : ["region", "destination"],
+    canonical: "/restaurantes",
+  });
+}
 
 export const Route = createFileRoute("/restaurantes")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -30,12 +54,19 @@ function RestaurantesRoute() {
   const filtered = destino
     ? businesses.filter((b: MarketplaceBusinessCard) => b.destination_slug === destino)
     : businesses;
+  const contextDeclaration = buildRestaurantesContext(destino);
+  const legacyCrumbs = [
+    { label: "Restaurantes", to: "/restaurantes" },
+    ...(destino ? [{ label: destino.replace(/-/g, " ") }] : []),
+  ];
   return (
     <PublicShell
       eyebrow="Categoría"
       title={destino ? `Restaurantes en ${destino.replace(/-/g, " ")}` : "Restaurantes"}
       description="Cocina yucateca, panuchos, recados y mesas de autor."
-      crumbs={[{ label: "Restaurantes", to: "/restaurantes" }, ...(destino ? [{ label: destino.replace(/-/g, " ") }] : [])]}
+      crumbs={legacyCrumbs}
+      contextDeclaration={contextDeclaration}
+      useContextCrumbs
     >
       <MarketplaceSurface
         items={filtered}
