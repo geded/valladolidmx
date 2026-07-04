@@ -39,6 +39,7 @@ import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
 import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/workspace-preview'
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
 import { Route as LovableProtectedActionsPreviewRouteImport } from './routes/lovable/protected-actions-preview'
+import { Route as LovableExperienceHeroPreviewRouteImport } from './routes/lovable/experience-hero-preview'
 import { Route as LovableContextEnginePreviewRouteImport } from './routes/lovable/context-engine-preview'
 import { Route as LSlugRouteImport } from './routes/l.$slug'
 import { Route as EventosSlugRouteImport } from './routes/eventos.$slug'
@@ -274,6 +275,12 @@ const LovableProtectedActionsPreviewRoute =
   LovableProtectedActionsPreviewRouteImport.update({
     id: '/lovable/protected-actions-preview',
     path: '/lovable/protected-actions-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableExperienceHeroPreviewRoute =
+  LovableExperienceHeroPreviewRouteImport.update({
+    id: '/lovable/experience-hero-preview',
+    path: '/lovable/experience-hero-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableContextEnginePreviewRoute =
@@ -801,6 +808,7 @@ export interface FileRoutesByFullPath {
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
+  '/lovable/experience-hero-preview': typeof LovableExperienceHeroPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -912,6 +920,7 @@ export interface FileRoutesByTo {
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
+  '/lovable/experience-hero-preview': typeof LovableExperienceHeroPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -1029,6 +1038,7 @@ export interface FileRoutesById {
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
+  '/lovable/experience-hero-preview': typeof LovableExperienceHeroPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -1147,6 +1157,7 @@ export interface FileRouteTypes {
     | '/eventos/$slug'
     | '/l/$slug'
     | '/lovable/context-engine-preview'
+    | '/lovable/experience-hero-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -1258,6 +1269,7 @@ export interface FileRouteTypes {
     | '/eventos/$slug'
     | '/l/$slug'
     | '/lovable/context-engine-preview'
+    | '/lovable/experience-hero-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -1374,6 +1386,7 @@ export interface FileRouteTypes {
     | '/eventos/$slug'
     | '/l/$slug'
     | '/lovable/context-engine-preview'
+    | '/lovable/experience-hero-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -1483,6 +1496,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   LSlugRoute: typeof LSlugRoute
   LovableContextEnginePreviewRoute: typeof LovableContextEnginePreviewRoute
+  LovableExperienceHeroPreviewRoute: typeof LovableExperienceHeroPreviewRoute
   LovableProtectedActionsPreviewRoute: typeof LovableProtectedActionsPreviewRoute
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
   LovableWorkspacePreviewRoute: typeof LovableWorkspacePreviewRoute
@@ -1713,6 +1727,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/protected-actions-preview'
       fullPath: '/lovable/protected-actions-preview'
       preLoaderRoute: typeof LovableProtectedActionsPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/experience-hero-preview': {
+      id: '/lovable/experience-hero-preview'
+      path: '/lovable/experience-hero-preview'
+      fullPath: '/lovable/experience-hero-preview'
+      preLoaderRoute: typeof LovableExperienceHeroPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/context-engine-preview': {
@@ -2638,6 +2659,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   LSlugRoute: LSlugRoute,
   LovableContextEnginePreviewRoute: LovableContextEnginePreviewRoute,
+  LovableExperienceHeroPreviewRoute: LovableExperienceHeroPreviewRoute,
   LovableProtectedActionsPreviewRoute: LovableProtectedActionsPreviewRoute,
   LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,
   LovableWorkspacePreviewRoute: LovableWorkspacePreviewRoute,
@@ -2661,3 +2683,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
