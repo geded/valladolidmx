@@ -52,6 +52,12 @@ export function DiscoveryNavigatorBlock({
   const categories = dto?.categories ?? [];
   const scopeLabel = dto?.scope.label ?? null;
   const defaultTitle = scopeLabel ? `Explora ${scopeLabel}` : "Explora el destino";
+  const defaultCtaLabel = scopeLabel
+    ? `Ver todo lo que ofrece ${scopeLabel}`
+    : "Ver todo el destino";
+  const defaultCtaHref = destinationSlug
+    ? `/oriente-maya/${destinationSlug}`
+    : "/oriente-maya";
 
   return (
     <DiscoveryNavigator
@@ -59,11 +65,8 @@ export function DiscoveryNavigatorBlock({
       variant={config.variant ?? "panel"}
       showCounts={config.showCounts ?? true}
       categories={categories}
-      ctaLabel={config.ctaLabel ?? "Ver todo el Marketplace"}
-      ctaHref={
-        config.ctaHref ??
-        (destinationSlug ? `/marketplace?destino=${encodeURIComponent(destinationSlug)}` : "/marketplace")
-      }
+      ctaLabel={config.ctaLabel ?? defaultCtaLabel}
+      ctaHref={config.ctaHref ?? defaultCtaHref}
       emptyLabel={config.emptyLabel ?? "Aún no hay categorías publicadas."}
     />
   );
@@ -86,8 +89,8 @@ export function DiscoveryNavigatorPreview() {
     <DiscoveryNavigator
       title="Explora Valladolid"
       categories={demo.categories}
-      ctaLabel="Ver todo el Marketplace"
-      ctaHref="/marketplace?destino=valladolid"
+      ctaLabel="Ver todo lo que ofrece Valladolid"
+      ctaHref="/oriente-maya/valladolid"
     />
   );
 }
