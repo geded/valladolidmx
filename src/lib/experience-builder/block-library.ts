@@ -1767,6 +1767,11 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   // H-03 · Ola I1.b — Experience Subnav + CTA Bar (fundacionales).
   experienceSubnavBlock,
   experienceCtaBarBlock,
+  // H-03 · Ola I1.c — Gallery, Info-Grid, Section, Features.
+  experienceGalleryBlock,
+  experienceInfoGridBlock,
+  experienceSectionBlock,
+  experienceFeaturesBlock,
 ];
 
 let bootstrapped = false;
