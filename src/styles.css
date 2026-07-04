@@ -95,6 +95,32 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
+
+  /*
+   * Institutional Badges — H-03 · I3.d.2 · M1
+   * Especificación oficial: docs/blueprint/15.10.H-03-INSTITUTIONAL-BADGE-SPECIFICATION-v1.0.md
+   * Aditivo. No reemplaza ni modifica tokens existentes.
+   */
+  --color-badge-pueblo-magico: var(--badge-pueblo-magico);
+  --color-badge-pueblo-magico-foreground: var(--badge-pueblo-magico-fg);
+  --color-badge-despierta: var(--badge-despierta);
+  --color-badge-despierta-foreground: var(--badge-despierta-fg);
+  --color-badge-oriente-maya: var(--badge-oriente-maya);
+  --color-badge-oriente-maya-foreground: var(--badge-oriente-maya-fg);
+  --color-badge-patrimonio: var(--badge-patrimonio);
+  --color-badge-patrimonio-foreground: var(--badge-patrimonio-fg);
+  --color-badge-verified: var(--badge-verified);
+  --color-badge-verified-foreground: var(--badge-verified-fg);
+  --color-badge-alux: var(--badge-alux);
+  --color-badge-alux-foreground: var(--badge-alux-fg);
+  --color-badge-award: var(--badge-award);
+  --color-badge-award-foreground: var(--badge-award-fg);
+  --color-badge-certification: var(--badge-certification);
+  --color-badge-certification-foreground: var(--badge-certification-fg);
+  --color-badge-recognition: var(--badge-recognition);
+  --color-badge-recognition-foreground: var(--badge-recognition-fg);
+  --color-badge-neutral: var(--badge-neutral);
+  --color-badge-neutral-foreground: var(--badge-neutral-fg);
 }
 
 :root {
@@ -182,6 +208,44 @@
   --shadow-overlay: 0 16px 48px oklch(0 0 0 / 0.16);
   --shadow-focus: 0 0 0 3px color-mix(in oklab, var(--ring) 35%, transparent);
 
+  /*
+   * Institutional Badges · Tokens M1 (light) — aditivos
+   * Todos calculados sobre la paleta oficial DSL v1.0.
+   */
+  --badge-pueblo-magico:    oklch(0.62 0.16 25);
+  --badge-pueblo-magico-fg: oklch(0.98 0.008 86.8);
+  --badge-despierta:        oklch(0.777 0.140 74.9);
+  --badge-despierta-fg:     oklch(0.227 0.017 112.9);
+  --badge-oriente-maya:     oklch(0.511 0.073 125.9);
+  --badge-oriente-maya-fg:  oklch(0.977 0.013 86.8);
+  --badge-patrimonio:       oklch(0.548 0.096 217.9);
+  --badge-patrimonio-fg:    oklch(0.977 0.013 86.8);
+  --badge-verified:         oklch(0.58 0.130 150);
+  --badge-verified-fg:      oklch(0.99 0.005 150);
+  --badge-alux:             oklch(0.54 0.14 295);
+  --badge-alux-fg:          oklch(0.98 0.008 295);
+  --badge-award:            oklch(0.72 0.15 85);
+  --badge-award-fg:         oklch(0.22 0.02 85);
+  --badge-certification:    oklch(0.62 0.11 230);
+  --badge-certification-fg: oklch(0.99 0.005 230);
+  --badge-recognition:      oklch(0.42 0.045 129.7);
+  --badge-recognition-fg:   oklch(0.977 0.013 86.8);
+  --badge-neutral:          oklch(0.945 0.018 85.8);
+  --badge-neutral-fg:       oklch(0.227 0.017 112.9);
+
+  /* Tamaños canónicos (sm / md / lg) */
+  --badge-h-sm: 20px;   --badge-h-md: 28px;   --badge-h-lg: 36px;
+  --badge-px-sm: 8px;   --badge-px-md: 12px;  --badge-px-lg: 16px;
+  --badge-gap-sm: 4px;  --badge-gap-md: 6px;  --badge-gap-lg: 8px;
+  --badge-icon-sm: 12px; --badge-icon-md: 14px; --badge-icon-lg: 18px;
+  --badge-text-sm: 11px; --badge-text-md: 13px; --badge-text-lg: 15px;
+  --radius-badge: 999px;
+  --radius-badge-editorial: var(--radius-md);
+
+  /* Sombra dedicada — sutil, cálida */
+  --shadow-badge: 0 1px 2px oklch(0 0 0 / 0.08),
+                  0 1px 1px color-mix(in oklab, var(--atardecer) 10%, transparent);
+
   /* Motion */
   --motion-instant: 80ms;
   --motion-fast: 160ms;
@@ -247,6 +311,34 @@
   --warning-foreground: oklch(0.22 0.020 70);
   --info: oklch(0.72 0.110 230);
   --info-foreground: oklch(0.22 0.020 230);
+
+  /*
+   * Institutional Badges · Tokens M1 (dark) — aditivos
+   * +1 paso de luminosidad, -croma leve, para conservar AA sobre --surface-raised.
+   */
+  --badge-pueblo-magico:    oklch(0.70 0.15 25);
+  --badge-pueblo-magico-fg: oklch(0.98 0.008 86.8);
+  --badge-despierta:        oklch(0.82 0.130 74.9);
+  --badge-despierta-fg:     oklch(0.227 0.017 112.9);
+  --badge-oriente-maya:     oklch(0.62 0.075 125.9);
+  --badge-oriente-maya-fg:  oklch(0.977 0.013 86.8);
+  --badge-patrimonio:       oklch(0.66 0.100 217.9);
+  --badge-patrimonio-fg:    oklch(0.977 0.013 86.8);
+  --badge-verified:         oklch(0.70 0.130 150);
+  --badge-verified-fg:      oklch(0.18 0.020 150);
+  --badge-alux:             oklch(0.66 0.135 295);
+  --badge-alux-fg:          oklch(0.98 0.008 295);
+  --badge-award:            oklch(0.80 0.140 85);
+  --badge-award-fg:         oklch(0.22 0.02 85);
+  --badge-certification:    oklch(0.72 0.105 230);
+  --badge-certification-fg: oklch(0.18 0.020 230);
+  --badge-recognition:      oklch(0.58 0.055 129.7);
+  --badge-recognition-fg:   oklch(0.977 0.013 86.8);
+  --badge-neutral:          oklch(0.42 0.045 129.7);
+  --badge-neutral-fg:       oklch(0.977 0.013 86.8);
+
+  --shadow-badge: 0 1px 2px oklch(0 0 0 / 0.35),
+                  0 1px 1px color-mix(in oklab, var(--atardecer) 12%, transparent);
 }
 
 /* Densidad compacta — reduce ~25% verticales del Workspace */
