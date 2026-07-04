@@ -22,6 +22,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database, Json } from "@/integrations/supabase/types";
+import { createClient } from "@supabase/supabase-js";
 
 // -------------------------------------------------------------------------
 // Contrato público (estable)
@@ -95,6 +96,8 @@ export interface TravelPlan {
   created_at: string;
   updated_at: string;
   archived_at: string | null;
+  share_token: string | null;
+  shared_at: string | null;
 }
 
 export interface TravelPlanWithItems {
@@ -189,6 +192,8 @@ function mapPlan(r: PlanRow): TravelPlan {
     created_at: r.created_at,
     updated_at: r.updated_at,
     archived_at: r.archived_at,
+    share_token: r.share_token ?? null,
+    shared_at: r.shared_at ?? null,
   };
 }
 
