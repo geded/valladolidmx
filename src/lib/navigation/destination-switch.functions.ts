@@ -13,6 +13,7 @@
  * `profile` del `NavigationContext` NO se consumen aquí (Ola N1..N9).
  */
 import { createServerFn } from "@tanstack/react-start";
+import { queryOptions } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { resolveCanonicalPath } from "./canonical-paths";
@@ -292,3 +293,12 @@ export const listSwitchableDestinations = createServerFn({ method: "GET" }).hand
       .map((r) => ({ slug: r.slug as string, name: (r.name as string) ?? (r.slug as string) }));
   },
 );
+
+/** Query options canónicas para consumir el listado desde React Query. */
+export function switchableDestinationsQueryOptions() {
+  return queryOptions({
+    queryKey: ["nav", "switchable-destinations"],
+    queryFn: () => listSwitchableDestinations(),
+    staleTime: 5 * 60_000,
+  });
+}
