@@ -96,19 +96,19 @@ export const experienceGalleryDtoSchema = z.object({
 export type ExperienceGalleryDTO = z.infer<typeof experienceGalleryDtoSchema>;
 
 export function buildExperienceGalleryPreviewDTO(): ExperienceGalleryDTO {
-  const stock = (seed: number) =>
-    `https://images.unsplash.com/photo-${seed}?auto=format&fit=crop&w=1200&q=70`;
+  const stock = (id: string) =>
+    `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1200&q=70`;
   return {
     variant: "mosaic",
     heading: "Galería",
     subheading: null,
     items: [
-      { kind: "image", url: stock(1502134249126-9f3755a50d78), alt: "Cenote" },
-      { kind: "image", url: stock(1476514525535-07fb3b4ae5f1), alt: "Selva" },
-      { kind: "image", url: stock(1526779259212-939e64788e3c), alt: "Playa" },
-      { kind: "image", url: stock(1519821172144-4f87d85de2a4), alt: "Ruinas" },
-      { kind: "image", url: stock(1533105079780-92b9be482077), alt: "Mercado" },
-      { kind: "image", url: stock(1544551763-46a013bb70d5), alt: "Hacienda" },
+      { kind: "image", url: stock("1502134249126-9f3755a50d78"), alt: "Cenote" },
+      { kind: "image", url: stock("1476514525535-07fb3b4ae5f1"), alt: "Selva" },
+      { kind: "image", url: stock("1526779259212-939e64788e3c"), alt: "Playa" },
+      { kind: "image", url: stock("1519821172144-4f87d85de2a4"), alt: "Ruinas" },
+      { kind: "image", url: stock("1533105079780-92b9be482077"), alt: "Mercado" },
+      { kind: "image", url: stock("1544551763-46a013bb70d5"), alt: "Hacienda" },
     ],
     maxVisible: 6,
     aspect: "landscape",
