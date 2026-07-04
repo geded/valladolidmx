@@ -1388,6 +1388,147 @@ const discoveryNavigatorBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+/* ------------------------------------------------------------------ *
+ * H-03 · Ola I1.a — Experience Hero (`vmx.experience.hero`)
+ *
+ * Bloque fundacional de las Experience Pages. Su misión es reemplazar
+ * los headers estáticos de fichas por un hero accionable que informa,
+ * inspira, descubre y convierte, respetando la identidad de
+ * Valladolid.mx.
+ *
+ * Regla de Compatibilidad Evolutiva: este bloque evoluciona sólo
+ * mediante `variant`, `capabilities`, `permissions` y `extensions[]`.
+ * NO se creará jamás `experience.hero-pro` ni `experience.hero-v2`.
+ *
+ * 3 capas:
+ *  - Presentación: `src/components/experience-builder/blocks/experience-hero/ExperienceHero.tsx`
+ *  - Contenido:    `src/lib/experience-builder/blocks/experience-hero/contract.ts` (Zod v1.0.0)
+ *  - Comportamiento: `.../ExperienceHeroBlock.tsx` (hidrata SurfaceContext)
+ *
+ * Checklist de admisión (6/6 verde):
+ *  1. Reutilizable en business/product/event/destination/region/landing ✔
+ *  2. Aporta valor al visitante (jerarquía + acciones inmediatas)       ✔
+ *  3. Mejora descubrimiento (badges + meta contextuales)                ✔
+ *  4. Mejora conversión (CTA primario/secundario persistente)           ✔
+ *  5. Mobile First / Touch First (min-h 44px, layout responsive)        ✔
+ *  6. Respeta Context Engine (no altera rutas ni breadcrumbs)           ✔
+ * ------------------------------------------------------------------ */
+const experienceHeroBlock: BlockContract = {
+  type: "vmx.experience.hero",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Experience Hero",
+  description:
+    "Hero accionable universal para Experience Pages (business, product, event, destination, region). Informa, inspira y convierte desde el primer scroll.",
+  schema: {
+    source: {
+      type: "select",
+      label: "Fuente de datos",
+      default: "manual",
+      options: [
+        { value: "manual", label: "Manual (config)" },
+        { value: "business", label: "Ficha de empresa (auto)" },
+        { value: "product", label: "Ficha de producto (reservado)" },
+        { value: "destination", label: "Destino (reservado)" },
+        { value: "event", label: "Evento (reservado)" },
+      ],
+    },
+    variant: {
+      type: "select",
+      label: "Variante",
+      default: "immersive",
+      options: [
+        { value: "immersive", label: "Inmersivo (media full-bleed)" },
+        { value: "compact", label: "Compacto (media + texto)" },
+        { value: "editorial", label: "Editorial (sin media)" },
+      ],
+    },
+    eyebrow:     { type: "text", label: "Eyebrow", translatable: true },
+    title:       { type: "text", label: "Título", translatable: true },
+    description: { type: "rich_text", label: "Descripción", translatable: true },
+    mediaUrl:    { type: "url", label: "URL de la media (imagen)" },
+    mediaAlt:    { type: "text", label: "Texto alternativo", translatable: true },
+    overlay:     { type: "number", label: "Overlay (0–1)", default: 0.45 },
+    badges: {
+      type: "list",
+      label: "Badges",
+      item: {
+        type: "object",
+        label: "Badge",
+        fields: {
+          label:   { type: "text", label: "Texto", translatable: true, required: true },
+          tone:    { type: "select", label: "Tono", default: "neutral", options: [
+            { value: "neutral", label: "Neutro" },
+            { value: "primary", label: "Primario" },
+            { value: "success", label: "Éxito" },
+            { value: "warning", label: "Advertencia" },
+          ] },
+          iconKey: { type: "text", label: "Icono (Lucide key)" },
+        },
+      },
+    },
+    meta: {
+      type: "list",
+      label: "Meta chips",
+      item: {
+        type: "object",
+        label: "Meta",
+        fields: {
+          iconKey: { type: "text", label: "Icono (Lucide key)" },
+          label:   { type: "text", label: "Texto", translatable: true, required: true },
+        },
+      },
+    },
+    ctaPrimary: {
+      type: "object",
+      label: "CTA primario",
+      fields: {
+        label:  { type: "text", label: "Texto", translatable: true, required: true },
+        href:   { type: "url", label: "URL" },
+        action: { type: "select", label: "Acción", default: "navigate", options: [
+          { value: "navigate", label: "Navegar" },
+          { value: "favorite", label: "Guardar" },
+          { value: "contact",  label: "Contactar" },
+          { value: "book",     label: "Reservar" },
+          { value: "share",    label: "Compartir" },
+        ] },
+      },
+    },
+    ctaSecondary: {
+      type: "object",
+      label: "CTA secundario",
+      fields: {
+        label:  { type: "text", label: "Texto", translatable: true, required: true },
+        href:   { type: "url", label: "URL" },
+        action: { type: "select", label: "Acción", default: "navigate", options: [
+          { value: "navigate", label: "Navegar" },
+          { value: "favorite", label: "Guardar" },
+          { value: "contact",  label: "Contactar" },
+          { value: "book",     label: "Reservar" },
+          { value: "share",    label: "Compartir" },
+        ] },
+      },
+    },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+    soporta_seo: true,
+  },
+  // Sin `constraints.surfaces` → utilizable en cualquier Experience Page.
+  constraints: { unique_per_page: true },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["variant", "overlay"],
+  },
+  i18n: {
+    translatable_fields: ["eyebrow", "title", "description", "mediaAlt"],
+  },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
@@ -1450,6 +1591,8 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   ...KIT_BLOCK_CONTRACTS,
   // H-02 · Iniciativa 2 — Discovery Navigator (centro de descubrimiento).
   discoveryNavigatorBlock,
+  // H-03 · Ola I1.a — Experience Hero (fundacional Experience Pages).
+  experienceHeroBlock,
 ];
 
 let bootstrapped = false;

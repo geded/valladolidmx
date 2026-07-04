@@ -76,6 +76,10 @@ import {
   DiscoveryNavigatorBlock,
   DiscoveryNavigatorPreview,
 } from "@/components/experience-builder/blocks/DiscoveryNavigatorBlock";
+import {
+  ExperienceHeroBlock,
+  ExperienceHeroPreview,
+} from "@/components/experience-builder/blocks/experience-hero/ExperienceHeroBlock";
 
 /**
  * US-R3 · Sub-ola 2.5d — mapa de renderers `vmx.kit.*`. Se expande de
@@ -455,6 +459,12 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   <DiscoveryNavigatorPreview />
 );
 
+// H-03 · Ola I1.a — Experience Hero (Studio preview neutral).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.hero"] = () => (
+  <ExperienceHeroPreview />
+);
+
 /* ------------------------------------------------------------------ *
  * Mapa de producción (Etapa 15.10.3)
  *
@@ -674,6 +684,12 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
 PRODUCTION_COMPONENT_MAP["vmx.discovery.navigator"] = ({ node }) => (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   <DiscoveryNavigatorBlock config={node.config as any} />
+);
+
+// H-03 · Ola I1.a — Experience Hero (producción: hidrata SurfaceContext
+// cuando `source !== 'manual'`).
+PRODUCTION_COMPONENT_MAP["vmx.experience.hero"] = ({ node }) => (
+  <ExperienceHeroBlock config={node.config} />
 );
 
 /* ------------------------------------------------------------------ *
