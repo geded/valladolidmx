@@ -1951,6 +1951,96 @@ const experienceFeaturesBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+const experienceInstitutionalBadgesBlock: BlockContract = {
+  type: "vmx.experience.institutional-badges",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Experience · Institutional Badges",
+  description:
+    "Distintivos institucionales oficiales (Pueblo Mágico, Patrimonio, Oriente Maya, Despierta en Valladolid, premios, certificaciones, reconocimientos, Empresa Verificada, Recomendado por Alux). Único bloque autorizado; NUNCA se hardcodean en plantillas.",
+  schema: {
+    source: {
+      type: "select", label: "Fuente", default: "manual",
+      options: [
+        { value: "manual", label: "Manual" },
+        { value: "destination", label: "Destino (reservado)" },
+        { value: "business", label: "Empresa (reservado)" },
+        { value: "product", label: "Producto (reservado)" },
+        { value: "event", label: "Evento (reservado)" },
+      ],
+    },
+    variant: {
+      type: "select", label: "Variante", default: "soft",
+      options: [
+        { value: "filled", label: "Sólido (máxima jerarquía)" },
+        { value: "soft", label: "Suave (default)" },
+        { value: "outline", label: "Contorno" },
+        { value: "icon-only", label: "Sólo icono (móvil / overlay)" },
+      ],
+    },
+    size: {
+      type: "select", label: "Tamaño", default: "md",
+      options: [
+        { value: "sm", label: "Pequeño" },
+        { value: "md", label: "Medio" },
+        { value: "lg", label: "Grande (hero editorial)" },
+      ],
+    },
+    layout: {
+      type: "select", label: "Disposición", default: "strip",
+      options: [
+        { value: "strip", label: "Fila" },
+        { value: "stack", label: "Columna" },
+      ],
+    },
+    subjectSlug: {
+      type: "text",
+      label: "Slug del sujeto (destino/negocio/producto)",
+    },
+    ariaLabel: {
+      type: "text", label: "Etiqueta accesible",
+      default: "Distintivos institucionales", translatable: true,
+    },
+    items: {
+      type: "list", label: "Distintivos",
+      item: {
+        type: "object", label: "Distintivo",
+        fields: {
+          kind: {
+            type: "select", label: "Tipo",
+            options: [
+              { value: "pueblo-magico", label: "Pueblo Mágico" },
+              { value: "patrimonio", label: "Patrimonio" },
+              { value: "oriente-maya", label: "Oriente Maya" },
+              { value: "despierta-en-valladolid", label: "Despierta en Valladolid" },
+              { value: "award", label: "Premio" },
+              { value: "official-recognition", label: "Reconocimiento oficial" },
+              { value: "certification", label: "Certificación" },
+              { value: "verified-business", label: "Empresa Verificada" },
+              { value: "alux-recommended", label: "Recomendado por Alux" },
+              { value: "custom", label: "Distintivo (custom)" },
+            ],
+          },
+          slug: { type: "text", label: "Slug único" },
+          label: { type: "text", label: "Etiqueta (override)", translatable: true },
+          shortLabel: { type: "text", label: "Etiqueta corta (móvil)", translatable: true },
+          programUrl: { type: "url", label: "URL del programa" },
+          issuedAt: { type: "text", label: "Fecha (ISO)" },
+        },
+      },
+    },
+  },
+  capabilities: { soporta_i18n: true, soporta_seo: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  constraints: {
+    surfaces: [
+      "home", "landing", "institutional", "destination", "business", "product",
+    ],
+  },
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "size", "layout"] },
+  i18n: { translatable_fields: ["ariaLabel", "items"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 const experienceProductsBlock: BlockContract = {
   type: "vmx.experience.products",
   category: "static",
