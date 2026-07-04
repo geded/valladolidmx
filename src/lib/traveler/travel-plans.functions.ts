@@ -754,3 +754,123 @@ export const promotePlanToCase = createServerFn({ method: "POST" })
       return { caseId: caseId as string, planId: data.planId };
     },
   );
+
+// =========================================================================
+// COMPARTIR (US-E4.3)
+// =========================================================================
+
+export interface SharedPlanItem {
+  id: string;
+  item_kind: TravelItemKind;
+  target_id: string | null;
+  position: number;
+  day_index: number | null;
+  snapshot: TravelPlanItemSnapshot;
+}
+
+export interface SharedPlanView {
+  plan: {
+    id: string;
+    title: string;
+    status: TravelPlanStatus;
+    party_size: number | null;
+    start_date: string | null;
+    end_date: string | null;
+    cover_image_url: string | null;
+    shared_at: string | null;
+    created_at: string;
+    updated_at: string;
+  };
+  items: SharedPlanItem[];
+}
+
+/**
+ * enableShareLink — Activa el link público del plan (genera token si no existe).
+ * Owner-only vía RLS.
+ */
+export const enableShareLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => ({
+    planId: assertUuid((d as { planId?: unknown })?.planId, "plan_id"),
+  }))
+  .handler(
+    async ({ context, data }): Promise<{ token: string; sharedAt: string }> => {
+      const { data: existing, error: readErr } = await context.supabase
+        .from("travel_plans")
+        .select("share_token, shared_at")
+        .eq("id", data.planId)
+        .single();
+      if (readErr) throw new Error(`plan_read_failed: ${readErr.message}`);
+      if (existing.share_token) {
+        return {
+          token: existing.share_token as string,
+          sharedAt: (existing.shared_at as string) ?? new Date().toISOString(),
+        };
+      }
+      const token = crypto.randomUUID();
+      const sharedAt = new Date().toISOString();
+      const { error } = await context.supabase
+        .from("travel_plans")
+        .update({ share_token: token, shared_at: sharedAt })
+        .eq("id", data.planId);
+      if (error) throw new Error(`share_enable_failed: ${error.message}`);
+      return { token, sharedAt };
+    },
+  );
+
+/**
+ * disableShareLink — Revoca el link público (limpia token). Owner-only vía RLS.
+ */
+export const disableShareLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => ({
+    planId: assertUuid((d as { planId?: unknown })?.planId, "plan_id"),
+  }))
+  .handler(async ({ context, data }): Promise<{ revoked: boolean }> => {
+    const { error } = await context.supabase
+      .from("travel_plans")
+      .update({ share_token: null, shared_at: null })
+      .eq("id", data.planId);
+    if (error) throw new Error(`share_disable_failed: ${error.message}`);
+    return { revoked: true };
+  });
+
+/**
+ * getSharedPlan — Endpoint PÚBLICO. Devuelve el expediente read-only
+ * asociado al token. Usa cliente publishable + RPC SECURITY DEFINER;
+ * nunca expone user_id ni notas privadas del plan.
+ */
+export const getSharedPlan = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => {
+    const t = (d as { token?: unknown })?.token;
+    if (typeof t !== "string" || !UUID_RE.test(t)) {
+      throw new Error("invalid_token");
+    }
+    return { token: t };
+  })
+  .handler(async ({ data }): Promise<SharedPlanView | null> => {
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+    if (!url || !key) throw new Error("supabase_env_missing");
+    const client = createClient<Database>(url, key, {
+      auth: {
+        storage: undefined,
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    });
+    const { data: json, error } = await client.rpc("travel_plan_get_shared", {
+      _token: data.token,
+    });
+    if (error) throw new Error(`shared_read_failed: ${error.message}`);
+    if (!json) return null;
+    const raw = json as unknown as {
+      plan: SharedPlanView["plan"] | null;
+      items: SharedPlanItem[] | null;
+    };
+    if (!raw.plan) return null;
+    return {
+      plan: raw.plan,
+      items: Array.isArray(raw.items) ? raw.items : [],
+    };
+  });
