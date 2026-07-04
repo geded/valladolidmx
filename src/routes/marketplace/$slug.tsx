@@ -72,7 +72,7 @@ function buildBusinessContext(b: MarketplaceBusinessDetail): RouteContextDeclara
           }),
         },
       ]
-    : [{ kind: "marketplace" as const, label: "Marketplace", href: "/marketplace" }];
+    : [{ kind: "marketplace" as const, label: "Catálogo", href: "/marketplace" }];
   return defineRouteContext({
     current: {
       kind: "business",

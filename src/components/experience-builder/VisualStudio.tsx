@@ -452,7 +452,7 @@ const SITE_PAGES: SitePage[] = [
     description: "Agenda de eventos y actividades.", publicPath: "/p/eventos", status: "editable" },
   { key: "empresas", slug: "empresas", page_type: "landing", title: "Empresas",
     description: "Directorio de empresas locales.", publicPath: "/p/empresas", status: "editable" },
-  { key: "marketplace", slug: "marketplace", page_type: "landing", title: "Marketplace",
+  { key: "marketplace", slug: "marketplace", page_type: "landing", title: "Catálogo Oriente Maya",
     description: "Tienda y reservaciones.", publicPath: "/p/marketplace", status: "editable" },
   { key: "arma-tu-viaje", slug: "arma-tu-viaje", page_type: "landing", title: "Arma tu viaje",
     description: "Planificador interactivo del viaje.", publicPath: "/p/arma-tu-viaje", status: "editable" },

@@ -21,7 +21,7 @@ function AdminOperacionesHub() {
       eyebrow="Panel Fundador · 15.10.4R"
       title="Operaciones"
       description="Pagos, órdenes y actividad transaccional. Las tablas y métricas se reutilizan de CMS y Portal."
-      domains={["Pagos", "Marketplace", "UNC", "Observabilidad"]}
+      domains={["Pagos", "Catálogo Oriente Maya", "UNC", "Observabilidad"]}
       sections={[
         {
           title: "Pagos y órdenes",

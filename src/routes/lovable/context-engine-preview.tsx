@@ -76,7 +76,7 @@ function buildDeclaration(scenario: Scenario): RouteContextDeclaration {
         inherit: ["region", "destination", "category"],
         canonical: "/marketplace/hacienda-selva",
         kindDefaults: [
-          { kind: "marketplace", label: "Marketplace", href: "/marketplace" },
+          { kind: "marketplace", label: "Catálogo", href: "/marketplace" },
         ],
       });
   }

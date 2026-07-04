@@ -125,7 +125,7 @@ function AdminCockpit() {
             className="mt-1 rounded-md border border-border bg-background px-2 py-1 text-sm"
           >
             <option value="all">Todos</option>
-            <option value="marketplace">Marketplace</option>
+            <option value="marketplace">Catálogo Oriente Maya</option>
             <option value="concierge">Concierge</option>
             <option value="portal">Portal</option>
             <option value="cms">CMS</option>

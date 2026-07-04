@@ -63,7 +63,7 @@ export function ProductShellBlock({
         vm={{
           title: "Producto (previsualiza con datos reales o demo)",
           crumbs: [
-            { label: "Marketplace", href: "/marketplace" },
+            { label: "Catálogo", href: "/marketplace" },
             { label: "—" },
           ],
         }}

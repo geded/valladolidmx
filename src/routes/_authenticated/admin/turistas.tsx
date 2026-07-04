@@ -21,7 +21,7 @@ function AdminTuristasHub() {
       eyebrow="Panel Fundador · 15.10.4R"
       title="Turistas"
       description="Vista interna del Fundador sobre la experiencia del viajero. Todas las pantallas reutilizan las rutas /cuenta existentes."
-      domains={["Cuenta del Viajero", "Marketplace", "Concierge", "UNC"]}
+      domains={["Cuenta del Viajero", "Catálogo Oriente Maya", "Concierge", "UNC"]}
       sections={[
         {
           title: "Experiencia del viajero",

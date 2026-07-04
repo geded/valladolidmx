@@ -594,7 +594,7 @@ const cockpitKpiGridBlock: BlockContract = {
       default: "all",
       options: [
         { value: "all", label: "Todos" },
-        { value: "marketplace", label: "Marketplace" },
+        { value: "marketplace", label: "Catálogo Oriente Maya" },
         { value: "concierge", label: "Concierge" },
         { value: "portal", label: "Portal" },
         { value: "cms", label: "CMS" },
