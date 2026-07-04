@@ -30,7 +30,7 @@ import type {
 export function productToShellVM(p: MarketplaceProductDetail): ShellVM {
   return {
     crumbs: [
-      { label: "Marketplace", href: "/marketplace" },
+      { label: "Catálogo", href: "/marketplace" },
       { label: p.business.display_name, href: `/marketplace/${p.business.slug}` },
       { label: p.name },
     ] satisfies CrumbVM[],
