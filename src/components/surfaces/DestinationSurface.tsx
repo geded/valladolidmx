@@ -241,10 +241,11 @@ export function DestinationSurface({
               title: `Explora ${input.name}`,
               scope: "destination",
               manualDestinationSlug: slug ?? undefined,
-              ctaLabel: "Ver todo el Marketplace",
-              ctaHref: slug
-                ? `/marketplace?destino=${encodeURIComponent(slug)}`
-                : "/marketplace",
+              // Ya estamos en la superficie del destino: el navegador de
+              // categorías es autosuficiente y no necesita un CTA que apunte
+              // a otra ruta. Se oculta pasando cadenas vacías.
+              ctaLabel: "",
+              ctaHref: "",
             }}
           />
         </aside>
