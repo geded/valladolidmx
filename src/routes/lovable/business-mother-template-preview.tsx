@@ -39,6 +39,8 @@ const MOCK_HOTEL: MarketplaceBusinessDetail = {
       secondary_action_mode: "contact",
       secondary_action_label: "Contactar",
       accepts_online_payment: false,
+      requires_availability: false,
+      visibility_level: "public",
     },
     {
       id: "p2",
@@ -55,6 +57,8 @@ const MOCK_HOTEL: MarketplaceBusinessDetail = {
       secondary_action_mode: "contact",
       secondary_action_label: "Contactar",
       accepts_online_payment: false,
+      requires_availability: true,
+      visibility_level: "public",
     },
   ],
   promotions: [
@@ -64,6 +68,8 @@ const MOCK_HOTEL: MarketplaceBusinessDetail = {
       title: "Verano Maya 2026",
       description: "3x2 en noches del 15 de junio al 30 de agosto.",
       discount_percent: 33,
+      starts_at: null,
+      ends_at: null,
       business_slug: "hacienda-selva-maya",
       business_name: "Hacienda Selva Maya",
     },
