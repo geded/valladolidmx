@@ -35,9 +35,9 @@ export interface DiscoveryNavigatorDTO {
   /**
    * Reservado para evolución futura sin cambiar el contrato:
    * promociones, eventos, experiencias destacadas, rutas, Alux, campañas.
-   * Vacío en esta ola.
+   * Vacío en esta ola. Los items serán objetos JSON serializables.
    */
-  extensions: Array<{ kind: string; items: unknown[] }>;
+  extensions: Array<{ kind: string; items: Array<Record<string, string | number | boolean | null>> }>;
 }
 
 /** Slugs de categoría que tienen ruta pública propia. */
