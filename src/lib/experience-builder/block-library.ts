@@ -2120,6 +2120,69 @@ const experienceReviewsBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+const experienceRelatedCollectionBlock: BlockContract = {
+  type: "vmx.experience.related-collection",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Experience Related Collection",
+  description:
+    "Motor de descubrimiento contextual — colecciones heterogéneas (empresas, productos, experiencias, hoteles, restaurantes, eventos, promociones, rutas, destinos, regiones) usando siempre el mismo bloque. Preparado para evolucionar hacia recomendaciones de Alux y Context Engine sin romper compatibilidad.",
+  schema: {
+    source: {
+      type: "select", label: "Fuente", default: "manual",
+      options: [
+        { value: "manual", label: "Manual" },
+        { value: "destination", label: "Destino (contexto)" },
+        { value: "region", label: "Región (reservado)" },
+        { value: "category", label: "Categoría (reservado)" },
+        { value: "business", label: "Empresa (reservado)" },
+        { value: "product", label: "Producto (reservado)" },
+        { value: "context", label: "Context Engine (reservado)" },
+        { value: "alux", label: "Alux (reservado)" },
+      ],
+    },
+    entityKind: {
+      type: "select", label: "Tipo de entidad", default: "mixed",
+      options: [
+        { value: "mixed", label: "Mixto" },
+        { value: "business", label: "Empresas" },
+        { value: "product", label: "Productos" },
+        { value: "experience", label: "Experiencias" },
+        { value: "hotel", label: "Hoteles" },
+        { value: "restaurant", label: "Restaurantes" },
+        { value: "event", label: "Eventos" },
+        { value: "promotion", label: "Promociones" },
+        { value: "route", label: "Rutas" },
+        { value: "destination", label: "Destinos" },
+        { value: "region", label: "Regiones" },
+        { value: "category", label: "Categorías" },
+      ],
+    },
+    variant: {
+      type: "select", label: "Variante", default: "grid",
+      options: [
+        { value: "grid", label: "Grid" },
+        { value: "list", label: "Lista" },
+        { value: "carousel", label: "Carrusel" },
+        { value: "masonry", label: "Mosaico" },
+        { value: "featured", label: "Destacado" },
+        { value: "compact", label: "Compacto" },
+      ],
+    },
+    heading: { type: "text", label: "Encabezado", translatable: true, default: "Sigue descubriendo" },
+    subheading: { type: "text", label: "Subencabezado", translatable: true },
+    emptyMessage: { type: "text", label: "Mensaje vacío", translatable: true, default: "Aún no hay contenido para descubrir aquí." },
+    columns: { type: "number", label: "Columnas", default: 2 },
+    maxItems: { type: "number", label: "Máximo de items" },
+    ariaLabel: { type: "text", label: "Etiqueta accesible", translatable: true, default: "Sigue descubriendo" },
+  },
+  capabilities: { soporta_i18n: true, soporta_seo: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  constraints: {},
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "columns"] },
+  i18n: { translatable_fields: ["heading", "subheading", "emptyMessage", "ariaLabel"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
@@ -2198,6 +2261,8 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   experiencePromotionsBlock,
   // H-03 · Ola I2.c — Experience Reviews.
   experienceReviewsBlock,
+  // H-03 · Ola I3.b — Experience Related Collection (Motor de Descubrimiento).
+  experienceRelatedCollectionBlock,
 ];
 
 let bootstrapped = false;
