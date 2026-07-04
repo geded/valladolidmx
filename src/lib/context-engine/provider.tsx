@@ -142,9 +142,12 @@ export function ContextEngineProvider({
   const ancestorsFingerprint = result.context.ancestors
     .map((n) => `${n.kind}:${n.slug ?? n.href ?? n.label}`)
     .join("|");
+  const canPersistBeforePreviousHydrated =
+    (declaration.inherit?.length ?? 0) === 0 &&
+    (declaration.kindDefaults?.length ?? 0) === 0;
   useEffect(() => {
     if (!persistOnMount) return;
-    if (!previousHydrated) return;
+    if (!previousHydrated && !canPersistBeforePreviousHydrated) return;
     writePreviousContext(result.context.current, result.context.ancestors);
     emitContextEngineEvent("context_engine.previous_saved", {
       kind: result.context.current.kind,
@@ -152,7 +155,13 @@ export function ContextEngineProvider({
     });
     // sólo al cambiar de canonical
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result.context.canonical, ancestorsFingerprint, persistOnMount, previousHydrated]);
+  }, [
+    result.context.canonical,
+    ancestorsFingerprint,
+    persistOnMount,
+    previousHydrated,
+    canPersistBeforePreviousHydrated,
+  ]);
 
   return (
     <ResolvedContextCtx.Provider value={result.context}>
