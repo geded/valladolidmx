@@ -10,14 +10,47 @@
 import { Link } from "@tanstack/react-router";
 import { ChevronRight, Home } from "lucide-react";
 import type { BreadcrumbCrumb } from "@/types/territory";
+import { useResolvedContext } from "@/lib/context-engine";
 import { cn } from "@/lib/utils";
 
 interface Props {
-  crumbs: readonly BreadcrumbCrumb[];
+  /**
+   * Migas explícitas. Mientras `useContextCrumbs` sea `false` (default),
+   * ésta sigue siendo la fuente única. Retrocompatibilidad total.
+   */
+  crumbs?: readonly BreadcrumbCrumb[];
+  /**
+   * H-02 · I2 — Opt-in para derivar migas desde el Context Engine.
+   * Default `false`: comportamiento idéntico al actual. Cuando `true`
+   * y `useResolvedContext()` retorna contexto, `ancestors + current` se
+   * usan como migas. Si no hay contexto disponible, cae a `crumbs`.
+   */
+  useContextCrumbs?: boolean;
   className?: string;
 }
 
-export function BreadcrumbTerritorial({ crumbs, className }: Props) {
+function crumbsFromContext(
+  ctx: NonNullable<ReturnType<typeof useResolvedContext>>,
+): readonly BreadcrumbCrumb[] {
+  const nodes = [...ctx.ancestors, ctx.current];
+  return nodes.map((n) => ({
+    label: n.label,
+    to: n.href,
+    params: n.params ? { ...n.params } : undefined,
+  }));
+}
+
+export function BreadcrumbTerritorial({
+  crumbs,
+  useContextCrumbs = false,
+  className,
+}: Props) {
+  const ctx = useResolvedContext();
+  const effectiveCrumbs: readonly BreadcrumbCrumb[] =
+    useContextCrumbs && ctx ? crumbsFromContext(ctx) : (crumbs ?? []);
+
+  if (effectiveCrumbs.length === 0) return null;
+
   return (
     <nav aria-label="Ruta territorial" className={cn("text-sm", className)}>
       <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
@@ -30,8 +63,8 @@ export function BreadcrumbTerritorial({ crumbs, className }: Props) {
             <span className="sr-only">Inicio</span>
           </Link>
         </li>
-        {crumbs.map((c, i) => {
-          const isLast = i === crumbs.length - 1;
+        {effectiveCrumbs.map((c, i) => {
+          const isLast = i === effectiveCrumbs.length - 1;
           return (
             <li key={`${c.label}-${i}`} className="flex items-center gap-1.5">
               <ChevronRight className="size-3.5 opacity-50" aria-hidden />
