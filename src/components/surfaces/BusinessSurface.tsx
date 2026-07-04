@@ -34,6 +34,7 @@ import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/exper
 import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar";
 import { ExperienceProductsBlock } from "@/components/experience-builder/blocks/experience-products/ExperienceProductsBlock";
 import { ExperiencePromotionsBlock } from "@/components/experience-builder/blocks/experience-promotions/ExperiencePromotionsBlock";
+import { ExperienceReviewsBlock } from "@/components/experience-builder/blocks/experience-reviews/ExperienceReviewsBlock";
 import {
   businessToHeroDTO,
   businessToSubnavDTO,
@@ -189,6 +190,18 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
           />
         </section>
       ) : null}
+
+      <section id="opiniones" data-eb-anchor className="mt-10 scroll-mt-24">
+        <ExperienceReviewsBlock
+          config={{
+            source: "business",
+            variant: "list",
+            heading: "Opiniones de viajeros",
+            emptyMessage:
+              "Aún no hay reseñas publicadas de esta empresa. Sé la primera persona en compartir tu experiencia.",
+          }}
+        />
+      </section>
 
       <ExperienceCtaBar dto={ctaBarDto} />
     </PublicShell>
