@@ -32,6 +32,13 @@ import {
 import { resolveCanonicalPath } from "@/lib/navigation";
 import { DISCOVERY_ORIGIN } from "@/lib/discovery/seo";
 
+function humanizeSlug(slug: string): string {
+  return slug
+    .split("-")
+    .map((s) => (s ? s[0].toUpperCase() + s.slice(1) : s))
+    .join(" ");
+}
+
 /**
  * H-02 · I6 — Declaración de contexto de la ficha de producto.
  *
