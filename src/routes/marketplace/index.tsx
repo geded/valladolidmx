@@ -24,16 +24,16 @@ import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-
  */
 function buildMarketplaceContext(): RouteContextDeclaration {
   return defineRouteContext({
-    current: { kind: "category", slug: "marketplace", label: "Marketplace", href: "/marketplace" },
+    current: { kind: "category", slug: "marketplace", label: "Catálogo", href: "/marketplace" },
     ancestors: [],
     inherit: ["region", "destination"],
     canonical: "/marketplace",
   });
 }
 
-const TITLE = `Marketplace — ${SITE.name}`;
+const TITLE = `Catálogo Oriente Maya — ${SITE.name}`;
 const DESCRIPTION =
-  "Descubre empresas verificadas, experiencias y promociones publicadas en el destino. Vitrina oficial del Marketplace.";
+  "Descubre empresas verificadas, experiencias y promociones publicadas en el Oriente Maya. Catálogo oficial de Valladolid.mx.";
 
 export const Route = createFileRoute("/marketplace/")({
   loader: async () => {
@@ -52,12 +52,12 @@ export const Route = createFileRoute("/marketplace/")({
     }),
   component: MarketplaceIndex,
   errorComponent: ({ error }) => (
-    <PublicShell title="Marketplace no disponible" crumbs={[{ label: "Marketplace" }]}>
+    <PublicShell title="Catálogo no disponible" crumbs={[{ label: "Catálogo" }]}>
       <p className="text-sm text-muted-foreground">{String(error.message)}</p>
     </PublicShell>
   ),
   notFoundComponent: () => (
-    <PublicShell title="Marketplace no disponible" crumbs={[{ label: "Marketplace" }]}>
+    <PublicShell title="Catálogo no disponible" crumbs={[{ label: "Catálogo" }]}>
       <p className="text-sm text-muted-foreground">No hay empresas publicadas aún.</p>
     </PublicShell>
   ),
@@ -67,10 +67,10 @@ function MarketplaceIndex() {
   const { composition } = Route.useLoaderData();
   return (
     <PublicShell
-      eyebrow="Marketplace"
+      eyebrow="Catálogo Oriente Maya"
       title="Empresas y experiencias publicadas"
-      description="Vitrina pública del destino con empresas verificadas del Oriente Maya."
-      crumbs={[{ label: "Marketplace" }]}
+      description="Descubre las empresas verificadas del Oriente Maya."
+      crumbs={[{ label: "Catálogo" }]}
       contextDeclaration={buildMarketplaceContext()}
       useContextCrumbs
     >
