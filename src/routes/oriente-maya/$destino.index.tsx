@@ -49,7 +49,7 @@ function buildDestinationContext(
   });
 }
 
-export const Route = createFileRoute("/oriente-maya/$destino")({
+export const Route = createFileRoute("/oriente-maya/$destino/")({
   loader: async ({ params }) => {
     const mock = DESTINOS_MOCK.find(
       (d) => d.slug === params.destino && d.region_slug === ORIENTE_MAYA.slug,
