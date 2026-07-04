@@ -119,6 +119,15 @@ export function ContextEngineProvider({
   }, [result, previous]);
 
   // Persistir current como próximo `previous` — sólo cliente.
+  // La dependencia incluye un fingerprint de ancestors: la primera
+  // hidratación calcula ancestors=[] (previous aún undefined) y
+  // escribiría un previous "plano" que rompe la cadena
+  // Destino → Categoría → Categoría (hallazgo I5). Al llegar el
+  // previous heredado y re-computar ancestors, este effect vuelve a
+  // dispararse y persiste el snapshot completo con territorio incluido.
+  const ancestorsFingerprint = result.context.ancestors
+    .map((n) => `${n.kind}:${n.slug ?? n.href ?? n.label}`)
+    .join("|");
   useEffect(() => {
     if (!persistOnMount) return;
     writePreviousContext(result.context.current, result.context.ancestors);
@@ -128,7 +137,7 @@ export function ContextEngineProvider({
     });
     // sólo al cambiar de canonical
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result.context.canonical, persistOnMount]);
+  }, [result.context.canonical, ancestorsFingerprint, persistOnMount]);
 
   return (
     <ResolvedContextCtx.Provider value={result.context}>
