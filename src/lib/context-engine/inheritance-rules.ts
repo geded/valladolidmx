@@ -33,6 +33,19 @@ export const DEFAULT_INHERITANCE_RULES: readonly InheritanceRule[] = [
   { from: "destination", to: "experience", slots: ["region", "destination"] },
   { from: "destination", to: "hotel", slots: ["region", "destination"] },
   { from: "destination", to: "restaurant", slots: ["region", "destination"] },
+  // Self-loops — el usuario refresca la misma ficha o navega a otra
+  // ficha del mismo kind (business → business, product → product,
+  // event → event). Sin esta regla el refresh pierde el territorio ya
+  // resuelto porque `previous.from.kind === current.kind` no coincide
+  // con ninguna transición. Conserva sólo territorio, jamás la
+  // ficha anterior como ancestro.
+  { from: "business", to: "business", slots: ["region", "destination", "category"] },
+  { from: "product", to: "product", slots: ["region", "destination", "category"] },
+  { from: "event", to: "event", slots: ["region", "destination", "category"] },
+  { from: "hotel", to: "hotel", slots: ["region", "destination", "category"] },
+  { from: "restaurant", to: "restaurant", slots: ["region", "destination", "category"] },
+  { from: "experience", to: "experience", slots: ["region", "destination", "category"] },
+  { from: "destination", to: "destination", slots: ["region"] },
 ];
 
 export function findInheritanceRule(
