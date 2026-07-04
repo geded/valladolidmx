@@ -18,6 +18,10 @@ import { EXPERIENCE_SUBNAV_PRESETS } from "@/lib/experience-builder/blocks/exper
 import type { ExperienceSectionDTO } from "@/lib/experience-builder/blocks/experience-section/contract";
 import type { ExperienceInfoGridDTO } from "@/lib/experience-builder/blocks/experience-info-grid/contract";
 import type { ExperienceCtaBarDTO } from "@/lib/experience-builder/blocks/experience-cta-bar/contract";
+import type {
+  ExperienceProductsDTO,
+} from "@/lib/experience-builder/blocks/experience-products/contract";
+import { marketplaceProductToItem } from "@/components/experience-builder/blocks/experience-products/ExperienceProductsBlock";
 
 /* ------------------------------------------------------------------ *
  * Hero
@@ -146,6 +150,45 @@ export function businessToCtaBarDTO(b: MarketplaceBusinessDetail): ExperienceCta
       showPriceBadge: false,
       showFavorite: false,
       showShare: false,
+    },
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * H-03 · Ola I2.a — Products
+ *
+ * Adapter neutro: mapea el catálogo del negocio a un DTO consumible
+ * por `vmx.experience.products`. La Plantilla Business no vuelve a
+ * pintar `<ul>` — sólo orquesta bloques oficiales.
+ * ------------------------------------------------------------------ */
+export function businessToProductsDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceProductsDTO {
+  const variant = resolveBusinessVariant(b.category_slug);
+  return {
+    variant: "grid",
+    heading: variant.productsHeading,
+    subheading: null,
+    emptyMessage: variant.productsEmpty,
+    columns: 2,
+    groupBy: "none",
+    ariaLabel: variant.productsHeading,
+    items: b.products.map(marketplaceProductToItem),
+    capabilities: {
+      showPrice: true,
+      showFavorite: true,
+      showActions: true,
+      showBusiness: false,
+      showMedia: false,
+      compact: false,
+      contextAware: false,
+      livePricing: false,
+      liveAvailability: false,
+    },
+    contextRefs: {
+      businessSlug: b.slug,
+      destinationSlug: b.destination_slug ?? null,
+      categorySlug: b.category_slug ?? null,
     },
   };
 }

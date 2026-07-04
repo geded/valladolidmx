@@ -1951,6 +1951,55 @@ const experienceFeaturesBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+const experienceProductsBlock: BlockContract = {
+  type: "vmx.experience.products",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Experience Products",
+  description:
+    "Listado oficial de productos / habitaciones / tours / accesos / experiencias. Reutilizable en business, destination, region, category, landing y micrositios.",
+  schema: {
+    source: {
+      type: "select", label: "Fuente", default: "manual",
+      options: [
+        { value: "manual", label: "Manual" },
+        { value: "business", label: "Ficha empresa (contexto)" },
+        { value: "destination", label: "Destino (reservado)" },
+        { value: "region", label: "Región (reservado)" },
+        { value: "category", label: "Categoría (reservado)" },
+        { value: "context", label: "Context Engine (reservado)" },
+      ],
+    },
+    variant: {
+      type: "select", label: "Variante", default: "grid",
+      options: [
+        { value: "grid", label: "Grid" },
+        { value: "list", label: "Lista" },
+        { value: "carousel", label: "Carrusel" },
+        { value: "featured", label: "Destacado" },
+      ],
+    },
+    heading: { type: "text", label: "Encabezado", translatable: true },
+    subheading: { type: "text", label: "Subencabezado", translatable: true },
+    emptyMessage: { type: "text", label: "Mensaje vacío", translatable: true, default: "Sin productos publicados." },
+    columns: { type: "number", label: "Columnas", default: 2 },
+    maxItems: { type: "number", label: "Máximo de items" },
+    groupBy: {
+      type: "select", label: "Agrupar por", default: "none",
+      options: [
+        { value: "none", label: "Sin agrupar" },
+        { value: "type", label: "Tipo de producto" },
+      ],
+    },
+    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Productos y experiencias", translatable: true },
+  },
+  capabilities: { soporta_i18n: true, soporta_seo: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  constraints: {},
+  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "columns"] },
+  i18n: { translatable_fields: ["heading", "subheading", "emptyMessage", "ariaLabel"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   containerBlock,
   sectionBlock,
@@ -2023,6 +2072,8 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   experienceInfoGridBlock,
   experienceSectionBlock,
   experienceFeaturesBlock,
+  // H-03 · Ola I2.a — Experience Products.
+  experienceProductsBlock,
 ];
 
 let bootstrapped = false;
