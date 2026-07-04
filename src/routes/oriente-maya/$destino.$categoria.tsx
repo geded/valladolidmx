@@ -17,7 +17,12 @@ import {
   resolveTerritorialPath,
   resolutionToNavigationContext,
 } from "@/lib/navigation/territorial-resolver.functions";
-import { buildBreadcrumbs, resolveCanonicalPath } from "@/lib/navigation";
+import {
+  buildBreadcrumbs,
+  navigationContextToDeclaration,
+  resolveCanonicalPath,
+} from "@/lib/navigation";
+import { ContextEngineProvider } from "@/lib/context-engine";
 import {
   listMarketplaceBusinesses,
   type MarketplaceBusinessCard,
@@ -84,7 +89,9 @@ function CategoriaEnDestinoPage() {
   }));
   const destLabel = resolution.destination?.label ?? destino;
   const catLabel = resolution.category?.label ?? categoria;
+  const declaration = navigationContextToDeclaration(ctx);
   return (
+    <ContextEngineProvider declaration={declaration}>
     <PublicShell
       eyebrow={destLabel}
       title={`${catLabel} en ${destLabel}`}
@@ -129,5 +136,6 @@ function CategoriaEnDestinoPage() {
         </ul>
       )}
     </PublicShell>
+    </ContextEngineProvider>
   );
 }
