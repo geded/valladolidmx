@@ -29,6 +29,8 @@ import {
   defineRouteContext,
   type RouteContextDeclaration,
 } from "@/lib/context-engine";
+import { resolveCanonicalPath } from "@/lib/navigation";
+import { DISCOVERY_ORIGIN } from "@/lib/discovery/seo";
 
 /**
  * H-02 · I6 — Declaración de contexto de la ficha de producto.
@@ -113,7 +115,7 @@ export const Route = createFileRoute("/producto/$slug")({
       };
     }
 
-    return buildPublicHead({
+    const head = buildPublicHead({
       title,
       description,
       path: `/producto/${p.slug}`,
@@ -121,6 +123,30 @@ export const Route = createFileRoute("/producto/$slug")({
       ogImage: cover,
       jsonLd: [jsonLd],
     });
+
+    // Sub-ola N2.3 · Fase 1 — Canonicalización territorial.
+    // Cuando la empresa oferente tiene destino y categoría publicados,
+    // el canonical y el `og:url` apuntan a la URL territorial oficial.
+    // La ruta legacy sigue 200 OK; NO se emite ningún 301 en esta fase.
+    const destSlug = p.business.destination_slug;
+    const catSlug = p.business.category_slug;
+    if (destSlug && catSlug) {
+      const territorialPath = resolveCanonicalPath({
+        kind: "product",
+        slug: p.slug,
+        business: p.business.slug,
+        category: catSlug,
+        destination: destSlug,
+      });
+      const territorialUrl = `${DISCOVERY_ORIGIN}${territorialPath}`;
+      for (const link of head.links) {
+        if (link.rel === "canonical") link.href = territorialUrl;
+      }
+      for (const m of head.meta) {
+        if (m.property === "og:url") m.content = territorialUrl;
+      }
+    }
+    return head;
   },
   component: MarketplaceProductPage,
   errorComponent: ({ error }) => (
