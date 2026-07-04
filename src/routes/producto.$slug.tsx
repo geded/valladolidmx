@@ -37,29 +37,64 @@ import { DISCOVERY_ORIGIN } from "@/lib/discovery/seo";
  *
  * · `inherit: ["region","destination","category"]` enriquece el
  *   breadcrumb cuando el usuario llega desde una categoría o destino.
- * · `kindDefaults` preserva el breadcrumb legacy en el acceso directo:
- *   "Inicio › Marketplace › [Empresa] › [Producto]".
- * · `canonical` = URL del producto; la herencia jamás toca SEO.
+ * · `kindDefaults` reconstruye el breadcrumb territorial oficial
+ *   ("Inicio › Destino › Categoría › Empresa › Producto") en el
+ *   acceso directo cuando la empresa tiene destino y categoría
+ *   publicados. Sólo cae al breadcrumb legacy con "Marketplace"
+ *   cuando la empresa aún no está asignada territorialmente.
+ * · `canonical` = URL territorial si existe; si no, ruta legacy.
  */
 function buildProductContext(p: MarketplaceProductDetail): RouteContextDeclaration {
+  const destSlug = p.business.destination_slug;
+  const catSlug = p.business.category_slug;
+  const hasTerritorial = Boolean(destSlug && catSlug);
+  const canonical = hasTerritorial
+    ? resolveCanonicalPath({
+        kind: "product",
+        slug: p.slug,
+        business: p.business.slug,
+        category: catSlug,
+        destination: destSlug,
+      })
+    : `/producto/${p.slug}`;
+  const businessHref = hasTerritorial
+    ? resolveCanonicalPath({
+        kind: "business",
+        slug: p.business.slug,
+        category: catSlug,
+        destination: destSlug,
+      })
+    : `/marketplace/${p.business.slug}`;
+  const kindDefaults = hasTerritorial
+    ? [
+        { kind: "destination" as const, slug: destSlug },
+        { kind: "category" as const, slug: catSlug },
+        {
+          kind: "business" as const,
+          slug: p.business.slug,
+          label: p.business.display_name,
+          href: businessHref,
+        },
+      ]
+    : [
+        { kind: "marketplace" as const, label: "Marketplace", href: "/marketplace" },
+        {
+          kind: "business" as const,
+          slug: p.business.slug,
+          label: p.business.display_name,
+          href: `/marketplace/${p.business.slug}`,
+        },
+      ];
   return defineRouteContext({
     current: {
       kind: "product",
       slug: p.slug,
       label: p.name,
-      href: `/producto/${p.slug}`,
+      href: canonical,
     },
     inherit: ["region", "destination", "category"],
-    canonical: `/producto/${p.slug}`,
-    kindDefaults: [
-      { kind: "marketplace", label: "Marketplace", href: "/marketplace" },
-      {
-        kind: "business",
-        slug: p.business.slug,
-        label: p.business.display_name,
-        href: `/marketplace/${p.business.slug}`,
-      },
-    ],
+    canonical,
+    kindDefaults,
   });
 }
 
