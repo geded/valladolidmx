@@ -672,9 +672,8 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
 // H-02 · Iniciativa 2 — Discovery Navigator (producción: hidrata desde
 // Context/Params + TanStack Query).
 PRODUCTION_COMPONENT_MAP["vmx.discovery.navigator"] = ({ node }) => (
-  <DiscoveryNavigatorBlock
-    config={node.config as Record<string, unknown>}
-  />
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  <DiscoveryNavigatorBlock config={node.config as any} />
 );
 
 /* ------------------------------------------------------------------ *
