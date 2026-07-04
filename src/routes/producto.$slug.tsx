@@ -74,8 +74,22 @@ function buildProductContext(p: MarketplaceProductDetail): RouteContextDeclarati
     : `/marketplace/${p.business.slug}`;
   const kindDefaults = hasTerritorial
     ? [
-        { kind: "destination" as const, slug: destSlug },
-        { kind: "category" as const, slug: catSlug },
+        {
+          kind: "destination" as const,
+          slug: destSlug,
+          label: humanizeSlug(destSlug),
+          href: resolveCanonicalPath({ kind: "destination", slug: destSlug }),
+        },
+        {
+          kind: "category" as const,
+          slug: catSlug,
+          label: humanizeSlug(catSlug),
+          href: resolveCanonicalPath({
+            kind: "category",
+            slug: catSlug,
+            destination: destSlug,
+          }),
+        },
         {
           kind: "business" as const,
           slug: p.business.slug,
