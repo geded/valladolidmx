@@ -1593,6 +1593,9 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   discoveryNavigatorBlock,
   // H-03 · Ola I1.a — Experience Hero (fundacional Experience Pages).
   experienceHeroBlock,
+  // H-03 · Ola I1.b — Experience Subnav + CTA Bar (fundacionales).
+  experienceSubnavBlock,
+  experienceCtaBarBlock,
 ];
 
 let bootstrapped = false;
