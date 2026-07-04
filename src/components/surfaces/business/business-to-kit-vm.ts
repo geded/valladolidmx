@@ -34,7 +34,7 @@ export function businessToShellVM(b: MarketplaceBusinessDetail): ShellVM {
     title: b.display_name,
     description: b.tagline ?? undefined,
     crumbs: [
-      { label: "Marketplace", href: "/marketplace" },
+      { label: "Catálogo", href: "/marketplace" },
       { label: b.display_name },
     ] satisfies CrumbVM[],
   };
