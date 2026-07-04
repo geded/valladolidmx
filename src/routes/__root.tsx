@@ -27,6 +27,7 @@ import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
+import { ProtectedActionResumeRunner } from "@/lib/protected-actions";
 
 const rootPublishedHomeQuery = queryOptions({
   queryKey: ["eb", "published-home", "default"],
@@ -189,6 +190,8 @@ function RootComponent() {
         {!isAppShellRoute ? <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" /> : null}
         {!isAppShellRoute ? <AluxFloatingTrigger /> : null}
         {!isAppShellRoute ? <EditThisPageButton pathname={pathname} /> : null}
+        {/* OLA H-01 · Épica 1 · I1 — no-op mientras no haya consumidores. */}
+        <ProtectedActionResumeRunner />
         </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>
