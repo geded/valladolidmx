@@ -124,6 +124,7 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
       title={b.display_name}
       description={b.tagline}
       crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: b.display_name }]}
+      useContextCrumbs
     >
       <div className="-mt-2 mb-6 flex flex-wrap items-center gap-3">
         <FavoriteButton entityKind="business" entityId={b.id} />

@@ -15,6 +15,7 @@ export function KitShell({
       title={vm.title}
       description={vm.description}
       crumbs={vm.crumbs?.map((c) => ({ label: c.label, to: c.href }))}
+      useContextCrumbs
     >
       {children}
     </PublicShell>
