@@ -18,7 +18,10 @@ import {
   resolutionToNavigationContext,
 } from "@/lib/navigation/territorial-resolver.functions";
 import { buildBreadcrumbs, resolveCanonicalPath } from "@/lib/navigation";
-import { listMarketplaceBusinesses } from "@/lib/marketplace/marketplace-reads.functions";
+import {
+  listMarketplaceBusinesses,
+  type MarketplaceBusinessCard,
+} from "@/lib/marketplace/marketplace-reads.functions";
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria")({
   loader: async ({ params }) => {
@@ -33,9 +36,11 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria")({
     }
     // Listado de empresas por dest+cat (filtrado defensivo cliente,
     // fuente única de verdad ya validada por el resolver).
-    const businesses = await listMarketplaceBusinesses().catch(() => []);
-    const items = businesses.filter(
-      (b) =>
+    const businesses = await listMarketplaceBusinesses().catch(
+      () => [] as MarketplaceBusinessCard[],
+    );
+    const items: MarketplaceBusinessCard[] = businesses.filter(
+      (b: MarketplaceBusinessCard) =>
         b.destination_slug === params.destino &&
         b.category_slug === params.categoria,
     );
