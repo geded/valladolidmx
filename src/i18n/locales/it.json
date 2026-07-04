@@ -93,5 +93,14 @@
     "unexpected": "Errore inatteso",
     "eyebrow": "Account",
     "subtitle": "Accedi per salvare viaggi, preferiti e parlare con Alux."
+  },
+  "protected_actions": {
+    "title": "Devi accedere",
+    "description": "Continua da dove hai lasciato dopo l’accesso.",
+    "dismiss": "Non ora",
+    "magic_cta": "Inviami un magic link",
+    "magic_sent": "Controlla la tua email",
+    "email_required": "Inserisci la tua email",
+    "go_full_auth": "Vai alla pagina di accesso"
   }
 }

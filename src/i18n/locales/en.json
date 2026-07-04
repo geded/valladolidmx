@@ -93,5 +93,14 @@
     "unexpected": "Unexpected error",
     "eyebrow": "Account",
     "subtitle": "Sign in to save trips, favorites and chat with Alux."
+  },
+  "protected_actions": {
+    "title": "You need to sign in",
+    "description": "Continue where you left off after signing in.",
+    "dismiss": "Not now",
+    "magic_cta": "Send me a magic link",
+    "magic_sent": "Check your email",
+    "email_required": "Enter your email",
+    "go_full_auth": "Go to sign-in page"
   }
 }

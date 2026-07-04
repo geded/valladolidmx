@@ -93,5 +93,14 @@
     "unexpected": "Unerwarteter Fehler",
     "eyebrow": "Konto",
     "subtitle": "Melde dich an, um Reisen, Favoriten zu speichern und mit Alux zu chatten."
+  },
+  "protected_actions": {
+    "title": "Bitte melde dich an",
+    "description": "Fahre nach der Anmeldung fort.",
+    "dismiss": "Nicht jetzt",
+    "magic_cta": "Magic-Link senden",
+    "magic_sent": "E-Mail prüfen",
+    "email_required": "E-Mail eingeben",
+    "go_full_auth": "Zur Anmeldeseite"
   }
 }

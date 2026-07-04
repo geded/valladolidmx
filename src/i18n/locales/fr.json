@@ -93,5 +93,14 @@
     "unexpected": "Erreur inattendue",
     "eyebrow": "Compte",
     "subtitle": "Connecte-toi pour sauvegarder tes voyages, favoris et discuter avec Alux."
+  },
+  "protected_actions": {
+    "title": "Vous devez vous connecter",
+    "description": "Reprenez là où vous en étiez après connexion.",
+    "dismiss": "Plus tard",
+    "magic_cta": "Recevoir un lien magique",
+    "magic_sent": "Vérifiez votre e-mail",
+    "email_required": "Saisissez votre e-mail",
+    "go_full_auth": "Aller à la page de connexion"
   }
 }
