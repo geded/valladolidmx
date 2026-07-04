@@ -16,6 +16,8 @@ import type { CategoryRelatedDTO } from "@/lib/catalog/category-related.function
 export interface CategorySurfaceRelatedValue {
   destinationSlug: string;
   categorySlug: string;
+  destinationLabel: string | null;
+  categoryLabel: string | null;
   related: CategoryRelatedDTO | null;
 }
 
