@@ -1314,7 +1314,7 @@ const productRelatedBlock = productBlock(
  * ------------------------------------------------------------------ */
 const discoveryNavigatorBlock: BlockContract = {
   type: "vmx.discovery.navigator",
-  category: "smart",
+  category: "static",
   version: "1.0.0",
   display_name: "Discovery Navigator",
   description:
