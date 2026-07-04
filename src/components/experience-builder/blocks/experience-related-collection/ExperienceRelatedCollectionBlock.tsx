@@ -291,8 +291,8 @@ export function ExperienceRelatedCollectionBlock({
         items = resolveCategoryGroupItems(
           g.id,
           category.related,
-          null,
-          null,
+          category.destinationLabel,
+          category.categoryLabel,
         );
       }
       // (Fuentes reservadas: region/category/business/product/context/alux
