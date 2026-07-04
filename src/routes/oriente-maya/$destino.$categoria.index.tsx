@@ -27,6 +27,12 @@ import {
   listMarketplaceBusinesses,
   type MarketplaceBusinessCard,
 } from "@/lib/catalog/marketplace-reads.functions";
+import { getCategoryRelated } from "@/lib/catalog/category-related.functions";
+import {
+  CategorySurfaceRelatedProvider,
+  type CategorySurfaceRelatedValue,
+} from "@/components/surfaces/CategorySurface";
+import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
   loader: async ({ params }) => {
@@ -49,7 +55,15 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
         b.destination_slug === params.destino &&
         b.category_slug === params.categoria,
     );
-    return { resolution, items };
+    // E2 · US-E2.3 — Related Collection para superficie Categoría.
+    // Fallback silencioso: el bloque se oculta si no hay datos.
+    const related = await getCategoryRelated({
+      data: {
+        destinationSlug: params.destino,
+        categorySlug: params.categoria,
+      },
+    }).catch(() => null);
+    return { resolution, items, related };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
@@ -80,7 +94,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
 });
 
 function CategoriaEnDestinoPage() {
-  const { resolution, items } = Route.useLoaderData();
+  const { resolution, items, related } = Route.useLoaderData();
   const { destino, categoria } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
   // `BreadcrumbTerritorial` renderiza el ícono/Home por sí mismo, así
@@ -92,8 +106,21 @@ function CategoriaEnDestinoPage() {
   const destLabel = resolution.destination?.label ?? destino;
   const catLabel = resolution.category?.label ?? categoria;
   const declaration = navigationContextToDeclaration(ctx);
+  const categoryValue: CategorySurfaceRelatedValue = {
+    destinationSlug: destino,
+    categorySlug: categoria,
+    destinationLabel: destLabel,
+    categoryLabel: catLabel,
+    related,
+  };
+  const hasRelated = Boolean(
+    related &&
+      (related.otherCategoriesInDestination.length > 0 ||
+        related.sameCategoryOtherDestinations.length > 0),
+  );
   return (
     <ContextEngineProvider declaration={declaration}>
+    <CategorySurfaceRelatedProvider value={categoryValue}>
     <PublicShell
       eyebrow={destLabel}
       title={`${catLabel} en ${destLabel}`}
@@ -137,7 +164,40 @@ function CategoriaEnDestinoPage() {
           ))}
         </ul>
       )}
+      {hasRelated ? (
+        <section id="descubre" className="mt-12">
+          <ExperienceRelatedCollectionBlock
+            config={{
+              source: "category",
+              entityKind: "business",
+              variant: "grid",
+              columns: 3,
+              heading: "Sigue descubriendo",
+              subheading: `Más ideas para tu viaje por ${destLabel} y el Oriente Maya.`,
+              capabilities: {
+                showRationale: true,
+                showKindBadge: false,
+              },
+              groups: [
+                {
+                  id: "otras-categorias-destino",
+                  entityKind: "business",
+                  heading: `Otras categorías en ${destLabel}`,
+                  items: [],
+                },
+                {
+                  id: "misma-categoria-otros-destinos",
+                  entityKind: "business",
+                  heading: `${catLabel} en otros destinos del Oriente Maya`,
+                  items: [],
+                },
+              ],
+            }}
+          />
+        </section>
+      ) : null}
     </PublicShell>
+    </CategorySurfaceRelatedProvider>
     </ContextEngineProvider>
   );
 }

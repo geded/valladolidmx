@@ -20,6 +20,7 @@ import { ExperienceRelatedCollection } from "./ExperienceRelatedCollection";
 import { DestinationSurfaceContext } from "@/components/surfaces/DestinationSurface";
 import { BusinessSurfaceRelatedContext } from "@/components/surfaces/BusinessSurface";
 import { ProductSurfaceContext, ProductSurfaceRelatedContext } from "@/components/surfaces/ProductSurface";
+import { CategorySurfaceRelatedContext } from "@/components/surfaces/CategorySurface";
 import {
   buildExperienceRelatedCollectionPreviewDTO,
   dedupeItems,
@@ -37,10 +38,12 @@ import {
 } from "@/lib/experience-builder/adapters/destination-related-to-block";
 import { businessRelatedToItems } from "@/lib/experience-builder/adapters/business-related-to-block";
 import { productRelatedToItems } from "@/lib/experience-builder/adapters/product-related-to-block";
+import { categoryRelatedBusinessesToItems } from "@/lib/experience-builder/adapters/category-related-to-block";
 import type { DestinationRelatedDTO } from "@/lib/destinations/public-reads.functions";
 import type { BusinessRelatedDTO } from "@/lib/catalog/business-related.functions";
 import type { ProductRelatedDTO } from "@/lib/catalog/product-related.functions";
 import type { MarketplaceProductDetail } from "@/lib/catalog/marketplace-reads.functions";
+import type { CategoryRelatedDTO } from "@/lib/catalog/category-related.functions";
 
 function safeParse(raw: unknown): ExperienceRelatedCollectionConfig {
   const r = experienceRelatedCollectionConfigSchema.safeParse(raw ?? {});
@@ -150,6 +153,38 @@ function resolveProductGroupItems(
   );
 }
 
+function resolveCategoryGroupItems(
+  groupId: string,
+  related: CategoryRelatedDTO,
+  destinationLabel: string | null,
+  categoryLabel: string | null,
+): ExperienceRelatedItem[] {
+  if (groupId === "otras-categorias-destino") {
+    return categoryRelatedBusinessesToItems(
+      related.otherCategoriesInDestination,
+      destinationLabel
+        ? `Otras categorías en ${destinationLabel}`
+        : "Otras categorías del mismo destino",
+    );
+  }
+  if (groupId === "misma-categoria-otros-destinos") {
+    return categoryRelatedBusinessesToItems(
+      related.sameCategoryOtherDestinations,
+      categoryLabel
+        ? `${categoryLabel} en otros destinos del Oriente Maya`
+        : "Misma categoría en otros destinos del Oriente Maya",
+    );
+  }
+  // Fallback: unión deduplicada.
+  return categoryRelatedBusinessesToItems(
+    [
+      ...related.otherCategoriesInDestination,
+      ...related.sameCategoryOtherDestinations,
+    ],
+    "Sigue descubriendo el Oriente Maya",
+  );
+}
+
 function buildDTO(
   cfg: ExperienceRelatedCollectionConfig,
   groups: ExperienceRelatedGroup[],
@@ -212,6 +247,7 @@ export function ExperienceRelatedCollectionBlock({
   const businessRelated = useContext(BusinessSurfaceRelatedContext);
   const product = useContext(ProductSurfaceContext);
   const productRelated = useContext(ProductSurfaceRelatedContext);
+  const category = useContext(CategorySurfaceRelatedContext);
 
   const resolvedGroups = useMemo<ExperienceRelatedGroup[]>(() => {
     // Sin grupos explícitos: usar `items` de nivel superior como un solo grupo.
@@ -251,13 +287,21 @@ export function ExperienceRelatedCollectionBlock({
       if (cfg.source === "product" && product) {
         items = resolveProductGroupItems(g.id, product, productRelated);
       }
+      if (cfg.source === "category" && category?.related) {
+        items = resolveCategoryGroupItems(
+          g.id,
+          category.related,
+          category.destinationLabel,
+          category.categoryLabel,
+        );
+      }
       // (Fuentes reservadas: region/category/business/product/context/alux
       //  se conectarán en olas siguientes sin cambiar el contrato.)
 
       if (cfg.capabilities.dedupe ?? true) items = dedupeItems(items);
       return { ...g, items };
     });
-  }, [cfg, destination, businessRelated, product, productRelated]);
+  }, [cfg, destination, businessRelated, product, productRelated, category]);
 
   const dto = useMemo(() => buildDTO(cfg, resolvedGroups), [cfg, resolvedGroups]);
 
