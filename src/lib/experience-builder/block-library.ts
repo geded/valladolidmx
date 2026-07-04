@@ -1345,7 +1345,7 @@ const discoveryNavigatorBlock: BlockContract = {
       type: "text",
       label: "Texto del enlace inferior",
       translatable: true,
-      default: "Ver todo el Marketplace",
+      default: "Ver todo lo que ofrece este destino",
     },
     ctaHref: {
       type: "url",
