@@ -30,6 +30,7 @@ import { Route as AluxRouteImport } from './routes/alux'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
+import { Route as ViajeroHandleRouteImport } from './routes/viajero.$handle'
 import { Route as ViajeCompartidoTokenRouteImport } from './routes/viaje-compartido.$token'
 import { Route as ProductoSlugRouteImport } from './routes/producto.$slug'
 import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
@@ -241,6 +242,11 @@ const IndexRoute = IndexRouteImport.update({
 const OrienteMayaIndexRoute = OrienteMayaIndexRouteImport.update({
   id: '/oriente-maya/',
   path: '/oriente-maya/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ViajeroHandleRoute = ViajeroHandleRouteImport.update({
+  id: '/viajero/$handle',
+  path: '/viajero/$handle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ViajeCompartidoTokenRoute = ViajeCompartidoTokenRouteImport.update({
@@ -916,6 +922,7 @@ export interface FileRoutesByFullPath {
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
+  '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1040,6 +1047,7 @@ export interface FileRoutesByTo {
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
+  '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1169,6 +1177,7 @@ export interface FileRoutesById {
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
+  '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/_authenticated/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1301,6 +1310,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/producto/$slug'
     | '/viaje-compartido/$token'
+    | '/viajero/$handle'
     | '/oriente-maya/'
     | '/admin/concierge'
     | '/admin/empresas'
@@ -1425,6 +1435,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/producto/$slug'
     | '/viaje-compartido/$token'
+    | '/viajero/$handle'
     | '/oriente-maya'
     | '/admin/concierge'
     | '/admin/empresas'
@@ -1553,6 +1564,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/producto/$slug'
     | '/viaje-compartido/$token'
+    | '/viajero/$handle'
     | '/oriente-maya/'
     | '/_authenticated/admin/concierge'
     | '/_authenticated/admin/empresas'
@@ -1675,6 +1687,7 @@ export interface RootRouteChildren {
   PreviewTokenRoute: typeof PreviewTokenRoute
   ProductoSlugRoute: typeof ProductoSlugRoute
   ViajeCompartidoTokenRoute: typeof ViajeCompartidoTokenRoute
+  ViajeroHandleRoute: typeof ViajeroHandleRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
@@ -1832,6 +1845,13 @@ declare module '@tanstack/react-router' {
       path: '/oriente-maya'
       fullPath: '/oriente-maya/'
       preLoaderRoute: typeof OrienteMayaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/viajero/$handle': {
+      id: '/viajero/$handle'
+      path: '/viajero/$handle'
+      fullPath: '/viajero/$handle'
+      preLoaderRoute: typeof ViajeroHandleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/viaje-compartido/$token': {
@@ -3001,6 +3021,7 @@ const rootRouteChildren: RootRouteChildren = {
   PreviewTokenRoute: PreviewTokenRoute,
   ProductoSlugRoute: ProductoSlugRoute,
   ViajeCompartidoTokenRoute: ViajeCompartidoTokenRoute,
+  ViajeroHandleRoute: ViajeroHandleRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:
