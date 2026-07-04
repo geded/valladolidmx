@@ -234,7 +234,11 @@ function hrefWithActiveDestination(href: string, activeDestination: string | nul
 export function PrimaryMegaMenu(props: PrimaryMegaMenuProps) {
   const sections = useSections();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const activeDestination = activeDestinationFromPath(pathname);
+  const [browserPathname, setBrowserPathname] = useState<string | null>(null);
+  useEffect(() => {
+    setBrowserPathname(window.location.pathname);
+  }, [pathname]);
+  const activeDestination = activeDestinationFromPath(browserPathname ?? pathname);
   if (props.variant === "desktop") {
     return (
       <DesktopMenu
