@@ -24,7 +24,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 import { BottomSheet } from "@/components/workspace/BottomSheet";
 
-export function SignInPromptSheet(): JSX.Element | null {
+export function SignInPromptSheet() {
   const [gate, setGate] = useState<ActiveGate | null>(() => SheetController.current());
   const { user } = useAuth();
   const { t } = useTranslation();
