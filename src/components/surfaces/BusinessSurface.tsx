@@ -25,10 +25,7 @@
 import { createContext, useContext } from "react";
 import { PublicShell } from "@/components/discovery";
 import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
-import type {
-  MarketplaceBusinessDetail,
-  MarketplacePromotionCard,
-} from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplaceBusinessDetail } from "@/lib/marketplace/marketplace-reads.functions";
 import { planAllows } from "@/lib/plans/plans-catalog";
 import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
 import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
