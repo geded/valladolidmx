@@ -39,6 +39,7 @@ import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
 import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/workspace-preview'
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
 import { Route as LovableProtectedActionsPreviewRouteImport } from './routes/lovable/protected-actions-preview'
+import { Route as LovableContextEnginePreviewRouteImport } from './routes/lovable/context-engine-preview'
 import { Route as LSlugRouteImport } from './routes/l.$slug'
 import { Route as EventosSlugRouteImport } from './routes/eventos.$slug'
 import { Route as AuthenticatedPaginasRouteImport } from './routes/_authenticated/paginas'
@@ -273,6 +274,12 @@ const LovableProtectedActionsPreviewRoute =
   LovableProtectedActionsPreviewRouteImport.update({
     id: '/lovable/protected-actions-preview',
     path: '/lovable/protected-actions-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableContextEnginePreviewRoute =
+  LovableContextEnginePreviewRouteImport.update({
+    id: '/lovable/context-engine-preview',
+    path: '/lovable/context-engine-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LSlugRoute = LSlugRouteImport.update({
@@ -793,6 +800,7 @@ export interface FileRoutesByFullPath {
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
+  '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -903,6 +911,7 @@ export interface FileRoutesByTo {
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
+  '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -1019,6 +1028,7 @@ export interface FileRoutesById {
   '/_authenticated/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
+  '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
@@ -1136,6 +1146,7 @@ export interface FileRouteTypes {
     | '/paginas'
     | '/eventos/$slug'
     | '/l/$slug'
+    | '/lovable/context-engine-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -1246,6 +1257,7 @@ export interface FileRouteTypes {
     | '/paginas'
     | '/eventos/$slug'
     | '/l/$slug'
+    | '/lovable/context-engine-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -1361,6 +1373,7 @@ export interface FileRouteTypes {
     | '/_authenticated/paginas'
     | '/eventos/$slug'
     | '/l/$slug'
+    | '/lovable/context-engine-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
@@ -1469,6 +1482,7 @@ export interface RootRouteChildren {
   RestaurantesRoute: typeof RestaurantesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   LSlugRoute: typeof LSlugRoute
+  LovableContextEnginePreviewRoute: typeof LovableContextEnginePreviewRoute
   LovableProtectedActionsPreviewRoute: typeof LovableProtectedActionsPreviewRoute
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
   LovableWorkspacePreviewRoute: typeof LovableWorkspacePreviewRoute
@@ -1699,6 +1713,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/protected-actions-preview'
       fullPath: '/lovable/protected-actions-preview'
       preLoaderRoute: typeof LovableProtectedActionsPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/context-engine-preview': {
+      id: '/lovable/context-engine-preview'
+      path: '/lovable/context-engine-preview'
+      fullPath: '/lovable/context-engine-preview'
+      preLoaderRoute: typeof LovableContextEnginePreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/l/$slug': {
@@ -2616,6 +2637,7 @@ const rootRouteChildren: RootRouteChildren = {
   RestaurantesRoute: RestaurantesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   LSlugRoute: LSlugRoute,
+  LovableContextEnginePreviewRoute: LovableContextEnginePreviewRoute,
   LovableProtectedActionsPreviewRoute: LovableProtectedActionsPreviewRoute,
   LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,
   LovableWorkspacePreviewRoute: LovableWorkspacePreviewRoute,
