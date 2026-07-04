@@ -11,6 +11,7 @@ import type {} from "@tanstack/react-start";
 import { listPublishedPagesForSitemap } from "@/lib/experience-builder/eb-sitemap.functions";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { resolveCanonicalPath } from "@/lib/navigation";
 
 const BASE_URL = "https://valladolidmx.lovable.app";
 
@@ -76,14 +77,36 @@ export const Route = createFileRoute("/sitemap.xml")({
             changefreq: "weekly" as const,
             priority: "0.8",
           })),
+          // Sub-ola N2.3 · Fase 1 — sitemap emite la URL territorial
+          // cuando la empresa tiene destino y categoría publicados.
+          // Fallback a la URL legacy (`/marketplace/:slug`,
+          // `/producto/:slug`) sólo si falta destino o categoría.
+          // Rutas legacy siguen 200 OK; no se emiten 301 todavía.
           ...entities.empresas.map((r) => ({
-            path: `/marketplace/${r.slug}`,
+            path:
+              r.destination_slug && r.category_slug
+                ? resolveCanonicalPath({
+                    kind: "business",
+                    slug: r.slug,
+                    category: r.category_slug,
+                    destination: r.destination_slug,
+                  })
+                : `/marketplace/${r.slug}`,
             lastmod: r.updated_at ?? undefined,
             changefreq: "weekly" as const,
             priority: "0.7",
           })),
           ...entities.productos.map((r) => ({
-            path: `/producto/${r.slug}`,
+            path:
+              r.destination_slug && r.category_slug && r.business_slug
+                ? resolveCanonicalPath({
+                    kind: "product",
+                    slug: r.slug,
+                    business: r.business_slug,
+                    category: r.category_slug,
+                    destination: r.destination_slug,
+                  })
+                : `/producto/${r.slug}`,
             lastmod: r.updated_at ?? undefined,
             changefreq: "weekly" as const,
             priority: "0.6",
@@ -133,7 +156,21 @@ function clamp01(n: number): number {
 }
 
 interface EntityRow { slug: string; updated_at: string | null }
-interface PublicEntities { destinos: EntityRow[]; empresas: EntityRow[]; productos: EntityRow[]; eventos: EntityRow[] }
+interface BusinessRow extends EntityRow {
+  destination_slug: string | null;
+  category_slug: string | null;
+}
+interface ProductRow extends EntityRow {
+  destination_slug: string | null;
+  category_slug: string | null;
+  business_slug: string | null;
+}
+interface PublicEntities {
+  destinos: EntityRow[];
+  empresas: BusinessRow[];
+  productos: ProductRow[];
+  eventos: EntityRow[];
+}
 
 async function fetchPublicEntities(): Promise<PublicEntities> {
   const url = process.env.SUPABASE_URL;
@@ -144,16 +181,54 @@ async function fetchPublicEntities(): Promise<PublicEntities> {
   });
   const [d, b, p, e] = await Promise.all([
     sb.from("destinations").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(500),
-    sb.from("businesses").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(1000),
-    sb.from("products").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(2000),
+    sb
+      .from("businesses")
+      .select(
+        "slug, updated_at, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug )",
+      )
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .limit(1000),
+    sb
+      .from("products")
+      .select(
+        "slug, updated_at, businesses!inner ( slug, status, deleted_at, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ) )",
+      )
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .limit(2000),
     sb.from("events").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(1000),
   ]);
   const norm = (rows: { slug: string; updated_at: string | null }[] | null) =>
     (rows ?? []).filter((r) => typeof r.slug === "string" && r.slug.length > 0);
+  const pickSlug = (rel: unknown): string | null => {
+    const s = (rel as { slug?: unknown } | null)?.slug;
+    return typeof s === "string" && s.length > 0 ? s : null;
+  };
+  const empresas: BusinessRow[] = ((b.data as any[]) ?? [])
+    .filter((r) => typeof r?.slug === "string" && r.slug.length > 0)
+    .map((r) => ({
+      slug: r.slug as string,
+      updated_at: (r.updated_at as string | null) ?? null,
+      destination_slug: pickSlug(r.destinations),
+      category_slug: pickSlug(r.business_categories),
+    }));
+  const productos: ProductRow[] = ((p.data as any[]) ?? [])
+    .filter((r) => typeof r?.slug === "string" && r.slug.length > 0)
+    .map((r) => {
+      const biz = r.businesses as any;
+      return {
+        slug: r.slug as string,
+        updated_at: (r.updated_at as string | null) ?? null,
+        business_slug: pickSlug(biz),
+        destination_slug: pickSlug(biz?.destinations),
+        category_slug: pickSlug(biz?.business_categories),
+      };
+    });
   return {
     destinos: norm(d.data as EntityRow[] | null),
-    empresas: norm(b.data as EntityRow[] | null),
-    productos: norm(p.data as EntityRow[] | null),
+    empresas,
+    productos,
     eventos: norm(e.data as EntityRow[] | null),
   };
 }
