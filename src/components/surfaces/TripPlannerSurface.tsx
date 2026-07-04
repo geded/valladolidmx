@@ -39,6 +39,7 @@ import { getMyActivePlan } from "@/lib/traveler/travel-plans.functions";
 import { readGuestQueue } from "@/lib/traveler/guest-queue";
 import { useAluxContext } from "@/lib/alux/use-alux-context";
 import { GuestPlanPreview } from "@/components/traveler/GuestPlanPreview";
+import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 
 export function TripPlannerSurface() {
   const { user } = useAuth();
@@ -92,6 +93,9 @@ export function TripPlannerSurface() {
         />
       ) : null}
       {state === "authed-empty" ? <AuthedEmptySection /> : null}
+
+      {state === "authed-active" ? <AluxTravelerPanel /> : null}
+      {state !== "authed-active" ? <AluxTeaserSection authed={Boolean(user)} /> : null}
 
       <HowItWorksSection />
 
