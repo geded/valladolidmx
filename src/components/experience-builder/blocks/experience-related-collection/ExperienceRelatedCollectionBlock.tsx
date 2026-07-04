@@ -203,6 +203,8 @@ export function ExperienceRelatedCollectionBlock({
   const cfg = safeParse(config);
   const destination = useContext(DestinationSurfaceContext);
   const businessRelated = useContext(BusinessSurfaceRelatedContext);
+  const product = useContext(ProductSurfaceContext);
+  const productRelated = useContext(ProductSurfaceRelatedContext);
 
   const resolvedGroups = useMemo<ExperienceRelatedGroup[]>(() => {
     // Sin grupos explícitos: usar `items` de nivel superior como un solo grupo.
@@ -239,13 +241,16 @@ export function ExperienceRelatedCollectionBlock({
       if (cfg.source === "business" && businessRelated) {
         items = resolveBusinessGroupItems(g.id, businessRelated);
       }
+      if (cfg.source === "product" && product) {
+        items = resolveProductGroupItems(g.id, product, productRelated);
+      }
       // (Fuentes reservadas: region/category/business/product/context/alux
       //  se conectarán en olas siguientes sin cambiar el contrato.)
 
       if (cfg.capabilities.dedupe ?? true) items = dedupeItems(items);
       return { ...g, items };
     });
-  }, [cfg, destination, businessRelated]);
+  }, [cfg, destination, businessRelated, product, productRelated]);
 
   const dto = useMemo(() => buildDTO(cfg, resolvedGroups), [cfg, resolvedGroups]);
 
