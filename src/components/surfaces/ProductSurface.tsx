@@ -9,8 +9,8 @@
  */
 import { createContext, useContext } from "react";
 import { PublicShell } from "@/components/discovery";
-import type { MarketplaceProductDetail } from "@/lib/marketplace/marketplace-reads.functions";
-import type { ProductRelatedDTO } from "@/lib/marketplace/product-related.functions";
+import type { MarketplaceProductDetail } from "@/lib/catalog/marketplace-reads.functions";
+import type { ProductRelatedDTO } from "@/lib/catalog/product-related.functions";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 
 export const ProductSurfaceContext = createContext<MarketplaceProductDetail | null>(null);

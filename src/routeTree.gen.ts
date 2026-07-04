@@ -15,6 +15,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as QueHacerRouteImport } from './routes/que-hacer'
 import { Route as PromocionesRouteImport } from './routes/promociones'
 import { Route as OfflineRouteImport } from './routes/offline'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as HotelesRouteImport } from './routes/hoteles'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
@@ -29,13 +30,11 @@ import { Route as AluxRouteImport } from './routes/alux'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
-import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index'
 import { Route as ProductoSlugRouteImport } from './routes/producto.$slug'
 import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$destino'
-import { Route as MarketplaceBuscarRouteImport } from './routes/marketplace/buscar'
-import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
+import { Route as MarketplaceSplatRouteImport } from './routes/marketplace.$'
 import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/workspace-preview'
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
 import { Route as LovableProtectedActionsPreviewRouteImport } from './routes/lovable/protected-actions-preview'
@@ -169,6 +168,11 @@ const OfflineRoute = OfflineRouteImport.update({
   path: '/offline',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MapaRoute = MapaRouteImport.update({
   id: '/mapa',
   path: '/mapa',
@@ -238,11 +242,6 @@ const OrienteMayaIndexRoute = OrienteMayaIndexRouteImport.update({
   path: '/oriente-maya/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
-  id: '/marketplace/',
-  path: '/marketplace/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ProductoSlugRoute = ProductoSlugRouteImport.update({
   id: '/producto/$slug',
   path: '/producto/$slug',
@@ -263,15 +262,10 @@ const OrienteMayaDestinoRoute = OrienteMayaDestinoRouteImport.update({
   path: '/oriente-maya/$destino',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MarketplaceBuscarRoute = MarketplaceBuscarRouteImport.update({
-  id: '/marketplace/buscar',
-  path: '/marketplace/buscar',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
-  id: '/marketplace/$slug',
-  path: '/marketplace/$slug',
-  getParentRoute: () => rootRouteImport,
+const MarketplaceSplatRoute = MarketplaceSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => MarketplaceRoute,
 } as any)
 const LovableWorkspacePreviewRoute = LovableWorkspacePreviewRouteImport.update({
   id: '/lovable/workspace-preview',
@@ -881,6 +875,7 @@ export interface FileRoutesByFullPath {
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
   '/mapa': typeof MapaRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/offline': typeof OfflineRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
@@ -909,13 +904,11 @@ export interface FileRoutesByFullPath {
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
-  '/marketplace/$slug': typeof MarketplaceSlugRoute
-  '/marketplace/buscar': typeof MarketplaceBuscarRoute
+  '/marketplace/$': typeof MarketplaceSplatRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRouteWithChildren
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
-  '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1011,6 +1004,7 @@ export interface FileRoutesByTo {
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
   '/mapa': typeof MapaRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/offline': typeof OfflineRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
@@ -1034,12 +1028,10 @@ export interface FileRoutesByTo {
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
-  '/marketplace/$slug': typeof MarketplaceSlugRoute
-  '/marketplace/buscar': typeof MarketplaceBuscarRoute
+  '/marketplace/$': typeof MarketplaceSplatRoute
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
-  '/marketplace': typeof MarketplaceIndexRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1134,6 +1126,7 @@ export interface FileRoutesById {
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
   '/mapa': typeof MapaRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/offline': typeof OfflineRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
@@ -1162,13 +1155,11 @@ export interface FileRoutesById {
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
-  '/marketplace/$slug': typeof MarketplaceSlugRoute
-  '/marketplace/buscar': typeof MarketplaceBuscarRoute
+  '/marketplace/$': typeof MarketplaceSplatRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoRouteWithChildren
   '/p/$slug': typeof PSlugRoute
   '/preview/$token': typeof PreviewTokenRoute
   '/producto/$slug': typeof ProductoSlugRoute
-  '/marketplace/': typeof MarketplaceIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/_authenticated/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1266,6 +1257,7 @@ export interface FileRouteTypes {
     | '/experiencias'
     | '/hoteles'
     | '/mapa'
+    | '/marketplace'
     | '/offline'
     | '/promociones'
     | '/que-hacer'
@@ -1294,13 +1286,11 @@ export interface FileRouteTypes {
     | '/lovable/protected-actions-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
-    | '/marketplace/$slug'
-    | '/marketplace/buscar'
+    | '/marketplace/$'
     | '/oriente-maya/$destino'
     | '/p/$slug'
     | '/preview/$token'
     | '/producto/$slug'
-    | '/marketplace/'
     | '/oriente-maya/'
     | '/admin/concierge'
     | '/admin/empresas'
@@ -1396,6 +1386,7 @@ export interface FileRouteTypes {
     | '/experiencias'
     | '/hoteles'
     | '/mapa'
+    | '/marketplace'
     | '/offline'
     | '/promociones'
     | '/que-hacer'
@@ -1419,12 +1410,10 @@ export interface FileRouteTypes {
     | '/lovable/protected-actions-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
-    | '/marketplace/$slug'
-    | '/marketplace/buscar'
+    | '/marketplace/$'
     | '/p/$slug'
     | '/preview/$token'
     | '/producto/$slug'
-    | '/marketplace'
     | '/oriente-maya'
     | '/admin/concierge'
     | '/admin/empresas'
@@ -1518,6 +1507,7 @@ export interface FileRouteTypes {
     | '/experiencias'
     | '/hoteles'
     | '/mapa'
+    | '/marketplace'
     | '/offline'
     | '/promociones'
     | '/que-hacer'
@@ -1546,13 +1536,11 @@ export interface FileRouteTypes {
     | '/lovable/protected-actions-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
-    | '/marketplace/$slug'
-    | '/marketplace/buscar'
+    | '/marketplace/$'
     | '/oriente-maya/$destino'
     | '/p/$slug'
     | '/preview/$token'
     | '/producto/$slug'
-    | '/marketplace/'
     | '/oriente-maya/'
     | '/_authenticated/admin/concierge'
     | '/_authenticated/admin/empresas'
@@ -1650,6 +1638,7 @@ export interface RootRouteChildren {
   ExperienciasRoute: typeof ExperienciasRoute
   HotelesRoute: typeof HotelesRoute
   MapaRoute: typeof MapaRoute
+  MarketplaceRoute: typeof MarketplaceRouteWithChildren
   OfflineRoute: typeof OfflineRoute
   PromocionesRoute: typeof PromocionesRoute
   QueHacerRoute: typeof QueHacerRoute
@@ -1669,13 +1658,10 @@ export interface RootRouteChildren {
   LovableProtectedActionsPreviewRoute: typeof LovableProtectedActionsPreviewRoute
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
   LovableWorkspacePreviewRoute: typeof LovableWorkspacePreviewRoute
-  MarketplaceSlugRoute: typeof MarketplaceSlugRoute
-  MarketplaceBuscarRoute: typeof MarketplaceBuscarRoute
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRouteWithChildren
   PSlugRoute: typeof PSlugRoute
   PreviewTokenRoute: typeof PreviewTokenRoute
   ProductoSlugRoute: typeof ProductoSlugRoute
-  MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
@@ -1728,6 +1714,13 @@ declare module '@tanstack/react-router' {
       path: '/offline'
       fullPath: '/offline'
       preLoaderRoute: typeof OfflineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mapa': {
@@ -1828,13 +1821,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrienteMayaIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/marketplace/': {
-      id: '/marketplace/'
-      path: '/marketplace'
-      fullPath: '/marketplace/'
-      preLoaderRoute: typeof MarketplaceIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/producto/$slug': {
       id: '/producto/$slug'
       path: '/producto/$slug'
@@ -1863,19 +1849,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrienteMayaDestinoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/marketplace/buscar': {
-      id: '/marketplace/buscar'
-      path: '/marketplace/buscar'
-      fullPath: '/marketplace/buscar'
-      preLoaderRoute: typeof MarketplaceBuscarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/marketplace/$slug': {
-      id: '/marketplace/$slug'
-      path: '/marketplace/$slug'
-      fullPath: '/marketplace/$slug'
-      preLoaderRoute: typeof MarketplaceSlugRouteImport
-      parentRoute: typeof rootRouteImport
+    '/marketplace/$': {
+      id: '/marketplace/$'
+      path: '/$'
+      fullPath: '/marketplace/$'
+      preLoaderRoute: typeof MarketplaceSplatRouteImport
+      parentRoute: typeof MarketplaceRoute
     }
     '/lovable/workspace-preview': {
       id: '/lovable/workspace-preview'
@@ -2897,6 +2876,18 @@ const EventosRouteChildren: EventosRouteChildren = {
 const EventosRouteWithChildren =
   EventosRoute._addFileChildren(EventosRouteChildren)
 
+interface MarketplaceRouteChildren {
+  MarketplaceSplatRoute: typeof MarketplaceSplatRoute
+}
+
+const MarketplaceRouteChildren: MarketplaceRouteChildren = {
+  MarketplaceSplatRoute: MarketplaceSplatRoute,
+}
+
+const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
+  MarketplaceRouteChildren,
+)
+
 interface OrienteMayaDestinoCategoriaEmpresaRouteChildren {
   OrienteMayaDestinoCategoriaEmpresaProductoRoute: typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
   OrienteMayaDestinoCategoriaEmpresaIndexRoute: typeof OrienteMayaDestinoCategoriaEmpresaIndexRoute
@@ -2961,6 +2952,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExperienciasRoute: ExperienciasRoute,
   HotelesRoute: HotelesRoute,
   MapaRoute: MapaRoute,
+  MarketplaceRoute: MarketplaceRouteWithChildren,
   OfflineRoute: OfflineRoute,
   PromocionesRoute: PromocionesRoute,
   QueHacerRoute: QueHacerRoute,
@@ -2984,13 +2976,10 @@ const rootRouteChildren: RootRouteChildren = {
   LovableProtectedActionsPreviewRoute: LovableProtectedActionsPreviewRoute,
   LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,
   LovableWorkspacePreviewRoute: LovableWorkspacePreviewRoute,
-  MarketplaceSlugRoute: MarketplaceSlugRoute,
-  MarketplaceBuscarRoute: MarketplaceBuscarRoute,
   OrienteMayaDestinoRoute: OrienteMayaDestinoRouteWithChildren,
   PSlugRoute: PSlugRoute,
   PreviewTokenRoute: PreviewTokenRoute,
   ProductoSlugRoute: ProductoSlugRoute,
-  MarketplaceIndexRoute: MarketplaceIndexRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:

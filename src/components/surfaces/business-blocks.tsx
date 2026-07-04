@@ -41,9 +41,9 @@
  * `vmx.business.*` ni tocar el `CompositionRenderer`.
  */
 import { useContext } from "react";
-import { FavoriteButton } from "@/components/marketplace/FavoriteButton";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
-import { ProductActions } from "@/components/marketplace/ProductActions";
+import { ProductActions } from "@/components/commerce/ProductActions";
 import { planAllows } from "@/lib/plans/plans-catalog";
 import {
   BusinessSurfaceContext,
@@ -52,7 +52,7 @@ import {
 import type {
   MarketplaceProductCard,
   MarketplacePromotionCard,
-} from "@/lib/marketplace/marketplace-reads.functions";
+} from "@/lib/catalog/marketplace-reads.functions";
 import { EmptyHint, KitShell } from "@/components/surfaces/kit";
 import {
   businessToInfoRowVMs,

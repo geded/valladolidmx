@@ -11,7 +11,7 @@
  * "candidato a evolución" antes de crear cualquier bloque nuevo.
  */
 import { resolveBusinessVariant } from "@/components/surfaces/BusinessSurface";
-import type { MarketplaceBusinessDetail } from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
 import type { ExperienceHeroDTO } from "@/lib/experience-builder/blocks/experience-hero/contract";
 import type { ExperienceSubnavDTO } from "@/lib/experience-builder/blocks/experience-subnav/contract";
 import { EXPERIENCE_SUBNAV_PRESETS } from "@/lib/experience-builder/blocks/experience-subnav/contract";

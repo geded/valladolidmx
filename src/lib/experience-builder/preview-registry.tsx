@@ -24,13 +24,13 @@ import {
   getMarketplaceBusinessBySlug,
   listMarketplaceBusinesses,
   type MarketplaceBusinessDetail,
-} from "@/lib/marketplace/marketplace-reads.functions";
+} from "@/lib/catalog/marketplace-reads.functions";
 import { BusinessSurfaceProvider } from "@/components/surfaces/BusinessSurface";
 import {
   getMarketplaceProductBySlug,
   searchMarketplace,
   type MarketplaceProductDetail,
-} from "@/lib/marketplace/marketplace-reads.functions";
+} from "@/lib/catalog/marketplace-reads.functions";
 import { ProductSurfaceProvider } from "@/components/surfaces/ProductSurface";
 
 /** Candidato ligero para poblar el selector "Vista previa con…". */

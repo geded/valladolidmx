@@ -24,7 +24,7 @@ import type {
   MarketplaceBusinessDetail,
   MarketplaceProductCard,
   MarketplacePromotionCard,
-} from "@/lib/marketplace/marketplace-reads.functions";
+} from "@/lib/catalog/marketplace-reads.functions";
 import { resolveBusinessVariant } from "@/components/surfaces/BusinessSurface";
 
 export function businessToShellVM(b: MarketplaceBusinessDetail): ShellVM {

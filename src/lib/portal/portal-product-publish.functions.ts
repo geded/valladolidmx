@@ -16,7 +16,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { MarketplaceProductDetail } from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplaceProductDetail } from "@/lib/catalog/marketplace-reads.functions";
 import { resolveBusinessPlanTier } from "@/lib/plans/plans-catalog";
 import {
   ProductPublishValidator,

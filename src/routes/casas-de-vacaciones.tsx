@@ -13,7 +13,7 @@ import { SITE } from "@/config/site";
 import {
   listMarketplaceBusinesses,
   type MarketplaceBusinessCard,
-} from "@/lib/marketplace/marketplace-reads.functions";
+} from "@/lib/catalog/marketplace-reads.functions";
 import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";

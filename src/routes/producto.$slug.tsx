@@ -17,7 +17,7 @@ import { SITE } from "@/config/site";
 import {
   getMarketplaceProductBySlug,
   type MarketplaceProductDetail,
-} from "@/lib/marketplace/marketplace-reads.functions";
+} from "@/lib/catalog/marketplace-reads.functions";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import {

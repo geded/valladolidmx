@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
-import { addToCart } from "@/lib/marketplace/cart.functions";
+import { addToCart } from "@/lib/catalog/cart.functions";
 
 interface Props {
   productId: string;

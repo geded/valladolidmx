@@ -7,7 +7,7 @@
  * de componentes: la tarjeta `BusinessTile` se exporta para reuso.
  */
 import { Link } from "@tanstack/react-router";
-import type { MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplaceBusinessCard } from "@/lib/catalog/marketplace-reads.functions";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { resolveCanonicalPath } from "@/lib/navigation";
 

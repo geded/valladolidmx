@@ -8,7 +8,7 @@
  * Hrefs canónicos territoriales (Navigation Contract v1.0):
  *   /oriente-maya/:destino/:categoria/:empresa/:producto
  */
-import type { MarketplaceProductCard } from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplaceProductCard } from "@/lib/catalog/marketplace-reads.functions";
 import type {
   ExperienceRelatedItem,
 } from "@/lib/experience-builder/blocks/experience-related-collection/contract";

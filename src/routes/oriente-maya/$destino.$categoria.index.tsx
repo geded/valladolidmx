@@ -26,7 +26,7 @@ import { ContextEngineProvider } from "@/lib/context-engine";
 import {
   listMarketplaceBusinesses,
   type MarketplaceBusinessCard,
-} from "@/lib/marketplace/marketplace-reads.functions";
+} from "@/lib/catalog/marketplace-reads.functions";
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
   loader: async ({ params }) => {

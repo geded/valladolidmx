@@ -20,7 +20,7 @@ import {
   type ExperienceReviewsDTO,
 } from "@/lib/experience-builder/blocks/experience-reviews/contract";
 import { BusinessSurfaceProvider } from "@/components/surfaces/BusinessSurface";
-import type { MarketplaceBusinessDetail } from "@/lib/marketplace/marketplace-reads.functions";
+import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
 
 export const Route = createFileRoute("/lovable/experience-reviews-preview")({
   head: () => ({
