@@ -66,7 +66,7 @@ export function ContextEngineProvider({
   rules,
   persistOnMount = true,
   children,
-}: ContextEngineProviderProps): JSX.Element {
+}: ContextEngineProviderProps) {
   const previous = useClientPrevious();
 
   const result = useMemo(
