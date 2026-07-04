@@ -53,10 +53,31 @@ interface ContextEngineProviderProps {
  * Hook interno SSR-safe. Devuelve `undefined` en servidor y en el
  * primer render de cliente; el efecto rellena tras hidratación
  * para evitar hydration mismatch.
+ *
+ * IMPORTANTE: `useSyncExternalStore` exige que `getSnapshot` devuelva
+ * una referencia estable mientras el estado subyacente no cambie.
+ * `readPreviousContext()` parsea JSON en cada llamada y retorna un
+ * objeto nuevo cada vez → sin caché, React lanza
+ * "getSnapshot should be cached to avoid an infinite loop" y
+ * "Maximum update depth exceeded" al hidratar cualquier ruta con
+ * provider. Cacheamos por JSON serializado a nivel de módulo (single
+ * store, sin fuga entre requests SSR porque el snapshot server es
+ * siempre `undefined`).
  */
+let __cachedRaw: string | null = null;
+let __cachedValue: PreviousContext | undefined;
+function cachedSnapshot(): PreviousContext | undefined {
+  const next = readPreviousContext();
+  const raw = next ? JSON.stringify(next) : null;
+  if (raw === __cachedRaw) return __cachedValue;
+  __cachedRaw = raw;
+  __cachedValue = next;
+  return __cachedValue;
+}
+
 function useClientPrevious(): PreviousContext | undefined {
   const subscribe = () => () => {}; // no re-suscripción; leemos on-demand
-  const getSnapshot = () => readPreviousContext();
+  const getSnapshot = () => cachedSnapshot();
   const getServerSnapshot = () => undefined;
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
