@@ -19,7 +19,7 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useSyncExternalStore,
+  useState,
   type ReactNode,
 } from "react";
 import { emitContextEngineEvent } from "./events";
@@ -50,15 +50,30 @@ interface ContextEngineProviderProps {
 }
 
 /**
- * Hook interno SSR-safe. Devuelve `undefined` en servidor y en el
- * primer render de cliente; el efecto rellena tras hidratación
- * para evitar hydration mismatch.
+ * Hook interno SSR-safe. Captura `previous` UNA sola vez al montar,
+ * después de la hidratación. Esto es crítico:
+ *
+ * · El primer render (SSR + primera hidratación cliente) usa
+ *   `undefined` → sin herencia → HTML server = HTML cliente inicial
+ *   (cero hydration mismatch por este dato).
+ * · Un `useEffect` de montaje lee `sessionStorage` UNA vez y setea
+ *   el snapshot. Trigger un re-render con `previous` real → resolver
+ *   aplica herencia y el breadcrumb se enriquece.
+ * · El `useEffect` que persiste el NUEVO `previous` (esta ruta) para
+ *   la próxima navegación NO afecta el snapshot capturado, evitando
+ *   la auto-sobrescritura que anulaba la herencia en I3–I5.
+ * · Sin `useSyncExternalStore` no reaparece el warning
+ *   "getSnapshot should be cached to avoid an infinite loop".
  */
 function useClientPrevious(): PreviousContext | undefined {
-  const subscribe = () => () => {}; // no re-suscripción; leemos on-demand
-  const getSnapshot = () => readPreviousContext();
-  const getServerSnapshot = () => undefined;
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [previous, setPrevious] = useState<PreviousContext | undefined>(undefined);
+  useEffect(() => {
+    setPrevious(readPreviousContext());
+    // Snapshot único al montar la ruta; cambios posteriores en
+    // sessionStorage no re-disparan este provider (se leen al montar
+    // el provider de la próxima ruta).
+  }, []);
+  return previous;
 }
 
 export function ContextEngineProvider({
@@ -104,6 +119,15 @@ export function ContextEngineProvider({
   }, [result, previous]);
 
   // Persistir current como próximo `previous` — sólo cliente.
+  // La dependencia incluye un fingerprint de ancestors: la primera
+  // hidratación calcula ancestors=[] (previous aún undefined) y
+  // escribiría un previous "plano" que rompe la cadena
+  // Destino → Categoría → Categoría (hallazgo I5). Al llegar el
+  // previous heredado y re-computar ancestors, este effect vuelve a
+  // dispararse y persiste el snapshot completo con territorio incluido.
+  const ancestorsFingerprint = result.context.ancestors
+    .map((n) => `${n.kind}:${n.slug ?? n.href ?? n.label}`)
+    .join("|");
   useEffect(() => {
     if (!persistOnMount) return;
     writePreviousContext(result.context.current, result.context.ancestors);
@@ -113,7 +137,7 @@ export function ContextEngineProvider({
     });
     // sólo al cambiar de canonical
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result.context.canonical, persistOnMount]);
+  }, [result.context.canonical, ancestorsFingerprint, persistOnMount]);
 
   return (
     <ResolvedContextCtx.Provider value={result.context}>

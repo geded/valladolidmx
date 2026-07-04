@@ -14,6 +14,11 @@ export const DEFAULT_INHERITANCE_RULES: readonly InheritanceRule[] = [
   { from: "region", to: "category", slots: ["region"] },
   // De un destino a una categoría plana → conserva destino y su región.
   { from: "destination", to: "category", slots: ["region", "destination"] },
+  // Entre categorías hermanas (hoteles → restaurantes → …) → conserva
+  // región/destino heredados sin arrastrar la categoría anterior. Sin
+  // esta regla la cadena Destino → Categoría → Categoría pierde el
+  // territorio en el segundo salto (hallazgo I5, prueba cruzada).
+  { from: "category", to: "category", slots: ["region", "destination"] },
   // De una categoría a un detalle → conserva región/destino/categoría.
   { from: "category", to: "business", slots: ["region", "destination", "category"] },
   { from: "category", to: "product", slots: ["region", "destination", "category"] },
