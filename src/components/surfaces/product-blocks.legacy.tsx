@@ -66,7 +66,7 @@ export function ProductShellBlock({
     return (
       <PublicShell
         title="Producto (previsualiza con datos reales o demo)"
-        crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: "—" }]}
+        crumbs={[{ label: "Catálogo", to: "/marketplace" }, { label: "—" }]}
       >
         {renderChildren?.()}
       </PublicShell>
@@ -75,7 +75,7 @@ export function ProductShellBlock({
   return (
     <PublicShell
       crumbs={[
-        { label: "Marketplace", to: "/marketplace" },
+        { label: "Catálogo", to: "/marketplace" },
         { label: p.business.display_name, to: `/marketplace/${p.business.slug}` },
         { label: p.name },
       ]}
