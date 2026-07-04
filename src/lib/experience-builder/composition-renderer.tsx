@@ -120,6 +120,10 @@ import {
   ExperienceRelatedCollectionBlock,
   ExperienceRelatedCollectionPreview,
 } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
+import {
+  InstitutionalBadgesBlock,
+  InstitutionalBadgesPreview,
+} from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 
 /**
  * US-R3 · Sub-ola 2.5d — mapa de renderers `vmx.kit.*`. Se expande de
@@ -536,6 +540,9 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
 // H-03 · Ola I3.b — Experience Related Collection (Studio).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (STUDIO_PREVIEW_MAP as any)["vmx.experience.related-collection"] = () => <ExperienceRelatedCollectionPreview />;
+// H-03 · Ola I3.c — Institutional Badges (Studio).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.institutional-badges"] = () => <InstitutionalBadgesPreview />;
 
 /* ------------------------------------------------------------------ *
  * Mapa de producción (Etapa 15.10.3)
@@ -801,6 +808,10 @@ PRODUCTION_COMPONENT_MAP["vmx.experience.reviews"] = ({ node }) => (
 // H-03 · Ola I3.b — Experience Related Collection (Producción).
 PRODUCTION_COMPONENT_MAP["vmx.experience.related-collection"] = ({ node }) => (
   <ExperienceRelatedCollectionBlock config={node.config} />
+);
+// H-03 · Ola I3.c — Institutional Badges (Producción).
+PRODUCTION_COMPONENT_MAP["vmx.experience.institutional-badges"] = ({ node }) => (
+  <InstitutionalBadgesBlock config={node.config} />
 );
 
 /* ------------------------------------------------------------------ *
