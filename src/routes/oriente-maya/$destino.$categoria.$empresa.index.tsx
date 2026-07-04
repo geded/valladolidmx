@@ -11,6 +11,7 @@ import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getMarketplaceBusinessBySlug } from "@/lib/marketplace/marketplace-reads.functions";
+import { getBusinessRelated } from "@/lib/marketplace/business-related.functions";
 import {
   resolveTerritorialPath,
   resolutionToNavigationContext,
@@ -35,7 +36,21 @@ export const Route = createFileRoute(
       data: { slug: params.empresa },
     });
     if (!business) throw notFound();
-    return { resolution, business };
+    // E2 · US-E2.1 — Related Collection contextual del negocio.
+    // Fallback silencioso: si falla no rompe el render de la ficha.
+    let related = null as Awaited<ReturnType<typeof getBusinessRelated>> | null;
+    try {
+      related = await getBusinessRelated({
+        data: {
+          businessId: business.id,
+          destinationSlug: business.destination_slug,
+          categorySlug: business.category_slug,
+        },
+      });
+    } catch {
+      related = null;
+    }
+    return { resolution, business, related };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
@@ -61,7 +76,7 @@ export const Route = createFileRoute(
 });
 
 function EmpresaTerritorialPage() {
-  const { resolution, business } = Route.useLoaderData();
+  const { resolution, business, related } = Route.useLoaderData();
   const { destino } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
   // N2.2: fuente única = Navigation Contract. El adapter deriva
@@ -74,7 +89,7 @@ function EmpresaTerritorialPage() {
 
   return (
     <ContextEngineProvider declaration={declaration}>
-      <BusinessSurfaceProvider business={business}>
+      <BusinessSurfaceProvider business={business} related={related}>
         <BusinessSurface />
       </BusinessSurfaceProvider>
     </ContextEngineProvider>
