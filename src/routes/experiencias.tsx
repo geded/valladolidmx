@@ -5,12 +5,17 @@ import { SITE } from "@/config/site";
 import { listMarketplaceBusinesses, type MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
 import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
 import { ORIENTE_MAYA } from "@/config/regions";
+import { DESTINOS_MOCK } from "@/mocks/destinos";
 import {
   defineRouteContext,
   type RouteContextDeclaration,
 } from "@/lib/context-engine";
 
 const CATEGORY_SLUGS = new Set(["experiencias", "experiencias-tours", "tours"]);
+
+function destinationLabel(slug: string): string {
+  return DESTINOS_MOCK.find((d) => d.slug === slug)?.name ?? slug.replace(/-/g, " ");
+}
 
 /**
  * H-02 · I5 — Declaración de contexto (patrón I4).
@@ -22,7 +27,7 @@ function buildExperienciasContext(destino: string | undefined): RouteContextDecl
   const explicitAncestors = destino
     ? [
         { kind: "region" as const, slug: ORIENTE_MAYA.slug, label: ORIENTE_MAYA.name, href: "/oriente-maya" },
-        { kind: "destination" as const, slug: destino, label: destino.replace(/-/g, " "), href: `/oriente-maya/${destino}` },
+        { kind: "destination" as const, slug: destino, label: destinationLabel(destino), href: `/oriente-maya/${destino}` },
       ]
     : [];
   return defineRouteContext({
@@ -62,7 +67,7 @@ function ExperienciasRoute() {
   const contextDeclaration = buildExperienciasContext(destino);
   const legacyCrumbs = [
     { label: "Experiencias", to: "/experiencias" },
-    ...(destino ? [{ label: destino.replace(/-/g, " ") }] : []),
+    ...(destino ? [{ label: destinationLabel(destino) }] : []),
     ...(humanTema && !destino ? [{ label: humanTema }] : []),
   ];
   return (
@@ -70,7 +75,7 @@ function ExperienciasRoute() {
       eyebrow="Categoría"
       title={
         destino
-          ? `Experiencias en ${destino.replace(/-/g, " ")}`
+          ? `Experiencias en ${destinationLabel(destino)}`
           : humanTema
             ? `Experiencias · ${humanTema}`
             : "Experiencias"
@@ -84,7 +89,7 @@ function ExperienciasRoute() {
         items={filtered}
         emptyMessage={
           destino
-            ? `Aún no hay experiencias publicadas en ${destino.replace(/-/g, " ")}.`
+            ? `Aún no hay experiencias publicadas en ${destinationLabel(destino)}.`
             : "Aún no hay experiencias publicadas. Vuelve pronto para descubrir vivencias con guías locales."
         }
       />

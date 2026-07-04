@@ -5,12 +5,17 @@ import { SITE } from "@/config/site";
 import { listMarketplaceBusinesses, type MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
 import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
 import { ORIENTE_MAYA } from "@/config/regions";
+import { DESTINOS_MOCK } from "@/mocks/destinos";
 import {
   defineRouteContext,
   type RouteContextDeclaration,
 } from "@/lib/context-engine";
 
 const CATEGORY_SLUGS = new Set(["hoteles", "hospedaje"]);
+
+function destinationLabel(slug: string): string {
+  return DESTINOS_MOCK.find((d) => d.slug === slug)?.name ?? slug.replace(/-/g, " ");
+}
 
 /**
  * H-02 · I4 — Declaración de contexto de la categoría piloto.
@@ -39,7 +44,7 @@ function buildHotelesContext(destino: string | undefined): RouteContextDeclarati
         {
           kind: "destination" as const,
           slug: destino,
-          label: destino.replace(/-/g, " "),
+          label: destinationLabel(destino),
           href: `/oriente-maya/${destino}`,
         },
       ]
@@ -82,12 +87,12 @@ function HotelesRoute() {
   // usa. Con provider montado, `useContextCrumbs` toma el control.
   const legacyCrumbs = [
     { label: "Hoteles", to: "/hoteles" },
-    ...(destino ? [{ label: destino.replace(/-/g, " ") }] : []),
+    ...(destino ? [{ label: destinationLabel(destino) }] : []),
   ];
   return (
     <PublicShell
       eyebrow="Categoría"
-      title={destino ? `Hoteles en ${destino.replace(/-/g, " ")}` : "Hoteles"}
+      title={destino ? `Hoteles en ${destinationLabel(destino)}` : "Hoteles"}
       description="Haciendas restauradas, posadas familiares y refugios en el corazón del Oriente Maya."
       crumbs={legacyCrumbs}
       contextDeclaration={contextDeclaration}
@@ -97,7 +102,7 @@ function HotelesRoute() {
         items={filtered}
         emptyMessage={
           destino
-            ? `Aún no hay hoteles publicados en ${destino.replace(/-/g, " ")}.`
+            ? `Aún no hay hoteles publicados en ${destinationLabel(destino)}.`
             : "Aún no hay hoteles publicados. Vuelve pronto para descubrir hospedajes verificados."
         }
       />

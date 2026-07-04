@@ -5,12 +5,17 @@ import { SITE } from "@/config/site";
 import { listMarketplaceBusinesses, type MarketplaceBusinessCard } from "@/lib/marketplace/marketplace-reads.functions";
 import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
 import { ORIENTE_MAYA } from "@/config/regions";
+import { DESTINOS_MOCK } from "@/mocks/destinos";
 import {
   defineRouteContext,
   type RouteContextDeclaration,
 } from "@/lib/context-engine";
 
 const CATEGORY_SLUGS = new Set(["restaurantes", "gastronomia"]);
+
+function destinationLabel(slug: string): string {
+  return DESTINOS_MOCK.find((d) => d.slug === slug)?.name ?? slug.replace(/-/g, " ");
+}
 
 /**
  * H-02 · I5 — Declaración de contexto (patrón I4).
@@ -20,7 +25,7 @@ function buildRestaurantesContext(destino: string | undefined): RouteContextDecl
   const explicitAncestors = destino
     ? [
         { kind: "region" as const, slug: ORIENTE_MAYA.slug, label: ORIENTE_MAYA.name, href: "/oriente-maya" },
-        { kind: "destination" as const, slug: destino, label: destino.replace(/-/g, " "), href: `/oriente-maya/${destino}` },
+        { kind: "destination" as const, slug: destino, label: destinationLabel(destino), href: `/oriente-maya/${destino}` },
       ]
     : [];
   return defineRouteContext({
@@ -57,12 +62,12 @@ function RestaurantesRoute() {
   const contextDeclaration = buildRestaurantesContext(destino);
   const legacyCrumbs = [
     { label: "Restaurantes", to: "/restaurantes" },
-    ...(destino ? [{ label: destino.replace(/-/g, " ") }] : []),
+    ...(destino ? [{ label: destinationLabel(destino) }] : []),
   ];
   return (
     <PublicShell
       eyebrow="Categoría"
-      title={destino ? `Restaurantes en ${destino.replace(/-/g, " ")}` : "Restaurantes"}
+      title={destino ? `Restaurantes en ${destinationLabel(destino)}` : "Restaurantes"}
       description="Cocina yucateca, panuchos, recados y mesas de autor."
       crumbs={legacyCrumbs}
       contextDeclaration={contextDeclaration}
@@ -72,7 +77,7 @@ function RestaurantesRoute() {
         items={filtered}
         emptyMessage={
           destino
-            ? `Aún no hay restaurantes publicados en ${destino.replace(/-/g, " ")}.`
+            ? `Aún no hay restaurantes publicados en ${destinationLabel(destino)}.`
             : "Aún no hay restaurantes publicados. Vuelve pronto para descubrir cocineras y mesas locales."
         }
       />
