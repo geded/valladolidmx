@@ -14,11 +14,8 @@ import {
   resolveTerritorialPath,
   resolutionToNavigationContext,
 } from "@/lib/navigation/territorial-resolver.functions";
-import { buildBreadcrumbs } from "@/lib/navigation";
-import {
-  ContextEngineProvider,
-  defineRouteContext,
-} from "@/lib/context-engine";
+import { navigationContextToDeclaration } from "@/lib/navigation";
+import { ContextEngineProvider } from "@/lib/context-engine";
 import {
   ProductSurface,
   ProductSurfaceProvider,
@@ -70,39 +67,14 @@ export const Route = createFileRoute(
 
 function ProductoTerritorialPage() {
   const { resolution, product } = Route.useLoaderData();
-  const { destino, categoria, empresa, producto } = Route.useParams();
+  const { destino } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
-  void buildBreadcrumbs(ctx); // breadcrumbs vía Context Engine (N2.2 los conectará al render).
-
-  const declaration = defineRouteContext({
-    current: {
-      kind: "product",
-      slug: producto,
-      label: product.name,
-      href: `/oriente-maya/${destino}/${categoria}/${empresa}/${producto}`,
-    },
-    ancestors: [
-      { kind: "region", slug: "oriente-maya", label: "Oriente Maya", href: "/oriente-maya" },
-      {
-        kind: "destination",
-        slug: destino,
-        label: resolution.destination?.label ?? destino,
-        href: `/oriente-maya/${destino}`,
-      },
-      {
-        kind: "category",
-        slug: categoria,
-        label: resolution.category?.label ?? categoria,
-        href: `/oriente-maya/${destino}/${categoria}`,
-      },
-      {
-        kind: "business",
-        slug: empresa,
-        label: resolution.business?.label ?? empresa,
-        href: `/oriente-maya/${destino}/${categoria}/${empresa}`,
-      },
-    ],
-    canonical: `/oriente-maya/${destino}/${categoria}/${empresa}/${producto}`,
+  // N2.2: fuente única = Navigation Contract. El adapter deriva
+  // ancestros + hoja desde el contexto ya resuelto; `ProductSurface`
+  // (vía `useContextCrumbs`) renderiza la cadena territorial completa
+  // Inicio → Oriente Maya → Destino → Categoría → Empresa → Producto.
+  const declaration = navigationContextToDeclaration(ctx, {
+    currentLabel: product.name,
   });
 
   return (

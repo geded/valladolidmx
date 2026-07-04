@@ -20,3 +20,7 @@ export {
   switchDestination,
 } from "./canonical-paths";
 export { buildBreadcrumbs, type BuildBreadcrumbsOptions } from "./breadcrumbs";
+export {
+  navigationContextToDeclaration,
+  type NavigationContextDeclarationOptions,
+} from "./context-adapter";
