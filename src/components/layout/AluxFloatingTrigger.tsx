@@ -7,12 +7,15 @@
  * territorial vivo, el trigger cae al modo informativo clásico
  * (enlace a /alux).
  *
- * Fuente única: `useAluxContext()` → Context Engine + Navigation
- * Session. Sin llamadas al backend en esta ola.
+ * Fuente única del contexto: `useAluxContext()` → Context Engine +
+ * Navigation Session. Las sugerencias contextuales las provee la server
+ * fn pública `aluxContextualSuggest` (US-E1.2), sin motor paralelo.
  */
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Compass, MapPin, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   Sheet,
   SheetContent,
@@ -21,6 +24,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useAluxContext, type AluxContextSlot } from "@/lib/alux/use-alux-context";
+import {
+  aluxContextualSuggest,
+  type AluxContextualSuggestion,
+} from "@/lib/alux/contextual-suggest.functions";
 import { useTranslation } from "@/i18n/context";
 
 function ContextChip({ slot }: { slot: AluxContextSlot }) {
@@ -44,6 +51,30 @@ export function AluxFloatingTrigger() {
   const { t } = useTranslation();
   const ctx = useAluxContext();
   const [open, setOpen] = useState(false);
+  const suggestFn = useServerFn(aluxContextualSuggest);
+  const suggestionsQuery = useQuery({
+    queryKey: [
+      "alux",
+      "contextual-suggest",
+      ctx.destination?.slug ?? null,
+      ctx.category?.slug ?? null,
+      ctx.business?.slug ?? null,
+      ctx.product?.slug ?? null,
+    ],
+    queryFn: () =>
+      suggestFn({
+        data: {
+          region: ctx.region,
+          destination: ctx.destination,
+          category: ctx.category,
+          business: ctx.business,
+          product: ctx.product,
+          limit: 6,
+        },
+      }),
+    enabled: open && ctx.hasContext && Boolean(ctx.destination?.slug),
+    staleTime: 60_000,
+  });
 
   // Sin contexto territorial vivo/rehidratado → comportamiento clásico.
   if (!ctx.hasContext) {
@@ -157,34 +188,56 @@ export function AluxFloatingTrigger() {
               <Sparkles className="size-3.5" aria-hidden />
               <span id="alux-next">Qué explorar cerca</span>
             </div>
-            {ctx.related.length > 0 ? (
-              <ul className="mt-2 grid gap-2">
-                {ctx.related.slice(0, 6).map((slot) => (
-                  <li key={`${slot.slug}-${slot.label}`}>
-                    {slot.href ? (
+            {(() => {
+              const remote = suggestionsQuery.data?.suggestions ?? [];
+              const items: AluxContextualSuggestion[] = remote.length > 0
+                ? [...remote]
+                : ctx.related.slice(0, 6).map((slot) => ({
+                    kind: "business" as const,
+                    slug: slot.slug,
+                    label: slot.label,
+                    href: slot.href ?? "#",
+                    rationale: `Relacionado con ${ctx.destination?.label ?? "tu recorrido"}.`,
+                    source: { table: "context-engine", id: slot.slug },
+                  }));
+              if (suggestionsQuery.isLoading && items.length === 0) {
+                return (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Alux está preparando sugerencias del catálogo…
+                  </p>
+                );
+              }
+              if (items.length === 0) {
+                return (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {suggestionsQuery.data?.reason
+                      ?? `Sigue explorando ${ctx.destination?.label ?? "el Oriente Maya"} y Alux te sugerirá qué visitar a continuación.`}
+                  </p>
+                );
+              }
+              return (
+                <ul className="mt-2 grid gap-2">
+                  {items.map((item) => (
+                    <li key={`${item.source.table}-${item.source.id}`}>
                       <a
-                        href={slot.href}
-                        className="group flex items-center justify-between gap-3 rounded-xl border border-border bg-card/60 px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-card"
+                        href={item.href}
+                        className="group flex items-start justify-between gap-3 rounded-xl border border-border bg-card/60 px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-card"
                       >
-                        <span className="truncate">{slot.label}</span>
-                        <ArrowRight className="size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden />
+                        <span className="min-w-0">
+                          <span className="block truncate font-medium">{item.label}</span>
+                          <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                            {item.rationale}
+                          </span>
+                        </span>
+                        <ArrowRight className="mt-1 size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden />
                       </a>
-                    ) : (
-                      <div className="rounded-xl border border-border bg-card/40 px-3 py-2.5 text-sm text-muted-foreground">
-                        {slot.label}
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-2 text-sm text-muted-foreground">
-                Sigue explorando {ctx.destination?.label ?? "el Oriente Maya"} y Alux te
-                sugerirá qué visitar a continuación.
-              </p>
-            )}
+                    </li>
+                  ))}
+                </ul>
+              );
+            })()}
             <p className="mt-3 text-[11px] text-muted-foreground">
-              Sugerencias derivadas del contexto real de tu recorrido, nunca inventadas.
+              Sugerencias derivadas del catálogo publicado y del contexto real de tu recorrido, nunca inventadas.
             </p>
           </section>
 
