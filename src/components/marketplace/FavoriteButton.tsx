@@ -1,12 +1,20 @@
 /**
  * FavoriteButton — Botón cliente para alternar un favorito.
- * (Ola 4 · Etapa 4). Idempotente: tolera doble click y race
- * con otras pestañas; el servidor garantiza unicidad.
+ * (Ola 4 · Etapa 4 · migrado en OLA H-01 · Épica 1 · I3).
+ *
+ * Idempotente: tolera doble click y race con otras pestañas; el servidor
+ * garantiza unicidad. Primer consumidor real de `useProtectedAction`:
+ *  - Autenticado → ejecuta directo (comportamiento preservado).
+ *  - Visitante   → abre `SignInPromptSheet`; tras login exitoso la acción
+ *    se reanuda automáticamente vía `ResumeRunner`. Cancelar cierra sin
+ *    escribir. Expirar (>10 min) descarta silenciosamente.
  */
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { useProtectedAction } from "@/lib/protected-actions";
 import {
   listMyFavorites,
   toggleFavorite,
@@ -47,14 +55,31 @@ export function FavoriteButton({ entityKind, entityId, className }: Props) {
     onError: () => setOptimistic(null),
   });
 
-  if (!user) return null;
+  const protectedRun = useProtectedAction<void, unknown>({
+    kind: "favorite.toggle",
+    requirements: { authenticated: true },
+    reason: isActive ? "favorite.toggle:off" : "favorite.toggle:on",
+    gateCopy: {
+      title: "Guarda tus favoritos",
+      description:
+        "Inicia sesión para guardar este lugar y encontrarlo en /cuenta/favoritos.",
+      primaryCta: "Iniciar sesión y guardar",
+    },
+    action: async () => mutation.mutateAsync(),
+    onError: (err) => {
+      const msg = err instanceof Error ? err.message : "No se pudo guardar el favorito";
+      toast.error(msg);
+    },
+  });
+
   const active = optimistic ?? isActive;
+  const disabled = mutation.isPending || protectedRun.pending;
 
   return (
     <button
       type="button"
-      disabled={mutation.isPending}
-      onClick={() => mutation.mutate()}
+      disabled={disabled}
+      onClick={() => protectedRun.run()}
       aria-pressed={active}
       className={[
         "inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-60",
