@@ -128,11 +128,12 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
   const tier = b.plan_tier;
   const showPromotions = planAllows(tier, "promotions") && b.promotions.length > 0;
 
-  // H-03 · Ola I1.d — Migración a bloques oficiales de la Biblioteca EB.
-  // H-03 · Ola I2.a — Products migrado a `vmx.experience.products`.
-  // La plantilla es orquestador puro: sólo declara qué bloques usa,
-  // en qué orden y con qué configuración. Cero JSX propio de listing.
-  // Promotions y Reviews se migrarán en Ola I2.b/I2.c.
+  // H-03 · Ola I2.d — Refactor final: BusinessSurface es orquestador
+  // puro. Cero JSX visual propio. Toda la presentación proviene
+  // exclusivamente de bloques oficiales del Experience Builder.
+  // Responsabilidades restantes: proveer contexto (BusinessSurfaceProvider),
+  // adaptar datos (adapters), y componer la secuencia declarativa de
+  // bloques + anchors que la sub-navegación necesita.
   const heroDto = businessToHeroDTO(b);
   const subnavDto = businessToSubnavDTO(b);
   const descriptionSection = businessToDescriptionSectionDTO(b);
@@ -144,27 +145,24 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
       crumbs={[{ label: "Marketplace", to: "/marketplace" }, { label: b.display_name }]}
       useContextCrumbs
     >
-      <ExperienceHero dto={heroDto} headingLevel="h1" />
+      <ExperienceHero
+        dto={heroDto}
+        headingLevel="h1"
+        extensionsSlot={
+          <div className="flex flex-wrap items-center gap-3">
+            <FavoriteButton entityKind="business" entityId={b.id} />
+          </div>
+        }
+      />
 
-      <div className="mt-4 mb-6 flex flex-wrap items-center gap-3">
-        <FavoriteButton entityKind="business" entityId={b.id} />
-        {b.verified ? (
-          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-            Verificado
-          </span>
-        ) : null}
-      </div>
+      <ExperienceSubnav dto={subnavDto} className="mt-6 mb-6" />
 
-      <ExperienceSubnav dto={subnavDto} className="mb-6" />
-
-      <section id="resumen" data-eb-anchor className="scroll-mt-24">
-        {descriptionSection ? (
-          <ExperienceSection dto={descriptionSection} />
-        ) : b.tagline ? (
-          <p className="max-w-3xl text-sm text-foreground/80">{b.tagline}</p>
-        ) : null}
-        {infoGridDto ? <ExperienceInfoGrid dto={infoGridDto} className="mt-6" /> : null}
-      </section>
+      {descriptionSection || infoGridDto ? (
+        <section id="resumen" data-eb-anchor className="scroll-mt-24">
+          {descriptionSection ? <ExperienceSection dto={descriptionSection} /> : null}
+          {infoGridDto ? <ExperienceInfoGrid dto={infoGridDto} className="mt-6" /> : null}
+        </section>
+      ) : null}
 
       <section id="servicios" data-eb-anchor className="mt-10 scroll-mt-24">
         <ExperienceProductsBlock
