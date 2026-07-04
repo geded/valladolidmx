@@ -12,6 +12,7 @@ import { ChevronRight, Home } from "lucide-react";
 import type { BreadcrumbCrumb } from "@/types/territory";
 import { useResolvedContext } from "@/lib/context-engine";
 import { cn } from "@/lib/utils";
+import { TerritorialSwitcherMount } from "@/components/navigation/TerritorialSwitcherMount";
 
 interface Props {
   /**
@@ -52,7 +53,10 @@ export function BreadcrumbTerritorial({
   if (effectiveCrumbs.length === 0) return null;
 
   return (
-    <nav aria-label="Ruta territorial" className={cn("text-sm", className)}>
+    <nav
+      aria-label="Ruta territorial"
+      className={cn("flex flex-wrap items-start justify-between gap-3 text-sm", className)}
+    >
       <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
         <li className="flex items-center gap-1.5">
           <Link
@@ -88,6 +92,13 @@ export function BreadcrumbTerritorial({
           );
         })}
       </ol>
+      {/*
+        N2.5 · Montaje visual único del DestinationSwitcher junto al
+        breadcrumb. Se autooculta si no hay contexto territorial o si
+        existe un único destino publicado — no genera ruido en Home,
+        Blog, Contacto ni superficies sin ancla.
+      */}
+      <TerritorialSwitcherMount className="h-8 min-w-40 shrink-0 text-xs" />
     </nav>
   );
 }
