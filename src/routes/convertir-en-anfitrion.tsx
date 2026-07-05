@@ -17,6 +17,8 @@ import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { Briefcase, Compass, Sparkles, Users } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { BecomeHostFlow } from "@/components/hosting/BecomeHostFlow";
 
 export const Route = createFileRoute("/convertir-en-anfitrion")({
   head: () =>
@@ -48,6 +50,21 @@ const BENEFITS = [
 ];
 
 function BecomeHostRoute() {
+  const { user, loading } = useAuth();
+
+  if (!loading && user) {
+    return (
+      <PublicShell
+        eyebrow="Para empresas turísticas"
+        title="Convierte tu negocio en anfitrión del Oriente Maya"
+        description="Reclama tu negocio o registra uno nuevo. Un administrador lo revisará y podrás alternar entre Viajero y Empresa."
+        crumbs={[{ label: "Convertir en anfitrión" }]}
+      >
+        <BecomeHostFlow />
+      </PublicShell>
+    );
+  }
+
   return (
     <PublicShell
       eyebrow="Para empresas turísticas"
