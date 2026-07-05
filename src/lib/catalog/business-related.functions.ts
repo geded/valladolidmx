@@ -101,9 +101,11 @@ export const getBusinessRelated = createServerFn({ method: "GET" })
 
     // Aplica pins: los items fijados se anteponen manteniendo su orden.
     const byId = new Map(all.map((b) => [b.id, b]));
-    const pinnedCards = pinnedIds
-      .map((id) => byId.get(id))
-      .filter((c): c is MarketplaceBusinessCard => Boolean(c) && !hiddenIds.has(c.id));
+    const pinnedCards: MarketplaceBusinessCard[] = [];
+    for (const id of pinnedIds) {
+      const c = byId.get(id);
+      if (c && !hiddenIds.has(c.id)) pinnedCards.push(c);
+    }
     const pinnedSet = new Set(pinnedCards.map((c) => c.id));
 
     const sameCategoryNatural = inDestination
