@@ -83,6 +83,24 @@ export type ReviewVM = {
   rating: number;
   title?: string;
   body: string;
+  publishedAt?: string | null;
+  language?: string | null;
+  visitType?: string | null;
+  verifiedSource?:
+    | "verified_purchase"
+    | "managed_visit"
+    | "verified_visit"
+    | "declared_visitor"
+    | null;
+  businessResponse?: string | null;
+  businessResponseAt?: string | null;
+};
+
+export type ReviewStatsVM = {
+  count: number;
+  average: number;
+  verifiedCount: number;
+  distribution: Record<"1" | "2" | "3" | "4" | "5", number>;
 };
 
 export type FaqVM = { id: string; question: string; answer: string };
