@@ -8,10 +8,10 @@
  * sigue ocurriendo server-side en cada server function, p.ej.
  * founder_dashboard_kpis exige super_admin o admin).
  */
-import { useMemo } from "react";
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { useEffect, useMemo } from "react";
+import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
-import { type AppRole } from "@/types/auth";
+import { resolveRoleHome, type AppRole } from "@/types/auth";
 import { WorkspaceProvider } from "@/components/workspace/WorkspaceProvider";
 import { WorkspaceShell } from "@/components/workspace/WorkspaceShell";
 
@@ -22,28 +22,27 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 function AdminLayout() {
-  const { roles } = useAuth();
+  const { roles, loading } = useAuth();
+  const navigate = useNavigate();
   const allowed = useMemo(
     () => roles.some((r) => ADMIN_ROLES.includes(r)),
     [roles],
   );
 
-  if (!allowed) {
+  // Si el usuario está autenticado pero no tiene rol admin, en lugar de
+  // mostrar 403 lo enviamos silenciosamente al panel que sí le corresponde
+  // (Airbnb-style: nunca dejamos al usuario en una pared sin salida).
+  useEffect(() => {
+    if (!loading && !allowed) {
+      const home = resolveRoleHome(roles);
+      void navigate({ to: home, replace: true });
+    }
+  }, [loading, allowed, roles, navigate]);
+
+  if (loading || !allowed) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="max-w-md text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">403</p>
-          <h1 className="mt-2 text-3xl">Acceso restringido</h1>
-          <p className="mt-3 text-sm text-muted-foreground">
-            El Panel del Fundador está reservado a roles de gobierno de la plataforma.
-          </p>
-          <Link
-            to="/"
-            className="mt-6 inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-95"
-          >
-            Volver al inicio
-          </Link>
-        </div>
+        <p className="text-sm text-muted-foreground">Redirigiendo…</p>
       </div>
     );
   }
