@@ -17,8 +17,8 @@ export type PublicReviewSubjectKind =
   | "business"
   | "product"
   | "destination"
-  | "region"
-  | "category"
+  | "tourism_region"
+  | "business_category"
   | "event";
 
 export type PublicReviewSort = "recent" | "highest" | "lowest" | "helpful";
@@ -72,14 +72,14 @@ function serverPublicClient() {
 }
 
 function normalizeSubjectKind(raw: unknown): PublicReviewSubjectKind {
-  const allowed: PublicReviewSubjectKind[] = [
-    "business",
-    "product",
-    "destination",
-    "region",
-    "category",
-    "event",
-  ];
+    const allowed: PublicReviewSubjectKind[] = [
+      "business",
+      "product",
+      "destination",
+      "tourism_region",
+      "business_category",
+      "event",
+    ];
   if (typeof raw !== "string" || !allowed.includes(raw as PublicReviewSubjectKind)) {
     throw new Error(`Invalid subjectKind: ${String(raw)}`);
   }
