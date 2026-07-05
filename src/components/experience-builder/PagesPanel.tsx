@@ -637,7 +637,7 @@ function GroupBlock({
   canDelete: boolean;
 }) {
   return (
-    <section className="overflow-hidden rounded-lg border border-border bg-card">
+    <section className="rounded-lg border border-border bg-card">
       <button
         type="button"
         onClick={onToggle}
@@ -816,7 +816,7 @@ function PageRow({
           {menuOpen ? (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="absolute right-0 z-20 mt-1 w-52 rounded-md border border-border bg-popover p-1 text-xs shadow-lg"
+              className="absolute right-0 z-50 mt-1 w-52 rounded-md border border-border bg-popover p-1 text-xs shadow-lg"
             >
               <MenuItem icon={Eye} label="Abrir" onClick={() => onAction("open", row)} />
               <MenuItem
