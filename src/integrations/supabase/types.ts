@@ -667,7 +667,7 @@ export type Database = {
           business_id: string
           created_at: string
           expires_at: string
-          from_user_id: string
+          from_user_id: string | null
           id: string
           notes: string | null
           requested_at: string
@@ -680,7 +680,7 @@ export type Database = {
           business_id: string
           created_at?: string
           expires_at?: string
-          from_user_id: string
+          from_user_id?: string | null
           id?: string
           notes?: string | null
           requested_at?: string
@@ -693,7 +693,7 @@ export type Database = {
           business_id?: string
           created_at?: string
           expires_at?: string
-          from_user_id?: string
+          from_user_id?: string | null
           id?: string
           notes?: string | null
           requested_at?: string
@@ -5905,7 +5905,7 @@ export type Database = {
       invitation_status: "pending" | "accepted" | "revoked" | "expired"
       locale_code: "es" | "en" | "fr" | "de" | "it" | "pt"
       media_kind: "image" | "video" | "document" | "audio"
-      membership_status: "active" | "suspended" | "removed"
+      membership_status: "active" | "suspended" | "removed" | "pending"
       notification_category:
         | "transactional"
         | "operational"
@@ -6171,7 +6171,7 @@ export const Constants = {
       invitation_status: ["pending", "accepted", "revoked", "expired"],
       locale_code: ["es", "en", "fr", "de", "it", "pt"],
       media_kind: ["image", "video", "document", "audio"],
-      membership_status: ["active", "suspended", "removed"],
+      membership_status: ["active", "suspended", "removed", "pending"],
       notification_category: [
         "transactional",
         "operational",
