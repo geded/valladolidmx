@@ -174,13 +174,16 @@ export const submitBusinessResponse = createServerFn({ method: "POST" })
     const raw_response = typeof d.response === "string" ? d.response : "";
     const response = raw_response.trim();
     if (response.length > 2000) throw new Error("response_too_long");
-    return { reviewId: d.reviewId, response: response.length === 0 ? null : response };
+    return {
+      reviewId: d.reviewId,
+      response: response.length === 0 ? "" : response,
+    };
   })
   .handler(async ({ data, context }): Promise<BusinessResponseResult> => {
     const { supabase } = context;
     const { data: rows, error } = await supabase.rpc("set_business_response", {
       _review_id: data.reviewId,
-      _response: data.response,
+      _response: data.response, // empty string -> RPC normalizes to NULL (borra)
     });
     if (error) throw new Error(error.message);
     const row = Array.isArray(rows) ? rows[0] : rows;
