@@ -417,14 +417,34 @@ export const getPortalProductPreview = createServerFn({ method: "POST" })
         business_slug: biz.slug as string,
         business_name: biz.display_name as string,
       })),
-      reviews: (reviews ?? []).map((r) => ({
-        id: r.id as string,
-        author_display_name: (r.author_display_name as string) ?? "Viajero",
-        rating: Number(r.rating ?? 0),
-        title: (r.title as string | null) ?? null,
-        body: (r.body as string) ?? "",
-        published_at: (r.published_at as string | null) ?? null,
-      })),
+      reviews: (reviews ?? []).map((r) => {
+        const row = r as unknown as Record<string, unknown>;
+        return {
+          id: row.id as string,
+          author_display_name: (row.author_display_name as string) ?? "Viajero",
+          rating: Number(row.rating ?? 0),
+          title: (row.title as string | null) ?? null,
+          body: (row.body as string) ?? "",
+          published_at: (row.published_at as string | null) ?? null,
+          language: (row.language as string | null) ?? null,
+          visit_type: (row.visit_type as string | null) ?? null,
+          verified_source:
+            (row.verified_source as
+              | "verified_purchase"
+              | "managed_visit"
+              | "verified_visit"
+              | "declared_visitor"
+              | null) ?? null,
+          business_response: (row.business_response as string | null) ?? null,
+          business_response_at: (row.business_response_at as string | null) ?? null,
+        };
+      }),
+      review_stats: {
+        count: 0,
+        average: 0,
+        verifiedCount: 0,
+        distribution: { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
+      },
       faqs: (faqs ?? []).map((f) => ({
         id: f.id as string,
         question: (f.question as string) ?? "",
