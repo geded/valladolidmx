@@ -28,6 +28,7 @@ function AdminEmpresasHub() {
           title: "Gobierno (super_admin)",
           links: [
             { to: "/portal/empresas", label: "Listado de empresas", description: "Tabla global con búsqueda y filtros." },
+            { to: "/admin/anfitriones", label: "Solicitudes de anfitrión", description: "Reclamos y registros pendientes de aprobación." },
           ],
         },
         {
