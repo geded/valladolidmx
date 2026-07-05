@@ -121,6 +121,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       .eq("slug", destSlug)
       .maybeSingle();
     if (dErr || !dest) return { ...EMPTY, reason: "Destino no publicado." };
+    const destination = dest;
 
     // 2. Empresas publicadas del destino con su categoría primaria.
     const { data: biz, error: bErr } = await sb
@@ -192,7 +193,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     const picks = ordered.slice(0, limit);
 
     // 4. Rationale explicable por item.
-    const destinationLabel = data.destination?.label ?? dest.name;
+    const destinationLabel = data.destination?.label ?? destination.name;
     function deterministicRationale(row: BizRow): string {
       if (currentProductSlug && currentBusinessSlug) {
         return row.category_slug === currentCategorySlug
@@ -211,7 +212,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     }
 
     function buildSuggestion(row: BizRow, rationale: string): AluxContextualSuggestion {
-      const href = `/oriente-maya/${dest.slug}/${row.category_slug || "empresas"}/${row.slug}`;
+      const href = `/oriente-maya/${destination.slug}/${row.category_slug || "empresas"}/${row.slug}`;
       const clean = rationale.trim().replace(/\s+/g, " ");
       const safeRationale = clean.length > 0 && clean.length <= 200 ? clean : deterministicRationale(row);
       return {
