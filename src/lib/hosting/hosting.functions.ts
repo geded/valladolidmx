@@ -21,19 +21,23 @@ export interface BusinessSearchHit {
 
 export const searchBusinessesForClaim = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { q: string }) => ({
-    q: z.string().trim().min(2).max(120).parse(data?.q),
+  .inputValidator((data: { q?: string }) => ({
+    q: z.string().trim().max(120).parse(data?.q ?? ""),
   }))
   .handler(async ({ data, context }): Promise<BusinessSearchHit[]> => {
     const { supabase } = context;
-    const { data: rows, error } = await supabase
+    let query = supabase
       .from("businesses")
       .select(
         "id, slug, display_name, destination_id, destinations!inner(name), business_users(user_id, role, status), business_ownership_transfers(status)",
       )
-      .ilike("display_name", `%${data.q}%`)
       .is("deleted_at", null)
-      .limit(20);
+      .order("display_name", { ascending: true })
+      .limit(50);
+    if (data.q.length >= 2) {
+      query = query.ilike("display_name", `%${data.q}%`);
+    }
+    const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
     return (rows ?? []).map((r: any) => ({
       id: r.id,
