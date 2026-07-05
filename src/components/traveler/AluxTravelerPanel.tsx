@@ -13,6 +13,13 @@
  *  - Nunca contacta empresas, reserva ni crea pagos.
  *  - Sin memoria conversacional propia: cada llamada usa el contexto
  *    oficial del Travel Workspace.
+ *
+ * AT-3 · Alux productivo en Mi Viaje (2026-07-05):
+ *  - Reconocimiento explícito de 402 (créditos) y 429 (rate limit) del
+ *    Lovable AI Gateway: se muestra un aviso claro y se ofrece "reintentar"
+ *    sin dejar la superficie en blanco.
+ *  - Errores persisten por capacidad (no sólo toast), así el viajero ve
+ *    exactamente qué capacidad falló y puede repetirla.
  */
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -26,6 +33,8 @@ import {
   Compass,
   MessageSquareText,
   Loader2,
+  AlertTriangle,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -91,6 +100,9 @@ export function AluxTravelerPanel() {
   const [results, setResults] = useState<
     Partial<Record<AluxTravelerCapability, AluxTravelerSuggestion>>
   >({});
+  const [errors, setErrors] = useState<
+    Partial<Record<AluxTravelerCapability, { kind: "rate_limited" | "credits_exhausted" | "error"; message: string }>>
+  >({});
 
   const fns = {
     suggest_experiences: useServerFn(suggestExperiences),
@@ -107,14 +119,37 @@ export function AluxTravelerPanel() {
       const res = (await fn({ data: {} })) as AluxTravelerSuggestion;
       return { id, res };
     },
-    onMutate: (id) => setActive(id),
+    onMutate: (id) => {
+      setActive(id);
+      setErrors((prev) => {
+        if (!prev[id]) return prev;
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    },
     onSuccess: ({ id, res }) => {
       setResults((prev) => ({ ...prev, [id]: res }));
     },
-    onError: (e) =>
-      toast.error("Alux no pudo generar la sugerencia", {
-        description: e instanceof Error ? e.message : undefined,
-      }),
+    onError: (e, id) => {
+      const message = e instanceof Error ? e.message : String(e);
+      const kind: "rate_limited" | "credits_exhausted" | "error" =
+        /\b429\b|rate.?limit/i.test(message)
+          ? "rate_limited"
+          : /\b402\b|credit/i.test(message)
+            ? "credits_exhausted"
+            : "error";
+      setErrors((prev) => ({ ...prev, [id]: { kind, message } }));
+      const title =
+        kind === "credits_exhausted"
+          ? "Alux está sin cuota momentáneamente"
+          : kind === "rate_limited"
+            ? "Alux está saturado, intenta en un momento"
+            : "Alux no pudo generar la sugerencia";
+      toast.error(title, {
+        description: kind === "error" ? message : undefined,
+      });
+    },
     onSettled: () => setActive(null),
   });
 
@@ -175,6 +210,47 @@ export function AluxTravelerPanel() {
       {/* Resultados apilados por capacidad */}
       <div className="mt-5 space-y-4">
         {CAPABILITIES.map((c) => {
+          const err = errors[c.id];
+          if (err) {
+            const title =
+              err.kind === "credits_exhausted"
+                ? "Alux está sin cuota momentáneamente"
+                : err.kind === "rate_limited"
+                  ? "Alux está saturado, intenta de nuevo en un momento"
+                  : "Alux no pudo generar esta sugerencia";
+            return (
+              <article
+                key={`err-${c.id}`}
+                className="rounded-xl border border-warning/30 bg-warning/5 p-4"
+              >
+                <header className="mb-2 flex items-center gap-2">
+                  <span className="grid size-7 place-items-center rounded-full bg-warning/15 text-warning">
+                    <AlertTriangle className="size-3.5" aria-hidden />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-warning">
+                      Alux · {c.label}
+                    </p>
+                    <p className="text-xs text-foreground">{title}</p>
+                  </div>
+                </header>
+                {err.kind === "error" && (
+                  <p className="mb-3 text-[11px] text-muted-foreground">
+                    {err.message}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={() => mut.mutate(c.id)}
+                  disabled={mut.isPending}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-primary/5 disabled:opacity-60"
+                >
+                  <RotateCcw className="size-3" aria-hidden />
+                  Reintentar
+                </button>
+              </article>
+            );
+          }
           const res = results[c.id];
           if (!res) return null;
           return (

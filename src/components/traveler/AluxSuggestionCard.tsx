@@ -14,7 +14,7 @@
  * corresponde a un tipo del Travel Workspace (destination/business/
  * product/event). Alux nunca modifica el plan por su cuenta.
  */
-import { Sparkles, ShieldCheck, Info } from "lucide-react";
+import { Sparkles, ShieldCheck, Info, Zap } from "lucide-react";
 import type {
   AluxTravelerSource,
   AluxTravelerSuggestion,
@@ -67,6 +67,15 @@ export function AluxSuggestionCard({
             Sugerencia · no modifica tu viaje sin tu confirmación
           </p>
         </div>
+        {suggestion.latency_ms > 0 && (
+          <span
+            className="ml-auto inline-flex items-center gap-1 rounded-full bg-background/60 px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
+            title={`Generado en ${suggestion.latency_ms} ms`}
+          >
+            <Zap className="size-3" aria-hidden />
+            {(suggestion.latency_ms / 1000).toFixed(1)}s
+          </span>
+        )}
       </header>
 
       {/* 1. Recomendación */}
