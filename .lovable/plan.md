@@ -1,154 +1,62 @@
+# Trust Engine v1 — Arranque: US-G.2 · Lectura pública
 
-# E6 · Related Collection
+**Épica G · Carril A · v2.5 → v3.0**
+**Política de elegibilidad aprobada:** A (compra verificada) + B (caso concierge cerrado) + D (visitante declarado bajo protesta). C (check-in físico) queda para v2.
 
-**Programa:** Discovery Layer · **Carril A** (Producto) · **Versión:** v2.5
-**Dependencias cerradas:** E5 (Traveler Public Profile), N-Blueprint v1.0, H-03 Block Rules
-**Preparación E7:** contrato `RelatedCollectionProvider` + tabla `related_overrides` (ver conversación previa)
-
----
-
-## 1. Alcance v1
-
-**Superficies (4):** Empresa · Producto/Experiencia · Destino · Evento.
-**Estrategia:** Reglas automáticas + overrides manuales (pin/hide).
-**Fallback vacío:** Populares del destino activo. Si aún <3 items → oculta el bloque.
-**Render:** Bloque oficial EB `vmx.discovery.related-collection` (H-03, L4, evolutivo a L6).
-
-## 2. Contrato del Provider (preparado para E7)
-
-Firma única que E6 implementa y E7 podrá reemplazar sin refactorizar el bloque:
-
-```ts
-getRelatedCollection({
-  entityType: 'business' | 'product' | 'destination' | 'event',
-  entityId: string,
-  surface: string,           // 'business-profile' | ...
-  context?: {                // activado desde v1, opcional
-    activeDestinationId?: string,
-    localeId?: string,
-    season?: string,
-  },
-  limit?: number,            // default 8
-}) → {
-  items: RelatedItem[],
-  strategy: 'same-category' | 'same-destination' | 'same-region'
-          | 'tags-match' | 'popular-destination' | 'manual-pin',
-  rationale?: string,        // explicable por defecto
-}
-```
-
-`RelatedItem` = `{ id, entityType, title, subtitle, image, href, badges[], score }`.
-`href` se resuelve vía `@/lib/navigation` (contrato N-Blueprint) — nunca hardcodeado.
-
-## 3. Reglas automáticas por entidad
-
-| Entidad | Regla primaria | Secundaria | Terciaria (fallback) |
-|---|---|---|---|
-| Empresa | `same_category + same_destination` | `same_category + same_region` | `popular-destination` |
-| Producto/Experiencia | `same_category + same_destination + tags` | `same_category + same_region` | `popular-destination` |
-| Destino | `same_region` (tourism_region) | `neighbor destinations` | `popular globales del tipo` |
-| Evento | `same_destination + fechas ±30d` | `same_destination` | `popular-destination` |
-
-Excluye el propio `entityId`, ítems `hidden` en overrides, y items no publicados.
-`limit` por defecto 8, mínimo para render 3.
-
-## 4. Backend (una migración)
-
-Tabla `related_overrides` (fuente única):
-
-- `id`, `entity_type`, `entity_id`, `surface`
-- `related_entity_type`, `related_entity_id`
-- `mode` enum `pin | hide`
-- `position` int null (orden para pins)
-- `note` text null (rationale editorial)
-- `created_by` (auth.uid), `created_at`, `updated_at`
-- Índice compuesto `(entity_type, entity_id, surface)`
-- Unicidad `(entity_type, entity_id, surface, related_entity_type, related_entity_id)`
-
-GRANTs + RLS:
-- `SELECT` a `anon` y `authenticated` (los pins son públicos; se renderizan en superficies públicas).
-- `INSERT/UPDATE/DELETE` sólo a admin/super_admin/editor vía `has_role`.
-- `service_role`: ALL.
-
-RPC `related_get_collection(p_entity_type, p_entity_id, p_surface, p_context jsonb, p_limit)` — SECURITY DEFINER, devuelve JSON con `items`, `strategy`, `rationale`. Implementa reglas + overrides + fallback populares.
-
-## 5. Server functions (client-safe, en `src/lib/related/`)
-
-- `related.functions.ts` → `getRelatedCollection` (público, publishable key server client — llama RPC).
-- `related-admin.functions.ts` → `listOverrides`, `upsertOverride`, `deleteOverride` (`requireSupabaseAuth` + role check).
-
-## 6. Bloque oficial EB — `vmx.discovery.related-collection`
-
-Ubicación: `src/components/eb/blocks/discovery/RelatedCollection/`
-- `RelatedCollection.block.tsx` (presentación)
-- `RelatedCollection.contract.ts` (Zod, `contractVersion: "1.0.0"`)
-- `RelatedCollection.config.tsx` (panel de configuración: título, límite, variante, filtros)
-- `RelatedCollection.registry.ts` (registro en Library, L4, categoría Discovery)
-
-Contrato (3 capas H-03):
-- **Presentación:** variante (`grid` | `carousel` | `list`), densidad, cards del Cards Registry.
-- **Contenido:** título, subtítulo, empty-state message, cta opcional.
-- **Comportamiento:** `entityBinding` (auto desde surface), `limit`, `strategyHint` (opcional), `showRationale` (bool).
-
-DoR H-03 (6 preguntas en verde) documentado en el bloque.
-Ficha de madurez L4 (preparado L5 = admin overrides UI, L6 = recomendación IA vía E7).
-
-## 7. Integración en superficies
-
-Añadir el bloque al preset EB por defecto de las 4 plantillas:
-- `business-profile` → después de "Reviews", antes de footer.
-- `product-detail` → después de "Detalles", antes de "Reviews".
-- `destination-detail` → después de "Puntos de interés".
-- `event-detail` → después de "Info del evento".
-
-Sin código específico en las superficies: sólo el bloque en el preset. Consistencia H-03.
-
-## 8. Workspace mini-UI · Overrides
-
-Nueva pestaña "Relacionados" en el Inspector de cada ficha (Workspace Engine, sin nuevos engines):
-- Lista los items sugeridos automáticamente (preview).
-- Acciones por item: **Pin arriba** · **Ocultar** · **Nota editorial**.
-- Búsqueda para pinear items ajenos a las reglas.
-- Máx 6 pins por surface.
-
-Consume `listOverrides` + `upsertOverride`/`deleteOverride`.
-
-## 9. Cards Registry
-
-Reutiliza cards existentes (`business-card`, `product-card`, `destination-card`, `event-card`) del Cards Registry — no crea nuevas variantes.
-
-## 10. SEO / Performance
-
-- SSR del bloque en fichas públicas (loader → `getRelatedCollection` vía TanStack Query).
-- `loading="lazy"` en imágenes de cards.
-- No añade og:image (ya definido por la ficha).
-- Prefetch on hover vía TanStack Link `preload`.
-
-## 11. Demo Pack (obligatorio)
-
-Seeds en migración: mínimo 6 items relacionables por cada uno de 4 entidades demo (1 por tipo), 2 pins + 1 hide como ejemplo editorial.
-URLs exactas, credenciales editor, pasos de reproducción, marca temporal.
-
-## 12. DoD
-
-- Typecheck + Build + Smoke.
-- Bloque en Library visible y arrastrable.
-- Bloque renderiza en las 4 fichas demo con datos reales.
-- Overrides funcionales (pin/hide/nota).
-- Fallback populares verificado (vaciando overrides).
-- Comparativa visual antes/después de las 4 fichas.
-- Completion Report `16.20-E6-COMPLETION-REPORT-v1.0.md` con matriz de reutilización + ficha de madurez L4 + preparación E7 documentada.
-- Product Changelog actualizado (Roadmap v2.0).
-
-## 13. Fuera de alcance (queda para E7)
-
-Reglas configurables por admin · priorización/scoring · campañas · señales de traveler · integración Alux · A/B testing · panel de recomendaciones. E6 deja los ganchos: contrato, tabla overrides, campo `context`, `strategy`, `rationale`.
+Arranco por **US-G.2** porque desbloquea el render real (US-G.3) sin tocar auth ni composer. Todo se apoya en la tabla `reviews` ya existente (polimórfica por `subject_kind`/`subject_id`, con `status`, `rating`, `body`, `author_user_id`, `moderation_notes`, etc.). Cero infra nueva.
 
 ---
 
-**Ejecución sugerida en 3 pasos revisables:**
-1. Migración (`related_overrides` + RPC + seeds demo).
-2. Server fns + bloque EB + integración en presets.
-3. Workspace mini-UI overrides + Completion Report + Demo Pack.
+## Alcance US-G.2
 
-¿Apruebas el plan y arranco por el paso 1 (migración)?
+Servidor público — cero secretos — para alimentar el bloque `vmx.experience.reviews` y cualquier superficie pública (ficha de producto, negocio, destino).
+
+### 1. Backend (server functions públicas)
+
+Archivo nuevo: `src/lib/reviews/public-reads.functions.ts`
+
+- `listPublicReviews({ subjectKind, subjectId, limit?, cursor?, sort? })`
+  - Cliente publishable (no `requireSupabaseAuth`, para permitir SSR de rutas públicas).
+  - Filtra `status = 'approved'`, proyecta sólo columnas seguras (id, rating, title, body, author_display_name, verified_source, published_at, business_response, business_response_at).
+  - Orden: `recent` (default), `highest`, `lowest`, `helpful`.
+  - Paginación por cursor (`published_at + id`).
+- `getReviewStats({ subjectKind, subjectId })`
+  - Devuelve `{ count, average, distribution: {1..5}, verifiedCount }`.
+  - Usa RPC `get_review_stats(subject_kind, subject_id)` (creado en migración) para agregarse en DB — evita N+1.
+
+### 2. Migración
+
+- Añadir columnas a `reviews` **si no existen** (verificar primero):
+  - `verified_source text` — enum `verified_purchase | managed_visit | verified_visit | declared_visitor`
+  - `visit_date date`, `visit_type text`, `weight numeric default 1.0`
+  - `business_response text`, `business_response_at timestamptz`, `business_response_by uuid`
+  - `helpful_count int default 0`, `report_count int default 0`
+- Índice: `(subject_kind, subject_id, status, published_at desc)`
+- RPC `get_review_stats(subject_kind text, subject_id uuid)` → agregado con `count / avg / distribución / verified`, `security definer`, `stable`.
+- Policy nueva **TO anon**: `SELECT` sólo cuando `status='approved'`. Mantener policies existentes de owner/moderador.
+- `GRANT SELECT ON public.reviews TO anon` (proyección se controla en server fn) + `GRANT EXECUTE ON FUNCTION get_review_stats TO anon, authenticated`.
+
+### 3. Cliente / consumo
+
+- **No** cablear todavía el bloque `experience-reviews` (eso es US-G.3). Sólo exponer las server fns con tipos + un smoke que las llame.
+- Actualizar `ExperienceReviewsBlock` documentando el punto de mapeo pero sin activarlo (mantener retrocompatibilidad manual).
+
+### 4. Definition of Done
+
+- `bunx tsgo --noEmit` → 0 errores.
+- Migración aplicada, RLS + GRANTs verificados con `supabase--read_query`.
+- Smoke: llamar `listPublicReviews` y `getReviewStats` para un `subject_kind='product'` conocido → responde `[]` / `count: 0` sin error 401/403.
+- Auditoría no-regresión: `/cms/reviews`, `/producto/*`, `/oriente-maya/**` intactas.
+- **Demo Pack:** sembrar 3 reseñas approved + 1 pending sobre 1 producto real → validar que anon ve las 3 approved y que stats devuelve `count=3, average` correcto. URLs exactas en el Completion Report.
+- Completion Report + Product Changelog v2.0 (nueva entrada Épica G · US-G.2).
+
+### 5. Siguientes olas (no ahora)
+
+- **US-G.3** — Cablear `experience-reviews` a datos reales en `/producto/$slug`.
+- **US-G.1** — `ReviewComposer` con flujo estrellas→texto + elegibilidad A/B/D + fricciones antiabuso.
+- **US-G.4** — Verificación básica (badge `verified`).
+- **US-G.5** — `<TrustBadges>` dinámico.
+
+---
+
+¿Autorizas arrancar US-G.2 con este alcance?
