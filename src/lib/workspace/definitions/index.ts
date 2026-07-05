@@ -50,7 +50,7 @@ const founder: WorkspaceDefinition = {
   icon: Compass,
   accent: "atardecer",
   rootPath: "/admin",
-  roles: ["founder", "admin"],
+  roles: ["super_admin", "admin"],
   navigation: [
     { id: "founder.today", workspaceId: "founder", label: "Hoy", icon: LayoutDashboard, to: "/admin", group: "pulso", order: 1, surfaces: ["sidebar", "bottom", "palette"], primary: true },
     { id: "founder.empresas", workspaceId: "founder", label: "Empresas", icon: Building2, to: "/admin/empresas", group: "pulso", order: 2, surfaces: ["sidebar", "bottom", "palette"] },
@@ -146,7 +146,7 @@ const portal: WorkspaceDefinition = {
   icon: Building2,
   accent: "primary",
   rootPath: "/portal",
-  roles: ["business_owner", "business_staff"],
+  roles: ["business_owner"],
   navigation: [
     { id: "portal.today", workspaceId: "portal", label: "Resumen", icon: LayoutDashboard, to: "/portal", group: "pulso", order: 1, surfaces: ["sidebar", "bottom", "palette"], primary: true },
     { id: "portal.empresas", workspaceId: "portal", label: "Empresas", icon: Building2, to: "/portal/empresas", group: "pulso", order: 2, surfaces: ["sidebar", "bottom", "palette"] },
@@ -224,7 +224,7 @@ const concierge: WorkspaceDefinition = {
   icon: ConciergeBell,
   accent: "cenote",
   rootPath: "/concierge",
-  roles: ["concierge", "admin"],
+  roles: ["super_admin", "admin", "concierge", "concierge_lead"],
   navigation: [
     { id: "concierge.inbox", workspaceId: "concierge", label: "Bandeja", icon: Inbox, to: "/concierge", group: "trabajo", order: 1, surfaces: ["sidebar", "bottom", "palette"], primary: true },
   ],
@@ -277,7 +277,7 @@ const cms: WorkspaceDefinition = {
   icon: FileCog,
   accent: "selva",
   rootPath: "/cms",
-  roles: ["editor", "admin"],
+  roles: ["super_admin", "admin", "editor"],
   navigation: [
     { id: "cms.today", workspaceId: "cms", label: "Hoy", icon: LayoutDashboard, to: "/cms", group: "vista", order: 1, surfaces: ["sidebar", "bottom", "palette"], primary: true },
     { id: "cms.regiones", workspaceId: "cms", label: "Regiones", icon: Globe2, to: "/cms/regiones", group: "territorio", order: 2, surfaces: ["sidebar", "palette"] },

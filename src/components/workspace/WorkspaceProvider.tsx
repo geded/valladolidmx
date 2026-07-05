@@ -17,6 +17,7 @@ import {
 import { bootstrapWorkspaceDefinitions } from "@/lib/workspace/definitions";
 import { getWorkspace, listWorkspaces } from "@/lib/workspace/workspace-registry";
 import type { WorkspaceDefinition } from "@/lib/workspace/types";
+import { useAuth } from "@/hooks/useAuth";
 
 export type SidebarState = "expanded" | "rail" | "hidden" | "floating";
 export type InspectorState = "docked" | "drawer" | "sheet" | "closed";
@@ -64,6 +65,7 @@ export function WorkspaceProvider({
 }) {
   // Registro idempotente.
   bootstrapWorkspaceDefinitions();
+  const { user, roles } = useAuth();
 
   const [prefs, setPrefs] = useState<Prefs>({
     ...DEFAULT_PREFS,
@@ -128,11 +130,23 @@ export function WorkspaceProvider({
   }, []);
 
   const value = useMemo<Ctx>(() => {
-    const ws = getWorkspace(prefs.activeWorkspaceId);
+    const canAccessWorkspace = (workspace: WorkspaceDefinition) => {
+      const requiredRoles = workspace.roles ?? [];
+      if (!requiredRoles.length) return true;
+      if (user && requiredRoles.includes("authenticated")) return true;
+      return requiredRoles.some((role) => roles.includes(role as never));
+    };
+    const accessibleWorkspaces = listWorkspaces().filter(canAccessWorkspace);
+    const ws = accessibleWorkspaces.find((w) => w.id === prefs.activeWorkspaceId)
+      ?? accessibleWorkspaces.find((w) => w.id === initialWorkspaceId)
+      ?? getWorkspace(prefs.activeWorkspaceId);
     return {
       workspace: ws,
-      workspaces: listWorkspaces(),
-      setActiveWorkspace: (id) => setPrefs((p) => ({ ...p, activeWorkspaceId: id })),
+      workspaces: accessibleWorkspaces,
+      setActiveWorkspace: (id) => {
+        if (!accessibleWorkspaces.some((w) => w.id === id)) return;
+        setPrefs((p) => ({ ...p, activeWorkspaceId: id }));
+      },
       sidebar: prefs.sidebar,
       setSidebar: (s) => setPrefs((p) => ({ ...p, sidebar: s })),
       toggleSidebar: () =>
@@ -147,7 +161,7 @@ export function WorkspaceProvider({
       paletteOpen,
       setPaletteOpen,
     };
-  }, [prefs, paletteOpen]);
+  }, [prefs, paletteOpen, roles, user, initialWorkspaceId]);
 
   return <WorkspaceCtx.Provider value={value}>{children}</WorkspaceCtx.Provider>;
 }
