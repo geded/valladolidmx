@@ -13,6 +13,7 @@ import { UserRound, LogOut, ChevronDown, Shield, LayoutDashboard, Briefcase, Hea
 import { useTranslation } from "@/i18n/context";
 import { ROLE_LABELS, type AppRole } from "@/types/auth";
 import { useAuth } from "@/hooks/useAuth";
+import { ProfileModeSwitcher } from "@/components/layout/ProfileModeSwitcher";
 
 type MenuLink = { to: "/admin" | "/cms" | "/empresa" | "/concierge" | "/mi-viaje" | "/cuenta"; label: string; icon: typeof UserRound };
 
@@ -94,6 +95,7 @@ export function UserMenu() {
                 ))}
               </div>
             ) : null}
+            <ProfileModeSwitcher onSwitched={() => setOpen(false)} />
             <button
               type="button"
               onMouseDown={(e) => e.preventDefault()}
