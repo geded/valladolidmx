@@ -5309,6 +5309,20 @@ export type Database = {
         }
       }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
+      profile_get_available_modes: {
+        Args: never
+        Returns: {
+          available: boolean
+          entity_count: number
+          mode: Database["public"]["Enums"]["profile_mode"]
+          primary_label: string
+          secondary_label: string
+        }[]
+      }
+      profile_set_active_mode: {
+        Args: { _mode: Database["public"]["Enums"]["profile_mode"] }
+        Returns: Database["public"]["Enums"]["profile_mode"]
+      }
       publish_business_product: { Args: { _product_id: string }; Returns: Json }
       purge_demo_seed: {
         Args: { _batch: string }
