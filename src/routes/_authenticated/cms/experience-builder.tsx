@@ -13,7 +13,8 @@
  *  - CMS First, BEA, Customer Case File, Alux read-only.
  */
 
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { VisualStudio } from "@/components/experience-builder/VisualStudio";
 
@@ -79,6 +80,13 @@ function ExperienceBuilderShell() {
   return (
     <div className="flex flex-col">
       <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
+        <Link
+          to="/cms"
+          aria-label="Volver a CMS Studio"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
         <div className="min-w-0">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Studio
