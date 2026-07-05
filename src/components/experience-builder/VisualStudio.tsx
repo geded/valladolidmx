@@ -1057,21 +1057,29 @@ function PageVisualEditor({
     let cancelled = false;
     void (async () => {
       try {
-        const all = await list();
-        const existing = pickCompositionBySlug(all, pageDef.slug, pageDef.page_type);
         let detail: CompositionDetail | null = null;
-        if (existing) {
-          detail = (await get({ data: { id: existing.id } })) as CompositionDetail | null;
-        } else {
-          const { id } = await create({
-            data: {
-              slug: pageDef.slug,
-              title: pageDef.title,
-              page_type: pageDef.page_type,
-              description: pageDef.description,
-            },
-          });
-          detail = (await get({ data: { id } })) as CompositionDetail | null;
+        // Preferir carga por ID real (viene del Panel de Páginas). Esto
+        // evita el bug donde un lookup por slug/page_type no encontraba
+        // la composición y creaba una nueva vacía (sólo header/footer).
+        if (pageDef.compositionId) {
+          detail = (await get({ data: { id: pageDef.compositionId } })) as CompositionDetail | null;
+        }
+        if (!detail) {
+          const all = await list();
+          const existing = pickCompositionBySlug(all, pageDef.slug, pageDef.page_type);
+          if (existing) {
+            detail = (await get({ data: { id: existing.id } })) as CompositionDetail | null;
+          } else {
+            const { id } = await create({
+              data: {
+                slug: pageDef.slug,
+                title: pageDef.title,
+                page_type: pageDef.page_type,
+                description: pageDef.description,
+              },
+            });
+            detail = (await get({ data: { id } })) as CompositionDetail | null;
+          }
         }
         if (cancelled || !detail) return;
         setPage(detail);
@@ -1085,7 +1093,7 @@ function PageVisualEditor({
     return () => {
       cancelled = true;
     };
-  }, [list, get, create, pageDef.slug, pageDef.page_type, pageDef.title, pageDef.description]);
+  }, [list, get, create, pageDef.compositionId, pageDef.slug, pageDef.page_type, pageDef.title, pageDef.description]);
 
   const saveTimer = useRef<number | null>(null);
   useEffect(() => {
