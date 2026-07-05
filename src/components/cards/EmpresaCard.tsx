@@ -7,6 +7,7 @@ import type { BusinessTeaser } from "@/types/entities";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { resolveCanonicalPath } from "@/lib/navigation";
+import { TrustBadge } from "@/components/reviews/TrustBadge";
 
 export function EmpresaCard({ business }: { business: BusinessTeaser }) {
   // US-E3.2 · Fase B — canonical territorial. Fallback a /marketplace/$slug
@@ -30,6 +31,7 @@ export function EmpresaCard({ business }: { business: BusinessTeaser }) {
         <p className="text-xs uppercase tracking-wider text-muted-foreground">{business.category_slug}</p>
         <h3 className="text-base font-semibold">{business.name}</h3>
         <p className="text-sm text-muted-foreground">{business.tagline}</p>
+        <TrustBadge subjectKind="business" subjectId={business.id} className="mt-1" />
         <div className="mt-auto flex items-center gap-1.5 pt-2 text-xs font-medium text-primary">
           Ver empresa
           <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
