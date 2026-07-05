@@ -155,6 +155,8 @@ export interface PagesPanelProps {
    * su lista interna (comportamiento actual de `PagesPicker`).
    */
   onOpenPage: (page: {
+    /** ID real de `page_compositions`. Evita lookups por slug que crean duplicados. */
+    id: string;
     key: string;
     slug: string;
     title: string;
@@ -270,6 +272,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
   const handleOpen = (r: StudioPageRow) => {
     const def = getPageKindDefinition(r.kind);
     onOpenPage({
+      id: r.id,
       key: r.slug,
       slug: r.slug,
       title: r.title,
@@ -549,6 +552,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
               await reload();
               const def = getPageKindDefinition(form.kind);
               onOpenPage({
+                id: created.id,
                 key: clean,
                 slug: clean,
                 title: form.title.trim() || clean,
