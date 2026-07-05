@@ -85,6 +85,7 @@ import { Route as AuthenticatedCuentaHistorialRouteImport } from './routes/_auth
 import { Route as AuthenticatedCuentaFavoritosRouteImport } from './routes/_authenticated/cuenta/favoritos'
 import { Route as AuthenticatedCuentaConciergeRouteImport } from './routes/_authenticated/cuenta/concierge'
 import { Route as AuthenticatedCuentaCarritoRouteImport } from './routes/_authenticated/cuenta/carrito'
+import { Route as AuthenticatedCuentaAnfitrionRouteImport } from './routes/_authenticated/cuenta/anfitrion'
 import { Route as AuthenticatedCuentaActividadRouteImport } from './routes/_authenticated/cuenta/actividad'
 import { Route as AuthenticatedCmsPagosRouteImport } from './routes/_authenticated/cms/pagos'
 import { Route as AuthenticatedCmsObservabilidadRouteImport } from './routes/_authenticated/cms/observabilidad'
@@ -561,6 +562,12 @@ const AuthenticatedCuentaCarritoRoute =
     path: '/carrito',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
+const AuthenticatedCuentaAnfitrionRoute =
+  AuthenticatedCuentaAnfitrionRouteImport.update({
+    id: '/anfitrion',
+    path: '/anfitrion',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
 const AuthenticatedCuentaActividadRoute =
   AuthenticatedCuentaActividadRouteImport.update({
     id: '/actividad',
@@ -985,6 +992,7 @@ export interface FileRoutesByFullPath {
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
+  '/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRouteWithChildren
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
@@ -1116,6 +1124,7 @@ export interface FileRoutesByTo {
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
+  '/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/cuenta/concierge': typeof AuthenticatedCuentaConciergeRouteWithChildren
   '/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
@@ -1254,6 +1263,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/_authenticated/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/_authenticated/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
+  '/_authenticated/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
   '/_authenticated/cuenta/concierge': typeof AuthenticatedCuentaConciergeRouteWithChildren
   '/_authenticated/cuenta/favoritos': typeof AuthenticatedCuentaFavoritosRoute
@@ -1394,6 +1404,7 @@ export interface FileRouteTypes {
     | '/cms/observabilidad'
     | '/cms/pagos'
     | '/cuenta/actividad'
+    | '/cuenta/anfitrion'
     | '/cuenta/carrito'
     | '/cuenta/concierge'
     | '/cuenta/favoritos'
@@ -1525,6 +1536,7 @@ export interface FileRouteTypes {
     | '/cms/observabilidad'
     | '/cms/pagos'
     | '/cuenta/actividad'
+    | '/cuenta/anfitrion'
     | '/cuenta/carrito'
     | '/cuenta/concierge'
     | '/cuenta/favoritos'
@@ -1662,6 +1674,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/observabilidad'
     | '/_authenticated/cms/pagos'
     | '/_authenticated/cuenta/actividad'
+    | '/_authenticated/cuenta/anfitrion'
     | '/_authenticated/cuenta/carrito'
     | '/_authenticated/cuenta/concierge'
     | '/_authenticated/cuenta/favoritos'
@@ -2323,6 +2336,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCuentaCarritoRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
+    '/_authenticated/cuenta/anfitrion': {
+      id: '/_authenticated/cuenta/anfitrion'
+      path: '/anfitrion'
+      fullPath: '/cuenta/anfitrion'
+      preLoaderRoute: typeof AuthenticatedCuentaAnfitrionRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
     '/_authenticated/cuenta/actividad': {
       id: '/_authenticated/cuenta/actividad'
       path: '/actividad'
@@ -2847,6 +2867,7 @@ const AuthenticatedCuentaConciergeRouteWithChildren =
 
 interface AuthenticatedCuentaRouteRouteChildren {
   AuthenticatedCuentaActividadRoute: typeof AuthenticatedCuentaActividadRoute
+  AuthenticatedCuentaAnfitrionRoute: typeof AuthenticatedCuentaAnfitrionRoute
   AuthenticatedCuentaCarritoRoute: typeof AuthenticatedCuentaCarritoRoute
   AuthenticatedCuentaConciergeRoute: typeof AuthenticatedCuentaConciergeRouteWithChildren
   AuthenticatedCuentaFavoritosRoute: typeof AuthenticatedCuentaFavoritosRoute
@@ -2863,6 +2884,7 @@ interface AuthenticatedCuentaRouteRouteChildren {
 const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildren =
   {
     AuthenticatedCuentaActividadRoute: AuthenticatedCuentaActividadRoute,
+    AuthenticatedCuentaAnfitrionRoute: AuthenticatedCuentaAnfitrionRoute,
     AuthenticatedCuentaCarritoRoute: AuthenticatedCuentaCarritoRoute,
     AuthenticatedCuentaConciergeRoute:
       AuthenticatedCuentaConciergeRouteWithChildren,
