@@ -120,7 +120,7 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
           <button
             type="button"
             aria-label="Cerrar"
-            className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
+            className="absolute right-4 top-4 rounded-pill bg-white/10 p-2 text-white hover:bg-white/20 focus-visible:outline-none focus-visible:ring-focus"
             onClick={(e) => { e.stopPropagation(); close(); }}
           >
             <X className="h-5 w-5" />
@@ -128,7 +128,7 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
           <button
             type="button"
             aria-label="Anterior"
-            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
+            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-pill bg-white/10 p-2 text-white hover:bg-white/20 focus-visible:outline-none focus-visible:ring-focus"
             onClick={(e) => { e.stopPropagation(); nav(-1); }}
           >
             <ChevronLeft className="h-6 w-6" />
@@ -142,7 +142,7 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
           <button
             type="button"
             aria-label="Siguiente"
-            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
+            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-pill bg-white/10 p-2 text-white hover:bg-white/20 focus-visible:outline-none focus-visible:ring-focus"
             onClick={(e) => { e.stopPropagation(); nav(1); }}
           >
             <ChevronRight className="h-6 w-6" />
@@ -185,7 +185,7 @@ function Thumb({
     <button
       type="button"
       onClick={onClick}
-      className="group block w-full overflow-hidden rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+      className="group block w-full overflow-hidden rounded-md text-left focus-visible:outline-none focus-visible:ring-focus"
       aria-label={`Abrir ${item.alt || "imagen"}`}
     >
       {inner}
