@@ -82,7 +82,6 @@ function ClaimBranch() {
   const results = useQuery({
     queryKey: ["hosting-search", term],
     queryFn: () => search({ data: { q: term } }),
-    enabled: term.length >= 2,
   });
 
   const mutate = useMutation({
