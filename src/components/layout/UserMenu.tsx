@@ -74,7 +74,7 @@ export function UserMenu() {
     (p) => pathname === p || pathname.startsWith(p + "/"),
   );
   // Landing canónico del modo activo (para "Mi cuenta" desde la parte pública).
-  const MODE_LANDING: Record<ProfileMode, "/cuenta" | "/portal" | "/concierge" | "/cms" | "/mi-viaje"> = {
+  const MODE_LANDING: Record<ProfileMode, "/cuenta" | "/portal" | "/concierge" | "/cms" | "/mi-viaje" | "/admin"> = {
     traveler: "/mi-viaje",
     business: "/portal",
     concierge: "/concierge",
