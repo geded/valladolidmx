@@ -280,13 +280,13 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         .limit(6),
       supabase
         .from("reviews")
-        .select("id, author_display_name, rating, title, body, published_at, status, deleted_at, subject_kind, subject_id")
+        .select("id, author_display_name, rating, title, body, published_at, language, visit_type, verified_source, business_response, business_response_at, status, deleted_at, subject_kind, subject_id")
         .eq("subject_kind", "product")
         .eq("subject_id", prod.id)
         .eq("status", "published")
         .is("deleted_at", null)
         .order("published_at", { ascending: false })
-        .limit(6),
+        .limit(20),
       supabase
         .from("faqs")
         .select("id, question, answer, position, status, deleted_at, entity_kind, entity_id, locale")
