@@ -164,6 +164,97 @@ export const listEventsForDestination = createServerFn({ method: "GET" })
     return mapCards((rows ?? []) as unknown as CardRow[], false);
   });
 
+/**
+ * E6.b · getEventRelated — Eventos hermanos publicados en el mismo
+ * destino, próximos, excluyendo el evento actual. Aplica overrides
+ * editoriales (pin/hide) sobre la superficie `event-detail`.
+ */
+export const getEventRelated = createServerFn({ method: "GET" })
+  .inputValidator(
+    (input: { eventId: string; destinationId: string | null; limit?: number }) => {
+      if (!input || typeof input.eventId !== "string" || !input.eventId) {
+        throw new Error("invalid_event_id");
+      }
+      return {
+        eventId: input.eventId,
+        destinationId: typeof input.destinationId === "string" ? input.destinationId : null,
+        limit:
+          typeof input.limit === "number" && input.limit > 0
+            ? Math.min(input.limit, 12)
+            : 6,
+      };
+    },
+  )
+  .handler(async ({ data }): Promise<PublicEventCard[]> => {
+    const sb = await pubClient();
+
+    // Overrides
+    const { data: overrides } = await sb
+      .from("related_overrides")
+      .select("related_entity_type, related_entity_id, mode")
+      .eq("entity_type", "event")
+      .eq("entity_id", data.eventId)
+      .eq("surface", "event-detail")
+      .eq("related_entity_type", "event");
+    const hidden = new Set<string>();
+    const pinnedIds: string[] = [];
+    for (const o of overrides ?? []) {
+      if (o.mode === "hide") hidden.add(o.related_entity_id as string);
+      else if (o.mode === "pin") pinnedIds.push(o.related_entity_id as string);
+    }
+
+    // Reglas automáticas: mismo destino + próximos + excluir actual.
+    let q = sb
+      .from("events")
+      .select(SELECT_CARD)
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .neq("id", data.eventId)
+      .gte("starts_at", new Date().toISOString())
+      .order("starts_at", { ascending: true })
+      .limit(Math.max(data.limit * 4, 24));
+    if (data.destinationId) q = q.eq("destination_id", data.destinationId);
+    const { data: rows, error } = await q;
+    if (error) {
+      console.error("[getEventRelated]", error);
+      return [];
+    }
+    const filtered = ((rows ?? []) as unknown as CardRow[]).filter((r) => !hidden.has(r.id));
+    const cards = await mapCards(filtered, false);
+
+    // Fallback: si no hay suficientes en el destino, completa con próximos globales.
+    let out = cards;
+    if (out.length < data.limit) {
+      const seen = new Set(out.map((c) => c.id));
+      const { data: extra } = await sb
+        .from("events")
+        .select(SELECT_CARD)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .neq("id", data.eventId)
+        .gte("starts_at", new Date().toISOString())
+        .order("starts_at", { ascending: true })
+        .limit(data.limit * 2);
+      const extraCards = await mapCards(
+        ((extra ?? []) as unknown as CardRow[]).filter(
+          (r) => !hidden.has(r.id) && !seen.has(r.id),
+        ),
+        false,
+      );
+      out = [...out, ...extraCards];
+    }
+
+    // Aplica pins (prepend).
+    if (pinnedIds.length > 0) {
+      const byId = new Map(out.map((c) => [c.id, c] as const));
+      const pinnedCards = pinnedIds.map((id) => byId.get(id)).filter(Boolean) as PublicEventCard[];
+      const pinnedSet = new Set(pinnedCards.map((c) => c.id));
+      out = [...pinnedCards, ...out.filter((c) => !pinnedSet.has(c.id))];
+    }
+
+    return out.slice(0, data.limit);
+  });
+
 export const getEventBySlug = createServerFn({ method: "GET" })
   .inputValidator((input: { slug: string }) => {
     if (!input || !isSlug(input.slug)) throw new Error("Invalid slug");
