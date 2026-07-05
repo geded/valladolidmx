@@ -19,40 +19,106 @@ export interface BusinessSearchHit {
   has_pending_claim: boolean;
 }
 
+export interface BusinessSearchResult {
+  rows: BusinessSearchHit[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
 export const searchBusinessesForClaim = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { q?: string }) => ({
-    q: z.string().trim().max(120).parse(data?.q ?? ""),
-  }))
-  .handler(async ({ data, context }): Promise<BusinessSearchHit[]> => {
+  .inputValidator(
+    (data: {
+      q?: string;
+      destination_id?: string | null;
+      category_id?: string | null;
+      page?: number;
+      page_size?: number;
+    }) => ({
+      q: z.string().trim().max(120).parse(data?.q ?? ""),
+      destination_id: data?.destination_id
+        ? z.string().uuid().parse(data.destination_id)
+        : null,
+      category_id: data?.category_id
+        ? z.string().uuid().parse(data.category_id)
+        : null,
+      page: z.number().int().min(1).max(500).parse(data?.page ?? 1),
+      page_size: z.number().int().min(1).max(50).parse(data?.page_size ?? 10),
+    }),
+  )
+  .handler(async ({ data, context }): Promise<BusinessSearchResult> => {
     const { supabase } = context;
+    const from = (data.page - 1) * data.page_size;
+    const to = from + data.page_size - 1;
+
+    // If filtering by category, first resolve matching business ids.
+    let idFilter: string[] | null = null;
+    if (data.category_id) {
+      const { data: links, error: linkErr } = await supabase
+        .from("business_category_links")
+        .select("business_id")
+        .eq("category_id", data.category_id);
+      if (linkErr) throw new Error(linkErr.message);
+      idFilter = (links ?? []).map((l: any) => l.business_id);
+      if (idFilter.length === 0) {
+        return { rows: [], total: 0, page: data.page, page_size: data.page_size };
+      }
+    }
+
     let query = supabase
       .from("businesses")
       .select(
         "id, slug, display_name, destination_id, destinations!inner(name), business_users(user_id, role, status), business_ownership_transfers(status)",
+        { count: "exact" },
       )
       .is("deleted_at", null)
       .order("display_name", { ascending: true })
-      .limit(50);
-    if (data.q.length >= 2) {
-      query = query.ilike("display_name", `%${data.q}%`);
-    }
-    const { data: rows, error } = await query;
+      .range(from, to);
+
+    if (data.q.length >= 2) query = query.ilike("display_name", `%${data.q}%`);
+    if (data.destination_id) query = query.eq("destination_id", data.destination_id);
+    if (idFilter) query = query.in("id", idFilter);
+
+    const { data: rows, error, count } = await query;
     if (error) throw new Error(error.message);
-    return (rows ?? []).map((r: any) => ({
-      id: r.id,
-      slug: r.slug,
-      display_name: r.display_name,
-      destination_id: r.destination_id,
-      destination_name: r.destinations?.name ?? null,
-      has_owner: (r.business_users ?? []).some(
-        (m: any) => m.role === "owner" && m.status === "active",
-      ),
-      has_pending_claim: (r.business_ownership_transfers ?? []).some(
-        (t: any) => t.status === "pending",
-      ),
-    }));
+    return {
+      rows: (rows ?? []).map((r: any) => ({
+        id: r.id,
+        slug: r.slug,
+        display_name: r.display_name,
+        destination_id: r.destination_id,
+        destination_name: r.destinations?.name ?? null,
+        has_owner: (r.business_users ?? []).some(
+          (m: any) => m.role === "owner" && m.status === "active",
+        ),
+        has_pending_claim: (r.business_ownership_transfers ?? []).some(
+          (t: any) => t.status === "pending",
+        ),
+      })),
+      total: count ?? 0,
+      page: data.page,
+      page_size: data.page_size,
+    };
   });
+
+export const listBusinessCategoriesForClaim = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(
+    async ({
+      context,
+    }): Promise<{ id: string; name: string; slug: string }[]> => {
+      const { data, error } = await context.supabase
+        .from("business_categories")
+        .select("id, name, slug")
+        .is("deleted_at", null)
+        .eq("status", "published")
+        .order("sort_order")
+        .order("name");
+      if (error) throw new Error(error.message);
+      return (data as { id: string; name: string; slug: string }[]) ?? [];
+    },
+  );
 
 export const claimBusiness = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
