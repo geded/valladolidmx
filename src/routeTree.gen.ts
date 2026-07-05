@@ -102,6 +102,7 @@ import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './rout
 import { Route as AuthenticatedPortalEmpresasIndexRouteImport } from './routes/_authenticated/portal/empresas.index'
 import { Route as AuthenticatedCmsZonasIndexRouteImport } from './routes/_authenticated/cms/zonas.index'
 import { Route as AuthenticatedCmsReviewsIndexRouteImport } from './routes/_authenticated/cms/reviews.index'
+import { Route as AuthenticatedCmsRelacionadosIndexRouteImport } from './routes/_authenticated/cms/relacionados.index'
 import { Route as AuthenticatedCmsRegionesIndexRouteImport } from './routes/_authenticated/cms/regiones.index'
 import { Route as AuthenticatedCmsProductosIndexRouteImport } from './routes/_authenticated/cms/productos.index'
 import { Route as AuthenticatedCmsEmpresasIndexRouteImport } from './routes/_authenticated/cms/empresas.index'
@@ -654,6 +655,12 @@ const AuthenticatedCmsReviewsIndexRoute =
     path: '/reviews/',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsRelacionadosIndexRoute =
+  AuthenticatedCmsRelacionadosIndexRouteImport.update({
+    id: '/relacionados/',
+    path: '/relacionados/',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsRegionesIndexRoute =
   AuthenticatedCmsRegionesIndexRouteImport.update({
     id: '/regiones/',
@@ -995,6 +1002,7 @@ export interface FileRoutesByFullPath {
   '/cms/empresas/': typeof AuthenticatedCmsEmpresasIndexRoute
   '/cms/productos/': typeof AuthenticatedCmsProductosIndexRoute
   '/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
+  '/cms/relacionados/': typeof AuthenticatedCmsRelacionadosIndexRoute
   '/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
   '/cms/zonas/': typeof AuthenticatedCmsZonasIndexRoute
   '/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
@@ -1118,6 +1126,7 @@ export interface FileRoutesByTo {
   '/cms/empresas': typeof AuthenticatedCmsEmpresasIndexRoute
   '/cms/productos': typeof AuthenticatedCmsProductosIndexRoute
   '/cms/regiones': typeof AuthenticatedCmsRegionesIndexRoute
+  '/cms/relacionados': typeof AuthenticatedCmsRelacionadosIndexRoute
   '/cms/reviews': typeof AuthenticatedCmsReviewsIndexRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasIndexRoute
   '/portal/empresas': typeof AuthenticatedPortalEmpresasIndexRoute
@@ -1252,6 +1261,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/empresas/': typeof AuthenticatedCmsEmpresasIndexRoute
   '/_authenticated/cms/productos/': typeof AuthenticatedCmsProductosIndexRoute
   '/_authenticated/cms/regiones/': typeof AuthenticatedCmsRegionesIndexRoute
+  '/_authenticated/cms/relacionados/': typeof AuthenticatedCmsRelacionadosIndexRoute
   '/_authenticated/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
   '/_authenticated/cms/zonas/': typeof AuthenticatedCmsZonasIndexRoute
   '/_authenticated/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
@@ -1386,6 +1396,7 @@ export interface FileRouteTypes {
     | '/cms/empresas/'
     | '/cms/productos/'
     | '/cms/regiones/'
+    | '/cms/relacionados/'
     | '/cms/reviews/'
     | '/cms/zonas/'
     | '/portal/empresas/'
@@ -1509,6 +1520,7 @@ export interface FileRouteTypes {
     | '/cms/empresas'
     | '/cms/productos'
     | '/cms/regiones'
+    | '/cms/relacionados'
     | '/cms/reviews'
     | '/cms/zonas'
     | '/portal/empresas'
@@ -1642,6 +1654,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/empresas/'
     | '/_authenticated/cms/productos/'
     | '/_authenticated/cms/regiones/'
+    | '/_authenticated/cms/relacionados/'
     | '/_authenticated/cms/reviews/'
     | '/_authenticated/cms/zonas/'
     | '/_authenticated/portal/empresas/'
@@ -2364,6 +2377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsReviewsIndexRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/relacionados/': {
+      id: '/_authenticated/cms/relacionados/'
+      path: '/relacionados'
+      fullPath: '/cms/relacionados/'
+      preLoaderRoute: typeof AuthenticatedCmsRelacionadosIndexRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/regiones/': {
       id: '/_authenticated/cms/regiones/'
       path: '/regiones'
@@ -2841,6 +2861,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsEmpresasIndexRoute: typeof AuthenticatedCmsEmpresasIndexRoute
   AuthenticatedCmsProductosIndexRoute: typeof AuthenticatedCmsProductosIndexRoute
   AuthenticatedCmsRegionesIndexRoute: typeof AuthenticatedCmsRegionesIndexRoute
+  AuthenticatedCmsRelacionadosIndexRoute: typeof AuthenticatedCmsRelacionadosIndexRoute
   AuthenticatedCmsReviewsIndexRoute: typeof AuthenticatedCmsReviewsIndexRoute
   AuthenticatedCmsZonasIndexRoute: typeof AuthenticatedCmsZonasIndexRoute
   AuthenticatedCmsCategoriasIdEditarRoute: typeof AuthenticatedCmsCategoriasIdEditarRoute
@@ -2872,6 +2893,8 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsEmpresasIndexRoute: AuthenticatedCmsEmpresasIndexRoute,
   AuthenticatedCmsProductosIndexRoute: AuthenticatedCmsProductosIndexRoute,
   AuthenticatedCmsRegionesIndexRoute: AuthenticatedCmsRegionesIndexRoute,
+  AuthenticatedCmsRelacionadosIndexRoute:
+    AuthenticatedCmsRelacionadosIndexRoute,
   AuthenticatedCmsReviewsIndexRoute: AuthenticatedCmsReviewsIndexRoute,
   AuthenticatedCmsZonasIndexRoute: AuthenticatedCmsZonasIndexRoute,
   AuthenticatedCmsCategoriasIdEditarRoute:
