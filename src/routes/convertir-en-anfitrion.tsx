@@ -13,6 +13,7 @@
  * business_users.
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
@@ -21,12 +22,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { BecomeHostFlow } from "@/components/hosting/BecomeHostFlow";
 
 export const Route = createFileRoute("/convertir-en-anfitrion")({
-  // La ruta alterna entre landing pública y BecomeHostFlow según sesión
-  // del cliente. Sin `ssr: false`, el SSR renderiza siempre la variante
-  // logged-out (no hay sesión en el servidor) y la re-render tras
-  // hidratar no siempre dispara — el usuario ve la landing pública aun
-  // estando autenticado.
-  ssr: false,
   head: () =>
     buildPublicHead({
       title: `Convierte tu negocio en anfitrión · ${SITE.name}`,
@@ -57,8 +52,13 @@ const BENEFITS = [
 
 function BecomeHostRoute() {
   const { user, loading } = useAuth();
+  // Evitar hydration mismatch: en SSR user siempre es null. Renderizamos
+  // la landing pública en el primer render cliente (igual al SSR) y sólo
+  // después de montar consumimos useAuth para decidir la variante.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  if (!loading && user) {
+  if (mounted && !loading && user) {
     return (
       <PublicShell
         eyebrow="Para empresas turísticas"
