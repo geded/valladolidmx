@@ -23,7 +23,6 @@
  * Navigation Session. Las sugerencias contextuales las provee la server
  * fn pública `aluxContextualSuggest` (US-E1.2), sin motor paralelo.
  */
-import { Link } from "@tanstack/react-router";
 import { ArrowRight, Compass, MapPin, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
