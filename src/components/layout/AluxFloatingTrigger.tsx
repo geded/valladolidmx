@@ -227,7 +227,21 @@ export function AluxFloatingTrigger() {
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               <Sparkles className="size-3.5" aria-hidden />
               <span id="alux-next">Qué explorar cerca</span>
+              {suggestionsQuery.data?.rationaleSource === "ai" && (
+                <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                  <Sparkles className="size-3" aria-hidden />
+                  Alux
+                </span>
+              )}
             </div>
+            {(suggestionsQuery.data?.aiStatus === "rate_limited" ||
+              suggestionsQuery.data?.aiStatus === "credits_exhausted") && (
+              <p className="mt-2 rounded-lg border border-border/60 bg-muted/40 px-2.5 py-1.5 text-[11px] text-muted-foreground">
+                {suggestionsQuery.data.aiStatus === "credits_exhausted"
+                  ? "Alux está en pausa breve por cuota. Te mostramos sugerencias del catálogo mientras vuelve."
+                  : "Alux está saturado en este momento. Te mostramos sugerencias del catálogo mientras se libera."}
+              </p>
+            )}
             {(() => {
               const remote = suggestionsQuery.data?.suggestions ?? [];
               const items: AluxContextualSuggestion[] = remote.length > 0
@@ -242,9 +256,14 @@ export function AluxFloatingTrigger() {
                   }));
               if (suggestionsQuery.isLoading && items.length === 0) {
                 return (
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Alux está preparando sugerencias del catálogo…
-                  </p>
+                  <ul className="mt-2 grid gap-2" aria-label="Cargando sugerencias">
+                    {[0, 1, 2].map((i) => (
+                      <li
+                        key={i}
+                        className="h-14 animate-pulse rounded-xl border border-border bg-card/40"
+                      />
+                    ))}
+                  </ul>
                 );
               }
               if (items.length === 0) {
@@ -255,25 +274,46 @@ export function AluxFloatingTrigger() {
                   </p>
                 );
               }
+              // Agrupar por categoría publicada para volver navegable el bloque.
+              const groups = new Map<string, { label: string; items: AluxContextualSuggestion[] }>();
+              for (const it of items) {
+                const key = it.categorySlug ?? "otras";
+                const label = it.categoryName ?? "Otras opciones";
+                if (!groups.has(key)) groups.set(key, { label, items: [] });
+                groups.get(key)!.items.push(it);
+              }
+              const grouped = Array.from(groups.values());
+              const showGroupHeaders = grouped.length > 1;
               return (
-                <ul className="mt-2 grid gap-2">
-                  {items.map((item) => (
-                    <li key={`${item.source.table}-${item.source.id}`}>
-                      <a
-                        href={item.href}
-                        className="group flex items-start justify-between gap-3 rounded-xl border border-border bg-card/60 px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-card"
-                      >
-                        <span className="min-w-0">
-                          <span className="block truncate font-medium">{item.label}</span>
-                          <span className="mt-0.5 block text-[11px] text-muted-foreground">
-                            {item.rationale}
-                          </span>
-                        </span>
-                        <ArrowRight className="mt-1 size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden />
-                      </a>
-                    </li>
+                <div className="mt-2 grid gap-4">
+                  {grouped.map((g) => (
+                    <div key={g.label}>
+                      {showGroupHeaders && (
+                        <p className="mb-1.5 text-[11px] font-medium text-muted-foreground">
+                          {g.label}
+                        </p>
+                      )}
+                      <ul className="grid gap-2">
+                        {g.items.map((item) => (
+                          <li key={`${item.source.table}-${item.source.id}`}>
+                            <a
+                              href={item.href}
+                              className="group flex items-start justify-between gap-3 rounded-xl border border-border bg-card/60 px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-card"
+                            >
+                              <span className="min-w-0">
+                                <span className="block truncate font-medium">{item.label}</span>
+                                <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                                  {item.rationale}
+                                </span>
+                              </span>
+                              <ArrowRight className="mt-1 size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden />
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   ))}
-                </ul>
+                </div>
               );
             })()}
             <p className="mt-3 text-[11px] text-muted-foreground">
