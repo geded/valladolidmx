@@ -106,7 +106,7 @@ export function WorkspaceTopbar({ title }: { title?: string }) {
   return (
     <header
       className={cn(
-        "flex h-14 items-center gap-2 border-b border-border bg-surface/80 px-3 backdrop-blur md:h-16 md:px-4",
+        "relative z-40 flex h-14 items-center gap-2 border-b border-border bg-surface/80 px-3 backdrop-blur md:h-16 md:px-4",
       )}
     >
       <div className="md:hidden">
