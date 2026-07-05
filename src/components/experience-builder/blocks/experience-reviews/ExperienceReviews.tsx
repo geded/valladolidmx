@@ -66,7 +66,7 @@ function StarLine({ rating, scale = 5, size = "sm" }: { rating: number; scale?: 
 
 function PlatformBadge({ platform }: { platform: ExperienceReviewsPlatform }) {
   return (
-    <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/70">
+    <span className="inline-flex items-center rounded-pill bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/70">
       {PLATFORM_LABEL[platform]}
     </span>
   );
@@ -87,7 +87,7 @@ function Distribution({
         return (
           <li key={k} className="flex items-center gap-2 text-[11px]">
             <span className="w-6 text-right text-muted-foreground">{k}★</span>
-            <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+            <span className="relative h-1.5 flex-1 overflow-hidden rounded-pill bg-muted">
               <span
                 className="absolute inset-y-0 left-0 bg-primary"
                 style={{ width: `${pct}%` }}
@@ -179,7 +179,7 @@ function ReviewCard({ item, capabilities, renderItemActions, compact }: ReviewCa
               <PlatformBadge platform={item.platform} />
             ) : null}
             {item.featured ? (
-              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+              <span className="rounded-pill bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
                 Destacada
               </span>
             ) : null}
@@ -218,7 +218,7 @@ function ReviewCard({ item, capabilities, renderItemActions, compact }: ReviewCa
           {item.tags.map((t) => (
             <span
               key={t}
-              className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-foreground/70"
+              className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-medium text-foreground/70"
             >
               #{t}
             </span>

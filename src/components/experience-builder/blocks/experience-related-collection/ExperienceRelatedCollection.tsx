@@ -427,7 +427,7 @@ function BadgeChip({
   return (
     <span
       className={cn(
-        "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+        "rounded-pill px-2 py-0.5 text-[10px] font-semibold",
         tone === "primary"
           ? "bg-primary/10 text-primary"
           : tone === "success"

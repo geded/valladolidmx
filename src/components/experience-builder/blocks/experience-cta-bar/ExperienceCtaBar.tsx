@@ -73,7 +73,7 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
       className={cn(
         "mx-auto flex w-full max-w-6xl items-center gap-3 px-4 py-3",
         variant === "floating"
-          ? "rounded-full border border-border bg-background/95 shadow-lg backdrop-blur sm:max-w-2xl"
+          ? "rounded-pill border border-border bg-background/95 shadow-floating backdrop-blur sm:max-w-2xl"
           : variant === "bar"
             ? "border-t border-border bg-background/95 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] backdrop-blur"
             : "rounded-2xl border border-border bg-card",
@@ -99,11 +99,11 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
         {actions.map((a, i) => {
           const iconOnly = !a.label && Boolean(a.iconKey);
           const classes = cn(
-            "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full text-sm font-semibold transition",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+            "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-pill text-sm font-semibold transition",
+            "focus-visible:outline-none focus-visible:ring-focus",
             iconOnly ? "px-3" : "px-4",
             a.emphasis === "primary"
-              ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+              ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft"
               : a.emphasis === "ghost"
                 ? "text-foreground hover:bg-muted"
                 : "bg-background text-foreground ring-1 ring-border hover:bg-muted",

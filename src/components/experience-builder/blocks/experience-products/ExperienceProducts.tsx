@@ -229,7 +229,7 @@ function ProductCard({
                 <span
                   key={i}
                   className={cn(
-                    "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                    "rounded-pill px-2 py-0.5 text-[10px] font-semibold",
                     b.tone === "primary"
                       ? "bg-primary/10 text-primary"
                       : b.tone === "success"
