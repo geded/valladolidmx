@@ -12,7 +12,7 @@
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Briefcase, Check, Compass, Headphones, Shield } from "lucide-react";
 import {
   getProfileModeState,
@@ -46,8 +46,19 @@ const MODE_META: Record<
   },
 };
 
+// US-EPS.4 — Landing canónico por modo. Home pública permanece fija (/);
+// tras el switch enviamos al usuario al espacio de trabajo del modo elegido,
+// como hace Airbnb al alternar entre "Traveling" y "Hosting".
+const MODE_LANDING: Record<ProfileMode, string> = {
+  traveler: "/",
+  business: "/portal",
+  concierge: "/concierge",
+  staff: "/cms",
+};
+
 export function ProfileModeSwitcher({ onSwitched }: { onSwitched?: () => void }) {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const fetchState = useServerFn(getProfileModeState);
   const persist = useServerFn(setActiveMode);
 
@@ -59,9 +70,11 @@ export function ProfileModeSwitcher({ onSwitched }: { onSwitched?: () => void })
 
   const mutate = useMutation({
     mutationFn: (mode: ProfileMode) => persist({ data: { mode } }),
-    onSuccess: (next) => {
+    onSuccess: (next, mode) => {
       qc.setQueryData(["profile-mode-state"], next);
       onSwitched?.();
+      const target = MODE_LANDING[mode];
+      if (target) navigate({ to: target }).catch(() => undefined);
     },
   });
 
