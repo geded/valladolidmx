@@ -49,7 +49,6 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
   ]);
   const platformLinks = linkItems(config?.platform_links, [
     { href: "/arma-tu-viaje", label: t("nav.plan_trip") },
-    { href: "/alux", label: t("nav.alux") },
     { href: "/empresas", label: t("nav.for_business") },
   ]);
   const tagline = textValue(config?.tagline) ?? t("footer.tagline");

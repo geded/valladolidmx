@@ -2,8 +2,7 @@
  * ConsejoAluxSection — Sección 5 de Home.
  * Presencia visible de Alux SIN chat flotante como elemento principal.
  */
-import { Sparkles, ArrowUpRight } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Sparkles } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ComingSoonBadge } from "@/components/common/ComingSoonBadge";
 import { useTranslation } from "@/i18n/context";
@@ -26,12 +25,9 @@ export function ConsejoAluxSection({ config }: { config?: Record<string, unknown
               <ComingSoonBadge label={t("common.coming_soon")} />
             </div>
             <p className="text-balance text-xl leading-snug @3xl:text-2xl">{t("sections.alux_body")}</p>
-            <Link
-              to="/alux"
-              className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
-            >
-              {t("common.learn_more")} <ArrowUpRight className="size-3.5" aria-hidden />
-            </Link>
+            <p className="mt-4 text-xs text-muted-foreground">
+              Toca el botón de Alux en cualquier destino, empresa o producto para recibir sugerencias contextuales.
+            </p>
           </div>
         </div>
       </Container>
