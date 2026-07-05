@@ -30,6 +30,8 @@ function publicClient() {
   });
 }
 
+const BUSINESS_SURFACE = "business-profile";
+
 export const getBusinessRelated = createServerFn({ method: "GET" })
   .inputValidator(
     (data: {
@@ -52,6 +54,21 @@ export const getBusinessRelated = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }): Promise<BusinessRelatedDTO> => {
     const supabase = publicClient();
+    // E6 · Related overrides (pin/hide) para esta ficha de empresa.
+    const { data: overrides } = await supabase
+      .from("related_overrides")
+      .select("related_entity_type, related_entity_id, mode, position")
+      .eq("entity_type", "business")
+      .eq("entity_id", data.businessId)
+      .eq("surface", BUSINESS_SURFACE)
+      .eq("related_entity_type", "business");
+    const hiddenIds = new Set<string>();
+    const pinnedIds: string[] = [];
+    for (const o of overrides ?? []) {
+      if (o.mode === "hide") hiddenIds.add(o.related_entity_id as string);
+      else if (o.mode === "pin") pinnedIds.push(o.related_entity_id as string);
+    }
+
     const { data: rows, error } = await supabase
       .from("businesses")
       .select(
@@ -80,13 +97,28 @@ export const getBusinessRelated = createServerFn({ method: "GET" })
     const inDestination = all.filter(
       (b) =>
         b.destination_slug === data.destinationSlug && b.id !== data.businessId,
-    );
-    const sameCategory = inDestination
-      .filter((b) => b.category_slug === data.categorySlug)
-      .slice(0, 6);
-    const sameDestinationOther = inDestination
-      .filter((b) => b.category_slug !== data.categorySlug)
-      .slice(0, 6);
+    ).filter((b) => !hiddenIds.has(b.id));
+
+    // Aplica pins: los items fijados se anteponen manteniendo su orden.
+    const byId = new Map(all.map((b) => [b.id, b]));
+    const pinnedCards = pinnedIds
+      .map((id) => byId.get(id))
+      .filter((c): c is MarketplaceBusinessCard => Boolean(c) && !hiddenIds.has(c.id));
+    const pinnedSet = new Set(pinnedCards.map((c) => c.id));
+
+    const sameCategoryNatural = inDestination
+      .filter((b) => b.category_slug === data.categorySlug && !pinnedSet.has(b.id));
+    const sameDestinationOtherNatural = inDestination
+      .filter((b) => b.category_slug !== data.categorySlug && !pinnedSet.has(b.id));
+
+    const sameCategory = [
+      ...pinnedCards.filter((c) => c.category_slug === data.categorySlug),
+      ...sameCategoryNatural,
+    ].slice(0, 6);
+    const sameDestinationOther = [
+      ...pinnedCards.filter((c) => c.category_slug !== data.categorySlug),
+      ...sameDestinationOtherNatural,
+    ].slice(0, 6);
 
     return { sameCategory, sameDestinationOther };
   });
