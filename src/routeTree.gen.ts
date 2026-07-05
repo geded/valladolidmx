@@ -117,6 +117,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicStudioMediaSplatRouteImport } from './routes/api/public/studio-media.$'
+import { Route as ApiPublicMapsStaticRouteImport } from './routes/api/public/maps/static'
 import { Route as ApiPublicHooksEbProcessScheduledPublishRouteImport } from './routes/api/public/hooks/eb-process-scheduled-publish'
 import { Route as ApiPublicHealthMapsRouteImport } from './routes/api/public/health/maps'
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
@@ -746,6 +747,11 @@ const ApiPublicStudioMediaSplatRoute =
     path: '/api/public/studio-media/$',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicMapsStaticRoute = ApiPublicMapsStaticRouteImport.update({
+  id: '/api/public/maps/static',
+  path: '/api/public/maps/static',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksEbProcessScheduledPublishRoute =
   ApiPublicHooksEbProcessScheduledPublishRouteImport.update({
     id: '/api/public/hooks/eb-process-scheduled-publish',
@@ -1020,6 +1026,7 @@ export interface FileRoutesByFullPath {
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -1149,6 +1156,7 @@ export interface FileRoutesByTo {
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -1287,6 +1295,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -1426,6 +1435,7 @@ export interface FileRouteTypes {
     | '/portal/invitaciones/$token'
     | '/api/public/health/maps'
     | '/api/public/hooks/eb-process-scheduled-publish'
+    | '/api/public/maps/static'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1555,6 +1565,7 @@ export interface FileRouteTypes {
     | '/portal/invitaciones/$token'
     | '/api/public/health/maps'
     | '/api/public/hooks/eb-process-scheduled-publish'
+    | '/api/public/maps/static'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1692,6 +1703,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/invitaciones/$token'
     | '/api/public/health/maps'
     | '/api/public/hooks/eb-process-scheduled-publish'
+    | '/api/public/maps/static'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1769,6 +1781,7 @@ export interface RootRouteChildren {
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
   ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  ApiPublicMapsStaticRoute: typeof ApiPublicMapsStaticRoute
   ApiPublicStudioMediaSplatRoute: typeof ApiPublicStudioMediaSplatRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -2534,6 +2547,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStudioMediaSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/maps/static': {
+      id: '/api/public/maps/static'
+      path: '/api/public/maps/static'
+      fullPath: '/api/public/maps/static'
+      preLoaderRoute: typeof ApiPublicMapsStaticRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/eb-process-scheduled-publish': {
       id: '/api/public/hooks/eb-process-scheduled-publish'
       path: '/api/public/hooks/eb-process-scheduled-publish'
@@ -3158,6 +3178,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHealthMapsRoute: ApiPublicHealthMapsRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:
     ApiPublicHooksEbProcessScheduledPublishRoute,
+  ApiPublicMapsStaticRoute: ApiPublicMapsStaticRoute,
   ApiPublicStudioMediaSplatRoute: ApiPublicStudioMediaSplatRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,

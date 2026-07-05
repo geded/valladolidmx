@@ -44,6 +44,7 @@ import {
   businessToInfoGridDTO,
   businessToCtaBarDTO,
 } from "@/lib/experience-builder/adapters/business-to-blocks";
+import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 
 /* ------------------------------------------------------------------ *
  * Contexto — poblado por la ruta pública (SSR-safe).
@@ -190,6 +191,18 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
           }}
         />
       </section>
+
+      {b.primary_location?.latitude != null && b.primary_location?.longitude != null ? (
+        <section id="ubicacion" data-eb-anchor className="mt-10 scroll-mt-24">
+          <BusinessLocationBlock
+            lat={b.primary_location.latitude}
+            lng={b.primary_location.longitude}
+            name={b.display_name}
+            addressLine1={b.primary_location.address_line1}
+            addressLine2={b.primary_location.address_line2}
+          />
+        </section>
+      ) : null}
 
       {showPromotions ? (
         <section id="promociones" data-eb-anchor className="mt-10 scroll-mt-24">
