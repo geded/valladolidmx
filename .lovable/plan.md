@@ -1,102 +1,149 @@
-## Objetivo
+# Iniciativa · Single Studio Consolidation + Destination OS Foundations (SSC-01)
 
-Alta profesional de empresas con dos puertas de aprobación que garanticen que sólo empresas reales y con perfil completo aparezcan publicadas.
+Consolidar el Experience Builder como único punto de administración visual de ValladolidMX **y** sentar las bases del **Destination Operating System (DOS)** vía el Route Inventory como inventario oficial del producto. Cero infra nueva. Cero cambios a rutas públicas, SEO o navegación. Aditivo por construcción.
 
-## Flujo de estados
+---
 
-```text
-alta enriquecida ──► pending_identity ──► (Admin: Puerta 1)
-                                              │
-                    rechazada / más docs ◄────┤
-                                              ▼
-                                            draft
-                                              │
-                       anfitrión trabaja perfil en workspace
-                                              ▼
-                                       pending_review ──► (Admin: Puerta 2)
-                                                            │
-                              devuelta con notas ◄──────────┤
-                                                            ▼
-                                                       published
+## Paso 1 · Previews de plantillas dinámicas (SSC-01·P1)
+
+**Objetivo:** al abrir en el Studio las plantillas `Destino`, `Categoría`, `Empresa`, `Producto` y `Evento`, ver un render real con una instancia demo en lugar de "no disponible".
+
+### Alcance
+
+- Ampliar `src/lib/experience-builder/preview-registry` con 5 proveedores oficiales que resuelven una instancia demo vía `public-reads` (RLS `TO anon`):
+  - Destino → Valladolid
+  - Categoría → Restaurantes en Valladolid
+  - Empresa → primera empresa verificada publicada
+  - Producto → primer producto publicado
+  - Evento → próximo evento publicado
+- Selector "Vista previa con datos de…" en el topbar del Studio cuando `page_type ∈ {destination, category, business, product, event}`, con la instancia demo como default.
+- Fallback conservador: si el proveedor falla, se preserva la pantalla actual (sin regresión).
+
+### Fuera de alcance
+
+- Editar contenido de las instancias (vive en CMS).
+- Cambiar el modelo de superficies dinámicas.
+- Rutas públicas, SEO o navegación.
+
+### Verificación (DoD)
+
+- Typecheck + build verdes.
+- Smoke visual: cada plantilla renderiza el preview real en `/cms/experience-builder`.
+- Auditoría no-regresión: `/oriente-maya/valladolid`, `/empresas`, `/eventos`, `/producto/*` intactos.
+- Demo Pack (5 URLs Studio + capturas antes/después).
+- Completion Report en `docs/blueprint/`.
+
+### Rollback
+
+Revertir el archivo del preview-registry ampliado.
+
+---
+
+## Paso 2 · Route Inventory as Product Inventory (SSC-01·P2)
+
+**Objetivo:** que el Panel de Páginas del Studio muestre TODAS las rutas del sitio clasificadas y con **metadatos de evolución del producto**, sirviendo como fuente oficial del DOS. Sin migrar contenido todavía.
+
+### Modelo de metadatos por ruta
+
+```ts
+RouteInventoryEntry {
+  routeId: string              // filesystem-canonical
+  publicPath: string           // ej. "/oriente-maya/$destino"
+  category: 'studio' | 'dynamic-template' | 'technical'
+          | 'system' | 'pending-migration'
+  maturity: 'L0' | 'L1' | 'L2' | 'L3' | 'L4' | 'L5' | 'L6'
+  businessPriority: 'critical' | 'high' | 'medium' | 'low'
+  migrationStatus: 'native-studio' | 'template-cms'
+                 | 'planned' | 'in-progress'
+                 | 'blocked' | 'technical-exception' | 'deprecated'
+  functionalOwner: string       // "Founder" | "Product" | "CMS" | ...
+  dependencies: string[]        // otros routeId + capabilities
+  lastReviewed: string          // ISO date
+  productVersion: string        // ej. "v2.5" — versión en que se incorporó
+  notes?: string
+}
 ```
 
-## Cambios de base de datos (migración)
+### Alcance
 
-- Nuevo `enum business_lifecycle_status`: `pending_identity | draft | pending_review | published | changes_requested | rejected`.
-- Columnas nuevas en `businesses`:
-  - `lifecycle_status business_lifecycle_status default 'pending_identity'`
-  - `verification_document_url text` (ruta en storage privado)
-  - `verification_notes text`
-  - `submitted_for_review_at timestamptz`
-  - `published_at timestamptz`
-  - `review_notes text` (notas del admin al devolver o publicar)
-- Bucket privado `business-verification` (sólo owner del negocio + admins pueden leer vía RLS en `storage.objects`).
-- Ajuste de RLS: `businesses` sólo es visible al público cuando `lifecycle_status = 'published'`; el owner ve siempre la suya.
-- RPCs `SECURITY DEFINER` nuevos:
-  - `submit_business_for_review(_business_id)` — owner. Requiere perfil mínimo completo (logo, portada, descripción, categoría, ubicación, contacto). Pone `pending_review`.
-  - `admin_approve_identity(_business_id, _approve, _notes)` — Puerta 1. Approve → concede `owner` + pone `draft`. Reject → `rejected`.
-  - `admin_publish_business(_business_id, _approve, _notes)` — Puerta 2. Approve → `published`. Reject → `changes_requested`.
-- RPC `list_pending_business_requests` se amplía: devuelve dos tipos, `identity_review` y `publication_review`.
+- Crear **Route Inventory** declarativo (`src/lib/experience-builder/route-inventory.ts`) con un entry por cada archivo bajo `src/routes/`, incluyendo los metadatos completos.
+- Categorías oficiales:
+  - `studio` — administrable desde EB (composiciones `page_compositions`).
+  - `dynamic-template` — plantilla + instancias CMS.
+  - `technical` — excepción (auth, callbacks OAuth, reset, offline, error, `/preview/*`).
+  - `system` — infraestructura no editorial (`/api/*`, sitemap, health, webhooks).
+  - `pending-migration` — pública editorial aún fuera del EB.
+- Ampliar `PagesPanel` con tabs: **Studio · Plantillas · Pendientes · Técnicas · Sistema** + columnas Madurez, Prioridad, Estado, Propietario, Última revisión, Versión.
+- Vista "Roadmap del producto" derivada del inventario (filtros por prioridad × madurez × estado) — sólo lectura en P2, editable en olas futuras.
+- Regla de gobernanza en CI: `scripts/route-inventory-coverage.ts` — falla si aparece una ruta en `src/routes/` sin entry en el inventario o con campos obligatorios vacíos.
+- **Matriz oficial**: `docs/blueprint/15.10.4d-ROUTE-INVENTORY-MATRIX-v1.0.md` con las 5 categorías, cobertura, madurez agregada y roadmap derivado.
 
-## Alta enriquecida (formulario en `/cuenta/anfitrion`)
+### Fuera de alcance (olas futuras)
 
-Wizard de 4 pasos, mobile-first, estilo Airbnb:
+- Migrar rutas `pending-migration` al EB (una historia por ruta).
+- Edición de metadatos desde UI (por ahora se editan en el manifiesto declarativo).
+- Persistir el inventario en BD (aditivo, si el DOS lo requiere después).
 
-1. **Datos básicos**: nombre, categoría principal (select desde `business_categories`), destino, tagline, descripción larga (min 80 caracteres).
-2. **Ubicación y contacto**: dirección, colonia, referencias, teléfono, WhatsApp, email público, sitio web.
-3. **Verificación**: subida obligatoria de UN documento (RFC, acta constitutiva, licencia municipal o comprobante de domicilio del negocio). Storage privado. Mensaje: "Sólo tú y los administradores pueden ver este documento."
-4. **Revisión**: resumen antes de enviar. Botón único **Enviar solicitud**.
+### Verificación (DoD)
 
-Sin fotos aquí — las fotos son parte del perfil, se suben en el workspace.
+- Typecheck + build verdes.
+- `bun run scripts/route-inventory-coverage.ts` → 100% cobertura + metadatos obligatorios completos.
+- Smoke: Studio muestra los 5 tabs, columnas de evolución y vista Roadmap.
+- Matriz revisada por Founder.
+- Completion Report + Demo Pack.
 
-## Workspace de la empresa — Publicación
+### Rollback
 
-En el workspace de la empresa nueva ruta `/cuenta/empresa/$businessId/publicacion`:
+Feature flag `VITE_STUDIO_INVENTORY=off` oculta tabs nuevos; el resto del EB funciona igual.
 
-- Checklist visual estilo Airbnb ("Prepara tu ficha para publicar"):
-  - Logo cuadrado ✓/✗
-  - Portada panorámica ✓/✗
-  - Galería (min 3 fotos) ✓/✗
-  - Descripción larga ✓/✗
-  - Categoría principal ✓/✗
-  - Ubicación con mapa ✓/✗
-  - Al menos un canal de contacto ✓/✗
-- Botón **Enviar a revisión para publicar** habilitado sólo si el checklist está completo.
-- Estado visible: badge del `lifecycle_status` actual.
-- Si `changes_requested`: banner con `review_notes` del admin.
+---
 
-## Admin `/admin/anfitriones` — Dos pestañas
+## Directiva permanente (post-SSC-01)
 
-- **Pestaña 1 · Verificación de identidad** (Puerta 1): lista `pending_identity`. Cada fila muestra datos + preview del documento (signed URL). Acciones: Aprobar / Rechazar / Pedir más info (nota).
-- **Pestaña 2 · Publicaciones pendientes** (Puerta 2): lista `pending_review`. Muestra preview del perfil completo (logo, portada, galería, descripción, mapa). Acciones: Publicar / Devolver con notas.
+Incorporada a memoria de proyecto:
 
-## Estilo visual (Airbnb + Google Business)
+> **Single Studio Coverage Rule** — Toda ruta pública nueva (a) nace como composición en el EB, o (b) declara excepción técnica/sistema en el Route Inventory con justificación. Prohibido crear páginas públicas editoriales fuera del EB.
+>
+> **Route Inventory Rule (DOS)** — Toda ruta debe existir en el Route Inventory con metadatos completos (categoría, madurez, prioridad, estado, propietario, dependencias, última revisión, versión). Es la fuente oficial para planificar olas, priorizar QA, medir avance y auditar cobertura.
+>
+> **DOS Reuse Rule** — Toda nueva capacidad se integra al DOS reutilizando Context Engine, Navigation Contract, Experience Builder, Block Library y Design System. Prohibidos motores paralelos.
 
-Sin salir del Valladolid Colonial Design System v1.0:
-- Wizard: barra de progreso superior, un solo paso visible, botones Atrás/Siguiente sticky en móvil.
-- Uploader de documento: dropzone con `rounded-2xl` + borde punteado + preview thumbnail al cargar.
-- Checklist de publicación: cards con icono estado + acción rápida "Completar".
-- Preview de admin: layout de dos columnas (datos ↔ documento/perfil) idéntico al que ya usamos en CMS.
-- Todos los estados con badges tonales (`success/warning/info/destructive`) ya migrados en I3.d.4.
+Enforcement automático vía `assertRouteInventoryCoverage()` en CI.
 
-## No regresión / afectados
+---
 
-- `searchBusinessesForClaim` sigue funcionando; ahora filtra por `lifecycle_status = 'published'` para el listado público del reclamo, pero incluye empresas en cualquier estado si el buscador es admin (para reclamos internos).
-- Rutas públicas (`/marketplace/*`, cards de empresa) ya usan `deleted_at IS NULL`; añadir filtro `lifecycle_status = 'published'`.
-- Migración soft: todas las empresas existentes se marcan `lifecycle_status = 'published'` en el mismo cambio para no romper el marketplace actual.
+## Alineación con la visión Destination Operating System
+
+El Route Inventory se convierte en la primera capa operativa del DOS: fuente única para roadmap, cobertura, madurez y gobernanza. En olas futuras (no incluidas aquí) podrá:
+
+- Cruzarse con `context-registry`, `navigation-registry` y `page-kind-registry` para reporting integrado.
+- Alimentar Alux con conocimiento de qué superficies existen, su madurez y prioridad.
+- Exportarse a un dashboard interno de evolución del producto.
+
+Nada de eso se implementa en SSC-01 — pero el modelo de metadatos ya lo habilita sin refactor.
+
+---
 
 ## Detalles técnicos
 
-- Server fns nuevas en `src/lib/hosting/hosting.functions.ts`: `getVerificationDocumentSignedUrl`, `submitBusinessForReview`, `adminPublishBusiness` (Puerta 2). `approveBusinessRegistration` se renombra internamente a Puerta 1 (`admin_approve_identity`).
-- Subida del documento: server fn `createVerificationUploadUrl(business_id, filename, contentType)` que devuelve URL firmada de Supabase Storage al bucket privado.
-- Un solo componente `BecomeHostWizard` reemplaza el `RegisterBranch` actual.
-- `BusinessPublishChecklist` nuevo componente reutilizable en workspace.
-- Los toasts, sheets y navegación reusan Workspace Engine (política Workspace First).
-- Sin nuevos providers ni engines (Infrastructure Freeze).
+- **Sin infraestructura nueva.** Reutiliza `preview-registry`, `PagesPanel`, `page_compositions`, `public-reads`, tabs shadcn, sistema de rutas de TanStack.
+- **Sin migraciones de BD.**
+- **Sin cambios en rutas, `head()`, `sitemap.xml` ni canonicals.**
+- **Orden estricto:** P1 cierra con Completion Report antes de tocar P2.
 
-## Fuera de alcance de esta iteración
+## Entregables finales
 
-- Verificación automática por scraping o llamadas al RFC/SAT.
-- Verificación por videollamada.
-- Sellos institucionales (ya viven en su propio bloque `institutional-badges`).
-- Emails transaccionales personalizados de rechazo (usa UNC estándar).
+1. Preview real de 5 plantillas dinámicas en el Studio.
+2. Panel de Páginas con inventario completo + metadatos de evolución (5 tabs + vista Roadmap).
+3. Matriz oficial de rutas + roadmap derivado del inventario.
+4. Regla CI que impide regresión de cobertura o metadatos incompletos.
+5. Dos Completion Reports + Demo Pack por paso.
+6. Bases del DOS sentadas sin motores paralelos ni deuda técnica.  
+==========================================================
+  VISIÓN DE EVOLUCIÓN · DESTINATION OPERATING SYSTEM
+  ==========================================================
+  La presente iniciativa establece únicamente las bases del Destination Operating System (DOS).
+  En futuras versiones, el Route Inventory evolucionará gradualmente desde un inventario de rutas hacia un Catálogo Oficial del Producto.
+  Esta evolución podrá incorporar metadatos adicionales como capacidades consumidas, objetivos de negocio, relaciones entre módulos y otras capacidades de gobernanza.
+  Estos elementos NO forman parte del alcance de SSC-01.
+  Quedan registrados únicamente como dirección estratégica para la evolución del producto, manteniendo el principio de crecimiento incremental y sin modificar el alcance aprobado de esta iniciativa.
