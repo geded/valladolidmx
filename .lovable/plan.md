@@ -1,59 +1,102 @@
-# Google Maps — Primitivos + Demo
+## Objetivo
 
-Construir 3 primitivos reutilizables usando las keys ya conectadas, y montarlos en la ficha de Empresa como demo funcional. Todo servidor-first para funcionar en `quehacerenvalladolid.com` sin depender del referrer de la browser key.
+Alta profesional de empresas con dos puertas de aprobación que garanticen que sólo empresas reales y con perfil completo aparezcan publicadas.
 
-## Qué se entrega
+## Flujo de estados
 
-### 1. Server functions (`src/lib/maps/*.functions.ts`)
-- `geocodeAddress({ address })` → `{ lat, lng, formatted }` vía Geocoding API (gateway).
-- `computeRoute({ originLat, originLng, destLat, destLng, mode? })` → `{ distanceMeters, durationSeconds, polyline }` vía Routes API v2 (`routes/directions/v2:computeRoutes`, gateway).
-- `getStaticMapUrl({ lat, lng, zoom?, size?, marker? })` → URL firmada al gateway Static Maps para `<img>`. La URL apunta al gateway (no expone key), o al endpoint proxy `/api/public/maps/static` (opción B, mejor para custom domain).
+```text
+alta enriquecida ──► pending_identity ──► (Admin: Puerta 1)
+                                              │
+                    rechazada / más docs ◄────┤
+                                              ▼
+                                            draft
+                                              │
+                       anfitrión trabaja perfil en workspace
+                                              ▼
+                                       pending_review ──► (Admin: Puerta 2)
+                                                            │
+                              devuelta con notas ◄──────────┤
+                                                            ▼
+                                                       published
+```
 
-### 2. Proxy de Static Maps (`src/routes/api/public/maps/static.ts`)
-Endpoint público que hace stream de la imagen Static Maps desde el gateway server-side. Ventajas:
-- No expone ni la browser key ni el token del gateway.
-- Funciona idéntico en `*.lovable.app` y `quehacerenvalladolid.com`.
-- Cachea con `Cache-Control: public, max-age=86400`.
+## Cambios de base de datos (migración)
 
-Validación estricta: lat/lng numéricos, zoom 1–20, size ≤ 640x640, formato png|jpg.
+- Nuevo `enum business_lifecycle_status`: `pending_identity | draft | pending_review | published | changes_requested | rejected`.
+- Columnas nuevas en `businesses`:
+  - `lifecycle_status business_lifecycle_status default 'pending_identity'`
+  - `verification_document_url text` (ruta en storage privado)
+  - `verification_notes text`
+  - `submitted_for_review_at timestamptz`
+  - `published_at timestamptz`
+  - `review_notes text` (notas del admin al devolver o publicar)
+- Bucket privado `business-verification` (sólo owner del negocio + admins pueden leer vía RLS en `storage.objects`).
+- Ajuste de RLS: `businesses` sólo es visible al público cuando `lifecycle_status = 'published'`; el owner ve siempre la suya.
+- RPCs `SECURITY DEFINER` nuevos:
+  - `submit_business_for_review(_business_id)` — owner. Requiere perfil mínimo completo (logo, portada, descripción, categoría, ubicación, contacto). Pone `pending_review`.
+  - `admin_approve_identity(_business_id, _approve, _notes)` — Puerta 1. Approve → concede `owner` + pone `draft`. Reject → `rejected`.
+  - `admin_publish_business(_business_id, _approve, _notes)` — Puerta 2. Approve → `published`. Reject → `changes_requested`.
+- RPC `list_pending_business_requests` se amplía: devuelve dos tipos, `identity_review` y `publication_review`.
 
-### 3. Componentes UI (`src/components/maps/*`)
-- `<StaticMap lat lng zoom? size? className? />` — `<img>` que apunta al proxy. SSR-safe, cero JS.
-- `<DistanceBadge originLatLng destLatLng />` — muestra "a 4.2 km · 8 min en auto" con skeleton mientras carga vía `useSuspenseQuery(computeRoute)`.
-- `<InteractiveMap lat lng markerTitle? className? />` — carga Maps JS (browser key), un `google.maps.Marker`, sin AdvancedMarker, `loading=async` + callback global. Cliente puro (dynamic import).
+## Alta enriquecida (formulario en `/cuenta/anfitrion`)
 
-### 4. Demo en ficha de Empresa
-En `src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx` (o el componente que renderiza el detalle):
-- Sección **Ubicación**: `<StaticMap>` grande + dirección + `<DistanceBadge>` (si el viajero compartió ubicación) + botón "Cómo llegar" (link a `https://www.google.com/maps/dir/?api=1&destination=lat,lng`).
-- Toggle "Ver mapa interactivo" que monta `<InteractiveMap>` on-demand (evita cargar Maps JS por defecto).
+Wizard de 4 pasos, mobile-first, estilo Airbnb:
+
+1. **Datos básicos**: nombre, categoría principal (select desde `business_categories`), destino, tagline, descripción larga (min 80 caracteres).
+2. **Ubicación y contacto**: dirección, colonia, referencias, teléfono, WhatsApp, email público, sitio web.
+3. **Verificación**: subida obligatoria de UN documento (RFC, acta constitutiva, licencia municipal o comprobante de domicilio del negocio). Storage privado. Mensaje: "Sólo tú y los administradores pueden ver este documento."
+4. **Revisión**: resumen antes de enviar. Botón único **Enviar solicitud**.
+
+Sin fotos aquí — las fotos son parte del perfil, se suben en el workspace.
+
+## Workspace de la empresa — Publicación
+
+En el workspace de la empresa nueva ruta `/cuenta/empresa/$businessId/publicacion`:
+
+- Checklist visual estilo Airbnb ("Prepara tu ficha para publicar"):
+  - Logo cuadrado ✓/✗
+  - Portada panorámica ✓/✗
+  - Galería (min 3 fotos) ✓/✗
+  - Descripción larga ✓/✗
+  - Categoría principal ✓/✗
+  - Ubicación con mapa ✓/✗
+  - Al menos un canal de contacto ✓/✗
+- Botón **Enviar a revisión para publicar** habilitado sólo si el checklist está completo.
+- Estado visible: badge del `lifecycle_status` actual.
+- Si `changes_requested`: banner con `review_notes` del admin.
+
+## Admin `/admin/anfitriones` — Dos pestañas
+
+- **Pestaña 1 · Verificación de identidad** (Puerta 1): lista `pending_identity`. Cada fila muestra datos + preview del documento (signed URL). Acciones: Aprobar / Rechazar / Pedir más info (nota).
+- **Pestaña 2 · Publicaciones pendientes** (Puerta 2): lista `pending_review`. Muestra preview del perfil completo (logo, portada, galería, descripción, mapa). Acciones: Publicar / Devolver con notas.
+
+## Estilo visual (Airbnb + Google Business)
+
+Sin salir del Valladolid Colonial Design System v1.0:
+- Wizard: barra de progreso superior, un solo paso visible, botones Atrás/Siguiente sticky en móvil.
+- Uploader de documento: dropzone con `rounded-2xl` + borde punteado + preview thumbnail al cargar.
+- Checklist de publicación: cards con icono estado + acción rápida "Completar".
+- Preview de admin: layout de dos columnas (datos ↔ documento/perfil) idéntico al que ya usamos en CMS.
+- Todos los estados con badges tonales (`success/warning/info/destructive`) ya migrados en I3.d.4.
+
+## No regresión / afectados
+
+- `searchBusinessesForClaim` sigue funcionando; ahora filtra por `lifecycle_status = 'published'` para el listado público del reclamo, pero incluye empresas en cualquier estado si el buscador es admin (para reclamos internos).
+- Rutas públicas (`/marketplace/*`, cards de empresa) ya usan `deleted_at IS NULL`; añadir filtro `lifecycle_status = 'published'`.
+- Migración soft: todas las empresas existentes se marcan `lifecycle_status = 'published'` en el mismo cambio para no romper el marketplace actual.
 
 ## Detalles técnicos
 
-- **Gateway URLs**:
-  - Geocoding: `GET /google_maps/maps/api/geocode/json?address=...`
-  - Static: `GET /google_maps/maps/api/staticmap?...`
-  - Routes: `POST /google_maps/routes/directions/v2:computeRoutes` con `X-Goog-FieldMask: routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline`.
-- **Headers gateway** (leer dentro del handler, nunca a nivel de módulo):
-  - `Authorization: Bearer ${process.env.LOVABLE_API_KEY}`
-  - `X-Connection-Api-Key: ${process.env.GOOGLE_MAPS_API_KEY}`
-- **Interactive map**: script `https://maps.googleapis.com/maps/api/js?key=${VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY}&loading=async&callback=vmxInitMap`. No `mapId`. Marker clásico.
-- **Cache Query**: `computeRoute` y `geocodeAddress` con `staleTime: 24h` (coordenadas no cambian).
-- **Ubicación del viajero**: hook `useVisitorGeolocation()` que pide `navigator.geolocation.getCurrentPosition` con consentimiento explícito; si no hay, `DistanceBadge` muestra CTA "Compartir mi ubicación".
+- Server fns nuevas en `src/lib/hosting/hosting.functions.ts`: `getVerificationDocumentSignedUrl`, `submitBusinessForReview`, `adminPublishBusiness` (Puerta 2). `approveBusinessRegistration` se renombra internamente a Puerta 1 (`admin_approve_identity`).
+- Subida del documento: server fn `createVerificationUploadUrl(business_id, filename, contentType)` que devuelve URL firmada de Supabase Storage al bucket privado.
+- Un solo componente `BecomeHostWizard` reemplaza el `RegisterBranch` actual.
+- `BusinessPublishChecklist` nuevo componente reutilizable en workspace.
+- Los toasts, sheets y navegación reusan Workspace Engine (política Workspace First).
+- Sin nuevos providers ni engines (Infrastructure Freeze).
 
-## Validaciones al cerrar
+## Fuera de alcance de esta iteración
 
-1. `bunx tsgo --noEmit` → 0 errores.
-2. `GET /api/public/health/maps` sigue devolviendo ok:true.
-3. `GET /api/public/maps/static?lat=20.68&lng=-88.20&zoom=15` devuelve `image/png` HTTP 200.
-4. En preview: la ficha de una empresa muestra mapa estático + botón "Cómo llegar" + distancia si comparto ubicación.
-5. Toggle interactivo carga Maps JS sin errores de consola.
-
-## Fuera de alcance (siguiente iteración)
-- Autocomplete Places en CMS de Empresa (I2).
-- Mapa de destino con múltiples pines (E7).
-- Isochrones / matriz de distancias para "cerca de mí" en Marketplace.
-
-## Rollback
-Cada archivo es aditivo; revertir borrando `src/lib/maps/`, `src/components/maps/`, `src/routes/api/public/maps/`, y el bloque agregado a la ficha de empresa.
-
-¿Procedo?
+- Verificación automática por scraping o llamadas al RFC/SAT.
+- Verificación por videollamada.
+- Sellos institucionales (ya viven en su propio bloque `institutional-badges`).
+- Emails transaccionales personalizados de rechazo (usa UNC estándar).
