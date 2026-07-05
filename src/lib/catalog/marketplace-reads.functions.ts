@@ -467,14 +467,43 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         business_slug: biz.slug,
         business_name: biz.display_name,
       })),
-      reviews: (reviews ?? []).map((r) => ({
-        id: r.id as string,
-        author_display_name: (r.author_display_name as string) ?? "Viajero",
-        rating: Number(r.rating ?? 0),
-        title: (r.title as string | null) ?? null,
-        body: (r.body as string) ?? "",
-        published_at: (r.published_at as string | null) ?? null,
-      })),
+      reviews: (reviews ?? []).map((r) => {
+        const row = r as unknown as Record<string, unknown>;
+        return {
+          id: row.id as string,
+          author_display_name: (row.author_display_name as string) ?? "Viajero",
+          rating: Number(row.rating ?? 0),
+          title: (row.title as string | null) ?? null,
+          body: (row.body as string) ?? "",
+          published_at: (row.published_at as string | null) ?? null,
+          language: (row.language as string | null) ?? null,
+          visit_type: (row.visit_type as string | null) ?? null,
+          verified_source:
+            (row.verified_source as ProductReviewItem["verified_source"]) ?? null,
+          business_response: (row.business_response as string | null) ?? null,
+          business_response_at: (row.business_response_at as string | null) ?? null,
+        } satisfies ProductReviewItem;
+      }),
+      review_stats: await (async (): Promise<ProductReviewStats> => {
+        const { data: statsRaw } = await supabase.rpc("get_review_stats", {
+          _subject_kind: "product",
+          _subject_id: prod.id,
+        });
+        const src = (statsRaw ?? {}) as Record<string, unknown>;
+        const dist = (src.distribution ?? {}) as Record<string, unknown>;
+        return {
+          count: Number(src.count ?? 0),
+          average: Number(src.average ?? 0),
+          verifiedCount: Number(src.verifiedCount ?? 0),
+          distribution: {
+            "1": Number(dist["1"] ?? 0),
+            "2": Number(dist["2"] ?? 0),
+            "3": Number(dist["3"] ?? 0),
+            "4": Number(dist["4"] ?? 0),
+            "5": Number(dist["5"] ?? 0),
+          },
+        };
+      })(),
       faqs: (faqs ?? []).map((f) => ({
         id: f.id as string,
         question: (f.question as string) ?? "",
