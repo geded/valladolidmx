@@ -70,6 +70,18 @@ export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
   plan_tier: "free" | "starter" | "pro" | "premium";
   products: MarketplaceProductCard[];
   promotions: MarketplacePromotionCard[];
+  primary_contact: {
+    type: string;
+    value: string;
+    label: string | null;
+  } | null;
+  primary_location: {
+    label: string | null;
+    address_line1: string | null;
+    address_line2: string | null;
+    latitude: number | null;
+    longitude: number | null;
+  } | null;
 }
 
 export interface MarketplaceSearchHit {
