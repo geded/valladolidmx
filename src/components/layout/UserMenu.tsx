@@ -116,7 +116,7 @@ export function UserMenu() {
         {open ? (
           <div
             role="menu"
-            className="absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border border-border bg-popover shadow-lg z-[100]"
+            className="absolute right-0 mt-2 w-56 max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-xl border border-border bg-popover shadow-lg z-[200]"
           >
             <div className="border-b border-border px-3 py-2 text-xs text-muted-foreground">
               <div className="truncate font-medium text-foreground">
