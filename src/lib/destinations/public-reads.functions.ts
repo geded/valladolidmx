@@ -110,6 +110,30 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
       .from("destinations").select("id, slug").eq("slug", data.slug).maybeSingle();
     if (dErr || !dest) return empty;
 
+    // E6 · Overrides (pin/hide) para la ficha de destino.
+    const { data: overridesRows } = await sb
+      .from("related_overrides")
+      .select("related_entity_type, related_entity_id, mode")
+      .eq("entity_type", "destination")
+      .eq("entity_id", dest.id)
+      .eq("surface", "destination-detail");
+    const hidden = {
+      business: new Set<string>(),
+      product: new Set<string>(),
+      event: new Set<string>(),
+    };
+    const pinnedIds = {
+      business: [] as string[],
+      product: [] as string[],
+      event: [] as string[],
+    };
+    for (const o of overridesRows ?? []) {
+      const t = o.related_entity_type as "business" | "product" | "event" | "destination";
+      if (t === "destination") continue;
+      if (o.mode === "hide") hidden[t].add(o.related_entity_id as string);
+      else if (o.mode === "pin") pinnedIds[t].push(o.related_entity_id as string);
+    }
+
     const { data: biz, error: bErr } = await sb
       .from("businesses")
       .select("id, slug, display_name, tagline, verified, status, deleted_at, business_categories!businesses_primary_category_id_fkey ( slug )")
@@ -131,13 +155,29 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         destination_slug: dest.slug,
         category_slug: typeof cat === "string" ? cat : "",
       };
-    });
+    }).filter((c) => !hidden.business.has(c.id));
     const grouped: DestinationRelatedDTO = { hoteles: [], restaurantes: [], experiencias: [], otras: [], productos: [], eventos: [] };
+    const bizById = new Map(cards.map((c) => [c.id, c] as const));
     for (const c of cards) {
       if (HOTEL_CATS.has(c.category_slug)) grouped.hoteles.push(c);
       else if (RESTO_CATS.has(c.category_slug)) grouped.restaurantes.push(c);
       else if (EXP_CATS.has(c.category_slug)) grouped.experiencias.push(c);
       else grouped.otras.push(c);
+    }
+    // Pins de empresa → prepend a `otras` (categoría agnóstica en superficie destino).
+    if (pinnedIds.business.length > 0) {
+      const pinnedBiz: MarketplaceBusinessCard[] = [];
+      const pinnedSet = new Set<string>();
+      for (const id of pinnedIds.business) {
+        const c = bizById.get(id);
+        if (c && !pinnedSet.has(id)) { pinnedBiz.push(c); pinnedSet.add(id); }
+      }
+      if (pinnedBiz.length > 0) {
+        grouped.otras = [
+          ...pinnedBiz,
+          ...grouped.otras.filter((c) => !pinnedSet.has(c.id)),
+        ];
+      }
     }
 
     const bizIds = cards.map((c) => c.id);
@@ -151,8 +191,7 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         .order("name", { ascending: true })
         .limit(24);
       if (!pErr && prods) {
-        const bizById = new Map(cards.map((c) => [c.id, c] as const));
-        grouped.productos = prods.map((p) => {
+        grouped.productos = prods.filter((p) => !hidden.product.has(p.id as string)).map((p) => {
           const parent = bizById.get(p.business_id as string);
           return {
             id: p.id,
@@ -173,6 +212,15 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
             visibility_level: String((p as Record<string, unknown>).visibility_level ?? "standard"),
           };
         });
+        if (pinnedIds.product.length > 0) {
+          const byId = new Map(grouped.productos.map((c) => [c.id, c] as const));
+          const pinnedCards = pinnedIds.product.map((id) => byId.get(id)).filter(Boolean) as typeof grouped.productos;
+          const pinnedSet = new Set(pinnedCards.map((c) => c.id));
+          grouped.productos = [
+            ...pinnedCards,
+            ...grouped.productos.filter((c) => !pinnedSet.has(c.id)),
+          ];
+        }
       }
     }
 
@@ -187,7 +235,7 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
       .order("starts_at", { ascending: true })
       .limit(6);
     if (!eErr && evs) {
-      grouped.eventos = evs.map((e) => ({
+      grouped.eventos = evs.filter((e) => !hidden.event.has(e.id as string)).map((e) => ({
         id: e.id as string,
         slug: e.slug as string,
         title: e.title as string,
@@ -199,6 +247,15 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         destination_slug: dest.slug,
         cover_url: null,
       }));
+      if (pinnedIds.event.length > 0) {
+        const byId = new Map(grouped.eventos.map((c) => [c.id, c] as const));
+        const pinnedCards = pinnedIds.event.map((id) => byId.get(id)).filter(Boolean) as typeof grouped.eventos;
+        const pinnedSet = new Set(pinnedCards.map((c) => c.id));
+        grouped.eventos = [
+          ...pinnedCards,
+          ...grouped.eventos.filter((c) => !pinnedSet.has(c.id)),
+        ];
+      }
     }
     return grouped;
   });
