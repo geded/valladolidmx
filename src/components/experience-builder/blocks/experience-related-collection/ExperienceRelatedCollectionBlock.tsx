@@ -189,6 +189,15 @@ function buildDTO(
   cfg: ExperienceRelatedCollectionConfig,
   groups: ExperienceRelatedGroup[],
 ): ExperienceRelatedCollectionDTO {
+  // E7 v1 · Explainable by Default: cuando la fuente NO es manual, el
+  // motor produce items con `rationale` derivado de señales (misma
+  // categoría, mismo destino, misma empresa, populares, etc.). Se
+  // renderizan por defecto — el editor puede desactivar `showRationale`
+  // explícitamente si quiere una vista más compacta.
+  const isComputedSource = cfg.source !== "manual";
+  const defaultShowRationale = isComputedSource
+    ? true
+    : (cfg.capabilities.showRationale ?? false);
   const capabilities = {
     showImage: cfg.capabilities.showImage ?? true,
     showMeta: cfg.capabilities.showMeta ?? true,
@@ -196,7 +205,7 @@ function buildDTO(
     showTags: cfg.capabilities.showTags ?? false,
     showPrice: cfg.capabilities.showPrice ?? true,
     showDate: cfg.capabilities.showDate ?? true,
-    showRationale: cfg.capabilities.showRationale ?? false,
+    showRationale: cfg.capabilities.showRationale ?? defaultShowRationale,
     showKindBadge: cfg.capabilities.showKindBadge ?? true,
     dedupe: cfg.capabilities.dedupe ?? true,
     compact: cfg.capabilities.compact ?? false,
