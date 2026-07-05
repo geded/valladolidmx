@@ -3,15 +3,21 @@
  * Whitelist server-side; sólo el propio `user_id` es accesible.
  */
 import { useEffect, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { Briefcase, Headphones, Shield, Mail, UserRound } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   getMyTravelerProfile,
   upsertMyTravelerProfile,
   type TravelerProfileInput,
 } from "@/lib/traveler/traveler-account.functions";
+import {
+  getProfileModeState,
+  type ProfileMode,
+} from "@/lib/profile-mode/mode.functions";
+import { ROLE_LABELS } from "@/types/auth";
 
 export const Route = createFileRoute("/_authenticated/cuenta/perfil")({
   component: CuentaPerfilPage,
@@ -36,11 +42,20 @@ function CuentaPerfilPage() {
   const queryClient = useQueryClient();
   const fetchProfile = useServerFn(getMyTravelerProfile);
   const saveProfile = useServerFn(upsertMyTravelerProfile);
+  const fetchMode = useServerFn(getProfileModeState);
+
+  const modeQ = useQuery({
+    queryKey: ["profile-mode-state"],
+    queryFn: () => fetchMode(),
+    enabled: Boolean(user?.id),
+    staleTime: 60_000,
+  });
+  const active: ProfileMode = modeQ.data?.active ?? "traveler";
 
   const { data, isLoading } = useQuery({
     queryKey: ["traveler", "profile", user?.id],
     queryFn: () => fetchProfile(),
-    enabled: Boolean(user?.id),
+    enabled: Boolean(user?.id) && active === "traveler",
     staleTime: 60_000,
   });
 
@@ -76,6 +91,14 @@ function CuentaPerfilPage() {
       void navigate({ to: "/cuenta" });
     },
   });
+
+  if (modeQ.isLoading) {
+    return <p className="text-sm text-muted-foreground">Cargando…</p>;
+  }
+
+  if (active !== "traveler") {
+    return <NonTravelerAccount mode={active} />;
+  }
 
   if (isLoading) {
     return <p className="text-sm text-muted-foreground">Cargando…</p>;
