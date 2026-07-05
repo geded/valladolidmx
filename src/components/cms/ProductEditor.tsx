@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { EntityEditor } from "@/components/cms/EntityEditor";
 import { ProductMediaPanels } from "@/components/cms/ProductMediaPanels";
+import { RelatedOverridesPanel } from "@/components/cms/RelatedOverridesPanel";
 import { PRODUCT_FIELDS } from "@/lib/cms/editor-fields";
 import { listBusinessesForProductSelect } from "@/lib/cms/products-media.functions";
 
@@ -44,7 +45,12 @@ export function ProductEditor({ id }: Props) {
       listQueryKey="products"
       fields={fields}
       renderExtras={({ id: entityId }) =>
-        entityId ? <ProductMediaPanels productId={entityId} /> : null
+        entityId ? (
+          <>
+            <ProductMediaPanels productId={entityId} />
+            <RelatedOverridesPanel entityType="product" entityId={entityId} />
+          </>
+        ) : null
       }
     />
   );
