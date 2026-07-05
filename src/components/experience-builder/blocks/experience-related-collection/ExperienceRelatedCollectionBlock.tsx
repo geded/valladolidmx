@@ -59,33 +59,33 @@ function resolveDestinationGroupItems(
 ): ExperienceRelatedItem[] {
   switch (entityKind) {
     case "hotel":
-      return destinationRelatedBucketToItems(related.hoteles, "hotel");
+      return destinationRelatedBucketToItems(related.hoteles, "hotel", "Hoteles del destino");
     case "restaurant":
-      return destinationRelatedBucketToItems(related.restaurantes, "restaurant");
+      return destinationRelatedBucketToItems(related.restaurantes, "restaurant", "Restaurantes del destino");
     case "experience":
-      return destinationRelatedBucketToItems(related.experiencias, "experience");
+      return destinationRelatedBucketToItems(related.experiencias, "experience", "Experiencias del destino");
     case "business": {
       if (categorySlug === "hoteles") {
-        return destinationRelatedBucketToItems(related.hoteles, "hotel");
+        return destinationRelatedBucketToItems(related.hoteles, "hotel", "Hoteles del destino");
       }
       if (categorySlug === "restaurantes") {
-        return destinationRelatedBucketToItems(related.restaurantes, "restaurant");
+        return destinationRelatedBucketToItems(related.restaurantes, "restaurant", "Restaurantes del destino");
       }
       if (categorySlug === "experiencias") {
-        return destinationRelatedBucketToItems(related.experiencias, "experience");
+        return destinationRelatedBucketToItems(related.experiencias, "experience", "Experiencias del destino");
       }
       // Todas las empresas del destino, sin duplicar por bucket.
       return [
-        ...destinationRelatedBucketToItems(related.hoteles, "hotel"),
-        ...destinationRelatedBucketToItems(related.restaurantes, "restaurant"),
-        ...destinationRelatedBucketToItems(related.experiencias, "experience"),
-        ...destinationRelatedBucketToItems(related.otras, "business"),
+        ...destinationRelatedBucketToItems(related.hoteles, "hotel", "Hoteles del destino"),
+        ...destinationRelatedBucketToItems(related.restaurantes, "restaurant", "Restaurantes del destino"),
+        ...destinationRelatedBucketToItems(related.experiencias, "experience", "Experiencias del destino"),
+        ...destinationRelatedBucketToItems(related.otras, "business", "Otras empresas del destino"),
       ];
     }
     case "event":
-      return destinationRelatedEventsToItems(related.eventos ?? []);
+      return destinationRelatedEventsToItems(related.eventos ?? [], "Próximos eventos en el destino");
     case "product":
-      return destinationRelatedProductsToItems(related.productos ?? []);
+      return destinationRelatedProductsToItems(related.productos ?? [], "Productos y experiencias del destino");
     default:
       return [];
   }
