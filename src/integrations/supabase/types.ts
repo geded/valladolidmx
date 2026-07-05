@@ -3560,6 +3560,57 @@ export type Database = {
           },
         ]
       }
+      related_overrides: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          demo_seed_batch: string | null
+          entity_id: string
+          entity_type: Database["public"]["Enums"]["related_entity_kind"]
+          id: string
+          is_demo_seed: boolean
+          mode: Database["public"]["Enums"]["related_override_mode"]
+          note: string | null
+          position: number | null
+          related_entity_id: string
+          related_entity_type: Database["public"]["Enums"]["related_entity_kind"]
+          surface: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          demo_seed_batch?: string | null
+          entity_id: string
+          entity_type: Database["public"]["Enums"]["related_entity_kind"]
+          id?: string
+          is_demo_seed?: boolean
+          mode: Database["public"]["Enums"]["related_override_mode"]
+          note?: string | null
+          position?: number | null
+          related_entity_id: string
+          related_entity_type: Database["public"]["Enums"]["related_entity_kind"]
+          surface: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          demo_seed_batch?: string | null
+          entity_id?: string
+          entity_type?: Database["public"]["Enums"]["related_entity_kind"]
+          id?: string
+          is_demo_seed?: boolean
+          mode?: Database["public"]["Enums"]["related_override_mode"]
+          note?: string | null
+          position?: number | null
+          related_entity_id?: string
+          related_entity_type?: Database["public"]["Enums"]["related_entity_kind"]
+          surface?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           author_display_name: string | null
@@ -5276,6 +5327,16 @@ export type Database = {
         Args: { _notes?: string; _transfer_id: string }
         Returns: undefined
       }
+      related_get_collection: {
+        Args: {
+          p_context?: Json
+          p_entity_id: string
+          p_entity_type: Database["public"]["Enums"]["related_entity_kind"]
+          p_limit?: number
+          p_surface: string
+        }
+        Returns: Json
+      }
       remove_business_media: {
         Args: { _business_media_id: string }
         Returns: undefined
@@ -5845,6 +5906,8 @@ export type Database = {
         | "servicio"
         | "artesanal"
       product_visibility_level: "standard" | "destacado" | "premium"
+      related_entity_kind: "business" | "product" | "destination" | "event"
+      related_override_mode: "pin" | "hide"
       system_alert_severity: "info" | "warning" | "critical"
       system_alert_status: "open" | "acknowledged" | "resolved"
       travel_item_kind:
@@ -6114,6 +6177,8 @@ export const Constants = {
         "artesanal",
       ],
       product_visibility_level: ["standard", "destacado", "premium"],
+      related_entity_kind: ["business", "product", "destination", "event"],
+      related_override_mode: ["pin", "hide"],
       system_alert_severity: ["info", "warning", "critical"],
       system_alert_status: ["open", "acknowledged", "resolved"],
       travel_item_kind: ["destination", "business", "product", "event", "note"],
