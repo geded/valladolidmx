@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.search_marketplace(text, text, text, numeric, numeric, integer, integer) TO anon, authenticated;
