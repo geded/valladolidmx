@@ -14,11 +14,21 @@
  */
 import { useEffect, useRef, useState } from "react";
 
-type GMaps = typeof google;
+// Tipos mínimos locales para evitar depender de @types/google.maps.
+type LatLng = { lat: number; lng: number };
+interface GMap {
+  new (el: HTMLElement, opts: Record<string, unknown>): unknown;
+}
+interface GMarker {
+  new (opts: { position: LatLng; map: unknown; title?: string }): unknown;
+}
+interface GoogleMapsNamespace {
+  maps: { Map: GMap; Marker: GMarker };
+}
 
 declare global {
   interface Window {
-    google?: GMaps;
+    google?: GoogleMapsNamespace;
     __vmxGmapsCbList?: Array<() => void>;
     vmxInitGoogleMaps?: () => void;
   }
@@ -26,7 +36,7 @@ declare global {
 
 const SCRIPT_ID = "vmx-google-maps-js";
 
-function loadGoogleMapsScript(apiKey: string): Promise<GMaps> {
+function loadGoogleMapsScript(apiKey: string): Promise<GoogleMapsNamespace> {
   return new Promise((resolve, reject) => {
     if (typeof window === "undefined") {
       reject(new Error("SSR"));
