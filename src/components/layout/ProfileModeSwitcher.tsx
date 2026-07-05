@@ -12,6 +12,7 @@
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { Link } from "@tanstack/react-router";
 import { Briefcase, Check, Compass, Headphones, Shield } from "lucide-react";
 import {
   getProfileModeState,
@@ -72,8 +73,27 @@ export function ProfileModeSwitcher({ onSwitched }: { onSwitched?: () => void })
 
   const { active, available } = state.data;
 
-  // Airbnb-style: si sólo hay 1 modo disponible no mostramos el submenú.
-  if (available.length <= 1) return null;
+  // Airbnb-style: si sólo hay 1 modo disponible (traveler puro) mostramos
+  // un CTA "Convierte tu negocio en anfitrión" en vez del submenú.
+  if (available.length <= 1) {
+    return (
+      <Link
+        to="/convertir-en-anfitrion"
+        onClick={() => onSwitched?.()}
+        className="flex items-start gap-2 border-b border-border px-3 py-2 text-left text-sm hover:bg-accent"
+      >
+        <Briefcase className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+        <span className="min-w-0 flex-1">
+          <span className="block font-medium text-foreground">
+            Convierte tu negocio en anfitrión
+          </span>
+          <span className="block text-[11px] text-muted-foreground">
+            Publica tu hotel, restaurante o experiencia en el Oriente Maya.
+          </span>
+        </span>
+      </Link>
+    );
+  }
 
   return (
     <div className="border-b border-border py-1">
