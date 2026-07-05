@@ -22,6 +22,7 @@ import { Link } from "@tanstack/react-router";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { ProductActions } from "@/components/commerce/ProductActions";
+import { ReviewComposer } from "@/components/reviews/ReviewComposer";
 import { SITE } from "@/config/site";
 import { resolveCanonicalPath } from "@/lib/navigation";
 import { useProduct } from "@/components/surfaces/ProductSurface";
@@ -234,11 +235,20 @@ export function ProductReviewsBlock() {
   const p = useProduct();
   if (!p) return <EmptyHint>Opiniones de viajeros.</EmptyHint>;
   return (
-    <KitReviews
-      reviews={productToReviewVMs(p)}
-      stats={productToReviewStatsVM(p)}
-      emptyLabel="Sin opiniones publicadas todavía."
-    />
+    <section>
+      <div className="mb-3 flex items-center justify-end">
+        <ReviewComposer
+          subjectKind="product"
+          subjectId={p.id}
+          subjectName={p.name}
+        />
+      </div>
+      <KitReviews
+        reviews={productToReviewVMs(p)}
+        stats={productToReviewStatsVM(p)}
+        emptyLabel="Sin opiniones publicadas todavía."
+      />
+    </section>
   );
 }
 
