@@ -32,6 +32,16 @@ import {
   type MarketplaceProductDetail,
 } from "@/lib/catalog/marketplace-reads.functions";
 import { ProductSurfaceProvider } from "@/components/surfaces/ProductSurface";
+import {
+  DestinationSurfaceProvider,
+  type DestinationSurfaceContextValue,
+} from "@/components/surfaces/DestinationSurface";
+import {
+  getPublicDestinationBySlug,
+  getDestinationRelated,
+} from "@/lib/destinations/public-reads.functions";
+import { DESTINOS_MOCK } from "@/mocks/destinos";
+import { ORIENTE_MAYA } from "@/config/regions";
 
 /** Candidato ligero para poblar el selector "Vista previa con…". */
 export interface PreviewCandidate {
@@ -89,6 +99,45 @@ function ProductDataProvider({
   children: ReactNode;
 }) {
   return <ProductSurfaceProvider product={data}>{children}</ProductSurfaceProvider>;
+}
+
+/* Destination provider — envuelve DestinationSurfaceProvider con el shape TData. */
+function DestinationDataProvider({
+  data,
+  children,
+}: {
+  data: DestinationSurfaceContextValue | null;
+  children: ReactNode;
+}) {
+  return (
+    <DestinationSurfaceProvider
+      db={data?.db ?? null}
+      related={data?.related ?? null}
+      slug={data?.slug ?? null}
+    >
+      {children}
+    </DestinationSurfaceProvider>
+  );
+}
+
+/** Destino demo estable — evita "Destino no disponible" en Studio. */
+function demoDestination(): DestinationSurfaceContextValue {
+  return {
+    slug: "valladolid",
+    db: {
+      slug: "valladolid",
+      name: "Valladolid",
+      tagline: "Corazón colonial del Oriente Maya",
+      description:
+        "Ejemplo de destino cargado en el Studio. Selecciona un destino real desde la barra superior para previsualizar con datos verdaderos antes de publicar.",
+      highlights: ["Centro histórico", "Cenotes cercanos", "Gastronomía yucateca"],
+      hero_palette: "territorio",
+      hero_url: null,
+      latitude: 20.6893,
+      longitude: -88.2011,
+    },
+    related: null,
+  };
 }
 
 /** Producto demo estable — evita "Producto no disponible" en Studio. */
@@ -288,9 +337,44 @@ const REGISTRY: TemplatePreviewProvider<any>[] = [
     demoData: demoProduct,
     Provider: ProductDataProvider,
   } satisfies TemplatePreviewProvider<MarketplaceProductDetail>,
-  // NOTA: `region`, `destination`, `event`, `experience`, `restaurant`
-  // se registrarán aquí cuando expongan un `SurfaceProvider` equivalente.
-  // El Studio no requiere cambios: consulta este registry por `kind`.
+  /**
+   * `destination` — Plantilla Madre Destino (SSC-01·P1). Lista los
+   * destinos publicados de Oriente Maya y los inyecta en
+   * `DestinationSurfaceProvider` (db + related). Los bloques
+   * `vmx.experience.*` renderizan datos reales en el canvas.
+   */
+  {
+    kind: "destination",
+    label: "Vista previa con destino",
+    placeholder: "Selecciona un destino…",
+    async loadCandidates() {
+      return DESTINOS_MOCK.filter((d) => d.region_slug === ORIENTE_MAYA.slug).map(
+        (d) => ({
+          slug: d.slug,
+          label: d.name,
+          secondary: "Oriente Maya",
+        }),
+      );
+    },
+    async loadDetail(slug) {
+      try {
+        const [db, related] = await Promise.all([
+          getPublicDestinationBySlug({ data: { slug } }),
+          getDestinationRelated({ data: { slug } }).catch(() => null),
+        ]);
+        if (!db) return null;
+        return { db, related, slug } satisfies DestinationSurfaceContextValue;
+      } catch {
+        return null;
+      }
+    },
+    demoData: demoDestination,
+    Provider: DestinationDataProvider,
+  } satisfies TemplatePreviewProvider<DestinationSurfaceContextValue>,
+  // NOTA: `region`, `event`, `experience`, `restaurant`, `category`
+  // se registrarán aquí cuando expongan un `SurfaceProvider` equivalente
+  // con `db + related`. El Studio no requiere cambios: consulta este
+  // registry por `kind`.
 ];
 
 export function getPreviewProvider(
