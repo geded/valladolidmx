@@ -342,7 +342,7 @@ function DesktopMenu({
                     {cols.map((col, idx) => (
                       <div key={idx}>
                         {col.title ? (
-                          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                          <p className="text-caption mb-2 text-muted-foreground">
                             {col.title}
                           </p>
                         ) : null}
@@ -414,7 +414,7 @@ function MobileMenu({
                 {cols.map((col, idx) => (
                   <div key={idx} className="mt-2">
                     {col.title ? (
-                      <p className="mb-1 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      <p className="text-caption mb-1 px-2 text-muted-foreground">
                         {col.title}
                       </p>
                     ) : null}
