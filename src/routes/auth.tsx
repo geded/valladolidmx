@@ -87,7 +87,8 @@ function AuthRoute() {
   async function handleGoogle() {
     setError(null);
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      // Return to /auth so the post-login effect picks up the stored "next".
+      redirect_uri: `${window.location.origin}/auth`,
     });
     if (result.error) {
       setError(result.error.message ?? t("auth.google_error"));
