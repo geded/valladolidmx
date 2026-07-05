@@ -36,6 +36,8 @@ function publicClient() {
   });
 }
 
+const PRODUCT_SURFACE = "product-detail";
+
 export const getProductRelated = createServerFn({ method: "GET" })
   .inputValidator(
     (data: {
@@ -63,6 +65,20 @@ export const getProductRelated = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }): Promise<ProductRelatedDTO> => {
     const supabase = publicClient();
+    // E6 · Overrides (pin/hide) para la ficha de producto.
+    const { data: overrides } = await supabase
+      .from("related_overrides")
+      .select("related_entity_type, related_entity_id, mode")
+      .eq("entity_type", "product")
+      .eq("entity_id", data.productId)
+      .eq("surface", PRODUCT_SURFACE)
+      .eq("related_entity_type", "product");
+    const hiddenIds = new Set<string>();
+    const pinnedIds: string[] = [];
+    for (const o of overrides ?? []) {
+      if (o.mode === "hide") hiddenIds.add(o.related_entity_id as string);
+      else if (o.mode === "pin") pinnedIds.push(o.related_entity_id as string);
+    }
     // Trae productos publicados con su empresa y join a destino+categoría.
     // Filtramos client-side por destino/categoría/exclusión: mantiene
     // la consulta simple y compatible con RLS TO anon.
@@ -80,6 +96,7 @@ export const getProductRelated = createServerFn({ method: "GET" })
     const inDestination: MarketplaceProductCard[] = [];
     const sameCat: MarketplaceProductCard[] = [];
     const otherCat: MarketplaceProductCard[] = [];
+    const byId = new Map<string, MarketplaceProductCard>();
     for (const row of rows ?? []) {
       const biz = row.business as
         | {
@@ -95,6 +112,7 @@ export const getProductRelated = createServerFn({ method: "GET" })
       if (!biz || biz.status !== "published" || biz.deleted_at) continue;
       if (biz.id === data.businessId) continue;
       if (row.id === data.productId) continue;
+      if (hiddenIds.has(row.id)) continue;
       const destSlug = (biz.destinations as { slug?: unknown } | null)?.slug;
       const catSlug = (biz.business_categories as { slug?: unknown } | null)?.slug;
       if (typeof destSlug !== "string" || destSlug !== data.destinationSlug) continue;
@@ -120,6 +138,7 @@ export const getProductRelated = createServerFn({ method: "GET" })
         visibility_level: String((row as Record<string, unknown>).visibility_level ?? "standard"),
       };
       inDestination.push(card);
+      byId.set(card.id, card);
       if (data.categorySlug && typeof catSlug === "string" && catSlug === data.categorySlug) {
         sameCat.push(card);
       } else {
@@ -128,8 +147,21 @@ export const getProductRelated = createServerFn({ method: "GET" })
       if (inDestination.length >= 24) break;
     }
 
+    // Aplica pins: los ids fijados se anteponen a la lista relevante.
+    const pinnedCards: MarketplaceProductCard[] = [];
+    for (const id of pinnedIds) {
+      const c = byId.get(id);
+      if (c) pinnedCards.push(c);
+    }
+    const pinnedSet = new Set(pinnedCards.map((c) => c.id));
+    const sameCategoryOut = [
+      ...pinnedCards,
+      ...sameCat.filter((c) => !pinnedSet.has(c.id)),
+    ].slice(0, 6);
+    const otherOut = otherCat.filter((c) => !pinnedSet.has(c.id)).slice(0, 6);
+
     return {
-      sameCategoryInDestination: sameCat.slice(0, 6),
-      otherInDestination: otherCat.slice(0, 6),
+      sameCategoryInDestination: sameCategoryOut,
+      otherInDestination: otherOut,
     };
   });
