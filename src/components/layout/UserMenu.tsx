@@ -8,7 +8,7 @@
  * Dependencias: types/auth, useTranslation.
  */
 import { useState } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { UserRound, LogOut, ChevronDown, Shield, LayoutDashboard, Briefcase, Headphones, Compass, Globe } from "lucide-react";
@@ -59,6 +59,7 @@ export function UserMenu() {
   const { t } = useTranslation();
   const { authUser, role, signOut, loading } = useAuth();
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
   const fetchMode = useServerFn(getProfileModeState);
   const modeQ = useQuery({
     queryKey: ["profile-mode-state"],
@@ -167,7 +168,10 @@ export function UserMenu() {
               type="button"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => {
-                void signOut();
+                void (async () => {
+                  await signOut();
+                  navigate({ to: "/", replace: true }).catch(() => undefined);
+                })();
                 setOpen(false);
               }}
               className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-accent"
