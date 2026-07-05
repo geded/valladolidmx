@@ -19,6 +19,15 @@
  *    modo "descubrimiento" e invita a explorar destinos del Oriente
  *    Maya sin sacar al visitante de la superficie actual.
  *
+ * AT-2 · Sheet productivo (2026-07-05):
+ *  · Consume sugerencias reales (server fn productiva).
+ *  · Agrupa por categoría publicada (hoteles / restaurantes /
+ *    experiencias / otras) para volver navegable el bloque "Qué explorar".
+ *  · Muestra un microbadge "✨ Alux" cuando el rationale viene del
+ *    modelo, y avisa con un chip discreto si el gateway está sin cuota
+ *    o rate-limited (las sugerencias siguen sirviéndose desde catálogo).
+ *  · Loading con skeletons — nunca queda "en blanco".
+ *
  * Fuente única del contexto: `useAluxContext()` → Context Engine +
  * Navigation Session. Las sugerencias contextuales las provee la server
  * fn pública `aluxContextualSuggest` (US-E1.2), sin motor paralelo.
