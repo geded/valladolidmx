@@ -5430,6 +5430,14 @@ export type Database = {
         Args: { _mode: Database["public"]["Enums"]["profile_mode"] }
         Returns: Database["public"]["Enums"]["profile_mode"]
       }
+      set_business_response: {
+        Args: { _response: string; _review_id: string }
+        Returns: {
+          business_response: string
+          business_response_at: string
+          id: string
+        }[]
+      }
       transition_content_status: {
         Args: {
           _entity_id: string
