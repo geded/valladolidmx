@@ -10,6 +10,7 @@ import {
   createFileRoute,
   Outlet,
   useNavigate,
+  useLocation,
 } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -20,12 +21,18 @@ export const Route = createFileRoute("/_authenticated")({
 function AuthenticatedLayout() {
   const { loading, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!loading && !user) {
+      const next = location.pathname + (location.searchStr ?? "");
+      // Persist intended destination for post-login (survives OAuth round-trip).
+      if (typeof window !== "undefined" && next && next !== "/auth") {
+        try { window.sessionStorage.setItem("vmx.auth.next", next); } catch { /* noop */ }
+      }
       void navigate({ to: "/auth" });
     }
-  }, [loading, user, navigate]);
+  }, [loading, user, navigate, location]);
 
   if (loading) {
     return (

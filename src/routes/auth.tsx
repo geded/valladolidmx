@@ -36,8 +36,16 @@ function AuthRoute() {
 
   useEffect(() => {
     if (!loading && user) {
-      const home = resolveRoleHome(roles);
-      void navigate({ to: home });
+      // Preserve "next" across sign-in / OAuth round-trip.
+      let next: string | null = null;
+      if (typeof window !== "undefined") {
+        try {
+          next = window.sessionStorage.getItem("vmx.auth.next");
+          if (next) window.sessionStorage.removeItem("vmx.auth.next");
+        } catch { /* noop */ }
+      }
+      const target = next && next.startsWith("/") && !next.startsWith("//") ? next : resolveRoleHome(roles);
+      void navigate({ to: target });
     }
   }, [loading, user, roles, navigate]);
 
@@ -79,7 +87,8 @@ function AuthRoute() {
   async function handleGoogle() {
     setError(null);
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      // Return to /auth so the post-login effect picks up the stored "next".
+      redirect_uri: `${window.location.origin}/auth`,
     });
     if (result.error) {
       setError(result.error.message ?? t("auth.google_error"));
