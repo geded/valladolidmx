@@ -667,7 +667,7 @@ export type Database = {
           business_id: string
           created_at: string
           expires_at: string
-          from_user_id: string
+          from_user_id: string | null
           id: string
           notes: string | null
           requested_at: string
@@ -680,7 +680,7 @@ export type Database = {
           business_id: string
           created_at?: string
           expires_at?: string
-          from_user_id: string
+          from_user_id?: string | null
           id?: string
           notes?: string | null
           requested_at?: string
@@ -693,7 +693,7 @@ export type Database = {
           business_id?: string
           created_at?: string
           expires_at?: string
-          from_user_id?: string
+          from_user_id?: string | null
           id?: string
           notes?: string | null
           requested_at?: string
@@ -4650,6 +4650,14 @@ export type Database = {
         Args: { _capability: string; _meta?: Json; _plan_id?: string }
         Returns: string
       }
+      approve_business_registration: {
+        Args: { _approve: boolean; _business_id: string; _notes?: string }
+        Returns: undefined
+      }
+      approve_ownership_claim: {
+        Args: { _approve: boolean; _notes?: string; _transfer_id: string }
+        Returns: undefined
+      }
       archive_business_product: {
         Args: { _product_id: string }
         Returns: undefined
@@ -4757,6 +4765,10 @@ export type Database = {
       check_traveler_handle_available: {
         Args: { _handle: string }
         Returns: Json
+      }
+      claim_business: {
+        Args: { _business_id: string; _notes?: string }
+        Returns: string
       }
       concierge_alux_context_for_case: {
         Args: { _case_id: string }
@@ -4983,6 +4995,16 @@ export type Database = {
           _starts_at?: string
           _terms?: string
           _title: string
+        }
+        Returns: string
+      }
+      create_owned_business: {
+        Args: {
+          _description?: string
+          _destination_id: string
+          _display_name: string
+          _primary_category_id?: string
+          _tagline?: string
         }
         Returns: string
       }
@@ -5224,6 +5246,21 @@ export type Database = {
       is_reserved_traveler_handle: {
         Args: { _handle: string }
         Returns: boolean
+      }
+      list_pending_business_requests: {
+        Args: never
+        Returns: {
+          business_id: string
+          business_name: string
+          created_at: string
+          destination_id: string
+          kind: string
+          notes: string
+          ref_id: string
+          requester_email: string
+          requester_id: string
+          requester_name: string
+        }[]
       }
       log_business_presence_audit: {
         Args: { _action: string; _business_id: string; _notes?: string }
@@ -5905,7 +5942,7 @@ export type Database = {
       invitation_status: "pending" | "accepted" | "revoked" | "expired"
       locale_code: "es" | "en" | "fr" | "de" | "it" | "pt"
       media_kind: "image" | "video" | "document" | "audio"
-      membership_status: "active" | "suspended" | "removed"
+      membership_status: "active" | "suspended" | "removed" | "pending"
       notification_category:
         | "transactional"
         | "operational"
@@ -6171,7 +6208,7 @@ export const Constants = {
       invitation_status: ["pending", "accepted", "revoked", "expired"],
       locale_code: ["es", "en", "fr", "de", "it", "pt"],
       media_kind: ["image", "video", "document", "audio"],
-      membership_status: ["active", "suspended", "removed"],
+      membership_status: ["active", "suspended", "removed", "pending"],
       notification_category: [
         "transactional",
         "operational",

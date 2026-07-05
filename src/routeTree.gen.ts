@@ -98,6 +98,7 @@ import { Route as AuthenticatedAdminOperacionesRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminIaRouteImport } from './routes/_authenticated/admin/ia'
 import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
 import { Route as AuthenticatedAdminConciergeRouteImport } from './routes/_authenticated/admin/concierge'
+import { Route as AuthenticatedAdminAnfitrionesRouteImport } from './routes/_authenticated/admin/anfitriones'
 import { Route as OrienteMayaDestinoCategoriaIndexRouteImport } from './routes/oriente-maya/$destino.$categoria.index'
 import { Route as AuthenticatedPortalResenasIndexRouteImport } from './routes/_authenticated/portal/resenas.index'
 import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './routes/_authenticated/portal/invitaciones.index'
@@ -632,6 +633,12 @@ const AuthenticatedAdminConciergeRoute =
     path: '/concierge',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminAnfitrionesRoute =
+  AuthenticatedAdminAnfitrionesRouteImport.update({
+    id: '/anfitriones',
+    path: '/anfitriones',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const OrienteMayaDestinoCategoriaIndexRoute =
   OrienteMayaDestinoCategoriaIndexRouteImport.update({
     id: '/',
@@ -952,6 +959,7 @@ export interface FileRoutesByFullPath {
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/admin/anfitriones': typeof AuthenticatedAdminAnfitrionesRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/ia': typeof AuthenticatedAdminIaRoute
@@ -1081,6 +1089,7 @@ export interface FileRoutesByTo {
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
+  '/admin/anfitriones': typeof AuthenticatedAdminAnfitrionesRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/ia': typeof AuthenticatedAdminIaRoute
@@ -1215,6 +1224,7 @@ export interface FileRoutesById {
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/_authenticated/admin/anfitriones': typeof AuthenticatedAdminAnfitrionesRoute
   '/_authenticated/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/_authenticated/admin/ia': typeof AuthenticatedAdminIaRoute
@@ -1352,6 +1362,7 @@ export interface FileRouteTypes {
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/oriente-maya/'
+    | '/admin/anfitriones'
     | '/admin/concierge'
     | '/admin/empresas'
     | '/admin/ia'
@@ -1481,6 +1492,7 @@ export interface FileRouteTypes {
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/oriente-maya'
+    | '/admin/anfitriones'
     | '/admin/concierge'
     | '/admin/empresas'
     | '/admin/ia'
@@ -1614,6 +1626,7 @@ export interface FileRouteTypes {
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/oriente-maya/'
+    | '/_authenticated/admin/anfitriones'
     | '/_authenticated/admin/concierge'
     | '/_authenticated/admin/empresas'
     | '/_authenticated/admin/ia'
@@ -2375,6 +2388,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminConciergeRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/anfitriones': {
+      id: '/_authenticated/admin/anfitriones'
+      path: '/anfitriones'
+      fullPath: '/admin/anfitriones'
+      preLoaderRoute: typeof AuthenticatedAdminAnfitrionesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/oriente-maya/$destino/$categoria/': {
       id: '/oriente-maya/$destino/$categoria/'
       path: '/'
@@ -2711,6 +2731,7 @@ const AuthenticatedAdminSistemaRouteWithChildren =
   )
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminAnfitrionesRoute: typeof AuthenticatedAdminAnfitrionesRoute
   AuthenticatedAdminConciergeRoute: typeof AuthenticatedAdminConciergeRoute
   AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
   AuthenticatedAdminIaRoute: typeof AuthenticatedAdminIaRoute
@@ -2722,6 +2743,7 @@ interface AuthenticatedAdminRouteRouteChildren {
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminAnfitrionesRoute: AuthenticatedAdminAnfitrionesRoute,
     AuthenticatedAdminConciergeRoute: AuthenticatedAdminConciergeRoute,
     AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
     AuthenticatedAdminIaRoute: AuthenticatedAdminIaRoute,
