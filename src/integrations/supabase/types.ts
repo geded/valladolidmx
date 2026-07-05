@@ -811,11 +811,15 @@ export type Database = {
           metadata: Json
           primary_category_id: string | null
           published_at: string | null
+          review_notes: string | null
           slug: string
           status: Database["public"]["Enums"]["content_status"]
+          submitted_for_review_at: string | null
           tagline: string | null
           updated_at: string
           updated_by: string | null
+          verification_document_url: string | null
+          verification_notes: string | null
           verified: boolean
         }
         Insert: {
@@ -837,11 +841,15 @@ export type Database = {
           metadata?: Json
           primary_category_id?: string | null
           published_at?: string | null
+          review_notes?: string | null
           slug: string
           status?: Database["public"]["Enums"]["content_status"]
+          submitted_for_review_at?: string | null
           tagline?: string | null
           updated_at?: string
           updated_by?: string | null
+          verification_document_url?: string | null
+          verification_notes?: string | null
           verified?: boolean
         }
         Update: {
@@ -863,11 +871,15 @@ export type Database = {
           metadata?: Json
           primary_category_id?: string | null
           published_at?: string | null
+          review_notes?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["content_status"]
+          submitted_for_review_at?: string | null
           tagline?: string | null
           updated_at?: string
           updated_by?: string | null
+          verification_document_url?: string | null
+          verification_notes?: string | null
           verified?: boolean
         }
         Relationships: [
@@ -4998,16 +5010,35 @@ export type Database = {
         }
         Returns: string
       }
-      create_owned_business: {
-        Args: {
-          _description?: string
-          _destination_id: string
-          _display_name: string
-          _primary_category_id?: string
-          _tagline?: string
-        }
-        Returns: string
-      }
+      create_owned_business:
+        | {
+            Args: {
+              _description?: string
+              _destination_id: string
+              _display_name: string
+              _primary_category_id?: string
+              _tagline?: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              _address_line1?: string
+              _address_line2?: string
+              _description?: string
+              _destination_id: string
+              _display_name: string
+              _email?: string
+              _phone?: string
+              _postal_code?: string
+              _primary_category_id?: string
+              _tagline?: string
+              _verification_document_url?: string
+              _website?: string
+              _whatsapp?: string
+            }
+            Returns: string
+          }
       delete_business_product_faq: {
         Args: { _faq_id: string }
         Returns: undefined
@@ -5346,6 +5377,10 @@ export type Database = {
         }
       }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
+      publish_business: {
+        Args: { _approve: boolean; _business_id: string; _notes?: string }
+        Returns: undefined
+      }
       publish_business_product: { Args: { _product_id: string }; Returns: Json }
       purge_demo_seed: {
         Args: { _batch: string }
@@ -5484,6 +5519,10 @@ export type Database = {
           business_response_at: string
           id: string
         }[]
+      }
+      submit_business_for_review: {
+        Args: { _business_id: string }
+        Returns: undefined
       }
       transition_content_status: {
         Args: {

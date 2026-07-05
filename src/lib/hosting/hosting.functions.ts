@@ -144,6 +144,14 @@ export const createOwnedBusiness = createServerFn({ method: "POST" })
       primary_category_id?: string | null;
       tagline?: string | null;
       description?: string | null;
+      address_line1?: string | null;
+      address_line2?: string | null;
+      postal_code?: string | null;
+      phone?: string | null;
+      whatsapp?: string | null;
+      email?: string | null;
+      website?: string | null;
+      verification_document_url: string;
     }) => ({
       display_name: z.string().trim().min(2).max(120).parse(data?.display_name),
       destination_id: z.string().uuid().parse(data?.destination_id),
@@ -153,9 +161,26 @@ export const createOwnedBusiness = createServerFn({ method: "POST" })
       tagline: data?.tagline
         ? z.string().trim().max(160).parse(data.tagline)
         : null,
-      description: data?.description
-        ? z.string().trim().max(2000).parse(data.description)
+      description: z.string().trim().min(80).max(2000).parse(data?.description ?? ""),
+      address_line1: data?.address_line1
+        ? z.string().trim().max(200).parse(data.address_line1)
         : null,
+      address_line2: data?.address_line2
+        ? z.string().trim().max(200).parse(data.address_line2)
+        : null,
+      postal_code: data?.postal_code
+        ? z.string().trim().max(20).parse(data.postal_code)
+        : null,
+      phone: data?.phone ? z.string().trim().max(40).parse(data.phone) : null,
+      whatsapp: data?.whatsapp ? z.string().trim().max(40).parse(data.whatsapp) : null,
+      email: data?.email ? z.string().trim().email().max(200).parse(data.email) : null,
+      website: data?.website ? z.string().trim().url().max(300).parse(data.website) : null,
+      verification_document_url: z
+        .string()
+        .trim()
+        .min(1)
+        .max(500)
+        .parse(data?.verification_document_url),
     }),
   )
   .handler(async ({ data, context }) => {
@@ -167,6 +192,14 @@ export const createOwnedBusiness = createServerFn({ method: "POST" })
         _primary_category_id: data.primary_category_id,
         _tagline: data.tagline,
         _description: data.description,
+        _address_line1: data.address_line1,
+        _address_line2: data.address_line2,
+        _postal_code: data.postal_code,
+        _phone: data.phone,
+        _whatsapp: data.whatsapp,
+        _email: data.email,
+        _website: data.website,
+        _verification_document_url: data.verification_document_url,
       } as never,
     );
     if (error) throw new Error(error.message);
@@ -174,7 +207,7 @@ export const createOwnedBusiness = createServerFn({ method: "POST" })
   });
 
 export interface PendingRequestRow {
-  kind: "claim" | "registration";
+  kind: "claim" | "registration" | "publication";
   ref_id: string;
   business_id: string;
   business_name: string;
@@ -235,6 +268,189 @@ export const approveBusinessRegistration = createServerFn({ method: "POST" })
     );
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+/* ── Puerta 2: publicación ─────────────────────────────────────── */
+
+export const submitBusinessForReview = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { business_id: string }) => ({
+    business_id: z.string().uuid().parse(data?.business_id),
+  }))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc(
+      "submit_business_for_review",
+      { _business_id: data.business_id } as never,
+    );
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const publishBusiness = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (data: { business_id: string; approve: boolean; notes?: string }) => ({
+      business_id: z.string().uuid().parse(data?.business_id),
+      approve: z.boolean().parse(data?.approve),
+      notes: data?.notes ? z.string().max(500).parse(data.notes) : null,
+    }),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("publish_business", {
+      _business_id: data.business_id,
+      _approve: data.approve,
+      _notes: data.notes,
+    } as never);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/* ── Documento de verificación (admin) ─────────────────────────── */
+
+export const getVerificationDocumentSignedUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { business_id: string }) => ({
+    business_id: z.string().uuid().parse(data?.business_id),
+  }))
+  .handler(async ({ data, context }): Promise<{ url: string | null }> => {
+    const { supabase } = context;
+    const { data: biz, error: bErr } = await supabase
+      .from("businesses")
+      .select("verification_document_url")
+      .eq("id", data.business_id)
+      .maybeSingle();
+    if (bErr) throw new Error(bErr.message);
+    if (!biz?.verification_document_url) return { url: null };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signed, error } = await supabaseAdmin.storage
+      .from("business-verification")
+      .createSignedUrl(biz.verification_document_url, 60 * 10);
+    if (error) throw new Error(error.message);
+    return { url: signed?.signedUrl ?? null };
+  });
+
+/* ── Mis empresas + checklist de publicación ───────────────────── */
+
+export interface MyBusinessRow {
+  id: string;
+  display_name: string;
+  slug: string;
+  status: string;
+  destination_name: string | null;
+  review_notes: string | null;
+  submitted_for_review_at: string | null;
+}
+
+export const listMyBusinesses = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<MyBusinessRow[]> => {
+    const { supabase, userId } = context;
+    const { data: memberships, error: mErr } = await supabase
+      .from("business_users")
+      .select("business_id")
+      .eq("user_id", userId)
+      .eq("role", "owner")
+      .in("status", ["pending", "active"]);
+    if (mErr) throw new Error(mErr.message);
+    const ids = (memberships ?? []).map((m: any) => m.business_id);
+    if (ids.length === 0) return [];
+    const { data, error } = await supabase
+      .from("businesses")
+      .select(
+        "id, display_name, slug, status, review_notes, submitted_for_review_at, destinations(name)",
+      )
+      .in("id", ids)
+      .is("deleted_at", null)
+      .order("updated_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((b: any) => ({
+      id: b.id,
+      display_name: b.display_name,
+      slug: b.slug,
+      status: b.status,
+      destination_name: b.destinations?.name ?? null,
+      review_notes: b.review_notes,
+      submitted_for_review_at: b.submitted_for_review_at,
+    }));
+  });
+
+export interface PublishChecklist {
+  business_id: string;
+  display_name: string;
+  status: string;
+  review_notes: string | null;
+  submitted_for_review_at: string | null;
+  checks: {
+    logo: boolean;
+    cover: boolean;
+    gallery_count: number;
+    description: boolean;
+    category: boolean;
+    location: boolean;
+    contact: boolean;
+  };
+  ready: boolean;
+}
+
+export const getBusinessPublishChecklist = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { business_id: string }) => ({
+    business_id: z.string().uuid().parse(data?.business_id),
+  }))
+  .handler(async ({ data, context }): Promise<PublishChecklist> => {
+    const { supabase } = context;
+    const { data: b, error } = await supabase
+      .from("businesses")
+      .select(
+        "id, display_name, status, review_notes, submitted_for_review_at, logo_media_id, cover_media_id, description, primary_category_id",
+      )
+      .eq("id", data.business_id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!b) throw new Error("business_not_found");
+    const [{ count: galleryCount }, { count: locationCount }, { count: contactCount }] =
+      await Promise.all([
+        supabase
+          .from("business_media")
+          .select("id", { count: "exact", head: true })
+          .eq("business_id", data.business_id),
+        supabase
+          .from("business_locations")
+          .select("id", { count: "exact", head: true })
+          .eq("business_id", data.business_id)
+          .is("deleted_at", null),
+        supabase
+          .from("business_contacts")
+          .select("id", { count: "exact", head: true })
+          .eq("business_id", data.business_id)
+          .is("deleted_at", null),
+      ]);
+    const checks = {
+      logo: !!b.logo_media_id,
+      cover: !!b.cover_media_id,
+      gallery_count: galleryCount ?? 0,
+      description: !!(b.description && b.description.trim().length >= 80),
+      category: !!b.primary_category_id,
+      location: (locationCount ?? 0) > 0,
+      contact: (contactCount ?? 0) > 0,
+    };
+    const ready =
+      checks.logo &&
+      checks.cover &&
+      checks.gallery_count >= 3 &&
+      checks.description &&
+      checks.category &&
+      checks.location &&
+      checks.contact;
+    return {
+      business_id: b.id,
+      display_name: b.display_name,
+      status: b.status,
+      review_notes: b.review_notes,
+      submitted_for_review_at: b.submitted_for_review_at,
+      checks,
+      ready,
+    };
   });
 
 export const listPublicDestinations = createServerFn({ method: "GET" })
