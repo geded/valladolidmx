@@ -46,6 +46,7 @@ import {
   productToPromoVMs,
   productToRelatedCardVMs,
   productToReviewVMs,
+  productToReviewStatsVM,
   productToShellVM,
 } from "@/components/surfaces/product/product-to-kit-vm";
 
@@ -235,6 +236,7 @@ export function ProductReviewsBlock() {
   return (
     <KitReviews
       reviews={productToReviewVMs(p)}
+      stats={productToReviewStatsVM(p)}
       emptyLabel="Sin opiniones publicadas todavía."
     />
   );
