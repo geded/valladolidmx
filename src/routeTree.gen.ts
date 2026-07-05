@@ -139,6 +139,7 @@ import { Route as OrienteMayaDestinoCategoriaEmpresaIndexRouteImport } from './r
 import { Route as OrienteMayaDestinoCategoriaEmpresaProductoRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa.$producto'
 import { Route as ApiPublicPaymentsProviderWebhookRouteImport } from './routes/api/public/payments/$provider/webhook'
 import { Route as AuthenticatedPortalProductosProductIdPreviewRouteImport } from './routes/_authenticated/portal/productos.$productId.preview'
+import { Route as AuthenticatedCuentaEmpresaBusinessIdPublicacionRouteImport } from './routes/_authenticated/cuenta/empresa.$businessId.publicacion'
 import { Route as AuthenticatedCuentaConciergeCaseIdEvaluarRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId.evaluar'
 import { Route as AuthenticatedCmsZonasIdEditarRouteImport } from './routes/_authenticated/cms/zonas.$id.editar'
 import { Route as AuthenticatedCmsReviewsIdModerarRouteImport } from './routes/_authenticated/cms/reviews.$id.moderar'
@@ -878,6 +879,12 @@ const AuthenticatedPortalProductosProductIdPreviewRoute =
     path: '/productos/$productId/preview',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
+const AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute =
+  AuthenticatedCuentaEmpresaBusinessIdPublicacionRouteImport.update({
+    id: '/empresa/$businessId/publicacion',
+    path: '/empresa/$businessId/publicacion',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
 const AuthenticatedCuentaConciergeCaseIdEvaluarRoute =
   AuthenticatedCuentaConciergeCaseIdEvaluarRouteImport.update({
     id: '/evaluar',
@@ -1061,6 +1068,7 @@ export interface FileRoutesByFullPath {
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cms/zonas/$id/editar': typeof AuthenticatedCmsZonasIdEditarRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
+  '/cuenta/empresa/$businessId/publicacion': typeof AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute
   '/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
   '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
@@ -1191,6 +1199,7 @@ export interface FileRoutesByTo {
   '/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/cms/zonas/$id/editar': typeof AuthenticatedCmsZonasIdEditarRoute
   '/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
+  '/cuenta/empresa/$businessId/publicacion': typeof AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute
   '/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
   '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
@@ -1332,6 +1341,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/reviews/$id/moderar': typeof AuthenticatedCmsReviewsIdModerarRoute
   '/_authenticated/cms/zonas/$id/editar': typeof AuthenticatedCmsZonasIdEditarRoute
   '/_authenticated/cuenta/concierge/$caseId/evaluar': typeof AuthenticatedCuentaConciergeCaseIdEvaluarRoute
+  '/_authenticated/cuenta/empresa/$businessId/publicacion': typeof AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute
   '/_authenticated/portal/productos/$productId/preview': typeof AuthenticatedPortalProductosProductIdPreviewRoute
   '/api/public/payments/$provider/webhook': typeof ApiPublicPaymentsProviderWebhookRoute
   '/oriente-maya/$destino/$categoria/$empresa/$producto': typeof OrienteMayaDestinoCategoriaEmpresaProductoRoute
@@ -1473,6 +1483,7 @@ export interface FileRouteTypes {
     | '/cms/reviews/$id/moderar'
     | '/cms/zonas/$id/editar'
     | '/cuenta/concierge/$caseId/evaluar'
+    | '/cuenta/empresa/$businessId/publicacion'
     | '/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
     | '/oriente-maya/$destino/$categoria/$empresa/$producto'
@@ -1603,6 +1614,7 @@ export interface FileRouteTypes {
     | '/cms/reviews/$id/moderar'
     | '/cms/zonas/$id/editar'
     | '/cuenta/concierge/$caseId/evaluar'
+    | '/cuenta/empresa/$businessId/publicacion'
     | '/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
     | '/oriente-maya/$destino/$categoria/$empresa/$producto'
@@ -1743,6 +1755,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/reviews/$id/moderar'
     | '/_authenticated/cms/zonas/$id/editar'
     | '/_authenticated/cuenta/concierge/$caseId/evaluar'
+    | '/_authenticated/cuenta/empresa/$businessId/publicacion'
     | '/_authenticated/portal/productos/$productId/preview'
     | '/api/public/payments/$provider/webhook'
     | '/oriente-maya/$destino/$categoria/$empresa/$producto'
@@ -2714,6 +2727,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalProductosProductIdPreviewRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
+    '/_authenticated/cuenta/empresa/$businessId/publicacion': {
+      id: '/_authenticated/cuenta/empresa/$businessId/publicacion'
+      path: '/empresa/$businessId/publicacion'
+      fullPath: '/cuenta/empresa/$businessId/publicacion'
+      preLoaderRoute: typeof AuthenticatedCuentaEmpresaBusinessIdPublicacionRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
     '/_authenticated/cuenta/concierge/$caseId/evaluar': {
       id: '/_authenticated/cuenta/concierge/$caseId/evaluar'
       path: '/evaluar'
@@ -2879,6 +2899,7 @@ interface AuthenticatedCuentaRouteRouteChildren {
   AuthenticatedCuentaIndexRoute: typeof AuthenticatedCuentaIndexRoute
   AuthenticatedCuentaPagosErrorRoute: typeof AuthenticatedCuentaPagosErrorRoute
   AuthenticatedCuentaPagosExitoRoute: typeof AuthenticatedCuentaPagosExitoRoute
+  AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute: typeof AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute
 }
 
 const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildren =
@@ -2899,6 +2920,8 @@ const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildr
     AuthenticatedCuentaIndexRoute: AuthenticatedCuentaIndexRoute,
     AuthenticatedCuentaPagosErrorRoute: AuthenticatedCuentaPagosErrorRoute,
     AuthenticatedCuentaPagosExitoRoute: AuthenticatedCuentaPagosExitoRoute,
+    AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute:
+      AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute,
   }
 
 const AuthenticatedCuentaRouteRouteWithChildren =
