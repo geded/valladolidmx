@@ -16,6 +16,7 @@ import { Building2, CheckCircle2, Loader2, Search } from "lucide-react";
 import {
   claimBusiness,
   createOwnedBusiness,
+  listBusinessCategoriesForClaim,
   listPublicDestinations,
   searchBusinessesForClaim,
   type BusinessSearchHit,
@@ -75,13 +76,39 @@ function TabButton({
 function ClaimBranch() {
   const [q, setQ] = useState("");
   const [term, setTerm] = useState("");
+  const [destinationId, setDestinationId] = useState<string>("");
+  const [categoryId, setCategoryId] = useState<string>("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const search = useServerFn(searchBusinessesForClaim);
   const claim = useServerFn(claimBusiness);
+  const listDest = useServerFn(listPublicDestinations);
+  const listCats = useServerFn(listBusinessCategoriesForClaim);
   const qc = useQueryClient();
 
+  const destinations = useQuery({
+    queryKey: ["hosting-destinations"],
+    queryFn: () => listDest(),
+    staleTime: 5 * 60_000,
+  });
+  const categories = useQuery({
+    queryKey: ["hosting-categories"],
+    queryFn: () => listCats(),
+    staleTime: 5 * 60_000,
+  });
+
   const results = useQuery({
-    queryKey: ["hosting-search", term],
-    queryFn: () => search({ data: { q: term } }),
+    queryKey: ["hosting-search", term, destinationId, categoryId, page],
+    queryFn: () =>
+      search({
+        data: {
+          q: term,
+          destination_id: destinationId || null,
+          category_id: categoryId || null,
+          page,
+          page_size: pageSize,
+        },
+      }),
   });
 
   const mutate = useMutation({
@@ -89,14 +116,20 @@ function ClaimBranch() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["hosting-search"] }),
   });
 
+  const resetPage = () => setPage(1);
+  const rows = results.data?.rows ?? [];
+  const total = results.data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
   return (
     <div>
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          resetPage();
           setTerm(q.trim());
         }}
-        className="flex gap-2"
+        className="flex flex-col gap-2 sm:flex-row"
       >
         <div className="relative flex-1">
           <Search
@@ -118,21 +151,77 @@ function ClaimBranch() {
         </button>
       </form>
 
+      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <select
+          value={destinationId}
+          onChange={(e) => {
+            setDestinationId(e.target.value);
+            resetPage();
+          }}
+          className="rounded-full border border-border bg-card px-4 py-2 text-sm"
+          aria-label="Filtrar por destino"
+        >
+          <option value="">Todos los destinos</option>
+          {(destinations.data ?? []).map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.name}
+            </option>
+          ))}
+        </select>
+        <select
+          value={categoryId}
+          onChange={(e) => {
+            setCategoryId(e.target.value);
+            resetPage();
+          }}
+          className="rounded-full border border-border bg-card px-4 py-2 text-sm"
+          aria-label="Filtrar por categoría"
+        >
+          <option value="">Todas las categorías</option>
+          {(categories.data ?? []).map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+        <span>
+          {total} {total === 1 ? "resultado" : "resultados"}
+        </span>
+        {(destinationId || categoryId || term) && (
+          <button
+            type="button"
+            onClick={() => {
+              setDestinationId("");
+              setCategoryId("");
+              setQ("");
+              setTerm("");
+              resetPage();
+            }}
+            className="text-primary hover:underline"
+          >
+            Limpiar filtros
+          </button>
+        )}
+      </div>
+
       {results.isFetching && (
         <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
           <Loader2 className="size-3 animate-spin" aria-hidden /> Buscando…
         </p>
       )}
 
-      {results.data && results.data.length === 0 && (
+      {results.data && rows.length === 0 && (
         <p className="mt-4 text-sm text-muted-foreground">
-          No encontramos ningún negocio con ese nombre. Prueba con otro término o
+          No encontramos negocios con esos filtros. Prueba con otro término o
           usa la pestaña <strong>Registrar nuevo</strong>.
         </p>
       )}
 
       <ul className="mt-4 space-y-2">
-        {(results.data ?? []).map((row: BusinessSearchHit) => (
+        {rows.map((row: BusinessSearchHit) => (
           <li
             key={row.id}
             className="flex items-start justify-between gap-4 rounded-2xl border border-border bg-card p-4"
@@ -170,6 +259,30 @@ function ClaimBranch() {
           </li>
         ))}
       </ul>
+
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            className="rounded-full border border-border px-3 py-1.5 text-xs font-medium disabled:opacity-40"
+          >
+            ← Anterior
+          </button>
+          <span className="text-xs text-muted-foreground">
+            Página {page} de {totalPages}
+          </span>
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+            className="rounded-full border border-border px-3 py-1.5 text-xs font-medium disabled:opacity-40"
+          >
+            Siguiente →
+          </button>
+        </div>
+      )}
 
       {mutate.isSuccess && (
         <div className="mt-4 flex items-start gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-50 p-4 text-sm text-emerald-800">
