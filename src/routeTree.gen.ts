@@ -99,6 +99,7 @@ import { Route as AuthenticatedAdminIaRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
 import { Route as AuthenticatedAdminConciergeRouteImport } from './routes/_authenticated/admin/concierge'
 import { Route as OrienteMayaDestinoCategoriaIndexRouteImport } from './routes/oriente-maya/$destino.$categoria.index'
+import { Route as AuthenticatedPortalResenasIndexRouteImport } from './routes/_authenticated/portal/resenas.index'
 import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './routes/_authenticated/portal/invitaciones.index'
 import { Route as AuthenticatedPortalEmpresasIndexRouteImport } from './routes/_authenticated/portal/empresas.index'
 import { Route as AuthenticatedCmsZonasIndexRouteImport } from './routes/_authenticated/cms/zonas.index'
@@ -637,6 +638,12 @@ const OrienteMayaDestinoCategoriaIndexRoute =
     path: '/',
     getParentRoute: () => OrienteMayaDestinoCategoriaRoute,
   } as any)
+const AuthenticatedPortalResenasIndexRoute =
+  AuthenticatedPortalResenasIndexRouteImport.update({
+    id: '/resenas/',
+    path: '/resenas/',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
 const AuthenticatedPortalInvitacionesIndexRoute =
   AuthenticatedPortalInvitacionesIndexRouteImport.update({
     id: '/invitaciones/',
@@ -1014,6 +1021,7 @@ export interface FileRoutesByFullPath {
   '/cms/zonas/': typeof AuthenticatedCmsZonasIndexRoute
   '/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
   '/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
+  '/portal/resenas/': typeof AuthenticatedPortalResenasIndexRoute
   '/oriente-maya/$destino/$categoria/': typeof OrienteMayaDestinoCategoriaIndexRoute
   '/cms/categorias/$id/editar': typeof AuthenticatedCmsCategoriasIdEditarRoute
   '/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
@@ -1139,6 +1147,7 @@ export interface FileRoutesByTo {
   '/cms/zonas': typeof AuthenticatedCmsZonasIndexRoute
   '/portal/empresas': typeof AuthenticatedPortalEmpresasIndexRoute
   '/portal/invitaciones': typeof AuthenticatedPortalInvitacionesIndexRoute
+  '/portal/resenas': typeof AuthenticatedPortalResenasIndexRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaIndexRoute
   '/cms/categorias/$id/editar': typeof AuthenticatedCmsCategoriasIdEditarRoute
   '/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
@@ -1275,6 +1284,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/zonas/': typeof AuthenticatedCmsZonasIndexRoute
   '/_authenticated/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
   '/_authenticated/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
+  '/_authenticated/portal/resenas/': typeof AuthenticatedPortalResenasIndexRoute
   '/oriente-maya/$destino/$categoria/': typeof OrienteMayaDestinoCategoriaIndexRoute
   '/_authenticated/cms/categorias/$id/editar': typeof AuthenticatedCmsCategoriasIdEditarRoute
   '/_authenticated/cms/destinos/$destinationId/editar': typeof AuthenticatedCmsDestinosDestinationIdEditarRoute
@@ -1411,6 +1421,7 @@ export interface FileRouteTypes {
     | '/cms/zonas/'
     | '/portal/empresas/'
     | '/portal/invitaciones/'
+    | '/portal/resenas/'
     | '/oriente-maya/$destino/$categoria/'
     | '/cms/categorias/$id/editar'
     | '/cms/destinos/$destinationId/editar'
@@ -1536,6 +1547,7 @@ export interface FileRouteTypes {
     | '/cms/zonas'
     | '/portal/empresas'
     | '/portal/invitaciones'
+    | '/portal/resenas'
     | '/oriente-maya/$destino/$categoria'
     | '/cms/categorias/$id/editar'
     | '/cms/destinos/$destinationId/editar'
@@ -1671,6 +1683,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/zonas/'
     | '/_authenticated/portal/empresas/'
     | '/_authenticated/portal/invitaciones/'
+    | '/_authenticated/portal/resenas/'
     | '/oriente-maya/$destino/$categoria/'
     | '/_authenticated/cms/categorias/$id/editar'
     | '/_authenticated/cms/destinos/$destinationId/editar'
@@ -2369,6 +2382,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrienteMayaDestinoCategoriaIndexRouteImport
       parentRoute: typeof OrienteMayaDestinoCategoriaRoute
     }
+    '/_authenticated/portal/resenas/': {
+      id: '/_authenticated/portal/resenas/'
+      path: '/resenas'
+      fullPath: '/portal/resenas/'
+      preLoaderRoute: typeof AuthenticatedPortalResenasIndexRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
     '/_authenticated/portal/invitaciones/': {
       id: '/_authenticated/portal/invitaciones/'
       path: '/invitaciones'
@@ -2816,6 +2836,7 @@ interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalInvitacionesTokenRoute: typeof AuthenticatedPortalInvitacionesTokenRoute
   AuthenticatedPortalEmpresasIndexRoute: typeof AuthenticatedPortalEmpresasIndexRoute
   AuthenticatedPortalInvitacionesIndexRoute: typeof AuthenticatedPortalInvitacionesIndexRoute
+  AuthenticatedPortalResenasIndexRoute: typeof AuthenticatedPortalResenasIndexRoute
   AuthenticatedPortalProductosProductIdPreviewRoute: typeof AuthenticatedPortalProductosProductIdPreviewRoute
 }
 
@@ -2838,6 +2859,7 @@ const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildr
       AuthenticatedPortalEmpresasIndexRoute,
     AuthenticatedPortalInvitacionesIndexRoute:
       AuthenticatedPortalInvitacionesIndexRoute,
+    AuthenticatedPortalResenasIndexRoute: AuthenticatedPortalResenasIndexRoute,
     AuthenticatedPortalProductosProductIdPreviewRoute:
       AuthenticatedPortalProductosProductIdPreviewRoute,
   }
