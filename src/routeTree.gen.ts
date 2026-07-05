@@ -118,6 +118,7 @@ import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/em
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicStudioMediaSplatRouteImport } from './routes/api/public/studio-media.$'
 import { Route as ApiPublicHooksEbProcessScheduledPublishRouteImport } from './routes/api/public/hooks/eb-process-scheduled-publish'
+import { Route as ApiPublicHealthMapsRouteImport } from './routes/api/public/health/maps'
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
 import { Route as AuthenticatedPortalEmpresasBusinessIdRouteImport } from './routes/_authenticated/portal/empresas.$businessId'
 import { Route as AuthenticatedCuentaPagosExitoRouteImport } from './routes/_authenticated/cuenta/pagos.exito'
@@ -751,6 +752,11 @@ const ApiPublicHooksEbProcessScheduledPublishRoute =
     path: '/api/public/hooks/eb-process-scheduled-publish',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHealthMapsRoute = ApiPublicHealthMapsRouteImport.update({
+  id: '/api/public/health/maps',
+  path: '/api/public/health/maps',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedPortalInvitacionesTokenRoute =
   AuthenticatedPortalInvitacionesTokenRouteImport.update({
     id: '/invitaciones/$token',
@@ -1012,6 +1018,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -1140,6 +1147,7 @@ export interface FileRoutesByTo {
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -1277,6 +1285,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/_authenticated/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -1415,6 +1424,7 @@ export interface FileRouteTypes {
     | '/cuenta/pagos/exito'
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
+    | '/api/public/health/maps'
     | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
@@ -1543,6 +1553,7 @@ export interface FileRouteTypes {
     | '/cuenta/pagos/exito'
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
+    | '/api/public/health/maps'
     | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
@@ -1679,6 +1690,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/pagos/exito'
     | '/_authenticated/portal/empresas/$businessId'
     | '/_authenticated/portal/invitaciones/$token'
+    | '/api/public/health/maps'
     | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
@@ -1755,6 +1767,7 @@ export interface RootRouteChildren {
   ViajeroHandleRoute: typeof ViajeroHandleRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
+  ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
   ApiPublicStudioMediaSplatRoute: typeof ApiPublicStudioMediaSplatRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -2528,6 +2541,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksEbProcessScheduledPublishRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/health/maps': {
+      id: '/api/public/health/maps'
+      path: '/api/public/health/maps'
+      fullPath: '/api/public/health/maps'
+      preLoaderRoute: typeof ApiPublicHealthMapsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/portal/invitaciones/$token': {
       id: '/_authenticated/portal/invitaciones/$token'
       path: '/invitaciones/$token'
@@ -3135,6 +3155,7 @@ const rootRouteChildren: RootRouteChildren = {
   ViajeroHandleRoute: ViajeroHandleRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
+  ApiPublicHealthMapsRoute: ApiPublicHealthMapsRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:
     ApiPublicHooksEbProcessScheduledPublishRoute,
   ApiPublicStudioMediaSplatRoute: ApiPublicStudioMediaSplatRoute,
@@ -3146,13 +3167,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
