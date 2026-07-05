@@ -136,7 +136,6 @@ type Override = Partial<
 const OVERRIDES: Readonly<Record<string, Override>> = {
   "src/routes/index.tsx": {
     category: "studio",
-    priority: "critical" as RouteBusinessPriority,
     businessPriority: "critical",
     maturity: "L5",
     migrationStatus: "native-studio",
