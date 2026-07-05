@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { EntityEditor } from "@/components/cms/EntityEditor";
 import { BusinessMediaPanels } from "@/components/cms/BusinessMediaPanels";
+import { RelatedOverridesPanel } from "@/components/cms/RelatedOverridesPanel";
 import { BUSINESS_FIELDS } from "@/lib/cms/editor-fields";
 import {
   listBusinessCategoriesForSelect,
@@ -64,7 +65,12 @@ export function BusinessEditor({ id }: Props) {
       listQueryKey="businesses"
       fields={fields}
       renderExtras={({ id: entityId }) =>
-        entityId ? <BusinessMediaPanels businessId={entityId} /> : null
+        entityId ? (
+          <>
+            <BusinessMediaPanels businessId={entityId} />
+            <RelatedOverridesPanel entityType="business" entityId={entityId} />
+          </>
+        ) : null
       }
     />
   );
