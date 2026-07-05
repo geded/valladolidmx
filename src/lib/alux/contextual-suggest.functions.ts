@@ -59,6 +59,8 @@ export interface AluxContextualSuggestion {
   readonly label: string;
   readonly href: string;
   readonly rationale: string;
+  readonly categorySlug?: string;
+  readonly categoryName?: string;
   readonly source: { table: string; id: string };
 }
 
@@ -74,6 +76,12 @@ export interface AluxContextualSuggestResult {
   readonly reason: string;
   /** "ai" cuando Alux enriqueció los rationales; "deterministic" en fallback. */
   readonly rationaleSource?: "ai" | "deterministic";
+  /**
+   * Estado del enriquecimiento AI. Permite a la UI mostrar un mensaje
+   * discreto cuando Alux está momentáneamente sin cuota/rate-limit,
+   * sin romper las sugerencias (que siguen sirviéndose desde catálogo).
+   */
+  readonly aiStatus?: "ok" | "skipped" | "rate_limited" | "credits_exhausted" | "error";
 }
 
 const EMPTY: AluxContextualSuggestResult = {
@@ -221,6 +229,8 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         label: row.display_name,
         href,
         rationale: safeRationale,
+        categorySlug: row.category_slug || undefined,
+        categoryName: row.category_name || undefined,
         source: { table: "businesses", id: row.id },
       };
     }
@@ -228,6 +238,8 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     // 4a. Enriquecimiento con Alux (Lovable AI Gateway).
     const lovableApiKey = process.env.LOVABLE_API_KEY;
     let aiRationales: Map<string, string> | null = null;
+    let aiStatus: NonNullable<AluxContextualSuggestResult["aiStatus"]> =
+      lovableApiKey && picks.length > 0 ? "ok" : "skipped";
     if (lovableApiKey && picks.length > 0) {
       try {
         const gateway = createLovableAiGatewayProvider(lovableApiKey);
@@ -283,7 +295,12 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           if (validIds.has(p.id)) aiRationales.set(p.id, p.rationale);
         }
         if (aiRationales.size === 0) aiRationales = null;
+        if (!aiRationales) aiStatus = "error";
       } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (/\b429\b|rate.?limit/i.test(message)) aiStatus = "rate_limited";
+        else if (/\b402\b|credit/i.test(message)) aiStatus = "credits_exhausted";
+        else aiStatus = "error";
         if (!NoObjectGeneratedError.isInstance(error)) {
           console.warn("[alux.contextual-suggest] AI enrichment failed, using deterministic fallback:", error);
         }
@@ -313,5 +330,6 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
             : `Sugerencias derivadas del catálogo publicado en ${destinationLabel}.`
           : `Aún no hay más publicaciones en ${destinationLabel} para sugerir.`,
       rationaleSource,
+      aiStatus,
     };
   });
