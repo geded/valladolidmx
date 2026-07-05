@@ -18,8 +18,8 @@ import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { Briefcase, Compass, Sparkles, Users } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
 import { BecomeHostFlow } from "@/components/hosting/BecomeHostFlow";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/convertir-en-anfitrion")({
   head: () =>
@@ -51,14 +51,27 @@ const BENEFITS = [
 ];
 
 function BecomeHostRoute() {
-  const { user, loading } = useAuth();
-  // Evitar hydration mismatch: en SSR user siempre es null. Renderizamos
-  // la landing pública en el primer render cliente (igual al SSR) y sólo
-  // después de montar consumimos useAuth para decidir la variante.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  // Detectar sesión directamente contra Supabase para evitar depender de
+  // que el AuthContext esté hidratado a tiempo en esta ruta SSR pública.
+  const [status, setStatus] = useState<"loading" | "authed" | "anon">(
+    "loading",
+  );
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
+      setStatus(data.session?.user ? "authed" : "anon");
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      setStatus(s?.user ? "authed" : "anon");
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
 
-  if (mounted && !loading && user) {
+  if (status === "authed") {
     return (
       <PublicShell
         eyebrow="Para empresas turísticas"
