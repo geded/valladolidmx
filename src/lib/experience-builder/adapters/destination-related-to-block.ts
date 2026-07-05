@@ -20,6 +20,7 @@ import type {
 export function destinationRelatedBucketToItems(
   businesses: MarketplaceBusinessCard[],
   kind: ExperienceRelatedEntityKind,
+  rationale?: string | null,
 ): ExperienceRelatedItem[] {
   return businesses.map((b) => ({
     id: b.id,
@@ -39,7 +40,7 @@ export function destinationRelatedBucketToItems(
     dateEnd: null,
     destinationSlug: b.destination_slug || null,
     categorySlug: b.category_slug || null,
-    rationale: null,
+    rationale: rationale ?? null,
     sourceHint: "destination",
     score: null,
   }));
@@ -48,6 +49,7 @@ export function destinationRelatedBucketToItems(
 /** Mapea productos del marketplace a items universales. */
 export function destinationRelatedProductsToItems(
   products: MarketplaceProductCard[],
+  rationale?: string | null,
 ): ExperienceRelatedItem[] {
   return products.map((p) => ({
     id: p.id,
@@ -67,7 +69,7 @@ export function destinationRelatedProductsToItems(
     dateEnd: null,
     destinationSlug: null,
     categorySlug: null,
-    rationale: null,
+    rationale: rationale ?? null,
     sourceHint: "destination",
     score: null,
   }));
@@ -76,6 +78,7 @@ export function destinationRelatedProductsToItems(
 /** Mapea eventos públicos a items universales. */
 export function destinationRelatedEventsToItems(
   events: PublicEventCard[],
+  rationale?: string | null,
 ): ExperienceRelatedItem[] {
   return events.map((e) => ({
     id: e.id,
@@ -95,7 +98,7 @@ export function destinationRelatedEventsToItems(
     dateEnd: e.ends_at || null,
     destinationSlug: e.destination_slug || null,
     categorySlug: null,
-    rationale: null,
+    rationale: rationale ?? null,
     sourceHint: "destination",
     score: null,
   }));

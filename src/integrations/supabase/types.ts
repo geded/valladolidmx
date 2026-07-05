@@ -5412,6 +5412,16 @@ export type Database = {
         }
         Returns: Json
       }
+      related_recommend_v1: {
+        Args: {
+          p_context?: Json
+          p_entity_id: string
+          p_entity_type: Database["public"]["Enums"]["related_entity_kind"]
+          p_limit?: number
+          p_surface: string
+        }
+        Returns: Json
+      }
       remove_business_media: {
         Args: { _business_media_id: string }
         Returns: undefined
