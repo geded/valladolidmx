@@ -133,6 +133,12 @@ function demoProduct(): MarketplaceProductDetail {
     related: [],
     promotions: [],
     reviews: [],
+    review_stats: {
+      count: 0,
+      average: 0,
+      verifiedCount: 0,
+      distribution: { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
+    },
     faqs: [],
   };
 }
