@@ -504,10 +504,16 @@ export function VisualStudio({ page = null, onSelectPage, advanced = false }: Vi
           publicPath: p.publicPath,
           status: "editable",
           custom: p.custom,
+          compositionId: p.id,
         };
         setCustomPages((prev) =>
           prev.some((x) => normalizePageKey(x.key) === normalizePageKey(sitePage.key))
-            ? prev
+            // Reemplazar la entrada previa para que `compositionId` quede
+            // actualizado si el usuario abre la misma página después de
+            // renombrar/duplicar.
+            ? prev.map((x) =>
+                normalizePageKey(x.key) === normalizePageKey(sitePage.key) ? sitePage : x,
+              )
             : [...prev, sitePage],
         );
         setOpen(sitePage.key);
