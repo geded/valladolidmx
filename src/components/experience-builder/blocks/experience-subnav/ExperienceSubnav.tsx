@@ -111,7 +111,7 @@ export function ExperienceSubnav({ dto, className }: ExperienceSubnavProps) {
         {anchors.map((a) => {
           const isActive = a.id === activeId;
           const base =
-            "inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2";
+            "inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap text-sm font-medium transition focus-visible:outline-none focus-visible:ring-focus";
           const styles =
             variant === "tabs"
               ? cn(
@@ -127,11 +127,11 @@ export function ExperienceSubnav({ dto, className }: ExperienceSubnavProps) {
                     "px-3 py-2 relative",
                     isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
                     isActive &&
-                      "after:absolute after:inset-x-3 after:bottom-1 after:h-0.5 after:rounded-full after:bg-primary",
+                      "after:absolute after:inset-x-3 after:bottom-1 after:h-0.5 after:rounded-pill after:bg-primary",
                   )
                 : cn(
                     base,
-                    "rounded-full px-3.5 py-1.5",
+                    "rounded-pill px-3.5 py-1.5",
                     isActive
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground",

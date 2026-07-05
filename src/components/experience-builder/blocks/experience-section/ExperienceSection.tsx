@@ -47,7 +47,7 @@ export function ExperienceSection({ dto, className }: ExperienceSectionProps) {
               key={i}
               href={c.href}
               className={cn(
-                "inline-flex min-h-11 items-center rounded-full px-5 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                "inline-flex min-h-11 items-center rounded-pill px-5 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-focus",
                 c.emphasis === "primary" && "bg-primary text-primary-foreground hover:opacity-95",
                 c.emphasis === "secondary" && "border border-primary text-primary hover:bg-primary/10",
                 c.emphasis === "ghost" && "text-primary hover:bg-primary/10",
@@ -72,7 +72,7 @@ export function ExperienceSection({ dto, className }: ExperienceSectionProps) {
       {variant === "split" && media ? (
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-8 px-4 md:grid-cols-2">
           {textBlock}
-          <img src={media.url} alt={media.alt} className="w-full rounded-2xl object-cover shadow-sm" loading="lazy" />
+          <img src={media.url} alt={media.alt} className="w-full rounded-2xl object-cover shadow-soft" loading="lazy" />
         </div>
       ) : (
         <div className="mx-auto max-w-6xl px-4">
@@ -82,7 +82,7 @@ export function ExperienceSection({ dto, className }: ExperienceSectionProps) {
               src={media.url}
               alt={media.alt}
               loading="lazy"
-              className="mt-8 w-full rounded-2xl object-cover shadow-sm"
+              className="mt-8 w-full rounded-2xl object-cover shadow-soft"
             />
           ) : null}
         </div>

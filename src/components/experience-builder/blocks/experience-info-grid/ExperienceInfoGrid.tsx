@@ -50,7 +50,7 @@ export function ExperienceInfoGrid({ dto, className }: ExperienceInfoGridProps) 
             const I = it.iconKey ? ICONS[it.iconKey] : null;
             return (
               <li key={i}>
-                <MaybeLink href={it.href} className={cn("inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-sm", TONE[it.tone])}>
+                <MaybeLink href={it.href} className={cn("inline-flex items-center gap-1.5 rounded-pill border border-border bg-background px-3 py-1.5 text-sm", TONE[it.tone])}>
                   {I ? <I className="h-4 w-4" aria-hidden="true" /> : null}
                   <span className="font-medium">{it.label}:</span> <span>{it.value}</span>
                 </MaybeLink>

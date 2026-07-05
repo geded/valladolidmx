@@ -59,7 +59,7 @@ export function ExperienceFeatures({ dto, className }: ExperienceFeaturesProps) 
             const I = it.iconKey ? ICONS[it.iconKey] : null;
             return (
               <li key={i}>
-                <span className={cn("inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-sm", !it.available && "opacity-50 line-through")}>
+                <span className={cn("inline-flex items-center gap-1.5 rounded-pill border border-border bg-background px-3 py-1.5 text-sm", !it.available && "opacity-50 line-through")}>
                   {I ? <I className="h-4 w-4" aria-hidden="true" /> : null}
                   {it.title}
                 </span>

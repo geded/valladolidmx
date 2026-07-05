@@ -260,7 +260,7 @@ function DiscountBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full bg-primary/10 font-semibold text-primary",
+        "inline-flex items-center rounded-pill bg-primary/10 font-semibold text-primary",
         compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-1 text-xs",
       )}
     >
@@ -278,7 +278,7 @@ function UrgencyTag({ item, enabled }: { item: ExperiencePromotionItem; enabled:
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+        "inline-flex items-center gap-1 rounded-pill px-2 py-0.5 text-[10px] font-semibold",
         tone === "danger"
           ? "bg-red-500/10 text-red-600"
           : "bg-amber-500/10 text-amber-700",
@@ -297,7 +297,7 @@ function BadgesRow({ item }: { item: ExperiencePromotionItem }) {
         <span
           key={i}
           className={cn(
-            "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+            "rounded-pill px-2 py-0.5 text-[10px] font-semibold",
             b.tone === "primary"
               ? "bg-primary/10 text-primary"
               : b.tone === "success"
