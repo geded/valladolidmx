@@ -352,6 +352,7 @@ const cuenta: WorkspaceDefinition = {
   roles: ["traveler", "authenticated"],
   navigation: [
     { id: "cuenta.home", workspaceId: "cuenta", label: "Resumen", icon: LayoutDashboard, to: "/cuenta", group: "viaje", order: 1, surfaces: ["sidebar", "bottom", "palette"], primary: true },
+    { id: "cuenta.anfitrion", workspaceId: "cuenta", label: "Ser anfitrión", icon: Building2, to: "/cuenta/anfitrion", group: "viaje", order: 1.5, surfaces: ["sidebar", "bottom", "palette"] },
     { id: "cuenta.fav", workspaceId: "cuenta", label: "Favoritos", icon: HeartHandshake, to: "/cuenta/favoritos", group: "viaje", order: 2, surfaces: ["sidebar", "bottom", "palette"] },
     { id: "cuenta.cart", workspaceId: "cuenta", label: "Carrito", icon: ShoppingCart, to: "/cuenta/carrito", group: "viaje", order: 3, surfaces: ["sidebar", "bottom", "palette"] },
     { id: "cuenta.hist", workspaceId: "cuenta", label: "Historial", icon: ListChecks, to: "/cuenta/historial", group: "viaje", order: 4, surfaces: ["sidebar", "palette"] },

@@ -91,7 +91,8 @@ export function ProfileModeSwitcher({ onSwitched }: { onSwitched?: () => void })
   if (available.length <= 1) {
     return (
       <Link
-        to="/convertir-en-anfitrion"
+        to="/cuenta/anfitrion"
+        onMouseDown={(e) => e.preventDefault()}
         onClick={() => onSwitched?.()}
         className="flex items-start gap-2 border-b border-border px-3 py-2 text-left text-sm hover:bg-accent"
       >
