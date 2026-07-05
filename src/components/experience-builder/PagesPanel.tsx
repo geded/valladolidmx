@@ -637,11 +637,11 @@ function GroupBlock({
   canDelete: boolean;
 }) {
   return (
-    <section className="overflow-hidden rounded-lg border border-border bg-card">
+    <section className="rounded-lg border border-border bg-card">
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center justify-between gap-2 border-b border-border bg-muted/30 px-3 py-2 text-left hover:bg-muted/50"
+        className="flex w-full items-center justify-between gap-2 rounded-t-lg border-b border-border bg-muted/30 px-3 py-2 text-left hover:bg-muted/50"
       >
         <div className="flex min-w-0 items-center gap-2">
           {open ? (
@@ -816,7 +816,7 @@ function PageRow({
           {menuOpen ? (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="absolute right-0 z-20 mt-1 w-52 rounded-md border border-border bg-popover p-1 text-xs shadow-lg"
+              className="absolute right-0 z-50 mt-1 w-52 rounded-md border border-border bg-popover p-1 text-xs shadow-lg"
             >
               <MenuItem icon={Eye} label="Abrir" onClick={() => onAction("open", row)} />
               <MenuItem
