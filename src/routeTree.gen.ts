@@ -21,6 +21,7 @@ import { Route as HotelesRouteImport } from './routes/hoteles'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as ConvertirEnAnfitrionRouteImport } from './routes/convertir-en-anfitrion'
 import { Route as ContactoRouteImport } from './routes/contacto'
 import { Route as CasasDeVacacionesRouteImport } from './routes/casas-de-vacaciones'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -200,6 +201,11 @@ const EventosRoute = EventosRouteImport.update({
 const EmpresasRoute = EmpresasRouteImport.update({
   id: '/empresas',
   path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConvertirEnAnfitrionRoute = ConvertirEnAnfitrionRouteImport.update({
+  id: '/convertir-en-anfitrion',
+  path: '/convertir-en-anfitrion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactoRoute = ContactoRouteImport.update({
@@ -896,6 +902,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/casas-de-vacaciones': typeof CasasDeVacacionesRoute
   '/contacto': typeof ContactoRoute
+  '/convertir-en-anfitrion': typeof ConvertirEnAnfitrionRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
@@ -1029,6 +1036,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/casas-de-vacaciones': typeof CasasDeVacacionesRoute
   '/contacto': typeof ContactoRoute
+  '/convertir-en-anfitrion': typeof ConvertirEnAnfitrionRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
@@ -1155,6 +1163,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/casas-de-vacaciones': typeof CasasDeVacacionesRoute
   '/contacto': typeof ContactoRoute
+  '/convertir-en-anfitrion': typeof ConvertirEnAnfitrionRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
@@ -1290,6 +1299,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/casas-de-vacaciones'
     | '/contacto'
+    | '/convertir-en-anfitrion'
     | '/empresas'
     | '/eventos'
     | '/experiencias'
@@ -1423,6 +1433,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/casas-de-vacaciones'
     | '/contacto'
+    | '/convertir-en-anfitrion'
     | '/empresas'
     | '/eventos'
     | '/experiencias'
@@ -1548,6 +1559,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/casas-de-vacaciones'
     | '/contacto'
+    | '/convertir-en-anfitrion'
     | '/empresas'
     | '/eventos'
     | '/experiencias'
@@ -1683,6 +1695,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   CasasDeVacacionesRoute: typeof CasasDeVacacionesRoute
   ContactoRoute: typeof ContactoRoute
+  ConvertirEnAnfitrionRoute: typeof ConvertirEnAnfitrionRoute
   EmpresasRoute: typeof EmpresasRoute
   EventosRoute: typeof EventosRouteWithChildren
   ExperienciasRoute: typeof ExperienciasRoute
@@ -1808,6 +1821,13 @@ declare module '@tanstack/react-router' {
       path: '/empresas'
       fullPath: '/empresas'
       preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/convertir-en-anfitrion': {
+      id: '/convertir-en-anfitrion'
+      path: '/convertir-en-anfitrion'
+      fullPath: '/convertir-en-anfitrion'
+      preLoaderRoute: typeof ConvertirEnAnfitrionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contacto': {
@@ -3033,6 +3053,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   CasasDeVacacionesRoute: CasasDeVacacionesRoute,
   ContactoRoute: ContactoRoute,
+  ConvertirEnAnfitrionRoute: ConvertirEnAnfitrionRoute,
   EmpresasRoute: EmpresasRoute,
   EventosRoute: EventosRouteWithChildren,
   ExperienciasRoute: ExperienciasRoute,
