@@ -641,7 +641,7 @@ function GroupBlock({
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center justify-between gap-2 border-b border-border bg-muted/30 px-3 py-2 text-left hover:bg-muted/50"
+        className="flex w-full items-center justify-between gap-2 rounded-t-lg border-b border-border bg-muted/30 px-3 py-2 text-left hover:bg-muted/50"
       >
         <div className="flex min-w-0 items-center gap-2">
           {open ? (
