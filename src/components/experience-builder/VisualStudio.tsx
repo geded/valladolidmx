@@ -416,6 +416,13 @@ interface SitePage {
   status: "editable" | "soon";
   soonLabel?: string;
   custom?: boolean;
+  /**
+   * ID real de `page_compositions` cuando la página se abrió desde el
+   * Panel de Páginas. Permite cargar la composición directamente sin
+   * hacer un lookup por slug/page_type (que puede fallar y crear
+   * duplicados vacíos con sólo header y footer).
+   */
+  compositionId?: string;
 }
 
 type CompoSummary = {
