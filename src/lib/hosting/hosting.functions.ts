@@ -468,3 +468,37 @@ export const listPublicDestinations = createServerFn({ method: "GET" })
       return (data as { id: string; name: string; slug: string }[]) ?? [];
     },
   );
+
+export interface PendingClaimRow {
+  business_id: string;
+  display_name: string;
+  slug: string;
+  destination_name: string | null;
+  requested_at: string;
+  expires_at: string;
+  notes: string | null;
+}
+
+export const listMyPendingClaims = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<PendingClaimRow[]> => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("business_ownership_transfers")
+      .select(
+        "business_id, requested_at, expires_at, notes, businesses!inner(display_name, slug, destinations(name))",
+      )
+      .eq("to_user_id", userId)
+      .eq("status", "pending")
+      .order("requested_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((r: any) => ({
+      business_id: r.business_id,
+      display_name: r.businesses?.display_name ?? "",
+      slug: r.businesses?.slug ?? "",
+      destination_name: r.businesses?.destinations?.name ?? null,
+      requested_at: r.requested_at,
+      expires_at: r.expires_at,
+      notes: r.notes,
+    }));
+  });

@@ -29,6 +29,8 @@ import {
   claimBusiness,
   createOwnedBusiness,
   listBusinessCategoriesForClaim,
+  listMyBusinesses,
+  listMyPendingClaims,
   listPublicDestinations,
   searchBusinessesForClaim,
   type BusinessSearchHit,
@@ -40,6 +42,7 @@ export function BecomeHostFlow() {
   const [tab, setTab] = useState<Tab>("claim");
   return (
     <section className="mt-2">
+      <PendingRequestsBanner />
       <div
         className="inline-flex rounded-full border border-border bg-card p-1"
         role="tablist"
@@ -82,6 +85,227 @@ function TabButton({
       {children}
     </button>
   );
+}
+
+/* ── Banner de solicitudes en curso ─────────────────────────────── */
+function PendingRequestsBanner() {
+  const navigate = useNavigate();
+  const listBiz = useServerFn(listMyBusinesses);
+  const listClaims = useServerFn(listMyPendingClaims);
+
+  const myBiz = useQuery({
+    queryKey: ["hosting-my-businesses"],
+    queryFn: () => listBiz(),
+    staleTime: 30_000,
+  });
+  const myClaims = useQuery({
+    queryKey: ["hosting-my-pending-claims"],
+    queryFn: () => listClaims(),
+    staleTime: 30_000,
+  });
+
+  const businesses = (myBiz.data ?? []).filter(
+    (b) => b.status !== "published",
+  );
+  const claims = myClaims.data ?? [];
+
+  if (businesses.length === 0 && claims.length === 0) return null;
+
+  return (
+    <div className="mb-6 space-y-3">
+      <h2 className="text-sm font-semibold text-muted-foreground">
+        Tus solicitudes en curso
+      </h2>
+      {businesses.map((b) => (
+        <BusinessStatusCard
+          key={b.id}
+          business={b}
+          onOpen={() => navigate({ to: "/cuenta/anfitrion" })}
+          onWorkspace={() =>
+            navigate({
+              to: "/cuenta/empresa/$businessId/publicacion",
+              params: { businessId: b.id },
+            })
+          }
+        />
+      ))}
+      {claims.map((c) => (
+        <div
+          key={c.business_id}
+          className="rounded-lg border border-border bg-card p-4"
+        >
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 rounded-full bg-amber-100 p-1.5 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+              <ShieldCheck className="h-4 w-4" />
+            </div>
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-medium">{c.display_name}</span>
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                  Reclamo en revisión
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Enviaste tu solicitud el{" "}
+                {new Date(c.requested_at).toLocaleDateString("es-MX", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+                {c.destination_name ? ` · ${c.destination_name}` : ""}. Te
+                avisaremos en cuanto un administrador la revise.
+              </p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BusinessStatusCard({
+  business,
+  onOpen,
+  onWorkspace,
+}: {
+  business: {
+    id: string;
+    display_name: string;
+    status: string;
+    review_notes: string | null;
+    submitted_for_review_at: string | null;
+  };
+  onOpen: () => void;
+  onWorkspace: () => void;
+}) {
+  const meta = describeStatus(business.status);
+  return (
+    <div className="rounded-lg border border-border bg-card p-4">
+      <div className="flex items-start gap-3">
+        <div className={`mt-0.5 rounded-full p-1.5 ${meta.iconBg}`}>
+          <meta.Icon className="h-4 w-4" />
+        </div>
+        <div className="flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-medium">{business.display_name}</span>
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-medium ${meta.badge}`}
+            >
+              {meta.label}
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">{meta.description}</p>
+          {business.review_notes && (
+            <p className="mt-2 rounded-md bg-muted p-2 text-sm">
+              <span className="font-medium">Nota del administrador: </span>
+              {business.review_notes}
+            </p>
+          )}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={onOpen}
+              className="rounded-full border border-border px-3 py-1 text-xs font-medium hover:bg-muted"
+            >
+              Ver detalle
+            </button>
+            {meta.canOpenWorkspace && (
+              <button
+                type="button"
+                onClick={onWorkspace}
+                className="rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground hover:opacity-90"
+              >
+                Completar perfil
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function describeStatus(status: string): {
+  label: string;
+  description: string;
+  badge: string;
+  iconBg: string;
+  Icon: typeof ShieldCheck;
+  canOpenWorkspace: boolean;
+} {
+  switch (status) {
+    case "pending_identity":
+    case "pending":
+      return {
+        label: "Verificando identidad",
+        description:
+          "Recibimos tu solicitud. Nuestro equipo revisa tu documento en las próximas 24 a 48 horas hábiles.",
+        badge:
+          "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+        iconBg:
+          "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+        Icon: ShieldCheck,
+        canOpenWorkspace: false,
+      };
+    case "draft":
+      return {
+        label: "Identidad verificada",
+        description:
+          "Tu identidad fue aprobada. Completa el perfil de tu empresa para enviarla a publicación.",
+        badge:
+          "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+        iconBg:
+          "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+        Icon: CheckCircle2,
+        canOpenWorkspace: true,
+      };
+    case "in_review":
+    case "pending_review":
+      return {
+        label: "En revisión para publicación",
+        description:
+          "Enviamos tu perfil al equipo editorial. Revisan las fotos y datos antes de publicarlo.",
+        badge:
+          "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
+        iconBg:
+          "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
+        Icon: FileCheck2,
+        canOpenWorkspace: true,
+      };
+    case "changes_requested":
+      return {
+        label: "Cambios solicitados",
+        description:
+          "El administrador pidió ajustes antes de publicar. Revisa la nota y actualiza tu perfil.",
+        badge:
+          "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+        iconBg:
+          "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
+        Icon: FileCheck2,
+        canOpenWorkspace: true,
+      };
+    case "rejected":
+      return {
+        label: "Solicitud rechazada",
+        description:
+          "Tu solicitud no fue aprobada. Consulta la nota del administrador y, si aplica, envía una nueva solicitud.",
+        badge:
+          "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+        iconBg:
+          "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+        Icon: ShieldCheck,
+        canOpenWorkspace: false,
+      };
+    default:
+      return {
+        label: status,
+        description: "Solicitud en curso.",
+        badge: "bg-muted text-foreground",
+        iconBg: "bg-muted text-foreground",
+        Icon: Building2,
+        canOpenWorkspace: false,
+      };
+  }
 }
 
 /* ── Rama A: reclamar empresa existente ─────────────────────────── */
