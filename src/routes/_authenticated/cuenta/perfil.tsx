@@ -220,6 +220,156 @@ function SelectField({
   );
 }
 
+const NON_TRAVELER_META: Record<
+  Exclude<ProfileMode, "traveler">,
+  { eyebrow: string; Icon: typeof Briefcase; functions: string[] }
+> = {
+  business: {
+    eyebrow: "Modo Empresa",
+    Icon: Briefcase,
+    functions: [
+      "Administra tu(s) empresa(s), sucursales y equipo",
+      "Publica productos, promociones y eventos",
+      "Consulta estadísticas, reseñas y actividad",
+      "Gestiona pagos, visibilidad y suscripciones",
+    ],
+  },
+  concierge: {
+    eyebrow: "Modo Concierge",
+    Icon: Headphones,
+    functions: [
+      "Atiende solicitudes de viajeros asignadas",
+      "Envía propuestas y coordina con empresas",
+      "Da seguimiento a expedientes activos",
+    ],
+  },
+  staff: {
+    eyebrow: "Modo Staff",
+    Icon: Shield,
+    functions: [
+      "Edita contenido y plantillas del CMS",
+      "Modera reseñas y publicaciones",
+      "Administra usuarios, roles y operación (si aplica)",
+    ],
+  },
+};
+
+function NonTravelerAccount({ mode }: { mode: Exclude<ProfileMode, "traveler"> }) {
+  const { authUser, role } = useAuth();
+  const meta = NON_TRAVELER_META[mode];
+  const { Icon } = meta;
+  return (
+    <div className="max-w-3xl">
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+        {meta.eyebrow}
+      </p>
+      <h1 className="mt-2 text-4xl">Mi cuenta</h1>
+      <p className="mt-3 text-sm text-muted-foreground">
+        Datos personales y funciones asociadas a este modo. Para editar tus
+        preferencias de viaje cambia al modo <strong>Viajero</strong> desde el
+        menú de tu foto.
+      </p>
+
+      <section className="mt-8 rounded-2xl border border-border bg-card p-5">
+        <h2 className="text-lg font-semibold">Datos de la cuenta</h2>
+        <dl className="mt-4 grid gap-4 text-sm md:grid-cols-2">
+          <div className="flex items-start gap-2">
+            <UserRound className="mt-0.5 size-4 text-muted-foreground" aria-hidden />
+            <div>
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                Nombre
+              </dt>
+              <dd className="mt-0.5">{authUser?.display_name ?? "—"}</dd>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <Mail className="mt-0.5 size-4 text-muted-foreground" aria-hidden />
+            <div>
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                Correo
+              </dt>
+              <dd className="mt-0.5 break-all">{authUser?.email ?? "—"}</dd>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <Shield className="mt-0.5 size-4 text-muted-foreground" aria-hidden />
+            <div>
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                Rol principal
+              </dt>
+              <dd className="mt-0.5">{role ? ROLE_LABELS[role] : "—"}</dd>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <Icon className="mt-0.5 size-4 text-muted-foreground" aria-hidden />
+            <div>
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                Modo activo
+              </dt>
+              <dd className="mt-0.5">{meta.eyebrow.replace("Modo ", "")}</dd>
+            </div>
+          </div>
+        </dl>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-border bg-card p-5">
+        <h2 className="text-lg font-semibold">Funciones en este modo</h2>
+        <ul className="mt-3 space-y-2 text-sm">
+          {meta.functions.map((f) => (
+            <li key={f} className="flex items-start gap-2">
+              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
+              <span>{f}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Link
+            to="/cuenta"
+            className="inline-flex items-center rounded-md border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-accent"
+          >
+            Volver al resumen
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function SelectFieldLegacyMarker() { return null; }
+SelectFieldLegacyMarker;
+
+function _unused_SelectField({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: string[];
+  onChange: (v: string) => void;
+}) {
+  return (
+    <label className="grid gap-1 text-sm">
+      <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="rounded-md border border-border bg-background px-3 py-2"
+      >
+        <option value="">—</option>
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 function ListField({
   label,
   value,
