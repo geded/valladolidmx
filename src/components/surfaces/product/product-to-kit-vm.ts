@@ -18,6 +18,7 @@ import type {
   PriceVM,
   PromoVM,
   ReviewVM,
+  ReviewStatsVM,
   ShellVM,
   RichTextVM,
 } from "@/components/surfaces/kit/types";
@@ -112,7 +113,24 @@ export function productToReviewVMs(p: MarketplaceProductDetail): ReviewVM[] {
     rating: r.rating,
     title: r.title ?? undefined,
     body: r.body,
+    publishedAt: r.published_at,
+    language: r.language,
+    visitType: r.visit_type,
+    verifiedSource: r.verified_source,
+    businessResponse: r.business_response,
+    businessResponseAt: r.business_response_at,
   }));
+}
+
+export function productToReviewStatsVM(
+  p: MarketplaceProductDetail,
+): ReviewStatsVM {
+  return {
+    count: p.review_stats.count,
+    average: p.review_stats.average,
+    verifiedCount: p.review_stats.verifiedCount,
+    distribution: p.review_stats.distribution,
+  };
 }
 
 export function productToFaqVMs(p: MarketplaceProductDetail): FaqVM[] {
