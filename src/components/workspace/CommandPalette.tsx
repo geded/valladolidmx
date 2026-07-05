@@ -15,14 +15,12 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { useWorkspace } from "./WorkspaceProvider";
-import { listWorkspaces } from "@/lib/workspace/workspace-registry";
 import { getNavItemsForWorkspace } from "@/lib/workspace/navigation-registry";
 import { useAvailableActions, useWorkspaceContext } from "./context/WorkspaceContextProvider";
 
 export function CommandPalette() {
-  const { paletteOpen, setPaletteOpen, workspace, setActiveWorkspace } = useWorkspace();
+  const { paletteOpen, setPaletteOpen, workspace, workspaces, setActiveWorkspace } = useWorkspace();
   const navigate = useNavigate();
-  const workspaces = listWorkspaces();
   const contextActions = useAvailableActions();
   const { workspaceId, selection, focused } = useWorkspaceContext();
 
