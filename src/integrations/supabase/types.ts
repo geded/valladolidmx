@@ -3619,61 +3619,88 @@ export type Database = {
           author_display_name: string | null
           author_user_id: string | null
           body: string | null
+          business_response: string | null
+          business_response_at: string | null
+          business_response_by: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
           deleted_by: string | null
+          helpful_count: number
           id: string
           language: Database["public"]["Enums"]["locale_code"]
           metadata: Json
           published_at: string | null
           rating: number
+          report_count: number
           status: Database["public"]["Enums"]["content_status"]
           subject_id: string
           subject_kind: Database["public"]["Enums"]["entity_kind"]
           title: string | null
           updated_at: string
           updated_by: string | null
+          verified_source: string | null
+          visit_date: string | null
+          visit_type: string | null
+          weight: number
         }
         Insert: {
           author_display_name?: string | null
           author_user_id?: string | null
           body?: string | null
+          business_response?: string | null
+          business_response_at?: string | null
+          business_response_by?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          helpful_count?: number
           id?: string
           language?: Database["public"]["Enums"]["locale_code"]
           metadata?: Json
           published_at?: string | null
           rating: number
+          report_count?: number
           status?: Database["public"]["Enums"]["content_status"]
           subject_id: string
           subject_kind: Database["public"]["Enums"]["entity_kind"]
           title?: string | null
           updated_at?: string
           updated_by?: string | null
+          verified_source?: string | null
+          visit_date?: string | null
+          visit_type?: string | null
+          weight?: number
         }
         Update: {
           author_display_name?: string | null
           author_user_id?: string | null
           body?: string | null
+          business_response?: string | null
+          business_response_at?: string | null
+          business_response_by?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          helpful_count?: number
           id?: string
           language?: Database["public"]["Enums"]["locale_code"]
           metadata?: Json
           published_at?: string | null
           rating?: number
+          report_count?: number
           status?: Database["public"]["Enums"]["content_status"]
           subject_id?: string
           subject_kind?: Database["public"]["Enums"]["entity_kind"]
           title?: string | null
           updated_at?: string
           updated_by?: string | null
+          verified_source?: string | null
+          visit_date?: string | null
+          visit_type?: string | null
+          weight?: number
         }
         Relationships: []
       }
@@ -5151,6 +5178,10 @@ export type Database = {
         Returns: Database["public"]["Enums"]["profile_mode"][]
       }
       get_public_traveler_profile: { Args: { _handle: string }; Returns: Json }
+      get_review_stats: {
+        Args: { _subject_id: string; _subject_kind: string }
+        Returns: Json
+      }
       has_any_permission: {
         Args: { _keys: string[]; _user_id: string }
         Returns: boolean
