@@ -7,20 +7,32 @@
  * del catálogo publicado, coherentes con el snapshot territorial del
  * Context Engine.
  *
- * Reglas (Reconciliation Report aprobado):
- *  · Público (anon). Sin autenticación obligatoria. Sin acceso a
- *    perfil, plan, expediente ni tablas privadas.
- *  · Cero motor paralelo: NO invoca modelo AI en esta ola. Recuperación
- *    determinista sobre `businesses` / `products` publicados con las
- *    mismas policies públicas que ya usa Discovery.
- *  · NO toca Alux Traveler ni Alux del Concierge.
+ * AT-1 · Alux Traveler productivo (2026-07-05):
+ *  · Ahora enriquece los rationales vía Lovable AI Gateway
+ *    (`google/gemini-3-flash-preview`) con GROUNDING estricto: el modelo
+ *    SOLO puede reordenar y redactar `rationale` sobre candidatos reales
+ *    del catálogo — no puede inventar ids, slugs ni entidades.
+ *  · Tono: cálido, colonial, español neutro, ≤140 chars por rationale.
+ *  · Fallback determinístico intacto: si el gateway falla, no responde
+ *    a tiempo, o el modelo devuelve algo no válido, se usan los
+ *    rationales textuales calculados en código. Nunca degradamos a UI
+ *    rota o sugerencias vacías.
+ *  · Público (anon). Sin persistencia por request: la sesión ya cachea
+ *    con `staleTime` en el cliente; persistir por visitante anónimo no
+ *    aporta valor y genera ruido.
+ *
+ * Reglas permanentes:
+ *  · Público (anon). Sin acceso a perfil, plan, expediente ni tablas privadas.
+ *  · Recuperación determinista sobre `businesses` publicados con las mismas
+ *    policies públicas que ya usa Discovery. Nunca inventa entidades.
  *  · Sólo Oriente Maya: si `region.slug ≠ oriente-maya`, responde vacío.
- *  · Cada sugerencia declara `rationale` humano y `sources` (tabla+id),
+ *  · Cada sugerencia declara `rationale` humano y `source` (tabla+id),
  *    alineado con el contrato Explainable-by-Default (Política 06).
- *  · Nunca inventa entidades: cada item existe en el catálogo publicado.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { generateText, Output, NoObjectGeneratedError } from "ai";
+import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 
 const SlotSchema = z
   .object({
@@ -60,6 +72,8 @@ export interface AluxContextualSuggestResult {
   };
   readonly generatedAt: string;
   readonly reason: string;
+  /** "ai" cuando Alux enriqueció los rationales; "deterministic" en fallback. */
+  readonly rationaleSource?: "ai" | "deterministic";
 }
 
 const EMPTY: AluxContextualSuggestResult = {
@@ -107,6 +121,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       .eq("slug", destSlug)
       .maybeSingle();
     if (dErr || !dest) return { ...EMPTY, reason: "Destino no publicado." };
+    const destination = dest;
 
     // 2. Empresas publicadas del destino con su categoría primaria.
     const { data: biz, error: bErr } = await sb
@@ -178,34 +193,109 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     const picks = ordered.slice(0, limit);
 
     // 4. Rationale explicable por item.
-    const destinationLabel = data.destination?.label ?? dest.name;
-    const suggestions: AluxContextualSuggestion[] = picks.map((row) => {
-      let rationale: string;
+    const destinationLabel = data.destination?.label ?? destination.name;
+    function deterministicRationale(row: BizRow): string {
       if (currentProductSlug && currentBusinessSlug) {
-        rationale =
-          row.category_slug === currentCategorySlug
-            ? `Otra opción de ${row.category_name || currentCategorySlug} en ${destinationLabel}, cerca de ${data.business?.label ?? currentBusinessSlug}.`
-            : `Complementa tu visita en ${destinationLabel} con ${row.category_name || "otra experiencia"}.`;
-      } else if (currentBusinessSlug) {
-        rationale =
-          row.category_slug === currentCategorySlug
-            ? `Alternativa de ${row.category_name || currentCategorySlug} en ${destinationLabel}.`
-            : `También destacado en ${destinationLabel}: ${row.category_name || "explora otra categoría"}.`;
-      } else if (currentCategorySlug) {
-        rationale = `Publicado en ${row.category_name || currentCategorySlug}, ${destinationLabel}.`;
-      } else {
-        rationale = `Destacado en ${destinationLabel}${row.category_name ? ` · ${row.category_name}` : ""}.`;
+        return row.category_slug === currentCategorySlug
+          ? `Otra opción de ${row.category_name || currentCategorySlug} en ${destinationLabel}, cerca de ${data.business?.label ?? currentBusinessSlug}.`
+          : `Complementa tu visita en ${destinationLabel} con ${row.category_name || "otra experiencia"}.`;
       }
-      const href = `/oriente-maya/${dest.slug}/${row.category_slug || "empresas"}/${row.slug}`;
+      if (currentBusinessSlug) {
+        return row.category_slug === currentCategorySlug
+          ? `Alternativa de ${row.category_name || currentCategorySlug} en ${destinationLabel}.`
+          : `También destacado en ${destinationLabel}: ${row.category_name || "explora otra categoría"}.`;
+      }
+      if (currentCategorySlug) {
+        return `Publicado en ${row.category_name || currentCategorySlug}, ${destinationLabel}.`;
+      }
+      return `Destacado en ${destinationLabel}${row.category_name ? ` · ${row.category_name}` : ""}.`;
+    }
+
+    function buildSuggestion(row: BizRow, rationale: string): AluxContextualSuggestion {
+      const href = `/oriente-maya/${destination.slug}/${row.category_slug || "empresas"}/${row.slug}`;
+      const clean = rationale.trim().replace(/\s+/g, " ");
+      const safeRationale = clean.length > 0 && clean.length <= 200 ? clean : deterministicRationale(row);
       return {
         kind: "business" as const,
         slug: row.slug,
         label: row.display_name,
         href,
-        rationale,
+        rationale: safeRationale,
         source: { table: "businesses", id: row.id },
       };
+    }
+
+    // 4a. Enriquecimiento con Alux (Lovable AI Gateway).
+    const lovableApiKey = process.env.LOVABLE_API_KEY;
+    let aiRationales: Map<string, string> | null = null;
+    if (lovableApiKey && picks.length > 0) {
+      try {
+        const gateway = createLovableAiGatewayProvider(lovableApiKey);
+        const model = gateway("google/gemini-3-flash-preview");
+
+        const contextLine = [
+          `Destino: ${destinationLabel}`,
+          currentCategorySlug ? `Categoría activa: ${data.category?.label ?? currentCategorySlug}` : null,
+          currentBusinessSlug ? `Empresa activa: ${data.business?.label ?? currentBusinessSlug}` : null,
+          currentProductSlug ? `Producto activo: ${data.product?.label ?? currentProductSlug}` : null,
+        ]
+          .filter(Boolean)
+          .join(" · ");
+
+        const catalogBlock = picks
+          .map(
+            (row, i) =>
+              `${i + 1}. id="${row.id}" · ${row.display_name}${row.category_name ? ` (${row.category_name})` : ""}${row.tagline ? ` — ${row.tagline}` : ""}`,
+          )
+          .join("\n");
+
+        const prompt = [
+          "Eres Alux, Concierge IA del Oriente Maya (Yucatán, México).",
+          "Tono cálido, colonial, cercano, en español neutro. Nunca marketing agresivo.",
+          "",
+          `Contexto del visitante: ${contextLine}.`,
+          "",
+          "Candidatos reales del catálogo publicado (usa SOLO estos ids):",
+          catalogBlock,
+          "",
+          "Para cada id, redacta un rationale breve (máx 140 caracteres) explicando por qué se lo sugieres al visitante ahora, considerando su contexto activo. No inventes atributos, precios, distancias ni horarios que no aparezcan en la lista. No repitas literalmente el nombre del lugar en el rationale. Devuelve exactamente un rationale por id.",
+        ].join("\n");
+
+        const AiSchema = z.object({
+          picks: z.array(
+            z.object({
+              id: z.string().min(1).max(64),
+              rationale: z.string().min(1).max(220),
+            }),
+          ),
+        });
+
+        const { output } = await generateText({
+          model,
+          output: Output.object({ schema: AiSchema }),
+          prompt,
+          abortSignal: AbortSignal.timeout(6_000),
+        });
+
+        const validIds = new Set(picks.map((p) => p.id));
+        aiRationales = new Map();
+        for (const p of output.picks) {
+          if (validIds.has(p.id)) aiRationales.set(p.id, p.rationale);
+        }
+        if (aiRationales.size === 0) aiRationales = null;
+      } catch (error) {
+        if (!NoObjectGeneratedError.isInstance(error)) {
+          console.warn("[alux.contextual-suggest] AI enrichment failed, using deterministic fallback:", error);
+        }
+        aiRationales = null;
+      }
+    }
+
+    const suggestions: AluxContextualSuggestion[] = picks.map((row) => {
+      const aiRationale = aiRationales?.get(row.id);
+      return buildSuggestion(row, aiRationale ?? deterministicRationale(row));
     });
+    const rationaleSource: "ai" | "deterministic" = aiRationales ? "ai" : "deterministic";
 
     return {
       suggestions,
@@ -218,7 +308,10 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       generatedAt: new Date().toISOString(),
       reason:
         suggestions.length > 0
-          ? `Sugerencias derivadas del catálogo publicado en ${destinationLabel}.`
+          ? rationaleSource === "ai"
+            ? `Alux te sugiere estas opciones en ${destinationLabel}, con base en tu recorrido actual.`
+            : `Sugerencias derivadas del catálogo publicado en ${destinationLabel}.`
           : `Aún no hay más publicaciones en ${destinationLabel} para sugerir.`,
+      rationaleSource,
     };
   });
