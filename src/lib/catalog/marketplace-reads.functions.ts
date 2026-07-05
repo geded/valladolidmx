@@ -141,6 +141,23 @@ export interface ProductReviewItem {
   title: string | null;
   body: string;
   published_at: string | null;
+  language: string | null;
+  visit_type: string | null;
+  verified_source:
+    | "verified_purchase"
+    | "managed_visit"
+    | "verified_visit"
+    | "declared_visitor"
+    | null;
+  business_response: string | null;
+  business_response_at: string | null;
+}
+
+export interface ProductReviewStats {
+  count: number;
+  average: number;
+  verifiedCount: number;
+  distribution: Record<"1" | "2" | "3" | "4" | "5", number>;
 }
 
 export interface MarketplaceProductDetail {
@@ -165,6 +182,7 @@ export interface MarketplaceProductDetail {
   related: MarketplaceProductCard[];
   promotions: MarketplacePromotionCard[];
   reviews: ProductReviewItem[];
+  review_stats: ProductReviewStats;
   faqs: ProductFaqItem[];
 }
 
