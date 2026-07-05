@@ -3,15 +3,21 @@
  * Whitelist server-side; sólo el propio `user_id` es accesible.
  */
 import { useEffect, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { Briefcase, Headphones, Shield, Mail, UserRound } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   getMyTravelerProfile,
   upsertMyTravelerProfile,
   type TravelerProfileInput,
 } from "@/lib/traveler/traveler-account.functions";
+import {
+  getProfileModeState,
+  type ProfileMode,
+} from "@/lib/profile-mode/mode.functions";
+import { ROLE_LABELS } from "@/types/auth";
 
 export const Route = createFileRoute("/_authenticated/cuenta/perfil")({
   component: CuentaPerfilPage,
@@ -36,11 +42,20 @@ function CuentaPerfilPage() {
   const queryClient = useQueryClient();
   const fetchProfile = useServerFn(getMyTravelerProfile);
   const saveProfile = useServerFn(upsertMyTravelerProfile);
+  const fetchMode = useServerFn(getProfileModeState);
+
+  const modeQ = useQuery({
+    queryKey: ["profile-mode-state"],
+    queryFn: () => fetchMode(),
+    enabled: Boolean(user?.id),
+    staleTime: 60_000,
+  });
+  const active: ProfileMode = modeQ.data?.active ?? "traveler";
 
   const { data, isLoading } = useQuery({
     queryKey: ["traveler", "profile", user?.id],
     queryFn: () => fetchProfile(),
-    enabled: Boolean(user?.id),
+    enabled: Boolean(user?.id) && active === "traveler",
     staleTime: 60_000,
   });
 
@@ -76,6 +91,14 @@ function CuentaPerfilPage() {
       void navigate({ to: "/cuenta" });
     },
   });
+
+  if (modeQ.isLoading) {
+    return <p className="text-sm text-muted-foreground">Cargando…</p>;
+  }
+
+  if (active !== "traveler") {
+    return <NonTravelerAccount mode={active} />;
+  }
 
   if (isLoading) {
     return <p className="text-sm text-muted-foreground">Cargando…</p>;
@@ -194,6 +217,121 @@ function SelectField({
         ))}
       </select>
     </label>
+  );
+}
+
+const NON_TRAVELER_META: Record<
+  Exclude<ProfileMode, "traveler">,
+  { eyebrow: string; Icon: typeof Briefcase; functions: string[] }
+> = {
+  business: {
+    eyebrow: "Modo Empresa",
+    Icon: Briefcase,
+    functions: [
+      "Administra tu(s) empresa(s), sucursales y equipo",
+      "Publica productos, promociones y eventos",
+      "Consulta estadísticas, reseñas y actividad",
+      "Gestiona pagos, visibilidad y suscripciones",
+    ],
+  },
+  concierge: {
+    eyebrow: "Modo Concierge",
+    Icon: Headphones,
+    functions: [
+      "Atiende solicitudes de viajeros asignadas",
+      "Envía propuestas y coordina con empresas",
+      "Da seguimiento a expedientes activos",
+    ],
+  },
+  staff: {
+    eyebrow: "Modo Staff",
+    Icon: Shield,
+    functions: [
+      "Edita contenido y plantillas del CMS",
+      "Modera reseñas y publicaciones",
+      "Administra usuarios, roles y operación (si aplica)",
+    ],
+  },
+};
+
+function NonTravelerAccount({ mode }: { mode: Exclude<ProfileMode, "traveler"> }) {
+  const { authUser, role } = useAuth();
+  const meta = NON_TRAVELER_META[mode];
+  const { Icon } = meta;
+  return (
+    <div className="max-w-3xl">
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+        {meta.eyebrow}
+      </p>
+      <h1 className="mt-2 text-4xl">Mi cuenta</h1>
+      <p className="mt-3 text-sm text-muted-foreground">
+        Datos personales y funciones asociadas a este modo. Para editar tus
+        preferencias de viaje cambia al modo <strong>Viajero</strong> desde el
+        menú de tu foto.
+      </p>
+
+      <section className="mt-8 rounded-2xl border border-border bg-card p-5">
+        <h2 className="text-lg font-semibold">Datos de la cuenta</h2>
+        <dl className="mt-4 grid gap-4 text-sm md:grid-cols-2">
+          <div className="flex items-start gap-2">
+            <UserRound className="mt-0.5 size-4 text-muted-foreground" aria-hidden />
+            <div>
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                Nombre
+              </dt>
+              <dd className="mt-0.5">{authUser?.display_name ?? "—"}</dd>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <Mail className="mt-0.5 size-4 text-muted-foreground" aria-hidden />
+            <div>
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                Correo
+              </dt>
+              <dd className="mt-0.5 break-all">{authUser?.email ?? "—"}</dd>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <Shield className="mt-0.5 size-4 text-muted-foreground" aria-hidden />
+            <div>
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                Rol principal
+              </dt>
+              <dd className="mt-0.5">{role ? ROLE_LABELS[role] : "—"}</dd>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <Icon className="mt-0.5 size-4 text-muted-foreground" aria-hidden />
+            <div>
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                Modo activo
+              </dt>
+              <dd className="mt-0.5">{meta.eyebrow.replace("Modo ", "")}</dd>
+            </div>
+          </div>
+        </dl>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-border bg-card p-5">
+        <h2 className="text-lg font-semibold">Funciones en este modo</h2>
+        <ul className="mt-3 space-y-2 text-sm">
+          {meta.functions.map((f) => (
+            <li key={f} className="flex items-start gap-2">
+              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
+              <span>{f}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Link
+            to="/cuenta"
+            className="inline-flex items-center rounded-md border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-accent"
+          >
+            Volver al resumen
+          </Link>
+        </div>
+      </section>
+    </div>
   );
 }
 
