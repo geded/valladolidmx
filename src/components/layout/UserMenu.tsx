@@ -9,26 +9,48 @@
  */
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { UserRound, LogOut, ChevronDown, Shield, LayoutDashboard, Briefcase, Headphones, Compass } from "lucide-react";
 import { useTranslation } from "@/i18n/context";
 import { ROLE_LABELS, type AppRole } from "@/types/auth";
 import { useAuth } from "@/hooks/useAuth";
 import { ProfileModeSwitcher } from "@/components/layout/ProfileModeSwitcher";
+import {
+  getProfileModeState,
+  type ProfileMode,
+} from "@/lib/profile-mode/mode.functions";
 
-type MenuLink = { to: "/admin" | "/cms" | "/empresa" | "/concierge" | "/mi-viaje" | "/cuenta"; label: string; icon: typeof UserRound };
+type MenuLink = { to: "/admin" | "/cms" | "/portal" | "/concierge" | "/mi-viaje" | "/cuenta"; label: string; icon: typeof UserRound };
 
-function buildMenuLinks(role: AppRole | null): MenuLink[] {
+// Los enlaces del menú se derivan del MODO ACTIVO (Airbnb-style), no
+// solo del rol. En modo Empresa/Concierge/Staff no debe aparecer "Mi
+// viaje"; en modo Viajero no deben aparecer los paneles operativos.
+function buildMenuLinks(role: AppRole | null, mode: ProfileMode): MenuLink[] {
   const links: MenuLink[] = [];
   if (!role) return links;
-  if (role === "super_admin" || role === "admin") {
-    links.push({ to: "/admin", label: "Panel de administración", icon: Shield });
-    links.push({ to: "/cms", label: "CMS", icon: LayoutDashboard });
+
+  if (mode === "staff") {
+    if (role === "super_admin" || role === "admin") {
+      links.push({ to: "/admin", label: "Panel de administración", icon: Shield });
+    }
+    if (role === "super_admin" || role === "admin" || role === "editor") {
+      links.push({ to: "/cms", label: "CMS", icon: LayoutDashboard });
+    }
   }
-  if (role === "editor") links.push({ to: "/cms", label: "CMS", icon: LayoutDashboard });
-  if (role === "business_owner") links.push({ to: "/empresa", label: "Mi empresa", icon: Briefcase });
-  if (role === "concierge" || role === "concierge_lead")
+
+  if (mode === "business") {
+    links.push({ to: "/portal", label: "Portal empresarial", icon: Briefcase });
+  }
+
+  if (mode === "concierge") {
     links.push({ to: "/concierge", label: "Concierge", icon: Headphones });
-  links.push({ to: "/mi-viaje", label: "Mi viaje", icon: Compass });
+  }
+
+  if (mode === "traveler") {
+    links.push({ to: "/mi-viaje", label: "Mi viaje", icon: Compass });
+  }
+
   links.push({ to: "/cuenta", label: "Mi cuenta", icon: UserRound });
   return links;
 }
@@ -37,6 +59,14 @@ export function UserMenu() {
   const { t } = useTranslation();
   const { authUser, role, signOut, loading } = useAuth();
   const [open, setOpen] = useState(false);
+  const fetchMode = useServerFn(getProfileModeState);
+  const modeQ = useQuery({
+    queryKey: ["profile-mode-state"],
+    queryFn: () => fetchMode(),
+    enabled: Boolean(authUser),
+    staleTime: 60_000,
+  });
+  const activeMode: ProfileMode = modeQ.data?.active ?? "traveler";
 
   if (loading) {
     return (
@@ -50,7 +80,7 @@ export function UserMenu() {
   }
 
   if (authUser) {
-    const links = buildMenuLinks(role);
+    const links = buildMenuLinks(role, activeMode);
     return (
       <div className="relative">
         <button
