@@ -1,62 +1,59 @@
-# Trust Engine v1 — Arranque: US-G.2 · Lectura pública
+# Google Maps — Primitivos + Demo
 
-**Épica G · Carril A · v2.5 → v3.0**
-**Política de elegibilidad aprobada:** A (compra verificada) + B (caso concierge cerrado) + D (visitante declarado bajo protesta). C (check-in físico) queda para v2.
+Construir 3 primitivos reutilizables usando las keys ya conectadas, y montarlos en la ficha de Empresa como demo funcional. Todo servidor-first para funcionar en `quehacerenvalladolid.com` sin depender del referrer de la browser key.
 
-Arranco por **US-G.2** porque desbloquea el render real (US-G.3) sin tocar auth ni composer. Todo se apoya en la tabla `reviews` ya existente (polimórfica por `subject_kind`/`subject_id`, con `status`, `rating`, `body`, `author_user_id`, `moderation_notes`, etc.). Cero infra nueva.
+## Qué se entrega
 
----
+### 1. Server functions (`src/lib/maps/*.functions.ts`)
+- `geocodeAddress({ address })` → `{ lat, lng, formatted }` vía Geocoding API (gateway).
+- `computeRoute({ originLat, originLng, destLat, destLng, mode? })` → `{ distanceMeters, durationSeconds, polyline }` vía Routes API v2 (`routes/directions/v2:computeRoutes`, gateway).
+- `getStaticMapUrl({ lat, lng, zoom?, size?, marker? })` → URL firmada al gateway Static Maps para `<img>`. La URL apunta al gateway (no expone key), o al endpoint proxy `/api/public/maps/static` (opción B, mejor para custom domain).
 
-## Alcance US-G.2
+### 2. Proxy de Static Maps (`src/routes/api/public/maps/static.ts`)
+Endpoint público que hace stream de la imagen Static Maps desde el gateway server-side. Ventajas:
+- No expone ni la browser key ni el token del gateway.
+- Funciona idéntico en `*.lovable.app` y `quehacerenvalladolid.com`.
+- Cachea con `Cache-Control: public, max-age=86400`.
 
-Servidor público — cero secretos — para alimentar el bloque `vmx.experience.reviews` y cualquier superficie pública (ficha de producto, negocio, destino).
+Validación estricta: lat/lng numéricos, zoom 1–20, size ≤ 640x640, formato png|jpg.
 
-### 1. Backend (server functions públicas)
+### 3. Componentes UI (`src/components/maps/*`)
+- `<StaticMap lat lng zoom? size? className? />` — `<img>` que apunta al proxy. SSR-safe, cero JS.
+- `<DistanceBadge originLatLng destLatLng />` — muestra "a 4.2 km · 8 min en auto" con skeleton mientras carga vía `useSuspenseQuery(computeRoute)`.
+- `<InteractiveMap lat lng markerTitle? className? />` — carga Maps JS (browser key), un `google.maps.Marker`, sin AdvancedMarker, `loading=async` + callback global. Cliente puro (dynamic import).
 
-Archivo nuevo: `src/lib/reviews/public-reads.functions.ts`
+### 4. Demo en ficha de Empresa
+En `src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx` (o el componente que renderiza el detalle):
+- Sección **Ubicación**: `<StaticMap>` grande + dirección + `<DistanceBadge>` (si el viajero compartió ubicación) + botón "Cómo llegar" (link a `https://www.google.com/maps/dir/?api=1&destination=lat,lng`).
+- Toggle "Ver mapa interactivo" que monta `<InteractiveMap>` on-demand (evita cargar Maps JS por defecto).
 
-- `listPublicReviews({ subjectKind, subjectId, limit?, cursor?, sort? })`
-  - Cliente publishable (no `requireSupabaseAuth`, para permitir SSR de rutas públicas).
-  - Filtra `status = 'approved'`, proyecta sólo columnas seguras (id, rating, title, body, author_display_name, verified_source, published_at, business_response, business_response_at).
-  - Orden: `recent` (default), `highest`, `lowest`, `helpful`.
-  - Paginación por cursor (`published_at + id`).
-- `getReviewStats({ subjectKind, subjectId })`
-  - Devuelve `{ count, average, distribution: {1..5}, verifiedCount }`.
-  - Usa RPC `get_review_stats(subject_kind, subject_id)` (creado en migración) para agregarse en DB — evita N+1.
+## Detalles técnicos
 
-### 2. Migración
+- **Gateway URLs**:
+  - Geocoding: `GET /google_maps/maps/api/geocode/json?address=...`
+  - Static: `GET /google_maps/maps/api/staticmap?...`
+  - Routes: `POST /google_maps/routes/directions/v2:computeRoutes` con `X-Goog-FieldMask: routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline`.
+- **Headers gateway** (leer dentro del handler, nunca a nivel de módulo):
+  - `Authorization: Bearer ${process.env.LOVABLE_API_KEY}`
+  - `X-Connection-Api-Key: ${process.env.GOOGLE_MAPS_API_KEY}`
+- **Interactive map**: script `https://maps.googleapis.com/maps/api/js?key=${VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY}&loading=async&callback=vmxInitMap`. No `mapId`. Marker clásico.
+- **Cache Query**: `computeRoute` y `geocodeAddress` con `staleTime: 24h` (coordenadas no cambian).
+- **Ubicación del viajero**: hook `useVisitorGeolocation()` que pide `navigator.geolocation.getCurrentPosition` con consentimiento explícito; si no hay, `DistanceBadge` muestra CTA "Compartir mi ubicación".
 
-- Añadir columnas a `reviews` **si no existen** (verificar primero):
-  - `verified_source text` — enum `verified_purchase | managed_visit | verified_visit | declared_visitor`
-  - `visit_date date`, `visit_type text`, `weight numeric default 1.0`
-  - `business_response text`, `business_response_at timestamptz`, `business_response_by uuid`
-  - `helpful_count int default 0`, `report_count int default 0`
-- Índice: `(subject_kind, subject_id, status, published_at desc)`
-- RPC `get_review_stats(subject_kind text, subject_id uuid)` → agregado con `count / avg / distribución / verified`, `security definer`, `stable`.
-- Policy nueva **TO anon**: `SELECT` sólo cuando `status='approved'`. Mantener policies existentes de owner/moderador.
-- `GRANT SELECT ON public.reviews TO anon` (proyección se controla en server fn) + `GRANT EXECUTE ON FUNCTION get_review_stats TO anon, authenticated`.
+## Validaciones al cerrar
 
-### 3. Cliente / consumo
+1. `bunx tsgo --noEmit` → 0 errores.
+2. `GET /api/public/health/maps` sigue devolviendo ok:true.
+3. `GET /api/public/maps/static?lat=20.68&lng=-88.20&zoom=15` devuelve `image/png` HTTP 200.
+4. En preview: la ficha de una empresa muestra mapa estático + botón "Cómo llegar" + distancia si comparto ubicación.
+5. Toggle interactivo carga Maps JS sin errores de consola.
 
-- **No** cablear todavía el bloque `experience-reviews` (eso es US-G.3). Sólo exponer las server fns con tipos + un smoke que las llame.
-- Actualizar `ExperienceReviewsBlock` documentando el punto de mapeo pero sin activarlo (mantener retrocompatibilidad manual).
+## Fuera de alcance (siguiente iteración)
+- Autocomplete Places en CMS de Empresa (I2).
+- Mapa de destino con múltiples pines (E7).
+- Isochrones / matriz de distancias para "cerca de mí" en Marketplace.
 
-### 4. Definition of Done
+## Rollback
+Cada archivo es aditivo; revertir borrando `src/lib/maps/`, `src/components/maps/`, `src/routes/api/public/maps/`, y el bloque agregado a la ficha de empresa.
 
-- `bunx tsgo --noEmit` → 0 errores.
-- Migración aplicada, RLS + GRANTs verificados con `supabase--read_query`.
-- Smoke: llamar `listPublicReviews` y `getReviewStats` para un `subject_kind='product'` conocido → responde `[]` / `count: 0` sin error 401/403.
-- Auditoría no-regresión: `/cms/reviews`, `/producto/*`, `/oriente-maya/**` intactas.
-- **Demo Pack:** sembrar 3 reseñas approved + 1 pending sobre 1 producto real → validar que anon ve las 3 approved y que stats devuelve `count=3, average` correcto. URLs exactas en el Completion Report.
-- Completion Report + Product Changelog v2.0 (nueva entrada Épica G · US-G.2).
-
-### 5. Siguientes olas (no ahora)
-
-- **US-G.3** — Cablear `experience-reviews` a datos reales en `/producto/$slug`.
-- **US-G.1** — `ReviewComposer` con flujo estrellas→texto + elegibilidad A/B/D + fricciones antiabuso.
-- **US-G.4** — Verificación básica (badge `verified`).
-- **US-G.5** — `<TrustBadges>` dinámico.
-
----
-
-¿Autorizas arrancar US-G.2 con este alcance?
+¿Procedo?
