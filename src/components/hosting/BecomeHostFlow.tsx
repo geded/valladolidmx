@@ -29,6 +29,8 @@ import {
   claimBusiness,
   createOwnedBusiness,
   listBusinessCategoriesForClaim,
+  listMyBusinesses,
+  listMyPendingClaims,
   listPublicDestinations,
   searchBusinessesForClaim,
   type BusinessSearchHit,
@@ -40,6 +42,7 @@ export function BecomeHostFlow() {
   const [tab, setTab] = useState<Tab>("claim");
   return (
     <section className="mt-2">
+      <PendingRequestsBanner />
       <div
         className="inline-flex rounded-full border border-border bg-card p-1"
         role="tablist"
