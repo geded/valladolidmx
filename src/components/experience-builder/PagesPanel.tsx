@@ -552,6 +552,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
               await reload();
               const def = getPageKindDefinition(form.kind);
               onOpenPage({
+                id: created.id,
                 key: clean,
                 slug: clean,
                 title: form.title.trim() || clean,
