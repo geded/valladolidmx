@@ -18,7 +18,7 @@ const TONE: Record<string, string> = {
   default: "text-foreground",
   primary: "text-primary",
   accent: "text-accent-foreground",
-  warning: "text-amber-600",
+  warning: "text-warning",
 };
 
 export interface ExperienceInfoGridProps {

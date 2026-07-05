@@ -431,11 +431,11 @@ function BadgeChip({
         tone === "primary"
           ? "bg-primary/10 text-primary"
           : tone === "success"
-            ? "bg-emerald-500/10 text-emerald-600"
+            ? "bg-success/10 text-success"
             : tone === "warning"
-              ? "bg-amber-500/10 text-amber-700"
+              ? "bg-warning/10 text-warning"
               : tone === "info"
-                ? "bg-sky-500/10 text-sky-700"
+                ? "bg-info/10 text-info"
                 : "bg-muted text-foreground/70",
       )}
     >
