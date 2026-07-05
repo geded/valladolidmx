@@ -62,8 +62,8 @@ function Icon({ name, className }: { name?: string; className?: string }) {
 const BADGE_TONE_CLASSES: Record<ExperienceHeroBadge["tone"], string> = {
   neutral: "bg-background/85 text-foreground border-border/60",
   primary: "bg-primary/15 text-primary border-primary/30",
-  success: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300",
-  warning: "bg-amber-500/15 text-amber-800 border-amber-500/30 dark:text-amber-200",
+  success: "bg-success/15 text-success border-success/30",
+  warning: "bg-warning/15 text-warning border-warning/30",
 };
 
 /* ------------------------------------------------------------------ *

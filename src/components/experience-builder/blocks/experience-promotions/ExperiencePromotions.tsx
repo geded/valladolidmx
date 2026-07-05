@@ -280,8 +280,8 @@ function UrgencyTag({ item, enabled }: { item: ExperiencePromotionItem; enabled:
       className={cn(
         "inline-flex items-center gap-1 rounded-pill px-2 py-0.5 text-[10px] font-semibold",
         tone === "danger"
-          ? "bg-red-500/10 text-red-600"
-          : "bg-amber-500/10 text-amber-700",
+          ? "bg-destructive/10 text-destructive"
+          : "bg-warning/10 text-warning",
       )}
     >
       {label}
@@ -301,11 +301,11 @@ function BadgesRow({ item }: { item: ExperiencePromotionItem }) {
             b.tone === "primary"
               ? "bg-primary/10 text-primary"
               : b.tone === "success"
-                ? "bg-emerald-500/10 text-emerald-600"
+                ? "bg-success/10 text-success"
                 : b.tone === "warning"
-                  ? "bg-amber-500/10 text-amber-700"
+                  ? "bg-warning/10 text-warning"
                   : b.tone === "danger"
-                    ? "bg-red-500/10 text-red-600"
+                    ? "bg-destructive/10 text-destructive"
                     : "bg-muted text-foreground/70",
           )}
         >
