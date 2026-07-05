@@ -3420,6 +3420,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          active_mode: Database["public"]["Enums"]["profile_mode"]
           avatar_url: string | null
           country: string | null
           created_at: string
@@ -3436,6 +3437,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          active_mode?: Database["public"]["Enums"]["profile_mode"]
           avatar_url?: string | null
           country?: string | null
           created_at?: string
@@ -3452,6 +3454,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          active_mode?: Database["public"]["Enums"]["profile_mode"]
           avatar_url?: string | null
           country?: string | null
           created_at?: string
@@ -5143,6 +5146,10 @@ export type Database = {
         Returns: number
       }
       founder_dashboard_kpis: { Args: never; Returns: Json }
+      get_available_modes: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["profile_mode"][]
+      }
       get_public_traveler_profile: { Args: { _handle: string }; Returns: Json }
       has_any_permission: {
         Args: { _keys: string[]; _user_id: string }
@@ -5387,6 +5394,10 @@ export type Database = {
           product_type: string
           total_count: number
         }[]
+      }
+      set_active_mode: {
+        Args: { _mode: Database["public"]["Enums"]["profile_mode"] }
+        Returns: Database["public"]["Enums"]["profile_mode"]
       }
       transition_content_status: {
         Args: {
@@ -5906,6 +5917,7 @@ export type Database = {
         | "servicio"
         | "artesanal"
       product_visibility_level: "standard" | "destacado" | "premium"
+      profile_mode: "traveler" | "business" | "concierge" | "staff"
       related_entity_kind: "business" | "product" | "destination" | "event"
       related_override_mode: "pin" | "hide"
       system_alert_severity: "info" | "warning" | "critical"
@@ -6177,6 +6189,7 @@ export const Constants = {
         "artesanal",
       ],
       product_visibility_level: ["standard", "destacado", "premium"],
+      profile_mode: ["traveler", "business", "concierge", "staff"],
       related_entity_kind: ["business", "product", "destination", "event"],
       related_override_mode: ["pin", "hide"],
       system_alert_severity: ["info", "warning", "critical"],
