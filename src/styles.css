@@ -29,6 +29,7 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  --radius-pill: 9999px;
 
   /* Tipografía centralizada */
   --font-display: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
@@ -537,4 +538,42 @@
   letter-spacing: 0.14em;
   font-weight: 600;
   text-transform: uppercase;
+}
+
+/*
+ * DSL Colonial · M3 — Radios, Sombras & Foco (aditivos)
+ * Reutilizan tokens existentes (--radius-*, --shadow-*, --ring).
+ * No modifican componentes existentes; disponibles para migración progresiva.
+ */
+@utility rounded-pill {
+  border-radius: var(--radius-pill);
+}
+
+@utility shadow-soft {
+  box-shadow: var(--shadow-card);
+}
+
+@utility shadow-elevated {
+  box-shadow: var(--shadow-raised);
+}
+
+@utility shadow-floating {
+  box-shadow: var(--shadow-overlay);
+}
+
+@utility ring-focus {
+  box-shadow: var(--shadow-focus);
+  outline: none;
+}
+
+@utility border-hairline {
+  border-width: 1px;
+  border-style: solid;
+  border-color: color-mix(in oklab, var(--border) 60%, transparent);
+}
+
+@utility border-subtle {
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--border);
 }
