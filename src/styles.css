@@ -391,6 +391,7 @@
     font-family: var(--font-display);
     font-feature-settings: "ss01";
     letter-spacing: -0.015em;
+    line-height: 1.05;
   }
 
   .font-script {
@@ -469,4 +470,71 @@
   outline: 2px dashed color-mix(in oklab, var(--color-muted-foreground) 60%, transparent);
   outline-offset: -4px;
   position: relative;
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * DSL Colonial · Escala tipográfica oficial (M2)
+ * Fuente única: docs/blueprint/15.10.H-03-VALLADOLID-COLONIAL-DESIGN-SYSTEM-v1.0.md §5
+ * Aditivo: no reemplaza ni redefine utilidades Tailwind existentes.
+ * ───────────────────────────────────────────────────────────── */
+@utility text-display-xs {
+  font-family: var(--font-display);
+  font-size: 1.5rem;      /* 24px */
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  font-feature-settings: "ss01";
+}
+@utility text-display-sm {
+  font-family: var(--font-display);
+  font-size: 2.25rem;     /* 36px */
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  font-feature-settings: "ss01";
+}
+@utility text-display-md {
+  font-family: var(--font-display);
+  font-size: 3rem;        /* 48px */
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  font-feature-settings: "ss01";
+}
+@utility text-display-lg {
+  font-family: var(--font-display);
+  font-size: 4rem;        /* 64px */
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  font-feature-settings: "ss01";
+}
+@utility text-display-xl {
+  font-family: var(--font-display);
+  font-size: 5.5rem;      /* 88px */
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-feature-settings: "ss01";
+}
+@utility text-body-sm {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;    /* 14px */
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+@utility text-body-md {
+  font-family: var(--font-sans);
+  font-size: 1rem;        /* 16px */
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+@utility text-body-lg {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;    /* 18px */
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+@utility text-caption {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;   /* 11px */
+  line-height: 1.3;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  text-transform: uppercase;
 }
