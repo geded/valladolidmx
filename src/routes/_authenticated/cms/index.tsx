@@ -27,17 +27,18 @@ interface EntityCard {
   key: string;
   name: string;
   description: string;
+  to: string;
 }
 
 const ENTITIES: EntityCard[] = [
-  { key: "tourism_regions", name: "Regiones turísticas", description: "Regiones que agrupan destinos del territorio." },
-  { key: "destinations", name: "Destinos", description: "Pueblos, ciudades y enclaves del Oriente Maya." },
-  { key: "destination_zones", name: "Zonas de destino", description: "Sub-áreas y barrios dentro de cada destino." },
-  { key: "business_categories", name: "Categorías", description: "Taxonomía oficial de empresas y productos." },
-  { key: "businesses", name: "Empresas", description: "Fichas editoriales de empresas locales." },
-  { key: "products", name: "Productos", description: "Experiencias, hoteles, restaurantes, eventos y más." },
-  { key: "media_assets", name: "Media", description: "Biblioteca multimedia compartida." },
-  { key: "reviews", name: "Reseñas", description: "Moderación de reseñas y respuestas." },
+  { key: "tourism_regions", name: "Regiones turísticas", description: "Regiones que agrupan destinos del territorio.", to: "/cms/regiones" },
+  { key: "destinations", name: "Destinos", description: "Pueblos, ciudades y enclaves del Oriente Maya.", to: "/cms/destinos" },
+  { key: "destination_zones", name: "Zonas de destino", description: "Sub-áreas y barrios dentro de cada destino.", to: "/cms/zonas" },
+  { key: "business_categories", name: "Categorías", description: "Taxonomía oficial de empresas y productos.", to: "/cms/categorias" },
+  { key: "businesses", name: "Empresas", description: "Fichas editoriales de empresas locales.", to: "/cms/empresas" },
+  { key: "products", name: "Productos", description: "Experiencias, hoteles, restaurantes, eventos y más.", to: "/cms/productos" },
+  { key: "media_assets", name: "Media", description: "Biblioteca multimedia compartida.", to: "/cms/media" },
+  { key: "reviews", name: "Reseñas", description: "Moderación de reseñas y respuestas.", to: "/cms/reviews" },
 ];
 
 function CmsDashboard() {
@@ -100,15 +101,19 @@ function CmsDashboard() {
         </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {ENTITIES.map((e) => (
-            <article
+            <Link
               key={e.key}
-              className="rounded-xl border border-border bg-card p-4 transition-colors hover:bg-accent/40"
+              to={e.to}
+              className="group block rounded-xl border border-border bg-card p-4 transition-colors hover:bg-accent/40"
             >
               <h3 className="text-base font-semibold">{e.name}</h3>
               <p className="mt-1 text-xs text-muted-foreground">
                 {e.description}
               </p>
-            </article>
+              <span className="mt-2 inline-block text-xs font-semibold text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                Abrir →
+              </span>
+            </Link>
           ))}
         </div>
       </section>
