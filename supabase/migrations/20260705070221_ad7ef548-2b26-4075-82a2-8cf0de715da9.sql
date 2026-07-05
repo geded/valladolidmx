@@ -1,0 +1,2 @@
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticated, anon, service_role;
+GRANT EXECUTE ON FUNCTION public.concierge_case_list_for_role(text, integer, text, text[], text[], uuid, integer) TO authenticated, service_role;
