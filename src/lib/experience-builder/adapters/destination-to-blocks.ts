@@ -272,3 +272,84 @@ export function destinationToCtaBarDTO(d: DestinationBlockInput): ExperienceCtaB
     },
   };
 }
+
+/* ------------------------------------------------------------------ *
+ * Gallery — U-VISUAL · V4.2 · Airbnb-style above-the-fold mosaic.
+ * Reusa el bloque oficial `vmx.experience.gallery` variante `mosaic`
+ * (1 imagen dominante + 4 tiles). Compatibilidad Evolutiva: sin bloque
+ * nuevo, sin variant nuevo — usa la biblioteca vigente.
+ * ------------------------------------------------------------------ */
+const VALLADOLID_STOCK_FALLBACK: string[] = [
+  "https://images.unsplash.com/photo-1518638150340-f706e86654de?auto=format&fit=crop&w=1600&q=75",
+  "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=1200&q=75",
+  "https://images.unsplash.com/photo-1526481280695-3c469368a44f?auto=format&fit=crop&w=1200&q=75",
+  "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1200&q=75",
+  "https://images.unsplash.com/photo-1512813498716-3e640fed3f39?auto=format&fit=crop&w=1200&q=75",
+];
+
+export function destinationToGalleryDTO(
+  d: DestinationBlockInput,
+): ExperienceGalleryDTO | null {
+  const urls: string[] = [];
+  if (d.heroUrl) urls.push(d.heroUrl);
+  urls.push(...d.galleryUrls);
+  // Rellenar hasta 5 con imágenes de referencia si faltan (evita
+  // mosaico incompleto). Sólo mientras el CMS de medios se puebla.
+  while (urls.length < 5) {
+    const next = VALLADOLID_STOCK_FALLBACK[urls.length];
+    if (!next) break;
+    urls.push(next);
+  }
+  if (urls.length === 0) return null;
+  return {
+    variant: "mosaic",
+    heading: null,
+    subheading: null,
+    items: urls.slice(0, 5).map((url, i) => ({
+      kind: "image",
+      url,
+      alt: `${d.name} — foto ${i + 1}`,
+    })),
+    maxVisible: 5,
+    aspect: "landscape",
+    ariaLabel: `Galería de ${d.name}`,
+    capabilities: {
+      lightbox: true,
+      captions: false,
+      video: false,
+      panorama360: false,
+      model3d: false,
+      ar: false,
+      ugc: false,
+    },
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * Map — U-VISUAL · V4.2 · Founder Discovery Map Principle.
+ * Reusa el bloque oficial `vmx.experience.map` variante `multi`. Centro
+ * = coordenadas del destino; puntos = negocios publicados con geocode.
+ * ------------------------------------------------------------------ */
+export function destinationToMapDTO(
+  d: DestinationBlockInput,
+): ExperienceMapDTO | null {
+  const hasCenter = d.latitude != null && d.longitude != null;
+  if (!hasCenter && d.mapPoints.length === 0) return null;
+  return {
+    variant: "multi",
+    heading: `Ubicación · ${d.name}`,
+    center: hasCenter
+      ? { lat: d.latitude!, lng: d.longitude!, zoom: 14 }
+      : null,
+    points: d.mapPoints,
+    capabilities: {
+      showDistance: true,
+      showDirections: true,
+      clustering: false,
+      syncList: false,
+      staticFallback: true,
+      allowInteractiveToggle: true,
+    },
+    emptyMessage: `Aún no publicamos puntos de interés geolocalizados en ${d.name}.`,
+  };
+}
