@@ -81,7 +81,7 @@ function ObservabilityPage() {
           Observabilidad y Hardening
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Dashboards técnicos y de negocio del Marketplace. Todas las
+          Dashboards técnicos y de negocio de la plataforma. Todas las
           lecturas son agregadas y exigen rol admin / super_admin server-side.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3 text-xs">
@@ -109,7 +109,7 @@ function ObservabilityPage() {
           Embudo de negocio
         </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-          <Card label="Marketplace (búsquedas)" value={funnel?.searches} />
+          <Card label="Catálogo (búsquedas)" value={funnel?.searches} />
           <Card label="Arma tu Viaje" value={funnel?.favorites} />
           <Card label="Carrito" value={funnel?.carts} />
           <Card label="Pago iniciado" value={funnel?.payments} />
