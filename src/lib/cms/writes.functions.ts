@@ -382,6 +382,40 @@ export const transitionEntityStatus = createServerFn({ method: "POST" })
     const from = current.status as ContentStatus;
     assertAllowedTransition(from, data.to);
 
+    // Regla vinculante Geolocation Mandatory: ningún negocio o producto
+    // avanza más allá de "draft" sin coordenadas primarias en
+    // `business_locations`. Alux necesita la ubicación real para calcular
+    // distancias/tiempos y cercanía territorial. Ver mem://policies/geolocation-mandatory.md
+    if (data.to !== "draft" && data.to !== "archived") {
+      let businessIdToCheck: string | null = null;
+      if (data.table === "businesses") {
+        businessIdToCheck = data.id;
+      } else if (data.table === "products") {
+        const { data: prod, error: prodErr } = await db
+          .from("products")
+          .select("business_id")
+          .eq("id", data.id)
+          .maybeSingle();
+        if (prodErr) throw prodErr;
+        businessIdToCheck = (prod?.business_id as string | null) ?? null;
+      }
+      if (businessIdToCheck) {
+        const { data: loc, error: locErr } = await db
+          .from("business_locations")
+          .select("id, latitude, longitude")
+          .eq("business_id", businessIdToCheck)
+          .eq("is_primary", true)
+          .is("deleted_at", null)
+          .maybeSingle();
+        if (locErr) throw locErr;
+        if (!loc || loc.latitude == null || loc.longitude == null) {
+          throw new Error(
+            "Falta la ubicación en el mapa. Marca el pin en el panel de Ubicación antes de continuar (obligatorio para todos los negocios y productos).",
+          );
+        }
+      }
+    }
+
     const patch: Record<string, unknown> = {
       status: data.to,
       updated_by: context.userId,
