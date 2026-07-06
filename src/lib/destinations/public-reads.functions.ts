@@ -290,6 +290,47 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
     }
 
     const bizIds = cards.map((c) => c.id);
+    // Covers de empresas (business_media role=cover).
+    if (bizIds.length > 0) {
+      const { data: bmedia } = await sb
+        .from("business_media")
+        .select("business_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path )")
+        .in("business_id", bizIds)
+        .eq("role", "cover")
+        .order("sort_order", { ascending: true });
+      if (bmedia && bmedia.length > 0) {
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const seen = new Set<string>();
+          const first = bmedia.filter((r) => {
+            const bid = r.business_id as string;
+            if (seen.has(bid)) return false;
+            seen.add(bid);
+            return true;
+          });
+          const signed = await Promise.all(
+            first.map(async (r) => {
+              const a = (r as unknown as { media_assets?: { storage_bucket: string; storage_path: string } | null }).media_assets;
+              if (!a) return { id: r.business_id as string, url: null as string | null };
+              const { data: s } = await supabaseAdmin.storage
+                .from(a.storage_bucket)
+                .createSignedUrl(a.storage_path, 3600);
+              return { id: r.business_id as string, url: s?.signedUrl ?? null };
+            }),
+          );
+          const byBiz = new Map(signed.map((x) => [x.id, x.url] as const));
+          const patchCover = (c: MarketplaceBusinessCard) => ({ ...c, cover_url: byBiz.get(c.id) ?? null });
+          grouped.hoteles = grouped.hoteles.map(patchCover);
+          grouped.restaurantes = grouped.restaurantes.map(patchCover);
+          grouped.experiencias = grouped.experiencias.map(patchCover);
+          grouped.otras = grouped.otras.map(patchCover);
+          for (const [bid, url] of byBiz) bizById.set(bid, { ...(bizById.get(bid) as MarketplaceBusinessCard), cover_url: url });
+        } catch (e) {
+          console.warn("[getDestinationRelated] biz cover sign failed", e);
+        }
+      }
+    }
+
     if (bizIds.length > 0) {
       const { data: prods, error: pErr } = await sb
         .from("products")
@@ -319,8 +360,53 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
             accepts_online_payment: Boolean((p as Record<string, unknown>).accepts_online_payment),
             requires_availability: Boolean((p as Record<string, unknown>).requires_availability),
             visibility_level: String((p as Record<string, unknown>).visibility_level ?? "standard"),
+            cover_url: null,
           };
         });
+        // Covers de productos (product_media role=cover) + fallback a la portada del negocio.
+        const prodIds = grouped.productos.map((p) => p.id);
+        if (prodIds.length > 0) {
+          const { data: pmedia } = await sb
+            .from("product_media")
+            .select("product_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path )")
+            .in("product_id", prodIds)
+            .eq("role", "cover")
+            .order("sort_order", { ascending: true });
+          const byProd = new Map<string, string | null>();
+          if (pmedia && pmedia.length > 0) {
+            try {
+              const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+              const seen = new Set<string>();
+              const first = pmedia.filter((r) => {
+                const pid = r.product_id as string;
+                if (seen.has(pid)) return false;
+                seen.add(pid);
+                return true;
+              });
+              const signed = await Promise.all(
+                first.map(async (r) => {
+                  const a = (r as unknown as { media_assets?: { storage_bucket: string; storage_path: string } | null }).media_assets;
+                  if (!a) return { id: r.product_id as string, url: null as string | null };
+                  const { data: s } = await supabaseAdmin.storage
+                    .from(a.storage_bucket)
+                    .createSignedUrl(a.storage_path, 3600);
+                  return { id: r.product_id as string, url: s?.signedUrl ?? null };
+                }),
+              );
+              for (const { id, url } of signed) byProd.set(id, url);
+            } catch (e) {
+              console.warn("[getDestinationRelated] product cover sign failed", e);
+            }
+          }
+          grouped.productos = grouped.productos.map((p) => {
+            const own = byProd.get(p.id) ?? null;
+            if (own) return { ...p, cover_url: own };
+            // Fallback: usar la portada del negocio dueño.
+            const parent = grouped.hoteles.concat(grouped.restaurantes, grouped.experiencias, grouped.otras)
+              .find((b) => b.slug === p.business_slug);
+            return { ...p, cover_url: parent?.cover_url ?? null };
+          });
+        }
         if (pinnedIds.product.length > 0) {
           const byId = new Map(grouped.productos.map((c) => [c.id, c] as const));
           const pinnedCards = pinnedIds.product.map((id) => byId.get(id)).filter(Boolean) as typeof grouped.productos;

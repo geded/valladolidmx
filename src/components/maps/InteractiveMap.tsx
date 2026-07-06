@@ -20,7 +20,7 @@ interface GMap {
   new (el: HTMLElement, opts: Record<string, unknown>): unknown;
 }
 interface GMarker {
-  new (opts: { position: LatLng; map: unknown; title?: string }): unknown;
+  new (opts: { position: LatLng; map: unknown; title?: string; label?: unknown }): unknown;
 }
 interface GoogleMapsNamespace {
   maps: { Map: GMap; Marker: GMarker };
@@ -82,6 +82,10 @@ export interface InteractiveMapProps {
   markers?: Array<{ lat: number; lng: number; title?: string; href?: string | null }>;
 }
 
+function labelForIndex(i: number) {
+  return String.fromCharCode(65 + (i % 26));
+}
+
 export function InteractiveMap({
   lat,
   lng,
@@ -116,13 +120,19 @@ export function InteractiveMap({
         const list = markers && markers.length > 0
           ? markers
           : [{ lat, lng, title: markerTitle }];
-        for (const m of list) {
+        list.forEach((m, i) => {
           new google.maps.Marker({
             position: { lat: m.lat, lng: m.lng },
             map,
             title: m.title ?? markerTitle,
+            label: {
+              text: labelForIndex(i),
+              color: "#ffffff",
+              fontWeight: "700",
+              fontSize: "12px",
+            },
           });
-        }
+        });
         setReady(true);
       })
       .catch((e) => {

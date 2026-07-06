@@ -231,9 +231,12 @@ export function destinationToHighlightsInfoGridDTO(
 ): ExperienceInfoGridDTO | null {
   if (!d.highlights.length) return null;
   return {
-    variant: "cards",
+    // Compact: lista con separadores en lugar de tarjetas, para que
+    // "Lo esencial" no compita visualmente con el hero, el mapa y las
+    // colecciones de descubrimiento (Founder Experience Rule).
+    variant: "list",
     heading: "Lo esencial",
-    columns: Math.min(2, Math.max(1, d.highlights.length)),
+    columns: 1,
     items: d.highlights.map((h) => ({
       iconKey: "sparkles",
       label: "Highlight",

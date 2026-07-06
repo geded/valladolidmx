@@ -75,6 +75,7 @@ export function ExperienceMapBlock({ dto, className }: ExperienceMapBlockProps) 
 
   const primary = dto.points.find((p) => p.id === activeId) ?? dto.points[0];
   const isMulti = dto.variant !== "single";
+  const labelOf = (idx: number) => String.fromCharCode(65 + (idx % 26));
 
   return (
     <section className={cn("space-y-4", className)}>
@@ -119,10 +120,11 @@ export function ExperienceMapBlock({ dto, className }: ExperienceMapBlockProps) 
               width={640}
               height={420}
               alt={dto.heading ?? primary.title}
-              markers={dto.points.map((p) => ({
+              markers={dto.points.map((p, i) => ({
                 lat: p.lat,
                 lng: p.lng,
                 kind: p.kind,
+                label: labelOf(i),
               }))}
             />
           )}
@@ -146,8 +148,9 @@ export function ExperienceMapBlock({ dto, className }: ExperienceMapBlockProps) 
               className="max-h-[360px] space-y-2 overflow-y-auto rounded-2xl border border-border bg-card p-3"
               aria-label="Puntos en el mapa"
             >
-              {dto.points.map((p) => {
+              {dto.points.map((p, i) => {
                 const isActive = p.id === primary.id;
+                const label = labelOf(i);
                 return (
                   <li key={p.id}>
                     <button
@@ -160,18 +163,26 @@ export function ExperienceMapBlock({ dto, className }: ExperienceMapBlockProps) 
                           : "border-transparent hover:bg-muted",
                       )}
                     >
-                      {p.thumbUrl ? (
-                        <img
-                          src={p.thumbUrl}
-                          alt=""
-                          className="h-12 w-12 flex-shrink-0 rounded-lg object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <span className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-lg bg-muted text-primary">
-                          <MapPin className="h-5 w-5" aria-hidden />
+                      <span className="relative flex-shrink-0">
+                        {p.thumbUrl ? (
+                          <img
+                            src={p.thumbUrl}
+                            alt=""
+                            className="h-12 w-12 rounded-lg object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <span className="grid h-12 w-12 place-items-center rounded-lg bg-muted text-primary">
+                            <MapPin className="h-5 w-5" aria-hidden />
+                          </span>
+                        )}
+                        <span
+                          aria-hidden
+                          className="absolute -top-1 -left-1 grid h-5 w-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow"
+                        >
+                          {label}
                         </span>
-                      )}
+                      </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-medium text-foreground">
                           {p.title}

@@ -23,8 +23,8 @@ const Query = z.object({
   format: z.enum(["png", "jpg"]).default("png"),
 });
 
-// Marker adicional: "kind:lat,lng" — kind ∈ {poi, business, product, event}.
-const MARKER_RE = /^(poi|business|product|event|destination):(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/;
+// Marker adicional: "kind:LABEL:lat,lng" o "kind:lat,lng" (legacy).
+const MARKER_RE = /^(poi|business|product|event|destination)(?::([A-Z0-9]))?:(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/;
 const MARKER_COLORS: Record<string, string> = {
   business: "0x0d5c46",
   product: "0xd97706",
@@ -66,23 +66,18 @@ export const Route = createFileRoute("/api/public/maps/static")({
             `color:red|size:mid|${lat},${lng}`,
           );
         } else {
-          // Agrupar por kind para minimizar `markers` params (Google
-          // permite estilo por grupo).
-          const groups = new Map<string, string[]>();
+          // Un `markers=` por pin para preservar la etiqueta individual.
           for (const raw of rawMarkers) {
             const m = MARKER_RE.exec(raw);
             if (!m) continue;
             const kind = m[1];
-            const arr = groups.get(kind) ?? [];
-            arr.push(`${m[2]},${m[3]}`);
-            groups.set(kind, arr);
-          }
-          for (const [kind, coords] of groups) {
+            const label = m[2] ?? "";
+            const coord = `${m[3]},${m[4]}`;
             const color = MARKER_COLORS[kind] ?? MARKER_COLORS.poi;
-            gw.searchParams.append(
-              "markers",
-              `color:${color}|size:mid|${coords.join("|")}`,
-            );
+            const parts = [`color:${color}`, "size:mid"];
+            if (label) parts.push(`label:${label}`);
+            parts.push(coord);
+            gw.searchParams.append("markers", parts.join("|"));
           }
         }
 
