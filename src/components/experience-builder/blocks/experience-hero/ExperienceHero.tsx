@@ -504,8 +504,8 @@ function GalleryHero({
   }
 
   return (
-    <section className={cn("flex flex-col", className)}>
-      <div className="relative isolate overflow-hidden sm:rounded-3xl">
+    <section className={cn("flex flex-col gap-5 sm:gap-6", className)}>
+      <div className="relative isolate mx-3 overflow-hidden rounded-2xl shadow-soft sm:mx-0 sm:rounded-3xl">
         {total > 0 ? (
           <ul
             id={`hero-gallery-${dto.title}`}
@@ -582,7 +582,9 @@ function GalleryHero({
         ) : null}
       </div>
 
-      <div className="px-4 pt-5 sm:px-6 sm:pt-6">{textStack}</div>
+      <div className="px-5 sm:px-6">
+        <div className="mx-auto max-w-3xl">{textStack}</div>
+      </div>
     </section>
   );
 }
