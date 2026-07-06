@@ -12,6 +12,7 @@ import type { MarketplaceProductCard } from "@/lib/catalog/marketplace-reads.fun
 import type {
   ExperienceRelatedItem,
 } from "@/lib/experience-builder/blocks/experience-related-collection/contract";
+import { EXPERIENCE_RELATED_ITEM_V11_DEFAULTS as V11 } from "@/lib/experience-builder/blocks/experience-related-collection/contract";
 import { resolveCanonicalPath } from "@/lib/navigation/canonical-paths";
 
 export function productRelatedToItems(
@@ -36,6 +37,7 @@ export function productRelatedToItems(
           })
         : `/producto/${p.slug}`;
     return {
+      ...V11,
       id: p.id,
       kind: "product",
       title: p.name,
