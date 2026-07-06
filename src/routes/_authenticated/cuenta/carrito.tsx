@@ -94,14 +94,14 @@ function CarritoPage() {
       ) : isEmpty ? (
         <div className="mt-8 rounded-2xl border border-dashed border-border bg-card p-6">
           <p className="text-sm text-muted-foreground">
-            Tu carrito está vacío. Explora el Marketplace para añadir
+            Tu carrito está vacío. Explora Oriente Maya para añadir
             experiencias.
           </p>
           <Link
             to="/oriente-maya"
             className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
           >
-            Ir al Marketplace
+            Descubrir Oriente Maya
           </Link>
         </div>
       ) : (
