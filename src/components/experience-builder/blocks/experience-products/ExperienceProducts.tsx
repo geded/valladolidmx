@@ -9,7 +9,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import type {
-  ExperienceEntityKind,
   ExperienceProductItem,
   ExperienceProductsDTO,
 } from "@/lib/experience-builder/blocks/experience-products/contract";
