@@ -2,14 +2,21 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
-import { listMarketplaceBusinesses, type MarketplaceBusinessCard } from "@/lib/catalog/marketplace-reads.functions";
-import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
+import {
+  listMarketplaceBusinesses,
+  type MarketplaceBusinessCard,
+} from "@/lib/catalog/marketplace-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import {
   defineRouteContext,
   type RouteContextDeclaration,
 } from "@/lib/context-engine";
+import {
+  TourismListingSurface,
+  buildDestinationFacet,
+} from "@/components/surfaces/TourismListingSurface";
+import { businessToTourismCard } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 
 const CATEGORY_SLUGS = new Set(["experiencias", "experiencias-tours", "tours"]);
 
@@ -70,23 +77,37 @@ function ExperienciasRoute() {
     ...(destino ? [{ label: destinationLabel(destino) }] : []),
     ...(humanTema && !destino ? [{ label: humanTema }] : []),
   ];
+  const cards = filtered.map((b: MarketplaceBusinessCard) =>
+    businessToTourismCard(b, {
+      destinationLabel: destinationLabel(b.destination_slug),
+      regionLabel: ORIENTE_MAYA.name,
+      forcedCategorySlug: "experiencias",
+    }),
+  );
+  const destinoFacet = buildDestinationFacet(cards);
+  const title = destino
+    ? `Experiencias en ${destinationLabel(destino)}`
+    : humanTema
+      ? `Experiencias · ${humanTema}`
+      : "Experiencias";
   return (
     <PublicShell
-      eyebrow="Categoría"
-      title={
-        destino
-          ? `Experiencias en ${destinationLabel(destino)}`
-          : humanTema
-            ? `Experiencias · ${humanTema}`
-            : "Experiencias"
-      }
-      description="Vivencias auténticas con comunidades, cocineros y guías locales del Oriente Maya."
       crumbs={legacyCrumbs}
       contextDeclaration={contextDeclaration}
       useContextCrumbs={!humanTema || !!destino}
     >
-      <MarketplaceSurface
-        items={filtered}
+      <TourismListingSurface
+        hero={{
+          eyebrow: "Vive el Oriente Maya",
+          title,
+          subtitle:
+            "Vivencias auténticas con comunidades, cocineros y guías locales del Oriente Maya.",
+          metaLabel: destino ? destinationLabel(destino) : ORIENTE_MAYA.name,
+        }}
+        items={cards}
+        facets={destino || !destinoFacet ? [] : [destinoFacet]}
+        destinationSlug={destino ?? null}
+        destinationLabel={destino ? destinationLabel(destino) : null}
         emptyMessage={
           destino
             ? `Aún no hay experiencias publicadas en ${destinationLabel(destino)}.`

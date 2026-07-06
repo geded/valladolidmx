@@ -14,13 +14,17 @@ import {
   listMarketplaceBusinesses,
   type MarketplaceBusinessCard,
 } from "@/lib/catalog/marketplace-reads.functions";
-import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import {
   defineRouteContext,
   type RouteContextDeclaration,
 } from "@/lib/context-engine";
+import {
+  TourismListingSurface,
+  buildDestinationFacet,
+} from "@/components/surfaces/TourismListingSurface";
+import { businessToTourismCard } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 
 const CATEGORY_SLUGS = new Set([
   "casas-de-vacaciones",
@@ -85,17 +89,34 @@ function CasasRoute() {
     { label: "Casas de vacaciones", to: "/casas-de-vacaciones" },
     ...(destino ? [{ label: destinationLabel(destino) }] : []),
   ];
+  const cards = filtered.map((b: MarketplaceBusinessCard) =>
+    businessToTourismCard(b, {
+      destinationLabel: destinationLabel(b.destination_slug),
+      regionLabel: ORIENTE_MAYA.name,
+      forcedCategorySlug: "casas-de-vacaciones",
+    }),
+  );
+  const destinoFacet = buildDestinationFacet(cards);
   return (
     <PublicShell
-      eyebrow="Hospedaje"
-      title={destino ? `Casas de vacaciones en ${destinationLabel(destino)}` : "Casas de vacaciones"}
-      description="Casas, villas y rentas vacacionales para explorar el Oriente Maya a tu ritmo."
       crumbs={legacyCrumbs}
       contextDeclaration={contextDeclaration}
       useContextCrumbs
     >
-      <MarketplaceSurface
-        items={filtered}
+      <TourismListingSurface
+        hero={{
+          eyebrow: "Tu casa en el Oriente Maya",
+          title: destino
+            ? `Casas de vacaciones en ${destinationLabel(destino)}`
+            : "Casas de vacaciones",
+          subtitle:
+            "Casas, villas y rentas vacacionales para explorar el Oriente Maya a tu ritmo.",
+          metaLabel: destino ? destinationLabel(destino) : ORIENTE_MAYA.name,
+        }}
+        items={cards}
+        facets={destino || !destinoFacet ? [] : [destinoFacet]}
+        destinationSlug={destino ?? null}
+        destinationLabel={destino ? destinationLabel(destino) : null}
         emptyMessage="Aún estamos verificando casas de vacaciones. Mientras tanto, explora hoteles y haciendas del Oriente Maya."
       />
     </PublicShell>

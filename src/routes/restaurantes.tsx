@@ -2,14 +2,21 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
-import { listMarketplaceBusinesses, type MarketplaceBusinessCard } from "@/lib/catalog/marketplace-reads.functions";
-import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
+import {
+  listMarketplaceBusinesses,
+  type MarketplaceBusinessCard,
+} from "@/lib/catalog/marketplace-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import {
   defineRouteContext,
   type RouteContextDeclaration,
 } from "@/lib/context-engine";
+import {
+  TourismListingSurface,
+  buildDestinationFacet,
+} from "@/components/surfaces/TourismListingSurface";
+import { businessToTourismCard } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 
 const CATEGORY_SLUGS = new Set(["restaurantes", "gastronomia"]);
 
@@ -64,17 +71,31 @@ function RestaurantesRoute() {
     { label: "Restaurantes", to: "/restaurantes" },
     ...(destino ? [{ label: destinationLabel(destino) }] : []),
   ];
+  const cards = filtered.map((b: MarketplaceBusinessCard) =>
+    businessToTourismCard(b, {
+      destinationLabel: destinationLabel(b.destination_slug),
+      regionLabel: ORIENTE_MAYA.name,
+      forcedCategorySlug: "restaurantes",
+    }),
+  );
+  const destinoFacet = buildDestinationFacet(cards);
   return (
     <PublicShell
-      eyebrow="Categoría"
-      title={destino ? `Restaurantes en ${destinationLabel(destino)}` : "Restaurantes"}
-      description="Cocina yucateca, panuchos, recados y mesas de autor."
       crumbs={legacyCrumbs}
       contextDeclaration={contextDeclaration}
       useContextCrumbs
     >
-      <MarketplaceSurface
-        items={filtered}
+      <TourismListingSurface
+        hero={{
+          eyebrow: "Sabores del Oriente Maya",
+          title: destino ? `Restaurantes en ${destinationLabel(destino)}` : "Restaurantes",
+          subtitle: "Cocina yucateca, panuchos, recados y mesas de autor.",
+          metaLabel: destino ? destinationLabel(destino) : ORIENTE_MAYA.name,
+        }}
+        items={cards}
+        facets={destino || !destinoFacet ? [] : [destinoFacet]}
+        destinationSlug={destino ?? null}
+        destinationLabel={destino ? destinationLabel(destino) : null}
         emptyMessage={
           destino
             ? `Aún no hay restaurantes publicados en ${destinationLabel(destino)}.`
