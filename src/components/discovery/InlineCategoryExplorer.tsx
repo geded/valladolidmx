@@ -393,7 +393,7 @@ function ExplorerActionSheet({
     <Sheet open={!!panel} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="max-h-[88vh] overflow-y-auto rounded-t-2xl border-border bg-background px-4 pb-5 pt-6 sm:left-1/2 sm:max-w-2xl sm:-translate-x-1/2 sm:px-6"
+        className="max-h-[88vh] overflow-y-auto rounded-t-2xl border-border bg-background px-4 pb-5 pt-6 sm:inset-x-auto sm:left-1/2 sm:w-[min(42rem,calc(100vw-2rem))] sm:-translate-x-1/2 sm:px-6"
       >
         {item ? (
           <div className="mx-auto w-full max-w-2xl">
