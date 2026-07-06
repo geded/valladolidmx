@@ -2422,6 +2422,8 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   experienceReviewsBlock,
   // H-03 · Ola I3.b — Experience Related Collection (Motor de Descubrimiento).
   experienceRelatedCollectionBlock,
+  // U-VISUAL · V4 — Experience Map (Founder Discovery Map Principle).
+  experienceMapBlock,
 ];
 
 let bootstrapped = false;
