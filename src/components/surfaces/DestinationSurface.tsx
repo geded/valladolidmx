@@ -38,7 +38,6 @@ import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/exper
 import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
-import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapPoint } from "@/lib/experience-builder/blocks/experience-map/contract";
 import {
@@ -49,7 +48,6 @@ import {
   destinationToHighlightsInfoGridDTO,
   destinationToCtaBarDTO,
   destinationToBadgeItems,
-  destinationToGalleryDTO,
   destinationToMapDTO,
 } from "@/lib/experience-builder/adapters/destination-to-blocks";
 
@@ -149,7 +147,6 @@ export function DestinationSurface({
   const highlightsInfoGrid = destinationToHighlightsInfoGridDTO(input);
   const ctaBarDto = destinationToCtaBarDTO(input);
   const badgeItems = destinationToBadgeItems(input);
-  const galleryDto = destinationToGalleryDTO(input);
   const mapDto = destinationToMapDTO(input);
 
   return (
@@ -161,15 +158,7 @@ export function DestinationSurface({
       ]}
       useContextCrumbs
     >
-      {galleryDto ? (
-        <section id="galeria" data-eb-anchor className="scroll-mt-24">
-          <ExperienceGallery dto={galleryDto} />
-        </section>
-      ) : null}
-
-      <div className={galleryDto ? "mt-8" : undefined}>
-        <ExperienceHero dto={heroDto} headingLevel="h1" />
-      </div>
+      <ExperienceHero dto={heroDto} headingLevel="h1" />
 
       {badgeItems.length > 0 ? (
         <div className="mt-6">
