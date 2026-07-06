@@ -20,6 +20,11 @@ import type { ExperienceSectionDTO } from "@/lib/experience-builder/blocks/exper
 import type { ExperienceInfoGridDTO } from "@/lib/experience-builder/blocks/experience-info-grid/contract";
 import type { ExperienceCtaBarDTO } from "@/lib/experience-builder/blocks/experience-cta-bar/contract";
 import type { InstitutionalBadgeItem } from "@/lib/experience-builder/blocks/experience-institutional-badges/contract";
+import type { ExperienceGalleryDTO } from "@/lib/experience-builder/blocks/experience-gallery/contract";
+import type {
+  ExperienceMapDTO,
+  ExperienceMapPoint,
+} from "@/lib/experience-builder/blocks/experience-map/contract";
 import { PUEBLOS_MAGICOS_AUTORIZADOS } from "@/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry";
 
 /**
@@ -34,6 +39,10 @@ export interface DestinationBlockInput {
   description: string | null;
   highlights: string[];
   heroUrl: string | null;
+  galleryUrls: string[];
+  latitude: number | null;
+  longitude: number | null;
+  mapPoints: ExperienceMapPoint[];
   regionSlug: string;
   regionName: string;
   relatedCounts: {
@@ -57,6 +66,8 @@ export function toDestinationBlockInput(
     regionSlug: string;
     regionName: string;
     counts?: DestinationBlockInput["relatedCounts"];
+    galleryUrls?: string[];
+    mapPoints?: ExperienceMapPoint[];
   },
 ): DestinationBlockInput {
   return {
@@ -66,6 +77,10 @@ export function toDestinationBlockInput(
     description: dbData?.description ?? null,
     highlights: (dbData?.highlights?.length ? dbData.highlights : mock?.highlights ?? []) as string[],
     heroUrl: dbData?.hero_url ?? null,
+    galleryUrls: ctx.galleryUrls ?? [],
+    latitude: dbData?.latitude ?? null,
+    longitude: dbData?.longitude ?? null,
+    mapPoints: ctx.mapPoints ?? [],
     regionSlug: ctx.regionSlug,
     regionName: ctx.regionName,
     relatedCounts: ctx.counts ?? {
