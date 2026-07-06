@@ -87,6 +87,19 @@ function publicPathFromKind(def: PageKindDefinition | undefined, slug: string): 
   return def.publicRoutePattern.replace("{slug}", slug) || `/${slug}`;
 }
 
+/**
+ * Devuelve el patrón de URL pública absoluta (origin + pattern) para mostrar
+ * al editor mientras cambia el slug. Ej: "https://quehacerenvalladolid.com/l/{slug}".
+ */
+function publicUrlPattern(def: PageKindDefinition | undefined): string {
+  const origin =
+    typeof window !== "undefined" && window.location?.origin
+      ? window.location.origin
+      : "";
+  const pattern = def?.publicRoutePattern ?? "/p/{slug}";
+  return `${origin}${pattern}`;
+}
+
 function formatRelativeShort(iso: string): string {
   const then = new Date(iso).getTime();
   const diffMs = Date.now() - then;
