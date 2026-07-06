@@ -61,7 +61,6 @@ import {
 } from "@/components/surfaces/business-blocks";
 import {
   ProductShellBlock,
-  ProductHeroBlock,
   ProductGalleryBlock,
   ProductPriceCtaBlock,
   ProductDescriptionBlock,
@@ -71,6 +70,7 @@ import {
   ProductFaqBlock,
   ProductRelatedBlock,
 } from "@/components/surfaces/product-blocks";
+import { ExperienceHeroFromProduct } from "@/components/experience-builder/blocks/experience-hero/ExperienceHeroFromProduct";
 import { KIT_BLOCK_RENDERERS } from "./kit-blocks";
 import {
   DiscoveryNavigatorBlock,
@@ -484,7 +484,8 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.product.shell": ({ renderChildren }) => (
     <ProductShellBlock renderChildren={renderChildren} />
   ),
-  "vmx.product.hero": () => <ProductHeroBlock />,
+  // U1.5 · Unificado con `vmx.experience.hero` — sin bloque paralelo.
+  "vmx.product.hero": () => <ExperienceHeroFromProduct />,
   "vmx.product.gallery": () => <ProductGalleryBlock />,
   "vmx.product.price-cta": () => <ProductPriceCtaBlock />,
   "vmx.product.description": () => <ProductDescriptionBlock />,
@@ -745,7 +746,7 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.product.shell": ({ renderChildren }) => (
     <ProductShellBlock renderChildren={renderChildren} />
   ),
-  "vmx.product.hero": () => <ProductHeroBlock />,
+  "vmx.product.hero": () => <ExperienceHeroFromProduct />,
   "vmx.product.gallery": () => <ProductGalleryBlock />,
   "vmx.product.price-cta": () => <ProductPriceCtaBlock />,
   "vmx.product.description": () => <ProductDescriptionBlock />,

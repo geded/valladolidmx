@@ -1259,8 +1259,9 @@ const productShellBlock = productBlock(
 );
 const productHeroBlock = productBlock(
   "vmx.product.hero",
-  "Producto · Hero",
-  "Tipo, título, tagline y favorito bajo el encabezado del producto.",
+  "Producto · Hero (delegado)",
+  "LEGACY SHIM (U1.5): delega en la familia oficial `vmx.experience.hero` " +
+    "vía adapter `ExperienceHeroFromProduct`. No crear Heros paralelos.",
 );
 const productGalleryBlock = productBlock(
   "vmx.product.gallery",
