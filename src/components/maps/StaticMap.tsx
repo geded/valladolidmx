@@ -16,7 +16,7 @@ export interface StaticMapProps {
   alt?: string;
   className?: string;
   /** Pines adicionales (kind + coordenadas). Opcional. */
-  markers?: Array<{ lat: number; lng: number; kind?: string }>;
+  markers?: Array<{ lat: number; lng: number; kind?: string; label?: string | null }>;
 }
 
 export function StaticMap({
@@ -37,9 +37,13 @@ export function StaticMap({
     width: String(width),
     height: String(height),
   });
-  for (const m of markers ?? []) {
-    params.append("m", `${m.kind ?? "poi"}:${m.lat},${m.lng}`);
-  }
+  const list = markers ?? [];
+  list.forEach((m, i) => {
+    // Etiqueta A-Z automática si no viene explícita, para que cada pin
+    // se pueda leer y correlacionar con la lista lateral.
+    const label = (m.label ?? String.fromCharCode(65 + (i % 26))).toString().slice(0, 1).toUpperCase();
+    params.append("m", `${m.kind ?? "poi"}:${label}:${m.lat},${m.lng}`);
+  });
   const src = `/api/public/maps/static?${params.toString()}`;
 
   if (failed) {
