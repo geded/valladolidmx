@@ -146,12 +146,11 @@ export function DestinationSurface({
 
   const galleryDto = destinationToGalleryDTO(input);
   const heroDtoRaw = destinationToHeroDTO(input);
-  // Airbnb-style: cuando hay mosaico como cabecera visual, el Hero
-  // se degrada a `editorial` (título + tagline + CTAs debajo) para no
-  // duplicar la imagen dominante.
-  const heroDto = galleryDto
-    ? { ...heroDtoRaw, variant: "editorial" as const, media: null }
-    : heroDtoRaw;
+  // Tourist Hero `gallery` v1.2.0 — el propio Hero es el carrusel
+  // Airbnb-style. Cuando se activa, el mosaico `ExperienceGallery`
+  // se omite para no duplicar la imagen dominante.
+  const heroDto = heroDtoRaw;
+  const showGalleryMosaic = heroDto.variant !== "gallery" && Boolean(galleryDto);
   const subnavDto = destinationToSubnavDTO(input);
   const descriptionSection = destinationToDescriptionSectionDTO(input);
   const highlightsInfoGrid = destinationToHighlightsInfoGridDTO(input);
@@ -168,13 +167,13 @@ export function DestinationSurface({
       ]}
       useContextCrumbs
     >
-      {galleryDto ? (
+      {showGalleryMosaic && galleryDto ? (
         <section id="galeria" data-eb-anchor className="scroll-mt-24">
           <ExperienceGallery dto={galleryDto} />
         </section>
       ) : null}
 
-      <ExperienceHero dto={heroDto} headingLevel="h1" className={galleryDto ? "mt-6" : undefined} />
+      <ExperienceHero dto={heroDto} headingLevel="h1" className={showGalleryMosaic ? "mt-6" : undefined} />
 
       {badgeItems.length > 0 ? (
         <div className="mt-6">
