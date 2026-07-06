@@ -437,7 +437,7 @@ export const EXPERIENCE_RELATED_CAPABILITIES_V11_DEFAULTS = {
  * ------------------------------------------------------------------ */
 export function buildExperienceRelatedCollectionPreviewDTO(): ExperienceRelatedCollectionDTO {
   const businesses: ExperienceRelatedItem[] = [
-    {
+    createRelatedItem({
       id: "b1",
       kind: "hotel",
       title: "Hacienda Selva Maya",
@@ -458,10 +458,18 @@ export function buildExperienceRelatedCollectionPreviewDTO(): ExperienceRelatedC
       rationale: null,
       sourceHint: "destination",
       score: null,
-    },
+      institutionalBadges: [{ label: "Pueblo Mágico", tone: "primary" }],
+      rating: { value: 4.9, count: 312 },
+      location: { label: "Valladolid, Yucatán", distanceKm: 3 },
+      territorialContext: "Oriente Maya · Valladolid",
+      highlights: ["Cenote propio", "Desayuno maya", "Piscina"],
+      priceHint: "desde $2,850 MXN por noche",
+      primaryAction: { label: "Ver disponibilidad", href: "/marketplace/hacienda-selva-maya" },
+      secondaryAction: { label: "Contactar", href: null },
+    }),
   ];
   const events: ExperienceRelatedItem[] = [
-    {
+    createRelatedItem({
       id: "e1",
       kind: "event",
       title: "Festival Sac-Bé",
@@ -482,12 +490,20 @@ export function buildExperienceRelatedCollectionPreviewDTO(): ExperienceRelatedC
       rationale: null,
       sourceHint: "destination",
       score: null,
-    },
+      dateLabel: "Sáb 15 nov · 19:00",
+      territorialContext: "Oriente Maya · Valladolid",
+      location: { label: "Parque Francisco Cantón", distanceKm: null },
+      priceHint: "Entrada libre",
+      institutionalBadges: [{ label: "Despierta en Valladolid", tone: "warning" }],
+      primaryAction: { label: "Agregar al viaje", href: "#" },
+    }),
   ];
   return {
     variant: "grid",
     entityKind: "mixed",
     columns: 2,
+    density: "comfortable",
+    groupBy: "none",
     heading: "Sigue descubriendo",
     subheading:
       "Empresas, eventos y experiencias para continuar construyendo tu viaje.",
@@ -531,6 +547,7 @@ export function buildExperienceRelatedCollectionPreviewDTO(): ExperienceRelatedC
       contextAware: false,
       aluxRecommended: false,
       aluxDynamicGroups: false,
+      ...EXPERIENCE_RELATED_CAPABILITIES_V11_DEFAULTS,
     },
     contextRefs: { destinationSlug: "valladolid" },
   };
