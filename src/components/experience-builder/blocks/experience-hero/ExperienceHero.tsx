@@ -27,6 +27,8 @@ import {
   Compass,
   ArrowRight,
   ChevronRight,
+  ChevronLeft,
+  ArrowLeft,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -181,6 +183,13 @@ export interface ExperienceHeroProps {
   onCtaAction?: (cta: ExperienceHeroCta) => void;
   /** Slot inferior para extensiones (booking widget, contador live, etc.). */
   extensionsSlot?: ReactNode;
+  /**
+   * v1.2.0 — Acciones que se superponen a la galería (variante `gallery`).
+   * Típicamente favorito + compartir. Se ignoran en otras variantes.
+   */
+  headerActionsSlot?: ReactNode;
+  /** v1.2.0 — Sobrescribe el back de la variante `gallery`. */
+  onBack?: () => void;
   className?: string;
 }
 
@@ -192,6 +201,8 @@ export function ExperienceHero({
   headingLevel = "h1",
   onCtaAction,
   extensionsSlot,
+  headerActionsSlot,
+  onBack,
   className,
 }: ExperienceHeroProps) {
   const Heading = headingLevel;
@@ -200,6 +211,7 @@ export function ExperienceHero({
   const useCinematic = dto.variant === "cinematic" && (hasSlides || hasMedia);
   const useImmersive = dto.variant === "immersive" && hasMedia;
   const useCompact = dto.variant === "compact" && hasMedia;
+  const useGallery = dto.variant === "gallery" && (hasSlides || hasMedia);
   const onDark = useImmersive || useCinematic;
 
   const alignment = dto.alignment ?? "left";
@@ -290,6 +302,18 @@ export function ExperienceHero({
         dto={dto}
         className={className}
         textStack={textStack}
+      />
+    );
+  }
+
+  if (useGallery) {
+    return (
+      <GalleryHero
+        dto={dto}
+        className={className}
+        textStack={textStack}
+        headerActionsSlot={headerActionsSlot}
+        onBack={onBack}
       />
     );
   }
