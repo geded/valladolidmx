@@ -164,11 +164,13 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
       <ExperienceHero
         dto={heroDto}
         headingLevel="h1"
-        extensionsSlot={
-          <div className="flex flex-wrap items-center gap-3">
+        headerActionsSlot={
+          <>
+            <ShareButton title={b.display_name} />
             <FavoriteButton entityKind="business" entityId={b.id} />
-          </div>
+          </>
         }
+        extensionsSlot={null}
       />
 
       <ExperienceSubnav dto={subnavDto} className="mt-6 mb-6" />
