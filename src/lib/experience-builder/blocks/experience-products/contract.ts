@@ -19,7 +19,25 @@
  */
 import { z } from "zod";
 
-export const EXPERIENCE_PRODUCTS_CONTRACT_VERSION = "1.0.0";
+export const EXPERIENCE_PRODUCTS_CONTRACT_VERSION = "1.1.0";
+
+/**
+ * Family of tourism entities that the block can render with the SAME
+ * `ExperienceProducts` component. Added in v1.1.0 as part of the
+ * Tourism Component Library evolution — a single card family, many
+ * meanings via configuration.
+ */
+export const experienceEntityKindSchema = z.enum([
+  "product",
+  "business",
+  "hotel",
+  "restaurant",
+  "experience",
+  "event",
+  "destination",
+  "landing",
+]);
+export type ExperienceEntityKind = z.infer<typeof experienceEntityKindSchema>;
 
 /* ------------------------------------------------------------------ *
  * Enums
@@ -53,13 +71,53 @@ export const experienceProductItemSchema = z.object({
   name: z.string().min(1),
   tagline: z.string().nullable().default(null),
   productType: z.string().nullable().default(null),
+  /**
+   * v1.1.0 — tourism entity kind. Drives eyebrow label, iconography
+   * and semantic default badges. Optional for backward compatibility.
+   */
+  entityKind: experienceEntityKindSchema.nullable().default(null),
   href: z.string().nullable().default(null),
   mediaUrl: z.string().nullable().default(null),
   mediaAlt: z.string().nullable().default(null),
   priceAmount: z.number().nullable().default(null),
   priceCurrency: z.string().nullable().default(null),
+  /**
+   * v1.1.0 — free-form price qualifier (e.g. "desde", "por noche",
+   * "por persona"). Presentation only, does not affect commerce.
+   */
+  priceHint: z.string().nullable().default(null),
   businessId: z.string().nullable().default(null),
   businessName: z.string().nullable().default(null),
+  /**
+   * v1.1.0 — social proof. Answers "¿por qué vale la pena?".
+   */
+  rating: z
+    .object({
+      value: z.number().min(0).max(5),
+      count: z.number().min(0).default(0),
+    })
+    .nullable()
+    .default(null),
+  /**
+   * v1.1.0 — location context. Answers "¿dónde está?".
+   * `distanceKm` is optional and rendered when the visitor is geolocated.
+   */
+  location: z
+    .object({
+      label: z.string().min(1),
+      distanceKm: z.number().nullable().default(null),
+    })
+    .nullable()
+    .default(null),
+  /**
+   * v1.1.0 — differentiators. Answers "¿qué la hace diferente?".
+   * Max 4; the card renders up to 3 to preserve above-the-fold hierarchy.
+   */
+  highlights: z.array(z.string().min(1)).max(4).default([]),
+  /**
+   * v1.1.0 — date/schedule context (events, temporary experiences).
+   */
+  dateLabel: z.string().nullable().default(null),
   badges: z
     .array(
       z.object({
