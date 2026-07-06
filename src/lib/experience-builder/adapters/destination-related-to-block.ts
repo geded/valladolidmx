@@ -15,6 +15,7 @@ import type {
   ExperienceRelatedEntityKind,
   ExperienceRelatedItem,
 } from "@/lib/experience-builder/blocks/experience-related-collection/contract";
+import { EXPERIENCE_RELATED_ITEM_V11_DEFAULTS as V11 } from "@/lib/experience-builder/blocks/experience-related-collection/contract";
 
 /** Mapea empresas del marketplace a items universales. */
 export function destinationRelatedBucketToItems(
@@ -23,6 +24,7 @@ export function destinationRelatedBucketToItems(
   rationale?: string | null,
 ): ExperienceRelatedItem[] {
   return businesses.map((b) => ({
+    ...V11,
     id: b.id,
     kind,
     title: b.display_name,
@@ -52,6 +54,7 @@ export function destinationRelatedProductsToItems(
   rationale?: string | null,
 ): ExperienceRelatedItem[] {
   return products.map((p) => ({
+    ...V11,
     id: p.id,
     kind: "product",
     title: p.name,
@@ -81,6 +84,7 @@ export function destinationRelatedEventsToItems(
   rationale?: string | null,
 ): ExperienceRelatedItem[] {
   return events.map((e) => ({
+    ...V11,
     id: e.id,
     kind: "event",
     title: e.title,
