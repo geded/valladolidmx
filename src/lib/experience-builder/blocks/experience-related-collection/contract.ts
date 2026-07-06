@@ -32,7 +32,7 @@
  */
 import { z } from "zod";
 
-export const EXPERIENCE_RELATED_COLLECTION_CONTRACT_VERSION = "1.0.0";
+export const EXPERIENCE_RELATED_COLLECTION_CONTRACT_VERSION = "1.1.0";
 
 /* ------------------------------------------------------------------ *
  * Enums
@@ -128,6 +128,13 @@ export const experienceRelatedMetaSchema = z.object({
 });
 export type ExperienceRelatedMeta = z.infer<typeof experienceRelatedMetaSchema>;
 
+/** v1.1.0 — Acción CTA universal (reutiliza contrato TourismCard). */
+export const experienceRelatedActionSchema = z.object({
+  label: z.string().min(1),
+  href: z.string().nullable().default(null),
+});
+export type ExperienceRelatedAction = z.infer<typeof experienceRelatedActionSchema>;
+
 export const experienceRelatedItemSchema = z.object({
   id: z.string().min(1),
   kind: experienceRelatedEntityKindSchema,
@@ -139,13 +146,47 @@ export const experienceRelatedItemSchema = z.object({
   imageAlt: z.string().nullable().default(null),
   meta: z.array(experienceRelatedMetaSchema).default([]),
   badges: z.array(experienceRelatedBadgeSchema).default([]),
+  /** v1.1.0 — distintivos institucionales oficiales (Pueblo Mágico, etc.). */
+  institutionalBadges: z.array(experienceRelatedBadgeSchema).default([]),
   tags: z.array(z.string().min(1)).default([]),
   priceAmount: z.number().nullable().default(null),
   priceCurrency: z.string().nullable().default(null),
+  /** v1.1.0 — pista de precio ("desde", "por noche", "por persona"). */
+  priceHint: z.string().nullable().default(null),
   /** Fecha ISO (eventos, promociones con vigencia). */
   dateStart: z.string().nullable().default(null),
   /** Fecha ISO (eventos, promociones). */
   dateEnd: z.string().nullable().default(null),
+  /** v1.1.0 — etiqueta legible del rango de fechas (override del formateo). */
+  dateLabel: z.string().nullable().default(null),
+  /** v1.1.0 — disponibilidad ("Reserva hoy", "Últimos lugares", etc.). */
+  availabilityLabel: z.string().nullable().default(null),
+  /** v1.1.0 — rating / social proof (Founder Experience Rule Q2). */
+  rating: z
+    .object({
+      value: z.number().min(0).max(5),
+      count: z.number().min(0).default(0),
+    })
+    .nullable()
+    .default(null),
+  /** v1.1.0 — ubicación explicita con distancia opcional. */
+  location: z
+    .object({
+      label: z.string().min(1),
+      distanceKm: z.number().nullable().default(null),
+    })
+    .nullable()
+    .default(null),
+  /** v1.1.0 — chip territorial (destino / región / Oriente Maya). */
+  territorialContext: z.string().nullable().default(null),
+  /** v1.1.0 — diferenciadores (máx 4, se renderizan hasta 3). */
+  highlights: z.array(z.string().min(1)).max(4).default([]),
+  /** v1.1.0 — nombre de la empresa cuando aplica (producto/hab/tour). */
+  businessName: z.string().nullable().default(null),
+  /** v1.1.0 — CTA principal ("Reservar", "Ver", "Agregar al viaje"). */
+  primaryAction: experienceRelatedActionSchema.nullable().default(null),
+  /** v1.1.0 — CTA secundaria ("Contactar", "Cómo llegar"). */
+  secondaryAction: experienceRelatedActionSchema.nullable().default(null),
   /** Slug del destino asociado (para dedupe y filtros). */
   destinationSlug: z.string().nullable().default(null),
   /** Slug de la categoría asociada (dedupe / filtros). */
@@ -204,6 +245,12 @@ export const experienceRelatedCollectionConfigSchema = z.object({
   items: z.array(experienceRelatedItemSchema).default([]),
   /** Composición multi-grupo (empresas + eventos + productos, etc). */
   groups: z.array(experienceRelatedGroupSchema).default([]),
+  /** v1.1.0 — densidad visual (Founder: no clonar SaaS genérico). */
+  density: z.enum(["comfortable", "compact"]).default("comfortable"),
+  /** v1.1.0 — cómo agrupar internamente cuando la fuente lo permita. */
+  groupBy: z
+    .enum(["none", "destination", "category", "type"])
+    .default("none"),
   capabilities: z
     .object({
       showImage: z.boolean().default(true),
@@ -223,6 +270,22 @@ export const experienceRelatedCollectionConfigSchema = z.object({
       aluxRecommended: z.boolean().default(false),
       /** Reservado — dejar que Alux inyecte grupos adicionales dinámicos. */
       aluxDynamicGroups: z.boolean().default(false),
+      /** v1.1.0 — rating / social proof. */
+      showRating: z.boolean().default(true),
+      /** v1.1.0 — distancia al visitante (si `location.distanceKm`). */
+      showDistance: z.boolean().default(true),
+      /** v1.1.0 — etiqueta de disponibilidad. */
+      showAvailability: z.boolean().default(true),
+      /** v1.1.0 — botón de favorito / plan / acciones interactivas. */
+      showFavorite: z.boolean().default(true),
+      /** v1.1.0 — CTA secundaria de la card. */
+      showSecondaryAction: z.boolean().default(true),
+      /** v1.1.0 — chip territorial (destino / región / Oriente Maya). */
+      showTerritorialContext: z.boolean().default(true),
+      /** v1.1.0 — distintivos institucionales oficiales. */
+      showInstitutionalBadges: z.boolean().default(true),
+      /** v1.1.0 — highlights / diferenciadores. */
+      showHighlights: z.boolean().default(true),
     })
     .partial()
     .default({}),
@@ -244,6 +307,8 @@ export const experienceRelatedCollectionDtoSchema = z.object({
   variant: experienceRelatedVariantSchema,
   entityKind: experienceRelatedEntityKindSchema,
   columns: z.number(),
+  density: z.enum(["comfortable", "compact"]),
+  groupBy: z.enum(["none", "destination", "category", "type"]),
   heading: z.string().nullable(),
   subheading: z.string().nullable(),
   emptyMessage: z.string(),
@@ -275,6 +340,14 @@ export const experienceRelatedCollectionDtoSchema = z.object({
     contextAware: z.boolean(),
     aluxRecommended: z.boolean(),
     aluxDynamicGroups: z.boolean(),
+    showRating: z.boolean(),
+    showDistance: z.boolean(),
+    showAvailability: z.boolean(),
+    showFavorite: z.boolean(),
+    showSecondaryAction: z.boolean(),
+    showTerritorialContext: z.boolean(),
+    showInstitutionalBadges: z.boolean(),
+    showHighlights: z.boolean(),
   }),
   contextRefs: experienceRelatedContextRefsSchema,
 });
