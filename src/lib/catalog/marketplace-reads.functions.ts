@@ -31,6 +31,8 @@ export interface MarketplaceBusinessCard {
   destination_slug: string;
   category_slug: string;
   verified: boolean;
+  /** URL firmada de la portada oficial (business_media role=cover). */
+  cover_url?: string | null;
 }
 
 export interface MarketplaceProductCard {
@@ -50,6 +52,8 @@ export interface MarketplaceProductCard {
   accepts_online_payment: boolean;
   requires_availability: boolean;
   visibility_level: string;
+  /** URL firmada de la portada oficial (product_media role=cover). */
+  cover_url?: string | null;
 }
 
 export interface MarketplacePromotionCard {
