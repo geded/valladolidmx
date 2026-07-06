@@ -1,5 +1,7 @@
 ## V3 · Dynamic Listings Hardening — Founder Discovery Standard
 
+**Estado:** ✅ IMPLEMENTADO (typecheck limpio, 8 rutas migradas; pendiente validación visual del Founder). Ver `docs/blueprint/16.09-U-VISUAL-V3-DYNAMIC-LISTINGS-COMPLETION-REPORT-v1.0.md`. Preview interno omitido: las 8 rutas oficiales son la validación directa.
+
 Unificar los 8 listados de descubrimiento en un mismo sistema visual y de UX, sin tocar rutas, contratos, tipos internos ni backend. Cero regresiones; cero motores paralelos.
 
 ### Founder Discovery Principle (contrato de UX)
