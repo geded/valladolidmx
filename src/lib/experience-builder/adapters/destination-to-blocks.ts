@@ -173,8 +173,14 @@ export function destinationToBadgeItems(
  * ------------------------------------------------------------------ */
 export function destinationToSubnavDTO(d: DestinationBlockInput): ExperienceSubnavDTO {
   const anchors: ExperienceSubnavAnchor[] = [];
+  if (d.galleryUrls.length > 0 || d.heroUrl) {
+    anchors.push({ id: "galeria", label: "Fotos" });
+  }
   if (d.description || d.highlights.length > 0) {
     anchors.push({ id: "resumen", label: "Resumen" });
+  }
+  if (d.mapPoints.length > 0 || (d.latitude != null && d.longitude != null)) {
+    anchors.push({ id: "ubicacion", label: "Ubicación" });
   }
   const c = d.relatedCounts;
   const total =
