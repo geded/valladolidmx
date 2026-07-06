@@ -2329,7 +2329,6 @@ const experienceMapBlock: BlockContract = {
       "destination",
       "business",
       "product",
-      "listing",
     ],
   },
   responsive: {
