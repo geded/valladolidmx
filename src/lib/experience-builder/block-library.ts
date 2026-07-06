@@ -2275,6 +2275,7 @@ const experienceRelatedCollectionBlock: BlockContract = {
 };
 
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
+  // NOTE: `experienceMapBlock` is appended near the end of this array.
   containerBlock,
   sectionBlock,
   spacerBlock,
