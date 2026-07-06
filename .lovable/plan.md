@@ -1,52 +1,66 @@
-# V4 · Founder Discovery Map Principle
+## Diagnóstico del micrositio `/oriente-maya/valladolid`
 
-Objetivo: convertir `vmx.experience.map` en la única familia oficial de mapas y activar el Sistema de Descubrimiento Territorial (mapa + Tourism Card + Context Engine + Navigation Contract + Alux).
+Revisé la ruta (`src/routes/oriente-maya/$destino.index.tsx`), la superficie oficial (`DestinationSurface`) y la documentación vigente (`15.11-NAVIGATION-BLUEPRINT-v1.0`, `15.10.H-03-EPICA-1-I3a-DESTINATION-SURFACE-CLOSURE`, `16.09-U-VISUAL-V1-DESTINATION-PARITY`, `mem://policies/founder-discovery-standard`). El micrositio SÍ está compuesto con la Plantilla Madre oficial (Hero + Badges + Subnav + Section + InfoGrid + RelatedCollection), pero los 4 síntomas que describes son reales y tienen causa distinta:
 
-Alcance grande → ejecución en 4 fases secuenciales, cada una con Completion Report + validación visual antes de continuar. Reutilizo la infraestructura ya existente (`InteractiveMap`, `StaticMap`, `DistanceBadge`, `useVisitorGeolocation`, `maps.functions.ts`, `BusinessLocationBlock`); no se crean motores paralelos.
+### 1. "No aparecen negocios" — es un problema de **datos**, no de código
+El bloque `vmx.experience.related-collection` lee `getDestinationRelated({slug:"valladolid"})`. Hoy devuelve 0 hoteles / 0 restaurantes / 0 experiencias publicados asociados al destino Valladolid, por eso muestra el `emptyMessage`. El código funciona; falta contenido publicado con `destination_slug = valladolid` en Lovable Cloud.
 
----
+### 2. "No veo los mapas" — **V4.2 aún no está ejecutada**
+V4.1 sólo creó el bloque `vmx.experience.map` y su preview. El micrositio de destino todavía **no monta** el bloque. Está en la planificación V4.2 aprobada.
 
-## Fase V4.1 — Bloque oficial `vmx.experience.map` + adaptadores
+### 3. "No hay galería tipo Airbnb" — **capacidad nueva**, no existe
+La `DestinationSurface` no compone hoy un bloque de galería. La biblioteca oficial tiene `experience-gallery` (I1.c, L4) pero nunca se cableó en la Plantilla Madre de destino. Es alcance nuevo.
 
-- `src/lib/experience-builder/blocks/experience-map/contract.ts` — DTO Zod:
-  - `variant`: `single | multi | list-sync | cluster`
-  - `center`, `zoom`, `points[]` (id, lat, lng, kind, title, href, badge, price, thumb)
-  - `capabilities`: `showDistance`, `showDirections`, `clustering`, `syncList`, `staticFallback`
-  - `contract_version: "1.0.0"`, `extensions[]`, `permissions`.
-- `src/components/experience-builder/blocks/experience-map/ExperienceMapBlock.tsx` — orquesta `StaticMap` (SSR/fallback) e `InteractiveMap` (progressive enhancement); toggle "Ver interactivo".
-- Registro en `block-library.ts` + smoke.
-- Adaptadores en `src/lib/experience-builder/adapters/`:
-  - `entityToMapPoint.ts`: `businessToMapPoint`, `productToMapPoint`, `destinationToMapPoint`.
-
-## Fase V4.2 — Ficha Empresa · Ficha Producto · Micrositio Destino
-
-- Ficha Empresa: reemplazar `BusinessLocationBlock` inline por el bloque oficial (variant `single`, `showDistance`, `showDirections`). Sección "Qué hay cerca" (variant `multi`) alimentada por `business-related` en radio ≤ 2km.
-- Ficha Producto: bloque `single` con dirección heredada de la empresa + DistanceBadge + CTA "Cómo llegar".
-- Micrositio Destino: bloque `multi` con clusters por categoría del destino (usa items ya cargados por `destination-to-blocks`).
-
-## Fase V4.3 — Vista Lista + Mapa sincronizada en `TourismListingSurface`
-
-- Habilitar `mapSlot` del V3: `<ExperienceMapBlock variant="list-sync">` sincronizado con grid + facets.
-- Clustering (Supercluster JS puro, sin native deps) por zona/destino.
-- Toggle Lista | Mapa | Split — Split sólo en desktop; Mobile = tabs.
-- Activar por defecto en `/hoteles` y `/restaurantes`; opt-in en el resto vía prop.
-
-## Fase V4.4 — Alux territorial + validación final
-
-- Nueva capability `distance` en `contextual-suggest.functions.ts`: si visitante tiene geo, Alux prepende "a X km · Y min caminando/en auto" en sugerencias.
-- `AluxSuggestionCard` muestra pill con distancia (reusa `formatDistance`).
-- Preview interno `src/routes/lovable/experience-map-preview.tsx` con las 4 variantes.
-- Completion Report V4 + Completion Report U-VISUAL v1 consolidado (V1+V2+V3+V4).
-- Validación visual (mobile + desktop) de las 9 superficies exigidas por el Founder.
+### 4. "Imagen sin puntas redondeadas / poco profesional"
+El Hero de destino usa `variant` estándar del `experience-hero`. Necesita ajuste de contenedor + radios DSL (`rounded-2xl`, `shadow-elevated`) y grid tipo Airbnb (1 imagen grande + 4 chicas above-the-fold).
 
 ---
 
-## Fuera de alcance V4 (queda registrado como Founder Territorial Platform Principle → evolución futura)
+## Propuesta: V4.2 · Destino Airbnb-Style (una entrega, foco Valladolid)
 
-Rutas sugeridas, itinerarios de Arma tu Viaje, recorridos optimizados por Alux, capas temáticas (cenotes, gastronomía, arqueología…), zonas de interés, disponibilidad contextual, información territorial enriquecida. Toda evolución futura sobre `vmx.experience.map`.
+Alcance quirúrgico sobre la **Plantilla Madre `DestinationSurface`** — sin motores paralelos, sin duplicar bloques, respetando Founder Discovery Standard y Compatibilidad Evolutiva.
+
+### A. Galería Airbnb-style above-the-fold (NUEVO en destino)
+- Reusar el bloque oficial `vmx.experience.gallery` (ya existe, L4) con nueva `variant: "airbnb-grid"` (1 hero + 4 tiles + "Ver todas las fotos"). Sin crear bloque nuevo — evolución por variant, conforme H-03.
+- Adaptador `destinationToGalleryDTO` en `destination-to-blocks.ts` leyendo `db.media[]` (o mock/placeholder si vacío).
+- Radios DSL: `rounded-2xl` + `shadow-soft`, gap 8px, esquinas redondeadas siempre visibles.
+- Reemplaza al Hero actual como primer bloque above-the-fold (el Hero pasa a modo compacto para título/tagline/badges).
+
+### B. Mapa territorial (V4.2 del Founder Discovery Map Principle)
+- Montar `ExperienceMapBlock` con `variant: "multi"` en la sección "Ubicación" del micrositio.
+- Adaptador `destinationToMapDTO`: centro = `db.latitude/longitude`, puntos = `related.hoteles + restaurantes + experiencias` que tengan geocode (vía `businessToMapPoint`).
+- Ancla `#ubicacion` añadida al subnav.
+- Fallback vacío elegante si no hay puntos aún.
+
+### C. Datos demo Valladolid (Demo Pack)
+Migración `seed` con contenido demo marcado (`is_demo=true`) para que el micrositio no aparezca vacío:
+- 3 hoteles, 3 restaurantes, 2 experiencias, 1 evento, todos con lat/lng, cover, tagline.
+- Cumple Demo Pack Policy vigente. Retención hasta autorización explícita del Founder.
+
+### D. Polish visual Hero de destino
+- Aplicar radios DSL y sombras `shadow-elevated`.
+- Contenedor con `max-w-7xl` y padding responsive.
+- Alineación tipográfica igual a Airbnb Experiences (título grande, meta chips debajo).
+
+### Fuera de alcance (queda para después)
+- Cluster/`list-sync` del mapa (V4.3).
+- Reviews block, wishlist, calendario en vivo.
+- Galería con lightbox modal completo (esta entrega usa navegación a `/oriente-maya/valladolid/galeria` como stub o a la propia galería expandida).
 
 ---
 
-## Ejecución
+## Detalles técnicos
 
-Propongo empezar **ahora con Fase V4.1** (bloque + adaptadores + preview) y detenerme para validación antes de V4.2. ¿Autorizas arrancar V4.1?
+- **Archivos a crear**: `experience-gallery/variants/airbnb-grid.tsx` (variante interna, mismo bloque), `adapters/destination-to-blocks.ts` (extender con `toGalleryDTO`+`toMapDTO`), 1 migración seed.
+- **Archivos a editar**: `DestinationSurface.tsx` (agregar Gallery arriba, Map en `#ubicacion`), `experience-hero` variant compacto, `subnav` DTO con nuevo ancla.
+- **Sin cambios en contratos** de bloques existentes → Compatibilidad Evolutiva OK.
+- **Typecheck + build + smoke** obligatorios en la entrega.
+- **Completion Report** V4.2 con matriz de reutilización y comparativa antes/después.
+
+---
+
+## Preguntas para el Founder antes de iniciar
+
+1. ¿Autorizas la variante `airbnb-grid` en `vmx.experience.gallery` (evolución, no bloque nuevo)?
+2. ¿Autorizas seed demo de negocios para Valladolid (Demo Pack retenido hasta tu OK)?
+3. ¿Ejecutamos V4.2 como una sola entrega (A+B+C+D) o prefieres separar el mapa (B) del rediseño visual (A+D)?
