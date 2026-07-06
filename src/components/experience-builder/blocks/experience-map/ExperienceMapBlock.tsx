@@ -91,7 +91,7 @@ export function ExperienceMapBlock({ dto, className }: ExperienceMapBlockProps) 
             : "md:grid-cols-[minmax(0,1fr)_320px]",
         )}
       >
-        <div className="space-y-3">
+        <div className="min-w-0 space-y-3">
           {interactive && dto.capabilities.allowInteractiveToggle ? (
             <Suspense
               fallback={
