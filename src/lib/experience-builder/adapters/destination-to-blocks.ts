@@ -330,18 +330,46 @@ export function destinationToGalleryDTO(
  * Reusa el bloque oficial `vmx.experience.map` variante `multi`. Centro
  * = coordenadas del destino; puntos = negocios publicados con geocode.
  * ------------------------------------------------------------------ */
+/**
+ * Centroides oficiales de destinos del Oriente Maya. Fallback cuando el
+ * CMS aún no captura lat/lng en `destinations`. Se consulta por slug.
+ * Amplíese al incorporar nuevos destinos autorizados.
+ */
+const DESTINATION_CENTROIDS: Record<string, { lat: number; lng: number }> = {
+  valladolid: { lat: 20.6896, lng: -88.2019 },
+  izamal: { lat: 20.9319, lng: -89.0179 },
+  espita: { lat: 21.0114, lng: -88.3086 },
+};
+
 export function destinationToMapDTO(
   d: DestinationBlockInput,
 ): ExperienceMapDTO | null {
-  const hasCenter = d.latitude != null && d.longitude != null;
+  const fallback = DESTINATION_CENTROIDS[d.slug.toLowerCase()] ?? null;
+  const lat = d.latitude ?? fallback?.lat ?? null;
+  const lng = d.longitude ?? fallback?.lng ?? null;
+  const hasCenter = lat != null && lng != null;
   if (!hasCenter && d.mapPoints.length === 0) return null;
+  // Sin puntos → variante `single` (evita aside vacío en `multi`).
+  const variant = d.mapPoints.length > 0 ? "multi" : "single";
   return {
-    variant: "multi",
+    variant,
     heading: `Ubicación · ${d.name}`,
-    center: hasCenter
-      ? { lat: d.latitude!, lng: d.longitude!, zoom: 14 }
-      : null,
-    points: d.mapPoints,
+    center: hasCenter ? { lat: lat!, lng: lng!, zoom: 14 } : null,
+    points:
+      d.mapPoints.length > 0
+        ? d.mapPoints
+        : hasCenter
+          ? [
+              {
+                id: `destination:${d.slug}`,
+                kind: "destination",
+                lat: lat!,
+                lng: lng!,
+                title: d.name,
+                subtitle: d.regionName,
+              },
+            ]
+          : [],
     capabilities: {
       showDistance: true,
       showDirections: true,
