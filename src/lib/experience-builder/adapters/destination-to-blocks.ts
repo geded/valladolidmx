@@ -93,19 +93,24 @@ export function toDestinationBlockInput(
  * Hero
  * ------------------------------------------------------------------ */
 export function destinationToHeroDTO(d: DestinationBlockInput): ExperienceHeroDTO {
-  // U-VISUAL · V4.2 — Tourist Hero `immersive` para micrositios de
-  // destino. Airbnb-style: imagen contenida con `rounded-3xl` + overlay,
-  // no full-bleed (evita el edge-to-edge sin esquinas del `cinematic`).
-  // Evolución vía `variant` del contrato oficial (Tourist Hero Policy).
-  // Sin heroUrl → `editorial`.
-  if (d.heroUrl) {
+  // Tourist Hero `gallery` (v1.2.0) — Airbnb-style: carrusel + contador,
+  // acciones back/share/favorito en overlay e info debajo. Evolución vía
+  // `variant` del contrato oficial (Tourist Hero Policy).
+  const slides = [
+    ...(d.heroUrl ? [{ url: d.heroUrl, alt: d.name, focalPoint: "center" }] : []),
+    ...d.galleryUrls
+      .filter((u) => u && u !== d.heroUrl)
+      .map((u, i) => ({ url: u, alt: `${d.name} — foto ${i + 2}`, focalPoint: "center" })),
+  ];
+  if (slides.length > 0) {
     const encoded = encodeURIComponent(d.slug);
     return {
-      variant: "immersive",
+      variant: "gallery",
       eyebrow: `Descubre ${d.regionName}`,
       title: d.name,
       description: d.tagline || null,
-      media: { url: d.heroUrl, alt: d.name, overlay: 0.45 },
+      media: { url: slides[0].url, alt: slides[0].alt, overlay: 0 },
+      mediaSlides: slides,
       badges: [],
       meta: [{ iconKey: "map-pin", label: d.regionName }],
       ctaPrimary: {
