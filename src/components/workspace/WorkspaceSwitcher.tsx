@@ -23,15 +23,18 @@ export function WorkspaceSwitcher({ compact = false }: { compact?: boolean }) {
         <button
           type="button"
           className={cn(
-            "flex min-h-[44px] items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-left text-sm transition",
+            "flex min-h-[44px] w-full min-w-0 items-center gap-2 rounded-xl border border-border bg-surface py-2 text-left text-sm transition",
+            compact ? "justify-center px-0" : "px-3",
             "hover:bg-surface-raised hover:border-border-strong",
           )}
+          title={compact ? (workspace.shortLabel ?? workspace.label) : undefined}
+          aria-label={compact ? (workspace.shortLabel ?? workspace.label) : undefined}
         >
           <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary">
             <Icon className="h-4 w-4" aria-hidden />
           </span>
           {!compact ? (
-            <span className="min-w-0">
+            <span className="min-w-0 flex-1">
               <span className="block truncate font-display text-sm font-semibold leading-tight">
                 {workspace.shortLabel ?? workspace.label}
               </span>
@@ -40,7 +43,9 @@ export function WorkspaceSwitcher({ compact = false }: { compact?: boolean }) {
               </span>
             </span>
           ) : null}
-          <ChevronsUpDown className="ml-auto h-3.5 w-3.5 text-muted-foreground" aria-hidden />
+          {!compact ? (
+            <ChevronsUpDown className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
+          ) : null}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-64">
