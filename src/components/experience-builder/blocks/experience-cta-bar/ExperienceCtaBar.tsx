@@ -19,6 +19,7 @@ import type {
   ExperienceCtaBarAction,
   ExperienceCtaBarDTO,
 } from "@/lib/experience-builder/blocks/experience-cta-bar/contract";
+import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
 
 const ICONS: Record<string, LucideIcon> = {
   calendar: Calendar,
@@ -56,6 +57,15 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, [revealAfterScroll]);
+
+  // Coordinación con Alux flotante: mientras esta barra esté montada
+  // como CTA sticky (variant !== "inline"), Alux se oculta para no
+  // solapar el CTA comercial.
+  useEffect(() => {
+    if (variant === "inline" || actions.length === 0) return;
+    const release = registerStickyCta();
+    return release;
+  }, [variant, actions.length]);
 
   if (actions.length === 0) return null;
 
