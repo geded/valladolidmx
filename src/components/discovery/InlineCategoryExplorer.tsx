@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
+import { toast } from "sonner";
 import {
   inlineExplorerQueryOptions,
   type InlineExplorerItem,
@@ -57,9 +58,12 @@ async function shareItem(item: InlineExplorerItem) {
     }
     if (nav?.clipboard?.writeText) {
       await nav.clipboard.writeText(url);
+      toast.success("Enlace copiado", { description: item.display_name });
+      return;
     }
+    toast.error("No se pudo compartir en este dispositivo");
   } catch {
-    /* usuario canceló o no soportado */
+    /* usuario canceló — sin feedback */
   }
 }
 
