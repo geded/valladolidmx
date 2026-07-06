@@ -38,7 +38,7 @@ import {
   LineChart,
   AlertTriangle,
 } from "lucide-react";
-import { Plus, ExternalLink, Search, LogOut, Home } from "lucide-react";
+import { Plus, ExternalLink, Search, Home } from "lucide-react";
 
 import type { WorkspaceDefinition } from "../types";
 import { registerWorkspace } from "../workspace-registry";
