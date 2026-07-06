@@ -153,6 +153,7 @@ export function DestinationSurface({
   const mapDto = destinationToMapDTO(input);
 
   return (
+    <DestinationSurfaceProvider db={db} related={rel} slug={slug ?? null}>
     <PublicShell
       crumbs={[
         { label: ORIENTE_MAYA.name, to: "/oriente-maya" },
@@ -306,5 +307,6 @@ export function DestinationSurface({
 
       <ExperienceCtaBar dto={ctaBarDto} />
     </PublicShell>
+    </DestinationSurfaceProvider>
   );
 }
