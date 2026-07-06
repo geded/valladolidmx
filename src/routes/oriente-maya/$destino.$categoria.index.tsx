@@ -9,7 +9,7 @@
  *  - No se toca aún UX profunda ni composición de EB — llega en N2.2.
  *  - No se activan redirects 301 (Fase 2 de N2.3, previa validación).
  */
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
@@ -20,7 +20,6 @@ import {
 import {
   buildBreadcrumbs,
   navigationContextToDeclaration,
-  resolveCanonicalPath,
 } from "@/lib/navigation";
 import { ContextEngineProvider } from "@/lib/context-engine";
 import {
@@ -33,6 +32,8 @@ import {
   type CategorySurfaceRelatedValue,
 } from "@/components/surfaces/CategorySurface";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
+import { TourismListingSurface } from "@/components/surfaces/TourismListingSurface";
+import { businessToTourismCard } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
   loader: async ({ params }) => {
@@ -121,49 +122,25 @@ function CategoriaEnDestinoPage() {
   return (
     <ContextEngineProvider declaration={declaration}>
     <CategorySurfaceRelatedProvider value={categoryValue}>
-    <PublicShell
-      eyebrow={destLabel}
-      title={`${catLabel} en ${destLabel}`}
-      description={`Empresas y experiencias de ${catLabel.toLowerCase()} en ${destLabel}, Oriente Maya de Yucatán.`}
-      crumbs={crumbs}
-    >
-      {items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          Aún no publicamos empresas de {catLabel.toLowerCase()} en {destLabel}.
-        </p>
-      ) : (
-        <ul className="grid gap-4 sm:grid-cols-2">
-          {items.map((b: MarketplaceBusinessCard) => (
-            <li
-              key={b.id}
-              className="rounded-lg border border-border bg-card p-4 shadow-sm"
-            >
-              <Link
-                to="/oriente-maya/$destino/$categoria/$empresa"
-                params={{
-                  destino,
-                  categoria,
-                  empresa: b.slug,
-                }}
-                className="text-base font-medium hover:underline"
-              >
-                {b.display_name}
-              </Link>
-              {b.tagline ? (
-                <p className="mt-1 text-sm text-muted-foreground">{b.tagline}</p>
-              ) : null}
-              <p className="mt-2 text-xs text-muted-foreground/80">
-                {resolveCanonicalPath({
-                  kind: "business",
-                  slug: b.slug,
-                  destination: destino,
-                  category: categoria,
-                })}
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
+    <PublicShell crumbs={crumbs}>
+      <TourismListingSurface
+        hero={{
+          eyebrow: destLabel,
+          title: `${catLabel} en ${destLabel}`,
+          subtitle: `Selección editorial de ${catLabel.toLowerCase()} en ${destLabel}, Oriente Maya de Yucatán.`,
+          metaLabel: destLabel,
+        }}
+        items={items.map((b: MarketplaceBusinessCard) =>
+          businessToTourismCard(b, {
+            destinationLabel: destLabel,
+            regionLabel: "Oriente Maya",
+            forcedCategorySlug: categoria,
+          }),
+        )}
+        destinationSlug={destino}
+        destinationLabel={destLabel}
+        emptyMessage={`Aún no publicamos empresas de ${catLabel.toLowerCase()} en ${destLabel}.`}
+      />
       {hasRelated ? (
         <section id="descubre" className="mt-12">
           <ExperienceRelatedCollectionBlock
