@@ -40,6 +40,7 @@ import { Route as OrienteMayaDestinoRouteImport } from './routes/oriente-maya/$d
 import { Route as MarketplaceSplatRouteImport } from './routes/marketplace.$'
 import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/workspace-preview'
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
+import { Route as LovableTourismCardPreviewRouteImport } from './routes/lovable/tourism-card-preview'
 import { Route as LovableProtectedActionsPreviewRouteImport } from './routes/lovable/protected-actions-preview'
 import { Route as LovableExperienceSubnavCtabarPreviewRouteImport } from './routes/lovable/experience-subnav-ctabar-preview'
 import { Route as LovableExperienceReviewsPreviewRouteImport } from './routes/lovable/experience-reviews-preview'
@@ -303,6 +304,12 @@ const LovableWorkspaceFoundationsRoute =
   LovableWorkspaceFoundationsRouteImport.update({
     id: '/lovable/workspace-foundations',
     path: '/lovable/workspace-foundations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableTourismCardPreviewRoute =
+  LovableTourismCardPreviewRouteImport.update({
+    id: '/lovable/tourism-card-preview',
+    path: '/lovable/tourism-card-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableProtectedActionsPreviewRoute =
@@ -982,6 +989,7 @@ export interface FileRoutesByFullPath {
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
+  '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$': typeof MarketplaceSplatRoute
@@ -1118,6 +1126,7 @@ export interface FileRoutesByTo {
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
+  '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$': typeof MarketplaceSplatRoute
@@ -1257,6 +1266,7 @@ export interface FileRoutesById {
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
+  '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
   '/lovable/workspace-preview': typeof LovableWorkspacePreviewRoute
   '/marketplace/$': typeof MarketplaceSplatRoute
@@ -1400,6 +1410,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
     | '/lovable/protected-actions-preview'
+    | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
     | '/marketplace/$'
@@ -1536,6 +1547,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
     | '/lovable/protected-actions-preview'
+    | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
     | '/marketplace/$'
@@ -1674,6 +1686,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
     | '/lovable/protected-actions-preview'
+    | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
     | '/lovable/workspace-preview'
     | '/marketplace/$'
@@ -1808,6 +1821,7 @@ export interface RootRouteChildren {
   LovableExperienceReviewsPreviewRoute: typeof LovableExperienceReviewsPreviewRoute
   LovableExperienceSubnavCtabarPreviewRoute: typeof LovableExperienceSubnavCtabarPreviewRoute
   LovableProtectedActionsPreviewRoute: typeof LovableProtectedActionsPreviewRoute
+  LovableTourismCardPreviewRoute: typeof LovableTourismCardPreviewRoute
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
   LovableWorkspacePreviewRoute: typeof LovableWorkspacePreviewRoute
   OrienteMayaDestinoRoute: typeof OrienteMayaDestinoRouteWithChildren
@@ -2045,6 +2059,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/workspace-foundations'
       fullPath: '/lovable/workspace-foundations'
       preLoaderRoute: typeof LovableWorkspaceFoundationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/tourism-card-preview': {
+      id: '/lovable/tourism-card-preview'
+      path: '/lovable/tourism-card-preview'
+      fullPath: '/lovable/tourism-card-preview'
+      preLoaderRoute: typeof LovableTourismCardPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/protected-actions-preview': {
@@ -3233,6 +3254,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableExperienceSubnavCtabarPreviewRoute:
     LovableExperienceSubnavCtabarPreviewRoute,
   LovableProtectedActionsPreviewRoute: LovableProtectedActionsPreviewRoute,
+  LovableTourismCardPreviewRoute: LovableTourismCardPreviewRoute,
   LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,
   LovableWorkspacePreviewRoute: LovableWorkspacePreviewRoute,
   OrienteMayaDestinoRoute: OrienteMayaDestinoRouteWithChildren,
