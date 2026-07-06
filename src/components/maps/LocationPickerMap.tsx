@@ -12,44 +12,24 @@
 import { useEffect, useRef, useState } from "react";
 
 type LatLng = { lat: number; lng: number };
-interface GMap {
-  new (el: HTMLElement, opts: Record<string, unknown>): {
-    setCenter: (p: LatLng) => void;
-    addListener: (ev: string, cb: (e: { latLng: { lat: () => number; lng: () => number } }) => void) => void;
-  };
-}
-interface GMarker {
-  new (opts: {
-    position: LatLng;
-    map: unknown;
-    draggable?: boolean;
-    title?: string;
-  }): {
-    setPosition: (p: LatLng) => void;
-    addListener: (ev: string, cb: (e: { latLng: { lat: () => number; lng: () => number } }) => void) => void;
-  };
-}
-interface GoogleMapsNamespace {
-  maps: { Map: GMap; Marker: GMarker };
-}
-
-declare global {
-  interface Window {
-    google?: GoogleMapsNamespace;
-    __vmxGmapsCbList?: Array<() => void>;
-    vmxInitGoogleMaps?: () => void;
-  }
-}
+// Nota: la declaración `global { Window }` vive en `InteractiveMap.tsx`.
+// Aquí usamos acceso dinámico para evitar colisión de tipos duplicados.
 
 const SCRIPT_ID = "vmx-google-maps-js";
 
-function loadGoogleMapsScript(apiKey: string): Promise<GoogleMapsNamespace> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function loadGoogleMapsScript(apiKey: string): Promise<any> {
   return new Promise((resolve, reject) => {
     if (typeof window === "undefined") return reject(new Error("SSR"));
-    if (window.google?.maps) return resolve(window.google);
+    const w = window as unknown as {
+      google?: { maps?: unknown };
+      __vmxGmapsCbList?: Array<() => void>;
+      vmxInitGoogleMaps?: () => void;
+    };
+    if (w.google?.maps) return resolve(w.google);
     window.__vmxGmapsCbList = window.__vmxGmapsCbList ?? [];
     window.__vmxGmapsCbList.push(() => {
-      if (window.google?.maps) resolve(window.google);
+      if (w.google?.maps) resolve(w.google);
       else reject(new Error("Maps JS failed to load"));
     });
     window.vmxInitGoogleMaps = () => {
@@ -86,8 +66,10 @@ export function LocationPickerMap({
   className,
 }: LocationPickerMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<ReturnType<InstanceType<GMap>["addListener"]> extends never ? never : InstanceType<GMap> | null>(null);
-  const markerRef = useRef<InstanceType<GMarker> | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const markerRef = useRef<any>(null);
   const onChangeRef = useRef(onChange);
   const [error, setError] = useState<string | null>(null);
 
@@ -121,16 +103,16 @@ export function LocationPickerMap({
           draggable: true,
           title: "Arrastra o toca el mapa para ubicar",
         });
-        marker.addListener("dragend", (e) => {
+        marker.addListener("dragend", (e: { latLng: { lat: () => number; lng: () => number } }) => {
           const p = { lat: e.latLng.lat(), lng: e.latLng.lng() };
           onChangeRef.current(p);
         });
-        map.addListener("click", (e) => {
+        map.addListener("click", (e: { latLng: { lat: () => number; lng: () => number } }) => {
           const p = { lat: e.latLng.lat(), lng: e.latLng.lng() };
           marker.setPosition(p);
           onChangeRef.current(p);
         });
-        mapRef.current = map as unknown as InstanceType<GMap>;
+        mapRef.current = map;
         markerRef.current = marker;
       })
       .catch((e) => setError(e instanceof Error ? e.message : "Mapa no disponible"));
