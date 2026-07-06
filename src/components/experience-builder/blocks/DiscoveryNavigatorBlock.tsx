@@ -5,9 +5,10 @@
  * consulta `getDiscoveryNavigator` vía TanStack Query y delega el
  * render al componente presentacional `DiscoveryNavigator`.
  */
-import { useParams } from "@tanstack/react-router";
+import { useParams, useNavigate, useSearch } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { DiscoveryNavigator } from "@/components/discovery/DiscoveryNavigator";
+import { InlineCategoryExplorer } from "@/components/discovery/InlineCategoryExplorer";
 import {
   discoveryNavigatorQueryOptions,
   type DiscoveryNavigatorDTO,
@@ -24,6 +25,14 @@ export interface DiscoveryNavigatorBlockConfig {
   scope?: "auto" | "destination" | "region";
   manualDestinationSlug?: string;
   manualRegionSlug?: string;
+  /**
+   * `navigate` (default): los chips llevan a rutas globales.
+   * `inline`: los chips abren un explorador embebido debajo del bloque,
+   * sin sacar al visitante del micrositio.
+   */
+  mode?: "navigate" | "inline";
+  /** Tarjetas por página en el explorador embebido. */
+  pageSize?: number;
 }
 
 export function DiscoveryNavigatorBlock({
@@ -59,16 +68,60 @@ export function DiscoveryNavigatorBlock({
     ? `/oriente-maya/${destinationSlug}`
     : "/oriente-maya";
 
+  const mode = config.mode ?? "navigate";
+  const isInline = mode === "inline" && Boolean(destinationSlug);
+
+  const navigate = useNavigate();
+  const search = useSearch({ strict: false }) as { explora?: string };
+  const activeCategory = isInline ? (search?.explora ?? null) : null;
+
+  const setActive = (slug: string | null) => {
+    navigate({
+      to: ".",
+      search: (prev) => ({ ...(prev as Record<string, unknown>), explora: slug ?? undefined }),
+      replace: true,
+    });
+    if (slug && typeof document !== "undefined") {
+      requestAnimationFrame(() => {
+        document
+          .querySelector("[data-inline-explorer]")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  };
+
+  const activeCategoryItem =
+    activeCategory != null
+      ? categories.find((c) => c.slug === activeCategory) ?? null
+      : null;
+
   return (
-    <DiscoveryNavigator
-      title={config.title ?? defaultTitle}
-      variant={config.variant ?? "panel"}
-      showCounts={config.showCounts ?? true}
-      categories={categories}
-      ctaLabel={config.ctaLabel ?? defaultCtaLabel}
-      ctaHref={config.ctaHref ?? defaultCtaHref}
-      emptyLabel={config.emptyLabel ?? "Aún no hay categorías publicadas."}
-    />
+    <div className="space-y-4">
+      <DiscoveryNavigator
+        title={config.title ?? defaultTitle}
+        variant={config.variant ?? "panel"}
+        showCounts={config.showCounts ?? true}
+        categories={categories}
+        ctaLabel={isInline ? "" : (config.ctaLabel ?? defaultCtaLabel)}
+        ctaHref={isInline ? "" : (config.ctaHref ?? defaultCtaHref)}
+        emptyLabel={config.emptyLabel ?? "Aún no hay categorías publicadas."}
+        mode={mode}
+        activeCategory={activeCategory}
+        onSelect={(slug) =>
+          setActive(activeCategory === slug ? null : slug)
+        }
+      />
+      {isInline && activeCategory && destinationSlug ? (
+        <InlineCategoryExplorer
+          destinationSlug={destinationSlug}
+          destinationName={scopeLabel}
+          categorySlug={activeCategory}
+          categoryLabel={activeCategoryItem?.label ?? activeCategory}
+          pageSize={config.pageSize ?? 8}
+          onClose={() => setActive(null)}
+        />
+      ) : null}
+    </div>
   );
 }
 
