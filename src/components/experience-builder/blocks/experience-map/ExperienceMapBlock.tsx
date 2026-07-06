@@ -157,42 +157,46 @@ export function ExperienceMapBlock({ dto, className }: ExperienceMapBlockProps) 
               const label = labelOf(i);
               return (
                 <li key={p.id}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveId(p.id)}
-                    aria-pressed={isActive}
+                  <div
                     className={cn(
-                      "block w-full rounded-2xl border bg-card p-4 text-left transition",
+                      "rounded-2xl border bg-card p-4 transition",
                       isActive
                         ? "border-primary shadow-elevated"
                         : "border-border hover:border-primary/50",
                     )}
                   >
-                    <div className="flex items-start gap-3">
-                      {isMulti ? (
-                        <span
-                          aria-hidden
-                          className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground"
-                        >
-                          {label}
-                        </span>
-                      ) : null}
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-foreground">
-                          {p.title}
-                        </p>
-                        {p.subtitle ? (
-                          <p className="mt-0.5 text-xs text-muted-foreground">
-                            {p.subtitle}
-                          </p>
+                    <button
+                      type="button"
+                      onClick={() => setActiveId(p.id)}
+                      aria-pressed={isActive}
+                      className="block w-full text-left"
+                    >
+                      <div className="flex items-start gap-3">
+                        {isMulti ? (
+                          <span
+                            aria-hidden
+                            className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground"
+                          >
+                            {label}
+                          </span>
                         ) : null}
-                        {p.priceLabel ? (
-                          <p className="mt-1 text-xs font-medium text-primary">
-                            {p.priceLabel}
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-foreground">
+                            {p.title}
                           </p>
-                        ) : null}
+                          {p.subtitle ? (
+                            <p className="mt-0.5 text-xs text-muted-foreground">
+                              {p.subtitle}
+                            </p>
+                          ) : null}
+                          {p.priceLabel ? (
+                            <p className="mt-1 text-xs font-medium text-primary">
+                              {p.priceLabel}
+                            </p>
+                          ) : null}
+                        </div>
                       </div>
-                    </div>
+                    </button>
 
                     {dto.capabilities.showDistance ? (
                       <div className="mt-3">
@@ -208,7 +212,6 @@ export function ExperienceMapBlock({ dto, className }: ExperienceMapBlockProps) 
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label={`Cómo llegar a ${p.title}`}
-                            onClick={(e) => e.stopPropagation()}
                           >
                             <Navigation className="mr-2 h-4 w-4" aria-hidden />
                             Cómo llegar
@@ -222,16 +225,11 @@ export function ExperienceMapBlock({ dto, className }: ExperienceMapBlockProps) 
                           variant="outline"
                           className="w-full"
                         >
-                          <a
-                            href={p.href}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            Ver detalles
-                          </a>
+                          <a href={p.href}>Ver detalles</a>
                         </Button>
                       ) : null}
                     </div>
-                  </button>
+                  </div>
                 </li>
               );
             })}
