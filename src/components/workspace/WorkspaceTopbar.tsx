@@ -165,17 +165,17 @@ export function WorkspaceTopbar({ title }: { title?: string }) {
       <button
         type="button"
         onClick={() => setPaletteOpen(true)}
-        className="hidden items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-xs text-muted-foreground hover:bg-surface-raised md:inline-flex"
+        className="hidden min-w-0 max-w-[220px] items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-xs text-muted-foreground hover:bg-surface-raised lg:inline-flex xl:max-w-[280px]"
       >
         <Command className="h-3.5 w-3.5" aria-hidden />
-        <span>Buscar o ejecutar…</span>
+        <span className="truncate">Buscar o ejecutar…</span>
         <kbd className="rounded bg-muted px-1 py-0.5 text-[10px]">⌘K</kbd>
       </button>
       <button
         type="button"
         onClick={() => setPaletteOpen(true)}
         aria-label="Abrir Command Palette"
-        className="grid size-10 place-items-center rounded-full text-muted-foreground hover:bg-muted md:hidden"
+        className="grid size-10 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted lg:hidden"
       >
         <Command className="h-4 w-4" aria-hidden />
       </button>
@@ -186,7 +186,7 @@ export function WorkspaceTopbar({ title }: { title?: string }) {
         aria-pressed={inspectorOpen}
         aria-label="Alternar Copiloto"
         className={cn(
-          "grid size-10 place-items-center rounded-full transition",
+          "grid size-10 shrink-0 place-items-center rounded-full transition",
           inspectorOpen
             ? "bg-primary/15 text-primary"
             : "text-muted-foreground hover:bg-muted",
@@ -198,11 +198,11 @@ export function WorkspaceTopbar({ title }: { title?: string }) {
         type="button"
         onClick={() => setInspector(inspectorOpen ? "closed" : "docked")}
         aria-label="Alternar inspector"
-        className="hidden size-10 place-items-center rounded-full text-muted-foreground hover:bg-muted md:grid"
+        className="hidden size-10 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted lg:grid"
       >
         <PanelRight className="h-4 w-4" aria-hidden />
       </button>
-      <div className="ml-1">
+      <div className="ml-1 shrink-0">
         <UserMenu />
       </div>
     </header>

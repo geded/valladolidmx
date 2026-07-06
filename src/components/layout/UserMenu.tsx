@@ -120,7 +120,7 @@ export function UserMenu() {
           aria-expanded={open}
         >
           <UserRound className="size-4" aria-hidden />
-          <span className="hidden max-w-[120px] truncate sm:inline">
+          <span className="hidden max-w-[140px] truncate lg:inline">
             {authUser.display_name ?? authUser.email}
           </span>
           <ChevronDown className="size-3 opacity-60" aria-hidden />
