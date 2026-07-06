@@ -95,12 +95,12 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
         </ul>
       ) : (
         // mosaic
-        <div className="grid grid-cols-2 gap-2 overflow-hidden rounded-3xl sm:grid-cols-4 sm:grid-rows-2 sm:h-[420px] md:h-[520px]">
+        <div className="grid grid-cols-2 gap-2 overflow-hidden rounded-3xl auto-rows-[45vw] sm:auto-rows-auto sm:grid-cols-4 sm:grid-rows-2 sm:h-[420px] md:h-[520px]">
           {visible.map((it, i) => (
             <div
               key={i}
               className={cn(
-                "relative",
+                "relative min-w-0",
                 i === 0 && "sm:col-span-2 sm:row-span-2",
               )}
             >

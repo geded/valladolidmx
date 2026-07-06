@@ -199,7 +199,7 @@ export function DestinationSurface({
       <ExperienceSubnav dto={subnavDto} className="mt-6 mb-6" />
 
       <div className="grid gap-8 lg:grid-cols-3">
-        <aside className="order-first space-y-4 lg:order-last lg:col-start-3 lg:row-start-1">
+        <aside className="order-first min-w-0 space-y-4 lg:order-last lg:col-start-3 lg:row-start-1">
           <DiscoveryNavigatorBlock
             config={{
               title: `Explora ${input.name}`,
@@ -210,7 +210,7 @@ export function DestinationSurface({
             }}
           />
         </aside>
-        <div className="lg:col-span-2 space-y-10 lg:col-start-1 lg:row-start-1">
+        <div className="min-w-0 space-y-10 lg:col-span-2 lg:col-start-1 lg:row-start-1">
           {descriptionSection || highlightsInfoGrid ? (
             <section id="resumen" data-eb-anchor className="scroll-mt-24">
               {descriptionSection ? <ExperienceSection dto={descriptionSection} /> : null}
