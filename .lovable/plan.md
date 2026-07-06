@@ -1,66 +1,66 @@
-## Diagnóstico del micrositio `/oriente-maya/valladolid`
 
-Revisé la ruta (`src/routes/oriente-maya/$destino.index.tsx`), la superficie oficial (`DestinationSurface`) y la documentación vigente (`15.11-NAVIGATION-BLUEPRINT-v1.0`, `15.10.H-03-EPICA-1-I3a-DESTINATION-SURFACE-CLOSURE`, `16.09-U-VISUAL-V1-DESTINATION-PARITY`, `mem://policies/founder-discovery-standard`). El micrositio SÍ está compuesto con la Plantilla Madre oficial (Hero + Badges + Subnav + Section + InfoGrid + RelatedCollection), pero los 4 síntomas que describes son reales y tienen causa distinta:
+# Explorador de categorías dentro del micrositio de destino
 
-### 1. "No aparecen negocios" — es un problema de **datos**, no de código
-El bloque `vmx.experience.related-collection` lee `getDestinationRelated({slug:"valladolid"})`. Hoy devuelve 0 hoteles / 0 restaurantes / 0 experiencias publicados asociados al destino Valladolid, por eso muestra el `emptyMessage`. El código funciona; falta contenido publicado con `destination_slug = valladolid` en Lovable Cloud.
+## Objetivo (Founder Experience)
+Cuando el visitante está en `/oriente-maya/valladolid` y toca un chip del explorador (Hoteles, Restaurantes, Experiencias, etc.), NO debe salir del micrositio ni ver una avalancha de 100 tarjetas. Debe ver, **debajo del explorador**, un panel controlado que responde: "¿qué tipo?", "¿qué tan lejos?", "¿cuál elijo primero?".
 
-### 2. "No veo los mapas" — **V4.2 aún no está ejecutada**
-V4.1 sólo creó el bloque `vmx.experience.map` y su preview. El micrositio de destino todavía **no monta** el bloque. Está en la planificación V4.2 aprobada.
+## Reglas que se respetan (sin excepción)
+- **DSL Colonial bloqueado**: sin nuevos tokens, tipografías ni colores.
+- **Compatibility Evolution**: se reutiliza `TourismListingSurface`, `TourismCard`, facets, `useVisitorGeolocation` y `DistanceBadge` existentes. Cero componentes nuevos de listado.
+- **Single Studio**: la configuración del panel (categorías visibles, orden, límite por página) se administra desde `DiscoveryNavigatorBlock` en el Experience Builder — no se hardcodea.
+- **Founder Discovery Standard**: mismo patrón de listado que ya usan `/hoteles`, `/restaurantes`, etc.
+- **Alux-ready**: el chip activo actualiza `contextRefs` (destino + categoría) para que Alux sepa qué está mirando el viajero.
+- **Cero triplicación**: se elimina el listado paralelo del mapa y las tarjetas duplicadas de "Sigue descubriendo" cuando el explorador está activo.
 
-### 3. "No hay galería tipo Airbnb" — **capacidad nueva**, no existe
-La `DestinationSurface` no compone hoy un bloque de galería. La biblioteca oficial tiene `experience-gallery` (I1.c, L4) pero nunca se cableó en la Plantilla Madre de destino. Es alcance nuevo.
+## Comportamiento (UX)
 
-### 4. "Imagen sin puntas redondeadas / poco profesional"
-El Hero de destino usa `variant` estándar del `experience-hero`. Necesita ajuste de contenedor + radios DSL (`rounded-2xl`, `shadow-elevated`) y grid tipo Airbnb (1 imagen grande + 4 chicas above-the-fold).
+1. **Chips del explorador** (Hoteles, Restaurantes, Casas, Experiencias, Qué hacer…): quedan como están arriba, pero al tocarse **NO navegan**. Solo actualizan un search param `?explora=hoteles` y hacen scroll suave al panel.
+2. **Panel "Explorando: Hoteles en Valladolid"** debajo del explorador:
+   - Sub-filtros contextuales (facets del surface): tipo de hotel (boutique, colonial, hostal, hacienda), rango de precio, servicios.
+   - Orden por defecto: **más cercanos primero** cuando hay geolocalización; si no, "recomendados".
+   - Tarjetas compactas (variant `compact` de `TourismCard`): foto pequeña, nombre, 1 línea de descripción, `DistanceBadge` ("a 1.2 km · 4 min a pie"), CTA discreto.
+   - **Paginación real**: 8 por página en móvil, 12 en desktop, con "Cargar más" + navegación `?explora=hoteles&page=2`.
+   - Estado vacío colonial: "Aún no hay hoteles registrados en Valladolid".
+3. **Cuando hay categoría activa**: se ocultan los bloques `related-collection` que repiten esa misma categoría más abajo (evita triplicación).
+4. **Cerrar categoría**: chip "✕ Ver todo el destino" restaura la vista narrativa completa.
 
----
+## Cambios técnicos (mínimos)
 
-## Propuesta: V4.2 · Destino Airbnb-Style (una entrega, foco Valladolid)
+### 1. `DiscoveryNavigator` (presentacional)
+- Los chips reciben `onSelect(categorySlug)` en lugar de `href` cuando `mode="inline"`.
+- Prop nueva `activeCategory` para marcar chip seleccionado (variant visual ya existente).
 
-Alcance quirúrgico sobre la **Plantilla Madre `DestinationSurface`** — sin motores paralelos, sin duplicar bloques, respetando Founder Discovery Standard y Compatibilidad Evolutiva.
+### 2. `DiscoveryNavigatorBlock` (EB wrapper)
+- Nuevo `config.mode`: `"navigate"` (actual, default) | `"inline"` (nuevo).
+- En `inline`: lee/escribe `?explora` con `useNavigate` + `useSearch`, y renderiza debajo `<InlineCategoryPanel />`.
 
-### A. Galería Airbnb-style above-the-fold (NUEVO en destino)
-- Reusar el bloque oficial `vmx.experience.gallery` (ya existe, L4) con nueva `variant: "airbnb-grid"` (1 hero + 4 tiles + "Ver todas las fotos"). Sin crear bloque nuevo — evolución por variant, conforme H-03.
-- Adaptador `destinationToGalleryDTO` en `destination-to-blocks.ts` leyendo `db.media[]` (o mock/placeholder si vacío).
-- Radios DSL: `rounded-2xl` + `shadow-soft`, gap 8px, esquinas redondeadas siempre visibles.
-- Reemplaza al Hero actual como primer bloque above-the-fold (el Hero pasa a modo compacto para título/tagline/badges).
+### 3. `InlineCategoryPanel` (nuevo, presentacional, ~120 líneas)
+- Reutiliza `TourismListingSurface` en modo embebido (sin Hero, sin breadcrumbs, sin badges).
+- Recibe `destinationSlug` + `categorySlug` + `page`.
+- Usa `useVisitorGeolocation` + orden por distancia si disponible.
+- Paginación via search param `?page`.
 
-### B. Mapa territorial (V4.2 del Founder Discovery Map Principle)
-- Montar `ExperienceMapBlock` con `variant: "multi"` en la sección "Ubicación" del micrositio.
-- Adaptador `destinationToMapDTO`: centro = `db.latitude/longitude`, puntos = `related.hoteles + restaurantes + experiencias` que tengan geocode (vía `businessToMapPoint`).
-- Ancla `#ubicacion` añadida al subnav.
-- Fallback vacío elegante si no hay puntos aún.
+### 4. Server fn `listTourismItemsByCategory`
+- Ya existe base en `src/lib/catalog/category-related.functions.ts`. Se añade parámetro `page`, `pageSize`, `sortByDistance` (lat/lon opcional del visitante para calcular distancia server-side vía PostGIS `ST_Distance`).
+- Devuelve `{ items: TourismCardVM[], totalCount, page, pageSize }`.
 
-### C. Datos demo Valladolid (Demo Pack)
-Migración `seed` con contenido demo marcado (`is_demo=true`) para que el micrositio no aparezca vacío:
-- 3 hoteles, 3 restaurantes, 2 experiencias, 1 evento, todos con lat/lng, cover, tagline.
-- Cumple Demo Pack Policy vigente. Retención hasta autorización explícita del Founder.
+### 5. `DestinationSurface`
+- Cuando `?explora` está presente, colapsa los `related-collection` de esa misma categoría (regla anti-triplicación).
 
-### D. Polish visual Hero de destino
-- Aplicar radios DSL y sombras `shadow-elevated`.
-- Contenedor con `max-w-7xl` y padding responsive.
-- Alineación tipográfica igual a Airbnb Experiences (título grande, meta chips debajo).
+### 6. Persistencia en EB
+- El bloque `DiscoveryNavigatorBlock` gana campos editables en el Studio: `mode`, `pageSize`, `defaultSort`.
 
-### Fuera de alcance (queda para después)
-- Cluster/`list-sync` del mapa (V4.3).
-- Reviews block, wishlist, calendario en vivo.
-- Galería con lightbox modal completo (esta entrega usa navegación a `/oriente-maya/valladolid/galeria` como stub o a la propia galería expandida).
+## No cambios
+- No se toca DSL, tokens, tipografía.
+- No se crean nuevas tarjetas ni nuevos Hero.
+- No se toca la navegación del header ni las rutas `/hoteles`, `/restaurantes` (siguen funcionando como acceso global).
+- No se toca `BusinessLocationPanel` ni la regla de geolocalización obligatoria.
 
----
+## Alcance de esta entrega
+Sub-ola única, una PR. Solo `DestinationSurface` + `DiscoveryNavigator(Block)` + nuevo `InlineCategoryPanel` + extensión del server fn de listado por categoría.
 
-## Detalles técnicos
-
-- **Archivos a crear**: `experience-gallery/variants/airbnb-grid.tsx` (variante interna, mismo bloque), `adapters/destination-to-blocks.ts` (extender con `toGalleryDTO`+`toMapDTO`), 1 migración seed.
-- **Archivos a editar**: `DestinationSurface.tsx` (agregar Gallery arriba, Map en `#ubicacion`), `experience-hero` variant compacto, `subnav` DTO con nuevo ancla.
-- **Sin cambios en contratos** de bloques existentes → Compatibilidad Evolutiva OK.
-- **Typecheck + build + smoke** obligatorios en la entrega.
-- **Completion Report** V4.2 con matriz de reutilización y comparativa antes/después.
-
----
-
-## Preguntas para el Founder antes de iniciar
-
-1. ¿Autorizas la variante `airbnb-grid` en `vmx.experience.gallery` (evolución, no bloque nuevo)?
-2. ¿Autorizas seed demo de negocios para Valladolid (Demo Pack retenido hasta tu OK)?
-3. ¿Ejecutamos V4.2 como una sola entrega (A+B+C+D) o prefieres separar el mapa (B) del rediseño visual (A+D)?
+## Preguntas al Founder antes de implementar
+1. ¿Confirmas **8 tarjetas por página en móvil / 12 en desktop** como default (editable en el Studio)?
+2. ¿Orden por defecto: **distancia si hay GPS, "recomendados" si no**? ¿O prefieres "recomendados" siempre y distancia como opción manual?
+3. ¿Confirmo que al activar una categoría se **colapsen los bloques `related-collection` duplicados** más abajo, para eliminar la triplicación?
+4. ¿Alcance limitado a `DestinationSurface` en esta entrega (Regiones y otras superficies vienen después)?

@@ -22,7 +22,7 @@
  * `groups[]` heterogéneos (business/event/product).
  */
 import { createContext, useContext } from "react";
-import { useParams } from "@tanstack/react-router";
+import { useParams, useSearch } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
@@ -104,6 +104,8 @@ export function DestinationSurface({
   galleryUrls,
 }: DestinationSurfaceProps = {}) {
   const params = useParams({ strict: false }) as { destino?: string };
+  const routeSearch = useSearch({ strict: false }) as { explora?: string };
+  const activeExplora = routeSearch?.explora ?? null;
   const ctx = useContext(DestinationSurfaceContext);
   const slug = destinationSlug ?? params.destino ?? ctx?.slug ?? undefined;
   const db = dbData ?? ctx?.db ?? null;
@@ -198,20 +200,8 @@ export function DestinationSurface({
 
       <ExperienceSubnav dto={subnavDto} className="mt-6 mb-6" />
 
-      <div className="grid gap-8 lg:grid-cols-3">
-        <aside className="order-first min-w-0 space-y-4 lg:order-last lg:col-start-3 lg:row-start-1">
-          <DiscoveryNavigatorBlock
-            config={{
-              title: `Explora ${input.name}`,
-              scope: "destination",
-              manualDestinationSlug: slug ?? undefined,
-              ctaLabel: "",
-              ctaHref: "",
-            }}
-          />
-        </aside>
-        <div className="min-w-0 space-y-10 lg:col-span-2 lg:col-start-1 lg:row-start-1">
-          {descriptionSection || highlightsInfoGrid ? (
+      <div className="space-y-10">
+        {descriptionSection || highlightsInfoGrid ? (
             <section id="resumen" data-eb-anchor className="scroll-mt-24">
               {descriptionSection ? <ExperienceSection dto={descriptionSection} /> : null}
               {highlightsInfoGrid ? (
@@ -220,13 +210,25 @@ export function DestinationSurface({
             </section>
           ) : null}
 
-          {mapDto ? (
+        <section id="explora" data-eb-anchor className="scroll-mt-24">
+          <DiscoveryNavigatorBlock
+            config={{
+              title: `Explora ${input.name}`,
+              scope: "destination",
+              manualDestinationSlug: slug ?? undefined,
+              mode: "inline",
+              variant: "grid",
+            }}
+          />
+        </section>
+
+        {mapDto ? (
             <section id="ubicacion" data-eb-anchor className="scroll-mt-24">
               <ExperienceMapBlock dto={mapDto} />
             </section>
           ) : null}
 
-          {rel ? (
+        {rel && !activeExplora ? (
             <section id="descubre" data-eb-anchor className="scroll-mt-24">
               <ExperienceRelatedCollectionBlock
                 config={{
@@ -303,7 +305,6 @@ export function DestinationSurface({
               />
             </section>
           ) : null}
-        </div>
       </div>
 
       <ExperienceCtaBar dto={ctaBarDto} />
