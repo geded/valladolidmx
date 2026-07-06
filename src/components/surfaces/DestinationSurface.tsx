@@ -204,6 +204,12 @@ export function DestinationSurface({
             </section>
           ) : null}
 
+          {mapDto ? (
+            <section id="ubicacion" data-eb-anchor className="scroll-mt-24">
+              <ExperienceMapBlock dto={mapDto} />
+            </section>
+          ) : null}
+
           {rel ? (
             <section id="descubre" data-eb-anchor className="scroll-mt-24">
               <ExperienceRelatedCollectionBlock
