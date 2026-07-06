@@ -93,21 +93,19 @@ export function toDestinationBlockInput(
  * Hero
  * ------------------------------------------------------------------ */
 export function destinationToHeroDTO(d: DestinationBlockInput): ExperienceHeroDTO {
-  // U-VISUAL · V1 — Tourist Hero cinematic para micrositios de destino.
-  // Evolución vía `variant` + `capabilities` del contrato oficial
-  // (Tourist Hero Policy). Compatibilidad: sin heroUrl caemos a
-  // `editorial` como antes.
+  // U-VISUAL · V4.2 — Tourist Hero `immersive` para micrositios de
+  // destino. Airbnb-style: imagen contenida con `rounded-3xl` + overlay,
+  // no full-bleed (evita el edge-to-edge sin esquinas del `cinematic`).
+  // Evolución vía `variant` del contrato oficial (Tourist Hero Policy).
+  // Sin heroUrl → `editorial`.
   if (d.heroUrl) {
     const encoded = encodeURIComponent(d.slug);
     return {
-      variant: "cinematic",
+      variant: "immersive",
       eyebrow: `Descubre ${d.regionName}`,
-      eyebrowStyle: "script",
       title: d.name,
       description: d.tagline || null,
       media: { url: d.heroUrl, alt: d.name, overlay: 0.45 },
-      mediaSlides: [{ url: d.heroUrl, alt: d.name }],
-      overlapHeader: true,
       badges: [],
       meta: [{ iconKey: "map-pin", label: d.regionName }],
       ctaPrimary: {
@@ -119,7 +117,7 @@ export function destinationToHeroDTO(d: DestinationBlockInput): ExperienceHeroDT
       ctaSecondary: {
         label: "Ver en el mapa",
         action: "navigate",
-        href: `/oriente-maya/${encoded}#mapa`,
+        href: `/oriente-maya/${encoded}#ubicacion`,
         emphasis: "secondary",
       },
     };
