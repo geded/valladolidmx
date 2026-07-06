@@ -21,7 +21,7 @@ import {
   type ProfileMode,
 } from "@/lib/profile-mode/mode.functions";
 
-type MenuLink = { to: "/admin" | "/cms" | "/portal" | "/concierge" | "/mi-viaje" | "/cuenta"; label: string; icon: typeof UserRound };
+type MenuLink = { to: "/admin" | "/cms" | "/portal" | "/portal/ficha" | "/concierge" | "/mi-viaje" | "/cuenta"; label: string; icon: typeof UserRound };
 
 // Los enlaces del menú se derivan del MODO ACTIVO (Airbnb-style), no
 // solo del rol. En modo Empresa/Concierge/Staff no debe aparecer "Mi
@@ -51,7 +51,19 @@ function buildMenuLinks(role: AppRole | null, mode: ProfileMode): MenuLink[] {
     links.push({ to: "/mi-viaje", label: "Mi viaje", icon: Compass });
   }
 
-  links.push({ to: "/cuenta", label: "Mi cuenta", icon: UserRound });
+  // "Mi cuenta" es sensible al MODO ACTIVO: cada perfil tiene su propia
+  // superficie de cuenta. Antes apuntaba siempre a /cuenta (viajero),
+  // por lo que un usuario en modo Empresa veía datos del viajero.
+  if (mode === "business") {
+    links.push({ to: "/portal/ficha", label: "Mi empresa", icon: UserRound });
+  } else if (mode === "concierge") {
+    links.push({ to: "/concierge", label: "Mi panel", icon: UserRound });
+  } else if (mode === "staff") {
+    // Staff no tiene ficha de cuenta separada; su "cuenta" es su panel.
+    // Se omite el enlace duplicado (ya está el panel arriba).
+  } else {
+    links.push({ to: "/cuenta", label: "Mi cuenta", icon: UserRound });
+  }
   return links;
 }
 
