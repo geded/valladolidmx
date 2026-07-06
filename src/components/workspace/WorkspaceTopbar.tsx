@@ -95,12 +95,10 @@ export function WorkspaceTopbar({ title }: { title?: string }) {
 
   const canGoBack = Boolean(parentTo);
   const handleBack = () => {
-    // Preferir historial del navegador si aplica; fallback a parentTo.
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.history.back();
-      return;
-    }
-    if (parentTo) router.navigate({ to: parentTo });
+    // Siempre navegar al padre lógico del workspace. Usar history.back()
+    // puede sacar al usuario del workspace (p.ej. al sitio público de
+    // donde entró), lo cual rompe la sensación de estar dentro de un panel.
+    if (parentTo) void router.navigate({ to: parentTo });
   };
 
   return (
