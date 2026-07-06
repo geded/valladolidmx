@@ -202,12 +202,6 @@ export function buildExperienceHeroPreviewDTO(): ExperienceHeroDTO {
       alt: "Hacienda colonial iluminada al atardecer",
       overlay: 0.5,
     },
-    mediaSlides: [],
-    slideIntervalMs: 7000,
-    alignment: "left",
-    eyebrowStyle: "eyebrow",
-    overlapHeader: false,
-    autoplaySlides: true,
     badges: [
       { label: "Verificado", tone: "primary", iconKey: "badge-check" },
       { label: "4.9 · 128 reseñas", tone: "neutral", iconKey: "star" },
