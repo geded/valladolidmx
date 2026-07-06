@@ -39,6 +39,7 @@ import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experie
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
+import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
 import type { ExperienceMapPoint } from "@/lib/experience-builder/blocks/experience-map/contract";
 import {
   toDestinationBlockInput,
@@ -49,6 +50,7 @@ import {
   destinationToCtaBarDTO,
   destinationToBadgeItems,
   destinationToMapDTO,
+  destinationToGalleryDTO,
 } from "@/lib/experience-builder/adapters/destination-to-blocks";
 
 /* ------------------------------------------------------------------ *
@@ -141,7 +143,14 @@ export function DestinationSurface({
     mapPoints: mapPoints ?? [],
   });
 
-  const heroDto = destinationToHeroDTO(input);
+  const galleryDto = destinationToGalleryDTO(input);
+  const heroDtoRaw = destinationToHeroDTO(input);
+  // Airbnb-style: cuando hay mosaico como cabecera visual, el Hero
+  // se degrada a `editorial` (título + tagline + CTAs debajo) para no
+  // duplicar la imagen dominante.
+  const heroDto = galleryDto
+    ? { ...heroDtoRaw, variant: "editorial" as const, media: null }
+    : heroDtoRaw;
   const subnavDto = destinationToSubnavDTO(input);
   const descriptionSection = destinationToDescriptionSectionDTO(input);
   const highlightsInfoGrid = destinationToHighlightsInfoGridDTO(input);
@@ -158,7 +167,13 @@ export function DestinationSurface({
       ]}
       useContextCrumbs
     >
-      <ExperienceHero dto={heroDto} headingLevel="h1" />
+      {galleryDto ? (
+        <section id="galeria" data-eb-anchor className="scroll-mt-24">
+          <ExperienceGallery dto={galleryDto} />
+        </section>
+      ) : null}
+
+      <ExperienceHero dto={heroDto} headingLevel="h1" className={galleryDto ? "mt-6" : undefined} />
 
       {badgeItems.length > 0 ? (
         <div className="mt-6">
