@@ -222,11 +222,8 @@ export function DestinationSurface({
           />
         </section>
 
-        {mapDto ? (
-            <section id="ubicacion" data-eb-anchor className="scroll-mt-24">
-              <ExperienceMapBlock dto={mapDto} />
-            </section>
-          ) : null}
+        {/* Mapa territorial ahora vive dentro del Explorador Inline
+            (`DiscoveryNavigatorBlock` mode="inline") para evitar duplicidad. */}
 
         {rel && !activeExplora ? (
             <section id="descubre" data-eb-anchor className="scroll-mt-24">
