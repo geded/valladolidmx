@@ -454,3 +454,135 @@ function CinematicHero({
     </section>
   );
 }
+
+/* ------------------------------------------------------------------ *
+ * Gallery — v1.2.0. Airbnb-style: carrusel horizontal snap con
+ * contador, back/share/favorite overlay y bloque de información
+ * (título, meta, badges) inmediatamente debajo.
+ * ------------------------------------------------------------------ */
+function GalleryHero({
+  dto,
+  className,
+  textStack,
+  headerActionsSlot,
+  onBack,
+}: {
+  dto: ExperienceHeroDTO;
+  className?: string;
+  textStack: ReactNode;
+  headerActionsSlot?: ReactNode;
+  onBack?: () => void;
+}) {
+  const slides =
+    dto.mediaSlides && dto.mediaSlides.length > 0
+      ? dto.mediaSlides
+      : dto.media
+        ? [{ url: dto.media.url, alt: dto.media.alt }]
+        : [];
+  const [index, setIndex] = useState(0);
+  const total = slides.length;
+
+  function handleBack() {
+    if (onBack) return onBack();
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      window.history.back();
+    }
+  }
+
+  function onScroll(e: React.UIEvent<HTMLUListElement>) {
+    const el = e.currentTarget;
+    const w = el.clientWidth || 1;
+    const i = Math.round(el.scrollLeft / w);
+    if (i !== index) setIndex(i);
+  }
+
+  function goTo(i: number) {
+    const list = document.getElementById(`hero-gallery-${dto.title}`);
+    if (!list) return;
+    const w = list.clientWidth;
+    list.scrollTo({ left: w * i, behavior: "smooth" });
+  }
+
+  return (
+    <section className={cn("flex flex-col", className)}>
+      <div className="relative isolate overflow-hidden sm:rounded-3xl">
+        {total > 0 ? (
+          <ul
+            id={`hero-gallery-${dto.title}`}
+            onScroll={onScroll}
+            className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            aria-label={`Galería de ${dto.title}`}
+          >
+            {slides.map((s, i) => (
+              <li
+                key={`${s.url}-${i}`}
+                className="relative w-full flex-shrink-0 snap-center"
+                style={{ aspectRatio: "4 / 3" }}
+              >
+                <img
+                  src={s.url}
+                  alt={s.alt || `${dto.title} — foto ${i + 1}`}
+                  className="h-full w-full object-cover"
+                  style={{ objectPosition: s.focalPoint ?? "center" }}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  fetchPriority={i === 0 ? "high" : "auto"}
+                  decoding="async"
+                />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="aspect-[4/3] w-full bg-muted" />
+        )}
+
+        {/* Overlay top bar: back + actions */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-3 sm:p-4">
+          <button
+            type="button"
+            onClick={handleBack}
+            aria-label="Volver"
+            className="pointer-events-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/90 text-foreground shadow-soft backdrop-blur-sm transition hover:bg-background focus-visible:outline-none focus-visible:ring-focus"
+          >
+            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+          </button>
+          {headerActionsSlot ? (
+            <div className="pointer-events-auto flex items-center gap-2">
+              {headerActionsSlot}
+            </div>
+          ) : null}
+        </div>
+
+        {/* Counter */}
+        {total > 1 ? (
+          <div className="pointer-events-none absolute bottom-3 right-3 rounded-pill bg-black/65 px-2.5 py-1 text-xs font-medium text-white sm:bottom-4 sm:right-4">
+            {index + 1} / {total}
+          </div>
+        ) : null}
+
+        {/* Prev/Next chevrons on wider screens */}
+        {total > 1 ? (
+          <>
+            <button
+              type="button"
+              aria-label="Foto anterior"
+              onClick={() => goTo(Math.max(0, index - 1))}
+              className="pointer-events-auto absolute left-3 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-background/85 p-2 text-foreground shadow-soft backdrop-blur-sm hover:bg-background sm:inline-flex"
+            >
+              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              aria-label="Foto siguiente"
+              onClick={() => goTo(Math.min(total - 1, index + 1))}
+              className="pointer-events-auto absolute right-3 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-background/85 p-2 text-foreground shadow-soft backdrop-blur-sm hover:bg-background sm:inline-flex"
+            >
+              <ChevronRight className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </>
+        ) : null}
+      </div>
+
+      <div className="px-4 pt-5 sm:px-6 sm:pt-6">{textStack}</div>
+    </section>
+  );
+}
