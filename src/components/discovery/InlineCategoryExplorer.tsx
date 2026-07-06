@@ -50,11 +50,14 @@ async function shareItem(item: InlineExplorerItem) {
       : item.href;
   const data = { title: item.display_name, text: item.tagline || item.display_name, url };
   try {
-    if (typeof navigator !== "undefined" && "share" in navigator) {
-      await (navigator as Navigator & { share: (d: ShareData) => Promise<void> }).share(data);
+    const nav = typeof navigator !== "undefined" ? (navigator as Navigator) : null;
+    if (nav && "share" in nav && typeof (nav as { share?: (d: ShareData) => Promise<void> }).share === "function") {
+      await (nav as { share: (d: ShareData) => Promise<void> }).share(data);
       return;
     }
-    await navigator.clipboard?.writeText(url);
+    if (nav?.clipboard?.writeText) {
+      await nav.clipboard.writeText(url);
+    }
   } catch {
     /* usuario canceló o no soportado */
   }
