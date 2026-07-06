@@ -40,13 +40,21 @@ export function businessToHeroDTO(b: MarketplaceBusinessDetail): ExperienceHeroD
   if (b.destination_slug) {
     meta.push({ iconKey: "map-pin", label: b.destination_slug.replace(/-/g, " ") });
   }
+  meta.push({ iconKey: "tag", label: variant.eyebrow });
+
+  const slides = b.cover_url
+    ? [{ url: b.cover_url, alt: b.display_name, focalPoint: "center" }]
+    : [];
 
   return {
-    variant: "editorial",
+    variant: slides.length > 0 ? "gallery" : "editorial",
     eyebrow: variant.eyebrow,
     title: b.display_name,
     description: b.tagline || null,
-    media: null,
+    media: slides[0]
+      ? { url: slides[0].url, alt: slides[0].alt, overlay: 0 }
+      : null,
+    mediaSlides: slides,
     badges,
     meta,
     ctaPrimary: null,
