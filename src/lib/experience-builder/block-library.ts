@@ -1010,9 +1010,9 @@ const surfaceMarketplaceBlock: BlockContract = {
   type: "vmx.surface.marketplace",
   category: "static",
   version: "1.0.0",
-  display_name: "Superficie · Marketplace",
+  display_name: "Superficie · Catálogo Oriente Maya",
   description:
-    "Plantilla oficial del Marketplace público (/marketplace). Renderiza el catálogo de empresas publicadas.",
+    "Plantilla oficial del catálogo turístico público (/oriente-maya). Renderiza las empresas publicadas.",
   schema: {},
   capabilities: {
     soporta_preview: true,

@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/cms/pagos")({
       {
         name: "description",
         content:
-          "Configuración y auditoría del proveedor de pagos del Marketplace.",
+          "Configuración y auditoría del proveedor de pagos de la plataforma.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
@@ -60,7 +60,7 @@ function PaymentsAdminPage() {
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
           Pagos
         </p>
-        <h1 className="mt-2 text-3xl font-semibold">Pagos del Marketplace</h1>
+        <h1 className="mt-2 text-3xl font-semibold">Pagos de la plataforma</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Estado del proveedor de pagos activo, configuración de webhook y
           últimos eventos recibidos. Las llaves API se almacenan como

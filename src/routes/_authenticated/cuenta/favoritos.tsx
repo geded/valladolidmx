@@ -52,7 +52,7 @@ function FavoritosPage() {
       <h1 className="mt-2 text-4xl">Favoritos</h1>
       <p className="mt-3 text-sm text-muted-foreground">
         Aquí se guardan las empresas, productos y promociones que marcaste
-        en el Marketplace.
+        en el catálogo Oriente Maya.
       </p>
 
       {isLoading ? (
@@ -64,14 +64,14 @@ function FavoritosPage() {
       ) : !data || data.length === 0 ? (
         <div className="mt-8 rounded-2xl border border-dashed border-border bg-card p-6">
           <p className="text-sm text-muted-foreground">
-            Aún no tienes favoritos. Explora el Marketplace y guarda lo que
+            Aún no tienes favoritos. Explora Oriente Maya y guarda lo que
             te interese.
           </p>
           <Link
             to="/oriente-maya"
             className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
           >
-            Explorar el Marketplace
+            Explorar Oriente Maya
           </Link>
         </div>
       ) : (

@@ -35,7 +35,7 @@ const BENEFITS = [
   {
     Icon: Compass,
     title: "Descúbrete en el Oriente Maya",
-    body: "Aparece en Discovery, marketplace, destinos y rutas editoriales curadas por el equipo de Valladolid.mx.",
+    body: "Aparece en Discovery, catálogo turístico, destinos y rutas editoriales curadas por el equipo de Valladolid.mx.",
   },
   {
     Icon: Users,
