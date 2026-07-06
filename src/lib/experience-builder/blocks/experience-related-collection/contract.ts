@@ -390,6 +390,49 @@ export function dedupeItems(
 }
 
 /* ------------------------------------------------------------------ *
+ * v1.1.0 — Defaults reutilizables por adaptadores.
+ * Evita duplicar los campos nuevos en cada literal.
+ * ------------------------------------------------------------------ */
+export const EXPERIENCE_RELATED_ITEM_V11_DEFAULTS = {
+  institutionalBadges: [] as ExperienceRelatedBadge[],
+  priceHint: null as string | null,
+  dateLabel: null as string | null,
+  availabilityLabel: null as string | null,
+  rating: null as { value: number; count: number } | null,
+  location: null as { label: string; distanceKm: number | null } | null,
+  territorialContext: null as string | null,
+  highlights: [] as string[],
+  businessName: null as string | null,
+  primaryAction: null as ExperienceRelatedAction | null,
+  secondaryAction: null as ExperienceRelatedAction | null,
+} as const;
+
+/** Ayuda a construir un ExperienceRelatedItem completo desde un parcial. */
+export function createRelatedItem(
+  partial: Omit<
+    ExperienceRelatedItem,
+    keyof typeof EXPERIENCE_RELATED_ITEM_V11_DEFAULTS
+  > &
+    Partial<Pick<ExperienceRelatedItem, keyof typeof EXPERIENCE_RELATED_ITEM_V11_DEFAULTS>>,
+): ExperienceRelatedItem {
+  return {
+    ...EXPERIENCE_RELATED_ITEM_V11_DEFAULTS,
+    ...partial,
+  };
+}
+
+export const EXPERIENCE_RELATED_CAPABILITIES_V11_DEFAULTS = {
+  showRating: true,
+  showDistance: true,
+  showAvailability: true,
+  showFavorite: true,
+  showSecondaryAction: true,
+  showTerritorialContext: true,
+  showInstitutionalBadges: true,
+  showHighlights: true,
+} as const;
+
+/* ------------------------------------------------------------------ *
  * Preview DTO — usado por Studio y por la ruta /lovable de validación.
  * ------------------------------------------------------------------ */
 export function buildExperienceRelatedCollectionPreviewDTO(): ExperienceRelatedCollectionDTO {
