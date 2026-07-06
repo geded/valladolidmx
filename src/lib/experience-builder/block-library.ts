@@ -2274,6 +2274,72 @@ const experienceRelatedCollectionBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+/* ------------------------------------------------------------------ *
+ * U-VISUAL · V4 — Experience Map (Founder Discovery Map Principle).
+ * Única familia oficial de mapas. Evoluciona por variant/capabilities/
+ * extensions[]. Prohibido crear bloques cartográficos paralelos.
+ * ------------------------------------------------------------------ */
+const experienceMapBlock: BlockContract = {
+  type: "vmx.experience.map",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Experience Map",
+  description:
+    "Mapa turístico oficial. Responde dónde está, qué hay cerca, cómo llegar y qué descubrir alrededor.",
+  schema: {
+    variant: {
+      type: "select",
+      label: "Variante",
+      default: "single",
+      options: [
+        { value: "single", label: "Un punto" },
+        { value: "multi", label: "Varios puntos" },
+        { value: "list-sync", label: "Lista + mapa sincronizados" },
+        { value: "cluster", label: "Clusters territoriales" },
+      ],
+    },
+    heading: { type: "text", label: "Encabezado", translatable: true },
+    emptyMessage: {
+      type: "text",
+      label: "Mensaje vacío",
+      translatable: true,
+      default: "Ubicación no disponible por ahora.",
+    },
+    showDistance: { type: "boolean", label: "Mostrar distancia", default: true },
+    showDirections: { type: "boolean", label: "Mostrar cómo llegar", default: true },
+    clustering: { type: "boolean", label: "Agrupar puntos", default: false },
+    syncList: { type: "boolean", label: "Sincronizar con listado", default: false },
+    staticFallback: { type: "boolean", label: "Fallback estático (SSR)", default: true },
+    allowInteractiveToggle: {
+      type: "boolean",
+      label: "Permitir mapa interactivo",
+      default: true,
+    },
+  },
+  capabilities: {
+    soporta_seo: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  constraints: {
+    surfaces: [
+      "home",
+      "landing",
+      "destination",
+      "business",
+      "product",
+      "listing",
+    ],
+  },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["variant"],
+  },
+  i18n: { translatable_fields: ["heading", "emptyMessage"] },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   // NOTE: `experienceMapBlock` is appended near the end of this array.
   containerBlock,
