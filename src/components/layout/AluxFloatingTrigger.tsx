@@ -121,7 +121,12 @@ export function AluxFloatingTrigger() {
 
   return (
     <>
-      <div className="pointer-events-none fixed bottom-4 right-4 z-40 md:bottom-6 md:right-6">
+      <div
+        className="pointer-events-none fixed right-4 z-40 transition-[bottom] duration-300 md:right-6"
+        style={{
+          bottom: `calc(env(safe-area-inset-bottom, 0px) + ${1 + presence.bottomOffset / 16}rem)`,
+        }}
+      >
         <button
           type="button"
           onClick={() => setOpen(true)}

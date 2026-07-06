@@ -34,6 +34,11 @@ export interface AluxFloatingPresence {
     | "checkout"
     | "sticky-cta"
     | "none";
+  /**
+   * Offset vertical adicional (px) que el flotante debe respetar para no
+   * solapar barras sticky comerciales. 0 cuando no hay barra activa.
+   */
+  readonly bottomOffset: number;
 }
 
 export function useAluxFloatingPresence(): AluxFloatingPresence {
@@ -41,11 +46,16 @@ export function useAluxFloatingPresence(): AluxFloatingPresence {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const hasStickyCta = useHasStickyCta();
 
-  if (ctx.product) return { shouldHide: true, reason: "ficha-product" };
-  if (ctx.business) return { shouldHide: true, reason: "ficha-business" };
+  if (ctx.product)
+    return { shouldHide: true, reason: "ficha-product", bottomOffset: 0 };
+  if (ctx.business)
+    return { shouldHide: true, reason: "ficha-business", bottomOffset: 0 };
   if (HIDDEN_PATH_PREFIXES.some((p) => pathname.startsWith(p))) {
-    return { shouldHide: true, reason: "checkout" };
+    return { shouldHide: true, reason: "checkout", bottomOffset: 0 };
   }
-  if (hasStickyCta) return { shouldHide: true, reason: "sticky-cta" };
-  return { shouldHide: false, reason: "none" };
+  // Superficie con CTA sticky (destino, categoría, etc.): Alux sigue
+  // presente como copiloto, pero se eleva por encima de la barra.
+  if (hasStickyCta)
+    return { shouldHide: false, reason: "sticky-cta", bottomOffset: 88 };
+  return { shouldHide: false, reason: "none", bottomOffset: 0 };
 }
