@@ -26,6 +26,10 @@ const FORBIDDEN_SUFFIXES = /-(pro|v2|next|lite)\b/;
 const LEGACY_HERO_ALLOWED = new Set<string>([
   // Delegan al oficial vía adapter (U1.5).
   "vmx.product.hero",
+  // Primitive neutro del Surface Kit (ViewModel-only). No es un Hero
+  // turístico; es la base compartida sobre la que la familia oficial
+  // puede seguir componiendo sin duplicar geometría.
+  "vmx.kit.hero",
 ]);
 
 function walk(dir: string, out: string[] = []): string[] {
