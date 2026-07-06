@@ -160,7 +160,15 @@ export function DestinationSurface({
       ]}
       useContextCrumbs
     >
-      <ExperienceHero dto={heroDto} headingLevel="h1" />
+      {galleryDto ? (
+        <section id="galeria" data-eb-anchor className="scroll-mt-24">
+          <ExperienceGallery dto={galleryDto} />
+        </section>
+      ) : null}
+
+      <div className={galleryDto ? "mt-8" : undefined}>
+        <ExperienceHero dto={heroDto} headingLevel="h1" />
+      </div>
 
       {badgeItems.length > 0 ? (
         <div className="mt-6">
