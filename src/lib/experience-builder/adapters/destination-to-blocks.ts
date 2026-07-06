@@ -17,7 +17,7 @@ import type {
   ExperienceSubnavAnchor,
 } from "@/lib/experience-builder/blocks/experience-subnav/contract";
 import type { ExperienceSectionDTO } from "@/lib/experience-builder/blocks/experience-section/contract";
-import type { ExperienceInfoGridDTO } from "@/lib/experience-builder/blocks/experience-info-grid/contract";
+import type { ExperienceFeaturesDTO } from "@/lib/experience-builder/blocks/experience-features/contract";
 import type { ExperienceCtaBarDTO } from "@/lib/experience-builder/blocks/experience-cta-bar/contract";
 import type { InstitutionalBadgeItem } from "@/lib/experience-builder/blocks/experience-institutional-badges/contract";
 import type { ExperienceGalleryDTO } from "@/lib/experience-builder/blocks/experience-gallery/contract";
@@ -222,27 +222,32 @@ export function destinationToDescriptionSectionDTO(
 }
 
 /* ------------------------------------------------------------------ *
- * Info-grid — "Lo esencial" derivado de highlights.
+ * Features — "Lo esencial" derivado de highlights.
+ *
+ * Se usa el bloque oficial `vmx.experience.features` con variante
+ * `checklist` — cada highlight es un ítem editorial (icono + título)
+ * sin la redundancia label/value del info-grid, respetando el DSL
+ * colonial y la Founder Experience Rule.
  * ------------------------------------------------------------------ */
-export function destinationToHighlightsInfoGridDTO(
+export function destinationToHighlightsFeaturesDTO(
   d: DestinationBlockInput,
-): ExperienceInfoGridDTO | null {
+): ExperienceFeaturesDTO | null {
   if (!d.highlights.length) return null;
   return {
-    // Compact: lista con separadores en lugar de tarjetas, para que
-    // "Lo esencial" no compita visualmente con el hero, el mapa y las
-    // colecciones de descubrimiento (Founder Experience Rule).
-    variant: "list",
+    variant: "checklist",
     heading: "Lo esencial",
-    columns: 1,
+    subheading: null,
+    columns: 2,
     items: d.highlights.map((h) => ({
-      iconKey: "sparkles",
-      label: "Highlight",
-      value: h,
-      tone: "default",
+      title: h,
+      available: true,
     })),
     ariaLabel: "Lo esencial del destino",
-    capabilities: { copyable: false, livePricing: false, liveAvailability: false },
+    capabilities: {
+      groupByCategory: false,
+      showUnavailable: true,
+      compact: true,
+    },
   };
 }
 
