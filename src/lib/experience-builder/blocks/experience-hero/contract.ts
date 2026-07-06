@@ -218,6 +218,5 @@ export function buildExperienceHeroPreviewDTO(): ExperienceHeroDTO {
     ],
     ctaPrimary: { label: "Reservar", action: "book", href: "#" },
     ctaSecondary: { label: "Contactar", action: "contact", href: "#" },
-    ctas: [],
   };
 }
