@@ -7,6 +7,8 @@ import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { createServerFn } from "@tanstack/react-start";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
+import { TourismListingSurface } from "@/components/surfaces/TourismListingSurface";
+import { promoLandingToTourismCard } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 
 /**
  * H-02 · I7 · Fila 3 — Categoría plana `promociones`.
@@ -62,39 +64,32 @@ export const Route = createFileRoute("/promociones")({
 
 function PromosRoute() {
   const { promos } = Route.useLoaderData();
+  const cards = (promos as PromoCard[]).map(promoLandingToTourismCard);
   return (
     <PublicShell
-      eyebrow="Ofertas"
-      title="Promociones"
-      description="Campañas y ofertas vigentes de hoteles, restaurantes y experiencias del Oriente Maya."
       crumbs={[{ label: "Promociones" }]}
       contextDeclaration={buildPromocionesContext()}
       useContextCrumbs
     >
-      {promos.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          Aún no hay promociones activas. Explora el{" "}
-          <Link to="/oriente-maya" className="text-primary hover:underline">Catálogo Oriente Maya</Link>{" "}
-          para ver todas las empresas verificadas.
-        </p>
-      ) : (
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {promos.map((p: PromoCard) => (
-            <li key={p.slug}>
-              <Link
-                to="/l/$slug"
-                params={{ slug: p.slug }}
-                className="block rounded-2xl border border-border bg-card p-5 hover:border-primary/40 hover:bg-accent"
-              >
-                <p className="text-sm font-semibold text-foreground">{p.title}</p>
-                {p.description ? (
-                  <p className="mt-1 text-xs text-muted-foreground">{p.description}</p>
-                ) : null}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      <TourismListingSurface
+        hero={{
+          eyebrow: "Ofertas del Oriente Maya",
+          title: "Promociones",
+          subtitle:
+            "Campañas y ofertas vigentes de hoteles, restaurantes y experiencias del Oriente Maya.",
+        }}
+        items={cards}
+        emptyMessage="Aún no hay promociones activas."
+        emptyHint={
+          <>
+            Explora el{" "}
+            <Link to="/oriente-maya" className="text-primary hover:underline">
+              Catálogo Oriente Maya
+            </Link>{" "}
+            para ver todas las empresas verificadas.
+          </>
+        }
+      />
     </PublicShell>
   );
 }

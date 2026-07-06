@@ -2,14 +2,21 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
-import { listMarketplaceBusinesses, type MarketplaceBusinessCard } from "@/lib/catalog/marketplace-reads.functions";
-import { MarketplaceSurface } from "@/components/surfaces/MarketplaceSurface";
+import {
+  listMarketplaceBusinesses,
+  type MarketplaceBusinessCard,
+} from "@/lib/catalog/marketplace-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import {
   defineRouteContext,
   type RouteContextDeclaration,
 } from "@/lib/context-engine";
+import {
+  TourismListingSurface,
+  buildDestinationFacet,
+} from "@/components/surfaces/TourismListingSurface";
+import { businessToTourismCard } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 
 const CATEGORY_SLUGS = new Set(["hoteles", "hospedaje"]);
 
@@ -82,24 +89,36 @@ function HotelesRoute() {
     ? businesses.filter((b: MarketplaceBusinessCard) => b.destination_slug === destino)
     : businesses;
   const contextDeclaration = buildHotelesContext(destino);
-  // Fallback defensivo: si por cualquier razón el Context Engine no
-  // resolviera migas (provider ausente, ctx null), `crumbs` legacy se
-  // usa. Con provider montado, `useContextCrumbs` toma el control.
   const legacyCrumbs = [
     { label: "Hoteles", to: "/hoteles" },
     ...(destino ? [{ label: destinationLabel(destino) }] : []),
   ];
+  const cards = filtered.map((b: MarketplaceBusinessCard) =>
+    businessToTourismCard(b, {
+      destinationLabel: destinationLabel(b.destination_slug),
+      regionLabel: ORIENTE_MAYA.name,
+      forcedCategorySlug: "hoteles",
+    }),
+  );
+  const destinoFacet = buildDestinationFacet(cards);
   return (
     <PublicShell
-      eyebrow="Categoría"
-      title={destino ? `Hoteles en ${destinationLabel(destino)}` : "Hoteles"}
-      description="Haciendas restauradas, posadas familiares y refugios en el corazón del Oriente Maya."
       crumbs={legacyCrumbs}
       contextDeclaration={contextDeclaration}
       useContextCrumbs
     >
-      <MarketplaceSurface
-        items={filtered}
+      <TourismListingSurface
+        hero={{
+          eyebrow: "Descansa en el Oriente Maya",
+          title: destino ? `Hoteles en ${destinationLabel(destino)}` : "Hoteles",
+          subtitle:
+            "Haciendas restauradas, posadas familiares y refugios en el corazón del Oriente Maya.",
+          metaLabel: destino ? destinationLabel(destino) : ORIENTE_MAYA.name,
+        }}
+        items={cards}
+        facets={destino || !destinoFacet ? [] : [destinoFacet]}
+        destinationSlug={destino ?? null}
+        destinationLabel={destino ? destinationLabel(destino) : null}
         emptyMessage={
           destino
             ? `Aún no hay hoteles publicados en ${destinationLabel(destino)}.`
