@@ -1,39 +1,35 @@
 /**
  * H-03 · Ola I3.b — `vmx.experience.related-collection` (Capa 1: Presentación).
+ * U1.2 · v1.1.0 — Reutiliza la Tourism Card oficial. NO renderiza
+ * cards propias. Founder Directive: Related Collection es una
+ * recomendación turística útil (contexto + confianza + relevancia +
+ * siguiente acción), no un carrusel decorativo.
  *
- * Componente puro. Recibe DTO validado y renderiza sin acceder a
- * contextos, hooks de datos ni server functions. Todas las variantes
- * viven aquí — la evolución futura ocurre añadiendo variantes o
- * capabilities, jamás duplicando el bloque.
+ * Componente puro. Recibe DTO validado y delega en `<TourismCard/>` +
+ * `<TourismCardRow/>` (Biblioteca Turística Oficial). Sin acceso a
+ * contextos, hooks de datos ni server functions.
  */
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import {
-  kindLabel,
   type ExperienceRelatedCollectionDTO,
   type ExperienceRelatedItem,
   type ExperienceRelatedVariant,
 } from "@/lib/experience-builder/blocks/experience-related-collection/contract";
+import {
+  TourismCard,
+  TourismCardRow,
+  FeaturedTourismLayout,
+  type TourismCardCapabilities,
+  type TourismCardVM,
+  type TourismEntityKind,
+} from "@/components/experience-builder/tourism-card/TourismCard";
 
 export interface ExperienceRelatedCollectionProps {
   dto: ExperienceRelatedCollectionDTO;
   className?: string;
   /** Slot opcional para inyectar acciones interactivas (Favoritos, Plan). */
   renderItemActions?: (item: ExperienceRelatedItem) => ReactNode;
-}
-
-function formatPrice(amount: number | null, currency: string | null): string | null {
-  if (amount == null) return null;
-  const c = (currency ?? "MXN").toUpperCase();
-  try {
-    return new Intl.NumberFormat("es-MX", {
-      style: "currency",
-      currency: c,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  } catch {
-    return `${c} ${amount.toFixed(0)}`;
-  }
 }
 
 function formatDate(iso: string | null): string | null {
@@ -49,6 +45,77 @@ function formatDate(iso: string | null): string | null {
   }
 }
 
+/* ------------------------------------------------------------------ *
+ * Mapping ExperienceRelatedItem → TourismCardVM
+ * ------------------------------------------------------------------ */
+function relatedItemToVM(
+  item: ExperienceRelatedItem,
+  showKindBadge: boolean,
+): TourismCardVM {
+  const dateLabel =
+    item.dateLabel ??
+    (item.dateStart ? formatDate(item.dateStart) : null);
+  const meta = item.meta.filter((m) => m.label);
+  const territorialContext =
+    item.territorialContext ??
+    meta.find((m) => m.iconKey === "map-pin")?.label ??
+    null;
+  // Fallback description → tagline en Tourism Card.
+  const tagline = item.description ?? item.subtitle ?? null;
+  return {
+    id: `${item.kind}:${item.id}`,
+    entityKind: item.kind as TourismEntityKind,
+    eyebrow: showKindBadge ? undefined : null,
+    name: item.title,
+    href: item.href,
+    tagline,
+    businessName: item.businessName,
+    mediaUrl: item.imageUrl,
+    mediaAlt: item.imageAlt,
+    rating: item.rating,
+    location: item.location,
+    territorialContext,
+    highlights: item.highlights,
+    badges: item.badges,
+    institutionalBadges: item.institutionalBadges,
+    dateLabel,
+    availabilityLabel: item.availabilityLabel,
+    priceAmount: item.priceAmount,
+    priceCurrency: item.priceCurrency,
+    priceHint: item.priceHint,
+    primaryAction: item.primaryAction,
+    secondaryAction: item.secondaryAction,
+    rationale: item.rationale,
+  };
+}
+
+function capsToTourism(
+  caps: ExperienceRelatedCollectionDTO["capabilities"],
+  density: ExperienceRelatedCollectionDTO["density"],
+): Partial<TourismCardCapabilities> {
+  return {
+    showMedia: caps.showImage,
+    showEyebrow: caps.showKindBadge,
+    showBadges: caps.showBadges,
+    showInstitutionalBadges: caps.showInstitutionalBadges,
+    showRating: caps.showRating,
+    showLocation: caps.showImage || caps.showMeta,
+    showDistance: caps.showDistance,
+    showTerritorialContext: caps.showTerritorialContext,
+    showHighlights: caps.showHighlights,
+    showDate: caps.showDate,
+    showAvailability: caps.showAvailability,
+    showPrice: caps.showPrice,
+    showBusiness: true,
+    showTagline: true,
+    showPrimaryAction: true,
+    showSecondaryAction: caps.showSecondaryAction,
+    showFavorite: caps.showFavorite,
+    showRationale: caps.showRationale,
+    compact: density === "compact" || caps.compact,
+  };
+}
+
 export function ExperienceRelatedCollection({
   dto,
   className,
@@ -57,6 +124,7 @@ export function ExperienceRelatedCollection({
   const {
     variant,
     columns,
+    density,
     heading,
     subheading,
     emptyMessage,
@@ -66,12 +134,24 @@ export function ExperienceRelatedCollection({
   } = dto;
 
   const totalItems = groups.reduce((n, g) => n + g.items.length, 0);
+  const tourismCaps = capsToTourism(capabilities, density);
+  const renderActionsAdapter = renderItemActions
+    ? (vm: TourismCardVM) => {
+        // El id del VM es `kind:id`, no lo usamos para lookup — el
+        // slot original opera sobre el item completo.
+        const original = groups
+          .flatMap((g) => g.items)
+          .find((it) => `${it.kind}:${it.id}` === vm.id);
+        return original ? renderItemActions(original) : null;
+      }
+    : undefined;
 
   return (
     <section
       aria-label={ariaLabel}
       data-eb-block="experience-related-collection"
       data-eb-variant={variant}
+      data-eb-density={density}
       className={cn("w-full", className)}
     >
       {heading || subheading ? (
@@ -86,7 +166,12 @@ export function ExperienceRelatedCollection({
       ) : null}
 
       {totalItems === 0 ? (
-        <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+        <div
+          role="status"
+          className="rounded-2xl border border-dashed border-border bg-muted/30 px-6 py-10 text-center"
+        >
+          <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+        </div>
       ) : (
         <div className="flex flex-col gap-10">
           {groups.map((g) => {
@@ -120,16 +205,17 @@ export function ExperienceRelatedCollection({
                 ) : null}
 
                 {g.items.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
+                  <div className="rounded-2xl border border-dashed border-border bg-muted/30 px-4 py-6 text-center text-sm text-muted-foreground">
                     {g.emptyMessage}
-                  </p>
+                  </div>
                 ) : (
                   <ItemsLayout
                     variant={groupVariant}
                     columns={columns}
                     items={g.items}
                     capabilities={capabilities}
-                    renderItemActions={renderItemActions}
+                    tourismCaps={tourismCaps}
+                    renderItemActions={renderActionsAdapter}
                   />
                 )}
               </div>
@@ -142,7 +228,7 @@ export function ExperienceRelatedCollection({
 }
 
 /* ------------------------------------------------------------------ *
- * Sub-componentes internos
+ * Sub-componentes internos — layouts que delegan en TourismCard.
  * ------------------------------------------------------------------ */
 
 interface ItemsLayoutProps {
@@ -150,7 +236,8 @@ interface ItemsLayoutProps {
   columns: number;
   items: ExperienceRelatedItem[];
   capabilities: ExperienceRelatedCollectionDTO["capabilities"];
-  renderItemActions?: (item: ExperienceRelatedItem) => ReactNode;
+  tourismCaps: Partial<TourismCardCapabilities>;
+  renderItemActions?: (vm: TourismCardVM) => ReactNode;
 }
 
 function ItemsLayout({
@@ -158,8 +245,12 @@ function ItemsLayout({
   columns,
   items,
   capabilities,
+  tourismCaps,
   renderItemActions,
 }: ItemsLayoutProps) {
+  const showKindBadge = capabilities.showKindBadge;
+  const toVM = (it: ExperienceRelatedItem) => relatedItemToVM(it, showKindBadge);
+
   if (variant === "carousel") {
     return (
       <ul
@@ -171,10 +262,10 @@ function ItemsLayout({
             key={`${it.kind}-${it.id}`}
             className="min-w-[260px] max-w-[300px] shrink-0 snap-start"
           >
-            <RelatedCard
-              item={it}
-              capabilities={capabilities}
-              renderItemActions={renderItemActions}
+            <TourismCard
+              vm={toVM(it)}
+              capabilities={tourismCaps}
+              renderActions={renderItemActions}
             />
           </li>
         ))}
@@ -186,11 +277,13 @@ function ItemsLayout({
       <ul role="list" className="flex flex-col gap-3">
         {items.map((it) => (
           <li key={`${it.kind}-${it.id}`}>
-            <RelatedRow
-              item={it}
-              capabilities={capabilities}
-              renderItemActions={renderItemActions}
-              compact={variant === "compact"}
+            <TourismCardRow
+              vm={toVM(it)}
+              capabilities={{
+                ...tourismCaps,
+                compact: variant === "compact" || tourismCaps.compact,
+              }}
+              renderActions={renderItemActions}
             />
           </li>
         ))}
@@ -198,31 +291,12 @@ function ItemsLayout({
     );
   }
   if (variant === "featured") {
-    const [featured, ...rest] = items;
-    if (!featured) return null;
     return (
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <RelatedCard
-            item={featured}
-            capabilities={capabilities}
-            renderItemActions={renderItemActions}
-          />
-        </div>
-        {rest.length > 0 ? (
-          <ul role="list" className="flex flex-col gap-3">
-            {rest.slice(0, 3).map((it) => (
-              <li key={`${it.kind}-${it.id}`}>
-                <RelatedRow
-                  item={it}
-                  capabilities={capabilities}
-                  renderItemActions={renderItemActions}
-                />
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </div>
+      <FeaturedTourismLayout
+        items={items.map(toVM)}
+        capabilities={tourismCaps}
+        renderActions={renderItemActions}
+      />
     );
   }
   // grid / masonry
@@ -242,204 +316,13 @@ function ItemsLayout({
     >
       {items.map((it) => (
         <li key={`${it.kind}-${it.id}`}>
-          <RelatedCard
-            item={it}
-            capabilities={capabilities}
-            renderItemActions={renderItemActions}
+          <TourismCard
+            vm={toVM(it)}
+            capabilities={tourismCaps}
+            renderActions={renderItemActions}
           />
         </li>
       ))}
     </ul>
-  );
-}
-
-interface ItemProps {
-  item: ExperienceRelatedItem;
-  capabilities: ExperienceRelatedCollectionDTO["capabilities"];
-  renderItemActions?: (item: ExperienceRelatedItem) => ReactNode;
-}
-
-function RelatedCard({ item, capabilities, renderItemActions }: ItemProps) {
-  const price = capabilities.showPrice
-    ? formatPrice(item.priceAmount, item.priceCurrency)
-    : null;
-  const date = capabilities.showDate ? formatDate(item.dateStart) : null;
-  const showMedia = capabilities.showImage && item.imageUrl;
-  return (
-    <article
-      className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition hover:border-primary"
-      data-eb-item-kind={item.kind}
-    >
-      {showMedia ? (
-        <div className="aspect-[4/3] w-full overflow-hidden bg-muted">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={item.imageUrl!}
-            alt={item.imageAlt ?? item.title}
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
-        </div>
-      ) : null}
-      <div className="flex flex-1 flex-col p-5">
-        <div className="flex items-start justify-between gap-2">
-          {capabilities.showKindBadge ? (
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-              {kindLabel(item.kind)}
-            </p>
-          ) : <span />}
-          {capabilities.showBadges && item.badges.length > 0 ? (
-            <div className="flex flex-wrap justify-end gap-1">
-              {item.badges.map((b, i) => (
-                <BadgeChip key={i} label={b.label} tone={b.tone} />
-              ))}
-            </div>
-          ) : null}
-        </div>
-        <h4 className="mt-1 text-base font-semibold leading-tight">
-          {item.href ? (
-            <a href={item.href} className="hover:underline">
-              {item.title}
-            </a>
-          ) : (
-            item.title
-          )}
-        </h4>
-        {item.subtitle ? (
-          <p className="mt-0.5 text-xs text-muted-foreground">{item.subtitle}</p>
-        ) : null}
-        {item.description ? (
-          <p className="mt-1 line-clamp-3 text-sm text-muted-foreground">
-            {item.description}
-          </p>
-        ) : null}
-        {(date || price) ? (
-          <p className="mt-3 text-sm font-semibold">
-            {[date, price].filter(Boolean).join(" · ")}
-          </p>
-        ) : null}
-        {capabilities.showMeta && item.meta.length > 0 ? (
-          <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-            {item.meta.map((m, i) => (
-              <li key={i}>{m.label}</li>
-            ))}
-          </ul>
-        ) : null}
-        {capabilities.showRationale && item.rationale ? (
-          <p className="mt-3 rounded-lg bg-primary/5 px-3 py-2 text-xs text-primary">
-            {item.rationale}
-          </p>
-        ) : null}
-        {renderItemActions ? (
-          <div className="mt-4 flex flex-col gap-2">{renderItemActions(item)}</div>
-        ) : null}
-      </div>
-    </article>
-  );
-}
-
-function RelatedRow({
-  item,
-  capabilities,
-  renderItemActions,
-  compact,
-}: ItemProps & { compact?: boolean }) {
-  const price = capabilities.showPrice
-    ? formatPrice(item.priceAmount, item.priceCurrency)
-    : null;
-  const date = capabilities.showDate ? formatDate(item.dateStart) : null;
-  return (
-    <article
-      className={cn(
-        "flex gap-4 rounded-2xl border border-border bg-card p-4 transition hover:border-primary",
-        compact ? "p-3" : "",
-      )}
-      data-eb-item-kind={item.kind}
-    >
-      {capabilities.showImage && item.imageUrl ? (
-        <div
-          className={cn(
-            "shrink-0 overflow-hidden rounded-lg bg-muted",
-            compact ? "h-14 w-14" : "h-20 w-20",
-          )}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={item.imageUrl}
-            alt={item.imageAlt ?? item.title}
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
-        </div>
-      ) : null}
-      <div className="min-w-0 flex-1">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            {capabilities.showKindBadge ? (
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                {kindLabel(item.kind)}
-              </p>
-            ) : null}
-            <h4 className="truncate text-base font-semibold">
-              {item.href ? (
-                <a href={item.href} className="hover:underline">
-                  {item.title}
-                </a>
-              ) : (
-                item.title
-              )}
-            </h4>
-            {item.subtitle ? (
-              <p className="text-xs text-muted-foreground">{item.subtitle}</p>
-            ) : null}
-            {!compact && item.description ? (
-              <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">
-                {item.description}
-              </p>
-            ) : null}
-          </div>
-          {date || price ? (
-            <p className="shrink-0 text-sm font-semibold">
-              {[date, price].filter(Boolean).join(" · ")}
-            </p>
-          ) : null}
-        </div>
-        {capabilities.showRationale && item.rationale ? (
-          <p className="mt-2 rounded-lg bg-primary/5 px-3 py-1.5 text-xs text-primary">
-            {item.rationale}
-          </p>
-        ) : null}
-        {renderItemActions ? (
-          <div className="mt-2 flex flex-wrap gap-2">{renderItemActions(item)}</div>
-        ) : null}
-      </div>
-    </article>
-  );
-}
-
-function BadgeChip({
-  label,
-  tone,
-}: {
-  label: string;
-  tone: "default" | "primary" | "success" | "warning" | "info";
-}) {
-  return (
-    <span
-      className={cn(
-        "rounded-pill px-2 py-0.5 text-[10px] font-semibold",
-        tone === "primary"
-          ? "bg-primary/10 text-primary"
-          : tone === "success"
-            ? "bg-success/10 text-success"
-            : tone === "warning"
-              ? "bg-warning/10 text-warning"
-              : tone === "info"
-                ? "bg-info/10 text-info"
-                : "bg-muted text-foreground/70",
-      )}
-    >
-      {label}
-    </span>
   );
 }
