@@ -8,10 +8,11 @@
  */
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { BadgeCheck, MapPin, X } from "lucide-react";
+import { BadgeCheck, MapPin, X, Navigation, Share2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
+import { InteractiveMap } from "@/components/maps/InteractiveMap";
 import {
   inlineExplorerQueryOptions,
   type InlineExplorerItem,
@@ -32,6 +33,31 @@ function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: num
 function formatKm(km: number) {
   if (km < 1) return `${Math.round(km * 1000)} m`;
   return `${km < 10 ? km.toFixed(1) : Math.round(km)} km`;
+}
+
+function labelForIndex(i: number) {
+  return String.fromCharCode(65 + (i % 26));
+}
+
+function directionsHref(p: { lat: number; lng: number }) {
+  return `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
+}
+
+async function shareItem(item: InlineExplorerItem) {
+  const url =
+    typeof window !== "undefined"
+      ? new URL(item.href, window.location.origin).toString()
+      : item.href;
+  const data = { title: item.display_name, text: item.tagline || item.display_name, url };
+  try {
+    if (typeof navigator !== "undefined" && "share" in navigator) {
+      await (navigator as Navigator & { share: (d: ShareData) => Promise<void> }).share(data);
+      return;
+    }
+    await navigator.clipboard?.writeText(url);
+  } catch {
+    /* usuario canceló o no soportado */
+  }
 }
 
 export interface InlineCategoryExplorerProps {
@@ -83,6 +109,27 @@ export function InlineCategoryExplorer({
 
   const label = categoryLabel ?? categorySlug;
 
+  const mappable = useMemo(
+    () => sorted.filter((it) => it.latitude != null && it.longitude != null),
+    [sorted],
+  );
+  const mapCenter = useMemo(() => {
+    if (mappable.length === 0) return null;
+    const lat = mappable.reduce((s, p) => s + (p.latitude as number), 0) / mappable.length;
+    const lng = mappable.reduce((s, p) => s + (p.longitude as number), 0) / mappable.length;
+    return { lat, lng };
+  }, [mappable]);
+  const mapMarkers = useMemo(
+    () =>
+      mappable.map((it) => ({
+        lat: it.latitude as number,
+        lng: it.longitude as number,
+        title: it.display_name,
+        href: it.href,
+      })),
+    [mappable],
+  );
+
   return (
     <section
       aria-label={`Explorando ${label}${destinationName ? ` en ${destinationName}` : ""}`}
@@ -115,25 +162,41 @@ export function InlineCategoryExplorer({
         ) : null}
       </header>
 
-      {!location ? (
-        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-border/70 bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-          <MapPin className="h-4 w-4" aria-hidden />
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-border/70 bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+        <MapPin className="h-4 w-4" aria-hidden />
+        {location ? (
+          <span>Ubicación compartida · ordenamos por cercanía a ti.</span>
+        ) : (
           <span>Comparte tu ubicación para ordenar por cercanía.</span>
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-7"
-            onClick={request}
-            disabled={status === "prompting"}
-          >
-            {status === "prompting"
-              ? "Solicitando…"
+        )}
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7"
+          onClick={request}
+          disabled={status === "prompting"}
+        >
+          {status === "prompting"
+            ? "Solicitando…"
+            : location
+              ? "Actualizar ubicación"
               : status === "denied"
                 ? "Permiso denegado"
                 : status === "unavailable"
                   ? "No disponible"
-                  : "Compartir ubicación"}
-          </Button>
+                  : "Compartir mi ubicación"}
+        </Button>
+      </div>
+
+      {mapCenter && mapMarkers.length > 0 ? (
+        <div className="mb-4">
+          <InteractiveMap
+            lat={mapCenter.lat}
+            lng={mapCenter.lng}
+            zoom={mapMarkers.length === 1 ? 15 : 13}
+            markers={mapMarkers}
+            className="h-[420px] w-full rounded-2xl border border-border sm:h-[520px]"
+          />
         </div>
       ) : null}
 
@@ -147,10 +210,11 @@ export function InlineCategoryExplorer({
       ) : (
         <>
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {sorted.map((it) => (
+            {sorted.map((it, idx) => (
               <InlineExplorerCard
                 key={it.id}
                 item={it}
+                index={idx}
                 visitor={location}
               />
             ))}
@@ -181,21 +245,27 @@ export function InlineCategoryExplorer({
 
 function InlineExplorerCard({
   item,
+  index,
   visitor,
 }: {
   item: InlineExplorerItem;
+  index: number;
   visitor: { lat: number; lng: number } | null;
 }) {
   const km =
     visitor && item.latitude != null && item.longitude != null
       ? haversineKm(visitor, { lat: item.latitude, lng: item.longitude })
       : null;
+  const hasCoords = item.latitude != null && item.longitude != null;
   return (
     <li>
-      <a
-        href={item.href}
-        className="group flex h-full min-w-0 gap-3 rounded-xl border border-border bg-background p-3 transition hover:border-primary/40 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-      >
+      <article className="flex h-full min-w-0 gap-3 rounded-xl border border-border bg-background p-3 transition hover:border-primary/40">
+        <span
+          aria-hidden
+          className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground"
+        >
+          {labelForIndex(index)}
+        </span>
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-center gap-1.5">
             <span className="truncate text-sm font-semibold">{item.display_name}</span>
@@ -223,8 +293,39 @@ function InlineExplorerCard({
               </span>
             ) : null}
           </div>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {hasCoords ? (
+              <Button asChild size="sm" variant="outline" className="h-7 px-2 text-[11px]">
+                <a
+                  href={directionsHref({ lat: item.latitude as number, lng: item.longitude as number })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Cómo llegar a ${item.display_name}`}
+                >
+                  <Navigation className="mr-1 h-3 w-3" aria-hidden />
+                  Cómo llegar
+                </a>
+              </Button>
+            ) : null}
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-[11px]"
+              onClick={() => shareItem(item)}
+              aria-label={`Compartir ${item.display_name}`}
+            >
+              <Share2 className="mr-1 h-3 w-3" aria-hidden />
+              Compartir
+            </Button>
+            <Button asChild size="sm" className="h-7 px-2 text-[11px]">
+              <a href={item.href} aria-label={`Ver detalles de ${item.display_name}`}>
+                <ExternalLink className="mr-1 h-3 w-3" aria-hidden />
+                Ver detalles
+              </a>
+            </Button>
+          </div>
         </div>
-      </a>
+      </article>
     </li>
   );
 }
