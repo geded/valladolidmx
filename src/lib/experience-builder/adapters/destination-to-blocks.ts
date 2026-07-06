@@ -103,28 +103,21 @@ export function destinationToHeroDTO(d: DestinationBlockInput): ExperienceHeroDT
       .map((u, i) => ({ url: u, alt: `${d.name} — foto ${i + 2}`, focalPoint: "center" })),
   ];
   if (slides.length > 0) {
-    const encoded = encodeURIComponent(d.slug);
     return {
       variant: "gallery",
-      eyebrow: `Descubre ${d.regionName}`,
+      // Sin eyebrow: la región ya aparece en breadcrumb + meta + badges.
+      eyebrow: null,
       title: d.name,
       description: d.tagline || null,
       media: { url: slides[0].url, alt: slides[0].alt, overlay: 0 },
       mediaSlides: slides,
       badges: [],
       meta: [{ iconKey: "map-pin", label: d.regionName }],
-      ctaPrimary: {
-        label: "Explorar el destino",
-        action: "navigate",
-        href: `/oriente-maya/${encoded}#descubre`,
-        emphasis: "primary",
-      },
-      ctaSecondary: {
-        label: "Ver en el mapa",
-        action: "navigate",
-        href: `/oriente-maya/${encoded}#ubicacion`,
-        emphasis: "secondary",
-      },
+      // CTAs eliminados: la subnav inmediatamente debajo ya ofrece
+      // "Explora", "Ubicación" y "Sigue descubriendo". Evitamos ruido
+      // visual y respetamos el estilo editorial colonial.
+      ctaPrimary: null,
+      ctaSecondary: null,
     };
   }
   return {
