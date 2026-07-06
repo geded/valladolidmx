@@ -117,7 +117,7 @@ export const getInlineCategoryExplorer = createServerFn({ method: "GET" })
     let q = sb
       .from("businesses")
       .select(
-        "id, slug, display_name, tagline, verified, business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary )",
+        "id, slug, display_name, tagline, verified, primary_category:business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary )",
         { count: "exact" },
       )
       .eq("status", "published")
@@ -132,6 +132,9 @@ export const getInlineCategoryExplorer = createServerFn({ method: "GET" })
     const items: InlineExplorerItem[] = (rows ?? []).map((r) => {
       const locs = ((r as { business_locations?: Array<{ latitude: number | null; longitude: number | null; address_line1: string | null; is_primary: boolean | null }> }).business_locations) ?? [];
       const primary = locs.find((l) => l?.is_primary) ?? locs[0] ?? null;
+      const catSlug =
+        (r as { primary_category?: { slug?: string | null } | null }).primary_category?.slug ??
+        (isAll ? null : data.categorySlug);
       return {
         id: String(r.id),
         slug: String(r.slug),
@@ -141,9 +144,9 @@ export const getInlineCategoryExplorer = createServerFn({ method: "GET" })
         latitude: primary?.latitude != null ? Number(primary.latitude) : null,
         longitude: primary?.longitude != null ? Number(primary.longitude) : null,
         address: primary?.address_line1 ?? null,
-        href: isAll
-          ? `/oriente-maya/${encodeURIComponent(data.destinationSlug)}`
-          : `/oriente-maya/${encodeURIComponent(data.destinationSlug)}/${encodeURIComponent(data.categorySlug)}/${encodeURIComponent(String(r.slug))}`,
+        href: catSlug
+          ? `/oriente-maya/${encodeURIComponent(data.destinationSlug)}/${encodeURIComponent(catSlug)}/${encodeURIComponent(String(r.slug))}`
+          : `/oriente-maya/${encodeURIComponent(data.destinationSlug)}`,
       };
     });
 
