@@ -38,6 +38,7 @@ import {
   LineChart,
   AlertTriangle,
 } from "lucide-react";
+import { Plus, ExternalLink, Search, LogOut, Home } from "lucide-react";
 
 import type { WorkspaceDefinition } from "../types";
 import { registerWorkspace } from "../workspace-registry";
@@ -198,6 +199,16 @@ const portal: WorkspaceDefinition = {
     { id: "portal.business.read", label: "Leer ficha de empresa activa" },
     { id: "portal.presence.read", label: "Leer presencia y visibilidad" },
   ],
+  commands: [
+    { id: "portal.cmd.new-product", label: "Crear producto nuevo", icon: Plus, group: "crear", hint: "Añadir servicio, tour o ítem al catálogo", run: (ctx) => ctx.navigate("/portal/catalogo") },
+    { id: "portal.cmd.upload-photos", label: "Subir fotos a la galería", icon: ImageIcon, group: "crear", run: (ctx) => ctx.navigate("/portal/galeria") },
+    { id: "portal.cmd.edit-ficha", label: "Editar ficha pública", icon: BookOpenText, group: "crear", run: (ctx) => ctx.navigate("/portal/ficha") },
+    { id: "portal.cmd.invite", label: "Invitar a un colaborador", icon: Mail, group: "equipo", run: (ctx) => ctx.navigate("/portal/invitaciones") },
+    { id: "portal.cmd.reviews", label: "Ver reseñas recientes", icon: Bell, group: "ver", run: (ctx) => ctx.navigate("/portal/actividad") },
+    { id: "portal.cmd.plans", label: "Planes y visibilidad", icon: CreditCard, group: "ver", run: (ctx) => ctx.navigate("/portal/pagos") },
+    { id: "portal.cmd.public-site", label: "Abrir sitio público", icon: ExternalLink, group: "ir", hint: "Ver la plataforma como visitante", run: (ctx) => ctx.navigate("/") },
+    { id: "portal.cmd.alux", label: "Preguntar a Alux", icon: Sparkles, group: "ir", run: (ctx) => ctx.navigate("/alux") },
+  ],
   context: {
     workspaceId: "portal",
     entities: [
@@ -253,6 +264,11 @@ const concierge: WorkspaceDefinition = {
   aluxCapabilities: [
     { id: "concierge.cases.read", label: "Leer expedientes asignados" },
     { id: "concierge.workload.read", label: "Leer carga personal" },
+  ],
+  commands: [
+    { id: "concierge.cmd.inbox", label: "Ir a la bandeja", icon: Inbox, run: (ctx) => ctx.navigate("/concierge") },
+    { id: "concierge.cmd.public-site", label: "Abrir sitio público", icon: ExternalLink, run: (ctx) => ctx.navigate("/") },
+    { id: "concierge.cmd.alux", label: "Preguntar a Alux", icon: Sparkles, run: (ctx) => ctx.navigate("/alux") },
   ],
   context: {
     workspaceId: "concierge",
@@ -319,6 +335,15 @@ const cms: WorkspaceDefinition = {
   aluxCapabilities: [
     { id: "cms.moderation.read", label: "Leer cola de moderación" },
     { id: "cms.content.read", label: "Leer estado editorial" },
+  ],
+  commands: [
+    { id: "cms.cmd.new-page", label: "Nueva página", icon: Plus, group: "crear", run: (ctx) => ctx.navigate("/cms/experience-builder") },
+    { id: "cms.cmd.new-business", label: "Nueva empresa", icon: Building2, group: "crear", run: (ctx) => ctx.navigate("/cms/empresas") },
+    { id: "cms.cmd.new-product", label: "Nuevo producto", icon: Package, group: "crear", run: (ctx) => ctx.navigate("/cms/productos") },
+    { id: "cms.cmd.moderate", label: "Moderar reseñas", icon: Bell, group: "operar", run: (ctx) => ctx.navigate("/cms/reviews") },
+    { id: "cms.cmd.media", label: "Biblioteca de media", icon: ImageIcon, group: "operar", run: (ctx) => ctx.navigate("/cms/media") },
+    { id: "cms.cmd.observability", label: "Ver observabilidad", icon: LineChart, group: "operar", run: (ctx) => ctx.navigate("/cms/observabilidad") },
+    { id: "cms.cmd.public-site", label: "Abrir sitio público", icon: ExternalLink, group: "ir", run: (ctx) => ctx.navigate("/") },
   ],
   context: {
     workspaceId: "cms",
@@ -391,6 +416,17 @@ const cuenta: WorkspaceDefinition = {
     { id: "cuenta.travel.suggest_restaurants", label: "Recomendar restaurantes" },
     { id: "cuenta.travel.suggest_experiences", label: "Recomendar experiencias" },
     { id: "cuenta.travel.draft_concierge", label: "Preparar mensaje para Concierge" },
+  ],
+  commands: [
+    { id: "cuenta.cmd.trip", label: "Ir a Mi Viaje", icon: Compass, group: "viaje", run: (ctx) => ctx.navigate("/cuenta/mi-viaje") },
+    { id: "cuenta.cmd.favorites", label: "Ver favoritos", icon: HeartHandshake, group: "viaje", run: (ctx) => ctx.navigate("/cuenta/favoritos") },
+    { id: "cuenta.cmd.cart", label: "Ver carrito", icon: ShoppingCart, group: "viaje", run: (ctx) => ctx.navigate("/cuenta/carrito") },
+    { id: "cuenta.cmd.concierge", label: "Contactar Concierge", icon: ConciergeBell, group: "viaje", run: (ctx) => ctx.navigate("/cuenta/concierge") },
+    { id: "cuenta.cmd.explore", label: "Explorar destinos", icon: Search, group: "descubrir", run: (ctx) => ctx.navigate("/oriente-maya") },
+    { id: "cuenta.cmd.alux", label: "Preguntar a Alux", icon: Sparkles, group: "descubrir", run: (ctx) => ctx.navigate("/alux") },
+    { id: "cuenta.cmd.host", label: "Convertirme en anfitrión", icon: Building2, group: "cuenta", run: (ctx) => ctx.navigate("/cuenta/anfitrion") },
+    { id: "cuenta.cmd.profile", label: "Editar mi perfil", icon: UserRound, group: "cuenta", run: (ctx) => ctx.navigate("/cuenta/perfil") },
+    { id: "cuenta.cmd.public-site", label: "Ir al sitio público", icon: Home, group: "ir", run: (ctx) => ctx.navigate("/") },
   ],
   context: {
     workspaceId: "cuenta",
