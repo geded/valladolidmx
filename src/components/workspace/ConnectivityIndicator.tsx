@@ -49,7 +49,7 @@ export function ConnectivityIndicator({ className }: { className?: string }) {
       )}
     >
       <Icon className={cn("h-3.5 w-3.5", state === "reconnecting" && "animate-spin")} aria-hidden />
-      <span className="hidden sm:inline">{labelMap[state]}</span>
+      <span className="hidden xl:inline">{labelMap[state]}</span>
     </span>
   );
 }
