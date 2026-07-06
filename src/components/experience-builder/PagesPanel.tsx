@@ -87,6 +87,19 @@ function publicPathFromKind(def: PageKindDefinition | undefined, slug: string): 
   return def.publicRoutePattern.replace("{slug}", slug) || `/${slug}`;
 }
 
+/**
+ * Devuelve el patrón de URL pública absoluta (origin + pattern) para mostrar
+ * al editor mientras cambia el slug. Ej: "https://quehacerenvalladolid.com/l/{slug}".
+ */
+function publicUrlPattern(def: PageKindDefinition | undefined): string {
+  const origin =
+    typeof window !== "undefined" && window.location?.origin
+      ? window.location.origin
+      : "";
+  const pattern = def?.publicRoutePattern ?? "/p/{slug}";
+  return `${origin}${pattern}`;
+}
+
 function formatRelativeShort(iso: string): string {
   const then = new Date(iso).getTime();
   const diffMs = Date.now() - then;
@@ -579,6 +592,11 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           hint={
             inlineEdit.mode === "slug"
               ? "Sólo minúsculas, números y guiones. En US-R3 se activarán redirects 301 y actualización de canonical/sitemap."
+              : undefined
+          }
+          previewPattern={
+            inlineEdit.mode === "slug"
+              ? publicUrlPattern(getPageKindDefinition(inlineEdit.row.kind))
               : undefined
           }
           onCancel={() => setInlineEdit(null)}
@@ -1114,6 +1132,7 @@ function SimpleTextDialog({
   value,
   onChange,
   hint,
+  previewPattern,
   onCancel,
   onSubmit,
   busy,
@@ -1123,10 +1142,14 @@ function SimpleTextDialog({
   value: string;
   onChange: (v: string) => void;
   hint?: string;
+  previewPattern?: string;
   onCancel: () => void;
   onSubmit: () => void;
   busy: boolean;
 }) {
+  const previewUrl = previewPattern
+    ? previewPattern.replace("{slug}", slugify(value) || "…")
+    : null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm">
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-4 shadow-2xl">
@@ -1158,6 +1181,16 @@ function SimpleTextDialog({
               className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
             />
           </label>
+          {previewUrl ? (
+            <div className="rounded-md border border-dashed border-border bg-muted/40 px-2 py-1.5">
+              <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                URL pública
+              </p>
+              <p className="mt-0.5 break-all font-mono text-xs text-foreground">
+                {previewUrl}
+              </p>
+            </div>
+          ) : null}
           {hint ? <p className="text-[10px] text-muted-foreground">{hint}</p> : null}
           <div className="flex items-center justify-end gap-2 pt-1">
             <button
