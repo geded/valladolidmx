@@ -8,9 +8,16 @@
  */
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { BadgeCheck, MapPin, X, Navigation, Share2, ExternalLink } from "lucide-react";
+import { BadgeCheck, MapPin, X, Navigation, Share2, ExternalLink, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
 import { toast } from "sonner";
@@ -44,11 +51,24 @@ function directionsHref(p: { lat: number; lng: number }) {
   return `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
 }
 
-async function shareItem(item: InlineExplorerItem) {
-  const url =
-    typeof window !== "undefined"
-      ? new URL(item.href, window.location.origin).toString()
-      : item.href;
+function itemUrl(item: InlineExplorerItem) {
+  return typeof window !== "undefined"
+    ? new URL(item.href, window.location.origin).toString()
+    : item.href;
+}
+
+async function copyText(value: string, label = "Enlace copiado") {
+  if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
+    toast.error("No se pudo copiar en este dispositivo");
+    return false;
+  }
+  await navigator.clipboard.writeText(value);
+  toast.success(label);
+  return true;
+}
+
+async function nativeShareItem(item: InlineExplorerItem) {
+  const url = itemUrl(item);
   const data = { title: item.display_name, text: item.tagline || item.display_name, url };
   try {
     const nav = typeof navigator !== "undefined" ? (navigator as Navigator) : null;
@@ -56,16 +76,17 @@ async function shareItem(item: InlineExplorerItem) {
       await (nav as { share: (d: ShareData) => Promise<void> }).share(data);
       return;
     }
-    if (nav?.clipboard?.writeText) {
-      await nav.clipboard.writeText(url);
-      toast.success("Enlace copiado", { description: item.display_name });
-      return;
-    }
-    toast.error("No se pudo compartir en este dispositivo");
+    await copyText(url, "Enlace copiado");
   } catch {
     /* usuario canceló — sin feedback */
   }
 }
+
+type ExplorerPanel =
+  | { type: "details"; item: InlineExplorerItem }
+  | { type: "directions"; item: InlineExplorerItem }
+  | { type: "share"; item: InlineExplorerItem }
+  | null;
 
 export interface InlineCategoryExplorerProps {
   destinationSlug: string;
@@ -86,6 +107,7 @@ export function InlineCategoryExplorer({
   onClose,
 }: InlineCategoryExplorerProps) {
   const [page, setPage] = useState(1);
+  const [panel, setPanel] = useState<ExplorerPanel>(null);
   const { location, status, request } = useVisitorGeolocation();
 
   const { data, isLoading } = useQuery(
@@ -223,6 +245,9 @@ export function InlineCategoryExplorer({
                 item={it}
                 index={idx}
                 visitor={location}
+                onDetails={() => setPanel({ type: "details", item: it })}
+                onDirections={() => setPanel({ type: "directions", item: it })}
+                onShare={() => setPanel({ type: "share", item: it })}
               />
             ))}
           </ul>
@@ -246,6 +271,8 @@ export function InlineCategoryExplorer({
           </div>
         </>
       )}
+
+      <ExplorerActionSheet panel={panel} onOpenChange={(open) => !open && setPanel(null)} />
     </section>
   );
 }
@@ -254,10 +281,16 @@ function InlineExplorerCard({
   item,
   index,
   visitor,
+  onDetails,
+  onDirections,
+  onShare,
 }: {
   item: InlineExplorerItem;
   index: number;
   visitor: { lat: number; lng: number } | null;
+  onDetails: () => void;
+  onDirections: () => void;
+  onShare: () => void;
 }) {
   const km =
     visitor && item.latitude != null && item.longitude != null
@@ -302,37 +335,178 @@ function InlineExplorerCard({
           </div>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {hasCoords ? (
-              <Button asChild size="sm" variant="outline" className="h-7 px-2 text-[11px]">
-                <a
-                  href={directionsHref({ lat: item.latitude as number, lng: item.longitude as number })}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Cómo llegar a ${item.display_name}`}
-                >
-                  <Navigation className="mr-1 h-3 w-3" aria-hidden />
-                  Cómo llegar
-                </a>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-7 px-2 text-[11px]"
+                onClick={onDirections}
+                aria-label={`Cómo llegar a ${item.display_name}`}
+              >
+                <Navigation className="mr-1 h-3 w-3" aria-hidden />
+                Cómo llegar
               </Button>
             ) : null}
             <Button
+              type="button"
               size="sm"
               variant="outline"
               className="h-7 px-2 text-[11px]"
-              onClick={() => shareItem(item)}
+              onClick={onShare}
               aria-label={`Compartir ${item.display_name}`}
             >
               <Share2 className="mr-1 h-3 w-3" aria-hidden />
               Compartir
             </Button>
-            <Button asChild size="sm" className="h-7 px-2 text-[11px]">
-              <a href={item.href} aria-label={`Ver detalles de ${item.display_name}`}>
-                <ExternalLink className="mr-1 h-3 w-3" aria-hidden />
-                Ver detalles
-              </a>
+            <Button
+              type="button"
+              size="sm"
+              className="h-7 px-2 text-[11px]"
+              onClick={onDetails}
+              aria-label={`Ver detalles de ${item.display_name}`}
+            >
+              <ExternalLink className="mr-1 h-3 w-3" aria-hidden />
+              Ver detalles
             </Button>
           </div>
         </div>
       </article>
     </li>
+  );
+}
+
+function ExplorerActionSheet({
+  panel,
+  onOpenChange,
+}: {
+  panel: ExplorerPanel;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const item = panel?.item ?? null;
+  const hasCoords = item?.latitude != null && item.longitude != null;
+  const url = item ? itemUrl(item) : "";
+  const directionsUrl = hasCoords
+    ? directionsHref({ lat: item.latitude as number, lng: item.longitude as number })
+    : "";
+
+  return (
+    <Sheet open={!!panel} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="bottom"
+        className="max-h-[88vh] overflow-y-auto rounded-t-2xl border-border bg-background px-4 pb-5 pt-6 sm:inset-x-auto sm:left-1/2 sm:w-[min(42rem,calc(100vw-2rem))] sm:-translate-x-1/2 sm:px-6"
+      >
+        {item ? (
+          <div className="mx-auto w-full max-w-2xl">
+            <SheetHeader className="pr-8 text-left">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                {panel?.type === "directions" ? "Cómo llegar" : panel?.type === "share" ? "Compartir" : "Detalles"}
+              </p>
+              <SheetTitle className="font-serif text-2xl font-semibold leading-tight sm:text-3xl">
+                {item.display_name}
+              </SheetTitle>
+              <SheetDescription className="text-sm leading-relaxed">
+                {item.tagline || item.address || "Información publicada dentro del destino."}
+              </SheetDescription>
+            </SheetHeader>
+
+            {panel?.type === "details" ? (
+              <div className="mt-5 space-y-4">
+                {item.address ? (
+                  <div className="rounded-xl border border-border bg-muted/30 p-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Ubicación</p>
+                    <p className="mt-1 text-sm text-foreground">{item.address}</p>
+                  </div>
+                ) : null}
+                {hasCoords ? (
+                  <InteractiveMap
+                    lat={item.latitude as number}
+                    lng={item.longitude as number}
+                    zoom={15}
+                    markerTitle={item.display_name}
+                    className="h-[280px] w-full rounded-2xl border border-border sm:h-[360px]"
+                  />
+                ) : null}
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                  {hasCoords ? (
+                    <Button type="button" variant="outline" onClick={() => copyText(directionsUrl, "Ruta copiada")}>
+                      <Navigation className="mr-2 h-4 w-4" aria-hidden />
+                      Copiar ruta
+                    </Button>
+                  ) : null}
+                  <Button type="button" variant="outline" onClick={() => copyText(url)}>
+                    <Copy className="mr-2 h-4 w-4" aria-hidden />
+                    Copiar enlace
+                  </Button>
+                  <Button type="button" onClick={() => nativeShareItem(item)}>
+                    <Share2 className="mr-2 h-4 w-4" aria-hidden />
+                    Compartir
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+
+            {panel?.type === "directions" ? (
+              <div className="mt-5 space-y-4">
+                {hasCoords ? (
+                  <>
+                    <InteractiveMap
+                      lat={item.latitude as number}
+                      lng={item.longitude as number}
+                      zoom={15}
+                      markerTitle={item.display_name}
+                      className="h-[340px] w-full rounded-2xl border border-border sm:h-[440px]"
+                    />
+                    <div className="rounded-xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+                      <p className="font-medium text-foreground">{item.address ?? "Punto marcado en el mapa"}</p>
+                      <p className="mt-1">Copia la ruta para abrirla cuando quieras, sin abandonar este micrositio.</p>
+                    </div>
+                    <Button type="button" className="w-full" onClick={() => copyText(directionsUrl, "Ruta copiada")}>
+                      <Navigation className="mr-2 h-4 w-4" aria-hidden />
+                      Copiar ruta de Google Maps
+                    </Button>
+                  </>
+                ) : (
+                  <p className="rounded-xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+                    Este lugar aún no tiene coordenadas públicas para mostrar la ruta.
+                  </p>
+                )}
+              </div>
+            ) : null}
+
+            {panel?.type === "share" ? (
+              <div className="mt-5 space-y-3">
+                <div className="rounded-xl border border-border bg-muted/30 p-4">
+                  <p className="break-all text-sm text-muted-foreground">{url}</p>
+                </div>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <Button type="button" onClick={() => nativeShareItem(item)}>
+                    <Share2 className="mr-2 h-4 w-4" aria-hidden />
+                    Compartir del dispositivo
+                  </Button>
+                  <Button type="button" variant="outline" onClick={() => copyText(url)}>
+                    <Copy className="mr-2 h-4 w-4" aria-hidden />
+                    Copiar enlace
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => copyText(`${item.display_name}\n${url}`, "Texto copiado")}
+                  >
+                    <Check className="mr-2 h-4 w-4" aria-hidden />
+                    Copiar texto
+                  </Button>
+                  {hasCoords ? (
+                    <Button type="button" variant="outline" onClick={() => copyText(directionsUrl, "Ruta copiada")}>
+                      <Navigation className="mr-2 h-4 w-4" aria-hidden />
+                      Copiar ruta
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </SheetContent>
+    </Sheet>
   );
 }
