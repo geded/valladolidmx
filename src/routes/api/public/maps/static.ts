@@ -23,6 +23,16 @@ const Query = z.object({
   format: z.enum(["png", "jpg"]).default("png"),
 });
 
+// Marker adicional: "kind:lat,lng" — kind ∈ {poi, business, product, event}.
+const MARKER_RE = /^(poi|business|product|event|destination):(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/;
+const MARKER_COLORS: Record<string, string> = {
+  business: "0x0d5c46",
+  product: "0xd97706",
+  event: "0x7c3aed",
+  destination: "0xdc2626",
+  poi: "0x0d5c46",
+};
+
 export const Route = createFileRoute("/api/public/maps/static")({
   server: {
     handlers: {
@@ -39,6 +49,7 @@ export const Route = createFileRoute("/api/public/maps/static")({
           return new Response("Invalid parameters", { status: 400 });
         }
         const { lat, lng, zoom, width, height, scale, format } = parsed.data;
+        const rawMarkers = url.searchParams.getAll("m").slice(0, 40);
 
         const gw = new URL(
           "https://connector-gateway.lovable.dev/google_maps/maps/api/staticmap",
@@ -49,10 +60,31 @@ export const Route = createFileRoute("/api/public/maps/static")({
         gw.searchParams.set("scale", String(scale));
         gw.searchParams.set("format", format);
         gw.searchParams.set("maptype", "roadmap");
-        gw.searchParams.set(
-          "markers",
-          `color:red|size:mid|${lat},${lng}`,
-        );
+        if (rawMarkers.length === 0) {
+          gw.searchParams.append(
+            "markers",
+            `color:red|size:mid|${lat},${lng}`,
+          );
+        } else {
+          // Agrupar por kind para minimizar `markers` params (Google
+          // permite estilo por grupo).
+          const groups = new Map<string, string[]>();
+          for (const raw of rawMarkers) {
+            const m = MARKER_RE.exec(raw);
+            if (!m) continue;
+            const kind = m[1];
+            const arr = groups.get(kind) ?? [];
+            arr.push(`${m[2]},${m[3]}`);
+            groups.set(kind, arr);
+          }
+          for (const [kind, coords] of groups) {
+            const color = MARKER_COLORS[kind] ?? MARKER_COLORS.poi;
+            gw.searchParams.append(
+              "markers",
+              `color:${color}|size:mid|${coords.join("|")}`,
+            );
+          }
+        }
 
         const upstream = await fetch(gw, {
           headers: {
