@@ -44,6 +44,7 @@ export function marketplaceProductToItem(
     name: p.name,
     tagline: p.tagline || null,
     productType: p.product_type || null,
+    entityKind: "product",
     href: p.business_slug && p.slug
       ? `/marketplace/${p.business_slug}#p-${p.slug}`
       : null,
@@ -51,8 +52,13 @@ export function marketplaceProductToItem(
     mediaAlt: null,
     priceAmount: p.price_amount != null ? Number(p.price_amount) : null,
     priceCurrency: p.price_currency || "MXN",
+    priceHint: null,
     businessId: null,
     businessName: p.business_name || null,
+    rating: null,
+    location: null,
+    highlights: [],
+    dateLabel: null,
     badges: [],
     primaryAction: null,
     secondaryAction: null,
