@@ -581,6 +581,11 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
               ? "Sólo minúsculas, números y guiones. En US-R3 se activarán redirects 301 y actualización de canonical/sitemap."
               : undefined
           }
+          previewPattern={
+            inlineEdit.mode === "slug"
+              ? publicUrlPattern(getPageKindDefinition(inlineEdit.row.kind))
+              : undefined
+          }
           onCancel={() => setInlineEdit(null)}
           onSubmit={submitInlineEdit}
           busy={busyId === inlineEdit.row.id}
