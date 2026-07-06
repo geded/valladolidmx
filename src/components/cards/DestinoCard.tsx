@@ -1,120 +1,85 @@
 /**
- * DestinoCard — Tarjeta reutilizable de Destino.
+ * DestinoCard — Adaptador oficial sobre TourismCard (U1.3).
  *
- * Propósito: presentar un Destino con placeholder visual, nombre, tagline,
- * highlights y CTA "+ Arma tu Viaje" (deshabilitado en Fase 0).
- *
- * Reutilizable: recibe `destination` por props. Hoy enruta a
- * /oriente-maya/$destino; cuando se sume otra región se ampliará con
- * un mapa region_slug → ruta sin tocar el resto del componente.
+ * Mantiene la API `{ destination }` y el resolvedor de ruta multi-región
+ * (`region_slug → ruta`) para que RegionSurface, Home Destinos y Discovery
+ * cards-registry no requieran cambios. Sustituye la card local por la
+ * Tourism Card oficial de la biblioteca turística (Single Card Family).
  */
-import { Link } from "@tanstack/react-router";
-import { ArrowUpRight } from "lucide-react";
-import { PlaceholderImage } from "@/components/common/PlaceholderImage";
 import type { Destination } from "@/types/territory";
 import { useTranslation } from "@/i18n/context";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import {
+  TourismCard,
+  type TourismCardVM,
+} from "@/components/experience-builder/tourism-card/TourismCard";
 
 // Multi-región ready: añadir aquí nuevas regiones cuando existan.
-const REGION_TO_ROUTE: Record<string, "/oriente-maya/$destino"> = {
-  "oriente-maya": "/oriente-maya/$destino",
+const REGION_TO_HREF: Record<string, (slug: string) => string> = {
+  "oriente-maya": (slug) => `/oriente-maya/${slug}`,
 };
 
-/**
- * DestinoMedia — Renderiza fotografía real cuando hay `image_url`,
- * o el placeholder territorial si todavía no llegan los activos oficiales.
- * Aislado para que sustituir el banco de imágenes sea un cambio puntual.
- */
-function DestinoMedia({ destination }: { destination: Destination }) {
-  if (destination.image_url) {
-    return (
-      <div className="aspect-[4/3] w-full overflow-hidden">
-        <img
-          src={destination.image_url}
-          alt={`${destination.name} — ${destination.tagline}`}
-          loading="lazy"
-          width={1280}
-          height={960}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
-        />
-      </div>
-    );
-  }
-  return (
-    <PlaceholderImage
-      palette={destination.hero_palette}
-      label={destination.name}
-      aspect="4/3"
-      className="rounded-none border-0 transition group-hover:scale-[1.02]"
-    />
-  );
+function toVM(
+  destination: Destination,
+  labels: { explore: string; comingSoon: string },
+): TourismCardVM {
+  const builder = REGION_TO_HREF[destination.region_slug];
+  const href = builder ? builder(destination.slug) : null;
+  return {
+    id: `destination:${destination.id}`,
+    entityKind: "destination",
+    eyebrow: null,
+    name: destination.name,
+    href,
+    tagline: destination.tagline,
+    businessName: null,
+    mediaUrl: destination.image_url ?? null,
+    mediaAlt: `${destination.name} — ${destination.tagline}`,
+    rating: null,
+    location: null,
+    territorialContext: null,
+    highlights: [...destination.highlights].slice(0, 3),
+    badges: [],
+    institutionalBadges: [],
+    dateLabel: null,
+    availabilityLabel: null,
+    priceAmount: null,
+    priceCurrency: null,
+    priceHint: null,
+    primaryAction: href ? { label: labels.explore, href } : null,
+    secondaryAction: href ? null : { label: labels.comingSoon, href: null },
+  };
 }
 
 export function DestinoCard({ destination }: { destination: Destination }) {
   const { t } = useTranslation();
-  const route = REGION_TO_ROUTE[destination.region_slug];
-
+  const vm = toVM(destination, {
+    explore: t("common.explore"),
+    comingSoon: t("common.coming_soon"),
+  });
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-3xl border border-border/70 bg-card shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl">
-      {route ? (
-        <Link
-          to={route}
-          params={{ destino: destination.slug }}
-          aria-label={`${destination.name} — ${destination.tagline}`}
-          className="block focus:outline-none"
-        >
-          <DestinoMedia destination={destination} />
-        </Link>
-      ) : (
-        <DestinoMedia destination={destination} />
+    <TourismCard
+      vm={vm}
+      capabilities={{
+        showRating: false,
+        showPrice: false,
+        showDate: false,
+        showAvailability: false,
+        showDistance: false,
+        showBusiness: false,
+        showLocation: false,
+        showFavorite: true,
+      }}
+      renderActions={() => (
+        <AddToTravelPlanButton
+          kind="destination"
+          targetId={destination.id}
+          title={destination.name}
+          slug={destination.slug}
+          imageUrl={destination.image_url ?? null}
+          subtitle={destination.tagline}
+        />
       )}
-      <div className="flex flex-1 flex-col gap-3 p-6">
-        <div>
-          {route ? (
-            <Link
-              to={route}
-              params={{ destino: destination.slug }}
-              className="focus:outline-none"
-            >
-              <h3 className="text-2xl font-semibold tracking-tight hover:text-primary">
-                {destination.name}
-              </h3>
-            </Link>
-          ) : (
-            <h3 className="text-2xl font-semibold tracking-tight">{destination.name}</h3>
-          )}
-          <p className="mt-1 text-sm text-muted-foreground">{destination.tagline}</p>
-        </div>
-        <ul className="flex flex-wrap gap-1.5">
-          {destination.highlights.slice(0, 3).map((h) => (
-            <li key={h} className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">
-              {h}
-            </li>
-          ))}
-        </ul>
-        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
-          {route ? (
-            <Link
-              to={route}
-              params={{ destino: destination.slug }}
-              className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
-            >
-              {t("common.explore")}
-              <ArrowUpRight className="size-3.5" aria-hidden />
-            </Link>
-          ) : (
-            <span className="text-xs text-muted-foreground">{t("common.coming_soon")}</span>
-          )}
-          <AddToTravelPlanButton
-            kind="destination"
-            targetId={destination.id}
-            title={destination.name}
-            slug={destination.slug}
-            imageUrl={destination.image_url ?? null}
-            subtitle={destination.tagline}
-          />
-        </div>
-      </div>
-    </article>
+    />
   );
 }

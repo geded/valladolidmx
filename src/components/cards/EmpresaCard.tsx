@@ -1,17 +1,20 @@
 /**
- * EmpresaCard — Tarjeta teaser de Empresa recomendada.
- * En Fase 4 el orden vendrá del Motor de Visibilidad Inteligente.
+ * EmpresaCard — Adaptador oficial sobre TourismCard (U1.3).
+ *
+ * H-03 · U1.3: consolida toda la familia de cards en una única
+ * Tourism Card. Esta capa preserva la API `{ business }` que consumen
+ * `EmpresasSection`, Discovery Cards Registry y cualquier futuro
+ * listado, sin fabricar variantes visuales paralelas.
  */
-import { PlaceholderImage } from "@/components/common/PlaceholderImage";
 import type { BusinessTeaser } from "@/types/entities";
-import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
 import { resolveCanonicalPath } from "@/lib/navigation";
 import { TrustBadge } from "@/components/reviews/TrustBadge";
+import {
+  TourismCard,
+  type TourismCardVM,
+} from "@/components/experience-builder/tourism-card/TourismCard";
 
-export function EmpresaCard({ business }: { business: BusinessTeaser }) {
-  // US-E3.2 · Fase B — canonical territorial. Fallback a /marketplace/$slug
-  // (que 301 al canonical) sólo si aún no hay destino/categoría publicados.
+function toVM(business: BusinessTeaser): TourismCardVM {
   const href =
     business.destination_slug && business.category_slug
       ? resolveCanonicalPath({
@@ -21,22 +24,50 @@ export function EmpresaCard({ business }: { business: BusinessTeaser }) {
           destination: business.destination_slug,
         })
       : `/marketplace/${business.slug}`;
+  return {
+    id: `business:${business.id}`,
+    entityKind: "business",
+    eyebrow: business.category_slug ?? null,
+    name: business.name,
+    href,
+    tagline: business.tagline ?? null,
+    businessName: null,
+    mediaUrl: null,
+    mediaAlt: business.name,
+    rating: null,
+    location: business.destination_slug
+      ? { label: business.destination_slug, distanceKm: null }
+      : null,
+    territorialContext: null,
+    highlights: [],
+    badges: [],
+    institutionalBadges: [],
+    dateLabel: null,
+    availabilityLabel: null,
+    priceAmount: null,
+    priceCurrency: null,
+    priceHint: null,
+    primaryAction: { label: "Ver empresa", href },
+    secondaryAction: null,
+  };
+}
+
+export function EmpresaCard({ business }: { business: BusinessTeaser }) {
+  const vm = toVM(business);
   return (
-    <Link
-      to={href}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg"
-    >
-      <PlaceholderImage palette={business.palette} label={business.name} aspect="4/3" className="rounded-none border-0" />
-      <div className="flex flex-1 flex-col gap-2 p-5">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">{business.category_slug}</p>
-        <h3 className="text-base font-semibold">{business.name}</h3>
-        <p className="text-sm text-muted-foreground">{business.tagline}</p>
-        <TrustBadge subjectKind="business" subjectId={business.id} className="mt-1" />
-        <div className="mt-auto flex items-center gap-1.5 pt-2 text-xs font-medium text-primary">
-          Ver empresa
-          <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
-        </div>
-      </div>
-    </Link>
+    <TourismCard
+      vm={vm}
+      capabilities={{
+        showRating: false,
+        showPrice: false,
+        showDate: false,
+        showAvailability: false,
+        showDistance: false,
+        showFavorite: true,
+      }}
+      renderActions={() => (
+        <TrustBadge subjectKind="business" subjectId={business.id} />
+      )}
+    />
   );
 }

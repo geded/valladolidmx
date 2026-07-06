@@ -1,30 +1,65 @@
 /**
- * RutaCard — Tarjeta reutilizable de Ruta sugerida.
+ * RutaCard — Adaptador oficial sobre TourismCard (U1.3).
+ *
+ * Mantiene la API `{ route }` que consumen `RutasSection` y el Discovery
+ * cards-registry. Consolida la card bajo la biblioteca oficial y
+ * traslada duración/destinos como dateLabel + highlight.
  */
-import { Clock, MapPin } from "lucide-react";
-import { PlaceholderImage } from "@/components/common/PlaceholderImage";
 import type { SuggestedRoute } from "@/types/entities";
 import { useTranslation } from "@/i18n/context";
+import {
+  TourismCard,
+  type TourismCardVM,
+} from "@/components/experience-builder/tourism-card/TourismCard";
+
+function toVM(
+  route: SuggestedRoute,
+  labels: { days: string; destinationsLabel: (n: number) => string },
+): TourismCardVM {
+  return {
+    id: `route:${route.id}`,
+    entityKind: "route",
+    eyebrow: null,
+    name: route.name,
+    href: null,
+    tagline: route.summary,
+    businessName: null,
+    mediaUrl: null,
+    mediaAlt: route.name,
+    rating: null,
+    location: null,
+    territorialContext: null,
+    highlights: [labels.destinationsLabel(route.destination_slugs.length)],
+    badges: [],
+    institutionalBadges: [],
+    dateLabel: `${route.duration_days} ${labels.days}`,
+    availabilityLabel: null,
+    priceAmount: null,
+    priceCurrency: null,
+    priceHint: null,
+    primaryAction: null,
+    secondaryAction: null,
+  };
+}
 
 export function RutaCard({ route }: { route: SuggestedRoute }) {
   const { t } = useTranslation();
+  const vm = toVM(route, {
+    days: t("common.days"),
+    destinationsLabel: (n) => `${n} destinos`,
+  });
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition hover:shadow-md">
-      <PlaceholderImage palette={route.palette} label={route.name} aspect="video" className="rounded-none border-0" />
-      <div className="flex flex-1 flex-col gap-3 p-5">
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="inline-flex items-center gap-1">
-            <Clock className="size-3.5" aria-hidden />
-            {route.duration_days} {t("common.days")}
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <MapPin className="size-3.5" aria-hidden />
-            {route.destination_slugs.length}
-          </span>
-        </div>
-        <h3 className="text-lg font-semibold">{route.name}</h3>
-        <p className="text-sm text-muted-foreground">{route.summary}</p>
-      </div>
-    </article>
+    <TourismCard
+      vm={vm}
+      capabilities={{
+        showRating: false,
+        showPrice: false,
+        showAvailability: false,
+        showDistance: false,
+        showBusiness: false,
+        showLocation: false,
+        showFavorite: false,
+      }}
+    />
   );
 }

@@ -1,61 +1,76 @@
 /**
- * CategoriaCard — Tarjeta reutilizable de Categoría.
+ * CategoriaCard — Adaptador oficial sobre TourismCard (U1.3).
  *
- * Hoy: las categorías con ruta top-level (experiencias/hoteles/restaurantes/
- * eventos) son links navegables; el resto muestra "próximamente". Cuando
- * en Fase 1 exista /categoria/$slug, se sustituye el mapa por la ruta
- * dinámica sin tocar consumidores.
+ * Mapa slug → ruta top-level preservado; cuando exista /categoria/$slug
+ * en Fase 1 se amplía sin tocar consumidores. La representación visual
+ * queda unificada bajo la Tourism Card oficial (Single Card Family),
+ * usando el gradiente institucional para categorías sin fotografía.
  */
-import { Link } from "@tanstack/react-router";
-import * as Icons from "lucide-react";
 import type { Category } from "@/types/entities";
 import { useTranslation } from "@/i18n/context";
-import { cn } from "@/lib/utils";
+import {
+  TourismCard,
+  type TourismCardVM,
+} from "@/components/experience-builder/tourism-card/TourismCard";
 
-const PALETTE_BG: Record<Category["palette"], string> = {
-  primary: "bg-primary/10 text-primary",
-  selva: "bg-selva/15 text-selva",
-  cenote: "bg-cenote/15 text-cenote",
-  atardecer: "bg-atardecer/15 text-atardecer",
-};
-
-const ROUTE_BY_SLUG: Partial<
-  Record<string, "/experiencias" | "/hoteles" | "/restaurantes" | "/eventos">
-> = {
+const ROUTE_BY_SLUG: Partial<Record<string, string>> = {
   experiencias: "/experiencias",
   hoteles: "/hoteles",
   restaurantes: "/restaurantes",
   eventos: "/eventos",
 };
 
+function toVM(
+  category: Category,
+  labels: { explore: string; comingSoon: string },
+): TourismCardVM {
+  const href = ROUTE_BY_SLUG[category.slug] ?? null;
+  return {
+    id: `category:${category.id}`,
+    entityKind: "category",
+    eyebrow: null,
+    name: category.name,
+    href,
+    tagline: category.description,
+    businessName: null,
+    mediaUrl: null,
+    mediaAlt: category.name,
+    rating: null,
+    location: null,
+    territorialContext: null,
+    highlights: [],
+    badges: [],
+    institutionalBadges: [],
+    dateLabel: null,
+    availabilityLabel: href ? null : labels.comingSoon,
+    priceAmount: null,
+    priceCurrency: null,
+    priceHint: null,
+    primaryAction: href ? { label: labels.explore, href } : null,
+    secondaryAction: null,
+  };
+}
+
 export function CategoriaCard({ category }: { category: Category }) {
   const { t } = useTranslation();
-  const Icon = (Icons as unknown as Record<string, Icons.LucideIcon>)[category.icon] ?? Icons.Sparkles;
-  const route = ROUTE_BY_SLUG[category.slug];
-
-  const inner = (
-    <>
-      <span aria-hidden className={cn("grid size-10 place-items-center rounded-xl", PALETTE_BG[category.palette])}>
-        <Icon className="size-5" />
-      </span>
-      <div>
-        <h3 className="text-base font-semibold">{category.name}</h3>
-        <p className="mt-1 text-sm text-muted-foreground">{category.description}</p>
-        {!route ? (
-          <p className="mt-2 text-xs text-muted-foreground">· {t("common.coming_soon")}</p>
-        ) : null}
-      </div>
-    </>
-  );
-
-  const baseClass =
-    "group flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 transition hover:shadow-md";
-
-  return route ? (
-    <Link to={route} className={baseClass}>
-      {inner}
-    </Link>
-  ) : (
-    <div className={cn(baseClass, "opacity-90")}>{inner}</div>
+  const vm = toVM(category, {
+    explore: t("common.explore"),
+    comingSoon: t("common.coming_soon"),
+  });
+  return (
+    <TourismCard
+      vm={vm}
+      capabilities={{
+        showRating: false,
+        showPrice: false,
+        showDate: false,
+        showAvailability: !ROUTE_BY_SLUG[category.slug],
+        showDistance: false,
+        showBusiness: false,
+        showLocation: false,
+        showHighlights: false,
+        showFavorite: false,
+      }}
+    />
   );
 }
