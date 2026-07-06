@@ -14,6 +14,7 @@ import type {
   ExperienceRelatedEntityKind,
   ExperienceRelatedItem,
 } from "@/lib/experience-builder/blocks/experience-related-collection/contract";
+import { EXPERIENCE_RELATED_ITEM_V11_DEFAULTS as V11 } from "@/lib/experience-builder/blocks/experience-related-collection/contract";
 import { resolveCanonicalPath } from "@/lib/navigation/canonical-paths";
 
 export function businessRelatedToItems(
@@ -22,6 +23,7 @@ export function businessRelatedToItems(
   rationale?: string | null,
 ): ExperienceRelatedItem[] {
   return businesses.map((b) => ({
+    ...V11,
     id: b.id,
     kind,
     title: b.display_name,
