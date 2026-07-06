@@ -171,12 +171,12 @@ export const experienceHeroDtoSchema = z.object({
     })
     .nullable(),
   /** v1.1.0 — Slides para `cinematic`. Vacío en variantes clásicas. */
-  mediaSlides: z.array(experienceHeroSlideSchema).default([]),
-  slideIntervalMs: z.number().int().default(7000),
-  alignment: experienceHeroAlignmentSchema.default("left"),
-  eyebrowStyle: experienceHeroEyebrowStyleSchema.default("eyebrow"),
-  overlapHeader: z.boolean().default(false),
-  autoplaySlides: z.boolean().default(true),
+  mediaSlides: z.array(experienceHeroSlideSchema).optional(),
+  slideIntervalMs: z.number().int().optional(),
+  alignment: experienceHeroAlignmentSchema.optional(),
+  eyebrowStyle: experienceHeroEyebrowStyleSchema.optional(),
+  overlapHeader: z.boolean().optional(),
+  autoplaySlides: z.boolean().optional(),
   badges: z.array(experienceHeroBadgeSchema),
   meta: z.array(experienceHeroMetaSchema),
   ctaPrimary: experienceHeroCtaSchema.nullable(),
@@ -185,7 +185,7 @@ export const experienceHeroDtoSchema = z.object({
    * v1.1.0 — Lista extendida de CTAs (n≥0). Cuando viene poblada,
    * la Presentación la usa en lugar de `ctaPrimary`/`ctaSecondary`.
    */
-  ctas: z.array(experienceHeroCtaSchema).default([]),
+  ctas: z.array(experienceHeroCtaSchema).optional(),
 });
 export type ExperienceHeroDTO = z.infer<typeof experienceHeroDtoSchema>;
 
