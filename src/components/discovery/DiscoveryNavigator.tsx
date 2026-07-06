@@ -43,6 +43,14 @@ export interface DiscoveryNavigatorProps {
   emptyLabel?: string | null;
   /** Slots futuros (promociones, eventos, Alux). Se renderizan al final. */
   slots?: ReactNode;
+  /**
+   * `navigate` (default): los chips son enlaces (`href`) que salen del
+   * micrositio. `inline`: los chips son botones que emiten `onSelect`
+   * y el explorador se abre debajo del propio bloque.
+   */
+  mode?: "navigate" | "inline";
+  activeCategory?: string | null;
+  onSelect?: (slug: string) => void;
 }
 
 export function DiscoveryNavigator({
@@ -54,6 +62,9 @@ export function DiscoveryNavigator({
   ctaHref,
   emptyLabel = "Aún no hay categorías publicadas para este destino.",
   slots,
+  mode = "navigate",
+  activeCategory = null,
+  onSelect,
 }: DiscoveryNavigatorProps) {
   if (categories.length === 0 && emptyLabel === null && !slots) return null;
 
@@ -87,32 +98,58 @@ export function DiscoveryNavigator({
         <ul className={layout}>
           {categories.map((c) => {
             const Icon = ICONS[c.iconKey] ?? Layers;
+            const isActive = mode === "inline" && activeCategory === c.slug;
+            const commonInner = (
+              <>
+                <span
+                  className={
+                    "flex h-9 w-9 items-center justify-center rounded-full " +
+                    (isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-primary/10 text-primary")
+                  }
+                >
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                </span>
+                <span className="flex-1 min-w-0 text-left">
+                  <span className="block truncate text-sm font-medium leading-tight">
+                    {c.label}
+                  </span>
+                  {showCounts ? (
+                    <span className="block text-xs text-muted-foreground">
+                      {c.count} {c.count === 1 ? "opción" : "opciones"}
+                    </span>
+                  ) : null}
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground"
+                >
+                  {isActive ? "•" : "→"}
+                </span>
+              </>
+            );
+            const chipClass =
+              "group flex w-full items-center gap-3 rounded-xl border px-3 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary " +
+              (isActive
+                ? "border-primary/50 bg-primary/5"
+                : "border-transparent hover:border-border hover:bg-muted/40");
             return (
               <li key={c.slug}>
-                <a
-                  href={c.href}
-                  className="group flex items-center gap-3 rounded-xl border border-transparent px-3 py-2 transition hover:border-border hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <Icon className="h-4 w-4" aria-hidden="true" />
-                  </span>
-                  <span className="flex-1">
-                    <span className="block text-sm font-medium leading-tight">
-                      {c.label}
-                    </span>
-                    {showCounts ? (
-                      <span className="block text-xs text-muted-foreground">
-                        {c.count} {c.count === 1 ? "opción" : "opciones"}
-                      </span>
-                    ) : null}
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className="text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground"
+                {mode === "inline" ? (
+                  <button
+                    type="button"
+                    aria-pressed={isActive}
+                    onClick={() => onSelect?.(c.slug)}
+                    className={chipClass}
                   >
-                    →
-                  </span>
-                </a>
+                    {commonInner}
+                  </button>
+                ) : (
+                  <a href={c.href} className={chipClass}>
+                    {commonInner}
+                  </a>
+                )}
               </li>
             );
           })}
