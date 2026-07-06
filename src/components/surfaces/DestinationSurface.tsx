@@ -38,6 +38,9 @@ import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/exper
 import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
+import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
+import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
+import type { ExperienceMapPoint } from "@/lib/experience-builder/blocks/experience-map/contract";
 import {
   toDestinationBlockInput,
   destinationToHeroDTO,
@@ -46,6 +49,8 @@ import {
   destinationToHighlightsInfoGridDTO,
   destinationToCtaBarDTO,
   destinationToBadgeItems,
+  destinationToGalleryDTO,
+  destinationToMapDTO,
 } from "@/lib/experience-builder/adapters/destination-to-blocks";
 
 /* ------------------------------------------------------------------ *
@@ -85,12 +90,18 @@ export interface DestinationSurfaceProps {
   dbData?: PublicDestinationDTO;
   /** Contenido relacionado (empresas y productos publicados del destino). */
   related?: DestinationRelatedDTO;
+  /** U-VISUAL · V4.2 — Puntos territoriales para `vmx.experience.map`. */
+  mapPoints?: ExperienceMapPoint[];
+  /** U-VISUAL · V4.2 — URLs de galería (BD) para `vmx.experience.gallery`. */
+  galleryUrls?: string[];
 }
 
 export function DestinationSurface({
   destinationSlug,
   dbData,
   related,
+  mapPoints,
+  galleryUrls,
 }: DestinationSurfaceProps = {}) {
   const params = useParams({ strict: false }) as { destino?: string };
   const ctx = useContext(DestinationSurfaceContext);
@@ -128,6 +139,8 @@ export function DestinationSurface({
       productos: rel?.productos.length ?? 0,
       eventos: rel?.eventos?.length ?? 0,
     },
+    galleryUrls: galleryUrls ?? [],
+    mapPoints: mapPoints ?? [],
   });
 
   const heroDto = destinationToHeroDTO(input);
@@ -136,6 +149,8 @@ export function DestinationSurface({
   const highlightsInfoGrid = destinationToHighlightsInfoGridDTO(input);
   const ctaBarDto = destinationToCtaBarDTO(input);
   const badgeItems = destinationToBadgeItems(input);
+  const galleryDto = destinationToGalleryDTO(input);
+  const mapDto = destinationToMapDTO(input);
 
   return (
     <PublicShell
