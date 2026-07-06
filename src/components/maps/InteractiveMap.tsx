@@ -78,6 +78,8 @@ export interface InteractiveMapProps {
   zoom?: number;
   markerTitle?: string;
   className?: string;
+  /** Pines adicionales para renderizar (visitas territoriales). */
+  markers?: Array<{ lat: number; lng: number; title?: string; href?: string | null }>;
 }
 
 export function InteractiveMap({
@@ -86,6 +88,7 @@ export function InteractiveMap({
   zoom = 15,
   markerTitle,
   className,
+  markers,
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -110,11 +113,16 @@ export function InteractiveMap({
           fullscreenControl: true,
           gestureHandling: "cooperative",
         });
-        new google.maps.Marker({
-          position: { lat, lng },
-          map,
-          title: markerTitle,
-        });
+        const list = markers && markers.length > 0
+          ? markers
+          : [{ lat, lng, title: markerTitle }];
+        for (const m of list) {
+          new google.maps.Marker({
+            position: { lat: m.lat, lng: m.lng },
+            map,
+            title: m.title ?? markerTitle,
+          });
+        }
         setReady(true);
       })
       .catch((e) => {
@@ -123,7 +131,7 @@ export function InteractiveMap({
     return () => {
       cancelled = true;
     };
-  }, [lat, lng, zoom, markerTitle]);
+  }, [lat, lng, zoom, markerTitle, markers]);
 
   if (error) {
     return (
