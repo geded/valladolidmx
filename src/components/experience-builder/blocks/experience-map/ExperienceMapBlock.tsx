@@ -17,7 +17,7 @@
  */
 import { lazy, Suspense, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MapPin, Navigation, Map as MapIcon } from "lucide-react";
+import { Navigation, Map as MapIcon } from "lucide-react";
 import { StaticMap } from "@/components/maps/StaticMap";
 import { DistanceBadge } from "@/components/maps/DistanceBadge";
 import { cn } from "@/lib/utils";
@@ -143,98 +143,99 @@ export function ExperienceMapBlock({ dto, className }: ExperienceMapBlockProps) 
         </div>
 
         <aside className="space-y-4">
-          {isMulti ? (
-            <ul
-              className="max-h-[360px] space-y-2 overflow-y-auto rounded-2xl border border-border bg-card p-3"
-              aria-label="Puntos en el mapa"
-            >
-              {dto.points.map((p, i) => {
-                const isActive = p.id === primary.id;
-                const label = labelOf(i);
-                return (
-                  <li key={p.id}>
-                    <button
-                      type="button"
-                      onClick={() => setActiveId(p.id)}
-                      className={cn(
-                        "flex w-full items-start gap-3 rounded-xl border p-3 text-left transition",
-                        isActive
-                          ? "border-primary bg-primary/5"
-                          : "border-transparent hover:bg-muted",
-                      )}
-                    >
-                      <span className="relative flex-shrink-0">
-                        {p.thumbUrl ? (
-                          <img
-                            src={p.thumbUrl}
-                            alt=""
-                            className="h-12 w-12 rounded-lg object-cover"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <span className="grid h-12 w-12 place-items-center rounded-lg bg-muted text-primary">
-                            <MapPin className="h-5 w-5" aria-hidden />
-                          </span>
-                        )}
+          <ul
+            className={cn(
+              "space-y-3",
+              isMulti
+                ? "max-h-[560px] overflow-y-auto pr-1"
+                : undefined,
+            )}
+            aria-label="Puntos en el mapa"
+          >
+            {dto.points.map((p, i) => {
+              const isActive = p.id === primary.id;
+              const label = labelOf(i);
+              return (
+                <li key={p.id}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveId(p.id)}
+                    aria-pressed={isActive}
+                    className={cn(
+                      "block w-full rounded-2xl border bg-card p-4 text-left transition",
+                      isActive
+                        ? "border-primary shadow-elevated"
+                        : "border-border hover:border-primary/50",
+                    )}
+                  >
+                    <div className="flex items-start gap-3">
+                      {isMulti ? (
                         <span
                           aria-hidden
-                          className="absolute -top-1 -left-1 grid h-5 w-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow"
+                          className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground"
                         >
                           {label}
                         </span>
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-medium text-foreground">
+                      ) : null}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-foreground">
                           {p.title}
-                        </span>
+                        </p>
                         {p.subtitle ? (
-                          <span className="block truncate text-xs text-muted-foreground">
+                          <p className="mt-0.5 text-xs text-muted-foreground">
                             {p.subtitle}
-                          </span>
+                          </p>
                         ) : null}
                         {p.priceLabel ? (
-                          <span className="mt-1 inline-block text-xs font-medium text-primary">
+                          <p className="mt-1 text-xs font-medium text-primary">
                             {p.priceLabel}
-                          </span>
+                          </p>
                         ) : null}
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : null}
+                      </div>
+                    </div>
 
-          <div className="space-y-3 rounded-2xl border border-border bg-card p-4">
-            <p className="text-sm font-medium text-foreground">{primary.title}</p>
-            {primary.subtitle ? (
-              <p className="text-xs text-muted-foreground">{primary.subtitle}</p>
-            ) : null}
+                    {dto.capabilities.showDistance ? (
+                      <div className="mt-3">
+                        <DistanceBadge destLat={p.lat} destLng={p.lng} />
+                      </div>
+                    ) : null}
 
-            {dto.capabilities.showDistance ? (
-              <DistanceBadge destLat={primary.lat} destLng={primary.lng} />
-            ) : null}
-
-            {dto.capabilities.showDirections ? (
-              <Button asChild size="sm" className="w-full">
-                <a
-                  href={directionsHref(primary)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Cómo llegar a ${primary.title}`}
-                >
-                  <Navigation className="mr-2 h-4 w-4" aria-hidden />
-                  Cómo llegar
-                </a>
-              </Button>
-            ) : null}
-
-            {primary.href ? (
-              <Button asChild size="sm" variant="outline" className="w-full">
-                <a href={primary.href}>Ver detalles</a>
-              </Button>
-            ) : null}
-          </div>
+                    <div className="mt-3 space-y-2">
+                      {dto.capabilities.showDirections ? (
+                        <Button asChild size="sm" className="w-full">
+                          <a
+                            href={directionsHref(p)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Cómo llegar a ${p.title}`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Navigation className="mr-2 h-4 w-4" aria-hidden />
+                            Cómo llegar
+                          </a>
+                        </Button>
+                      ) : null}
+                      {p.href ? (
+                        <Button
+                          asChild
+                          size="sm"
+                          variant="outline"
+                          className="w-full"
+                        >
+                          <a
+                            href={p.href}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Ver detalles
+                          </a>
+                        </Button>
+                      ) : null}
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         </aside>
       </div>
     </section>
