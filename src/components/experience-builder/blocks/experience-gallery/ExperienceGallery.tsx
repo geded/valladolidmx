@@ -86,7 +86,7 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
           ))}
         </ul>
       ) : variant === "grid" ? (
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4" role="list">
+        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4" role="list">
           {visible.map((it, i) => (
             <li key={i}>
               <Thumb item={it} aspect={aspect} onClick={() => open(i)} lightbox={!!capabilities.lightbox} captions={!!capabilities.captions} />
@@ -95,15 +95,16 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
         </ul>
       ) : (
         // mosaic
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:grid-rows-2">
+        <div className="grid grid-cols-2 gap-2 overflow-hidden rounded-3xl sm:grid-cols-4 sm:grid-rows-2 sm:h-[420px] md:h-[520px]">
           {visible.map((it, i) => (
             <div
               key={i}
               className={cn(
+                "relative",
                 i === 0 && "sm:col-span-2 sm:row-span-2",
               )}
             >
-              <Thumb item={it} aspect={i === 0 ? "landscape" : "square"} onClick={() => open(i)} lightbox={!!capabilities.lightbox} captions={!!capabilities.captions} />
+              <Thumb item={it} aspect={i === 0 ? "landscape" : "square"} onClick={() => open(i)} lightbox={!!capabilities.lightbox} captions={!!capabilities.captions} fill />
             </div>
           ))}
         </div>
@@ -159,12 +160,14 @@ function Thumb({
   onClick,
   lightbox,
   captions,
+  fill,
 }: {
   item: ExperienceGalleryItem;
   aspect: keyof typeof ASPECT | string;
   onClick: () => void;
   lightbox: boolean;
   captions: boolean;
+  fill?: boolean;
 }) {
   const cls = ASPECT[aspect as string] ?? ASPECT.landscape;
   const inner = (
@@ -173,19 +176,26 @@ function Thumb({
         src={item.url}
         alt={item.alt}
         loading="lazy"
-        className={cn("h-full w-full rounded-md object-cover transition group-hover:scale-[1.02]", cls)}
+        className={cn(
+          "h-full w-full object-cover transition group-hover:scale-[1.02]",
+          fill ? "absolute inset-0 rounded-none" : "rounded-2xl",
+          !fill && cls,
+        )}
       />
       {captions && item.caption ? (
         <span className="mt-1 block truncate text-xs text-muted-foreground">{item.caption}</span>
       ) : null}
     </>
   );
-  if (!lightbox) return <div className={cn("group overflow-hidden", cls && "relative")}>{inner}</div>;
+  if (!lightbox) return <div className={cn("group overflow-hidden", fill ? "absolute inset-0" : cls && "relative")}>{inner}</div>;
   return (
     <button
       type="button"
       onClick={onClick}
-      className="group block w-full overflow-hidden rounded-md text-left focus-visible:outline-none focus-visible:ring-focus"
+      className={cn(
+        "group block w-full overflow-hidden text-left focus-visible:outline-none focus-visible:ring-focus",
+        fill ? "absolute inset-0" : "rounded-2xl",
+      )}
       aria-label={`Abrir ${item.alt || "imagen"}`}
     >
       {inner}

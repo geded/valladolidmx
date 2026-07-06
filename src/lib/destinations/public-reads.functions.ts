@@ -82,6 +82,115 @@ export interface DestinationRelatedDTO {
   eventos: PublicEventCard[];
 }
 
+/* ------------------------------------------------------------------ *
+ * U-VISUAL · V4.2 — Datos para el bloque `vmx.experience.map` en la
+ * superficie de destino. Se lee `business_locations` de todos los
+ * negocios publicados asociados al destino y se proyectan como puntos
+ * territoriales. Compatibilidad Evolutiva: función nueva, no modifica
+ * `getDestinationRelated`.
+ * ------------------------------------------------------------------ */
+export interface DestinationMapPointDTO {
+  id: string;
+  kind: "business";
+  lat: number;
+  lng: number;
+  title: string;
+  subtitle: string | null;
+  href: string | null;
+  thumbUrl: string | null;
+  badge: string | null;
+  priceLabel: string | null;
+}
+
+export const getDestinationMapPoints = createServerFn({ method: "GET" })
+  .inputValidator((input: { slug: string }) => {
+    if (!input || typeof input.slug !== "string" || !/^[a-z0-9-]{1,80}$/.test(input.slug)) {
+      throw new Error("Invalid slug");
+    }
+    return input;
+  })
+  .handler(async ({ data }): Promise<DestinationMapPointDTO[]> => {
+    const { createClient } = await import("@supabase/supabase-js");
+    const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: dest } = await sb
+      .from("destinations").select("id").eq("slug", data.slug).maybeSingle();
+    if (!dest) return [];
+    const { data: rows, error } = await sb
+      .from("businesses")
+      .select("id, slug, display_name, tagline, status, deleted_at, business_locations!inner(latitude, longitude, address_line1, is_primary)")
+      .eq("destination_id", dest.id)
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .limit(80);
+    if (error || !rows) return [];
+    const points: DestinationMapPointDTO[] = [];
+    for (const row of rows) {
+      const locs = (row.business_locations ?? []) as Array<{
+        latitude: number | null;
+        longitude: number | null;
+        address_line1: string | null;
+        is_primary: boolean | null;
+      }>;
+      const primary = locs.find((l) => l.is_primary) ?? locs[0];
+      if (!primary || primary.latitude == null || primary.longitude == null) continue;
+      points.push({
+        id: row.id as string,
+        kind: "business",
+        lat: Number(primary.latitude),
+        lng: Number(primary.longitude),
+        title: (row.display_name as string) ?? "",
+        subtitle: primary.address_line1 ?? (row.tagline as string | null) ?? null,
+        href: `/negocio/${row.slug}`,
+        thumbUrl: null,
+        badge: null,
+        priceLabel: null,
+      });
+    }
+    return points;
+  });
+
+/* ------------------------------------------------------------------ *
+ * U-VISUAL · V4.2 — Galería del destino (Airbnb-style). Lee
+ * `destination_media` firmando URLs desde el bucket privado.
+ * ------------------------------------------------------------------ */
+export const getDestinationGalleryUrls = createServerFn({ method: "GET" })
+  .inputValidator((input: { slug: string }) => {
+    if (!input || typeof input.slug !== "string" || !/^[a-z0-9-]{1,80}$/.test(input.slug)) {
+      throw new Error("Invalid slug");
+    }
+    return input;
+  })
+  .handler(async ({ data }): Promise<string[]> => {
+    const { createClient } = await import("@supabase/supabase-js");
+    const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: dest } = await sb
+      .from("destinations").select("id").eq("slug", data.slug).maybeSingle();
+    if (!dest) return [];
+    const { data: rows, error } = await sb
+      .from("destination_media")
+      .select("sort_order, media_assets:media_asset_id ( storage_bucket, storage_path )")
+      .eq("destination_id", dest.id)
+      .order("sort_order", { ascending: true })
+      .limit(12);
+    if (error || !rows) return [];
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const urls: string[] = [];
+    for (const r of rows) {
+      const m = (r as unknown as {
+        media_assets?: { storage_bucket: string; storage_path: string } | null;
+      }).media_assets;
+      if (!m?.storage_bucket || !m?.storage_path) continue;
+      const { data: signed } = await supabaseAdmin.storage
+        .from(m.storage_bucket).createSignedUrl(m.storage_path, 60 * 60);
+      if (signed?.signedUrl) urls.push(signed.signedUrl);
+    }
+    return urls;
+  });
+
 const HOTEL_CATS = new Set(["hoteles", "hospedaje"]);
 const RESTO_CATS = new Set(["restaurantes", "gastronomia"]);
 const EXP_CATS = new Set(["experiencias", "experiencias-tours", "tours"]);

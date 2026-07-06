@@ -14,7 +14,12 @@ import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
 import { DestinationSurface } from "@/components/surfaces/DestinationSurface";
-import { getPublicDestinationBySlug, getDestinationRelated } from "@/lib/destinations/public-reads.functions";
+import {
+  getPublicDestinationBySlug,
+  getDestinationRelated,
+  getDestinationMapPoints,
+  getDestinationGalleryUrls,
+} from "@/lib/destinations/public-reads.functions";
 import {
   ContextEngineProvider,
   defineRouteContext,
@@ -54,9 +59,11 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
     const mock = DESTINOS_MOCK.find(
       (d) => d.slug === params.destino && d.region_slug === ORIENTE_MAYA.slug,
     );
-    const [db, related] = await Promise.all([
+    const [db, related, mapPoints, galleryUrls] = await Promise.all([
       getPublicDestinationBySlug({ data: { slug: params.destino } }).catch(() => null),
       getDestinationRelated({ data: { slug: params.destino } }).catch(() => null),
+      getDestinationMapPoints({ data: { slug: params.destino } }).catch(() => []),
+      getDestinationGalleryUrls({ data: { slug: params.destino } }).catch(() => []),
     ]);
     if (!mock && !db) throw notFound();
     const dest = {
@@ -67,7 +74,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
         "territorio" | "selva" | "cenote" | "atardecer",
       highlights: (db?.highlights?.length ? db.highlights : mock?.highlights ?? []) as string[],
     };
-    return { dest, db, related };
+    return { dest, db, related, mapPoints, galleryUrls };
   },
   head: ({ loaderData, params }) =>
     loaderData
@@ -83,7 +90,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
 });
 
 function DestinoPage() {
-  const { dest, db, related } = Route.useLoaderData();
+  const { dest, db, related, mapPoints, galleryUrls } = Route.useLoaderData();
   const declaration = buildDestinationContext(dest.slug, dest.name);
   // H-02 · I3 — Sólo la RUTA monta el provider. La superficie
   // (`DestinationSurface`) mantiene su propio `PublicShell` intacto —
@@ -91,7 +98,12 @@ function DestinoPage() {
   // en `sessionStorage` para habilitar herencia en I4 (categorías).
   return (
     <ContextEngineProvider declaration={declaration}>
-      <DestinationSurface dbData={db ?? undefined} related={related ?? undefined} />
+      <DestinationSurface
+        dbData={db ?? undefined}
+        related={related ?? undefined}
+        mapPoints={mapPoints ?? []}
+        galleryUrls={galleryUrls ?? []}
+      />
     </ContextEngineProvider>
   );
 }
