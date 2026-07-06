@@ -15,6 +15,7 @@ import {
   listBusinessCategoriesForSelect,
   listDestinationsForSelect,
 } from "@/lib/cms/businesses-media.functions";
+import { getBusinessPrimaryLocation } from "@/lib/cms/business-locations.functions";
 
 interface Props {
   id?: string;
@@ -68,12 +69,50 @@ export function BusinessEditor({ id }: Props) {
       renderExtras={({ id: entityId }) =>
         entityId ? (
           <>
+            <LocationGate businessId={entityId} />
             <BusinessLocationPanel businessId={entityId} />
             <BusinessMediaPanels businessId={entityId} />
             <RelatedOverridesPanel entityType="business" entityId={entityId} />
           </>
-        ) : null
+        ) : (
+          <NewBusinessLocationNotice />
+        )
       }
     />
+  );
+}
+
+function NewBusinessLocationNotice() {
+  return (
+    <div className="rounded-xl border border-amber-500/40 bg-amber-500/5 p-4 text-sm text-amber-900 dark:text-amber-200">
+      <p className="font-semibold">Paso siguiente obligatorio: ubicación en el mapa</p>
+      <p className="mt-1 text-xs">
+        Al crear el borrador aparecerá el panel de <strong>Ubicación</strong>.
+        Debes marcar el pin en el mapa antes de enviar a revisión o publicar.
+        Alux usa esas coordenadas para calcular distancia, tiempo y cercanía
+        al viajero.
+      </p>
+    </div>
+  );
+}
+
+function LocationGate({ businessId }: { businessId: string }) {
+  const readFn = useServerFn(getBusinessPrimaryLocation);
+  const q = useQuery({
+    queryKey: ["cms", "business", businessId, "primary-location"],
+    queryFn: () => readFn({ data: { businessId } }),
+  });
+  const hasLocation =
+    !!q.data && q.data.latitude != null && q.data.longitude != null;
+  if (q.isLoading || hasLocation) return null;
+  return (
+    <div className="mb-4 rounded-xl border border-destructive/50 bg-destructive/5 p-4 text-sm text-destructive">
+      <p className="font-semibold">Ubicación obligatoria</p>
+      <p className="mt-1 text-xs">
+        Este negocio aún no tiene coordenadas. No podrás enviarlo a revisión ni
+        publicarlo hasta marcar el pin en el mapa abajo. Regla vinculante:
+        Geolocation Mandatory.
+      </p>
+    </div>
   );
 }
