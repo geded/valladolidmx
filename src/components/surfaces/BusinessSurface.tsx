@@ -45,6 +45,7 @@ import {
   businessToCtaBarDTO,
 } from "@/lib/experience-builder/adapters/business-to-blocks";
 import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
+import { Share2 } from "lucide-react";
 
 /* ------------------------------------------------------------------ *
  * Contexto — poblado por la ruta pública (SSR-safe).
@@ -164,11 +165,13 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
       <ExperienceHero
         dto={heroDto}
         headingLevel="h1"
-        extensionsSlot={
-          <div className="flex flex-wrap items-center gap-3">
+        headerActionsSlot={
+          <>
+            <ShareButton title={b.display_name} />
             <FavoriteButton entityKind="business" entityId={b.id} />
-          </div>
+          </>
         }
+        extensionsSlot={null}
       />
 
       <ExperienceSubnav dto={subnavDto} className="mt-6 mb-6" />
@@ -285,5 +288,38 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
 
       <ExperienceCtaBar dto={ctaBarDto} />
     </PublicShell>
+  );
+}
+
+/**
+ * ShareButton — botón de compartir compacto (Web Share API + fallback a
+ * clipboard). Se usa en el overlay del Hero "gallery".
+ */
+function ShareButton({ title }: { title: string }) {
+  async function handleShare() {
+    if (typeof navigator === "undefined") return;
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    try {
+      const nav = navigator as Navigator & { share?: (d: ShareData) => Promise<void> };
+      if (nav.share) {
+        await nav.share({ title, url });
+        return;
+      }
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      }
+    } catch {
+      /* usuario canceló */
+    }
+  }
+  return (
+    <button
+      type="button"
+      onClick={handleShare}
+      aria-label="Compartir"
+      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/90 text-foreground shadow-soft backdrop-blur-sm transition hover:bg-background focus-visible:outline-none focus-visible:ring-focus"
+    >
+      <Share2 className="h-5 w-5" aria-hidden="true" />
+    </button>
   );
 }

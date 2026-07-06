@@ -18,6 +18,8 @@ export const experienceHeroVariantSchema = z.enum([
   "compact",   // Media a la izquierda, texto a la derecha (desktop).
   "editorial", // Sin media dominante, tipografía protagonista.
   "cinematic", // v1.1.0 · Full-viewport, carrusel de slides, eyebrow script.
+  "gallery",   // v1.2.0 · Airbnb-style: carrusel horizontal + contador
+               //          + back/share/favorite overlay + info debajo.
 ]);
 export type ExperienceHeroVariant = z.infer<typeof experienceHeroVariantSchema>;
 
