@@ -78,7 +78,10 @@ export function DiscoveryNavigatorBlock({
   const setActive = (slug: string | null) => {
     navigate({
       to: ".",
-      search: (prev) => ({ ...(prev as Record<string, unknown>), explora: slug ?? undefined }),
+      search: (prev: Record<string, unknown>) => ({
+        ...prev,
+        explora: slug ?? undefined,
+      }),
       replace: true,
     });
     if (slug && typeof document !== "undefined") {
