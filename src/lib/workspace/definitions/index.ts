@@ -99,6 +99,15 @@ const founder: WorkspaceDefinition = {
     { id: "founder.kpis.read", label: "Leer KPIs globales" },
     { id: "founder.alerts.read", label: "Leer alertas de sistema" },
   ],
+  commands: [
+    { id: "founder.cmd.today", label: "Vista Hoy", icon: LayoutDashboard, group: "ver", run: (ctx) => ctx.navigate("/admin") },
+    { id: "founder.cmd.empresas", label: "Ver empresas", icon: Building2, group: "ver", run: (ctx) => ctx.navigate("/admin/empresas") },
+    { id: "founder.cmd.concierge", label: "Ver Concierge", icon: ConciergeBell, group: "ver", run: (ctx) => ctx.navigate("/admin/concierge") },
+    { id: "founder.cmd.users", label: "Usuarios y roles", icon: Users, group: "config", run: (ctx) => ctx.navigate("/admin/sistema/usuarios") },
+    { id: "founder.cmd.system", label: "Sistema", icon: Settings, group: "config", run: (ctx) => ctx.navigate("/admin/sistema") },
+    { id: "founder.cmd.cms", label: "Ir al CMS", icon: FileCog, group: "ir", run: (ctx) => ctx.setWorkspace("cms") },
+    { id: "founder.cmd.public-site", label: "Abrir sitio público", icon: ExternalLink, group: "ir", run: (ctx) => ctx.navigate("/") },
+  ],
   context: {
     workspaceId: "founder",
     entities: [
