@@ -9,6 +9,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { EntityEditor } from "@/components/cms/EntityEditor";
 import { BusinessMediaPanels } from "@/components/cms/BusinessMediaPanels";
 import { RelatedOverridesPanel } from "@/components/cms/RelatedOverridesPanel";
+import { BusinessLocationPanel } from "@/components/cms/BusinessLocationPanel";
 import { BUSINESS_FIELDS } from "@/lib/cms/editor-fields";
 import {
   listBusinessCategoriesForSelect,
@@ -67,6 +68,7 @@ export function BusinessEditor({ id }: Props) {
       renderExtras={({ id: entityId }) =>
         entityId ? (
           <>
+            <BusinessLocationPanel businessId={entityId} />
             <BusinessMediaPanels businessId={entityId} />
             <RelatedOverridesPanel entityType="business" entityId={entityId} />
           </>
