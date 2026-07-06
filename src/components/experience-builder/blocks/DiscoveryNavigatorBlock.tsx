@@ -73,7 +73,22 @@ export function DiscoveryNavigatorBlock({
 
   const navigate = useNavigate();
   const search = useSearch({ strict: false }) as { explora?: string };
-  const activeCategory = isInline ? (search?.explora ?? null) : null;
+  // En modo inline, el explorador está activo por defecto en "todo"
+  // (mapa interactivo con TODOS los negocios del destino). Al elegir
+  // una categoría, el mapa y las tarjetas se filtran a esa categoría.
+  const activeCategory = isInline ? (search?.explora ?? "todo") : null;
+
+  const totalCount = categories.reduce((s, c) => s + (c.count ?? 0), 0);
+  const allChip = isInline
+    ? {
+        slug: "todo",
+        label: "Todo el destino",
+        iconKey: "layers",
+        count: totalCount,
+        href: destinationSlug ? `/oriente-maya/${destinationSlug}` : "#explora",
+      }
+    : null;
+  const chipCategories = allChip ? [allChip, ...categories] : categories;
 
   const setActive = (slug: string | null) => {
     navigate({
@@ -95,7 +110,7 @@ export function DiscoveryNavigatorBlock({
 
   const activeCategoryItem =
     activeCategory != null
-      ? categories.find((c) => c.slug === activeCategory) ?? null
+      ? chipCategories.find((c) => c.slug === activeCategory) ?? null
       : null;
 
   return (
@@ -104,14 +119,16 @@ export function DiscoveryNavigatorBlock({
         title={config.title ?? defaultTitle}
         variant={config.variant ?? "panel"}
         showCounts={config.showCounts ?? true}
-        categories={categories}
+        categories={chipCategories}
         ctaLabel={isInline ? "" : (config.ctaLabel ?? defaultCtaLabel)}
         ctaHref={isInline ? "" : (config.ctaHref ?? defaultCtaHref)}
         emptyLabel={config.emptyLabel ?? "Aún no hay categorías publicadas."}
         mode={mode}
         activeCategory={activeCategory}
         onSelect={(slug) =>
-          setActive(activeCategory === slug ? null : slug)
+          // Nunca desactivar en modo inline: al deseleccionar una
+          // categoría, se vuelve al estado "todo" (mapa global).
+          setActive(activeCategory === slug ? (isInline ? "todo" : null) : slug)
         }
       />
       {isInline && activeCategory && destinationSlug ? (
@@ -121,7 +138,9 @@ export function DiscoveryNavigatorBlock({
           categorySlug={activeCategory}
           categoryLabel={activeCategoryItem?.label ?? activeCategory}
           pageSize={config.pageSize ?? 8}
-          onClose={() => setActive(null)}
+          onClose={
+            activeCategory === "todo" ? undefined : () => setActive("todo")
+          }
         />
       ) : null}
     </div>

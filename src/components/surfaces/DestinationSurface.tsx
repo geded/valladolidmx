@@ -34,7 +34,7 @@ import { DiscoveryNavigatorBlock } from "@/components/experience-builder/blocks/
 import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
 import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
 import { ExperienceSection } from "@/components/experience-builder/blocks/experience-section/ExperienceSection";
-import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGrid";
+import { ExperienceFeatures } from "@/components/experience-builder/blocks/experience-features/ExperienceFeatures";
 import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
@@ -45,7 +45,7 @@ import {
   destinationToHeroDTO,
   destinationToSubnavDTO,
   destinationToDescriptionSectionDTO,
-  destinationToHighlightsInfoGridDTO,
+  destinationToHighlightsFeaturesDTO,
   destinationToCtaBarDTO,
   destinationToBadgeItems,
   destinationToMapDTO,
@@ -153,7 +153,7 @@ export function DestinationSurface({
   const showGalleryMosaic = heroDto.variant !== "gallery" && Boolean(galleryDto);
   const subnavDto = destinationToSubnavDTO(input);
   const descriptionSection = destinationToDescriptionSectionDTO(input);
-  const highlightsInfoGrid = destinationToHighlightsInfoGridDTO(input);
+  const highlightsFeatures = destinationToHighlightsFeaturesDTO(input);
   const ctaBarDto = destinationToCtaBarDTO(input);
   const badgeItems = destinationToBadgeItems(input);
   void destinationToMapDTO; // mapa ahora se renderiza dentro del Explorador Inline
@@ -199,11 +199,11 @@ export function DestinationSurface({
       <ExperienceSubnav dto={subnavDto} className="mt-6 mb-6" />
 
       <div className="space-y-10">
-        {descriptionSection || highlightsInfoGrid ? (
+        {descriptionSection || highlightsFeatures ? (
             <section id="resumen" data-eb-anchor className="scroll-mt-24">
               {descriptionSection ? <ExperienceSection dto={descriptionSection} /> : null}
-              {highlightsInfoGrid ? (
-                <ExperienceInfoGrid dto={highlightsInfoGrid} className="mt-6" />
+              {highlightsFeatures ? (
+                <ExperienceFeatures dto={highlightsFeatures} className="mt-6" />
               ) : null}
             </section>
           ) : null}
