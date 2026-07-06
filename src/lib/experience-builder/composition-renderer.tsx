@@ -746,7 +746,7 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.product.shell": ({ renderChildren }) => (
     <ProductShellBlock renderChildren={renderChildren} />
   ),
-  "vmx.product.hero": () => <ProductHeroBlock />,
+  "vmx.product.hero": () => <ExperienceHeroFromProduct />,
   "vmx.product.gallery": () => <ProductGalleryBlock />,
   "vmx.product.price-cta": () => <ProductPriceCtaBlock />,
   "vmx.product.description": () => <ProductDescriptionBlock />,
