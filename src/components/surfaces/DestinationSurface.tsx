@@ -37,6 +37,7 @@ import { ExperienceSection } from "@/components/experience-builder/blocks/experi
 import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGrid";
 import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
+import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import {
   toDestinationBlockInput,
   destinationToHeroDTO,
@@ -44,6 +45,7 @@ import {
   destinationToDescriptionSectionDTO,
   destinationToHighlightsInfoGridDTO,
   destinationToCtaBarDTO,
+  destinationToBadgeItems,
 } from "@/lib/experience-builder/adapters/destination-to-blocks";
 
 /* ------------------------------------------------------------------ *
@@ -133,6 +135,7 @@ export function DestinationSurface({
   const descriptionSection = destinationToDescriptionSectionDTO(input);
   const highlightsInfoGrid = destinationToHighlightsInfoGridDTO(input);
   const ctaBarDto = destinationToCtaBarDTO(input);
+  const badgeItems = destinationToBadgeItems(input);
 
   return (
     <PublicShell
@@ -143,6 +146,27 @@ export function DestinationSurface({
       useContextCrumbs
     >
       <ExperienceHero dto={heroDto} headingLevel="h1" />
+
+      {badgeItems.length > 0 ? (
+        <div className="mt-6">
+          <InstitutionalBadgesBlock
+            config={{
+              source: "destination",
+              subjectSlug: input.slug,
+              variant: "soft",
+              size: "md",
+              layout: "strip",
+              items: badgeItems,
+              ariaLabel: `Distintivos institucionales de ${input.name}`,
+              capabilities: {
+                showLabel: true,
+                showTooltip: true,
+                mobileVisibleMax: 3,
+              },
+            }}
+          />
+        </div>
+      ) : null}
 
       <ExperienceSubnav dto={subnavDto} className="mt-6 mb-6" />
 

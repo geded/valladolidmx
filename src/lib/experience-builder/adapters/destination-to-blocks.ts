@@ -19,6 +19,8 @@ import type {
 import type { ExperienceSectionDTO } from "@/lib/experience-builder/blocks/experience-section/contract";
 import type { ExperienceInfoGridDTO } from "@/lib/experience-builder/blocks/experience-info-grid/contract";
 import type { ExperienceCtaBarDTO } from "@/lib/experience-builder/blocks/experience-cta-bar/contract";
+import type { InstitutionalBadgeItem } from "@/lib/experience-builder/blocks/experience-institutional-badges/contract";
+import { PUEBLOS_MAGICOS_AUTORIZADOS } from "@/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry";
 
 /**
  * Modelo unificado consumido por los adapters. Se compone en la ruta a
@@ -76,19 +78,81 @@ export function toDestinationBlockInput(
  * Hero
  * ------------------------------------------------------------------ */
 export function destinationToHeroDTO(d: DestinationBlockInput): ExperienceHeroDTO {
+  // U-VISUAL · V1 — Tourist Hero cinematic para micrositios de destino.
+  // Evolución vía `variant` + `capabilities` del contrato oficial
+  // (Tourist Hero Policy). Compatibilidad: sin heroUrl caemos a
+  // `editorial` como antes.
+  if (d.heroUrl) {
+    const encoded = encodeURIComponent(d.slug);
+    return {
+      variant: "cinematic",
+      eyebrow: `Descubre ${d.regionName}`,
+      eyebrowStyle: "script",
+      title: d.name,
+      description: d.tagline || null,
+      media: { url: d.heroUrl, alt: d.name, overlay: 0.45 },
+      mediaSlides: [{ url: d.heroUrl, alt: d.name }],
+      overlapHeader: true,
+      badges: [],
+      meta: [{ iconKey: "map-pin", label: d.regionName }],
+      ctaPrimary: {
+        label: "Explorar el destino",
+        action: "navigate",
+        href: `/oriente-maya/${encoded}#descubre`,
+        emphasis: "primary",
+      },
+      ctaSecondary: {
+        label: "Ver en el mapa",
+        action: "navigate",
+        href: `/oriente-maya/${encoded}#mapa`,
+        emphasis: "secondary",
+      },
+    };
+  }
   return {
-    variant: d.heroUrl ? "immersive" : "editorial",
+    variant: "editorial",
     eyebrow: d.regionName,
     title: d.name,
     description: d.tagline || null,
-    media: d.heroUrl
-      ? { url: d.heroUrl, alt: d.name, overlay: 0.4 }
-      : null,
+    media: null,
     badges: [],
     meta: [{ iconKey: "map-pin", label: `${d.regionName}` }],
     ctaPrimary: null,
     ctaSecondary: null,
   };
+}
+
+/* ------------------------------------------------------------------ *
+ * Institutional Badges — deriva distintivos oficiales del destino.
+ * Founder Design Principle (identidad cultural + distintivos
+ * institucionales) + Institutional Badges Rule (jamás hardcodeados en
+ * plantillas; el registry autoriza).
+ * ------------------------------------------------------------------ */
+export function destinationToBadgeItems(
+  d: DestinationBlockInput,
+): InstitutionalBadgeItem[] {
+  const items: InstitutionalBadgeItem[] = [];
+  const slug = d.slug.toLowerCase();
+  if ((PUEBLOS_MAGICOS_AUTORIZADOS as readonly string[]).includes(slug)) {
+    items.push({
+      kind: "pueblo-magico",
+      slug: `pueblo-magico:${slug}`,
+      source: "destination",
+    });
+  }
+  items.push({
+    kind: "oriente-maya",
+    slug: `oriente-maya:${slug}`,
+    source: "destination",
+  });
+  if (slug === "valladolid") {
+    items.push({
+      kind: "despierta-en-valladolid",
+      slug: `despierta:${slug}`,
+      source: "destination",
+    });
+  }
+  return items;
 }
 
 /* ------------------------------------------------------------------ *
