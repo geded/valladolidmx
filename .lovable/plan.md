@@ -1,70 +1,52 @@
-## V3 · Dynamic Listings Hardening — Founder Discovery Standard
+# V4 · Founder Discovery Map Principle
 
-**Estado:** ✅ IMPLEMENTADO (typecheck limpio, 8 rutas migradas; pendiente validación visual del Founder). Ver `docs/blueprint/16.09-U-VISUAL-V3-DYNAMIC-LISTINGS-COMPLETION-REPORT-v1.0.md`. Preview interno omitido: las 8 rutas oficiales son la validación directa.
+Objetivo: convertir `vmx.experience.map` en la única familia oficial de mapas y activar el Sistema de Descubrimiento Territorial (mapa + Tourism Card + Context Engine + Navigation Contract + Alux).
 
-Unificar los 8 listados de descubrimiento en un mismo sistema visual y de UX, sin tocar rutas, contratos, tipos internos ni backend. Cero regresiones; cero motores paralelos.
-
-### Founder Discovery Principle (contrato de UX)
-Cada listado debe responder above-the-fold: ¿qué puedo descubrir aquí? · ¿cuál es la mejor opción para mí? · ¿qué hay cerca? · ¿por qué es diferente? · ¿cuál abro ahora? Hero + TourismCard + filtros + contexto territorial + (V4) mapa forman **un solo sistema**, no piezas sueltas.
+Alcance grande → ejecución en 4 fases secuenciales, cada una con Completion Report + validación visual antes de continuar. Reutilizo la infraestructura ya existente (`InteractiveMap`, `StaticMap`, `DistanceBadge`, `useVisitorGeolocation`, `maps.functions.ts`, `BusinessLocationBlock`); no se crean motores paralelos.
 
 ---
 
-### 1. Nueva superficie oficial `TourismListingSurface`
+## Fase V4.1 — Bloque oficial `vmx.experience.map` + adaptadores
 
-Archivo: `src/components/surfaces/TourismListingSurface.tsx`. Reutiliza infraestructura existente (Tourist Hero cinematic, TourismCard, Institutional Badges, kit tokens DSL). Responsabilidades:
+- `src/lib/experience-builder/blocks/experience-map/contract.ts` — DTO Zod:
+  - `variant`: `single | multi | list-sync | cluster`
+  - `center`, `zoom`, `points[]` (id, lat, lng, kind, title, href, badge, price, thumb)
+  - `capabilities`: `showDistance`, `showDirections`, `clustering`, `syncList`, `staticFallback`
+  - `contract_version: "1.0.0"`, `extensions[]`, `permissions`.
+- `src/components/experience-builder/blocks/experience-map/ExperienceMapBlock.tsx` — orquesta `StaticMap` (SSR/fallback) e `InteractiveMap` (progressive enhancement); toggle "Ver interactivo".
+- Registro en `block-library.ts` + smoke.
+- Adaptadores en `src/lib/experience-builder/adapters/`:
+  - `entityToMapPoint.ts`: `businessToMapPoint`, `productToMapPoint`, `destinationToMapPoint`.
 
-- **Hero cinematic** (`vmx.experience.hero`, variant `cinematic`, eyebrow `script`, `overlapHeader`) alimentado por props `hero: { eyebrow, title, subtitle, mediaUrl, badges }`.
-- **Sticky filter bar** con facets declarativos (`facets: FacetDef[]`) — destino, subtipo, precio, fecha, badges institucionales. Filtro cliente-side sobre el array recibido; sin nueva query server. Persistencia en `searchParams` de la ruta (opt-in por ruta).
-- **Contexto territorial**: consume `useContextCrumbs`; muestra el chip "Explorando en {Destino}" cuando hay `destinationSlug` heredado.
-- **Grid TourismCard** con `columns` responsive (1/2/3), skeleton coherente y `emptyMessage` accionable ("Explorar otros destinos").
-- **Slot `mapSlot`** reservado para V4 (`vmx.experience.map`) — hoy renderiza null; queda como capability activable por config.
-- **Institutional Badges strip** encima del grid cuando el destino/categoría tiene badges (Pueblo Mágico, Oriente Maya, Despierta en Valladolid).
+## Fase V4.2 — Ficha Empresa · Ficha Producto · Micrositio Destino
 
-Cero lógica de negocio nueva: todo se compone con bloques ya oficiales.
+- Ficha Empresa: reemplazar `BusinessLocationBlock` inline por el bloque oficial (variant `single`, `showDistance`, `showDirections`). Sección "Qué hay cerca" (variant `multi`) alimentada por `business-related` en radio ≤ 2km.
+- Ficha Producto: bloque `single` con dirección heredada de la empresa + DistanceBadge + CTA "Cómo llegar".
+- Micrositio Destino: bloque `multi` con clusters por categoría del destino (usa items ya cargados por `destination-to-blocks`).
 
-### 2. Adapters `→ TourismCardVM`
+## Fase V4.3 — Vista Lista + Mapa sincronizada en `TourismListingSurface`
 
-En `src/lib/experience-builder/adapters/tourism-listing-adapters.ts`:
+- Habilitar `mapSlot` del V3: `<ExperienceMapBlock variant="list-sync">` sincronizado con grid + facets.
+- Clustering (Supercluster JS puro, sin native deps) por zona/destino.
+- Toggle Lista | Mapa | Split — Split sólo en desktop; Mobile = tabs.
+- Activar por defecto en `/hoteles` y `/restaurantes`; opt-in en el resto vía prop.
 
-- `businessToTourismCard(MarketplaceBusinessCard, destinoLabel?) → TourismCardVM`
-- `promotionToTourismCard(PromotionCard, ...)`
-- `eventToTourismCard(PublicEventCard, ...)`
-- `destinationToTourismCard(Destination, ...)` (reuso en `/que-hacer`)
+## Fase V4.4 — Alux territorial + validación final
 
-Cada adapter deriva `entityKind`, `eyebrow`, `location`, `institutionalBadges`, `href` canónico (via `resolveCanonicalPath`), rating/precio cuando existan. Sin inventar datos: campos no disponibles → `null` y capabilities los ocultan.
+- Nueva capability `distance` en `contextual-suggest.functions.ts`: si visitante tiene geo, Alux prepende "a X km · Y min caminando/en auto" en sugerencias.
+- `AluxSuggestionCard` muestra pill con distancia (reusa `formatDistance`).
+- Preview interno `src/routes/lovable/experience-map-preview.tsx` con las 4 variantes.
+- Completion Report V4 + Completion Report U-VISUAL v1 consolidado (V1+V2+V3+V4).
+- Validación visual (mobile + desktop) de las 9 superficies exigidas por el Founder.
 
-### 3. Migración de las 8 rutas
+---
 
-Todas las rutas mantienen su loader y contratos; sólo cambia el render:
+## Fuera de alcance V4 (queda registrado como Founder Territorial Platform Principle → evolución futura)
 
-| Ruta | Fuente | Notas |
-|---|---|---|
-| `/hoteles` | `listMarketplaceBusinesses` filtrado | Ya tiene filtro `?destino`; facet destino. Hero: "Descansa en el Oriente Maya". |
-| `/restaurantes` | idem | Facet destino + cocina si existe. |
-| `/experiencias` | idem | Facet destino + tipo. |
-| `/casas-de-vacaciones` | idem | Facet destino + capacidad. |
-| `/eventos` | `listPublishedEvents` | Facet mes/destino; muestra `dateLabel`. |
-| `/que-hacer` | destinos + eventos | Sección multi-entidad, usa `mixed`. |
-| `/promociones` | `listPromotions` (composiciones) | Facet destino/vigencia. |
-| `/oriente-maya/:destino/:categoria` | resolver + businesses | Hero deriva de destino+categoría (media del destino si existe); ancla `#descubre` intacta. |
+Rutas sugeridas, itinerarios de Arma tu Viaje, recorridos optimizados por Alux, capas temáticas (cenotes, gastronomía, arqueología…), zonas de interés, disponibilidad contextual, información territorial enriquecida. Toda evolución futura sobre `vmx.experience.map`.
 
-Regla: si un filtro no tiene datos para poblarse, no se renderiza — se activa progresivamente conforme los feeds maduran.
+---
 
-### 4. Preview y validación visual
+## Ejecución
 
-- Ruta interna `src/routes/lovable/tourism-listing-preview.tsx` con las 8 configuraciones lado a lado (mock data), para revisión Founder en un solo lugar.
-- `docs/blueprint/16.09-U-VISUAL-V3-DYNAMIC-LISTINGS-COMPLETION-REPORT-v1.0.md` con: matriz de reutilización, capabilities usadas, comparativas antes/después por ruta, typecheck limpio, notas de retro-compatibilidad y ficha de madurez L4→L5.
-
-### 5. Founder Discovery Standard (política)
-
-Al cerrar V3, guardar `mem://policies/founder-discovery-standard.md`: toda categoría nueva (museos, spas, tours, guías, transporte, bodas, naturaleza, gastronomía, compras…) se construye sólo por **configuración** de `TourismListingSurface` + adapters existentes. Cualquier listado con diseño propio requiere autorización explícita del Founder.
-
-Actualizar `mem://index.md` (Core) con la regla resumida y `.lovable/plan.md` marcando V3 como entregado tras validación.
-
-### Fuera de alcance (queda para V4)
-- Bloque `vmx.experience.map`, clusters Airbnb-style, capability `distance` en Alux, badge de distancia real (hoy sólo el placeholder de UI si `location.distanceKm` viene del feed).
-- Cambios en tipos `MarketplaceBusinessCard*` o rutas legacy `/marketplace/*` (E3.3).
-- Nuevos servidores/queries; nuevos motores editoriales.
-
-### DoD
-Typecheck `bunx tsgo --noEmit` limpio · 8 rutas rendereando `TourismListingSurface` · preview `/lovable/tourism-listing-preview` navegable · Completion Report con comparativas · Founder Discovery Standard registrado en memoria · aprobación Founder antes de iniciar V4.
+Propongo empezar **ahora con Fase V4.1** (bloque + adaptadores + preview) y detenerme para validación antes de V4.2. ¿Autorizas arrancar V4.1?
