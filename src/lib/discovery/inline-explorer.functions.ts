@@ -87,26 +87,34 @@ export const getInlineCategoryExplorer = createServerFn({ method: "GET" })
       };
     }
 
-    const { data: cat } = await sb
-      .from("business_categories")
-      .select("id, slug")
-      .eq("slug", data.categorySlug)
-      .maybeSingle();
-    if (!cat) {
-      return {
-        items: [],
-        totalCount: 0,
-        page: data.page,
-        pageSize: data.pageSize,
-        destinationSlug: data.destinationSlug,
-        categorySlug: data.categorySlug,
-      };
+    // Cuando la categoría es `todo`, se omite el filtro por categoría
+    // y se devuelven todos los negocios publicados del destino — usado
+    // por el explorador inline en su estado por defecto (mapa global).
+    const isAll = data.categorySlug === "todo";
+    let catId: string | null = null;
+    if (!isAll) {
+      const { data: cat } = await sb
+        .from("business_categories")
+        .select("id, slug")
+        .eq("slug", data.categorySlug)
+        .maybeSingle();
+      if (!cat) {
+        return {
+          items: [],
+          totalCount: 0,
+          page: data.page,
+          pageSize: data.pageSize,
+          destinationSlug: data.destinationSlug,
+          categorySlug: data.categorySlug,
+        };
+      }
+      catId = (cat as { id: string }).id;
     }
 
     const from = (data.page - 1) * data.pageSize;
     const to = from + data.pageSize - 1;
 
-    const { data: rows, count } = await sb
+    let q = sb
       .from("businesses")
       .select(
         "id, slug, display_name, tagline, verified, business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary )",
@@ -114,8 +122,9 @@ export const getInlineCategoryExplorer = createServerFn({ method: "GET" })
       )
       .eq("status", "published")
       .is("deleted_at", null)
-      .eq("destination_id", (dest as { id: string }).id)
-      .eq("primary_category_id", (cat as { id: string }).id)
+      .eq("destination_id", (dest as { id: string }).id);
+    if (catId) q = q.eq("primary_category_id", catId);
+    const { data: rows, count } = await q
       .order("verified", { ascending: false })
       .order("display_name", { ascending: true })
       .range(from, to);
@@ -132,7 +141,9 @@ export const getInlineCategoryExplorer = createServerFn({ method: "GET" })
         latitude: primary?.latitude != null ? Number(primary.latitude) : null,
         longitude: primary?.longitude != null ? Number(primary.longitude) : null,
         address: primary?.address_line1 ?? null,
-        href: `/oriente-maya/${encodeURIComponent(data.destinationSlug)}/${encodeURIComponent(data.categorySlug)}/${encodeURIComponent(String(r.slug))}`,
+        href: isAll
+          ? `/oriente-maya/${encodeURIComponent(data.destinationSlug)}`
+          : `/oriente-maya/${encodeURIComponent(data.destinationSlug)}/${encodeURIComponent(data.categorySlug)}/${encodeURIComponent(String(r.slug))}`,
       };
     });
 
