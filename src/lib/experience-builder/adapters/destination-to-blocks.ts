@@ -172,9 +172,9 @@ export function destinationToCtaBarDTO(d: DestinationBlockInput): ExperienceCtaB
     meta: d.tagline || null,
     actions: [
       {
-        label: "Ver marketplace",
+        label: "Explorar experiencias",
         action: "navigate",
-        href: `/marketplace?destino=${encodeURIComponent(d.slug)}`,
+        href: `/oriente-maya/${encodeURIComponent(d.slug)}#descubre`,
         emphasis: "primary",
       },
     ],
