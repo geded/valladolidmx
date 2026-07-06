@@ -17,7 +17,7 @@
  */
 import { lazy, Suspense, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MapPin, Navigation, Map as MapIcon } from "lucide-react";
+import { Navigation, Map as MapIcon } from "lucide-react";
 import { StaticMap } from "@/components/maps/StaticMap";
 import { DistanceBadge } from "@/components/maps/DistanceBadge";
 import { cn } from "@/lib/utils";
