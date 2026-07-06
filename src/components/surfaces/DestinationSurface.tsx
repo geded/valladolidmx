@@ -199,7 +199,18 @@ export function DestinationSurface({
       <ExperienceSubnav dto={subnavDto} className="mt-6 mb-6" />
 
       <div className="grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-10">
+        <aside className="order-first space-y-4 lg:order-last lg:col-start-3 lg:row-start-1">
+          <DiscoveryNavigatorBlock
+            config={{
+              title: `Explora ${input.name}`,
+              scope: "destination",
+              manualDestinationSlug: slug ?? undefined,
+              ctaLabel: "",
+              ctaHref: "",
+            }}
+          />
+        </aside>
+        <div className="lg:col-span-2 space-y-10 lg:col-start-1 lg:row-start-1">
           {descriptionSection || highlightsInfoGrid ? (
             <section id="resumen" data-eb-anchor className="scroll-mt-24">
               {descriptionSection ? <ExperienceSection dto={descriptionSection} /> : null}
@@ -293,20 +304,6 @@ export function DestinationSurface({
             </section>
           ) : null}
         </div>
-        <aside className="space-y-4">
-          <DiscoveryNavigatorBlock
-            config={{
-              title: `Explora ${input.name}`,
-              scope: "destination",
-              manualDestinationSlug: slug ?? undefined,
-              // Ya estamos en la superficie del destino: el navegador de
-              // categorías es autosuficiente y no necesita un CTA que apunte
-              // a otra ruta. Se oculta pasando cadenas vacías.
-              ctaLabel: "",
-              ctaHref: "",
-            }}
-          />
-        </aside>
       </div>
 
       <ExperienceCtaBar dto={ctaBarDto} />
