@@ -147,7 +147,6 @@ export function DestinationSurface({
   const highlightsInfoGrid = destinationToHighlightsInfoGridDTO(input);
   const ctaBarDto = destinationToCtaBarDTO(input);
   const badgeItems = destinationToBadgeItems(input);
-  const galleryDto = destinationToGalleryDTO(input);
   const mapDto = destinationToMapDTO(input);
 
   return (
