@@ -102,6 +102,12 @@ export function ExperienceMapBlock({ dto, className }: ExperienceMapBlockProps) 
                 lng={center.lng}
                 zoom={center.zoom ?? 14}
                 markerTitle={primary.title}
+                markers={dto.points.map((p) => ({
+                  lat: p.lat,
+                  lng: p.lng,
+                  title: p.title,
+                  href: p.href ?? null,
+                }))}
                 className="h-[420px] w-full rounded-2xl border border-border"
               />
             </Suspense>
@@ -110,9 +116,14 @@ export function ExperienceMapBlock({ dto, className }: ExperienceMapBlockProps) 
               lat={center.lat}
               lng={center.lng}
               zoom={center.zoom ?? 14}
-              width={720}
+              width={640}
               height={420}
               alt={dto.heading ?? primary.title}
+              markers={dto.points.map((p) => ({
+                lat: p.lat,
+                lng: p.lng,
+                kind: p.kind,
+              }))}
             />
           )}
 

@@ -15,6 +15,8 @@ export interface StaticMapProps {
   height?: number;
   alt?: string;
   className?: string;
+  /** Pines adicionales (kind + coordenadas). Opcional. */
+  markers?: Array<{ lat: number; lng: number; kind?: string }>;
 }
 
 export function StaticMap({
@@ -25,9 +27,20 @@ export function StaticMap({
   height = 300,
   alt = "Ubicación en el mapa",
   className,
+  markers,
 }: StaticMapProps) {
   const [failed, setFailed] = useState(false);
-  const src = `/api/public/maps/static?lat=${lat}&lng=${lng}&zoom=${zoom}&width=${width}&height=${height}`;
+  const params = new URLSearchParams({
+    lat: String(lat),
+    lng: String(lng),
+    zoom: String(zoom),
+    width: String(width),
+    height: String(height),
+  });
+  for (const m of markers ?? []) {
+    params.append("m", `${m.kind ?? "poi"}:${m.lat},${m.lng}`);
+  }
+  const src = `/api/public/maps/static?${params.toString()}`;
 
   if (failed) {
     return (
