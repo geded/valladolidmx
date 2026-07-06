@@ -11,12 +11,13 @@
  */
 import { z } from "zod";
 
-export const EXPERIENCE_HERO_CONTRACT_VERSION = "1.0.0";
+export const EXPERIENCE_HERO_CONTRACT_VERSION = "1.1.0";
 
 export const experienceHeroVariantSchema = z.enum([
   "immersive", // Full-bleed media, gradiente, textos sobre overlay.
   "compact",   // Media a la izquierda, texto a la derecha (desktop).
   "editorial", // Sin media dominante, tipografía protagonista.
+  "cinematic", // v1.1.0 · Full-viewport, carrusel de slides, eyebrow script.
 ]);
 export type ExperienceHeroVariant = z.infer<typeof experienceHeroVariantSchema>;
 
@@ -59,8 +60,31 @@ export const experienceHeroCtaSchema = z.object({
    * (favorite/contact/book) en olas futuras.
    */
   action: z.enum(["navigate", "favorite", "contact", "book", "share"]).default("navigate"),
+  /**
+   * Énfasis visual. Compatible con Tourism DSL. Cuando no se define,
+   * el CTA primario se pinta `primary` y los siguientes `secondary`.
+   */
+  emphasis: z.enum(["primary", "secondary", "ghost"]).optional(),
+  iconKey: z.string().optional(),
 });
 export type ExperienceHeroCta = z.infer<typeof experienceHeroCtaSchema>;
+
+/**
+ * v1.1.0 — Slide del carrusel cinemático. Sin animaciones más allá de
+ * `crossfade`; la Presentación respeta `prefers-reduced-motion`.
+ */
+export const experienceHeroSlideSchema = z.object({
+  url: z.string().min(1),
+  alt: z.string().default(""),
+  focalPoint: z.string().optional(),
+});
+export type ExperienceHeroSlide = z.infer<typeof experienceHeroSlideSchema>;
+
+export const experienceHeroAlignmentSchema = z.enum(["left", "center", "right"]);
+export type ExperienceHeroAlignment = z.infer<typeof experienceHeroAlignmentSchema>;
+
+export const experienceHeroEyebrowStyleSchema = z.enum(["eyebrow", "script"]);
+export type ExperienceHeroEyebrowStyle = z.infer<typeof experienceHeroEyebrowStyleSchema>;
 
 /** Config persistida en `page_compositions` (fuente en Studio). */
 export const experienceHeroConfigSchema = z.object({
@@ -84,6 +108,24 @@ export const experienceHeroConfigSchema = z.object({
   ctaSecondary: experienceHeroCtaSchema.optional(),
 
   /**
+   * v1.1.0 — Lista extendida de CTAs (n≥0). Si viene poblada, sobrescribe
+   * a `ctaPrimary` / `ctaSecondary` en la Presentación. Compatibilidad:
+   * cuando está vacía, el motor sigue usando `ctaPrimary`/`ctaSecondary`.
+   */
+  ctas: z.array(experienceHeroCtaSchema).default([]),
+
+  /** v1.1.0 — Slides para variante `cinematic`. */
+  mediaSlides: z.array(experienceHeroSlideSchema).default([]),
+  slideIntervalMs: z.number().int().min(2000).max(30000).default(7000),
+
+  /** v1.1.0 — Alineación del bloque de texto. */
+  alignment: experienceHeroAlignmentSchema.default("left"),
+  /** v1.1.0 — Estilo tipográfico del eyebrow. */
+  eyebrowStyle: experienceHeroEyebrowStyleSchema.default("eyebrow"),
+  /** v1.1.0 — Compensa cabecera overlay (Home). Sólo `cinematic`. */
+  overlapHeader: z.boolean().default(false),
+
+  /**
    * Capacidades opt-in. Habilitan comportamiento sin cambiar el
    * `blockType`. Se amplían por olas futuras.
    */
@@ -94,6 +136,8 @@ export const experienceHeroConfigSchema = z.object({
       video: z.boolean().default(false),
       immersive360: z.boolean().default(false),
       ar: z.boolean().default(false),
+      /** v1.1.0 — Carrusel automático en `cinematic`. */
+      autoplaySlides: z.boolean().default(true),
     })
     .partial()
     .default({}),
@@ -126,10 +170,22 @@ export const experienceHeroDtoSchema = z.object({
       overlay: z.number().min(0).max(1),
     })
     .nullable(),
+  /** v1.1.0 — Slides para `cinematic`. Vacío en variantes clásicas. */
+  mediaSlides: z.array(experienceHeroSlideSchema).default([]),
+  slideIntervalMs: z.number().int().default(7000),
+  alignment: experienceHeroAlignmentSchema.default("left"),
+  eyebrowStyle: experienceHeroEyebrowStyleSchema.default("eyebrow"),
+  overlapHeader: z.boolean().default(false),
+  autoplaySlides: z.boolean().default(true),
   badges: z.array(experienceHeroBadgeSchema),
   meta: z.array(experienceHeroMetaSchema),
   ctaPrimary: experienceHeroCtaSchema.nullable(),
   ctaSecondary: experienceHeroCtaSchema.nullable(),
+  /**
+   * v1.1.0 — Lista extendida de CTAs (n≥0). Cuando viene poblada,
+   * la Presentación la usa en lugar de `ctaPrimary`/`ctaSecondary`.
+   */
+  ctas: z.array(experienceHeroCtaSchema).default([]),
 });
 export type ExperienceHeroDTO = z.infer<typeof experienceHeroDtoSchema>;
 
@@ -146,6 +202,12 @@ export function buildExperienceHeroPreviewDTO(): ExperienceHeroDTO {
       alt: "Hacienda colonial iluminada al atardecer",
       overlay: 0.5,
     },
+    mediaSlides: [],
+    slideIntervalMs: 7000,
+    alignment: "left",
+    eyebrowStyle: "eyebrow",
+    overlapHeader: false,
+    autoplaySlides: true,
     badges: [
       { label: "Verificado", tone: "primary", iconKey: "badge-check" },
       { label: "4.9 · 128 reseñas", tone: "neutral", iconKey: "star" },
@@ -156,5 +218,6 @@ export function buildExperienceHeroPreviewDTO(): ExperienceHeroDTO {
     ],
     ctaPrimary: { label: "Reservar", action: "book", href: "#" },
     ctaSecondary: { label: "Contactar", action: "contact", href: "#" },
+    ctas: [],
   };
 }
