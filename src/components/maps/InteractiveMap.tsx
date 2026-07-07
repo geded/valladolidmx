@@ -1,5 +1,5 @@
 /**
- * InteractiveMap — Mapa Google Maps JS con un marker.
+ * InteractiveMap — Mapa Google Maps JS con markers personalizados.
  *
  * Reglas (google_maps knowledge):
  *  - loading=async + callback global obligatorio para evitar bloqueo.
@@ -7,6 +7,10 @@
  *  - No mapId en la construcción del Map.
  *  - Sólo se monta cuando el usuario lo pide (toggle) para no pagar
  *    Maps JS en cada visita.
+ *
+ * Cada marker se renderiza como un círculo con la letra asignada (A, B, C…)
+ * para que el visitante pueda detectar y correlacionar los servicios del
+ * listado con su ubicación en el mapa.
  *
  * Requiere la browser key (`VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY`)
  * autorizada para el dominio actual. En `*.lovable.app` la managed key
@@ -20,10 +24,22 @@ interface GMap {
   new (el: HTMLElement, opts: Record<string, unknown>): unknown;
 }
 interface GMarker {
-  new (opts: { position: LatLng; map: unknown; title?: string; label?: unknown }): unknown;
+  new (opts: {
+    position: LatLng;
+    map: unknown;
+    title?: string;
+    label?: unknown;
+    icon?: unknown;
+  }): unknown;
+}
+interface GSize {
+  new (width: number, height: number): unknown;
+}
+interface GPoint {
+  new (x: number, y: number): unknown;
 }
 interface GoogleMapsNamespace {
-  maps: { Map: GMap; Marker: GMarker };
+  maps: { Map: GMap; Marker: GMarker; Size: GSize; Point: GPoint };
 }
 
 declare global {
