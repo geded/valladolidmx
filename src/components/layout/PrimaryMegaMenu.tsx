@@ -314,7 +314,7 @@ function DesktopMenu({
                   }
                 }}
                 className={cn(
-                  "relative inline-flex items-center gap-1 rounded-md px-3 py-2 text-[13.5px] font-medium tracking-tight transition-colors duration-150 active:scale-[0.98]",
+                  "relative inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-2 text-[13px] font-medium tracking-tight transition-colors duration-150 active:scale-[0.98] xl:px-3 xl:text-[13.5px]",
                   "after:pointer-events-none after:absolute after:inset-x-3 after:-bottom-0.5 after:h-[2px] after:origin-center after:scale-x-0 after:rounded-full after:bg-current after:transition-transform after:duration-200",
                   isOverlay
                     ? "text-white/90 hover:text-white"
