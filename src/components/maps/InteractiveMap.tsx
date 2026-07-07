@@ -102,6 +102,25 @@ function labelForIndex(i: number) {
   return String.fromCharCode(65 + (i % 26));
 }
 
+function getMarkerColors(): { bg: string; fg: string; stroke: string } {
+  if (typeof document === "undefined") {
+    return { bg: "#EAA840", fg: "#1C1D14", stroke: "#ffffff" };
+  }
+  const root = getComputedStyle(document.documentElement);
+  const bg = root.getPropertyValue("--primary").trim() || "#EAA840";
+  const fg = root.getPropertyValue("--primary-foreground").trim() || "#1C1D14";
+  return { bg, fg, stroke: "#ffffff" };
+}
+
+function markerIconDataUri(letter: string): string {
+  const { bg, fg, stroke } = getMarkerColors();
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+    <circle cx="16" cy="16" r="13" fill="${bg}" stroke="${stroke}" stroke-width="2.5"/>
+    <text x="16" y="20.5" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="14" font-weight="800" fill="${fg}">${letter}</text>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
 export function InteractiveMap({
   lat,
   lng,
@@ -137,15 +156,15 @@ export function InteractiveMap({
           ? markers
           : [{ lat, lng, title: markerTitle }];
         list.forEach((m, i) => {
+          const letter = labelForIndex(i);
           new google.maps.Marker({
             position: { lat: m.lat, lng: m.lng },
             map,
-            title: m.title ?? markerTitle,
-            label: {
-              text: labelForIndex(i),
-              color: "#ffffff",
-              fontWeight: "700",
-              fontSize: "12px",
+            title: `${letter} · ${m.title ?? markerTitle ?? "Ubicación"}`,
+            icon: {
+              url: markerIconDataUri(letter),
+              scaledSize: new google.maps.Size(32, 32),
+              anchor: new google.maps.Point(16, 32),
             },
           });
         });
