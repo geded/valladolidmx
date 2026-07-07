@@ -128,7 +128,7 @@ function CategoriaEnDestinoPage() {
 
   // Puntos del mapa (Founder Discovery: mapa arriba + tarjetas abajo).
   const mapPoints = useMemo<ExperienceMapPoint[]>(() => {
-    return items
+    const arr: (ExperienceMapPoint | null)[] = items
       .map((b: MarketplaceBusinessCard) => {
         const point = businessToMapPoint({
           id: b.id,
@@ -142,8 +142,8 @@ function CategoriaEnDestinoPage() {
         });
         // Interceptamos href para abrir el modal (no navegar).
         return point ? { ...point, href: null } : null;
-      })
-      .filter((p): p is ExperienceMapPoint => p !== null);
+      });
+    return arr.filter((p): p is ExperienceMapPoint => p !== null);
   }, [items, catLabel]);
 
   // Intercepta clicks a la ficha completa y abre el modal en su lugar.
