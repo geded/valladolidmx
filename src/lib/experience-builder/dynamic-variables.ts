@@ -43,8 +43,29 @@ const CATALOG: Record<string, VariableDescriptor[]> = {
     { field: "phone_public", label: "Teléfono público", description: "Solo si la empresa lo publicó", demoValue: "" },
   ],
   destination: [
-    { field: "name", label: "Nombre", description: "Nombre del destino", demoValue: "Cenote Demo" },
-    { field: "region", label: "Región", description: "Región turística", demoValue: "Oriente Maya" },
+    // ---------------------------------------------------------------
+    // H-03 · N-Destino · Ola D1 — Catálogo oficial de tokens de destino
+    // Sólo campos escalares (texto) reales de la ficha de un destino
+    // del Oriente Maya. Los arreglos (galería, badges, puntos de mapa)
+    // NO se exponen como tokens: los consumen los bloques oficiales
+    // vía el contexto de renderizado, no vía sustitución de strings.
+    // ---------------------------------------------------------------
+    { field: "slug", label: "Slug", description: "Identificador del destino en la URL", demoValue: "valladolid" },
+    { field: "name", label: "Nombre", description: "Nombre del destino", demoValue: "Valladolid" },
+    { field: "tagline", label: "Tagline", description: "Frase corta editorial del destino", demoValue: "Corazón colonial del Oriente Maya" },
+    { field: "description", label: "Descripción", description: "Descripción larga editorial", demoValue: "Ciudad colonial declarada Pueblo Mágico, puerta de entrada a cenotes, gastronomía yucateca y patrimonio maya." },
+    { field: "region", label: "Región", description: "Nombre de la región turística", demoValue: "Oriente Maya" },
+    { field: "region_slug", label: "Slug de región", description: "Slug de la región turística", demoValue: "oriente-maya" },
+    { field: "hero_url", label: "Imagen hero", description: "URL de la imagen principal del destino", demoValue: "" },
+    { field: "highlight_count", label: "Nº de highlights", description: "Cantidad de highlights publicados", demoValue: "0" },
+    { field: "gallery_count", label: "Nº de fotos", description: "Cantidad de fotos en galería", demoValue: "0" },
+    { field: "hoteles_count", label: "Nº hoteles", description: "Hoteles publicados en el destino", demoValue: "0" },
+    { field: "restaurantes_count", label: "Nº restaurantes", description: "Restaurantes publicados en el destino", demoValue: "0" },
+    { field: "experiencias_count", label: "Nº experiencias", description: "Experiencias publicadas en el destino", demoValue: "0" },
+    { field: "otras_count", label: "Nº otras empresas", description: "Otras empresas publicadas en el destino", demoValue: "0" },
+    { field: "productos_count", label: "Nº productos", description: "Productos publicados en el destino", demoValue: "0" },
+    { field: "eventos_count", label: "Nº eventos", description: "Eventos publicados en el destino", demoValue: "0" },
+    { field: "descubre_href", label: "URL descubrimiento", description: "Ancla al bloque de descubrimiento del destino", demoValue: "/oriente-maya/valladolid#descubre" },
   ],
   experience: [
     { field: "title", label: "Título", description: "Título de la experiencia", demoValue: "Tour Demo" },
@@ -129,4 +150,62 @@ function resolveString(s: string, ctx: VariableContext): string {
     const value = ctx[scope]?.[field];
     return value ?? match;
   });
+}
+
+/* ------------------------------------------------------------------ *
+ * H-03 · N-Destino · Ola D1 — Helper de contexto de destino.
+ *
+ * Traduce `DestinationBlockInput` (adapter oficial de destino) al
+ * `VariableContext` que consume `resolveVariables`. Cero side effects,
+ * cero acceso a BD: recibe el input ya cargado y devuelve strings.
+ *
+ * Preparado para D3 (render dinámico por slug). No se invoca todavía
+ * desde la ruta pública — la plantilla actual sigue usando el resolver
+ * en código; este helper queda disponible para la composición editable
+ * que se ensambla en D2/D3.
+ * ------------------------------------------------------------------ */
+export interface DestinationTokenInput {
+  slug: string;
+  name: string;
+  tagline: string | null;
+  description: string | null;
+  heroUrl: string | null;
+  regionSlug: string;
+  regionName: string;
+  highlightCount: number;
+  galleryCount: number;
+  relatedCounts: {
+    hoteles: number;
+    restaurantes: number;
+    experiencias: number;
+    otras: number;
+    productos: number;
+    eventos: number;
+  };
+}
+
+export function buildDestinationContext(
+  input: DestinationTokenInput,
+): VariableContext {
+  const slugSafe = encodeURIComponent(input.slug);
+  return {
+    destination: {
+      slug: input.slug,
+      name: input.name,
+      tagline: input.tagline ?? "",
+      description: input.description ?? "",
+      region: input.regionName,
+      region_slug: input.regionSlug,
+      hero_url: input.heroUrl ?? "",
+      highlight_count: String(input.highlightCount),
+      gallery_count: String(input.galleryCount),
+      hoteles_count: String(input.relatedCounts.hoteles),
+      restaurantes_count: String(input.relatedCounts.restaurantes),
+      experiencias_count: String(input.relatedCounts.experiencias),
+      otras_count: String(input.relatedCounts.otras),
+      productos_count: String(input.relatedCounts.productos),
+      eventos_count: String(input.relatedCounts.eventos),
+      descubre_href: `/oriente-maya/${slugSafe}#descubre`,
+    },
+  };
 }
