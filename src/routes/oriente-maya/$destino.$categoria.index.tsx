@@ -10,7 +10,9 @@
  *  - No se activan redirects 301 (Fase 2 de N2.3, previa validación).
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
 import { PublicShell } from "@/components/discovery";
+import { BusinessQuickViewDialog } from "@/components/discovery/BusinessQuickViewDialog";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import {
@@ -34,6 +36,9 @@ import {
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 import { TourismListingSurface } from "@/components/surfaces/TourismListingSurface";
 import { businessToTourismCard } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
+import { businessToMapPoint } from "@/lib/experience-builder/adapters/entity-to-map-point";
+import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
+import type { ExperienceMapPoint } from "@/lib/experience-builder/blocks/experience-map/contract";
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
   loader: async ({ params }) => {
@@ -97,6 +102,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
 function CategoriaEnDestinoPage() {
   const { resolution, items, related } = Route.useLoaderData();
   const { destino, categoria } = Route.useParams();
+  const [quickViewSlug, setQuickViewSlug] = useState<string | null>(null);
   const ctx = resolutionToNavigationContext(resolution, destino);
   // `BreadcrumbTerritorial` renderiza el ícono/Home por sí mismo, así
   // que evitamos duplicarlo pidiéndole a `buildBreadcrumbs` que lo omita.
@@ -119,10 +125,48 @@ function CategoriaEnDestinoPage() {
       (related.otherCategoriesInDestination.length > 0 ||
         related.sameCategoryOtherDestinations.length > 0),
   );
+
+  // Puntos del mapa (Founder Discovery: mapa arriba + tarjetas abajo).
+  const mapPoints = useMemo<ExperienceMapPoint[]>(() => {
+    return items
+      .map((b: MarketplaceBusinessCard) => {
+        const point = businessToMapPoint({
+          id: b.id,
+          name: b.display_name,
+          slug: b.slug,
+          latitude: b.latitude ?? null,
+          longitude: b.longitude ?? null,
+          address_line1: b.address_line1 ?? null,
+          cover_url: b.cover_url ?? null,
+          category_label: catLabel,
+        });
+        // Interceptamos href para abrir el modal (no navegar).
+        return point ? { ...point, href: null } : null;
+      })
+      .filter((p): p is ExperienceMapPoint => p !== null);
+  }, [items, catLabel]);
+
+  // Intercepta clicks a la ficha completa y abre el modal en su lugar.
+  const handleListingClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    const anchor = target.closest("a");
+    if (!anchor) return;
+    const href = anchor.getAttribute("href");
+    if (!href) return;
+    const prefix = `/oriente-maya/${destino}/${categoria}/`;
+    if (!href.startsWith(prefix)) return;
+    // Extrae el slug de empresa (segmento tras el prefijo).
+    const rest = href.slice(prefix.length).split("/")[0];
+    if (!rest) return;
+    e.preventDefault();
+    setQuickViewSlug(rest);
+  };
+
   return (
     <ContextEngineProvider declaration={declaration}>
     <CategorySurfaceRelatedProvider value={categoryValue}>
     <PublicShell crumbs={crumbs}>
+      <div onClick={handleListingClick}>
       <TourismListingSurface
         hero={{
           eyebrow: destLabel,
@@ -139,8 +183,30 @@ function CategoriaEnDestinoPage() {
         )}
         destinationSlug={destino}
         destinationLabel={destLabel}
+        mapSlot={
+          mapPoints.length > 0 ? (
+            <ExperienceMapBlock
+              dto={{
+                variant: "list-sync",
+                heading: `${catLabel} en el mapa de ${destLabel}`,
+                center: null,
+                points: mapPoints,
+                capabilities: {
+                  showDistance: true,
+                  showDirections: true,
+                  clustering: false,
+                  syncList: true,
+                  staticFallback: true,
+                  allowInteractiveToggle: true,
+                },
+                emptyMessage: null,
+              }}
+            />
+          ) : null
+        }
         emptyMessage={`Aún no publicamos empresas de ${catLabel.toLowerCase()} en ${destLabel}.`}
       />
+      </div>
       {hasRelated ? (
         <section id="descubre" className="mt-12">
           <ExperienceRelatedCollectionBlock
@@ -173,6 +239,12 @@ function CategoriaEnDestinoPage() {
           />
         </section>
       ) : null}
+      <BusinessQuickViewDialog
+        slug={quickViewSlug}
+        destinoSlug={destino}
+        categoriaSlug={categoria}
+        onClose={() => setQuickViewSlug(null)}
+      />
     </PublicShell>
     </CategorySurfaceRelatedProvider>
     </ContextEngineProvider>
