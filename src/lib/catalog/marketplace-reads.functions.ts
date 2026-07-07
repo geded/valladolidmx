@@ -33,6 +33,10 @@ export interface MarketplaceBusinessCard {
   verified: boolean;
   /** URL firmada de la portada oficial (business_media role=cover). */
   cover_url?: string | null;
+  /** Coordenadas primarias — para el bloque `vmx.experience.map`. */
+  latitude?: number | null;
+  longitude?: number | null;
+  address_line1?: string | null;
 }
 
 export interface MarketplaceProductCard {
