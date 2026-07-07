@@ -553,7 +553,7 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
     const { data, error } = await supabase
       .from("businesses")
       .select(
-        "id, slug, display_name, tagline, verified, status, deleted_at, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug )",
+        "id, slug, display_name, tagline, verified, status, deleted_at, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at )",
       )
       .eq("status", "published")
       .is("deleted_at", null)
@@ -563,6 +563,13 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
     return (data ?? []).map((row) => {
       const dest = (row.destinations as { slug?: unknown } | null)?.slug;
       const cat = (row.business_categories as { slug?: unknown } | null)?.slug;
+      const locs = ((row as { business_locations?: Array<Record<string, unknown>> | null }).business_locations ?? [])
+        .filter((l) => (l as { deleted_at?: unknown }).deleted_at == null);
+      const primary =
+        locs.find((l) => (l as { is_primary?: unknown }).is_primary === true) ?? locs[0] ?? null;
+      const rawLat = primary ? (primary as { latitude?: unknown }).latitude : null;
+      const rawLng = primary ? (primary as { longitude?: unknown }).longitude : null;
+      const rawAddr = primary ? (primary as { address_line1?: unknown }).address_line1 : null;
       return {
         id: row.id,
         slug: row.slug,
@@ -571,6 +578,9 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
         verified: Boolean(row.verified),
         destination_slug: typeof dest === "string" ? dest : "",
         category_slug: typeof cat === "string" ? cat : "",
+        latitude: rawLat == null ? null : Number(rawLat),
+        longitude: rawLng == null ? null : Number(rawLng),
+        address_line1: typeof rawAddr === "string" ? rawAddr : null,
       };
     });
   },
