@@ -270,6 +270,22 @@ function DesktopMenu({
 }) {
   const [open, setOpen] = useState<string | null>(null);
   const rootRef = useRef<HTMLElement | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelClose = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  };
+  const scheduleClose = () => {
+    cancelClose();
+    closeTimer.current = setTimeout(() => setOpen(null), 140);
+  };
+  const openNow = (id: string) => {
+    cancelClose();
+    setOpen(id);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -287,31 +303,34 @@ function DesktopMenu({
       document.removeEventListener("keydown", onKey);
     };
   }, [open]);
+  useEffect(() => () => cancelClose(), []);
 
   return (
     <nav
       ref={rootRef}
       aria-label="Principal"
       className="hidden xl:block"
-      onMouseLeave={() => setOpen(null)}
     >
       <ul className="flex items-center gap-1 xl:gap-2">
         {sections.map((section) => {
           const isOpen = open === section.id;
           const cols = Array.isArray(section.columns) ? section.columns : [];
           return (
-            <li key={section.id} className="relative" onMouseEnter={() => setOpen(section.id)}>
+            <li
+              key={section.id}
+              className="relative"
+              onMouseEnter={() => openNow(section.id)}
+              onMouseLeave={scheduleClose}
+            >
               <a
                 href={hrefWithActiveDestination(section.href, activeDestination)}
                 aria-haspopup="true"
                 aria-expanded={isOpen}
                 onClick={(e) => {
-                  // Permite abrir el dropdown con click sin navegar si el
-                  // usuario apenas está explorando; segundo click navega.
-                  if (!isOpen) {
-                    e.preventDefault();
-                    setOpen(section.id);
-                  }
+                  // Click sobre el trigger sólo abre/cierra el dropdown.
+                  // Para navegar a la sección se usa el primer link "Ver todo".
+                  e.preventDefault();
+                  setOpen(isOpen ? null : section.id);
                 }}
                 className={cn(
                   "relative inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-2 text-[13px] font-medium tracking-tight transition-colors duration-150 active:scale-[0.98] xl:px-3 xl:text-[13.5px]",
@@ -327,40 +346,47 @@ function DesktopMenu({
               </a>
               {isOpen ? (
                 <div
-                  role="menu"
-                  className={cn(
-                    "absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 rounded-2xl border border-border/70 bg-background/95 p-5 shadow-2xl backdrop-blur",
-                    cols.length > 1 ? "w-[38rem]" : "w-64",
-                  )}
+                  className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-2"
+                  onMouseEnter={cancelClose}
+                  onMouseLeave={scheduleClose}
                 >
                   <div
+                    role="menu"
                     className={cn(
-                      "grid gap-6",
-                      cols.length > 1 ? "grid-cols-2" : "grid-cols-1",
+                      "rounded-2xl border border-border/70 bg-background p-5 shadow-elevated",
+                      cols.length > 1 ? "w-[40rem]" : "w-72",
                     )}
                   >
-                    {cols.map((col, idx) => (
-                      <div key={idx}>
-                        {col.title ? (
-                          <p className="text-caption mb-2 text-muted-foreground">
-                            {col.title}
-                          </p>
-                        ) : null}
-                        <ul className="flex flex-col gap-0.5">
-                          {col.links.map((link) => (
-                            <li key={link.href + link.label}>
-                              <a
-                                href={hrefWithActiveDestination(link.href, activeDestination)}
-                                role="menuitem"
-                                className="block rounded-md px-2 py-1.5 text-sm text-foreground hover:bg-accent hover:text-accent-foreground"
-                              >
-                                {link.label}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
+                    <div
+                      className={cn(
+                        "grid gap-6",
+                        cols.length > 1 ? "grid-cols-2" : "grid-cols-1",
+                      )}
+                    >
+                      {cols.map((col, idx) => (
+                        <div key={idx}>
+                          {col.title ? (
+                            <p className="mb-2 px-2 text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground">
+                              {col.title}
+                            </p>
+                          ) : null}
+                          <ul className="flex flex-col gap-0.5">
+                            {col.links.map((link) => (
+                              <li key={link.href + link.label}>
+                                <a
+                                  href={hrefWithActiveDestination(link.href, activeDestination)}
+                                  role="menuitem"
+                                  onClick={() => setOpen(null)}
+                                  className="block rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                                >
+                                  {link.label}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ) : null}
