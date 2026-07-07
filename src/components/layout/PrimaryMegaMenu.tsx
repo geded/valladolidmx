@@ -292,7 +292,7 @@ function DesktopMenu({
     <nav
       ref={rootRef}
       aria-label="Principal"
-      className="hidden lg:block"
+      className="hidden xl:block"
       onMouseLeave={() => setOpen(null)}
     >
       <ul className="flex items-center gap-1 xl:gap-2">
