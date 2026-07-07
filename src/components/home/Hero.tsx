@@ -11,9 +11,10 @@
  * sin tocar layout, copy, CTAs ni degradados.
  */
 import { useEffect, useState, type ReactNode } from "react";
-import { Search, ArrowRight, Compass } from "lucide-react";
+import { ArrowRight, Compass } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { useTranslation } from "@/i18n/context";
+import { HeroSearchPill } from "@/components/home/HeroSearchPill";
 import { readFieldTypography, typographyToStyle, type FieldTypography } from "@/lib/experience-builder/typography";
 import heroBg01 from "@/assets/brand/hero/bg01.jpg";
 import heroBg02 from "@/assets/brand/hero/bg02.jpg";
@@ -292,30 +293,15 @@ export function Hero({ config }: HeroProps = {}) {
         {/* Buscador discreto (12C.1): secundario al mensaje inspirador. */}
         {showSearch ? (
           <div className={`mt-4 flex w-full @2xl:mt-6 @3xl:mt-10 ${searchJustifyClass}`}>
-            <form
-              role="search"
-              aria-label={t("hero.search_aria")}
-              onSubmit={(e) => e.preventDefault()}
-              className={`relative flex w-full items-center rounded-xl border border-white/20 bg-white/5 shadow-lg backdrop-blur-xl pr-1 ${searchSizeClass} ${searchMaxWidthClass}`}
-            >
-              <Search className="shrink-0 text-white/80 size-4" aria-hidden />
-              <input
-                type="search"
-                placeholder={searchPlaceholder}
-                className="w-full bg-transparent text-inherit text-white placeholder:text-white/40 focus:outline-none"
-                aria-label={searchPlaceholder}
+            <div className={`w-full ${searchMaxWidthClass}`}>
+              <HeroSearchPill
+                align={searchAlignment as "left" | "center" | "right"}
+                maxWidth={
+                  (searchMaxWidth as "sm" | "md" | "lg" | "xl" | "full") ?? "xl"
+                }
+                submitLabel={t("hero.search_button")}
               />
-              {searchHelper ? (
-                <span className="mr-2 hidden text-[11px] text-white/60 @5xl:inline">{searchHelper}</span>
-              ) : null}
-              <button
-                type="submit"
-                className="ml-1 inline-flex shrink-0 items-center gap-1 rounded-lg bg-white px-3 py-1.5 text-[12px] font-semibold text-zinc-900 shadow-md transition-all hover:bg-white/90 active:scale-[0.98]"
-                aria-label={t("hero.search_button")}
-              >
-                {t("hero.search_button")}
-              </button>
-            </form>
+            </div>
           </div>
         ) : null}
       </Container>
