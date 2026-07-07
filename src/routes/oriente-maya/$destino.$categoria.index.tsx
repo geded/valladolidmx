@@ -190,10 +190,15 @@ function CategoriaEnDestinoPage() {
             regionLabel: "Oriente Maya",
             forcedCategorySlug: categoria,
           });
+          const pointIndex = mapPoints.findIndex((p) => p.id === b.id);
           // Inyectamos CTA primario: abre el modal (interceptado por
           // handleListingClick porque el href apunta a la ficha completa).
           return {
             ...vm,
+            mapLabel:
+              pointIndex >= 0
+                ? String.fromCharCode(65 + (pointIndex % 26))
+                : null,
             primaryAction: vm.href
               ? { label: primaryCtaLabel, href: vm.href }
               : null,

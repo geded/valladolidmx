@@ -78,6 +78,8 @@ export interface TourismCardVM {
   entityKind: TourismEntityKind | null;
   /** Override manual del eyebrow (ej. tipo de producto o categoría). */
   eyebrow?: string | null;
+  /** Letra asignada en un mapa sincronizado (A, B, C…). */
+  mapLabel?: string | null;
   name: string;
   href: string | null;
   tagline: string | null;
@@ -341,10 +343,22 @@ export function TourismCard({
           ) : (
             <MediaPlaceholder kind={vm.entityKind} />
           )}
-          {eyebrow ? (
-            <span className="absolute left-3 top-3 rounded-pill bg-background/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-foreground shadow-soft backdrop-blur">
-              {eyebrow}
-            </span>
+          {(eyebrow || vm.mapLabel) ? (
+            <div className="absolute left-3 top-3 flex items-center gap-2">
+              {vm.mapLabel ? (
+                <span
+                  aria-label={`Ubicación ${vm.mapLabel} en el mapa`}
+                  className="grid h-6 w-6 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground shadow-soft"
+                >
+                  {vm.mapLabel}
+                </span>
+              ) : null}
+              {eyebrow ? (
+                <span className="rounded-pill bg-background/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-foreground shadow-soft backdrop-blur">
+                  {eyebrow}
+                </span>
+              ) : null}
+            </div>
           ) : null}
           {institutional.length + badges.length > 0 ? (
             <div className="absolute right-3 top-3 flex flex-wrap justify-end gap-1">

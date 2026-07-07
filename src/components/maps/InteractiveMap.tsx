@@ -1,5 +1,5 @@
 /**
- * InteractiveMap — Mapa Google Maps JS con un marker.
+ * InteractiveMap — Mapa Google Maps JS con markers personalizados.
  *
  * Reglas (google_maps knowledge):
  *  - loading=async + callback global obligatorio para evitar bloqueo.
@@ -7,6 +7,10 @@
  *  - No mapId en la construcción del Map.
  *  - Sólo se monta cuando el usuario lo pide (toggle) para no pagar
  *    Maps JS en cada visita.
+ *
+ * Cada marker se renderiza como un círculo con la letra asignada (A, B, C…)
+ * para que el visitante pueda detectar y correlacionar los servicios del
+ * listado con su ubicación en el mapa.
  *
  * Requiere la browser key (`VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY`)
  * autorizada para el dominio actual. En `*.lovable.app` la managed key
@@ -20,10 +24,22 @@ interface GMap {
   new (el: HTMLElement, opts: Record<string, unknown>): unknown;
 }
 interface GMarker {
-  new (opts: { position: LatLng; map: unknown; title?: string; label?: unknown }): unknown;
+  new (opts: {
+    position: LatLng;
+    map: unknown;
+    title?: string;
+    label?: unknown;
+    icon?: unknown;
+  }): unknown;
+}
+interface GSize {
+  new (width: number, height: number): unknown;
+}
+interface GPoint {
+  new (x: number, y: number): unknown;
 }
 interface GoogleMapsNamespace {
-  maps: { Map: GMap; Marker: GMarker };
+  maps: { Map: GMap; Marker: GMarker; Size: GSize; Point: GPoint };
 }
 
 declare global {
@@ -86,6 +102,25 @@ function labelForIndex(i: number) {
   return String.fromCharCode(65 + (i % 26));
 }
 
+function getMarkerColors(): { bg: string; fg: string; stroke: string } {
+  if (typeof document === "undefined") {
+    return { bg: "#EAA840", fg: "#1C1D14", stroke: "#ffffff" };
+  }
+  const root = getComputedStyle(document.documentElement);
+  const bg = root.getPropertyValue("--primary").trim() || "#EAA840";
+  const fg = root.getPropertyValue("--primary-foreground").trim() || "#1C1D14";
+  return { bg, fg, stroke: "#ffffff" };
+}
+
+function markerIconDataUri(letter: string): string {
+  const { bg, fg, stroke } = getMarkerColors();
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+    <circle cx="16" cy="16" r="13" fill="${bg}" stroke="${stroke}" stroke-width="2.5"/>
+    <text x="16" y="20.5" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="14" font-weight="800" fill="${fg}">${letter}</text>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
 export function InteractiveMap({
   lat,
   lng,
@@ -121,15 +156,15 @@ export function InteractiveMap({
           ? markers
           : [{ lat, lng, title: markerTitle }];
         list.forEach((m, i) => {
+          const letter = labelForIndex(i);
           new google.maps.Marker({
             position: { lat: m.lat, lng: m.lng },
             map,
-            title: m.title ?? markerTitle,
-            label: {
-              text: labelForIndex(i),
-              color: "#ffffff",
-              fontWeight: "700",
-              fontSize: "12px",
+            title: `${letter} · ${m.title ?? markerTitle ?? "Ubicación"}`,
+            icon: {
+              url: markerIconDataUri(letter),
+              scaledSize: new google.maps.Size(32, 32),
+              anchor: new google.maps.Point(16, 32),
             },
           });
         });
