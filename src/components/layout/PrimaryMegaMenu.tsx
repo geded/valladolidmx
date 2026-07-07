@@ -11,7 +11,7 @@
  * Modo `mobile`  → acordeón vertical apto para el drawer existente.
  */
 import { useEffect, useRef, useState } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -373,14 +373,14 @@ function DesktopMenu({
                           <ul className="flex flex-col gap-0.5">
                             {col.links.map((link) => (
                               <li key={link.href + link.label}>
-                                <Link
-                                  to={hrefWithActiveDestination(link.href, activeDestination)}
+                                <a
+                                  href={hrefWithActiveDestination(link.href, activeDestination)}
                                   role="menuitem"
                                   onClick={() => setOpen(null)}
                                   className="block rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                                 >
                                   {link.label}
-                                </Link>
+                                </a>
                               </li>
                             ))}
                           </ul>
