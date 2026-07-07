@@ -348,11 +348,19 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
   const { isOverlay, open, setOpen, menuButtonRef, ctaFallback } = ctx;
 
   if (btn.kind === "language") {
-    return <LanguageSwitcher key={key} />;
+    // v1.1: el selector de idioma vive en SiteTopBar (desktop) y en el drawer
+    // (mobile). En la fila principal sólo se muestra bajo `lg` cuando la
+    // topbar está oculta, para preservar acceso al cambio de idioma sobre
+    // el Hero (overlay) o en tabletas.
+    return (
+      <div key={key} className="lg:hidden">
+        <LanguageSwitcher />
+      </div>
+    );
   }
   if (btn.kind === "user_menu") {
     return (
-      <div key={key} data-header-button-kind={btn.kind} className="hidden @2xl:block">
+      <div key={key} data-header-button-kind={btn.kind} className="hidden sm:block">
         <UserMenu />
       </div>
     );
@@ -364,7 +372,7 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
         ref={menuButtonRef}
         type="button"
         className={cn(
-          "inline-flex h-9 w-9 items-center justify-center rounded-md border transition-all active:scale-[0.98] @5xl:hidden",
+          "inline-flex h-9 w-9 items-center justify-center rounded-md border transition-all active:scale-[0.98] lg:hidden",
           isOverlay
             ? "border-white/30 bg-white/10 text-white"
             : "border-border bg-card text-foreground",
@@ -394,7 +402,7 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
         : size === "lg"
           ? "px-4 py-2 text-sm gap-2"
           : "px-3 py-1.5 text-[13px] gap-1.5";
-  const hiddenOnMobile = btn.kind === "cta" ? "hidden @2xl:inline-flex" : "inline-flex";
+  const hiddenOnMobile = btn.kind === "cta" ? "hidden sm:inline-flex" : "inline-flex";
   return (
     <a
       key={key}
