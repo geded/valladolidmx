@@ -14,7 +14,7 @@
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { MapPin, ExternalLink, Loader2, BadgeCheck } from "lucide-react";
+import { MapPin, ExternalLink, Loader2, BadgeCheck, Navigation, Phone, MessageCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -99,18 +99,70 @@ export function BusinessQuickViewDialog({
               </DialogHeader>
 
               {biz.description ? (
-                <p className="text-sm leading-relaxed text-foreground/80">
-                  {biz.description.length > 320
-                    ? `${biz.description.slice(0, 320)}…`
-                    : biz.description}
+                <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/80">
+                  {biz.description}
                 </p>
               ) : null}
 
+              {biz.primary_location ? (
+                <section className="space-y-2 rounded-2xl border border-border bg-card/60 p-4">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Cómo llegar
+                  </h3>
+                  <p className="inline-flex items-start gap-2 text-sm text-foreground/80">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
+                    <span>
+                      {[
+                        biz.primary_location.address_line1,
+                        biz.primary_location.address_line2,
+                        biz.primary_location.label,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ") || "Ubicación en el destino"}
+                    </span>
+                  </p>
+                  {biz.primary_location.latitude != null &&
+                  biz.primary_location.longitude != null ? (
+                    <Button asChild size="sm" variant="secondary" className="rounded-pill">
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${biz.primary_location.latitude},${biz.primary_location.longitude}`}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        <Navigation className="mr-2 h-4 w-4" aria-hidden />
+                        Cómo llegar en Google Maps
+                      </a>
+                    </Button>
+                  ) : null}
+                </section>
+              ) : null}
+
               {biz.primary_contact ? (
-                <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <MapPin className="h-3.5 w-3.5" aria-hidden />
-                  {biz.primary_contact.label ?? biz.primary_contact.value}
-                </p>
+                <div className="flex flex-wrap gap-2">
+                  {biz.primary_contact.type === "whatsapp" ? (
+                    <Button asChild size="sm" variant="outline" className="rounded-pill">
+                      <a
+                        href={`https://wa.me/${biz.primary_contact.value.replace(/[^0-9]/g, "")}`}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        <MessageCircle className="mr-2 h-4 w-4" aria-hidden />
+                        WhatsApp
+                      </a>
+                    </Button>
+                  ) : biz.primary_contact.type === "phone" ? (
+                    <Button asChild size="sm" variant="outline" className="rounded-pill">
+                      <a href={`tel:${biz.primary_contact.value}`}>
+                        <Phone className="mr-2 h-4 w-4" aria-hidden />
+                        {biz.primary_contact.label ?? biz.primary_contact.value}
+                      </a>
+                    </Button>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                      {biz.primary_contact.label ?? biz.primary_contact.value}
+                    </span>
+                  )}
+                </div>
               ) : null}
 
               {biz.products && biz.products.length > 0 ? (
