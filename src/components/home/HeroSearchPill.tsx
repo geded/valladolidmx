@@ -102,7 +102,7 @@ export function HeroSearchPill({
       <div
         className={cn(
           "flex w-full items-stretch rounded-full bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.35)] ring-1 ring-black/5 backdrop-blur-sm",
-          "p-1.5 gap-1",
+          "p-1 gap-1",
           maxWidthClass,
         )}
       >
@@ -112,7 +112,7 @@ export function HeroSearchPill({
             <button
               type="button"
               className={cn(
-                "group relative flex flex-1 items-center gap-2.5 rounded-full px-4 py-2 text-left transition-colors",
+                "group relative flex flex-1 items-center gap-2 rounded-full px-3 py-1.5 text-left transition-colors",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openDestino && "bg-muted/70",
               )}
@@ -124,7 +124,7 @@ export function HeroSearchPill({
                 </span>
                 <span
                   className={cn(
-                    "truncate text-sm",
+                    "truncate text-[13px]",
                     destino ? "font-medium text-foreground" : "text-muted-foreground/80",
                   )}
                 >
@@ -149,7 +149,7 @@ export function HeroSearchPill({
         </Popover>
 
         {/* Divisor */}
-        <div aria-hidden className="my-2 w-px bg-border/70" />
+        <div aria-hidden className="my-auto h-6 w-px bg-border/70" />
 
         {/* Segmento: Categoría */}
         <Popover open={openCategoria} onOpenChange={setOpenCategoria}>
@@ -157,7 +157,7 @@ export function HeroSearchPill({
             <button
               type="button"
               className={cn(
-                "group relative flex flex-1 items-center gap-2.5 rounded-full px-4 py-2 text-left transition-colors",
+                "group relative flex flex-1 items-center gap-2 rounded-full px-3 py-1.5 text-left transition-colors",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openCategoria && "bg-muted/70",
               )}
@@ -169,7 +169,7 @@ export function HeroSearchPill({
                 </span>
                 <span
                   className={cn(
-                    "truncate text-sm",
+                    "truncate text-[13px]",
                     categoria ? "font-medium text-foreground" : "text-muted-foreground/80",
                   )}
                 >
@@ -197,7 +197,7 @@ export function HeroSearchPill({
           type="submit"
           aria-label={submitLabel}
           className={cn(
-            "ml-1 inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 text-primary-foreground shadow-md",
+            "ml-1 inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-3 text-primary-foreground shadow-md",
             "transition-all hover:brightness-110 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
           )}
         >
