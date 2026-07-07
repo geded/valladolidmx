@@ -78,6 +78,8 @@ export interface TourismCardVM {
   entityKind: TourismEntityKind | null;
   /** Override manual del eyebrow (ej. tipo de producto o categoría). */
   eyebrow?: string | null;
+  /** Letra asignada en un mapa sincronizado (A, B, C…). */
+  mapLabel?: string | null;
   name: string;
   href: string | null;
   tagline: string | null;
