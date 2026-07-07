@@ -1,91 +1,62 @@
-
-# Reparación del Header desktop (v1.1)
-
-## Contexto oficial
-
-En memoria y en `docs/blueprint/15.10.8-INITIATIVE-HEADER-NAVIGATION-BUILDER-v1.0.md` está registrado que el **Header administrable + Mega Menú desde el Experience Builder** (Iniciativa 15.10.8) queda **bloqueada** hasta cerrar: Arma tu Viaje, Alux, Demo Pack, Google y Stripe.
-
-Mientras tanto, la regla vigente es:
-
-> "Cualquier trabajo sobre Header / Mega Menú anterior a su arranque debe limitarse a **correcciones puntuales** sobre la solución v1."
-
-Por lo tanto **no** vamos a construir aún el Header componible. Vamos a **arreglar la v1** para que sea profesional en desktop, sin tocar la arquitectura ni crear rutas/registries nuevos.
-
-## Diagnóstico del amontonamiento
-
-En `src/components/layout/SiteHeader.tsx` conviven en una sola fila de 64px de alto:
-
-1. Logo (`BrandLogo`)
-2. `PrimaryMegaMenu` (7 secciones con dropdowns)
-3. Botones: CTA "Arma tu Viaje" + LanguageSwitcher + UserMenu + toggle móvil
-
-En anchos desktop reales (1024–1366) el mega menú y la botonera compiten por el mismo eje horizontal, no hay separación jerárquica y el CTA queda pegado al selector de idioma. Además el menú móvil se muestra hasta `@5xl` (≈1280px), lo que deja rangos 1024–1279 en modo drawer aunque hay espacio.
-
 ## Objetivo
 
-Header desktop **profesional, respirado y jerárquico** (referencia: Airbnb / Booking / Visit Mexico) sin cambiar contenido ni comportamiento actual, y sin abrir la Iniciativa 15.10.8.
+Convertir la ficha de categoría en destino (ej. `/oriente-maya/valladolid/hoteles`) — a donde llega el buscador tipo Airbnb — en una experiencia de descubrimiento tipo Airbnb: **mapa arriba con todos los hoteles encontrados** + **grid de tarjetas abajo** con corazón de favoritos y "Ver info" que abre un **modal** (sin salir de la página).
 
-## Alcance (sólo corrección v1)
+## Alcance
 
-1. **Topbar utilitaria (fila superior, 32px)** — sólo desktop `lg+`:
-   - Izquierda: idioma + moneda (placeholder v1, sólo idioma real).
-   - Derecha: enlaces suaves ("Ayuda", "Contacto", "Empresas").
-   - Fondo `bg-muted/40`, texto `text-muted-foreground`, sin sombra.
-   - En overlay (Home) se oculta para no romper el Hero.
+Aplica a `src/routes/oriente-maya/$destino.$categoria.index.tsx` (categoría en destino). Reutilizamos la infraestructura oficial:
 
-2. **Fila principal (56–64px)** reorganizada en 3 zonas con grid:
-   - Zona A (izquierda): Logo.
-   - Zona B (centro): `PrimaryMegaMenu` centrado, con separación real entre items (`gap-6`), chevron sutil, subrayado activo, transición 150ms.
-   - Zona C (derecha): UserMenu (avatar) + CTA principal "Arma tu Viaje" destacado.
-   - LanguageSwitcher se mueve a la topbar → deja de competir con el CTA.
+- `ExperienceMapBlock` (bloque oficial `vmx.experience.map`)
+- `TourismListingSurface` (ya tiene `mapSlot` y `renderActions` para el corazón)
+- `FavoriteButton` (Airbnb-style, ya existe)
+- `getMarketplaceBusinessBySlug` para hidratar el modal
+- `Dialog` de shadcn para el modal
 
-3. **Breakpoint del drawer móvil**: bajar de `@5xl` a `lg` (1024px). Entre 1024–1279 se ve el menú desktop respirado; debajo, drawer.
+No creamos motores ni componentes paralelos.
 
-4. **Mega Menú (mejoras visuales v1, sin cambiar datos)**:
-   - Panel con `shadow-elevated`, `rounded-2xl`, borde `border-border/60`.
-   - Grid de columnas con títulos en `text-xs uppercase tracking-wide text-muted-foreground`.
-   - Hover con `bg-accent/50` y transición 150ms.
-   - Cierre por click-fuera y `Escape` (ya existe, se conserva).
+## Cambios
 
-5. **Estados**:
-   - Overlay (Home): topbar oculta, fila principal transparente sobre scrim (ya existe).
-   - Scrolled: fondo sólido `bg-background/95` + `backdrop-blur` + sombra suave (ya existe, se conserva).
-   - Sticky (ya existe, se conserva).
+### 1. Datos — exponer coordenadas en el listado
+- `listMarketplaceBusinesses` (server fn en `marketplace-reads.functions.ts`): joinear `business_locations` (primary) y devolver `latitude`, `longitude`, `address_line1` en `MarketplaceBusinessCard`.
+- Sin regresiones: campos opcionales; superficies existentes no rompen.
 
-## Fuera de alcance (queda para Iniciativa 15.10.8)
+### 2. Adapter → puntos de mapa
+- En el loader de la ruta, mapear los `items` filtrados a `ExperienceMapPoint[]` con `businessToMapPoint` (ya existe en `entity-to-map-point.ts`). Descartar los que no tengan coordenadas.
 
-- Header como composición del Experience Builder.
-- Mega Menú administrable desde el CMS.
-- Visibilidad por rol/idioma/dispositivo/fecha.
-- Banners de temporada y promos en menú.
-- Registry declarativo de navegación pública.
+### 3. Superficie de categoría — insertar mapa
+- En `$destino.$categoria.index.tsx`, pasar `mapSlot={<ExperienceMapBlock dto={{ variant: "list-sync", points, heading: "Mapa de <cat> en <destino>", ... }} />}` a `TourismListingSurface`.
 
-## Archivos afectados
+### 4. Modal "Ver info" — no navegar
+- Nuevo componente `BusinessQuickViewDialog` (`src/components/discovery/BusinessQuickViewDialog.tsx`) con `Dialog` de shadcn:
+  - Recibe `slug` y `open`; al abrirse hace `useQuery` sobre `getMarketplaceBusinessBySlug`.
+  - Muestra cover, nombre, tagline, descripción corta, badges, dirección, mapa mini (opcional Fase 2), lista de productos con precios, y CTAs:
+    - **"Ver ficha completa"** → link a `/oriente-maya/{destino}/{cat}/{empresa}`
+    - **"Agregar a mi viaje"** (usa `AddToTravelPlanButton` existente)
+    - **Corazón favorito** (usa `FavoriteButton`)
+- La superficie inyecta un `renderActions`/`onOpenDetail` que abre el modal en lugar de navegar. Requiere una pequeña extensión de `TourismListingSurface` o envolver `TourismCard` en un wrapper local en la ruta que intercepte el click.
 
-- `src/components/layout/SiteHeader.tsx` — grid de 3 zonas + integración topbar.
-- `src/components/layout/PrimaryMegaMenu.tsx` — spacing, tokens visuales, breakpoint `lg`.
-- `src/components/layout/SiteTopBar.tsx` **(nuevo, sólo presentacional)** — topbar utilitaria.
-- **Cero** cambios en rutas, registries, BD, contratos, EB, Workspace ni Discovery Layer.
+**Enfoque mínimamente invasivo:** en la ruta creamos un `CategoryHotelsView` cliente que:
+  1. Renderiza el `ExperienceMapBlock` arriba.
+  2. Renderiza el grid de `TourismCard` directamente (sin `TourismListingSurface`) para poder interceptar la acción primaria → `setDialogSlug(vm.slug)`.
+  3. Mantiene el corazón visible con `FavoriteButton`.
 
-## Memoria a actualizar
+Esto evita ampliar contratos del surface oficial en esta iteración.
 
-Añadir a `mem://roadmap/header-navigation-builder.md` una nota:
+### 5. Modal sobre la tabla o página completa (mobile)
+- En desktop: `Dialog` estándar (max-w 720px, scrollable).
+- En mobile: mismo Dialog full-screen (h-full).
 
-> "2026-07-07 — Aplicada corrección puntual v1.1 (topbar + reordenación desktop + breakpoint drawer). Sigue bloqueada la Iniciativa 15.10.8. Al arrancarla, el Header v1.1 se reemplaza completo por composición del EB."
+## Detalles técnicos
 
-## Validación
+- **Ubicación obligatoria**: hoteles sin lat/lng no aparecen en el mapa pero sí en el grid (con badge "Ubicación no disponible" opcional).
+- **Sin cambios de ruta ni URL**: se conservan las URLs existentes; la ficha completa sigue funcionando en su ruta.
+- **Sin cambios en RLS ni migraciones**: los datos ya existen en `business_locations`.
+- **Typecheck**: `bunx tsgo --noEmit` al final.
 
-- Playwright a 1024, 1280, 1440 y 1920 en `/` (overlay), `/marketplace` (solid) y `/oriente-maya/valladolid` (solid). Screenshots antes/después.
-- Móvil 375/414: sin regresiones en drawer.
-- Typecheck `bunx tsgo --noEmit`.
-- Auditoría: no se importa nada nuevo fuera de `@/components/layout/*`.
+## Riesgos / no incluido
 
-## Rollback
+- No se implementa sincronización avanzada mapa↔lista (hover para resaltar). Queda para siguiente iteración.
+- No se rediseña `TourismListingSurface`; en esta ruta usamos composición local para no forzar props nuevos globales.
+- El modal no permite reservar directamente en esta iteración — sólo "Ver ficha completa" y "Agregar a mi viaje" (que ya cumple lo que pediste).
 
-Revertir los 3 archivos. Sin migraciones, sin cambios de contrato.
-
-## Entrega en 1 ola
-
-Una sola PR con los 3 archivos + screenshots comparativos + nota en la memoria. Sin dependencias externas.
-
-¿Apruebas este plan para ejecutar la corrección v1.1?
+¿Apruebas para implementar?
