@@ -30,6 +30,7 @@ import { Container } from "./Container";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { UserMenu } from "./UserMenu";
 import { PrimaryMegaMenu } from "./PrimaryMegaMenu";
+import { SiteTopBar } from "./SiteTopBar";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { useTranslation } from "@/i18n/context";
 import { cn } from "@/lib/utils";
@@ -308,12 +309,15 @@ export function SiteHeader({ variant = "solid", config }: Props) {
             className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-24 bg-[linear-gradient(180deg,rgba(0,0,0,0.45)_0%,rgba(0,0,0,0.18)_55%,rgba(0,0,0,0)_100%)]"
           />
         )}
-        <Container className="flex h-16 items-center justify-between gap-4">
+        <SiteTopBar hidden={isOverlay} />
+        <Container className="grid h-16 grid-cols-[auto_1fr_auto] items-center gap-6">
           <Link to="/" aria-label="Inicio" className="flex items-center">
             <BrandLogo tone={isOverlay ? "light" : "dark"} size="md" />
           </Link>
 
-          <PrimaryMegaMenu variant="desktop" isOverlay={isOverlay} />
+          <div className="flex min-w-0 items-center justify-center">
+            <PrimaryMegaMenu variant="desktop" isOverlay={isOverlay} />
+          </div>
 
           <div className="flex items-center gap-2">
             {visibleButtons.map((btn, idx) => renderHeaderButton(btn, idx, {
