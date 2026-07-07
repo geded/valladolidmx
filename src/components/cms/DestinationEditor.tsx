@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { EntityEditor } from "@/components/cms/EntityEditor";
 import { DestinationMediaPanels } from "@/components/cms/DestinationMediaPanels";
+import { DestinationLocationPanel } from "@/components/cms/DestinationLocationPanel";
 import { RelatedOverridesPanel } from "@/components/cms/RelatedOverridesPanel";
 import { DESTINATION_FIELDS } from "@/lib/cms/editor-fields";
 import { listTourismRegionsForSelect } from "@/lib/cms/destinations-media.functions";
@@ -49,6 +50,7 @@ export function DestinationEditor({ id }: Props) {
         entityId ? (
           <>
             <DestinationMediaPanels destinationId={entityId} />
+            <DestinationLocationPanel destinationId={entityId} />
             <RelatedOverridesPanel entityType="destination" entityId={entityId} />
           </>
         ) : null
