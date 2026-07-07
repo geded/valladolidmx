@@ -292,10 +292,10 @@ function DesktopMenu({
     <nav
       ref={rootRef}
       aria-label="Principal"
-      className="hidden @5xl:block"
+      className="hidden lg:block"
       onMouseLeave={() => setOpen(null)}
     >
-      <ul className="flex items-center gap-1">
+      <ul className="flex items-center gap-1 xl:gap-2">
         {sections.map((section) => {
           const isOpen = open === section.id;
           const cols = Array.isArray(section.columns) ? section.columns : [];
@@ -314,12 +314,12 @@ function DesktopMenu({
                   }
                 }}
                 className={cn(
-                  "inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-sm font-medium transition-all active:scale-[0.98]",
+                  "relative inline-flex items-center gap-1 rounded-md px-3 py-2 text-[13.5px] font-medium tracking-tight transition-colors duration-150 active:scale-[0.98]",
+                  "after:pointer-events-none after:absolute after:inset-x-3 after:-bottom-0.5 after:h-[2px] after:origin-center after:scale-x-0 after:rounded-full after:bg-current after:transition-transform after:duration-200",
                   isOverlay
-                    ? "text-white/90 hover:bg-white/15 hover:text-white"
-                    : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground",
-                  isOpen && !isOverlay && "bg-secondary/60 text-foreground",
-                  isOpen && isOverlay && "bg-white/15 text-white",
+                    ? "text-white/90 hover:text-white"
+                    : "text-foreground/75 hover:text-foreground",
+                  isOpen && (isOverlay ? "text-white after:scale-x-100" : "text-foreground after:scale-x-100"),
                 )}
               >
                 {section.label}
