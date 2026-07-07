@@ -151,3 +151,61 @@ function resolveString(s: string, ctx: VariableContext): string {
     return value ?? match;
   });
 }
+
+/* ------------------------------------------------------------------ *
+ * H-03 · N-Destino · Ola D1 — Helper de contexto de destino.
+ *
+ * Traduce `DestinationBlockInput` (adapter oficial de destino) al
+ * `VariableContext` que consume `resolveVariables`. Cero side effects,
+ * cero acceso a BD: recibe el input ya cargado y devuelve strings.
+ *
+ * Preparado para D3 (render dinámico por slug). No se invoca todavía
+ * desde la ruta pública — la plantilla actual sigue usando el resolver
+ * en código; este helper queda disponible para la composición editable
+ * que se ensambla en D2/D3.
+ * ------------------------------------------------------------------ */
+export interface DestinationTokenInput {
+  slug: string;
+  name: string;
+  tagline: string | null;
+  description: string | null;
+  heroUrl: string | null;
+  regionSlug: string;
+  regionName: string;
+  highlightCount: number;
+  galleryCount: number;
+  relatedCounts: {
+    hoteles: number;
+    restaurantes: number;
+    experiencias: number;
+    otras: number;
+    productos: number;
+    eventos: number;
+  };
+}
+
+export function buildDestinationContext(
+  input: DestinationTokenInput,
+): VariableContext {
+  const slugSafe = encodeURIComponent(input.slug);
+  return {
+    destination: {
+      slug: input.slug,
+      name: input.name,
+      tagline: input.tagline ?? "",
+      description: input.description ?? "",
+      region: input.regionName,
+      region_slug: input.regionSlug,
+      hero_url: input.heroUrl ?? "",
+      highlight_count: String(input.highlightCount),
+      gallery_count: String(input.galleryCount),
+      hoteles_count: String(input.relatedCounts.hoteles),
+      restaurantes_count: String(input.relatedCounts.restaurantes),
+      experiencias_count: String(input.relatedCounts.experiencias),
+      otras_count: String(input.relatedCounts.otras),
+      productos_count: String(input.relatedCounts.productos),
+      eventos_count: String(input.relatedCounts.eventos),
+      descubre_href: `/oriente-maya/${slugSafe}#descubre`,
+    },
+  };
+}
