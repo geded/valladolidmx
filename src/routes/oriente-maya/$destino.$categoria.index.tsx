@@ -37,8 +37,8 @@ import { ExperienceRelatedCollectionBlock } from "@/components/experience-builde
 import { TourismListingSurface } from "@/components/surfaces/TourismListingSurface";
 import { businessToTourismCard } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 import { businessToMapPoint } from "@/lib/experience-builder/adapters/entity-to-map-point";
-import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapPoint } from "@/lib/experience-builder/blocks/experience-map/contract";
+import { ListingMapHeader } from "@/components/discovery/ListingMapHeader";
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
   loader: async ({ params }) => {
@@ -112,6 +112,16 @@ function CategoriaEnDestinoPage() {
   }));
   const destLabel = resolution.destination?.label ?? destino;
   const catLabel = resolution.category?.label ?? categoria;
+
+  // Etiqueta contextual del CTA primario en cada tarjeta.
+  const primaryCtaLabel = (() => {
+    const c = catLabel.toLowerCase();
+    if (c.includes("hotel") || c.includes("hosped")) return "Ver hotel";
+    if (c.includes("restaur")) return "Ver restaurante";
+    if (c.includes("experi")) return "Ver experiencia";
+    if (c.includes("casa")) return "Ver alojamiento";
+    return `Ver ${c || "empresa"}`;
+  })();
   const declaration = navigationContextToDeclaration(ctx);
   const categoryValue: CategorySurfaceRelatedValue = {
     destinationSlug: destino,
@@ -174,33 +184,28 @@ function CategoriaEnDestinoPage() {
           subtitle: `Selección editorial de ${catLabel.toLowerCase()} en ${destLabel}, Oriente Maya de Yucatán.`,
           metaLabel: destLabel,
         }}
-        items={items.map((b: MarketplaceBusinessCard) =>
-          businessToTourismCard(b, {
+        items={items.map((b: MarketplaceBusinessCard) => {
+          const vm = businessToTourismCard(b, {
             destinationLabel: destLabel,
             regionLabel: "Oriente Maya",
             forcedCategorySlug: categoria,
-          }),
-        )}
+          });
+          // Inyectamos CTA primario: abre el modal (interceptado por
+          // handleListingClick porque el href apunta a la ficha completa).
+          return {
+            ...vm,
+            primaryAction: vm.href
+              ? { label: primaryCtaLabel, href: vm.href }
+              : null,
+          };
+        })}
         destinationSlug={destino}
         destinationLabel={destLabel}
         mapSlot={
           mapPoints.length > 0 ? (
-            <ExperienceMapBlock
-              dto={{
-                variant: "list-sync",
-                heading: `${catLabel} en el mapa de ${destLabel}`,
-                center: null,
-                points: mapPoints,
-                capabilities: {
-                  showDistance: true,
-                  showDirections: true,
-                  clustering: false,
-                  syncList: true,
-                  staticFallback: true,
-                  allowInteractiveToggle: true,
-                },
-                emptyMessage: null,
-              }}
+            <ListingMapHeader
+              heading={`${catLabel} en el mapa de ${destLabel}`}
+              points={mapPoints}
             />
           ) : null
         }
