@@ -353,7 +353,7 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
     // topbar está oculta, para preservar acceso al cambio de idioma sobre
     // el Hero (overlay) o en tabletas.
     return (
-      <div key={key} className="lg:hidden">
+      <div key={key} className="xl:hidden">
         <LanguageSwitcher />
       </div>
     );
@@ -372,7 +372,7 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
         ref={menuButtonRef}
         type="button"
         className={cn(
-          "inline-flex h-9 w-9 items-center justify-center rounded-md border transition-all active:scale-[0.98] lg:hidden",
+          "inline-flex h-9 w-9 items-center justify-center rounded-md border transition-all active:scale-[0.98] xl:hidden",
           isOverlay
             ? "border-white/30 bg-white/10 text-white"
             : "border-border bg-card text-foreground",
