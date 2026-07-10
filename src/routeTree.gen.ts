@@ -14,6 +14,7 @@ import { Route as RestaurantesRouteImport } from './routes/restaurantes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as QueHacerRouteImport } from './routes/que-hacer'
 import { Route as PromocionesRouteImport } from './routes/promociones'
+import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as MapaRouteImport } from './routes/mapa'
@@ -175,6 +176,11 @@ const QueHacerRoute = QueHacerRouteImport.update({
 const PromocionesRoute = PromocionesRouteImport.update({
   id: '/promociones',
   path: '/promociones',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadRoute = PrivacidadRouteImport.update({
+  id: '/privacidad',
+  path: '/privacidad',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OfflineRoute = OfflineRouteImport.update({
@@ -971,6 +977,7 @@ export interface FileRoutesByFullPath {
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/offline': typeof OfflineRoute
+  '/privacidad': typeof PrivacidadRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -1114,6 +1121,7 @@ export interface FileRoutesByTo {
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/offline': typeof OfflineRoute
+  '/privacidad': typeof PrivacidadRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -1250,6 +1258,7 @@ export interface FileRoutesById {
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/offline': typeof OfflineRoute
+  '/privacidad': typeof PrivacidadRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -1395,6 +1404,7 @@ export interface FileRouteTypes {
     | '/mapa'
     | '/marketplace'
     | '/offline'
+    | '/privacidad'
     | '/promociones'
     | '/que-hacer'
     | '/reset-password'
@@ -1538,6 +1548,7 @@ export interface FileRouteTypes {
     | '/mapa'
     | '/marketplace'
     | '/offline'
+    | '/privacidad'
     | '/promociones'
     | '/que-hacer'
     | '/reset-password'
@@ -1673,6 +1684,7 @@ export interface FileRouteTypes {
     | '/mapa'
     | '/marketplace'
     | '/offline'
+    | '/privacidad'
     | '/promociones'
     | '/que-hacer'
     | '/reset-password'
@@ -1818,6 +1830,7 @@ export interface RootRouteChildren {
   MapaRoute: typeof MapaRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   OfflineRoute: typeof OfflineRoute
+  PrivacidadRoute: typeof PrivacidadRoute
   PromocionesRoute: typeof PromocionesRoute
   QueHacerRoute: typeof QueHacerRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -1891,6 +1904,13 @@ declare module '@tanstack/react-router' {
       path: '/promociones'
       fullPath: '/promociones'
       preLoaderRoute: typeof PromocionesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidad': {
+      id: '/privacidad'
+      path: '/privacidad'
+      fullPath: '/privacidad'
+      preLoaderRoute: typeof PrivacidadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/offline': {
@@ -3255,6 +3275,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapaRoute: MapaRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
   OfflineRoute: OfflineRoute,
+  PrivacidadRoute: PrivacidadRoute,
   PromocionesRoute: PromocionesRoute,
   QueHacerRoute: QueHacerRoute,
   ResetPasswordRoute: ResetPasswordRoute,
@@ -3300,13 +3321,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
