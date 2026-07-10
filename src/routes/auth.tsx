@@ -33,6 +33,7 @@ function AuthRoute() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [googleBusy, setGoogleBusy] = useState(false);
 
   useEffect(() => {
     if (!loading && user) {
@@ -86,12 +87,21 @@ function AuthRoute() {
 
   async function handleGoogle() {
     setError(null);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      // Return to /auth so the post-login effect picks up the stored "next".
-      redirect_uri: `${window.location.origin}/auth`,
-    });
-    if (result.error) {
-      setError(result.error.message ?? t("auth.google_error"));
+    setGoogleBusy(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        // Return to /auth so the post-login effect picks up the stored "next".
+        redirect_uri: `${window.location.origin}/auth`,
+      });
+      if (result.error) {
+        setError(result.error.message ?? t("auth.google_error"));
+        setGoogleBusy(false);
+      }
+      // If result.redirected, the page will navigate away — leave modal visible.
+      // If tokens were returned (popup path), the auth effect will redirect.
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("auth.google_error"));
+      setGoogleBusy(false);
     }
   }
 
@@ -207,6 +217,31 @@ function AuthRoute() {
           )}
         </div>
       </div>
+
+      {googleBusy ? (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/70 backdrop-blur-sm">
+          <div className="mx-4 max-w-sm rounded-2xl border border-border bg-card p-6 text-center shadow-elevated">
+            <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10">
+              <svg viewBox="0 0 24 24" className="size-6 animate-spin text-primary" aria-hidden>
+                <circle cx="12" cy="12" r="10" strokeWidth="3" stroke="currentColor" strokeOpacity=".2" fill="none" />
+                <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
+              </svg>
+            </div>
+            <h2 className="mt-4 text-base font-semibold">Conectando con Google…</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Se abrirá una ventana segura de Google para verificar tu cuenta.
+              Si tu navegador bloquea la ventana, te redirigiremos automáticamente.
+            </p>
+            <button
+              type="button"
+              onClick={() => setGoogleBusy(false)}
+              className="mt-5 text-xs font-medium text-muted-foreground underline"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      ) : null}
     </PublicShell>
   );
 }
