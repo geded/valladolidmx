@@ -37,6 +37,8 @@ function AuthRoute() {
 
   useEffect(() => {
     if (!loading && user) {
+      // Session hydrated — close the "Conectando con Google…" modal if it was open.
+      setGoogleBusy(false);
       // Preserve "next" across sign-in / OAuth round-trip.
       let next: string | null = null;
       if (typeof window !== "undefined") {
@@ -96,9 +98,10 @@ function AuthRoute() {
       if (result.error) {
         setError(result.error.message ?? t("auth.google_error"));
         setGoogleBusy(false);
+        return;
       }
-      // If result.redirected, the page will navigate away — leave modal visible.
-      // If tokens were returned (popup path), the auth effect will redirect.
+      // If result.redirected → the browser is navigating to Google; leave modal visible.
+      // If tokens were returned (popup path) → the auth effect closes the modal and redirects.
     } catch (err) {
       setError(err instanceof Error ? err.message : t("auth.google_error"));
       setGoogleBusy(false);
