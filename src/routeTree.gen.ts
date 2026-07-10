@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TerminosRouteImport } from './routes/terminos'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RestaurantesRouteImport } from './routes/restaurantes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -153,6 +154,11 @@ import { Route as AuthenticatedCmsEmpresasBusinessIdEditarRouteImport } from './
 import { Route as AuthenticatedCmsDestinosDestinationIdEditarRouteImport } from './routes/_authenticated/cms/destinos.$destinationId.editar'
 import { Route as AuthenticatedCmsCategoriasIdEditarRouteImport } from './routes/_authenticated/cms/categorias.$id.editar'
 
+const TerminosRoute = TerminosRouteImport.update({
+  id: '/terminos',
+  path: '/terminos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -983,6 +989,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terminos': typeof TerminosRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/concierge': typeof AuthenticatedConciergeRouteRouteWithChildren
   '/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
@@ -1127,6 +1134,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terminos': typeof TerminosRoute
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
@@ -1264,6 +1272,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terminos': typeof TerminosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/concierge': typeof AuthenticatedConciergeRouteRouteWithChildren
   '/_authenticated/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
@@ -1410,6 +1419,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/restaurantes'
     | '/sitemap.xml'
+    | '/terminos'
     | '/admin'
     | '/concierge'
     | '/cuenta'
@@ -1554,6 +1564,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/restaurantes'
     | '/sitemap.xml'
+    | '/terminos'
     | '/empresa'
     | '/mi-viaje'
     | '/paginas'
@@ -1690,6 +1701,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/restaurantes'
     | '/sitemap.xml'
+    | '/terminos'
     | '/_authenticated/admin'
     | '/_authenticated/concierge'
     | '/_authenticated/cuenta'
@@ -1836,6 +1848,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   RestaurantesRoute: typeof RestaurantesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TerminosRoute: typeof TerminosRoute
   LSlugRoute: typeof LSlugRoute
   LovableBusinessMotherTemplatePreviewRoute: typeof LovableBusinessMotherTemplatePreviewRoute
   LovableContextEnginePreviewRoute: typeof LovableContextEnginePreviewRoute
@@ -1871,6 +1884,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terminos': {
+      id: '/terminos'
+      path: '/terminos'
+      fullPath: '/terminos'
+      preLoaderRoute: typeof TerminosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -3281,6 +3301,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   RestaurantesRoute: RestaurantesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TerminosRoute: TerminosRoute,
   LSlugRoute: LSlugRoute,
   LovableBusinessMotherTemplatePreviewRoute:
     LovableBusinessMotherTemplatePreviewRoute,
