@@ -1,22 +1,72 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { createClient } from "@supabase/supabase-js";
+import { timingSafeEqual } from "node:crypto";
+
+/**
+ * Diagnóstico de Google Maps. Endpoint sensible: gasta cuota del connector
+ * y no debe filtrar presencia/preview de secretos. Requiere sesión admin
+ * (Authorization: Bearer <supabase access token>) o el header
+ * `x-cron-secret` con `EB_CRON_SECRET` para diagnósticos internos.
+ */
+function safeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  return timingSafeEqual(ab, bb);
+}
+
+async function authorize(request: Request): Promise<boolean> {
+  const cronHeader = request.headers.get("x-cron-secret");
+  const cronSecret = process.env.EB_CRON_SECRET ?? "";
+  if (cronHeader && cronSecret && safeEqual(cronHeader, cronSecret)) return true;
+
+  const bearer = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
+  if (!bearer) return false;
+  try {
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_PUBLISHABLE_KEY!,
+      {
+        auth: { persistSession: false, autoRefreshToken: false },
+        global: { headers: { Authorization: `Bearer ${bearer}` } },
+      },
+    );
+    const { data: userData, error: userErr } = await supabase.auth.getUser(bearer);
+    if (userErr || !userData?.user) return false;
+    const { data: isAdmin } = await supabase.rpc("has_role", {
+      _user_id: userData.user.id,
+      _role: "admin",
+    });
+    const { data: isSuper } = await supabase.rpc("has_role", {
+      _user_id: userData.user.id,
+      _role: "super_admin",
+    });
+    return Boolean(isAdmin) || Boolean(isSuper);
+  } catch {
+    return false;
+  }
+}
 
 export const Route = createFileRoute("/api/public/health/maps")({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }) => {
+        if (!(await authorize(request))) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+
         const lovableKey = process.env.LOVABLE_API_KEY;
         const gmKey = process.env.GOOGLE_MAPS_API_KEY;
-        const browserKey = process.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY;
-
-        const result: Record<string, unknown> = {
-          hasLovableApiKey: Boolean(lovableKey),
-          hasServerKey: Boolean(gmKey),
-          hasBrowserKey: Boolean(browserKey),
-          browserKeyPreview: browserKey ? `${browserKey.slice(0, 6)}…${browserKey.slice(-4)}` : null,
-        };
 
         if (!lovableKey || !gmKey) {
-          return Response.json({ ok: false, ...result, error: "Missing keys" }, { status: 500 });
+          console.error("[health/maps] Missing server keys", {
+            hasLovableApiKey: Boolean(lovableKey),
+            hasServerKey: Boolean(gmKey),
+          });
+          return Response.json(
+            { ok: false, error: "Missing keys" },
+            { status: 500 },
+          );
         }
 
         const gwHeaders = {
@@ -88,7 +138,7 @@ export const Route = createFileRoute("/api/public/health/maps")({
           routes = { ok: false, error: err instanceof Error ? err.message : String(err) };
         }
 
-        return Response.json({ ...result, geocoding, staticMaps, routes });
+        return Response.json({ ok: true, geocoding, staticMaps, routes });
       },
     },
   },
