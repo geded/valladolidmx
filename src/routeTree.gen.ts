@@ -9,11 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TerminosRouteImport } from './routes/terminos'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RestaurantesRouteImport } from './routes/restaurantes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as QueHacerRouteImport } from './routes/que-hacer'
 import { Route as PromocionesRouteImport } from './routes/promociones'
+import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as MapaRouteImport } from './routes/mapa'
@@ -152,6 +154,11 @@ import { Route as AuthenticatedCmsEmpresasBusinessIdEditarRouteImport } from './
 import { Route as AuthenticatedCmsDestinosDestinationIdEditarRouteImport } from './routes/_authenticated/cms/destinos.$destinationId.editar'
 import { Route as AuthenticatedCmsCategoriasIdEditarRouteImport } from './routes/_authenticated/cms/categorias.$id.editar'
 
+const TerminosRoute = TerminosRouteImport.update({
+  id: '/terminos',
+  path: '/terminos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -175,6 +182,11 @@ const QueHacerRoute = QueHacerRouteImport.update({
 const PromocionesRoute = PromocionesRouteImport.update({
   id: '/promociones',
   path: '/promociones',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadRoute = PrivacidadRouteImport.update({
+  id: '/privacidad',
+  path: '/privacidad',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OfflineRoute = OfflineRouteImport.update({
@@ -971,11 +983,13 @@ export interface FileRoutesByFullPath {
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/offline': typeof OfflineRoute
+  '/privacidad': typeof PrivacidadRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terminos': typeof TerminosRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/concierge': typeof AuthenticatedConciergeRouteRouteWithChildren
   '/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
@@ -1114,11 +1128,13 @@ export interface FileRoutesByTo {
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/offline': typeof OfflineRoute
+  '/privacidad': typeof PrivacidadRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terminos': typeof TerminosRoute
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
@@ -1250,11 +1266,13 @@ export interface FileRoutesById {
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/offline': typeof OfflineRoute
+  '/privacidad': typeof PrivacidadRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terminos': typeof TerminosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/concierge': typeof AuthenticatedConciergeRouteRouteWithChildren
   '/_authenticated/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
@@ -1395,11 +1413,13 @@ export interface FileRouteTypes {
     | '/mapa'
     | '/marketplace'
     | '/offline'
+    | '/privacidad'
     | '/promociones'
     | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
     | '/sitemap.xml'
+    | '/terminos'
     | '/admin'
     | '/concierge'
     | '/cuenta'
@@ -1538,11 +1558,13 @@ export interface FileRouteTypes {
     | '/mapa'
     | '/marketplace'
     | '/offline'
+    | '/privacidad'
     | '/promociones'
     | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
     | '/sitemap.xml'
+    | '/terminos'
     | '/empresa'
     | '/mi-viaje'
     | '/paginas'
@@ -1673,11 +1695,13 @@ export interface FileRouteTypes {
     | '/mapa'
     | '/marketplace'
     | '/offline'
+    | '/privacidad'
     | '/promociones'
     | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
     | '/sitemap.xml'
+    | '/terminos'
     | '/_authenticated/admin'
     | '/_authenticated/concierge'
     | '/_authenticated/cuenta'
@@ -1818,11 +1842,13 @@ export interface RootRouteChildren {
   MapaRoute: typeof MapaRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   OfflineRoute: typeof OfflineRoute
+  PrivacidadRoute: typeof PrivacidadRoute
   PromocionesRoute: typeof PromocionesRoute
   QueHacerRoute: typeof QueHacerRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RestaurantesRoute: typeof RestaurantesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TerminosRoute: typeof TerminosRoute
   LSlugRoute: typeof LSlugRoute
   LovableBusinessMotherTemplatePreviewRoute: typeof LovableBusinessMotherTemplatePreviewRoute
   LovableContextEnginePreviewRoute: typeof LovableContextEnginePreviewRoute
@@ -1858,6 +1884,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terminos': {
+      id: '/terminos'
+      path: '/terminos'
+      fullPath: '/terminos'
+      preLoaderRoute: typeof TerminosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -1891,6 +1924,13 @@ declare module '@tanstack/react-router' {
       path: '/promociones'
       fullPath: '/promociones'
       preLoaderRoute: typeof PromocionesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidad': {
+      id: '/privacidad'
+      path: '/privacidad'
+      fullPath: '/privacidad'
+      preLoaderRoute: typeof PrivacidadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/offline': {
@@ -3255,11 +3295,13 @@ const rootRouteChildren: RootRouteChildren = {
   MapaRoute: MapaRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
   OfflineRoute: OfflineRoute,
+  PrivacidadRoute: PrivacidadRoute,
   PromocionesRoute: PromocionesRoute,
   QueHacerRoute: QueHacerRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RestaurantesRoute: RestaurantesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TerminosRoute: TerminosRoute,
   LSlugRoute: LSlugRoute,
   LovableBusinessMotherTemplatePreviewRoute:
     LovableBusinessMotherTemplatePreviewRoute,
@@ -3300,13 +3342,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
