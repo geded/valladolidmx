@@ -1,25 +1,32 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { timingSafeEqual } from "node:crypto";
 
 /**
  * US-D · Endpoint invocado por pg_cron para publicar automáticamente las
- * páginas cuya `scheduled_publish_at` ya llegó. Autenticación por apikey
- * (anon) — el prefijo /api/public/* omite la auth del sitio publicado, y
- * el trabajo real lo hace la RPC SECURITY DEFINER `eb_process_scheduled_publishes`,
- * que sólo está accesible desde el servidor.
+ * páginas cuya `scheduled_publish_at` ya llegó. Autenticación por secreto
+ * server-only `EB_CRON_SECRET` (header `x-cron-secret` o
+ * `Authorization: Bearer <secret>`), comparado en tiempo constante.
+ * El prefijo /api/public/* omite la auth del sitio publicado, así que el
+ * secreto ES la única barrera antes de la RPC SECURITY DEFINER
+ * `eb_process_scheduled_publishes`.
  */
+function safeEqual(a: string, b: string): boolean {
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
+}
+
 export const Route = createFileRoute("/api/public/hooks/eb-process-scheduled-publish")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apikey =
-          request.headers.get("apikey") ??
+        const provided =
+          request.headers.get("x-cron-secret") ??
           request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
           "";
-        const expected =
-          process.env.SUPABASE_PUBLISHABLE_KEY ??
-          process.env.SUPABASE_ANON_KEY ??
-          "";
-        if (!expected || apikey !== expected) {
+        const expected = process.env.EB_CRON_SECRET ?? "";
+        if (!expected || !provided || !safeEqual(provided, expected)) {
           return new Response("Unauthorized", { status: 401 });
         }
 
