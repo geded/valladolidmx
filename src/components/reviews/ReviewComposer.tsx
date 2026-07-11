@@ -39,6 +39,7 @@ import type { PublicReviewSubjectKind } from "@/lib/reviews/public-reads.functio
 const POLICY_LABEL: Record<EligibilityPolicy, string> = {
   verified_purchase: "Compra verificada — se publica al enviar",
   managed_visit: "Visita gestionada por Concierge — se publica al enviar",
+  verified_redemption: "Cupón canjeado en la empresa — se publica al enviar",
   declared_visitor: "Declarada bajo protesta — pasa por moderación antes de publicarse",
 };
 
