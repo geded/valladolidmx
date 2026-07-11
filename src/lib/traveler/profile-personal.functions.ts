@@ -80,7 +80,7 @@ export const upsertMyPersonalProfile = createServerFn({ method: "POST" })
       first_name: clampStr(v.first_name, 60),
       last_name: clampStr(v.last_name, 60),
       phone: clampStr(v.phone, 32),
-      avatar_url: clampStr(v.avatar_url, 512),
+      avatar_url: clampStr(v.avatar_url, 2000),
       country: clampStr(v.country, 60),
       preferred_language: lang && LANGS.has(lang) ? lang : null,
     };
