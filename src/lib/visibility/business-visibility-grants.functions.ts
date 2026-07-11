@@ -141,7 +141,9 @@ export const requestVisibilityGrant = createServerFn({ method: "POST" })
         notes: data.notes ?? null,
         created_by: context.userId,
         auto_renew: false,
-        expires_at: null,
+        // Placeholder: al activarse desde /cms/visibilidad, el admin
+        // establece starts_at/expires_at reales según el ciclo elegido.
+        expires_at: new Date().toISOString(),
       })
       .select("id")
       .single();
