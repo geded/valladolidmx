@@ -5,6 +5,8 @@
 import { Link } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import type { PublicTravelerProfile } from "@/lib/traveler/traveler-public.functions";
+import type { PublicReviewerStats } from "@/lib/reviews/reviewer-stats.functions";
+import { ReviewerBadge } from "@/components/traveler/ReviewerBadge";
 
 function initials(name: string | null, handle: string): string {
   const src = (name ?? handle).trim();
@@ -16,8 +18,10 @@ function initials(name: string | null, handle: string): string {
 
 export function TravelerPublicProfileSurface({
   profile,
+  reviewerStats,
 }: {
   profile: PublicTravelerProfile;
+  reviewerStats?: PublicReviewerStats;
 }) {
   const displayName = profile.display_name?.trim() || profile.handle;
   return (
@@ -54,6 +58,13 @@ export function TravelerPublicProfileSurface({
             <p className="max-w-lg text-pretty text-sm leading-relaxed text-foreground/80">
               {profile.bio}
             </p>
+          ) : null}
+          {reviewerStats && reviewerStats.isReviewerVerified ? (
+            <ReviewerBadge
+              verifiedCount={reviewerStats.verifiedCount}
+              isReviewerVerified={reviewerStats.isReviewerVerified}
+              size="md"
+            />
           ) : null}
         </div>
 

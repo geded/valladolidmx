@@ -9,13 +9,17 @@ import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getPublicTravelerProfile } from "@/lib/traveler/traveler-public.functions";
+import { getPublicReviewerStats } from "@/lib/reviews/reviewer-stats.functions";
 import { TravelerPublicProfileSurface } from "@/components/surfaces/TravelerPublicProfileSurface";
 
 export const Route = createFileRoute("/viajero/$handle")({
   loader: async ({ params }) => {
     const profile = await getPublicTravelerProfile({ data: { handle: params.handle } });
     if (!profile) throw notFound();
-    return { profile };
+    const reviewerStats = await getPublicReviewerStats({
+      data: { handle: params.handle },
+    }).catch(() => ({ verifiedCount: 0, isReviewerVerified: false }));
+    return { profile, reviewerStats };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
@@ -59,6 +63,8 @@ export const Route = createFileRoute("/viajero/$handle")({
 });
 
 function ViajeroPublicRoute() {
-  const { profile } = Route.useLoaderData();
-  return <TravelerPublicProfileSurface profile={profile} />;
+  const { profile, reviewerStats } = Route.useLoaderData();
+  return (
+    <TravelerPublicProfileSurface profile={profile} reviewerStats={reviewerStats} />
+  );
 }
