@@ -791,6 +791,88 @@ export type Database = {
           },
         ]
       }
+      business_visibility_grants: {
+        Row: {
+          amount_paid_mxn: number | null
+          auto_renew: boolean
+          business_id: string
+          cancelled_at: string | null
+          cancelled_reason: string | null
+          created_at: string
+          created_by: string | null
+          cycle: string
+          expires_at: string
+          id: string
+          notes: string | null
+          plan_id: string
+          source: string
+          source_order_id: string | null
+          starts_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_paid_mxn?: number | null
+          auto_renew?: boolean
+          business_id: string
+          cancelled_at?: string | null
+          cancelled_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          cycle?: string
+          expires_at: string
+          id?: string
+          notes?: string | null
+          plan_id: string
+          source?: string
+          source_order_id?: string | null
+          starts_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_paid_mxn?: number | null
+          auto_renew?: boolean
+          business_id?: string
+          cancelled_at?: string | null
+          cancelled_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          cycle?: string
+          expires_at?: string
+          id?: string
+          notes?: string | null
+          plan_id?: string
+          source?: string
+          source_order_id?: string | null
+          starts_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_visibility_grants_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_visibility_grants_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "visibility_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_visibility_grants_source_order_id_fkey"
+            columns: ["source_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       businesses: {
         Row: {
           can_self_publish: boolean
@@ -4524,6 +4606,72 @@ export type Database = {
           scope_type?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      visibility_plans: {
+        Row: {
+          badge_variant: string
+          base_price_mxn: number
+          color_token: string
+          commercial_rules: Json
+          created_at: string
+          cycles: Json
+          description_long: string | null
+          description_short: string | null
+          display_order: number
+          id: string
+          is_active: boolean
+          is_public: boolean
+          limits: Json
+          name: string
+          reporting: Json
+          slug: string
+          updated_at: string
+          updated_by: string | null
+          visibility_levers: Json
+        }
+        Insert: {
+          badge_variant?: string
+          base_price_mxn?: number
+          color_token?: string
+          commercial_rules?: Json
+          created_at?: string
+          cycles?: Json
+          description_long?: string | null
+          description_short?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          is_public?: boolean
+          limits?: Json
+          name: string
+          reporting?: Json
+          slug: string
+          updated_at?: string
+          updated_by?: string | null
+          visibility_levers?: Json
+        }
+        Update: {
+          badge_variant?: string
+          base_price_mxn?: number
+          color_token?: string
+          commercial_rules?: Json
+          created_at?: string
+          cycles?: Json
+          description_long?: string | null
+          description_short?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          is_public?: boolean
+          limits?: Json
+          name?: string
+          reporting?: Json
+          slug?: string
+          updated_at?: string
+          updated_by?: string | null
+          visibility_levers?: Json
         }
         Relationships: []
       }
