@@ -761,10 +761,12 @@ function ListField({
   label,
   value,
   onChange,
+  placeholder,
 }: {
   label: string;
   value: string;
   onChange: (arr: string[]) => void;
+  placeholder?: string;
 }) {
   return (
     <label className="grid gap-1 text-sm">
@@ -774,6 +776,7 @@ function ListField({
       <input
         type="text"
         defaultValue={value}
+        placeholder={placeholder}
         onBlur={(e) =>
           onChange(
             e.target.value
@@ -792,10 +795,14 @@ function TextAreaField({
   label,
   value,
   onChange,
+  hint,
+  placeholder,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
+  hint?: string;
+  placeholder?: string;
 }) {
   return (
     <label className="grid gap-1 text-sm">
@@ -805,9 +812,11 @@ function TextAreaField({
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
         rows={3}
         className="rounded-md border border-border bg-background px-3 py-2"
       />
+      {hint && <span className="text-[11px] text-muted-foreground">{hint}</span>}
     </label>
   );
 }
