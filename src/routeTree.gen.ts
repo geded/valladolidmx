@@ -99,6 +99,7 @@ import { Route as AuthenticatedCuentaConciergeRouteImport } from './routes/_auth
 import { Route as AuthenticatedCuentaCarritoRouteImport } from './routes/_authenticated/cuenta/carrito'
 import { Route as AuthenticatedCuentaAnfitrionRouteImport } from './routes/_authenticated/cuenta/anfitrion'
 import { Route as AuthenticatedCuentaActividadRouteImport } from './routes/_authenticated/cuenta/actividad'
+import { Route as AuthenticatedCmsVisibilidadRouteImport } from './routes/_authenticated/cms/visibilidad'
 import { Route as AuthenticatedCmsPagosRouteImport } from './routes/_authenticated/cms/pagos'
 import { Route as AuthenticatedCmsObservabilidadRouteImport } from './routes/_authenticated/cms/observabilidad'
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
@@ -657,6 +658,12 @@ const AuthenticatedCuentaActividadRoute =
     path: '/actividad',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
+const AuthenticatedCmsVisibilidadRoute =
+  AuthenticatedCmsVisibilidadRouteImport.update({
+    id: '/visibilidad',
+    path: '/visibilidad',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsPagosRoute = AuthenticatedCmsPagosRouteImport.update({
   id: '/pagos',
   path: '/pagos',
@@ -1110,6 +1117,7 @@ export interface FileRoutesByFullPath {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
+  '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -1259,6 +1267,7 @@ export interface FileRoutesByTo {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
+  '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -1415,6 +1424,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/_authenticated/cms/pagos': typeof AuthenticatedCmsPagosRoute
+  '/_authenticated/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRoute
   '/_authenticated/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/_authenticated/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -1573,6 +1583,7 @@ export interface FileRouteTypes {
     | '/cms/media'
     | '/cms/observabilidad'
     | '/cms/pagos'
+    | '/cms/visibilidad'
     | '/cuenta/actividad'
     | '/cuenta/anfitrion'
     | '/cuenta/carrito'
@@ -1722,6 +1733,7 @@ export interface FileRouteTypes {
     | '/cms/media'
     | '/cms/observabilidad'
     | '/cms/pagos'
+    | '/cms/visibilidad'
     | '/cuenta/actividad'
     | '/cuenta/anfitrion'
     | '/cuenta/carrito'
@@ -1877,6 +1889,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/media'
     | '/_authenticated/cms/observabilidad'
     | '/_authenticated/cms/pagos'
+    | '/_authenticated/cms/visibilidad'
     | '/_authenticated/cuenta/actividad'
     | '/_authenticated/cuenta/anfitrion'
     | '/_authenticated/cuenta/carrito'
@@ -2660,6 +2673,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCuentaActividadRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
+    '/_authenticated/cms/visibilidad': {
+      id: '/_authenticated/cms/visibilidad'
+      path: '/visibilidad'
+      fullPath: '/cms/visibilidad'
+      preLoaderRoute: typeof AuthenticatedCmsVisibilidadRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/pagos': {
       id: '/_authenticated/cms/pagos'
       path: '/pagos'
@@ -3334,6 +3354,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
   AuthenticatedCmsObservabilidadRoute: typeof AuthenticatedCmsObservabilidadRoute
   AuthenticatedCmsPagosRoute: typeof AuthenticatedCmsPagosRoute
+  AuthenticatedCmsVisibilidadRoute: typeof AuthenticatedCmsVisibilidadRoute
   AuthenticatedCmsIndexRoute: typeof AuthenticatedCmsIndexRoute
   AuthenticatedCmsCategoriasNuevaRoute: typeof AuthenticatedCmsCategoriasNuevaRoute
   AuthenticatedCmsDestinosNuevaRoute: typeof AuthenticatedCmsDestinosNuevaRoute
@@ -3366,6 +3387,7 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsMediaRoute: AuthenticatedCmsMediaRoute,
   AuthenticatedCmsObservabilidadRoute: AuthenticatedCmsObservabilidadRoute,
   AuthenticatedCmsPagosRoute: AuthenticatedCmsPagosRoute,
+  AuthenticatedCmsVisibilidadRoute: AuthenticatedCmsVisibilidadRoute,
   AuthenticatedCmsIndexRoute: AuthenticatedCmsIndexRoute,
   AuthenticatedCmsCategoriasNuevaRoute: AuthenticatedCmsCategoriasNuevaRoute,
   AuthenticatedCmsDestinosNuevaRoute: AuthenticatedCmsDestinosNuevaRoute,

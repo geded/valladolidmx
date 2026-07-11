@@ -39,6 +39,7 @@ const ENTITIES: EntityCard[] = [
   { key: "products", name: "Productos", description: "Experiencias, hoteles, restaurantes, eventos y más.", to: "/cms/productos" },
   { key: "media_assets", name: "Media", description: "Biblioteca multimedia compartida.", to: "/cms/media" },
   { key: "reviews", name: "Reseñas", description: "Moderación de reseñas y respuestas.", to: "/cms/reviews" },
+  { key: "visibility_plans", name: "Paquetes de visibilidad", description: "Catálogo comercial editable: precios, ciclos, límites y palancas por paquete.", to: "/cms/visibilidad" },
 ];
 
 function CmsDashboard() {
