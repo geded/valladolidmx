@@ -110,21 +110,12 @@ export function businessToTourismCard(
     ? [{ label: "Verificada", tone: "primary" }]
     : [];
   // Ola 7.4.a · Badge de paquete de visibilidad (Destacado/Premium/Élite…)
+  const allowedTones = new Set(["default", "primary", "success", "warning", "info"]);
+  const rawTone = (b.visibility_badge_variant ?? "").toLowerCase();
+  const visibilityTone = (allowedTones.has(rawTone) ? rawTone : "primary") as
+    TourismCardVM["badges"][number]["tone"];
   const visibilityBadges: TourismCardVM["badges"] = b.visibility_plan_name
-    ? [
-        {
-          label: b.visibility_plan_name,
-          tone:
-            (b.visibility_badge_variant as
-              | "primary"
-              | "info"
-              | "success"
-              | "warning"
-              | "destructive"
-              | "muted"
-              | undefined) ?? "primary",
-        },
-      ]
+    ? [{ label: b.visibility_plan_name, tone: visibilityTone }]
     : [];
   return {
     id: b.id,
