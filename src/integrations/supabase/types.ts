@@ -4791,19 +4791,21 @@ export type Database = {
     Views: {
       business_effective_visibility: {
         Row: {
+          badge_variant: string | null
+          base_price_mxn: number | null
           business_id: string | null
           business_slug: string | null
-          cycle_months: number | null
+          color_token: string | null
+          cycle: string | null
           expires_at: string | null
           grant_id: string | null
           is_default: boolean | null
           levers: Json | null
           limits: Json | null
-          plan_code: string | null
           plan_id: string | null
           plan_name: string | null
+          plan_slug: string | null
           starts_at: string | null
-          tier: string | null
         }
         Relationships: []
       }
@@ -5585,17 +5587,19 @@ export type Database = {
       get_business_active_plan: {
         Args: { _business_id: string }
         Returns: {
-          cycle_months: number
+          badge_variant: string
+          base_price_mxn: number
+          color_token: string
+          cycle: string
           expires_at: string
           grant_id: string
           is_default: boolean
           levers: Json
           limits: Json
-          plan_code: string
           plan_id: string
           plan_name: string
+          plan_slug: string
           starts_at: string
-          tier: string
         }[]
       }
       get_coupons_needing_review_reminder: {
