@@ -39,6 +39,7 @@ const CAPABILITIES = [
   "detect_gaps",
   "draft_concierge_message",
   "suggest_from_coupons",
+  "discover_promotions",
 ] as const;
 
 export type AluxTravelerCapability = (typeof CAPABILITIES)[number];
@@ -337,10 +338,61 @@ export const suggestFromCoupons = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) =>
     runAluxTraveler(
       "suggest_from_coupons",
-      "Sólo trabajas con cupones que aparezcan en `active_coupons` del contexto. NUNCA inventes códigos, descuentos, negocios ni vigencias. Si `active_coupons` está vacío, dilo abiertamente y sugiere visitar /promociones. Nunca redimes: el viajero canjea desde el negocio con su QR.",
+      "Sólo trabajas con cupones que aparezcan en `active_coupons` del contexto. NUNCA inventes códigos, descuentos, negocios ni vigencias. Si `active_coupons` está vacío o hay pocos cupones activos, dilo abiertamente e invita explícitamente al viajero a visitar /promociones para reclamar promociones nuevas (incluye el enlace textual `/promociones`). Nunca redimes: el viajero canjea desde el negocio con su QR.",
       "Analiza los cupones activos del viajero y sugiere cómo aprovecharlos en su viaje" +
         (data.focus ? `. Foco: ${data.focus}` : "") +
-        ". Para cada cupón cita: título exacto, negocio, % de descuento (si lo trae), vigencia (fecha) y en qué momento del plan (o del recorrido por el Oriente Maya) le conviene usarlo. Si un cupón está por vencer, priorízalo. No inventes menús ni tarifas.",
+        ". Para cada cupón cita: título exacto, negocio, % de descuento (si lo trae), vigencia (fecha) y en qué momento del plan (o del recorrido por el Oriente Maya) le conviene usarlo. Si un cupón está por vencer, priorízalo. Cierra recordando que puede descubrir más promociones en /promociones. No inventes menús ni tarifas.",
       context.supabase,
     ),
   );
+
+/**
+ * discoverPromotions — Ola 4 (bis): recomienda promociones publicadas que
+ * el viajero AÚN NO ha reclamado, cruzándolas con su perfil, plan activo y
+ * cupones ya activos. NO reclama por él; solo sugiere y lo invita a
+ * visitar /promociones. Fuente única de promociones: la vitrina pública
+ * `page_compositions` (kind=promotion), leída server-side.
+ */
+export const discoverPromotions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => CapabilityInput.parse(d ?? {}))
+  .handler(async ({ context, data }) => {
+    // Fuente única y publishable-only. Sin admin, sin RLS bypass.
+    const { createClient } = await import("@supabase/supabase-js");
+    const sb = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_PUBLISHABLE_KEY!,
+      { auth: { persistSession: false, autoRefreshToken: false } },
+    );
+    const { data: rows } = await sb
+      .from("page_compositions")
+      .select("slug, title, description")
+      .eq("kind", "promotion")
+      .eq("status", "published")
+      .eq("is_template", false)
+      .order("published_at", { ascending: false })
+      .limit(12);
+    const promos = (rows ?? []).map((r) => ({
+      slug: r.slug as string,
+      title: (r.title as string) ?? (r.slug as string),
+      description: (r.description as string) ?? null,
+      url: `/promociones/${r.slug}`,
+    }));
+
+    const promosBlock =
+      promos.length === 0
+        ? "\n\nPromociones publicadas actualmente: (ninguna)."
+        : "\n\nPromociones publicadas (fuente única, no inventes otras):\n```json\n" +
+          JSON.stringify(promos).slice(0, 8_000) +
+          "\n```";
+
+    return runAluxTraveler(
+      "discover_promotions",
+      "Sólo puedes recomendar promociones que aparezcan en la lista `Promociones publicadas`. NUNCA inventes títulos, negocios, descuentos ni vigencias. Contrasta con `active_coupons` del contexto: NO recomiendes promociones cuyo cupón el viajero YA reclamó. Si no hay promociones publicadas, dilo con claridad e invita a volver más tarde. Nunca reclamas ni redimes por el viajero: él debe abrir el enlace y reclamar desde /promociones.",
+      "Sugiere hasta 3 promociones vigentes que le convengan al viajero según su perfil y plan activo" +
+        (data.focus ? `. Foco: ${data.focus}` : "") +
+        ". Para cada una: título exacto, por qué encaja en 1 línea y URL exacta (usa el campo `url` provisto). Cierra con una invitación clara a visitar /promociones para ver el catálogo completo y reclamar el cupón digital." +
+        promosBlock,
+      context.supabase,
+    );
+  });
