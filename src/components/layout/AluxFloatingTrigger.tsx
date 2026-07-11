@@ -325,6 +325,38 @@ export function AluxFloatingTrigger() {
               Sugerencias derivadas del catálogo publicado y del contexto real de tu recorrido, nunca inventadas.
             </p>
           </section>
+
+          {/* Invitación a completar y publicar perfil — para asesoría más precisa */}
+          <section
+            aria-labelledby="alux-profile"
+            className="rounded-2xl border border-primary/20 bg-primary/5 p-4"
+          >
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+              <Sparkles className="size-3.5" aria-hidden />
+              <span id="alux-profile">Ayúdame a asesorarte mejor</span>
+            </div>
+            <p className="mt-2 text-sm text-foreground">
+              Si completas tu perfil (estilo, intereses, compañía, presupuesto, fechas)
+              y lo haces público, puedo recomendarte hoteles, restaurantes,
+              experiencias y rutas del Oriente Maya con mucha más precisión.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <a
+                href="/cuenta/perfil"
+                className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-background px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
+              >
+                Completar mi perfil
+                <ArrowRight className="size-3.5" aria-hidden />
+              </a>
+              <a
+                href="/cuenta/perfil-publico"
+                className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                Activar perfil público
+                <ArrowRight className="size-3.5" aria-hidden />
+              </a>
+            </div>
+          </section>
         </SheetContent>
       </Sheet>
     </>
