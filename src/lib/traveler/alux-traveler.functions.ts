@@ -38,6 +38,7 @@ const CAPABILITIES = [
   "improve_trip",
   "detect_gaps",
   "draft_concierge_message",
+  "suggest_from_coupons",
 ] as const;
 
 export type AluxTravelerCapability = (typeof CAPABILITIES)[number];
