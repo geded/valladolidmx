@@ -39,6 +39,7 @@ import type { PublicReviewSubjectKind } from "@/lib/reviews/public-reads.functio
 const POLICY_LABEL: Record<EligibilityPolicy, string> = {
   verified_purchase: "Compra verificada — se publica al enviar",
   managed_visit: "Visita gestionada por Concierge — se publica al enviar",
+  verified_redemption: "Cupón canjeado en la empresa — se publica al enviar",
   declared_visitor: "Declarada bajo protesta — pasa por moderación antes de publicarse",
 };
 
@@ -47,6 +48,8 @@ export interface ReviewComposerProps {
   subjectId: string;
   subjectName?: string;
   triggerLabel?: string;
+  defaultOpen?: boolean;
+  hideTrigger?: boolean;
 }
 
 function StarPicker({
@@ -84,10 +87,12 @@ export function ReviewComposer({
   subjectId,
   subjectName,
   triggerLabel = "Escribir reseña",
+  defaultOpen = false,
+  hideTrigger = false,
 }: ReviewComposerProps) {
   const { user, profile } = useAuth();
   const qc = useQueryClient();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [rating, setRating] = useState(0);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -164,11 +169,13 @@ export function ReviewComposer({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" variant="outline">
-          {triggerLabel}
-        </Button>
-      </DialogTrigger>
+      {hideTrigger ? null : (
+        <DialogTrigger asChild>
+          <Button size="sm" variant="outline">
+            {triggerLabel}
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Comparte tu experiencia</DialogTitle>

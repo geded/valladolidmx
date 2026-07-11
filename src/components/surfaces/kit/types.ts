@@ -90,6 +90,7 @@ export type ReviewVM = {
     | "verified_purchase"
     | "managed_visit"
     | "verified_visit"
+    | "verified_redemption"
     | "declared_visitor"
     | null;
   businessResponse?: string | null;

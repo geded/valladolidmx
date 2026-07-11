@@ -15,6 +15,7 @@ const VERIFIED_LABEL: Record<NonNullable<ReviewVM["verifiedSource"]>, string> = 
   verified_purchase: "Compra verificada",
   managed_visit: "Visita gestionada",
   verified_visit: "Visita verificada",
+  verified_redemption: "Canje verificado",
   declared_visitor: "Visitante declarado",
 };
 
@@ -81,7 +82,8 @@ export function KitReviews({
           const isTrusted =
             r.verifiedSource === "verified_purchase" ||
             r.verifiedSource === "managed_visit" ||
-            r.verifiedSource === "verified_visit";
+            r.verifiedSource === "verified_visit" ||
+            r.verifiedSource === "verified_redemption";
           return (
             <li key={r.id} className="rounded-2xl border border-border bg-card p-5">
               <div className="flex flex-wrap items-baseline justify-between gap-2">

@@ -72,6 +72,7 @@ import { Route as AuthenticatedCuentaIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedConciergeIndexRouteImport } from './routes/_authenticated/concierge/index'
 import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticated/cms/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as ResenarNegocioSlugRouteImport } from './routes/resenar.negocio.$slug'
 import { Route as PreviewCompositionTokenRouteImport } from './routes/preview/composition.$token'
 import { Route as OrienteMayaDestinoCategoriaRouteImport } from './routes/oriente-maya/$destino.$categoria'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
@@ -495,6 +496,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const ResenarNegocioSlugRoute = ResenarNegocioSlugRouteImport.update({
+  id: '/resenar/negocio/$slug',
+  path: '/resenar/negocio/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PreviewCompositionTokenRoute = PreviewCompositionTokenRouteImport.update({
   id: '/preview/composition/$token',
@@ -1123,6 +1129,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
+  '/resenar/negocio/$slug': typeof ResenarNegocioSlugRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/cms/': typeof AuthenticatedCmsIndexRoute
   '/concierge/': typeof AuthenticatedConciergeIndexRoute
@@ -1269,6 +1276,7 @@ export interface FileRoutesByTo {
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
+  '/resenar/negocio/$slug': typeof ResenarNegocioSlugRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/cms': typeof AuthenticatedCmsIndexRoute
   '/concierge': typeof AuthenticatedConciergeIndexRoute
@@ -1424,6 +1432,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
+  '/resenar/negocio/$slug': typeof ResenarNegocioSlugRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
   '/_authenticated/concierge/': typeof AuthenticatedConciergeIndexRoute
@@ -1580,6 +1589,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/oriente-maya/$destino/$categoria'
     | '/preview/composition/$token'
+    | '/resenar/negocio/$slug'
     | '/admin/'
     | '/cms/'
     | '/concierge/'
@@ -1726,6 +1736,7 @@ export interface FileRouteTypes {
     | '/portal/propiedad'
     | '/lovable/email/suppression'
     | '/preview/composition/$token'
+    | '/resenar/negocio/$slug'
     | '/admin'
     | '/cms'
     | '/concierge'
@@ -1880,6 +1891,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/oriente-maya/$destino/$categoria'
     | '/preview/composition/$token'
+    | '/resenar/negocio/$slug'
     | '/_authenticated/admin/'
     | '/_authenticated/cms/'
     | '/_authenticated/concierge/'
@@ -1989,6 +2001,7 @@ export interface RootRouteChildren {
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
+  ResenarNegocioSlugRoute: typeof ResenarNegocioSlugRoute
   ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
   ApiPublicMapsStaticRoute: typeof ApiPublicMapsStaticRoute
@@ -2443,6 +2456,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/resenar/negocio/$slug': {
+      id: '/resenar/negocio/$slug'
+      path: '/resenar/negocio/$slug'
+      fullPath: '/resenar/negocio/$slug'
+      preLoaderRoute: typeof ResenarNegocioSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/preview/composition/$token': {
       id: '/preview/composition/$token'
@@ -3522,6 +3542,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
+  ResenarNegocioSlugRoute: ResenarNegocioSlugRoute,
   ApiPublicHealthMapsRoute: ApiPublicHealthMapsRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:
     ApiPublicHooksEbProcessScheduledPublishRoute,
