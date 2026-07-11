@@ -50,6 +50,7 @@ function normUuid(raw: unknown, label: string): string {
 export type EligibilityPolicy =
   | "verified_purchase"
   | "managed_visit"
+  | "verified_redemption"
   | "declared_visitor";
 
 export interface ReviewEligibility {
@@ -97,6 +98,27 @@ async function resolveEligibility(
       return {
         eligible: !hasExistingReview,
         policy: "verified_purchase",
+        hasExistingReview,
+        requiresDeclaration: false,
+        weight: 1.0,
+        reason: hasExistingReview ? "already_reviewed" : null,
+      };
+    }
+  }
+
+  // 2.5) verified_redemption — el viajero canjeó un cupón en este negocio
+  if (subjectKind === "business") {
+    const { data: redeemed, error: rErr } = await supabase
+      .from("traveler_coupons")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("business_id", subjectId)
+      .eq("status", "redeemed")
+      .limit(1);
+    if (!rErr && (redeemed ?? []).length > 0) {
+      return {
+        eligible: !hasExistingReview,
+        policy: "verified_redemption",
         hasExistingReview,
         requiresDeclaration: false,
         weight: 1.0,
@@ -194,6 +216,7 @@ export interface SubmitReviewResult {
 const POLICY_TO_SOURCE: Record<EligibilityPolicy, PublicReviewVerifiedSource> = {
   verified_purchase: "verified_purchase",
   managed_visit: "managed_visit",
+  verified_redemption: "verified_redemption",
   declared_visitor: "declared_visitor",
 };
 
@@ -252,7 +275,9 @@ export const submitReview = createServerFn({ method: "POST" })
     }
 
     const autoPublish =
-      elig.policy === "verified_purchase" || elig.policy === "managed_visit";
+      elig.policy === "verified_purchase" ||
+      elig.policy === "managed_visit" ||
+      elig.policy === "verified_redemption";
     const nowIso = new Date().toISOString();
 
     const insertRow: Record<string, unknown> = {
@@ -268,7 +293,14 @@ export const submitReview = createServerFn({ method: "POST" })
       published_at: autoPublish ? nowIso : null,
       verified_source: POLICY_TO_SOURCE[elig.policy],
       visit_date: data.visitDate,
-      visit_type: elig.policy === "managed_visit" ? "managed" : elig.policy === "verified_purchase" ? "purchased" : "declared",
+      visit_type:
+        elig.policy === "managed_visit"
+          ? "managed"
+          : elig.policy === "verified_purchase"
+            ? "purchased"
+            : elig.policy === "verified_redemption"
+              ? "redeemed"
+              : "declared",
       weight: elig.weight,
       created_by: userId,
       updated_by: userId,
