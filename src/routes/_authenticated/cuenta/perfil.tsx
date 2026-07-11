@@ -14,6 +14,11 @@ import {
   type TravelerProfileInput,
 } from "@/lib/traveler/traveler-account.functions";
 import {
+  getMyPersonalProfile,
+  upsertMyPersonalProfile,
+  type PersonalProfileInput,
+} from "@/lib/traveler/profile-personal.functions";
+import {
   getProfileModeState,
   type ProfileMode,
 } from "@/lib/profile-mode/mode.functions";
@@ -42,6 +47,8 @@ function CuentaPerfilPage() {
   const queryClient = useQueryClient();
   const fetchProfile = useServerFn(getMyTravelerProfile);
   const saveProfile = useServerFn(upsertMyTravelerProfile);
+  const fetchPersonal = useServerFn(getMyPersonalProfile);
+  const savePersonal = useServerFn(upsertMyPersonalProfile);
   const fetchMode = useServerFn(getProfileModeState);
 
   const modeQ = useQuery({
@@ -59,6 +66,13 @@ function CuentaPerfilPage() {
     staleTime: 60_000,
   });
 
+  const { data: personal, isLoading: loadingPersonal } = useQuery({
+    queryKey: ["traveler", "personal", user?.id],
+    queryFn: () => fetchPersonal(),
+    enabled: Boolean(user?.id) && active === "traveler",
+    staleTime: 60_000,
+  });
+
   const [form, setForm] = useState<TravelerProfileInput>({
     travel_style: null,
     budget_range: null,
@@ -68,6 +82,15 @@ function CuentaPerfilPage() {
     dietary_restrictions: null,
     accessibility_needs: null,
     trip_context: {},
+  });
+
+  const [personalForm, setPersonalForm] = useState<PersonalProfileInput>({
+    first_name: null,
+    last_name: null,
+    phone: null,
+    avatar_url: null,
+    country: null,
+    preferred_language: null,
   });
 
   useEffect(() => {
@@ -84,10 +107,32 @@ function CuentaPerfilPage() {
     });
   }, [data]);
 
+  useEffect(() => {
+    if (!personal) return;
+    setPersonalForm({
+      first_name: personal.first_name,
+      last_name: personal.last_name,
+      phone: personal.phone,
+      avatar_url: personal.avatar_url,
+      country: personal.country,
+      preferred_language: personal.preferred_language,
+    });
+  }, [personal]);
+
   const mutation = useMutation({
-    mutationFn: (input: TravelerProfileInput) => saveProfile({ data: input }),
-    onSuccess: (result) => {
-      queryClient.setQueryData(["traveler", "profile", user?.id], result);
+    mutationFn: async (payload: {
+      personal: PersonalProfileInput;
+      travel: TravelerProfileInput;
+    }) => {
+      const [p, t] = await Promise.all([
+        savePersonal({ data: payload.personal }),
+        saveProfile({ data: payload.travel }),
+      ]);
+      return { p, t };
+    },
+    onSuccess: ({ p, t }) => {
+      queryClient.setQueryData(["traveler", "personal", user?.id], p);
+      queryClient.setQueryData(["traveler", "profile", user?.id], t);
       void navigate({ to: "/cuenta" });
     },
   });
@@ -100,7 +145,7 @@ function CuentaPerfilPage() {
     return <NonTravelerAccount mode={active} />;
   }
 
-  if (isLoading) {
+  if (isLoading || loadingPersonal) {
     return <p className="text-sm text-muted-foreground">Cargando…</p>;
   }
 
@@ -109,19 +154,85 @@ function CuentaPerfilPage() {
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
         Cuenta del viajero
       </p>
-      <h1 className="mt-2 text-4xl">Mi perfil de viaje</h1>
+      <h1 className="mt-2 text-4xl">Mi perfil</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        Estos datos personalizan tus recomendaciones. Puedes actualizarlos
-        cuando quieras.
+        Cuéntanos sobre ti y sobre tu viaje. Alux y nuestro Concierge usan
+        esta información para acompañarte mejor en el Oriente Maya de Yucatán.
       </p>
 
       <form
-        className="mt-8 grid gap-5"
+        className="mt-8 grid gap-8"
         onSubmit={(e) => {
           e.preventDefault();
-          mutation.mutate(form);
+          mutation.mutate({ personal: personalForm, travel: form });
         }}
       >
+        <fieldset className="grid gap-5 rounded-2xl border border-border bg-card p-5 shadow-soft">
+          <legend className="px-2 text-sm font-semibold">Sobre ti</legend>
+          <p className="text-xs text-muted-foreground">
+            Tu nombre y contacto para que podamos dirigirnos a ti y —si lo pides—
+            que el Concierge pueda escribirte.
+          </p>
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextField
+              label="Nombre"
+              value={personalForm.first_name ?? ""}
+              onChange={(v) => setPersonalForm({ ...personalForm, first_name: v || null })}
+            />
+            <TextField
+              label="Apellido"
+              value={personalForm.last_name ?? ""}
+              onChange={(v) => setPersonalForm({ ...personalForm, last_name: v || null })}
+            />
+          </div>
+          <label className="grid gap-1 text-sm">
+            <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              Correo electrónico
+            </span>
+            <input
+              type="email"
+              value={personal?.email ?? user?.email ?? ""}
+              disabled
+              className="rounded-md border border-border bg-muted/40 px-3 py-2 text-muted-foreground"
+            />
+            <span className="text-[11px] text-muted-foreground">
+              El correo se toma de tu inicio de sesión y no se puede cambiar aquí.
+            </span>
+          </label>
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextField
+              label="Teléfono"
+              placeholder="+52 985 000 0000"
+              value={personalForm.phone ?? ""}
+              onChange={(v) => setPersonalForm({ ...personalForm, phone: v || null })}
+            />
+            <TextField
+              label="País de origen"
+              placeholder="México, USA, Francia…"
+              value={personalForm.country ?? ""}
+              onChange={(v) => setPersonalForm({ ...personalForm, country: v || null })}
+            />
+          </div>
+          <SelectField
+            label="Idioma preferido · Alux te responderá en este idioma"
+            value={personalForm.preferred_language ?? ""}
+            options={LANGS}
+            onChange={(v) => setPersonalForm({ ...personalForm, preferred_language: v || null })}
+          />
+          <TextField
+            label="Foto de perfil (URL)"
+            placeholder="https://…"
+            value={personalForm.avatar_url ?? ""}
+            onChange={(v) => setPersonalForm({ ...personalForm, avatar_url: v || null })}
+          />
+        </fieldset>
+
+        <fieldset className="grid gap-5 rounded-2xl border border-border bg-card p-5 shadow-soft">
+          <legend className="px-2 text-sm font-semibold">Tu estilo de viaje</legend>
+          <p className="text-xs text-muted-foreground">
+            Con esto Alux filtra y recomienda experiencias, hoteles y
+            restaurantes alineados a lo que buscas.
+          </p>
         <SelectField
           label="Estilo de viaje"
           value={form.travel_style ?? ""}
@@ -134,32 +245,27 @@ function CuentaPerfilPage() {
           options={BUDGET_RANGES}
           onChange={(v) => setForm({ ...form, budget_range: v || null })}
         />
-        <SelectField
-          label="Idioma preferido"
-          value={form.preferred_language ?? ""}
-          options={LANGS}
-          onChange={(v) => setForm({ ...form, preferred_language: v || null })}
-        />
         <ListField
-          label="Intereses (separa con comas)"
+          label="Intereses · qué te gusta hacer (separa con comas)"
           value={(form.interests ?? []).join(", ")}
           onChange={(arr) => setForm({ ...form, interests: arr })}
         />
         <ListField
-          label="Destinos preferidos (separa con comas)"
+          label="Destinos preferidos del Oriente Maya (separa con comas)"
           value={(form.preferred_destinations ?? []).join(", ")}
           onChange={(arr) => setForm({ ...form, preferred_destinations: arr })}
         />
         <TextAreaField
-          label="Restricciones alimentarias"
+          label="Restricciones alimentarias · filtramos restaurantes compatibles"
           value={form.dietary_restrictions ?? ""}
           onChange={(v) => setForm({ ...form, dietary_restrictions: v || null })}
         />
         <TextAreaField
-          label="Accesibilidad"
+          label="Necesidades de accesibilidad"
           value={form.accessibility_needs ?? ""}
           onChange={(v) => setForm({ ...form, accessibility_needs: v || null })}
         />
+        </fieldset>
 
         {mutation.error ? (
           <p className="text-sm text-destructive">
@@ -171,20 +277,47 @@ function CuentaPerfilPage() {
           <button
             type="submit"
             disabled={mutation.isPending}
-            className="rounded-md bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+            className="rounded-pill bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
           >
-            {mutation.isPending ? "Guardando…" : "Guardar"}
+            {mutation.isPending ? "Guardando…" : "Guardar cambios"}
           </button>
           <button
             type="button"
             onClick={() => void navigate({ to: "/cuenta" })}
-            className="rounded-md border border-border px-5 py-2 text-sm font-medium hover:bg-accent"
+            className="rounded-pill border border-border px-5 py-2 text-sm font-medium hover:bg-accent"
           >
             Cancelar
           </button>
         </div>
       </form>
     </div>
+  );
+}
+
+function TextField({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <label className="grid gap-1 text-sm">
+      <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </span>
+      <input
+        type="text"
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        className="rounded-md border border-border bg-background px-3 py-2"
+      />
+    </label>
   );
 }
 
