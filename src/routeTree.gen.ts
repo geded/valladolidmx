@@ -56,6 +56,7 @@ import { Route as LovableContextEnginePreviewRouteImport } from './routes/lovabl
 import { Route as LovableBusinessMotherTemplatePreviewRouteImport } from './routes/lovable/business-mother-template-preview'
 import { Route as LSlugRouteImport } from './routes/l.$slug'
 import { Route as EventosSlugRouteImport } from './routes/eventos.$slug'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as AuthenticatedPaginasRouteImport } from './routes/_authenticated/paginas'
 import { Route as AuthenticatedMiViajeRouteImport } from './routes/_authenticated/mi-viaje'
 import { Route as AuthenticatedEmpresaRouteImport } from './routes/_authenticated/empresa'
@@ -72,6 +73,7 @@ import { Route as AuthenticatedCmsIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as PreviewCompositionTokenRouteImport } from './routes/preview/composition.$token'
 import { Route as OrienteMayaDestinoCategoriaRouteImport } from './routes/oriente-maya/$destino.$categoria'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as AuthenticatedPortalPropiedadRouteImport } from './routes/_authenticated/portal/propiedad'
 import { Route as AuthenticatedPortalPresenciaRouteImport } from './routes/_authenticated/portal/presencia'
 import { Route as AuthenticatedPortalPagosRouteImport } from './routes/_authenticated/portal/pagos'
@@ -120,6 +122,8 @@ import { Route as AuthenticatedCmsDestinosIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
 import { Route as AuthenticatedAdminSistemaIndexRouteImport } from './routes/_authenticated/admin/sistema.index'
 import { Route as OrienteMayaDestinoCategoriaEmpresaRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -403,6 +407,11 @@ const EventosSlugRoute = EventosSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => EventosRoute,
 } as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedPaginasRoute = AuthenticatedPaginasRouteImport.update({
   id: '/paginas',
   path: '/paginas',
@@ -490,6 +499,11 @@ const OrienteMayaDestinoCategoriaRoute =
     path: '/$categoria',
     getParentRoute: () => OrienteMayaDestinoRoute,
   } as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedPortalPropiedadRoute =
   AuthenticatedPortalPropiedadRouteImport.update({
     id: '/propiedad',
@@ -774,6 +788,18 @@ const OrienteMayaDestinoCategoriaEmpresaRoute =
     path: '/$empresa',
     getParentRoute: () => OrienteMayaDestinoCategoriaRoute,
   } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -1012,6 +1038,7 @@ export interface FileRoutesByFullPath {
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/business-mother-template-preview': typeof LovableBusinessMotherTemplatePreviewRoute
@@ -1070,6 +1097,7 @@ export interface FileRoutesByFullPath {
   '/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -1100,6 +1128,8 @@ export interface FileRoutesByFullPath {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaRouteWithChildren
   '/admin/sistema/': typeof AuthenticatedAdminSistemaIndexRoute
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
@@ -1154,6 +1184,7 @@ export interface FileRoutesByTo {
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/business-mother-template-preview': typeof LovableBusinessMotherTemplatePreviewRoute
@@ -1210,6 +1241,7 @@ export interface FileRoutesByTo {
   '/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/cms': typeof AuthenticatedCmsIndexRoute
@@ -1239,6 +1271,8 @@ export interface FileRoutesByTo {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/admin/sistema': typeof AuthenticatedAdminSistemaIndexRoute
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosIndexRoute
@@ -1299,6 +1333,7 @@ export interface FileRoutesById {
   '/_authenticated/empresa': typeof AuthenticatedEmpresaRoute
   '/_authenticated/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/_authenticated/paginas': typeof AuthenticatedPaginasRouteWithChildren
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/business-mother-template-preview': typeof LovableBusinessMotherTemplatePreviewRoute
@@ -1357,6 +1392,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/_authenticated/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/_authenticated/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -1387,6 +1423,8 @@ export interface FileRoutesById {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaRouteWithChildren
   '/_authenticated/admin/sistema/': typeof AuthenticatedAdminSistemaIndexRoute
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
@@ -1448,6 +1486,7 @@ export interface FileRouteTypes {
     | '/empresa'
     | '/mi-viaje'
     | '/paginas'
+    | '/email/unsubscribe'
     | '/eventos/$slug'
     | '/l/$slug'
     | '/lovable/business-mother-template-preview'
@@ -1506,6 +1545,7 @@ export interface FileRouteTypes {
     | '/portal/pagos'
     | '/portal/presencia'
     | '/portal/propiedad'
+    | '/lovable/email/suppression'
     | '/oriente-maya/$destino/$categoria'
     | '/preview/composition/$token'
     | '/admin/'
@@ -1536,6 +1576,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
     | '/oriente-maya/$destino/$categoria/$empresa'
     | '/admin/sistema/'
     | '/cms/categorias/'
@@ -1590,6 +1632,7 @@ export interface FileRouteTypes {
     | '/empresa'
     | '/mi-viaje'
     | '/paginas'
+    | '/email/unsubscribe'
     | '/eventos/$slug'
     | '/l/$slug'
     | '/lovable/business-mother-template-preview'
@@ -1646,6 +1689,7 @@ export interface FileRouteTypes {
     | '/portal/pagos'
     | '/portal/presencia'
     | '/portal/propiedad'
+    | '/lovable/email/suppression'
     | '/preview/composition/$token'
     | '/admin'
     | '/cms'
@@ -1675,6 +1719,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
     | '/admin/sistema'
     | '/cms/categorias'
     | '/cms/destinos'
@@ -1734,6 +1780,7 @@ export interface FileRouteTypes {
     | '/_authenticated/empresa'
     | '/_authenticated/mi-viaje'
     | '/_authenticated/paginas'
+    | '/email/unsubscribe'
     | '/eventos/$slug'
     | '/l/$slug'
     | '/lovable/business-mother-template-preview'
@@ -1792,6 +1839,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/pagos'
     | '/_authenticated/portal/presencia'
     | '/_authenticated/portal/propiedad'
+    | '/lovable/email/suppression'
     | '/oriente-maya/$destino/$categoria'
     | '/preview/composition/$token'
     | '/_authenticated/admin/'
@@ -1822,6 +1870,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
     | '/oriente-maya/$destino/$categoria/$empresa'
     | '/_authenticated/admin/sistema/'
     | '/_authenticated/cms/categorias/'
@@ -1875,6 +1925,7 @@ export interface RootRouteChildren {
   RestaurantesRoute: typeof RestaurantesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerminosRoute: typeof TerminosRoute
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   LSlugRoute: typeof LSlugRoute
   LovableBusinessMotherTemplatePreviewRoute: typeof LovableBusinessMotherTemplatePreviewRoute
   LovableContextEnginePreviewRoute: typeof LovableContextEnginePreviewRoute
@@ -1897,6 +1948,7 @@ export interface RootRouteChildren {
   ViajeCompartidoTokenRoute: typeof ViajeCompartidoTokenRoute
   ViajeroHandleRoute: typeof ViajeroHandleRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
+  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
   ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
@@ -1905,6 +1957,8 @@ export interface RootRouteChildren {
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
   ApiPublicPaymentsProviderWebhookRoute: typeof ApiPublicPaymentsProviderWebhookRoute
 }
 
@@ -2239,6 +2293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventosSlugRouteImport
       parentRoute: typeof EventosRoute
     }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/paginas': {
       id: '/_authenticated/paginas'
       path: '/paginas'
@@ -2350,6 +2411,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/oriente-maya/$destino/$categoria'
       preLoaderRoute: typeof OrienteMayaDestinoCategoriaRouteImport
       parentRoute: typeof OrienteMayaDestinoRoute
+    }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/portal/propiedad': {
       id: '/_authenticated/portal/propiedad'
@@ -2686,6 +2754,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/oriente-maya/$destino/$categoria/$empresa'
       preLoaderRoute: typeof OrienteMayaDestinoCategoriaEmpresaRouteImport
       parentRoute: typeof OrienteMayaDestinoCategoriaRoute
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
@@ -3346,6 +3428,7 @@ const rootRouteChildren: RootRouteChildren = {
   RestaurantesRoute: RestaurantesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerminosRoute: TerminosRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   LSlugRoute: LSlugRoute,
   LovableBusinessMotherTemplatePreviewRoute:
     LovableBusinessMotherTemplatePreviewRoute,
@@ -3372,6 +3455,7 @@ const rootRouteChildren: RootRouteChildren = {
   ViajeCompartidoTokenRoute: ViajeCompartidoTokenRoute,
   ViajeroHandleRoute: ViajeroHandleRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
   ApiPublicHealthMapsRoute: ApiPublicHealthMapsRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:
@@ -3381,6 +3465,8 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
   ApiPublicPaymentsProviderWebhookRoute: ApiPublicPaymentsProviderWebhookRoute,
 }
 export const routeTree = rootRouteImport
