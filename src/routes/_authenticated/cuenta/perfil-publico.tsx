@@ -10,7 +10,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import {
   checkHandleAvailability,
   getMyPublicProfile,
@@ -18,6 +17,10 @@ import {
   type HandleAvailability,
   type MyPublicProfile,
 } from "@/lib/traveler/traveler-public.functions";
+import { getMyPersonalProfile } from "@/lib/traveler/profile-personal.functions";
+import { getMyTravelerProfile } from "@/lib/traveler/traveler-account.functions";
+import { ProfileCompletionMeter } from "@/components/traveler/ProfileCompletionMeter";
+import { Lock } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cuenta/perfil-publico")({
   component: PerfilPublicoPage,
@@ -26,22 +29,14 @@ export const Route = createFileRoute("/_authenticated/cuenta/perfil-publico")({
 type FormState = {
   public_handle: string;
   is_public: boolean;
-  public_display_name: string;
   public_bio: string;
-  home_country: string;
-  languages: string;
-  avatar_url: string | null;
 };
 
 function toForm(p: MyPublicProfile): FormState {
   return {
     public_handle: p.public_handle ?? "",
     is_public: p.is_public,
-    public_display_name: p.public_display_name ?? "",
     public_bio: p.public_bio ?? "",
-    home_country: p.home_country ?? "",
-    languages: p.languages.join(", "),
-    avatar_url: p.avatar_url,
   };
 }
 
@@ -51,6 +46,8 @@ function PerfilPublicoPage() {
   const fetchProfile = useServerFn(getMyPublicProfile);
   const saveProfile = useServerFn(updateMyPublicProfile);
   const checkHandle = useServerFn(checkHandleAvailability);
+  const fetchPersonal = useServerFn(getMyPersonalProfile);
+  const fetchTravel = useServerFn(getMyTravelerProfile);
 
   const { data, isLoading } = useQuery({
     queryKey: ["traveler", "public-profile", user?.id],
@@ -59,19 +56,27 @@ function PerfilPublicoPage() {
     staleTime: 30_000,
   });
 
+  const { data: personal } = useQuery({
+    queryKey: ["traveler", "personal-profile", user?.id],
+    queryFn: () => fetchPersonal(),
+    enabled: Boolean(user?.id),
+    staleTime: 30_000,
+  });
+
+  const { data: travel } = useQuery({
+    queryKey: ["traveler", "travel-profile", user?.id],
+    queryFn: () => fetchTravel(),
+    enabled: Boolean(user?.id),
+    staleTime: 30_000,
+  });
+
   const [form, setForm] = useState<FormState>({
     public_handle: "",
     is_public: false,
-    public_display_name: "",
     public_bio: "",
-    home_country: "",
-    languages: "",
-    avatar_url: null,
   });
   const [handleStatus, setHandleStatus] = useState<HandleAvailability | null>(null);
   const [checking, setChecking] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
 
   useEffect(() => {
     if (data) setForm(toForm(data));
@@ -105,19 +110,11 @@ function PerfilPublicoPage() {
 
   const mutation = useMutation({
     mutationFn: async (payload: FormState) => {
-      const langs = payload.languages
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
       return saveProfile({
         data: {
           public_handle: payload.public_handle.trim().toLowerCase() || null,
           is_public: payload.is_public,
-          public_display_name: payload.public_display_name || null,
           public_bio: payload.public_bio || null,
-          home_country: payload.home_country || null,
-          languages: langs,
-          avatar_url: payload.avatar_url,
         },
       });
     },
@@ -127,46 +124,47 @@ function PerfilPublicoPage() {
     },
   });
 
+  // Completitud: 100% requerido para publicar
+  const completion = useMemo(() => {
+    const p = personal;
+    const t = travel;
+    const checks: boolean[] = [
+      Boolean(p?.first_name || p?.display_name),
+      Boolean(p?.phone),
+      Boolean(p?.country),
+      Boolean(p?.preferred_language),
+      Boolean(p?.avatar_url),
+      Boolean(t?.travel_style),
+      Boolean(t?.budget_range),
+      (t?.interests?.length ?? 0) > 0,
+      (t?.preferred_destinations?.length ?? 0) > 0,
+      Boolean(t?.trip_context?.travel_window),
+    ];
+    const done = checks.filter(Boolean).length;
+    return { done, total: checks.length, complete: done === checks.length };
+  }, [personal, travel]);
+
   const canPublish = useMemo(() => {
+    if (!completion.complete) return false;
     if (!form.public_handle.trim()) return false;
     if (handleStatus && !handleStatus.available) return false;
     return true;
-  }, [form.public_handle, handleStatus]);
-
-  async function handleAvatarChange(file: File) {
-    if (!user?.id) return;
-    setUploadError(null);
-    if (!file.type.startsWith("image/")) {
-      setUploadError("Sólo imágenes (jpg, png, webp).");
-      return;
-    }
-    if (file.size > 3 * 1024 * 1024) {
-      setUploadError("La imagen debe pesar menos de 3 MB.");
-      return;
-    }
-    setUploading(true);
-    try {
-      const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage
-        .from("avatars")
-        .upload(path, file, { upsert: true, contentType: file.type });
-      if (error) throw error;
-      const saved = await saveProfile({ data: { avatar_url: path } });
-      queryClient.setQueryData(["traveler", "public-profile", user?.id], saved);
-      setForm(toForm(saved));
-    } catch (err) {
-      setUploadError((err as Error).message);
-    } finally {
-      setUploading(false);
-    }
-  }
+  }, [completion.complete, form.public_handle, handleStatus]);
 
   if (isLoading) {
     return <p className="text-sm text-muted-foreground">Cargando…</p>;
   }
 
   const handleFeedback = renderHandleFeedback(form.public_handle, handleStatus, checking, originalHandle);
+  const publicPreview = {
+    name:
+      [personal?.first_name, personal?.last_name].filter(Boolean).join(" ").trim() ||
+      personal?.display_name ||
+      "—",
+    country: personal?.country || "—",
+    language: personal?.preferred_language || "—",
+    avatar: data?.avatar_url || personal?.avatar_url || null,
+  };
 
   return (
     <div className="max-w-3xl">
@@ -180,6 +178,20 @@ function PerfilPublicoPage() {
         viajeros o en redes sociales.
       </p>
 
+      {!completion.complete ? (
+        <div className="mt-6">
+          <ProfileCompletionMeter personal={personal} travel={travel} />
+          <p className="mt-3 flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-200">
+            <Lock className="mt-0.5 size-4 shrink-0" aria-hidden />
+            <span>
+              Para publicar tu perfil necesitas completar tu perfil al 100%.
+              Con eso mostramos tu nombre, foto, país e idioma sin volver a
+              pedírtelos aquí.
+            </span>
+          </p>
+        </div>
+      ) : null}
+
       <form
         className="mt-8 grid gap-6"
         onSubmit={(e) => {
@@ -187,41 +199,41 @@ function PerfilPublicoPage() {
           mutation.mutate(form);
         }}
       >
-        {/* Avatar */}
-        <div className="grid gap-2">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            Foto de perfil
-          </span>
-          <div className="flex items-center gap-4">
-            {form.avatar_url ? (
+        {/* Vista previa de datos tomados de "Mi Perfil" */}
+        <section className="rounded-2xl border border-border bg-muted/30 p-4">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              Así te verán (datos de tu perfil)
+            </p>
+            <Link
+              to="/cuenta/perfil"
+              className="text-xs font-medium text-primary hover:underline"
+            >
+              Editar en Mi Perfil →
+            </Link>
+          </div>
+          <div className="mt-3 flex items-center gap-4">
+            {publicPreview.avatar ? (
               <img
-                src={form.avatar_url}
-                alt="Avatar actual"
-                className="h-20 w-20 rounded-full border border-border object-cover"
+                src={publicPreview.avatar}
+                alt=""
+                className="h-16 w-16 rounded-full border border-border object-cover"
               />
             ) : (
-              <div className="flex h-20 w-20 items-center justify-center rounded-full border border-dashed border-border bg-muted text-xs text-muted-foreground">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-dashed border-border bg-background text-[10px] text-muted-foreground">
                 sin foto
               </div>
             )}
-            <label className="cursor-pointer rounded-md border border-border px-3 py-2 text-sm hover:bg-accent">
-              {uploading ? "Subiendo…" : "Cambiar foto"}
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                disabled={uploading}
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) void handleAvatarChange(f);
-                }}
-              />
-            </label>
+            <dl className="grid flex-1 grid-cols-2 gap-x-4 gap-y-1 text-sm">
+              <dt className="text-muted-foreground">Nombre</dt>
+              <dd className="font-medium">{publicPreview.name}</dd>
+              <dt className="text-muted-foreground">País</dt>
+              <dd>{publicPreview.country}</dd>
+              <dt className="text-muted-foreground">Idioma</dt>
+              <dd>{publicPreview.language}</dd>
+            </dl>
           </div>
-          {uploadError ? (
-            <p className="text-xs text-destructive">{uploadError}</p>
-          ) : null}
-        </div>
+        </section>
 
         {/* Handle */}
         <label className="grid gap-1 text-sm">
@@ -248,16 +260,6 @@ function PerfilPublicoPage() {
           {handleFeedback}
         </label>
 
-        {/* Display name */}
-        <TextField
-          label="Nombre público"
-          value={form.public_display_name}
-          maxLength={60}
-          placeholder="Ej. Mariana R."
-          onChange={(v) => setForm({ ...form, public_display_name: v })}
-          hint="Cómo apareces en tu perfil. Si lo dejas vacío se muestra tu handle."
-        />
-
         {/* Bio */}
         <label className="grid gap-1 text-sm">
           <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -273,22 +275,6 @@ function PerfilPublicoPage() {
           />
         </label>
 
-        <TextField
-          label="País de origen"
-          value={form.home_country}
-          maxLength={60}
-          placeholder="Ej. México"
-          onChange={(v) => setForm({ ...form, home_country: v })}
-        />
-
-        <TextField
-          label="Idiomas (separa con comas)"
-          value={form.languages}
-          maxLength={80}
-          placeholder="es, en, fr"
-          onChange={(v) => setForm({ ...form, languages: v.toLowerCase() })}
-        />
-
         {/* Toggle visibilidad */}
         <label className="flex items-start gap-3 rounded-md border border-border bg-card p-4">
           <input
@@ -303,9 +289,9 @@ function PerfilPublicoPage() {
               Hacer mi perfil público
             </span>
             <span className="text-xs text-muted-foreground">
-              Cuando está activo, cualquier persona con tu URL podrá ver tu
-              nombre público, foto, país e idiomas. Puedes desactivarlo en
-              cualquier momento.
+              {completion.complete
+                ? "Cuando está activo, cualquier persona con tu URL podrá ver tu nombre, foto, país e idiomas. Puedes desactivarlo en cualquier momento."
+                : `Disponible cuando tu perfil esté al 100% (${completion.done}/${completion.total} listo).`}
             </span>
           </span>
         </label>
@@ -412,6 +398,8 @@ function reasonLabel(reason?: HandleAvailability["reason"]): string {
 function mapError(msg: string): string {
   if (msg.includes("handle_required_to_publish"))
     return "Necesitas elegir un handle antes de publicar tu perfil.";
+  if (msg.includes("profile_incomplete"))
+    return "Debes completar tu perfil al 100% antes de publicar.";
   if (msg.includes("handle_taken")) return "Ese handle ya está en uso.";
   if (msg.includes("reserved_handle")) return "Ese handle está reservado.";
   if (msg.includes("invalid_handle"))

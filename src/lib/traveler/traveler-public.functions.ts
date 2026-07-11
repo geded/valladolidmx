@@ -236,7 +236,10 @@ export const updateMyPublicProfile = createServerFn({ method: "POST" })
     };
   })
   .handler(async ({ context, data }): Promise<MyPublicProfile> => {
-    // is_public=true requiere handle previo o en el mismo update.
+    // is_public=true requiere handle previo o en el mismo update, y
+    // perfil personal + de viaje completos (10/10). Los datos visibles
+    // (nombre, foto, país, idioma) se sirven desde `profiles`/
+    // `traveler_profiles`, así que no los persistimos aquí.
     if (data.is_public === true) {
       let handle = data.public_handle;
       if (!handle) {
@@ -248,6 +251,30 @@ export const updateMyPublicProfile = createServerFn({ method: "POST" })
         handle = (existing?.public_handle as string | null) ?? null;
       }
       if (!handle) throw new Error("handle_required_to_publish");
+
+      const { data: p } = await context.supabase
+        .from("profiles")
+        .select("first_name, last_name, display_name, phone, country, preferred_language, avatar_url")
+        .eq("user_id", context.userId)
+        .maybeSingle();
+      const { data: t } = await context.supabase
+        .from("traveler_profiles")
+        .select("travel_style, budget_range, interests, preferred_destinations, trip_context")
+        .eq("user_id", context.userId)
+        .maybeSingle();
+      const trip = (t?.trip_context ?? {}) as { travel_window?: unknown };
+      const complete =
+        Boolean((p?.first_name as string | null) || (p?.display_name as string | null)) &&
+        Boolean(p?.phone) &&
+        Boolean(p?.country) &&
+        Boolean(p?.preferred_language) &&
+        Boolean(p?.avatar_url) &&
+        Boolean(t?.travel_style) &&
+        Boolean(t?.budget_range) &&
+        Array.isArray(t?.interests) && (t!.interests as unknown[]).length > 0 &&
+        Array.isArray(t?.preferred_destinations) && (t!.preferred_destinations as unknown[]).length > 0 &&
+        Boolean(trip.travel_window);
+      if (!complete) throw new Error("profile_incomplete");
     }
 
     const payload = {
