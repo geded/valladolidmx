@@ -22,6 +22,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { CouponIssueDialog } from "./CouponIssueDialog";
 
 type GateStatus = "guest" | "incomplete" | "eligible" | "loading";
 
@@ -44,10 +45,15 @@ function useGateStatus(): GateStatus {
 export function PromocionesGate({ children }: { children: ReactNode }) {
   const status = useGateStatus();
   const [open, setOpen] = useState(false);
+  const [couponOpen, setCouponOpen] = useState(false);
+  const [couponTarget, setCouponTarget] = useState<{
+    slug: string;
+    title: string | null;
+  } | null>(null);
   const eligible = status === "eligible";
 
   const handleCapture = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (eligible || status === "loading") return;
+    if (status === "loading") return;
     const target = e.target as HTMLElement;
     // Sólo interceptamos clicks sobre enlaces/botones de tarjeta.
     const link = target.closest("a, button");
@@ -56,6 +62,22 @@ export function PromocionesGate({ children }: { children: ReactNode }) {
     if (link.closest("[data-favorite-button]")) return;
     e.preventDefault();
     e.stopPropagation();
+    if (eligible) {
+      // Extraer slug desde el href de la landing (`/l/<slug>`).
+      const anchor = link.closest("a") as HTMLAnchorElement | null;
+      const href = anchor?.getAttribute("href") ?? "";
+      const match = href.match(/\/l\/([^/?#]+)/);
+      const slug = match ? match[1] : null;
+      if (!slug) return;
+      const card = target.closest("[data-tourism-card]") as HTMLElement | null;
+      const title =
+        card?.querySelector("[data-tourism-card-title]")?.textContent?.trim() ??
+        anchor?.textContent?.trim() ??
+        null;
+      setCouponTarget({ slug, title });
+      setCouponOpen(true);
+      return;
+    }
     setOpen(true);
   };
 
@@ -68,6 +90,12 @@ export function PromocionesGate({ children }: { children: ReactNode }) {
       <div onClickCapture={handleCapture}>{children}</div>
 
       <UnlockDialog status={status} open={open} onOpenChange={setOpen} />
+      <CouponIssueDialog
+        open={couponOpen}
+        onOpenChange={setCouponOpen}
+        promotionSlug={couponTarget?.slug ?? null}
+        promotionTitle={couponTarget?.title ?? null}
+      />
     </div>
   );
 }
