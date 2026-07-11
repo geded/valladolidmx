@@ -27,6 +27,7 @@ export type PublicReviewVerifiedSource =
   | "verified_purchase"
   | "managed_visit"
   | "verified_visit"
+  | "verified_redemption"
   | "declared_visitor";
 
 export interface PublicReviewItem {
