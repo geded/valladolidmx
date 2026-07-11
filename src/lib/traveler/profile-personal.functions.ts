@@ -86,15 +86,17 @@ export const upsertMyPersonalProfile = createServerFn({ method: "POST" })
     };
   })
   .handler(async ({ context, data }): Promise<PersonalProfile> => {
-    const patch: Record<string, unknown> = {
+    const patch = {
       first_name: data.first_name,
       last_name: data.last_name,
       display_name: buildDisplayName(data.first_name, data.last_name),
       phone: data.phone,
       avatar_url: data.avatar_url,
       country: data.country,
+      ...(data.preferred_language
+        ? { preferred_language: data.preferred_language }
+        : {}),
     };
-    if (data.preferred_language) patch.preferred_language = data.preferred_language;
     const { data: row, error } = await context.supabase
       .from("profiles")
       .update(patch)
