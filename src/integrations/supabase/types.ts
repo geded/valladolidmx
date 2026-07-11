@@ -4255,6 +4255,8 @@ export type Database = {
           redeemed_channel:
             | Database["public"]["Enums"]["traveler_coupon_channel"]
             | null
+          review_reminder_1_sent_at: string | null
+          review_reminder_2_sent_at: string | null
           status: Database["public"]["Enums"]["traveler_coupon_status"]
           terms: string | null
           title: string
@@ -4276,6 +4278,8 @@ export type Database = {
           redeemed_channel?:
             | Database["public"]["Enums"]["traveler_coupon_channel"]
             | null
+          review_reminder_1_sent_at?: string | null
+          review_reminder_2_sent_at?: string | null
           status?: Database["public"]["Enums"]["traveler_coupon_status"]
           terms?: string | null
           title: string
@@ -4297,6 +4301,8 @@ export type Database = {
           redeemed_channel?:
             | Database["public"]["Enums"]["traveler_coupon_channel"]
             | null
+          review_reminder_1_sent_at?: string | null
+          review_reminder_2_sent_at?: string | null
           status?: Database["public"]["Enums"]["traveler_coupon_status"]
           terms?: string | null
           title?: string
@@ -5296,6 +5302,22 @@ export type Database = {
       get_available_modes: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["profile_mode"][]
+      }
+      get_coupons_needing_review_reminder: {
+        Args: { hours_max: number; hours_min: number; reminder_number: number }
+        Returns: {
+          business_id: string
+          business_name: string
+          business_slug: string
+          coupon_code: string
+          coupon_id: string
+          discount_percent: number
+          promotion_title: string
+          recipient_email: string
+          redeemed_at: string
+          traveler_first_name: string
+          user_id: string
+        }[]
       }
       get_public_traveler_profile: { Args: { _handle: string }; Returns: Json }
       get_review_stats: {
