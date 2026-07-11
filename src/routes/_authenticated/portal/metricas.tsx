@@ -9,7 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart3, TrendingUp, Users, Ticket, ArrowLeft } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Ticket, ArrowLeft, MessageSquareHeart, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -141,6 +141,51 @@ function MetricsPage() {
               hint={`${m.totals.expired} expirados`}
             />
           </div>
+
+          {/* Ola 6.3 · Conversión canje → reseña verificada */}
+          <section className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold">
+                Conversión canje → reseña verificada
+              </h2>
+              <Link
+                to="/portal/resenas"
+                className="text-xs font-medium text-primary hover:underline"
+              >
+                Ir a bandeja de reseñas →
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <Kpi
+                icon={MessageSquareHeart}
+                label="Reseñas verificadas"
+                value={m.totals.reviewed}
+                hint={`De ${m.totals.redeemed} canjes en la ventana`}
+                tone="success"
+              />
+              <Kpi
+                icon={TrendingUp}
+                label="Tasa de reseña"
+                value={`${Math.round(m.totals.review_conversion * 100)}%`}
+                hint="canje → reseña publicada"
+                tone="info"
+              />
+              <Kpi
+                icon={Star}
+                label="Rating promedio"
+                value={
+                  m.totals.reviewed > 0
+                    ? m.totals.avg_verified_rating.toFixed(1)
+                    : "—"
+                }
+                hint="Solo canjes verificados"
+              />
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Enviamos recordatorios a las 48h y a los 7 días para animar
+              al viajero a dejar su reseña con sello verificado.
+            </p>
+          </section>
 
           {/* Serie temporal */}
           <section className="rounded-2xl border border-border bg-card p-4 shadow-soft">

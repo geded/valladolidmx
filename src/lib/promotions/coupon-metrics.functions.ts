@@ -41,6 +41,9 @@ export interface CouponMetrics {
     redeemed: number;
     expired: number;
     conversion: number; // 0..1
+    reviewed: number; // reseñas verificadas por canje en la ventana
+    review_conversion: number; // reviewed / redeemed
+    avg_verified_rating: number; // 0..5
   };
   series: CouponMetricsSeriesPoint[];
   top_promotions: CouponMetricsTopPromo[];
@@ -114,6 +117,9 @@ export const getBusinessCouponMetrics = createServerFn({ method: "POST" })
       redeemed: issued.filter((r) => r.status === "redeemed").length,
       expired: issued.filter((r) => r.status === "expired").length,
       conversion: 0,
+      reviewed: 0,
+      review_conversion: 0,
+      avg_verified_rating: 0,
     };
     totals.conversion = totals.issued > 0 ? totals.redeemed / totals.issued : 0;
 
@@ -200,6 +206,29 @@ export const getBusinessCouponMetrics = createServerFn({ method: "POST" })
       .map(([country_code, count]) => ({ country_code, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
+
+    // Ola 6.3 · Conversión canje → reseña verificada.
+    // Contamos reseñas publicadas con verified_source='verified_redemption'
+    // del negocio, cuyo published_at cae en la ventana.
+    const { data: revRows, error: e3 } = await context.supabase
+      .from("reviews")
+      .select("id, rating, published_at")
+      .eq("subject_kind", "business")
+      .eq("subject_id", data.business_id)
+      .eq("status", "published")
+      .eq("verified_source", "verified_redemption")
+      .is("deleted_at", null)
+      .gte("published_at", fromIso)
+      .limit(5000);
+    if (e3) throw new Error(`metrics_reviews_failed: ${e3.message}`);
+    const rev = (revRows ?? []) as Array<{ rating: number | null }>;
+    totals.reviewed = rev.length;
+    totals.review_conversion =
+      redeemed.length > 0 ? rev.length / redeemed.length : 0;
+    if (rev.length > 0) {
+      const sum = rev.reduce((acc, r) => acc + (Number(r.rating) || 0), 0);
+      totals.avg_verified_rating = sum / rev.length;
+    }
 
     return {
       window_days: data.window_days,
