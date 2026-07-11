@@ -565,7 +565,7 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
       .order("display_name", { ascending: true })
       .limit(120);
     if (error) throw new Error(`marketplace_businesses_failed: ${error.message}`);
-    const rows = (data ?? []).map((row) => {
+    const rows: MarketplaceBusinessCard[] = (data ?? []).map((row) => {
       const dest = (row.destinations as { slug?: unknown } | null)?.slug;
       const cat = (row.business_categories as { slug?: unknown } | null)?.slug;
       const locs = ((row as { business_locations?: Array<Record<string, unknown>> | null }).business_locations ?? [])
@@ -586,7 +586,7 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
         latitude: rawLat == null ? null : Number(rawLat),
         longitude: rawLng == null ? null : Number(rawLng),
         address_line1: typeof rawAddr === "string" ? rawAddr : null,
-      } satisfies MarketplaceBusinessCard;
+      };
     });
 
     // Ola 7.4.a · Enriquecer con plan de visibilidad efectivo
