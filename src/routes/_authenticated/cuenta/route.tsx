@@ -17,6 +17,7 @@ import { getMyTravelerProfile } from "@/lib/traveler/traveler-account.functions"
 import { getMyPersonalProfile } from "@/lib/traveler/profile-personal.functions";
 import { getProfileModeState } from "@/lib/profile-mode/mode.functions";
 import { WelcomeOnboardingModal } from "@/components/traveler/WelcomeOnboardingModal";
+import { PendingReviewsBanner } from "@/components/traveler/PendingReviewsBanner";
 
 export const Route = createFileRoute("/_authenticated/cuenta")({
   component: CuentaWorkspaceRoute,
@@ -27,6 +28,7 @@ function CuentaWorkspaceRoute() {
     <WorkspaceProvider initialWorkspaceId="cuenta">
       <WorkspaceShell title="Mi Cuenta">
         <TravelerOnboardingMount />
+        <PendingReviewsBanner />
         <Outlet />
       </WorkspaceShell>
     </WorkspaceProvider>
