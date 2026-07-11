@@ -33,6 +33,8 @@ import {
   upsertMyTravelerProfile,
   type TravelerProfile,
 } from "@/lib/traveler/traveler-account.functions";
+import { upsertMyPersonalProfile } from "@/lib/traveler/profile-personal.functions";
+import { Input } from "@/components/ui/input";
 
 type Lang = "es" | "en" | "fr" | "de" | "it" | "pt";
 type Window = "este_mes" | "proximos_3_meses" | "mas_adelante" | "no_se";
@@ -103,6 +105,8 @@ export function WelcomeOnboardingModal({
 }: WelcomeOnboardingModalProps) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [lang, setLang] = useState<Lang>(detectDefaultLang());
   const [travelWindow, setTravelWindow] = useState<Window | null>(null);
   const [party, setParty] = useState<Party | null>(null);
@@ -116,16 +120,29 @@ export function WelcomeOnboardingModal({
 
   const qc = useQueryClient();
   const upsertFn = useServerFn(upsertMyTravelerProfile);
+  const upsertPersonalFn = useServerFn(upsertMyPersonalProfile);
   const mutation = useMutation({
-    mutationFn: (data: Parameters<typeof upsertFn>[0]) => upsertFn(data),
+    mutationFn: async (data: Parameters<typeof upsertFn>[0]) => {
+      const p = await upsertPersonalFn({
+        data: {
+          first_name: firstName.trim() || null,
+          last_name: lastName.trim() || null,
+          preferred_language: lang,
+        },
+      });
+      const t = await upsertFn(data);
+      return { p, t };
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["traveler", "profile"] });
+      qc.invalidateQueries({ queryKey: ["traveler", "personal"] });
       toast.success("¡Listo! Alux ya puede personalizar tus recomendaciones.");
     },
     onError: (e) => toast.error(`No se pudo guardar: ${(e as Error).message}`),
   });
 
-  const canFinish = useMemo(() => Boolean(lang && travelWindow && party), [
+  const canFinish = useMemo(() => Boolean(firstName.trim() && lang && travelWindow && party), [
+    firstName,
     lang,
     travelWindow,
     party,
@@ -172,9 +189,9 @@ export function WelcomeOnboardingModal({
 
         <div className="py-2">
           <div className="mb-4 flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Paso {step} de 3</span>
+            <span>Paso {step} de 4</span>
             <div className="flex gap-1">
-              {[1, 2, 3].map((n) => (
+              {[1, 2, 3, 4].map((n) => (
                 <span
                   key={n}
                   className={`h-1.5 w-6 rounded-full ${
@@ -186,6 +203,28 @@ export function WelcomeOnboardingModal({
           </div>
 
           {step === 1 && (
+            <div className="space-y-3">
+              <p className="text-sm font-medium">¿Cómo te llamas?</p>
+              <div className="grid gap-2">
+                <Input
+                  autoFocus
+                  placeholder="Nombre"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+                <Input
+                  placeholder="Apellido (opcional)"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Así podemos dirigirnos a ti y personalizar tus recomendaciones.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
             <div className="space-y-3">
               <p className="text-sm font-medium">¿En qué idioma prefieres viajar?</p>
               <div className="grid grid-cols-2 gap-2">
@@ -202,7 +241,7 @@ export function WelcomeOnboardingModal({
             </div>
           )}
 
-          {step === 2 && (
+          {step === 3 && (
             <div className="space-y-3">
               <p className="text-sm font-medium">¿Cuándo piensas viajar?</p>
               <div className="grid grid-cols-1 gap-2">
@@ -219,7 +258,7 @@ export function WelcomeOnboardingModal({
             </div>
           )}
 
-          {step === 3 && (
+          {step === 4 && (
             <div className="space-y-3">
               <p className="text-sm font-medium">¿Con quién vas a viajar?</p>
               <div className="grid grid-cols-2 gap-2">
@@ -247,18 +286,20 @@ export function WelcomeOnboardingModal({
                 Atrás
               </Button>
             )}
-            {step < 3 && (
+            {step < 4 && (
               <Button
                 size="sm"
                 onClick={() => setStep(step + 1)}
                 disabled={
-                  (step === 1 && !lang) || (step === 2 && !travelWindow)
+                  (step === 1 && !firstName.trim()) ||
+                  (step === 2 && !lang) ||
+                  (step === 3 && !travelWindow)
                 }
               >
                 Continuar
               </Button>
             )}
-            {step === 3 && (
+            {step === 4 && (
               <Button
                 size="sm"
                 onClick={finish}
