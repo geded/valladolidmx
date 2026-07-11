@@ -75,10 +75,8 @@ export interface VisibilityPlan {
   updated_at: string;
 }
 
-async function assertAdmin(context: {
-  supabase: ReturnType<typeof requireSupabaseAuth.middleware>["context"]["supabase"] extends infer T ? T : never;
-  userId: string;
-}) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function assertAdmin(context: any) {
   const { data: isAdmin } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",
@@ -132,9 +130,13 @@ export const toggleVisibilityPlan = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);
+    const patch =
+      data.field === "is_active"
+        ? { is_active: data.value, updated_by: context.userId }
+        : { is_public: data.value, updated_by: context.userId };
     const { error } = await context.supabase
       .from("visibility_plans")
-      .update({ [data.field]: data.value, updated_by: context.userId })
+      .update(patch)
       .eq("id", data.id);
     if (error) throw error;
     return { ok: true };
