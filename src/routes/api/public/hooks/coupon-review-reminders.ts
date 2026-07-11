@@ -55,7 +55,15 @@ export const Route = createFileRoute('/api/public/hooks/coupon-review-reminders'
           request.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ??
           ''
         const expected = process.env.EB_CRON_SECRET ?? ''
-        if (!expected || !provided || !safeEqual(provided, expected)) {
+        const apiKeyProvided = request.headers.get('apikey') ?? ''
+        const publishable = process.env.SUPABASE_PUBLISHABLE_KEY ?? ''
+        const secretMatch =
+          expected && provided && safeEqual(provided, expected)
+        const apiKeyMatch =
+          publishable &&
+          apiKeyProvided &&
+          safeEqual(apiKeyProvided, publishable)
+        if (!secretMatch && !apiKeyMatch) {
           return new Response('Unauthorized', { status: 401 })
         }
 
