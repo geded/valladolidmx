@@ -167,14 +167,47 @@ export const getMyPublicProfile = createServerFn({ method: "GET" })
       .maybeSingle();
     if (error) throw new Error(`my_public_profile_read_failed: ${error.message}`);
     const row = (data ?? {}) as Record<string, unknown>;
+
+    // Fallback: rellenar desde `profiles` (datos personales) para no
+    // volver a pedirle al viajero lo que ya nos dio en su alta o en
+    // /cuenta/perfil. Sólo se usa como sugerencia visible: al guardar,
+    // los valores efectivos se persisten en `traveler_profiles`.
+    const { data: personal } = await context.supabase
+      .from("profiles")
+      .select("first_name, last_name, display_name, avatar_url, country, preferred_language")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    const p = (personal ?? {}) as Record<string, unknown>;
+
+    const fullName = [p.first_name, p.last_name]
+      .filter((s) => typeof s === "string" && (s as string).trim())
+      .join(" ")
+      .trim();
+    const suggestedName =
+      fullName || ((p.display_name as string | null) ?? null) || null;
+
+    const rawLangs = Array.isArray(row.languages) ? (row.languages as string[]) : [];
+    const suggestedLangs =
+      rawLangs.length > 0
+        ? rawLangs
+        : p.preferred_language
+          ? [String(p.preferred_language)]
+          : [];
+
     return {
       public_handle: (row.public_handle as string | null) ?? null,
       is_public: Boolean(row.is_public),
-      public_display_name: (row.public_display_name as string | null) ?? null,
+      public_display_name:
+        ((row.public_display_name as string | null) ?? null) || suggestedName,
       public_bio: (row.public_bio as string | null) ?? null,
-      avatar_url: await signAvatar((row.avatar_url as string | null) ?? null),
-      home_country: (row.home_country as string | null) ?? null,
-      languages: Array.isArray(row.languages) ? (row.languages as string[]) : [],
+      avatar_url: await signAvatar(
+        ((row.avatar_url as string | null) ?? null) ||
+          ((p.avatar_url as string | null) ?? null),
+      ),
+      home_country:
+        ((row.home_country as string | null) ?? null) ||
+        ((p.country as string | null) ?? null),
+      languages: suggestedLangs,
     };
   });
 
