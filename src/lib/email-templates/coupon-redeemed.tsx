@@ -93,7 +93,7 @@ export const template = {
     discountPercent: 20,
     businessName: 'Restaurante Maya',
     redeemedAt: new Date().toISOString(),
-    reviewUrl: 'https://valladolid.mx/negocios/restaurante-maya?review=1',
+    reviewUrl: 'https://valladolid.mx/resenar/negocio/restaurante-maya',
   },
 } satisfies TemplateEntry
 
