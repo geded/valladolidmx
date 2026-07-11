@@ -9,6 +9,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import { TourismListingSurface } from "@/components/surfaces/TourismListingSurface";
 import { promoLandingToTourismCard } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
+import { PromocionesGate } from "@/components/promociones/PromocionesGate";
 
 /**
  * H-02 · I7 · Fila 3 — Categoría plana `promociones`.
@@ -71,25 +72,27 @@ function PromosRoute() {
       contextDeclaration={buildPromocionesContext()}
       useContextCrumbs
     >
-      <TourismListingSurface
-        hero={{
-          eyebrow: "Ofertas del Oriente Maya",
-          title: "Promociones",
-          subtitle:
-            "Campañas y ofertas vigentes de hoteles, restaurantes y experiencias del Oriente Maya.",
-        }}
-        items={cards}
-        emptyMessage="Aún no hay promociones activas."
-        emptyHint={
-          <>
-            Explora el{" "}
-            <Link to="/oriente-maya" className="text-primary hover:underline">
-              Catálogo Oriente Maya
-            </Link>{" "}
-            para ver todas las empresas verificadas.
-          </>
-        }
-      />
+      <PromocionesGate>
+        <TourismListingSurface
+          hero={{
+            eyebrow: "Ofertas del Oriente Maya",
+            title: "Promociones",
+            subtitle:
+              "Campañas y ofertas vigentes de hoteles, restaurantes y experiencias del Oriente Maya. Exclusivas para viajeros con perfil público completo.",
+          }}
+          items={cards}
+          emptyMessage="Aún no hay promociones activas."
+          emptyHint={
+            <>
+              Explora el{" "}
+              <Link to="/oriente-maya" className="text-primary hover:underline">
+                Catálogo Oriente Maya
+              </Link>{" "}
+              para ver todas las empresas verificadas.
+            </>
+          }
+        />
+      </PromocionesGate>
     </PublicShell>
   );
 }
