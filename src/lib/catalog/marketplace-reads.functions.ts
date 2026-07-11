@@ -565,7 +565,7 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
       .order("display_name", { ascending: true })
       .limit(120);
     if (error) throw new Error(`marketplace_businesses_failed: ${error.message}`);
-    return (data ?? []).map((row) => {
+    const rows = (data ?? []).map((row) => {
       const dest = (row.destinations as { slug?: unknown } | null)?.slug;
       const cat = (row.business_categories as { slug?: unknown } | null)?.slug;
       const locs = ((row as { business_locations?: Array<Record<string, unknown>> | null }).business_locations ?? [])
@@ -586,8 +586,45 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
         latitude: rawLat == null ? null : Number(rawLat),
         longitude: rawLng == null ? null : Number(rawLng),
         address_line1: typeof rawAddr === "string" ? rawAddr : null,
-      };
+      } satisfies MarketplaceBusinessCard;
     });
+
+    // Ola 7.4.a · Enriquecer con plan de visibilidad efectivo
+    if (rows.length > 0) {
+      const ids = rows.map((r) => r.id);
+      const { data: viz } = await supabase
+        .from("business_effective_visibility")
+        .select("business_id, plan_slug, plan_name, badge_variant, levers, base_price_mxn, is_default")
+        .in("business_id", ids);
+      const byId = new Map<string, Record<string, unknown>>();
+      for (const r of viz ?? []) {
+        byId.set(String((r as { business_id: string }).business_id), r as Record<string, unknown>);
+      }
+      for (const row of rows) {
+        const v = byId.get(row.id);
+        if (!v || v.is_default === true) {
+          row.visibility_boost = 0;
+          continue;
+        }
+        const levers = (v.levers as Record<string, unknown> | null) ?? {};
+        const boost = Number(
+          (levers.discovery_boost as number | undefined) ??
+            (levers.search_weight as number | undefined) ??
+            0,
+        );
+        row.visibility_plan_slug = (v.plan_slug as string | null) ?? null;
+        row.visibility_plan_name = (v.plan_name as string | null) ?? null;
+        row.visibility_badge_variant = (v.badge_variant as string | null) ?? null;
+        row.visibility_boost = Number.isFinite(boost) ? boost : 0;
+      }
+      // Ordenar: boost DESC primero, luego alfabético
+      rows.sort((a, b) => {
+        const diff = (b.visibility_boost ?? 0) - (a.visibility_boost ?? 0);
+        if (diff !== 0) return diff;
+        return a.display_name.localeCompare(b.display_name, "es");
+      });
+    }
+    return rows;
   },
 );
 
