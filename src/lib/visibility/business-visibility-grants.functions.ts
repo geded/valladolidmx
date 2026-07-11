@@ -141,6 +141,7 @@ export const requestVisibilityGrant = createServerFn({ method: "POST" })
         notes: data.notes ?? null,
         created_by: context.userId,
         auto_renew: false,
+        expires_at: null,
       })
       .select("id")
       .single();
