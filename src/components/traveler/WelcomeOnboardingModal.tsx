@@ -163,7 +163,7 @@ export function WelcomeOnboardingModal({
     <Dialog open={open} onOpenChange={(v) => (v ? setOpen(true) : dismiss())}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Bienvenido al Oriente Maya</DialogTitle>
+          <DialogTitle>Bienvenido al Oriente Maya de Yucatán</DialogTitle>
           <DialogDescription>
             3 preguntas rápidas para que Alux te recomiende mejor. Puedes
             editarlas después en tu perfil.
@@ -264,7 +264,7 @@ export function WelcomeOnboardingModal({
                 onClick={finish}
                 disabled={!canFinish || mutation.isPending}
               >
-                {mutation.isPending ? "Guardando…" : "Descubrir Oriente Maya"}
+                {mutation.isPending ? "Guardando…" : "Descubrir Oriente Maya de Yucatán"}
               </Button>
             )}
           </div>
