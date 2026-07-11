@@ -15,10 +15,14 @@ export function LinkGoogleCard() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data } = await supabase.auth.getUserIdentities();
+      const { data: userData } = await supabase.auth.getUser();
       if (cancelled) return;
-      const list = data?.identities ?? [];
-      setLinked(list.some((i) => i.provider === "google"));
+      const identities = userData.user?.identities ?? [];
+      const providers = new Set<string>([
+        ...identities.map((i) => i.provider),
+        ...(((userData.user?.app_metadata as { providers?: string[] } | undefined)?.providers) ?? []),
+      ]);
+      setLinked(providers.has("google"));
     })();
     return () => {
       cancelled = true;
@@ -39,7 +43,7 @@ export function LinkGoogleCard() {
     }
   }
 
-  if (linked === null) return null;
+  if (linked === null || linked) return null;
 
   return (
     <section className="mt-6 rounded-2xl border border-border bg-card p-5">
