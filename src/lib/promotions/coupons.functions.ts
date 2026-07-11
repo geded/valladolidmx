@@ -75,8 +75,10 @@ export const issueCoupon = createServerFn({ method: "POST" })
       .from("page_compositions")
       .select("slug, title, kind, status")
       .eq("slug", data.promotion_slug)
-      .eq("kind", "promotion")
-      .eq("status", "published")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .eq("kind", "promotion" as any)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .eq("status", "published" as any)
       .maybeSingle();
     if (!comp) throw new Error("promotion_not_found");
 
