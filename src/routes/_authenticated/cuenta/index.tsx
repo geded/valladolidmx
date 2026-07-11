@@ -7,11 +7,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
 import { getMyTravelerProfile } from "@/lib/traveler/traveler-account.functions";
+import { getMyPersonalProfile } from "@/lib/traveler/profile-personal.functions";
+import { ProfileCompletionMeter } from "@/components/traveler/ProfileCompletionMeter";
 import {
   getProfileModeState,
   type ProfileMode,
 } from "@/lib/profile-mode/mode.functions";
-import { Briefcase, Compass, Headphones, Shield } from "lucide-react";
+import { Briefcase, Compass, Headphones, Mail, Shield, UserRound } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cuenta/")({
   component: CuentaResumen,
@@ -42,26 +44,67 @@ function CuentaResumen() {
 function TravelerCuenta() {
   const { user } = useAuth();
   const fetchProfile = useServerFn(getMyTravelerProfile);
+  const fetchPersonal = useServerFn(getMyPersonalProfile);
   const { data, isLoading, error } = useQuery({
     queryKey: ["traveler", "profile", user?.id],
     queryFn: () => fetchProfile(),
     enabled: Boolean(user?.id),
     staleTime: 60_000,
   });
+  const { data: personal } = useQuery({
+    queryKey: ["traveler", "personal", user?.id],
+    queryFn: () => fetchPersonal(),
+    enabled: Boolean(user?.id),
+    staleTime: 60_000,
+  });
+
+  const displayName =
+    personal?.display_name ||
+    [personal?.first_name, personal?.last_name].filter(Boolean).join(" ").trim() ||
+    null;
 
   return (
     <div className="max-w-3xl">
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
         Cuenta del viajero
       </p>
-      <h1 className="mt-2 text-4xl">Bienvenida, bienvenido.</h1>
+      <h1 className="mt-2 text-4xl">
+        {displayName ? `Hola, ${displayName.split(" ")[0]}.` : "Bienvenida, bienvenido."}
+      </h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        Esta es tu cuenta para guardar preferencias y, próximamente,
-        favoritos e historial de reservas.
+        Aquí vives tu Oriente Maya de Yucatán: tu perfil, tu viaje, tus favoritos.
       </p>
 
-      <section className="mt-8 rounded-2xl border border-border bg-card p-5">
-        <h2 className="text-lg font-semibold">Tu perfil de viaje</h2>
+      <section className="mt-6 rounded-2xl border border-border bg-card p-5">
+        <h2 className="text-lg font-semibold">Datos de contacto</h2>
+        <dl className="mt-4 grid gap-4 text-sm md:grid-cols-2">
+          <div className="flex items-start gap-2">
+            <UserRound className="mt-0.5 size-4 text-muted-foreground" aria-hidden />
+            <div>
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                Nombre
+              </dt>
+              <dd className="mt-0.5">{displayName ?? "—"}</dd>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <Mail className="mt-0.5 size-4 text-muted-foreground" aria-hidden />
+            <div>
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                Correo
+              </dt>
+              <dd className="mt-0.5 break-all">{personal?.email ?? user?.email ?? "—"}</dd>
+            </div>
+          </div>
+        </dl>
+      </section>
+
+      <div className="mt-6">
+        <ProfileCompletionMeter personal={personal} travel={data} />
+      </div>
+
+      <section className="mt-6 rounded-2xl border border-border bg-card p-5">
+        <h2 className="text-lg font-semibold">Tu estilo de viaje</h2>
         {isLoading ? (
           <p className="mt-2 text-sm text-muted-foreground">Cargando…</p>
         ) : error ? (
@@ -95,14 +138,6 @@ function TravelerCuenta() {
             Aún no has completado tu perfil de viaje.
           </p>
         )}
-        <div className="mt-5">
-          <Link
-            to="/cuenta/perfil"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
-          >
-            {data ? "Editar mi perfil" : "Completar mi perfil"}
-          </Link>
-        </div>
       </section>
 
       <section className="mt-8 grid gap-4 md:grid-cols-2">
