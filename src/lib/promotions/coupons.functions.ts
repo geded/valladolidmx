@@ -178,6 +178,11 @@ export interface CouponLookupResult {
   coupon: TravelerCoupon | null;
   reason?: "not_found" | "not_your_business" | "already_redeemed" | "expired";
   traveler_display_name?: string | null;
+  traveler_avatar_url?: string | null;
+  traveler_country_code?: string | null;
+  traveler_country_name?: string | null;
+  business_slug?: string | null;
+  business_name?: string | null;
 }
 
 export const lookupCoupon = createServerFn({ method: "POST" })
@@ -214,7 +219,7 @@ export const lookupCoupon = createServerFn({ method: "POST" })
     // Nombre del viajero (best-effort).
     const { data: prof } = await context.supabase
       .from("profiles")
-      .select("display_name, first_name, last_name")
+      .select("display_name, first_name, last_name, avatar_url, country")
       .eq("user_id", (row as { user_id: string }).user_id)
       .maybeSingle();
     const p = (prof ?? {}) as Record<string, string | null>;
@@ -222,8 +227,58 @@ export const lookupCoupon = createServerFn({ method: "POST" })
       [p.first_name, p.last_name].filter(Boolean).join(" ").trim() ||
       p.display_name ||
       null;
-    return { coupon, traveler_display_name: name };
+    // País: intentar profiles.country, luego traveler_profiles.home_country.
+    let countryCode = (p.country as string | null) ?? null;
+    if (!countryCode) {
+      const { data: tp } = await context.supabase
+        .from("traveler_profiles")
+        .select("home_country")
+        .eq("user_id", (row as { user_id: string }).user_id)
+        .maybeSingle();
+      countryCode =
+        ((tp as { home_country?: string | null } | null)?.home_country ?? null) ||
+        null;
+    }
+    let countryName: string | null = null;
+    if (countryCode) {
+      const { data: c } = await context.supabase
+        .from("countries")
+        .select("name")
+        .eq("iso_code", countryCode.toUpperCase())
+        .maybeSingle();
+      countryName = ((c as { name?: string } | null)?.name ?? null) || null;
+    }
+    // Datos del negocio (para email post-canje).
+    let businessSlug: string | null = null;
+    let businessName: string | null = null;
+    if (coupon.business_id) {
+      const { data: b } = await context.supabase
+        .from("businesses")
+        .select("slug, display_name")
+        .eq("id", coupon.business_id)
+        .maybeSingle();
+      const bb = (b ?? {}) as { slug?: string; display_name?: string };
+      businessSlug = bb.slug ?? null;
+      businessName = bb.display_name ?? null;
+    }
+    return {
+      coupon,
+      traveler_display_name: name,
+      traveler_avatar_url: (p.avatar_url as string | null) ?? null,
+      traveler_country_code: countryCode ? countryCode.toUpperCase() : null,
+      traveler_country_name: countryName,
+      business_slug: businessSlug,
+      business_name: businessName,
+    };
   });
+
+export interface RedeemResult {
+  coupon: TravelerCoupon;
+  traveler_email: string | null;
+  traveler_name: string | null;
+  business_name: string | null;
+  business_slug: string | null;
+}
 
 export const redeemCoupon = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -235,7 +290,7 @@ export const redeemCoupon = createServerFn({ method: "POST" })
       channel: input.channel === "qr" ? ("qr" as const) : ("code" as const),
     };
   })
-  .handler(async ({ data, context }): Promise<TravelerCoupon> => {
+  .handler(async ({ data, context }): Promise<RedeemResult> => {
     const { data: row, error } = await context.supabase
       .from("traveler_coupons")
       .update({
@@ -251,5 +306,157 @@ export const redeemCoupon = createServerFn({ method: "POST" })
     if (error || !row) {
       throw new Error(`coupon_redeem_failed: ${error?.message ?? "not_active"}`);
     }
-    return row as unknown as TravelerCoupon;
+    const coupon = row as unknown as TravelerCoupon;
+    // Enriquecer para email post-canje.
+    const { data: prof } = await context.supabase
+      .from("profiles")
+      .select("email, first_name, last_name, display_name")
+      .eq("user_id", (row as { user_id: string }).user_id)
+      .maybeSingle();
+    const p = (prof ?? {}) as Record<string, string | null>;
+    const travelerName =
+      [p.first_name, p.last_name].filter(Boolean).join(" ").trim() ||
+      p.display_name ||
+      null;
+    let businessName: string | null = null;
+    let businessSlug: string | null = null;
+    if (coupon.business_id) {
+      const { data: b } = await context.supabase
+        .from("businesses")
+        .select("slug, display_name")
+        .eq("id", coupon.business_id)
+        .maybeSingle();
+      const bb = (b ?? {}) as { slug?: string; display_name?: string };
+      businessName = bb.display_name ?? null;
+      businessSlug = bb.slug ?? null;
+    }
+    return {
+      coupon,
+      traveler_email: (p.email as string | null) ?? null,
+      traveler_name: travelerName,
+      business_name: businessName,
+      business_slug: businessSlug,
+    };
+  });
+
+export interface BusinessRedemptionRow {
+  coupon_id: string;
+  code: string;
+  title: string;
+  discount_percent: number | null;
+  redeemed_at: string;
+  redeemed_channel: "qr" | "code" | null;
+  redeemed_by: string | null;
+  redeemed_by_name: string | null;
+  traveler_name: string | null;
+  traveler_country_code: string | null;
+  promotion_slug: string;
+}
+
+export const listBusinessRedemptions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (input: {
+      business_id: string;
+      from?: string | null;
+      to?: string | null;
+      promotion_slug?: string | null;
+      channel?: "qr" | "code" | null;
+      limit?: number;
+    }) => {
+      const business_id = String(input?.business_id ?? "").trim();
+      if (!business_id) throw new Error("invalid_business");
+      return {
+        business_id,
+        from: input?.from ? String(input.from) : null,
+        to: input?.to ? String(input.to) : null,
+        promotion_slug: input?.promotion_slug
+          ? String(input.promotion_slug).toLowerCase()
+          : null,
+        channel:
+          input?.channel === "qr" || input?.channel === "code"
+            ? input.channel
+            : null,
+        limit: Math.min(Math.max(Number(input?.limit ?? 100), 1), 500),
+      };
+    },
+  )
+  .handler(async ({ data, context }): Promise<BusinessRedemptionRow[]> => {
+    // RLS ya limita: business_users del negocio activo pueden leer.
+    let q = context.supabase
+      .from("traveler_coupons")
+      .select(
+        "id, code, title, discount_percent, promotion_slug, redeemed_at, redeemed_channel, redeemed_by, user_id",
+      )
+      .eq("business_id", data.business_id)
+      .eq("status", "redeemed")
+      .order("redeemed_at", { ascending: false })
+      .limit(data.limit);
+    if (data.from) q = q.gte("redeemed_at", data.from);
+    if (data.to) q = q.lte("redeemed_at", data.to);
+    if (data.promotion_slug) q = q.eq("promotion_slug", data.promotion_slug);
+    if (data.channel)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      q = q.eq("redeemed_channel", data.channel as any);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(`list_redemptions_failed: ${error.message}`);
+    const list = (rows ?? []) as Array<{
+      id: string;
+      code: string;
+      title: string;
+      discount_percent: number | null;
+      promotion_slug: string;
+      redeemed_at: string;
+      redeemed_channel: "qr" | "code" | null;
+      redeemed_by: string | null;
+      user_id: string;
+    }>;
+    if (!list.length) return [];
+    const userIds = Array.from(
+      new Set(
+        list
+          .flatMap((r) => [r.user_id, r.redeemed_by])
+          .filter((x): x is string => !!x),
+      ),
+    );
+    const { data: profs } = await context.supabase
+      .from("profiles")
+      .select("user_id, first_name, last_name, display_name, country")
+      .in("user_id", userIds);
+    const profMap = new Map<
+      string,
+      { name: string | null; country: string | null }
+    >();
+    for (const p of ((profs ?? []) as Array<{
+      user_id: string;
+      first_name: string | null;
+      last_name: string | null;
+      display_name: string | null;
+      country: string | null;
+    }>)) {
+      const nm =
+        [p.first_name, p.last_name].filter(Boolean).join(" ").trim() ||
+        p.display_name ||
+        null;
+      profMap.set(p.user_id, { name: nm, country: p.country ?? null });
+    }
+    return list.map((r) => {
+      const t = profMap.get(r.user_id);
+      const s = r.redeemed_by ? profMap.get(r.redeemed_by) : null;
+      return {
+        coupon_id: r.id,
+        code: r.code,
+        title: r.title,
+        discount_percent: r.discount_percent,
+        promotion_slug: r.promotion_slug,
+        redeemed_at: r.redeemed_at,
+        redeemed_channel: r.redeemed_channel,
+        redeemed_by: r.redeemed_by,
+        redeemed_by_name: s?.name ?? null,
+        traveler_name: t?.name ?? null,
+        traveler_country_code: t?.country
+          ? t.country.toUpperCase()
+          : null,
+      };
+    });
   });

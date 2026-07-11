@@ -1,67 +1,89 @@
-## Ola 2 · Cupón Digital Valladolid.mx
 
-Alcance aprobado: cupón con QR + código único, `/cuenta/mis-cupones`, panel de canje en `/portal`, límite 1 por viajero por promoción, vigencia = `promotion.ends_at`.
+# Ola 3 · Canje Robusto del Cupón Digital
 
-### 1. Base de datos (migración única)
+**Objetivo**: elevar la experiencia de canje en `/portal/canjear` para que sea segura, verificable y trazable — con confirmación visual del viajero, historial de canjes filtrable, y notificación automática al viajero + invitación a reseñar.
 
-**Tabla `traveler_coupons`**
+El escáner QR con `html5-qrcode` ya funciona (Ola 2). Esta ola cierra el ciclo alrededor de ese flujo.
 
-Campos de dominio:
-- `promotion_slug` (text, indexado) — ancla la landing (`page_compositions.slug`)
-- `promotion_id` (uuid nullable) — cuando exista registro en `promotions`
-- `business_id` (uuid nullable) — para filtrar canje por negocio
-- `user_id` (uuid, FK auth.users)
-- `code` (text, unique) — 10 chars alfanuméricos legibles (ej. `VMX-A3K9-7X`)
-- `qr_token` (uuid unique) — payload interno del QR
-- `discount_percent` (numeric nullable) — snapshot
-- `title` (text) — snapshot del título
-- `terms` (text nullable) — snapshot
-- `valid_until` (timestamptz)
-- `status` enum(`active`,`redeemed`,`expired`,`revoked`) default `active`
-- `redeemed_at`, `redeemed_by` (uuid → auth.users, staff del negocio)
-- `redeemed_channel` (`qr` | `code`)
+---
 
-Índices: `(user_id, promotion_slug)` UNIQUE parcial `WHERE status <> 'revoked'` → aplica límite 1 por viajero por promoción.
+## Historia 3.1 · Confirmación visual del viajero (identidad)
 
-GRANTs: authenticated (select/insert/update), service_role (all).
+Antes de "Marcar como canjeado", el empresario debe ver **quién es** el viajero para confirmar identidad y evitar fraudes.
 
-RLS:
-- Viajero ve/actualiza sólo sus cupones (`auth.uid() = user_id`, y update sólo si aún `active`).
-- Staff del negocio ve cupones donde `business_id ∈ business_users.business_id` (helper `has_business_access`).
-- Admin ve todo vía `has_role(auth.uid(),'admin')`.
+**Backend** (`lookupCoupon`):
+- Extender el retorno con: `avatar_url`, `country_code`, `country_name`, `first_name`, `last_name`.
+- Leer de `traveler_profiles` (país/idioma) + `profiles` (avatar/nombre).
 
-Trigger: al `SELECT` marca `expired` si `valid_until < now()`; alternativa: función `expire_stale_coupons()` que corre en el server fn de listado antes de leer.
+**Frontend** (`/portal/canjear`):
+- Nueva **tarjeta de identidad** encima de la ficha del cupón:
+  - Avatar circular grande (o placeholder con iniciales).
+  - Nombre completo + bandera del país.
+  - Aviso: "Verifica que la persona frente a ti coincide con esta foto."
+- Bloqueo del botón "Canjear" hasta que el staff marque un checkbox: *"Confirmo que verifiqué la identidad del viajero"*.
 
-### 2. Server functions (`src/lib/promotions/coupons.functions.ts`)
+---
 
-Todas con `requireSupabaseAuth`:
-- `issueCoupon({ promotion_slug })` → valida `is_public=true` (perfil 100%), lee snapshot desde `page_compositions` (+ opcional `promotions` por `business_id`), inserta cupón, devuelve `{ code, qr_token, valid_until }`. Manejo de UNIQUE → devuelve el existente.
-- `listMyCoupons()` → cupones del viajero con estado calculado.
-- `getCouponByCode({ code })` → para staff en `/portal/canjear`.
-- `redeemCoupon({ qr_token_or_code, business_id })` → sólo si el usuario tiene acceso al negocio; marca `redeemed`.
+## Historia 3.2 · Historial de canjes del negocio (`/portal/canjes`)
 
-### 3. UI viajero
+Los negocios necesitan auditar sus canjes.
 
-- **`PromocionesGate`**: si `eligible`, el click en tarjeta abre `CouponIssueDialog` en vez del link. Muestra código + QR + botón "Ver en mis cupones".
-- **`/cuenta/mis-cupones.tsx`** (nueva ruta bajo `_authenticated/cuenta/`): grid con Active / Usados / Expirados. Cada card: título, negocio, descuento, vigencia, botón "Mostrar QR" (modal con QR grande + código). Item en `navigation-registry`.
+**Backend** (nueva server fn `listBusinessRedemptions`):
+- Input: `business_id`, filtros opcionales (`from`, `to`, `promotion_slug`, `staff_user_id`, `channel`).
+- Middleware: `requireSupabaseAuth` + verificación `business_users` (mismo patrón que canjear).
+- Devuelve: código, título, viajero (nombre + país), staff que canjeó, canal (qr/código), fecha.
+- Paginado (50/página).
 
-### 4. UI negocio · Panel de canje
+**Frontend** (nueva ruta `/portal/canjes`):
+- Tabla con filtros de fecha, promoción y canal.
+- KPIs arriba: total canjes hoy / semana / mes, promo top.
+- Botón "Exportar CSV" (cliente, sin backend).
+- Enlace desde `/portal/canjear` → "Ver historial".
 
-- **`/portal/canjear.tsx`** (bajo `_authenticated/portal/`): input para pegar/teclear código, botón "Escanear QR" (usa `html5-qrcode`, ya disponible o instalar). Al leer, muestra ficha del cupón (viajero, descuento, vigencia) y botón "Marcar como canjeado". Success → toast + reset.
-- Item en `navigation-registry` visible sólo con rol `business_owner`/`business_staff`.
+**Nav**: agregar entrada "Canjes" al portal empresa.
 
-### 5. Dependencias
-- `qrcode` (generar SVG del QR en cliente) — `bun add qrcode @types/qrcode`
-- `html5-qrcode` para escaneo en portal — `bun add html5-qrcode`
+---
 
-### 6. DoD
-- Typecheck + build OK.
-- Playwright: registrar viajero, completar perfil, desbloquear cupón, verlo en `/cuenta/mis-cupones`; iniciar sesión negocio, canjear código manual, cupón queda `redeemed`.
-- Demo Pack: 1 promoción sembrada + 1 cupón activo.
+## Historia 3.3 · Notificación post-canje al viajero
 
-### Fuera de alcance
-- Notificaciones/email del cupón (Ola 3).
-- Push cuando falten X días para expirar.
-- Reporte analítico de canjes por negocio.
+Cuando el cupón se canjea, mandar email transaccional al viajero.
 
-¿Apruebas para implementar tal cual?
+**Plantilla** `src/lib/email-templates/coupon-redeemed.tsx`:
+- Confirmación de canje (negocio, monto/descuento, fecha, código).
+- Bloque **"¿Cómo estuvo tu experiencia?"** con CTA a `/negocios/{slug}?review=1` (deep-link a formulario de reseña — la Ola 5 conecta la creación real; por ahora abre la ficha con toast "Próximamente").
+- Registrar en `registry.ts`.
+
+**Integración** (dentro de `redeemCoupon`):
+- Tras `UPDATE` exitoso, disparar `sendTransactionalEmail` con `idempotencyKey = redeem-${coupon_id}`.
+- Correo del viajero: `profiles.email` o `auth.users.email` (vía `supabaseAdmin` cargado dentro del handler).
+- Failure-tolerant: si el email falla, el canje NO se revierte (log a `email_send_log`).
+
+---
+
+## Historia 3.4 · Polish del panel de canje
+
+- Feedback háptico/sonoro al detectar QR (opcional, `navigator.vibrate(200)`).
+- Estados visuales claros: escaneando (con marco animado), procesando, éxito (checkmark grande + confetti sonner), error (banner rojo).
+- Botón "Escanear otro" tras canjear (mantiene la cámara lista).
+- Persistir preferencia "Empresa activa" ya existe; ok.
+
+---
+
+## Fuera de alcance (para olas siguientes)
+
+- Reseñas reales (Ola 5).
+- Métricas y dashboard de conversión de promos (Ola 5).
+- Alux conversacional con contexto de cupones (Ola 4).
+- Roles finos de staff (cajero vs gerente).
+
+---
+
+## Definition of Done
+
+- Typecheck + build verdes.
+- Historial visible con datos reales de canjes de Ola 2.
+- Email de canje enviado (verificable en `email_send_log`).
+- Sin regresiones en el escáner QR ni en emisión de cupones.
+- Demo Pack: 1 promo con 1 cupón emitido → canjeado desde `/portal/canjear` → email recibido → visible en `/portal/canjes`.
+
+¿Apruebas la Ola 3 completa (3.1 + 3.2 + 3.3 + 3.4) o prefieres partirla y ejecutar sólo 3.1 + 3.3 primero (identidad + email) y dejar historial y polish para una sub-ola posterior?

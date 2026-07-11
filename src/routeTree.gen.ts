@@ -82,6 +82,7 @@ import { Route as AuthenticatedPortalGaleriaRouteImport } from './routes/_authen
 import { Route as AuthenticatedPortalFichaRouteImport } from './routes/_authenticated/portal/ficha'
 import { Route as AuthenticatedPortalConciergeRouteImport } from './routes/_authenticated/portal/concierge'
 import { Route as AuthenticatedPortalCatalogoRouteImport } from './routes/_authenticated/portal/catalogo'
+import { Route as AuthenticatedPortalCanjesRouteImport } from './routes/_authenticated/portal/canjes'
 import { Route as AuthenticatedPortalCanjearRouteImport } from './routes/_authenticated/portal/canjear'
 import { Route as AuthenticatedPortalActividadRouteImport } from './routes/_authenticated/portal/actividad'
 import { Route as AuthenticatedPaginasSplatRouteImport } from './routes/_authenticated/paginas.$'
@@ -550,6 +551,12 @@ const AuthenticatedPortalCatalogoRoute =
   AuthenticatedPortalCatalogoRouteImport.update({
     id: '/catalogo',
     path: '/catalogo',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
+const AuthenticatedPortalCanjesRoute =
+  AuthenticatedPortalCanjesRouteImport.update({
+    id: '/canjes',
+    path: '/canjes',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
 const AuthenticatedPortalCanjearRoute =
@@ -1097,6 +1104,7 @@ export interface FileRoutesByFullPath {
   '/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/canjear': typeof AuthenticatedPortalCanjearRoute
+  '/portal/canjes': typeof AuthenticatedPortalCanjesRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/portal/concierge': typeof AuthenticatedPortalConciergeRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
@@ -1242,6 +1250,7 @@ export interface FileRoutesByTo {
   '/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/canjear': typeof AuthenticatedPortalCanjearRoute
+  '/portal/canjes': typeof AuthenticatedPortalCanjesRoute
   '/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/portal/concierge': typeof AuthenticatedPortalConciergeRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
@@ -1394,6 +1403,7 @@ export interface FileRoutesById {
   '/_authenticated/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/_authenticated/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/_authenticated/portal/canjear': typeof AuthenticatedPortalCanjearRoute
+  '/_authenticated/portal/canjes': typeof AuthenticatedPortalCanjesRoute
   '/_authenticated/portal/catalogo': typeof AuthenticatedPortalCatalogoRoute
   '/_authenticated/portal/concierge': typeof AuthenticatedPortalConciergeRoute
   '/_authenticated/portal/ficha': typeof AuthenticatedPortalFichaRoute
@@ -1548,6 +1558,7 @@ export interface FileRouteTypes {
     | '/paginas/$'
     | '/portal/actividad'
     | '/portal/canjear'
+    | '/portal/canjes'
     | '/portal/catalogo'
     | '/portal/concierge'
     | '/portal/ficha'
@@ -1693,6 +1704,7 @@ export interface FileRouteTypes {
     | '/paginas/$'
     | '/portal/actividad'
     | '/portal/canjear'
+    | '/portal/canjes'
     | '/portal/catalogo'
     | '/portal/concierge'
     | '/portal/ficha'
@@ -1844,6 +1856,7 @@ export interface FileRouteTypes {
     | '/_authenticated/paginas/$'
     | '/_authenticated/portal/actividad'
     | '/_authenticated/portal/canjear'
+    | '/_authenticated/portal/canjes'
     | '/_authenticated/portal/catalogo'
     | '/_authenticated/portal/concierge'
     | '/_authenticated/portal/ficha'
@@ -2486,6 +2499,13 @@ declare module '@tanstack/react-router' {
       path: '/catalogo'
       fullPath: '/portal/catalogo'
       preLoaderRoute: typeof AuthenticatedPortalCatalogoRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
+    '/_authenticated/portal/canjes': {
+      id: '/_authenticated/portal/canjes'
+      path: '/canjes'
+      fullPath: '/portal/canjes'
+      preLoaderRoute: typeof AuthenticatedPortalCanjesRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
     '/_authenticated/portal/canjear': {
@@ -3178,6 +3198,7 @@ const AuthenticatedCuentaRouteRouteWithChildren =
 interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalActividadRoute: typeof AuthenticatedPortalActividadRoute
   AuthenticatedPortalCanjearRoute: typeof AuthenticatedPortalCanjearRoute
+  AuthenticatedPortalCanjesRoute: typeof AuthenticatedPortalCanjesRoute
   AuthenticatedPortalCatalogoRoute: typeof AuthenticatedPortalCatalogoRoute
   AuthenticatedPortalConciergeRoute: typeof AuthenticatedPortalConciergeRoute
   AuthenticatedPortalFichaRoute: typeof AuthenticatedPortalFichaRoute
@@ -3198,6 +3219,7 @@ const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildr
   {
     AuthenticatedPortalActividadRoute: AuthenticatedPortalActividadRoute,
     AuthenticatedPortalCanjearRoute: AuthenticatedPortalCanjearRoute,
+    AuthenticatedPortalCanjesRoute: AuthenticatedPortalCanjesRoute,
     AuthenticatedPortalCatalogoRoute: AuthenticatedPortalCatalogoRoute,
     AuthenticatedPortalConciergeRoute: AuthenticatedPortalConciergeRoute,
     AuthenticatedPortalFichaRoute: AuthenticatedPortalFichaRoute,

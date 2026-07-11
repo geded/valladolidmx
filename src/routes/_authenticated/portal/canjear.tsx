@@ -9,8 +9,9 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Camera, CameraOff, Check, Search, Ticket } from "lucide-react";
+import { Camera, CameraOff, Check, History, Search, Ticket, UserCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ import {
   redeemCoupon,
   type CouponLookupResult,
 } from "@/lib/promotions/coupons.functions";
+import { sendTransactionalEmail } from "@/lib/email/send";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
@@ -51,6 +53,7 @@ function RedeemPage() {
   const [channel, setChannel] = useState<"qr" | "code">("code");
   const [busy, setBusy] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [identityConfirmed, setIdentityConfirmed] = useState(false);
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const scannerInstance = useRef<{ stop: () => Promise<void> } | null>(null);
 
@@ -65,6 +68,7 @@ function RedeemPage() {
     try {
       const r = await lookup({ data: { key: key.trim(), business_id: businessId } });
       setResult(r);
+      setIdentityConfirmed(false);
       if (r.reason === "not_found")
         toast.error("No encontramos un cupón con ese código.");
       else if (r.reason === "not_your_business")
@@ -81,12 +85,46 @@ function RedeemPage() {
 
   const doRedeem = async () => {
     if (!result?.coupon) return;
+    if (!identityConfirmed) {
+      toast.warning("Confirma primero la identidad del viajero.");
+      return;
+    }
     setBusy(true);
     try {
-      await redeem({ data: { coupon_id: result.coupon.id, channel } });
+      const rr = await redeem({
+        data: { coupon_id: result.coupon.id, channel },
+      });
       toast.success("¡Cupón canjeado! Aplica el descuento.");
+      // Notificación al viajero (best-effort; no bloquea el canje).
+      if (rr.traveler_email) {
+        const reviewUrl = rr.business_slug
+          ? `${window.location.origin}/negocios/${rr.business_slug}?review=1`
+          : window.location.origin;
+        sendTransactionalEmail({
+          templateName: "coupon-redeemed",
+          recipientEmail: rr.traveler_email,
+          idempotencyKey: `redeem-${rr.coupon.id}`,
+          templateData: {
+            travelerName: rr.traveler_name ?? undefined,
+            title: rr.coupon.title,
+            code: rr.coupon.code,
+            discountPercent: rr.coupon.discount_percent,
+            businessName: rr.business_name,
+            redeemedAt: rr.coupon.redeemed_at ?? new Date().toISOString(),
+            reviewUrl,
+          },
+        }).catch((e) => {
+          console.warn("[canjear] email post-canje falló:", e);
+        });
+      }
+      try {
+        if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+          (navigator as Navigator).vibrate?.(180);
+        }
+      } catch { /* noop */ }
       setResult(null);
       setCode("");
+      setIdentityConfirmed(false);
     } catch (e) {
       toast.error((e as Error).message || "Error al canjear.");
     } finally {
@@ -143,14 +181,24 @@ function RedeemPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <header className="space-y-1">
-        <p className="text-[11px] uppercase tracking-[0.18em] text-primary">
-          Panel de canje
-        </p>
-        <h1 className="text-2xl font-semibold">Canjear cupón digital</h1>
-        <p className="text-sm text-muted-foreground">
-          Pide al viajero que te muestre el QR o dicte el código de su cupón.
-          Sólo puedes canjear cupones asignados a la empresa activa.
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-primary">
+              Panel de canje
+            </p>
+            <h1 className="text-2xl font-semibold">Canjear cupón digital</h1>
+            <p className="text-sm text-muted-foreground">
+              Pide al viajero que te muestre el QR o dicte el código. Sólo puedes
+              canjear cupones asignados a la empresa activa.
+            </p>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/portal/canjes">
+              <History className="mr-2 size-4" aria-hidden />
+              Historial
+            </Link>
+          </Button>
+        </div>
       </header>
 
       {!businessId && (
@@ -218,15 +266,54 @@ function RedeemPage() {
 
       {result?.coupon && (
         <section className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+          {/* Identidad del viajero */}
+          <div className="mb-4 rounded-xl border border-primary/30 bg-primary/5 p-3">
+            <div className="flex items-center gap-3">
+              {result.traveler_avatar_url ? (
+                <img
+                  src={result.traveler_avatar_url}
+                  alt={result.traveler_display_name ?? "Viajero"}
+                  className="size-14 rounded-full border border-border object-cover"
+                />
+              ) : (
+                <span className="grid size-14 place-items-center rounded-full bg-primary/15 text-primary">
+                  <UserCircle2 className="size-8" aria-hidden />
+                </span>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-base font-semibold">
+                  {result.traveler_display_name ?? "Viajero sin nombre"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {result.traveler_country_name
+                    ? `${countryFlag(result.traveler_country_code)} ${result.traveler_country_name}`
+                    : "País no especificado"}
+                </p>
+              </div>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Verifica que la persona frente a ti coincide con esta información
+              antes de aplicar el descuento.
+            </p>
+            <label className="mt-2 flex items-start gap-2 text-xs">
+              <input
+                type="checkbox"
+                checked={identityConfirmed}
+                onChange={(e) => setIdentityConfirmed(e.target.checked)}
+                className="mt-0.5 size-4 accent-primary"
+              />
+              <span>
+                Confirmo que verifiqué la identidad del viajero.
+              </span>
+            </label>
+          </div>
+
           <div className="flex items-start gap-3">
             <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
               <Ticket className="size-5" aria-hidden />
             </span>
             <div className="flex-1">
               <h2 className="font-semibold">{result.coupon.title}</h2>
-              <p className="mt-0.5 text-sm text-muted-foreground">
-                Viajero: {result.traveler_display_name ?? "—"}
-              </p>
               <p className="mt-0.5 text-sm">
                 Descuento:{" "}
                 <strong>
@@ -248,13 +335,18 @@ function RedeemPage() {
               onClick={() => {
                 setResult(null);
                 setCode("");
+                setIdentityConfirmed(false);
               }}
             >
               Cancelar
             </Button>
             {result.coupon.status === "active" &&
               new Date(result.coupon.valid_until) > new Date() && (
-                <Button type="button" onClick={doRedeem} disabled={busy}>
+                <Button
+                  type="button"
+                  onClick={doRedeem}
+                  disabled={busy || !identityConfirmed}
+                >
                   <Check className="mr-2 size-4" aria-hidden />
                   Marcar como canjeado
                 </Button>
@@ -264,4 +356,11 @@ function RedeemPage() {
       )}
     </div>
   );
+}
+
+function countryFlag(iso: string | null | undefined): string {
+  if (!iso || iso.length !== 2) return "🌎";
+  const base = 0x1f1e6 - 65;
+  const cc = iso.toUpperCase();
+  return String.fromCodePoint(cc.charCodeAt(0) + base, cc.charCodeAt(1) + base);
 }
