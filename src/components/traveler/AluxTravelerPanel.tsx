@@ -36,6 +36,7 @@ import {
   AlertTriangle,
   RotateCcw,
   Ticket,
+  Gift,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -46,6 +47,7 @@ import {
   suggestHotels,
   suggestRestaurants,
   suggestFromCoupons,
+  discoverPromotions,
   type AluxTravelerCapability,
   type AluxTravelerSuggestion,
 } from "@/lib/traveler/alux-traveler.functions";
@@ -70,6 +72,12 @@ const CAPABILITIES: CapabilityDef[] = [
     label: "Aprovechar mis cupones",
     description: "Cómo y cuándo usar los cupones que ya reclamaste.",
     icon: Ticket,
+  },
+  {
+    id: "discover_promotions",
+    label: "Descubrir promociones para mí",
+    description: "Promociones vigentes que aún no reclamas y encajan contigo.",
+    icon: Gift,
   },
   {
     id: "detect_gaps",
@@ -120,6 +128,7 @@ export function AluxTravelerPanel() {
     detect_gaps: useServerFn(detectPlanGaps),
     draft_concierge_message: useServerFn(draftConciergeMessage),
     suggest_from_coupons: useServerFn(suggestFromCoupons),
+    discover_promotions: useServerFn(discoverPromotions),
   } as const;
 
   const mut = useMutation({
