@@ -173,7 +173,7 @@ function PerfilPublicoPage() {
       </p>
       <h1 className="mt-2 text-4xl">Perfil público</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        Tu perfil es <strong>privado por defecto</strong>. Actívalo cuando
+        Tu perfil público es <strong>opcional</strong>. Complétalo cuando
         quieras compartir tu URL <code>/viajero/tu-handle</code> con otros
         viajeros o en redes sociales.
       </p>
@@ -181,7 +181,7 @@ function PerfilPublicoPage() {
       {/* Ventajas de activar el perfil público */}
       <section className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-4">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          ¿Por qué activarlo?
+          ¿Por qué completarlo?
         </p>
         <ul className="mt-3 grid gap-2 sm:grid-cols-2">
           <li className="flex items-start gap-2 text-sm">
@@ -209,7 +209,7 @@ function PerfilPublicoPage() {
           <p className="mt-3 flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-200">
             <Lock className="mt-0.5 size-4 shrink-0" aria-hidden />
             <span>
-              Para publicar tu perfil necesitas completar tu perfil al 100%.
+              Para completar tu perfil público necesitas completar tu perfil personal al 100%.
               Con eso mostramos tu nombre, foto, país e idioma sin volver a
               pedírtelos aquí.
             </span>
@@ -314,11 +314,11 @@ function PerfilPublicoPage() {
           />
           <span className="grid gap-1 text-sm">
             <span className="font-medium text-foreground">
-              Hacer mi perfil público
+              Completar tu perfil público
             </span>
             <span className="text-xs text-muted-foreground">
               {completion.complete
-                ? "Cuando está activo, cualquier persona con tu URL podrá ver tu nombre, foto, país e idiomas. Puedes desactivarlo en cualquier momento."
+                ? "Cuando lo completas, cualquier persona con tu URL podrá ver tu nombre, foto, país e idiomas. Puedes desactivarlo en cualquier momento."
                 : `Disponible cuando tu perfil esté al 100% (${completion.done}/${completion.total} listo).`}
             </span>
           </span>
@@ -425,9 +425,9 @@ function reasonLabel(reason?: HandleAvailability["reason"]): string {
 
 function mapError(msg: string): string {
   if (msg.includes("handle_required_to_publish"))
-    return "Necesitas elegir un handle antes de publicar tu perfil.";
+    return "Necesitas elegir un handle antes de completar tu perfil público.";
   if (msg.includes("profile_incomplete"))
-    return "Debes completar tu perfil al 100% antes de publicar.";
+    return "Debes completar tu perfil al 100% antes de completar tu perfil público.";
   if (msg.includes("handle_taken")) return "Ese handle ya está en uso.";
   if (msg.includes("reserved_handle")) return "Ese handle está reservado.";
   if (msg.includes("invalid_handle"))

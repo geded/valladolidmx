@@ -54,12 +54,12 @@ export function PublicProfileBenefitsCard({
           <h2 className="mt-1 text-lg font-semibold">
             {isPublic
               ? "Tu perfil público está activo"
-              : "Hazte parte visible del Oriente Maya"}
+              : "Completar tu perfil público"}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {isPublic
               ? "Los demás viajeros pueden ver tus reseñas, tu país y tu estilo de viaje."
-              : "Actívalo para dejar reseñas creíbles, aparecer en la comunidad y recibir mejores recomendaciones de Alux."}
+              : "Complétalo para dejar reseñas creíbles, aparecer en la comunidad y recibir mejores recomendaciones de Alux."}
           </p>
         </div>
       </div>
@@ -87,7 +87,7 @@ export function PublicProfileBenefitsCard({
           to="/cuenta/perfil-publico"
           className="inline-flex items-center gap-1.5 rounded-pill bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
         >
-          {isPublic ? "Gestionar mi perfil público" : "Activar mi perfil público"}
+          {isPublic ? "Gestionar mi perfil público" : "Completar tu perfil público"}
           <ArrowRight className="size-4" aria-hidden />
         </Link>
         {!isComplete && (

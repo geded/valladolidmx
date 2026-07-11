@@ -23,16 +23,19 @@ function AuthenticatedLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const pathname = location.pathname;
+  const searchStr = location.searchStr ?? "";
+
   useEffect(() => {
     if (!loading && !user) {
-      const next = location.pathname + (location.searchStr ?? "");
+      const next = pathname + searchStr;
       // Persist intended destination for post-login (survives OAuth round-trip).
       if (typeof window !== "undefined" && next && next !== "/auth") {
         try { window.sessionStorage.setItem("vmx.auth.next", next); } catch { /* noop */ }
       }
       void navigate({ to: "/auth" });
     }
-  }, [loading, user, navigate, location]);
+  }, [loading, user, navigate, pathname, searchStr]);
 
   if (loading) {
     return (

@@ -336,8 +336,8 @@ export function AluxFloatingTrigger() {
               <span id="alux-profile">Ayúdame a asesorarte mejor</span>
             </div>
             <p className="mt-2 text-sm text-foreground">
-              Si completas tu perfil (estilo, intereses, compañía, presupuesto, fechas)
-              y lo haces público, puedo recomendarte hoteles, restaurantes,
+              Si completas tu perfil de viajero (estilo, intereses, compañía, presupuesto, fechas)
+              y también tu perfil público, puedo recomendarte hoteles, restaurantes,
               experiencias y rutas del Oriente Maya con mucha más precisión.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -352,7 +352,7 @@ export function AluxFloatingTrigger() {
                 href="/cuenta/perfil-publico"
                 className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
-                Activar perfil público
+                Completar tu perfil público
                 <ArrowRight className="size-3.5" aria-hidden />
               </a>
             </div>
