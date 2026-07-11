@@ -111,7 +111,7 @@ export function AvatarUploader({
   const shown = preview ?? currentUrl ?? null;
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
@@ -139,7 +139,7 @@ export function AvatarUploader({
           )}
         </span>
       </button>
-      <div className="min-w-0">
+      <div className="min-w-0 text-center sm:text-left">
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
