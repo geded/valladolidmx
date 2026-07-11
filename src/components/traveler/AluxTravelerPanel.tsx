@@ -182,7 +182,7 @@ export function AluxTravelerPanel() {
           </a>
           {" · "}
           <a href="/cuenta/perfil-publico" className="font-medium text-primary hover:underline">
-            Activar perfil público
+            Completar tu perfil público
           </a>
         </p>
       </div>
