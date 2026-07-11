@@ -216,9 +216,9 @@ function CuentaPerfilPage() {
   }
 
   return (
-    <div className="max-w-3xl">
-      <header className="rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-5 shadow-soft">
-        <div className="flex items-start gap-4">
+    <div className="mx-auto w-full max-w-3xl px-3 sm:px-0">
+      <header className="rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-4 shadow-soft sm:p-5">
+        <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:text-left">
           <AvatarUploader
             userId={user?.id}
             currentUrl={personalForm.avatar_url ?? personal?.avatar_url}
@@ -230,10 +230,10 @@ function CuentaPerfilPage() {
             onUploaded={(url) => setPersonalForm({ ...personalForm, avatar_url: url })}
           />
           <div className="min-w-0 flex-1">
-            <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+            <p className="flex items-center justify-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-primary sm:justify-start">
               <Sparkles className="size-3" aria-hidden /> Tu perfil de viaje
             </p>
-            <h1 className="mt-1 text-2xl font-semibold leading-tight sm:text-3xl">
+            <h1 className="mt-1 text-xl font-semibold leading-tight sm:text-3xl">
               {personalForm.first_name
                 ? `Hola, ${personalForm.first_name}`
                 : "Cuéntanos quién viaja"}
