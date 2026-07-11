@@ -20,14 +20,16 @@ export type JsonValue =
 export interface EffectiveVisibilityPlan {
   grant_id: string | null;
   plan_id: string;
-  plan_code: string;
+  plan_slug: string;
   plan_name: string;
-  tier: string | null;
+  badge_variant: string | null;
+  color_token: string | null;
   starts_at: string | null;
   expires_at: string | null;
-  cycle_months: number | null;
+  cycle: string | null;
   levers: Record<string, JsonValue>;
   limits: Record<string, JsonValue>;
+  base_price_mxn: number | null;
   is_default: boolean;
 }
 
@@ -36,14 +38,16 @@ function normalize(row: Record<string, unknown> | null): EffectiveVisibilityPlan
   return {
     grant_id: (row.grant_id as string | null) ?? null,
     plan_id: row.plan_id as string,
-    plan_code: row.plan_code as string,
+    plan_slug: row.plan_slug as string,
     plan_name: row.plan_name as string,
-    tier: (row.tier as string | null) ?? null,
+    badge_variant: (row.badge_variant as string | null) ?? null,
+    color_token: (row.color_token as string | null) ?? null,
     starts_at: (row.starts_at as string | null) ?? null,
     expires_at: (row.expires_at as string | null) ?? null,
-    cycle_months: (row.cycle_months as number | null) ?? null,
+    cycle: (row.cycle as string | null) ?? null,
     levers: (row.levers as Record<string, JsonValue>) ?? {},
     limits: (row.limits as Record<string, JsonValue>) ?? {},
+    base_price_mxn: (row.base_price_mxn as number | null) ?? null,
     is_default: Boolean(row.is_default),
   };
 }
