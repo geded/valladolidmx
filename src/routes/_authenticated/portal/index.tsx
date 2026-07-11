@@ -21,6 +21,9 @@ const SHORTCUTS = [
   { to: "/portal/presencia" as const, label: "Contactos, ubicaciones, horarios, redes" },
   { to: "/portal/galeria" as const, label: "Galería de empresa" },
   { to: "/portal/catalogo" as const, label: "Productos y promociones" },
+  { to: "/portal/metricas" as const, label: "Métricas de cupones" },
+  { to: "/portal/canjes" as const, label: "Historial de canjes" },
+  { to: "/portal/canjear" as const, label: "Canjear cupón" },
   { to: "/portal/invitaciones" as const, label: "Invitaciones y usuarios" },
   { to: "/portal/propiedad" as const, label: "Propiedad y transferencia" },
 ];

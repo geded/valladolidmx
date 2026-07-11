@@ -78,6 +78,7 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/em
 import { Route as AuthenticatedPortalPropiedadRouteImport } from './routes/_authenticated/portal/propiedad'
 import { Route as AuthenticatedPortalPresenciaRouteImport } from './routes/_authenticated/portal/presencia'
 import { Route as AuthenticatedPortalPagosRouteImport } from './routes/_authenticated/portal/pagos'
+import { Route as AuthenticatedPortalMetricasRouteImport } from './routes/_authenticated/portal/metricas'
 import { Route as AuthenticatedPortalGaleriaRouteImport } from './routes/_authenticated/portal/galeria'
 import { Route as AuthenticatedPortalFichaRouteImport } from './routes/_authenticated/portal/ficha'
 import { Route as AuthenticatedPortalConciergeRouteImport } from './routes/_authenticated/portal/concierge'
@@ -527,6 +528,12 @@ const AuthenticatedPortalPagosRoute =
   AuthenticatedPortalPagosRouteImport.update({
     id: '/pagos',
     path: '/pagos',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
+const AuthenticatedPortalMetricasRoute =
+  AuthenticatedPortalMetricasRouteImport.update({
+    id: '/metricas',
+    path: '/metricas',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
 const AuthenticatedPortalGaleriaRoute =
@@ -1109,6 +1116,7 @@ export interface FileRoutesByFullPath {
   '/portal/concierge': typeof AuthenticatedPortalConciergeRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
+  '/portal/metricas': typeof AuthenticatedPortalMetricasRoute
   '/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
@@ -1255,6 +1263,7 @@ export interface FileRoutesByTo {
   '/portal/concierge': typeof AuthenticatedPortalConciergeRoute
   '/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
+  '/portal/metricas': typeof AuthenticatedPortalMetricasRoute
   '/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
@@ -1408,6 +1417,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/concierge': typeof AuthenticatedPortalConciergeRoute
   '/_authenticated/portal/ficha': typeof AuthenticatedPortalFichaRoute
   '/_authenticated/portal/galeria': typeof AuthenticatedPortalGaleriaRoute
+  '/_authenticated/portal/metricas': typeof AuthenticatedPortalMetricasRoute
   '/_authenticated/portal/pagos': typeof AuthenticatedPortalPagosRoute
   '/_authenticated/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/_authenticated/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
@@ -1563,6 +1573,7 @@ export interface FileRouteTypes {
     | '/portal/concierge'
     | '/portal/ficha'
     | '/portal/galeria'
+    | '/portal/metricas'
     | '/portal/pagos'
     | '/portal/presencia'
     | '/portal/propiedad'
@@ -1709,6 +1720,7 @@ export interface FileRouteTypes {
     | '/portal/concierge'
     | '/portal/ficha'
     | '/portal/galeria'
+    | '/portal/metricas'
     | '/portal/pagos'
     | '/portal/presencia'
     | '/portal/propiedad'
@@ -1861,6 +1873,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/concierge'
     | '/_authenticated/portal/ficha'
     | '/_authenticated/portal/galeria'
+    | '/_authenticated/portal/metricas'
     | '/_authenticated/portal/pagos'
     | '/_authenticated/portal/presencia'
     | '/_authenticated/portal/propiedad'
@@ -2471,6 +2484,13 @@ declare module '@tanstack/react-router' {
       path: '/pagos'
       fullPath: '/portal/pagos'
       preLoaderRoute: typeof AuthenticatedPortalPagosRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
+    '/_authenticated/portal/metricas': {
+      id: '/_authenticated/portal/metricas'
+      path: '/metricas'
+      fullPath: '/portal/metricas'
+      preLoaderRoute: typeof AuthenticatedPortalMetricasRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
     '/_authenticated/portal/galeria': {
@@ -3203,6 +3223,7 @@ interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalConciergeRoute: typeof AuthenticatedPortalConciergeRoute
   AuthenticatedPortalFichaRoute: typeof AuthenticatedPortalFichaRoute
   AuthenticatedPortalGaleriaRoute: typeof AuthenticatedPortalGaleriaRoute
+  AuthenticatedPortalMetricasRoute: typeof AuthenticatedPortalMetricasRoute
   AuthenticatedPortalPagosRoute: typeof AuthenticatedPortalPagosRoute
   AuthenticatedPortalPresenciaRoute: typeof AuthenticatedPortalPresenciaRoute
   AuthenticatedPortalPropiedadRoute: typeof AuthenticatedPortalPropiedadRoute
@@ -3224,6 +3245,7 @@ const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildr
     AuthenticatedPortalConciergeRoute: AuthenticatedPortalConciergeRoute,
     AuthenticatedPortalFichaRoute: AuthenticatedPortalFichaRoute,
     AuthenticatedPortalGaleriaRoute: AuthenticatedPortalGaleriaRoute,
+    AuthenticatedPortalMetricasRoute: AuthenticatedPortalMetricasRoute,
     AuthenticatedPortalPagosRoute: AuthenticatedPortalPagosRoute,
     AuthenticatedPortalPresenciaRoute: AuthenticatedPortalPresenciaRoute,
     AuthenticatedPortalPropiedadRoute: AuthenticatedPortalPropiedadRoute,
