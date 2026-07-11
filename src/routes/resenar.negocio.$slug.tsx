@@ -38,7 +38,7 @@ export const Route = createFileRoute("/resenar/negocio/$slug")({
 
 function ReviewRoute() {
   const { slug } = Route.useParams();
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const resolve = useServerFn(resolveBusinessBySlug);
   const q = useQuery({
     queryKey: ["resenar-negocio", slug],
