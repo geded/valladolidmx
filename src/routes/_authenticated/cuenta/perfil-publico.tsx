@@ -398,6 +398,8 @@ function reasonLabel(reason?: HandleAvailability["reason"]): string {
 function mapError(msg: string): string {
   if (msg.includes("handle_required_to_publish"))
     return "Necesitas elegir un handle antes de publicar tu perfil.";
+  if (msg.includes("profile_incomplete"))
+    return "Debes completar tu perfil al 100% antes de publicar.";
   if (msg.includes("handle_taken")) return "Ese handle ya está en uso.";
   if (msg.includes("reserved_handle")) return "Ese handle está reservado.";
   if (msg.includes("invalid_handle"))
