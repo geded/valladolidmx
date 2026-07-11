@@ -98,7 +98,7 @@ function RedeemPage() {
       // Notificación al viajero (best-effort; no bloquea el canje).
       if (rr.traveler_email) {
         const reviewUrl = rr.business_slug
-          ? `${window.location.origin}/negocios/${rr.business_slug}?review=1`
+          ? `${window.location.origin}/resenar/negocio/${rr.business_slug}`
           : window.location.origin;
         sendTransactionalEmail({
           templateName: "coupon-redeemed",
