@@ -135,9 +135,11 @@ export function WelcomeOnboardingModal({
   const upsertPersonalFn = useServerFn(upsertMyPersonalProfile);
   const mutation = useMutation({
     mutationFn: async (data: Parameters<typeof upsertFn>[0]) => {
-      const personalPayload: Parameters<typeof upsertPersonalFn>[0]["data"] = {
-        preferred_language: lang,
-      };
+      const personalPayload: {
+        preferred_language: string;
+        first_name?: string | null;
+        last_name?: string | null;
+      } = { preferred_language: lang };
       if (!hasName) {
         personalPayload.first_name = firstName.trim() || null;
         personalPayload.last_name = lastName.trim() || null;
