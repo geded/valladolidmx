@@ -1,62 +1,67 @@
-## Objetivo
+## Ola 2 · Cupón Digital Valladolid.mx
 
-Convertir la ficha de categoría en destino (ej. `/oriente-maya/valladolid/hoteles`) — a donde llega el buscador tipo Airbnb — en una experiencia de descubrimiento tipo Airbnb: **mapa arriba con todos los hoteles encontrados** + **grid de tarjetas abajo** con corazón de favoritos y "Ver info" que abre un **modal** (sin salir de la página).
+Alcance aprobado: cupón con QR + código único, `/cuenta/mis-cupones`, panel de canje en `/portal`, límite 1 por viajero por promoción, vigencia = `promotion.ends_at`.
 
-## Alcance
+### 1. Base de datos (migración única)
 
-Aplica a `src/routes/oriente-maya/$destino.$categoria.index.tsx` (categoría en destino). Reutilizamos la infraestructura oficial:
+**Tabla `traveler_coupons`**
 
-- `ExperienceMapBlock` (bloque oficial `vmx.experience.map`)
-- `TourismListingSurface` (ya tiene `mapSlot` y `renderActions` para el corazón)
-- `FavoriteButton` (Airbnb-style, ya existe)
-- `getMarketplaceBusinessBySlug` para hidratar el modal
-- `Dialog` de shadcn para el modal
+Campos de dominio:
+- `promotion_slug` (text, indexado) — ancla la landing (`page_compositions.slug`)
+- `promotion_id` (uuid nullable) — cuando exista registro en `promotions`
+- `business_id` (uuid nullable) — para filtrar canje por negocio
+- `user_id` (uuid, FK auth.users)
+- `code` (text, unique) — 10 chars alfanuméricos legibles (ej. `VMX-A3K9-7X`)
+- `qr_token` (uuid unique) — payload interno del QR
+- `discount_percent` (numeric nullable) — snapshot
+- `title` (text) — snapshot del título
+- `terms` (text nullable) — snapshot
+- `valid_until` (timestamptz)
+- `status` enum(`active`,`redeemed`,`expired`,`revoked`) default `active`
+- `redeemed_at`, `redeemed_by` (uuid → auth.users, staff del negocio)
+- `redeemed_channel` (`qr` | `code`)
 
-No creamos motores ni componentes paralelos.
+Índices: `(user_id, promotion_slug)` UNIQUE parcial `WHERE status <> 'revoked'` → aplica límite 1 por viajero por promoción.
 
-## Cambios
+GRANTs: authenticated (select/insert/update), service_role (all).
 
-### 1. Datos — exponer coordenadas en el listado
-- `listMarketplaceBusinesses` (server fn en `marketplace-reads.functions.ts`): joinear `business_locations` (primary) y devolver `latitude`, `longitude`, `address_line1` en `MarketplaceBusinessCard`.
-- Sin regresiones: campos opcionales; superficies existentes no rompen.
+RLS:
+- Viajero ve/actualiza sólo sus cupones (`auth.uid() = user_id`, y update sólo si aún `active`).
+- Staff del negocio ve cupones donde `business_id ∈ business_users.business_id` (helper `has_business_access`).
+- Admin ve todo vía `has_role(auth.uid(),'admin')`.
 
-### 2. Adapter → puntos de mapa
-- En el loader de la ruta, mapear los `items` filtrados a `ExperienceMapPoint[]` con `businessToMapPoint` (ya existe en `entity-to-map-point.ts`). Descartar los que no tengan coordenadas.
+Trigger: al `SELECT` marca `expired` si `valid_until < now()`; alternativa: función `expire_stale_coupons()` que corre en el server fn de listado antes de leer.
 
-### 3. Superficie de categoría — insertar mapa
-- En `$destino.$categoria.index.tsx`, pasar `mapSlot={<ExperienceMapBlock dto={{ variant: "list-sync", points, heading: "Mapa de <cat> en <destino>", ... }} />}` a `TourismListingSurface`.
+### 2. Server functions (`src/lib/promotions/coupons.functions.ts`)
 
-### 4. Modal "Ver info" — no navegar
-- Nuevo componente `BusinessQuickViewDialog` (`src/components/discovery/BusinessQuickViewDialog.tsx`) con `Dialog` de shadcn:
-  - Recibe `slug` y `open`; al abrirse hace `useQuery` sobre `getMarketplaceBusinessBySlug`.
-  - Muestra cover, nombre, tagline, descripción corta, badges, dirección, mapa mini (opcional Fase 2), lista de productos con precios, y CTAs:
-    - **"Ver ficha completa"** → link a `/oriente-maya/{destino}/{cat}/{empresa}`
-    - **"Agregar a mi viaje"** (usa `AddToTravelPlanButton` existente)
-    - **Corazón favorito** (usa `FavoriteButton`)
-- La superficie inyecta un `renderActions`/`onOpenDetail` que abre el modal en lugar de navegar. Requiere una pequeña extensión de `TourismListingSurface` o envolver `TourismCard` en un wrapper local en la ruta que intercepte el click.
+Todas con `requireSupabaseAuth`:
+- `issueCoupon({ promotion_slug })` → valida `is_public=true` (perfil 100%), lee snapshot desde `page_compositions` (+ opcional `promotions` por `business_id`), inserta cupón, devuelve `{ code, qr_token, valid_until }`. Manejo de UNIQUE → devuelve el existente.
+- `listMyCoupons()` → cupones del viajero con estado calculado.
+- `getCouponByCode({ code })` → para staff en `/portal/canjear`.
+- `redeemCoupon({ qr_token_or_code, business_id })` → sólo si el usuario tiene acceso al negocio; marca `redeemed`.
 
-**Enfoque mínimamente invasivo:** en la ruta creamos un `CategoryHotelsView` cliente que:
-  1. Renderiza el `ExperienceMapBlock` arriba.
-  2. Renderiza el grid de `TourismCard` directamente (sin `TourismListingSurface`) para poder interceptar la acción primaria → `setDialogSlug(vm.slug)`.
-  3. Mantiene el corazón visible con `FavoriteButton`.
+### 3. UI viajero
 
-Esto evita ampliar contratos del surface oficial en esta iteración.
+- **`PromocionesGate`**: si `eligible`, el click en tarjeta abre `CouponIssueDialog` en vez del link. Muestra código + QR + botón "Ver en mis cupones".
+- **`/cuenta/mis-cupones.tsx`** (nueva ruta bajo `_authenticated/cuenta/`): grid con Active / Usados / Expirados. Cada card: título, negocio, descuento, vigencia, botón "Mostrar QR" (modal con QR grande + código). Item en `navigation-registry`.
 
-### 5. Modal sobre la tabla o página completa (mobile)
-- En desktop: `Dialog` estándar (max-w 720px, scrollable).
-- En mobile: mismo Dialog full-screen (h-full).
+### 4. UI negocio · Panel de canje
 
-## Detalles técnicos
+- **`/portal/canjear.tsx`** (bajo `_authenticated/portal/`): input para pegar/teclear código, botón "Escanear QR" (usa `html5-qrcode`, ya disponible o instalar). Al leer, muestra ficha del cupón (viajero, descuento, vigencia) y botón "Marcar como canjeado". Success → toast + reset.
+- Item en `navigation-registry` visible sólo con rol `business_owner`/`business_staff`.
 
-- **Ubicación obligatoria**: hoteles sin lat/lng no aparecen en el mapa pero sí en el grid (con badge "Ubicación no disponible" opcional).
-- **Sin cambios de ruta ni URL**: se conservan las URLs existentes; la ficha completa sigue funcionando en su ruta.
-- **Sin cambios en RLS ni migraciones**: los datos ya existen en `business_locations`.
-- **Typecheck**: `bunx tsgo --noEmit` al final.
+### 5. Dependencias
+- `qrcode` (generar SVG del QR en cliente) — `bun add qrcode @types/qrcode`
+- `html5-qrcode` para escaneo en portal — `bun add html5-qrcode`
 
-## Riesgos / no incluido
+### 6. DoD
+- Typecheck + build OK.
+- Playwright: registrar viajero, completar perfil, desbloquear cupón, verlo en `/cuenta/mis-cupones`; iniciar sesión negocio, canjear código manual, cupón queda `redeemed`.
+- Demo Pack: 1 promoción sembrada + 1 cupón activo.
 
-- No se implementa sincronización avanzada mapa↔lista (hover para resaltar). Queda para siguiente iteración.
-- No se rediseña `TourismListingSurface`; en esta ruta usamos composición local para no forzar props nuevos globales.
-- El modal no permite reservar directamente en esta iteración — sólo "Ver ficha completa" y "Agregar a mi viaje" (que ya cumple lo que pediste).
+### Fuera de alcance
+- Notificaciones/email del cupón (Ola 3).
+- Push cuando falten X días para expirar.
+- Reporte analítico de canjes por negocio.
 
-¿Apruebas para implementar?
+¿Apruebas para implementar tal cual?
