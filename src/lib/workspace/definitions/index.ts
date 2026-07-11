@@ -392,9 +392,9 @@ const cuenta: WorkspaceDefinition = {
     { id: "cuenta.hist", workspaceId: "cuenta", label: "Historial", icon: ListChecks, to: "/cuenta/historial", group: "viaje", order: 4, surfaces: ["sidebar", "palette"] },
     { id: "cuenta.act", workspaceId: "cuenta", label: "Actividad", icon: Activity, to: "/cuenta/actividad", group: "viaje", order: 5, surfaces: ["sidebar", "palette"] },
     { id: "cuenta.conc", workspaceId: "cuenta", label: "Concierge", icon: ConciergeBell, to: "/cuenta/concierge", group: "viaje", order: 6, surfaces: ["sidebar", "bottom", "palette"] },
-    { id: "cuenta.notif", workspaceId: "cuenta", label: "Notificaciones", icon: Bell, to: "/cuenta/notificaciones", group: "config", order: 8, surfaces: ["sidebar", "palette"] },
-    { id: "cuenta.perfil", workspaceId: "cuenta", label: "Perfil", icon: Users, to: "/cuenta/perfil", group: "config", order: 9, surfaces: ["sidebar", "palette"] },
-    { id: "cuenta.perfil_publico", workspaceId: "cuenta", label: "Perfil público", icon: Users, to: "/cuenta/perfil-publico", group: "config", order: 10, surfaces: ["sidebar", "palette"] },
+    { id: "cuenta.notif", workspaceId: "cuenta", label: "Notificaciones", icon: Bell, to: "/cuenta/notificaciones", group: "config", order: 8, surfaces: ["sidebar", "bottom", "palette"] },
+    { id: "cuenta.perfil", workspaceId: "cuenta", label: "Perfil", icon: Users, to: "/cuenta/perfil", group: "config", order: 9, surfaces: ["sidebar", "bottom", "palette"] },
+    { id: "cuenta.perfil_publico", workspaceId: "cuenta", label: "Perfil público", icon: Users, to: "/cuenta/perfil-publico", group: "config", order: 10, surfaces: ["sidebar", "bottom", "palette"] },
   ],
   alux: {
     headline: "Tienes 1 viaje próximo. Te sugiero 2 experiencias en ruta.",
