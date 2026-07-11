@@ -12,6 +12,8 @@ import { ProfileCompletionMeter } from "@/components/traveler/ProfileCompletionM
 import { LinkGoogleCard } from "@/components/traveler/LinkGoogleCard";
 import { PublicProfileBenefitsCard } from "@/components/traveler/PublicProfileBenefitsCard";
 import { getMyPublicProfile } from "@/lib/traveler/traveler-public.functions";
+import { ReviewerBadge } from "@/components/traveler/ReviewerBadge";
+import { getMyReviewerStats } from "@/lib/reviews/reviewer-stats.functions";
 import {
   getProfileModeState,
   type ProfileMode,
@@ -49,6 +51,7 @@ function TravelerCuenta() {
   const fetchProfile = useServerFn(getMyTravelerProfile);
   const fetchPersonal = useServerFn(getMyPersonalProfile);
   const fetchPublic = useServerFn(getMyPublicProfile);
+  const fetchReviewerStats = useServerFn(getMyReviewerStats);
   const { data, isLoading, error } = useQuery({
     queryKey: ["traveler", "profile", user?.id],
     queryFn: () => fetchProfile(),
@@ -66,6 +69,12 @@ function TravelerCuenta() {
     queryFn: () => fetchPublic(),
     enabled: Boolean(user?.id),
     staleTime: 60_000,
+  });
+  const { data: reviewerStats } = useQuery({
+    queryKey: ["reviewer-stats", user?.id],
+    queryFn: () => fetchReviewerStats(),
+    enabled: Boolean(user?.id),
+    staleTime: 5 * 60_000,
   });
 
   const completionChecks: boolean[] = [
@@ -99,6 +108,16 @@ function TravelerCuenta() {
       <p className="mt-3 text-sm text-muted-foreground">
         Aquí vives tu Oriente Maya de Yucatán: tu perfil, tu viaje, tus favoritos.
       </p>
+      {reviewerStats ? (
+        <div className="mt-4">
+          <ReviewerBadge
+            verifiedCount={reviewerStats.verifiedCount}
+            isReviewerVerified={reviewerStats.isReviewerVerified}
+            size="md"
+            showProgress
+          />
+        </div>
+      ) : null}
 
       <section className="mt-6 rounded-2xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold">Datos de contacto</h2>
