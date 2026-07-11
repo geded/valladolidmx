@@ -97,19 +97,31 @@ function recentlyDismissed(): boolean {
 export interface WelcomeOnboardingModalProps {
   profile: TravelerProfile | null | undefined;
   ready: boolean;
+  knownFirstName?: string | null;
 }
 
 export function WelcomeOnboardingModal({
   profile,
   ready,
+  knownFirstName,
 }: WelcomeOnboardingModalProps) {
+  const hasName = Boolean(knownFirstName && knownFirstName.trim());
+  const firstStep = hasName ? 2 : 1;
+  const totalSteps = hasName ? 3 : 4;
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState(1);
-  const [firstName, setFirstName] = useState("");
+  const [step, setStep] = useState(firstStep);
+  const [firstName, setFirstName] = useState(knownFirstName ?? "");
   const [lastName, setLastName] = useState("");
   const [lang, setLang] = useState<Lang>(detectDefaultLang());
   const [travelWindow, setTravelWindow] = useState<Window | null>(null);
   const [party, setParty] = useState<Party | null>(null);
+
+  useEffect(() => {
+    if (hasName) {
+      setFirstName(knownFirstName ?? "");
+      setStep((s) => (s < 2 ? 2 : s));
+    }
+  }, [hasName, knownFirstName]);
 
   useEffect(() => {
     if (!ready) return;
@@ -123,13 +135,14 @@ export function WelcomeOnboardingModal({
   const upsertPersonalFn = useServerFn(upsertMyPersonalProfile);
   const mutation = useMutation({
     mutationFn: async (data: Parameters<typeof upsertFn>[0]) => {
-      const p = await upsertPersonalFn({
-        data: {
-          first_name: firstName.trim() || null,
-          last_name: lastName.trim() || null,
-          preferred_language: lang,
-        },
-      });
+      const personalPayload: Parameters<typeof upsertPersonalFn>[0]["data"] = {
+        preferred_language: lang,
+      };
+      if (!hasName) {
+        personalPayload.first_name = firstName.trim() || null;
+        personalPayload.last_name = lastName.trim() || null;
+      }
+      const p = await upsertPersonalFn({ data: personalPayload });
       const t = await upsertFn(data);
       return { p, t };
     },
@@ -180,7 +193,11 @@ export function WelcomeOnboardingModal({
     <Dialog open={open} onOpenChange={(v) => (v ? setOpen(true) : dismiss())}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Bienvenido al Oriente Maya de Yucatán</DialogTitle>
+          <DialogTitle>
+            {hasName
+              ? `Bienvenido${knownFirstName ? `, ${knownFirstName}` : ""} al Oriente Maya de Yucatán`
+              : "Bienvenido al Oriente Maya de Yucatán"}
+          </DialogTitle>
           <DialogDescription>
             3 preguntas rápidas para que Alux te recomiende mejor. Puedes
             editarlas después en tu perfil.
@@ -189,9 +206,11 @@ export function WelcomeOnboardingModal({
 
         <div className="py-2">
           <div className="mb-4 flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Paso {step} de 4</span>
+            <span>
+              Paso {hasName ? step - 1 : step} de {totalSteps}
+            </span>
             <div className="flex gap-1">
-              {[1, 2, 3, 4].map((n) => (
+              {Array.from({ length: totalSteps }, (_, i) => i + firstStep).map((n) => (
                 <span
                   key={n}
                   className={`h-1.5 w-6 rounded-full ${
@@ -202,7 +221,7 @@ export function WelcomeOnboardingModal({
             </div>
           </div>
 
-          {step === 1 && (
+          {step === 1 && !hasName && (
             <div className="space-y-3">
               <p className="text-sm font-medium">¿Cómo te llamas?</p>
               <div className="grid gap-2">
@@ -281,7 +300,7 @@ export function WelcomeOnboardingModal({
             Ahora no
           </Button>
           <div className="flex gap-2">
-            {step > 1 && (
+            {step > firstStep && (
               <Button variant="outline" size="sm" onClick={() => setStep(step - 1)}>
                 Atrás
               </Button>
