@@ -4725,7 +4725,7 @@ export type Database = {
         }[]
       }
       alux_traveler_log_suggestion: {
-        Args: { _capability: string; _meta?: Json; _plan_id?: string }
+        Args: { _capability: string; _meta: Json; _plan_id: string }
         Returns: string
       }
       approve_business_registration: {
