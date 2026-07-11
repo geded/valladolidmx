@@ -433,6 +433,13 @@ export type Database = {
             foreignKeyName: "business_category_links_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_category_links_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
@@ -496,6 +503,13 @@ export type Database = {
             foreignKeyName: "business_contacts_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_contacts_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
@@ -536,6 +550,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "business_hours_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "business_hours_business_id_fkey"
             columns: ["business_id"]
@@ -608,6 +629,13 @@ export type Database = {
             foreignKeyName: "business_locations_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_locations_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
@@ -646,6 +674,13 @@ export type Database = {
           sort_order?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "business_media_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "business_media_business_id_fkey"
             columns: ["business_id"]
@@ -707,6 +742,13 @@ export type Database = {
             foreignKeyName: "business_ownership_transfers_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_ownership_transfers_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
@@ -741,6 +783,13 @@ export type Database = {
           url?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "business_social_links_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "business_social_links_business_id_fkey"
             columns: ["business_id"]
@@ -782,6 +831,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "business_users_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "business_users_business_id_fkey"
             columns: ["business_id"]
@@ -850,6 +906,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "business_visibility_grants_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "business_visibility_grants_business_id_fkey"
             columns: ["business_id"]
@@ -1280,6 +1343,13 @@ export type Database = {
             foreignKeyName: "concierge_case_requests_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "concierge_case_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
@@ -1616,6 +1686,13 @@ export type Database = {
           valid_until?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "concierge_quotes_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "concierge_quotes_business_id_fkey"
             columns: ["business_id"]
@@ -2257,6 +2334,13 @@ export type Database = {
             foreignKeyName: "events_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
@@ -2693,6 +2777,13 @@ export type Database = {
             foreignKeyName: "notification_webhook_endpoints_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "notification_webhook_endpoints_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
@@ -2774,6 +2865,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "order_items_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "order_items_business_id_fkey"
             columns: ["business_id"]
@@ -3500,6 +3598,13 @@ export type Database = {
             foreignKeyName: "products_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "products_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
@@ -3634,6 +3739,13 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "promotions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "promotions_business_id_fkey"
             columns: ["business_id"]
@@ -4677,6 +4789,24 @@ export type Database = {
       }
     }
     Views: {
+      business_effective_visibility: {
+        Row: {
+          business_id: string | null
+          business_slug: string | null
+          cycle_months: number | null
+          expires_at: string | null
+          grant_id: string | null
+          is_default: boolean | null
+          levers: Json | null
+          limits: Json | null
+          plan_code: string | null
+          plan_id: string | null
+          plan_name: string | null
+          starts_at: string | null
+          tier: string | null
+        }
+        Relationships: []
+      }
       demo_seed_inventory: {
         Row: {
           demo_seed_batch: string | null
@@ -5446,10 +5576,27 @@ export type Database = {
         Returns: number
       }
       expire_stale_coupons: { Args: never; Returns: undefined }
+      expire_visibility_grants: { Args: never; Returns: number }
       founder_dashboard_kpis: { Args: never; Returns: Json }
       get_available_modes: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["profile_mode"][]
+      }
+      get_business_active_plan: {
+        Args: { _business_id: string }
+        Returns: {
+          cycle_months: number
+          expires_at: string
+          grant_id: string
+          is_default: boolean
+          levers: Json
+          limits: Json
+          plan_code: string
+          plan_id: string
+          plan_name: string
+          starts_at: string
+          tier: string
+        }[]
       }
       get_coupons_needing_review_reminder: {
         Args: { hours_max: number; hours_min: number; reminder_number: number }
