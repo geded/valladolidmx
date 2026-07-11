@@ -181,6 +181,8 @@ export interface CouponLookupResult {
   traveler_avatar_url?: string | null;
   traveler_country_code?: string | null;
   traveler_country_name?: string | null;
+  business_slug?: string | null;
+  business_name?: string | null;
 }
 
 export const lookupCoupon = createServerFn({ method: "POST" })
@@ -246,12 +248,27 @@ export const lookupCoupon = createServerFn({ method: "POST" })
         .maybeSingle();
       countryName = ((c as { name?: string } | null)?.name ?? null) || null;
     }
+    // Datos del negocio (para email post-canje).
+    let businessSlug: string | null = null;
+    let businessName: string | null = null;
+    if (coupon.business_id) {
+      const { data: b } = await context.supabase
+        .from("businesses")
+        .select("slug, display_name")
+        .eq("id", coupon.business_id)
+        .maybeSingle();
+      const bb = (b ?? {}) as { slug?: string; display_name?: string };
+      businessSlug = bb.slug ?? null;
+      businessName = bb.display_name ?? null;
+    }
     return {
       coupon,
       traveler_display_name: name,
       traveler_avatar_url: (p.avatar_url as string | null) ?? null,
       traveler_country_code: countryCode ? countryCode.toUpperCase() : null,
       traveler_country_name: countryName,
+      business_slug: businessSlug,
+      business_name: businessName,
     };
   });
 
