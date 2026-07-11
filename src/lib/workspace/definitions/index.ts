@@ -166,6 +166,7 @@ const portal: WorkspaceDefinition = {
     { id: "portal.galeria", workspaceId: "portal", label: "Galería", icon: ImageIcon, to: "/portal/galeria", group: "presencia", order: 5, surfaces: ["sidebar", "palette"] },
     { id: "portal.catalogo", workspaceId: "portal", label: "Catálogo", icon: ListChecks, to: "/portal/catalogo", group: "operacion", order: 6, surfaces: ["sidebar", "palette"] },
     { id: "portal.pagos", workspaceId: "portal", label: "Pagos y visibilidad", icon: CreditCard, to: "/portal/pagos", group: "operacion", order: 7, surfaces: ["sidebar", "palette"] },
+    { id: "portal.canjear", workspaceId: "portal", label: "Canjear cupón", icon: QrCode, to: "/portal/canjear", group: "operacion", order: 7.5, surfaces: ["sidebar", "bottom", "palette"] },
     { id: "portal.actividad", workspaceId: "portal", label: "Actividad", icon: Activity, to: "/portal/actividad", group: "operacion", order: 8, surfaces: ["sidebar", "palette"] },
     { id: "portal.concierge", workspaceId: "portal", label: "Concierge", icon: ConciergeBell, to: "/portal/concierge", group: "operacion", order: 9, surfaces: ["sidebar", "palette"] },
     { id: "portal.invitaciones", workspaceId: "portal", label: "Invitaciones", icon: Mail, to: "/portal/invitaciones", group: "equipo", order: 10, surfaces: ["sidebar", "palette"] },
