@@ -37,6 +37,11 @@ export interface MarketplaceBusinessCard {
   latitude?: number | null;
   longitude?: number | null;
   address_line1?: string | null;
+  /** Ola 7.4.a · Paquete de visibilidad efectivo (null si sólo tiene el básico por defecto). */
+  visibility_plan_slug?: string | null;
+  visibility_plan_name?: string | null;
+  visibility_badge_variant?: string | null;
+  visibility_boost?: number;
 }
 
 export interface MarketplaceProductCard {
