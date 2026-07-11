@@ -272,6 +272,14 @@ export const lookupCoupon = createServerFn({ method: "POST" })
     };
   });
 
+export interface RedeemResult {
+  coupon: TravelerCoupon;
+  traveler_email: string | null;
+  traveler_name: string | null;
+  business_name: string | null;
+  business_slug: string | null;
+}
+
 export const redeemCoupon = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { coupon_id: string; channel: "qr" | "code" }) => {
@@ -282,7 +290,7 @@ export const redeemCoupon = createServerFn({ method: "POST" })
       channel: input.channel === "qr" ? ("qr" as const) : ("code" as const),
     };
   })
-  .handler(async ({ data, context }): Promise<TravelerCoupon> => {
+  .handler(async ({ data, context }): Promise<RedeemResult> => {
     const { data: row, error } = await context.supabase
       .from("traveler_coupons")
       .update({
@@ -298,7 +306,37 @@ export const redeemCoupon = createServerFn({ method: "POST" })
     if (error || !row) {
       throw new Error(`coupon_redeem_failed: ${error?.message ?? "not_active"}`);
     }
-    return row as unknown as TravelerCoupon;
+    const coupon = row as unknown as TravelerCoupon;
+    // Enriquecer para email post-canje.
+    const { data: prof } = await context.supabase
+      .from("profiles")
+      .select("email, first_name, last_name, display_name")
+      .eq("user_id", (row as { user_id: string }).user_id)
+      .maybeSingle();
+    const p = (prof ?? {}) as Record<string, string | null>;
+    const travelerName =
+      [p.first_name, p.last_name].filter(Boolean).join(" ").trim() ||
+      p.display_name ||
+      null;
+    let businessName: string | null = null;
+    let businessSlug: string | null = null;
+    if (coupon.business_id) {
+      const { data: b } = await context.supabase
+        .from("businesses")
+        .select("slug, display_name")
+        .eq("id", coupon.business_id)
+        .maybeSingle();
+      const bb = (b ?? {}) as { slug?: string; display_name?: string };
+      businessName = bb.display_name ?? null;
+      businessSlug = bb.slug ?? null;
+    }
+    return {
+      coupon,
+      traveler_email: (p.email as string | null) ?? null,
+      traveler_name: travelerName,
+      business_name: businessName,
+      business_slug: businessSlug,
+    };
   });
 
 export interface BusinessRedemptionRow {
