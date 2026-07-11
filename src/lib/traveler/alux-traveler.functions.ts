@@ -38,6 +38,7 @@ const CAPABILITIES = [
   "improve_trip",
   "detect_gaps",
   "draft_concierge_message",
+  "suggest_from_coupons",
 ] as const;
 
 export type AluxTravelerCapability = (typeof CAPABILITIES)[number];
@@ -320,6 +321,26 @@ export const draftConciergeMessage = createServerFn({ method: "POST" })
       "Redacta un borrador corto (máx. 180 palabras) para que el viajero solicite ayuda del Concierge sobre su plan activo" +
         (data.focus ? `. Foco: ${data.focus}` : "") +
         ". Incluye: qué ya definió, qué necesita resolver y qué tipo de propuesta espera. El envío final lo hace el viajero desde la UI.",
+      context.supabase,
+    ),
+  );
+
+/**
+ * suggestFromCoupons — Ola 4: recomienda cómo aprovechar los cupones
+ * activos del viajero, cruzándolos con su plan y perfil. NO reserva,
+ * NO redime; solo sugiere. Los cupones vienen en `active_coupons` del
+ * contexto (nunca inventa códigos ni descuentos).
+ */
+export const suggestFromCoupons = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => CapabilityInput.parse(d ?? {}))
+  .handler(async ({ context, data }) =>
+    runAluxTraveler(
+      "suggest_from_coupons",
+      "Sólo trabajas con cupones que aparezcan en `active_coupons` del contexto. NUNCA inventes códigos, descuentos, negocios ni vigencias. Si `active_coupons` está vacío, dilo abiertamente y sugiere visitar /promociones. Nunca redimes: el viajero canjea desde el negocio con su QR.",
+      "Analiza los cupones activos del viajero y sugiere cómo aprovecharlos en su viaje" +
+        (data.focus ? `. Foco: ${data.focus}` : "") +
+        ". Para cada cupón cita: título exacto, negocio, % de descuento (si lo trae), vigencia (fecha) y en qué momento del plan (o del recorrido por el Oriente Maya) le conviene usarlo. Si un cupón está por vencer, priorízalo. No inventes menús ni tarifas.",
       context.supabase,
     ),
   );
