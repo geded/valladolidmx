@@ -4240,6 +4240,72 @@ export type Database = {
           },
         ]
       }
+      traveler_coupons: {
+        Row: {
+          business_id: string | null
+          code: string
+          created_at: string
+          discount_percent: number | null
+          id: string
+          promotion_id: string | null
+          promotion_slug: string
+          qr_token: string
+          redeemed_at: string | null
+          redeemed_by: string | null
+          redeemed_channel:
+            | Database["public"]["Enums"]["traveler_coupon_channel"]
+            | null
+          status: Database["public"]["Enums"]["traveler_coupon_status"]
+          terms: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          valid_until: string
+        }
+        Insert: {
+          business_id?: string | null
+          code: string
+          created_at?: string
+          discount_percent?: number | null
+          id?: string
+          promotion_id?: string | null
+          promotion_slug: string
+          qr_token?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          redeemed_channel?:
+            | Database["public"]["Enums"]["traveler_coupon_channel"]
+            | null
+          status?: Database["public"]["Enums"]["traveler_coupon_status"]
+          terms?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          valid_until: string
+        }
+        Update: {
+          business_id?: string | null
+          code?: string
+          created_at?: string
+          discount_percent?: number | null
+          id?: string
+          promotion_id?: string | null
+          promotion_slug?: string
+          qr_token?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          redeemed_channel?:
+            | Database["public"]["Enums"]["traveler_coupon_channel"]
+            | null
+          status?: Database["public"]["Enums"]["traveler_coupon_status"]
+          terms?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          valid_until?: string
+        }
+        Relationships: []
+      }
       traveler_favorites: {
         Row: {
           created_at: string
@@ -5225,6 +5291,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      expire_stale_coupons: { Args: never; Returns: undefined }
       founder_dashboard_kpis: { Args: never; Returns: Json }
       get_available_modes: {
         Args: { _user_id: string }
@@ -6059,6 +6126,8 @@ export type Database = {
         | "active"
         | "shared_with_concierge"
         | "archived"
+      traveler_coupon_channel: "qr" | "code"
+      traveler_coupon_status: "active" | "redeemed" | "expired" | "revoked"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -6327,6 +6396,8 @@ export const Constants = {
         "shared_with_concierge",
         "archived",
       ],
+      traveler_coupon_channel: ["qr", "code"],
+      traveler_coupon_status: ["active", "redeemed", "expired", "revoked"],
     },
   },
 } as const

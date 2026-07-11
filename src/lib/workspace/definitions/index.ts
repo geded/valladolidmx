@@ -39,6 +39,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { Plus, ExternalLink, Search, Home } from "lucide-react";
+import { Ticket, QrCode } from "lucide-react";
 
 import type { WorkspaceDefinition } from "../types";
 import { registerWorkspace } from "../workspace-registry";
@@ -165,6 +166,7 @@ const portal: WorkspaceDefinition = {
     { id: "portal.galeria", workspaceId: "portal", label: "Galería", icon: ImageIcon, to: "/portal/galeria", group: "presencia", order: 5, surfaces: ["sidebar", "palette"] },
     { id: "portal.catalogo", workspaceId: "portal", label: "Catálogo", icon: ListChecks, to: "/portal/catalogo", group: "operacion", order: 6, surfaces: ["sidebar", "palette"] },
     { id: "portal.pagos", workspaceId: "portal", label: "Pagos y visibilidad", icon: CreditCard, to: "/portal/pagos", group: "operacion", order: 7, surfaces: ["sidebar", "palette"] },
+    { id: "portal.canjear", workspaceId: "portal", label: "Canjear cupón", icon: QrCode, to: "/portal/canjear", group: "operacion", order: 7.5, surfaces: ["sidebar", "bottom", "palette"] },
     { id: "portal.actividad", workspaceId: "portal", label: "Actividad", icon: Activity, to: "/portal/actividad", group: "operacion", order: 8, surfaces: ["sidebar", "palette"] },
     { id: "portal.concierge", workspaceId: "portal", label: "Concierge", icon: ConciergeBell, to: "/portal/concierge", group: "operacion", order: 9, surfaces: ["sidebar", "palette"] },
     { id: "portal.invitaciones", workspaceId: "portal", label: "Invitaciones", icon: Mail, to: "/portal/invitaciones", group: "equipo", order: 10, surfaces: ["sidebar", "palette"] },
@@ -388,6 +390,7 @@ const cuenta: WorkspaceDefinition = {
     { id: "cuenta.home", workspaceId: "cuenta", label: "Resumen", icon: LayoutDashboard, to: "/cuenta", group: "viaje", order: 1, surfaces: ["sidebar", "bottom", "palette"], primary: true },
     { id: "cuenta.anfitrion", workspaceId: "cuenta", label: "Ser anfitrión", icon: Building2, to: "/cuenta/anfitrion", group: "viaje", order: 1.5, surfaces: ["sidebar", "bottom", "palette"] },
     { id: "cuenta.fav", workspaceId: "cuenta", label: "Favoritos", icon: HeartHandshake, to: "/cuenta/favoritos", group: "viaje", order: 2, surfaces: ["sidebar", "bottom", "palette"] },
+    { id: "cuenta.cupones", workspaceId: "cuenta", label: "Mis cupones", icon: Ticket, to: "/cuenta/mis-cupones", group: "viaje", order: 2.5, surfaces: ["sidebar", "bottom", "palette"] },
     { id: "cuenta.cart", workspaceId: "cuenta", label: "Carrito", icon: ShoppingCart, to: "/cuenta/carrito", group: "viaje", order: 3, surfaces: ["sidebar", "bottom", "palette"] },
     { id: "cuenta.hist", workspaceId: "cuenta", label: "Historial", icon: ListChecks, to: "/cuenta/historial", group: "viaje", order: 4, surfaces: ["sidebar", "palette"] },
     { id: "cuenta.act", workspaceId: "cuenta", label: "Actividad", icon: Activity, to: "/cuenta/actividad", group: "viaje", order: 5, surfaces: ["sidebar", "palette"] },
