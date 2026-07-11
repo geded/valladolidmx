@@ -134,6 +134,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicStudioMediaSplatRouteImport } from './routes/api/public/studio-media.$'
 import { Route as ApiPublicMapsStaticRouteImport } from './routes/api/public/maps/static'
 import { Route as ApiPublicHooksEbProcessScheduledPublishRouteImport } from './routes/api/public/hooks/eb-process-scheduled-publish'
+import { Route as ApiPublicHooksCouponReviewRemindersRouteImport } from './routes/api/public/hooks/coupon-review-reminders'
 import { Route as ApiPublicHealthMapsRouteImport } from './routes/api/public/health/maps'
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
 import { Route as AuthenticatedPortalEmpresasBusinessIdRouteImport } from './routes/_authenticated/portal/empresas.$businessId'
@@ -859,6 +860,12 @@ const ApiPublicHooksEbProcessScheduledPublishRoute =
     path: '/api/public/hooks/eb-process-scheduled-publish',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksCouponReviewRemindersRoute =
+  ApiPublicHooksCouponReviewRemindersRouteImport.update({
+    id: '/api/public/hooks/coupon-review-reminders',
+    path: '/api/public/hooks/coupon-review-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHealthMapsRoute = ApiPublicHealthMapsRouteImport.update({
   id: '/api/public/health/maps',
   path: '/api/public/health/maps',
@@ -1152,6 +1159,7 @@ export interface FileRoutesByFullPath {
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
+  '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
@@ -1299,6 +1307,7 @@ export interface FileRoutesByTo {
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
+  '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
@@ -1455,6 +1464,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
+  '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
@@ -1612,6 +1622,7 @@ export interface FileRouteTypes {
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
     | '/api/public/health/maps'
+    | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/maps/static'
     | '/api/public/studio-media/$'
@@ -1759,6 +1770,7 @@ export interface FileRouteTypes {
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
     | '/api/public/health/maps'
+    | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/maps/static'
     | '/api/public/studio-media/$'
@@ -1914,6 +1926,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/empresas/$businessId'
     | '/_authenticated/portal/invitaciones/$token'
     | '/api/public/health/maps'
+    | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/maps/static'
     | '/api/public/studio-media/$'
@@ -2003,6 +2016,7 @@ export interface RootRouteChildren {
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
   ResenarNegocioSlugRoute: typeof ResenarNegocioSlugRoute
   ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
+  ApiPublicHooksCouponReviewRemindersRoute: typeof ApiPublicHooksCouponReviewRemindersRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
   ApiPublicMapsStaticRoute: typeof ApiPublicMapsStaticRoute
   ApiPublicStudioMediaSplatRoute: typeof ApiPublicStudioMediaSplatRoute
@@ -2891,6 +2905,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksEbProcessScheduledPublishRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/coupon-review-reminders': {
+      id: '/api/public/hooks/coupon-review-reminders'
+      path: '/api/public/hooks/coupon-review-reminders'
+      fullPath: '/api/public/hooks/coupon-review-reminders'
+      preLoaderRoute: typeof ApiPublicHooksCouponReviewRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/health/maps': {
       id: '/api/public/health/maps'
       path: '/api/public/health/maps'
@@ -3544,6 +3565,8 @@ const rootRouteChildren: RootRouteChildren = {
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
   ResenarNegocioSlugRoute: ResenarNegocioSlugRoute,
   ApiPublicHealthMapsRoute: ApiPublicHealthMapsRoute,
+  ApiPublicHooksCouponReviewRemindersRoute:
+    ApiPublicHooksCouponReviewRemindersRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:
     ApiPublicHooksEbProcessScheduledPublishRoute,
   ApiPublicMapsStaticRoute: ApiPublicMapsStaticRoute,
