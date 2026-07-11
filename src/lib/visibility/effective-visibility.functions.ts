@@ -9,6 +9,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
 export interface EffectiveVisibilityPlan {
   grant_id: string | null;
   plan_id: string;
@@ -18,8 +26,8 @@ export interface EffectiveVisibilityPlan {
   starts_at: string | null;
   expires_at: string | null;
   cycle_months: number | null;
-  levers: Record<string, unknown>;
-  limits: Record<string, unknown>;
+  levers: Record<string, JsonValue>;
+  limits: Record<string, JsonValue>;
   is_default: boolean;
 }
 
@@ -34,8 +42,8 @@ function normalize(row: Record<string, unknown> | null): EffectiveVisibilityPlan
     starts_at: (row.starts_at as string | null) ?? null,
     expires_at: (row.expires_at as string | null) ?? null,
     cycle_months: (row.cycle_months as number | null) ?? null,
-    levers: (row.levers as Record<string, unknown>) ?? {},
-    limits: (row.limits as Record<string, unknown>) ?? {},
+    levers: (row.levers as Record<string, JsonValue>) ?? {},
+    limits: (row.limits as Record<string, JsonValue>) ?? {},
     is_default: Boolean(row.is_default),
   };
 }
