@@ -171,6 +171,22 @@ export function AluxTravelerPanel() {
         </div>
       </header>
 
+      <div className="mt-3 rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs text-foreground">
+        <p className="font-medium">Ayúdame a asesorarte mejor</p>
+        <p className="mt-1 text-muted-foreground">
+          Mientras más completo esté tu perfil (estilo, intereses, presupuesto, fechas) y más lo hagas público,
+          más preciso puedo ser al recomendarte hoteles, restaurantes, experiencias y rutas del Oriente Maya.
+          {" "}
+          <a href="/cuenta/perfil" className="font-medium text-primary hover:underline">
+            Completar perfil
+          </a>
+          {" · "}
+          <a href="/cuenta/perfil-publico" className="font-medium text-primary hover:underline">
+            Activar perfil público
+          </a>
+        </p>
+      </div>
+
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
         {CAPABILITIES.map((c) => {
           const Icon = c.icon;

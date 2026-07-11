@@ -10,6 +10,8 @@ import { getMyTravelerProfile } from "@/lib/traveler/traveler-account.functions"
 import { getMyPersonalProfile } from "@/lib/traveler/profile-personal.functions";
 import { ProfileCompletionMeter } from "@/components/traveler/ProfileCompletionMeter";
 import { LinkGoogleCard } from "@/components/traveler/LinkGoogleCard";
+import { PublicProfileBenefitsCard } from "@/components/traveler/PublicProfileBenefitsCard";
+import { getMyPublicProfile } from "@/lib/traveler/traveler-public.functions";
 import {
   getProfileModeState,
   type ProfileMode,
@@ -46,6 +48,7 @@ function TravelerCuenta() {
   const { user } = useAuth();
   const fetchProfile = useServerFn(getMyTravelerProfile);
   const fetchPersonal = useServerFn(getMyPersonalProfile);
+  const fetchPublic = useServerFn(getMyPublicProfile);
   const { data, isLoading, error } = useQuery({
     queryKey: ["traveler", "profile", user?.id],
     queryFn: () => fetchProfile(),
@@ -58,6 +61,27 @@ function TravelerCuenta() {
     enabled: Boolean(user?.id),
     staleTime: 60_000,
   });
+  const { data: publicProfile } = useQuery({
+    queryKey: ["traveler", "public-profile", user?.id],
+    queryFn: () => fetchPublic(),
+    enabled: Boolean(user?.id),
+    staleTime: 60_000,
+  });
+
+  const completionChecks: boolean[] = [
+    Boolean(personal?.first_name || personal?.display_name),
+    Boolean(personal?.phone),
+    Boolean(personal?.country),
+    Boolean(personal?.preferred_language),
+    Boolean(personal?.avatar_url),
+    Boolean(data?.travel_style),
+    Boolean(data?.budget_range),
+    (data?.interests?.length ?? 0) > 0,
+    (data?.preferred_destinations?.length ?? 0) > 0,
+    Boolean(data?.trip_context?.travel_window),
+  ];
+  const done = completionChecks.filter(Boolean).length;
+  const total = completionChecks.length;
 
   const displayName =
     personal?.display_name ||
@@ -103,6 +127,13 @@ function TravelerCuenta() {
       <div className="mt-6">
         <ProfileCompletionMeter personal={personal} travel={data} />
       </div>
+
+      <PublicProfileBenefitsCard
+        isPublic={Boolean(publicProfile?.is_public)}
+        isComplete={done === total}
+        done={done}
+        total={total}
+      />
 
       <LinkGoogleCard />
 
