@@ -48,6 +48,8 @@ export interface ReviewComposerProps {
   subjectId: string;
   subjectName?: string;
   triggerLabel?: string;
+  defaultOpen?: boolean;
+  hideTrigger?: boolean;
 }
 
 function StarPicker({
@@ -85,10 +87,12 @@ export function ReviewComposer({
   subjectId,
   subjectName,
   triggerLabel = "Escribir reseña",
+  defaultOpen = false,
+  hideTrigger = false,
 }: ReviewComposerProps) {
   const { user, profile } = useAuth();
   const qc = useQueryClient();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [rating, setRating] = useState(0);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -165,11 +169,13 @@ export function ReviewComposer({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" variant="outline">
-          {triggerLabel}
-        </Button>
-      </DialogTrigger>
+      {hideTrigger ? null : (
+        <DialogTrigger asChild>
+          <Button size="sm" variant="outline">
+            {triggerLabel}
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Comparte tu experiencia</DialogTitle>
