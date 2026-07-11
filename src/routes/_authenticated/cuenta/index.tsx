@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getMyTravelerProfile } from "@/lib/traveler/traveler-account.functions";
 import { getMyPersonalProfile } from "@/lib/traveler/profile-personal.functions";
 import { ProfileCompletionMeter } from "@/components/traveler/ProfileCompletionMeter";
+import { LinkGoogleCard } from "@/components/traveler/LinkGoogleCard";
 import {
   getProfileModeState,
   type ProfileMode,
@@ -102,6 +103,8 @@ function TravelerCuenta() {
       <div className="mt-6">
         <ProfileCompletionMeter personal={personal} travel={data} />
       </div>
+
+      <LinkGoogleCard />
 
       <section className="mt-6 rounded-2xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold">Tu estilo de viaje</h2>
