@@ -24,6 +24,8 @@ import {
   type TravelerCoupon,
 } from "@/lib/promotions/coupons.functions";
 import { CouponQR } from "./CouponQR";
+import { sendTransactionalEmail } from "@/lib/email/send";
+import { supabase } from "@/integrations/supabase/client";
 
 export function CouponIssueDialog({
   open,
@@ -52,6 +54,34 @@ export function CouponIssueDialog({
       .then((c) => {
         setCoupon(c);
         queryClient.invalidateQueries({ queryKey: ["my-coupons"] });
+        // Email de confirmación (idempotente por coupon.id — no duplica en reintentos).
+        void (async () => {
+          try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user?.email) return;
+            const origin =
+              typeof window !== "undefined" ? window.location.origin : "";
+            await sendTransactionalEmail({
+              templateName: "coupon-issued",
+              recipientEmail: user.email,
+              idempotencyKey: `coupon-issued-${c.id}`,
+              templateData: {
+                travelerName:
+                  (user.user_metadata as { first_name?: string } | null)
+                    ?.first_name ?? null,
+                title: c.title,
+                code: c.code,
+                discountPercent: c.discount_percent,
+                businessName: c.business_name ?? null,
+                validUntil: c.valid_until,
+                terms: c.terms,
+                couponUrl: `${origin}/cuenta/mis-cupones`,
+              },
+            });
+          } catch (err) {
+            console.warn("[coupon-issued email] send failed", err);
+          }
+        })();
       })
       .catch((e: Error) => {
         const msg = e.message || "";
