@@ -20,7 +20,7 @@ import {
 import { getMyPersonalProfile } from "@/lib/traveler/profile-personal.functions";
 import { getMyTravelerProfile } from "@/lib/traveler/traveler-account.functions";
 import { ProfileCompletionMeter } from "@/components/traveler/ProfileCompletionMeter";
-import { Lock } from "lucide-react";
+import { Lock, Star, Users, Sparkles, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cuenta/perfil-publico")({
   component: PerfilPublicoPage,
@@ -178,6 +178,31 @@ function PerfilPublicoPage() {
         viajeros o en redes sociales.
       </p>
 
+      {/* Ventajas de activar el perfil público */}
+      <section className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+          ¿Por qué activarlo?
+        </p>
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+          <li className="flex items-start gap-2 text-sm">
+            <Star className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+            <span>Tus reseñas se muestran con nombre, foto y país — dan más confianza.</span>
+          </li>
+          <li className="flex items-start gap-2 text-sm">
+            <Users className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+            <span>Otros viajeros pueden descubrirte y aprender de tus rutas.</span>
+          </li>
+          <li className="flex items-start gap-2 text-sm">
+            <Sparkles className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+            <span>Alux personaliza mejor sus recomendaciones para tu viaje.</span>
+          </li>
+          <li className="flex items-start gap-2 text-sm">
+            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+            <span>Accedes a promociones y experiencias reservadas a perfiles verificados.</span>
+          </li>
+        </ul>
+      </section>
+
       {!completion.complete ? (
         <div className="mt-6">
           <ProfileCompletionMeter personal={personal} travel={travel} />
@@ -255,7 +280,7 @@ function PerfilPublicoPage() {
             />
           </div>
           <span className="text-xs text-muted-foreground">
-            3–24 caracteres. Solo letras, números y guion bajo.
+            3–24 caracteres. Solo letras, números y guion bajo. Este es el nombre único que aparecerá en tu URL pública y podrás compartir en redes sociales.
           </span>
           {handleFeedback}
         </label>
@@ -273,6 +298,9 @@ function PerfilPublicoPage() {
             className="rounded-md border border-border bg-background px-3 py-2"
             placeholder="Amante de cenotes, tacos y arte colonial."
           />
+          <span className="text-xs text-muted-foreground">
+            Aparece junto a tus reseñas y en tu perfil público. Cuéntale a otros viajeros qué te apasiona del Oriente Maya.
+          </span>
         </label>
 
         {/* Toggle visibilidad */}
