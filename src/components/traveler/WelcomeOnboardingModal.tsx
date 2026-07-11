@@ -264,7 +264,7 @@ export function WelcomeOnboardingModal({
                 onClick={finish}
                 disabled={!canFinish || mutation.isPending}
               >
-                {mutation.isPending ? "Guardando…" : "Descubrir Oriente Maya"}
+                {mutation.isPending ? "Guardando…" : "Descubrir Oriente Maya de Yucatán"}
               </Button>
             )}
           </div>
