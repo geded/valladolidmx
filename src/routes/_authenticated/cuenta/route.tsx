@@ -14,6 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
 import { getMyTravelerProfile } from "@/lib/traveler/traveler-account.functions";
+import { getMyPersonalProfile } from "@/lib/traveler/profile-personal.functions";
 import { getProfileModeState } from "@/lib/profile-mode/mode.functions";
 import { WelcomeOnboardingModal } from "@/components/traveler/WelcomeOnboardingModal";
 
@@ -36,6 +37,7 @@ function TravelerOnboardingMount() {
   const { user } = useAuth();
   const fetchMode = useServerFn(getProfileModeState);
   const fetchProfile = useServerFn(getMyTravelerProfile);
+  const fetchPersonal = useServerFn(getMyPersonalProfile);
   const modeQ = useQuery({
     queryKey: ["profile-mode-state"],
     queryFn: () => fetchMode(),
@@ -49,11 +51,23 @@ function TravelerOnboardingMount() {
     enabled: Boolean(user?.id) && isTraveler,
     staleTime: 60_000,
   });
+  const personalQ = useQuery({
+    queryKey: ["traveler", "personal", user?.id],
+    queryFn: () => fetchPersonal(),
+    enabled: Boolean(user?.id) && isTraveler,
+    staleTime: 60_000,
+  });
   if (!user?.id || !isTraveler) return null;
   return (
     <WelcomeOnboardingModal
       profile={profileQ.data}
-      ready={!profileQ.isLoading && profileQ.isFetched}
+      knownFirstName={personalQ.data?.first_name ?? null}
+      ready={
+        !profileQ.isLoading &&
+        profileQ.isFetched &&
+        !personalQ.isLoading &&
+        personalQ.isFetched
+      }
     />
   );
 }
