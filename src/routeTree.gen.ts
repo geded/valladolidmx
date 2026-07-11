@@ -145,6 +145,7 @@ import { Route as AuthenticatedCuentaPagosErrorRouteImport } from './routes/_aut
 import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId'
 import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId'
 import { Route as AuthenticatedCmsZonasNuevaRouteImport } from './routes/_authenticated/cms/zonas.nueva'
+import { Route as AuthenticatedCmsVisibilidadSolicitudesRouteImport } from './routes/_authenticated/cms/visibilidad.solicitudes'
 import { Route as AuthenticatedCmsRegionesNuevaRouteImport } from './routes/_authenticated/cms/regiones.nueva'
 import { Route as AuthenticatedCmsProductosNuevaRouteImport } from './routes/_authenticated/cms/productos.nueva'
 import { Route as AuthenticatedCmsExperienceBuilderPagesRouteImport } from './routes/_authenticated/cms/experience-builder.pages'
@@ -927,6 +928,12 @@ const AuthenticatedCmsZonasNuevaRoute =
     path: '/zonas/nueva',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsVisibilidadSolicitudesRoute =
+  AuthenticatedCmsVisibilidadSolicitudesRouteImport.update({
+    id: '/solicitudes',
+    path: '/solicitudes',
+    getParentRoute: () => AuthenticatedCmsVisibilidadRoute,
+  } as any)
 const AuthenticatedCmsRegionesNuevaRoute =
   AuthenticatedCmsRegionesNuevaRouteImport.update({
     id: '/regiones/nueva',
@@ -1124,7 +1131,7 @@ export interface FileRoutesByFullPath {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
-  '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRoute
+  '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -1167,6 +1174,7 @@ export interface FileRoutesByFullPath {
   '/cms/experience-builder/pages': typeof AuthenticatedCmsExperienceBuilderPagesRoute
   '/cms/productos/nueva': typeof AuthenticatedCmsProductosNuevaRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
+  '/cms/visibilidad/solicitudes': typeof AuthenticatedCmsVisibilidadSolicitudesRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
@@ -1275,7 +1283,7 @@ export interface FileRoutesByTo {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
-  '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRoute
+  '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -1317,6 +1325,7 @@ export interface FileRoutesByTo {
   '/cms/experience-builder/pages': typeof AuthenticatedCmsExperienceBuilderPagesRoute
   '/cms/productos/nueva': typeof AuthenticatedCmsProductosNuevaRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
+  '/cms/visibilidad/solicitudes': typeof AuthenticatedCmsVisibilidadSolicitudesRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
@@ -1433,7 +1442,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/_authenticated/cms/pagos': typeof AuthenticatedCmsPagosRoute
-  '/_authenticated/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRoute
+  '/_authenticated/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
   '/_authenticated/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/_authenticated/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -1476,6 +1485,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/experience-builder/pages': typeof AuthenticatedCmsExperienceBuilderPagesRoute
   '/_authenticated/cms/productos/nueva': typeof AuthenticatedCmsProductosNuevaRoute
   '/_authenticated/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
+  '/_authenticated/cms/visibilidad/solicitudes': typeof AuthenticatedCmsVisibilidadSolicitudesRoute
   '/_authenticated/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
   '/_authenticated/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
@@ -1636,6 +1646,7 @@ export interface FileRouteTypes {
     | '/cms/experience-builder/pages'
     | '/cms/productos/nueva'
     | '/cms/regiones/nueva'
+    | '/cms/visibilidad/solicitudes'
     | '/cms/zonas/nueva'
     | '/concierge/expedientes/$caseId'
     | '/cuenta/concierge/$caseId'
@@ -1786,6 +1797,7 @@ export interface FileRouteTypes {
     | '/cms/experience-builder/pages'
     | '/cms/productos/nueva'
     | '/cms/regiones/nueva'
+    | '/cms/visibilidad/solicitudes'
     | '/cms/zonas/nueva'
     | '/concierge/expedientes/$caseId'
     | '/cuenta/concierge/$caseId'
@@ -1944,6 +1956,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/experience-builder/pages'
     | '/_authenticated/cms/productos/nueva'
     | '/_authenticated/cms/regiones/nueva'
+    | '/_authenticated/cms/visibilidad/solicitudes'
     | '/_authenticated/cms/zonas/nueva'
     | '/_authenticated/concierge/expedientes/$caseId'
     | '/_authenticated/cuenta/concierge/$caseId'
@@ -3008,6 +3021,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsZonasNuevaRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/visibilidad/solicitudes': {
+      id: '/_authenticated/cms/visibilidad/solicitudes'
+      path: '/solicitudes'
+      fullPath: '/cms/visibilidad/solicitudes'
+      preLoaderRoute: typeof AuthenticatedCmsVisibilidadSolicitudesRouteImport
+      parentRoute: typeof AuthenticatedCmsVisibilidadRoute
+    }
     '/_authenticated/cms/regiones/nueva': {
       id: '/_authenticated/cms/regiones/nueva'
       path: '/regiones/nueva'
@@ -3369,6 +3389,21 @@ const AuthenticatedCmsExperienceBuilderRouteWithChildren =
     AuthenticatedCmsExperienceBuilderRouteChildren,
   )
 
+interface AuthenticatedCmsVisibilidadRouteChildren {
+  AuthenticatedCmsVisibilidadSolicitudesRoute: typeof AuthenticatedCmsVisibilidadSolicitudesRoute
+}
+
+const AuthenticatedCmsVisibilidadRouteChildren: AuthenticatedCmsVisibilidadRouteChildren =
+  {
+    AuthenticatedCmsVisibilidadSolicitudesRoute:
+      AuthenticatedCmsVisibilidadSolicitudesRoute,
+  }
+
+const AuthenticatedCmsVisibilidadRouteWithChildren =
+  AuthenticatedCmsVisibilidadRoute._addFileChildren(
+    AuthenticatedCmsVisibilidadRouteChildren,
+  )
+
 interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsActividadRoute: typeof AuthenticatedCmsActividadRoute
   AuthenticatedCmsAlertasRoute: typeof AuthenticatedCmsAlertasRoute
@@ -3376,7 +3411,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
   AuthenticatedCmsObservabilidadRoute: typeof AuthenticatedCmsObservabilidadRoute
   AuthenticatedCmsPagosRoute: typeof AuthenticatedCmsPagosRoute
-  AuthenticatedCmsVisibilidadRoute: typeof AuthenticatedCmsVisibilidadRoute
+  AuthenticatedCmsVisibilidadRoute: typeof AuthenticatedCmsVisibilidadRouteWithChildren
   AuthenticatedCmsIndexRoute: typeof AuthenticatedCmsIndexRoute
   AuthenticatedCmsCategoriasNuevaRoute: typeof AuthenticatedCmsCategoriasNuevaRoute
   AuthenticatedCmsDestinosNuevaRoute: typeof AuthenticatedCmsDestinosNuevaRoute
@@ -3409,7 +3444,8 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsMediaRoute: AuthenticatedCmsMediaRoute,
   AuthenticatedCmsObservabilidadRoute: AuthenticatedCmsObservabilidadRoute,
   AuthenticatedCmsPagosRoute: AuthenticatedCmsPagosRoute,
-  AuthenticatedCmsVisibilidadRoute: AuthenticatedCmsVisibilidadRoute,
+  AuthenticatedCmsVisibilidadRoute:
+    AuthenticatedCmsVisibilidadRouteWithChildren,
   AuthenticatedCmsIndexRoute: AuthenticatedCmsIndexRoute,
   AuthenticatedCmsCategoriasNuevaRoute: AuthenticatedCmsCategoriasNuevaRoute,
   AuthenticatedCmsDestinosNuevaRoute: AuthenticatedCmsDestinosNuevaRoute,
