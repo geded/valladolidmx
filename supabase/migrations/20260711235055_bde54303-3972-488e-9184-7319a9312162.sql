@@ -1,0 +1,1 @@
+ALTER VIEW public.business_effective_visibility SET (security_invoker = on);
