@@ -109,6 +109,23 @@ export function businessToTourismCard(
   const verifiedBadges: TourismCardVM["badges"] = b.verified
     ? [{ label: "Verificada", tone: "primary" }]
     : [];
+  // Ola 7.4.a · Badge de paquete de visibilidad (Destacado/Premium/Élite…)
+  const visibilityBadges: TourismCardVM["badges"] = b.visibility_plan_name
+    ? [
+        {
+          label: b.visibility_plan_name,
+          tone:
+            (b.visibility_badge_variant as
+              | "primary"
+              | "info"
+              | "success"
+              | "warning"
+              | "destructive"
+              | "muted"
+              | undefined) ?? "primary",
+        },
+      ]
+    : [];
   return {
     id: b.id,
     entityKind: categoryToEntityKind(categorySlug),
@@ -125,7 +142,7 @@ export function businessToTourismCard(
       : null,
     territorialContext: opts.regionLabel ?? null,
     highlights: [],
-    badges: verifiedBadges,
+    badges: [...visibilityBadges, ...verifiedBadges],
     institutionalBadges: institutionalBadgesForDestination(b.destination_slug),
     dateLabel: null,
     availabilityLabel: null,
