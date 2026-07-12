@@ -400,18 +400,54 @@ export function AluxFloatingTrigger() {
                       <ul className="grid gap-2">
                         {g.items.map((item) => (
                           <li key={`${item.source.table}-${item.source.id}`}>
-                            <a
-                              href={item.href}
-                              className="group flex items-start justify-between gap-3 rounded-xl border border-border bg-card/60 px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-card"
-                            >
-                              <span className="min-w-0">
-                                <span className="block truncate font-medium">{item.label}</span>
-                                <span className="mt-0.5 block text-[11px] text-muted-foreground">
-                                  {item.rationale}
+                            <div className="rounded-xl border border-border bg-card/60 px-3 py-2.5 text-sm text-foreground">
+                              <a
+                                href={item.href}
+                                className="group flex items-start justify-between gap-3"
+                              >
+                                <span className="min-w-0">
+                                  <span className="flex items-center gap-1.5">
+                                    <span className="block truncate font-medium">{item.label}</span>
+                                    {item.hasActiveCoupon && (
+                                      <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                                        <Ticket className="size-2.5" aria-hidden />
+                                        Cupón tuyo
+                                      </span>
+                                    )}
+                                    {!item.hasActiveCoupon && item.activePromotionSlug && (
+                                      <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-400">
+                                        <Tag className="size-2.5" aria-hidden />
+                                        Promo
+                                      </span>
+                                    )}
+                                  </span>
+                                  <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                                    {item.rationale}
+                                  </span>
                                 </span>
-                              </span>
-                              <ArrowRight className="mt-1 size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden />
-                            </a>
+                                <ArrowRight className="mt-1 size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden />
+                              </a>
+                              {item.ctas && item.ctas.length > 1 && (
+                                <div className="mt-2 flex flex-wrap gap-1.5">
+                                  {item.ctas
+                                    .filter((c) => c.kind !== "view")
+                                    .map((cta) => (
+                                      <a
+                                        key={`${cta.kind}-${cta.href}`}
+                                        href={cta.href}
+                                        target={cta.kind === "directions" ? "_blank" : undefined}
+                                        rel={cta.kind === "directions" ? "noopener noreferrer" : undefined}
+                                        className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium text-foreground transition-colors hover:bg-muted"
+                                      >
+                                        {cta.kind === "directions" && <Navigation className="size-2.5" aria-hidden />}
+                                        {cta.kind === "promotion" && <Tag className="size-2.5" aria-hidden />}
+                                        {cta.kind === "coupon" && <Ticket className="size-2.5" aria-hidden />}
+                                        {cta.label}
+                                      </a>
+                                    ))}
+                                </div>
+                              )}
+                            </div>
                           </li>
                         ))}
                       </ul>
@@ -424,6 +460,74 @@ export function AluxFloatingTrigger() {
               Sugerencias derivadas del catálogo publicado y del contexto real de tu recorrido, nunca inventadas.
             </p>
           </section>
+
+          {/* A6 · Cupones activos del viajero (autenticado) */}
+          {isAuthed && lens && lens.active_coupons.length > 0 && (
+            <section
+              aria-labelledby="alux-coupons"
+              className="rounded-2xl border border-primary/20 bg-primary/5 p-4"
+            >
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+                <Ticket className="size-3.5" aria-hidden />
+                <span id="alux-coupons">Tus cupones activos</span>
+              </div>
+              <ul className="mt-2 grid gap-1.5">
+                {lens.active_coupons.slice(0, 4).map((c) => (
+                  <li key={c.id} className="flex items-center justify-between gap-2 text-sm">
+                    <span className="min-w-0 truncate text-foreground">
+                      {c.title}
+                      {c.discount_percent != null && (
+                        <span className="ml-1 text-xs text-primary">−{c.discount_percent}%</span>
+                      )}
+                    </span>
+                    <a
+                      href="/cuenta/cupones"
+                      className="shrink-0 text-[11px] font-medium text-primary hover:underline"
+                    >
+                      Canjear
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* A6 · Promociones activas del destino */}
+          {suggestionsQuery.data?.activePromotions && suggestionsQuery.data.activePromotions.length > 0 && (
+            <section
+              aria-labelledby="alux-promos"
+              className="rounded-2xl border border-border bg-card/60 p-4"
+            >
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                <Tag className="size-3.5" aria-hidden />
+                <span id="alux-promos">Promociones en {ctx.destination?.label ?? "el destino"}</span>
+              </div>
+              <ul className="mt-2 grid gap-1.5">
+                {suggestionsQuery.data.activePromotions.slice(0, 4).map((p) => (
+                  <li key={p.slug} className="flex items-center justify-between gap-2 text-sm">
+                    <span className="min-w-0 truncate">
+                      <span className="text-foreground">{p.title}</span>
+                      {p.businessName && (
+                        <span className="ml-1 text-[11px] text-muted-foreground">· {p.businessName}</span>
+                      )}
+                    </span>
+                    <a
+                      href={p.href}
+                      className="shrink-0 text-[11px] font-medium text-primary hover:underline"
+                    >
+                      Ver
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              {!isAuthed && (
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  Crea tu cuenta para reclamar cupones digitales en{" "}
+                  <a href="/promociones" className="text-primary hover:underline">/promociones</a>.
+                </p>
+              )}
+            </section>
+          )}
 
           {/* Invitación a completar y publicar perfil — para asesoría más precisa */}
           <section
