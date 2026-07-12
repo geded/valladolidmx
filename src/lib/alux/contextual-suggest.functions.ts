@@ -261,6 +261,43 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       (data.activeCouponBusinessSlugs ?? []).map((s) => s.toLowerCase()),
     );
 
+    // 2c. Horarios reales (A7) — precomputa "abierto ahora" por negocio en TZ del destino.
+    // Oriente Maya opera en America/Merida (UTC−6 sin DST).
+    const openByBizId = new Map<
+      string,
+      { state: OpenNowState; label: string }
+    >();
+    if (bizIdsInDest.length) {
+      const { data: hoursRows } = await sb
+        .from("business_hours")
+        .select("business_id, day_of_week, opens_at, closes_at, is_closed")
+        .in("business_id", bizIdsInDest);
+      const byBiz = new Map<
+        string,
+        Array<{ day_of_week: number; opens_at: string | null; closes_at: string | null; is_closed: boolean | null }>
+      >();
+      for (const r of (hoursRows ?? []) as Array<{
+        business_id: string;
+        day_of_week: number;
+        opens_at: string | null;
+        closes_at: string | null;
+        is_closed: boolean | null;
+      }>) {
+        const arr = byBiz.get(r.business_id) ?? [];
+        arr.push({
+          day_of_week: r.day_of_week,
+          opens_at: r.opens_at,
+          closes_at: r.closes_at,
+          is_closed: r.is_closed,
+        });
+        byBiz.set(r.business_id, arr);
+      }
+      for (const [bizId, arr] of byBiz.entries()) {
+        const r = computeOpenNow(arr, { timezone: "America/Merida" });
+        openByBizId.set(bizId, { state: r.state, label: r.label });
+      }
+    }
+
     // 3. Ranking según nivel de contexto.
     const currentBusinessSlug = data.business?.slug;
     const currentCategorySlug = data.category?.slug;
@@ -295,20 +332,21 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       }
     }
 
-    // A6 · Prioriza negocios con cupón activo del viajero y luego los que
-    // tienen promoción vigente en el destino — sin romper el ranking base.
-    if (activeCouponSlugSet.size > 0 || promoByBizId.size > 0) {
-      const withCoupon: BizRow[] = [];
-      const withPromo: BizRow[] = [];
-      const rest: BizRow[] = [];
-      for (const b of ordered) {
-        if (activeCouponSlugSet.has(b.slug.toLowerCase())) withCoupon.push(b);
-        else if (promoByBizId.has(b.id)) withPromo.push(b);
-        else rest.push(b);
-      }
-      ordered.length = 0;
-      ordered.push(...withCoupon, ...withPromo, ...rest);
-    }
+    // A6 · Prioriza cupón activo → promo activa → resto.
+    // A7 · Dentro de cada grupo, empuja al final los que sabemos que están cerrados.
+    const rank = (b: BizRow): number => {
+      // Grupo primario (0 = cupón, 1 = promo, 2 = resto).
+      const group = activeCouponSlugSet.has(b.slug.toLowerCase())
+        ? 0
+        : promoByBizId.has(b.id)
+          ? 1
+          : 2;
+      // Subgrupo por estado (0 = open/unknown, 1 = closed).
+      const open = openByBizId.get(b.id);
+      const closed = open?.state === "closed" ? 1 : 0;
+      return group * 10 + closed;
+    };
+    ordered.sort((a, b) => rank(a) - rank(b));
     const picks = ordered.slice(0, limit);
 
     // 4. Rationale explicable por item.
@@ -336,6 +374,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       const safeRationale = clean.length > 0 && clean.length <= 200 ? clean : deterministicRationale(row);
       const hasActiveCoupon = activeCouponSlugSet.has(row.slug.toLowerCase());
       const promo = promoByBizId.get(row.id) ?? null;
+      const open = openByBizId.get(row.id);
       const ctas: AluxSuggestionCta[] = [
         { kind: "view", label: "Ver ficha", href },
         {
@@ -371,6 +410,8 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         ctas,
         hasActiveCoupon: hasActiveCoupon || undefined,
         activePromotionSlug: promo?.slug,
+        openState: open?.state,
+        openLabel: open?.label,
       };
     }
 
@@ -415,7 +456,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         const catalogBlock = picks
           .map(
             (row, i) =>
-              `${i + 1}. id="${row.id}" · ${row.display_name}${row.category_name ? ` (${row.category_name})` : ""}${row.tagline ? ` — ${row.tagline}` : ""}${promoByBizId.has(row.id) ? " · [Promo activa]" : ""}${activeCouponSlugSet.has(row.slug.toLowerCase()) ? " · [Cupón del viajero]" : ""}`,
+              `${i + 1}. id="${row.id}" · ${row.display_name}${row.category_name ? ` (${row.category_name})` : ""}${row.tagline ? ` — ${row.tagline}` : ""}${promoByBizId.has(row.id) ? " · [Promo activa]" : ""}${activeCouponSlugSet.has(row.slug.toLowerCase()) ? " · [Cupón del viajero]" : ""}${openByBizId.get(row.id) ? ` · [${openByBizId.get(row.id)!.label}]` : ""}`,
           )
           .join("\n");
 
@@ -430,7 +471,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           "Candidatos reales del catálogo publicado (usa SOLO estos ids):",
           catalogBlock,
           "",
-          "Para cada id, redacta un rationale breve (máx 140 caracteres) explicando por qué se lo sugieres al visitante ahora, considerando su contexto activo y — si aplica — su perfil M2 (estilo, dieta, presupuesto, intereses, país). Si el candidato tiene [Cupón del viajero] o [Promo activa], mencionalo con naturalidad SIN inventar % ni fechas. No inventes atributos, precios, distancias ni horarios que no aparezcan en la lista. No repitas literalmente el nombre del lugar en el rationale. Devuelve exactamente un rationale por id.",
+          "Para cada id, redacta un rationale breve (máx 140 caracteres) explicando por qué se lo sugieres al visitante ahora, considerando su contexto activo y — si aplica — su perfil M2 (estilo, dieta, presupuesto, intereses, país). Si el candidato tiene [Cupón del viajero] o [Promo activa], mencionalo con naturalidad SIN inventar % ni fechas. Si aparece un corchete con [Abierto...] o [Cerrado...], respétalo literalmente cuando decidas cómo hablar del sitio (si está cerrado, evita el imperativo 've ahora' y ofrécelo como plan para más tarde). No inventes horarios, precios ni distancias que no aparezcan en la lista. No repitas literalmente el nombre del lugar en el rationale. Devuelve exactamente un rationale por id.",
         ]
           .filter(Boolean)
           .join("\n");
