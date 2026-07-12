@@ -79,7 +79,7 @@ function ContextChip({ slot }: { slot: AluxContextSlot }) {
 }
 
 export function AluxFloatingTrigger() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { user } = useAuth();
   const isAuthed = Boolean(user);
   const rawCtx = useAluxContext();
