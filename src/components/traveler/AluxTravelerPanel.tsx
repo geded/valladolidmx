@@ -54,8 +54,10 @@ import {
 } from "@/lib/traveler/alux-traveler.functions";
 import { AluxSuggestionCard } from "./AluxSuggestionCard";
 
+// Panel expone todas las capacidades salvo las de fondo (dock / Alux público).
+type PanelCapabilityId = Exclude<AluxTravelerCapability, "narrate_plan">;
 type CapabilityDef = {
-  id: AluxTravelerCapability;
+  id: PanelCapabilityId;
   label: string;
   description: string;
   icon: typeof Sparkles;
