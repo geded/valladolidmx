@@ -95,6 +95,7 @@ export function AluxFloatingTrigger() {
       };
   const presence = useAluxFloatingPresence();
   const [open, setOpen] = useState(false);
+  const geo = useVisitorGeolocation();
   const suggestFn = useServerFn(aluxContextualSuggest);
   const suggestionsQuery = useQuery({
     queryKey: [
@@ -186,6 +187,45 @@ export function AluxFloatingTrigger() {
               </div>
             </div>
           </SheetHeader>
+
+          {/* Ubicación viva (A5) — opt-in contextual, no intrusivo. */}
+          <section
+            aria-labelledby="alux-geo"
+            className="rounded-2xl border border-border bg-card/60 p-4"
+          >
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              <MapPin className="size-3.5" aria-hidden />
+              <span id="alux-geo">Cercanía real</span>
+            </div>
+            {geo.status === "granted" && geo.location ? (
+              <p className="mt-2 text-sm text-foreground">
+                Compartiste tu ubicación. Puedo calcular distancias reales a
+                hoteles, restaurantes y experiencias del Oriente Maya.
+              </p>
+            ) : (
+              <>
+                <p className="mt-2 text-sm text-foreground">
+                  Compartir tu ubicación me permite priorizar lugares que
+                  están realmente cerca de ti y calcular tiempos de traslado.
+                </p>
+                <button
+                  type="button"
+                  onClick={geo.request}
+                  disabled={geo.status === "requesting"}
+                  className="mt-3 inline-flex items-center gap-1 rounded-full border border-primary/40 bg-background px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/10 disabled:opacity-60"
+                >
+                  <MapPin className="size-3.5" aria-hidden />
+                  {geo.status === "requesting"
+                    ? "Solicitando permiso…"
+                    : geo.status === "denied"
+                      ? "Permiso denegado — reintentar"
+                      : geo.status === "unavailable"
+                        ? "Ubicación no disponible"
+                        : "Compartir mi ubicación"}
+                </button>
+              </>
+            )}
+          </section>
 
           {ctx.hasContext ? (
             <>
