@@ -42,6 +42,18 @@ export function logAluxPublicSignal(input: {
   slug?: string;
   pathContext?: { destination?: string | null; category?: string | null };
 }): void {
+  // A14 · Espejo local para detección de intención (independiente del server fn).
+  try {
+    void import("./travel-intent").then(({ recordLocalSignal }) =>
+      recordLocalSignal({
+        action: input.action,
+        slug: input.slug,
+        category: (input.pathContext ?? derivePathContext()).category ?? null,
+      }),
+    );
+  } catch {
+    /* noop */
+  }
   const sessionKey = getSessionKey();
   if (!sessionKey) return; // sin sesión de chat pública no hay a quién recordarle
   const payload = {
