@@ -1189,3 +1189,296 @@ function ConciergeSection({
     </section>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Fase activa del viaje (CV4.3-narrativa · Etapa 5)                   */
+/* ------------------------------------------------------------------ */
+
+type TripPhase = "planning" | "t14" | "t3" | "onsite" | "post" | "closed";
+
+interface ChecklistItem {
+  key: string;
+  label: string;
+  hint?: string;
+}
+
+const PHASE_META: Record<
+  TripPhase,
+  {
+    label: string;
+    tagline: string;
+    tone: "muted" | "info" | "primary" | "success" | "warning";
+    aluxPrompt: string;
+    checklist: ChecklistItem[];
+  }
+> = {
+  planning: {
+    label: "Preparación",
+    tagline: "Aún tienes tiempo para afinar detalles con tu concierge.",
+    tone: "muted",
+    aluxPrompt: "Ayúdame a preparar mi viaje al Oriente Maya con calma.",
+    checklist: [
+      { key: "identity", label: "Documentos y datos de acompañantes", hint: "Nombres completos y contactos de emergencia." },
+      { key: "expectations", label: "Cuéntale a tu concierge tus expectativas", hint: "Ritmo, intereses, restricciones alimentarias." },
+      { key: "wishlist", label: "Guarda inspiración en Mi Viaje", hint: "Cenotes, restaurantes o experiencias que te llamen." },
+    ],
+  },
+  t14: {
+    label: "T‑14 · Preparando tu llegada",
+    tagline: "Faltan menos de dos semanas: alista lo esencial.",
+    tone: "info",
+    aluxPrompt: "Dame recomendaciones de clima, ropa y cultura para mi viaje.",
+    checklist: [
+      { key: "weather", label: "Revisa el clima y qué empacar", hint: "Alux te da el pronóstico de tu destino." },
+      { key: "culture", label: "Contexto cultural del Oriente Maya", hint: "Pequeños hábitos que enriquecen la experiencia." },
+      { key: "docs", label: "Copia digital de identificaciones y reservas" },
+    ],
+  },
+  t3: {
+    label: "T‑3 · Últimos detalles",
+    tagline: "Tu viaje inicia en días. Confirmamos logística fina.",
+    tone: "warning",
+    aluxPrompt: "Confirma conmigo el punto de encuentro y qué llevar el primer día.",
+    checklist: [
+      { key: "arrival", label: "Punto de encuentro y hora de llegada" },
+      { key: "contact", label: "Guarda el contacto de tu concierge" },
+      { key: "emergency", label: "Contacto de emergencia y seguros" },
+      { key: "pack", label: "Empaca ligero: sandalias, protector, agua reutilizable" },
+    ],
+  },
+  onsite: {
+    label: "Bienvenido al Oriente Maya",
+    tagline: "Ya estás aquí. Alux te acompaña con contexto vivo del lugar.",
+    tone: "success",
+    aluxPrompt: "¿Qué me recomiendas hacer ahora mismo cerca de mí?",
+    checklist: [
+      { key: "checkin", label: "Confirma tu llegada con tu concierge" },
+      { key: "explore", label: "Explora recomendaciones cercanas con Alux" },
+      { key: "share", label: "Comparte momentos: los publicaremos si autorizas" },
+    ],
+  },
+  post: {
+    label: "Después de tu viaje",
+    tagline: "Gracias por descubrir el Oriente Maya con nosotros.",
+    tone: "primary",
+    aluxPrompt: "Ayúdame a dejar reseñas de las experiencias que viví.",
+    checklist: [
+      { key: "review", label: "Deja una reseña de las experiencias vividas" },
+      { key: "next", label: "Guarda inspiración para tu próximo viaje" },
+    ],
+  },
+  closed: {
+    label: "Viaje cerrado",
+    tagline: "Tu expediente queda disponible para consultas y futuras visitas.",
+    tone: "muted",
+    aluxPrompt: "Ayúdame a planear mi próxima visita al Oriente Maya.",
+    checklist: [],
+  },
+};
+
+function derivePhase(data: {
+  days_to_trip: number | null;
+  plan_end_date: string | null;
+}): TripPhase {
+  const d = data.days_to_trip;
+  if (typeof d !== "number") return "planning";
+  if (d > 14) return "planning";
+  if (d > 3) return "t14";
+  if (d > 0) return "t3";
+  // d <= 0 → viaje en curso o pasado
+  if (data.plan_end_date) {
+    const end = new Date(`${data.plan_end_date}T23:59:59Z`).getTime();
+    const now = Date.now();
+    if (now <= end) return "onsite";
+    const daysAfter = Math.floor((now - end) / 86_400_000);
+    if (daysAfter <= 14) return "post";
+    return "closed";
+  }
+  return "onsite";
+}
+
+function TripPhaseCard({
+  data,
+}: {
+  data: {
+    folio: string;
+    days_to_trip: number | null;
+    plan_end_date: string | null;
+    email_t14_sent_at: string | null;
+    email_t3_sent_at: string | null;
+    email_welcome_sent_at: string | null;
+    email_post_sent_at: string | null;
+  };
+}) {
+  const phase = derivePhase(data);
+  const meta = PHASE_META[phase];
+
+  // Persistimos qué correos ya "leyó" el viajero en local storage
+  // (señal 100% cliente; el hito recién enviado se marca con un badge).
+  const storageKey = `mi-viaje:read-milestones:${data.folio}`;
+  const [readMap, setReadMap] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) setReadMap(JSON.parse(raw));
+    } catch {
+      /* noop */
+    }
+  }, [storageKey]);
+  const markRead = (key: string, iso: string | null) => {
+    if (!iso) return;
+    const next = { ...readMap, [`${key}:${iso}`]: true };
+    setReadMap(next);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(next));
+    } catch {
+      /* noop */
+    }
+  };
+
+  const milestones: { key: "t14" | "t3" | "welcome" | "post"; label: string; iso: string | null }[] = [
+    { key: "t14", label: "Preparando tu llegada", iso: data.email_t14_sent_at },
+    { key: "t3", label: "Últimos detalles del viaje", iso: data.email_t3_sent_at },
+    { key: "welcome", label: "Bienvenida al Oriente Maya", iso: data.email_welcome_sent_at },
+    { key: "post", label: "Después de tu viaje", iso: data.email_post_sent_at },
+  ];
+  const unread = milestones.filter((m) => m.iso && !readMap[`${m.key}:${m.iso}`]);
+
+  // Checklist local: el viajero puede marcar sus propios pendientes.
+  const checkKey = `mi-viaje:checklist:${data.folio}:${phase}`;
+  const [done, setDone] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(checkKey);
+      setDone(raw ? JSON.parse(raw) : {});
+    } catch {
+      setDone({});
+    }
+  }, [checkKey]);
+  const toggle = (key: string) => {
+    const next = { ...done, [key]: !done[key] };
+    setDone(next);
+    try {
+      localStorage.setItem(checkKey, JSON.stringify(next));
+    } catch {
+      /* noop */
+    }
+  };
+  const completedCount = meta.checklist.filter((c) => done[c.key]).length;
+
+  const toneRing: Record<typeof meta.tone, string> = {
+    muted: "border-border/60 bg-card",
+    info: "border-info/40 bg-info/5",
+    primary: "border-primary/40 bg-primary/5",
+    success: "border-success/40 bg-success/5",
+    warning: "border-warning/40 bg-warning/5",
+  };
+
+  const dateFmt = (iso: string) =>
+    new Date(iso).toLocaleDateString("es-MX", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  return (
+    <section
+      className={`overflow-hidden rounded-2xl border p-6 shadow-soft ${toneRing[meta.tone]}`}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Fase actual de tu viaje
+          </p>
+          <h2 className="mt-1 font-serif text-xl text-foreground">{meta.label}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{meta.tagline}</p>
+        </div>
+        {meta.checklist.length > 0 ? (
+          <div className="rounded-full border border-border/70 bg-background/70 px-3 py-1 text-[11px] text-muted-foreground">
+            {completedCount}/{meta.checklist.length} listos
+          </div>
+        ) : null}
+      </div>
+
+      {unread.length > 0 ? (
+        <div className="mt-4 rounded-xl border border-primary/40 bg-primary/5 p-3">
+          <div className="flex items-center gap-2 text-xs font-semibold text-primary">
+            <Bell className="h-3.5 w-3.5" aria-hidden />
+            Novedades de tu viaje
+          </div>
+          <ul className="mt-2 space-y-1.5">
+            {unread.map((m) => (
+              <li key={m.key} className="flex items-center justify-between gap-3 text-sm">
+                <span className="text-foreground">
+                  {m.label}
+                  <span className="ml-2 text-[11px] text-muted-foreground">
+                    · {dateFmt(m.iso!)}
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => markRead(m.key, m.iso)}
+                  className="rounded-md border border-primary/40 px-2 py-0.5 text-[11px] text-primary hover:bg-primary/10"
+                >
+                  Marcar leído
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {meta.checklist.length > 0 ? (
+        <ul className="mt-5 space-y-2">
+          {meta.checklist.map((c) => {
+            const isDone = !!done[c.key];
+            return (
+              <li key={c.key}>
+                <button
+                  type="button"
+                  onClick={() => toggle(c.key)}
+                  className="flex w-full items-start gap-3 rounded-lg border border-border/50 bg-background/60 p-3 text-left transition hover:bg-accent/40"
+                >
+                  {isDone ? (
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden />
+                  ) : (
+                    <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+                  )}
+                  <span className="min-w-0">
+                    <span
+                      className={`block text-sm font-medium ${
+                        isDone ? "text-muted-foreground line-through" : "text-foreground"
+                      }`}
+                    >
+                      {c.label}
+                    </span>
+                    {c.hint ? (
+                      <span className="mt-0.5 block text-xs text-muted-foreground">
+                        {c.hint}
+                      </span>
+                    ) : null}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border/50 pt-4">
+        <p className="text-xs text-muted-foreground">
+          Alux te acompaña en cada fase con contexto real y respuestas rápidas.
+        </p>
+        <Link
+          to="/alux"
+          search={{ prompt: meta.aluxPrompt }}
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+        >
+          <MessageCircle className="h-3.5 w-3.5" aria-hidden />
+          Pregúntale a Alux
+        </Link>
+      </div>
+    </section>
+  );
+}
