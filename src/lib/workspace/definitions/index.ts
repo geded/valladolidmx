@@ -167,6 +167,7 @@ const portal: WorkspaceDefinition = {
     { id: "portal.galeria", workspaceId: "portal", label: "Galería", icon: ImageIcon, to: "/portal/galeria", group: "presencia", order: 5, surfaces: ["sidebar", "palette"] },
     { id: "portal.catalogo", workspaceId: "portal", label: "Catálogo", icon: ListChecks, to: "/portal/catalogo", group: "operacion", order: 6, surfaces: ["sidebar", "palette"] },
     { id: "portal.ventas", workspaceId: "portal", label: "Ventas en línea", icon: ShoppingBag, to: "/portal/ventas-en-linea", group: "operacion", order: 6.5, surfaces: ["sidebar", "palette"] },
+    { id: "portal.ventas-ordenes", workspaceId: "portal", label: "Mis ventas (órdenes)", icon: ShoppingBag, to: "/portal/ventas-en-linea/ordenes", group: "operacion", order: 6.55, surfaces: ["sidebar", "palette"] },
     { id: "portal.pagos", workspaceId: "portal", label: "Pagos y visibilidad", icon: CreditCard, to: "/portal/pagos", group: "operacion", order: 7, surfaces: ["sidebar", "palette"] },
     { id: "portal.visibilidad", workspaceId: "portal", label: "Paquetes de visibilidad", icon: Sparkles, to: "/portal/visibilidad", group: "operacion", order: 7.1, surfaces: ["sidebar", "palette"] },
     { id: "portal.canjear", workspaceId: "portal", label: "Canjear cupón", icon: QrCode, to: "/portal/canjear", group: "operacion", order: 7.5, surfaces: ["sidebar", "bottom", "palette"] },
