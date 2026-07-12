@@ -5516,6 +5516,10 @@ export type Database = {
           product_slug: string
         }[]
       }
+      alux_get_concierge_context_for_user: {
+        Args: { _user_id: string }
+        Returns: Json
+      }
       alux_public_check_rate: {
         Args: { _day_limit?: number; _hour_limit?: number; _ip_hash: string }
         Returns: {
