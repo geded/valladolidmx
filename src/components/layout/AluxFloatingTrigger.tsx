@@ -57,6 +57,7 @@ import {
 } from "@/lib/alux/contextual-suggest.functions";
 import { getAluxTravelerLens } from "@/lib/alux/traveler-lens.functions";
 import { getAluxTerritorialMemory } from "@/lib/alux/territorial-memory.functions";
+import { bindAluxSessionToTraveler } from "@/lib/alux/bind-session.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 
@@ -115,6 +116,7 @@ export function AluxFloatingTrigger() {
   const suggestFn = useServerFn(aluxContextualSuggest);
   const lensFn = useServerFn(getAluxTravelerLens);
   const territoryFn = useServerFn(getAluxTerritorialMemory);
+  const bindFn = useServerFn(bindAluxSessionToTraveler);
 
   // A16 · Memoria territorial persistente (por session_key anónimo).
   const [sessionKey, setSessionKey] = useState<string | null>(null);
@@ -135,6 +137,33 @@ export function AluxFloatingTrigger() {
     staleTime: 60_000,
   });
   const territory = territoryQuery.data;
+
+  // A17 · Vincular la sesión anónima con el viajero autenticado (una vez
+  // por combinación user+device). Consolida memoria territorial entre
+  // dispositivos y sesiones futuras del mismo viajero.
+  useEffect(() => {
+    if (!isAuthed || !user?.id || !sessionKey) return;
+    const marker = `alux_bound:${user.id}:${sessionKey}`;
+    try {
+      if (window.localStorage.getItem(marker)) return;
+    } catch {
+      /* noop */
+    }
+    void bindFn({ data: { sessionKey } })
+      .then((r) => {
+        if (r?.bound) {
+          try {
+            window.localStorage.setItem(marker, "1");
+          } catch {
+            /* noop */
+          }
+          void queryClient.invalidateQueries({
+            queryKey: ["alux", "territorial-memory", sessionKey],
+          });
+        }
+      })
+      .catch(() => undefined);
+  }, [isAuthed, user?.id, sessionKey, bindFn, queryClient]);
 
   // A6 · Lente del viajero (M2 + cupones) — sólo autenticado.
   const lensQuery = useQuery({
