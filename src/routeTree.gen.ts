@@ -106,6 +106,7 @@ import { Route as AuthenticatedCmsPagosRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedCmsObservabilidadRouteImport } from './routes/_authenticated/cms/observabilidad'
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
 import { Route as AuthenticatedCmsExperienceBuilderRouteImport } from './routes/_authenticated/cms/experience-builder'
+import { Route as AuthenticatedCmsAluxRouteImport } from './routes/_authenticated/cms/alux'
 import { Route as AuthenticatedCmsAlertasRouteImport } from './routes/_authenticated/cms/alertas'
 import { Route as AuthenticatedCmsActividadRouteImport } from './routes/_authenticated/cms/actividad'
 import { Route as AuthenticatedAdminTuristasRouteImport } from './routes/_authenticated/admin/turistas'
@@ -703,6 +704,11 @@ const AuthenticatedCmsExperienceBuilderRoute =
     path: '/experience-builder',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsAluxRoute = AuthenticatedCmsAluxRouteImport.update({
+  id: '/alux',
+  path: '/alux',
+  getParentRoute: () => AuthenticatedCmsRoute,
+} as any)
 const AuthenticatedCmsAlertasRoute = AuthenticatedCmsAlertasRouteImport.update({
   id: '/alertas',
   path: '/alertas',
@@ -1148,6 +1154,7 @@ export interface FileRoutesByFullPath {
   '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
+  '/cms/alux': typeof AuthenticatedCmsAluxRoute
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
@@ -1303,6 +1310,7 @@ export interface FileRoutesByTo {
   '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
+  '/cms/alux': typeof AuthenticatedCmsAluxRoute
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
@@ -1465,6 +1473,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/_authenticated/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/_authenticated/cms/alertas': typeof AuthenticatedCmsAlertasRoute
+  '/_authenticated/cms/alux': typeof AuthenticatedCmsAluxRoute
   '/_authenticated/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
@@ -1629,6 +1638,7 @@ export interface FileRouteTypes {
     | '/admin/turistas'
     | '/cms/actividad'
     | '/cms/alertas'
+    | '/cms/alux'
     | '/cms/experience-builder'
     | '/cms/media'
     | '/cms/observabilidad'
@@ -1784,6 +1794,7 @@ export interface FileRouteTypes {
     | '/admin/turistas'
     | '/cms/actividad'
     | '/cms/alertas'
+    | '/cms/alux'
     | '/cms/experience-builder'
     | '/cms/media'
     | '/cms/observabilidad'
@@ -1945,6 +1956,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/turistas'
     | '/_authenticated/cms/actividad'
     | '/_authenticated/cms/alertas'
+    | '/_authenticated/cms/alux'
     | '/_authenticated/cms/experience-builder'
     | '/_authenticated/cms/media'
     | '/_authenticated/cms/observabilidad'
@@ -2788,6 +2800,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsExperienceBuilderRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/alux': {
+      id: '/_authenticated/cms/alux'
+      path: '/alux'
+      fullPath: '/cms/alux'
+      preLoaderRoute: typeof AuthenticatedCmsAluxRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/alertas': {
       id: '/_authenticated/cms/alertas'
       path: '/alertas'
@@ -3473,6 +3492,7 @@ const AuthenticatedCmsVisibilidadRouteWithChildren =
 interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsActividadRoute: typeof AuthenticatedCmsActividadRoute
   AuthenticatedCmsAlertasRoute: typeof AuthenticatedCmsAlertasRoute
+  AuthenticatedCmsAluxRoute: typeof AuthenticatedCmsAluxRoute
   AuthenticatedCmsExperienceBuilderRoute: typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
   AuthenticatedCmsObservabilidadRoute: typeof AuthenticatedCmsObservabilidadRoute
@@ -3505,6 +3525,7 @@ interface AuthenticatedCmsRouteChildren {
 const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsActividadRoute: AuthenticatedCmsActividadRoute,
   AuthenticatedCmsAlertasRoute: AuthenticatedCmsAlertasRoute,
+  AuthenticatedCmsAluxRoute: AuthenticatedCmsAluxRoute,
   AuthenticatedCmsExperienceBuilderRoute:
     AuthenticatedCmsExperienceBuilderRouteWithChildren,
   AuthenticatedCmsMediaRoute: AuthenticatedCmsMediaRoute,
