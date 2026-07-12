@@ -84,6 +84,31 @@ const SuggestInput = z.object({
       "perdido",
     ])
     .optional(),
+  /**
+   * A15 · Snapshot del plan activo del viajero (fechas, compañía,
+   * guardados, canjeados). Se usa SÓLO como coloración de prompt para
+   * encadenar recomendaciones y evitar repetir lo ya elegido.
+   */
+  travelerPlan: z
+    .object({
+      start_date: z.string().max(20).nullable().optional(),
+      end_date: z.string().max(20).nullable().optional(),
+      party_size: z.number().int().min(1).max(40).nullable().optional(),
+      days_remaining: z.number().int().nullable().optional(),
+      saved_items: z
+        .array(
+          z.object({
+            kind: z.string().max(20),
+            slug: z.string().max(160).nullable().optional(),
+            title: z.string().max(200).nullable().optional(),
+          }),
+        )
+        .max(30)
+        .optional(),
+      redeemed_business_slugs: z.array(z.string().max(160)).max(20).optional(),
+      item_count: z.number().int().min(0).max(200).optional(),
+    })
+    .optional(),
 });
 
 export type AluxSuggestKind = "business" | "product" | "event";
