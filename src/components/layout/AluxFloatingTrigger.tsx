@@ -36,6 +36,7 @@ import { ArrowRight, Compass, MapPin, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useRouterState } from "@tanstack/react-router";
 import {
   Sheet,
   SheetContent,
@@ -70,7 +71,14 @@ function ContextChip({ slot }: { slot: AluxContextSlot }) {
 
 export function AluxFloatingTrigger() {
   const { t } = useTranslation();
-  const ctx = useAluxContext();
+  const rawCtx = useAluxContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // Sólo confiamos en el contexto territorial cuando la ruta actual
+  // pertenece al árbol `/oriente-maya/*`. En cualquier otra superficie
+  // (Home, Marketplace, /alux, /cuenta, etc.) el Sheet abre siempre en
+  // "modo descubrimiento" — nunca arrastra el destino/ficha anterior.
+  const contextIsRelevant = pathname.startsWith("/oriente-maya/");
+  const ctx = contextIsRelevant ? rawCtx : { ...rawCtx, hasContext: false, related: [] as typeof rawCtx.related };
   const presence = useAluxFloatingPresence();
   const [open, setOpen] = useState(false);
   const suggestFn = useServerFn(aluxContextualSuggest);
