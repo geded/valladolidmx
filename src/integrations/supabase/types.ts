@@ -5555,6 +5555,10 @@ export type Database = {
         }[]
       }
       admin_marketplace_funnel: { Args: { p_days?: number }; Returns: Json }
+      admin_ops_attention_queue: {
+        Args: { p_limit?: number; p_only_mine?: boolean }
+        Returns: Json
+      }
       admin_resolve_system_alert: {
         Args: { p_id: string }
         Returns: {

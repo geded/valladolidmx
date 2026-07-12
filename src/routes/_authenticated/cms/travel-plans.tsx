@@ -17,6 +17,7 @@ import { TravelPlansKpiStrip } from "@/components/admin/travel-plans/TravelPlans
 import { TravelPlansFilters } from "@/components/admin/travel-plans/TravelPlansFilters";
 import { ActiveTravelPlansTable } from "@/components/admin/travel-plans/ActiveTravelPlansTable";
 import { TravelPlanOperationalDrawer } from "@/components/admin/travel-plans/TravelPlanOperationalDrawer";
+import { AttentionQueue } from "@/components/admin/travel-plans/AttentionQueue";
 import { useSheetStack } from "@/components/workspace/sheets/SheetStackProvider";
 
 export const Route = createFileRoute("/_authenticated/cms/travel-plans")({
@@ -121,6 +122,18 @@ function TravelPlansOpsPage() {
           setKpi(k);
           setOffset(0);
         }}
+      />
+
+      <AttentionQueue
+        onlyMine={onlyMine}
+        onOpenPlan={(planId) =>
+          sheets.push({
+            title: "Expediente del viaje",
+            description: `Plan ${planId.slice(0, 8)}`,
+            snap: "full",
+            content: <TravelPlanOperationalDrawer planId={planId} />,
+          })
+        }
       />
 
       <TravelPlansFilters

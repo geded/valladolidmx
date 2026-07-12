@@ -168,6 +168,51 @@ const ListInput = z.object({
 
 const DetailInput = z.object({ plan_id: z.string().uuid() });
 
+// ---- Attention Queue (CV1.2) ----
+
+export type AttentionCategory = "ops" | "sales";
+export type AttentionSeverity = "critical" | "high" | "medium";
+export type AttentionType =
+  | "sla_breach"
+  | "sla_at_risk"
+  | "proposal_awaiting"
+  | "alux_pending"
+  | "high_intent_no_case"
+  | "trip_imminent"
+  | "sales_opportunity";
+
+export interface AttentionSignal {
+  type: AttentionType;
+  category: AttentionCategory;
+  severity: AttentionSeverity;
+  plan_id: string;
+  case_id: string | null;
+  traveler_display_name: string;
+  age_hours: number;
+  rationale: string;
+  deep_link: string;
+  score: number;
+}
+
+export interface AttentionQueueResult {
+  generated_at: string;
+  is_admin: boolean;
+  signals: AttentionSignal[];
+  counts: {
+    ops_critical: number;
+    ops_high: number;
+    ops_medium: number;
+    sales_high: number;
+    sales_medium: number;
+    total: number;
+  };
+}
+
+const AttentionInput = z.object({
+  only_mine: z.boolean().optional(),
+  limit: z.number().int().min(1).max(200).optional(),
+});
+
 // ---- Server functions ----
 
 export const getTravelPlansOpsOverview = createServerFn({ method: "GET" })
@@ -212,4 +257,19 @@ export const getTravelPlanOperationalDetail = createServerFn({ method: "POST" })
     );
     if (error) throw new Error(error.message);
     return res as unknown as TravelPlanOpsDetail;
+  });
+
+export const getAttentionQueue = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => AttentionInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: res, error } = await context.supabase.rpc(
+      "admin_ops_attention_queue",
+      {
+        p_only_mine: data.only_mine ?? false,
+        p_limit: data.limit ?? 60,
+      },
+    );
+    if (error) throw new Error(error.message);
+    return res as unknown as AttentionQueueResult;
   });
