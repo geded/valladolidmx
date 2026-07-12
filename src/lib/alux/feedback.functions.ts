@@ -54,7 +54,7 @@ export const submitAluxFeedback = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => SubmitInput.parse(d))
   .handler(async ({ data, context }) => {
-    const sb = context.supabase as SbLike;
+    const sb = context.supabase as unknown as SbLike;
     const excerpt = data.suggestionText
       ? data.suggestionText.slice(0, 280)
       : null;
@@ -92,7 +92,7 @@ export const listMyRecentAluxFeedback = createServerFn({ method: "POST" })
       .parse(d ?? {}),
   )
   .handler(async ({ data, context }) => {
-    const sb = context.supabase as SbLike;
+    const sb = context.supabase as unknown as SbLike;
     const { data: rows, error } = await sb
       .from("alux_feedback")
       .select("id, capability, rating, reason, suggestion_excerpt, created_at")
@@ -143,7 +143,7 @@ export const getAluxFeedbackStats = createServerFn({ method: "POST" })
       .parse(d ?? {}),
   )
   .handler(async ({ data, context }): Promise<AluxFeedbackStats> => {
-    const sb = context.supabase as SbLike;
+    const sb = context.supabase as unknown as SbLike;
 
     // Doble verificación (defensa en profundidad).
     const roleChecks = await Promise.all([
