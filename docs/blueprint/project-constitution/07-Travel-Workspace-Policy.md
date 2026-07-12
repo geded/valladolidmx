@@ -59,6 +59,18 @@ Alux Traveler consume el Travel Workspace vía `traveler_alux_context_for_user()
 
 ---
 
+## Referencia cruzada oficial
+
+El contrato técnico único del Travel Plan vive en:
+
+`docs/blueprint/16.CV0-TRAVEL-PLAN-CONTRACT-v1.0.md` — **Travel Plan Contract v1.0**
+
+Incluye Filosofía del Producto, Consumer Journey oficial, Experience Ownership por etapa, Read/Write/Signal Contracts, reglas de invariancia, roadmap dependiente (CV0 → CV2 → CV3 → CV1 → CV4) y el **Founder Product Axiom**.
+
+Toda iniciativa que toque el viaje del viajero debe consumir ese contrato.
+
+---
+
 ## Conflictos pendientes de decisión del Founder
 
 - **URL canónica del Workspace del viajero:** vigente `/cuenta/mi-viaje`; `/mi-viaje` conservado como redirect. Sin conflicto activo.
