@@ -2071,6 +2071,10 @@ export type Database = {
           discount_amount: number
           editorial_summary: string | null
           editorial_title: string | null
+          email_post_sent_at: string | null
+          email_t14_sent_at: string | null
+          email_t3_sent_at: string | null
+          email_welcome_sent_at: string | null
           expires_at: string | null
           folio: string
           id: string
@@ -2104,6 +2108,10 @@ export type Database = {
           discount_amount?: number
           editorial_summary?: string | null
           editorial_title?: string | null
+          email_post_sent_at?: string | null
+          email_t14_sent_at?: string | null
+          email_t3_sent_at?: string | null
+          email_welcome_sent_at?: string | null
           expires_at?: string | null
           folio: string
           id?: string
@@ -2137,6 +2145,10 @@ export type Database = {
           discount_amount?: number
           editorial_summary?: string | null
           editorial_title?: string | null
+          email_post_sent_at?: string | null
+          email_t14_sent_at?: string | null
+          email_t3_sent_at?: string | null
+          email_welcome_sent_at?: string | null
           expires_at?: string | null
           folio?: string
           id?: string
@@ -6565,6 +6577,22 @@ export type Database = {
           recipient_email: string
           redeemed_at: string
           traveler_first_name: string
+          user_id: string
+        }[]
+      }
+      get_orders_needing_trip_email: {
+        Args: { _kind: string }
+        Returns: {
+          days_to_trip: number
+          destination_name: string
+          end_date: string
+          folio: string
+          order_id: string
+          party_size: number
+          start_date: string
+          traveler_email: string
+          traveler_locale: string
+          traveler_name: string
           user_id: string
         }[]
       }
