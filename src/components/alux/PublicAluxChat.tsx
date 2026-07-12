@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useServerFn } from "@tanstack/react-start";
 import { proposeAluxPlanAddition } from "@/lib/alux/plan-proposals.functions";
 import { toast } from "sonner";
+import { useTranslation } from "@/i18n/context";
 
 type Proposal = {
   entity_type: "business" | "product" | "event" | "destination";
@@ -51,6 +52,7 @@ const SUGGESTIONS = [
 ];
 
 export function PublicAluxChat() {
+  const { locale } = useTranslation();
   const [sessionKey, setSessionKey] = useState("");
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -134,6 +136,7 @@ export function PublicAluxChat() {
             message: trimmed,
             history: messages.slice(-16),
             visitor: location ?? undefined,
+            locale,
             pathContext: (() => {
               if (typeof window === "undefined") return undefined;
               const parts = window.location.pathname.split("/").filter(Boolean);
@@ -177,7 +180,7 @@ export function PublicAluxChat() {
         setSending(false);
       }
     },
-    [messages, sending, sessionKey, location],
+    [messages, sending, sessionKey, location, locale],
   );
 
   return (

@@ -79,7 +79,7 @@ function ContextChip({ slot }: { slot: AluxContextSlot }) {
 }
 
 export function AluxFloatingTrigger() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { user } = useAuth();
   const isAuthed = Boolean(user);
   const rawCtx = useAluxContext();
@@ -211,6 +211,7 @@ export function AluxFloatingTrigger() {
       isAuthed ? (lens?.generated_at ?? null) : null,
       intent,
       territory?.destination_visit_count ?? 0,
+      locale,
     ],
     queryFn: () =>
       suggestFn({
@@ -221,6 +222,7 @@ export function AluxFloatingTrigger() {
           business: ctx.business,
           product: ctx.product,
           limit: 6,
+          locale,
           travelerHints: lens
             ? {
                 home_country: lens.hints.home_country,
