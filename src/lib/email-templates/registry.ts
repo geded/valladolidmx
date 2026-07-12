@@ -7,6 +7,10 @@ import { template as visibilityActivatedTemplate } from './visibility-activated'
 import { template as visibilityRejectedTemplate } from './visibility-rejected'
 import { template as visibilityExpiringTemplate } from './visibility-expiring'
 import { template as visibilityExpiredTemplate } from './visibility-expired'
+import { template as tripT14Template } from './trip-t14'
+import { template as tripT3Template } from './trip-t3'
+import { template as tripWelcomeTemplate } from './trip-welcome'
+import { template as tripPostTemplate } from './trip-post'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -34,4 +38,8 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'visibility-rejected': visibilityRejectedTemplate,
   'visibility-expiring': visibilityExpiringTemplate,
   'visibility-expired': visibilityExpiredTemplate,
+  'trip-t14': tripT14Template,
+  'trip-t3': tripT3Template,
+  'trip-welcome': tripWelcomeTemplate,
+  'trip-post': tripPostTemplate,
 }
