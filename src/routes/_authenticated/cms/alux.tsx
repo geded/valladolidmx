@@ -4,6 +4,7 @@
  * max_tokens y banderas de las capas de memoria M1..M4.
  */
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -146,6 +147,14 @@ function AluxConsolePage() {
             Última actualización: {new Date(data.updated_at).toLocaleString("es-MX")}
           </p>
         )}
+        <div className="pt-2">
+          <Link
+            to="/cms/alux/conocimiento"
+            className="inline-flex items-center gap-2 text-sm underline underline-offset-4 hover:text-primary"
+          >
+            📚 Gestionar Base de Conocimiento (Ola A2)
+          </Link>
+        </div>
       </header>
 
       <section className="rounded-2xl border bg-card p-6 space-y-4 shadow-soft">
