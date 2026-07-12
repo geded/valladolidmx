@@ -77,6 +77,7 @@ import { Route as PreviewCompositionTokenRouteImport } from './routes/preview/co
 import { Route as OrienteMayaDestinoCategoriaRouteImport } from './routes/oriente-maya/$destino.$categoria'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as AuthenticatedPortalVisibilidadRouteImport } from './routes/_authenticated/portal/visibilidad'
+import { Route as AuthenticatedPortalVentasEnLineaRouteImport } from './routes/_authenticated/portal/ventas-en-linea'
 import { Route as AuthenticatedPortalReportesRouteImport } from './routes/_authenticated/portal/reportes'
 import { Route as AuthenticatedPortalPropiedadRouteImport } from './routes/_authenticated/portal/propiedad'
 import { Route as AuthenticatedPortalPresenciaRouteImport } from './routes/_authenticated/portal/presencia'
@@ -535,6 +536,12 @@ const AuthenticatedPortalVisibilidadRoute =
   AuthenticatedPortalVisibilidadRouteImport.update({
     id: '/visibilidad',
     path: '/visibilidad',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
+const AuthenticatedPortalVentasEnLineaRoute =
+  AuthenticatedPortalVentasEnLineaRouteImport.update({
+    id: '/ventas-en-linea',
+    path: '/ventas-en-linea',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
 const AuthenticatedPortalReportesRoute =
@@ -1218,6 +1225,7 @@ export interface FileRoutesByFullPath {
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/portal/reportes': typeof AuthenticatedPortalReportesRoute
+  '/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRoute
   '/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
@@ -1379,6 +1387,7 @@ export interface FileRoutesByTo {
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/portal/reportes': typeof AuthenticatedPortalReportesRoute
+  '/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRoute
   '/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
@@ -1547,6 +1556,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/_authenticated/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/_authenticated/portal/reportes': typeof AuthenticatedPortalReportesRoute
+  '/_authenticated/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRoute
   '/_authenticated/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
@@ -1717,6 +1727,7 @@ export interface FileRouteTypes {
     | '/portal/presencia'
     | '/portal/propiedad'
     | '/portal/reportes'
+    | '/portal/ventas-en-linea'
     | '/portal/visibilidad'
     | '/lovable/email/suppression'
     | '/oriente-maya/$destino/$categoria'
@@ -1878,6 +1889,7 @@ export interface FileRouteTypes {
     | '/portal/presencia'
     | '/portal/propiedad'
     | '/portal/reportes'
+    | '/portal/ventas-en-linea'
     | '/portal/visibilidad'
     | '/lovable/email/suppression'
     | '/preview/composition/$token'
@@ -2045,6 +2057,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/presencia'
     | '/_authenticated/portal/propiedad'
     | '/_authenticated/portal/reportes'
+    | '/_authenticated/portal/ventas-en-linea'
     | '/_authenticated/portal/visibilidad'
     | '/lovable/email/suppression'
     | '/oriente-maya/$destino/$categoria'
@@ -2660,6 +2673,13 @@ declare module '@tanstack/react-router' {
       path: '/visibilidad'
       fullPath: '/portal/visibilidad'
       preLoaderRoute: typeof AuthenticatedPortalVisibilidadRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
+    '/_authenticated/portal/ventas-en-linea': {
+      id: '/_authenticated/portal/ventas-en-linea'
+      path: '/ventas-en-linea'
+      fullPath: '/portal/ventas-en-linea'
+      preLoaderRoute: typeof AuthenticatedPortalVentasEnLineaRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
     '/_authenticated/portal/reportes': {
@@ -3509,6 +3529,7 @@ interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalPresenciaRoute: typeof AuthenticatedPortalPresenciaRoute
   AuthenticatedPortalPropiedadRoute: typeof AuthenticatedPortalPropiedadRoute
   AuthenticatedPortalReportesRoute: typeof AuthenticatedPortalReportesRoute
+  AuthenticatedPortalVentasEnLineaRoute: typeof AuthenticatedPortalVentasEnLineaRoute
   AuthenticatedPortalVisibilidadRoute: typeof AuthenticatedPortalVisibilidadRoute
   AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
   AuthenticatedPortalEmpresasBusinessIdRoute: typeof AuthenticatedPortalEmpresasBusinessIdRoute
@@ -3533,6 +3554,8 @@ const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildr
     AuthenticatedPortalPresenciaRoute: AuthenticatedPortalPresenciaRoute,
     AuthenticatedPortalPropiedadRoute: AuthenticatedPortalPropiedadRoute,
     AuthenticatedPortalReportesRoute: AuthenticatedPortalReportesRoute,
+    AuthenticatedPortalVentasEnLineaRoute:
+      AuthenticatedPortalVentasEnLineaRoute,
     AuthenticatedPortalVisibilidadRoute: AuthenticatedPortalVisibilidadRoute,
     AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
     AuthenticatedPortalEmpresasBusinessIdRoute:
