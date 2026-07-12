@@ -34,6 +34,8 @@ function AuthRoute() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [googleBusy, setGoogleBusy] = useState(false);
+  const [googleMode, setGoogleMode] = useState<"popup" | "redirect">("popup");
+  const [welcomeName, setWelcomeName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && user) {
@@ -48,7 +50,18 @@ function AuthRoute() {
         } catch { /* noop */ }
       }
       const target = next && next.startsWith("/") && !next.startsWith("//") ? next : resolveRoleHome(roles);
-      void navigate({ to: target });
+      // Splash "¡Bienvenido, {nombre}!" antes de saltar al destino.
+      const meta = (user.user_metadata ?? {}) as { full_name?: string; name?: string; given_name?: string };
+      const first =
+        (meta.given_name ?? meta.full_name ?? meta.name ?? user.email ?? "")
+          .toString()
+          .trim()
+          .split(/\s+/)[0] || null;
+      setWelcomeName(first);
+      const timer = window.setTimeout(() => {
+        void navigate({ to: target });
+      }, 1200);
+      return () => window.clearTimeout(timer);
     }
   }, [loading, user, roles, navigate]);
 
@@ -89,16 +102,26 @@ function AuthRoute() {
 
   async function handleGoogle() {
     setError(null);
+    setGoogleMode("popup");
     setGoogleBusy(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
         // Return to /auth so the post-login effect picks up the stored "next".
         redirect_uri: `${window.location.origin}/auth`,
+        extraParams: {
+          // Muestra siempre el selector de cuentas: útil en dispositivos
+          // compartidos o con múltiples cuentas de Google.
+          prompt: "select_account",
+        },
       });
       if (result.error) {
         setError(result.error.message ?? t("auth.google_error"));
         setGoogleBusy(false);
         return;
+      }
+      if (result.redirected) {
+        // El navegador está redirigiendo a Google (full-page).
+        setGoogleMode("redirect");
       }
       // If result.redirected → the browser is navigating to Google; leave modal visible.
       // If tokens were returned (popup path) → the auth effect closes the modal and redirects.
@@ -230,10 +253,15 @@ function AuthRoute() {
                 <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
               </svg>
             </div>
-            <h2 className="mt-4 text-base font-semibold">Conectando con Google…</h2>
+            <h2 className="mt-4 text-base font-semibold">
+              {googleMode === "redirect"
+                ? "Te llevamos a Google…"
+                : "Conectando con Google…"}
+            </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Se abrirá una ventana segura de Google para verificar tu cuenta.
-              Si tu navegador bloquea la ventana, te redirigiremos automáticamente.
+              {googleMode === "redirect"
+                ? "Te llevamos a Google para verificar tu cuenta. Volverás automáticamente cuando termines."
+                : "Se abrirá una ventana segura de Google para verificar tu cuenta. Si tu navegador la bloquea, te redirigiremos automáticamente."}
             </p>
             <button
               type="button"
@@ -242,6 +270,22 @@ function AuthRoute() {
             >
               Cancelar
             </button>
+          </div>
+        </div>
+      ) : null}
+
+      {welcomeName ? (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="mx-4 max-w-sm rounded-2xl border border-border bg-card p-8 text-center shadow-elevated">
+            <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-primary/10 text-2xl">
+              👋
+            </div>
+            <h2 className="mt-4 font-serif text-2xl">
+              ¡Bienvenido, {welcomeName}!
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Preparando tu viaje por el Oriente Maya…
+            </p>
           </div>
         </div>
       ) : null}
