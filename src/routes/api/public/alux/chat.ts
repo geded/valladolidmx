@@ -594,6 +594,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         const system = [
           persona,
           PUBLIC_PERSONA_EXTRA,
+          localeBlock,
           memoryBlock,
           temporal.block,
           knowledgeBlock,
