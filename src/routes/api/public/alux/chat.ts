@@ -519,6 +519,49 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         ).catch(() => []);
         const eventsBlock = eventsToPromptBlock(activeEvents);
 
+        // 4e) Clima real (Ola A10 · Open-Meteo, sin API key).
+        // Fuente: GPS del visitante si compartió ubicación; si no,
+        // coordenadas del destino activo como fallback territorial.
+        let weatherBlock = "";
+        let weatherSource: "gps" | "destino" | null = null;
+        let weatherLat: number | null = null;
+        let weatherLon: number | null = null;
+        let destinationLabel: string | null = null;
+        if (visitor) {
+          weatherSource = "gps";
+          weatherLat = visitor.lat;
+          weatherLon = visitor.lng;
+        } else if (activeDestination) {
+          const { data: destGeo } = await supabaseAdmin
+            .from("destinations")
+            .select("name, latitude, longitude")
+            .eq("slug", activeDestination)
+            .maybeSingle();
+          if (
+            destGeo &&
+            typeof destGeo.latitude === "number" &&
+            typeof destGeo.longitude === "number"
+          ) {
+            weatherSource = "destino";
+            weatherLat = destGeo.latitude;
+            weatherLon = destGeo.longitude;
+            destinationLabel = destGeo.name ?? activeDestination;
+          }
+        }
+        if (weatherSource && weatherLat !== null && weatherLon !== null) {
+          const { fetchWeatherCached, weatherToPromptBlock } = await import(
+            "@/lib/alux/weather.server"
+          );
+          const snapshot = await fetchWeatherCached(weatherLat, weatherLon).catch(
+            () => null,
+          );
+          weatherBlock = weatherToPromptBlock(
+            snapshot,
+            weatherSource,
+            destinationLabel,
+          );
+        }
+
         // 5) Genera respuesta.
         const provider = createLovableAiGatewayProvider(apiKey);
         const persona =
@@ -535,6 +578,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           knowledgeBlock,
           nearbyBlock,
           eventsBlock,
+          weatherBlock,
           `---\n${guardrails}`,
         ]
           .filter(Boolean)
