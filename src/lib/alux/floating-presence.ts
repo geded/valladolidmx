@@ -15,7 +15,6 @@
  * SSR-safe. Nunca lanza. No introduce contratos nuevos.
  */
 import { useRouterState } from "@tanstack/react-router";
-import { useAluxContext } from "@/lib/alux/use-alux-context";
 import { useHasStickyCta } from "@/lib/alux/sticky-cta-presence";
 
 /** Prefijos de ruta con CTA sticky propio donde el flotante debe ocultarse. */
@@ -23,6 +22,24 @@ const HIDDEN_PATH_PREFIXES: readonly string[] = [
   "/cuenta/carrito",
   "/cuenta/pagos",
 ];
+
+/**
+ * Detecta fichas comerciales por URL (no por contexto rehidratado).
+ *
+ * Antes usábamos `ctx.business` / `ctx.product` de `useAluxContext`, pero
+ * ese hook rehidrata desde sessionStorage tras visitar una ficha, así que
+ * al volver al Home el contexto quedaba "pegado" y ocultaba el flotante
+ * en páginas donde SÍ debe verse. La ruta es la única señal fiable.
+ *
+ * Ruta canónica: `/oriente-maya/:destino/:categoria/:empresa[/:producto]`.
+ */
+function detectFicha(pathname: string): "business" | "product" | null {
+  if (!pathname.startsWith("/oriente-maya/")) return null;
+  const segs = pathname.replace(/^\/oriente-maya\//, "").split("/").filter(Boolean);
+  if (segs.length >= 4) return "product";
+  if (segs.length >= 3) return "business";
+  return null;
+}
 
 export interface AluxFloatingPresence {
   /** El flotante debe ocultarse en la superficie actual. */
@@ -42,19 +59,17 @@ export interface AluxFloatingPresence {
 }
 
 export function useAluxFloatingPresence(): AluxFloatingPresence {
-  const ctx = useAluxContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const hasStickyCta = useHasStickyCta();
 
-  if (ctx.product)
+  const ficha = detectFicha(pathname);
+  if (ficha === "product")
     return { shouldHide: true, reason: "ficha-product", bottomOffset: 0 };
-  if (ctx.business)
+  if (ficha === "business")
     return { shouldHide: true, reason: "ficha-business", bottomOffset: 0 };
   if (HIDDEN_PATH_PREFIXES.some((p) => pathname.startsWith(p))) {
     return { shouldHide: true, reason: "checkout", bottomOffset: 0 };
   }
-  // Superficie con CTA sticky (destino, categoría, etc.): Alux sigue
-  // presente como copiloto, pero se eleva por encima de la barra.
   if (hasStickyCta)
     return { shouldHide: false, reason: "sticky-cta", bottomOffset: 88 };
   return { shouldHide: false, reason: "none", bottomOffset: 0 };
