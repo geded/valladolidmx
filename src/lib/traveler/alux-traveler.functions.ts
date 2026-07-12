@@ -23,6 +23,11 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import type { Json } from "@/integrations/supabase/types";
+import { resolveAluxSettingsServer } from "@/lib/alux/settings.functions";
+import {
+  retrieveAluxKnowledgeServer,
+  knowledgeToPromptBlock,
+} from "@/lib/alux/knowledge.functions";
 
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 
@@ -151,11 +156,26 @@ async function runAluxTraveler(
   const planId = contextActivePlanId(context);
   const sources = extractSources(context);
 
+  // Ola A2 · Inyección de la Base de Conocimiento (M4).
+  const settings = await resolveAluxSettingsServer(supabase).catch(() => null);
+  let knowledgeBlock = "";
+  let knowledgeCount = 0;
+  if (!settings || settings.flags.m4_knowledge) {
+    const query = [capability, userPrompt].join(" ").slice(0, 500);
+    const matches = await retrieveAluxKnowledgeServer(supabase, query, {
+      matchCount: 4,
+    });
+    knowledgeCount = matches.length;
+    knowledgeBlock = knowledgeToPromptBlock(matches);
+  }
+
   const provider = createLovableAiGatewayProvider(requireApiKey());
   const t0 = Date.now();
   const { text, usage } = await generateText({
     model: provider(DEFAULT_MODEL),
-    system: [SYSTEM_BASE, systemExtra, RATIONALE_INSTRUCTION].join("\n\n"),
+    system: [SYSTEM_BASE, systemExtra, knowledgeBlock, RATIONALE_INSTRUCTION]
+      .filter(Boolean)
+      .join("\n\n"),
     prompt:
       userPrompt +
       "\n\nContexto del viajero (JSON):\n```json\n" +
@@ -175,6 +195,7 @@ async function runAluxTraveler(
     tokens_in: usage?.inputTokens ?? null,
     tokens_out: usage?.outputTokens ?? null,
     sources_count: sources.length,
+    kb_matches: knowledgeCount,
   });
 
   return {

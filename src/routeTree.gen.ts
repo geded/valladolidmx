@@ -157,6 +157,7 @@ import { Route as AuthenticatedCmsExperienceBuilderInventoryRouteImport } from '
 import { Route as AuthenticatedCmsEmpresasNuevaRouteImport } from './routes/_authenticated/cms/empresas.nueva'
 import { Route as AuthenticatedCmsDestinosNuevaRouteImport } from './routes/_authenticated/cms/destinos.nueva'
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
+import { Route as AuthenticatedCmsAluxConocimientoRouteImport } from './routes/_authenticated/cms/alux.conocimiento'
 import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/_authenticated/admin/sistema.usuarios'
 import { Route as OrienteMayaDestinoCategoriaEmpresaIndexRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa.index'
 import { Route as OrienteMayaDestinoCategoriaEmpresaProductoRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa.$producto'
@@ -1003,6 +1004,12 @@ const AuthenticatedCmsCategoriasNuevaRoute =
     path: '/categorias/nueva',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsAluxConocimientoRoute =
+  AuthenticatedCmsAluxConocimientoRouteImport.update({
+    id: '/conocimiento',
+    path: '/conocimiento',
+    getParentRoute: () => AuthenticatedCmsAluxRoute,
+  } as any)
 const AuthenticatedAdminSistemaUsuariosRoute =
   AuthenticatedAdminSistemaUsuariosRouteImport.update({
     id: '/usuarios',
@@ -1154,7 +1161,7 @@ export interface FileRoutesByFullPath {
   '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
-  '/cms/alux': typeof AuthenticatedCmsAluxRoute
+  '/cms/alux': typeof AuthenticatedCmsAluxRouteWithChildren
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
@@ -1196,6 +1203,7 @@ export interface FileRoutesByFullPath {
   '/portal/': typeof AuthenticatedPortalIndexRoute
   '/oriente-maya/$destino/': typeof OrienteMayaDestinoIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
+  '/cms/alux/conocimiento': typeof AuthenticatedCmsAluxConocimientoRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/destinos/nueva': typeof AuthenticatedCmsDestinosNuevaRoute
   '/cms/empresas/nueva': typeof AuthenticatedCmsEmpresasNuevaRoute
@@ -1310,7 +1318,7 @@ export interface FileRoutesByTo {
   '/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
-  '/cms/alux': typeof AuthenticatedCmsAluxRoute
+  '/cms/alux': typeof AuthenticatedCmsAluxRouteWithChildren
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
@@ -1351,6 +1359,7 @@ export interface FileRoutesByTo {
   '/portal': typeof AuthenticatedPortalIndexRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
+  '/cms/alux/conocimiento': typeof AuthenticatedCmsAluxConocimientoRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/destinos/nueva': typeof AuthenticatedCmsDestinosNuevaRoute
   '/cms/empresas/nueva': typeof AuthenticatedCmsEmpresasNuevaRoute
@@ -1473,7 +1482,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/turistas': typeof AuthenticatedAdminTuristasRoute
   '/_authenticated/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/_authenticated/cms/alertas': typeof AuthenticatedCmsAlertasRoute
-  '/_authenticated/cms/alux': typeof AuthenticatedCmsAluxRoute
+  '/_authenticated/cms/alux': typeof AuthenticatedCmsAluxRouteWithChildren
   '/_authenticated/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
@@ -1515,6 +1524,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
   '/oriente-maya/$destino/': typeof OrienteMayaDestinoIndexRoute
   '/_authenticated/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
+  '/_authenticated/cms/alux/conocimiento': typeof AuthenticatedCmsAluxConocimientoRoute
   '/_authenticated/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/_authenticated/cms/destinos/nueva': typeof AuthenticatedCmsDestinosNuevaRoute
   '/_authenticated/cms/empresas/nueva': typeof AuthenticatedCmsEmpresasNuevaRoute
@@ -1680,6 +1690,7 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/oriente-maya/$destino/'
     | '/admin/sistema/usuarios'
+    | '/cms/alux/conocimiento'
     | '/cms/categorias/nueva'
     | '/cms/destinos/nueva'
     | '/cms/empresas/nueva'
@@ -1835,6 +1846,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/oriente-maya/$destino'
     | '/admin/sistema/usuarios'
+    | '/cms/alux/conocimiento'
     | '/cms/categorias/nueva'
     | '/cms/destinos/nueva'
     | '/cms/empresas/nueva'
@@ -1998,6 +2010,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/'
     | '/oriente-maya/$destino/'
     | '/_authenticated/admin/sistema/usuarios'
+    | '/_authenticated/cms/alux/conocimiento'
     | '/_authenticated/cms/categorias/nueva'
     | '/_authenticated/cms/destinos/nueva'
     | '/_authenticated/cms/empresas/nueva'
@@ -3157,6 +3170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsCategoriasNuevaRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/alux/conocimiento': {
+      id: '/_authenticated/cms/alux/conocimiento'
+      path: '/conocimiento'
+      fullPath: '/cms/alux/conocimiento'
+      preLoaderRoute: typeof AuthenticatedCmsAluxConocimientoRouteImport
+      parentRoute: typeof AuthenticatedCmsAluxRoute
+    }
     '/_authenticated/admin/sistema/usuarios': {
       id: '/_authenticated/admin/sistema/usuarios'
       path: '/usuarios'
@@ -3453,6 +3473,17 @@ const AuthenticatedPortalRouteRouteWithChildren =
     AuthenticatedPortalRouteRouteChildren,
   )
 
+interface AuthenticatedCmsAluxRouteChildren {
+  AuthenticatedCmsAluxConocimientoRoute: typeof AuthenticatedCmsAluxConocimientoRoute
+}
+
+const AuthenticatedCmsAluxRouteChildren: AuthenticatedCmsAluxRouteChildren = {
+  AuthenticatedCmsAluxConocimientoRoute: AuthenticatedCmsAluxConocimientoRoute,
+}
+
+const AuthenticatedCmsAluxRouteWithChildren =
+  AuthenticatedCmsAluxRoute._addFileChildren(AuthenticatedCmsAluxRouteChildren)
+
 interface AuthenticatedCmsExperienceBuilderRouteChildren {
   AuthenticatedCmsExperienceBuilderInventoryRoute: typeof AuthenticatedCmsExperienceBuilderInventoryRoute
   AuthenticatedCmsExperienceBuilderPagesRoute: typeof AuthenticatedCmsExperienceBuilderPagesRoute
@@ -3492,7 +3523,7 @@ const AuthenticatedCmsVisibilidadRouteWithChildren =
 interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsActividadRoute: typeof AuthenticatedCmsActividadRoute
   AuthenticatedCmsAlertasRoute: typeof AuthenticatedCmsAlertasRoute
-  AuthenticatedCmsAluxRoute: typeof AuthenticatedCmsAluxRoute
+  AuthenticatedCmsAluxRoute: typeof AuthenticatedCmsAluxRouteWithChildren
   AuthenticatedCmsExperienceBuilderRoute: typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
   AuthenticatedCmsObservabilidadRoute: typeof AuthenticatedCmsObservabilidadRoute
@@ -3525,7 +3556,7 @@ interface AuthenticatedCmsRouteChildren {
 const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsActividadRoute: AuthenticatedCmsActividadRoute,
   AuthenticatedCmsAlertasRoute: AuthenticatedCmsAlertasRoute,
-  AuthenticatedCmsAluxRoute: AuthenticatedCmsAluxRoute,
+  AuthenticatedCmsAluxRoute: AuthenticatedCmsAluxRouteWithChildren,
   AuthenticatedCmsExperienceBuilderRoute:
     AuthenticatedCmsExperienceBuilderRouteWithChildren,
   AuthenticatedCmsMediaRoute: AuthenticatedCmsMediaRoute,
