@@ -40,6 +40,7 @@ import {
 } from "@/lib/traveler/guest-queue";
 import { ccListMyCases } from "@/lib/concierge/cc.functions";
 import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
+import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsInbox";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   component: MiViajePage,
@@ -95,6 +96,8 @@ function MiViajePage() {
       </header>
 
       <GuestImportBanner onImported={invalidatePlan} />
+
+      <AluxPlanProposalsInbox onChanged={invalidatePlan} />
 
       {activeQ.isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando tu plan…</p>

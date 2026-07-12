@@ -149,6 +149,84 @@ export type Database = {
         }
         Relationships: []
       }
+      alux_plan_proposals: {
+        Row: {
+          created_at: string
+          created_plan_item_id: string | null
+          decided_at: string | null
+          decision_note: string | null
+          entity_id: string | null
+          entity_slug: string | null
+          entity_type: string
+          id: string
+          image_url: string | null
+          plan_id: string | null
+          rationale: string | null
+          source_session_id: string | null
+          sources: Json
+          status: string
+          subtitle: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_plan_item_id?: string | null
+          decided_at?: string | null
+          decision_note?: string | null
+          entity_id?: string | null
+          entity_slug?: string | null
+          entity_type: string
+          id?: string
+          image_url?: string | null
+          plan_id?: string | null
+          rationale?: string | null
+          source_session_id?: string | null
+          sources?: Json
+          status?: string
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_plan_item_id?: string | null
+          decided_at?: string | null
+          decision_note?: string | null
+          entity_id?: string | null
+          entity_slug?: string | null
+          entity_type?: string
+          id?: string
+          image_url?: string | null
+          plan_id?: string | null
+          rationale?: string | null
+          source_session_id?: string | null
+          sources?: Json
+          status?: string
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alux_plan_proposals_created_plan_item_id_fkey"
+            columns: ["created_plan_item_id"]
+            isOneToOne: false
+            referencedRelation: "travel_plan_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alux_plan_proposals_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "travel_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alux_public_messages: {
         Row: {
           content: string
