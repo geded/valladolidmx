@@ -1930,6 +1930,259 @@ export type Database = {
         }
         Relationships: []
       }
+      concierge_order_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          order_id: string
+          payload: Json
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          order_id: string
+          payload?: Json
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          order_id?: string
+          payload?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concierge_order_items: {
+        Row: {
+          business_id: string | null
+          commission_amount: number
+          commission_bps: number
+          commission_source: string
+          created_at: string
+          currency: string
+          description: string | null
+          entity_id: string | null
+          entity_kind: string
+          fulfillment_status: string
+          guest_notes: string | null
+          id: string
+          image_url: string | null
+          metadata: Json
+          order_id: string
+          quantity: number
+          scheduled_for: string | null
+          subtotal_amount: number
+          title: string
+          unit_amount: number
+          updated_at: string
+        }
+        Insert: {
+          business_id?: string | null
+          commission_amount?: number
+          commission_bps?: number
+          commission_source?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          entity_id?: string | null
+          entity_kind: string
+          fulfillment_status?: string
+          guest_notes?: string | null
+          id?: string
+          image_url?: string | null
+          metadata?: Json
+          order_id: string
+          quantity?: number
+          scheduled_for?: string | null
+          subtotal_amount?: number
+          title: string
+          unit_amount: number
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string | null
+          commission_amount?: number
+          commission_bps?: number
+          commission_source?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          entity_id?: string | null
+          entity_kind?: string
+          fulfillment_status?: string
+          guest_notes?: string | null
+          id?: string
+          image_url?: string | null
+          metadata?: Json
+          order_id?: string
+          quantity?: number
+          scheduled_for?: string | null
+          subtotal_amount?: number
+          title?: string
+          unit_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_order_items_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "concierge_order_items_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concierge_orders: {
+        Row: {
+          cancelled_at: string | null
+          cancelled_reason: string | null
+          commission_amount: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          destination_name: string | null
+          discount_amount: number
+          editorial_summary: string | null
+          editorial_title: string | null
+          expires_at: string | null
+          folio: string
+          id: string
+          metadata: Json
+          paid_at: string | null
+          payment_provider: string | null
+          payment_provider_intent_id: string | null
+          source_case_id: string | null
+          source_kind: string
+          source_proposal_id: string | null
+          status: string
+          subtotal_amount: number
+          tax_amount: number
+          total_amount: number
+          travel_plan_id: string | null
+          traveler_email: string | null
+          traveler_locale: string | null
+          traveler_name: string | null
+          traveler_phone: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          cancelled_at?: string | null
+          cancelled_reason?: string | null
+          commission_amount?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          destination_name?: string | null
+          discount_amount?: number
+          editorial_summary?: string | null
+          editorial_title?: string | null
+          expires_at?: string | null
+          folio: string
+          id?: string
+          metadata?: Json
+          paid_at?: string | null
+          payment_provider?: string | null
+          payment_provider_intent_id?: string | null
+          source_case_id?: string | null
+          source_kind: string
+          source_proposal_id?: string | null
+          status?: string
+          subtotal_amount?: number
+          tax_amount?: number
+          total_amount?: number
+          travel_plan_id?: string | null
+          traveler_email?: string | null
+          traveler_locale?: string | null
+          traveler_name?: string | null
+          traveler_phone?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          cancelled_at?: string | null
+          cancelled_reason?: string | null
+          commission_amount?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          destination_name?: string | null
+          discount_amount?: number
+          editorial_summary?: string | null
+          editorial_title?: string | null
+          expires_at?: string | null
+          folio?: string
+          id?: string
+          metadata?: Json
+          paid_at?: string | null
+          payment_provider?: string | null
+          payment_provider_intent_id?: string | null
+          source_case_id?: string | null
+          source_kind?: string
+          source_proposal_id?: string | null
+          status?: string
+          subtotal_amount?: number
+          tax_amount?: number
+          total_amount?: number
+          travel_plan_id?: string | null
+          traveler_email?: string | null
+          traveler_locale?: string | null
+          traveler_name?: string | null
+          traveler_phone?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_orders_source_case_id_fkey"
+            columns: ["source_case_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_orders_source_proposal_id_fkey"
+            columns: ["source_proposal_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_proposals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_orders_travel_plan_id_fkey"
+            columns: ["travel_plan_id"]
+            isOneToOne: false
+            referencedRelation: "travel_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       concierge_profiles: {
         Row: {
           active: boolean
@@ -4030,6 +4283,14 @@ export type Database = {
           demo_seed_batch: string | null
           demo_source_url: string | null
           description: string | null
+          direct_sale_cancellation_policy: string | null
+          direct_sale_commission_bps: number | null
+          direct_sale_currency: string | null
+          direct_sale_enabled: boolean
+          direct_sale_max_quantity: number | null
+          direct_sale_min_lead_hours: number | null
+          direct_sale_price_amount: number | null
+          direct_sale_terms: string | null
           duration_minutes: number | null
           eligible_for_ems_campaigns: boolean
           generates_commission: boolean
@@ -4065,6 +4326,14 @@ export type Database = {
           demo_seed_batch?: string | null
           demo_source_url?: string | null
           description?: string | null
+          direct_sale_cancellation_policy?: string | null
+          direct_sale_commission_bps?: number | null
+          direct_sale_currency?: string | null
+          direct_sale_enabled?: boolean
+          direct_sale_max_quantity?: number | null
+          direct_sale_min_lead_hours?: number | null
+          direct_sale_price_amount?: number | null
+          direct_sale_terms?: string | null
           duration_minutes?: number | null
           eligible_for_ems_campaigns?: boolean
           generates_commission?: boolean
@@ -4100,6 +4369,14 @@ export type Database = {
           demo_seed_batch?: string | null
           demo_source_url?: string | null
           description?: string | null
+          direct_sale_cancellation_policy?: string | null
+          direct_sale_commission_bps?: number | null
+          direct_sale_currency?: string | null
+          direct_sale_enabled?: boolean
+          direct_sale_max_quantity?: number | null
+          direct_sale_min_lead_hours?: number | null
+          direct_sale_price_amount?: number | null
+          direct_sale_terms?: string | null
           duration_minutes?: number | null
           eligible_for_ems_campaigns?: boolean
           generates_commission?: boolean
@@ -5451,6 +5728,7 @@ export type Database = {
           is_admin: boolean
         }[]
       }
+      _cv41_generate_folio: { Args: never; Returns: string }
       _order_recompute_totals: {
         Args: { p_order_id: string }
         Returns: undefined
