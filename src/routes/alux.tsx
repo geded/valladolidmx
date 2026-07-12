@@ -5,6 +5,7 @@ import { SITE } from "@/config/site";
 import { AluxSurface } from "@/components/surfaces/AluxSurface";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import { PublicAluxChat } from "@/components/alux/PublicAluxChat";
 
 export const Route = createFileRoute("/alux")({
   loader: async () => {
@@ -30,6 +31,9 @@ function AluxPage() {
       description="La inteligencia que acompaña el trabajo del concierge humano: resume expedientes, sugiere productos y prepara borradores revisables."
       crumbs={[{ label: "Alux" }]}
     >
+      <div className="mx-auto w-full max-w-3xl px-4 mb-10">
+        <PublicAluxChat />
+      </div>
       {composition ? (
         <CompositionRenderer tree={composition.snapshot} />
       ) : (
