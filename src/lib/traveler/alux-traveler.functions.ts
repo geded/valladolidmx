@@ -27,6 +27,8 @@ import { resolveAluxSettingsServer } from "@/lib/alux/settings.functions";
 import {
   retrieveAluxKnowledgeServer,
   knowledgeToPromptBlock,
+  ALUX_KB_LOCALES,
+  type AluxKbLocale,
 } from "@/lib/alux/knowledge.functions";
 
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
@@ -51,12 +53,27 @@ export type AluxTravelerCapability = (typeof CAPABILITIES)[number];
 
 // ---------- Contratos I/O ----------
 
-const EmptyInput = z.object({}).optional().default({});
+const LocaleField = z.enum(ALUX_KB_LOCALES).optional();
+
+const EmptyInput = z
+  .object({ locale: LocaleField })
+  .optional()
+  .default({});
 
 const CapabilityInput = z.object({
   planId: z.string().uuid().optional(),
   focus: z.string().max(500).optional(),
+  locale: LocaleField,
 });
+
+const LOCALE_DIRECTIVES: Record<AluxKbLocale, string> = {
+  es: "Responde SIEMPRE en español neutro.",
+  en: "ALWAYS respond in natural English. Keep proper names, addresses, prices and URLs unchanged.",
+  fr: "Réponds TOUJOURS en français naturel. Conserve tels quels les noms propres, adresses, prix et URLs.",
+  de: "Antworte IMMER auf natürlichem Deutsch. Eigennamen, Adressen, Preise und URLs unverändert lassen.",
+  it: "Rispondi SEMPRE in italiano naturale. Mantieni invariati nomi propri, indirizzi, prezzi e URL.",
+  pt: "Responda SEMPRE em português natural. Mantenha inalterados nomes próprios, endereços, preços e URLs.",
+};
 
 const LogInput = z.object({
   capability: z.enum(CAPABILITIES),
@@ -141,17 +158,18 @@ function contextActivePlanId(context: unknown): string | null {
 }
 
 const SYSTEM_BASE =
-  "Eres Alux, asistente del viajero en Valladolid.mx. Respondes SIEMPRE en español, breve y honesto. Trabajas SÓLO con la información del contexto entregado (perfil del viajero, plan activo, referencias del catálogo). Nunca inventas empresas, precios, horarios ni disponibilidad. Nunca reservas, nunca modificas el plan, nunca envías al concierge, nunca contactas empresas. Sólo sugieres, explicas y redactas. Cuando cites algo, usa exactamente el título tal como aparece en las referencias.";
+  "Eres Alux, asistente del viajero en Valladolid.mx. Respondes en el idioma indicado por la directiva de idioma, siempre breve y honesto. Trabajas SÓLO con la información del contexto entregado (perfil del viajero, plan activo, referencias del catálogo). Nunca inventas empresas, precios, horarios ni disponibilidad. Nunca reservas, nunca modificas el plan, nunca envías al concierge, nunca contactas empresas. Sólo sugieres, explicas y redactas. Cuando cites algo, usa exactamente el título tal como aparece en las referencias.";
 
 const RATIONALE_INSTRUCTION =
-  "Formato de respuesta OBLIGATORIO en dos secciones Markdown:\n" +
-  "## Sugerencia\n<contenido>\n\n## Por qué\n<1–3 líneas explicando el razonamiento con base en el contexto>";
+  "Formato de respuesta OBLIGATORIO en dos secciones Markdown. Mantén los encabezados EXACTAMENTE como aparecen aquí (en español) aunque el cuerpo esté en otro idioma:\n" +
+  "## Sugerencia\n<contenido en el idioma solicitado>\n\n## Por qué\n<1–3 líneas de razonamiento en el idioma solicitado>";
 
 async function runAluxTraveler(
   capability: AluxTravelerCapability,
   systemExtra: string,
   userPrompt: string,
   supabase: unknown,
+  locale: AluxKbLocale = "es",
 ): Promise<AluxTravelerSuggestion> {
   const context = await fetchTravelerContext(supabase);
   const planId = contextActivePlanId(context);
@@ -166,19 +184,26 @@ async function runAluxTraveler(
     const query = [capability, userPrompt].join(" ").slice(0, 500);
     const matches = await retrieveAluxKnowledgeServer(supabase, query, {
       matchCount: 4,
+      locale,
     });
     knowledgeCount = matches.length;
     knowledgeIds = matches
       .map((m) => (m as { id?: string }).id)
       .filter((v): v is string => typeof v === "string");
-    knowledgeBlock = knowledgeToPromptBlock(matches);
+    knowledgeBlock = knowledgeToPromptBlock(matches, { locale });
   }
 
   const provider = createLovableAiGatewayProvider(requireApiKey());
   const t0 = Date.now();
   const { text, usage } = await generateText({
     model: provider(DEFAULT_MODEL),
-    system: [SYSTEM_BASE, systemExtra, knowledgeBlock, RATIONALE_INSTRUCTION]
+    system: [
+      SYSTEM_BASE,
+      LOCALE_DIRECTIVES[locale],
+      systemExtra,
+      knowledgeBlock,
+      RATIONALE_INSTRUCTION,
+    ]
       .filter(Boolean)
       .join("\n\n"),
     prompt:
@@ -264,6 +289,7 @@ export const suggestExperiences = createServerFn({ method: "POST" })
         (data.focus ? `. Foco solicitado: ${data.focus}` : "") +
         ". Para cada una: título, por qué encaja (1 línea) y qué momento del viaje ocupa. No inventes títulos.",
       context.supabase,
+      data.locale ?? "es",
     ),
   );
 
@@ -281,6 +307,7 @@ export const suggestRestaurants = createServerFn({ method: "POST" })
         (data.focus ? `. Foco: ${data.focus}` : "") +
         ". Para cada uno: nombre, tipo de cocina si consta en el contexto y motivo. No inventes menús ni precios.",
       context.supabase,
+      data.locale ?? "es",
     ),
   );
 
@@ -298,6 +325,7 @@ export const suggestHotels = createServerFn({ method: "POST" })
         (data.focus ? `. Foco: ${data.focus}` : "") +
         ". Para cada uno: nombre, encaje con presupuesto/perfil y motivo. No confirmes disponibilidad ni tarifas.",
       context.supabase,
+      data.locale ?? "es",
     ),
   );
 
@@ -316,6 +344,7 @@ export const improveMyTrip = createServerFn({ method: "POST" })
         (data.focus ? `. Foco: ${data.focus}` : "") +
         ". Para cada mejora indica qué cambiaría y por qué mejora la experiencia del viajero.",
       context.supabase,
+      data.locale ?? "es",
     ),
   );
 
@@ -325,12 +354,13 @@ export const improveMyTrip = createServerFn({ method: "POST" })
 export const detectPlanGaps = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => EmptyInput.parse(d ?? {}))
-  .handler(async ({ context }) =>
+  .handler(async ({ context, data }) =>
     runAluxTraveler(
       "detect_gaps",
       "Sólo observas huecos evidentes en el plan activo. No inventas: si el plan no tiene fechas, dilo.",
       "Detecta huecos del plan activo: días sin actividad, tramos sin comida planeada, falta de hospedaje, falta de transporte entre destinos distantes, sobrecarga de actividades intensas seguidas. Para cada hueco: descripción y sugerencia de acción no destructiva.",
       context.supabase,
+      data?.locale ?? "es",
     ),
   );
 
@@ -350,6 +380,7 @@ export const draftConciergeMessage = createServerFn({ method: "POST" })
         (data.focus ? `. Foco: ${data.focus}` : "") +
         ". Incluye: qué ya definió, qué necesita resolver y qué tipo de propuesta espera. El envío final lo hace el viajero desde la UI.",
       context.supabase,
+      data.locale ?? "es",
     ),
   );
 
@@ -370,6 +401,7 @@ export const suggestFromCoupons = createServerFn({ method: "POST" })
         (data.focus ? `. Foco: ${data.focus}` : "") +
         ". Para cada cupón cita: título exacto, negocio, % de descuento (si lo trae), vigencia (fecha) y en qué momento del plan (o del recorrido por el Oriente Maya) le conviene usarlo. Si un cupón está por vencer, priorízalo. Cierra recordando que puede descubrir más promociones en /promociones. No inventes menús ni tarifas.",
       context.supabase,
+      data.locale ?? "es",
     ),
   );
 
@@ -477,5 +509,6 @@ export const discoverPromotions = createServerFn({ method: "POST" })
         ". Para cada una: título exacto, por qué encaja en 1 línea y URL exacta (usa el campo `url` provisto). Cierra con una invitación clara a visitar /promociones para ver el catálogo completo y reclamar el cupón digital." +
         promosBlock,
       context.supabase,
+      data.locale ?? "es",
     );
   });
