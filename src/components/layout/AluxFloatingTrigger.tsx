@@ -211,11 +211,11 @@ export function AluxFloatingTrigger() {
                 <button
                   type="button"
                   onClick={geo.request}
-                  disabled={geo.status === "requesting"}
+                  disabled={geo.status === "prompting"}
                   className="mt-3 inline-flex items-center gap-1 rounded-full border border-primary/40 bg-background px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/10 disabled:opacity-60"
                 >
                   <MapPin className="size-3.5" aria-hidden />
-                  {geo.status === "requesting"
+                  {geo.status === "prompting"
                     ? "Solicitando permiso…"
                     : geo.status === "denied"
                       ? "Permiso denegado — reintentar"
