@@ -40,6 +40,7 @@ const ENTITIES: EntityCard[] = [
   { key: "media_assets", name: "Media", description: "Biblioteca multimedia compartida.", to: "/cms/media" },
   { key: "reviews", name: "Reseñas", description: "Moderación de reseñas y respuestas.", to: "/cms/reviews" },
   { key: "visibility_plans", name: "Paquetes de visibilidad", description: "Catálogo comercial editable: precios, ciclos, límites y palancas por paquete.", to: "/cms/visibilidad" },
+  { key: "travel_plans_ops", name: "Viajes en curso (CV1.1)", description: "Vista operativa read-only de Travel Plans activos, Alux y Concierge.", to: "/cms/travel-plans" },
 ];
 
 function CmsDashboard() {
