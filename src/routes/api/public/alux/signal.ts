@@ -94,7 +94,7 @@ export const Route = createFileRoute("/api/public/alux/signal")({
         const { data: row, error } = await supabaseAdmin
           .from("alux_public_sessions")
           .select(
-            "id, summary, last_signals, last_destination_slug, last_category_slug",
+            "id, summary, last_signals, last_destination_slug, last_category_slug, visited_destinations, visited_categories, destination_visit_count",
           )
           .eq("session_key", sessionKey)
           .maybeSingle();
@@ -122,6 +122,9 @@ export const Route = createFileRoute("/api/public/alux/signal")({
           last_seen_at: string;
           last_destination_slug?: string;
           last_category_slug?: string;
+          visited_destinations?: unknown;
+          visited_categories?: unknown;
+          destination_visit_count?: number;
         } = {
           last_signals: mergedSignals,
           summary: nextSummary,
@@ -130,6 +133,43 @@ export const Route = createFileRoute("/api/public/alux/signal")({
         };
         if (dest) patch.last_destination_slug = dest;
         if (cat) patch.last_category_slug = cat;
+
+        // A16 · Memoria territorial persistente — acumular destinos y
+        // categorías visitadas entre sesiones/turnos, dedupe por slug.
+        const nowIso = new Date().toISOString();
+        type Visit = { slug: string; label?: string | null; first_seen: string; last_seen: string; count: number };
+        if (dest) {
+          const arr: Visit[] = Array.isArray(row.visited_destinations)
+            ? (row.visited_destinations as Visit[])
+            : [];
+          const idx = arr.findIndex((v) => v && v.slug === dest);
+          const changedDest = idx === -1 || arr[idx].slug !== (row.last_destination_slug ?? null);
+          if (idx === -1) {
+            arr.push({ slug: dest, label: dest, first_seen: nowIso, last_seen: nowIso, count: 1 });
+          } else {
+            arr[idx].last_seen = nowIso;
+            if (changedDest) arr[idx].count = (arr[idx].count ?? 0) + 1;
+          }
+          patch.visited_destinations = arr.slice(-20);
+          if (changedDest) {
+            patch.destination_visit_count =
+              (row.destination_visit_count as number | null | undefined) ?? 0;
+            patch.destination_visit_count = (patch.destination_visit_count ?? 0) + 1;
+          }
+        }
+        if (cat) {
+          type CatVisit = { slug: string; count: number; last_seen: string };
+          const arr: CatVisit[] = Array.isArray(row.visited_categories)
+            ? (row.visited_categories as CatVisit[])
+            : [];
+          const idx = arr.findIndex((v) => v && v.slug === cat);
+          if (idx === -1) arr.push({ slug: cat, count: 1, last_seen: nowIso });
+          else {
+            arr[idx].last_seen = nowIso;
+            arr[idx].count = (arr[idx].count ?? 0) + 1;
+          }
+          patch.visited_categories = arr.slice(-30);
+        }
 
         await supabaseAdmin
           .from("alux_public_sessions")
