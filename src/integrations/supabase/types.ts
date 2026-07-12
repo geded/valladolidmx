@@ -218,6 +218,7 @@ export type Database = {
           summary: string | null
           summary_message_count: number
           summary_updated_at: string | null
+          traveler_user_id: string | null
           user_agent: string | null
           visited_categories: Json
           visited_destinations: Json
@@ -240,6 +241,7 @@ export type Database = {
           summary?: string | null
           summary_message_count?: number
           summary_updated_at?: string | null
+          traveler_user_id?: string | null
           user_agent?: string | null
           visited_categories?: Json
           visited_destinations?: Json
@@ -262,6 +264,7 @@ export type Database = {
           summary?: string | null
           summary_message_count?: number
           summary_updated_at?: string | null
+          traveler_user_id?: string | null
           user_agent?: string | null
           visited_categories?: Json
           visited_destinations?: Json
