@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import { Plus, ExternalLink, Search, Home } from "lucide-react";
 import { Ticket, QrCode, History, BarChart3 } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 
 import type { WorkspaceDefinition } from "../types";
 import { registerWorkspace } from "../workspace-registry";
@@ -165,6 +166,7 @@ const portal: WorkspaceDefinition = {
     { id: "portal.presencia", workspaceId: "portal", label: "Presencia", icon: Radio, to: "/portal/presencia", group: "presencia", order: 4, surfaces: ["sidebar", "palette"] },
     { id: "portal.galeria", workspaceId: "portal", label: "Galería", icon: ImageIcon, to: "/portal/galeria", group: "presencia", order: 5, surfaces: ["sidebar", "palette"] },
     { id: "portal.catalogo", workspaceId: "portal", label: "Catálogo", icon: ListChecks, to: "/portal/catalogo", group: "operacion", order: 6, surfaces: ["sidebar", "palette"] },
+    { id: "portal.ventas", workspaceId: "portal", label: "Ventas en línea", icon: ShoppingBag, to: "/portal/ventas-en-linea", group: "operacion", order: 6.5, surfaces: ["sidebar", "palette"] },
     { id: "portal.pagos", workspaceId: "portal", label: "Pagos y visibilidad", icon: CreditCard, to: "/portal/pagos", group: "operacion", order: 7, surfaces: ["sidebar", "palette"] },
     { id: "portal.visibilidad", workspaceId: "portal", label: "Paquetes de visibilidad", icon: Sparkles, to: "/portal/visibilidad", group: "operacion", order: 7.1, surfaces: ["sidebar", "palette"] },
     { id: "portal.canjear", workspaceId: "portal", label: "Canjear cupón", icon: QrCode, to: "/portal/canjear", group: "operacion", order: 7.5, surfaces: ["sidebar", "bottom", "palette"] },
