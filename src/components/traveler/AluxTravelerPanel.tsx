@@ -24,6 +24,7 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import {
   Sparkles,
   Wand2,
@@ -112,6 +113,13 @@ const CAPABILITIES: CapabilityDef[] = [
 ];
 
 export function AluxTravelerPanel() {
+  const { i18n } = useTranslation();
+  const rawLocale = (i18n.language ?? "es").toLowerCase().slice(0, 2);
+  const locale = (["es", "en", "fr", "de", "it", "pt"] as const).includes(
+    rawLocale as never,
+  )
+    ? (rawLocale as "es" | "en" | "fr" | "de" | "it" | "pt")
+    : "es";
   const [active, setActive] = useState<AluxTravelerCapability | null>(null);
   const [results, setResults] = useState<
     Partial<Record<AluxTravelerCapability, AluxTravelerSuggestion>>
@@ -134,7 +142,7 @@ export function AluxTravelerPanel() {
   const mut = useMutation({
     mutationFn: async (id: AluxTravelerCapability) => {
       const fn = fns[id];
-      const res = (await fn({ data: {} })) as AluxTravelerSuggestion;
+      const res = (await fn({ data: { locale } })) as AluxTravelerSuggestion;
       return { id, res };
     },
     onMutate: (id) => {
