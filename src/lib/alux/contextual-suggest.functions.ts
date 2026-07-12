@@ -84,6 +84,31 @@ const SuggestInput = z.object({
       "perdido",
     ])
     .optional(),
+  /**
+   * A15 · Snapshot del plan activo del viajero (fechas, compañía,
+   * guardados, canjeados). Se usa SÓLO como coloración de prompt para
+   * encadenar recomendaciones y evitar repetir lo ya elegido.
+   */
+  travelerPlan: z
+    .object({
+      start_date: z.string().max(20).nullable().optional(),
+      end_date: z.string().max(20).nullable().optional(),
+      party_size: z.number().int().min(1).max(40).nullable().optional(),
+      days_remaining: z.number().int().nullable().optional(),
+      saved_items: z
+        .array(
+          z.object({
+            kind: z.string().max(20),
+            slug: z.string().max(160).nullable().optional(),
+            title: z.string().max(200).nullable().optional(),
+          }),
+        )
+        .max(30)
+        .optional(),
+      redeemed_business_slugs: z.array(z.string().max(160)).max(20).optional(),
+      item_count: z.number().int().min(0).max(200).optional(),
+    })
+    .optional(),
 });
 
 export type AluxSuggestKind = "business" | "product" | "event";
@@ -480,6 +505,34 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
             })()
           : null;
 
+        // A15 · Plan del viajero — memoria de lo que ya decidió.
+        const planLine = (() => {
+          const p = data.travelerPlan;
+          if (!p) return null;
+          const parts: string[] = [];
+          if (p.start_date && p.end_date) {
+            parts.push(`viaja del ${p.start_date} al ${p.end_date}`);
+          } else if (p.start_date) {
+            parts.push(`llega ${p.start_date}`);
+          }
+          if (typeof p.days_remaining === "number") {
+            if (p.days_remaining > 0) parts.push(`faltan ${p.days_remaining} días`);
+            else if (p.days_remaining === 0) parts.push("llega hoy");
+            else parts.push("viaje en curso");
+          }
+          if (p.party_size && p.party_size > 1) parts.push(`viaja con ${p.party_size} personas`);
+          const saved = (p.saved_items ?? []).filter((s) => s.title).slice(0, 6);
+          if (saved.length) {
+            parts.push(`ya guardó: ${saved.map((s) => s.title).join(", ")}`);
+          }
+          const redeemed = (p.redeemed_business_slugs ?? []).slice(0, 6);
+          if (redeemed.length) {
+            parts.push(`ya visitó (canjeó cupón en): ${redeemed.join(", ")}`);
+          }
+          if (parts.length === 0) return null;
+          return `Plan del viajero: ${parts.join(" · ")}. Encadena recomendaciones con lo que ya guardó o visitó — no repitas lo mismo, sugiere complementos cercanos.`;
+        })();
+
         const catalogBlock = picks
           .map(
             (row, i) =>
@@ -493,6 +546,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           "",
           `Contexto del visitante: ${contextLine}.`,
           travelerLine ? `Perfil del viajero: ${travelerLine}.` : null,
+          planLine,
           couponHintLine,
           intentHintLine,
           "",

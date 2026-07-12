@@ -75,7 +75,13 @@ function MiViajePage() {
   });
 
   const invalidatePlan = () =>
-    qc.invalidateQueries({ queryKey: ["traveler", "active-plan", user?.id] });
+    {
+      qc.invalidateQueries({ queryKey: ["traveler", "active-plan", user?.id] });
+      // A15 · notifica al Concierge para refrescar snapshot inmediato.
+      void import("@/lib/alux/plan-signals").then(({ notifyPlanChanged }) =>
+        notifyPlanChanged("mi-viaje"),
+      );
+    };
 
   return (
     <div className="max-w-5xl space-y-8">

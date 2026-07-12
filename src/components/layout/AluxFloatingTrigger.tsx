@@ -32,13 +32,14 @@
  * Navigation Session. Las sugerencias contextuales las provee la server
  * fn pública `aluxContextualSuggest` (US-E1.2), sin motor paralelo.
  */
-import { ArrowRight, Clock, Compass, MapPin, Sparkles, Tag, Ticket, Navigation } from "lucide-react";
+import { ArrowRight, CalendarDays, Clock, Compass, MapPin, Sparkles, Tag, Ticket, Navigation, Users } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
 import { logAluxPublicSignal, type AluxPublicSignalAction } from "@/lib/alux/public-signals";
 import { onAluxFloatingOpen } from "@/lib/alux/floating-bus";
+import { onPlanChanged } from "@/lib/alux/plan-signals";
 import { useTravelIntent, markNudgeShown } from "@/lib/alux/travel-intent";
 import {
   Sheet,
@@ -81,6 +82,7 @@ export function AluxFloatingTrigger() {
   const isAuthed = Boolean(user);
   const rawCtx = useAluxContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const queryClient = useQueryClient();
   // Sólo confiamos en el contexto territorial cuando la ruta actual
   // pertenece al árbol `/oriente-maya/*`. En cualquier otra superficie
   // (Home, Marketplace, /alux, /cuenta, etc.) el Sheet abre siempre en
@@ -120,10 +122,21 @@ export function AluxFloatingTrigger() {
     staleTime: 60_000,
   });
   const lens = lensQuery.data;
+  const plan = lens?.plan ?? null;
   const activeCouponBusinessSlugs =
     lens?.active_coupons
       .map((c) => c.business_slug)
       .filter((s): s is string => Boolean(s)) ?? [];
+
+  // A15 · Refrescar snapshot en cuanto el plan cambie (sin esperar staleTime).
+  useEffect(() => {
+    if (!isAuthed) return;
+    return onPlanChanged(() => {
+      void queryClient.invalidateQueries({
+        queryKey: ["alux", "traveler-lens", user?.id ?? null],
+      });
+    });
+  }, [isAuthed, queryClient, user?.id]);
 
   // A14 · Intención de viaje detectada por navegación + señales A11.
   const unusedCouponCount = lens?.active_coupons.length ?? 0;
@@ -168,6 +181,17 @@ export function AluxFloatingTrigger() {
             : undefined,
           activeCouponBusinessSlugs,
           travelIntent: intent,
+          travelerPlan: plan
+            ? {
+                start_date: plan.start_date,
+                end_date: plan.end_date,
+                party_size: plan.party_size,
+                days_remaining: plan.days_remaining,
+                saved_items: plan.saved_items.slice(0, 12),
+                redeemed_business_slugs: plan.redeemed_business_slugs,
+                item_count: plan.item_count,
+              }
+            : undefined,
         },
       }),
     enabled:
@@ -260,6 +284,68 @@ export function AluxFloatingTrigger() {
               </div>
             </div>
           </SheetHeader>
+
+          {/* A15 · Timeline "Tu viaje" — memoria de lo que el viajero ya decidió. */}
+          {isAuthed && plan && (plan.start_date || plan.item_count > 0 || plan.party_size) && (
+            <section
+              aria-labelledby="alux-plan"
+              className="rounded-2xl border border-primary/20 bg-primary/5 p-4"
+            >
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+                <CalendarDays className="size-3.5" aria-hidden />
+                <span id="alux-plan">Tu viaje</span>
+                <a
+                  href="/cuenta/mi-viaje"
+                  className="ml-auto text-[10px] font-medium text-primary/80 hover:underline"
+                >
+                  Editar
+                </a>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {typeof plan.days_remaining === "number" && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-background/70 px-2.5 py-1 text-[11px] font-medium text-foreground">
+                    <Clock className="size-3" aria-hidden />
+                    {plan.days_remaining > 0
+                      ? `Faltan ${plan.days_remaining} día${plan.days_remaining === 1 ? "" : "s"}`
+                      : plan.days_remaining === 0
+                        ? "Llegas hoy"
+                        : "Viaje en curso"}
+                  </span>
+                )}
+                {plan.start_date && plan.end_date && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-background/70 px-2.5 py-1 text-[11px] text-foreground">
+                    {plan.start_date} → {plan.end_date}
+                  </span>
+                )}
+                {plan.party_size && plan.party_size > 1 && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-background/70 px-2.5 py-1 text-[11px] text-foreground">
+                    <Users className="size-3" aria-hidden />
+                    {plan.party_size} personas
+                  </span>
+                )}
+                {plan.item_count > 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-background/70 px-2.5 py-1 text-[11px] text-foreground">
+                    {plan.item_count} lugar{plan.item_count === 1 ? "" : "es"} guardado{plan.item_count === 1 ? "" : "s"}
+                  </span>
+                )}
+              </div>
+              {plan.saved_items.length > 0 && (
+                <p className="mt-2 truncate text-[11px] text-muted-foreground">
+                  Últimos guardados:{" "}
+                  {plan.saved_items
+                    .filter((s) => s.title)
+                    .slice(0, 3)
+                    .map((s) => s.title)
+                    .join(" · ")}
+                </p>
+              )}
+              {!plan.start_date && (
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  Añade tus fechas en Mi Viaje para que te encadene recomendaciones día a día.
+                </p>
+              )}
+            </section>
+          )}
 
           {/* Ubicación viva (A5) — opt-in contextual, no intrusivo. */}
           <section

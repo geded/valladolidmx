@@ -12,7 +12,8 @@ export type AluxPublicSignalAction =
   | "dismiss_suggestion"
   | "save_favorite"
   | "start_review"
-  | "open_nearby_suggestion";
+  | "open_nearby_suggestion"
+  | "plan_updated";
 
 const SESSION_STORAGE_KEY = "alux_public_session_key";
 

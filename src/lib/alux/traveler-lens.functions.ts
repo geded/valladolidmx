@@ -43,10 +43,35 @@ export interface AluxTravelerActiveCoupon {
   valid_until: string;
 }
 
+/**
+ * Ola A15 · Snapshot compacto del plan activo del viajero.
+ * Sólo datos útiles para el Concierge (fechas, compañía, guardados,
+ * canjeados). Nada de PII ni notas privadas.
+ */
+export interface AluxTravelerPlanItem {
+  kind: "destination" | "business" | "product" | "event" | "note";
+  slug: string | null;
+  title: string | null;
+}
+
+export interface AluxTravelerPlanSnapshot {
+  plan_id: string;
+  title: string;
+  start_date: string | null;
+  end_date: string | null;
+  party_size: number | null;
+  days_remaining: number | null;
+  saved_items: AluxTravelerPlanItem[];
+  redeemed_business_slugs: string[];
+  item_count: number;
+}
+
 export interface AluxTravelerLens {
   authenticated: true;
   hints: AluxTravelerHints;
   active_coupons: AluxTravelerActiveCoupon[];
+  /** Ola A15 — Plan activo (si existe). */
+  plan: AluxTravelerPlanSnapshot | null;
   generated_at: string;
 }
 
@@ -180,10 +205,112 @@ export const getAluxTravelerLens = createServerFn({ method: "POST" })
       valid_until: c.valid_until,
     }));
 
+    // 3) A15 · Snapshot del plan activo (best-effort, no rompe si falla).
+    let plan: AluxTravelerPlanSnapshot | null = null;
+    try {
+      const anySb = context.supabase as unknown as {
+        rpc: (name: string) => Promise<{ data: unknown; error: unknown }>;
+        from: (t: string) => {
+          select: (c: string) => {
+            eq: (c: string, v: unknown) => {
+              maybeSingle?: () => Promise<{ data: unknown; error: unknown }>;
+              order?: (c: string, o?: unknown) => {
+                limit: (n: number) => Promise<{ data: unknown; error: unknown }>;
+              };
+            };
+          };
+        };
+      };
+      const ensured = await anySb.rpc("travel_plan_ensure_active");
+      const planId = ensured.data as string | null;
+      if (planId) {
+        const planRes = await anySb
+          .from("travel_plans")
+          .select("id, title, start_date, end_date, party_size")
+          .eq("id", planId)
+          .maybeSingle!();
+        const p = planRes.data as
+          | {
+              id: string;
+              title: string;
+              start_date: string | null;
+              end_date: string | null;
+              party_size: number | null;
+            }
+          | null;
+        if (p) {
+          const itemsRes = await anySb
+            .from("travel_plan_items")
+            .select("item_kind, snapshot")
+            .eq("plan_id", p.id)
+            .order!("position", { ascending: true })
+            .limit(30);
+          const rawItems = (itemsRes.data ?? []) as Array<{
+            item_kind: string;
+            snapshot: { title?: string | null; slug?: string | null } | null;
+          }>;
+          const saved_items: AluxTravelerPlanItem[] = rawItems.map((r) => ({
+            kind: (r.item_kind as AluxTravelerPlanItem["kind"]) ?? "note",
+            slug: r.snapshot?.slug ?? null,
+            title: r.snapshot?.title ?? null,
+          }));
+
+          let days_remaining: number | null = null;
+          if (p.start_date) {
+            const start = Date.parse(p.start_date + "T00:00:00Z");
+            if (Number.isFinite(start)) {
+              const diff = Math.round((start - Date.now()) / 86_400_000);
+              days_remaining = diff;
+            }
+          }
+
+          plan = {
+            plan_id: p.id,
+            title: p.title,
+            start_date: p.start_date,
+            end_date: p.end_date,
+            party_size: p.party_size,
+            days_remaining,
+            saved_items,
+            redeemed_business_slugs: [],
+            item_count: saved_items.length,
+          };
+        }
+      }
+
+      // Canjeados: negocios donde el viajero YA usó cupón.
+      const redeemedRes = await (context.supabase as unknown as {
+        from: (t: string) => {
+          select: (c: string) => {
+            eq: (c: string, v: unknown) => {
+              eq: (c: string, v: unknown) => {
+                limit: (n: number) => Promise<{ data: unknown; error: unknown }>;
+              };
+            };
+          };
+        };
+      })
+        .from("traveler_coupons")
+        .select("businesses:businesses!traveler_coupons_business_id_fkey ( slug )")
+        .eq("user_id", context.userId)
+        .eq("status", "redeemed")
+        .limit(20);
+      const redeemedRaw = (redeemedRes.data ?? []) as Array<{
+        businesses?: { slug?: string | null } | null;
+      }>;
+      const redeemedSlugs = redeemedRaw
+        .map((r) => r.businesses?.slug ?? null)
+        .filter((s): s is string => Boolean(s));
+      if (plan) plan.redeemed_business_slugs = Array.from(new Set(redeemedSlugs)).slice(0, 20);
+    } catch (error) {
+      console.warn("[alux.traveler-lens] plan snapshot failed:", error);
+    }
+
     return {
       authenticated: true,
       hints,
       active_coupons,
+      plan,
       generated_at: new Date().toISOString(),
     };
   });

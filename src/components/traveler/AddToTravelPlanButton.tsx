@@ -112,6 +112,10 @@ export function AddToTravelPlanButton({
       void queryClient.invalidateQueries({
         queryKey: ["traveler", "active-plan", user?.id],
       });
+      // A15 · notifica cambio de plan al Concierge.
+      void import("@/lib/alux/plan-signals").then(({ notifyPlanChanged }) =>
+        notifyPlanChanged(res.created ? "add_item" : "already_in_plan"),
+      );
       toast.success(
         res.created ? "Agregado a Mi Viaje" : "Ya estaba en Mi Viaje",
         { description: title },
