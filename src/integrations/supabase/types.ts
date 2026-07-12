@@ -6176,6 +6176,14 @@ export type Database = {
         Args: { _case_id: string }
         Returns: undefined
       }
+      concierge_create_direct_sale_order: {
+        Args: { _product_id: string; _quantity?: number }
+        Returns: string
+      }
+      concierge_create_order_from_proposal: {
+        Args: { _proposal_id: string }
+        Returns: string
+      }
       concierge_is_internal: { Args: { _user_id: string }; Returns: boolean }
       concierge_my_workload: { Args: never; Returns: Json }
       concierge_proposal_accept: {
