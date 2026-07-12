@@ -202,6 +202,7 @@ export type Database = {
       alux_public_sessions: {
         Row: {
           created_at: string
+          destination_visit_count: number
           first_seen_at: string
           id: string
           ip_hash: string
@@ -218,9 +219,12 @@ export type Database = {
           summary_message_count: number
           summary_updated_at: string | null
           user_agent: string | null
+          visited_categories: Json
+          visited_destinations: Json
         }
         Insert: {
           created_at?: string
+          destination_visit_count?: number
           first_seen_at?: string
           id?: string
           ip_hash: string
@@ -237,9 +241,12 @@ export type Database = {
           summary_message_count?: number
           summary_updated_at?: string | null
           user_agent?: string | null
+          visited_categories?: Json
+          visited_destinations?: Json
         }
         Update: {
           created_at?: string
+          destination_visit_count?: number
           first_seen_at?: string
           id?: string
           ip_hash?: string
@@ -256,6 +263,8 @@ export type Database = {
           summary_message_count?: number
           summary_updated_at?: string | null
           user_agent?: string | null
+          visited_categories?: Json
+          visited_destinations?: Json
         }
         Relationships: []
       }
