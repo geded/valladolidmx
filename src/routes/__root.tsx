@@ -23,6 +23,8 @@ import {
 } from "@/components/discovery";
 import { AluxFloatingTrigger } from "@/components/layout/AluxFloatingTrigger";
 import { FloatingTravelPlanDock } from "@/components/travel-plan/FloatingTravelPlanDock";
+import { ConciergeProposalObserver } from "@/components/travel-plan/ConciergeProposalObserver";
+import { Toaster } from "@/components/ui/sonner";
 import { EditThisPageButton } from "@/components/experience-builder/EditThisPageButton";
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
@@ -193,6 +195,8 @@ function RootComponent() {
         {!isAppShellRoute ? <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" /> : null}
         {!isAppShellRoute ? <AluxFloatingTrigger /> : null}
         <FloatingTravelPlanDock />
+        <ConciergeProposalObserver />
+        <Toaster />
         {!isAppShellRoute ? <EditThisPageButton pathname={pathname} /> : null}
         {/* OLA H-01 · Épica 1 · I1 — no-op mientras no haya consumidores. */}
         <ProtectedActionResumeRunner />
