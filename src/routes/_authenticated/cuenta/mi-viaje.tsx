@@ -34,6 +34,7 @@ import {
   type TravelPlanWithItems,
 } from "@/lib/traveler/travel-plans.functions";
 import { getAluxConciergeContext } from "@/lib/alux/concierge-context.functions";
+import { getMyConfirmedTravel } from "@/lib/concierge/orders.functions";
 import {
   clearGuestQueue,
   readGuestQueue,
@@ -42,6 +43,7 @@ import {
 import { ccListMyCases } from "@/lib/concierge/cc.functions";
 import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsInbox";
+import { CalendarCheck, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   component: MiViajePage,
@@ -65,6 +67,7 @@ function MiViajePage() {
   const fetchActive = useServerFn(getMyActivePlan);
   const fetchCases = useServerFn(ccListMyCases);
   const fetchConcierge = useServerFn(getAluxConciergeContext);
+  const fetchConfirmed = useServerFn(getMyConfirmedTravel);
 
   const activeQ = useQuery({
     queryKey: ["traveler", "active-plan", user?.id],
@@ -79,6 +82,11 @@ function MiViajePage() {
   const { data: concierge } = useQuery({
     queryKey: ["alux", "concierge-ctx", user?.id],
     queryFn: () => fetchConcierge(),
+    staleTime: 30_000,
+  });
+  const { data: confirmed } = useQuery({
+    queryKey: ["traveler", "confirmed-travel", user?.id],
+    queryFn: () => fetchConfirmed(),
     staleTime: 30_000,
   });
   const reservedIds = useMemo(() => {
@@ -116,6 +124,10 @@ function MiViajePage() {
       </header>
 
       <GuestImportBanner onImported={invalidatePlan} />
+
+      {confirmed && confirmed.status !== "refunded" ? (
+        <ConfirmedTravelBanner data={confirmed} />
+      ) : null}
 
       <AluxPlanProposalsInbox onChanged={invalidatePlan} />
 
