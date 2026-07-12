@@ -21,6 +21,14 @@ type ProposalRow = {
   summary: string | null;
 };
 
+type OrderRow = {
+  id: string;
+  status: string;
+  folio: string | null;
+  user_id: string | null;
+  editorial_title: string | null;
+};
+
 export function ConciergeProposalObserver() {
   const { user } = useAuth();
   const seen = useRef<Set<string>>(new Set());
@@ -49,6 +57,33 @@ export function ConciergeProposalObserver() {
       notifyPlanChanged(`concierge:proposal:${kind.toLowerCase()}`);
     };
 
+    const handleOrder = (row: OrderRow | null) => {
+      if (!row || row.user_id !== user.id) return;
+      const key = `order:${row.id}:${row.status}`;
+      if (seen.current.has(key)) return;
+      seen.current.add(key);
+
+      if (row.status === "paid" || row.status === "fulfilled") {
+        toast.success("Tu viaje está confirmado", {
+          description:
+            row.editorial_title ??
+            "Reservamos tu experiencia. Tu concierge sigue contigo.",
+          action: {
+            label: "Ver",
+            onClick: () => {
+              window.location.assign(`/cuenta/pagos/exito?order=${row.id}`);
+            },
+          },
+        });
+        notifyPlanChanged("concierge:order:paid");
+      } else if (row.status === "cancelled" || row.status === "expired") {
+        toast.message("Tu viaje ya no está en proceso", {
+          description: "Puedes retomarlo desde tu recorrido cuando quieras.",
+        });
+        notifyPlanChanged("concierge:order:cancelled");
+      }
+    };
+
     const channel = supabase
       .channel(`concierge-proposals:${user.id}`)
       .on(
@@ -60,6 +95,16 @@ export function ConciergeProposalObserver() {
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "concierge_proposals" },
         (payload) => handle(payload.new as ProposalRow, "UPDATE"),
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "concierge_orders" },
+        (payload) => handleOrder(payload.new as OrderRow),
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "concierge_orders" },
+        (payload) => handleOrder(payload.new as OrderRow),
       )
       .subscribe();
 
