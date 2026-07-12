@@ -243,6 +243,12 @@ export interface ConfirmedTravelSummary {
   plan_end_date: string | null;
   party_size: number | null;
   days_to_trip: number | null;
+  /** Marcas de tiempo de los correos de la Etapa 8 (viaje).
+   *  Se usan como señal de "hito nuevo sin leer" en el workspace del viajero. */
+  email_t14_sent_at: string | null;
+  email_t3_sent_at: string | null;
+  email_welcome_sent_at: string | null;
+  email_post_sent_at: string | null;
 }
 
 function daysUntil(iso: string | null): number | null {
@@ -268,7 +274,7 @@ export const getMyConfirmedTravel = createServerFn({ method: "GET" })
     const { data: order, error } = await context.supabase
       .from("concierge_orders")
       .select(
-        "id, folio, status, paid_at, editorial_title, destination_name, total_amount, currency, travel_plan_id",
+        "id, folio, status, paid_at, editorial_title, destination_name, total_amount, currency, travel_plan_id, email_t14_sent_at, email_t3_sent_at, email_welcome_sent_at, email_post_sent_at",
       )
       .eq("user_id", context.userId)
       .in("status", ["paid", "fulfilled", "refunded"])
@@ -307,5 +313,9 @@ export const getMyConfirmedTravel = createServerFn({ method: "GET" })
       plan_end_date,
       party_size,
       days_to_trip: daysUntil(plan_start_date),
+      email_t14_sent_at: (order as any).email_t14_sent_at ?? null,
+      email_t3_sent_at: (order as any).email_t3_sent_at ?? null,
+      email_welcome_sent_at: (order as any).email_welcome_sent_at ?? null,
+      email_post_sent_at: (order as any).email_post_sent_at ?? null,
     };
   });
