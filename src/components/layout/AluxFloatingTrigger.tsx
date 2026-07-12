@@ -44,7 +44,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useAluxContext, type AluxContextSlot } from "@/lib/alux/use-alux-context";
+import { useAluxContext, type AluxContext, type AluxContextSlot } from "@/lib/alux/use-alux-context";
 import { useAluxFloatingPresence } from "@/lib/alux/floating-presence";
 import {
   aluxContextualSuggest,
@@ -78,13 +78,13 @@ export function AluxFloatingTrigger() {
   // (Home, Marketplace, /alux, /cuenta, etc.) el Sheet abre siempre en
   // "modo descubrimiento" — nunca arrastra el destino/ficha anterior.
   const contextIsRelevant = pathname.startsWith("/oriente-maya/");
-  const ctx = contextIsRelevant
+  const ctx: AluxContext = contextIsRelevant
     ? rawCtx
     : {
-        hasContext: false as const,
-        related: [] as typeof rawCtx.related,
+        hasContext: false,
+        related: [],
         reason: rawCtx.reason,
-        origin: "none" as const,
+        origin: "none",
         region: undefined,
         destination: undefined,
         category: undefined,
