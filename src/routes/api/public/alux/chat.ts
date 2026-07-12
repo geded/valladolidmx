@@ -507,9 +507,9 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           .slice(0, 500);
         const matches =
           !settings || settings.flags.m4_knowledge
-            ? await retrieveAluxKnowledgeServer(supabaseAdmin, query, { matchCount: 4 })
+            ? await retrieveAluxKnowledgeServer(supabaseAdmin, query, { matchCount: 4, locale })
             : [];
-        const knowledgeBlock = knowledgeToPromptBlock(matches);
+        const knowledgeBlock = knowledgeToPromptBlock(matches, { locale });
         const knowledgeIds = matches.map((m) => m.id);
 
         // 4c) Memoria M3 (resumen incremental por sesión).
