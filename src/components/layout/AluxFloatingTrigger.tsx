@@ -33,11 +33,12 @@
  * fn pública `aluxContextualSuggest` (US-E1.2), sin motor paralelo.
  */
 import { ArrowRight, Clock, Compass, MapPin, Sparkles, Tag, Ticket, Navigation } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
 import { logAluxPublicSignal, type AluxPublicSignalAction } from "@/lib/alux/public-signals";
+import { onAluxFloatingOpen } from "@/lib/alux/floating-bus";
 import {
   Sheet,
   SheetContent,
@@ -100,6 +101,12 @@ export function AluxFloatingTrigger() {
       };
   const presence = useAluxFloatingPresence();
   const [open, setOpen] = useState(false);
+
+  // A13 · Escuchar apertura programática desde banners/cards proactivos.
+  useEffect(() => {
+    return onAluxFloatingOpen(() => setOpen(true));
+  }, []);
+
   const geo = useVisitorGeolocation();
   const suggestFn = useServerFn(aluxContextualSuggest);
   const lensFn = useServerFn(getAluxTravelerLens);
