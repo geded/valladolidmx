@@ -44,6 +44,48 @@ export type Database = {
         }
         Relationships: []
       }
+      alux_settings: {
+        Row: {
+          capability_overrides: Json
+          default_model: string
+          flags: Json
+          guardrails: string
+          id: string
+          max_tokens: number
+          persona: string
+          singleton: boolean
+          temperature: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          capability_overrides?: Json
+          default_model?: string
+          flags?: Json
+          guardrails?: string
+          id?: string
+          max_tokens?: number
+          persona?: string
+          singleton?: boolean
+          temperature?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          capability_overrides?: Json
+          default_model?: string
+          flags?: Json
+          guardrails?: string
+          id?: string
+          max_tokens?: number
+          persona?: string
+          singleton?: boolean
+          temperature?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       alux_traveler_suggestions: {
         Row: {
           capability: string
