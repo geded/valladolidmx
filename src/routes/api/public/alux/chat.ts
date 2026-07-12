@@ -22,6 +22,9 @@ const MAX_MESSAGE_LEN = 800;
 const MAX_HISTORY_TURNS = 8;
 const NEARBY_RADIUS_KM = 25;
 const NEARBY_LIMIT = 6;
+// Ola A8 · M3 multiturno público: cada N mensajes se regenera el resumen incremental.
+const SUMMARY_REFRESH_EVERY = 4;
+const SUMMARY_MAX_CHARS = 900;
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Visitor = { lat: number; lng: number };
@@ -100,6 +103,55 @@ function nearbyToPromptBlock(
     (i) => `- ${i.name}${i.category ? ` (${i.category})` : ""} · a ${i.km.toFixed(1)} km`,
   );
   return `[CONTEXTO ESPACIAL] El visitante compartió su ubicación aproximada. Negocios publicados más cercanos (radio ${NEARBY_RADIUS_KM} km, ordenados por distancia real):\n${lines.join("\n")}\n\nCuando recomiendes lugares cercanos: (1) usa SÓLO estos negocios, (2) menciona la distancia con naturalidad ("a X km"), (3) explica que es cercanía real desde su ubicación compartida, (4) si el visitante NO preguntó por cercanía, no fuerces la mención.`;
+}
+
+function memoryToPromptBlock(summary: string | null | undefined): string {
+  if (!summary || summary.trim().length === 0) return "";
+  return `[MEMORIA M3 · Conversación previa con este visitante]\n${summary.trim()}\n\nUsa esta memoria para NO re-preguntar datos ya compartidos (país, fechas, presupuesto, intereses, con quién viaja). Si contradice el turno actual, prioriza el turno actual.`;
+}
+
+async function refreshSessionSummary(
+  provider: ReturnType<typeof createLovableAiGatewayProvider>,
+  model: string,
+  previousSummary: string | null,
+  history: Msg[],
+  latestUser: string,
+  latestAssistant: string,
+): Promise<string | null> {
+  try {
+    const convo = [
+      ...history.map((m) => `${m.role === "user" ? "Visitante" : "Alux"}: ${m.content}`),
+      `Visitante: ${latestUser}`,
+      `Alux: ${latestAssistant}`,
+    ]
+      .join("\n")
+      .slice(-4000);
+    const sys =
+      "Eres el sistema de memoria de Alux (concierge turístico del Oriente Maya). " +
+      "Tu tarea es mantener un RESUMEN INCREMENTAL de la conversación con un visitante anónimo. " +
+      `Devuelve un texto plano de máximo ${SUMMARY_MAX_CHARS} caracteres, en español, en tercera persona, ` +
+      "que capture SOLO hechos útiles para futuras respuestas: origen, fechas/estación, duración del viaje, " +
+      "con quién viaja, presupuesto declarado, intereses, restricciones (dieta, movilidad, idioma), " +
+      "destinos/experiencias ya sugeridos y decisiones tomadas. " +
+      "Nada de saludos, disculpas ni conjeturas. Si no hay hechos nuevos, devuelve el resumen previo casi igual.";
+    const prompt = [
+      previousSummary ? `Resumen previo:\n${previousSummary}` : "Resumen previo: (vacío)",
+      "",
+      "Conversación reciente:",
+      convo,
+      "",
+      "Devuelve SOLO el nuevo resumen incremental.",
+    ].join("\n");
+    const res = await generateText({
+      model: provider(model),
+      system: sys,
+      prompt,
+    });
+    const text = (res.text ?? "").trim().slice(0, SUMMARY_MAX_CHARS);
+    return text.length > 0 ? text : previousSummary;
+  } catch {
+    return previousSummary;
+  }
 }
 
 function hashIp(ip: string): string {
@@ -222,10 +274,14 @@ export const Route = createFileRoute("/api/public/alux/chat")({
             },
             { onConflict: "session_key" },
           )
-          .select("id, message_count")
+          .select("id, message_count, summary, summary_message_count")
           .single();
         if (sessErr || !sessionRow) return json({ error: "session_upsert_failed" }, 500);
         const sessionId = sessionRow.id as string;
+        const previousSummary =
+          (sessionRow as { summary?: string | null }).summary ?? null;
+        const summaryMsgCount =
+          (sessionRow as { summary_message_count?: number }).summary_message_count ?? 0;
 
         // 3) Log del mensaje del usuario.
         await supabaseAdmin.from("alux_public_messages").insert({
@@ -247,6 +303,9 @@ export const Route = createFileRoute("/api/public/alux/chat")({
             : [];
         const knowledgeBlock = knowledgeToPromptBlock(matches);
         const knowledgeIds = matches.map((m) => m.id);
+
+        // 4c) Memoria M3 (resumen incremental por sesión).
+        const memoryBlock = memoryToPromptBlock(previousSummary);
 
         // 4b) Contexto espacial (opt-in).
         let nearbyBlock = "";
@@ -270,6 +329,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         const system = [
           persona,
           PUBLIC_PERSONA_EXTRA,
+          memoryBlock,
           knowledgeBlock,
           nearbyBlock,
           `---\n${guardrails}`,
@@ -316,11 +376,40 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           tokens_in: tokensIn,
           tokens_out: tokensOut,
         });
+        const newMessageCount = (sessionRow.message_count ?? 0) + 1;
+
+        // 6b) M3 · Refresco del resumen incremental cada N mensajes.
+        let nextSummary: string | null = previousSummary;
+        let nextSummaryCount = summaryMsgCount;
+        let memoryRefreshed = false;
+        if (newMessageCount - summaryMsgCount >= SUMMARY_REFRESH_EVERY) {
+          const refreshed = await refreshSessionSummary(
+            provider,
+            model,
+            previousSummary,
+            history,
+            message,
+            text,
+          );
+          if (refreshed && refreshed !== previousSummary) {
+            nextSummary = refreshed;
+            nextSummaryCount = newMessageCount;
+            memoryRefreshed = true;
+          }
+        }
+
         await supabaseAdmin
           .from("alux_public_sessions")
           .update({
-            message_count: (sessionRow.message_count ?? 0) + 1,
+            message_count: newMessageCount,
             last_seen_at: new Date().toISOString(),
+            ...(memoryRefreshed
+              ? {
+                  summary: nextSummary,
+                  summary_message_count: nextSummaryCount,
+                  summary_updated_at: new Date().toISOString(),
+                }
+              : {}),
           })
           .eq("id", sessionId);
 
@@ -331,6 +420,10 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           knowledge_used: matches.length,
           nearby_used: nearbyCount,
           spatial_context: visitor ? "granted" : "none",
+          memory: {
+            has_summary: !!nextSummary,
+            refreshed: memoryRefreshed,
+          },
           rate: {
             hour_count: (rateRow?.hour_count ?? 0) + 1,
             day_count: (rateRow?.day_count ?? 0) + 1,

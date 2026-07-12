@@ -7,7 +7,7 @@
  * (no hay memoria persistente para prospectos).
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Send, Sparkles, Loader2, MapPin, MapPinOff } from "lucide-react";
+import { Send, Sparkles, Loader2, MapPin, MapPinOff, BrainCircuit, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@tanstack/react-router";
@@ -16,6 +16,8 @@ import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 type Msg = { role: "user" | "assistant"; content: string };
 
 const STORAGE_KEY = "alux_public_session_key";
+const HISTORY_KEY_PREFIX = "alux_public_history:";
+const MAX_PERSISTED_MSGS = 40;
 
 function ensureSessionKey(): string {
   if (typeof window === "undefined") return "";
@@ -44,16 +46,63 @@ export function PublicAluxChat() {
   const [error, setError] = useState<string | null>(null);
   const [rateInfo, setRateInfo] = useState<{ used: number; limit: number } | null>(null);
   const [nearbyUsed, setNearbyUsed] = useState<number | null>(null);
+  const [hasMemory, setHasMemory] = useState(false);
   const { location, status, request: requestLocation } = useVisitorGeolocation();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSessionKey(ensureSessionKey());
+    const key = ensureSessionKey();
+    setSessionKey(key);
+    // Ola A8 · Restaurar conversación previa (M3 multiturno del lado cliente).
+    if (key && typeof window !== "undefined") {
+      try {
+        const raw = window.localStorage.getItem(HISTORY_KEY_PREFIX + key);
+        if (raw) {
+          const parsed = JSON.parse(raw) as Msg[];
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setMessages(parsed.slice(-MAX_PERSISTED_MSGS));
+            setHasMemory(true);
+          }
+        }
+      } catch {
+        /* noop */
+      }
+    }
   }, []);
+
+  // Persistir historial para retomar la conversación entre visitas.
+  useEffect(() => {
+    if (!sessionKey || typeof window === "undefined") return;
+    try {
+      if (messages.length === 0) {
+        window.localStorage.removeItem(HISTORY_KEY_PREFIX + sessionKey);
+      } else {
+        window.localStorage.setItem(
+          HISTORY_KEY_PREFIX + sessionKey,
+          JSON.stringify(messages.slice(-MAX_PERSISTED_MSGS)),
+        );
+      }
+    } catch {
+      /* quota / privacy — ignorar */
+    }
+  }, [messages, sessionKey]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, sending]);
+
+  const resetConversation = useCallback(() => {
+    setMessages([]);
+    setHasMemory(false);
+    setError(null);
+    if (sessionKey && typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem(HISTORY_KEY_PREFIX + sessionKey);
+      } catch {
+        /* noop */
+      }
+    }
+  }, [sessionKey]);
 
   const send = useCallback(
     async (text: string) => {
@@ -96,6 +145,7 @@ export function PublicAluxChat() {
           setRateInfo({ used: data.rate.day_count, limit: data.rate.day_limit });
         }
         if (typeof data?.nearby_used === "number") setNearbyUsed(data.nearby_used);
+        if (data?.memory?.has_summary) setHasMemory(true);
       } catch {
         setError("Sin conexión. Revisa tu red e inténtalo de nuevo.");
       } finally {
@@ -125,7 +175,25 @@ export function PublicAluxChat() {
             {rateInfo.used}/{rateInfo.limit} hoy
           </span>
         )}
+        {messages.length > 0 && (
+          <button
+            type="button"
+            onClick={resetConversation}
+            className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition"
+            title="Iniciar una conversación nueva"
+          >
+            <RotateCcw className="h-3 w-3" />
+            Nueva
+          </button>
+        )}
       </header>
+
+      {hasMemory && (
+        <div className="flex items-center gap-2 border-b border-border/60 bg-primary/5 px-5 py-2 text-[11px] text-primary">
+          <BrainCircuit className="h-3 w-3" />
+          Alux recuerda tu conversación previa · no necesitas repetir contexto
+        </div>
+      )}
 
       {/* Consentimiento espacial (opt-in, no intrusivo) */}
       <div className="flex items-center gap-2 border-b border-border/60 bg-background px-5 py-2 text-[11px]">
