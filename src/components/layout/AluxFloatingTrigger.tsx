@@ -56,6 +56,7 @@ import {
   type AluxContextualSuggestion,
 } from "@/lib/alux/contextual-suggest.functions";
 import { getAluxTravelerLens } from "@/lib/alux/traveler-lens.functions";
+import { getAluxTerritorialMemory } from "@/lib/alux/territorial-memory.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 
@@ -113,6 +114,27 @@ export function AluxFloatingTrigger() {
   const geo = useVisitorGeolocation();
   const suggestFn = useServerFn(aluxContextualSuggest);
   const lensFn = useServerFn(getAluxTravelerLens);
+  const territoryFn = useServerFn(getAluxTerritorialMemory);
+
+  // A16 · Memoria territorial persistente (por session_key anónimo).
+  const [sessionKey, setSessionKey] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const k = window.localStorage.getItem("alux_public_session_key");
+      if (k && k.length >= 8) setSessionKey(k);
+    } catch {
+      /* noop */
+    }
+  }, [open, pathname]);
+
+  const territoryQuery = useQuery({
+    queryKey: ["alux", "territorial-memory", sessionKey],
+    queryFn: () => territoryFn({ data: { sessionKey: sessionKey! } }),
+    enabled: Boolean(sessionKey) && open,
+    staleTime: 60_000,
+  });
+  const territory = territoryQuery.data;
 
   // A6 · Lente del viajero (M2 + cupones) — sólo autenticado.
   const lensQuery = useQuery({
@@ -157,6 +179,7 @@ export function AluxFloatingTrigger() {
       ctx.product?.slug ?? null,
       isAuthed ? (lens?.generated_at ?? null) : null,
       intent,
+      territory?.destination_visit_count ?? 0,
     ],
     queryFn: () =>
       suggestFn({
@@ -181,6 +204,17 @@ export function AluxFloatingTrigger() {
             : undefined,
           activeCouponBusinessSlugs,
           travelIntent: intent,
+          travelerHistory: territory
+            ? {
+                is_returning: territory.is_returning,
+                destination_visit_count: territory.destination_visit_count,
+                distinct_destinations: territory.distinct_destinations,
+                previous_destinations: territory.visited_destinations
+                  .map((v) => v.slug)
+                  .filter((s) => s && s !== (ctx.destination?.slug ?? "")),
+                top_categories: territory.top_categories.map((c) => c.slug),
+              }
+            : undefined,
           travelerPlan: plan
             ? {
                 start_date: plan.start_date,
@@ -284,6 +318,23 @@ export function AluxFloatingTrigger() {
               </div>
             </div>
           </SheetHeader>
+
+          {/* A16 · Retomar donde te quedaste (memoria territorial persistente). */}
+          {territory?.is_returning &&
+            territory.last_destination_slug &&
+            !pathname.includes(`/oriente-maya/${territory.last_destination_slug}`) && (
+              <a
+                href={`/oriente-maya/${territory.last_destination_slug}`}
+                className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-2 text-[12px] font-medium text-primary transition-colors hover:bg-primary/15"
+              >
+                <Compass className="size-3.5" aria-hidden />
+                Retomar donde te quedaste en{" "}
+                <span className="capitalize">
+                  {territory.last_destination_slug.replace(/-/g, " ")}
+                </span>
+                <ArrowRight className="size-3.5" aria-hidden />
+              </a>
+            )}
 
           {/* A15 · Timeline "Tu viaje" — memoria de lo que el viajero ya decidió. */}
           {isAuthed && plan && (plan.start_date || plan.item_count > 0 || plan.party_size) && (

@@ -109,6 +109,21 @@ const SuggestInput = z.object({
       item_count: z.number().int().min(0).max(200).optional(),
     })
     .optional(),
+  /**
+   * A16 · Memoria territorial persistente (proyección compacta).
+   * Colorea el prompt para distinguir visitantes recurrentes de
+   * primerizos y para sugerir "retomar donde te quedaste" cuando el
+   * visitante regresa a un destino que ya exploró.
+   */
+  travelerHistory: z
+    .object({
+      is_returning: z.boolean().optional(),
+      destination_visit_count: z.number().int().min(0).max(9999).optional(),
+      distinct_destinations: z.number().int().min(0).max(9999).optional(),
+      previous_destinations: z.array(z.string().max(120)).max(8).optional(),
+      top_categories: z.array(z.string().max(120)).max(5).optional(),
+    })
+    .optional(),
 });
 
 export type AluxSuggestKind = "business" | "product" | "event";
@@ -533,6 +548,27 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           return `Plan del viajero: ${parts.join(" · ")}. Encadena recomendaciones con lo que ya guardó o visitó — no repitas lo mismo, sugiere complementos cercanos.`;
         })();
 
+        // A16 · Memoria territorial persistente.
+        const historyLine = (() => {
+          const h = data.travelerHistory;
+          if (!h) return null;
+          const previous = (h.previous_destinations ?? []).filter(
+            (s) => s && s !== (data.destination?.slug ?? ""),
+          );
+          const bits: string[] = [];
+          if (h.is_returning) {
+            bits.push(
+              `visitante recurrente (${h.destination_visit_count ?? 0} entradas a destinos, ${h.distinct_destinations ?? previous.length + 1} distintos)`,
+            );
+          } else {
+            bits.push("primera vez explorando");
+          }
+          if (previous.length) bits.push(`ya conoce: ${previous.slice(0, 5).join(", ")}`);
+          if (h.top_categories?.length)
+            bits.push(`patrón de exploración: ${h.top_categories.slice(0, 3).join(", ")}`);
+          return `Historial territorial: ${bits.join(" · ")}. Si es recurrente, evita repetir lo que ya vio y ofrece progresión (más profundo, más local, complementario); si es primera vez, sé más pedagógico con lo esencial del destino.`;
+        })();
+
         const catalogBlock = picks
           .map(
             (row, i) =>
@@ -547,6 +583,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           `Contexto del visitante: ${contextLine}.`,
           travelerLine ? `Perfil del viajero: ${travelerLine}.` : null,
           planLine,
+          historyLine,
           couponHintLine,
           intentHintLine,
           "",
