@@ -22,6 +22,8 @@ import {
 } from "@/lib/portal/business-media.functions";
 import { listMyBusinesses } from "@/lib/portal/portal-reads.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { toPlanLimitMessage } from "@/lib/visibility/plan-limit-errors";
+import { toast } from "sonner";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
@@ -194,7 +196,12 @@ function MediaSection({
       setStatus("Archivo cargado.");
       await refresh();
     } catch (err) {
-      setStatus(err instanceof Error ? err.message : "Error al subir");
+      const msg = toPlanLimitMessage(
+        err,
+        err instanceof Error ? err.message : "Error al subir",
+      );
+      setStatus(msg);
+      toast.error(msg);
     } finally {
       setBusy(false);
       if (inputRef.current) inputRef.current.value = "";
