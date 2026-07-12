@@ -70,6 +70,20 @@ const SuggestInput = z.object({
     .optional(),
   /** Slugs de negocios donde el viajero ya tiene un cupón activo. */
   activeCouponBusinessSlugs: z.array(z.string().max(120)).max(20).optional(),
+  /**
+   * A14 · Intención de viaje detectada en cliente. El servidor la usa sólo
+   * como coloración de prompt; jamás sustituye contexto real ni catálogo.
+   */
+  travelIntent: z
+    .enum([
+      "explorando",
+      "comparando_hoteles",
+      "buscando_comida",
+      "planeando_noche",
+      "cazando_cupones",
+      "perdido",
+    ])
+    .optional(),
 });
 
 export type AluxSuggestKind = "business" | "product" | "event";
