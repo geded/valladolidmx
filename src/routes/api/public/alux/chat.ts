@@ -229,17 +229,18 @@ function parseVisitor(input: unknown): Visitor | null {
 async function fetchNearbyBusinesses(
   supabaseAdmin: typeof import("@/integrations/supabase/client.server")["supabaseAdmin"],
   visitor: Visitor,
-): Promise<Array<{ name: string; category: string | null; km: number; slug: string }>> {
+): Promise<Array<{ id: string; name: string; category: string | null; km: number; slug: string }>> {
   const { data, error } = await supabaseAdmin
     .from("businesses")
     .select(
-      "slug, display_name, primary_category:business_categories!businesses_primary_category_id_fkey ( slug, display_name ), business_locations!business_locations_business_id_fkey ( latitude, longitude, is_primary )",
+      "id, slug, display_name, primary_category:business_categories!businesses_primary_category_id_fkey ( slug, display_name ), business_locations!business_locations_business_id_fkey ( latitude, longitude, is_primary )",
     )
     .eq("status", "published")
     .limit(200);
   if (error || !data) return [];
-  const scored: Array<{ name: string; category: string | null; km: number; slug: string }> = [];
+  const scored: Array<{ id: string; name: string; category: string | null; km: number; slug: string }> = [];
   for (const r of data as Array<{
+    id: string;
     slug: string;
     display_name: string;
     primary_category?: { slug: string; display_name: string | null } | null;
@@ -258,6 +259,7 @@ async function fetchNearbyBusinesses(
     });
     if (km > NEARBY_RADIUS_KM) continue;
     scored.push({
+      id: r.id,
       slug: r.slug,
       name: r.display_name,
       category: r.primary_category?.display_name ?? r.primary_category?.slug ?? null,
@@ -499,12 +501,14 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         // 4b) Contexto espacial (opt-in).
         let nearbyBlock = "";
         let nearbyCount = 0;
+        let nearbyProposals: Array<{ id: string; slug: string; name: string; category: string | null; km: number }> = [];
         if (visitor) {
           const nearby = await fetchNearbyBusinesses(supabaseAdmin, visitor).catch(
             () => [] as Awaited<ReturnType<typeof fetchNearbyBusinesses>>,
           );
           nearbyBlock = nearbyToPromptBlock(visitor, nearby);
           nearbyCount = nearby.length;
+          nearbyProposals = nearby.slice(0, 3);
         }
 
         // 4d) Contexto temporal + eventos activos (Ola A9).
@@ -699,6 +703,14 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           latency_ms: latency,
           knowledge_used: matches.length,
           nearby_used: nearbyCount,
+          proposals: nearbyProposals.map((n) => ({
+            entity_type: "business" as const,
+            entity_id: n.id,
+            entity_slug: n.slug,
+            title: n.name,
+            subtitle: n.category ? `${n.category} · a ${n.km.toFixed(1)} km` : `a ${n.km.toFixed(1)} km`,
+            rationale: `Alux te lo sugiere porque está a ${n.km.toFixed(1)} km de tu ubicación.`,
+          })),
           spatial_context: visitor ? "granted" : "none",
           temporal: {
             local: temporal.isoLocal,
