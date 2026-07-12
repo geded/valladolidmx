@@ -18,6 +18,10 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  assertUnderLimit,
+  getEffectiveLimits,
+} from "@/lib/visibility/plan-limits";
 
 // ---------------- Tipos ---------------------------------------------------
 
@@ -202,6 +206,19 @@ export const createBusinessMediaUploadTicket = createServerFn({ method: "POST" }
   )
   .handler(async ({ data, context }): Promise<SignedUploadTicket> => {
     await ensureAccess(context, data.businessId, "editor");
+
+    // Ola 7.4.b · Límite de fotos por plan de visibilidad (sólo galería).
+    if (data.role === "gallery") {
+      const limits = await getEffectiveLimits(context.supabase, data.businessId);
+      if (limits.max_photos && limits.max_photos > 0) {
+        const { count } = await context.supabase
+          .from("business_media")
+          .select("id", { count: "exact", head: true })
+          .eq("business_id", data.businessId)
+          .eq("role", "gallery");
+        assertUnderLimit(limits, "max_photos", count ?? 0);
+      }
+    }
 
     const bucket = roleToBucket(data.role);
     const ext = extFromMime(data.mime);
