@@ -7,13 +7,25 @@
  * (no hay memoria persistente para prospectos).
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Send, Sparkles, Loader2, MapPin, MapPinOff, BrainCircuit, RotateCcw } from "lucide-react";
+import { Send, Sparkles, Loader2, MapPin, MapPinOff, BrainCircuit, RotateCcw, Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@tanstack/react-router";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
+import { useAuth } from "@/hooks/useAuth";
+import { useServerFn } from "@tanstack/react-start";
+import { proposeAluxPlanAddition } from "@/lib/alux/plan-proposals.functions";
+import { toast } from "sonner";
 
-type Msg = { role: "user" | "assistant"; content: string };
+type Proposal = {
+  entity_type: "business" | "product" | "event" | "destination";
+  entity_id: string;
+  entity_slug: string | null;
+  title: string;
+  subtitle?: string | null;
+  rationale?: string | null;
+};
+type Msg = { role: "user" | "assistant"; content: string; proposals?: Proposal[] };
 
 const STORAGE_KEY = "alux_public_session_key";
 const HISTORY_KEY_PREFIX = "alux_public_history:";
@@ -146,7 +158,14 @@ export function PublicAluxChat() {
           }
           return;
         }
-        setMessages([...nextHistory, { role: "assistant", content: data.text }]);
+        setMessages([
+          ...nextHistory,
+          {
+            role: "assistant",
+            content: data.text,
+            proposals: Array.isArray(data.proposals) ? (data.proposals as Proposal[]) : [],
+          },
+        ]);
         if (data?.rate) {
           setRateInfo({ used: data.rate.day_count, limit: data.rate.day_limit });
         }
@@ -257,7 +276,7 @@ export function PublicAluxChat() {
         {messages.map((m, i) => (
           <div
             key={i}
-            className={m.role === "user" ? "flex justify-end" : "flex justify-start"}
+            className={m.role === "user" ? "flex justify-end" : "flex flex-col items-start gap-2"}
           >
             <div
               className={[
@@ -269,6 +288,9 @@ export function PublicAluxChat() {
             >
               {m.content}
             </div>
+            {m.role === "assistant" && m.proposals && m.proposals.length > 0 && (
+              <AluxProposals items={m.proposals} />
+            )}
           </div>
         ))}
 
@@ -322,5 +344,65 @@ export function PublicAluxChat() {
         tu viaje completo, <Link to="/auth" className="underline">crea tu cuenta gratuita</Link>.
       </p>
     </section>
+  );
+}
+
+function AluxProposals({ items }: { items: Proposal[] }) {
+  const { user } = useAuth();
+  const proposeFn = useServerFn(proposeAluxPlanAddition);
+  const [pending, setPending] = useState<string | null>(null);
+  const [done, setDone] = useState<Set<string>>(new Set());
+
+  async function handleAdd(p: Proposal) {
+    if (!user) {
+      toast.info("Crea tu cuenta para guardar sugerencias en tu viaje.");
+      return;
+    }
+    setPending(p.entity_id);
+    try {
+      await proposeFn({
+        data: {
+          entityType: p.entity_type,
+          entityId: p.entity_id,
+          entitySlug: p.entity_slug ?? null,
+          title: p.title,
+          subtitle: p.subtitle ?? null,
+          rationale: p.rationale ?? null,
+        },
+      });
+      setDone((s) => new Set(s).add(p.entity_id));
+      toast.success("Sugerencia enviada a Mi Viaje · confírmala cuando quieras.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo guardar");
+    } finally {
+      setPending(null);
+    }
+  }
+
+  return (
+    <div className="ml-1 flex max-w-full flex-wrap gap-2">
+      {items.map((p) => {
+        const added = done.has(p.entity_id);
+        return (
+          <button
+            key={p.entity_id}
+            type="button"
+            disabled={added || pending === p.entity_id}
+            onClick={() => handleAdd(p)}
+            className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs text-primary hover:bg-primary/10 transition disabled:opacity-60"
+            title={p.rationale ?? undefined}
+          >
+            {added ? <Check className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
+            <span className="truncate max-w-[180px]">{p.title}</span>
+            {p.subtitle && (
+              <span className="text-[10px] text-primary/70">· {p.subtitle}</span>
+            )}
+          </button>
+        );
+      })}
+      <p className="basis-full text-[10px] text-muted-foreground">
+        Alux propone · tú confirmas en <Link to="/cuenta/mi-viaje" className="underline">Mi Viaje</Link>.
+      </p>
+    </div>
   );
 }
