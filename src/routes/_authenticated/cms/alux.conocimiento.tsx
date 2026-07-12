@@ -393,6 +393,117 @@ function AluxKnowledgePage() {
               )}
             </div>
           </div>
+
+          {draft.id && (
+            <div className="pt-4 border-t space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                    Traducciones (RAG multilingüe)
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ES es la fuente canónica. Los otros idiomas se generan
+                    con IA y quedan como borrador editorial hasta que las revises.
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() =>
+                    translateMut.mutate({
+                      entryId: draft.id!,
+                      locales: ALUX_KB_LOCALES.filter((l) => l !== "es"),
+                    })
+                  }
+                  disabled={translateMut.isPending}
+                >
+                  {translateMut.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                  ) : (
+                    <Languages className="h-3.5 w-3.5 mr-1" />
+                  )}
+                  Traducir faltantes
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {ALUX_KB_LOCALES.map((loc) => {
+                  const c = coverageByEntry.get(draft.id!)?.get(loc);
+                  const isEs = loc === "es";
+                  const state = !c
+                    ? "missing"
+                    : !c.embedded
+                      ? "no-emb"
+                      : c.source === "human" || isEs
+                        ? "reviewed"
+                        : "ai";
+                  return (
+                    <div
+                      key={loc}
+                      className="flex items-center justify-between rounded-lg border px-2 py-1.5"
+                    >
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="font-mono uppercase">{loc}</span>
+                        {state === "missing" && (
+                          <Badge variant="outline" className="text-[10px]">
+                            faltante
+                          </Badge>
+                        )}
+                        {state === "ai" && (
+                          <Badge variant="secondary" className="text-[10px]">
+                            IA
+                          </Badge>
+                        )}
+                        {state === "reviewed" && (
+                          <Badge className="text-[10px]">
+                            <CheckCircle2 className="h-3 w-3 mr-0.5" /> revisada
+                          </Badge>
+                        )}
+                        {state === "no-emb" && (
+                          <Badge variant="outline" className="text-[10px]">
+                            sin embedding
+                          </Badge>
+                        )}
+                      </div>
+                      {!isEs && (
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 px-2"
+                            onClick={() =>
+                              translateMut.mutate({
+                                entryId: draft.id!,
+                                locales: [loc],
+                                overwrite: !!c,
+                              })
+                            }
+                            disabled={translateMut.isPending}
+                            title={c ? "Regenerar con IA" : "Traducir con IA"}
+                          >
+                            <Languages className="h-3.5 w-3.5" />
+                          </Button>
+                          {c && state === "ai" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 px-2"
+                              onClick={() =>
+                                reviewMut.mutate({ entryId: draft.id!, locale: loc })
+                              }
+                              disabled={reviewMut.isPending}
+                              title="Marcar como revisada"
+                            >
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Lista + búsqueda */}
