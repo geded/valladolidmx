@@ -367,3 +367,228 @@ export const searchAluxKnowledge = createServerFn({ method: "POST" })
       matchThreshold: 0.4,
     });
   });
+
+// ---------- Ola A19 · Traducciones multilingües ----------
+
+export interface AluxKnowledgeLocaleCoverage {
+  entry_id: string;
+  locale: AluxKbLocale;
+  source: "canonical" | "human" | "ai_generated";
+  embedded: boolean;
+  reviewed_at: string | null;
+  updated_at: string;
+}
+
+type SbTrClient = {
+  from: (t: string) => {
+    select: (s: string) => {
+      order?: (c: string, o?: { ascending?: boolean }) => Promise<{
+        data: unknown;
+        error: { message: string } | null;
+      }>;
+      eq?: (a: string, b: unknown) => {
+        eq?: (a: string, b: unknown) => {
+          maybeSingle: () => Promise<{ data: unknown; error: { message: string } | null }>;
+        };
+      };
+    };
+    upsert: (
+      v: Record<string, unknown>,
+      o?: { onConflict?: string },
+    ) => Promise<{ error: { message: string } | null }>;
+  };
+};
+
+export const listAluxKnowledgeLocaleCoverage = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<AluxKnowledgeLocaleCoverage[]> => {
+    await ensureAdmin(context.supabase, context.userId);
+    const c = context.supabase as unknown as SbTrClient;
+    const res = await c
+      .from("alux_knowledge_translations")
+      .select("entry_id, locale, source, embedded_at, reviewed_at, updated_at")
+      .order!("updated_at", { ascending: false });
+    if (res.error) throw new Error(res.error.message);
+    return ((res.data as Record<string, unknown>[]) ?? []).map((r) => ({
+      entry_id: String(r.entry_id),
+      locale: r.locale as AluxKbLocale,
+      source: (r.source as "canonical" | "human" | "ai_generated") ?? "ai_generated",
+      embedded: Boolean(r.embedded_at),
+      reviewed_at: (r.reviewed_at as string | null) ?? null,
+      updated_at: String(r.updated_at ?? new Date().toISOString()),
+    }));
+  });
+
+async function translateWithAi(input: {
+  targetLocale: AluxKbLocale;
+  title: string;
+  summary: string | null;
+  body: string;
+  tags: string[];
+}): Promise<{ title: string; summary: string | null; body: string; tags: string[] }> {
+  const localeName = LOCALE_NAMES[input.targetLocale];
+  const systemPrompt =
+    "Eres traductor editorial turístico especializado en Yucatán y el Oriente Maya. " +
+    "Traduces con naturalidad, tono cercano y profesional. " +
+    "Mantén nombres propios (personas, cenotes, calles, hoteles, platillos), direcciones, precios y URLs sin cambios. " +
+    "No añadas contenido nuevo. Devuelve estrictamente JSON válido con las llaves title, summary, body, tags.";
+  const userPrompt = `Traduce este contenido al ${localeName} (código ${input.targetLocale}). Responde SOLO con JSON.\n\n` +
+    JSON.stringify({
+      title: input.title,
+      summary: input.summary,
+      body: input.body,
+      tags: input.tags,
+    });
+  const res = await fetch(CHAT_GATEWAY_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Lovable-API-Key": requireApiKey(),
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      response_format: { type: "json_object" },
+    }),
+  });
+  if (!res.ok) {
+    const msg = await res.text().catch(() => res.statusText);
+    throw new Error(`Traducción gateway ${res.status}: ${msg.slice(0, 300)}`);
+  }
+  const json = (await res.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+  };
+  const content = json.choices?.[0]?.message?.content ?? "";
+  const parsed = JSON.parse(content) as {
+    title?: string;
+    summary?: string | null;
+    body?: string;
+    tags?: string[];
+  };
+  if (!parsed.title || !parsed.body) throw new Error("Traducción inválida (title/body vacío)");
+  return {
+    title: String(parsed.title).slice(0, 400),
+    summary: parsed.summary ? String(parsed.summary).slice(0, 1200) : null,
+    body: String(parsed.body).slice(0, 24000),
+    tags: Array.isArray(parsed.tags) ? parsed.tags.map(String).slice(0, 20) : input.tags,
+  };
+}
+
+const TranslateInput = z.object({
+  entryId: z.string().uuid(),
+  locales: z.array(z.enum(ALUX_KB_LOCALES)).min(1),
+  overwrite: z.boolean().optional().default(false),
+});
+
+export const translateAluxKnowledgeEntry = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => TranslateInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context.supabase, context.userId);
+    const c = context.supabase as unknown as SbTrClient;
+
+    // 1) Cargar fila canónica ES
+    const sourceRes = await c
+      .from("alux_knowledge_translations")
+      .select!("title, summary, body, tags")
+      .eq!("entry_id", data.entryId)
+      .eq!("locale", "es")
+      .maybeSingle();
+    if (sourceRes.error) throw new Error(sourceRes.error.message);
+    const source = sourceRes.data as
+      | { title: string; summary: string | null; body: string; tags: string[] }
+      | null;
+    if (!source) throw new Error("Entrada sin versión ES canónica");
+
+    const results: Array<{ locale: string; ok: boolean; error?: string }> = [];
+    for (const locale of data.locales) {
+      if (locale === "es") {
+        results.push({ locale, ok: false, error: "ES ya es canónica" });
+        continue;
+      }
+      try {
+        // Skip si ya existe y no se pidió overwrite
+        if (!data.overwrite) {
+          const existing = await c
+            .from("alux_knowledge_translations")
+            .select!("id")
+            .eq!("entry_id", data.entryId)
+            .eq!("locale", locale)
+            .maybeSingle();
+          if (!existing.error && existing.data) {
+            results.push({ locale, ok: false, error: "ya existe" });
+            continue;
+          }
+        }
+        const translated = await translateWithAi({
+          targetLocale: locale,
+          title: source.title,
+          summary: source.summary,
+          body: source.body,
+          tags: source.tags,
+        });
+        const composed = [
+          translated.title,
+          translated.summary ?? "",
+          translated.body,
+          translated.tags.join(" "),
+        ]
+          .filter(Boolean)
+          .join("\n\n");
+        const embedding = await embedText(composed);
+        const up = await c
+          .from("alux_knowledge_translations")
+          .upsert(
+            {
+              entry_id: data.entryId,
+              locale,
+              title: translated.title,
+              summary: translated.summary,
+              body: translated.body,
+              tags: translated.tags,
+              embedding: pgvectorLiteral(embedding),
+              embedding_model: EMBEDDING_MODEL,
+              embedded_at: new Date().toISOString(),
+              source: "ai_generated",
+              reviewed_at: null,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: "entry_id,locale" },
+          );
+        if (up.error) throw new Error(up.error.message);
+        results.push({ locale, ok: true });
+      } catch (e) {
+        results.push({ locale, ok: false, error: (e as Error).message });
+      }
+    }
+    return { entryId: data.entryId, results };
+  });
+
+const MarkReviewedInput = z.object({
+  entryId: z.string().uuid(),
+  locale: z.enum(ALUX_KB_LOCALES),
+});
+
+export const markAluxTranslationReviewed = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => MarkReviewedInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context.supabase, context.userId);
+    const c = context.supabase as unknown as SbTrClient;
+    const up = await c.from("alux_knowledge_translations").upsert(
+      {
+        entry_id: data.entryId,
+        locale: data.locale,
+        source: "human",
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: context.userId,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "entry_id,locale" },
+    );
+    if (up.error) throw new Error(up.error.message);
+    return { ok: true };
+  });
