@@ -124,7 +124,11 @@ function MiViajePage() {
       ) : activeQ.data ? (
         <>
           <PlanMetaEditor data={activeQ.data} onSaved={invalidatePlan} />
-          <PlanItemsSection data={activeQ.data} onChanged={invalidatePlan} />
+          <PlanItemsSection
+            data={activeQ.data}
+            onChanged={invalidatePlan}
+            reservedIds={reservedIds}
+          />
           <ShareExportSection data={activeQ.data} onChanged={invalidatePlan} />
           <AluxTravelerPanel />
           <ConciergeSection data={activeQ.data} cases={cases} onChanged={invalidatePlan} />
@@ -515,9 +519,11 @@ function ShareExportSection({
 function PlanItemsSection({
   data,
   onChanged,
+  reservedIds,
 }: {
   data: TravelPlanWithItems;
   onChanged: () => void;
+  reservedIds: Set<string>;
 }) {
   const addItem = useServerFn(addPlanItem);
   const [newNote, setNewNote] = useState("");
@@ -592,7 +598,14 @@ function PlanItemsSection({
               </h3>
               <ul className="divide-y">
                 {items.map((it) => (
-                  <PlanItemRow key={it.id} item={it} onChanged={onChanged} />
+                  <PlanItemRow
+                    key={it.id}
+                    item={it}
+                    onChanged={onChanged}
+                    reservedByConcierge={Boolean(
+                      it.target_id && reservedIds.has(it.target_id),
+                    )}
+                  />
                 ))}
               </ul>
             </div>
@@ -629,9 +642,11 @@ function PlanItemsSection({
 function PlanItemRow({
   item,
   onChanged,
+  reservedByConcierge,
 }: {
   item: TravelPlanItem;
   onChanged: () => void;
+  reservedByConcierge?: boolean;
 }) {
   const remove = useServerFn(removePlanItem);
   const update = useServerFn(updatePlanItem);
