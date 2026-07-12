@@ -1,7 +1,7 @@
 /**
  * CV1.1 · Filtros del listado.
  */
-import { Search } from "lucide-react";
+import { Search, ShieldCheck } from "lucide-react";
 
 interface Props {
   search: string;
@@ -15,6 +15,8 @@ interface Props {
   includeClosed: boolean;
   onIncludeClosed: (v: boolean) => void;
   isAdmin: boolean;
+  confirmedOnly: boolean;
+  onConfirmedOnly: (v: boolean) => void;
 }
 
 export function TravelPlansFilters(p: Props) {
@@ -25,10 +27,24 @@ export function TravelPlansFilters(p: Props) {
         <input
           value={p.search}
           onChange={(e) => p.onSearch(e.target.value)}
-          placeholder="Buscar por viajero o título…"
+          placeholder="Buscar por viajero, título o folio VMX…"
           className="w-full rounded-pill border border-border bg-card py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
         />
       </div>
+      <button
+        type="button"
+        onClick={() => p.onConfirmedOnly(!p.confirmedOnly)}
+        aria-pressed={p.confirmedOnly}
+        className={
+          "inline-flex items-center gap-1.5 rounded-pill border px-3 py-2 text-sm transition-colors " +
+          (p.confirmedOnly
+            ? "border-success bg-success/10 text-success"
+            : "border-border bg-card hover:bg-accent/40")
+        }
+      >
+        <ShieldCheck className="h-3.5 w-3.5" />
+        Viajes confirmados
+      </button>
       <select
         value={p.planStatus ?? ""}
         onChange={(e) => p.onPlanStatus(e.target.value || null)}
