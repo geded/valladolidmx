@@ -42,7 +42,13 @@ function useGateStatus(): GateStatus {
   return data?.is_public ? "eligible" : "incomplete";
 }
 
-export function PromocionesGate({ children }: { children: ReactNode }) {
+export function PromocionesGate({
+  children,
+  promoCount = 0,
+}: {
+  children: ReactNode;
+  promoCount?: number;
+}) {
   const status = useGateStatus();
   const [open, setOpen] = useState(false);
   const [couponOpen, setCouponOpen] = useState(false);
@@ -84,7 +90,11 @@ export function PromocionesGate({ children }: { children: ReactNode }) {
   return (
     <div className="space-y-5">
       {!eligible && status !== "loading" ? (
-        <GateBanner status={status} onOpen={() => setOpen(true)} />
+        <GateBanner
+          status={status}
+          onOpen={() => setOpen(true)}
+          promoCount={promoCount}
+        />
       ) : null}
 
       <div className="relative">
@@ -92,19 +102,18 @@ export function PromocionesGate({ children }: { children: ReactNode }) {
           onClickCapture={handleCapture}
           className={
             !eligible && status !== "loading"
-              ? "pointer-events-auto select-none [filter:blur(2px)_saturate(0.85)] opacity-70 transition"
+              ? "pointer-events-auto select-none transition [&_ul>li:first-child]:opacity-100 [&_ul>li:first-child]:[filter:none] [&_ul>li:not(:first-child)]:opacity-70 [&_ul>li:not(:first-child)]:[filter:blur(4px)_saturate(0.85)]"
               : ""
           }
-          aria-hidden={!eligible && status !== "loading" ? "true" : undefined}
         >
           {children}
         </div>
         {!eligible && status !== "loading" ? (
-          <div className="pointer-events-none absolute inset-x-0 top-24 flex justify-center sm:top-32">
+          <div className="pointer-events-none sticky bottom-4 z-30 mt-4 flex justify-center sm:justify-end sm:pr-4">
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="pointer-events-auto inline-flex items-center gap-2 rounded-full border border-primary/30 bg-background/95 px-5 py-2.5 text-sm font-semibold text-primary shadow-elevated backdrop-blur-sm hover:bg-background"
+              className="pointer-events-auto inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-floating hover:bg-primary/90"
             >
               <Lock className="size-4" aria-hidden />
               {status === "guest"
@@ -129,9 +138,11 @@ export function PromocionesGate({ children }: { children: ReactNode }) {
 function GateBanner({
   status,
   onOpen,
+  promoCount,
 }: {
   status: GateStatus;
   onOpen: () => void;
+  promoCount: number;
 }) {
   const isGuest = status === "guest";
   return (
@@ -152,6 +163,12 @@ function GateBanner({
               con perfil público completo. Así los negocios saben que eres un
               viajero real y te reservan la promoción a ti.
             </p>
+            {promoCount > 0 ? (
+              <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+                <Sparkles className="size-3.5" aria-hidden />
+                {promoCount} {promoCount === 1 ? "promoción activa" : "promociones activas"} ahora mismo
+              </p>
+            ) : null}
           </div>
         </div>
         <Button
