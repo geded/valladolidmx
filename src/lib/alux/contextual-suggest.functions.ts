@@ -134,6 +134,12 @@ const SuggestInput = z.object({
   conciergeReservedBusinessSlugs: z.array(z.string().max(160)).max(30).optional(),
   conciergeReservedBusinessNames: z.array(z.string().max(200)).max(30).optional(),
   conciergeLatestProposalSummary: z.string().max(400).nullable().optional(),
+  /**
+   * A18 · Locale-Aware Alux — Idioma activo del selector UI del viajero.
+   * Prioridad sobre `travelerHints.preferred_language`. Alux redacta
+   * rationales en este idioma; jamás traduce nombres propios ni slugs.
+   */
+  locale: z.enum(["es", "en", "fr", "de", "it", "pt"]).optional(),
 });
 
 export type AluxSuggestKind = "business" | "product" | "event";
