@@ -21,6 +21,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { DirectSaleBuyButton } from "@/components/commerce/DirectSaleBuyButton";
+import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
@@ -47,6 +49,13 @@ function useActiveBusinessId(): string | null {
 function DirectSalesPage() {
   const businessId = useActiveBusinessId();
   const fetchProducts = useServerFn(listBusinessProducts);
+  const fetchPayStatus = useServerFn(getPaymentsReadyPublic);
+
+  const payStatusQ = useQuery({
+    queryKey: ["payments", "public-status"],
+    queryFn: () => fetchPayStatus(),
+    staleTime: 60_000,
+  });
 
   const { data: products = [], isLoading, error } = useQuery({
     queryKey: ["portal", "products", businessId],
@@ -85,6 +94,8 @@ function DirectSalesPage() {
         </div>
       </header>
 
+      <PaymentsStatusBanner ready={payStatusQ.data?.ready ?? false} />
+
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando experiencias…</p>
       ) : error ? (
@@ -105,6 +116,38 @@ function DirectSalesPage() {
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+function PaymentsStatusBanner({ ready }: { ready: boolean }) {
+  if (ready) {
+    return (
+      <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/5 p-4 text-sm">
+        <p className="font-medium text-emerald-700">
+          ✓ Pagos activos
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Los viajeros ya pueden completar la compra directa de tus experiencias.
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-4 text-sm">
+      <p className="font-medium text-amber-700">
+        ⚠ Pagos pendientes de activar
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        El botón <strong>Comprar</strong> ya está listo en las fichas de
+        experiencia, pero permanece deshabilitado hasta que un
+        administrador cargue las llaves del proveedor de pagos y active la
+        plataforma en{" "}
+        <Link to="/cms/pagos" className="underline">
+          CMS · Pagos
+        </Link>
+        .
+      </p>
     </div>
   );
 }
