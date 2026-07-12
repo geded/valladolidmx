@@ -122,8 +122,8 @@ export const Route = createFileRoute("/api/public/alux/signal")({
           last_seen_at: string;
           last_destination_slug?: string;
           last_category_slug?: string;
-          visited_destinations?: unknown;
-          visited_categories?: unknown;
+          visited_destinations?: Array<Record<string, unknown>>;
+          visited_categories?: Array<Record<string, unknown>>;
           destination_visit_count?: number;
         } = {
           last_signals: mergedSignals,
