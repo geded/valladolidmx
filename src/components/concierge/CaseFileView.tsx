@@ -772,7 +772,7 @@ function HandoffBlock({ title, children }: { title: string; children: ReactNode 
 }
 
 function ProfileSummary({ profile }: { profile: Record<string, unknown> }) {
-  const rows: Array<[string, unknown]> = [
+  const all: Array<[string, unknown]> = [
     ["Idioma", profile.preferred_language],
     ["País", profile.country_code],
     ["Moneda", profile.preferred_currency],
@@ -780,7 +780,8 @@ function ProfileSummary({ profile }: { profile: Record<string, unknown> }) {
     ["Dieta", profile.dietary_preferences],
     ["Movilidad", profile.mobility_needs],
     ["Intereses", profile.interests],
-  ].filter(([, v]) => v !== undefined && v !== null && v !== "");
+  ];
+  const rows = all.filter(([, v]) => v !== undefined && v !== null && v !== "");
   if (rows.length === 0) return <Empty>Perfil sin campos declarados.</Empty>;
   return (
     <dl className="grid gap-1 text-xs">
