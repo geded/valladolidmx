@@ -24,6 +24,8 @@ import {
 } from "@/lib/portal/business-catalog.functions";
 import { listMyBusinesses } from "@/lib/portal/portal-reads.functions";
 import { ProductAdvancedPanel } from "@/components/portal/ProductAdvancedPanel";
+import { toPlanLimitMessage } from "@/lib/visibility/plan-limit-errors";
+import { toast } from "sonner";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 const PRODUCT_TYPES: ProductType[] = [
@@ -185,7 +187,11 @@ function ProductsPanel({ businessId }: { businessId: string }) {
       refresh();
     },
     onError: (e) =>
-      setStatus(e instanceof Error ? e.message : "Error al crear"),
+      {
+        const msg = toPlanLimitMessage(e, e instanceof Error ? e.message : "Error al crear");
+        setStatus(msg);
+        toast.error(msg);
+      },
   });
 
   return (
@@ -512,7 +518,11 @@ function PromotionsPanel({ businessId }: { businessId: string }) {
       refresh();
     },
     onError: (e) =>
-      setStatus(e instanceof Error ? e.message : "Error al crear"),
+      {
+        const msg = toPlanLimitMessage(e, e instanceof Error ? e.message : "Error al crear");
+        setStatus(msg);
+        toast.error(msg);
+      },
   });
 
   return (
