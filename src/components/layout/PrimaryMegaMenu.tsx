@@ -187,6 +187,7 @@ function buildSections(destinos: DestinoLite[]): MenuSection[] {
       id: "mas",
       label: "Más",
       href: "/promociones",
+      expandOnly: true,
       columns: [
         {
           links: [
