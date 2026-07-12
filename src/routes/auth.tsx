@@ -253,10 +253,15 @@ function AuthRoute() {
                 <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
               </svg>
             </div>
-            <h2 className="mt-4 text-base font-semibold">Conectando con Google…</h2>
+            <h2 className="mt-4 text-base font-semibold">
+              {googleMode === "redirect"
+                ? "Te llevamos a Google…"
+                : "Conectando con Google…"}
+            </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Se abrirá una ventana segura de Google para verificar tu cuenta.
-              Si tu navegador bloquea la ventana, te redirigiremos automáticamente.
+              {googleMode === "redirect"
+                ? "Te llevamos a Google para verificar tu cuenta. Volverás automáticamente cuando termines."
+                : "Se abrirá una ventana segura de Google para verificar tu cuenta. Si tu navegador la bloquea, te redirigiremos automáticamente."}
             </p>
             <button
               type="button"
@@ -265,6 +270,22 @@ function AuthRoute() {
             >
               Cancelar
             </button>
+          </div>
+        </div>
+      ) : null}
+
+      {welcomeName ? (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="mx-4 max-w-sm rounded-2xl border border-border bg-card p-8 text-center shadow-elevated">
+            <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-primary/10 text-2xl">
+              👋
+            </div>
+            <h2 className="mt-4 font-serif text-2xl">
+              ¡Bienvenido, {welcomeName}!
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Preparando tu viaje por el Oriente Maya…
+            </p>
           </div>
         </div>
       ) : null}
