@@ -21,6 +21,7 @@ import type {
 } from "@/lib/traveler/alux-traveler.functions";
 import { AddToTravelPlanButton } from "./AddToTravelPlanButton";
 import { AluxSourcesFooter } from "./AluxSourcesFooter";
+import { AluxFeedbackButtons } from "./AluxFeedbackButtons";
 import type { TravelItemKind } from "@/lib/traveler/travel-plans.functions";
 
 const ADDABLE_KINDS: TravelItemKind[] = [
@@ -125,6 +126,9 @@ export function AluxSuggestionCard({
           </div>
         </div>
       ) : null}
+
+      {/* 6. Ola A4 · Feedback loop */}
+      <AluxFeedbackButtons suggestion={suggestion} />
     </article>
   );
 }

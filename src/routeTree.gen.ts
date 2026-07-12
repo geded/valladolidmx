@@ -157,6 +157,7 @@ import { Route as AuthenticatedCmsExperienceBuilderInventoryRouteImport } from '
 import { Route as AuthenticatedCmsEmpresasNuevaRouteImport } from './routes/_authenticated/cms/empresas.nueva'
 import { Route as AuthenticatedCmsDestinosNuevaRouteImport } from './routes/_authenticated/cms/destinos.nueva'
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
+import { Route as AuthenticatedCmsAluxFeedbackRouteImport } from './routes/_authenticated/cms/alux.feedback'
 import { Route as AuthenticatedCmsAluxConocimientoRouteImport } from './routes/_authenticated/cms/alux.conocimiento'
 import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/_authenticated/admin/sistema.usuarios'
 import { Route as OrienteMayaDestinoCategoriaEmpresaIndexRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa.index'
@@ -1004,6 +1005,12 @@ const AuthenticatedCmsCategoriasNuevaRoute =
     path: '/categorias/nueva',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsAluxFeedbackRoute =
+  AuthenticatedCmsAluxFeedbackRouteImport.update({
+    id: '/feedback',
+    path: '/feedback',
+    getParentRoute: () => AuthenticatedCmsAluxRoute,
+  } as any)
 const AuthenticatedCmsAluxConocimientoRoute =
   AuthenticatedCmsAluxConocimientoRouteImport.update({
     id: '/conocimiento',
@@ -1204,6 +1211,7 @@ export interface FileRoutesByFullPath {
   '/oriente-maya/$destino/': typeof OrienteMayaDestinoIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/cms/alux/conocimiento': typeof AuthenticatedCmsAluxConocimientoRoute
+  '/cms/alux/feedback': typeof AuthenticatedCmsAluxFeedbackRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/destinos/nueva': typeof AuthenticatedCmsDestinosNuevaRoute
   '/cms/empresas/nueva': typeof AuthenticatedCmsEmpresasNuevaRoute
@@ -1360,6 +1368,7 @@ export interface FileRoutesByTo {
   '/oriente-maya/$destino': typeof OrienteMayaDestinoIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/cms/alux/conocimiento': typeof AuthenticatedCmsAluxConocimientoRoute
+  '/cms/alux/feedback': typeof AuthenticatedCmsAluxFeedbackRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/destinos/nueva': typeof AuthenticatedCmsDestinosNuevaRoute
   '/cms/empresas/nueva': typeof AuthenticatedCmsEmpresasNuevaRoute
@@ -1525,6 +1534,7 @@ export interface FileRoutesById {
   '/oriente-maya/$destino/': typeof OrienteMayaDestinoIndexRoute
   '/_authenticated/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/_authenticated/cms/alux/conocimiento': typeof AuthenticatedCmsAluxConocimientoRoute
+  '/_authenticated/cms/alux/feedback': typeof AuthenticatedCmsAluxFeedbackRoute
   '/_authenticated/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/_authenticated/cms/destinos/nueva': typeof AuthenticatedCmsDestinosNuevaRoute
   '/_authenticated/cms/empresas/nueva': typeof AuthenticatedCmsEmpresasNuevaRoute
@@ -1691,6 +1701,7 @@ export interface FileRouteTypes {
     | '/oriente-maya/$destino/'
     | '/admin/sistema/usuarios'
     | '/cms/alux/conocimiento'
+    | '/cms/alux/feedback'
     | '/cms/categorias/nueva'
     | '/cms/destinos/nueva'
     | '/cms/empresas/nueva'
@@ -1847,6 +1858,7 @@ export interface FileRouteTypes {
     | '/oriente-maya/$destino'
     | '/admin/sistema/usuarios'
     | '/cms/alux/conocimiento'
+    | '/cms/alux/feedback'
     | '/cms/categorias/nueva'
     | '/cms/destinos/nueva'
     | '/cms/empresas/nueva'
@@ -2011,6 +2023,7 @@ export interface FileRouteTypes {
     | '/oriente-maya/$destino/'
     | '/_authenticated/admin/sistema/usuarios'
     | '/_authenticated/cms/alux/conocimiento'
+    | '/_authenticated/cms/alux/feedback'
     | '/_authenticated/cms/categorias/nueva'
     | '/_authenticated/cms/destinos/nueva'
     | '/_authenticated/cms/empresas/nueva'
@@ -3170,6 +3183,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsCategoriasNuevaRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/alux/feedback': {
+      id: '/_authenticated/cms/alux/feedback'
+      path: '/feedback'
+      fullPath: '/cms/alux/feedback'
+      preLoaderRoute: typeof AuthenticatedCmsAluxFeedbackRouteImport
+      parentRoute: typeof AuthenticatedCmsAluxRoute
+    }
     '/_authenticated/cms/alux/conocimiento': {
       id: '/_authenticated/cms/alux/conocimiento'
       path: '/conocimiento'
@@ -3475,10 +3495,12 @@ const AuthenticatedPortalRouteRouteWithChildren =
 
 interface AuthenticatedCmsAluxRouteChildren {
   AuthenticatedCmsAluxConocimientoRoute: typeof AuthenticatedCmsAluxConocimientoRoute
+  AuthenticatedCmsAluxFeedbackRoute: typeof AuthenticatedCmsAluxFeedbackRoute
 }
 
 const AuthenticatedCmsAluxRouteChildren: AuthenticatedCmsAluxRouteChildren = {
   AuthenticatedCmsAluxConocimientoRoute: AuthenticatedCmsAluxConocimientoRoute,
+  AuthenticatedCmsAluxFeedbackRoute: AuthenticatedCmsAluxFeedbackRoute,
 }
 
 const AuthenticatedCmsAluxRouteWithChildren =
