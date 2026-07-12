@@ -22,9 +22,11 @@
  * params antes de pasar `items`.
  */
 import { useMemo, useState } from "react";
+import { MapPin } from "lucide-react";
 import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import {
   TourismCard,
   type TourismCardCapabilities,
@@ -136,6 +138,14 @@ export function TourismListingSurface({
   className,
 }: TourismListingSurfaceProps) {
   const [active, setActive] = useState<Record<string, string | null>>({});
+  const [nearMeOn, setNearMeOn] = useState(false);
+  const geo = useVisitorGeolocation();
+
+  // A13 · ¿Algún item publicó coordenadas? Sin coords no hay ranking real.
+  const hasAnyCoords = useMemo(
+    () => items.some((it) => it.coordinates?.lat != null && it.coordinates?.lng != null),
+    [items],
+  );
 
   const filtered = useMemo(() => {
     if (facets.length === 0) return items;
@@ -147,6 +157,44 @@ export function TourismListingSurface({
       }),
     );
   }, [items, facets, active]);
+
+  // A13 · Cuando "Cerca de mí" está activo y hay GPS, calculamos distancia
+  // real y ordenamos por cercanía. Los items sin coordenadas quedan al
+  // final para no ocultarlos.
+  const displayItems = useMemo(() => {
+    if (!nearMeOn || !geo.location) return filtered;
+    const loc = geo.location;
+    const withDistance = filtered.map((vm) => {
+      if (!vm.coordinates) return { vm, km: null as number | null };
+      const R = 6371;
+      const toRad = (d: number) => (d * Math.PI) / 180;
+      const dLat = toRad(vm.coordinates.lat - loc.lat);
+      const dLng = toRad(vm.coordinates.lng - loc.lng);
+      const s =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(loc.lat)) *
+          Math.cos(toRad(vm.coordinates.lat)) *
+          Math.sin(dLng / 2) ** 2;
+      const km = 2 * R * Math.asin(Math.sqrt(s));
+      return { vm, km };
+    });
+    withDistance.sort((a, b) => {
+      if (a.km == null && b.km == null) return 0;
+      if (a.km == null) return 1;
+      if (b.km == null) return -1;
+      return a.km - b.km;
+    });
+    return withDistance.map(({ vm, km }) =>
+      km == null
+        ? vm
+        : {
+            ...vm,
+            location: vm.location
+              ? { ...vm.location, distanceKm: km }
+              : { label: destinationLabel ?? "Ubicación", distanceKm: km },
+          },
+    );
+  }, [filtered, nearMeOn, geo.location, destinationLabel]);
 
   const heroDto = useMemo(() => heroSpecToDTO(hero), [hero]);
 
@@ -207,6 +255,33 @@ export function TourismListingSurface({
               onChange={(v) => setActive((s) => ({ ...s, [f.id]: v }))}
             />
           ))}
+          {hasAnyCoords ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (!nearMeOn && geo.status !== "granted") geo.request();
+                setNearMeOn((v) => !v);
+              }}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-pill px-3 py-1 text-xs font-semibold transition-colors",
+                nearMeOn && geo.location
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-foreground/80 hover:bg-muted/70",
+              )}
+              title={
+                geo.status === "denied"
+                  ? "Permiso denegado — reintentar"
+                  : "Ordenar por cercanía real usando tu ubicación"
+              }
+            >
+              <MapPin className="size-3.5" aria-hidden />
+              {nearMeOn && geo.location
+                ? "Cerca de mí ✓"
+                : geo.status === "prompting"
+                  ? "Ubicando…"
+                  : "Cerca de mí"}
+            </button>
+          ) : null}
           {Object.values(active).some(Boolean) ? (
             <button
               type="button"
@@ -221,14 +296,14 @@ export function TourismListingSurface({
 
       {mapSlot ? <div>{mapSlot}</div> : null}
 
-      {filtered.length === 0 ? (
+      {displayItems.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center">
           <p className="text-sm text-muted-foreground">{emptyMessage}</p>
           {emptyHint ? <div className="mt-3 text-sm">{emptyHint}</div> : null}
         </div>
       ) : (
         <ul role="list" className={cn("grid gap-5", colClass)}>
-          {filtered.map((vm) => (
+          {displayItems.map((vm) => (
             <li key={vm.id}>
               <TourismCard
                 vm={vm}

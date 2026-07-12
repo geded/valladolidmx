@@ -39,6 +39,7 @@ import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experie
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
+import { AluxNearbySuggestionBanner } from "@/components/alux/AluxNearbySuggestionBanner";
 import type { ExperienceMapPoint } from "@/lib/experience-builder/blocks/experience-map/contract";
 import {
   toDestinationBlockInput,
@@ -158,6 +159,21 @@ export function DestinationSurface({
   const badgeItems = destinationToBadgeItems(input);
   void destinationToMapDTO; // mapa ahora se renderiza dentro del Explorador Inline
 
+  // A13 · Puntos geolocalizados del contenido publicado del destino
+  // para el banner proactivo de Alux (sólo se muestra si hay ≥3 cerca).
+  const nearbyPoints = (() => {
+    if (!rel) return [];
+    const src = [
+      ...rel.hoteles,
+      ...rel.restaurantes,
+      ...rel.experiencias,
+      ...rel.otras,
+    ];
+    return src
+      .filter((b) => b.latitude != null && b.longitude != null)
+      .map((b) => ({ id: b.id, lat: Number(b.latitude), lng: Number(b.longitude) }));
+  })();
+
   return (
     <DestinationSurfaceProvider db={db} related={rel} slug={slug ?? null}>
     <PublicShell
@@ -174,6 +190,13 @@ export function DestinationSurface({
       ) : null}
 
       <ExperienceHero dto={heroDto} headingLevel="h1" className={showGalleryMosaic ? "mt-6" : undefined} />
+
+      {nearbyPoints.length >= 3 ? (
+        <AluxNearbySuggestionBanner
+          destinationLabel={input.name}
+          points={nearbyPoints}
+        />
+      ) : null}
 
       {badgeItems.length > 0 ? (
         <div className="mt-6">
