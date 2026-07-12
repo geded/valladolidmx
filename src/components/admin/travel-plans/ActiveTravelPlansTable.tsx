@@ -10,6 +10,7 @@ import {
   SlaBadge,
   PriorityBadge,
 } from "./badges";
+import { ShieldCheck } from "lucide-react";
 
 interface Props {
   rows: TravelPlanOpsRow[];
@@ -60,6 +61,7 @@ export function ActiveTravelPlansTable({
           <thead className="text-left text-xs uppercase tracking-[0.14em] text-muted-foreground">
             <tr className="border-b border-border">
               <th className="p-3">Viajero · Plan</th>
+              <th className="p-3">Reservación</th>
               <th className="p-3">Estado plan</th>
               <th className="p-3">Intención</th>
               <th className="p-3">Concierge</th>
@@ -73,7 +75,7 @@ export function ActiveTravelPlansTable({
             {isLoading
               ? Array.from({ length: 6 }).map((_, i) => (
                   <tr key={i} className="border-b border-border/60">
-                    <td colSpan={8} className="p-4">
+                    <td colSpan={9} className="p-4">
                       <div className="h-4 w-full animate-pulse rounded bg-muted" />
                     </td>
                   </tr>
@@ -100,6 +102,9 @@ export function ActiveTravelPlansTable({
                           ? ` · ${r.pending_alux_count} Alux`
                           : ""}
                       </p>
+                    </td>
+                    <td className="p-3">
+                      <ReservationCell reservation={r.reservation} daysToTrip={r.days_to_trip} />
                     </td>
                     <td className="p-3"><PlanStatusBadge status={r.plan_status} /></td>
                     <td className="p-3"><IntentBadge level={r.intent_level} /></td>
