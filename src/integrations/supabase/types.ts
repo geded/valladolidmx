@@ -44,6 +44,51 @@ export type Database = {
         }
         Relationships: []
       }
+      alux_feedback: {
+        Row: {
+          capability: string
+          created_at: string
+          id: string
+          knowledge_ids: string[] | null
+          latency_ms: number | null
+          meta: Json
+          model: string | null
+          rating: number
+          reason: string | null
+          suggestion_excerpt: string | null
+          suggestion_hash: string | null
+          user_id: string
+        }
+        Insert: {
+          capability: string
+          created_at?: string
+          id?: string
+          knowledge_ids?: string[] | null
+          latency_ms?: number | null
+          meta?: Json
+          model?: string | null
+          rating: number
+          reason?: string | null
+          suggestion_excerpt?: string | null
+          suggestion_hash?: string | null
+          user_id: string
+        }
+        Update: {
+          capability?: string
+          created_at?: string
+          id?: string
+          knowledge_ids?: string[] | null
+          latency_ms?: number | null
+          meta?: Json
+          model?: string | null
+          rating?: number
+          reason?: string | null
+          suggestion_excerpt?: string | null
+          suggestion_hash?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       alux_knowledge_entries: {
         Row: {
           body: string
