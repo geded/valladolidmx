@@ -80,6 +80,7 @@ export interface AluxTravelerSuggestion {
   reversible: true;
   latency_ms: number;
   disclaimer: string;
+  knowledge_ids: string[];
 }
 
 // ---------- Helpers ----------
@@ -160,12 +161,16 @@ async function runAluxTraveler(
   const settings = await resolveAluxSettingsServer(supabase).catch(() => null);
   let knowledgeBlock = "";
   let knowledgeCount = 0;
+  let knowledgeIds: string[] = [];
   if (!settings || settings.flags.m4_knowledge) {
     const query = [capability, userPrompt].join(" ").slice(0, 500);
     const matches = await retrieveAluxKnowledgeServer(supabase, query, {
       matchCount: 4,
     });
     knowledgeCount = matches.length;
+    knowledgeIds = matches
+      .map((m) => (m as { id?: string }).id)
+      .filter((v): v is string => typeof v === "string");
     knowledgeBlock = knowledgeToPromptBlock(matches);
   }
 
@@ -207,6 +212,7 @@ async function runAluxTraveler(
     reversible: true,
     latency_ms: latency,
     disclaimer: DISCLAIMER,
+    knowledge_ids: knowledgeIds,
   };
 }
 
