@@ -37,6 +37,8 @@ interface MenuSection {
   href: string;
   /** Cuando es una función, se resuelve al abrir con destinos publicados. */
   columns: MenuColumn[] | ((destinos: DestinoLite[]) => MenuColumn[]);
+  /** Si es true, tocar la etiqueta no navega: sólo despliega el submenú. */
+  expandOnly?: boolean;
 }
 
 interface MenuColumn {
