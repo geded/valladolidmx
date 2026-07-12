@@ -215,6 +215,12 @@ export function AluxFloatingTrigger() {
         >
           <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
             <Sparkles className="size-3.5" aria-hidden />
+            {nudge && !open && (
+              <span
+                aria-hidden
+                className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background animate-pulse"
+              />
+            )}
           </span>
           <span className="hidden sm:inline">Alux</span>
           <span className="hidden text-xs text-muted-foreground sm:inline">
@@ -224,6 +230,16 @@ export function AluxFloatingTrigger() {
             {triggerLabel}
           </span>
         </button>
+        {nudge && !open && (
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="pointer-events-auto mt-2 block max-w-[80vw] rounded-2xl border border-primary/30 bg-card/95 px-3 py-2 text-left text-[12px] font-medium text-foreground shadow-lg backdrop-blur-md transition-colors hover:bg-card"
+          >
+            <span className="mr-1 text-primary">✨</span>
+            {nudge.message}
+          </button>
+        )}
       </div>
 
       <Sheet open={open} onOpenChange={setOpen}>
