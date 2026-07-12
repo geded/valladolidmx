@@ -47,6 +47,7 @@ const CAPABILITIES = [
   "draft_concierge_message",
   "suggest_from_coupons",
   "discover_promotions",
+  "narrate_plan",
 ] as const;
 
 export type AluxTravelerCapability = (typeof CAPABILITIES)[number];
@@ -512,3 +513,21 @@ export const discoverPromotions = createServerFn({ method: "POST" })
       data.locale ?? "es",
     );
   });
+/**
+ * narratePlan — CV3.2 · Narración editorial breve del plan activo mostrada
+ * en el dock flotante "Tu viaje". Read-only, no muta, no envía. Devuelve
+ * una micro-historia (máx. 3 líneas) + rationale corto, en el idioma del
+ * viajero.
+ */
+export const narratePlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => EmptyInput.parse(d ?? {}))
+  .handler(async ({ context, data }) =>
+    runAluxTraveler(
+      "narrate_plan",
+      "Narras el plan activo del viajero como una micro-historia editorial breve, cálida y honesta. Máximo 3 frases. No inventes empresas, fechas ni promesas. Si el plan está vacío, invita al viajero a añadir su primer destino o experiencia desde la exploración.",
+      "Redacta una narración de 2–3 líneas sobre el viaje que el viajero está armando: qué destinos y momentos aparecen, qué sensación transmite y qué falta por definir (fechas, hospedaje, restaurantes) SI EL PLAN LO REVELA. Cierra con una micro-invitación amable (una sola línea) a seguir explorando o abrir el plan completo. Nada de listados; prosa turística.",
+      context.supabase,
+      data?.locale ?? "es",
+    ),
+  );

@@ -17,7 +17,7 @@
  */
 import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowRight,
@@ -25,6 +25,7 @@ import {
   Luggage,
   MapPin,
   ShoppingBag,
+  Sparkles,
   StickyNote,
   Ticket,
 } from "lucide-react";
@@ -40,7 +41,13 @@ import {
   getMyActivePlan,
   type TravelItemKind,
 } from "@/lib/traveler/travel-plans.functions";
+import {
+  narratePlan,
+  type AluxTravelerSuggestion,
+} from "@/lib/traveler/alux-traveler.functions";
 import { onPlanChanged } from "@/lib/alux/plan-signals";
+import { useTranslation } from "@/i18n/context";
+import { ALUX_KB_LOCALES, type AluxKbLocale } from "@/lib/alux/knowledge.functions";
 
 const HIDE_PREFIXES = [
   "/cuenta",
@@ -87,11 +94,23 @@ export function FloatingTravelPlanDock() {
   });
 
   const [open, setOpen] = useState(false);
+  const { locale: rawLocale } = useTranslation();
+  const locale: AluxKbLocale = (ALUX_KB_LOCALES as readonly string[]).includes(
+    rawLocale,
+  )
+    ? (rawLocale as AluxKbLocale)
+    : "es";
+  const narrate = useServerFn(narratePlan);
+  const narration = useMutation({
+    mutationFn: async () =>
+      (await narrate({ data: { locale } })) as AluxTravelerSuggestion,
+  });
 
   useEffect(() => {
     if (!enabled) return;
     return onPlanChanged(() => {
       void q.refetch();
+      narration.reset();
     });
   }, [enabled, q]);
 
@@ -135,6 +154,38 @@ export function FloatingTravelPlanDock() {
                 : `${count} ${count === 1 ? "ítem guardado" : "ítems guardados"}. Abre la vista completa para editar fechas, notas y enviar a tu concierge.`}
             </SheetDescription>
           </SheetHeader>
+
+          {count > 0 ? (
+            <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3">
+              <div className="flex items-start gap-2">
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
+                  <Sparkles className="h-3.5 w-3.5" aria-hidden />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-primary">
+                    Alux · Tu viaje en una línea
+                  </p>
+                  {narration.data ? (
+                    <p className="mt-1 text-xs leading-relaxed text-foreground whitespace-pre-line">
+                      {narration.data.text}
+                    </p>
+                  ) : narration.isPending ? (
+                    <p className="mt-1 text-xs italic text-muted-foreground">
+                      Alux está leyendo tu viaje…
+                    </p>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => narration.mutate()}
+                      className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                    >
+                      Narrar mi viaje
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           <div className="mt-5 flex-1 space-y-2 overflow-y-auto pr-1">
             {items.map((it) => {

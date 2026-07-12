@@ -54,8 +54,10 @@ import {
 } from "@/lib/traveler/alux-traveler.functions";
 import { AluxSuggestionCard } from "./AluxSuggestionCard";
 
+// Panel expone todas las capacidades salvo las de fondo (dock / Alux público).
+type PanelCapabilityId = Exclude<AluxTravelerCapability, "narrate_plan">;
 type CapabilityDef = {
-  id: AluxTravelerCapability;
+  id: PanelCapabilityId;
   label: string;
   description: string;
   icon: typeof Sparkles;
@@ -120,12 +122,13 @@ export function AluxTravelerPanel() {
   )
     ? (rawLocale as "es" | "en" | "fr" | "de" | "it" | "pt")
     : "es";
-  const [active, setActive] = useState<AluxTravelerCapability | null>(null);
+  // `narrate_plan` es capacidad de fondo (dock CV3.2); el panel expone el resto.
+  const [active, setActive] = useState<PanelCapabilityId | null>(null);
   const [results, setResults] = useState<
-    Partial<Record<AluxTravelerCapability, AluxTravelerSuggestion>>
+    Partial<Record<PanelCapabilityId, AluxTravelerSuggestion>>
   >({});
   const [errors, setErrors] = useState<
-    Partial<Record<AluxTravelerCapability, { kind: "rate_limited" | "credits_exhausted" | "error"; message: string }>>
+    Partial<Record<PanelCapabilityId, { kind: "rate_limited" | "credits_exhausted" | "error"; message: string }>>
   >({});
 
   const fns = {
@@ -140,7 +143,7 @@ export function AluxTravelerPanel() {
   } as const;
 
   const mut = useMutation({
-    mutationFn: async (id: AluxTravelerCapability) => {
+    mutationFn: async (id: PanelCapabilityId) => {
       const fn = fns[id];
       const res = (await fn({ data: { locale } })) as AluxTravelerSuggestion;
       return { id, res };
