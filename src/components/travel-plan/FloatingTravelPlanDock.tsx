@@ -41,6 +41,7 @@ import {
   getMyActivePlan,
   type TravelItemKind,
 } from "@/lib/traveler/travel-plans.functions";
+import { getMyConfirmedTravel } from "@/lib/concierge/orders.functions";
 import {
   narratePlan,
   type AluxTravelerSuggestion,
@@ -92,6 +93,13 @@ export function FloatingTravelPlanDock() {
     enabled,
     staleTime: 30_000,
   });
+  const fetchConfirmed = useServerFn(getMyConfirmedTravel);
+  const confirmedQ = useQuery({
+    queryKey: ["traveler", "confirmed-travel", "dock", user?.id ?? "anon"],
+    queryFn: () => fetchConfirmed(),
+    enabled,
+    staleTime: 60_000,
+  });
 
   const [open, setOpen] = useState(false);
   const { locale: rawLocale } = useTranslation();
@@ -110,17 +118,20 @@ export function FloatingTravelPlanDock() {
     if (!enabled) return;
     return onPlanChanged(() => {
       void q.refetch();
+      void confirmedQ.refetch();
       narration.reset();
     });
-  }, [enabled, q]);
+  }, [enabled, q, confirmedQ]);
 
   if (!enabled) return null;
 
   const items = q.data?.items ?? [];
   const count = items.length;
+  const confirmed = confirmedQ.data ?? null;
+  const isConfirmed = !!confirmed && confirmed.status !== "refunded";
 
-  // No molestar cuando aún no hay ítems ni sheet abierto.
-  if (count === 0 && !open) return null;
+  // No molestar cuando aún no hay ítems ni viaje confirmado ni sheet abierto.
+  if (count === 0 && !isConfirmed && !open) return null;
 
   const planTitle = q.data?.plan.title ?? "Tu viaje";
 
@@ -129,16 +140,38 @@ export function FloatingTravelPlanDock() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label={`Tu viaje (${count} ${count === 1 ? "ítem" : "ítems"})`}
-        className="fixed bottom-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-card/95 px-3.5 py-2.5 text-sm font-semibold text-foreground shadow-elevated backdrop-blur transition-colors hover:bg-card md:left-6"
+        aria-label={
+          isConfirmed
+            ? `Viaje confirmado ${confirmed!.folio}`
+            : `Tu viaje (${count} ${count === 1 ? "ítem" : "ítems"})`
+        }
+        className={`fixed bottom-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border px-3.5 py-2.5 text-sm font-semibold shadow-elevated backdrop-blur transition-colors md:left-6 ${
+          isConfirmed
+            ? "border-success/40 bg-success/10 text-foreground hover:bg-success/15"
+            : "border-primary/25 bg-card/95 text-foreground hover:bg-card"
+        }`}
       >
-        <span className="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground">
+        <span
+          className={`grid size-7 place-items-center rounded-full ${
+            isConfirmed
+              ? "bg-success text-success-foreground"
+              : "bg-primary text-primary-foreground"
+          }`}
+        >
           <Luggage className="h-4 w-4" aria-hidden />
         </span>
-        <span className="hidden sm:inline">Tu viaje</span>
-        <span className="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-primary/15 px-1.5 text-[11px] font-bold text-primary">
-          {count}
+        <span className="hidden sm:inline">
+          {isConfirmed ? "Viaje confirmado" : "Tu viaje"}
         </span>
+        {isConfirmed ? (
+          <span className="inline-flex items-center rounded-full bg-success/20 px-2 text-[11px] font-bold tracking-wider text-success-foreground">
+            {confirmed!.folio}
+          </span>
+        ) : (
+          <span className="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-primary/15 px-1.5 text-[11px] font-bold text-primary">
+            {count}
+          </span>
+        )}
       </button>
 
       <Sheet open={open} onOpenChange={setOpen}>
@@ -149,11 +182,33 @@ export function FloatingTravelPlanDock() {
           <SheetHeader>
             <SheetTitle className="truncate">{planTitle}</SheetTitle>
             <SheetDescription>
-              {count === 0
+              {isConfirmed
+                ? `Tu viaje al Oriente Maya de Yucatán está confirmado. Folio ${confirmed!.folio}.`
+                : count === 0
                 ? "Aún no has guardado nada. Añade destinos, empresas, productos o eventos desde cualquier ficha."
                 : `${count} ${count === 1 ? "ítem guardado" : "ítems guardados"}. Abre la vista completa para editar fechas, notas y enviar a tu concierge.`}
             </SheetDescription>
           </SheetHeader>
+
+          {isConfirmed ? (
+            <div className="mt-4 rounded-xl border border-success/40 bg-success/10 p-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-success-foreground/80">
+                Viaje confirmado
+              </p>
+              <p className="mt-1 text-sm font-medium text-foreground">
+                {confirmed!.editorial_title ?? "Tu viaje al Oriente Maya de Yucatán"}
+              </p>
+              {typeof confirmed!.days_to_trip === "number" ? (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {confirmed!.days_to_trip > 0
+                    ? `Faltan ${confirmed!.days_to_trip} días para tu llegada.`
+                    : confirmed!.days_to_trip === 0
+                      ? "Hoy comienza tu viaje al Oriente Maya."
+                      : "Tu viaje está en curso o recién concluyó."}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
 
           {count > 0 ? (
             <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3">
