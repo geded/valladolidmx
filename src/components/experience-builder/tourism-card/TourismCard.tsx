@@ -88,6 +88,12 @@ export interface TourismCardVM {
   mediaAlt: string | null;
   rating: { value: number; count: number } | null;
   location: { label: string; distanceKm: number | null } | null;
+  /**
+   * A13 · Coordenadas geolocalizadas para cálculo de distancia real
+   * cuando el visitante comparte GPS. Opcional; puede completarse por
+   * el adapter cuando la entidad publica su ubicación en el feed.
+   */
+  coordinates?: { lat: number; lng: number } | null;
   /** Territorial context: destino / región (chip debajo del título). */
   territorialContext: string | null;
   highlights: string[];
