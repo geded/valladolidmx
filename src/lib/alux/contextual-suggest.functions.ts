@@ -209,6 +209,54 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       };
     });
 
+    // 2b. Promociones activas de negocios del destino (A6).
+    const bizIdsInDest = businesses.map((b) => b.id);
+    const bizById = new Map(businesses.map((b) => [b.id, b] as const));
+    const nowIso = new Date().toISOString();
+    let activePromotions: AluxActiveDestinationPromotion[] = [];
+    const promoByBizId = new Map<string, { slug: string; title: string }>();
+    if (bizIdsInDest.length) {
+      const { data: promoRows } = await sb
+        .from("promotions")
+        .select("slug, title, business_id, discount_percent, ends_at, starts_at")
+        .in("business_id", bizIdsInDest)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("published_at", { ascending: false })
+        .limit(24);
+      const items: AluxActiveDestinationPromotion[] = [];
+      for (const p of (promoRows ?? []) as Array<{
+        slug: string;
+        title: string;
+        business_id: string | null;
+        discount_percent: number | null;
+        ends_at: string | null;
+        starts_at: string | null;
+      }>) {
+        if (p.starts_at && p.starts_at > nowIso) continue;
+        if (p.ends_at && p.ends_at < nowIso) continue;
+        const biz = p.business_id ? bizById.get(p.business_id) : null;
+        if (!biz) continue;
+        if (!promoByBizId.has(biz.id))
+          promoByBizId.set(biz.id, { slug: p.slug, title: p.title });
+        items.push({
+          slug: p.slug,
+          title: p.title,
+          businessSlug: biz.slug,
+          businessName: biz.display_name,
+          discountPercent: p.discount_percent,
+          endsAt: p.ends_at,
+          href: `/promociones/${p.slug}`,
+        });
+        if (items.length >= 6) break;
+      }
+      activePromotions = items;
+    }
+
+    const activeCouponSlugSet = new Set(
+      (data.activeCouponBusinessSlugs ?? []).map((s) => s.toLowerCase()),
+    );
+
     // 3. Ranking según nivel de contexto.
     const currentBusinessSlug = data.business?.slug;
     const currentCategorySlug = data.category?.slug;
@@ -243,6 +291,20 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       }
     }
 
+    // A6 · Prioriza negocios con cupón activo del viajero y luego los que
+    // tienen promoción vigente en el destino — sin romper el ranking base.
+    if (activeCouponSlugSet.size > 0 || promoByBizId.size > 0) {
+      const withCoupon: BizRow[] = [];
+      const withPromo: BizRow[] = [];
+      const rest: BizRow[] = [];
+      for (const b of ordered) {
+        if (activeCouponSlugSet.has(b.slug.toLowerCase())) withCoupon.push(b);
+        else if (promoByBizId.has(b.id)) withPromo.push(b);
+        else rest.push(b);
+      }
+      ordered.length = 0;
+      ordered.push(...withCoupon, ...withPromo, ...rest);
+    }
     const picks = ordered.slice(0, limit);
 
     // 4. Rationale explicable por item.
@@ -268,6 +330,31 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       const href = `/oriente-maya/${destination.slug}/${row.category_slug || "empresas"}/${row.slug}`;
       const clean = rationale.trim().replace(/\s+/g, " ");
       const safeRationale = clean.length > 0 && clean.length <= 200 ? clean : deterministicRationale(row);
+      const hasActiveCoupon = activeCouponSlugSet.has(row.slug.toLowerCase());
+      const promo = promoByBizId.get(row.id) ?? null;
+      const ctas: AluxSuggestionCta[] = [
+        { kind: "view", label: "Ver ficha", href },
+        {
+          kind: "directions",
+          label: "Cómo llegar",
+          href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+            `${row.display_name} ${destinationLabel} Yucatán México`,
+          )}`,
+        },
+      ];
+      if (hasActiveCoupon) {
+        ctas.push({
+          kind: "coupon",
+          label: "Ver mi cupón",
+          href: "/cuenta/cupones",
+        });
+      } else if (promo) {
+        ctas.push({
+          kind: "promotion",
+          label: "Ver promoción",
+          href: `/promociones/${promo.slug}`,
+        });
+      }
       return {
         kind: "business" as const,
         slug: row.slug,
@@ -277,6 +364,9 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         categorySlug: row.category_slug || undefined,
         categoryName: row.category_name || undefined,
         source: { table: "businesses", id: row.id },
+        ctas,
+        hasActiveCoupon: hasActiveCoupon || undefined,
+        activePromotionSlug: promo?.slug,
       };
     }
 
@@ -299,10 +389,29 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           .filter(Boolean)
           .join(" · ");
 
+        const hints = data.travelerHints;
+        const travelerLine = hints
+          ? [
+              hints.home_country ? `viene de ${hints.home_country}` : null,
+              hints.preferred_language ? `habla ${hints.preferred_language}` : null,
+              hints.travel_style ? `estilo ${hints.travel_style}` : null,
+              hints.budget_band ? `presupuesto ${hints.budget_band}` : null,
+              hints.dietary?.length ? `dieta ${hints.dietary.join(", ")}` : null,
+              hints.accessibility?.length ? `accesibilidad ${hints.accessibility.join(", ")}` : null,
+              hints.interests?.length ? `intereses ${hints.interests.slice(0, 5).join(", ")}` : null,
+            ]
+              .filter(Boolean)
+              .join(" · ")
+          : null;
+
+        const couponHintLine = activeCouponSlugSet.size
+          ? `El viajero YA tiene cupones activos en: ${Array.from(activeCouponSlugSet).slice(0, 6).join(", ")}. Cuando aparezcan en la lista, recuerda con calidez que puede canjearlo (nunca inventes % ni vigencias).`
+          : null;
+
         const catalogBlock = picks
           .map(
             (row, i) =>
-              `${i + 1}. id="${row.id}" · ${row.display_name}${row.category_name ? ` (${row.category_name})` : ""}${row.tagline ? ` — ${row.tagline}` : ""}`,
+              `${i + 1}. id="${row.id}" · ${row.display_name}${row.category_name ? ` (${row.category_name})` : ""}${row.tagline ? ` — ${row.tagline}` : ""}${promoByBizId.has(row.id) ? " · [Promo activa]" : ""}${activeCouponSlugSet.has(row.slug.toLowerCase()) ? " · [Cupón del viajero]" : ""}`,
           )
           .join("\n");
 
@@ -311,12 +420,16 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           "Tono cálido, colonial, cercano, en español neutro. Nunca marketing agresivo.",
           "",
           `Contexto del visitante: ${contextLine}.`,
+          travelerLine ? `Perfil del viajero: ${travelerLine}.` : null,
+          couponHintLine,
           "",
           "Candidatos reales del catálogo publicado (usa SOLO estos ids):",
           catalogBlock,
           "",
-          "Para cada id, redacta un rationale breve (máx 140 caracteres) explicando por qué se lo sugieres al visitante ahora, considerando su contexto activo. No inventes atributos, precios, distancias ni horarios que no aparezcan en la lista. No repitas literalmente el nombre del lugar en el rationale. Devuelve exactamente un rationale por id.",
-        ].join("\n");
+          "Para cada id, redacta un rationale breve (máx 140 caracteres) explicando por qué se lo sugieres al visitante ahora, considerando su contexto activo y — si aplica — su perfil M2 (estilo, dieta, presupuesto, intereses, país). Si el candidato tiene [Cupón del viajero] o [Promo activa], mencionalo con naturalidad SIN inventar % ni fechas. No inventes atributos, precios, distancias ni horarios que no aparezcan en la lista. No repitas literalmente el nombre del lugar en el rationale. Devuelve exactamente un rationale por id.",
+        ]
+          .filter(Boolean)
+          .join("\n");
 
         const AiSchema = z.object({
           picks: z.array(
@@ -361,6 +474,8 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
 
     return {
       suggestions,
+      activePromotions,
+      travelerAware: Boolean(data.travelerHints),
       contextSnapshot: {
         destination: destSlug,
         category: currentCategorySlug,
