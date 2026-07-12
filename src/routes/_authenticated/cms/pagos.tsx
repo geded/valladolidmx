@@ -11,12 +11,16 @@
 import { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getPaymentProviderStatus,
   listRecentPaymentEvents,
   getPaymentsSummary,
 } from "@/lib/payments/admin.functions";
+import {
+  getPaymentsDemoModeAdmin,
+  setPaymentsDemoModeAdmin,
+} from "@/lib/payments/demo-mode.functions";
 
 export const Route = createFileRoute("/_authenticated/cms/pagos")({
   head: () => ({
@@ -84,6 +88,13 @@ function PaymentsAdminPage() {
           loading={statusQ.isLoading}
           error={statusQ.error}
         />
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          Modo demo
+        </h2>
+        <DemoModeToggle />
       </section>
 
       <section className="mt-10">
