@@ -10,10 +10,9 @@
  */
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { emitPlanChanged } from "@/lib/alux/plan-signals";
+import { notifyPlanChanged } from "@/lib/alux/plan-signals";
 
 type ProposalRow = {
   id: string;
@@ -47,7 +46,7 @@ export function ConciergeProposalObserver() {
           },
         },
       });
-      emitPlanChanged({ reason: `concierge:proposal:${kind.toLowerCase()}` });
+      notifyPlanChanged(`concierge:proposal:${kind.toLowerCase()}`);
     };
 
     const channel = supabase
@@ -69,7 +68,5 @@ export function ConciergeProposalObserver() {
     };
   }, [user?.id]);
 
-  // Link import kept for potential future in-toast navigation; suppress unused.
-  void Link;
   return null;
 }
