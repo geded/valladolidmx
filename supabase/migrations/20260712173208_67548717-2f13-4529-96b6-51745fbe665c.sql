@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.alux_get_concierge_context_for_user(UUID) FROM PUBLIC, anon;
