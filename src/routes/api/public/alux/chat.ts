@@ -48,9 +48,7 @@ function parseVisitor(input: unknown): Visitor | null {
 }
 
 async function fetchNearbyBusinesses(
-  supabaseAdmin: Awaited<
-    ReturnType<typeof import("@/integrations/supabase/client.server")>
-  >["supabaseAdmin"],
+  supabaseAdmin: typeof import("@/integrations/supabase/client.server")["supabaseAdmin"],
   visitor: Visitor,
 ): Promise<Array<{ name: string; category: string | null; km: number; slug: string }>> {
   const { data, error } = await supabaseAdmin
