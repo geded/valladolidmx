@@ -39,7 +39,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { Plus, ExternalLink, Search, Home } from "lucide-react";
-import { Ticket, QrCode, History } from "lucide-react";
+import { Ticket, QrCode, History, BarChart3 } from "lucide-react";
 
 import type { WorkspaceDefinition } from "../types";
 import { registerWorkspace } from "../workspace-registry";
@@ -169,6 +169,7 @@ const portal: WorkspaceDefinition = {
     { id: "portal.visibilidad", workspaceId: "portal", label: "Paquetes de visibilidad", icon: Sparkles, to: "/portal/visibilidad", group: "operacion", order: 7.1, surfaces: ["sidebar", "palette"] },
     { id: "portal.canjear", workspaceId: "portal", label: "Canjear cupón", icon: QrCode, to: "/portal/canjear", group: "operacion", order: 7.5, surfaces: ["sidebar", "bottom", "palette"] },
     { id: "portal.canjes", workspaceId: "portal", label: "Historial de canjes", icon: History, to: "/portal/canjes", group: "operacion", order: 7.6, surfaces: ["sidebar", "palette"] },
+    { id: "portal.reportes", workspaceId: "portal", label: "Reporte de presencia", icon: BarChart3, to: "/portal/reportes", group: "operacion", order: 7.7, surfaces: ["sidebar", "palette"] },
     { id: "portal.actividad", workspaceId: "portal", label: "Actividad", icon: Activity, to: "/portal/actividad", group: "operacion", order: 8, surfaces: ["sidebar", "palette"] },
     { id: "portal.concierge", workspaceId: "portal", label: "Concierge", icon: ConciergeBell, to: "/portal/concierge", group: "operacion", order: 9, surfaces: ["sidebar", "palette"] },
     { id: "portal.invitaciones", workspaceId: "portal", label: "Invitaciones", icon: Mail, to: "/portal/invitaciones", group: "equipo", order: 10, surfaces: ["sidebar", "palette"] },
