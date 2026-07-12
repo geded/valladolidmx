@@ -467,6 +467,19 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           ? `El viajero YA tiene cupones activos en: ${Array.from(activeCouponSlugSet).slice(0, 6).join(", ")}. Cuando aparezcan en la lista, recuerda con calidez que puede canjearlo (nunca inventes % ni vigencias).`
           : null;
 
+        const intentHintLine = data.travelIntent && data.travelIntent !== "explorando"
+          ? (() => {
+              const map: Record<string, string> = {
+                comparando_hoteles: "El viajero está comparando hoteles ahora — prioriza diferenciadores concretos (zona, ambiente, servicios) y evita generalidades.",
+                buscando_comida: "El viajero está buscando dónde comer — prioriza cocina, ambiente y si aplica horario de cocina.",
+                planeando_noche: "El viajero está planeando su noche — prioriza opciones abiertas después de las 18h y ambiente nocturno.",
+                cazando_cupones: "El viajero está atento a promociones — cuando un candidato tenga [Promo activa] o [Cupón del viajero], mencionalo con naturalidad.",
+                perdido: "El viajero lleva rato explorando sin decidir — sé más directo y ofrece un plan concreto, no una lista neutral.",
+              };
+              return `Intención detectada: ${map[data.travelIntent] ?? ""}`;
+            })()
+          : null;
+
         const catalogBlock = picks
           .map(
             (row, i) =>
@@ -481,6 +494,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           `Contexto del visitante: ${contextLine}.`,
           travelerLine ? `Perfil del viajero: ${travelerLine}.` : null,
           couponHintLine,
+          intentHintLine,
           "",
           "Candidatos reales del catálogo publicado (usa SOLO estos ids):",
           catalogBlock,
