@@ -126,7 +126,10 @@ function MiViajePage() {
       <GuestImportBanner onImported={invalidatePlan} />
 
       {confirmed && confirmed.status !== "refunded" ? (
-        <ConfirmedTravelBanner data={confirmed} />
+        <>
+          <ConfirmedTravelBanner data={confirmed} />
+          <ConfirmedTripTimeline data={confirmed} />
+        </>
       ) : null}
 
       <AluxPlanProposalsInbox onChanged={invalidatePlan} />
@@ -327,6 +330,156 @@ function ConfirmedTravelBanner({
         Los ítems reservados con tu concierge quedan bloqueados en tu plan.
         Guarda tu folio para referencia rápida con tu concierge.
       </p>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Timeline del viaje confirmado (CV4.3-narrativa · Etapa 7)          */
+/* ------------------------------------------------------------------ */
+
+function ConfirmedTripTimeline({
+  data,
+}: {
+  data: {
+    plan_start_date: string | null;
+    plan_end_date: string | null;
+    days_to_trip: number | null;
+    destination_name: string | null;
+  };
+}) {
+  const start = data.plan_start_date
+    ? new Date(`${data.plan_start_date}T00:00:00Z`)
+    : null;
+  const end = data.plan_end_date
+    ? new Date(`${data.plan_end_date}T00:00:00Z`)
+    : null;
+
+  const days: Date[] = [];
+  if (start && end) {
+    const cur = new Date(start);
+    for (let i = 0; i < 14 && cur.getTime() <= end.getTime(); i++) {
+      days.push(new Date(cur));
+      cur.setUTCDate(cur.getUTCDate() + 1);
+    }
+  } else if (start) {
+    days.push(start);
+  }
+
+  const fmtDay = (d: Date) =>
+    d.toLocaleDateString("es-MX", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      timeZone: "UTC",
+    });
+
+  const dtt = data.days_to_trip;
+  const preMilestones: { key: string; label: string; hint: string; active: boolean }[] =
+    typeof dtt === "number" && dtt >= 0
+      ? [
+          {
+            key: "t-14",
+            label: "T‑14 días · Preparando tu llegada",
+            hint: "Recomendaciones climáticas y culturales del Oriente Maya.",
+            active: dtt <= 14,
+          },
+          {
+            key: "t-3",
+            label: "T‑3 días · Todo listo para tu viaje",
+            hint: "Punto de encuentro, contacto de tu concierge, botón de emergencia.",
+            active: dtt <= 3,
+          },
+          {
+            key: "t-0",
+            label: "Día de llegada · Bienvenido al Oriente Maya",
+            hint: "Alux te acompaña con contexto espacial y tu concierge en línea.",
+            active: dtt === 0,
+          },
+        ]
+      : [];
+
+  return (
+    <section className="overflow-hidden rounded-2xl border border-border/70 bg-card p-6 shadow-soft">
+      <div className="flex items-center gap-2">
+        <Calendar className="h-4 w-4 text-primary" aria-hidden />
+        <h2 className="font-serif text-xl">Mapa de tu viaje</h2>
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Los hitos de tu experiencia en el Oriente Maya de Yucatán
+        {data.destination_name ? `, con base en ${data.destination_name}` : ""}.
+      </p>
+
+      {preMilestones.length > 0 ? (
+        <ol className="mt-5 space-y-3">
+          {preMilestones.map((m) => (
+            <li
+              key={m.key}
+              className={`flex gap-3 rounded-xl border p-3 ${
+                m.active
+                  ? "border-primary/40 bg-primary/5"
+                  : "border-border/60 bg-background/60"
+              }`}
+            >
+              <span
+                className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-full text-[10px] font-semibold ${
+                  m.active
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {m.active ? "●" : "○"}
+              </span>
+              <div>
+                <p className="text-sm font-medium text-foreground">{m.label}</p>
+                <p className="text-xs text-muted-foreground">{m.hint}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      ) : null}
+
+      {days.length > 0 ? (
+        <div className="mt-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            Tu itinerario día a día
+          </p>
+          <ol className="mt-3 space-y-2">
+            {days.map((d, idx) => {
+              const isArrival = idx === 0;
+              const isReturn = end && d.getTime() === end.getTime() && days.length > 1;
+              const label = isArrival
+                ? "Tu llegada"
+                : isReturn
+                  ? "Tu regreso"
+                  : `Día ${idx + 1}`;
+              return (
+                <li
+                  key={d.toISOString()}
+                  className="flex items-start gap-3 rounded-lg border border-border/50 bg-background/60 p-3"
+                >
+                  <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary/10 text-[11px] font-semibold text-primary">
+                    {idx + 1}
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">{label}</p>
+                    <p className="text-xs text-muted-foreground">{fmtDay(d)}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+          <p className="mt-3 text-[11px] text-muted-foreground">
+            Tu concierge y Alux te propondrán actividades por día conforme se
+            acerque tu viaje.
+          </p>
+        </div>
+      ) : (
+        <p className="mt-5 text-xs text-muted-foreground">
+          Cuando confirmes fechas con tu concierge, aquí verás tu itinerario
+          día por día.
+        </p>
+      )}
     </section>
   );
 }
