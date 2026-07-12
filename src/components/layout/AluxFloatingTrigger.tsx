@@ -37,6 +37,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
+import { logAluxPublicSignal, type AluxPublicSignalAction } from "@/lib/alux/public-signals";
 import {
   Sheet,
   SheetContent,
@@ -403,6 +404,13 @@ export function AluxFloatingTrigger() {
                             <div className="rounded-xl border border-border bg-card/60 px-3 py-2.5 text-sm text-foreground">
                               <a
                                 href={item.href}
+                                onClick={() =>
+                                  logAluxPublicSignal({
+                                    action: "view_business",
+                                    label: item.label,
+                                    slug: item.source.id,
+                                  })
+                                }
                                 className="group flex items-start justify-between gap-3"
                               >
                                 <span className="min-w-0">
@@ -454,6 +462,21 @@ export function AluxFloatingTrigger() {
                                         href={cta.href}
                                         target={cta.kind === "directions" ? "_blank" : undefined}
                                         rel={cta.kind === "directions" ? "noopener noreferrer" : undefined}
+                                        onClick={() => {
+                                          const map: Record<string, AluxPublicSignalAction | null> = {
+                                            directions: "request_directions",
+                                            promotion: "view_promotion",
+                                            coupon: "save_coupon",
+                                          };
+                                          const action = map[cta.kind] ?? null;
+                                          if (action) {
+                                            logAluxPublicSignal({
+                                              action,
+                                              label: item.label,
+                                              slug: item.source.id,
+                                            });
+                                          }
+                                        }}
                                         className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium text-foreground transition-colors hover:bg-muted"
                                       >
                                         {cta.kind === "directions" && <Navigation className="size-2.5" aria-hidden />}
