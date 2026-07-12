@@ -128,6 +128,7 @@ function MiViajePage() {
       {confirmed && confirmed.status !== "refunded" ? (
         <>
           <ConfirmedTravelBanner data={confirmed} />
+          <TripPhaseCard data={confirmed} />
           <ConfirmedTripTimeline data={confirmed} />
         </>
       ) : null}
