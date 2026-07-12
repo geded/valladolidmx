@@ -46,6 +46,7 @@ import {
 } from "@/lib/experience-builder/adapters/business-to-blocks";
 import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 import { Share2 } from "lucide-react";
+import { AluxContextChip } from "@/components/alux/AluxContextChip";
 
 /* ------------------------------------------------------------------ *
  * Contexto — poblado por la ruta pública (SSR-safe).
@@ -172,6 +173,14 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
           </>
         }
         extensionsSlot={null}
+      />
+
+      <AluxContextChip
+        businessId={b.id}
+        businessSlug={b.slug}
+        businessName={b.display_name}
+        latitude={b.primary_location?.latitude ?? b.latitude ?? null}
+        longitude={b.primary_location?.longitude ?? b.longitude ?? null}
       />
 
       <ExperienceSubnav dto={subnavDto} className="mt-6 mb-6" />
