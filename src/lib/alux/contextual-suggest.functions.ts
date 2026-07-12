@@ -109,6 +109,21 @@ const SuggestInput = z.object({
       item_count: z.number().int().min(0).max(200).optional(),
     })
     .optional(),
+  /**
+   * A16 · Memoria territorial persistente (proyección compacta).
+   * Colorea el prompt para distinguir visitantes recurrentes de
+   * primerizos y para sugerir "retomar donde te quedaste" cuando el
+   * visitante regresa a un destino que ya exploró.
+   */
+  travelerHistory: z
+    .object({
+      is_returning: z.boolean().optional(),
+      destination_visit_count: z.number().int().min(0).max(9999).optional(),
+      distinct_destinations: z.number().int().min(0).max(9999).optional(),
+      previous_destinations: z.array(z.string().max(120)).max(8).optional(),
+      top_categories: z.array(z.string().max(120)).max(5).optional(),
+    })
+    .optional(),
 });
 
 export type AluxSuggestKind = "business" | "product" | "event";
