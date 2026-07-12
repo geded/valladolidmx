@@ -154,6 +154,41 @@ export const activateVisibilityGrant = createServerFn({ method: "POST" })
       .eq("id", data.grant_id);
     if (uErr) throw uErr;
 
+    // Ola 7.9 · Notificar activación (silent-fail).
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const [{ getVisibilityRecipient, sendVisibilityEmail }, { data: planRow }] = await Promise.all([
+        import("@/lib/visibility/visibility-notifications.server"),
+        context.supabase
+          .from("business_visibility_grants")
+          .select("plan:visibility_plans(name)")
+          .eq("id", data.grant_id)
+          .maybeSingle(),
+      ]);
+      const recipient = await getVisibilityRecipient(supabaseAdmin, grant.business_id);
+      if (recipient) {
+        const result = await sendVisibilityEmail(supabaseAdmin, {
+          templateName: "visibility-activated",
+          recipientEmail: recipient.recipientEmail,
+          recipientName: recipient.recipientName,
+          businessName: recipient.businessName,
+          idempotencyKey: `visibility-activated-${data.grant_id}`,
+          templateData: {
+            planName: (planRow as { plan?: { name?: string } } | null)?.plan?.name,
+            expiresAt: expiresAt.toISOString(),
+          },
+        });
+        if (result.ok) {
+          await supabaseAdmin
+            .from("business_visibility_grants")
+            .update({ notified_activated_at: new Date().toISOString() })
+            .eq("id", data.grant_id);
+        }
+      }
+    } catch (err) {
+      console.error("visibility activation email failed", err);
+    }
+
     return { ok: true, starts_at: startsAt.toISOString(), expires_at: expiresAt.toISOString() };
   });
 
@@ -167,7 +202,7 @@ export const rejectVisibilityGrant = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);
-    const { error } = await context.supabase
+    const { data: grantRow, error } = await context.supabase
       .from("business_visibility_grants")
       .update({
         status: "rejected",
@@ -175,8 +210,46 @@ export const rejectVisibilityGrant = createServerFn({ method: "POST" })
         cancelled_reason: data.reason.trim(),
       })
       .eq("id", data.grant_id)
-      .eq("status", "pending");
+      .eq("status", "pending")
+      .select("id, business_id, plan:visibility_plans(name)")
+      .maybeSingle();
     if (error) throw error;
+
+    // Ola 7.9 · Notificar rechazo (silent-fail).
+    if (grantRow?.business_id) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { getVisibilityRecipient, sendVisibilityEmail } = await import(
+          "@/lib/visibility/visibility-notifications.server"
+        );
+        const recipient = await getVisibilityRecipient(
+          supabaseAdmin,
+          grantRow.business_id,
+        );
+        if (recipient) {
+          const result = await sendVisibilityEmail(supabaseAdmin, {
+            templateName: "visibility-rejected",
+            recipientEmail: recipient.recipientEmail,
+            recipientName: recipient.recipientName,
+            businessName: recipient.businessName,
+            idempotencyKey: `visibility-rejected-${data.grant_id}`,
+            templateData: {
+              planName: (grantRow as { plan?: { name?: string } }).plan?.name,
+              reason: data.reason.trim(),
+            },
+          });
+          if (result.ok) {
+            await supabaseAdmin
+              .from("business_visibility_grants")
+              .update({ notified_rejected_at: new Date().toISOString() })
+              .eq("id", data.grant_id);
+          }
+        }
+      } catch (err) {
+        console.error("visibility rejection email failed", err);
+      }
+    }
+
     return { ok: true };
   });
 

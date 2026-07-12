@@ -908,6 +908,11 @@ export type Database = {
           expires_at: string
           id: string
           notes: string | null
+          notified_activated_at: string | null
+          notified_expired_at: string | null
+          notified_expiring_1d_at: string | null
+          notified_expiring_7d_at: string | null
+          notified_rejected_at: string | null
           plan_id: string
           source: string
           source_order_id: string | null
@@ -927,6 +932,11 @@ export type Database = {
           expires_at: string
           id?: string
           notes?: string | null
+          notified_activated_at?: string | null
+          notified_expired_at?: string | null
+          notified_expiring_1d_at?: string | null
+          notified_expiring_7d_at?: string | null
+          notified_rejected_at?: string | null
           plan_id: string
           source?: string
           source_order_id?: string | null
@@ -946,6 +956,11 @@ export type Database = {
           expires_at?: string
           id?: string
           notes?: string | null
+          notified_activated_at?: string | null
+          notified_expired_at?: string | null
+          notified_expiring_1d_at?: string | null
+          notified_expiring_7d_at?: string | null
+          notified_rejected_at?: string | null
           plan_id?: string
           source?: string
           source_order_id?: string | null
@@ -5782,6 +5797,15 @@ export type Database = {
         Args: { _subject_id: string; _subject_kind: string }
         Returns: Json
       }
+      get_visibility_notification_recipient: {
+        Args: { _business_id: string }
+        Returns: {
+          business_name: string
+          business_slug: string
+          recipient_email: string
+          recipient_name: string
+        }[]
+      }
       has_any_permission: {
         Args: { _keys: string[]; _user_id: string }
         Returns: boolean
@@ -5838,6 +5862,32 @@ export type Database = {
           requester_email: string
           requester_id: string
           requester_name: string
+        }[]
+      }
+      list_visibility_grants_expiring: {
+        Args: { _reminder: number }
+        Returns: {
+          business_id: string
+          business_name: string
+          business_slug: string
+          expires_at: string
+          grant_id: string
+          plan_name: string
+          recipient_email: string
+          recipient_name: string
+        }[]
+      }
+      list_visibility_grants_recently_expired: {
+        Args: never
+        Returns: {
+          business_id: string
+          business_name: string
+          business_slug: string
+          expires_at: string
+          grant_id: string
+          plan_name: string
+          recipient_email: string
+          recipient_name: string
         }[]
       }
       log_business_presence_audit: {
