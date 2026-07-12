@@ -5444,6 +5444,13 @@ export type Database = {
         Args: { _priority: string }
         Returns: string
       }
+      _cv11_can_view_travel_ops: {
+        Args: { _uid: string }
+        Returns: {
+          can_view: boolean
+          is_admin: boolean
+        }[]
+      }
       _order_recompute_totals: {
         Args: { p_order_id: string }
         Returns: undefined
@@ -5491,6 +5498,23 @@ export type Database = {
       }
       admin_evaluate_functional_alerts: {
         Args: { p_window_minutes?: number }
+        Returns: Json
+      }
+      admin_get_travel_plan_detail: {
+        Args: { p_plan_id: string }
+        Returns: Json
+      }
+      admin_list_active_travel_plans: {
+        Args: {
+          p_include_closed?: boolean
+          p_kpi_filter?: string
+          p_limit?: number
+          p_offset?: number
+          p_only_mine?: boolean
+          p_plan_status?: string
+          p_priority?: string
+          p_search?: string
+        }
         Returns: Json
       }
       admin_list_system_alerts: {
@@ -5578,6 +5602,7 @@ export type Database = {
           product_slug: string
         }[]
       }
+      admin_travel_plan_overview: { Args: never; Returns: Json }
       alux_get_concierge_context_for_user: {
         Args: { _user_id: string }
         Returns: Json
