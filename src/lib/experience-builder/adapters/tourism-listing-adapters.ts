@@ -255,7 +255,7 @@ export function promoLandingToTourismCard(p: PromoLandingLike): TourismCardVM {
   let dateLabel: string | null = null;
   if (p.endsAt) {
     try {
-      dateLabel = `Vigente hasta ${new Date(p.endsAt).toLocaleDateString("es-MX", { day: "numeric", month: "short" })}`;
+      dateLabel = `Vigente hasta ${new Date(p.endsAt).toLocaleDateString("es-MX", { day: "numeric", month: "short", timeZone: "America/Merida" })}`;
     } catch {
       dateLabel = null;
     }
