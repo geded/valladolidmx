@@ -573,6 +573,33 @@ function AluxKnowledgePage() {
                         <div className="text-xs text-muted-foreground truncate">
                           {e.summary ?? e.body.slice(0, 120)}
                         </div>
+                        <div className="flex gap-0.5 mt-1 flex-wrap">
+                          {ALUX_KB_LOCALES.map((loc) => {
+                            const c = coverageByEntry.get(e.id)?.get(loc);
+                            const ok = !!c?.embedded;
+                            return (
+                              <span
+                                key={loc}
+                                className={`text-[9px] font-mono uppercase px-1 rounded ${
+                                  ok
+                                    ? "bg-primary/10 text-primary"
+                                    : "bg-muted text-muted-foreground/60"
+                                }`}
+                                title={
+                                  c
+                                    ? c.source === "human"
+                                      ? "Revisada"
+                                      : c.source === "canonical"
+                                        ? "Canónica"
+                                        : "Traducción IA"
+                                    : "Faltante"
+                                }
+                              >
+                                {loc}
+                              </span>
+                            );
+                          })}
+                        </div>
                       </div>
                       <div className="flex flex-col items-end gap-1 shrink-0">
                         <Badge
