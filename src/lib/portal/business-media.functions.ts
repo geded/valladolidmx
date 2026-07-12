@@ -215,8 +215,7 @@ export const createBusinessMediaUploadTicket = createServerFn({ method: "POST" }
           .from("business_media")
           .select("id", { count: "exact", head: true })
           .eq("business_id", data.businessId)
-          .eq("role", "gallery")
-          .is("deleted_at", null);
+          .eq("role", "gallery");
         assertUnderLimit(limits, "max_photos", count ?? 0);
       }
     }
