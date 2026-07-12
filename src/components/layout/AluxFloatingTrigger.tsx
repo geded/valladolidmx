@@ -285,6 +285,68 @@ export function AluxFloatingTrigger() {
             </div>
           </SheetHeader>
 
+          {/* A15 · Timeline "Tu viaje" — memoria de lo que el viajero ya decidió. */}
+          {isAuthed && plan && (plan.start_date || plan.item_count > 0 || plan.party_size) && (
+            <section
+              aria-labelledby="alux-plan"
+              className="rounded-2xl border border-primary/20 bg-primary/5 p-4"
+            >
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+                <CalendarDays className="size-3.5" aria-hidden />
+                <span id="alux-plan">Tu viaje</span>
+                <a
+                  href="/cuenta/mi-viaje"
+                  className="ml-auto text-[10px] font-medium text-primary/80 hover:underline"
+                >
+                  Editar
+                </a>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {typeof plan.days_remaining === "number" && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-background/70 px-2.5 py-1 text-[11px] font-medium text-foreground">
+                    <Clock className="size-3" aria-hidden />
+                    {plan.days_remaining > 0
+                      ? `Faltan ${plan.days_remaining} día${plan.days_remaining === 1 ? "" : "s"}`
+                      : plan.days_remaining === 0
+                        ? "Llegas hoy"
+                        : "Viaje en curso"}
+                  </span>
+                )}
+                {plan.start_date && plan.end_date && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-background/70 px-2.5 py-1 text-[11px] text-foreground">
+                    {plan.start_date} → {plan.end_date}
+                  </span>
+                )}
+                {plan.party_size && plan.party_size > 1 && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-background/70 px-2.5 py-1 text-[11px] text-foreground">
+                    <Users className="size-3" aria-hidden />
+                    {plan.party_size} personas
+                  </span>
+                )}
+                {plan.item_count > 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-background/70 px-2.5 py-1 text-[11px] text-foreground">
+                    {plan.item_count} lugar{plan.item_count === 1 ? "" : "es"} guardado{plan.item_count === 1 ? "" : "s"}
+                  </span>
+                )}
+              </div>
+              {plan.saved_items.length > 0 && (
+                <p className="mt-2 truncate text-[11px] text-muted-foreground">
+                  Últimos guardados:{" "}
+                  {plan.saved_items
+                    .filter((s) => s.title)
+                    .slice(0, 3)
+                    .map((s) => s.title)
+                    .join(" · ")}
+                </p>
+              )}
+              {!plan.start_date && (
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  Añade tus fechas en Mi Viaje para que te encadene recomendaciones día a día.
+                </p>
+              )}
+            </section>
+          )}
+
           {/* Ubicación viva (A5) — opt-in contextual, no intrusivo. */}
           <section
             aria-labelledby="alux-geo"
