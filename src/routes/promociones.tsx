@@ -80,7 +80,7 @@ function PromosRoute() {
       contextDeclaration={buildPromocionesContext()}
       useContextCrumbs
     >
-      <PromocionesGate>
+      <PromocionesGate promoCount={cards.length}>
         <TourismListingSurface
           hero={{
             eyebrow: "Ofertas del Oriente Maya",
