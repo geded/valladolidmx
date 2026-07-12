@@ -34,6 +34,8 @@ function AuthRoute() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [googleBusy, setGoogleBusy] = useState(false);
+  const [googleMode, setGoogleMode] = useState<"popup" | "redirect">("popup");
+  const [welcomeName, setWelcomeName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && user) {
@@ -48,7 +50,18 @@ function AuthRoute() {
         } catch { /* noop */ }
       }
       const target = next && next.startsWith("/") && !next.startsWith("//") ? next : resolveRoleHome(roles);
-      void navigate({ to: target });
+      // Splash "¡Bienvenido, {nombre}!" antes de saltar al destino.
+      const meta = (user.user_metadata ?? {}) as { full_name?: string; name?: string; given_name?: string };
+      const first =
+        (meta.given_name ?? meta.full_name ?? meta.name ?? user.email ?? "")
+          .toString()
+          .trim()
+          .split(/\s+/)[0] || null;
+      setWelcomeName(first);
+      const timer = window.setTimeout(() => {
+        void navigate({ to: target });
+      }, 1200);
+      return () => window.clearTimeout(timer);
     }
   }, [loading, user, roles, navigate]);
 
@@ -89,16 +102,26 @@ function AuthRoute() {
 
   async function handleGoogle() {
     setError(null);
+    setGoogleMode("popup");
     setGoogleBusy(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
         // Return to /auth so the post-login effect picks up the stored "next".
         redirect_uri: `${window.location.origin}/auth`,
+        extraParams: {
+          // Muestra siempre el selector de cuentas: útil en dispositivos
+          // compartidos o con múltiples cuentas de Google.
+          prompt: "select_account",
+        },
       });
       if (result.error) {
         setError(result.error.message ?? t("auth.google_error"));
         setGoogleBusy(false);
         return;
+      }
+      if (result.redirected) {
+        // El navegador está redirigiendo a Google (full-page).
+        setGoogleMode("redirect");
       }
       // If result.redirected → the browser is navigating to Google; leave modal visible.
       // If tokens were returned (popup path) → the auth effect closes the modal and redirects.
