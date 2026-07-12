@@ -7285,6 +7285,20 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_product_direct_sale_settings: {
+        Args: {
+          _cancellation_policy?: string
+          _commission_bps?: number
+          _currency?: string
+          _enabled: boolean
+          _max_quantity?: number
+          _min_lead_hours?: number
+          _price_amount?: number
+          _product_id: string
+          _terms?: string
+        }
+        Returns: undefined
+      }
       user_zone_scopes_for: {
         Args: { _user_id: string }
         Returns: {
