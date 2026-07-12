@@ -117,6 +117,20 @@ export function businessToTourismCard(
   const visibilityBadges: TourismCardVM["badges"] = b.visibility_plan_name
     ? [{ label: b.visibility_plan_name, tone: visibilityTone }]
     : [];
+  // Ola 7.8 · Founder Spotlight (sobre-exposición manual)
+  const spotlightBadges: TourismCardVM["badges"] = (b as {
+    spotlight_headline?: string | null;
+    spotlight_boost?: number;
+  }).spotlight_headline || ((b as { spotlight_boost?: number }).spotlight_boost ?? 0) > 0
+    ? [
+        {
+          label:
+            (b as { spotlight_headline?: string | null }).spotlight_headline ||
+            "Destacado por Valladolid",
+          tone: "warning",
+        },
+      ]
+    : [];
   return {
     id: b.id,
     entityKind: categoryToEntityKind(categorySlug),
@@ -133,7 +147,7 @@ export function businessToTourismCard(
       : null,
     territorialContext: opts.regionLabel ?? null,
     highlights: [],
-    badges: [...visibilityBadges, ...verifiedBadges],
+    badges: [...spotlightBadges, ...visibilityBadges, ...verifiedBadges],
     institutionalBadges: institutionalBadgesForDestination(b.destination_slug),
     dateLabel: null,
     availabilityLabel: null,
