@@ -33,6 +33,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateText, Output, NoObjectGeneratedError } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { computeOpenNow, type OpenNowState } from "@/lib/business/open-now";
 
 const SlotSchema = z
   .object({
@@ -93,6 +94,9 @@ export interface AluxContextualSuggestion {
   readonly hasActiveCoupon?: boolean;
   /** Slug de una promoción publicada del negocio, si existe. */
   readonly activePromotionSlug?: string;
+  /** A7 · Horarios reales. */
+  readonly openState?: OpenNowState;
+  readonly openLabel?: string;
 }
 
 export interface AluxActiveDestinationPromotion {
