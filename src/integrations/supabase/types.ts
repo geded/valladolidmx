@@ -149,6 +149,89 @@ export type Database = {
         }
         Relationships: []
       }
+      alux_public_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          ip_hash: string
+          knowledge_ids: string[]
+          latency_ms: number | null
+          model: string | null
+          role: string
+          session_id: string
+          tokens_in: number | null
+          tokens_out: number | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          ip_hash: string
+          knowledge_ids?: string[]
+          latency_ms?: number | null
+          model?: string | null
+          role: string
+          session_id: string
+          tokens_in?: number | null
+          tokens_out?: number | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          ip_hash?: string
+          knowledge_ids?: string[]
+          latency_ms?: number | null
+          model?: string | null
+          role?: string
+          session_id?: string
+          tokens_in?: number | null
+          tokens_out?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alux_public_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "alux_public_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      alux_public_sessions: {
+        Row: {
+          created_at: string
+          first_seen_at: string
+          id: string
+          ip_hash: string
+          last_seen_at: string
+          message_count: number
+          session_key: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          first_seen_at?: string
+          id?: string
+          ip_hash: string
+          last_seen_at?: string
+          message_count?: number
+          session_key: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          first_seen_at?: string
+          id?: string
+          ip_hash?: string
+          last_seen_at?: string
+          message_count?: number
+          session_key?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       alux_settings: {
         Row: {
           capability_overrides: Json
@@ -5314,6 +5397,16 @@ export type Database = {
           product_id: string
           product_name: string
           product_slug: string
+        }[]
+      }
+      alux_public_check_rate: {
+        Args: { _day_limit?: number; _hour_limit?: number; _ip_hash: string }
+        Returns: {
+          allowed: boolean
+          day_count: number
+          day_limit: number
+          hour_count: number
+          hour_limit: number
         }[]
       }
       alux_traveler_log_suggestion: {
