@@ -10,6 +10,10 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import {
+  composeSystemPrompt,
+  resolveAluxSettingsServer,
+} from "@/lib/alux/settings.functions";
 
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 
@@ -92,11 +96,14 @@ async function runAlux(
   supabase: unknown,
   caseId: string,
 ): Promise<AluxSuggestion> {
+  const settings = await resolveAluxSettingsServer(supabase);
   const provider = createLovableAiGatewayProvider(requireApiKey());
+  const model = settings.capability_overrides[capability]?.model ?? settings.default_model ?? DEFAULT_MODEL;
+  const effectiveSystem = composeSystemPrompt(settings, capability, systemPrompt);
   const t0 = Date.now();
   const { text, usage } = await generateText({
-    model: provider(DEFAULT_MODEL),
-    system: systemPrompt,
+    model: provider(model),
+    system: effectiveSystem,
     prompt:
       userPrompt +
       "\n\nContexto del expediente (JSON):\n```json\n" +
@@ -106,15 +113,16 @@ async function runAlux(
   const latency = Date.now() - t0;
 
   await logSuggestion(supabase, caseId, capability, {
-    model: DEFAULT_MODEL,
+    model,
     latency_ms: latency,
     tokens_in: usage?.inputTokens ?? null,
     tokens_out: usage?.outputTokens ?? null,
+    settings_id: settings.id,
   });
 
   return {
     capability,
-    model: DEFAULT_MODEL,
+    model,
     text,
     latency_ms: latency,
     disclaimer: DISCLAIMER,
