@@ -7,10 +7,11 @@
  * (no hay memoria persistente para prospectos).
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Send, Sparkles, Loader2 } from "lucide-react";
+import { Send, Sparkles, Loader2, MapPin, MapPinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@tanstack/react-router";
+import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -42,6 +43,8 @@ export function PublicAluxChat() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rateInfo, setRateInfo] = useState<{ used: number; limit: number } | null>(null);
+  const [nearbyUsed, setNearbyUsed] = useState<number | null>(null);
+  const { location, status, request: requestLocation } = useVisitorGeolocation();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,6 +72,7 @@ export function PublicAluxChat() {
             sessionKey,
             message: trimmed,
             history: messages.slice(-16),
+            visitor: location ?? undefined,
           }),
         });
         const data = await res.json().catch(() => ({}));
@@ -91,13 +95,14 @@ export function PublicAluxChat() {
         if (data?.rate) {
           setRateInfo({ used: data.rate.day_count, limit: data.rate.day_limit });
         }
+        if (typeof data?.nearby_used === "number") setNearbyUsed(data.nearby_used);
       } catch {
         setError("Sin conexión. Revisa tu red e inténtalo de nuevo.");
       } finally {
         setSending(false);
       }
     },
-    [messages, sending, sessionKey],
+    [messages, sending, sessionKey, location],
   );
 
   return (
@@ -121,6 +126,34 @@ export function PublicAluxChat() {
           </span>
         )}
       </header>
+
+      {/* Consentimiento espacial (opt-in, no intrusivo) */}
+      <div className="flex items-center gap-2 border-b border-border/60 bg-background px-5 py-2 text-[11px]">
+        {status === "granted" && location ? (
+          <span className="inline-flex items-center gap-1.5 rounded-pill bg-success/10 px-2.5 py-1 text-success">
+            <MapPin className="h-3 w-3" />
+            Ordenando por cercanía a tu ubicación
+            {nearbyUsed != null && nearbyUsed > 0 ? ` · ${nearbyUsed} cerca` : ""}
+          </span>
+        ) : status === "denied" || status === "unavailable" ? (
+          <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+            <MapPinOff className="h-3 w-3" />
+            Sin ubicación · recomiendo por relevancia territorial
+          </span>
+        ) : (
+          <button
+            type="button"
+            onClick={requestLocation}
+            disabled={status === "prompting"}
+            className="inline-flex items-center gap-1.5 rounded-pill border border-border/60 bg-muted/40 px-2.5 py-1 text-muted-foreground hover:bg-muted transition disabled:opacity-60"
+          >
+            <MapPin className="h-3 w-3" />
+            {status === "prompting"
+              ? "Solicitando ubicación…"
+              : "Compartir mi ubicación para sugerencias cercanas"}
+          </button>
+        )}
+      </div>
 
       <div
         ref={scrollRef}

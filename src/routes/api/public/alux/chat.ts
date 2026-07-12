@@ -20,8 +20,87 @@ const HOUR_LIMIT = 10;
 const DAY_LIMIT = 40;
 const MAX_MESSAGE_LEN = 800;
 const MAX_HISTORY_TURNS = 8;
+const NEARBY_RADIUS_KM = 25;
+const NEARBY_LIMIT = 6;
 
 type Msg = { role: "user" | "assistant"; content: string };
+type Visitor = { lat: number; lng: number };
+
+function haversineKm(a: Visitor, b: { lat: number; lng: number }): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
+function parseVisitor(input: unknown): Visitor | null {
+  if (!input || typeof input !== "object") return null;
+  const v = input as { lat?: unknown; lng?: unknown };
+  const lat = typeof v.lat === "number" ? v.lat : NaN;
+  const lng = typeof v.lng === "number" ? v.lng : NaN;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+  return { lat, lng };
+}
+
+async function fetchNearbyBusinesses(
+  supabaseAdmin: typeof import("@/integrations/supabase/client.server")["supabaseAdmin"],
+  visitor: Visitor,
+): Promise<Array<{ name: string; category: string | null; km: number; slug: string }>> {
+  const { data, error } = await supabaseAdmin
+    .from("businesses")
+    .select(
+      "slug, display_name, primary_category:business_categories!businesses_primary_category_id_fkey ( slug, display_name ), business_locations!business_locations_business_id_fkey ( latitude, longitude, is_primary )",
+    )
+    .eq("status", "published")
+    .limit(200);
+  if (error || !data) return [];
+  const scored: Array<{ name: string; category: string | null; km: number; slug: string }> = [];
+  for (const r of data as Array<{
+    slug: string;
+    display_name: string;
+    primary_category?: { slug: string; display_name: string | null } | null;
+    business_locations?: Array<{
+      latitude: number | null;
+      longitude: number | null;
+      is_primary: boolean | null;
+    }>;
+  }>) {
+    const locs = r.business_locations ?? [];
+    const primary = locs.find((l) => l.is_primary) ?? locs[0];
+    if (!primary || primary.latitude == null || primary.longitude == null) continue;
+    const km = haversineKm(visitor, {
+      lat: Number(primary.latitude),
+      lng: Number(primary.longitude),
+    });
+    if (km > NEARBY_RADIUS_KM) continue;
+    scored.push({
+      slug: r.slug,
+      name: r.display_name,
+      category: r.primary_category?.display_name ?? r.primary_category?.slug ?? null,
+      km,
+    });
+  }
+  scored.sort((a, b) => a.km - b.km);
+  return scored.slice(0, NEARBY_LIMIT);
+}
+
+function nearbyToPromptBlock(
+  visitor: Visitor,
+  items: Array<{ name: string; category: string | null; km: number }>,
+): string {
+  if (items.length === 0) {
+    return `[CONTEXTO ESPACIAL] El visitante compartió su ubicación (${visitor.lat.toFixed(3)}, ${visitor.lng.toFixed(3)}) pero no hay negocios publicados dentro de ${NEARBY_RADIUS_KM} km. Menciónalo con transparencia y recomienda destinos del Oriente Maya por relevancia territorial.`;
+  }
+  const lines = items.map(
+    (i) => `- ${i.name}${i.category ? ` (${i.category})` : ""} · a ${i.km.toFixed(1)} km`,
+  );
+  return `[CONTEXTO ESPACIAL] El visitante compartió su ubicación aproximada. Negocios publicados más cercanos (radio ${NEARBY_RADIUS_KM} km, ordenados por distancia real):\n${lines.join("\n")}\n\nCuando recomiendes lugares cercanos: (1) usa SÓLO estos negocios, (2) menciona la distancia con naturalidad ("a X km"), (3) explica que es cercanía real desde su ubicación compartida, (4) si el visitante NO preguntó por cercanía, no fuerces la mención.`;
+}
 
 function hashIp(ip: string): string {
   const salt = process.env.ALUX_PUBLIC_IP_SALT ?? process.env.SUPABASE_URL ?? "vmx";
@@ -69,6 +148,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           sessionKey?: string;
           message?: string;
           history?: Msg[];
+          visitor?: Visitor;
         };
         try {
           body = await request.json();
@@ -81,6 +161,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         if (!sessionKey || sessionKey.length < 8) return json({ error: "missing_session" }, 400);
         if (!message) return json({ error: "empty_message" }, 400);
         if (message.length > MAX_MESSAGE_LEN) return json({ error: "message_too_long" }, 400);
+        const visitor = parseVisitor(body.visitor);
 
         const history = Array.isArray(body.history)
           ? body.history
@@ -167,6 +248,17 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         const knowledgeBlock = knowledgeToPromptBlock(matches);
         const knowledgeIds = matches.map((m) => m.id);
 
+        // 4b) Contexto espacial (opt-in).
+        let nearbyBlock = "";
+        let nearbyCount = 0;
+        if (visitor) {
+          const nearby = await fetchNearbyBusinesses(supabaseAdmin, visitor).catch(
+            () => [] as Awaited<ReturnType<typeof fetchNearbyBusinesses>>,
+          );
+          nearbyBlock = nearbyToPromptBlock(visitor, nearby);
+          nearbyCount = nearby.length;
+        }
+
         // 5) Genera respuesta.
         const provider = createLovableAiGatewayProvider(apiKey);
         const persona =
@@ -175,7 +267,13 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         const guardrails =
           settings?.guardrails ??
           "Nunca inventes datos. Prioriza al viajero. Cita el contexto.";
-        const system = [persona, PUBLIC_PERSONA_EXTRA, knowledgeBlock, `---\n${guardrails}`]
+        const system = [
+          persona,
+          PUBLIC_PERSONA_EXTRA,
+          knowledgeBlock,
+          nearbyBlock,
+          `---\n${guardrails}`,
+        ]
           .filter(Boolean)
           .join("\n\n");
 
@@ -231,6 +329,8 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           model,
           latency_ms: latency,
           knowledge_used: matches.length,
+          nearby_used: nearbyCount,
+          spatial_context: visitor ? "granted" : "none",
           rate: {
             hour_count: (rateRow?.hour_count ?? 0) + 1,
             day_count: (rateRow?.day_count ?? 0) + 1,
