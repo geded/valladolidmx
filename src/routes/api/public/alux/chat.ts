@@ -27,10 +27,109 @@ const NEARBY_LIMIT = 6;
 // concierge, no chatbot: cada refresco responde a un cambio real del contexto.
 const GEO_MOVE_KM_THRESHOLD = 2;
 const SUMMARY_MAX_CHARS = 900;
+const EVENTS_LOOKAHEAD_DAYS = 7;
+const EVENTS_LIMIT = 5;
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Visitor = { lat: number; lng: number };
 type PathContext = { destination?: string | null; category?: string | null };
+
+// ---------------------------------------------------------------------------
+// Ola A9 · Contexto temporal / ambiental (concierge, no chatbot).
+// ---------------------------------------------------------------------------
+function getTemporalContext(): {
+  block: string;
+  isoLocal: string;
+  partOfDay: "madrugada" | "mañana" | "mediodía" | "tarde" | "noche";
+  season: "seca" | "lluvias";
+} {
+  const tz = "America/Merida";
+  const now = new Date();
+  const fmt = new Intl.DateTimeFormat("es-MX", {
+    timeZone: tz,
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const parts = fmt.formatToParts(now);
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  const hour = Number(get("hour"));
+  const monthIdx = new Date(
+    now.toLocaleString("en-US", { timeZone: tz }),
+  ).getMonth(); // 0..11
+  const partOfDay: "madrugada" | "mañana" | "mediodía" | "tarde" | "noche" =
+    hour < 6 ? "madrugada"
+    : hour < 12 ? "mañana"
+    : hour < 14 ? "mediodía"
+    : hour < 19 ? "tarde"
+    : "noche";
+  // Yucatán: temporada de lluvias mayo–octubre; seca noviembre–abril.
+  const season: "seca" | "lluvias" = monthIdx >= 4 && monthIdx <= 9 ? "lluvias" : "seca";
+  const isoLocal = `${get("weekday")} ${get("day")} de ${get("month")}, ${get("hour")}:${get("minute")}`;
+  const block =
+    `[CONTEXTO TEMPORAL] Ahora en el Oriente Maya (${tz}): ${isoLocal}. ` +
+    `Es ${partOfDay}. Temporada ${season} en Yucatán. ` +
+    `Ajusta tus sugerencias al momento del día (madrugada: casi todo cerrado; mañana: cenotes y ruinas frescos; mediodía: calor intenso, refugio y comida; tarde: paseo por el centro; noche: gastronomía y vida cultural) y a la temporada (lluvias: posibles chubascos vespertinos, prever plan B bajo techo; seca: días soleados y noches templadas). Nunca contradigas este momento.`;
+  return { block, isoLocal, partOfDay, season };
+}
+
+async function fetchActiveEvents(
+  supabaseAdmin: typeof import("@/integrations/supabase/client.server")["supabaseAdmin"],
+  destinationSlug: string | null,
+): Promise<Array<{ title: string; venue: string | null; startsAt: string; isFree: boolean | null }>> {
+  if (!destinationSlug) return [];
+  const { data: dest } = await supabaseAdmin
+    .from("destinations")
+    .select("id")
+    .eq("slug", destinationSlug)
+    .maybeSingle();
+  if (!dest?.id) return [];
+  const nowIso = new Date().toISOString();
+  const untilIso = new Date(
+    Date.now() + EVENTS_LOOKAHEAD_DAYS * 24 * 60 * 60 * 1000,
+  ).toISOString();
+  const { data, error } = await supabaseAdmin
+    .from("events")
+    .select("title, venue_name, starts_at, ends_at, is_free")
+    .eq("destination_id", dest.id)
+    .eq("status", "published")
+    .is("deleted_at", null)
+    .lte("starts_at", untilIso)
+    .or(`ends_at.gte.${nowIso},ends_at.is.null`)
+    .order("starts_at", { ascending: true })
+    .limit(EVENTS_LIMIT);
+  if (error || !data) return [];
+  return data.map((e) => ({
+    title: e.title,
+    venue: e.venue_name ?? null,
+    startsAt: e.starts_at as string,
+    isFree: e.is_free,
+  }));
+}
+
+function eventsToPromptBlock(
+  events: Array<{ title: string; venue: string | null; startsAt: string; isFree: boolean | null }>,
+): string {
+  if (events.length === 0) return "";
+  const lines = events.map((e) => {
+    const when = new Date(e.startsAt).toLocaleString("es-MX", {
+      timeZone: "America/Merida",
+      weekday: "short",
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    const price = e.isFree === true ? " · gratis" : "";
+    const venue = e.venue ? ` @ ${e.venue}` : "";
+    return `- ${e.title}${venue} · ${when}${price}`;
+  });
+  return `[EVENTOS ACTIVOS] Eventos publicados en los próximos ${EVENTS_LOOKAHEAD_DAYS} días en este destino:\n${lines.join("\n")}\n\nCuando el viajero pregunte "qué hay esta semana / hoy / este fin", menciona SOLO estos eventos con la fecha real.`;
+}
 
 // ---------------------------------------------------------------------------
 // Detección de señales de viaje (concierge, no chatbot)
@@ -408,6 +507,18 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           nearbyCount = nearby.length;
         }
 
+        // 4d) Contexto temporal + eventos activos (Ola A9).
+        const temporal = getTemporalContext();
+        const activeDestination =
+          pathContext?.destination ??
+          (sessionRow as { last_destination_slug?: string | null }).last_destination_slug ??
+          null;
+        const activeEvents = await fetchActiveEvents(
+          supabaseAdmin,
+          activeDestination,
+        ).catch(() => []);
+        const eventsBlock = eventsToPromptBlock(activeEvents);
+
         // 5) Genera respuesta.
         const provider = createLovableAiGatewayProvider(apiKey);
         const persona =
@@ -420,8 +531,10 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           persona,
           PUBLIC_PERSONA_EXTRA,
           memoryBlock,
+          temporal.block,
           knowledgeBlock,
           nearbyBlock,
+          eventsBlock,
           `---\n${guardrails}`,
         ]
           .filter(Boolean)
@@ -543,6 +656,12 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           knowledge_used: matches.length,
           nearby_used: nearbyCount,
           spatial_context: visitor ? "granted" : "none",
+          temporal: {
+            local: temporal.isoLocal,
+            part_of_day: temporal.partOfDay,
+            season: temporal.season,
+            events_used: activeEvents.length,
+          },
           memory: {
             has_summary: !!nextSummary,
             refreshed: memoryRefreshed,
