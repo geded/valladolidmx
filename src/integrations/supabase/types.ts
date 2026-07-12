@@ -44,6 +44,66 @@ export type Database = {
         }
         Relationships: []
       }
+      alux_knowledge_entries: {
+        Row: {
+          body: string
+          category: Database["public"]["Enums"]["alux_knowledge_category"]
+          created_at: string
+          created_by: string | null
+          embedded_at: string | null
+          embedding: string | null
+          embedding_model: string | null
+          id: string
+          priority: number
+          slug: string
+          source_url: string | null
+          status: Database["public"]["Enums"]["alux_knowledge_status"]
+          summary: string | null
+          tags: string[]
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          body: string
+          category?: Database["public"]["Enums"]["alux_knowledge_category"]
+          created_at?: string
+          created_by?: string | null
+          embedded_at?: string | null
+          embedding?: string | null
+          embedding_model?: string | null
+          id?: string
+          priority?: number
+          slug: string
+          source_url?: string | null
+          status?: Database["public"]["Enums"]["alux_knowledge_status"]
+          summary?: string | null
+          tags?: string[]
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          body?: string
+          category?: Database["public"]["Enums"]["alux_knowledge_category"]
+          created_at?: string
+          created_by?: string | null
+          embedded_at?: string | null
+          embedding?: string | null
+          embedding_model?: string | null
+          id?: string
+          priority?: number
+          slug?: string
+          source_url?: string | null
+          status?: Database["public"]["Enums"]["alux_knowledge_status"]
+          summary?: string | null
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       alux_settings: {
         Row: {
           capability_overrides: Json
@@ -5936,6 +5996,25 @@ export type Database = {
         Args: { _action: string; _business_id: string; _notes?: string }
         Returns: undefined
       }
+      match_alux_knowledge: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          body: string
+          category: Database["public"]["Enums"]["alux_knowledge_category"]
+          id: string
+          priority: number
+          similarity: number
+          slug: string
+          source_url: string
+          summary: string
+          tags: string[]
+          title: string
+        }[]
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -6574,6 +6653,21 @@ export type Database = {
       }
     }
     Enums: {
+      alux_knowledge_category:
+        | "cultura"
+        | "historia"
+        | "gastronomia"
+        | "clima"
+        | "transporte"
+        | "seguridad"
+        | "costumbres"
+        | "faq"
+        | "experiencias"
+        | "hospedaje"
+        | "eventos"
+        | "pueblos_magicos"
+        | "otros"
+      alux_knowledge_status: "draft" | "published" | "archived"
       app_role:
         | "traveler"
         | "business_owner"
@@ -6838,6 +6932,22 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      alux_knowledge_category: [
+        "cultura",
+        "historia",
+        "gastronomia",
+        "clima",
+        "transporte",
+        "seguridad",
+        "costumbres",
+        "faq",
+        "experiencias",
+        "hospedaje",
+        "eventos",
+        "pueblos_magicos",
+        "otros",
+      ],
+      alux_knowledge_status: ["draft", "published", "archived"],
       app_role: [
         "traveler",
         "business_owner",
