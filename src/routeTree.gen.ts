@@ -136,6 +136,7 @@ import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/em
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicStudioMediaSplatRouteImport } from './routes/api/public/studio-media.$'
 import { Route as ApiPublicMapsStaticRouteImport } from './routes/api/public/maps/static'
+import { Route as ApiPublicHooksVisibilityNotificationsRouteImport } from './routes/api/public/hooks/visibility-notifications'
 import { Route as ApiPublicHooksEbProcessScheduledPublishRouteImport } from './routes/api/public/hooks/eb-process-scheduled-publish'
 import { Route as ApiPublicHooksCouponReviewRemindersRouteImport } from './routes/api/public/hooks/coupon-review-reminders'
 import { Route as ApiPublicHealthMapsRouteImport } from './routes/api/public/health/maps'
@@ -877,6 +878,12 @@ const ApiPublicMapsStaticRoute = ApiPublicMapsStaticRouteImport.update({
   path: '/api/public/maps/static',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksVisibilityNotificationsRoute =
+  ApiPublicHooksVisibilityNotificationsRouteImport.update({
+    id: '/api/public/hooks/visibility-notifications',
+    path: '/api/public/hooks/visibility-notifications',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksEbProcessScheduledPublishRoute =
   ApiPublicHooksEbProcessScheduledPublishRouteImport.update({
     id: '/api/public/hooks/eb-process-scheduled-publish',
@@ -1201,6 +1208,7 @@ export interface FileRoutesByFullPath {
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -1354,6 +1362,7 @@ export interface FileRoutesByTo {
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -1516,6 +1525,7 @@ export interface FileRoutesById {
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -1679,6 +1689,7 @@ export interface FileRouteTypes {
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
+    | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
@@ -1832,6 +1843,7 @@ export interface FileRouteTypes {
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
+    | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
@@ -1993,6 +2005,7 @@ export interface FileRouteTypes {
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
+    | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
     | '/api/public/studio-media/$'
     | '/lovable/email/auth/preview'
@@ -2083,6 +2096,7 @@ export interface RootRouteChildren {
   ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
   ApiPublicHooksCouponReviewRemindersRoute: typeof ApiPublicHooksCouponReviewRemindersRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  ApiPublicHooksVisibilityNotificationsRoute: typeof ApiPublicHooksVisibilityNotificationsRoute
   ApiPublicMapsStaticRoute: typeof ApiPublicMapsStaticRoute
   ApiPublicStudioMediaSplatRoute: typeof ApiPublicStudioMediaSplatRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -2984,6 +2998,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicMapsStaticRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/visibility-notifications': {
+      id: '/api/public/hooks/visibility-notifications'
+      path: '/api/public/hooks/visibility-notifications'
+      fullPath: '/api/public/hooks/visibility-notifications'
+      preLoaderRoute: typeof ApiPublicHooksVisibilityNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/eb-process-scheduled-publish': {
       id: '/api/public/hooks/eb-process-scheduled-publish'
       path: '/api/public/hooks/eb-process-scheduled-publish'
@@ -3694,6 +3715,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicHooksCouponReviewRemindersRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:
     ApiPublicHooksEbProcessScheduledPublishRoute,
+  ApiPublicHooksVisibilityNotificationsRoute:
+    ApiPublicHooksVisibilityNotificationsRoute,
   ApiPublicMapsStaticRoute: ApiPublicMapsStaticRoute,
   ApiPublicStudioMediaSplatRoute: ApiPublicStudioMediaSplatRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
