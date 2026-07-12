@@ -158,6 +158,120 @@ function contextActivePlanId(context: unknown): string | null {
   return typeof active === "string" ? active : null;
 }
 
+// ---------- CV4.3-narrativa · Memoria post-venta ----------
+//
+// Cuando el viajero ya confirmó su viaje (orden pagada/fulfilled/refunded),
+// Alux debe reconocerlo y ajustar su tono: nada de "podrías reservar", nada
+// de "te ayudo a construir tu viaje". El viaje ya está en marcha.
+//
+// Se inyecta como un bloque `[VIAJE CONFIRMADO]` en el system prompt.
+
+interface ConfirmedTripBrief {
+  folio: string;
+  editorial_title: string | null;
+  destination_name: string | null;
+  plan_start_date: string | null;
+  plan_end_date: string | null;
+  party_size: number | null;
+  days_to_trip: number | null;
+}
+
+async function fetchConfirmedTripBrief(
+  supabase: unknown,
+): Promise<ConfirmedTripBrief | null> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c = supabase as any;
+    const { data: order } = await c
+      .from("concierge_orders")
+      .select(
+        "folio, editorial_title, destination_name, travel_plan_id, paid_at",
+      )
+      .in("status", ["paid", "fulfilled", "refunded"])
+      .order("paid_at", { ascending: false, nullsFirst: false })
+      .limit(1)
+      .maybeSingle();
+    const o = order as {
+      folio?: string;
+      editorial_title?: string | null;
+      destination_name?: string | null;
+      travel_plan_id?: string | null;
+    } | null;
+    if (!o?.folio) return null;
+
+    let plan_start_date: string | null = null;
+    let plan_end_date: string | null = null;
+    let party_size: number | null = null;
+    if (o.travel_plan_id) {
+      const { data: plan } = await c
+        .from("travel_plans")
+        .select("start_date, end_date, party_size")
+        .eq("id", o.travel_plan_id)
+        .maybeSingle();
+      const p = plan as {
+        start_date?: string | null;
+        end_date?: string | null;
+        party_size?: number | null;
+      } | null;
+      if (p) {
+        plan_start_date = p.start_date ?? null;
+        plan_end_date = p.end_date ?? null;
+        party_size = p.party_size ?? null;
+      }
+    }
+
+    let days_to_trip: number | null = null;
+    if (plan_start_date) {
+      const target = new Date(`${plan_start_date}T00:00:00Z`).getTime();
+      const now = new Date();
+      const todayUtc = Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate(),
+      );
+      days_to_trip = Math.round((target - todayUtc) / 86_400_000);
+    }
+
+    return {
+      folio: o.folio,
+      editorial_title: o.editorial_title ?? null,
+      destination_name: o.destination_name ?? null,
+      plan_start_date,
+      plan_end_date,
+      party_size,
+      days_to_trip,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function confirmedTripToPromptBlock(brief: ConfirmedTripBrief | null): string {
+  if (!brief) return "";
+  const parts: string[] = [];
+  parts.push(`Folio: ${brief.folio}`);
+  if (brief.editorial_title) parts.push(`Título: ${brief.editorial_title}`);
+  if (brief.destination_name) parts.push(`Destino: ${brief.destination_name}`);
+  if (brief.plan_start_date && brief.plan_end_date) {
+    parts.push(`Fechas: ${brief.plan_start_date} → ${brief.plan_end_date}`);
+  } else if (brief.plan_start_date) {
+    parts.push(`Inicio: ${brief.plan_start_date}`);
+  }
+  if (brief.party_size) parts.push(`Viajeros: ${brief.party_size}`);
+  if (brief.days_to_trip !== null) {
+    if (brief.days_to_trip > 0) parts.push(`Faltan ${brief.days_to_trip} días para la llegada`);
+    else if (brief.days_to_trip === 0) parts.push("Hoy es el día de llegada");
+    else parts.push(`El viaje ya inició (día ${Math.abs(brief.days_to_trip) + 1})`);
+  }
+  return (
+    "[VIAJE CONFIRMADO] El viajero ya confirmó su viaje al Oriente Maya. " +
+    "Trátalo como un viaje EN MARCHA: no propongas 'construir' ni 'reservar' lo ya reservado; " +
+    "acompaña, refina, sugiere complementos y responde a la logística real. " +
+    "Si el viajero pregunta por su reservación, cita el folio tal cual.\n" +
+    parts.join(" · ")
+  );
+}
+
 const SYSTEM_BASE =
   "Eres Alux, asistente del viajero en Valladolid.mx. Respondes en el idioma indicado por la directiva de idioma, siempre breve y honesto. Trabajas SÓLO con la información del contexto entregado (perfil del viajero, plan activo, referencias del catálogo). Nunca inventas empresas, precios, horarios ni disponibilidad. Nunca reservas, nunca modificas el plan, nunca envías al concierge, nunca contactas empresas. Sólo sugieres, explicas y redactas. Cuando cites algo, usa exactamente el título tal como aparece en las referencias.";
 
@@ -194,6 +308,10 @@ async function runAluxTraveler(
     knowledgeBlock = knowledgeToPromptBlock(matches, { locale });
   }
 
+  // CV4.3-narrativa · Memoria post-venta (viaje confirmado).
+  const confirmedBrief = await fetchConfirmedTripBrief(supabase);
+  const confirmedBlock = confirmedTripToPromptBlock(confirmedBrief);
+
   const provider = createLovableAiGatewayProvider(requireApiKey());
   const t0 = Date.now();
   const { text, usage } = await generateText({
@@ -202,6 +320,7 @@ async function runAluxTraveler(
       SYSTEM_BASE,
       LOCALE_DIRECTIVES[locale],
       systemExtra,
+      confirmedBlock,
       knowledgeBlock,
       RATIONALE_INSTRUCTION,
     ]
