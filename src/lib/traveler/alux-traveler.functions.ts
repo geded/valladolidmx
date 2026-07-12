@@ -354,13 +354,13 @@ export const improveMyTrip = createServerFn({ method: "POST" })
 export const detectPlanGaps = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => EmptyInput.parse(d ?? {}))
-  .handler(async ({ context }) =>
+  .handler(async ({ context, data }) =>
     runAluxTraveler(
       "detect_gaps",
       "Sólo observas huecos evidentes en el plan activo. No inventas: si el plan no tiene fechas, dilo.",
       "Detecta huecos del plan activo: días sin actividad, tramos sin comida planeada, falta de hospedaje, falta de transporte entre destinos distantes, sobrecarga de actividades intensas seguidas. Para cada hueco: descripción y sugerencia de acción no destructiva.",
       context.supabase,
-      data.locale ?? "es",
+      data?.locale ?? "es",
     ),
   );
 
