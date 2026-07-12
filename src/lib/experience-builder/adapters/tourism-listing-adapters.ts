@@ -145,6 +145,10 @@ export function businessToTourismCard(
     location: destinationLabel
       ? { label: destinationLabel, distanceKm: null }
       : null,
+    coordinates:
+      b.latitude != null && b.longitude != null
+        ? { lat: Number(b.latitude), lng: Number(b.longitude) }
+        : null,
     territorialContext: opts.regionLabel ?? null,
     highlights: [],
     badges: [...spotlightBadges, ...visibilityBadges, ...verifiedBadges],
