@@ -23,7 +23,8 @@ type Action =
   | "view_promotion"
   | "dismiss_suggestion"
   | "save_favorite"
-  | "start_review";
+  | "start_review"
+  | "plan_updated";
 
 const ACTION_VERB: Record<Action, string> = {
   view_business: "abrió la ficha de",
@@ -33,6 +34,7 @@ const ACTION_VERB: Record<Action, string> = {
   dismiss_suggestion: "descartó",
   save_favorite: "marcó como favorito",
   start_review: "empezó a reseñar",
+  plan_updated: "actualizó su plan de viaje:",
 };
 
 const ALLOWED = new Set<Action>(Object.keys(ACTION_VERB) as Action[]);
