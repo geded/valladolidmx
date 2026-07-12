@@ -148,5 +148,32 @@ export const requestVisibilityGrant = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw error;
+
+    // Ola 7.9 · Notificar solicitud recibida (silent-fail).
+    try {
+      const { getVisibilityRecipient, sendVisibilityEmail } = await import(
+        "@/lib/visibility/visibility-notifications.server"
+      );
+      const recipient = await getVisibilityRecipient(
+        supabaseAdmin,
+        data.business_id,
+      );
+      if (recipient) {
+        await sendVisibilityEmail(supabaseAdmin, {
+          templateName: "visibility-request-received",
+          recipientEmail: recipient.recipientEmail,
+          recipientName: recipient.recipientName,
+          businessName: recipient.businessName,
+          idempotencyKey: `visibility-request-${row.id}`,
+          templateData: {
+            planName: plan.name,
+            cycleLabel: data.cycle,
+          },
+        });
+      }
+    } catch (err) {
+      console.error("visibility request email failed", err);
+    }
+
     return { id: row.id as string };
   });
