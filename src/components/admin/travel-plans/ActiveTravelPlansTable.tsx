@@ -10,6 +10,7 @@ import {
   SlaBadge,
   PriorityBadge,
 } from "./badges";
+import { ShieldCheck } from "lucide-react";
 
 interface Props {
   rows: TravelPlanOpsRow[];
@@ -31,6 +32,35 @@ function fmtDate(iso: string | null): string {
   } catch {
     return "—";
   }
+}
+
+function ReservationCell({
+  reservation,
+  daysToTrip,
+}: {
+  reservation: TravelPlanOpsRow["reservation"];
+  daysToTrip: number | null;
+}) {
+  if (!reservation || !reservation.folio || !reservation.is_confirmed) {
+    return <span className="text-xs text-muted-foreground">Sin reservación</span>;
+  }
+  const label =
+    daysToTrip == null
+      ? "Confirmado"
+      : daysToTrip > 0
+        ? `Faltan ${daysToTrip} d`
+        : daysToTrip === 0
+          ? "Llega hoy"
+          : `En viaje (+${Math.abs(daysToTrip)}d)`;
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="inline-flex w-fit items-center gap-1 rounded-pill bg-success/10 px-2 py-0.5 text-[11px] font-medium text-success">
+        <ShieldCheck className="h-3 w-3" />
+        {reservation.folio}
+      </span>
+      <span className="text-[11px] text-muted-foreground">{label}</span>
+    </div>
+  );
 }
 
 export function ActiveTravelPlansTable({
@@ -60,6 +90,7 @@ export function ActiveTravelPlansTable({
           <thead className="text-left text-xs uppercase tracking-[0.14em] text-muted-foreground">
             <tr className="border-b border-border">
               <th className="p-3">Viajero · Plan</th>
+              <th className="p-3">Reservación</th>
               <th className="p-3">Estado plan</th>
               <th className="p-3">Intención</th>
               <th className="p-3">Concierge</th>
@@ -73,7 +104,7 @@ export function ActiveTravelPlansTable({
             {isLoading
               ? Array.from({ length: 6 }).map((_, i) => (
                   <tr key={i} className="border-b border-border/60">
-                    <td colSpan={8} className="p-4">
+                    <td colSpan={9} className="p-4">
                       <div className="h-4 w-full animate-pulse rounded bg-muted" />
                     </td>
                   </tr>
@@ -100,6 +131,9 @@ export function ActiveTravelPlansTable({
                           ? ` · ${r.pending_alux_count} Alux`
                           : ""}
                       </p>
+                    </td>
+                    <td className="p-3">
+                      <ReservationCell reservation={r.reservation} daysToTrip={r.days_to_trip} />
                     </td>
                     <td className="p-3"><PlanStatusBadge status={r.plan_status} /></td>
                     <td className="p-3"><IntentBadge level={r.intent_level} /></td>
