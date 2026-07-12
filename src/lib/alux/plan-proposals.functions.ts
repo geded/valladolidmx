@@ -73,6 +73,60 @@ export const proposeAluxPlanAddition = createServerFn({ method: "POST" })
       if (existing) return existing as AluxPlanProposal;
     }
 
+    // CV2.4 · Respeta al concierge humano.
+    // Si el negocio/producto/evento/destino ya está reservado por un caso
+    // activo del concierge, NO se crea propuesta pendiente: se registra
+    // como 'dismissed' con nota trazable para auditoría, sin ruido para el
+    // viajero (no aparece en la bandeja).
+    if (data.entityId) {
+      try {
+        const { data: concierge } = await (
+          context.supabase as unknown as {
+            rpc: (
+              name: string,
+              args: Record<string, unknown>,
+            ) => Promise<{ data: unknown; error: unknown }>;
+          }
+        ).rpc("alux_get_concierge_context_for_user", { _user_id: context.userId });
+        if (concierge && typeof concierge === "object") {
+          const c = concierge as Record<string, unknown>;
+          const bucket: Record<string, string[]> = {
+            business: Array.isArray(c.reserved_business_ids) ? (c.reserved_business_ids as string[]) : [],
+            product: Array.isArray(c.reserved_product_ids) ? (c.reserved_product_ids as string[]) : [],
+            event: Array.isArray(c.reserved_event_ids) ? (c.reserved_event_ids as string[]) : [],
+            destination: Array.isArray(c.reserved_destination_ids) ? (c.reserved_destination_ids as string[]) : [],
+          };
+          const reserved = bucket[data.entityType] ?? [];
+          if (reserved.includes(data.entityId)) {
+            const { data: row, error } = await context.supabase
+              .from("alux_plan_proposals")
+              .insert({
+                user_id: context.userId,
+                plan_id: data.planId ?? null,
+                entity_type: data.entityType,
+                entity_id: data.entityId ?? null,
+                entity_slug: data.entitySlug ?? null,
+                title: data.title,
+                subtitle: data.subtitle ?? null,
+                image_url: data.imageUrl ?? null,
+                rationale: data.rationale ?? null,
+                sources: (data.sources ?? []) as unknown as Json,
+                source_session_id: data.sourceSessionId ?? null,
+                status: "dismissed",
+                decided_at: new Date().toISOString(),
+                decision_note: "concierge_reserved",
+              })
+              .select("*")
+              .single();
+            if (error) throw new Error(`propose_failed: ${error.message}`);
+            return row as AluxPlanProposal;
+          }
+        }
+      } catch {
+        // Si el chequeo del concierge falla, continuamos con propuesta normal.
+      }
+    }
+
     const { data: row, error } = await context.supabase
       .from("alux_plan_proposals")
       .insert({
