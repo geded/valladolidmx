@@ -167,6 +167,7 @@ import { Route as AuthenticatedCmsDestinosNuevaRouteImport } from './routes/_aut
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
 import { Route as AuthenticatedCmsAluxFeedbackRouteImport } from './routes/_authenticated/cms/alux.feedback'
 import { Route as AuthenticatedCmsAluxConocimientoRouteImport } from './routes/_authenticated/cms/alux.conocimiento'
+import { Route as AuthenticatedCmsAluxCalidadRouteImport } from './routes/_authenticated/cms/alux.calidad'
 import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/_authenticated/admin/sistema.usuarios'
 import { Route as OrienteMayaDestinoCategoriaEmpresaIndexRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa.index'
 import { Route as OrienteMayaDestinoCategoriaEmpresaProductoRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa.$producto'
@@ -1071,6 +1072,12 @@ const AuthenticatedCmsAluxConocimientoRoute =
     path: '/conocimiento',
     getParentRoute: () => AuthenticatedCmsAluxRoute,
   } as any)
+const AuthenticatedCmsAluxCalidadRoute =
+  AuthenticatedCmsAluxCalidadRouteImport.update({
+    id: '/calidad',
+    path: '/calidad',
+    getParentRoute: () => AuthenticatedCmsAluxRoute,
+  } as any)
 const AuthenticatedAdminSistemaUsuariosRoute =
   AuthenticatedAdminSistemaUsuariosRouteImport.update({
     id: '/usuarios',
@@ -1267,6 +1274,7 @@ export interface FileRoutesByFullPath {
   '/portal/': typeof AuthenticatedPortalIndexRoute
   '/oriente-maya/$destino/': typeof OrienteMayaDestinoIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
+  '/cms/alux/calidad': typeof AuthenticatedCmsAluxCalidadRoute
   '/cms/alux/conocimiento': typeof AuthenticatedCmsAluxConocimientoRoute
   '/cms/alux/feedback': typeof AuthenticatedCmsAluxFeedbackRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
@@ -1432,6 +1440,7 @@ export interface FileRoutesByTo {
   '/portal': typeof AuthenticatedPortalIndexRoute
   '/oriente-maya/$destino': typeof OrienteMayaDestinoIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
+  '/cms/alux/calidad': typeof AuthenticatedCmsAluxCalidadRoute
   '/cms/alux/conocimiento': typeof AuthenticatedCmsAluxConocimientoRoute
   '/cms/alux/feedback': typeof AuthenticatedCmsAluxFeedbackRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
@@ -1606,6 +1615,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
   '/oriente-maya/$destino/': typeof OrienteMayaDestinoIndexRoute
   '/_authenticated/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
+  '/_authenticated/cms/alux/calidad': typeof AuthenticatedCmsAluxCalidadRoute
   '/_authenticated/cms/alux/conocimiento': typeof AuthenticatedCmsAluxConocimientoRoute
   '/_authenticated/cms/alux/feedback': typeof AuthenticatedCmsAluxFeedbackRoute
   '/_authenticated/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
@@ -1781,6 +1791,7 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/oriente-maya/$destino/'
     | '/admin/sistema/usuarios'
+    | '/cms/alux/calidad'
     | '/cms/alux/conocimiento'
     | '/cms/alux/feedback'
     | '/cms/categorias/nueva'
@@ -1946,6 +1957,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/oriente-maya/$destino'
     | '/admin/sistema/usuarios'
+    | '/cms/alux/calidad'
     | '/cms/alux/conocimiento'
     | '/cms/alux/feedback'
     | '/cms/categorias/nueva'
@@ -2119,6 +2131,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/'
     | '/oriente-maya/$destino/'
     | '/_authenticated/admin/sistema/usuarios'
+    | '/_authenticated/cms/alux/calidad'
     | '/_authenticated/cms/alux/conocimiento'
     | '/_authenticated/cms/alux/feedback'
     | '/_authenticated/cms/categorias/nueva'
@@ -3358,6 +3371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsAluxConocimientoRouteImport
       parentRoute: typeof AuthenticatedCmsAluxRoute
     }
+    '/_authenticated/cms/alux/calidad': {
+      id: '/_authenticated/cms/alux/calidad'
+      path: '/calidad'
+      fullPath: '/cms/alux/calidad'
+      preLoaderRoute: typeof AuthenticatedCmsAluxCalidadRouteImport
+      parentRoute: typeof AuthenticatedCmsAluxRoute
+    }
     '/_authenticated/admin/sistema/usuarios': {
       id: '/_authenticated/admin/sistema/usuarios'
       path: '/usuarios'
@@ -3676,11 +3696,13 @@ const AuthenticatedPortalRouteRouteWithChildren =
   )
 
 interface AuthenticatedCmsAluxRouteChildren {
+  AuthenticatedCmsAluxCalidadRoute: typeof AuthenticatedCmsAluxCalidadRoute
   AuthenticatedCmsAluxConocimientoRoute: typeof AuthenticatedCmsAluxConocimientoRoute
   AuthenticatedCmsAluxFeedbackRoute: typeof AuthenticatedCmsAluxFeedbackRoute
 }
 
 const AuthenticatedCmsAluxRouteChildren: AuthenticatedCmsAluxRouteChildren = {
+  AuthenticatedCmsAluxCalidadRoute: AuthenticatedCmsAluxCalidadRoute,
   AuthenticatedCmsAluxConocimientoRoute: AuthenticatedCmsAluxConocimientoRoute,
   AuthenticatedCmsAluxFeedbackRoute: AuthenticatedCmsAluxFeedbackRoute,
 }

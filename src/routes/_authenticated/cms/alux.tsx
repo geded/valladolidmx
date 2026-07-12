@@ -161,6 +161,13 @@ function AluxConsolePage() {
           >
             📊 Feedback y calidad (Ola A4)
           </Link>
+          <span className="mx-3 text-muted-foreground">·</span>
+          <Link
+            to="/cms/alux/calidad"
+            className="inline-flex items-center gap-2 text-sm underline underline-offset-4 hover:text-primary"
+          >
+            🎯 Calidad heurística (Ola A20)
+          </Link>
         </div>
       </header>
 
