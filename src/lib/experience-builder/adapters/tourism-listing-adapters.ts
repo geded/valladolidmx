@@ -242,26 +242,41 @@ export interface PromoLandingLike {
   slug: string;
   title: string;
   description: string | null;
+  businessName?: string | null;
+  discountPercent?: number | null;
+  endsAt?: string | null;
 }
 
 export function promoLandingToTourismCard(p: PromoLandingLike): TourismCardVM {
+  const badges: TourismCardVM["badges"] = [];
+  if (typeof p.discountPercent === "number" && p.discountPercent > 0) {
+    badges.push({ label: `-${p.discountPercent}%`, tone: "success" });
+  }
+  let dateLabel: string | null = null;
+  if (p.endsAt) {
+    try {
+      dateLabel = `Vigente hasta ${new Date(p.endsAt).toLocaleDateString("es-MX", { day: "numeric", month: "short" })}`;
+    } catch {
+      dateLabel = null;
+    }
+  }
   return {
     id: p.slug,
     entityKind: "promotion",
-    eyebrow: "Campaña",
+    eyebrow: p.businessName ?? "Campaña",
     name: p.title,
     href: `/l/${p.slug}`,
     tagline: p.description,
-    businessName: null,
+    businessName: p.businessName ?? null,
     mediaUrl: null,
     mediaAlt: null,
     rating: null,
     location: null,
     territorialContext: null,
     highlights: [],
-    badges: [],
+    badges,
     institutionalBadges: [],
-    dateLabel: null,
+    dateLabel,
     availabilityLabel: null,
     priceAmount: null,
     priceCurrency: null,
