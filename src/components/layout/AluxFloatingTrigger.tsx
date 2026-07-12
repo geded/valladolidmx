@@ -32,13 +32,14 @@
  * Navigation Session. Las sugerencias contextuales las provee la server
  * fn pública `aluxContextualSuggest` (US-E1.2), sin motor paralelo.
  */
-import { ArrowRight, Clock, Compass, MapPin, Sparkles, Tag, Ticket, Navigation } from "lucide-react";
+import { ArrowRight, CalendarDays, Clock, Compass, MapPin, Sparkles, Tag, Ticket, Navigation, Users } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
 import { logAluxPublicSignal, type AluxPublicSignalAction } from "@/lib/alux/public-signals";
 import { onAluxFloatingOpen } from "@/lib/alux/floating-bus";
+import { onPlanChanged } from "@/lib/alux/plan-signals";
 import { useTravelIntent, markNudgeShown } from "@/lib/alux/travel-intent";
 import {
   Sheet,
@@ -81,6 +82,7 @@ export function AluxFloatingTrigger() {
   const isAuthed = Boolean(user);
   const rawCtx = useAluxContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const queryClient = useQueryClient();
   // Sólo confiamos en el contexto territorial cuando la ruta actual
   // pertenece al árbol `/oriente-maya/*`. En cualquier otra superficie
   // (Home, Marketplace, /alux, /cuenta, etc.) el Sheet abre siempre en
@@ -120,10 +122,21 @@ export function AluxFloatingTrigger() {
     staleTime: 60_000,
   });
   const lens = lensQuery.data;
+  const plan = lens?.plan ?? null;
   const activeCouponBusinessSlugs =
     lens?.active_coupons
       .map((c) => c.business_slug)
       .filter((s): s is string => Boolean(s)) ?? [];
+
+  // A15 · Refrescar snapshot en cuanto el plan cambie (sin esperar staleTime).
+  useEffect(() => {
+    if (!isAuthed) return;
+    return onPlanChanged(() => {
+      void queryClient.invalidateQueries({
+        queryKey: ["alux", "traveler-lens", user?.id ?? null],
+      });
+    });
+  }, [isAuthed, queryClient, user?.id]);
 
   // A14 · Intención de viaje detectada por navegación + señales A11.
   const unusedCouponCount = lens?.active_coupons.length ?? 0;
@@ -168,6 +181,17 @@ export function AluxFloatingTrigger() {
             : undefined,
           activeCouponBusinessSlugs,
           travelIntent: intent,
+          travelerPlan: plan
+            ? {
+                start_date: plan.start_date,
+                end_date: plan.end_date,
+                party_size: plan.party_size,
+                days_remaining: plan.days_remaining,
+                saved_items: plan.saved_items.slice(0, 12),
+                redeemed_business_slugs: plan.redeemed_business_slugs,
+                item_count: plan.item_count,
+              }
+            : undefined,
         },
       }),
     enabled:
