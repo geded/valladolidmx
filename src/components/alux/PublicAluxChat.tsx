@@ -136,6 +136,7 @@ export function PublicAluxChat() {
             message: trimmed,
             history: messages.slice(-16),
             visitor: location ?? undefined,
+            locale,
             pathContext: (() => {
               if (typeof window === "undefined") return undefined;
               const parts = window.location.pathname.split("/").filter(Boolean);
