@@ -27,6 +27,8 @@ import { resolveAluxSettingsServer } from "@/lib/alux/settings.functions";
 import {
   retrieveAluxKnowledgeServer,
   knowledgeToPromptBlock,
+  ALUX_KB_LOCALES,
+  type AluxKbLocale,
 } from "@/lib/alux/knowledge.functions";
 
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
@@ -51,12 +53,27 @@ export type AluxTravelerCapability = (typeof CAPABILITIES)[number];
 
 // ---------- Contratos I/O ----------
 
-const EmptyInput = z.object({}).optional().default({});
+const LocaleField = z.enum(ALUX_KB_LOCALES).optional();
+
+const EmptyInput = z
+  .object({ locale: LocaleField })
+  .optional()
+  .default({});
 
 const CapabilityInput = z.object({
   planId: z.string().uuid().optional(),
   focus: z.string().max(500).optional(),
+  locale: LocaleField,
 });
+
+const LOCALE_DIRECTIVES: Record<AluxKbLocale, string> = {
+  es: "Responde SIEMPRE en español neutro.",
+  en: "ALWAYS respond in natural English. Keep proper names, addresses, prices and URLs unchanged.",
+  fr: "Réponds TOUJOURS en français naturel. Conserve tels quels les noms propres, adresses, prix et URLs.",
+  de: "Antworte IMMER auf natürlichem Deutsch. Eigennamen, Adressen, Preise und URLs unverändert lassen.",
+  it: "Rispondi SEMPRE in italiano naturale. Mantieni invariati nomi propri, indirizzi, prezzi e URL.",
+  pt: "Responda SEMPRE em português natural. Mantenha inalterados nomes próprios, endereços, preços e URLs.",
+};
 
 const LogInput = z.object({
   capability: z.enum(CAPABILITIES),
@@ -152,6 +169,7 @@ async function runAluxTraveler(
   systemExtra: string,
   userPrompt: string,
   supabase: unknown,
+  locale: AluxKbLocale = "es",
 ): Promise<AluxTravelerSuggestion> {
   const context = await fetchTravelerContext(supabase);
   const planId = contextActivePlanId(context);
@@ -166,19 +184,26 @@ async function runAluxTraveler(
     const query = [capability, userPrompt].join(" ").slice(0, 500);
     const matches = await retrieveAluxKnowledgeServer(supabase, query, {
       matchCount: 4,
+      locale,
     });
     knowledgeCount = matches.length;
     knowledgeIds = matches
       .map((m) => (m as { id?: string }).id)
       .filter((v): v is string => typeof v === "string");
-    knowledgeBlock = knowledgeToPromptBlock(matches);
+    knowledgeBlock = knowledgeToPromptBlock(matches, { locale });
   }
 
   const provider = createLovableAiGatewayProvider(requireApiKey());
   const t0 = Date.now();
   const { text, usage } = await generateText({
     model: provider(DEFAULT_MODEL),
-    system: [SYSTEM_BASE, systemExtra, knowledgeBlock, RATIONALE_INSTRUCTION]
+    system: [
+      SYSTEM_BASE,
+      LOCALE_DIRECTIVES[locale],
+      systemExtra,
+      knowledgeBlock,
+      RATIONALE_INSTRUCTION,
+    ]
       .filter(Boolean)
       .join("\n\n"),
     prompt:
