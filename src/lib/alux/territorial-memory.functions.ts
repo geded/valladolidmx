@@ -11,7 +11,6 @@
  * Fuente de verdad exclusiva del concierge — nunca expone PII.
  */
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 const Input = z.object({
@@ -51,15 +50,10 @@ const EMPTY: AluxTerritorialMemory = {
 export const getAluxTerritorialMemory = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data }): Promise<AluxTerritorialMemory> => {
-    const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_PUBLISHABLE_KEY;
-    if (!url || !key) return EMPTY;
-    const supabase = createClient(url, key, {
-      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
-    });
-    // Nota: la fila puede no ser visible al rol anon si RLS lo restringe;
-    // en ese caso fallback silencioso a EMPTY (memoria no disponible).
-    const { data: row } = await supabase
+    // Autorización = conocer el `session_key` (identificador opaco del
+    // navegador). Usamos admin sólo para leer esa fila específica.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
       .from("alux_public_sessions")
       .select(
         "visited_destinations, visited_categories, destination_visit_count, last_destination_slug, last_category_slug",
