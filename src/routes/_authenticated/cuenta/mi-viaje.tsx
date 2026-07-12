@@ -18,7 +18,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Trash2, Save, Users, Calendar, MapPin, Building2, ShoppingBag, Ticket, StickyNote, Plus, Share2, Copy, ExternalLink, Printer } from "lucide-react";
+import { Trash2, Save, Users, Calendar, MapPin, Building2, ShoppingBag, Ticket, StickyNote, Plus, Share2, Copy, ExternalLink, Printer, Headset } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   addPlanItem,
@@ -33,6 +33,7 @@ import {
   type TravelPlanItem,
   type TravelPlanWithItems,
 } from "@/lib/traveler/travel-plans.functions";
+import { getAluxConciergeContext } from "@/lib/alux/concierge-context.functions";
 import {
   clearGuestQueue,
   readGuestQueue,
@@ -63,6 +64,7 @@ function MiViajePage() {
   const { user } = useAuth();
   const fetchActive = useServerFn(getMyActivePlan);
   const fetchCases = useServerFn(ccListMyCases);
+  const fetchConcierge = useServerFn(getAluxConciergeContext);
 
   const activeQ = useQuery({
     queryKey: ["traveler", "active-plan", user?.id],
@@ -74,6 +76,24 @@ function MiViajePage() {
     queryFn: () => fetchCases(),
     staleTime: 30_000,
   });
+  const { data: concierge } = useQuery({
+    queryKey: ["alux", "concierge-ctx", user?.id],
+    queryFn: () => fetchConcierge(),
+    staleTime: 30_000,
+  });
+  const reservedIds = useMemo(() => {
+    const s = new Set<string>();
+    if (!concierge?.has_concierge) return s;
+    for (const arr of [
+      concierge.reserved_business_ids,
+      concierge.reserved_product_ids,
+      concierge.reserved_event_ids,
+      concierge.reserved_destination_ids,
+    ]) {
+      for (const id of arr) s.add(id);
+    }
+    return s;
+  }, [concierge]);
 
   const invalidatePlan = () =>
     {
