@@ -124,6 +124,16 @@ const SuggestInput = z.object({
       top_categories: z.array(z.string().max(120)).max(5).optional(),
     })
     .optional(),
+  /**
+   * CV2.4 · Bridge Concierge → Alux
+   * Slugs y nombres de negocios ya "trabajados" por el concierge humano
+   * del viajero (case_links + presupuestos activos), más un resumen de la
+   * última propuesta enviada. Alux debe RESPETAR y COMPLEMENTAR alrededor
+   * (nunca sugerir el mismo negocio, nunca contradecir).
+   */
+  conciergeReservedBusinessSlugs: z.array(z.string().max(160)).max(30).optional(),
+  conciergeReservedBusinessNames: z.array(z.string().max(200)).max(30).optional(),
+  conciergeLatestProposalSummary: z.string().max(400).nullable().optional(),
 });
 
 export type AluxSuggestKind = "business" | "product" | "event";
@@ -315,6 +325,12 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       (data.activeCouponBusinessSlugs ?? []).map((s) => s.toLowerCase()),
     );
 
+    // CV2.4 · Slugs reservados por el concierge humano — se eliminan de las
+    // sugerencias (Alux complementa alrededor, no duplica).
+    const conciergeReservedSlugSet = new Set(
+      (data.conciergeReservedBusinessSlugs ?? []).map((s) => s.toLowerCase()),
+    );
+
     // 2c. Horarios reales (A7) — precomputa "abierto ahora" por negocio en TZ del destino.
     // Oriente Maya opera en America/Merida (UTC−6 sin DST).
     const openByBizId = new Map<
@@ -363,6 +379,8 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     function push(rows: BizRow[]) {
       for (const r of rows) {
         if (r.slug === currentBusinessSlug) continue;
+        // CV2.4 · Filtro duro: el concierge ya trabaja este negocio.
+        if (conciergeReservedSlugSet.has(r.slug.toLowerCase())) continue;
         if (seen.has(r.id)) continue;
         seen.add(r.id);
         ordered.push(r);
@@ -507,6 +525,21 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           ? `El viajero YA tiene cupones activos en: ${Array.from(activeCouponSlugSet).slice(0, 6).join(", ")}. Cuando aparezcan en la lista, recuerda con calidez que puede canjearlo (nunca inventes % ni vigencias).`
           : null;
 
+        // CV2.4 · Línea de concierge humano.
+        const conciergeLine = (() => {
+          const names = data.conciergeReservedBusinessNames ?? [];
+          const summary = data.conciergeLatestProposalSummary ?? null;
+          if (!names.length && !summary) return null;
+          const parts: string[] = [];
+          if (names.length) {
+            parts.push(
+              `Su concierge humano ya está trabajando con: ${names.slice(0, 8).join(", ")}`,
+            );
+          }
+          if (summary) parts.push(`Última propuesta del concierge: "${summary.slice(0, 200)}"`);
+          return `Concierge humano activo · ${parts.join(" · ")}. Respeta ese trabajo: NO sugieras esos mismos negocios ni ofrezcas alternativas que los contradigan. Complementa alrededor (traslados, gastronomía cercana, actividades del día, opciones para acompañantes, plan B por clima).`;
+        })();
+
         const intentHintLine = data.travelIntent && data.travelIntent !== "explorando"
           ? (() => {
               const map: Record<string, string> = {
@@ -584,6 +617,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           travelerLine ? `Perfil del viajero: ${travelerLine}.` : null,
           planLine,
           historyLine,
+          conciergeLine,
           couponHintLine,
           intentHintLine,
           "",

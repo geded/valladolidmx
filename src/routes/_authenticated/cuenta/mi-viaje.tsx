@@ -18,7 +18,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Trash2, Save, Users, Calendar, MapPin, Building2, ShoppingBag, Ticket, StickyNote, Plus, Share2, Copy, ExternalLink, Printer } from "lucide-react";
+import { Trash2, Save, Users, Calendar, MapPin, Building2, ShoppingBag, Ticket, StickyNote, Plus, Share2, Copy, ExternalLink, Printer, Headset } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   addPlanItem,
@@ -33,6 +33,7 @@ import {
   type TravelPlanItem,
   type TravelPlanWithItems,
 } from "@/lib/traveler/travel-plans.functions";
+import { getAluxConciergeContext } from "@/lib/alux/concierge-context.functions";
 import {
   clearGuestQueue,
   readGuestQueue,
@@ -63,6 +64,7 @@ function MiViajePage() {
   const { user } = useAuth();
   const fetchActive = useServerFn(getMyActivePlan);
   const fetchCases = useServerFn(ccListMyCases);
+  const fetchConcierge = useServerFn(getAluxConciergeContext);
 
   const activeQ = useQuery({
     queryKey: ["traveler", "active-plan", user?.id],
@@ -74,6 +76,24 @@ function MiViajePage() {
     queryFn: () => fetchCases(),
     staleTime: 30_000,
   });
+  const { data: concierge } = useQuery({
+    queryKey: ["alux", "concierge-ctx", user?.id],
+    queryFn: () => fetchConcierge(),
+    staleTime: 30_000,
+  });
+  const reservedIds = useMemo(() => {
+    const s = new Set<string>();
+    if (!concierge?.has_concierge) return s;
+    for (const arr of [
+      concierge.reserved_business_ids,
+      concierge.reserved_product_ids,
+      concierge.reserved_event_ids,
+      concierge.reserved_destination_ids,
+    ]) {
+      for (const id of arr) s.add(id);
+    }
+    return s;
+  }, [concierge]);
 
   const invalidatePlan = () =>
     {
@@ -104,7 +124,11 @@ function MiViajePage() {
       ) : activeQ.data ? (
         <>
           <PlanMetaEditor data={activeQ.data} onSaved={invalidatePlan} />
-          <PlanItemsSection data={activeQ.data} onChanged={invalidatePlan} />
+          <PlanItemsSection
+            data={activeQ.data}
+            onChanged={invalidatePlan}
+            reservedIds={reservedIds}
+          />
           <ShareExportSection data={activeQ.data} onChanged={invalidatePlan} />
           <AluxTravelerPanel />
           <ConciergeSection data={activeQ.data} cases={cases} onChanged={invalidatePlan} />
@@ -495,9 +519,11 @@ function ShareExportSection({
 function PlanItemsSection({
   data,
   onChanged,
+  reservedIds,
 }: {
   data: TravelPlanWithItems;
   onChanged: () => void;
+  reservedIds: Set<string>;
 }) {
   const addItem = useServerFn(addPlanItem);
   const [newNote, setNewNote] = useState("");
@@ -572,7 +598,14 @@ function PlanItemsSection({
               </h3>
               <ul className="divide-y">
                 {items.map((it) => (
-                  <PlanItemRow key={it.id} item={it} onChanged={onChanged} />
+                  <PlanItemRow
+                    key={it.id}
+                    item={it}
+                    onChanged={onChanged}
+                    reservedByConcierge={Boolean(
+                      it.target_id && reservedIds.has(it.target_id),
+                    )}
+                  />
                 ))}
               </ul>
             </div>
@@ -609,9 +642,11 @@ function PlanItemsSection({
 function PlanItemRow({
   item,
   onChanged,
+  reservedByConcierge,
 }: {
   item: TravelPlanItem;
   onChanged: () => void;
+  reservedByConcierge?: boolean;
 }) {
   const remove = useServerFn(removePlanItem);
   const update = useServerFn(updatePlanItem);
@@ -662,7 +697,15 @@ function PlanItemRow({
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{title}</p>
+        <p className="flex items-center gap-1.5 truncate text-sm font-medium">
+          <span className="truncate">{title}</span>
+          {reservedByConcierge && (
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-400">
+              <Headset className="size-2.5" aria-hidden />
+              Propuesto por tu concierge
+            </span>
+          )}
+        </p>
         {snap.subtitle ? (
           <p className="truncate text-xs text-muted-foreground">{snap.subtitle}</p>
         ) : null}

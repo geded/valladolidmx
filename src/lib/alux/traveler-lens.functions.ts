@@ -17,6 +17,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import type { AluxConciergeContext } from "@/lib/alux/concierge-context.functions";
 
 const EmptyInput = z.object({}).optional().default({});
 
@@ -72,6 +73,13 @@ export interface AluxTravelerLens {
   active_coupons: AluxTravelerActiveCoupon[];
   /** Ola A15 — Plan activo (si existe). */
   plan: AluxTravelerPlanSnapshot | null;
+  /**
+   * CV2.4 — Contexto del concierge humano activo del viajero.
+   * Permite que Alux RESPETE lo que el concierge ya trabajó
+   * (entidades reservadas, notas visibles) y COMPLEMENTE alrededor,
+   * en lugar de duplicar o contradecir.
+   */
+  concierge: AluxConciergeContext;
   generated_at: string;
 }
 
@@ -306,11 +314,69 @@ export const getAluxTravelerLens = createServerFn({ method: "POST" })
       console.warn("[alux.traveler-lens] plan snapshot failed:", error);
     }
 
+    // 4) CV2.4 · Contexto del concierge humano (best-effort).
+    let concierge: AluxConciergeContext = {
+      has_concierge: false,
+      reserved_business_ids: [],
+      reserved_business_slugs: [],
+      reserved_business_names: [],
+      reserved_product_ids: [],
+      reserved_event_ids: [],
+      reserved_destination_ids: [],
+      active_proposals_count: 0,
+      latest_proposal_summary: null,
+      shared_notes: [],
+    };
+    try {
+      const rpc = (context.supabase as unknown as {
+        rpc: (
+          name: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ data: unknown; error: unknown }>;
+      }).rpc;
+      const { data: cRaw } = await rpc("alux_get_concierge_context_for_user", {
+        _user_id: context.userId,
+      });
+      if (cRaw && typeof cRaw === "object") {
+        const c = cRaw as Record<string, unknown>;
+        const arr = (v: unknown): string[] =>
+          Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
+        const notesRaw = Array.isArray(c.shared_notes) ? c.shared_notes : [];
+        concierge = {
+          has_concierge: Boolean(c.has_concierge),
+          active_case_count: Number(c.active_case_count ?? 0) || 0,
+          reserved_business_ids: arr(c.reserved_business_ids),
+          reserved_business_slugs: arr(c.reserved_business_slugs),
+          reserved_business_names: arr(c.reserved_business_names),
+          reserved_product_ids: arr(c.reserved_product_ids),
+          reserved_event_ids: arr(c.reserved_event_ids),
+          reserved_destination_ids: arr(c.reserved_destination_ids),
+          active_proposals_count: Number(c.active_proposals_count ?? 0) || 0,
+          latest_proposal_summary:
+            typeof c.latest_proposal_summary === "string" ? c.latest_proposal_summary : null,
+          shared_notes: notesRaw
+            .map((n) => {
+              const r = (n ?? {}) as { body?: unknown; created_at?: unknown };
+              if (typeof r.body !== "string") return null;
+              return {
+                body: r.body,
+                created_at:
+                  typeof r.created_at === "string" ? r.created_at : new Date().toISOString(),
+              };
+            })
+            .filter((x): x is { body: string; created_at: string } => x !== null),
+        };
+      }
+    } catch (error) {
+      console.warn("[alux.traveler-lens] concierge context failed:", error);
+    }
+
     return {
       authenticated: true,
       hints,
       active_coupons,
       plan,
+      concierge,
       generated_at: new Date().toISOString(),
     };
   });

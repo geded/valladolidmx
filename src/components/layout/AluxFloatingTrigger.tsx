@@ -32,7 +32,7 @@
  * Navigation Session. Las sugerencias contextuales las provee la server
  * fn pública `aluxContextualSuggest` (US-E1.2), sin motor paralelo.
  */
-import { ArrowRight, CalendarDays, Clock, Compass, MapPin, Sparkles, Tag, Ticket, Navigation, Users } from "lucide-react";
+import { ArrowRight, CalendarDays, Clock, Compass, MapPin, Sparkles, Tag, Ticket, Navigation, Users, Headset } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -178,6 +178,8 @@ export function AluxFloatingTrigger() {
     lens?.active_coupons
       .map((c) => c.business_slug)
       .filter((s): s is string => Boolean(s)) ?? [];
+  const concierge = lens?.concierge ?? null;
+  const hasConcierge = Boolean(concierge?.has_concierge);
 
   // A15 · Refrescar snapshot en cuanto el plan cambie (sin esperar staleTime).
   useEffect(() => {
@@ -255,6 +257,9 @@ export function AluxFloatingTrigger() {
                 item_count: plan.item_count,
               }
             : undefined,
+          conciergeReservedBusinessSlugs: concierge?.reserved_business_slugs,
+          conciergeReservedBusinessNames: concierge?.reserved_business_names,
+          conciergeLatestProposalSummary: concierge?.latest_proposal_summary ?? undefined,
         },
       }),
     enabled:
@@ -424,6 +429,59 @@ export function AluxFloatingTrigger() {
                   Añade tus fechas en Mi Viaje para que te encadene recomendaciones día a día.
                 </p>
               )}
+            </section>
+          )}
+
+          {/* CV2.4 · Bridge Concierge → Alux · Tu concierge trabaja en esto */}
+          {isAuthed && hasConcierge && concierge && (
+            <section
+              aria-labelledby="alux-concierge"
+              className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4"
+            >
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-400">
+                <Headset className="size-3.5" aria-hidden />
+                <span id="alux-concierge">Tu concierge humano</span>
+                <a
+                  href="/cuenta/mi-viaje"
+                  className="ml-auto text-[10px] font-medium hover:underline"
+                >
+                  Ver caso
+                </a>
+              </div>
+              {concierge.reserved_business_names.length > 0 && (
+                <>
+                  <p className="mt-2 text-[12px] text-foreground">
+                    Ya está trabajando con:
+                  </p>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {concierge.reserved_business_names.slice(0, 6).map((name) => (
+                      <span
+                        key={name}
+                        className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-background/70 px-2 py-0.5 text-[11px] font-medium text-foreground"
+                      >
+                        <Headset className="size-2.5 text-amber-600" aria-hidden />
+                        {name}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
+              {concierge.shared_notes.length > 0 && (
+                <ul className="mt-3 space-y-1.5">
+                  {concierge.shared_notes.slice(0, 2).map((n, i) => (
+                    <li
+                      key={i}
+                      className="rounded-lg border border-amber-500/20 bg-background/60 px-2.5 py-1.5 text-[11px] text-foreground"
+                    >
+                      <span className="mr-1 text-amber-600">Nota:</span>
+                      {n.body}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                No repito ni contradigo lo que tu concierge ya está armando — complemento alrededor.
+              </p>
             </section>
           )}
 
