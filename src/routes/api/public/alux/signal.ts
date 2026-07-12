@@ -113,7 +113,14 @@ export const Route = createFileRoute("/api/public/alux/signal")({
           ? prevSummary
           : (prevSummary ? prevSummary + "\n" + line : line).slice(-MAX_SUMMARY);
 
-        const patch: Record<string, unknown> = {
+        const patch: {
+          last_signals: string[];
+          summary: string;
+          summary_updated_at: string;
+          last_seen_at: string;
+          last_destination_slug?: string;
+          last_category_slug?: string;
+        } = {
           last_signals: mergedSignals,
           summary: nextSummary,
           summary_updated_at: new Date().toISOString(),

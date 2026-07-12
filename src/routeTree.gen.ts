@@ -141,6 +141,7 @@ import { Route as ApiPublicHooksVisibilityNotificationsRouteImport } from './rou
 import { Route as ApiPublicHooksEbProcessScheduledPublishRouteImport } from './routes/api/public/hooks/eb-process-scheduled-publish'
 import { Route as ApiPublicHooksCouponReviewRemindersRouteImport } from './routes/api/public/hooks/coupon-review-reminders'
 import { Route as ApiPublicHealthMapsRouteImport } from './routes/api/public/health/maps'
+import { Route as ApiPublicAluxSignalRouteImport } from './routes/api/public/alux/signal'
 import { Route as ApiPublicAluxChatRouteImport } from './routes/api/public/alux/chat'
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
 import { Route as AuthenticatedPortalEmpresasBusinessIdRouteImport } from './routes/_authenticated/portal/empresas.$businessId'
@@ -910,6 +911,11 @@ const ApiPublicHealthMapsRoute = ApiPublicHealthMapsRouteImport.update({
   path: '/api/public/health/maps',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAluxSignalRoute = ApiPublicAluxSignalRouteImport.update({
+  id: '/api/public/alux/signal',
+  path: '/api/public/alux/signal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicAluxChatRoute = ApiPublicAluxChatRouteImport.update({
   id: '/api/public/alux/chat',
   path: '/api/public/alux/chat',
@@ -1235,6 +1241,7 @@ export interface FileRoutesByFullPath {
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
+  '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
@@ -1393,6 +1400,7 @@ export interface FileRoutesByTo {
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
+  '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
@@ -1560,6 +1568,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
+  '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
@@ -1728,6 +1737,7 @@ export interface FileRouteTypes {
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
     | '/api/public/alux/chat'
+    | '/api/public/alux/signal'
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
@@ -1886,6 +1896,7 @@ export interface FileRouteTypes {
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
     | '/api/public/alux/chat'
+    | '/api/public/alux/signal'
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
@@ -2052,6 +2063,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/empresas/$businessId'
     | '/_authenticated/portal/invitaciones/$token'
     | '/api/public/alux/chat'
+    | '/api/public/alux/signal'
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
@@ -2144,6 +2156,7 @@ export interface RootRouteChildren {
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
   ResenarNegocioSlugRoute: typeof ResenarNegocioSlugRoute
   ApiPublicAluxChatRoute: typeof ApiPublicAluxChatRoute
+  ApiPublicAluxSignalRoute: typeof ApiPublicAluxSignalRoute
   ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
   ApiPublicHooksCouponReviewRemindersRoute: typeof ApiPublicHooksCouponReviewRemindersRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
@@ -3084,6 +3097,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHealthMapsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/alux/signal': {
+      id: '/api/public/alux/signal'
+      path: '/api/public/alux/signal'
+      fullPath: '/api/public/alux/signal'
+      preLoaderRoute: typeof ApiPublicAluxSignalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/alux/chat': {
       id: '/api/public/alux/chat'
       path: '/api/public/alux/chat'
@@ -3805,6 +3825,7 @@ const rootRouteChildren: RootRouteChildren = {
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
   ResenarNegocioSlugRoute: ResenarNegocioSlugRoute,
   ApiPublicAluxChatRoute: ApiPublicAluxChatRoute,
+  ApiPublicAluxSignalRoute: ApiPublicAluxSignalRoute,
   ApiPublicHealthMapsRoute: ApiPublicHealthMapsRoute,
   ApiPublicHooksCouponReviewRemindersRoute:
     ApiPublicHooksCouponReviewRemindersRoute,
