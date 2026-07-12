@@ -56,6 +56,7 @@ import {
   type AluxContextualSuggestion,
 } from "@/lib/alux/contextual-suggest.functions";
 import { getAluxTravelerLens } from "@/lib/alux/traveler-lens.functions";
+import { getAluxTerritorialMemory } from "@/lib/alux/territorial-memory.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 
@@ -113,6 +114,27 @@ export function AluxFloatingTrigger() {
   const geo = useVisitorGeolocation();
   const suggestFn = useServerFn(aluxContextualSuggest);
   const lensFn = useServerFn(getAluxTravelerLens);
+  const territoryFn = useServerFn(getAluxTerritorialMemory);
+
+  // A16 · Memoria territorial persistente (por session_key anónimo).
+  const [sessionKey, setSessionKey] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const k = window.localStorage.getItem("alux_public_session_key");
+      if (k && k.length >= 8) setSessionKey(k);
+    } catch {
+      /* noop */
+    }
+  }, [open, pathname]);
+
+  const territoryQuery = useQuery({
+    queryKey: ["alux", "territorial-memory", sessionKey],
+    queryFn: () => territoryFn({ data: { sessionKey: sessionKey! } }),
+    enabled: Boolean(sessionKey) && open,
+    staleTime: 60_000,
+  });
+  const territory = territoryQuery.data;
 
   // A6 · Lente del viajero (M2 + cupones) — sólo autenticado.
   const lensQuery = useQuery({
