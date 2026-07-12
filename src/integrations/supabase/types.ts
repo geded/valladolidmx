@@ -847,6 +847,54 @@ export type Database = {
           },
         ]
       }
+      business_view_events: {
+        Row: {
+          business_id: string
+          country_code: string | null
+          event_type: string
+          id: string
+          occurred_at: string
+          referer: string | null
+          session_hash: string | null
+          source: string | null
+        }
+        Insert: {
+          business_id: string
+          country_code?: string | null
+          event_type: string
+          id?: string
+          occurred_at?: string
+          referer?: string | null
+          session_hash?: string | null
+          source?: string | null
+        }
+        Update: {
+          business_id?: string
+          country_code?: string | null
+          event_type?: string
+          id?: string
+          occurred_at?: string
+          referer?: string | null
+          session_hash?: string | null
+          source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_view_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_view_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_visibility_grants: {
         Row: {
           amount_paid_mxn: number | null
@@ -5602,6 +5650,21 @@ export type Database = {
           starts_at: string
         }[]
       }
+      get_business_presence_report: {
+        Args: { _business_id: string; _window_days?: number }
+        Returns: {
+          countries: Json
+          series: Json
+          top_sources: Json
+          total_alux: number
+          total_impressions: number
+          total_map: number
+          total_phone: number
+          total_share: number
+          total_web: number
+          total_whatsapp: number
+        }[]
+      }
       get_coupons_needing_review_reminder: {
         Args: { hours_max: number; hours_min: number; reminder_number: number }
         Returns: {
@@ -5793,6 +5856,17 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      record_business_view_event: {
+        Args: {
+          _business_id: string
+          _country_code?: string
+          _event_type: string
+          _referer?: string
+          _session_hash?: string
+          _source?: string
+        }
+        Returns: string
       }
       record_search_metric: {
         Args: {
