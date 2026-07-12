@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/sheet";
 import { useAluxContext, type AluxContext, type AluxContextSlot } from "@/lib/alux/use-alux-context";
 import { useAluxFloatingPresence } from "@/lib/alux/floating-presence";
+import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import {
   aluxContextualSuggest,
   type AluxContextualSuggestion,
@@ -362,13 +363,6 @@ export function AluxFloatingTrigger() {
               experiencias y rutas del Oriente Maya con mucha más precisión.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <a
-                href="/cuenta/perfil"
-                className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-background px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
-              >
-                Completar mi perfil
-                <ArrowRight className="size-3.5" aria-hidden />
-              </a>
               <a
                 href="/cuenta/perfil-publico"
                 className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
