@@ -291,6 +291,8 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/portal/propiedad.tsx",
   "src/routes/_authenticated/portal/resenas.index.tsx",
   "src/routes/_authenticated/portal/route.tsx",
+  "src/routes/_authenticated/portal/ventas-en-linea.tsx",
+  "src/routes/_authenticated/portal/ventas-en-linea.ordenes.tsx",
   "src/routes/alux.tsx",
   "src/routes/api/public/health/maps.ts",
   "src/routes/api/public/hooks/eb-process-scheduled-publish.ts",
