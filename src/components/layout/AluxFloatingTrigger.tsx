@@ -32,7 +32,7 @@
  * Navigation Session. Las sugerencias contextuales las provee la server
  * fn pública `aluxContextualSuggest` (US-E1.2), sin motor paralelo.
  */
-import { ArrowRight, Compass, MapPin, Sparkles } from "lucide-react";
+import { ArrowRight, Compass, MapPin, Sparkles, Tag, Ticket, Navigation } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -51,6 +51,8 @@ import {
   aluxContextualSuggest,
   type AluxContextualSuggestion,
 } from "@/lib/alux/contextual-suggest.functions";
+import { getAluxTravelerLens } from "@/lib/alux/traveler-lens.functions";
+import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 
 function ContextChip({ slot }: { slot: AluxContextSlot }) {
@@ -72,6 +74,8 @@ function ContextChip({ slot }: { slot: AluxContextSlot }) {
 
 export function AluxFloatingTrigger() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const isAuthed = Boolean(user);
   const rawCtx = useAluxContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   // Sólo confiamos en el contexto territorial cuando la ruta actual
@@ -97,6 +101,21 @@ export function AluxFloatingTrigger() {
   const [open, setOpen] = useState(false);
   const geo = useVisitorGeolocation();
   const suggestFn = useServerFn(aluxContextualSuggest);
+  const lensFn = useServerFn(getAluxTravelerLens);
+
+  // A6 · Lente del viajero (M2 + cupones) — sólo autenticado.
+  const lensQuery = useQuery({
+    queryKey: ["alux", "traveler-lens", user?.id ?? null],
+    queryFn: () => lensFn({ data: {} }),
+    enabled: open && isAuthed,
+    staleTime: 60_000,
+  });
+  const lens = lensQuery.data;
+  const activeCouponBusinessSlugs =
+    lens?.active_coupons
+      .map((c) => c.business_slug)
+      .filter((s): s is string => Boolean(s)) ?? [];
+
   const suggestionsQuery = useQuery({
     queryKey: [
       "alux",
@@ -105,6 +124,7 @@ export function AluxFloatingTrigger() {
       ctx.category?.slug ?? null,
       ctx.business?.slug ?? null,
       ctx.product?.slug ?? null,
+      isAuthed ? (lens?.generated_at ?? null) : null,
     ],
     queryFn: () =>
       suggestFn({
@@ -115,9 +135,26 @@ export function AluxFloatingTrigger() {
           business: ctx.business,
           product: ctx.product,
           limit: 6,
+          travelerHints: lens
+            ? {
+                home_country: lens.hints.home_country,
+                preferred_language: lens.hints.preferred_language,
+                travel_style: lens.hints.travel_style,
+                budget_band: lens.hints.budget_band,
+                dietary: lens.hints.dietary,
+                accessibility: lens.hints.accessibility,
+                languages: lens.hints.languages,
+                interests: lens.hints.interests,
+              }
+            : undefined,
+          activeCouponBusinessSlugs,
         },
       }),
-    enabled: open && ctx.hasContext && Boolean(ctx.destination?.slug),
+    enabled:
+      open &&
+      ctx.hasContext &&
+      Boolean(ctx.destination?.slug) &&
+      (!isAuthed || !lensQuery.isLoading),
     staleTime: 60_000,
   });
 
