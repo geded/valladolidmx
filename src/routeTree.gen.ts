@@ -140,6 +140,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicStudioMediaSplatRouteImport } from './routes/api/public/studio-media.$'
 import { Route as ApiPublicMapsStaticRouteImport } from './routes/api/public/maps/static'
 import { Route as ApiPublicHooksVisibilityNotificationsRouteImport } from './routes/api/public/hooks/visibility-notifications'
+import { Route as ApiPublicHooksTripJourneyEmailsRouteImport } from './routes/api/public/hooks/trip-journey-emails'
 import { Route as ApiPublicHooksEbProcessScheduledPublishRouteImport } from './routes/api/public/hooks/eb-process-scheduled-publish'
 import { Route as ApiPublicHooksCouponReviewRemindersRouteImport } from './routes/api/public/hooks/coupon-review-reminders'
 import { Route as ApiPublicHealthMapsRouteImport } from './routes/api/public/health/maps'
@@ -909,6 +910,12 @@ const ApiPublicHooksVisibilityNotificationsRoute =
     path: '/api/public/hooks/visibility-notifications',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksTripJourneyEmailsRoute =
+  ApiPublicHooksTripJourneyEmailsRouteImport.update({
+    id: '/api/public/hooks/trip-journey-emails',
+    path: '/api/public/hooks/trip-journey-emails',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksEbProcessScheduledPublishRoute =
   ApiPublicHooksEbProcessScheduledPublishRouteImport.update({
     id: '/api/public/hooks/eb-process-scheduled-publish',
@@ -1269,6 +1276,7 @@ export interface FileRoutesByFullPath {
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
@@ -1431,6 +1439,7 @@ export interface FileRoutesByTo {
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
@@ -1602,6 +1611,7 @@ export interface FileRoutesById {
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
@@ -1774,6 +1784,7 @@ export interface FileRouteTypes {
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
+    | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
     | '/api/public/studio-media/$'
@@ -1936,6 +1947,7 @@ export interface FileRouteTypes {
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
+    | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
     | '/api/public/studio-media/$'
@@ -2106,6 +2118,7 @@ export interface FileRouteTypes {
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
+    | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
     | '/api/public/studio-media/$'
@@ -2199,6 +2212,7 @@ export interface RootRouteChildren {
   ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
   ApiPublicHooksCouponReviewRemindersRoute: typeof ApiPublicHooksCouponReviewRemindersRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  ApiPublicHooksTripJourneyEmailsRoute: typeof ApiPublicHooksTripJourneyEmailsRoute
   ApiPublicHooksVisibilityNotificationsRoute: typeof ApiPublicHooksVisibilityNotificationsRoute
   ApiPublicMapsStaticRoute: typeof ApiPublicMapsStaticRoute
   ApiPublicStudioMediaSplatRoute: typeof ApiPublicStudioMediaSplatRoute
@@ -3129,6 +3143,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksVisibilityNotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/trip-journey-emails': {
+      id: '/api/public/hooks/trip-journey-emails'
+      path: '/api/public/hooks/trip-journey-emails'
+      fullPath: '/api/public/hooks/trip-journey-emails'
+      preLoaderRoute: typeof ApiPublicHooksTripJourneyEmailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/eb-process-scheduled-publish': {
       id: '/api/public/hooks/eb-process-scheduled-publish'
       path: '/api/public/hooks/eb-process-scheduled-publish'
@@ -3899,6 +3920,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicHooksCouponReviewRemindersRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:
     ApiPublicHooksEbProcessScheduledPublishRoute,
+  ApiPublicHooksTripJourneyEmailsRoute: ApiPublicHooksTripJourneyEmailsRoute,
   ApiPublicHooksVisibilityNotificationsRoute:
     ApiPublicHooksVisibilityNotificationsRoute,
   ApiPublicMapsStaticRoute: ApiPublicMapsStaticRoute,
