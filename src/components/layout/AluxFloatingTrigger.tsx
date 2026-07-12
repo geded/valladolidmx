@@ -39,6 +39,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
 import { logAluxPublicSignal, type AluxPublicSignalAction } from "@/lib/alux/public-signals";
 import { onAluxFloatingOpen } from "@/lib/alux/floating-bus";
+import { useTravelIntent, markNudgeShown } from "@/lib/alux/travel-intent";
 import {
   Sheet,
   SheetContent,
@@ -124,6 +125,15 @@ export function AluxFloatingTrigger() {
       .map((c) => c.business_slug)
       .filter((s): s is string => Boolean(s)) ?? [];
 
+  // A14 · Intención de viaje detectada por navegación + señales A11.
+  const unusedCouponCount = lens?.active_coupons.filter((c) => !c.redeemed_at).length ?? 0;
+  const { intent, nudge } = useTravelIntent({ pathname, unusedCouponCount });
+
+  // Al abrir el sheet, descartamos el nudge activo (respeto).
+  useEffect(() => {
+    if (open && nudge) markNudgeShown(nudge.intent);
+  }, [open, nudge]);
+
   const suggestionsQuery = useQuery({
     queryKey: [
       "alux",
@@ -133,6 +143,7 @@ export function AluxFloatingTrigger() {
       ctx.business?.slug ?? null,
       ctx.product?.slug ?? null,
       isAuthed ? (lens?.generated_at ?? null) : null,
+      intent,
     ],
     queryFn: () =>
       suggestFn({
@@ -156,6 +167,7 @@ export function AluxFloatingTrigger() {
               }
             : undefined,
           activeCouponBusinessSlugs,
+          travelIntent: intent,
         },
       }),
     enabled:
