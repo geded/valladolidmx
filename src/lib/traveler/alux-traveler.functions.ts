@@ -47,6 +47,7 @@ const CAPABILITIES = [
   "draft_concierge_message",
   "suggest_from_coupons",
   "discover_promotions",
+  "narrate_plan",
 ] as const;
 
 export type AluxTravelerCapability = (typeof CAPABILITIES)[number];
