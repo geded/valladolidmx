@@ -31,7 +31,8 @@ export type KpiFilter =
   | "pending_alux"
   | "open_case"
   | "proposals_sla"
-  | "closed";
+  | "closed"
+  | "confirmed";
 
 export interface TravelPlanOpsRow {
   plan_id: string;
@@ -68,6 +69,14 @@ export interface TravelPlanOpsRow {
   intent_level: IntentLevel;
   sla_risk: SlaRisk;
   priority: PriorityLevel;
+  reservation: {
+    folio: string | null;
+    status: string | null;
+    paid_at: string | null;
+    total: number | null;
+    currency: string | null;
+    is_confirmed: boolean;
+  };
 }
 
 export interface TravelPlanOpsList {
@@ -154,7 +163,7 @@ export interface TravelPlanOpsDetail {
 
 const ListInput = z.object({
   kpi_filter: z
-    .enum(["active", "pending_alux", "open_case", "proposals_sla", "closed"])
+    .enum(["active", "pending_alux", "open_case", "proposals_sla", "closed", "confirmed"])
     .nullable()
     .optional(),
   plan_status: z.string().nullable().optional(),
