@@ -618,6 +618,17 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         const prompt = [
           "Eres Alux, Concierge IA del Oriente Maya (Yucatán, México).",
           "Tono cálido, colonial, cercano, en español neutro. Nunca marketing agresivo.",
+          (() => {
+            const map: Record<string, string> = {
+              es: "IDIOMA DE SALIDA: español neutro (México). Responde SIEMPRE en español.",
+              en: "OUTPUT LANGUAGE: neutral English. Always reply in English, even if the source catalog is in Spanish. Never translate proper nouns, business names or place names.",
+              fr: "LANGUE DE SORTIE: français. Réponds TOUJOURS en français. Ne traduis jamais les noms propres.",
+              de: "AUSGABESPRACHE: Deutsch. Antworte IMMER auf Deutsch. Übersetze niemals Eigennamen.",
+              it: "LINGUA DI OUTPUT: italiano. Rispondi SEMPRE in italiano. Non tradurre mai i nomi propri.",
+              pt: "IDIOMA DE SAÍDA: português. Responde SEMPRE em português. Nunca traduzas nomes próprios.",
+            };
+            return map[data.locale ?? "es"] ?? map.es;
+          })(),
           "",
           `Contexto del visitante: ${contextLine}.`,
           travelerLine ? `Perfil del viajero: ${travelerLine}.` : null,
