@@ -39,6 +39,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
 import { logAluxPublicSignal, type AluxPublicSignalAction } from "@/lib/alux/public-signals";
 import { onAluxFloatingOpen } from "@/lib/alux/floating-bus";
+import { useTravelIntent, markNudgeShown } from "@/lib/alux/travel-intent";
 import {
   Sheet,
   SheetContent,
@@ -124,6 +125,15 @@ export function AluxFloatingTrigger() {
       .map((c) => c.business_slug)
       .filter((s): s is string => Boolean(s)) ?? [];
 
+  // A14 · Intención de viaje detectada por navegación + señales A11.
+  const unusedCouponCount = lens?.active_coupons.length ?? 0;
+  const { intent, nudge } = useTravelIntent({ pathname, unusedCouponCount });
+
+  // Al abrir el sheet, descartamos el nudge activo (respeto).
+  useEffect(() => {
+    if (open && nudge) markNudgeShown(nudge.intent);
+  }, [open, nudge]);
+
   const suggestionsQuery = useQuery({
     queryKey: [
       "alux",
@@ -133,6 +143,7 @@ export function AluxFloatingTrigger() {
       ctx.business?.slug ?? null,
       ctx.product?.slug ?? null,
       isAuthed ? (lens?.generated_at ?? null) : null,
+      intent,
     ],
     queryFn: () =>
       suggestFn({
@@ -156,6 +167,7 @@ export function AluxFloatingTrigger() {
               }
             : undefined,
           activeCouponBusinessSlugs,
+          travelIntent: intent,
         },
       }),
     enabled:
@@ -201,8 +213,14 @@ export function AluxFloatingTrigger() {
           title={`Alux · ${triggerLabel}`}
           className="pointer-events-auto group flex max-w-[80vw] items-center gap-2 rounded-full border border-border bg-card/90 px-3.5 py-2 text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-all hover:bg-card active:scale-[0.98]"
         >
-          <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
+          <span className="relative grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
             <Sparkles className="size-3.5" aria-hidden />
+            {nudge && !open && (
+              <span
+                aria-hidden
+                className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background animate-pulse"
+              />
+            )}
           </span>
           <span className="hidden sm:inline">Alux</span>
           <span className="hidden text-xs text-muted-foreground sm:inline">
@@ -212,6 +230,16 @@ export function AluxFloatingTrigger() {
             {triggerLabel}
           </span>
         </button>
+        {nudge && !open && (
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="pointer-events-auto mt-2 block max-w-[80vw] rounded-2xl border border-primary/30 bg-card/95 px-3 py-2 text-left text-[12px] font-medium text-foreground shadow-lg backdrop-blur-md transition-colors hover:bg-card"
+          >
+            <span className="mr-1 text-primary">✨</span>
+            {nudge.message}
+          </button>
+        )}
       </div>
 
       <Sheet open={open} onOpenChange={setOpen}>
