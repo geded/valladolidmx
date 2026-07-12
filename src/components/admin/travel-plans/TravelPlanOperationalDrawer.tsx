@@ -4,7 +4,6 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Link } from "@tanstack/react-router";
 import {
   Calendar,
   Users,
@@ -12,7 +11,6 @@ import {
   Sparkles,
   Headset,
   Clock,
-  ExternalLink,
 } from "lucide-react";
 import { getTravelPlanOperationalDetail } from "@/lib/admin/travel-plans-operations.functions";
 import {
@@ -87,14 +85,9 @@ export function TravelPlanOperationalDrawer({ planId }: Props) {
         <div className="flex flex-wrap items-center gap-2">
           <PlanStatusBadge status={d.plan.status} />
           {d.plan.case_id ? (
-            <Link
-              to="/admin/concierge/$caseId"
-              params={{ caseId: d.plan.case_id }}
-              className="inline-flex items-center gap-1 rounded-pill border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary hover:bg-primary/15"
-            >
-              <Headset className="h-3 w-3" /> Ver caso
-              <ExternalLink className="h-3 w-3" />
-            </Link>
+            <span className="inline-flex items-center gap-1 rounded-pill border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+              <Headset className="h-3 w-3" /> Caso #{d.plan.case_id.slice(0, 8)}
+            </span>
           ) : null}
         </div>
         <h2 className="text-xl font-semibold tracking-tight">
