@@ -6,10 +6,20 @@
  * (PAYMENTS_ENABLED != "false"). El checkout definitivo se conecta en
  * la siguiente ola CV4.2.
  */
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
 
 export function DirectSaleBuyButton({
@@ -28,27 +38,124 @@ export function DirectSaleBuyButton({
     staleTime: 60_000,
   });
   const ready = data?.ready ?? false;
+  const demoMode = data?.demoMode ?? true;
+  const [open, setOpen] = useState(false);
+  const [step, setStep] = useState<"review" | "confirming" | "done">("review");
+
+  const disabled = !ready && !demoMode;
+  const label = ready
+    ? "Comprar ahora"
+    : demoMode
+      ? "Comprar (demo)"
+      : "Comprar · próximamente";
+
+  function handleClick() {
+    if (disabled) return;
+    setStep("review");
+    setOpen(true);
+  }
+
+  function handleConfirm() {
+    setStep("confirming");
+    // Simulación breve; el checkout real (Stripe) se conecta en CV4.2.
+    setTimeout(() => {
+      setStep("done");
+      if (!ready) {
+        toast.success(
+          `Compra demo registrada — ${productName ?? "experiencia"}${
+            priceLabel ? ` · ${priceLabel}` : ""
+          }`,
+        );
+      } else {
+        toast.info("Redirigiendo al proveedor de pagos…");
+      }
+    }, 700);
+  }
 
   return (
-    <Button
-      type="button"
-      disabled={!ready}
-      title={
-        ready
-          ? undefined
-          : "El botón Comprar estará activo cuando la plataforma de pagos se active."
-      }
-      onClick={() => {
-        if (!ready) return;
-        toast.info(
-          `Preparando el pago de ${productName ?? "esta experiencia"}${
-            priceLabel ? ` · ${priceLabel}` : ""
-          }…`,
-        );
-      }}
-      className={className}
-    >
-      {ready ? "Comprar ahora" : "Comprar · próximamente"}
-    </Button>
+    <>
+      <Button
+        type="button"
+        disabled={disabled}
+        title={
+          disabled
+            ? "Se activará cuando la plataforma de pagos esté configurada."
+            : undefined
+        }
+        onClick={handleClick}
+        className={className}
+      >
+        {label}
+      </Button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-2">
+              <DialogTitle>Confirmar compra</DialogTitle>
+              {!ready ? (
+                <Badge variant="outline" className="text-[10px] uppercase">
+                  Demo
+                </Badge>
+              ) : null}
+            </div>
+            <DialogDescription>
+              {productName ?? "Experiencia"}
+              {priceLabel ? ` · ${priceLabel}` : ""}
+            </DialogDescription>
+          </DialogHeader>
+
+          {step === "review" ? (
+            <div className="space-y-3 text-sm">
+              <div className="rounded-md border border-border bg-muted/40 p-3">
+                <p className="font-medium">Resumen</p>
+                <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                  <li>· 1 reserva de {productName ?? "experiencia"}</li>
+                  <li>· Precio total: {priceLabel ?? "—"}</li>
+                  <li>· Cancelación según política del anfitrión</li>
+                </ul>
+              </div>
+              {!ready ? (
+                <p className="text-[11px] text-amber-700">
+                  Esta compra es simulada. No se cobrará y sirve para probar
+                  el flujo antes de conectar el proveedor real.
+                </p>
+              ) : null}
+            </div>
+          ) : step === "confirming" ? (
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              Procesando…
+            </p>
+          ) : (
+            <div className="space-y-2 py-4 text-center text-sm">
+              <p className="text-2xl">✓</p>
+              <p className="font-medium">
+                {ready ? "Pago iniciado" : "Compra demo confirmada"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Folio ficticio: VMX-{Math.random().toString(36).slice(2, 8).toUpperCase()}
+                {!ready ? "-DEMO" : ""}
+              </p>
+            </div>
+          )}
+
+          <DialogFooter>
+            {step === "review" ? (
+              <>
+                <Button variant="outline" onClick={() => setOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button onClick={handleConfirm}>
+                  {ready ? "Pagar ahora" : "Confirmar compra demo"}
+                </Button>
+              </>
+            ) : step === "done" ? (
+              <Button onClick={() => setOpen(false)}>Cerrar</Button>
+            ) : null}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
+}
 }
