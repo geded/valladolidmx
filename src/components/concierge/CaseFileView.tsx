@@ -3,7 +3,7 @@
  * Consume concierge_case_file_v1 y respeta visibilidad por rol.
  */
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter } from "@tanstack/react-router";
 import {
@@ -16,6 +16,7 @@ import {
   assignConciergeCase,
   releaseConciergeCase,
   setConciergeCasePriority,
+  getConciergeCaseHandoffContext,
 } from "@/lib/concierge/concierge.functions";
 import {
   generateAluxSummary,
@@ -141,6 +142,7 @@ export function CaseFileView({ data, hideInternal = false }: { data: unknown; hi
     <div className="grid gap-6">
       <Header f={f} />
       {internal && <SlaAssignmentPanel f={f} />}
+      {internal && <HandoffContextCard caseId={f.case.id} />}
       {internal && <AluxAssistantPanel caseId={f.case.id} />}
       <Section title="Solicitudes">
         {f.requests.length === 0 ? (
