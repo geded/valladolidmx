@@ -37,6 +37,8 @@ interface MenuSection {
   href: string;
   /** Cuando es una función, se resuelve al abrir con destinos publicados. */
   columns: MenuColumn[] | ((destinos: DestinoLite[]) => MenuColumn[]);
+  /** Si es true, tocar la etiqueta no navega: sólo despliega el submenú. */
+  expandOnly?: boolean;
 }
 
 interface MenuColumn {
@@ -187,6 +189,7 @@ function buildSections(destinos: DestinoLite[]): MenuSection[] {
       id: "mas",
       label: "Más",
       href: "/promociones",
+      expandOnly: true,
       columns: [
         {
           links: [
@@ -418,13 +421,23 @@ function MobileMenu({
         return (
           <li key={section.id} className="border-b border-border/40 last:border-b-0">
             <div className="flex items-stretch">
-              <a
-                href={hrefWithActiveDestination(section.href, activeDestination)}
-                onClick={() => onNavigate?.()}
-                className="flex-1 rounded-lg px-3 py-2.5 text-[0.95rem] font-medium leading-tight text-foreground hover:bg-accent hover:text-accent-foreground"
-              >
-                {section.label}
-              </a>
+              {section.expandOnly ? (
+                <button
+                  type="button"
+                  onClick={() => setOpen(isOpen ? null : section.id)}
+                  className="flex-1 rounded-lg px-3 py-2.5 text-left text-[0.95rem] font-medium leading-tight text-foreground hover:bg-accent hover:text-accent-foreground"
+                >
+                  {section.label}
+                </button>
+              ) : (
+                <a
+                  href={hrefWithActiveDestination(section.href, activeDestination)}
+                  onClick={() => onNavigate?.()}
+                  className="flex-1 rounded-lg px-3 py-2.5 text-[0.95rem] font-medium leading-tight text-foreground hover:bg-accent hover:text-accent-foreground"
+                >
+                  {section.label}
+                </a>
+              )}
               <button
                 type="button"
                 aria-label={isOpen ? `Cerrar ${section.label}` : `Abrir ${section.label}`}
