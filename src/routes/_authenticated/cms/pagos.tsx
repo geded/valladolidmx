@@ -406,3 +406,82 @@ function EventsTable({
     </div>
   );
 }
+
+function DemoModeToggle() {
+  const fetchDemo = useServerFn(getPaymentsDemoModeAdmin);
+  const setDemo = useServerFn(setPaymentsDemoModeAdmin);
+  const qc = useQueryClient();
+
+  const q = useQuery({
+    queryKey: ["admin", "payments", "demo-mode"],
+    queryFn: () => fetchDemo(),
+    staleTime: 15_000,
+  });
+
+  const m = useMutation({
+    mutationFn: (enabled: boolean) => setDemo({ data: { enabled } }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "payments", "demo-mode"] });
+      void qc.invalidateQueries({ queryKey: ["payments", "public-status"] });
+    },
+  });
+
+  const enabled = q.data?.enabled ?? false;
+  const pending = q.isLoading || m.isPending;
+
+  return (
+    <div className="mt-3 rounded-lg border border-border bg-card p-5">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <p className="text-base font-semibold">
+              Modo demo de compras
+            </p>
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                enabled
+                  ? "bg-amber-500/10 text-amber-700"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {enabled ? "ACTIVO" : "APAGADO"}
+            </span>
+          </div>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Cuando está activo, el botón "Comprar" muestra "Comprar (demo)" y
+            permite simular una transacción con un folio ficticio
+            (<code className="rounded bg-muted px-1 text-[11px]">VMX-XXXXXX-DEMO</code>),
+            aunque el proveedor real de pagos no esté configurado. Úsalo para
+            tours con empresarios o para probar el flujo de compra.
+            Cuando lo apagues, el botón vuelve a "Comprar · próximamente"
+            hasta que las llaves reales estén activas.
+          </p>
+        </div>
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => m.mutate(!enabled)}
+          role="switch"
+          aria-checked={enabled}
+          aria-label="Modo demo de compras"
+          className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border transition-colors ${
+            enabled
+              ? "border-amber-500 bg-amber-500"
+              : "border-border bg-muted"
+          } ${pending ? "opacity-60" : ""}`}
+        >
+          <span
+            className={`inline-block h-5 w-5 transform rounded-full bg-background shadow transition-transform ${
+              enabled ? "translate-x-6" : "translate-x-1"
+            }`}
+          />
+        </button>
+      </div>
+      {m.error ? (
+        <p className="mt-3 text-xs text-destructive">
+          No se pudo actualizar el modo demo.
+        </p>
+      ) : null}
+    </div>
+  );
+}
