@@ -32,7 +32,7 @@
  * Navigation Session. Las sugerencias contextuales las provee la server
  * fn pública `aluxContextualSuggest` (US-E1.2), sin motor paralelo.
  */
-import { ArrowRight, CalendarDays, Clock, Compass, MapPin, Sparkles, Tag, Ticket, Navigation, Users } from "lucide-react";
+import { ArrowRight, CalendarDays, Clock, Compass, MapPin, Sparkles, Tag, Ticket, Navigation, Users, Headset } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -178,6 +178,8 @@ export function AluxFloatingTrigger() {
     lens?.active_coupons
       .map((c) => c.business_slug)
       .filter((s): s is string => Boolean(s)) ?? [];
+  const concierge = lens?.concierge ?? null;
+  const hasConcierge = Boolean(concierge?.has_concierge);
 
   // A15 · Refrescar snapshot en cuanto el plan cambie (sin esperar staleTime).
   useEffect(() => {
@@ -255,6 +257,9 @@ export function AluxFloatingTrigger() {
                 item_count: plan.item_count,
               }
             : undefined,
+          conciergeReservedBusinessSlugs: concierge?.reserved_business_slugs,
+          conciergeReservedBusinessNames: concierge?.reserved_business_names,
+          conciergeLatestProposalSummary: concierge?.latest_proposal_summary ?? undefined,
         },
       }),
     enabled:
