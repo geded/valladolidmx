@@ -9,6 +9,7 @@ import { createServerFn } from "@tanstack/react-start";
 export interface PublicPaymentsStatus {
   provider: string;
   ready: boolean;
+  demoMode: boolean;
 }
 
 export const getPaymentsReadyPublic = createServerFn({ method: "GET" }).handler(
@@ -21,6 +22,8 @@ export const getPaymentsReadyPublic = createServerFn({ method: "GET" }).handler(
         Boolean(process.env.STRIPE_SECRET_KEY) &&
         Boolean(process.env.STRIPE_WEBHOOK_SECRET);
     }
-    return { provider, ready: enabled && hasKeys };
+    const demoMode =
+      (process.env.PAYMENTS_DEMO_MODE ?? "true").toLowerCase() !== "false";
+    return { provider, ready: enabled && hasKeys, demoMode };
   },
 );
