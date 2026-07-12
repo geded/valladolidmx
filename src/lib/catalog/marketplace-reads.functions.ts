@@ -42,6 +42,9 @@ export interface MarketplaceBusinessCard {
   visibility_plan_name?: string | null;
   visibility_badge_variant?: string | null;
   visibility_boost?: number;
+  /** Ola 7.8 · Spotlight manual del Founder. */
+  spotlight_headline?: string | null;
+  spotlight_boost?: number;
 }
 
 export interface MarketplaceProductCard {
@@ -618,12 +621,39 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
         row.visibility_boost = Number.isFinite(boost) ? boost : 0;
       }
       // Ordenar: boost DESC primero, luego alfabético
-      rows.sort((a, b) => {
-        const diff = (b.visibility_boost ?? 0) - (a.visibility_boost ?? 0);
-        if (diff !== 0) return diff;
-        return a.display_name.localeCompare(b.display_name, "es");
-      });
     }
+
+    // Ola 7.8 · Enriquecer con Founder Spotlight activo
+    if (rows.length > 0) {
+      const ids = rows.map((r) => r.id);
+      const { data: spots } = await supabase
+        .from("active_founder_spotlights")
+        .select("business_id, headline, boost")
+        .in("business_id", ids);
+      const spotById = new Map<string, { headline: string | null; boost: number }>();
+      for (const s of spots ?? []) {
+        const r = s as { business_id: string; headline: string | null; boost: number };
+        spotById.set(String(r.business_id), {
+          headline: r.headline,
+          boost: Number(r.boost ?? 0),
+        });
+      }
+      for (const row of rows) {
+        const s = spotById.get(row.id);
+        if (!s) continue;
+        row.spotlight_headline = s.headline;
+        row.spotlight_boost = s.boost;
+      }
+    }
+
+    // Ordenar por (spotlight + visibility) DESC, luego alfabético
+    rows.sort((a, b) => {
+      const scoreA = (a.spotlight_boost ?? 0) + (a.visibility_boost ?? 0);
+      const scoreB = (b.spotlight_boost ?? 0) + (b.visibility_boost ?? 0);
+      if (scoreB !== scoreA) return scoreB - scoreA;
+      return a.display_name.localeCompare(b.display_name, "es");
+    });
+
     return rows;
   },
 );

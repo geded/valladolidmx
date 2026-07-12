@@ -146,6 +146,7 @@ import { Route as AuthenticatedCuentaPagosErrorRouteImport } from './routes/_aut
 import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId'
 import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId'
 import { Route as AuthenticatedCmsZonasNuevaRouteImport } from './routes/_authenticated/cms/zonas.nueva'
+import { Route as AuthenticatedCmsVisibilidadSpotlightRouteImport } from './routes/_authenticated/cms/visibilidad.spotlight'
 import { Route as AuthenticatedCmsVisibilidadSolicitudesRouteImport } from './routes/_authenticated/cms/visibilidad.solicitudes'
 import { Route as AuthenticatedCmsRegionesNuevaRouteImport } from './routes/_authenticated/cms/regiones.nueva'
 import { Route as AuthenticatedCmsProductosNuevaRouteImport } from './routes/_authenticated/cms/productos.nueva'
@@ -935,6 +936,12 @@ const AuthenticatedCmsZonasNuevaRoute =
     path: '/zonas/nueva',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsVisibilidadSpotlightRoute =
+  AuthenticatedCmsVisibilidadSpotlightRouteImport.update({
+    id: '/spotlight',
+    path: '/spotlight',
+    getParentRoute: () => AuthenticatedCmsVisibilidadRoute,
+  } as any)
 const AuthenticatedCmsVisibilidadSolicitudesRoute =
   AuthenticatedCmsVisibilidadSolicitudesRouteImport.update({
     id: '/solicitudes',
@@ -1183,6 +1190,7 @@ export interface FileRoutesByFullPath {
   '/cms/productos/nueva': typeof AuthenticatedCmsProductosNuevaRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/cms/visibilidad/solicitudes': typeof AuthenticatedCmsVisibilidadSolicitudesRoute
+  '/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
@@ -1335,6 +1343,7 @@ export interface FileRoutesByTo {
   '/cms/productos/nueva': typeof AuthenticatedCmsProductosNuevaRoute
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/cms/visibilidad/solicitudes': typeof AuthenticatedCmsVisibilidadSolicitudesRoute
+  '/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
@@ -1496,6 +1505,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/productos/nueva': typeof AuthenticatedCmsProductosNuevaRoute
   '/_authenticated/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/_authenticated/cms/visibilidad/solicitudes': typeof AuthenticatedCmsVisibilidadSolicitudesRoute
+  '/_authenticated/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
   '/_authenticated/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
   '/_authenticated/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
@@ -1658,6 +1668,7 @@ export interface FileRouteTypes {
     | '/cms/productos/nueva'
     | '/cms/regiones/nueva'
     | '/cms/visibilidad/solicitudes'
+    | '/cms/visibilidad/spotlight'
     | '/cms/zonas/nueva'
     | '/concierge/expedientes/$caseId'
     | '/cuenta/concierge/$caseId'
@@ -1810,6 +1821,7 @@ export interface FileRouteTypes {
     | '/cms/productos/nueva'
     | '/cms/regiones/nueva'
     | '/cms/visibilidad/solicitudes'
+    | '/cms/visibilidad/spotlight'
     | '/cms/zonas/nueva'
     | '/concierge/expedientes/$caseId'
     | '/cuenta/concierge/$caseId'
@@ -1970,6 +1982,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/productos/nueva'
     | '/_authenticated/cms/regiones/nueva'
     | '/_authenticated/cms/visibilidad/solicitudes'
+    | '/_authenticated/cms/visibilidad/spotlight'
     | '/_authenticated/cms/zonas/nueva'
     | '/_authenticated/concierge/expedientes/$caseId'
     | '/_authenticated/cuenta/concierge/$caseId'
@@ -3041,6 +3054,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsZonasNuevaRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/visibilidad/spotlight': {
+      id: '/_authenticated/cms/visibilidad/spotlight'
+      path: '/spotlight'
+      fullPath: '/cms/visibilidad/spotlight'
+      preLoaderRoute: typeof AuthenticatedCmsVisibilidadSpotlightRouteImport
+      parentRoute: typeof AuthenticatedCmsVisibilidadRoute
+    }
     '/_authenticated/cms/visibilidad/solicitudes': {
       id: '/_authenticated/cms/visibilidad/solicitudes'
       path: '/solicitudes'
@@ -3413,12 +3433,15 @@ const AuthenticatedCmsExperienceBuilderRouteWithChildren =
 
 interface AuthenticatedCmsVisibilidadRouteChildren {
   AuthenticatedCmsVisibilidadSolicitudesRoute: typeof AuthenticatedCmsVisibilidadSolicitudesRoute
+  AuthenticatedCmsVisibilidadSpotlightRoute: typeof AuthenticatedCmsVisibilidadSpotlightRoute
 }
 
 const AuthenticatedCmsVisibilidadRouteChildren: AuthenticatedCmsVisibilidadRouteChildren =
   {
     AuthenticatedCmsVisibilidadSolicitudesRoute:
       AuthenticatedCmsVisibilidadSolicitudesRoute,
+    AuthenticatedCmsVisibilidadSpotlightRoute:
+      AuthenticatedCmsVisibilidadSpotlightRoute,
   }
 
 const AuthenticatedCmsVisibilidadRouteWithChildren =

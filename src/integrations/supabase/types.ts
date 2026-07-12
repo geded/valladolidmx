@@ -2465,6 +2465,63 @@ export type Database = {
         }
         Relationships: []
       }
+      founder_spotlights: {
+        Row: {
+          boost: number
+          business_id: string
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          headline: string | null
+          id: string
+          is_active: boolean
+          reason: string
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          boost?: number
+          business_id: string
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          headline?: string | null
+          id?: string
+          is_active?: boolean
+          reason: string
+          starts_at?: string
+          updated_at?: string
+        }
+        Update: {
+          boost?: number
+          business_id?: string
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          headline?: string | null
+          id?: string
+          is_active?: boolean
+          reason?: string
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "founder_spotlights_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "founder_spotlights_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invitations: {
         Row: {
           accepted_at: string | null
@@ -4837,6 +4894,45 @@ export type Database = {
       }
     }
     Views: {
+      active_founder_spotlights: {
+        Row: {
+          boost: number | null
+          business_id: string | null
+          ends_at: string | null
+          headline: string | null
+          starts_at: string | null
+        }
+        Insert: {
+          boost?: number | null
+          business_id?: string | null
+          ends_at?: string | null
+          headline?: string | null
+          starts_at?: string | null
+        }
+        Update: {
+          boost?: number | null
+          business_id?: string | null
+          ends_at?: string | null
+          headline?: string | null
+          starts_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "founder_spotlights_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "founder_spotlights_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_effective_visibility: {
         Row: {
           badge_variant: string | null

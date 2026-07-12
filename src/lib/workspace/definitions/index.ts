@@ -321,6 +321,7 @@ const cms: WorkspaceDefinition = {
     { id: "cms.pagos", workspaceId: "cms", label: "Pagos", icon: CreditCard, to: "/cms/pagos", group: "operacion", order: 10, surfaces: ["sidebar", "palette"] },
     { id: "cms.visibilidad", workspaceId: "cms", label: "Paquetes de visibilidad", icon: Sparkles, to: "/cms/visibilidad", group: "operacion", order: 10.1, surfaces: ["sidebar", "palette"] },
     { id: "cms.visibilidad.solicitudes", workspaceId: "cms", label: "Solicitudes de visibilidad", icon: Bell, to: "/cms/visibilidad/solicitudes", group: "operacion", order: 10.2, surfaces: ["sidebar", "palette"] },
+    { id: "cms.visibilidad.spotlight", workspaceId: "cms", label: "Founder Spotlight", icon: Sparkles, to: "/cms/visibilidad/spotlight", group: "operacion", order: 10.3, surfaces: ["sidebar", "palette"] },
     { id: "cms.observabilidad", workspaceId: "cms", label: "Observabilidad", icon: LineChart, to: "/cms/observabilidad", group: "operacion", order: 11, surfaces: ["sidebar", "palette"] },
     { id: "cms.alertas", workspaceId: "cms", label: "Alertas", icon: AlertTriangle, to: "/cms/alertas", group: "operacion", order: 12, surfaces: ["sidebar", "palette"] },
     { id: "cms.actividad", workspaceId: "cms", label: "Actividad", icon: Activity, to: "/cms/actividad", group: "operacion", order: 13, surfaces: ["sidebar", "palette"] },
