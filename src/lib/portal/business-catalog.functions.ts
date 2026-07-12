@@ -429,3 +429,56 @@ export const withdrawPromotionReview = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
+// ---------- Direct sale (Ventas en línea · CV4.1) ----------
+
+export const updateProductDirectSaleSettings = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (data: {
+      productId: string;
+      enabled: boolean;
+      priceAmount?: number | null;
+      currency?: string | null;
+      commissionBps?: number | null;
+      cancellationPolicy?: string | null;
+      terms?: string | null;
+      minLeadHours?: number | null;
+      maxQuantity?: number | null;
+    }) => {
+      if (!data?.productId) throw new Error("productId required");
+      if (typeof data.enabled !== "boolean") throw new Error("enabled required");
+      if (data.enabled) {
+        if (data.priceAmount == null || data.priceAmount <= 0)
+          throw new Error("direct_sale_price_required");
+      }
+      if (
+        data.commissionBps != null &&
+        (data.commissionBps < 0 || data.commissionBps > 10000)
+      )
+        throw new Error("invalid_commission_bps");
+      if (data.minLeadHours != null && data.minLeadHours < 0)
+        throw new Error("invalid_min_lead_hours");
+      if (data.maxQuantity != null && data.maxQuantity <= 0)
+        throw new Error("invalid_max_quantity");
+      return data;
+    },
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await (context.supabase.rpc as any)(
+      "update_product_direct_sale_settings",
+      {
+        _product_id: data.productId,
+        _enabled: data.enabled,
+        _price_amount: data.priceAmount ?? null,
+        _currency: data.currency ?? null,
+        _commission_bps: data.commissionBps ?? null,
+        _cancellation_policy: data.cancellationPolicy ?? null,
+        _terms: data.terms ?? null,
+        _min_lead_hours: data.minLeadHours ?? null,
+        _max_quantity: data.maxQuantity ?? null,
+      },
+    );
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
