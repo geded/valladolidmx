@@ -15,6 +15,19 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const EMBEDDING_MODEL = "openai/text-embedding-3-small";
 const EMBEDDING_DIMS = 1536;
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/embeddings";
+const CHAT_GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+
+export const ALUX_KB_LOCALES = ["es", "en", "fr", "de", "it", "pt"] as const;
+export type AluxKbLocale = (typeof ALUX_KB_LOCALES)[number];
+
+const LOCALE_NAMES: Record<AluxKbLocale, string> = {
+  es: "español",
+  en: "inglés",
+  fr: "francés",
+  de: "alemán",
+  it: "italiano",
+  pt: "portugués",
+};
 
 export const ALUX_KNOWLEDGE_CATEGORIES = [
   "cultura",
@@ -61,6 +74,8 @@ export interface AluxKnowledgeMatch {
   tags: string[];
   source_url: string | null;
   similarity: number;
+  locale?: AluxKbLocale;
+  is_fallback?: boolean;
 }
 
 type SbFrom = {
