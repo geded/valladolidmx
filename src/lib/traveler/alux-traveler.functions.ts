@@ -372,12 +372,68 @@ export const discoverPromotions = createServerFn({ method: "POST" })
       .eq("is_template", false)
       .order("published_at", { ascending: false })
       .limit(12);
-    const promos = (rows ?? []).map((r) => ({
-      slug: r.slug as string,
-      title: (r.title as string) ?? (r.slug as string),
-      description: (r.description as string) ?? null,
-      url: `/promociones/${r.slug}`,
-    }));
+    const baseSlugs = (rows ?? []).map((r) => r.slug as string);
+
+    // Ola 7 · Sub-ola 7.4.c — Prioridad Alux por plan de visibilidad.
+    // Enriquecemos cada promo con business_id (vía tabla `promotions`) y
+    // luego con `business_effective_visibility.levers` para leer
+    // `alux_weight` y `alux_proactive`. Ordenamos por weight desc.
+    const promoRows = baseSlugs.length
+      ? (
+          await sb
+            .from("promotions")
+            .select("slug, business_id")
+            .in("slug", baseSlugs)
+        ).data ?? []
+      : [];
+    const bizBySlug = new Map<string, string>();
+    for (const p of promoRows) {
+      const s = (p as { slug?: string }).slug;
+      const b = (p as { business_id?: string }).business_id;
+      if (s && b) bizBySlug.set(s, b);
+    }
+    const bizIds = Array.from(new Set(bizBySlug.values()));
+    const visRows = bizIds.length
+      ? (
+          await sb
+            .from("business_effective_visibility")
+            .select("business_id, plan_slug, plan_name, levers")
+            .in("business_id", bizIds)
+        ).data ?? []
+      : [];
+    const visByBiz = new Map<string, { plan_slug: string; plan_name: string; levers: Record<string, unknown> }>();
+    for (const v of visRows) {
+      const id = (v as { business_id?: string }).business_id;
+      if (!id) continue;
+      visByBiz.set(id, {
+        plan_slug: String((v as { plan_slug?: string }).plan_slug ?? "basico"),
+        plan_name: String((v as { plan_name?: string }).plan_name ?? "Básico"),
+        levers: ((v as { levers?: Record<string, unknown> }).levers ?? {}) as Record<string, unknown>,
+      });
+    }
+
+    const scored = (rows ?? []).map((r) => {
+      const slug = r.slug as string;
+      const businessId = bizBySlug.get(slug) ?? null;
+      const vis = businessId ? visByBiz.get(businessId) : undefined;
+      const levers = vis?.levers ?? {};
+      const weight = Number((levers as { alux_weight?: unknown }).alux_weight ?? 1);
+      const proactive = Boolean((levers as { alux_proactive?: unknown }).alux_proactive);
+      return {
+        slug,
+        title: (r.title as string) ?? slug,
+        description: (r.description as string) ?? null,
+        url: `/promociones/${slug}`,
+        plan: vis?.plan_name ?? "Básico",
+        alux_weight: Number.isFinite(weight) ? weight : 1,
+        alux_proactive: proactive,
+      };
+    });
+    scored.sort((a, b) => {
+      if (a.alux_proactive !== b.alux_proactive) return a.alux_proactive ? -1 : 1;
+      return b.alux_weight - a.alux_weight;
+    });
+    const promos = scored.slice(0, 8);
 
     const promosBlock =
       promos.length === 0
@@ -388,7 +444,7 @@ export const discoverPromotions = createServerFn({ method: "POST" })
 
     return runAluxTraveler(
       "discover_promotions",
-      "Sólo puedes recomendar promociones que aparezcan en la lista `Promociones publicadas`. NUNCA inventes títulos, negocios, descuentos ni vigencias. Contrasta con `active_coupons` del contexto: NO recomiendes promociones cuyo cupón el viajero YA reclamó. Si no hay promociones publicadas, dilo con claridad e invita a volver más tarde. Nunca reclamas ni redimes por el viajero: él debe abrir el enlace y reclamar desde /promociones.",
+      "Sólo puedes recomendar promociones que aparezcan en la lista `Promociones publicadas`. NUNCA inventes títulos, negocios, descuentos ni vigencias. Respeta el orden de la lista: viene priorizado por `alux_weight` y `alux_proactive` del plan de visibilidad de cada negocio (los primeros son los que más te conviene mencionar primero). Si un item trae `alux_proactive: true`, tienes autorización comercial para promoverlo de forma explícita cuando encaje con el viajero. Contrasta con `active_coupons` del contexto: NO recomiendes promociones cuyo cupón el viajero YA reclamó. Si no hay promociones publicadas, dilo con claridad e invita a volver más tarde. Nunca reclamas ni redimes por el viajero: él debe abrir el enlace y reclamar desde /promociones.",
       "Sugiere hasta 3 promociones vigentes que le convengan al viajero según su perfil y plan activo" +
         (data.focus ? `. Foco: ${data.focus}` : "") +
         ". Para cada una: título exacto, por qué encaja en 1 línea y URL exacta (usa el campo `url` provisto). Cierra con una invitación clara a visitar /promociones para ver el catálogo completo y reclamar el cupón digital." +
