@@ -107,7 +107,7 @@ export interface TravelPlanOpsDetail {
     position: number;
     day_index: number | null;
     notes: string | null;
-    snapshot: Record<string, unknown> | null;
+    snapshot: unknown;
     created_at: string;
   }>;
   alux_proposals: Array<{
@@ -191,18 +191,19 @@ export const listActiveTravelPlansForOps = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => ListInput.parse(data))
   .handler(async ({ data, context }) => {
+    const args: Record<string, unknown> = {
+      p_kpi_filter: data.kpi_filter ?? null,
+      p_plan_status: data.plan_status ?? null,
+      p_priority: data.priority ?? null,
+      p_only_mine: data.only_mine ?? false,
+      p_include_closed: data.include_closed ?? false,
+      p_search: data.search ?? null,
+      p_limit: data.limit ?? 25,
+      p_offset: data.offset ?? 0,
+    };
     const { data: res, error } = await context.supabase.rpc(
       "admin_list_active_travel_plans",
-      {
-        p_kpi_filter: data.kpi_filter ?? null,
-        p_plan_status: data.plan_status ?? null,
-        p_priority: data.priority ?? null,
-        p_only_mine: data.only_mine ?? false,
-        p_include_closed: data.include_closed ?? false,
-        p_search: data.search ?? null,
-        p_limit: data.limit ?? 25,
-        p_offset: data.offset ?? 0,
-      },
+      args as never,
     );
     if (error) throw new Error(error.message);
     return res as unknown as TravelPlanOpsList;
