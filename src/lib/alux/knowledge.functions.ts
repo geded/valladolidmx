@@ -577,18 +577,26 @@ export const markAluxTranslationReviewed = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => MarkReviewedInput.parse(d))
   .handler(async ({ data, context }) => {
     await ensureAdmin(context.supabase, context.userId);
-    const c = context.supabase as unknown as SbTrClient;
-    const up = await c.from("alux_knowledge_translations").upsert(
-      {
-        entry_id: data.entryId,
-        locale: data.locale,
+    type UpdChain = {
+      from: (t: string) => {
+        update: (v: Record<string, unknown>) => {
+          eq: (
+            a: string,
+            b: unknown,
+          ) => { eq: (a: string, b: unknown) => Promise<{ error: { message: string } | null }> };
+        };
+      };
+    };
+    const c = context.supabase as unknown as UpdChain;
+    const res = await c
+      .from("alux_knowledge_translations")
+      .update({
         source: "human",
         reviewed_at: new Date().toISOString(),
         reviewed_by: context.userId,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "entry_id,locale" },
-    );
-    if (up.error) throw new Error(up.error.message);
+      })
+      .eq("entry_id", data.entryId)
+      .eq("locale", data.locale);
+    if (res.error) throw new Error(res.error.message);
     return { ok: true };
   });
