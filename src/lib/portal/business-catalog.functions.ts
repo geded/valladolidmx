@@ -44,6 +44,14 @@ export type PortalProduct = {
   capacity: number | null;
   status: ContentStatus;
   updated_at: string;
+  direct_sale_enabled: boolean;
+  direct_sale_price_amount: number | null;
+  direct_sale_currency: string | null;
+  direct_sale_commission_bps: number | null;
+  direct_sale_cancellation_policy: string | null;
+  direct_sale_terms: string | null;
+  direct_sale_min_lead_hours: number | null;
+  direct_sale_max_quantity: number | null;
 };
 
 export type PortalPromotion = {
@@ -80,7 +88,7 @@ export const listBusinessProducts = createServerFn({ method: "POST" })
     const { data: rows, error } = await supabase
       .from("products")
       .select(
-        "id,business_id,name,slug,product_type,tagline,description,price_amount,price_currency,duration_minutes,capacity,status,updated_at",
+        "id,business_id,name,slug,product_type,tagline,description,price_amount,price_currency,duration_minutes,capacity,status,updated_at,direct_sale_enabled,direct_sale_price_amount,direct_sale_currency,direct_sale_commission_bps,direct_sale_cancellation_policy,direct_sale_terms,direct_sale_min_lead_hours,direct_sale_max_quantity",
       )
       .eq("business_id", data.businessId)
       .is("deleted_at", null)
