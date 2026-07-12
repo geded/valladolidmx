@@ -42,6 +42,9 @@ export interface MarketplaceBusinessCard {
   visibility_plan_name?: string | null;
   visibility_badge_variant?: string | null;
   visibility_boost?: number;
+  /** Ola 7.8 · Spotlight manual del Founder. */
+  spotlight_headline?: string | null;
+  spotlight_boost?: number;
 }
 
 export interface MarketplaceProductCard {
