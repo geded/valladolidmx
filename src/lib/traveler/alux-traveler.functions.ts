@@ -289,6 +289,7 @@ export const suggestExperiences = createServerFn({ method: "POST" })
         (data.focus ? `. Foco solicitado: ${data.focus}` : "") +
         ". Para cada una: título, por qué encaja (1 línea) y qué momento del viaje ocupa. No inventes títulos.",
       context.supabase,
+      data.locale ?? "es",
     ),
   );
 
@@ -306,6 +307,7 @@ export const suggestRestaurants = createServerFn({ method: "POST" })
         (data.focus ? `. Foco: ${data.focus}` : "") +
         ". Para cada uno: nombre, tipo de cocina si consta en el contexto y motivo. No inventes menús ni precios.",
       context.supabase,
+      data.locale ?? "es",
     ),
   );
 
@@ -323,6 +325,7 @@ export const suggestHotels = createServerFn({ method: "POST" })
         (data.focus ? `. Foco: ${data.focus}` : "") +
         ". Para cada uno: nombre, encaje con presupuesto/perfil y motivo. No confirmes disponibilidad ni tarifas.",
       context.supabase,
+      data.locale ?? "es",
     ),
   );
 
@@ -341,6 +344,7 @@ export const improveMyTrip = createServerFn({ method: "POST" })
         (data.focus ? `. Foco: ${data.focus}` : "") +
         ". Para cada mejora indica qué cambiaría y por qué mejora la experiencia del viajero.",
       context.supabase,
+      data.locale ?? "es",
     ),
   );
 
@@ -356,6 +360,7 @@ export const detectPlanGaps = createServerFn({ method: "POST" })
       "Sólo observas huecos evidentes en el plan activo. No inventas: si el plan no tiene fechas, dilo.",
       "Detecta huecos del plan activo: días sin actividad, tramos sin comida planeada, falta de hospedaje, falta de transporte entre destinos distantes, sobrecarga de actividades intensas seguidas. Para cada hueco: descripción y sugerencia de acción no destructiva.",
       context.supabase,
+      data.locale ?? "es",
     ),
   );
 
@@ -375,6 +380,7 @@ export const draftConciergeMessage = createServerFn({ method: "POST" })
         (data.focus ? `. Foco: ${data.focus}` : "") +
         ". Incluye: qué ya definió, qué necesita resolver y qué tipo de propuesta espera. El envío final lo hace el viajero desde la UI.",
       context.supabase,
+      data.locale ?? "es",
     ),
   );
 
@@ -395,6 +401,7 @@ export const suggestFromCoupons = createServerFn({ method: "POST" })
         (data.focus ? `. Foco: ${data.focus}` : "") +
         ". Para cada cupón cita: título exacto, negocio, % de descuento (si lo trae), vigencia (fecha) y en qué momento del plan (o del recorrido por el Oriente Maya) le conviene usarlo. Si un cupón está por vencer, priorízalo. Cierra recordando que puede descubrir más promociones en /promociones. No inventes menús ni tarifas.",
       context.supabase,
+      data.locale ?? "es",
     ),
   );
 
@@ -502,5 +509,6 @@ export const discoverPromotions = createServerFn({ method: "POST" })
         ". Para cada una: título exacto, por qué encaja en 1 línea y URL exacta (usa el campo `url` provisto). Cierra con una invitación clara a visitar /promociones para ver el catálogo completo y reclamar el cupón digital." +
         promosBlock,
       context.supabase,
+      data.locale ?? "es",
     );
   });
