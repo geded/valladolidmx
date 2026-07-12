@@ -89,14 +89,14 @@ export function AluxContextChip({
         if (!userData.user) return;
         const { data, error } = await supabase
           .from("traveler_coupons")
-          .select("id, status, expires_at")
-          .eq("traveler_id", userData.user.id)
+          .select("id, status, valid_until")
+          .eq("user_id", userData.user.id)
           .eq("business_id", businessId)
-          .in("status", ["issued", "active"])
+          .eq("status", "active")
           .limit(1);
         if (cancelled || error || !data || data.length === 0) return;
-        const c = data[0] as { expires_at: string | null };
-        if (c.expires_at && new Date(c.expires_at).getTime() < Date.now()) return;
+        const c = data[0] as { valid_until: string | null };
+        if (c.valid_until && new Date(c.valid_until).getTime() < Date.now()) return;
         setHasCoupon(true);
       } catch {
         /* noop */
