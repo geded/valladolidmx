@@ -760,7 +760,7 @@ export const promotePlanToCase = createServerFn({ method: "POST" })
           caseId: caseId as string,
           planId: data.planId,
           userId: context.userId,
-          userSupabase: context.supabase,
+          userSupabase: context.supabase as unknown as AnySupabase,
           planItems: snap.items ?? [],
         });
       } catch (e) {
