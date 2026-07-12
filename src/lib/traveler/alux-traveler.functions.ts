@@ -180,21 +180,8 @@ async function fetchConfirmedTripBrief(
   supabase: unknown,
 ): Promise<ConfirmedTripBrief | null> {
   try {
-    const c = supabase as {
-      from: (t: string) => {
-        select: (cols: string) => {
-          eq: (col: string, val: unknown) => {
-            in: (col: string, vals: string[]) => {
-              order: (col: string, opts: unknown) => {
-                limit: (n: number) => {
-                  maybeSingle: () => Promise<{ data: unknown; error: unknown }>;
-                };
-              };
-            };
-          };
-        };
-      };
-    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c = supabase as any;
     const { data: order } = await c
       .from("concierge_orders")
       .select(
@@ -216,16 +203,7 @@ async function fetchConfirmedTripBrief(
     let plan_end_date: string | null = null;
     let party_size: number | null = null;
     if (o.travel_plan_id) {
-      const planClient = supabase as {
-        from: (t: string) => {
-          select: (cols: string) => {
-            eq: (col: string, val: unknown) => {
-              maybeSingle: () => Promise<{ data: unknown; error: unknown }>;
-            };
-          };
-        };
-      };
-      const { data: plan } = await planClient
+      const { data: plan } = await c
         .from("travel_plans")
         .select("start_date, end_date, party_size")
         .eq("id", o.travel_plan_id)
