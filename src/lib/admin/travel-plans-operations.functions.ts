@@ -79,6 +79,7 @@ export interface TravelPlanOpsList {
 }
 
 export interface TravelPlanOpsDetail {
+  // Marker: JSON-safe payload returned by RPC; nested unknown fields cast to any for RPC transport.
   plan: {
     id: string;
     title: string | null;
@@ -100,16 +101,8 @@ export interface TravelPlanOpsDetail {
     country?: string | null;
     email?: string | null;
   };
-  items: Array<{
-    id: string;
-    item_kind: string;
-    target_id: string | null;
-    position: number;
-    day_index: number | null;
-    notes: string | null;
-    snapshot: unknown;
-    created_at: string;
-  }>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  items: any[];
   alux_proposals: Array<{
     id: string;
     entity_type: string | null;
