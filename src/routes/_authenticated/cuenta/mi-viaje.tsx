@@ -247,6 +247,91 @@ function GuestImportBanner({ onImported }: { onImported: () => void }) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Viaje confirmado (CV4.3-narrativa · Etapa 7 Timeline)              */
+/* ------------------------------------------------------------------ */
+
+function ConfirmedTravelBanner({
+  data,
+}: {
+  data: {
+    folio: string;
+    editorial_title: string | null;
+    destination_name: string | null;
+    plan_start_date: string | null;
+    plan_end_date: string | null;
+    party_size: number | null;
+    days_to_trip: number | null;
+  };
+}) {
+  const dateFmt = (iso: string | null) =>
+    iso
+      ? new Date(`${iso}T00:00:00Z`).toLocaleDateString("es-MX", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          timeZone: "UTC",
+        })
+      : null;
+  const startTxt = dateFmt(data.plan_start_date);
+  const endTxt = dateFmt(data.plan_end_date);
+  const dateRange =
+    startTxt && endTxt
+      ? `${startTxt} – ${endTxt}`
+      : startTxt
+        ? `Desde el ${startTxt}`
+        : "Fechas por confirmar con tu concierge";
+
+  const countdown =
+    typeof data.days_to_trip === "number"
+      ? data.days_to_trip > 0
+        ? `Faltan ${data.days_to_trip} días para tu llegada al Oriente Maya de Yucatán`
+        : data.days_to_trip === 0
+          ? "Hoy comienza tu viaje al Oriente Maya de Yucatán"
+          : "Tu viaje al Oriente Maya está en curso o recién concluyó"
+      : "Tu concierge confirmará las fechas contigo";
+
+  return (
+    <section className="overflow-hidden rounded-2xl border border-success/40 bg-gradient-to-br from-success/12 via-card to-card p-6 shadow-elevated">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-success text-success-foreground">
+            <CalendarCheck className="h-5 w-5" aria-hidden />
+          </span>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-success-foreground/80">
+              Viaje confirmado
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
+              {data.editorial_title ?? "Tu viaje al Oriente Maya de Yucatán"}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">{dateRange}</p>
+          </div>
+        </div>
+        <div className="rounded-xl border border-success/40 bg-background/70 px-4 py-3 text-right">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            Folio
+          </p>
+          <p className="mt-1 font-mono text-sm font-bold tracking-[0.14em] text-foreground">
+            {data.folio}
+          </p>
+        </div>
+      </div>
+      <p className="mt-4 flex items-center gap-2 text-sm text-foreground">
+        <Sparkles className="h-4 w-4 text-primary" aria-hidden />
+        {countdown}
+        {data.party_size ? (
+          <span className="text-muted-foreground">· {data.party_size} viajero{data.party_size === 1 ? "" : "s"}</span>
+        ) : null}
+      </p>
+      <p className="mt-3 text-xs text-muted-foreground">
+        Los ítems reservados con tu concierge quedan bloqueados en tu plan.
+        Guarda tu folio para referencia rápida con tu concierge.
+      </p>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Editor de metadatos                                                 */
 /* ------------------------------------------------------------------ */
 
