@@ -15,23 +15,18 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 async function assertAdmin(context: {
-  supabase: {
+  supabase: { rpc: (fn: never, args: never) => unknown };
+  userId: string;
+}): Promise<void> {
+  const rpc = (context.supabase as unknown as {
     rpc: (
       fn: string,
       args: Record<string, unknown>,
     ) => Promise<{ data: boolean | null; error: { message: string } | null }>;
-  };
-  userId: string;
-}): Promise<void> {
+  }).rpc;
   const [a, b] = await Promise.all([
-    context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "super_admin",
-    }),
-    context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    }),
+    rpc("has_role", { _user_id: context.userId, _role: "super_admin" }),
+    rpc("has_role", { _user_id: context.userId, _role: "admin" }),
   ]);
   if (a.error) throw new Error(`role_check_failed: ${a.error.message}`);
   if (b.error) throw new Error(`role_check_failed: ${b.error.message}`);
