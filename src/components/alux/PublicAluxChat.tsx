@@ -346,3 +346,63 @@ export function PublicAluxChat() {
     </section>
   );
 }
+
+function AluxProposals({ items }: { items: Proposal[] }) {
+  const { user } = useAuth();
+  const proposeFn = useServerFn(proposeAluxPlanAddition);
+  const [pending, setPending] = useState<string | null>(null);
+  const [done, setDone] = useState<Set<string>>(new Set());
+
+  async function handleAdd(p: Proposal) {
+    if (!user) {
+      toast.info("Crea tu cuenta para guardar sugerencias en tu viaje.");
+      return;
+    }
+    setPending(p.entity_id);
+    try {
+      await proposeFn({
+        data: {
+          entityType: p.entity_type,
+          entityId: p.entity_id,
+          entitySlug: p.entity_slug ?? null,
+          title: p.title,
+          subtitle: p.subtitle ?? null,
+          rationale: p.rationale ?? null,
+        },
+      });
+      setDone((s) => new Set(s).add(p.entity_id));
+      toast.success("Sugerencia enviada a Mi Viaje · confírmala cuando quieras.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo guardar");
+    } finally {
+      setPending(null);
+    }
+  }
+
+  return (
+    <div className="ml-1 flex max-w-full flex-wrap gap-2">
+      {items.map((p) => {
+        const added = done.has(p.entity_id);
+        return (
+          <button
+            key={p.entity_id}
+            type="button"
+            disabled={added || pending === p.entity_id}
+            onClick={() => handleAdd(p)}
+            className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs text-primary hover:bg-primary/10 transition disabled:opacity-60"
+            title={p.rationale ?? undefined}
+          >
+            {added ? <Check className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
+            <span className="truncate max-w-[180px]">{p.title}</span>
+            {p.subtitle && (
+              <span className="text-[10px] text-primary/70">· {p.subtitle}</span>
+            )}
+          </button>
+        );
+      })}
+      <p className="basis-full text-[10px] text-muted-foreground">
+        Alux propone · tú confirmas en <Link to="/cuenta/mi-viaje" className="underline">Mi Viaje</Link>.
+      </p>
+    </div>
+  );
+}
