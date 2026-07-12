@@ -205,7 +205,13 @@ export type Database = {
           first_seen_at: string
           id: string
           ip_hash: string
+          last_category_slug: string | null
+          last_destination_slug: string | null
+          last_lat: number | null
+          last_lng: number | null
           last_seen_at: string
+          last_signals: Json | null
+          last_spatial_state: string | null
           message_count: number
           session_key: string
           summary: string | null
@@ -218,7 +224,13 @@ export type Database = {
           first_seen_at?: string
           id?: string
           ip_hash: string
+          last_category_slug?: string | null
+          last_destination_slug?: string | null
+          last_lat?: number | null
+          last_lng?: number | null
           last_seen_at?: string
+          last_signals?: Json | null
+          last_spatial_state?: string | null
           message_count?: number
           session_key: string
           summary?: string | null
@@ -231,7 +243,13 @@ export type Database = {
           first_seen_at?: string
           id?: string
           ip_hash?: string
+          last_category_slug?: string | null
+          last_destination_slug?: string | null
+          last_lat?: number | null
+          last_lng?: number | null
           last_seen_at?: string
+          last_signals?: Json | null
+          last_spatial_state?: string | null
           message_count?: number
           session_key?: string
           summary?: string | null

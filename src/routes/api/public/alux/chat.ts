@@ -22,12 +22,89 @@ const MAX_MESSAGE_LEN = 800;
 const MAX_HISTORY_TURNS = 8;
 const NEARBY_RADIUS_KM = 25;
 const NEARBY_LIMIT = 6;
-// Ola A8 · M3 multiturno público: cada N mensajes se regenera el resumen incremental.
-const SUMMARY_REFRESH_EVERY = 4;
+// Ola A8 · M3 multiturno público: la memoria se refresca por SEÑALES DE VIAJE
+// (identidad, viaje, territorio, acciones), NO por conteo de turnos. Alux es
+// concierge, no chatbot: cada refresco responde a un cambio real del contexto.
+const GEO_MOVE_KM_THRESHOLD = 2;
 const SUMMARY_MAX_CHARS = 900;
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Visitor = { lat: number; lng: number };
+type PathContext = { destination?: string | null; category?: string | null };
+
+// ---------------------------------------------------------------------------
+// Detección de señales de viaje (concierge, no chatbot)
+// Categorías cubiertas aquí: 1 Identidad, 2 Viaje, 3 Territorial, 5 Acción.
+// Las señales 6 (temporal/clima/eventos) llegan en Ola A9.
+// ---------------------------------------------------------------------------
+type TravelSignal =
+  | "origin"
+  | "companions"
+  | "budget"
+  | "restrictions"
+  | "dates"
+  | "duration"
+  | "lodging_anchor"
+  | "interests"
+  | "pace"
+  | "action_intent";
+
+const SIGNAL_PATTERNS: Array<{ signal: TravelSignal; re: RegExp }> = [
+  { signal: "origin", re: /\b(vengo|venimos|soy de|somos de|desde|llego de|llegamos de)\b/i },
+  {
+    signal: "companions",
+    re: /\b(solo|sola|pareja|mi esposa|mi esposo|con mi novia|con mi novio|familia|con mis hijos|niños|niñas|con amigos|grupo|adultos mayores|mis papás|mis padres)\b/i,
+  },
+  {
+    signal: "budget",
+    re: /\b(barato|económico|económica|low cost|presupuesto|gastar|invertir|sin importar precio|lujo|mid range|mochilero|backpacker|\$\d|mxn|usd|pesos|dólares)\b/i,
+  },
+  {
+    signal: "restrictions",
+    re: /\b(vegano|vegana|vegetariano|vegetariana|sin gluten|celíaco|celíaca|alergi|kosher|halal|silla de ruedas|movilidad|embarazad|diabét)\b/i,
+  },
+  {
+    signal: "dates",
+    re: /\b(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|el próximo|la próxima semana|este fin|semana santa|navidad|año nuevo|puente|el \d{1,2}\s*(de|\/))\b/i,
+  },
+  {
+    signal: "duration",
+    re: /\b(un día|dos días|tres días|\d+\s*(días|dias|noches|horas|semanas|weeks|days))\b/i,
+  },
+  {
+    signal: "lodging_anchor",
+    re: /\b(hotel|hostal|airbnb|casa|hospedaje|donde me hospedo|mi alojamiento|nos quedamos en|estoy en el|estamos en el)\b/i,
+  },
+  {
+    signal: "interests",
+    re: /\b(cenote|arqueolog|ruinas|chichén|chichen|coba|ek balam|gastronom|comida|foodie|artesan|maya|cultura|fotograf|nocturna|bar|snorkel|buceo|bici|maratón|yoga|spa)\b/i,
+  },
+  {
+    signal: "pace",
+    re: /\b(relax|tranquilo|aventura|intenso|improvisar|planear|itinerario|con calma|sin prisa)\b/i,
+  },
+  {
+    signal: "action_intent",
+    re: /\b(cómo llego|como llego|cómo llegar|reservar|reserva|contactar|guardar|apartar|comprar|precio|cotizar)\b/i,
+  },
+];
+
+function detectSignals(text: string): TravelSignal[] {
+  const found = new Set<TravelSignal>();
+  for (const { signal, re } of SIGNAL_PATTERNS) {
+    if (re.test(text)) found.add(signal);
+  }
+  return Array.from(found);
+}
+
+function parsePathContext(input: unknown): PathContext | null {
+  if (!input || typeof input !== "object") return null;
+  const p = input as { destination?: unknown; category?: unknown };
+  const dest = typeof p.destination === "string" ? p.destination.slice(0, 80) : null;
+  const cat = typeof p.category === "string" ? p.category.slice(0, 80) : null;
+  if (!dest && !cat) return null;
+  return { destination: dest, category: cat };
+}
 
 function haversineKm(a: Visitor, b: { lat: number; lng: number }): number {
   const R = 6371;
@@ -201,6 +278,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           message?: string;
           history?: Msg[];
           visitor?: Visitor;
+          pathContext?: PathContext;
         };
         try {
           body = await request.json();
@@ -214,6 +292,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         if (!message) return json({ error: "empty_message" }, 400);
         if (message.length > MAX_MESSAGE_LEN) return json({ error: "message_too_long" }, 400);
         const visitor = parseVisitor(body.visitor);
+        const pathContext = parsePathContext(body.pathContext);
 
         const history = Array.isArray(body.history)
           ? body.history
@@ -274,14 +353,25 @@ export const Route = createFileRoute("/api/public/alux/chat")({
             },
             { onConflict: "session_key" },
           )
-          .select("id, message_count, summary, summary_message_count")
+          .select(
+            "id, message_count, summary, summary_message_count, last_destination_slug, last_category_slug, last_spatial_state, last_lat, last_lng, last_signals",
+          )
           .single();
         if (sessErr || !sessionRow) return json({ error: "session_upsert_failed" }, 500);
         const sessionId = sessionRow.id as string;
         const previousSummary =
           (sessionRow as { summary?: string | null }).summary ?? null;
-        const summaryMsgCount =
-          (sessionRow as { summary_message_count?: number }).summary_message_count ?? 0;
+        const prev = sessionRow as {
+          last_destination_slug?: string | null;
+          last_category_slug?: string | null;
+          last_spatial_state?: string | null;
+          last_lat?: number | null;
+          last_lng?: number | null;
+          last_signals?: unknown;
+        };
+        const prevSignals: TravelSignal[] = Array.isArray(prev.last_signals)
+          ? (prev.last_signals as TravelSignal[])
+          : [];
 
         // 3) Log del mensaje del usuario.
         await supabaseAdmin.from("alux_public_messages").insert({
@@ -378,11 +468,39 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         });
         const newMessageCount = (sessionRow.message_count ?? 0) + 1;
 
-        // 6b) M3 · Refresco del resumen incremental cada N mensajes.
+        // 6b) M3 · Refresco por SEÑALES DE VIAJE (concierge, no chatbot).
+        const detected = detectSignals(message);
+        const newSignals = detected.filter((s) => !prevSignals.includes(s));
+        const mergedSignals = Array.from(new Set([...prevSignals, ...detected]));
+
+        const nextSpatialState: string = visitor ? "granted" : prev.last_spatial_state ?? "none";
+        const spatialTransitioned =
+          !!visitor && (prev.last_spatial_state ?? "none") !== "granted";
+        const geoMovedKm =
+          visitor && prev.last_lat != null && prev.last_lng != null
+            ? haversineKm(visitor, { lat: Number(prev.last_lat), lng: Number(prev.last_lng) })
+            : 0;
+        const geoMoved = geoMovedKm >= GEO_MOVE_KM_THRESHOLD;
+
+        const nextDestination = pathContext?.destination ?? prev.last_destination_slug ?? null;
+        const nextCategory = pathContext?.category ?? prev.last_category_slug ?? null;
+        const territoryChanged =
+          (!!pathContext?.destination &&
+            pathContext.destination !== (prev.last_destination_slug ?? null)) ||
+          (!!pathContext?.category &&
+            pathContext.category !== (prev.last_category_slug ?? null));
+
+        const refreshReasons: string[] = [];
+        if (!previousSummary && detected.length > 0) refreshReasons.push("first_signal");
+        if (newSignals.length > 0) refreshReasons.push("new_signal");
+        if (spatialTransitioned) refreshReasons.push("spatial_granted");
+        if (geoMoved) refreshReasons.push("geo_moved");
+        if (territoryChanged) refreshReasons.push("territory_changed");
+
         let nextSummary: string | null = previousSummary;
-        let nextSummaryCount = summaryMsgCount;
+        let nextSummaryCount = (sessionRow as { summary_message_count?: number }).summary_message_count ?? 0;
         let memoryRefreshed = false;
-        if (newMessageCount - summaryMsgCount >= SUMMARY_REFRESH_EVERY) {
+        if (refreshReasons.length > 0) {
           const refreshed = await refreshSessionSummary(
             provider,
             model,
@@ -403,6 +521,11 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           .update({
             message_count: newMessageCount,
             last_seen_at: new Date().toISOString(),
+            last_signals: mergedSignals,
+            last_spatial_state: nextSpatialState,
+            ...(visitor ? { last_lat: visitor.lat, last_lng: visitor.lng } : {}),
+            ...(nextDestination ? { last_destination_slug: nextDestination } : {}),
+            ...(nextCategory ? { last_category_slug: nextCategory } : {}),
             ...(memoryRefreshed
               ? {
                   summary: nextSummary,
@@ -423,6 +546,8 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           memory: {
             has_summary: !!nextSummary,
             refreshed: memoryRefreshed,
+            reasons: refreshReasons,
+            signals: mergedSignals,
           },
           rate: {
             hour_count: (rateRow?.hour_count ?? 0) + 1,

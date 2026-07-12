@@ -122,6 +122,12 @@ export function PublicAluxChat() {
             message: trimmed,
             history: messages.slice(-16),
             visitor: location ?? undefined,
+            pathContext: (() => {
+              if (typeof window === "undefined") return undefined;
+              const parts = window.location.pathname.split("/").filter(Boolean);
+              if (parts[0] !== "oriente-maya") return undefined;
+              return { destination: parts[1] ?? null, category: parts[2] ?? null };
+            })(),
           }),
         });
         const data = await res.json().catch(() => ({}));
