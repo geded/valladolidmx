@@ -24,7 +24,7 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/i18n/context";
 import {
   Sparkles,
   Wand2,
@@ -113,8 +113,8 @@ const CAPABILITIES: CapabilityDef[] = [
 ];
 
 export function AluxTravelerPanel() {
-  const { i18n } = useTranslation();
-  const rawLocale = (i18n.language ?? "es").toLowerCase().slice(0, 2);
+  const { locale: activeLocale } = useTranslation();
+  const rawLocale = (activeLocale ?? "es").toLowerCase().slice(0, 2);
   const locale = (["es", "en", "fr", "de", "it", "pt"] as const).includes(
     rawLocale as never,
   )
