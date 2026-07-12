@@ -5,7 +5,8 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { useRouter } from "@tanstack/react-router";
+import { useRouter, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import {
   acceptConciergeProposal,
   rejectConciergeProposal,
@@ -18,6 +19,7 @@ import {
   setConciergeCasePriority,
   getConciergeCaseHandoffContext,
 } from "@/lib/concierge/concierge.functions";
+import { createOrderFromProposal } from "@/lib/concierge/orders.functions";
 import {
   generateAluxSummary,
   generateAluxProducts,
@@ -331,11 +333,13 @@ function ProposalCard({
   internal: boolean;
 }) {
   const router = useRouter();
+  const navigate = useNavigate();
   const sendFn = useServerFn(sendConciergeProposal);
   const withdrawFn = useServerFn(withdrawConciergeProposal);
   const viewFn = useServerFn(viewConciergeProposal);
   const acceptFn = useServerFn(acceptConciergeProposal);
   const rejectFn = useServerFn(rejectConciergeProposal);
+  const createOrderFn = useServerFn(createOrderFromProposal);
   const [busy, setBusy] = useState(false);
 
   async function run(action: () => Promise<unknown>) {
@@ -404,19 +408,45 @@ function ProposalCard({
             onClick={() => run(() => withdrawFn({ data: { proposalId: p.proposal_id, reason: null } }))}
           />
         )}
-        {!internal && ["sent", "viewed"].includes(p.status) && (
+        {!internal && ["sent", "viewed", "accepted"].includes(p.status) && (
           <>
             <ActionButton
-              label="Aceptar propuesta"
+              label={p.status === "accepted" ? "Confirmar mi viaje" : "Confirmar mi viaje"}
               disabled={busy}
-              onClick={() => run(() => acceptFn({ data: { proposalId: p.proposal_id } }))}
+              onClick={async () => {
+                setBusy(true);
+                try {
+                  // Marca aceptada en el dominio concierge (idempotente)
+                  if (p.status !== "accepted") {
+                    await acceptFn({ data: { proposalId: p.proposal_id } });
+                  }
+                  const { orderId } = await createOrderFn({
+                    data: { proposalId: p.proposal_id },
+                  });
+                  await router.invalidate();
+                  navigate({
+                    to: "/cuenta/checkout/$orderId",
+                    params: { orderId },
+                  });
+                } catch (err) {
+                  toast.error(
+                    err instanceof Error
+                      ? err.message
+                      : "No se pudo abrir la confirmación del viaje",
+                  );
+                } finally {
+                  setBusy(false);
+                }
+              }}
             />
-            <ActionButton
-              label="Rechazar"
-              variant="ghost"
-              disabled={busy}
-              onClick={() => run(() => rejectFn({ data: { proposalId: p.proposal_id, reason: null } }))}
-            />
+            {p.status !== "accepted" ? (
+              <ActionButton
+                label="Rechazar"
+                variant="ghost"
+                disabled={busy}
+                onClick={() => run(() => rejectFn({ data: { proposalId: p.proposal_id, reason: null } }))}
+              />
+            ) : null}
           </>
         )}
       </div>

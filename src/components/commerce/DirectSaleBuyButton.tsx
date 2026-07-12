@@ -9,6 +9,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,17 +22,24 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
+import { createDirectSaleOrder } from "@/lib/concierge/orders.functions";
 
 export function DirectSaleBuyButton({
+  productId,
   productName,
   priceLabel,
   className,
+  quantity = 1,
 }: {
+  productId?: string;
   productName?: string;
   priceLabel?: string;
   className?: string;
+  quantity?: number;
 }) {
   const fetchStatus = useServerFn(getPaymentsReadyPublic);
+  const createOrder = useServerFn(createDirectSaleOrder);
+  const navigate = useNavigate();
   const { data } = useQuery({
     queryKey: ["payments", "public-status"],
     queryFn: () => fetchStatus(),
@@ -55,21 +63,37 @@ export function DirectSaleBuyButton({
     setOpen(true);
   }
 
-  function handleConfirm() {
+  async function handleConfirm() {
+    // Flujo real: crea la orden y navega al checkout narrativo (CV4.2).
+    if (productId) {
+      setStep("confirming");
+      try {
+        const { orderId } = await createOrder({
+          data: { productId, quantity },
+        });
+        setOpen(false);
+        setStep("review");
+        navigate({ to: "/cuenta/checkout/$orderId", params: { orderId } });
+      } catch (err) {
+        setStep("review");
+        toast.error(
+          err instanceof Error
+            ? err.message
+            : "No se pudo iniciar la confirmación",
+        );
+      }
+      return;
+    }
+    // Vista previa sin productId (p.ej. panel del empresario): simulación.
     setStep("confirming");
-    // Simulación breve; el checkout real (Stripe) se conecta en CV4.2.
     setTimeout(() => {
       setStep("done");
-      if (!ready) {
-        toast.success(
-          `Compra demo registrada — ${productName ?? "experiencia"}${
-            priceLabel ? ` · ${priceLabel}` : ""
-          }`,
-        );
-      } else {
-        toast.info("Redirigiendo al proveedor de pagos…");
-      }
-    }, 700);
+      toast.success(
+        `Compra demo registrada — ${productName ?? "experiencia"}${
+          priceLabel ? ` · ${priceLabel}` : ""
+        }`,
+      );
+    }, 500);
   }
 
   return (
