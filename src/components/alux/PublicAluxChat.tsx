@@ -180,7 +180,7 @@ export function PublicAluxChat() {
         setSending(false);
       }
     },
-    [messages, sending, sessionKey, location],
+    [messages, sending, sessionKey, location, locale],
   );
 
   return (
