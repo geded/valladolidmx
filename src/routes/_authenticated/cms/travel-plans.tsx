@@ -142,6 +142,11 @@ function TravelPlansOpsPage() {
           setSearch(v);
           setOffset(0);
         }}
+        confirmedOnly={kpi === "confirmed"}
+        onConfirmedOnly={(v) => {
+          setKpi(v ? "confirmed" : null);
+          setOffset(0);
+        }}
         planStatus={planStatus}
         onPlanStatus={(v) => {
           setPlanStatus(v);
