@@ -62,13 +62,15 @@ export const getAluxTerritorialMemory = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!row) return EMPTY;
 
-    const visits = (Array.isArray(row.visited_destinations)
-      ? (row.visited_destinations as AluxTerritorialVisit[])
-      : []
+    const visits = (
+      (Array.isArray(row.visited_destinations)
+        ? (row.visited_destinations as unknown as AluxTerritorialVisit[])
+        : []) as AluxTerritorialVisit[]
     ).filter((v) => v && typeof v.slug === "string");
-    const cats = (Array.isArray(row.visited_categories)
-      ? (row.visited_categories as Array<{ slug: string; count?: number }>)
-      : []
+    const cats = (
+      (Array.isArray(row.visited_categories)
+        ? (row.visited_categories as unknown as Array<{ slug: string; count?: number }>)
+        : []) as Array<{ slug: string; count?: number }>
     ).filter((v) => v && typeof v.slug === "string");
 
     visits.sort((a, b) => (b.last_seen ?? "").localeCompare(a.last_seen ?? ""));
