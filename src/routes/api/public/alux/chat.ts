@@ -391,6 +391,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           history?: Msg[];
           visitor?: Visitor;
           pathContext?: PathContext;
+          locale?: string;
         };
         try {
           body = await request.json();
@@ -405,6 +406,11 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         if (message.length > MAX_MESSAGE_LEN) return json({ error: "message_too_long" }, 400);
         const visitor = parseVisitor(body.visitor);
         const pathContext = parsePathContext(body.pathContext);
+        const locale =
+          typeof body.locale === "string" && ALLOWED_LOCALES.has(body.locale)
+            ? body.locale
+            : "es";
+        const localeBlock = LOCALE_DIRECTIVES[locale];
 
         const history = Array.isArray(body.history)
           ? body.history
