@@ -252,20 +252,55 @@ export const upsertAluxKnowledge = createServerFn({ method: "POST" })
     }
 
     const c = context.supabase as unknown as SbFrom;
+    let entryId: string;
+    let finalSlug: string;
     if (data.id) {
       const upd = await c.from("alux_knowledge_entries").update(rec).eq("id", data.id);
       if (upd.error) throw new Error(upd.error.message);
-      return { id: data.id, slug };
+      entryId = data.id;
+      finalSlug = slug;
+    } else {
+      rec.created_by = context.userId;
+      const ins = await c
+        .from("alux_knowledge_entries")
+        .insert(rec)
+        .select("id, slug")
+        .single();
+      if (ins.error) throw new Error(ins.error.message);
+      const row = ins.data as { id: string; slug: string };
+      entryId = row.id;
+      finalSlug = row.slug;
     }
-    rec.created_by = context.userId;
-    const ins = await c
-      .from("alux_knowledge_entries")
-      .insert(rec)
-      .select("id, slug")
-      .single();
-    if (ins.error) throw new Error(ins.error.message);
-    const row = ins.data as { id: string; slug: string };
-    return { id: row.id, slug: row.slug };
+
+    // Sincronizar fila ES canónica en alux_knowledge_translations
+    const tr = context.supabase as unknown as SbTrClient;
+    const trPayload: Record<string, unknown> = {
+      entry_id: entryId,
+      locale: "es",
+      title: data.title,
+      summary: data.summary ?? null,
+      body: data.body,
+      tags: data.tags ?? [],
+      source: "canonical",
+      reviewed_at: new Date().toISOString(),
+      reviewed_by: context.userId,
+      updated_at: new Date().toISOString(),
+    };
+    if (embedding) {
+      trPayload.embedding = pgvectorLiteral(embedding);
+      trPayload.embedding_model = EMBEDDING_MODEL;
+      trPayload.embedded_at = new Date().toISOString();
+    } else if (data.status !== "published") {
+      trPayload.embedding = null;
+      trPayload.embedded_at = null;
+      trPayload.embedding_model = null;
+    }
+    const trUp = await tr
+      .from("alux_knowledge_translations")
+      .upsert(trPayload, { onConflict: "entry_id,locale" });
+    if (trUp.error) throw new Error(trUp.error.message);
+
+    return { id: entryId, slug: finalSlug };
   });
 
 const DeleteInput = z.object({ id: z.string().uuid() });
