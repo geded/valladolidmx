@@ -87,7 +87,33 @@ export function PromocionesGate({ children }: { children: ReactNode }) {
         <GateBanner status={status} onOpen={() => setOpen(true)} />
       ) : null}
 
-      <div onClickCapture={handleCapture}>{children}</div>
+      <div className="relative">
+        <div
+          onClickCapture={handleCapture}
+          className={
+            !eligible && status !== "loading"
+              ? "pointer-events-auto select-none [filter:blur(2px)_saturate(0.85)] opacity-70 transition"
+              : ""
+          }
+          aria-hidden={!eligible && status !== "loading" ? "true" : undefined}
+        >
+          {children}
+        </div>
+        {!eligible && status !== "loading" ? (
+          <div className="pointer-events-none absolute inset-x-0 top-24 flex justify-center sm:top-32">
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="pointer-events-auto inline-flex items-center gap-2 rounded-full border border-primary/30 bg-background/95 px-5 py-2.5 text-sm font-semibold text-primary shadow-elevated backdrop-blur-sm hover:bg-background"
+            >
+              <Lock className="size-4" aria-hidden />
+              {status === "guest"
+                ? "Regístrate para ver los descuentos"
+                : "Completa tu perfil para desbloquear"}
+            </button>
+          </div>
+        ) : null}
+      </div>
 
       <UnlockDialog status={status} open={open} onOpenChange={setOpen} />
       <CouponIssueDialog
