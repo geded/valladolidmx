@@ -34,6 +34,35 @@ function fmtDate(iso: string | null): string {
   }
 }
 
+function ReservationCell({
+  reservation,
+  daysToTrip,
+}: {
+  reservation: TravelPlanOpsRow["reservation"];
+  daysToTrip: number | null;
+}) {
+  if (!reservation || !reservation.folio || !reservation.is_confirmed) {
+    return <span className="text-xs text-muted-foreground">Sin reservación</span>;
+  }
+  const label =
+    daysToTrip == null
+      ? "Confirmado"
+      : daysToTrip > 0
+        ? `Faltan ${daysToTrip} d`
+        : daysToTrip === 0
+          ? "Llega hoy"
+          : `En viaje (+${Math.abs(daysToTrip)}d)`;
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="inline-flex w-fit items-center gap-1 rounded-pill bg-success/10 px-2 py-0.5 text-[11px] font-medium text-success">
+        <ShieldCheck className="h-3 w-3" />
+        {reservation.folio}
+      </span>
+      <span className="text-[11px] text-muted-foreground">{label}</span>
+    </div>
+  );
+}
+
 export function ActiveTravelPlansTable({
   rows,
   isLoading,
