@@ -22,6 +22,7 @@ import {
   UpdateBanner,
 } from "@/components/discovery";
 import { AluxFloatingTrigger } from "@/components/layout/AluxFloatingTrigger";
+import { FloatingTravelPlanDock } from "@/components/travel-plan/FloatingTravelPlanDock";
 import { EditThisPageButton } from "@/components/experience-builder/EditThisPageButton";
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
@@ -191,6 +192,7 @@ function RootComponent() {
         <Outlet />
         {!isAppShellRoute ? <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" /> : null}
         {!isAppShellRoute ? <AluxFloatingTrigger /> : null}
+        <FloatingTravelPlanDock />
         {!isAppShellRoute ? <EditThisPageButton pathname={pathname} /> : null}
         {/* OLA H-01 · Épica 1 · I1 — no-op mientras no haya consumidores. */}
         <ProtectedActionResumeRunner />
