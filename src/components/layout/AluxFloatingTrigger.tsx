@@ -126,7 +126,7 @@ export function AluxFloatingTrigger() {
       .filter((s): s is string => Boolean(s)) ?? [];
 
   // A14 · Intención de viaje detectada por navegación + señales A11.
-  const unusedCouponCount = lens?.active_coupons.filter((c) => !c.redeemed_at).length ?? 0;
+  const unusedCouponCount = lens?.active_coupons.length ?? 0;
   const { intent, nudge } = useTravelIntent({ pathname, unusedCouponCount });
 
   // Al abrir el sheet, descartamos el nudge activo (respeto).
