@@ -122,15 +122,13 @@ export function AluxTravelerPanel() {
   )
     ? (rawLocale as "es" | "en" | "fr" | "de" | "it" | "pt")
     : "es";
-  // `narrate_plan` es una capacidad de fondo consumida sólo por el dock
-  // flotante "Tu viaje" (CV3.2); el panel expone el resto.
-  type PanelCapability = Exclude<AluxTravelerCapability, "narrate_plan">;
-  const [active, setActive] = useState<PanelCapability | null>(null);
+  // `narrate_plan` es capacidad de fondo (dock CV3.2); el panel expone el resto.
+  const [active, setActive] = useState<PanelCapabilityId | null>(null);
   const [results, setResults] = useState<
-    Partial<Record<PanelCapability, AluxTravelerSuggestion>>
+    Partial<Record<PanelCapabilityId, AluxTravelerSuggestion>>
   >({});
   const [errors, setErrors] = useState<
-    Partial<Record<PanelCapability, { kind: "rate_limited" | "credits_exhausted" | "error"; message: string }>>
+    Partial<Record<PanelCapabilityId, { kind: "rate_limited" | "credits_exhausted" | "error"; message: string }>>
   >({});
 
   const fns = {
@@ -145,7 +143,7 @@ export function AluxTravelerPanel() {
   } as const;
 
   const mut = useMutation({
-    mutationFn: async (id: PanelCapability) => {
+    mutationFn: async (id: PanelCapabilityId) => {
       const fn = fns[id];
       const res = (await fn({ data: { locale } })) as AluxTravelerSuggestion;
       return { id, res };
