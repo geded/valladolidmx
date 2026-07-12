@@ -179,6 +179,7 @@ export function AluxFloatingTrigger() {
       ctx.product?.slug ?? null,
       isAuthed ? (lens?.generated_at ?? null) : null,
       intent,
+      territory?.destination_visit_count ?? 0,
     ],
     queryFn: () =>
       suggestFn({
@@ -203,6 +204,17 @@ export function AluxFloatingTrigger() {
             : undefined,
           activeCouponBusinessSlugs,
           travelIntent: intent,
+          travelerHistory: territory
+            ? {
+                is_returning: territory.is_returning,
+                destination_visit_count: territory.destination_visit_count,
+                distinct_destinations: territory.distinct_destinations,
+                previous_destinations: territory.visited_destinations
+                  .map((v) => v.slug)
+                  .filter((s) => s && s !== (ctx.destination?.slug ?? "")),
+                top_categories: territory.top_categories.map((c) => c.slug),
+              }
+            : undefined,
           travelerPlan: plan
             ? {
                 start_date: plan.start_date,
