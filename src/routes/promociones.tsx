@@ -29,6 +29,9 @@ interface PromoCard {
   slug: string;
   title: string;
   description: string | null;
+  businessName: string | null;
+  discountPercent: number | null;
+  endsAt: string | null;
 }
 
 const listPromotions = createServerFn({ method: "GET" }).handler(async (): Promise<PromoCard[]> => {
@@ -37,11 +40,10 @@ const listPromotions = createServerFn({ method: "GET" }).handler(async (): Promi
     auth: { persistSession: false, autoRefreshToken: false },
   });
   const { data, error } = await sb
-    .from("page_compositions")
-    .select("slug, title, description, kind, status, is_template")
-    .eq("kind", "promotion")
+    .from("promotions")
+    .select("slug, title, description, discount_percent, ends_at, businesses(display_name)")
     .eq("status", "published")
-    .eq("is_template", false)
+    .is("deleted_at", null)
     .order("published_at", { ascending: false })
     .limit(24);
   if (error) return [];
@@ -49,6 +51,12 @@ const listPromotions = createServerFn({ method: "GET" }).handler(async (): Promi
     slug: r.slug as string,
     title: (r.title as string) ?? (r.slug as string),
     description: (r.description as string) ?? null,
+    businessName:
+      ((r as { businesses?: { display_name?: string } | null }).businesses?.display_name ?? null) as
+        | string
+        | null,
+    discountPercent: (r as { discount_percent?: number | null }).discount_percent ?? null,
+    endsAt: (r as { ends_at?: string | null }).ends_at ?? null,
   }));
 });
 
