@@ -384,6 +384,17 @@ function ProductDirectSaleCard({
         {dirty ? (
           <p className="text-xs text-amber-600">Cambios sin guardar</p>
         ) : null}
+        {enabled && price ? (
+          <div className="mr-auto flex items-center gap-2">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Vista previa:
+            </span>
+            <DirectSaleBuyButton
+              productName={product.name}
+              priceLabel={`${Number(price).toFixed(2)} ${currency}`}
+            />
+          </div>
+        ) : null}
         <Button
           onClick={() => mutation.mutate()}
           disabled={!dirty || mutation.isPending}
