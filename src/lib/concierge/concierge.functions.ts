@@ -64,6 +64,23 @@ export const getConciergeCaseFile = createServerFn({ method: "GET" })
     return (row ?? null) as Json | null;
   });
 
+/**
+ * CV2.1 · Handoff Context — devuelve la última fotografía adjuntada al caso
+ * (perfil M2, cupones activos, memoria territorial, plan snapshot).
+ * RLS delegada a `concierge_case_get_handoff_context` (SECURITY DEFINER).
+ */
+export const getConciergeCaseHandoffContext = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => GetInput.parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc(
+      "concierge_case_get_handoff_context" as never,
+      { _case_id: data.caseId } as never,
+    );
+    if (error) throw new Error((error as { message?: string }).message ?? "handoff_read_failed");
+    return (row ?? null) as Json | null;
+  });
+
 const PlanItem = z.object({
   title: z.string().optional(),
   notes: z.string().optional(),

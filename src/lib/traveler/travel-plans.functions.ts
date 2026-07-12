@@ -751,9 +751,124 @@ export const promotePlanToCase = createServerFn({ method: "POST" })
         .eq("id", data.planId);
       if (linkErr) throw new Error(`plan_link_failed: ${linkErr.message}`);
 
+      // 4. CV2.1 · Handoff Context — Alux adjunta al expediente una
+      //    fotografía compacta del contexto operativo del viajero
+      //    (perfil M2, cupones activos, memoria territorial, plan).
+      //    Best-effort: si falla, no rompemos la promoción del caso.
+      try {
+        await attachHandoffContext({
+          caseId: caseId as string,
+          planId: data.planId,
+          userId: context.userId,
+          userSupabase: context.supabase as unknown as AnySupabase,
+          planItems: snap.items ?? [],
+        });
+      } catch (e) {
+        console.warn("[cv2.1] handoff_context_attach_failed", e);
+      }
+
       return { caseId: caseId as string, planId: data.planId };
     },
   );
+
+// -------------------------------------------------------------------------
+// CV2.1 · Handoff Context helper (Alux → Concierge)
+// -------------------------------------------------------------------------
+
+type AnySupabase = {
+  from: (t: string) => any;
+  rpc: (fn: string, args?: unknown) => Promise<{ data: unknown; error: unknown }>;
+};
+
+async function attachHandoffContext(args: {
+  caseId: string;
+  planId: string;
+  userId: string;
+  userSupabase: AnySupabase;
+  planItems: ItemRow[];
+}): Promise<void> {
+  const { caseId, planId, userId, userSupabase, planItems } = args;
+
+  // Perfil M2 (subset operativo, sin PII).
+  const profilePromise = userSupabase
+    .from("traveler_profiles")
+    .select(
+      "home_country,preferred_language,travel_style,budget_band,dietary,accessibility,languages,interests,is_public",
+    )
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  // Cupones activos (emitidos, no canjeados, vigentes).
+  const nowIso = new Date().toISOString();
+  const couponsPromise = userSupabase
+    .from("traveler_coupons")
+    .select(
+      "id,title,code,business_slug,promotion_slug,discount_percent,valid_until,status",
+    )
+    .eq("user_id", userId)
+    .eq("status", "issued")
+    .gte("valid_until", nowIso)
+    .order("valid_until", { ascending: true })
+    .limit(20);
+
+  // Memoria territorial (tabla sin grants a authenticated → admin client).
+  let memory: unknown = null;
+  try {
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data: sess } = await (supabaseAdmin as unknown as AnySupabase)
+      .from("alux_public_sessions")
+      .select(
+        "last_destination_slug,last_category_slug,last_spatial_state,visited_destinations,visited_categories,destination_visit_count,summary,summary_updated_at,last_signals,last_seen_at",
+      )
+      .eq("traveler_user_id", userId)
+      .order("last_seen_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    memory = sess ?? null;
+  } catch {
+    memory = null;
+  }
+
+  const [profileRes, couponsRes] = await Promise.all([
+    profilePromise,
+    couponsPromise,
+  ]);
+
+  const planSnapshotItems = planItems.slice(0, 30).map((r) => {
+    const snap = (r.snapshot as TravelPlanItemSnapshot) ?? {};
+    return {
+      kind: r.item_kind,
+      target_id: r.target_id ?? null,
+      title: snap.title ?? null,
+      slug: snap.slug ?? null,
+      subtitle: snap.subtitle ?? null,
+    };
+  });
+
+  const payload = {
+    version: "cv2.1",
+    generated_at: nowIso,
+    source: "travel_plan_promotion",
+    plan_id: planId,
+    profile: (profileRes as { data?: unknown }).data ?? null,
+    active_coupons: (couponsRes as { data?: unknown }).data ?? [],
+    territorial_memory: memory,
+    plan_snapshot: {
+      item_count: planItems.length,
+      items: planSnapshotItems,
+    },
+  };
+
+  const { error } = await userSupabase.rpc(
+    "concierge_case_attach_handoff_context" as never,
+    { _case_id: caseId, _payload: payload } as never,
+  );
+  if (error) {
+    throw new Error(`attach_failed: ${(error as { message?: string }).message ?? "unknown"}`);
+  }
+}
 
 // =========================================================================
 // COMPARTIR (US-E4.3)

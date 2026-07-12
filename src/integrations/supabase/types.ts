@@ -5596,6 +5596,10 @@ export type Database = {
         Args: { _case_id: string; _concierge_user_id: string; _reason?: string }
         Returns: string
       }
+      concierge_case_attach_handoff_context: {
+        Args: { _case_id: string; _payload: Json }
+        Returns: string
+      }
       concierge_case_create: {
         Args: { _source?: string; _summary?: string; _traveler_user_id: string }
         Returns: string
@@ -5620,6 +5624,10 @@ export type Database = {
         Returns: string
       }
       concierge_case_get: { Args: { _case_id: string }; Returns: Json }
+      concierge_case_get_handoff_context: {
+        Args: { _case_id: string }
+        Returns: Json
+      }
       concierge_case_list_for_role: {
         Args: {
           _assigned_concierge_user_id?: string
