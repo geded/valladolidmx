@@ -1,89 +1,79 @@
+## Ola A19 · KB Multilingüe Editorial (Opción B)
 
-# Ola 3 · Canje Robusto del Cupón Digital
+Extender `alux_knowledge_entries` para almacenar contenido y embeddings por idioma en los 6 locales activos (es, en, fr, de, it, pt), con fallback automático a español.
 
-**Objetivo**: elevar la experiencia de canje en `/portal/canjear` para que sea segura, verificable y trazable — con confirmación visual del viajero, historial de canjes filtrable, y notificación automática al viajero + invitación a reseñar.
+### Alcance
 
-El escáner QR con `html5-qrcode` ya funciona (Ola 2). Esta ola cierra el ciclo alrededor de ese flujo.
+- **Idiomas**: los 6 configurados en `platform_locales` (es como fuente canónica).
+- **Contenido**: `title`, `body`, `summary`, `tags` traducidos por idioma.
+- **Embeddings**: uno por idioma (mejor recall semántico en el idioma del query).
+- **Fallback**: si no existe traducción en el idioma pedido → devolver la versión ES marcada como `fallback: true` para que Alux la traduzca on-the-fly en la respuesta.
 
----
+### Cambios de datos
 
-## Historia 3.1 · Confirmación visual del viajero (identidad)
+Nueva tabla `alux_knowledge_translations`:
+```
+- id uuid pk
+- entry_id uuid fk → alux_knowledge_entries
+- locale text (es|en|fr|de|it|pt)
+- title text
+- body text
+- summary text
+- tags text[]
+- embedding vector(1536)
+- source: 'human' | 'ai_generated' | 'canonical'
+- reviewed_at timestamptz null
+- unique(entry_id, locale)
+```
+La entrada base (`alux_knowledge_entries`) queda como metadata + slug + categoría; el contenido se muda a la tabla de traducciones (fila `es` = canonical). Migración copia el contenido actual como fila `es` con `source='canonical'`.
 
-Antes de "Marcar como canjeado", el empresario debe ver **quién es** el viajero para confirmar identidad y evitar fraudes.
+### RPC actualizado
 
-**Backend** (`lookupCoupon`):
-- Extender el retorno con: `avatar_url`, `country_code`, `country_name`, `first_name`, `last_name`.
-- Leer de `traveler_profiles` (país/idioma) + `profiles` (avatar/nombre).
+`match_alux_knowledge(query_embedding, locale, match_count)`:
+1. Busca en `alux_knowledge_translations` filtrado por `locale`.
+2. Si el top-k no llega al mínimo (ej. score < 0.7 o < 3 resultados), completa con `locale='es'` marcados como `fallback=true`.
+3. Devuelve `{ id, title, body, similarity, locale, is_fallback }`.
 
-**Frontend** (`/portal/canjear`):
-- Nueva **tarjeta de identidad** encima de la ficha del cupón:
-  - Avatar circular grande (o placeholder con iniciales).
-  - Nombre completo + bandera del país.
-  - Aviso: "Verifica que la persona frente a ti coincide con esta foto."
-- Bloqueo del botón "Canjear" hasta que el staff marque un checkbox: *"Confirmo que verifiqué la identidad del viajero"*.
+### Server functions
 
----
+- `contextualSuggest` y `chat`: usar el `locale` ya cableado (Ola A18) para embed del query + llamar al RPC con ese locale.
+- Cuando el chunk viene con `is_fallback=true`, inyectar en prompt: `[FUENTE_ES · TRADUCE AL ${locale}]` para que Alux traduzca al vuelo.
 
-## Historia 3.2 · Historial de canjes del negocio (`/portal/canjes`)
+### Backfill (traducción masiva)
 
-Los negocios necesitan auditar sus canjes.
+Server function admin `translateKnowledgeEntry(entryId, targetLocales[])`:
+- Lee la fila `es`.
+- Llama al gateway (Gemini 2.5 Flash) con prompt de traducción editorial turística (mantener nombres propios, tono cercano).
+- Genera embedding con `openai/text-embedding-3-small`.
+- Upsert en `alux_knowledge_translations` con `source='ai_generated'`.
 
-**Backend** (nueva server fn `listBusinessRedemptions`):
-- Input: `business_id`, filtros opcionales (`from`, `to`, `promotion_slug`, `staff_user_id`, `channel`).
-- Middleware: `requireSupabaseAuth` + verificación `business_users` (mismo patrón que canjear).
-- Devuelve: código, título, viajero (nombre + país), staff que canjeó, canal (qr/código), fecha.
-- Paginado (50/página).
+Batch runner `translateAllKnowledge()` (admin-only, throttle 1s):
+- Recorre todas las entradas y locales faltantes.
+- Reporta progreso a `system_alerts`.
 
-**Frontend** (nueva ruta `/portal/canjes`):
-- Tabla con filtros de fecha, promoción y canal.
-- KPIs arriba: total canjes hoy / semana / mes, promo top.
-- Botón "Exportar CSV" (cliente, sin backend).
-- Enlace desde `/portal/canjear` → "Ver historial".
+### Admin UI
 
-**Nav**: agregar entrada "Canjes" al portal empresa.
+En `/cms/alux/knowledge` (existente):
+- Nueva columna "Idiomas" con chips (es✓ en✓ fr✗…).
+- Botón "Traducir con IA" por entrada → dispara `translateKnowledgeEntry`.
+- Botón masivo "Traducir todo lo faltante" arriba.
+- Editor de entrada: tabs por idioma, con marca `ai_generated` vs `human` y botón "Marcar como revisado".
 
----
+### Fuera de alcance
 
-## Historia 3.3 · Notificación post-canje al viajero
+- UI pública para que empresarios traduzcan su propio contenido (otra ola).
+- Traducción de `alux_settings.personality_extra` (usar mismo patrón después).
 
-Cuando el cupón se canjea, mandar email transaccional al viajero.
+### Riesgos
 
-**Plantilla** `src/lib/email-templates/coupon-redeemed.tsx`:
-- Confirmación de canje (negocio, monto/descuento, fecha, código).
-- Bloque **"¿Cómo estuvo tu experiencia?"** con CTA a `/negocios/{slug}?review=1` (deep-link a formulario de reseña — la Ola 5 conecta la creación real; por ahora abre la ficha con toast "Próximamente").
-- Registrar en `registry.ts`.
+- **Costo del backfill**: N entradas × 5 traducciones × (1 llamada chat + 1 embedding). Con las entradas actuales es asumible; documentar en Completion Report.
+- **Calidad traducción IA**: por eso el flag `source` y el flujo "Marcar como revisado" — el Founder o un editor puede pulir manualmente las de mayor tráfico.
 
-**Integración** (dentro de `redeemCoupon`):
-- Tras `UPDATE` exitoso, disparar `sendTransactionalEmail` con `idempotencyKey = redeem-${coupon_id}`.
-- Correo del viajero: `profiles.email` o `auth.users.email` (vía `supabaseAdmin` cargado dentro del handler).
-- Failure-tolerant: si el email falla, el canje NO se revierte (log a `email_send_log`).
+### DoD
 
----
-
-## Historia 3.4 · Polish del panel de canje
-
-- Feedback háptico/sonoro al detectar QR (opcional, `navigator.vibrate(200)`).
-- Estados visuales claros: escaneando (con marco animado), procesando, éxito (checkmark grande + confetti sonner), error (banner rojo).
-- Botón "Escanear otro" tras canjear (mantiene la cámara lista).
-- Persistir preferencia "Empresa activa" ya existe; ok.
-
----
-
-## Fuera de alcance (para olas siguientes)
-
-- Reseñas reales (Ola 5).
-- Métricas y dashboard de conversión de promos (Ola 5).
-- Alux conversacional con contexto de cupones (Ola 4).
-- Roles finos de staff (cajero vs gerente).
-
----
-
-## Definition of Done
-
-- Typecheck + build verdes.
-- Historial visible con datos reales de canjes de Ola 2.
-- Email de canje enviado (verificable en `email_send_log`).
-- Sin regresiones en el escáner QR ni en emisión de cupones.
-- Demo Pack: 1 promo con 1 cupón emitido → canjeado desde `/portal/canjear` → email recibido → visible en `/portal/canjes`.
-
-¿Apruebas la Ola 3 completa (3.1 + 3.2 + 3.3 + 3.4) o prefieres partirla y ejecutar sólo 3.1 + 3.3 primero (identidad + email) y dejar historial y polish para una sub-ola posterior?
+- Migración aplicada + GRANTs.
+- RPC devuelve resultados en el locale pedido con fallback funcional.
+- Alux responde en francés a un query francés usando chunk francés (verificado con Playwright).
+- Admin puede traducir masivamente desde `/cms/alux/knowledge`.
+- Typecheck + build limpio.
+- Demo Pack: 3 entradas traducidas a los 6 idiomas + capturas del admin + query de prueba en cada idioma.

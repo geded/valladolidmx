@@ -149,6 +149,68 @@ export type Database = {
         }
         Relationships: []
       }
+      alux_knowledge_translations: {
+        Row: {
+          body: string
+          created_at: string
+          embedded_at: string | null
+          embedding: string | null
+          embedding_model: string | null
+          entry_id: string
+          id: string
+          locale: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source: string
+          summary: string | null
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          embedded_at?: string | null
+          embedding?: string | null
+          embedding_model?: string | null
+          entry_id: string
+          id?: string
+          locale: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source?: string
+          summary?: string | null
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          embedded_at?: string | null
+          embedding?: string | null
+          embedding_model?: string | null
+          entry_id?: string
+          id?: string
+          locale?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source?: string
+          summary?: string | null
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alux_knowledge_translations_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "alux_knowledge_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alux_plan_proposals: {
         Row: {
           created_at: string
@@ -6274,6 +6336,28 @@ export type Database = {
           category: Database["public"]["Enums"]["alux_knowledge_category"]
           id: string
           priority: number
+          similarity: number
+          slug: string
+          source_url: string
+          summary: string
+          tags: string[]
+          title: string
+        }[]
+      }
+      match_alux_knowledge_i18n: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+          target_locale?: string
+        }
+        Returns: {
+          body: string
+          category: Database["public"]["Enums"]["alux_knowledge_category"]
+          entry_id: string
+          id: string
+          is_fallback: boolean
+          locale: string
           similarity: number
           slug: string
           source_url: string
