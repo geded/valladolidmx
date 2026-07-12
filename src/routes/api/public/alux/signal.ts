@@ -171,7 +171,13 @@ export const Route = createFileRoute("/api/public/alux/signal")({
           patch.visited_categories = arr.slice(-30);
         }
 
-        await supabaseAdmin
+        await (supabaseAdmin as unknown as {
+          from: (t: string) => {
+            update: (v: Record<string, unknown>) => {
+              eq: (c: string, v: unknown) => Promise<{ error: unknown }>;
+            };
+          };
+        })
           .from("alux_public_sessions")
           .update(patch)
           .eq("id", row.id);
