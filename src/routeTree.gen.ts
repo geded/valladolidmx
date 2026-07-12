@@ -103,6 +103,7 @@ import { Route as AuthenticatedCuentaCarritoRouteImport } from './routes/_authen
 import { Route as AuthenticatedCuentaAnfitrionRouteImport } from './routes/_authenticated/cuenta/anfitrion'
 import { Route as AuthenticatedCuentaActividadRouteImport } from './routes/_authenticated/cuenta/actividad'
 import { Route as AuthenticatedCmsVisibilidadRouteImport } from './routes/_authenticated/cms/visibilidad'
+import { Route as AuthenticatedCmsVentasEnLineaRouteImport } from './routes/_authenticated/cms/ventas-en-linea'
 import { Route as AuthenticatedCmsTravelPlansRouteImport } from './routes/_authenticated/cms/travel-plans'
 import { Route as AuthenticatedCmsPagosRouteImport } from './routes/_authenticated/cms/pagos'
 import { Route as AuthenticatedCmsObservabilidadRouteImport } from './routes/_authenticated/cms/observabilidad'
@@ -696,6 +697,12 @@ const AuthenticatedCmsVisibilidadRoute =
     path: '/visibilidad',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsVentasEnLineaRoute =
+  AuthenticatedCmsVentasEnLineaRouteImport.update({
+    id: '/ventas-en-linea',
+    path: '/ventas-en-linea',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsTravelPlansRoute =
   AuthenticatedCmsTravelPlansRouteImport.update({
     id: '/travel-plans',
@@ -1214,6 +1221,7 @@ export interface FileRoutesByFullPath {
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/cms/travel-plans': typeof AuthenticatedCmsTravelPlansRoute
+  '/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
   '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
@@ -1378,6 +1386,7 @@ export interface FileRoutesByTo {
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/cms/travel-plans': typeof AuthenticatedCmsTravelPlansRoute
+  '/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
   '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
@@ -1549,6 +1558,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/_authenticated/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/_authenticated/cms/travel-plans': typeof AuthenticatedCmsTravelPlansRoute
+  '/_authenticated/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
   '/_authenticated/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
   '/_authenticated/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/_authenticated/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
@@ -1722,6 +1732,7 @@ export interface FileRouteTypes {
     | '/cms/observabilidad'
     | '/cms/pagos'
     | '/cms/travel-plans'
+    | '/cms/ventas-en-linea'
     | '/cms/visibilidad'
     | '/cuenta/actividad'
     | '/cuenta/anfitrion'
@@ -1886,6 +1897,7 @@ export interface FileRouteTypes {
     | '/cms/observabilidad'
     | '/cms/pagos'
     | '/cms/travel-plans'
+    | '/cms/ventas-en-linea'
     | '/cms/visibilidad'
     | '/cuenta/actividad'
     | '/cuenta/anfitrion'
@@ -2056,6 +2068,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/observabilidad'
     | '/_authenticated/cms/pagos'
     | '/_authenticated/cms/travel-plans'
+    | '/_authenticated/cms/ventas-en-linea'
     | '/_authenticated/cms/visibilidad'
     | '/_authenticated/cuenta/actividad'
     | '/_authenticated/cuenta/anfitrion'
@@ -2884,6 +2897,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsVisibilidadRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/ventas-en-linea': {
+      id: '/_authenticated/cms/ventas-en-linea'
+      path: '/ventas-en-linea'
+      fullPath: '/cms/ventas-en-linea'
+      preLoaderRoute: typeof AuthenticatedCmsVentasEnLineaRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/travel-plans': {
       id: '/_authenticated/cms/travel-plans'
       path: '/travel-plans'
@@ -3678,6 +3698,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsObservabilidadRoute: typeof AuthenticatedCmsObservabilidadRoute
   AuthenticatedCmsPagosRoute: typeof AuthenticatedCmsPagosRoute
   AuthenticatedCmsTravelPlansRoute: typeof AuthenticatedCmsTravelPlansRoute
+  AuthenticatedCmsVentasEnLineaRoute: typeof AuthenticatedCmsVentasEnLineaRoute
   AuthenticatedCmsVisibilidadRoute: typeof AuthenticatedCmsVisibilidadRouteWithChildren
   AuthenticatedCmsIndexRoute: typeof AuthenticatedCmsIndexRoute
   AuthenticatedCmsCategoriasNuevaRoute: typeof AuthenticatedCmsCategoriasNuevaRoute
@@ -3713,6 +3734,7 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsObservabilidadRoute: AuthenticatedCmsObservabilidadRoute,
   AuthenticatedCmsPagosRoute: AuthenticatedCmsPagosRoute,
   AuthenticatedCmsTravelPlansRoute: AuthenticatedCmsTravelPlansRoute,
+  AuthenticatedCmsVentasEnLineaRoute: AuthenticatedCmsVentasEnLineaRoute,
   AuthenticatedCmsVisibilidadRoute:
     AuthenticatedCmsVisibilidadRouteWithChildren,
   AuthenticatedCmsIndexRoute: AuthenticatedCmsIndexRoute,

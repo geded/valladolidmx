@@ -321,6 +321,7 @@ const cms: WorkspaceDefinition = {
     { id: "cms.media", workspaceId: "cms", label: "Media", icon: ImageIcon, to: "/cms/media", group: "contenido", order: 8, surfaces: ["sidebar", "bottom", "palette"] },
     { id: "cms.reviews", workspaceId: "cms", label: "Reseñas", icon: Bell, to: "/cms/reviews", group: "moderacion", order: 9, surfaces: ["sidebar", "bottom", "palette"] },
     { id: "cms.pagos", workspaceId: "cms", label: "Pagos", icon: CreditCard, to: "/cms/pagos", group: "operacion", order: 10, surfaces: ["sidebar", "palette"] },
+    { id: "cms.ventas-en-linea", workspaceId: "cms", label: "Ventas en línea", icon: CreditCard, to: "/cms/ventas-en-linea", group: "operacion", order: 10.05, surfaces: ["sidebar", "palette"] },
     { id: "cms.visibilidad", workspaceId: "cms", label: "Paquetes de visibilidad", icon: Sparkles, to: "/cms/visibilidad", group: "operacion", order: 10.1, surfaces: ["sidebar", "palette"] },
     { id: "cms.visibilidad.solicitudes", workspaceId: "cms", label: "Solicitudes de visibilidad", icon: Bell, to: "/cms/visibilidad/solicitudes", group: "operacion", order: 10.2, surfaces: ["sidebar", "palette"] },
     { id: "cms.visibilidad.spotlight", workspaceId: "cms", label: "Founder Spotlight", icon: Sparkles, to: "/cms/visibilidad/spotlight", group: "operacion", order: 10.3, surfaces: ["sidebar", "palette"] },
