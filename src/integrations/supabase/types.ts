@@ -208,6 +208,9 @@ export type Database = {
           last_seen_at: string
           message_count: number
           session_key: string
+          summary: string | null
+          summary_message_count: number
+          summary_updated_at: string | null
           user_agent: string | null
         }
         Insert: {
@@ -218,6 +221,9 @@ export type Database = {
           last_seen_at?: string
           message_count?: number
           session_key: string
+          summary?: string | null
+          summary_message_count?: number
+          summary_updated_at?: string | null
           user_agent?: string | null
         }
         Update: {
@@ -228,6 +234,9 @@ export type Database = {
           last_seen_at?: string
           message_count?: number
           session_key?: string
+          summary?: string | null
+          summary_message_count?: number
+          summary_updated_at?: string | null
           user_agent?: string | null
         }
         Relationships: []
