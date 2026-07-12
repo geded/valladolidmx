@@ -102,7 +102,7 @@ export function PromocionesGate({
           onClickCapture={handleCapture}
           className={
             !eligible && status !== "loading"
-              ? "pointer-events-auto select-none transition [&_ul>li:first-child]:opacity-100 [&_ul>li:first-child]:[filter:none] [&_ul>li:not(:first-child)]:opacity-70 [&_ul>li:not(:first-child)]:[filter:blur(4px)_saturate(0.85)]"
+              ? "pointer-events-auto select-none opacity-90 [filter:blur(2.5px)_saturate(0.9)] transition"
               : ""
           }
         >
