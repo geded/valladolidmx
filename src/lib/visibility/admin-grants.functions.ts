@@ -154,6 +154,41 @@ export const activateVisibilityGrant = createServerFn({ method: "POST" })
       .eq("id", data.grant_id);
     if (uErr) throw uErr;
 
+    // Ola 7.9 · Notificar activación (silent-fail).
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const [{ getVisibilityRecipient, sendVisibilityEmail }, { data: planRow }] = await Promise.all([
+        import("@/lib/visibility/visibility-notifications.server"),
+        context.supabase
+          .from("business_visibility_grants")
+          .select("plan:visibility_plans(name)")
+          .eq("id", data.grant_id)
+          .maybeSingle(),
+      ]);
+      const recipient = await getVisibilityRecipient(supabaseAdmin, grant.business_id);
+      if (recipient) {
+        const result = await sendVisibilityEmail(supabaseAdmin, {
+          templateName: "visibility-activated",
+          recipientEmail: recipient.recipientEmail,
+          recipientName: recipient.recipientName,
+          businessName: recipient.businessName,
+          idempotencyKey: `visibility-activated-${data.grant_id}`,
+          templateData: {
+            planName: (planRow as { plan?: { name?: string } } | null)?.plan?.name,
+            expiresAt: expiresAt.toISOString(),
+          },
+        });
+        if (result.ok) {
+          await supabaseAdmin
+            .from("business_visibility_grants")
+            .update({ notified_activated_at: new Date().toISOString() })
+            .eq("id", data.grant_id);
+        }
+      }
+    } catch (err) {
+      console.error("visibility activation email failed", err);
+    }
+
     return { ok: true, starts_at: startsAt.toISOString(), expires_at: expiresAt.toISOString() };
   });
 
