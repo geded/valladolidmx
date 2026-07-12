@@ -126,7 +126,10 @@ function MiViajePage() {
       <GuestImportBanner onImported={invalidatePlan} />
 
       {confirmed && confirmed.status !== "refunded" ? (
-        <ConfirmedTravelBanner data={confirmed} />
+        <>
+          <ConfirmedTravelBanner data={confirmed} />
+          <ConfirmedTripTimeline data={confirmed} />
+        </>
       ) : null}
 
       <AluxPlanProposalsInbox onChanged={invalidatePlan} />
