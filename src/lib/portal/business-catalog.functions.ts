@@ -8,6 +8,10 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  assertUnderLimit,
+  getEffectiveLimits,
+} from "@/lib/visibility/plan-limits";
 
 export type ProductType =
   | "experiencia"
@@ -157,6 +161,16 @@ export const createBusinessProduct = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }): Promise<{ id: string }> => {
     const { supabase } = context;
+    // Ola 7.4.b · Límite `max_products` del plan efectivo.
+    const limits = await getEffectiveLimits(supabase, data.businessId);
+    if (limits.max_products && limits.max_products > 0) {
+      const { count } = await supabase
+        .from("products")
+        .select("id", { count: "exact", head: true })
+        .eq("business_id", data.businessId)
+        .is("deleted_at", null);
+      assertUnderLimit(limits, "max_products", count ?? 0);
+    }
     const { data: id, error } = await (supabase.rpc as any)("create_business_product", {
       _business_id: data.businessId,
       _name: data.name,
@@ -290,6 +304,21 @@ export const createBusinessPromotion = createServerFn({ method: "POST" })
     },
   )
   .handler(async ({ data, context }): Promise<{ id: string }> => {
+    // Ola 7.4.b · Límite `max_active_coupons` del plan efectivo (promos vigentes).
+    const limits = await getEffectiveLimits(context.supabase, data.businessId);
+    if (limits.max_active_coupons && limits.max_active_coupons > 0) {
+      const nowIso = new Date().toISOString();
+      let query = context.supabase
+        .from("promotions")
+        .select("id", { count: "exact", head: true })
+        .eq("business_id", data.businessId)
+        .is("deleted_at", null)
+        .neq("status", "archived");
+      // Sólo consideramos vigentes: sin fecha fin o fin en el futuro.
+      query = query.or(`ends_at.is.null,ends_at.gte.${nowIso}`);
+      const { count } = await query;
+      assertUnderLimit(limits, "max_active_coupons", count ?? 0);
+    }
     const { data: id, error } = await (context.supabase.rpc as any)(
       "create_business_promotion",
       {
