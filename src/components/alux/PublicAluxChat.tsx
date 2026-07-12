@@ -7,13 +7,25 @@
  * (no hay memoria persistente para prospectos).
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Send, Sparkles, Loader2, MapPin, MapPinOff, BrainCircuit, RotateCcw } from "lucide-react";
+import { Send, Sparkles, Loader2, MapPin, MapPinOff, BrainCircuit, RotateCcw, Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@tanstack/react-router";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
+import { useAuth } from "@/hooks/useAuth";
+import { useServerFn } from "@tanstack/react-start";
+import { proposeAluxPlanAddition } from "@/lib/alux/plan-proposals.functions";
+import { toast } from "sonner";
 
-type Msg = { role: "user" | "assistant"; content: string };
+type Proposal = {
+  entity_type: "business" | "product" | "event" | "destination";
+  entity_id: string;
+  entity_slug: string | null;
+  title: string;
+  subtitle?: string | null;
+  rationale?: string | null;
+};
+type Msg = { role: "user" | "assistant"; content: string; proposals?: Proposal[] };
 
 const STORAGE_KEY = "alux_public_session_key";
 const HISTORY_KEY_PREFIX = "alux_public_history:";
@@ -146,7 +158,14 @@ export function PublicAluxChat() {
           }
           return;
         }
-        setMessages([...nextHistory, { role: "assistant", content: data.text }]);
+        setMessages([
+          ...nextHistory,
+          {
+            role: "assistant",
+            content: data.text,
+            proposals: Array.isArray(data.proposals) ? (data.proposals as Proposal[]) : [],
+          },
+        ]);
         if (data?.rate) {
           setRateInfo({ used: data.rate.day_count, limit: data.rate.day_limit });
         }
@@ -257,7 +276,7 @@ export function PublicAluxChat() {
         {messages.map((m, i) => (
           <div
             key={i}
-            className={m.role === "user" ? "flex justify-end" : "flex justify-start"}
+            className={m.role === "user" ? "flex justify-end" : "flex flex-col items-start gap-2"}
           >
             <div
               className={[
@@ -269,6 +288,9 @@ export function PublicAluxChat() {
             >
               {m.content}
             </div>
+            {m.role === "assistant" && m.proposals && m.proposals.length > 0 && (
+              <AluxProposals items={m.proposals} />
+            )}
           </div>
         ))}
 
