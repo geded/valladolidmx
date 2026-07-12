@@ -49,9 +49,35 @@ const SuggestInput = z.object({
   business: SlotSchema,
   product: SlotSchema,
   limit: z.number().int().min(1).max(8).optional().default(6),
+  /**
+   * A6 · Viajero Consciente — Hints M2 desde el cliente autenticado.
+   * Fuente única aceptada: `getAluxTravelerLens` (server fn autenticada).
+   * El servidor los trata como coloración de prompt, nunca como fuente
+   * de verdad de acceso.
+   */
+  travelerHints: z
+    .object({
+      home_country: z.string().max(60).nullable().optional(),
+      preferred_language: z.string().max(40).nullable().optional(),
+      travel_style: z.string().max(60).nullable().optional(),
+      budget_band: z.string().max(40).nullable().optional(),
+      dietary: z.array(z.string().max(60)).max(8).optional(),
+      accessibility: z.array(z.string().max(60)).max(8).optional(),
+      languages: z.array(z.string().max(40)).max(8).optional(),
+      interests: z.array(z.string().max(60)).max(10).optional(),
+    })
+    .optional(),
+  /** Slugs de negocios donde el viajero ya tiene un cupón activo. */
+  activeCouponBusinessSlugs: z.array(z.string().max(120)).max(20).optional(),
 });
 
 export type AluxSuggestKind = "business" | "product" | "event";
+
+export interface AluxSuggestionCta {
+  readonly label: string;
+  readonly href: string;
+  readonly kind: "view" | "directions" | "promotion" | "coupon";
+}
 
 export interface AluxContextualSuggestion {
   readonly kind: AluxSuggestKind;
@@ -62,10 +88,29 @@ export interface AluxContextualSuggestion {
   readonly categorySlug?: string;
   readonly categoryName?: string;
   readonly source: { table: string; id: string };
+  readonly ctas?: readonly AluxSuggestionCta[];
+  /** True si el viajero ya tiene un cupón activo del negocio. */
+  readonly hasActiveCoupon?: boolean;
+  /** Slug de una promoción publicada del negocio, si existe. */
+  readonly activePromotionSlug?: string;
+}
+
+export interface AluxActiveDestinationPromotion {
+  readonly slug: string;
+  readonly title: string;
+  readonly businessSlug: string | null;
+  readonly businessName: string | null;
+  readonly discountPercent: number | null;
+  readonly endsAt: string | null;
+  readonly href: string;
 }
 
 export interface AluxContextualSuggestResult {
   readonly suggestions: readonly AluxContextualSuggestion[];
+  /** Promociones publicadas de negocios del destino activo (top 6). */
+  readonly activePromotions?: readonly AluxActiveDestinationPromotion[];
+  /** Indica si el prompt usó hints M2 del viajero autenticado. */
+  readonly travelerAware?: boolean;
   readonly contextSnapshot: {
     destination?: string;
     category?: string;
