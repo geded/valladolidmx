@@ -150,6 +150,7 @@ import { Route as AuthenticatedPortalEmpresasBusinessIdRouteImport } from './rou
 import { Route as AuthenticatedCuentaPagosExitoRouteImport } from './routes/_authenticated/cuenta/pagos.exito'
 import { Route as AuthenticatedCuentaPagosErrorRouteImport } from './routes/_authenticated/cuenta/pagos.error'
 import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId'
+import { Route as AuthenticatedCuentaCheckoutOrderIdRouteImport } from './routes/_authenticated/cuenta/checkout.$orderId'
 import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId'
 import { Route as AuthenticatedCmsZonasNuevaRouteImport } from './routes/_authenticated/cms/zonas.nueva'
 import { Route as AuthenticatedCmsVisibilidadSpotlightRouteImport } from './routes/_authenticated/cms/visibilidad.spotlight'
@@ -965,6 +966,12 @@ const AuthenticatedCuentaConciergeCaseIdRoute =
     path: '/$caseId',
     getParentRoute: () => AuthenticatedCuentaConciergeRoute,
   } as any)
+const AuthenticatedCuentaCheckoutOrderIdRoute =
+  AuthenticatedCuentaCheckoutOrderIdRouteImport.update({
+    id: '/checkout/$orderId',
+    path: '/checkout/$orderId',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
+  } as any)
 const AuthenticatedConciergeExpedientesCaseIdRoute =
   AuthenticatedConciergeExpedientesCaseIdRouteImport.update({
     id: '/expedientes/$caseId',
@@ -1251,6 +1258,7 @@ export interface FileRoutesByFullPath {
   '/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
+  '/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
@@ -1412,6 +1420,7 @@ export interface FileRoutesByTo {
   '/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
+  '/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
@@ -1582,6 +1591,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
   '/_authenticated/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
+  '/_authenticated/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/_authenticated/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
   '/_authenticated/cuenta/pagos/error': typeof AuthenticatedCuentaPagosErrorRoute
   '/_authenticated/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
@@ -1753,6 +1763,7 @@ export interface FileRouteTypes {
     | '/cms/visibilidad/spotlight'
     | '/cms/zonas/nueva'
     | '/concierge/expedientes/$caseId'
+    | '/cuenta/checkout/$orderId'
     | '/cuenta/concierge/$caseId'
     | '/cuenta/pagos/error'
     | '/cuenta/pagos/exito'
@@ -1914,6 +1925,7 @@ export interface FileRouteTypes {
     | '/cms/visibilidad/spotlight'
     | '/cms/zonas/nueva'
     | '/concierge/expedientes/$caseId'
+    | '/cuenta/checkout/$orderId'
     | '/cuenta/concierge/$caseId'
     | '/cuenta/pagos/error'
     | '/cuenta/pagos/exito'
@@ -2083,6 +2095,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/visibilidad/spotlight'
     | '/_authenticated/cms/zonas/nueva'
     | '/_authenticated/concierge/expedientes/$caseId'
+    | '/_authenticated/cuenta/checkout/$orderId'
     | '/_authenticated/cuenta/concierge/$caseId'
     | '/_authenticated/cuenta/pagos/error'
     | '/_authenticated/cuenta/pagos/exito'
@@ -3186,6 +3199,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCuentaConciergeCaseIdRouteImport
       parentRoute: typeof AuthenticatedCuentaConciergeRoute
     }
+    '/_authenticated/cuenta/checkout/$orderId': {
+      id: '/_authenticated/cuenta/checkout/$orderId'
+      path: '/checkout/$orderId'
+      fullPath: '/cuenta/checkout/$orderId'
+      preLoaderRoute: typeof AuthenticatedCuentaCheckoutOrderIdRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
     '/_authenticated/concierge/expedientes/$caseId': {
       id: '/_authenticated/concierge/expedientes/$caseId'
       path: '/expedientes/$caseId'
@@ -3483,6 +3503,7 @@ interface AuthenticatedCuentaRouteRouteChildren {
   AuthenticatedCuentaPerfilRoute: typeof AuthenticatedCuentaPerfilRoute
   AuthenticatedCuentaPerfilPublicoRoute: typeof AuthenticatedCuentaPerfilPublicoRoute
   AuthenticatedCuentaIndexRoute: typeof AuthenticatedCuentaIndexRoute
+  AuthenticatedCuentaCheckoutOrderIdRoute: typeof AuthenticatedCuentaCheckoutOrderIdRoute
   AuthenticatedCuentaPagosErrorRoute: typeof AuthenticatedCuentaPagosErrorRoute
   AuthenticatedCuentaPagosExitoRoute: typeof AuthenticatedCuentaPagosExitoRoute
   AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute: typeof AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute
@@ -3505,6 +3526,8 @@ const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildr
     AuthenticatedCuentaPerfilPublicoRoute:
       AuthenticatedCuentaPerfilPublicoRoute,
     AuthenticatedCuentaIndexRoute: AuthenticatedCuentaIndexRoute,
+    AuthenticatedCuentaCheckoutOrderIdRoute:
+      AuthenticatedCuentaCheckoutOrderIdRoute,
     AuthenticatedCuentaPagosErrorRoute: AuthenticatedCuentaPagosErrorRoute,
     AuthenticatedCuentaPagosExitoRoute: AuthenticatedCuentaPagosExitoRoute,
     AuthenticatedCuentaEmpresaBusinessIdPublicacionRoute:
