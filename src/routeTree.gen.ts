@@ -147,6 +147,7 @@ import { Route as ApiPublicHooksCouponReviewRemindersRouteImport } from './route
 import { Route as ApiPublicHealthMapsRouteImport } from './routes/api/public/health/maps'
 import { Route as ApiPublicAluxSignalRouteImport } from './routes/api/public/alux/signal'
 import { Route as ApiPublicAluxChatRouteImport } from './routes/api/public/alux/chat'
+import { Route as AuthenticatedPortalVentasEnLineaOrdenesRouteImport } from './routes/_authenticated/portal/ventas-en-linea.ordenes'
 import { Route as AuthenticatedPortalInvitacionesTokenRouteImport } from './routes/_authenticated/portal/invitaciones.$token'
 import { Route as AuthenticatedPortalEmpresasBusinessIdRouteImport } from './routes/_authenticated/portal/empresas.$businessId'
 import { Route as AuthenticatedCuentaPagosExitoRouteImport } from './routes/_authenticated/cuenta/pagos.exito'
@@ -950,6 +951,12 @@ const ApiPublicAluxChatRoute = ApiPublicAluxChatRouteImport.update({
   path: '/api/public/alux/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPortalVentasEnLineaOrdenesRoute =
+  AuthenticatedPortalVentasEnLineaOrdenesRouteImport.update({
+    id: '/ordenes',
+    path: '/ordenes',
+    getParentRoute: () => AuthenticatedPortalVentasEnLineaRoute,
+  } as any)
 const AuthenticatedPortalInvitacionesTokenRoute =
   AuthenticatedPortalInvitacionesTokenRouteImport.update({
     id: '/invitaciones/$token',
@@ -1247,7 +1254,7 @@ export interface FileRoutesByFullPath {
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/portal/reportes': typeof AuthenticatedPortalReportesRoute
-  '/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRoute
+  '/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   '/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
@@ -1279,6 +1286,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/portal/ventas-en-linea/ordenes': typeof AuthenticatedPortalVentasEnLineaOrdenesRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
@@ -1412,7 +1420,7 @@ export interface FileRoutesByTo {
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/portal/reportes': typeof AuthenticatedPortalReportesRoute
-  '/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRoute
+  '/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   '/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
@@ -1443,6 +1451,7 @@ export interface FileRoutesByTo {
   '/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/portal/ventas-en-linea/ordenes': typeof AuthenticatedPortalVentasEnLineaOrdenesRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
@@ -1584,7 +1593,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/_authenticated/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/_authenticated/portal/reportes': typeof AuthenticatedPortalReportesRoute
-  '/_authenticated/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRoute
+  '/_authenticated/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   '/_authenticated/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
@@ -1616,6 +1625,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/pagos/exito': typeof AuthenticatedCuentaPagosExitoRoute
   '/_authenticated/portal/empresas/$businessId': typeof AuthenticatedPortalEmpresasBusinessIdRoute
   '/_authenticated/portal/invitaciones/$token': typeof AuthenticatedPortalInvitacionesTokenRoute
+  '/_authenticated/portal/ventas-en-linea/ordenes': typeof AuthenticatedPortalVentasEnLineaOrdenesRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
@@ -1790,6 +1800,7 @@ export interface FileRouteTypes {
     | '/cuenta/pagos/exito'
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
+    | '/portal/ventas-en-linea/ordenes'
     | '/api/public/alux/chat'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
@@ -1954,6 +1965,7 @@ export interface FileRouteTypes {
     | '/cuenta/pagos/exito'
     | '/portal/empresas/$businessId'
     | '/portal/invitaciones/$token'
+    | '/portal/ventas-en-linea/ordenes'
     | '/api/public/alux/chat'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
@@ -2126,6 +2138,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/pagos/exito'
     | '/_authenticated/portal/empresas/$businessId'
     | '/_authenticated/portal/invitaciones/$token'
+    | '/_authenticated/portal/ventas-en-linea/ordenes'
     | '/api/public/alux/chat'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
@@ -3205,6 +3218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAluxChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/portal/ventas-en-linea/ordenes': {
+      id: '/_authenticated/portal/ventas-en-linea/ordenes'
+      path: '/ordenes'
+      fullPath: '/portal/ventas-en-linea/ordenes'
+      preLoaderRoute: typeof AuthenticatedPortalVentasEnLineaOrdenesRouteImport
+      parentRoute: typeof AuthenticatedPortalVentasEnLineaRoute
+    }
     '/_authenticated/portal/invitaciones/$token': {
       id: '/_authenticated/portal/invitaciones/$token'
       path: '/invitaciones/$token'
@@ -3580,6 +3600,21 @@ const AuthenticatedCuentaRouteRouteWithChildren =
     AuthenticatedCuentaRouteRouteChildren,
   )
 
+interface AuthenticatedPortalVentasEnLineaRouteChildren {
+  AuthenticatedPortalVentasEnLineaOrdenesRoute: typeof AuthenticatedPortalVentasEnLineaOrdenesRoute
+}
+
+const AuthenticatedPortalVentasEnLineaRouteChildren: AuthenticatedPortalVentasEnLineaRouteChildren =
+  {
+    AuthenticatedPortalVentasEnLineaOrdenesRoute:
+      AuthenticatedPortalVentasEnLineaOrdenesRoute,
+  }
+
+const AuthenticatedPortalVentasEnLineaRouteWithChildren =
+  AuthenticatedPortalVentasEnLineaRoute._addFileChildren(
+    AuthenticatedPortalVentasEnLineaRouteChildren,
+  )
+
 interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalActividadRoute: typeof AuthenticatedPortalActividadRoute
   AuthenticatedPortalCanjearRoute: typeof AuthenticatedPortalCanjearRoute
@@ -3593,7 +3628,7 @@ interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalPresenciaRoute: typeof AuthenticatedPortalPresenciaRoute
   AuthenticatedPortalPropiedadRoute: typeof AuthenticatedPortalPropiedadRoute
   AuthenticatedPortalReportesRoute: typeof AuthenticatedPortalReportesRoute
-  AuthenticatedPortalVentasEnLineaRoute: typeof AuthenticatedPortalVentasEnLineaRoute
+  AuthenticatedPortalVentasEnLineaRoute: typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   AuthenticatedPortalVisibilidadRoute: typeof AuthenticatedPortalVisibilidadRoute
   AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
   AuthenticatedPortalEmpresasBusinessIdRoute: typeof AuthenticatedPortalEmpresasBusinessIdRoute
@@ -3619,7 +3654,7 @@ const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildr
     AuthenticatedPortalPropiedadRoute: AuthenticatedPortalPropiedadRoute,
     AuthenticatedPortalReportesRoute: AuthenticatedPortalReportesRoute,
     AuthenticatedPortalVentasEnLineaRoute:
-      AuthenticatedPortalVentasEnLineaRoute,
+      AuthenticatedPortalVentasEnLineaRouteWithChildren,
     AuthenticatedPortalVisibilidadRoute: AuthenticatedPortalVisibilidadRoute,
     AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
     AuthenticatedPortalEmpresasBusinessIdRoute:

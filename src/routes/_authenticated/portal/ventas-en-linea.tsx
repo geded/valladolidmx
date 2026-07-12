@@ -91,6 +91,12 @@ function DirectSalesPage() {
         <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
           <Badge variant="secondary">{enabledCount} activas</Badge>
           <Badge variant="outline">{products.length} experiencias totales</Badge>
+          <Link
+            to="/portal/ventas-en-linea/ordenes"
+            className="ml-auto rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20"
+          >
+            Ver mis ventas →
+          </Link>
         </div>
       </header>
 
