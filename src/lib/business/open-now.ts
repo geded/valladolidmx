@@ -92,14 +92,14 @@ export function computeOpenNow(
   if (!rows || rows.length === 0) {
     return { state: "unknown", label: "Horario sin publicar" };
   }
-
+  const safeRows: readonly BusinessHourRow[] = rows;
   const { dow, minutes } = nowInTz(now, tz);
 
   // Franjas efectivas del día actual (excluye is_closed).
   type Slot = { start: number; end: number; overnight: boolean };
   function slotsForDay(d: number): Slot[] {
     const out: Slot[] = [];
-    for (const r of rows) {
+    for (const r of safeRows) {
       if (r.day_of_week !== d) continue;
       if (r.is_closed) continue;
       const s = toMinutes(r.opens_at);
