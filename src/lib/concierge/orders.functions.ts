@@ -226,3 +226,86 @@ export const cancelConciergeOrder = createServerFn({ method: "POST" })
 
     return { ok: true as const };
   });
+
+// ---------- viaje confirmado del viajero (CV4.3-narrativa) ----------
+
+export interface ConfirmedTravelSummary {
+  order_id: string;
+  folio: string;
+  status: string; // "paid" | "fulfilled" | "refunded"
+  paid_at: string | null;
+  editorial_title: string | null;
+  destination_name: string | null;
+  total_amount: number;
+  currency: string;
+  travel_plan_id: string | null;
+  plan_start_date: string | null;
+  plan_end_date: string | null;
+  party_size: number | null;
+  days_to_trip: number | null;
+}
+
+function daysUntil(iso: string | null): number | null {
+  if (!iso) return null;
+  const target = new Date(`${iso}T00:00:00Z`).getTime();
+  const today = new Date();
+  const todayUtc = Date.UTC(
+    today.getUTCFullYear(),
+    today.getUTCMonth(),
+    today.getUTCDate(),
+  );
+  return Math.round((target - todayUtc) / 86_400_000);
+}
+
+/**
+ * Devuelve el viaje confirmado más reciente del viajero (si existe).
+ * Alimenta el dock flotante, el modo "confirmado" de /cuenta/mi-viaje y
+ * la memoria post-venta de Alux.
+ */
+export const getMyConfirmedTravel = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<ConfirmedTravelSummary | null> => {
+    const { data: order, error } = await context.supabase
+      .from("concierge_orders")
+      .select(
+        "id, folio, status, paid_at, editorial_title, destination_name, total_amount, currency, travel_plan_id",
+      )
+      .eq("user_id", context.userId)
+      .in("status", ["paid", "fulfilled", "refunded"])
+      .order("paid_at", { ascending: false, nullsFirst: false })
+      .limit(1)
+      .maybeSingle();
+    if (error || !order) return null;
+
+    let plan_start_date: string | null = null;
+    let plan_end_date: string | null = null;
+    let party_size: number | null = null;
+    if (order.travel_plan_id) {
+      const { data: plan } = await context.supabase
+        .from("travel_plans")
+        .select("start_date, end_date, party_size")
+        .eq("id", order.travel_plan_id)
+        .maybeSingle();
+      if (plan) {
+        plan_start_date = plan.start_date ?? null;
+        plan_end_date = plan.end_date ?? null;
+        party_size = plan.party_size ?? null;
+      }
+    }
+
+    return {
+      order_id: order.id,
+      folio: order.folio,
+      status: order.status,
+      paid_at: order.paid_at,
+      editorial_title: order.editorial_title,
+      destination_name: order.destination_name,
+      total_amount: order.total_amount,
+      currency: order.currency,
+      travel_plan_id: order.travel_plan_id,
+      plan_start_date,
+      plan_end_date,
+      party_size,
+      days_to_trip: daysUntil(plan_start_date),
+    };
+  });
