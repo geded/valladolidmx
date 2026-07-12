@@ -273,7 +273,66 @@ function confirmedTripToPromptBlock(brief: ConfirmedTripBrief | null): string {
 }
 
 const SYSTEM_BASE =
-  "Eres Alux, asistente del viajero en Valladolid.mx. Respondes en el idioma indicado por la directiva de idioma, siempre breve y honesto. Trabajas SÓLO con la información del contexto entregado (perfil del viajero, plan activo, referencias del catálogo). Nunca inventas empresas, precios, horarios ni disponibilidad. Nunca reservas, nunca modificas el plan, nunca envías al concierge, nunca contactas empresas. Sólo sugieres, explicas y redactas. Cuando cites algo, usa exactamente el título tal como aparece en las referencias.";
+  [
+    "Eres Alux, copiloto de viaje del Oriente Maya de Yucatán (Valladolid, Izamal, Espita y sus alrededores). Acompañas al viajero antes, durante y después de su viaje.",
+    "VOZ Y TONO: cálido, cercano, culto sin ser pomposo. Evoca la calidez colonial y la hospitalidad maya. Prefiere frases cortas. Nunca usas jerga corporativa ni promesas comerciales.",
+    "CONTINUIDAD (Founder Memory Principle): el viaje continúa, nunca reinicia. Si el viajero ya tiene plan activo o viaje confirmado, retómalo con naturalidad; no lo hagas empezar de cero.",
+    "CONFIANZA (Founder Trust Principle): tu trabajo es generar confianza en el destino, el concierge y el propio Alux. Antes que vender, orienta.",
+    "REGLA DE ORO: trabajas SÓLO con la información del contexto entregado (perfil, plan activo, catalog_refs, base de conocimiento). Si un dato no está, dilo con claridad y ofrece un siguiente paso concreto (declarar preferencia, hablar con el concierge humano, revisar la sección oficial).",
+    "PROHIBIDO: inventar empresas, direcciones, precios, horarios, disponibilidad, distancias o certificaciones; reservar; modificar el plan; contactar empresas; enviar mensajes al concierge; ofrecer descuentos que no estén en promociones activas del catálogo.",
+    "CITAS: cuando menciones un lugar, negocio, producto, experiencia o entrada de conocimiento, usa exactamente el título tal como aparece en las referencias. Si no aparece en las referencias, no lo nombres.",
+    "FORMATO: usa listas cortas cuando ayuden a decidir. Máximo 180 palabras salvo que se te pida un plan detallado.",
+  ].join(" ");
+
+const LOW_CONTEXT_ANSWERS: Record<AluxKbLocale, string> = {
+  es: "Todavía no tengo suficiente contexto de tu viaje para darte una sugerencia sólida. Cuéntame **cuándo viajas**, **con quién** y **qué tipo de experiencia buscas** (naturaleza, cultura, gastronomía, descanso), y de inmediato puedo proponerte algo del Oriente Maya.",
+  en: "I don't have enough context about your trip yet to give a solid suggestion. Tell me **when you travel**, **who's coming** and **what kind of experience you're looking for** (nature, culture, food, rest), and I'll suggest something from the Oriente Maya right away.",
+  fr: "Je n'ai pas encore assez de contexte sur ton voyage pour te faire une vraie suggestion. Dis-moi **quand tu voyages**, **avec qui** et **quel type d'expérience** tu cherches (nature, culture, gastronomie, repos), et je te propose tout de suite quelque chose de l'Oriente Maya.",
+  de: "Ich habe noch nicht genug Kontext zu deiner Reise, um dir eine solide Empfehlung zu geben. Sag mir **wann du reist**, **mit wem** und **welche Art von Erlebnis** du suchst (Natur, Kultur, Gastronomie, Erholung), dann schlage ich dir sofort etwas aus dem Oriente Maya vor.",
+  it: "Non ho ancora abbastanza contesto sul tuo viaggio per darti un consiglio solido. Dimmi **quando viaggi**, **con chi** e **che tipo di esperienza** cerchi (natura, cultura, gastronomia, riposo) e ti proporrò subito qualcosa dell'Oriente Maya.",
+  pt: "Ainda não tenho contexto suficiente sobre sua viagem para dar uma sugestão sólida. Me diga **quando você viaja**, **com quem** e **que tipo de experiência** procura (natureza, cultura, gastronomia, descanso), e eu já te sugiro algo do Oriente Maya.",
+};
+
+function isLowContext(
+  context: unknown,
+  sources: AluxTravelerSource[],
+  knowledgeCount: number,
+): boolean {
+  const activePlan = (context as { active_plan?: unknown } | null)?.active_plan;
+  const hasPlan = !!activePlan;
+  return !hasPlan && sources.length === 0 && knowledgeCount === 0;
+}
+
+/**
+ * Heurística barata para estimar riesgo de alucinación: cuenta cuántos
+ * títulos/nombres del texto NO aparecen en las referencias del contexto
+ * ni en la base de conocimiento inyectada. Sólo se registra en el log.
+ */
+function estimateHallucinationRisk(
+  text: string,
+  sources: AluxTravelerSource[],
+  knowledgeBlock: string,
+): { score: number; unknown_mentions: string[] } {
+  // Extrae candidatos: expresiones en negrita **X** o títulos entre comillas.
+  const bold = Array.from(text.matchAll(/\*\*([^*]{3,80})\*\*/g)).map((m) => m[1]);
+  const quoted = Array.from(text.matchAll(/[""]([^""]{3,80})[""]/g)).map((m) => m[1]);
+  const candidates = [...new Set([...bold, ...quoted])]
+    .map((s) => s.trim())
+    .filter((s) => /^[A-ZÁÉÍÓÚÑ]/.test(s));
+  if (candidates.length === 0) return { score: 0, unknown_mentions: [] };
+  const haystack = (
+    sources.map((s) => s.title ?? "").join(" | ") +
+    " | " +
+    knowledgeBlock
+  ).toLowerCase();
+  const unknown = candidates.filter(
+    (c) => !haystack.includes(c.toLowerCase()),
+  );
+  return {
+    score: Math.min(1, unknown.length / Math.max(candidates.length, 1)),
+    unknown_mentions: unknown.slice(0, 6),
+  };
+}
 
 const RATIONALE_INSTRUCTION =
   "Formato de respuesta OBLIGATORIO en dos secciones Markdown. Mantén los encabezados EXACTAMENTE como aparecen aquí (en español) aunque el cuerpo esté en otro idioma:\n" +
@@ -312,6 +371,29 @@ async function runAluxTraveler(
   const confirmedBrief = await fetchConfirmedTripBrief(supabase);
   const confirmedBlock = confirmedTripToPromptBlock(confirmedBrief);
 
+  // Rama low-context: sin plan, sin catalog_refs, sin KB → guía corta.
+  // Evita respuestas fabricadas por el modelo cuando no hay a qué anclarse.
+  if (!confirmedBrief && isLowContext(context, sources, knowledgeCount)) {
+    const answer = LOW_CONTEXT_ANSWERS[locale] ?? LOW_CONTEXT_ANSWERS.es;
+    await logSuggestion(supabase, capability, planId, {
+      model: "low_context_guard",
+      latency_ms: 0,
+      low_context: true,
+    });
+    return {
+      capability,
+      model: "low_context_guard",
+      text: answer,
+      rationale:
+        "Sin plan activo, sin referencias de catálogo y sin coincidencias en la base de conocimiento — Alux pide contexto antes de sugerir.",
+      sources: [],
+      reversible: true,
+      latency_ms: 0,
+      disclaimer: DISCLAIMER,
+      knowledge_ids: [],
+    };
+  }
+
   const provider = createLovableAiGatewayProvider(requireApiKey());
   const t0 = Date.now();
   const { text, usage } = await generateText({
@@ -339,6 +421,9 @@ async function runAluxTraveler(
   const body = (parts[0] ?? text).replace(/^##\s*Sugerencia\s*/i, "").trim();
   const rationale = (parts[1] ?? "").trim();
 
+  // Quality guard (heurístico): sólo se registra; no censura la salida.
+  const risk = estimateHallucinationRisk(body, sources, knowledgeBlock);
+
   await logSuggestion(supabase, capability, planId, {
     model: DEFAULT_MODEL,
     latency_ms: latency,
@@ -346,6 +431,11 @@ async function runAluxTraveler(
     tokens_out: usage?.outputTokens ?? null,
     sources_count: sources.length,
     kb_matches: knowledgeCount,
+    has_rationale: rationale.length > 0,
+    hallucination_risk: risk.score,
+    unknown_mentions: risk.unknown_mentions,
+    confirmed_trip: !!confirmedBrief,
+    locale,
   });
 
   return {
