@@ -432,6 +432,59 @@ export function AluxFloatingTrigger() {
             </section>
           )}
 
+          {/* CV2.4 · Bridge Concierge → Alux · Tu concierge trabaja en esto */}
+          {isAuthed && hasConcierge && concierge && (
+            <section
+              aria-labelledby="alux-concierge"
+              className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4"
+            >
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-400">
+                <Headset className="size-3.5" aria-hidden />
+                <span id="alux-concierge">Tu concierge humano</span>
+                <a
+                  href="/cuenta/mi-viaje"
+                  className="ml-auto text-[10px] font-medium hover:underline"
+                >
+                  Ver caso
+                </a>
+              </div>
+              {concierge.reserved_business_names.length > 0 && (
+                <>
+                  <p className="mt-2 text-[12px] text-foreground">
+                    Ya está trabajando con:
+                  </p>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {concierge.reserved_business_names.slice(0, 6).map((name) => (
+                      <span
+                        key={name}
+                        className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-background/70 px-2 py-0.5 text-[11px] font-medium text-foreground"
+                      >
+                        <Headset className="size-2.5 text-amber-600" aria-hidden />
+                        {name}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
+              {concierge.shared_notes.length > 0 && (
+                <ul className="mt-3 space-y-1.5">
+                  {concierge.shared_notes.slice(0, 2).map((n, i) => (
+                    <li
+                      key={i}
+                      className="rounded-lg border border-amber-500/20 bg-background/60 px-2.5 py-1.5 text-[11px] text-foreground"
+                    >
+                      <span className="mr-1 text-amber-600">Nota:</span>
+                      {n.body}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                No repito ni contradigo lo que tu concierge ya está armando — complemento alrededor.
+              </p>
+            </section>
+          )}
+
           {/* Ubicación viva (A5) — opt-in contextual, no intrusivo. */}
           <section
             aria-labelledby="alux-geo"
