@@ -200,7 +200,6 @@ async function fetchConfirmedTripBrief(
       .select(
         "folio, editorial_title, destination_name, travel_plan_id, paid_at",
       )
-      .eq("status", "paid")
       .in("status", ["paid", "fulfilled", "refunded"])
       .order("paid_at", { ascending: false, nullsFirst: false })
       .limit(1)
