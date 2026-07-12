@@ -3,7 +3,7 @@
  * Consume concierge_case_file_v1 y respeta visibilidad por rol.
  */
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter } from "@tanstack/react-router";
 import {
@@ -16,6 +16,7 @@ import {
   assignConciergeCase,
   releaseConciergeCase,
   setConciergeCasePriority,
+  getConciergeCaseHandoffContext,
 } from "@/lib/concierge/concierge.functions";
 import {
   generateAluxSummary,
@@ -141,6 +142,7 @@ export function CaseFileView({ data, hideInternal = false }: { data: unknown; hi
     <div className="grid gap-6">
       <Header f={f} />
       {internal && <SlaAssignmentPanel f={f} />}
+      {internal && <HandoffContextCard caseId={f.case.id} />}
       {internal && <AluxAssistantPanel caseId={f.case.id} />}
       <Section title="Solicitudes">
         {f.requests.length === 0 ? (
@@ -627,6 +629,174 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
 /* ============================================================
  * 14.60.6 — Asistente Alux (read-only, sólo internos)
  * ============================================================ */
+
+/* ============================================================
+ * CV2.1 — Handoff Context (fotografía del viajero al promover el plan)
+ * ============================================================ */
+type HandoffPayload = {
+  version?: string;
+  generated_at?: string;
+  source?: string;
+  profile?: Record<string, unknown> | null;
+  active_coupons?: Array<Record<string, unknown>>;
+  territorial_memory?: Record<string, unknown> | null;
+  plan_snapshot?: {
+    item_count?: number;
+    items?: Array<{ kind?: string; title?: string | null; slug?: string | null; subtitle?: string | null }>;
+  } | null;
+};
+
+function HandoffContextCard({ caseId }: { caseId: string }) {
+  const fetchFn = useServerFn(getConciergeCaseHandoffContext);
+  const [payload, setPayload] = useState<HandoffPayload | null>(null);
+  const [state, setState] = useState<"idle" | "loading" | "empty" | "error">("loading");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    setState("loading");
+    fetchFn({ data: { caseId } })
+      .then((raw) => {
+        if (!alive) return;
+        if (!raw) {
+          setState("empty");
+          return;
+        }
+        setPayload(raw as HandoffPayload);
+        setState("idle");
+      })
+      .catch((e) => {
+        if (!alive) return;
+        setError(e instanceof Error ? e.message : String(e));
+        setState("error");
+      });
+    return () => {
+      alive = false;
+    };
+  }, [caseId, fetchFn]);
+
+  return (
+    <section className="rounded-lg border border-border bg-card p-4">
+      <header className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="text-sm font-semibold">Contexto del viajero (Alux)</h3>
+          <p className="text-[11px] text-muted-foreground">
+            Fotografía inmutable capturada al promover el Travel Plan.
+          </p>
+        </div>
+        {payload?.generated_at && (
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+            {new Date(payload.generated_at).toLocaleString()}
+          </span>
+        )}
+      </header>
+
+      {state === "loading" && (
+        <p className="mt-3 text-xs text-muted-foreground">Cargando contexto…</p>
+      )}
+      {state === "empty" && (
+        <p className="mt-3 text-xs text-muted-foreground">
+          Sin fotografía adjunta todavía. Se capturará automáticamente al promover el plan del viajero.
+        </p>
+      )}
+      {state === "error" && (
+        <p className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive">
+          {error ?? "No se pudo cargar el contexto."}
+        </p>
+      )}
+
+      {state === "idle" && payload && (
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          <HandoffBlock title="Perfil del viajero">
+            {payload.profile ? (
+              <ProfileSummary profile={payload.profile} />
+            ) : (
+              <Empty>Sin perfil M2 disponible.</Empty>
+            )}
+          </HandoffBlock>
+
+          <HandoffBlock title={`Cupones activos (${payload.active_coupons?.length ?? 0})`}>
+            {payload.active_coupons && payload.active_coupons.length > 0 ? (
+              <ul className="grid gap-1 text-xs">
+                {payload.active_coupons.slice(0, 6).map((c, i) => (
+                  <li key={i} className="truncate">
+                    · {(c.code as string) ?? (c.id as string) ?? "cupón"}
+                    {c.business_name ? ` — ${c.business_name as string}` : ""}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <Empty>Sin cupones vigentes.</Empty>
+            )}
+          </HandoffBlock>
+
+          <HandoffBlock title={`Plan (${payload.plan_snapshot?.item_count ?? 0} ítems)`}>
+            {payload.plan_snapshot?.items && payload.plan_snapshot.items.length > 0 ? (
+              <ul className="grid gap-1 text-xs">
+                {payload.plan_snapshot.items.slice(0, 8).map((it, i) => (
+                  <li key={i} className="truncate">
+                    · <span className="text-muted-foreground">[{it.kind ?? "?"}]</span>{" "}
+                    {it.title ?? it.slug ?? "—"}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <Empty>Plan vacío al momento del handoff.</Empty>
+            )}
+          </HandoffBlock>
+
+          <HandoffBlock title="Memoria territorial">
+            {payload.territorial_memory ? (
+              <pre className="whitespace-pre-wrap break-words text-[11px] text-muted-foreground">
+                {JSON.stringify(payload.territorial_memory, null, 2).slice(0, 600)}
+              </pre>
+            ) : (
+              <Empty>Sin historial territorial registrado.</Empty>
+            )}
+          </HandoffBlock>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function HandoffBlock({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <article className="rounded-md border border-dashed border-border bg-background/60 p-3">
+      <h4 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-foreground">
+        {title}
+      </h4>
+      {children}
+    </article>
+  );
+}
+
+function ProfileSummary({ profile }: { profile: Record<string, unknown> }) {
+  const all: Array<[string, unknown]> = [
+    ["Idioma", profile.preferred_language],
+    ["País", profile.country_code],
+    ["Moneda", profile.preferred_currency],
+    ["Presupuesto", profile.budget_level],
+    ["Dieta", profile.dietary_preferences],
+    ["Movilidad", profile.mobility_needs],
+    ["Intereses", profile.interests],
+  ];
+  const rows = all.filter(([, v]) => v !== undefined && v !== null && v !== "");
+  if (rows.length === 0) return <Empty>Perfil sin campos declarados.</Empty>;
+  return (
+    <dl className="grid gap-1 text-xs">
+      {rows.map(([k, v]) => (
+        <div key={k} className="flex gap-2">
+          <dt className="min-w-[80px] text-muted-foreground">{k}</dt>
+          <dd className="flex-1 truncate text-foreground/90">
+            {Array.isArray(v) ? (v as unknown[]).join(", ") : String(v)}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 type AluxState = Partial<Record<AluxCapability, AluxSuggestion>>;
 
 const ALUX_LABELS: Record<AluxCapability, string> = {
