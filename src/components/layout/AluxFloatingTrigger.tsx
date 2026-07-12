@@ -32,7 +32,7 @@
  * Navigation Session. Las sugerencias contextuales las provee la server
  * fn pública `aluxContextualSuggest` (US-E1.2), sin motor paralelo.
  */
-import { ArrowRight, Compass, MapPin, Sparkles, Tag, Ticket, Navigation } from "lucide-react";
+import { ArrowRight, Clock, Compass, MapPin, Sparkles, Tag, Ticket, Navigation } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -420,10 +420,27 @@ export function AluxFloatingTrigger() {
                                         Promo
                                       </span>
                                     )}
+                                    {item.openState === "open" && (
+                                      <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400">
+                                        <Clock className="size-2.5" aria-hidden />
+                                        Abierto
+                                      </span>
+                                    )}
+                                    {item.openState === "closed" && (
+                                      <span className="inline-flex items-center gap-0.5 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                                        <Clock className="size-2.5" aria-hidden />
+                                        Cerrado
+                                      </span>
+                                    )}
                                   </span>
                                   <span className="mt-0.5 block text-[11px] text-muted-foreground">
                                     {item.rationale}
                                   </span>
+                                  {item.openLabel && (
+                                    <span className="mt-0.5 block text-[10px] text-muted-foreground/80">
+                                      {item.openLabel}
+                                    </span>
+                                  )}
                                 </span>
                                 <ArrowRight className="mt-1 size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden />
                               </a>
