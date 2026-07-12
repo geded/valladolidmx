@@ -14,6 +14,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { addPlanItem, type TravelItemKind } from "@/lib/traveler/travel-plans.functions";
+import type { Json } from "@/integrations/supabase/types";
 
 const ENTITY_TYPES = ["business", "product", "event", "destination"] as const;
 type EntityType = (typeof ENTITY_TYPES)[number];
@@ -27,7 +28,7 @@ export interface AluxPlanProposal {
   subtitle: string | null;
   image_url: string | null;
   rationale: string | null;
-  sources: unknown;
+  sources: Json;
   source_session_id: string | null;
   status: "pending" | "accepted" | "dismissed" | "expired";
   decided_at: string | null;
@@ -49,7 +50,7 @@ const ProposeInput = z.object({
   subtitle: z.string().max(300).optional().nullable(),
   imageUrl: z.string().url().max(500).optional().nullable(),
   rationale: z.string().max(600).optional().nullable(),
-  sources: z.array(z.record(z.unknown())).optional().default([]),
+  sources: z.array(z.any()).optional().default([]),
   sourceSessionId: z.string().max(200).optional().nullable(),
   planId: z.string().uuid().optional().nullable(),
 });
@@ -84,7 +85,7 @@ export const proposeAluxPlanAddition = createServerFn({ method: "POST" })
         subtitle: data.subtitle ?? null,
         image_url: data.imageUrl ?? null,
         rationale: data.rationale ?? null,
-        sources: data.sources ?? [],
+        sources: (data.sources ?? []) as unknown as Json,
         source_session_id: data.sourceSessionId ?? null,
       })
       .select("*")
@@ -105,14 +106,14 @@ export const listMyAluxPlanProposals = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => ListInput.parse(d ?? {}))
   .handler(async ({ data, context }): Promise<AluxPlanProposal[]> => {
-    let q = context.supabase
+    const base = context.supabase
       .from("alux_plan_proposals")
       .select("*")
-      .eq("user_id", context.userId)
+      .eq("user_id", context.userId);
+    const filtered = data.status === "all" ? base : base.eq("status", data.status);
+    const { data: rows, error } = await filtered
       .order("created_at", { ascending: false })
       .limit(data.limit);
-    if (data.status !== "all") q = q.eq("status", data.status);
-    const { data: rows, error } = await q;
     if (error) throw new Error(`list_failed: ${error.message}`);
     return (rows ?? []) as AluxPlanProposal[];
   });
