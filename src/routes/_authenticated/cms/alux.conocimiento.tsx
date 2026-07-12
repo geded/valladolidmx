@@ -9,10 +9,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ALUX_KNOWLEDGE_CATEGORIES,
+  ALUX_KB_LOCALES,
   deleteAluxKnowledge,
   listAluxKnowledge,
+  listAluxKnowledgeLocaleCoverage,
+  markAluxTranslationReviewed,
   searchAluxKnowledge,
+  translateAluxKnowledgeEntry,
   upsertAluxKnowledge,
+  type AluxKbLocale,
   type AluxKnowledgeCategory,
   type AluxKnowledgeEntry,
   type AluxKnowledgeStatus,
@@ -30,7 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Search, Trash2, Sparkles, Plus } from "lucide-react";
+import { Search, Trash2, Sparkles, Plus, Languages, CheckCircle2, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cms/alux/conocimiento")({
   head: () => ({
@@ -89,11 +94,29 @@ function AluxKnowledgePage() {
   const save = useServerFn(upsertAluxKnowledge);
   const del = useServerFn(deleteAluxKnowledge);
   const search = useServerFn(searchAluxKnowledge);
+  const coverageFn = useServerFn(listAluxKnowledgeLocaleCoverage);
+  const translateFn = useServerFn(translateAluxKnowledgeEntry);
+  const markReviewedFn = useServerFn(markAluxTranslationReviewed);
 
   const { data: entries = [], isLoading } = useQuery({
     queryKey: ["alux-knowledge"],
     queryFn: () => list(),
   });
+
+  const { data: coverage = [] } = useQuery({
+    queryKey: ["alux-knowledge-coverage"],
+    queryFn: () => coverageFn(),
+  });
+
+  const coverageByEntry = useMemo(() => {
+    const map = new Map<string, Map<AluxKbLocale, (typeof coverage)[number]>>();
+    for (const c of coverage) {
+      const inner = map.get(c.entry_id) ?? new Map();
+      inner.set(c.locale, c);
+      map.set(c.entry_id, inner);
+    }
+    return map;
+  }, [coverage]);
 
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
   const [query, setQuery] = useState("");
@@ -156,12 +179,41 @@ function AluxKnowledgePage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const translateMut = useMutation({
+    mutationFn: (v: { entryId: string; locales: AluxKbLocale[]; overwrite?: boolean }) =>
+      translateFn({ data: v }),
+    onSuccess: (res) => {
+      const ok = res.results.filter((r) => r.ok).length;
+      const fail = res.results.length - ok;
+      toast.success(
+        `Traducción: ${ok} ok${fail ? ` · ${fail} omitidas/fallidas` : ""}`,
+      );
+      qc.invalidateQueries({ queryKey: ["alux-knowledge-coverage"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const reviewMut = useMutation({
+    mutationFn: (v: { entryId: string; locale: AluxKbLocale }) =>
+      markReviewedFn({ data: v }),
+    onSuccess: () => {
+      toast.success("Traducción marcada como revisada.");
+      qc.invalidateQueries({ queryKey: ["alux-knowledge-coverage"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const stats = useMemo(() => {
     const total = entries.length;
     const published = entries.filter((e) => e.status === "published").length;
     const embedded = entries.filter((e) => e.embedded_at).length;
-    return { total, published, embedded };
-  }, [entries]);
+    const nonEsLocales = ALUX_KB_LOCALES.filter((l) => l !== "es").length;
+    const expected = published * nonEsLocales;
+    const translated = coverage.filter(
+      (c) => c.locale !== "es" && c.embedded,
+    ).length;
+    return { total, published, embedded, translated, expected };
+  }, [entries, coverage]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
@@ -179,6 +231,9 @@ function AluxKnowledgePage() {
           <Badge variant="secondary">{stats.total} entradas</Badge>
           <Badge>{stats.published} publicadas</Badge>
           <Badge variant="outline">{stats.embedded} con embedding</Badge>
+          <Badge variant="outline">
+            {stats.translated}/{stats.expected} traducciones IA
+          </Badge>
         </div>
       </header>
 
