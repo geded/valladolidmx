@@ -291,22 +291,27 @@ export const deleteAluxKnowledge = createServerFn({ method: "POST" })
 export async function retrieveAluxKnowledgeServer(
   supabase: unknown,
   query: string,
-  opts: { matchCount?: number; matchThreshold?: number } = {},
+  opts: { matchCount?: number; matchThreshold?: number; locale?: string } = {},
 ): Promise<AluxKnowledgeMatch[]> {
   const q = (query ?? "").trim();
   if (q.length < 3) return [];
+  const rawLocale = (opts.locale ?? "es").toLowerCase().slice(0, 2);
+  const locale: AluxKbLocale = (ALUX_KB_LOCALES as readonly string[]).includes(rawLocale)
+    ? (rawLocale as AluxKbLocale)
+    : "es";
   try {
     const emb = await embedText(q);
     const rpc = supabase as RpcClient;
-    const { data, error } = await rpc.rpc("match_alux_knowledge", {
+    const { data, error } = await rpc.rpc("match_alux_knowledge_i18n", {
       query_embedding: pgvectorLiteral(emb),
+      target_locale: locale,
       match_count: opts.matchCount ?? 4,
       match_threshold: opts.matchThreshold ?? 0.55,
     });
     if (error) return [];
     const rows = (data as Record<string, unknown>[]) ?? [];
     return rows.map((r) => ({
-      id: String(r.id),
+      id: String(r.entry_id ?? r.id),
       slug: String(r.slug),
       title: String(r.title),
       summary: (r.summary as string | null) ?? null,
@@ -315,6 +320,8 @@ export async function retrieveAluxKnowledgeServer(
       tags: Array.isArray(r.tags) ? (r.tags as string[]) : [],
       source_url: (r.source_url as string | null) ?? null,
       similarity: Number(r.similarity ?? 0),
+      locale: (r.locale as AluxKbLocale) ?? locale,
+      is_fallback: Boolean(r.is_fallback),
     }));
   } catch {
     return [];
@@ -322,15 +329,30 @@ export async function retrieveAluxKnowledgeServer(
 }
 
 /** Compone un bloque markdown para inyectar como contexto extra al prompt. */
-export function knowledgeToPromptBlock(matches: AluxKnowledgeMatch[]): string {
+export function knowledgeToPromptBlock(
+  matches: AluxKnowledgeMatch[],
+  opts: { locale?: string } = {},
+): string {
   if (!matches.length) return "";
+  const rawLocale = (opts.locale ?? "es").toLowerCase().slice(0, 2);
+  const target: AluxKbLocale = (ALUX_KB_LOCALES as readonly string[]).includes(rawLocale)
+    ? (rawLocale as AluxKbLocale)
+    : "es";
   const items = matches
     .map((m, i) => {
       const snippet = (m.summary ?? m.body).slice(0, 700).trim();
-      return `${i + 1}. [${m.category}] ${m.title}\n${snippet}${m.source_url ? `\nFuente: ${m.source_url}` : ""}`;
+      const fallbackMark =
+        m.is_fallback && target !== "es"
+          ? ` [FUENTE_ES · TRADUCE AL ${LOCALE_NAMES[target].toUpperCase()}]`
+          : "";
+      return `${i + 1}. [${m.category}]${fallbackMark} ${m.title}\n${snippet}${m.source_url ? `\nFuente: ${m.source_url}` : ""}`;
     })
     .join("\n\n");
-  return `Base de conocimiento curada del Oriente Maya (usa estos hechos textualmente cuando apliquen; cita el título tal cual):\n\n${items}`;
+  const note =
+    target !== "es"
+      ? `\n\nNota: los fragmentos marcados [FUENTE_ES] están en español; tradúcelos con naturalidad al ${LOCALE_NAMES[target]} manteniendo nombres propios, direcciones y precios sin cambios.`
+      : "";
+  return `Base de conocimiento curada del Oriente Maya (usa estos hechos textualmente cuando apliquen; cita el título tal cual):\n\n${items}${note}`;
 }
 
 /** Retrieval expuesto para depurar / probar desde la consola admin. */
