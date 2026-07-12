@@ -319,6 +319,23 @@ export function AluxFloatingTrigger() {
             </div>
           </SheetHeader>
 
+          {/* A16 · Retomar donde te quedaste (memoria territorial persistente). */}
+          {territory?.is_returning &&
+            territory.last_destination_slug &&
+            !pathname.includes(`/oriente-maya/${territory.last_destination_slug}`) && (
+              <a
+                href={`/oriente-maya/${territory.last_destination_slug}`}
+                className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-2 text-[12px] font-medium text-primary transition-colors hover:bg-primary/15"
+              >
+                <Compass className="size-3.5" aria-hidden />
+                Retomar donde te quedaste en{" "}
+                <span className="capitalize">
+                  {territory.last_destination_slug.replace(/-/g, " ")}
+                </span>
+                <ArrowRight className="size-3.5" aria-hidden />
+              </a>
+            )}
+
           {/* A15 · Timeline "Tu viaje" — memoria de lo que el viajero ya decidió. */}
           {isAuthed && plan && (plan.start_date || plan.item_count > 0 || plan.party_size) && (
             <section
