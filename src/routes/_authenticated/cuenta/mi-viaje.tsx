@@ -697,7 +697,15 @@ function PlanItemRow({
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{title}</p>
+        <p className="flex items-center gap-1.5 truncate text-sm font-medium">
+          <span className="truncate">{title}</span>
+          {reservedByConcierge && (
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-400">
+              <Headset className="size-2.5" aria-hidden />
+              Propuesto por tu concierge
+            </span>
+          )}
+        </p>
         {snap.subtitle ? (
           <p className="truncate text-xs text-muted-foreground">{snap.subtitle}</p>
         ) : null}
