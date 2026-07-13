@@ -1,37 +1,51 @@
 /**
  * FavoriteButton — Botón cliente para alternar un favorito.
- * (Ola 4 · Etapa 4 · migrado en OLA H-01 · Épica 1 · I3).
+ * (Ola 4 · Etapa 4 · migrado en OLA H-01 · Épica 1 · I3 · reactivo AC1.2).
  *
- * Idempotente: tolera doble click y race con otras pestañas; el servidor
- * garantiza unicidad. Primer consumidor real de `useProtectedAction`:
- *  - Autenticado → ejecuta directo (comportamiento preservado).
- *  - Visitante   → abre `SignInPromptSheet`; tras login exitoso la acción
- *    se reanuda automáticamente vía `ResumeRunner`. Cancelar cierra sin
- *    escribir. Expirar (>10 min) descarta silenciosamente.
+ * AC1.2 · Rewiring anónimo + Founder Intent Recognition Principle:
+ *  - Autenticado → escribe al Travel Plan (comportamiento preservado).
+ *  - Visitante   → escribe al AnonymousTravelDraft local (cero red, cero
+ *    gate). Alux acompaña desde el primer clic; jamás pide antes de dar.
+ *  - Toda confirmación es conversacional (Concierge Voice · copy oficial)
+ *    y describe intención, no operación técnica.
+ *  - Al alcanzar el límite anónimo se ofrece el registro como beneficio
+ *    ("guarda tu viaje…"), nunca como error.
  */
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { useProtectedAction } from "@/lib/protected-actions";
 import {
   listMyFavorites,
   toggleFavorite,
   type FavoriteEntityKind,
 } from "@/lib/traveler/traveler-favorites.functions";
+import { useAnonymousTrip, ANON_COPY } from "@/lib/traveler/anonymous-draft";
 
 interface Props {
   entityKind: FavoriteEntityKind;
   entityId: string;
+  /** Metadatos opcionales para enriquecer el AnonymousTravelDraft. */
+  entityTitle?: string;
+  entitySlug?: string;
+  entityImageUrl?: string;
   className?: string;
 }
 
-export function FavoriteButton({ entityKind, entityId, className }: Props) {
+export function FavoriteButton({
+  entityKind,
+  entityId,
+  entityTitle,
+  entitySlug,
+  entityImageUrl,
+  className,
+}: Props) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const fetchFavorites = useServerFn(listMyFavorites);
   const toggle = useServerFn(toggleFavorite);
+  const anon = useAnonymousTrip();
 
   const { data } = useQuery({
     queryKey: ["traveler", "favorites", user?.id],
@@ -40,9 +54,14 @@ export function FavoriteButton({ entityKind, entityId, className }: Props) {
     staleTime: 60_000,
   });
 
-  const isActive = Boolean(
+  const isActiveAuthed = Boolean(
     data?.some((f) => f.entity_kind === entityKind && f.entity_id === entityId),
   );
+  const isActiveAnon = Boolean(
+    anon.trip?.favorites?.some((f) => f.kind === entityKind && f.id === entityId),
+  );
+  const isActive = user?.id ? isActiveAuthed : isActiveAnon;
+
   const [optimistic, setOptimistic] = useState<boolean | null>(null);
   useEffect(() => setOptimistic(null), [isActive]);
 
@@ -55,31 +74,66 @@ export function FavoriteButton({ entityKind, entityId, className }: Props) {
     onError: () => setOptimistic(null),
   });
 
-  const protectedRun = useProtectedAction<void, unknown>({
-    kind: "favorite.toggle",
-    requirements: { authenticated: true },
-    reason: isActive ? "favorite.toggle:off" : "favorite.toggle:on",
-    gateCopy: {
-      title: "Guarda tus favoritos",
-      description:
-        "Inicia sesión para guardar este lugar y encontrarlo en /cuenta/favoritos.",
-      primaryCta: "Iniciar sesión y guardar",
-    },
-    action: async () => mutation.mutateAsync(),
-    onError: (err) => {
-      const msg = err instanceof Error ? err.message : "No se pudo guardar el favorito";
-      toast.error(msg);
-    },
-  });
+  const [anonBusy, setAnonBusy] = useState(false);
+
+  async function handleClick() {
+    // Rama autenticada — comportamiento preservado.
+    if (user?.id) {
+      const wasActive = isActive;
+      try {
+        await mutation.mutateAsync();
+        const c = wasActive ? ANON_COPY.intent.favoriteReleased : ANON_COPY.intent.favoriteAcknowledged;
+        toast(c.title, { description: c.body });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Intenta de nuevo.";
+        toast.error(msg);
+      }
+      return;
+    }
+
+    // Rama anónima — Alux acompaña desde el primer clic.
+    if (anonBusy) return;
+    setAnonBusy(true);
+    setOptimistic(!isActive);
+    try {
+      if (isActive) {
+        await anon.removeFavorite(entityKind, entityId);
+        const c = ANON_COPY.intent.favoriteReleased;
+        toast(c.title, { description: c.body });
+      } else {
+        const res = await anon.addFavorite({
+          kind: entityKind,
+          id: entityId,
+          title: entityTitle,
+          slug: entitySlug,
+          imageUrl: entityImageUrl,
+        });
+        if (!res.ok && res.reason === "limit") {
+          setOptimistic(null);
+          const c = ANON_COPY.intent.limitFriendly;
+          toast(c.title, { description: c.body });
+          return;
+        }
+        const c = ANON_COPY.intent.favoriteAcknowledged;
+        toast(c.title, { description: c.body });
+      }
+    } finally {
+      setAnonBusy(false);
+    }
+  }
 
   const active = optimistic ?? isActive;
-  const disabled = mutation.isPending || protectedRun.pending;
+  const disabled = mutation.isPending || anonBusy;
 
   return (
     <button
       type="button"
       disabled={disabled}
-      onClick={() => protectedRun.run()}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        void handleClick();
+      }}
       aria-pressed={active}
       className={[
         "inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-60",
