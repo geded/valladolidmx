@@ -138,34 +138,131 @@ export const destinationHoursDecisionContributor: DecisionContributor = {
 };
 
 /**
- * Traffic → si el traslado al próximo ítem es largo, sugerir salir antes.
+ * Traffic → convierte el TrafficSignalPayload normalizado (CV6.5.3) en
+ * decisiones accionables. Auto-Hide: `on_time` con holgura amplia y sin
+ * novedad relevante NO produce tarjeta.
  */
 export const destinationTrafficDecisionContributor: DecisionContributor = {
   id: "destination.traffic",
   contribute(input): DecisionCard[] {
     const ctx = asResolved(input);
     const sigs = signalsOf<TrafficSignalPayload>(ctx, "traffic");
-    const sig = sigs[0];
-    if (!sig) return [];
-    const t = sig.payload;
-    if (t.durationMinutes < 15) return [];
-    return [
-      {
-        id: `destination.traffic:leave-earlier`,
-        slot: "next",
-        priority: t.durationMinutes >= 30 ? 78 : 50,
-        tone: t.condition === "heavy" ? "warning" : "info",
-        title: "Sal antes",
-        rationale: `Traslado estimado ${t.durationMinutes} min (${t.distanceKm.toFixed(1)} km${t.condition !== "unknown" ? `, tráfico ${t.condition}` : ""}).`,
-        primaryAction: {
-          id: "navigate",
-          label: "Iniciar navegación",
-          intent: "navigate",
-        },
-        sources: ["destination_context", "geolocation"],
-        at: sig.at,
-      },
-    ];
+    const cards: DecisionCard[] = [];
+    for (const sig of sigs) {
+      const t = sig.payload;
+      const dur = t.durationMinutes ?? null;
+      const dist = t.distanceKm ?? null;
+      const durTxt = dur != null ? `${dur} min` : "trayecto";
+      const distTxt = dist != null ? ` (${dist.toFixed(1)} km)` : "";
+      const deltaTxt =
+        t.trafficDeltaMinutes != null && t.trafficDeltaMinutes > 0
+          ? `, +${t.trafficDeltaMinutes} min por tráfico`
+          : "";
+      const originHint =
+        t.originPrecision !== "device" ? ` · desde ${t.originLabel}` : "";
+      const baseSources: DecisionCard["sources"] = [
+        "destination_context",
+        ...(t.originPrecision === "device"
+          ? (["geolocation"] as const)
+          : []),
+      ];
+      const navAction = {
+        id: "navigate",
+        label: "Iniciar navegación",
+        intent: "navigate" as const,
+      };
+
+      switch (t.status) {
+        case "leave_now":
+          cards.push({
+            id: `destination.traffic:leave-now:${t.destEntityId}`,
+            slot: "now",
+            priority: 90,
+            tone: "warning",
+            title: "Sal ahora",
+            rationale: `${durTxt}${distTxt}${deltaTxt}${originHint}.`,
+            primaryAction: navAction,
+            sources: baseSources,
+            at: sig.at,
+          });
+          break;
+        case "leave_soon":
+          cards.push({
+            id: `destination.traffic:leave-soon:${t.destEntityId}`,
+            slot: "next",
+            priority: 75,
+            tone: "info",
+            title:
+              t.minutesToLeave != null
+                ? `Sal en ${t.minutesToLeave} min`
+                : "Sal pronto",
+            rationale: `${durTxt}${distTxt}${deltaTxt}${originHint}.`,
+            primaryAction: navAction,
+            sources: baseSources,
+            at: sig.at,
+          });
+          break;
+        case "delay_risk":
+          cards.push({
+            id: `destination.traffic:delay-risk:${t.destEntityId}`,
+            slot: "next",
+            priority: 70,
+            tone: "warning",
+            title: "Riesgo de retraso",
+            rationale: `${durTxt}${deltaTxt}. Considera adelantar la salida o mover la actividad.`,
+            primaryAction: navAction,
+            sources: baseSources,
+            at: sig.at,
+          });
+          break;
+        case "likely_late":
+          cards.push({
+            id: `destination.traffic:likely-late:${t.destEntityId}`,
+            slot: "now",
+            priority: 92,
+            tone: "critical",
+            title: "Llegarías tarde",
+            rationale: `${durTxt}${deltaTxt}. Reorganiza la actividad o avisa al lugar.`,
+            primaryAction: navAction,
+            sources: baseSources,
+            at: sig.at,
+          });
+          break;
+        case "on_time":
+          // Sólo emitir si el tráfico añade tiempo relevante — de lo
+          // contrario, silencio (Auto-Hide).
+          if ((t.trafficDeltaMinutes ?? 0) >= 8) {
+            cards.push({
+              id: `destination.traffic:heavier:${t.destEntityId}`,
+              slot: "next",
+              priority: 45,
+              tone: "info",
+              title: "El tráfico aumentó",
+              rationale: `${durTxt} (+${t.trafficDeltaMinutes} min respecto a lo habitual).`,
+              primaryAction: navAction,
+              sources: baseSources,
+              at: sig.at,
+            });
+          }
+          break;
+        case "route_unavailable":
+          cards.push({
+            id: `destination.traffic:route-unavailable:${t.destEntityId}`,
+            slot: "next",
+            priority: 30,
+            tone: "warning",
+            title: "Ruta no disponible",
+            rationale: `No pudimos calcular el trayecto hacia el próximo lugar${originHint}.`,
+            sources: baseSources,
+            at: sig.at,
+          });
+          break;
+        case "traffic_unknown":
+          // Auto-Hide.
+          break;
+      }
+    }
+    return cards;
   },
 };
 
