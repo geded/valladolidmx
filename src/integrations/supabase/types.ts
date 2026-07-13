@@ -5227,6 +5227,70 @@ export type Database = {
         }
         Relationships: []
       }
+      travel_memories: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          item_id: string | null
+          order_id: string | null
+          photo_url: string | null
+          plan_id: string | null
+          rating: number | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          order_id?: string | null
+          photo_url?: string | null
+          plan_id?: string | null
+          rating?: number | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          order_id?: string | null
+          photo_url?: string | null
+          plan_id?: string | null
+          rating?: number | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "travel_memories_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "travel_plan_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "travel_memories_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "travel_memories_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "travel_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       travel_plan_items: {
         Row: {
           created_at: string
