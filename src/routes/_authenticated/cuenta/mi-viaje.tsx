@@ -235,6 +235,7 @@ function MiViajePage() {
           confirmed={activeConfirmed}
           cases={cases}
           reservedIds={reservedIds}
+          phase={phase}
           onChanged={invalidatePlan}
         />
       )}
@@ -297,6 +298,7 @@ function MiViajeVistaBody({
   confirmed,
   cases,
   reservedIds,
+  phase,
   onChanged,
 }: {
   vista: MiViajeVista;
@@ -314,6 +316,7 @@ function MiViajeVistaBody({
     | null;
   cases: CaseSummary[];
   reservedIds: Set<string>;
+  phase: TravelCompanionPhase;
   onChanged: () => void;
 }) {
   if (vista === "resumen") {
@@ -376,6 +379,7 @@ function MiViajeVistaBody({
   if (vista === "alux") {
     return (
       <div className="space-y-6">
+        <AluxWorkspaceHeader plan={plan} phase={phase} confirmed={confirmed} />
         <AluxPlanProposalsInbox onChanged={onChanged} />
         <AluxTravelerPanel />
       </div>
@@ -425,6 +429,94 @@ function VistaEmpty({
       <Icon className="mx-auto size-6 text-primary" aria-hidden />
       <h2 className="mt-3 font-serif text-lg text-foreground">{title}</h2>
       <p className="mx-auto mt-1 max-w-lg text-sm text-muted-foreground">{body}</p>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* CV5.8 · Alux vista v2 · Header contextual + quick actions           */
+/* ------------------------------------------------------------------ */
+
+function AluxWorkspaceHeader({
+  plan,
+  phase,
+  confirmed,
+}: {
+  plan: TravelPlanWithItems;
+  phase: TravelCompanionPhase;
+  confirmed: { folio?: string | null } | null;
+}) {
+  const p = plan.plan;
+  const itemCount = plan.items.length;
+  const start = p.start_date ?? null;
+  const party = p.party_size ?? null;
+  const contextBits: string[] = [];
+  if (start) contextBits.push(`Llegada ${new Date(start + "T00:00:00").toLocaleDateString("es-MX", { day: "numeric", month: "short" })}`);
+  if (party) contextBits.push(`${party} ${party === 1 ? "viajero" : "viajeros"}`);
+  contextBits.push(`${itemCount} ${itemCount === 1 ? "parada" : "paradas"} en el plan`);
+
+  const phasePrompt: Record<TravelCompanionPhase, { title: string; prompt: string; cta: string }> = {
+    planning: {
+      title: "Estás planeando tu viaje",
+      prompt: `Ayúdame a mejorar mi plan actual con ${itemCount} paradas${start ? ` llegando el ${start}` : ""}. Sugiere qué falta y qué reordenar.`,
+      cta: "Mejorar mi plan con Alux",
+    },
+    confirmed: {
+      title: "Tu viaje está confirmado",
+      prompt: `Mi viaje está confirmado${confirmed?.folio ? ` (${confirmed.folio})` : ""}. Prepárame: qué llevar, clima, ropa y consejos culturales del Oriente Maya.`,
+      cta: "Prepararme para el viaje",
+    },
+    onsite: {
+      title: "Estás viviendo el Oriente Maya",
+      prompt: "Estoy en Valladolid ahora mismo. ¿Qué me recomiendas hacer hoy cerca de mí y qué debo saber para vivirlo mejor?",
+      cta: "¿Qué hago ahora?",
+    },
+    post: {
+      title: "El viaje continúa",
+      prompt: "Ya terminé mi viaje al Oriente Maya. Ayúdame a dejar reseñas y a planear mi próxima visita.",
+      cta: "Continuar mi historia",
+    },
+  };
+  const meta = phasePrompt[phase];
+
+  return (
+    <section className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background p-5 sm:p-6">
+      <div className="flex items-start gap-3">
+        <div className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
+          <SparklesIcon className="size-5" aria-hidden />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+            Alux · Copiloto de viaje
+          </p>
+          <h2 className="mt-1 font-serif text-xl text-foreground">{meta.title}</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {contextBits.join(" · ")}
+          </p>
+        </div>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Link
+          to="/alux"
+          search={{ prompt: meta.prompt }}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-soft transition hover:opacity-90"
+        >
+          <MessageCircle className="size-3.5" aria-hidden />
+          {meta.cta}
+        </Link>
+        <Link
+          to="/alux"
+          search={{ prompt: `Explícame mi plan actual con ${itemCount} paradas y dime qué mejorarías.` }}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border/70 bg-background px-3 py-2 text-xs font-medium text-foreground transition hover:bg-accent"
+        >
+          <RouteIcon className="size-3.5" aria-hidden />
+          Revisar mi plan
+        </Link>
+      </div>
+      <p className="mt-3 text-[11px] text-muted-foreground">
+        Alux conoce tu plan, tus reservas y tu momento del viaje. Cada sugerencia
+        se puede añadir con un solo toque; nada se agrega sin tu confirmación.
+      </p>
     </section>
   );
 }
