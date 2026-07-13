@@ -5,6 +5,7 @@ import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { PublicShell } from "@/components/discovery";
+import { ContinuityWelcomeSurface } from "@/components/traveler/ContinuityWelcomeSurface";
 import { useSectionEditWrap } from "@/components/experience-builder/SectionEditOverlay";
 import { buildPublicHead, pickFirstMediaUrl, webPageJsonLd } from "@/lib/discovery/seo";
 import {
@@ -70,6 +71,7 @@ function HomePage() {
   if (published?.snapshot) {
     return (
       <PublicShell variant="hero">
+        <ContinuityWelcomeSurface />
         <CompositionRenderer tree={published.snapshot} pageType="home" wrap={editWrap} />
       </PublicShell>
     );
@@ -102,6 +104,7 @@ const HOME_FALLBACK_SECTIONS: readonly DiscoverySectionKind[] = [
 function LegacyHome() {
   return (
     <PublicShell variant="hero">
+      <ContinuityWelcomeSurface />
       {HOME_FALLBACK_SECTIONS.map((kind) => {
         const Section = getDiscoverySection(kind).component;
         return <Section key={kind} />;

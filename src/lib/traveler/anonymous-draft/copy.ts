@@ -71,6 +71,46 @@ export const ANON_COPY = {
         "continuar en cualquier dispositivo.",
     },
   },
+  /**
+   * AC1.3 · Founder Continuity Recognition + First Five Seconds.
+   *
+   * Bank oficial de continuidad. El Delight Moment consume EXCLUSIVAMENTE
+   * este bloque — nunca se inventa copy en superficie. La rotación es
+   * determinista por índice para preservar hidratación SSR-safe.
+   */
+  continuity: {
+    greetings: [
+      {
+        title: "¡Qué gusto volver a verte!",
+        body: "Sigamos preparando tu viaje.",
+      },
+      {
+        title: "Tu viaje te estaba esperando.",
+        body: "Continuemos donde lo dejamos.",
+      },
+      {
+        title: "Continuemos desde donde lo dejamos.",
+        body: "Alux sigue acompañándote en el Oriente Maya.",
+      },
+      {
+        title: "Todavía tenemos un gran viaje por delante.",
+        body: "Retomemos juntos lo que ya empezamos.",
+      },
+    ],
+    where: {
+      label: "Dónde nos quedamos",
+      empty: "Ya empecé a preparar tu viaje.",
+    },
+    important: {
+      label: "Lo más importante ahora",
+    },
+    nextStep: {
+      label: "Tu siguiente paso",
+    },
+    primaryCta: "Continuemos mi viaje",
+    secondaryCta: "Empezar un viaje nuevo",
+    scopeNotice: "Este viaje permanecerá disponible en este dispositivo.",
+  },
 } as const;
 
 export type AnonCopyKey = keyof typeof ANON_COPY;
