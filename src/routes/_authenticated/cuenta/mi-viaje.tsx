@@ -580,6 +580,7 @@ function MiViajeVistaBody({
   reservedIds,
   phase,
   onChanged,
+  focus,
 }: {
   vista: MiViajeVista;
   plan: TravelPlanWithItems;
