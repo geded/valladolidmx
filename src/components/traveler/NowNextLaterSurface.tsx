@@ -40,6 +40,9 @@ import {
   type AluxSpatialProposal,
 } from "@/lib/traveler/alux-spatial";
 import { useRef } from "react";
+import { deriveOnTripConciergeState } from "@/lib/traveler/on-trip-concierge";
+import { OnTripConciergePriorityBanner } from "@/components/traveler/OnTripConciergePriorityBanner";
+import { useNavigate } from "@tanstack/react-router";
 
 type LoosePlan = {
   start_date?: string | null;
@@ -150,9 +153,21 @@ export interface NowNextLaterSurfaceProps {
   /** Coordenadas del destino/viajero para resolver contexto. Opcional. */
   geo?: { lat: number; lon: number } | null;
   destination?: string | null;
+  /** CV6.7 · Caso Concierge vigente vinculado al plan (si existe). */
+  activeCase?: { id: string; status?: string | null } | null;
+  /** CV6.7 · Orden confirmada del viaje (`concierge_orders`). */
+  order?: { status: string } | null;
 }
 
-export function NowNextLaterSurface({ phase, plan, geo, destination }: NowNextLaterSurfaceProps) {
+export function NowNextLaterSurface({
+  phase,
+  plan,
+  geo,
+  destination,
+  activeCase,
+  order,
+}: NowNextLaterSurfaceProps) {
+  const navigate = useNavigate();
   // Consumidores acceden EXCLUSIVAMENTE a ResolvedDestinationContext
   // vía server fn (Guardrail vinculante).
   const resolveFn = useServerFn(resolveTravelerDestinationContext);
@@ -262,14 +277,55 @@ export function NowNextLaterSurface({ phase, plan, geo, destination }: NowNextLa
     return proposals;
   }, [phase, plan, center, ctxQuery.data]);
 
-  // Auto-Hide global (Founder Decision Center Principle).
-  if (center.empty) return null;
+  // CV6.7 · Travel Assistance Layer · state derivado (Pure Domain).
+  const assistanceState = useMemo(() => {
+    const at = new Date();
+    const adapted: LiveDayPlanInput = {
+      start_date: plan?.start_date ?? null,
+      end_date: plan?.end_date ?? null,
+      items: adaptItems(plan?.items ?? null),
+    };
+    const liveDay = deriveLiveDay(adapted, at);
+    return deriveOnTripConciergeState({
+      phase,
+      liveDay,
+      case: activeCase ?? null,
+      order: order ?? null,
+      at,
+    });
+  }, [phase, plan, activeCase, order]);
+
+  // Auto-Hide global: sólo si NINGUNA capa aporta valor.
+  if (center.empty && !assistanceState.visible) return null;
+
+  // Handler stateless: sólo navega. Las mutaciones (promotePlanToCase)
+  // viven en la ruta destino /cuenta/mi-viaje (Strict Reuse).
+  const handleAssistancePrimary = () => {
+    if (assistanceState.ctaIntent === "view_case") {
+      navigate({ to: "/cuenta/mi-viaje", search: { vista: "concierge" } as never });
+    } else if (assistanceState.ctaIntent === "open_case") {
+      navigate({
+        to: "/cuenta/mi-viaje",
+        search: { vista: "concierge", accion: "contactar" } as never,
+      });
+    }
+  };
 
   return (
     <section
       aria-label="Centro de decisiones del viaje"
       className="rounded-3xl border border-border/70 bg-card/50 p-4 shadow-soft sm:p-5"
     >
+      {/* CV6.7 · Travel Assistance Layer — Single Entry Point */}
+      {assistanceState.visible ? (
+        <div className="mb-4">
+          <OnTripConciergePriorityBanner
+            state={assistanceState}
+            onPrimary={handleAssistancePrimary}
+          />
+        </div>
+      ) : null}
+
       <header className="mb-3 flex items-center gap-2">
         <span className="grid size-7 place-items-center rounded-full bg-primary/15 text-primary">
           <Sparkles className="size-4" aria-hidden />
