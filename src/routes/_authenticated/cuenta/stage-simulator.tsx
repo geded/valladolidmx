@@ -12,6 +12,7 @@ import { StageAwareCompanionBoard } from "@/components/traveler/StageAwareCompan
 import { ALL_STAGES, getStageExperience } from "@/lib/traveler/stage-experience";
 import type { TravelStage } from "@/lib/traveler/journey-stage";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SimulatorSearch {
   stage?: TravelStage;
@@ -33,6 +34,26 @@ function StageSimulator() {
   const { stage } = useSearch({ from: "/_authenticated/cuenta/stage-simulator" });
   const navigate = useNavigate({ from: "/cuenta/stage-simulator" });
   const active: TravelStage = stage ?? "inspiration";
+  const { role, loading } = useAuth();
+  const allowed =
+    import.meta.env.DEV === true || role === "super_admin" || role === "admin";
+
+  if (loading) return null;
+  if (!allowed) {
+    return (
+      <div className="max-w-3xl space-y-3">
+        <h1 className="font-serif text-2xl">Herramienta interna</h1>
+        <p className="text-sm text-muted-foreground">
+          El Stage Simulator es una utilidad de validación reservada al equipo
+          Founder/Admin. Como viajero no necesitas esta vista: Alux ya se adapta
+          automáticamente a la etapa real de tu viaje.
+        </p>
+        <Link to="/cuenta" className="text-sm underline">
+          Volver a mi cuenta
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl space-y-6">
