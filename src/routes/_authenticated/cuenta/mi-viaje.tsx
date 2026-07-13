@@ -52,6 +52,7 @@ import { List, Clock, Map as MapIcon, ChevronUp, ChevronDown, Wand2 } from "luci
 import { ReservationsList } from "@/components/traveler/ReservationsList";
 import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
 import { MemoriesSection } from "@/components/traveler/MemoriesSection";
+import { DayWeatherChip } from "@/components/traveler/DayWeatherChip";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista } => {
@@ -598,6 +599,17 @@ function ItinerarioTimeline({
     return days;
   }, [data.items]);
 
+  const totalDays = useMemo(() => {
+    let max = 0;
+    for (const it of data.items) {
+      if (typeof it.day_index === "number" && it.day_index + 1 > max) {
+        max = it.day_index + 1;
+      }
+    }
+    return Math.min(Math.max(max, 1), 16);
+  }, [data.items]);
+  const startDate = data.plan.start_date;
+
   if (data.items.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
@@ -617,7 +629,15 @@ function ItinerarioTimeline({
                 ({items.length})
               </span>
             </h3>
-            {items.length >= 2 ? (
+            <div className="ml-auto flex items-center gap-2">
+              {typeof key === "number" ? (
+                <DayWeatherChip
+                  startDate={startDate}
+                  totalDays={totalDays}
+                  dayIndex={key}
+                />
+              ) : null}
+              {items.length >= 2 ? (
               <button
                 type="button"
                 onClick={() =>
@@ -630,7 +650,8 @@ function ItinerarioTimeline({
                 <Wand2 className="size-3" aria-hidden />
                 Optimizar con Alux
               </button>
-            ) : null}
+              ) : null}
+            </div>
           </div>
           <ol className="relative space-y-3 border-l border-border/60 pl-4">
             {items.map((it, idx) => {
