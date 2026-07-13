@@ -90,13 +90,16 @@ describe("evaluateHoursStatus", () => {
   });
 
   test("7. overnight (bar 20:00→02:00) — abierto pasada la medianoche", () => {
-    // domingo 20:00 → lunes 02:00
+    // domingo 20:00 → lunes 02:00. A las 00:30 quedan 90 min → open_now.
     const rows: BusinessHourRow[] = [
       { day_of_week: 0, opens_at: "20:00", closes_at: "02:00" },
     ];
-    const r = evaluateHoursStatus(rows, { timezone: TZ, now: atLocal(MONDAY, 1) });
+    const r = evaluateHoursStatus(rows, { timezone: TZ, now: atLocal(MONDAY, 0, 30) });
     expect(r.status).toBe("open_now");
     expect(r.closesAt).toBe("02:00");
+    // A las 01:30 quedan 30 min → closing_soon.
+    const r2 = evaluateHoursStatus(rows, { timezone: TZ, now: atLocal(MONDAY, 1, 30) });
+    expect(r2.status).toBe("closing_soon");
   });
 
   test("8. sin filas → hours_unknown", () => {
