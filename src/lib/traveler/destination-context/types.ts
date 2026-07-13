@@ -48,7 +48,35 @@ export interface DestinationSignalScope {
     id: string;
     type: string;
     timezone?: string;
+    /**
+     * CV6.5.3 · Rol semántico dentro del día (aditivo).
+     * `next` marca el próximo ítem al que el viajero se trasladará —
+     * consumido por el Traffic Contributor.
+     */
+    role?: "current" | "next" | "later" | "previous" | (string & {});
+    /** Coordenadas conocidas de la entidad. Aditivo. */
+    geo?: { lat: number; lon: number };
   }>;
+  /**
+   * CV6.5.3 · Solicitud de tráfico (aditivo).
+   * Cuando está presente, el Traffic Contributor calcula ruta/ETA
+   * entre `origin` (o `scope.geo`) y la entidad marcada con role="next".
+   */
+  traffic?: {
+    origin?: {
+      geo?: { lat: number; lon: number };
+      label?: string;
+      precision?:
+        | "device"
+        | "hotel"
+        | "previous_activity"
+        | "destination_center"
+        | "unknown";
+    };
+    /** ISO datetime — hora objetivo de llegada al `next`. */
+    arriveBy?: string;
+    mode?: "DRIVE" | "WALK" | "BICYCLE" | "TWO_WHEELER";
+  };
 }
 
 /** Explicabilidad — obligatoria (Explainable by Default). */

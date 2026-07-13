@@ -155,7 +155,9 @@ export function NowNextLaterSurface({ phase, plan, geo, destination }: NowNextLa
 
   // CV6.5.2 · Adaptamos ítems del día en curso a entidades del scope
   // para que el Hours Contributor pueda evaluar horarios reales.
-  const todayEntities = useMemo(() => {
+  // CV6.5.3 · Marcamos rol `next` en el próximo ítem para que el
+  // Traffic Contributor calcule ruta/ETA.
+  const { todayEntities, traffic } = useMemo(() => {
     const at = new Date();
     const adapted: LiveDayPlanInput = {
       start_date: plan?.start_date ?? null,
@@ -164,17 +166,30 @@ export function NowNextLaterSurface({ phase, plan, geo, destination }: NowNextLa
     };
     const liveDay = deriveLiveDay(adapted, at);
     const seen = new Set<string>();
-    const out: Array<{ id: string; type: string }> = [];
-    for (const it of liveDay.items) {
+    const out: Array<{
+      id: string;
+      type: string;
+      role?: "current" | "next";
+    }> = [];
+    liveDay.items.forEach((it, idx) => {
       const id = it.entity_id ?? null;
       const type = it.entity_type ?? null;
-      if (!id || !type) continue;
+      if (!id || !type) return;
       const key = `${type}:${id}`;
-      if (seen.has(key)) continue;
+      if (seen.has(key)) return;
       seen.add(key);
-      out.push({ id, type });
-    }
-    return out;
+      let role: "current" | "next" | undefined;
+      if (idx === liveDay.nowIndex) role = "current";
+      else if (idx === liveDay.nextIndex) role = "next";
+      out.push({ id, type, role });
+    });
+    const nextItem =
+      liveDay.nextIndex != null ? liveDay.items[liveDay.nextIndex] : null;
+    const trafficReq =
+      nextItem && nextItem.starts_at
+        ? { arriveBy: nextItem.starts_at }
+        : undefined;
+    return { todayEntities: out, traffic: trafficReq };
   }, [plan]);
 
   const ctxQuery = useQuery({
@@ -184,6 +199,7 @@ export function NowNextLaterSurface({ phase, plan, geo, destination }: NowNextLa
       geo?.lon ?? null,
       destination ?? null,
       todayEntities.map((e) => `${e.type}:${e.id}`).join("|"),
+      traffic?.arriveBy ?? null,
     ],
     queryFn: () =>
       resolveFn({
@@ -191,6 +207,7 @@ export function NowNextLaterSurface({ phase, plan, geo, destination }: NowNextLa
           geo: geo ?? null,
           destination: destination ?? null,
           entities: todayEntities,
+          traffic,
         },
       }),
     enabled,
