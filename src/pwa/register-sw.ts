@@ -180,6 +180,7 @@ export async function applyPendingUpdate(): Promise<boolean> {
     emit("skipped", { reason: reason.value });
     return false;
   }
+  if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return false;
   const reg = currentRegistration ?? (await navigator.serviceWorker.getRegistration());
   const target = waitingWorker ?? reg?.waiting ?? null;
   if (!target) return false;
@@ -199,6 +200,7 @@ export async function applyPendingUpdate(): Promise<boolean> {
  * chequeos periódicos o al recuperar visibilidad de la pestaña.
  */
 export async function checkForUpdate(): Promise<boolean> {
+  if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return false;
   const reg = currentRegistration ?? (await navigator.serviceWorker.getRegistration());
   if (!reg) return false;
   try {
