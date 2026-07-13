@@ -495,7 +495,7 @@ function ItinerarioViews({
           reservedIds={reservedIds}
         />
       ) : view === "timeline" ? (
-        <ItinerarioTimeline data={data} />
+        <ItinerarioTimeline data={data} onChanged={onChanged} />
       ) : (
         <ItinerarioMap data={data} />
       )}
