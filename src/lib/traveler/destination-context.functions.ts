@@ -19,6 +19,14 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { DestinationSignal } from "@/lib/traveler/destination-context";
+
+/** Payload serializable devuelto al cliente. */
+export interface TravelerDestinationContextPayload {
+  signals: Record<string, DestinationSignal[]>;
+  resolvedAt: string;
+  contributors: string[];
+}
 
 const InputSchema = z.object({
   geo: z
@@ -34,7 +42,7 @@ const InputSchema = z.object({
 
 export const resolveTravelerDestinationContext = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<TravelerDestinationContextPayload> => {
     const mod = await import("@/lib/traveler/destination-context");
     // Registro idempotente por ID (registry es un Map en módulo cargado
     // una vez por worker). Contributors independientes — sin
@@ -51,5 +59,9 @@ export const resolveTravelerDestinationContext = createServerFn({ method: "POST"
       at: new Date(),
       locale: data.locale,
     });
-    return resolved;
+    return {
+      signals: resolved.signals,
+      resolvedAt: resolved.resolvedAt,
+      contributors: resolved.contributors,
+    };
   });
