@@ -35,6 +35,7 @@ import {
 } from "@/lib/traveler/traveler-account.functions";
 import { upsertMyPersonalProfile } from "@/lib/traveler/profile-personal.functions";
 import { Input } from "@/components/ui/input";
+import { deriveTravelStage, getDailyMission } from "@/lib/traveler/journey-stage";
 
 type Lang = "es" | "en" | "fr" | "de" | "it" | "pt";
 type Window = "este_mes" | "proximos_3_meses" | "mas_adelante" | "no_se";
@@ -106,8 +107,10 @@ export function WelcomeOnboardingModal({
   knownFirstName,
 }: WelcomeOnboardingModalProps) {
   const hasName = Boolean(knownFirstName && knownFirstName.trim());
+  // CV6.O1: se añade un paso final "Daily Companion" (Travel Companion First).
   const firstStep = hasName ? 2 : 1;
-  const totalSteps = hasName ? 3 : 4;
+  const totalSteps = hasName ? 4 : 5;
+  const FINAL_STEP = 5;
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(firstStep);
   const [firstName, setFirstName] = useState(knownFirstName ?? "");
@@ -155,6 +158,18 @@ export function WelcomeOnboardingModal({
     },
     onError: (e) => toast.error(`No se pudo guardar: ${(e as Error).message}`),
   });
+
+  // Etapa derivada tras completar el onboarding — sirve para mostrar la
+  // misión diaria (Daily Value Principle) sin persistir modelo nuevo.
+  const previewStage = deriveTravelStage({
+    hasCompletedProfile: Boolean(firstName.trim() && lang && travelWindow && party),
+    hasTravelPlan: false,
+    hasPlanItems: false,
+    hasActiveTrip: false,
+    daysUntilStart: null,
+    daysAfterEnd: null,
+  });
+  const mission = getDailyMission(previewStage);
 
   const canFinish = useMemo(() => Boolean(firstName.trim() && lang && travelWindow && party), [
     firstName,
@@ -295,6 +310,22 @@ export function WelcomeOnboardingModal({
               </div>
             </div>
           )}
+
+          {step === FINAL_STEP && (
+            <div className="space-y-3">
+              <p className="text-sm font-medium">Alux te acompaña todo el viaje</p>
+              <div className="rounded-2xl border border-border/70 bg-muted/30 p-4">
+                <p className="text-base font-semibold">{mission.headline}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {mission.subline}
+                </p>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Antes, durante y después. Sin pedirte permisos hasta que valga la
+                pena.
+              </p>
+            </div>
+          )}
         </div>
 
         <DialogFooter className="flex-row justify-between gap-2 sm:justify-between">
@@ -307,26 +338,27 @@ export function WelcomeOnboardingModal({
                 Atrás
               </Button>
             )}
-            {step < 4 && (
+            {step < FINAL_STEP && (
               <Button
                 size="sm"
                 onClick={() => setStep(step + 1)}
                 disabled={
                   (step === 1 && !firstName.trim()) ||
                   (step === 2 && !lang) ||
-                  (step === 3 && !travelWindow)
+                  (step === 3 && !travelWindow) ||
+                  (step === 4 && !party)
                 }
               >
                 Continuar
               </Button>
             )}
-            {step === 4 && (
+            {step === FINAL_STEP && (
               <Button
                 size="sm"
                 onClick={finish}
                 disabled={!canFinish || mutation.isPending}
               >
-                {mutation.isPending ? "Guardando…" : "Descubrir Oriente Maya de Yucatán"}
+                {mutation.isPending ? "Guardando…" : mission.ctaLabel}
               </Button>
             )}
           </div>
