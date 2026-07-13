@@ -314,11 +314,22 @@ function MiViajeVistaTabs({
 }) {
   const navigate = useNavigate({ from: Route.fullPath });
   const order = PHASE_VISTA_ORDER[phase];
+  const navRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const root = navRef.current;
+    if (!root) return;
+    const active = root.querySelector<HTMLButtonElement>('button[aria-pressed="true"]');
+    if (active) {
+      active.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }, [current, phase]);
   return (
-    <nav
-      className="scrollbar-none -mx-1 flex gap-1 overflow-x-auto rounded-xl border border-border/70 bg-card/40 p-1"
-      aria-label="Vistas de Mi Viaje"
-    >
+    <div className="relative">
+      <nav
+        ref={navRef}
+        className="scrollbar-none -mx-1 flex gap-1 overflow-x-auto rounded-xl border border-border/70 bg-card/40 p-1"
+        aria-label="Vistas de Mi Viaje"
+      >
       {order.map((key) => {
         const meta = VISTA_META[key];
         const Icon = meta.icon;
