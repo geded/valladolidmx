@@ -169,6 +169,35 @@ para implementación.
 
 ---
 
+## Adenda · Founder Business Value Principle (2026-07-13)
+
+La Constitución define **cómo debe sentirse Alux**. El Founder Business
+Value Principle define **para qué existe cada nueva capacidad** y **cómo
+se evaluará su éxito**. Ambos son requisito conjunto para autorizar
+Blueprint.
+
+Todo Blueprint de nueva épica/sub-ola/capacidad debe incluir:
+
+1. **Objetivo de negocio principal.**
+2. **Hipótesis de valor** (falsable).
+3. **Métrica primaria de éxito (North Star)** — una sola.
+4. **Métricas secundarias** — incluyendo contrapesos de confianza,
+   utilidad y continuidad.
+5. **Contribución estratégica** — cómo aporta al objetivo vigente.
+
+Cadena obligatoria: **Arquitectura → Experiencia → Comportamiento del
+viajero → Resultado de negocio.** Si falta cualquier eslabón, la épica
+no se aprueba.
+
+**Objetivo estratégico vigente:** incrementar la permanencia de los
+viajeros en el destino, mejorar su experiencia antes/durante/después del
+viaje y aumentar la conversión de esa experiencia en beneficios para el
+ecosistema turístico local.
+
+Referencia: `mem://policies/founder-business-value.md`.
+
+---
+
 _Documento mantenido por el Founder. Cualquier actualización se emite como
 `FOUNDER-EXPERIENCE-PRINCIPLES-vN.M.md` sin sobrescribir versiones
 anteriores._
