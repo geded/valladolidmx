@@ -35,6 +35,11 @@ import {
 import { CV6_5_DESTINATION_CONTRIBUTORS } from "@/lib/traveler/decision-center-destination";
 import { resolveTravelerDestinationContext } from "@/lib/traveler/destination-context.functions";
 import type { TripPhase } from "@/lib/traveler/trip-phase";
+import {
+  deriveAluxSpatialProposals,
+  type AluxSpatialProposal,
+} from "@/lib/traveler/alux-spatial";
+import { useRef } from "react";
 
 type LoosePlan = {
   start_date?: string | null;
@@ -234,6 +239,29 @@ export function NowNextLaterSurface({ phase, plan, geo, destination }: NowNextLa
     );
   }, [phase, plan, ctxQuery.data]);
 
+  // CV6.6 · Alux Espacial — dedupe por sesión (Regla de No Saturación).
+  const seenKeysRef = useRef<Set<string>>(new Set());
+
+  const aluxProposals: AluxSpatialProposal[] = useMemo(() => {
+    const at = new Date();
+    const adapted: LiveDayPlanInput = {
+      start_date: plan?.start_date ?? null,
+      end_date: plan?.end_date ?? null,
+      items: adaptItems(plan?.items ?? null),
+    };
+    const liveDay = deriveLiveDay(adapted, at);
+    const proposals = deriveAluxSpatialProposals({
+      phase,
+      liveDay,
+      decisionCenter: center,
+      destinationContext: (ctxQuery.data ?? null) as never,
+      at,
+      seenKeys: seenKeysRef.current,
+    });
+    proposals.forEach((p) => seenKeysRef.current.add(p.dedupeKey));
+    return proposals;
+  }, [phase, plan, center, ctxQuery.data]);
+
   // Auto-Hide global (Founder Decision Center Principle).
   if (center.empty) return null;
 
@@ -272,6 +300,57 @@ export function NowNextLaterSurface({ phase, plan, geo, destination }: NowNextLa
           );
         })}
       </div>
+
+      {/* CV6.6 · Alux Espacial — Auto-Hide si no hay propuestas. */}
+      {aluxProposals.length > 0 ? (
+        <div className="mt-5 border-t border-border/60 pt-4">
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+            Alux sugiere
+          </p>
+          <div className="grid gap-3 md:grid-cols-2">
+            {aluxProposals.map((p) => (
+              <article
+                key={p.id}
+                className="flex flex-col gap-2 rounded-2xl border border-primary/20 bg-primary/[0.04] p-4 shadow-soft"
+                aria-label={p.headline}
+              >
+                <p className="text-sm font-semibold text-foreground">
+                  {p.headline}
+                </p>
+                <dl className="grid gap-1.5 text-xs">
+                  <div>
+                    <dt className="font-medium text-foreground">Qué hacer</dt>
+                    <dd className="text-muted-foreground">{p.whatToDo}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-foreground">Por qué conviene</dt>
+                    <dd className="text-muted-foreground">{p.whyItMatters}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-foreground">Qué ganas</dt>
+                    <dd className="text-muted-foreground">{p.expectedBenefit}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-foreground">Si no lo haces</dt>
+                    <dd className="text-muted-foreground">{p.ifIgnored}</dd>
+                  </div>
+                </dl>
+                <Link
+                  to="/cuenta/mi-viaje"
+                  search={{ vista: "itinerario", focus: p.planItemId ?? undefined } as never}
+                  className="mt-1 inline-flex items-center gap-2 self-start rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-soft transition-transform hover:scale-[1.02]"
+                >
+                  <Sparkles className="size-4" aria-hidden />
+                  {p.primaryCta.label}
+                </Link>
+                <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/80">
+                  Confianza: {p.confidence}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
