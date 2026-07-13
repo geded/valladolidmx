@@ -27,6 +27,7 @@ import {
   getMyActivePlan,
   promotePlanToCase,
   removePlanItem,
+  reorderPlanItems,
   updatePlanItem,
   updatePlanMeta,
   type TravelItemKind,
@@ -45,8 +46,9 @@ import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsInbox";
 import { CalendarCheck, Sparkles } from "lucide-react";
 import { getPlanItemsGeo } from "@/lib/traveler/travel-plan-geo.functions";
+import { optimizePlanDay } from "@/lib/traveler/travel-plan-optimize.functions";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
-import { List, Clock, Map as MapIcon } from "lucide-react";
+import { List, Clock, Map as MapIcon, ChevronUp, ChevronDown, Wand2 } from "lucide-react";
 import { ReservationsList } from "@/components/traveler/ReservationsList";
 import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
 
@@ -493,7 +495,7 @@ function ItinerarioViews({
           reservedIds={reservedIds}
         />
       ) : view === "timeline" ? (
-        <ItinerarioTimeline data={data} />
+        <ItinerarioTimeline data={data} onChanged={onChanged} />
       ) : (
         <ItinerarioMap data={data} />
       )}
@@ -501,7 +503,84 @@ function ItinerarioViews({
   );
 }
 
-function ItinerarioTimeline({ data }: { data: TravelPlanWithItems }) {
+function ItinerarioTimeline({
+  data,
+  onChanged,
+}: {
+  data: TravelPlanWithItems;
+  onChanged: () => void;
+}) {
+  const globalOrder = useMemo(
+    () => [...data.items].sort((a, b) => a.position - b.position).map((i) => i.id),
+    [data.items],
+  );
+
+  const reorderFn = useServerFn(reorderPlanItems);
+  const optimizeFn = useServerFn(optimizePlanDay);
+
+  const reorder = useMutation({
+    mutationFn: (orderedItemIds: string[]) =>
+      reorderFn({ data: { planId: data.plan.id, orderedItemIds } }),
+    onSuccess: () => onChanged(),
+    onError: (e: unknown) =>
+      toast.error("No pudimos guardar el nuevo orden", {
+        description: e instanceof Error ? e.message : "Inténtalo de nuevo.",
+      }),
+  });
+
+  const optimize = useMutation({
+    mutationFn: (dayIndex: number | null) =>
+      optimizeFn({ data: { planId: data.plan.id, dayIndex } }),
+    onSuccess: (res) => {
+      onChanged();
+      if (res.updated === 0) {
+        toast(res.rationale);
+        return;
+      }
+      toast.success("Alux optimizó tu día", {
+        description: res.rationale,
+        duration: 8000,
+        action: {
+          label: "Deshacer",
+          onClick: () => reorder.mutate(res.previousOrder),
+        },
+      });
+    },
+    onError: (e: unknown) =>
+      toast.error("Alux no pudo optimizar este día", {
+        description: e instanceof Error ? e.message : "Inténtalo de nuevo.",
+      }),
+  });
+
+  function moveWithinDay(
+    dayItems: TravelPlanItem[],
+    itemId: string,
+    delta: -1 | 1,
+  ) {
+    const idx = dayItems.findIndex((i) => i.id === itemId);
+    if (idx < 0) return;
+    const target = idx + delta;
+    if (target < 0 || target >= dayItems.length) return;
+    // Reordena el bloque del día dentro del orden global.
+    const dayIds = dayItems.map((i) => i.id);
+    const [moved] = dayIds.splice(idx, 1);
+    dayIds.splice(target, 0, moved);
+    const daySet = new Set(dayIds);
+    const newOrder: string[] = [];
+    let inserted = false;
+    for (const id of globalOrder) {
+      if (daySet.has(id)) {
+        if (!inserted) {
+          newOrder.push(...dayIds);
+          inserted = true;
+        }
+        continue;
+      }
+      newOrder.push(id);
+    }
+    reorder.mutate(newOrder);
+  }
+
   const grouped = useMemo(() => {
     const map = new Map<number | "sin", TravelPlanItem[]>();
     for (const it of data.items) {
@@ -531,15 +610,33 @@ function ItinerarioTimeline({ data }: { data: TravelPlanWithItems }) {
     <div className="space-y-4">
       {grouped.map(([key, items]) => (
         <div key={String(key)} className="rounded-lg border bg-card p-4">
-          <h3 className="mb-3 font-serif text-sm text-foreground">
-            {key === "sin" ? "Sin día asignado" : `Día ${(key as number) + 1}`}
-            <span className="ml-2 text-xs text-muted-foreground">
-              ({items.length})
-            </span>
-          </h3>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h3 className="font-serif text-sm text-foreground">
+              {key === "sin" ? "Sin día asignado" : `Día ${(key as number) + 1}`}
+              <span className="ml-2 text-xs text-muted-foreground">
+                ({items.length})
+              </span>
+            </h3>
+            {items.length >= 2 ? (
+              <button
+                type="button"
+                onClick={() =>
+                  optimize.mutate(key === "sin" ? null : (key as number))
+                }
+                disabled={optimize.isPending}
+                className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary transition-colors hover:bg-primary/15 disabled:opacity-60"
+                title="Alux calcula la ruta más corta entre las paradas de este día"
+              >
+                <Wand2 className="size-3" aria-hidden />
+                Optimizar con Alux
+              </button>
+            ) : null}
+          </div>
           <ol className="relative space-y-3 border-l border-border/60 pl-4">
-            {items.map((it) => {
+            {items.map((it, idx) => {
               const snap = it.snapshot ?? {};
+              const canUp = idx > 0;
+              const canDown = idx < items.length - 1;
               return (
                 <li key={it.id} className="relative">
                   <span className="absolute -left-[21px] top-2 grid size-3 place-items-center rounded-full bg-primary" />
@@ -552,7 +649,7 @@ function ItinerarioTimeline({ data }: { data: TravelPlanWithItems }) {
                         loading="lazy"
                       />
                     ) : null}
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-foreground">
                         {snap.title || (it.item_kind === "note" ? "Nota" : "Elemento")}
                       </p>
@@ -567,6 +664,30 @@ function ItinerarioTimeline({ data }: { data: TravelPlanWithItems }) {
                         </p>
                       ) : null}
                     </div>
+                    {items.length > 1 ? (
+                      <div className="ml-auto flex shrink-0 flex-col gap-0.5">
+                        <button
+                          type="button"
+                          onClick={() => moveWithinDay(items, it.id, -1)}
+                          disabled={!canUp || reorder.isPending}
+                          className="grid size-6 place-items-center rounded-md border border-border/60 bg-background text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+                          aria-label="Mover arriba"
+                          title="Mover arriba"
+                        >
+                          <ChevronUp className="size-3.5" aria-hidden />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveWithinDay(items, it.id, 1)}
+                          disabled={!canDown || reorder.isPending}
+                          className="grid size-6 place-items-center rounded-md border border-border/60 bg-background text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+                          aria-label="Mover abajo"
+                          title="Mover abajo"
+                        >
+                          <ChevronDown className="size-3.5" aria-hidden />
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
                 </li>
               );
