@@ -13,7 +13,7 @@
  *  - Migración de cola de invitados (localStorage → plan activo).
  *  - Envío al Concierge sin cambiar la lógica del módulo (Sub-ola E).
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -262,7 +262,7 @@ function MiViajePage() {
             />
           </div>
         </div>
-        <h1 className="text-3xl font-semibold">Mi Viaje</h1>
+        <h1 className="text-2xl font-semibold sm:text-3xl">Mi Viaje</h1>
         <p className="text-sm text-muted-foreground">
           Tu compañero digital del Oriente Maya de Yucatán — antes, durante y
           después de tu visita. Todas las vistas comparten el mismo viaje.
