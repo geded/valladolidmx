@@ -61,9 +61,44 @@ const InputSchema = z.object({
         id: z.string().min(1).max(64),
         type: z.string().min(1).max(32),
         timezone: z.string().max(64).optional(),
+        role: z
+          .enum(["current", "next", "later", "previous"])
+          .optional(),
+        geo: z
+          .object({
+            lat: z.number().gte(-90).lte(90),
+            lon: z.number().gte(-180).lte(180),
+          })
+          .optional(),
       }),
     )
     .max(50)
+    .optional(),
+  traffic: z
+    .object({
+      origin: z
+        .object({
+          geo: z
+            .object({
+              lat: z.number().gte(-90).lte(90),
+              lon: z.number().gte(-180).lte(180),
+            })
+            .optional(),
+          label: z.string().max(80).optional(),
+          precision: z
+            .enum([
+              "device",
+              "hotel",
+              "previous_activity",
+              "destination_center",
+              "unknown",
+            ])
+            .optional(),
+        })
+        .optional(),
+      arriveBy: z.string().max(40).optional(),
+      mode: z.enum(["DRIVE", "WALK", "BICYCLE", "TWO_WHEELER"]).optional(),
+    })
     .optional(),
 });
 
@@ -83,6 +118,7 @@ export const resolveTravelerDestinationContext = createServerFn({ method: "POST"
         destination: data.destination ?? undefined,
         geo: data.geo ?? undefined,
         entities: data.entities ?? undefined,
+        traffic: data.traffic ?? undefined,
       },
       at: new Date(),
       locale: data.locale,
