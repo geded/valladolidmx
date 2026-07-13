@@ -113,9 +113,8 @@ function isLastDay(
       return atISO >= endISO;
     }
   }
-  // Fallback: no hay ítems para day+1 en el plan.
-  const hasTomorrow = planItems.some((it) => (it.day_number ?? -1) === currentDay + 1);
-  return !hasTomorrow;
+  // Sin endDate no inferimos el último día (Explainable Summary).
+  return false;
 }
 
 /**
