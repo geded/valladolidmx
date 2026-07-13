@@ -97,15 +97,31 @@ export const destinationHoursDecisionContributor: DecisionContributor = {
           sources: ["destination_context"],
           at: s.at,
         });
-      } else if (p.status === "closed") {
+      } else if (p.status === "opening_soon") {
+        cards.push({
+          id: `destination.hours:opening:${p.entityId}`,
+          slot: "next",
+          priority: 58,
+          tone: "info",
+          title: "Abre pronto",
+          rationale: p.opensAt
+            ? `Aún cerrado — abre a las ${p.opensAt}. Puedes acercarte para llegar en cuanto abra.`
+            : `Aún cerrado — abre pronto.`,
+          sources: ["destination_context"],
+          at: s.at,
+        });
+      } else if (p.status === "closed_now" || p.status === "closed_today") {
         cards.push({
           id: `destination.hours:closed:${p.entityId}`,
           slot: "next",
-          priority: 40,
+          priority: p.status === "closed_today" ? 44 : 40,
           tone: "critical",
-          title: "Está cerrado ahora",
+          title:
+            p.status === "closed_today"
+              ? "Cerrado hoy"
+              : "Está cerrado ahora",
           rationale: p.opensAt
-            ? `Reabre a las ${p.opensAt}. Ajusta el orden de tu día.`
+            ? `Reabre ${p.opensDayLabel ?? "próximamente"} ${p.opensAt}. Ajusta el orden de tu día.`
             : `Actualmente cerrado. Considera un plan alternativo.`,
           primaryAction: {
             id: "view_alternative",
