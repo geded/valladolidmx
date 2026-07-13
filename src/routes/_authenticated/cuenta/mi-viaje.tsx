@@ -48,6 +48,7 @@ import { getPlanItemsGeo } from "@/lib/traveler/travel-plan-geo.functions";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
 import { List, Clock, Map as MapIcon } from "lucide-react";
 import { ReservationsList } from "@/components/traveler/ReservationsList";
+import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista } => {
@@ -297,6 +298,7 @@ function MiViajeVistaBody({
   confirmed:
     | (Parameters<typeof ConfirmedTravelBanner>[0]["data"] & {
         order_id: string;
+        paid_at: string | null;
         status: string;
         email_t14_sent_at: string | null;
         email_t3_sent_at: string | null;
@@ -373,11 +375,19 @@ function MiViajeVistaBody({
   if (vista === "documentos") {
     return (
       <div className="space-y-6">
-        <VistaEmpty
-          title="Tus documentos en un solo lugar"
-          body="Aquí guardaremos tu voucher, recibo y comprobantes. Muy pronto podrás descargarlos como PDF."
-          icon={FileText}
-        />
+        {confirmed ? (
+          <TravelDocumentsList
+            orderId={confirmed.order_id}
+            folio={confirmed.folio}
+            paidAt={confirmed.paid_at ?? null}
+          />
+        ) : (
+          <VistaEmpty
+            title="Tus documentos en un solo lugar"
+            body="Cuando confirmes tu viaje aparecerán aquí tu voucher y recibo, listos para descargar como PDF."
+            icon={FileText}
+          />
+        )}
       </div>
     );
   }
