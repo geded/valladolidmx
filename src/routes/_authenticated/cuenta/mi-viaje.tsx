@@ -93,22 +93,11 @@ const V_KEYS = [
 ] as const;
 export type MiViajeVista = (typeof V_KEYS)[number];
 
-/** Fase macro derivada del plan + orden confirmada. NO se persiste. */
-export type TravelCompanionPhase = "planning" | "confirmed" | "onsite" | "post";
-
-function deriveCompanionPhase(
-  confirmed: { days_to_trip: number | null; plan_end_date: string | null } | null | undefined,
-): TravelCompanionPhase {
-  if (!confirmed) return "planning";
-  const d = confirmed.days_to_trip;
-  if (typeof d === "number" && d > 0) return "confirmed";
-  if (confirmed.plan_end_date) {
-    const end = new Date(`${confirmed.plan_end_date}T23:59:59Z`).getTime();
-    if (Date.now() <= end) return "onsite";
-    return "post";
-  }
-  return typeof d === "number" && d === 0 ? "onsite" : "confirmed";
-}
+/**
+ * Fase macro del viaje. Contrato canónico en `@/lib/traveler/trip-phase`.
+ * Alias local `TravelCompanionPhase` conservado por compatibilidad interna.
+ */
+export type TravelCompanionPhase = TripPhase;
 
 const PHASE_LABEL: Record<TravelCompanionPhase, string> = {
   planning: "Planeando",
