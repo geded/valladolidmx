@@ -255,7 +255,10 @@ function MiViajeVistaTabs({
             type="button"
             onClick={() =>
               navigate({
-                search: (prev) => ({ ...prev, vista: key === "resumen" ? undefined : key }),
+                search: (prev: { vista?: MiViajeVista }) => ({
+                  ...prev,
+                  vista: key === "resumen" ? undefined : key,
+                }),
                 replace: true,
                 resetScroll: false,
               })
