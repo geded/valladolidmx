@@ -45,8 +45,10 @@ import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsInbox";
 import { CalendarCheck, Sparkles } from "lucide-react";
 import { getPlanItemsGeo } from "@/lib/traveler/travel-plan-geo.functions";
+import { optimizePlanDay } from "@/lib/traveler/travel-plan-optimize.functions";
+import { reorderPlanItems } from "@/lib/traveler/travel-plans.functions";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
-import { List, Clock, Map as MapIcon } from "lucide-react";
+import { List, Clock, Map as MapIcon, ChevronUp, ChevronDown, Wand2 } from "lucide-react";
 import { ReservationsList } from "@/components/traveler/ReservationsList";
 import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
 
