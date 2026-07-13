@@ -258,6 +258,7 @@ function MiViajePage() {
               pendingProposals={pendingProposalsCount}
               confirmed={activeConfirmed}
               latestConciergeEvent={latestConciergeEvent}
+              firstPendingProposalId={firstPendingProposalId}
             />
           </div>
         </div>
