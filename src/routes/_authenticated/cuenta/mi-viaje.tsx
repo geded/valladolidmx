@@ -41,7 +41,9 @@ import {
   readGuestQueue,
   type GuestQueueItem,
 } from "@/lib/traveler/guest-queue";
-import { ccListMyCases } from "@/lib/concierge/cc.functions";
+import { ccListMyCases, ccTimelineAppend } from "@/lib/concierge/cc.functions";
+import { getConciergeCaseFile } from "@/lib/concierge/concierge.functions";
+import { CaseFileView } from "@/components/concierge/CaseFileView";
 import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsInbox";
 import { CalendarCheck, Sparkles } from "lucide-react";
