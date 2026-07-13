@@ -55,6 +55,7 @@ import { ReservationsList } from "@/components/traveler/ReservationsList";
 import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
 import { MemoriesSection } from "@/components/traveler/MemoriesSection";
 import { DayWeatherChip } from "@/components/traveler/DayWeatherChip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista } => {
@@ -184,6 +185,17 @@ function MiViajePage() {
       (p) => p.status === "sent" || p.status === "viewed",
     ).length;
   }, [caseFile]);
+  // CV5.10 · Último evento del expediente que no venga del propio viajero.
+  const latestConciergeEvent = useMemo(() => {
+    const cf = caseFile as
+      | { timeline?: Array<{ event_type?: string; summary?: string; created_at?: string }> }
+      | undefined;
+    const events = cf?.timeline ?? [];
+    const filtered = events.filter(
+      (e) => e.event_type && e.event_type !== "traveler_note",
+    );
+    return filtered[0] ?? null;
+  }, [caseFile]);
   const reservedIds = useMemo(() => {
     const s = new Set<string>();
     if (!concierge?.has_concierge) return s;
@@ -225,6 +237,13 @@ function MiViajePage() {
               {activeConfirmed.folio}
             </span>
           ) : null}
+          <div className="ml-auto">
+            <TravelNotificationsBell
+              pendingProposals={pendingProposalsCount}
+              confirmed={activeConfirmed}
+              latestConciergeEvent={latestConciergeEvent}
+            />
+          </div>
         </div>
         <h1 className="text-3xl font-semibold">Mi Viaje</h1>
         <p className="text-sm text-muted-foreground">
