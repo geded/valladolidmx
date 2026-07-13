@@ -91,6 +91,7 @@ import { Route as AuthenticatedPortalCanjesRouteImport } from './routes/_authent
 import { Route as AuthenticatedPortalCanjearRouteImport } from './routes/_authenticated/portal/canjear'
 import { Route as AuthenticatedPortalActividadRouteImport } from './routes/_authenticated/portal/actividad'
 import { Route as AuthenticatedPaginasSplatRouteImport } from './routes/_authenticated/paginas.$'
+import { Route as AuthenticatedCuentaStageSimulatorRouteImport } from './routes/_authenticated/cuenta/stage-simulator'
 import { Route as AuthenticatedCuentaPerfilPublicoRouteImport } from './routes/_authenticated/cuenta/perfil-publico'
 import { Route as AuthenticatedCuentaPerfilRouteImport } from './routes/_authenticated/cuenta/perfil'
 import { Route as AuthenticatedCuentaNotificacionesRouteImport } from './routes/_authenticated/cuenta/notificaciones'
@@ -628,6 +629,12 @@ const AuthenticatedPaginasSplatRoute =
     id: '/$',
     path: '/$',
     getParentRoute: () => AuthenticatedPaginasRoute,
+  } as any)
+const AuthenticatedCuentaStageSimulatorRoute =
+  AuthenticatedCuentaStageSimulatorRouteImport.update({
+    id: '/stage-simulator',
+    path: '/stage-simulator',
+    getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
 const AuthenticatedCuentaPerfilPublicoRoute =
   AuthenticatedCuentaPerfilPublicoRouteImport.update({
@@ -1263,6 +1270,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/cuenta/perfil-publico': typeof AuthenticatedCuentaPerfilPublicoRoute
+  '/cuenta/stage-simulator': typeof AuthenticatedCuentaStageSimulatorRoute
   '/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/canjear': typeof AuthenticatedPortalCanjearRoute
@@ -1432,6 +1440,7 @@ export interface FileRoutesByTo {
   '/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/cuenta/perfil-publico': typeof AuthenticatedCuentaPerfilPublicoRoute
+  '/cuenta/stage-simulator': typeof AuthenticatedCuentaStageSimulatorRoute
   '/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/canjear': typeof AuthenticatedPortalCanjearRoute
@@ -1608,6 +1617,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/notificaciones': typeof AuthenticatedCuentaNotificacionesRoute
   '/_authenticated/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/_authenticated/cuenta/perfil-publico': typeof AuthenticatedCuentaPerfilPublicoRoute
+  '/_authenticated/cuenta/stage-simulator': typeof AuthenticatedCuentaStageSimulatorRoute
   '/_authenticated/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/_authenticated/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/_authenticated/portal/canjear': typeof AuthenticatedPortalCanjearRoute
@@ -1786,6 +1796,7 @@ export interface FileRouteTypes {
     | '/cuenta/notificaciones'
     | '/cuenta/perfil'
     | '/cuenta/perfil-publico'
+    | '/cuenta/stage-simulator'
     | '/paginas/$'
     | '/portal/actividad'
     | '/portal/canjear'
@@ -1955,6 +1966,7 @@ export interface FileRouteTypes {
     | '/cuenta/notificaciones'
     | '/cuenta/perfil'
     | '/cuenta/perfil-publico'
+    | '/cuenta/stage-simulator'
     | '/paginas/$'
     | '/portal/actividad'
     | '/portal/canjear'
@@ -2130,6 +2142,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/notificaciones'
     | '/_authenticated/cuenta/perfil'
     | '/_authenticated/cuenta/perfil-publico'
+    | '/_authenticated/cuenta/stage-simulator'
     | '/_authenticated/paginas/$'
     | '/_authenticated/portal/actividad'
     | '/_authenticated/portal/canjear'
@@ -2864,6 +2877,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/paginas/$'
       preLoaderRoute: typeof AuthenticatedPaginasSplatRouteImport
       parentRoute: typeof AuthenticatedPaginasRoute
+    }
+    '/_authenticated/cuenta/stage-simulator': {
+      id: '/_authenticated/cuenta/stage-simulator'
+      path: '/stage-simulator'
+      fullPath: '/cuenta/stage-simulator'
+      preLoaderRoute: typeof AuthenticatedCuentaStageSimulatorRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
     '/_authenticated/cuenta/perfil-publico': {
       id: '/_authenticated/cuenta/perfil-publico'
@@ -3623,6 +3643,7 @@ interface AuthenticatedCuentaRouteRouteChildren {
   AuthenticatedCuentaNotificacionesRoute: typeof AuthenticatedCuentaNotificacionesRoute
   AuthenticatedCuentaPerfilRoute: typeof AuthenticatedCuentaPerfilRoute
   AuthenticatedCuentaPerfilPublicoRoute: typeof AuthenticatedCuentaPerfilPublicoRoute
+  AuthenticatedCuentaStageSimulatorRoute: typeof AuthenticatedCuentaStageSimulatorRoute
   AuthenticatedCuentaIndexRoute: typeof AuthenticatedCuentaIndexRoute
   AuthenticatedCuentaCheckoutOrderIdRoute: typeof AuthenticatedCuentaCheckoutOrderIdRoute
   AuthenticatedCuentaDocumentosOrderIdRoute: typeof AuthenticatedCuentaDocumentosOrderIdRoute
@@ -3647,6 +3668,8 @@ const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildr
     AuthenticatedCuentaPerfilRoute: AuthenticatedCuentaPerfilRoute,
     AuthenticatedCuentaPerfilPublicoRoute:
       AuthenticatedCuentaPerfilPublicoRoute,
+    AuthenticatedCuentaStageSimulatorRoute:
+      AuthenticatedCuentaStageSimulatorRoute,
     AuthenticatedCuentaIndexRoute: AuthenticatedCuentaIndexRoute,
     AuthenticatedCuentaCheckoutOrderIdRoute:
       AuthenticatedCuentaCheckoutOrderIdRoute,
