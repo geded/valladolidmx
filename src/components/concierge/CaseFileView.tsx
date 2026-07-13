@@ -228,7 +228,7 @@ export function CaseFileView({ data, hideInternal = false }: { data: unknown; hi
         </Section>
       )}
 
-      <Section title="Línea de tiempo">
+      <Section title="Línea de tiempo" id="case-timeline">
         {f.timeline.length === 0 ? (
           <Empty>Sin eventos.</Empty>
         ) : (
@@ -274,9 +274,9 @@ function Header({ f }: { f: CaseFile }) {
   );
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+function Section({ title, children, id }: { title: string; children: ReactNode; id?: string }) {
   return (
-    <section>
+    <section id={id} className={id ? "scroll-mt-24" : undefined}>
       <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{title}</h3>
       <div className="mt-2">{children}</div>
     </section>
@@ -301,7 +301,7 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
   if (proposals.length === 0 && !internal) return null;
 
   return (
-    <Section title="Propuestas">
+    <Section title="Propuestas" id="case-proposals">
       {proposals.length === 0 ? (
         <Empty>Sin propuestas todavía.</Empty>
       ) : (
@@ -358,7 +358,10 @@ function ProposalCard({
   }
 
   return (
-    <li className="rounded-md border border-border bg-card p-3 text-sm">
+    <li
+      id={`proposal-${p.proposal_id}`}
+      className="scroll-mt-24 rounded-md border border-border bg-card p-3 text-sm"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="font-medium">
           Propuesta v{p.version} · {money(p.total_amount_cents, p.currency)}

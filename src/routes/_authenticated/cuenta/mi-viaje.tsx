@@ -58,11 +58,16 @@ import { DayWeatherChip } from "@/components/traveler/DayWeatherChip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
-  validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista } => {
+  validateSearch: (
+    raw: Record<string, unknown>,
+  ): { vista?: MiViajeVista; focus?: string } => {
     const v = raw.vista;
-    return typeof v === "string" && (V_KEYS as readonly string[]).includes(v)
-      ? { vista: v as MiViajeVista }
-      : {};
+    const f = raw.focus;
+    const out: { vista?: MiViajeVista; focus?: string } = {};
+    if (typeof v === "string" && (V_KEYS as readonly string[]).includes(v))
+      out.vista = v as MiViajeVista;
+    if (typeof f === "string" && f.length > 0 && f.length < 128) out.focus = f;
+    return out;
   },
   component: MiViajePage,
 });
@@ -185,6 +190,17 @@ function MiViajePage() {
       (p) => p.status === "sent" || p.status === "viewed",
     ).length;
   }, [caseFile]);
+  // CV5.10 v2 · id de la primera propuesta pendiente para deep-link.
+  const firstPendingProposalId = useMemo(() => {
+    const cf = caseFile as
+      | { proposals?: Array<{ proposal_id: string; status?: string }> }
+      | undefined;
+    return (
+      (cf?.proposals ?? []).find(
+        (p) => p.status === "sent" || p.status === "viewed",
+      )?.proposal_id ?? null
+    );
+  }, [caseFile]);
   // CV5.10 · Último evento del expediente que no venga del propio viajero.
   const latestConciergeEvent = useMemo(() => {
     const cf = caseFile as
@@ -242,6 +258,7 @@ function MiViajePage() {
               pendingProposals={pendingProposalsCount}
               confirmed={activeConfirmed}
               latestConciergeEvent={latestConciergeEvent}
+              firstPendingProposalId={firstPendingProposalId}
             />
           </div>
         </div>
@@ -279,6 +296,7 @@ function MiViajePage() {
           reservedIds={reservedIds}
           phase={phase}
           onChanged={invalidatePlan}
+          focus={search.focus}
         />
       )}
     </div>
@@ -402,10 +420,12 @@ function TravelNotificationsBell({
   pendingProposals,
   confirmed,
   latestConciergeEvent,
+  firstPendingProposalId,
 }: {
   pendingProposals: number;
   confirmed: { days_to_trip: number | null; folio: string | null } | null;
   latestConciergeEvent: { event_type?: string; summary?: string; created_at?: string } | null;
+  firstPendingProposalId: string | null;
 }) {
   const navigate = useNavigate({ from: Route.fullPath });
   const daysToTrip = confirmed?.days_to_trip ?? null;
@@ -425,9 +445,13 @@ function TravelNotificationsBell({
     (tripMilestone !== null ? 1 : 0) +
     (hasEvent ? 1 : 0);
 
-  const goTo = (vista: MiViajeVista) =>
+  const goTo = (vista: MiViajeVista, focus?: string) =>
     navigate({
-      search: (prev: { vista?: MiViajeVista }) => ({ ...prev, vista }),
+      search: (prev: { vista?: MiViajeVista; focus?: string }) => ({
+        ...prev,
+        vista,
+        focus: focus ?? undefined,
+      }),
       replace: true,
       resetScroll: false,
     });
@@ -460,7 +484,14 @@ function TravelNotificationsBell({
             <li>
               <button
                 type="button"
-                onClick={() => goTo("concierge")}
+                onClick={() =>
+                  goTo(
+                    "concierge",
+                    firstPendingProposalId
+                      ? `proposal:${firstPendingProposalId}`
+                      : "proposals",
+                  )
+                }
                 className="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-accent"
               >
                 <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary">
@@ -511,7 +542,7 @@ function TravelNotificationsBell({
             <li>
               <button
                 type="button"
-                onClick={() => goTo("concierge")}
+                onClick={() => goTo("concierge", "timeline")}
                 className="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-accent"
               >
                 <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-muted text-foreground">
@@ -549,6 +580,7 @@ function MiViajeVistaBody({
   reservedIds,
   phase,
   onChanged,
+  focus,
 }: {
   vista: MiViajeVista;
   plan: TravelPlanWithItems;
@@ -567,6 +599,7 @@ function MiViajeVistaBody({
   reservedIds: Set<string>;
   phase: TravelCompanionPhase;
   onChanged: () => void;
+  focus?: string;
 }) {
   if (vista === "resumen") {
     return (
@@ -619,7 +652,7 @@ function MiViajeVistaBody({
     return (
       <div className="space-y-6">
         {plan.plan.case_id ? (
-          <EmbeddedCaseFile caseId={plan.plan.case_id} />
+          <EmbeddedCaseFile caseId={plan.plan.case_id} focus={focus} />
         ) : null}
         <ConciergeSection data={plan} cases={cases} onChanged={onChanged} />
       </div>
@@ -2010,7 +2043,7 @@ interface CaseSummary {
   updated_at: string;
 }
 
-function EmbeddedCaseFile({ caseId }: { caseId: string }) {
+function EmbeddedCaseFile({ caseId, focus }: { caseId: string; focus?: string }) {
   const qc = useQueryClient();
   const fetchFile = useServerFn(getConciergeCaseFile);
   const appendNote = useServerFn(ccTimelineAppend);
@@ -2020,6 +2053,31 @@ function EmbeddedCaseFile({ caseId }: { caseId: string }) {
     refetchOnWindowFocus: true,
     staleTime: 30_000,
   });
+  // CV5.10 v2 · Deep-link scroll cuando llega focus= desde el bell.
+  useEffect(() => {
+    if (!focus || !q.data) return;
+    let selector: string | null = null;
+    if (focus.startsWith("proposal:")) {
+      selector = `#proposal-${focus.slice("proposal:".length)}`;
+    } else if (focus === "proposals") {
+      selector = "#case-proposals";
+    } else if (focus === "timeline") {
+      selector = "#case-timeline";
+    }
+    if (!selector) return;
+    const id = window.setTimeout(() => {
+      const el = document.querySelector(selector!);
+      if (el instanceof HTMLElement) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        el.classList.add("ring-2", "ring-primary/60", "rounded-md");
+        window.setTimeout(
+          () => el.classList.remove("ring-2", "ring-primary/60", "rounded-md"),
+          1800,
+        );
+      }
+    }, 80);
+    return () => window.clearTimeout(id);
+  }, [focus, q.data]);
   const [note, setNote] = useState("");
   const send = useMutation({
     mutationFn: (summary: string) =>
