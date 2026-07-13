@@ -301,7 +301,7 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
   if (proposals.length === 0 && !internal) return null;
 
   return (
-    <Section title="Propuestas">
+    <Section title="Propuestas" id="case-proposals">
       {proposals.length === 0 ? (
         <Empty>Sin propuestas todavía.</Empty>
       ) : (
