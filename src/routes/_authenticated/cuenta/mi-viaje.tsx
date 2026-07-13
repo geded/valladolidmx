@@ -233,7 +233,7 @@ function MiViajePage() {
   const search = useSearch({ from: Route.id });
   const activeConfirmed =
     confirmed && confirmed.status !== "refunded" ? confirmed : null;
-  const phase = deriveCompanionPhase(activeConfirmed);
+  const phase = deriveTripPhase(activeQ.data?.plan ?? null, activeConfirmed);
   const vista: MiViajeVista = search.vista ?? PHASE_VISTA_ORDER[phase][0];
 
   return (
