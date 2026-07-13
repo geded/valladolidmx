@@ -56,6 +56,11 @@ import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
 import { MemoriesSection } from "@/components/traveler/MemoriesSection";
 import { DayWeatherChip } from "@/components/traveler/DayWeatherChip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  WorkspaceOnboardingTour,
+  openWorkspaceTour,
+} from "@/components/traveler/WorkspaceOnboardingTour";
+import { HelpCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   validateSearch: (
@@ -263,10 +268,21 @@ function MiViajePage() {
           </div>
         </div>
         <h1 className="text-2xl font-semibold sm:text-3xl">Mi Viaje</h1>
-        <p className="text-sm text-muted-foreground">
-          Tu compañero digital del Oriente Maya de Yucatán — antes, durante y
-          después de tu visita. Todas las vistas comparten el mismo viaje.
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-sm text-muted-foreground">
+            Tu compañero digital del Oriente Maya de Yucatán — antes, durante y
+            después de tu visita. Todas las vistas comparten el mismo viaje.
+          </p>
+          <button
+            type="button"
+            onClick={openWorkspaceTour}
+            aria-label="Cómo funciona Mi Viaje"
+            title="Cómo funciona Mi Viaje"
+            className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border/70 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+          >
+            <HelpCircle className="h-4 w-4" />
+          </button>
+        </div>
       </header>
 
       <MiViajeVistaTabs
@@ -274,6 +290,8 @@ function MiViajePage() {
         phase={phase}
         concierge_badge={pendingProposalsCount}
       />
+
+      <WorkspaceOnboardingTour userId={user?.id ?? null} />
 
       {pendingProposalsCount > 0 && vista !== "concierge" ? (
         <PendingProposalsSpotlight count={pendingProposalsCount} />
