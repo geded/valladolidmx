@@ -51,6 +51,7 @@ import { InteractiveMap } from "@/components/maps/InteractiveMap";
 import { List, Clock, Map as MapIcon, ChevronUp, ChevronDown, Wand2 } from "lucide-react";
 import { ReservationsList } from "@/components/traveler/ReservationsList";
 import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
+import { MemoriesSection } from "@/components/traveler/MemoriesSection";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista } => {
@@ -396,10 +397,9 @@ function MiViajeVistaBody({
   // recuerdos
   return (
     <div className="space-y-6">
-      <VistaEmpty
-        title="Tus recuerdos del Oriente Maya"
-        body="Cuando termine tu viaje, aquí verás tus reseñas y podrás inspirar tu próxima visita."
-        icon={Heart}
+      <MemoriesSection
+        planId={plan.plan.id}
+        orderId={confirmed?.order_id ?? null}
       />
     </div>
   );
