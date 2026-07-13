@@ -47,6 +47,7 @@ import { CalendarCheck, Sparkles } from "lucide-react";
 import { getPlanItemsGeo } from "@/lib/traveler/travel-plan-geo.functions";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
 import { List, Clock, Map as MapIcon } from "lucide-react";
+import { ReservationsList } from "@/components/traveler/ReservationsList";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista } => {
@@ -335,7 +336,15 @@ function MiViajeVistaBody({
   if (vista === "reservas") {
     return (
       <div className="space-y-6">
-        {confirmed ? <ConfirmedTravelBanner data={confirmed} /> : (
+        {confirmed ? (
+          <>
+            <ConfirmedTravelBanner data={confirmed} />
+            <ReservationsList
+              orderId={confirmed.order_id}
+              folio={confirmed.folio}
+            />
+          </>
+        ) : (
           <VistaEmpty
             title="Aún no tienes reservas confirmadas"
             body="Cuando cierres tu viaje con el Concierge, tus reservas aparecerán aquí."
