@@ -79,11 +79,18 @@ export const trafficContributor: DestinationContextContributor = {
           "@/integrations/supabase/client.server"
         );
         const { data } = await supabaseAdmin
-          .from("businesses")
-          .select("latitude, longitude")
-          .eq("id", nextEnt.id)
+          .from("business_locations")
+          .select("latitude, longitude, is_primary")
+          .eq("business_id", nextEnt.id)
+          .is("deleted_at", null)
+          .order("is_primary", { ascending: false })
+          .limit(1)
           .maybeSingle();
-        if (data && data.latitude != null && data.longitude != null) {
+        if (
+          data &&
+          data.latitude != null &&
+          data.longitude != null
+        ) {
           destGeo = {
             lat: Number(data.latitude),
             lon: Number(data.longitude),
