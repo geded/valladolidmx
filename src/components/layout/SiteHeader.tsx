@@ -32,6 +32,7 @@ import { UserMenu } from "./UserMenu";
 import { PrimaryMegaMenu } from "./PrimaryMegaMenu";
 import { SiteTopBar } from "./SiteTopBar";
 import { BrandLogo } from "@/components/brand/BrandLogo";
+import { MiViajeChip } from "@/components/travel-plan/MiViajeChip";
 import { useTranslation } from "@/i18n/context";
 import { cn } from "@/lib/utils";
 
@@ -320,6 +321,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
           </div>
 
           <div className="flex items-center gap-2">
+            <MiViajeChip isOverlay={isOverlay} />
             {visibleButtons.map((btn, idx) => renderHeaderButton(btn, idx, {
               isOverlay,
               open,
