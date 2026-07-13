@@ -44,6 +44,9 @@ import { ccListMyCases } from "@/lib/concierge/cc.functions";
 import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsInbox";
 import { CalendarCheck, Sparkles } from "lucide-react";
+import { getPlanItemsGeo } from "@/lib/traveler/travel-plan-geo.functions";
+import { InteractiveMap } from "@/components/maps/InteractiveMap";
+import { List, Clock, Map as MapIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista } => {
@@ -321,10 +324,10 @@ function MiViajeVistaBody({
     return (
       <div className="space-y-6">
         {confirmed ? <ConfirmedTripTimeline data={confirmed} /> : null}
-        <PlanItemsSection data={plan} onChanged={onChanged} reservedIds={reservedIds} />
-        <VistaHint
-          label="Próximamente"
-          body="Tu itinerario evolucionará hacia vistas Timeline y Mapa con optimización sugerida por Alux (distancias, horarios, clima)."
+        <ItinerarioViews
+          data={plan}
+          onChanged={onChanged}
+          reservedIds={reservedIds}
         />
       </div>
     );
