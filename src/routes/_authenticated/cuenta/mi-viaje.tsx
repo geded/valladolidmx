@@ -14,11 +14,11 @@
  *  - Envío al Concierge sin cambiar la lógica del módulo (Sub-ola E).
  */
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Trash2, Save, Users, Calendar, MapPin, Building2, ShoppingBag, Ticket, StickyNote, Plus, Share2, Copy, ExternalLink, Printer, Headset, CheckCircle2, Circle, Bell, MessageCircle } from "lucide-react";
+import { Trash2, Save, Users, Calendar, MapPin, Building2, ShoppingBag, Ticket, StickyNote, Plus, Share2, Copy, ExternalLink, Printer, Headset, CheckCircle2, Circle, Bell, MessageCircle, LayoutDashboard, Route as RouteIcon, ReceiptText, Sparkles as SparklesIcon, FileText, Heart } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   addPlanItem,
@@ -46,8 +46,77 @@ import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsI
 import { CalendarCheck, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
+  validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista } => {
+    const v = raw.vista;
+    return typeof v === "string" && (V_KEYS as readonly string[]).includes(v)
+      ? { vista: v as MiViajeVista }
+      : {};
+  },
   component: MiViajePage,
 });
+
+/* ------------------------------------------------------------------ */
+/* CV5.1 · Mi Viaje Workspace de vistas (Founder Travel Companion)     */
+/* ------------------------------------------------------------------ */
+
+const V_KEYS = [
+  "resumen",
+  "itinerario",
+  "reservas",
+  "concierge",
+  "alux",
+  "documentos",
+  "recuerdos",
+] as const;
+export type MiViajeVista = (typeof V_KEYS)[number];
+
+/** Fase macro derivada del plan + orden confirmada. NO se persiste. */
+export type TravelCompanionPhase = "planning" | "confirmed" | "onsite" | "post";
+
+function deriveCompanionPhase(
+  confirmed: { days_to_trip: number | null; plan_end_date: string | null } | null | undefined,
+): TravelCompanionPhase {
+  if (!confirmed) return "planning";
+  const d = confirmed.days_to_trip;
+  if (typeof d === "number" && d > 0) return "confirmed";
+  if (confirmed.plan_end_date) {
+    const end = new Date(`${confirmed.plan_end_date}T23:59:59Z`).getTime();
+    if (Date.now() <= end) return "onsite";
+    return "post";
+  }
+  return typeof d === "number" && d === 0 ? "onsite" : "confirmed";
+}
+
+const PHASE_LABEL: Record<TravelCompanionPhase, string> = {
+  planning: "Planeando",
+  confirmed: "Viaje confirmado",
+  onsite: "En viaje",
+  post: "Después del viaje",
+};
+
+const VISTA_META: Record<
+  MiViajeVista,
+  { label: string; icon: React.ComponentType<{ className?: string }> }
+> = {
+  resumen: { label: "Resumen", icon: LayoutDashboard },
+  itinerario: { label: "Itinerario", icon: RouteIcon },
+  reservas: { label: "Reservas", icon: ReceiptText },
+  concierge: { label: "Concierge", icon: Headset },
+  alux: { label: "Alux", icon: SparklesIcon },
+  documentos: { label: "Documentos", icon: FileText },
+  recuerdos: { label: "Recuerdos", icon: Heart },
+};
+
+/**
+ * Orden sugerido de vistas por fase. La vista destacada aparece primero.
+ * Vinculante con Founder Travel Companion Principle.
+ */
+const PHASE_VISTA_ORDER: Record<TravelCompanionPhase, MiViajeVista[]> = {
+  planning: ["resumen", "itinerario", "alux", "concierge", "reservas", "documentos", "recuerdos"],
+  confirmed: ["resumen", "reservas", "itinerario", "documentos", "concierge", "alux", "recuerdos"],
+  onsite: ["itinerario", "alux", "concierge", "reservas", "documentos", "resumen", "recuerdos"],
+  post: ["recuerdos", "resumen", "reservas", "documentos", "itinerario", "concierge", "alux"],
+};
 
 const KIND_META: Record<
   TravelItemKind,
@@ -112,49 +181,231 @@ function MiViajePage() {
       );
     };
 
+  const search = useSearch({ from: Route.id });
+  const activeConfirmed =
+    confirmed && confirmed.status !== "refunded" ? confirmed : null;
+  const phase = deriveCompanionPhase(activeConfirmed);
+  const vista: MiViajeVista = search.vista ?? PHASE_VISTA_ORDER[phase][0];
+
   return (
-    <div className="max-w-5xl space-y-8">
-      <header>
+    <div className="max-w-5xl space-y-6">
+      <header className="space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full border border-primary/30 bg-primary/5 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+            {PHASE_LABEL[phase]}
+          </span>
+          {activeConfirmed?.folio ? (
+            <span className="rounded-full border border-border/70 bg-background px-2.5 py-0.5 font-mono text-[10px] tracking-[0.14em] text-muted-foreground">
+              {activeConfirmed.folio}
+            </span>
+          ) : null}
+        </div>
         <h1 className="text-3xl font-semibold">Mi Viaje</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Tu expediente personal del Oriente Maya. Todo lo que guardas desde
-          las tarjetas del ecosistema aparece aquí, listo para enviarlo a tu
-          Concierge cuando estés listo.
+        <p className="text-sm text-muted-foreground">
+          Tu compañero digital del Oriente Maya de Yucatán — antes, durante y
+          después de tu visita. Todas las vistas comparten el mismo viaje.
         </p>
       </header>
 
+      <MiViajeVistaTabs current={vista} phase={phase} />
+
       <GuestImportBanner onImported={invalidatePlan} />
-
-      {confirmed && confirmed.status !== "refunded" ? (
-        <>
-          <ConfirmedTravelBanner data={confirmed} />
-          <TripPhaseCard data={confirmed} />
-          <ConfirmedTripTimeline data={confirmed} />
-        </>
-      ) : null}
-
-      <AluxPlanProposalsInbox onChanged={invalidatePlan} />
 
       {activeQ.isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando tu plan…</p>
-      ) : activeQ.data ? (
-        <>
-          <PlanMetaEditor data={activeQ.data} onSaved={invalidatePlan} />
-          <PlanItemsSection
-            data={activeQ.data}
-            onChanged={invalidatePlan}
-            reservedIds={reservedIds}
-          />
-          <ShareExportSection data={activeQ.data} onChanged={invalidatePlan} />
-          <AluxTravelerPanel />
-          <ConciergeSection data={activeQ.data} cases={cases} onChanged={invalidatePlan} />
-        </>
-      ) : (
+      ) : !activeQ.data ? (
         <p className="text-sm text-destructive">
           No pudimos cargar tu plan. Recarga la página.
         </p>
+      ) : (
+        <MiViajeVistaBody
+          vista={vista}
+          plan={activeQ.data}
+          confirmed={activeConfirmed}
+          cases={cases}
+          reservedIds={reservedIds}
+          onChanged={invalidatePlan}
+        />
       )}
     </div>
+  );
+}
+
+function MiViajeVistaTabs({
+  current,
+  phase,
+}: {
+  current: MiViajeVista;
+  phase: TravelCompanionPhase;
+}) {
+  const navigate = useNavigate({ from: Route.fullPath });
+  const order = PHASE_VISTA_ORDER[phase];
+  return (
+    <nav
+      className="scrollbar-none -mx-1 flex gap-1 overflow-x-auto rounded-xl border border-border/70 bg-card/40 p-1"
+      aria-label="Vistas de Mi Viaje"
+    >
+      {order.map((key) => {
+        const meta = VISTA_META[key];
+        const Icon = meta.icon;
+        const active = key === current;
+        return (
+          <button
+            key={key}
+            type="button"
+            onClick={() =>
+              navigate({
+                search: (prev: { vista?: MiViajeVista }) => ({
+                  ...prev,
+                  vista: key === "resumen" ? undefined : key,
+                }),
+                replace: true,
+                resetScroll: false,
+              })
+            }
+            aria-pressed={active}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+              active
+                ? "bg-primary text-primary-foreground shadow-soft"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground"
+            }`}
+          >
+            <Icon className="size-3.5" aria-hidden />
+            {meta.label}
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+/** Router de vistas — cada rama compone bloques existentes del mismo Travel Plan. */
+function MiViajeVistaBody({
+  vista,
+  plan,
+  confirmed,
+  cases,
+  reservedIds,
+  onChanged,
+}: {
+  vista: MiViajeVista;
+  plan: TravelPlanWithItems;
+  confirmed:
+    | (Parameters<typeof ConfirmedTravelBanner>[0]["data"] & {
+        status: string;
+        email_t14_sent_at: string | null;
+        email_t3_sent_at: string | null;
+        email_welcome_sent_at: string | null;
+        email_post_sent_at: string | null;
+      })
+    | null;
+  cases: CaseSummary[];
+  reservedIds: Set<string>;
+  onChanged: () => void;
+}) {
+  if (vista === "resumen") {
+    return (
+      <div className="space-y-6">
+        {confirmed ? (
+          <>
+            <ConfirmedTravelBanner data={confirmed} />
+            <TripPhaseCard data={confirmed} />
+          </>
+        ) : null}
+        <AluxPlanProposalsInbox onChanged={onChanged} />
+        <PlanMetaEditor data={plan} onSaved={onChanged} />
+      </div>
+    );
+  }
+  if (vista === "itinerario") {
+    return (
+      <div className="space-y-6">
+        {confirmed ? <ConfirmedTripTimeline data={confirmed} /> : null}
+        <PlanItemsSection data={plan} onChanged={onChanged} reservedIds={reservedIds} />
+        <VistaHint
+          label="Próximamente"
+          body="Tu itinerario evolucionará hacia vistas Timeline y Mapa con optimización sugerida por Alux (distancias, horarios, clima)."
+        />
+      </div>
+    );
+  }
+  if (vista === "reservas") {
+    return (
+      <div className="space-y-6">
+        {confirmed ? <ConfirmedTravelBanner data={confirmed} /> : (
+          <VistaEmpty
+            title="Aún no tienes reservas confirmadas"
+            body="Cuando cierres tu viaje con el Concierge, tus reservas aparecerán aquí."
+          />
+        )}
+        <ShareExportSection data={plan} onChanged={onChanged} />
+      </div>
+    );
+  }
+  if (vista === "concierge") {
+    return (
+      <div className="space-y-6">
+        <ConciergeSection data={plan} cases={cases} onChanged={onChanged} />
+      </div>
+    );
+  }
+  if (vista === "alux") {
+    return (
+      <div className="space-y-6">
+        <AluxPlanProposalsInbox onChanged={onChanged} />
+        <AluxTravelerPanel />
+      </div>
+    );
+  }
+  if (vista === "documentos") {
+    return (
+      <div className="space-y-6">
+        <VistaEmpty
+          title="Tus documentos en un solo lugar"
+          body="Aquí guardaremos tu voucher, recibo y comprobantes. Muy pronto podrás descargarlos como PDF."
+          icon={FileText}
+        />
+      </div>
+    );
+  }
+  // recuerdos
+  return (
+    <div className="space-y-6">
+      <VistaEmpty
+        title="Tus recuerdos del Oriente Maya"
+        body="Cuando termine tu viaje, aquí verás tus reseñas y podrás inspirar tu próxima visita."
+        icon={Heart}
+      />
+    </div>
+  );
+}
+
+function VistaEmpty({
+  title,
+  body,
+  icon: Icon = Sparkles,
+}: {
+  title: string;
+  body: string;
+  icon?: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <section className="rounded-2xl border border-dashed border-border/70 bg-card/40 p-8 text-center">
+      <Icon className="mx-auto size-6 text-primary" aria-hidden />
+      <h2 className="mt-3 font-serif text-lg text-foreground">{title}</h2>
+      <p className="mx-auto mt-1 max-w-lg text-sm text-muted-foreground">{body}</p>
+    </section>
+  );
+}
+
+function VistaHint({ label, body }: { label: string; body: string }) {
+  return (
+    <p className="rounded-lg border border-border/50 bg-background/60 px-4 py-3 text-xs text-muted-foreground">
+      <span className="mr-2 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
+        {label}
+      </span>
+      {body}
+    </p>
   );
 }
 
