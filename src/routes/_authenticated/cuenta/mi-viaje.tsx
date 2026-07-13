@@ -636,6 +636,7 @@ function MiViajeVistaBody({
   focus?: string;
 }) {
   if (vista === "resumen") {
+    const empty = plan.items.length === 0 && !confirmed;
     return (
       <div className="space-y-6">
         {confirmed ? (
@@ -646,10 +647,43 @@ function MiViajeVistaBody({
         ) : null}
         <AluxPlanProposalsInbox onChanged={onChanged} />
         <PlanMetaEditor data={plan} onSaved={onChanged} />
+        {empty ? (
+          <VistaEmpty
+            eyebrow="Comienza tu viaje"
+            title="Tu expediente del Oriente Maya está listo para empezar"
+            body="Agrega tus primeras paradas — un pueblo mágico, un cenote, una hacienda — o pídele a Alux que te proponga una ruta a la medida. Todo lo que guardes vivirá aquí."
+            icon={SparklesIcon}
+            cta={{ label: "Explorar el Oriente Maya", to: "/oriente-maya" }}
+            secondary={{
+              label: "Pedirle una ruta a Alux",
+              to: "/alux",
+              search: { prompt: "Propóneme una ruta de 3 días por el Oriente Maya de Yucatán." },
+            }}
+          />
+        ) : null}
       </div>
     );
   }
   if (vista === "itinerario") {
+    if (plan.items.length === 0) {
+      return (
+        <div className="space-y-6">
+          {confirmed ? <ConfirmedTripTimeline data={confirmed} /> : null}
+          <VistaEmpty
+            eyebrow="Tu itinerario"
+            title="Aún no hay paradas en tu ruta"
+            body="Añade destinos, hoteles, experiencias o eventos para verlos aquí como lista, línea de tiempo y mapa. Alux puede sugerirte el orden más cómodo."
+            icon={RouteIcon}
+            cta={{ label: "Descubrir experiencias", to: "/oriente-maya" }}
+            secondary={{
+              label: "Optimizar con Alux",
+              to: "/alux",
+              search: { prompt: "Ayúdame a construir un itinerario por el Oriente Maya con paradas eficientes." },
+            }}
+          />
+        </div>
+      );
+    }
     return (
       <div className="space-y-6">
         {confirmed ? <ConfirmedTripTimeline data={confirmed} /> : null}
@@ -674,8 +708,11 @@ function MiViajeVistaBody({
           </>
         ) : (
           <VistaEmpty
-            title="Aún no tienes reservas confirmadas"
-            body="Cuando cierres tu viaje con el Concierge, tus reservas aparecerán aquí."
+            eyebrow="Reservas"
+            title="Tus reservas del Oriente Maya vivirán aquí"
+            body="Cuando confirmes tu viaje con el Concierge, cada reserva (hotel, tour, experiencia) aparecerá con su folio, horario y contacto directo."
+            icon={ReceiptText}
+            cta={{ label: "Hablar con el Concierge", to: "/cuenta/concierge" }}
           />
         )}
         <ShareExportSection data={plan} onChanged={onChanged} />
@@ -683,6 +720,19 @@ function MiViajeVistaBody({
     );
   }
   if (vista === "concierge") {
+    if (!plan.plan.case_id && cases.length === 0) {
+      return (
+        <div className="space-y-6">
+          <VistaEmpty
+            eyebrow="Concierge Oriente Maya"
+            title="Un Concierge local, listo para armar tu viaje contigo"
+            body="Cuando envíes tu plan al Concierge, aquí verás propuestas, mensajes y confirmaciones. Sin sentir que estás comprando: confirmando lo que armaron juntos."
+            icon={Headset}
+            cta={{ label: "Enviar mi plan al Concierge", to: "/cuenta/mi-viaje", search: { vista: "resumen" } }}
+          />
+        </div>
+      );
+    }
     return (
       <div className="space-y-6">
         {plan.plan.case_id ? (
@@ -712,9 +762,11 @@ function MiViajeVistaBody({
           />
         ) : (
           <VistaEmpty
-            title="Tus documentos en un solo lugar"
-            body="Cuando confirmes tu viaje aparecerán aquí tu voucher y recibo, listos para descargar como PDF."
+            eyebrow="Documentos"
+            title="Voucher y recibo, siempre a la mano"
+            body="Al confirmar tu viaje generamos tu voucher imprimible y tu recibo del Oriente Maya en PDF. Podrás descargarlos o compartirlos desde aquí."
             icon={FileText}
+            cta={{ label: "Ver mi resumen", to: "/cuenta/mi-viaje", search: { vista: "resumen" } }}
           />
         )}
       </div>
@@ -735,16 +787,59 @@ function VistaEmpty({
   title,
   body,
   icon: Icon = Sparkles,
+  eyebrow,
+  cta,
+  secondary,
 }: {
   title: string;
   body: string;
   icon?: React.ComponentType<{ className?: string }>;
+  eyebrow?: string;
+  cta?: { label: string; to: string; search?: Record<string, unknown> };
+  secondary?: { label: string; to: string; search?: Record<string, unknown> };
 }) {
   return (
-    <section className="rounded-2xl border border-dashed border-border/70 bg-card/40 p-8 text-center">
-      <Icon className="mx-auto size-6 text-primary" aria-hidden />
-      <h2 className="mt-3 font-serif text-lg text-foreground">{title}</h2>
-      <p className="mx-auto mt-1 max-w-lg text-sm text-muted-foreground">{body}</p>
+    <section className="relative overflow-hidden rounded-2xl border border-dashed border-border/70 bg-gradient-to-br from-primary/5 via-card/40 to-background p-8 text-center">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(ellipse_at_top,theme(colors.primary/10),transparent_70%)]"
+        aria-hidden
+      />
+      <div className="relative">
+        <div className="mx-auto flex size-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <Icon className="size-5" aria-hidden />
+        </div>
+        {eyebrow ? (
+          <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">
+            {eyebrow}
+          </p>
+        ) : null}
+        <h2 className="mt-2 font-serif text-xl text-foreground">{title}</h2>
+        <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
+          {body}
+        </p>
+        {cta || secondary ? (
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+            {cta ? (
+              <Link
+                to={cta.to}
+                search={cta.search as never}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-soft transition hover:opacity-90"
+              >
+                {cta.label}
+              </Link>
+            ) : null}
+            {secondary ? (
+              <Link
+                to={secondary.to}
+                search={secondary.search as never}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border/70 bg-background px-3.5 py-2 text-xs font-medium text-foreground transition hover:bg-accent"
+              >
+                {secondary.label}
+              </Link>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
     </section>
   );
 }
