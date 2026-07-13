@@ -413,6 +413,221 @@ function VistaHint({ label, body }: { label: string; body: string }) {
 }
 
 /* ------------------------------------------------------------------ */
+/* CV5.1.2 · Itinerario Lista / Timeline / Mapa                        */
+/* ------------------------------------------------------------------ */
+
+type ItinerarioView = "lista" | "timeline" | "mapa";
+
+function ItinerarioViews({
+  data,
+  onChanged,
+  reservedIds,
+}: {
+  data: TravelPlanWithItems;
+  onChanged: () => void;
+  reservedIds: Set<string>;
+}) {
+  const [view, setView] = useState<ItinerarioView>("lista");
+  return (
+    <section className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-medium">Tu itinerario</h2>
+        <div
+          role="tablist"
+          aria-label="Cambiar vista del itinerario"
+          className="inline-flex rounded-lg border bg-background p-1 text-xs"
+        >
+          {(
+            [
+              { k: "lista", label: "Lista", Icon: List },
+              { k: "timeline", label: "Timeline", Icon: Clock },
+              { k: "mapa", label: "Mapa", Icon: MapIcon },
+            ] as const
+          ).map(({ k, label, Icon }) => {
+            const active = view === k;
+            return (
+              <button
+                key={k}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setView(k)}
+                className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 transition ${
+                  active
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Icon className="size-3.5" aria-hidden />
+                <span>{label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {view === "lista" ? (
+        <PlanItemsSection
+          data={data}
+          onChanged={onChanged}
+          reservedIds={reservedIds}
+        />
+      ) : view === "timeline" ? (
+        <ItinerarioTimeline data={data} />
+      ) : (
+        <ItinerarioMap data={data} />
+      )}
+    </section>
+  );
+}
+
+function ItinerarioTimeline({ data }: { data: TravelPlanWithItems }) {
+  const grouped = useMemo(() => {
+    const map = new Map<number | "sin", TravelPlanItem[]>();
+    for (const it of data.items) {
+      const key = typeof it.day_index === "number" ? it.day_index : "sin";
+      const arr = map.get(key) ?? [];
+      arr.push(it);
+      map.set(key, arr);
+    }
+    const days = Array.from(map.entries()).sort((a, b) => {
+      if (a[0] === "sin") return 1;
+      if (b[0] === "sin") return -1;
+      return (a[0] as number) - (b[0] as number);
+    });
+    for (const [, arr] of days) arr.sort((x, y) => x.position - y.position);
+    return days;
+  }, [data.items]);
+
+  if (data.items.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+        Aún no hay actividades. Cuando agregues elementos con día asignado, verás aquí tu recorrido cronológico.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {grouped.map(([key, items]) => (
+        <div key={String(key)} className="rounded-lg border bg-card p-4">
+          <h3 className="mb-3 font-serif text-sm text-foreground">
+            {key === "sin" ? "Sin día asignado" : `Día ${(key as number) + 1}`}
+            <span className="ml-2 text-xs text-muted-foreground">
+              ({items.length})
+            </span>
+          </h3>
+          <ol className="relative space-y-3 border-l border-border/60 pl-4">
+            {items.map((it) => {
+              const snap = it.snapshot ?? {};
+              return (
+                <li key={it.id} className="relative">
+                  <span className="absolute -left-[21px] top-2 grid size-3 place-items-center rounded-full bg-primary" />
+                  <div className="flex items-start gap-3">
+                    {snap.image_url ? (
+                      <img
+                        src={snap.image_url}
+                        alt=""
+                        className="size-12 shrink-0 rounded-md object-cover"
+                        loading="lazy"
+                      />
+                    ) : null}
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-foreground">
+                        {snap.title || (it.item_kind === "note" ? "Nota" : "Elemento")}
+                      </p>
+                      {snap.subtitle ? (
+                        <p className="truncate text-xs text-muted-foreground">
+                          {snap.subtitle}
+                        </p>
+                      ) : null}
+                      {it.notes ? (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {it.notes}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ItinerarioMap({ data }: { data: TravelPlanWithItems }) {
+  const fetchGeo = useServerFn(getPlanItemsGeo);
+  const itemsPayload = useMemo(
+    () =>
+      data.items
+        .filter((i) => i.target_id && (i.item_kind === "business" || i.item_kind === "destination"))
+        .map((i) => ({ id: i.id, kind: i.item_kind, target_id: i.target_id })),
+    [data.items],
+  );
+  const q = useQuery({
+    queryKey: ["mi-viaje", "itinerario-geo", data.plan.id, itemsPayload.length],
+    queryFn: () => fetchGeo({ data: { items: itemsPayload } }),
+    enabled: itemsPayload.length > 0,
+  });
+
+  const itemsById = useMemo(() => {
+    const m = new Map<string, TravelPlanItem>();
+    for (const i of data.items) m.set(i.id, i);
+    return m;
+  }, [data.items]);
+
+  const markers = useMemo(() => {
+    const geo = q.data?.geo ?? [];
+    return geo.map((g) => ({
+      lat: g.lat,
+      lng: g.lng,
+      title: itemsById.get(g.item_id)?.snapshot?.title ?? undefined,
+      href: null as string | null,
+    }));
+  }, [q.data, itemsById]);
+
+  if (itemsPayload.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+        El mapa muestra destinos y empresas de tu viaje. Cuando agregues alguno, aparecerá aquí con sus coordenadas reales.
+      </div>
+    );
+  }
+  if (q.isPending) {
+    return (
+      <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
+        Cargando ubicaciones…
+      </div>
+    );
+  }
+  if (markers.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+        Aún no encontramos coordenadas para los elementos guardados. Pide a tu Concierge que enriquezca la ubicación.
+      </div>
+    );
+  }
+  const first = markers[0];
+  return (
+    <div className="overflow-hidden rounded-lg border bg-card">
+      <InteractiveMap
+        lat={first.lat}
+        lng={first.lng}
+        zoom={12}
+        markers={markers}
+        className="h-[380px] w-full"
+      />
+      <p className="border-t px-3 py-2 text-xs text-muted-foreground">
+        {markers.length} ubicación{markers.length === 1 ? "" : "es"} en tu viaje. Los pines muestran destinos y empresas guardadas.
+      </p>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Guest queue → migración post-login                                  */
 /* ------------------------------------------------------------------ */
 
