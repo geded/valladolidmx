@@ -41,7 +41,9 @@ import {
   readGuestQueue,
   type GuestQueueItem,
 } from "@/lib/traveler/guest-queue";
-import { ccListMyCases } from "@/lib/concierge/cc.functions";
+import { ccListMyCases, ccTimelineAppend } from "@/lib/concierge/cc.functions";
+import { getConciergeCaseFile } from "@/lib/concierge/concierge.functions";
+import { CaseFileView } from "@/components/concierge/CaseFileView";
 import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsInbox";
 import { CalendarCheck, Sparkles } from "lucide-react";
@@ -364,6 +366,9 @@ function MiViajeVistaBody({
   if (vista === "concierge") {
     return (
       <div className="space-y-6">
+        {plan.plan.case_id ? (
+          <EmbeddedCaseFile caseId={plan.plan.case_id} />
+        ) : null}
         <ConciergeSection data={plan} cases={cases} onChanged={onChanged} />
       </div>
     );
@@ -1662,6 +1667,101 @@ interface CaseSummary {
   status: string;
   priority: string;
   updated_at: string;
+}
+
+function EmbeddedCaseFile({ caseId }: { caseId: string }) {
+  const qc = useQueryClient();
+  const fetchFile = useServerFn(getConciergeCaseFile);
+  const appendNote = useServerFn(ccTimelineAppend);
+  const q = useQuery({
+    queryKey: ["concierge", "case-file", "traveler", caseId],
+    queryFn: () => fetchFile({ data: { caseId } }),
+    refetchOnWindowFocus: true,
+    staleTime: 30_000,
+  });
+  const [note, setNote] = useState("");
+  const send = useMutation({
+    mutationFn: (summary: string) =>
+      appendNote({
+        data: {
+          caseId,
+          eventType: "traveler_note",
+          summary,
+          severity: "info",
+        },
+      }),
+    onSuccess: () => {
+      setNote("");
+      qc.invalidateQueries({ queryKey: ["concierge", "case-file", "traveler", caseId] });
+      toast.success("Nota enviada a tu concierge");
+    },
+    onError: (e) =>
+      toast.error("No se pudo enviar la nota", {
+        description: e instanceof Error ? e.message : undefined,
+      }),
+  });
+  return (
+    <section className="rounded-2xl border bg-card p-5">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            Mi expediente Concierge
+          </p>
+          <h2 className="font-serif text-lg text-foreground">
+            Conversación con tu concierge humano
+          </h2>
+        </div>
+        <Link
+          to="/cuenta/concierge/$caseId"
+          params={{ caseId }}
+          className="rounded-pill border border-border/60 px-3 py-1.5 text-xs text-primary hover:bg-accent"
+        >
+          Abrir en pantalla completa →
+        </Link>
+      </div>
+
+      <form
+        className="mb-5 space-y-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const t = note.trim();
+          if (t.length >= 3 && !send.isPending) send.mutate(t);
+        }}
+      >
+        <label className="text-xs font-medium text-foreground/80">
+          Enviar una nota rápida a tu concierge
+        </label>
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          rows={2}
+          maxLength={1000}
+          placeholder="Ej. Preferimos comenzar el segundo día un poco más tarde…"
+          className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+        />
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>{note.length}/1000</span>
+          <button
+            type="submit"
+            disabled={note.trim().length < 3 || send.isPending}
+            className="rounded-pill bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground disabled:opacity-50"
+          >
+            {send.isPending ? "Enviando…" : "Enviar nota"}
+          </button>
+        </div>
+      </form>
+
+      {q.isLoading ? (
+        <p className="text-sm text-muted-foreground">Cargando expediente…</p>
+      ) : q.data ? (
+        <div className="rounded-lg border border-border/60 bg-background/40 p-3">
+          <CaseFileView data={q.data} hideInternal />
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">Aún no hay expediente.</p>
+      )}
+    </section>
+  );
 }
 
 function ConciergeSection({
