@@ -228,7 +228,7 @@ export function CaseFileView({ data, hideInternal = false }: { data: unknown; hi
         </Section>
       )}
 
-      <Section title="Línea de tiempo">
+      <Section title="Línea de tiempo" id="case-timeline">
         {f.timeline.length === 0 ? (
           <Empty>Sin eventos.</Empty>
         ) : (
