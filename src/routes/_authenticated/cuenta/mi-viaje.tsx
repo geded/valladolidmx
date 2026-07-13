@@ -373,11 +373,19 @@ function MiViajeVistaBody({
   if (vista === "documentos") {
     return (
       <div className="space-y-6">
-        <VistaEmpty
-          title="Tus documentos en un solo lugar"
-          body="Aquí guardaremos tu voucher, recibo y comprobantes. Muy pronto podrás descargarlos como PDF."
-          icon={FileText}
-        />
+        {confirmed ? (
+          <TravelDocumentsList
+            orderId={confirmed.order_id}
+            folio={confirmed.folio}
+            paidAt={confirmed.paid_at ?? null}
+          />
+        ) : (
+          <VistaEmpty
+            title="Tus documentos en un solo lugar"
+            body="Cuando confirmes tu viaje aparecerán aquí tu voucher y recibo, listos para descargar como PDF."
+            icon={FileText}
+          />
+        )}
       </div>
     );
   }
