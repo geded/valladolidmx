@@ -233,3 +233,34 @@ El checklist de 12 preguntas de esta Constitución se amplía con la validación
 conjunta **Business Value + Behavioral Change Statement** como requisito
 obligatorio para autorizar la emisión de cualquier Blueprint. Ver
 `mem://policies/founder-behavioral-first.md`.
+
+---
+
+## Adenda · Founder Outcome Validation Principle (2026-07-13, vinculante)
+
+Complementa el **Founder Behavioral First Principle**. Una épica NO se
+considera completamente finalizada sólo porque el código compile, los tests
+pasen, la arquitectura sea correcta o el Blueprint se haya ejecutado. Debe
+demostrarse además que la experiencia tiene **capacidad de producir el cambio
+de comportamiento** definido en su Behavioral Change Statement.
+
+### Outcome Validation (obligatorio en todo Completion Report)
+
+Todo Completion Report debe cerrar con una sección **Outcome Validation**
+respondiendo como mínimo:
+
+1. ¿Se implementó completamente la experiencia diseñada?
+2. ¿Existe evidencia de que puede provocar el comportamiento esperado?
+3. ¿Qué métricas deberán observarse en producción para validar esa hipótesis?
+4. ¿Qué resultados podrían demostrar que la hipótesis fue incorrecta? (falsación)
+5. ¿Qué ajustes se realizarían si el comportamiento esperado no ocurre?
+
+### Distinción obligatoria
+
+- **Cierre técnico (Completion Report):** certifica que la implementación
+  quedó correctamente construida.
+- **Validación de resultados (Outcome Validation posterior):** confirma si la
+  experiencia realmente produjo el cambio de comportamiento previsto.
+
+Ambos forman parte de la definición de éxito del producto y deben mantenerse
+claramente diferenciados. Ver `mem://policies/founder-outcome-validation.md`.
