@@ -72,9 +72,9 @@ export async function resolveDestinationContext(
   // Publicación al Context Engine (canal `destination.*` — reutilizando
   // el bus existente). Consumidores globales pueden suscribirse.
   emitContextEngineEvent("context_engine.resolved", {
-    kind: "destination" as never,
+    kind: "destination",
     at: now,
-    inheritedSlots: Object.keys(signals) as DestinationSignalKind[] as never,
+    inheritedSlots: Object.keys(signals),
   });
 
   return resolved;
