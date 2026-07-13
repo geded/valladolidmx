@@ -2043,7 +2043,7 @@ interface CaseSummary {
   updated_at: string;
 }
 
-function EmbeddedCaseFile({ caseId }: { caseId: string }) {
+function EmbeddedCaseFile({ caseId, focus }: { caseId: string; focus?: string }) {
   const qc = useQueryClient();
   const fetchFile = useServerFn(getConciergeCaseFile);
   const appendNote = useServerFn(ccTimelineAppend);
@@ -2053,6 +2053,31 @@ function EmbeddedCaseFile({ caseId }: { caseId: string }) {
     refetchOnWindowFocus: true,
     staleTime: 30_000,
   });
+  // CV5.10 v2 · Deep-link scroll cuando llega focus= desde el bell.
+  useEffect(() => {
+    if (!focus || !q.data) return;
+    let selector: string | null = null;
+    if (focus.startsWith("proposal:")) {
+      selector = `#proposal-${focus.slice("proposal:".length)}`;
+    } else if (focus === "proposals") {
+      selector = "#case-proposals";
+    } else if (focus === "timeline") {
+      selector = "#case-timeline";
+    }
+    if (!selector) return;
+    const id = window.setTimeout(() => {
+      const el = document.querySelector(selector!);
+      if (el instanceof HTMLElement) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        el.classList.add("ring-2", "ring-primary/60", "rounded-md");
+        window.setTimeout(
+          () => el.classList.remove("ring-2", "ring-primary/60", "rounded-md"),
+          1800,
+        );
+      }
+    }, 80);
+    return () => window.clearTimeout(id);
+  }, [focus, q.data]);
   const [note, setNote] = useState("");
   const send = useMutation({
     mutationFn: (summary: string) =>
