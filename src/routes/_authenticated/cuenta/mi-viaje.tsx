@@ -48,6 +48,7 @@ import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsInbox";
 import { CalendarCheck, Sparkles } from "lucide-react";
 import { getPlanItemsGeo } from "@/lib/traveler/travel-plan-geo.functions";
+import { deriveTripPhase, type TripPhase } from "@/lib/traveler/trip-phase";
 import { optimizePlanDay } from "@/lib/traveler/travel-plan-optimize.functions";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
 import { List, Clock, Map as MapIcon, ChevronUp, ChevronDown, Wand2 } from "lucide-react";
@@ -92,22 +93,11 @@ const V_KEYS = [
 ] as const;
 export type MiViajeVista = (typeof V_KEYS)[number];
 
-/** Fase macro derivada del plan + orden confirmada. NO se persiste. */
-export type TravelCompanionPhase = "planning" | "confirmed" | "onsite" | "post";
-
-function deriveCompanionPhase(
-  confirmed: { days_to_trip: number | null; plan_end_date: string | null } | null | undefined,
-): TravelCompanionPhase {
-  if (!confirmed) return "planning";
-  const d = confirmed.days_to_trip;
-  if (typeof d === "number" && d > 0) return "confirmed";
-  if (confirmed.plan_end_date) {
-    const end = new Date(`${confirmed.plan_end_date}T23:59:59Z`).getTime();
-    if (Date.now() <= end) return "onsite";
-    return "post";
-  }
-  return typeof d === "number" && d === 0 ? "onsite" : "confirmed";
-}
+/**
+ * Fase macro del viaje. Contrato canónico en `@/lib/traveler/trip-phase`.
+ * Alias local `TravelCompanionPhase` conservado por compatibilidad interna.
+ */
+export type TravelCompanionPhase = TripPhase;
 
 const PHASE_LABEL: Record<TravelCompanionPhase, string> = {
   planning: "Planeando",
@@ -243,7 +233,7 @@ function MiViajePage() {
   const search = useSearch({ from: Route.id });
   const activeConfirmed =
     confirmed && confirmed.status !== "refunded" ? confirmed : null;
-  const phase = deriveCompanionPhase(activeConfirmed);
+  const phase = deriveTripPhase(activeQ.data?.plan ?? null, activeConfirmed);
   const vista: MiViajeVista = search.vista ?? PHASE_VISTA_ORDER[phase][0];
 
   return (
@@ -2453,7 +2443,12 @@ function ConciergeSection({
 /* Fase activa del viaje (CV4.3-narrativa · Etapa 5)                   */
 /* ------------------------------------------------------------------ */
 
-type TripPhase = "planning" | "t14" | "t3" | "onsite" | "post" | "closed";
+/**
+ * Fase de countdown interna del `TripPhaseCard` (T-14, T-3, cerrado…).
+ * NO es la fase macro del viaje — para eso usar `TripPhase` desde
+ * `@/lib/traveler/trip-phase`.
+ */
+type CountdownPhase = "planning" | "t14" | "t3" | "onsite" | "post" | "closed";
 
 interface ChecklistItem {
   key: string;
@@ -2462,7 +2457,7 @@ interface ChecklistItem {
 }
 
 const PHASE_META: Record<
-  TripPhase,
+  CountdownPhase,
   {
     label: string;
     tagline: string;
@@ -2538,7 +2533,7 @@ const PHASE_META: Record<
 function derivePhase(data: {
   days_to_trip: number | null;
   plan_end_date: string | null;
-}): TripPhase {
+}): CountdownPhase {
   const d = data.days_to_trip;
   if (typeof d !== "number") return "planning";
   if (d > 14) return "planning";
