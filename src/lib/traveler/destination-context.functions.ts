@@ -55,6 +55,16 @@ const InputSchema = z.object({
     .optional(),
   destination: z.string().max(120).nullable().optional(),
   locale: z.string().max(10).optional(),
+  entities: z
+    .array(
+      z.object({
+        id: z.string().min(1).max(64),
+        type: z.string().min(1).max(32),
+        timezone: z.string().max(64).optional(),
+      }),
+    )
+    .max(50)
+    .optional(),
 });
 
 export const resolveTravelerDestinationContext = createServerFn({ method: "POST" })
@@ -72,6 +82,7 @@ export const resolveTravelerDestinationContext = createServerFn({ method: "POST"
       scope: {
         destination: data.destination ?? undefined,
         geo: data.geo ?? undefined,
+        entities: data.entities ?? undefined,
       },
       at: new Date(),
       locale: data.locale,

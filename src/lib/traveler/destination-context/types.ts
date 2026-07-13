@@ -39,6 +39,16 @@ export interface DestinationSignalScope {
   entityType?: string;
   entityId?: string;
   geo?: { lat: number; lon: number };
+  /**
+   * CV6.5.2 · Entidades relevantes del día (aditivo).
+   * Los Contributors que operan por entidad (hours, availability,
+   * incidents…) leen esta lista. Contributors globales pueden ignorarla.
+   */
+  entities?: ReadonlyArray<{
+    id: string;
+    type: string;
+    timezone?: string;
+  }>;
 }
 
 /** Explicabilidad — obligatoria (Explainable by Default). */
