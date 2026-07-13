@@ -48,6 +48,7 @@ import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsInbox";
 import { CalendarCheck, Sparkles } from "lucide-react";
 import { getPlanItemsGeo } from "@/lib/traveler/travel-plan-geo.functions";
+import { deriveTripPhase, type TripPhase } from "@/lib/traveler/trip-phase";
 import { optimizePlanDay } from "@/lib/traveler/travel-plan-optimize.functions";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
 import { List, Clock, Map as MapIcon, ChevronUp, ChevronDown, Wand2 } from "lucide-react";
