@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Heart, Star, Trash2, Camera } from "lucide-react";
+import { Heart, Star, Trash2, Camera, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import {
   createMemory,
   deleteMemory,
@@ -33,6 +34,41 @@ export function MemoriesSection({ planId, orderId }: Props) {
   const [body, setBody] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [rating, setRating] = useState<number | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function handlePhotoFile(file: File) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("El archivo debe ser una imagen");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("La foto no puede superar los 10 MB");
+      return;
+    }
+    setUploading(true);
+    try {
+      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !userData.user) throw new Error("Sesión no válida");
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const path = `${userData.user.id}/${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("travel-memories")
+        .upload(path, file, { cacheControl: "3600", upsert: false });
+      if (upErr) throw upErr;
+      const { data: signed, error: sErr } = await supabase.storage
+        .from("travel-memories")
+        .createSignedUrl(path, 60 * 60 * 24 * 365);
+      if (sErr || !signed) throw sErr ?? new Error("No se pudo firmar la URL");
+      setPhotoUrl(signed.signedUrl);
+      toast.success("Foto lista");
+    } catch (e: unknown) {
+      toast.error("No pudimos subir la foto", {
+        description: e instanceof Error ? e.message : undefined,
+      });
+    } finally {
+      setUploading(false);
+    }
+  }
 
   const create = useMutation({
     mutationFn: () =>
@@ -69,7 +105,7 @@ export function MemoriesSection({ planId, orderId }: Props) {
   });
 
   const memories = q.data ?? [];
-  const canSubmit = body.trim().length > 0 && !create.isPending;
+  const canSubmit = body.trim().length > 0 && !create.isPending && !uploading;
 
   return (
     <div className="space-y-6">
@@ -109,15 +145,47 @@ export function MemoriesSection({ planId, orderId }: Props) {
             className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
           <div className="flex flex-wrap items-center gap-3">
-            <div className="relative flex-1 min-w-[220px]">
-              <Camera className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
-              <input
-                type="url"
-                value={photoUrl}
-                onChange={(e) => setPhotoUrl(e.target.value)}
-                placeholder="URL de foto (opcional)"
-                className="w-full rounded-md border border-input bg-background pl-8 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-              />
+            <div className="flex flex-1 min-w-[220px] items-center gap-2">
+              {photoUrl ? (
+                <div className="relative">
+                  <img
+                    src={photoUrl}
+                    alt="Vista previa"
+                    className="size-16 rounded-md object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setPhotoUrl("")}
+                    className="absolute -right-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-background text-muted-foreground shadow-soft ring-1 ring-border hover:text-destructive"
+                    aria-label="Quitar foto"
+                  >
+                    <X className="size-3" aria-hidden />
+                  </button>
+                </div>
+              ) : null}
+              <label
+                className={
+                  "inline-flex cursor-pointer items-center gap-2 rounded-pill border border-input bg-background px-3 py-2 text-sm text-foreground shadow-soft transition-colors hover:bg-accent " +
+                  (uploading ? "opacity-60 pointer-events-none" : "")
+                }
+              >
+                {uploading ? (
+                  <Loader2 className="size-4 animate-spin" aria-hidden />
+                ) : (
+                  <Camera className="size-4" aria-hidden />
+                )}
+                <span>{uploading ? "Subiendo…" : photoUrl ? "Cambiar foto" : "Añadir foto"}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) void handlePhotoFile(f);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
             </div>
             <div className="flex items-center gap-1" role="radiogroup" aria-label="Calificación">
               {[1, 2, 3, 4, 5].map((n) => (
