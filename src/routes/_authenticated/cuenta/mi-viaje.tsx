@@ -190,6 +190,17 @@ function MiViajePage() {
       (p) => p.status === "sent" || p.status === "viewed",
     ).length;
   }, [caseFile]);
+  // CV5.10 v2 · id de la primera propuesta pendiente para deep-link.
+  const firstPendingProposalId = useMemo(() => {
+    const cf = caseFile as
+      | { proposals?: Array<{ proposal_id: string; status?: string }> }
+      | undefined;
+    return (
+      (cf?.proposals ?? []).find(
+        (p) => p.status === "sent" || p.status === "viewed",
+      )?.proposal_id ?? null
+    );
+  }, [caseFile]);
   // CV5.10 · Último evento del expediente que no venga del propio viajero.
   const latestConciergeEvent = useMemo(() => {
     const cf = caseFile as
