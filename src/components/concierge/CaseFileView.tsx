@@ -480,14 +480,6 @@ function ProposalCard({
   );
 }
 
-function ProposalComposer({
-  ...args
-}: never) {
-  void args;
-  return null;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ProposalCompare({
   proposals,
   internal,
@@ -572,7 +564,7 @@ function ProposalCompare({
   );
 }
 
-function ProposalComposerReal({
+function ProposalComposer({
   caseId,
   quotes,
 }: {
