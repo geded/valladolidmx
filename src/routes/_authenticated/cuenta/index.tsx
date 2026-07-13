@@ -9,6 +9,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { getMyTravelerProfile } from "@/lib/traveler/traveler-account.functions";
 import { getMyPersonalProfile } from "@/lib/traveler/profile-personal.functions";
 import { ProfileCompletionMeter } from "@/components/traveler/ProfileCompletionMeter";
+import { StageAwareCompanionBoard } from "@/components/traveler/StageAwareCompanionBoard";
+import { useTravelStage } from "@/lib/traveler/use-travel-stage";
 import { LinkGoogleCard } from "@/components/traveler/LinkGoogleCard";
 import { PublicProfileBenefitsCard } from "@/components/traveler/PublicProfileBenefitsCard";
 import { getMyPublicProfile } from "@/lib/traveler/traveler-public.functions";
@@ -77,6 +79,10 @@ function TravelerCuenta() {
     staleTime: 5 * 60_000,
   });
 
+  // CV6.O2 · Stage-Aware Experience — resuelve la etapa reutilizando
+  // el contrato v1.0.0 (`deriveTravelStage`) y respeta override `?stage=`.
+  const { stage } = useTravelStage({ profile: data });
+
   const completionChecks: boolean[] = [
     Boolean(personal?.first_name || personal?.display_name),
     Boolean(personal?.phone),
@@ -118,6 +124,13 @@ function TravelerCuenta() {
           />
         </div>
       ) : null}
+
+      <div className="mt-6">
+        <StageAwareCompanionBoard
+          stage={stage}
+          firstName={displayName ? displayName.split(" ")[0] : null}
+        />
+      </div>
 
       <section className="mt-6 rounded-2xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold">Datos de contacto</h2>
