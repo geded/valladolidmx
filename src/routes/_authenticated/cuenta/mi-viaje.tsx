@@ -169,6 +169,21 @@ function MiViajePage() {
     queryFn: () => fetchConfirmed(),
     staleTime: 30_000,
   });
+  // CV5.9 · Propuestas pendientes por confirmar (badge + spotlight).
+  const fetchCaseFile = useServerFn(getConciergeCaseFile);
+  const activeCaseId = activeQ.data?.plan.case_id ?? null;
+  const { data: caseFile } = useQuery({
+    queryKey: ["concierge", "case-file", "traveler", activeCaseId],
+    queryFn: () => fetchCaseFile({ data: { caseId: activeCaseId! } }),
+    enabled: !!activeCaseId,
+    staleTime: 30_000,
+  });
+  const pendingProposalsCount = useMemo(() => {
+    const cf = caseFile as { proposals?: Array<{ status?: string }> } | undefined;
+    return (cf?.proposals ?? []).filter(
+      (p) => p.status === "sent" || p.status === "viewed",
+    ).length;
+  }, [caseFile]);
   const reservedIds = useMemo(() => {
     const s = new Set<string>();
     if (!concierge?.has_concierge) return s;
@@ -218,7 +233,15 @@ function MiViajePage() {
         </p>
       </header>
 
-      <MiViajeVistaTabs current={vista} phase={phase} />
+      <MiViajeVistaTabs
+        current={vista}
+        phase={phase}
+        concierge_badge={pendingProposalsCount}
+      />
+
+      {pendingProposalsCount > 0 && vista !== "concierge" ? (
+        <PendingProposalsSpotlight count={pendingProposalsCount} />
+      ) : null}
 
       <GuestImportBanner onImported={invalidatePlan} />
 
@@ -246,9 +269,11 @@ function MiViajePage() {
 function MiViajeVistaTabs({
   current,
   phase,
+  concierge_badge,
 }: {
   current: MiViajeVista;
   phase: TravelCompanionPhase;
+  concierge_badge?: number;
 }) {
   const navigate = useNavigate({ from: Route.fullPath });
   const order = PHASE_VISTA_ORDER[phase];
@@ -284,10 +309,67 @@ function MiViajeVistaTabs({
           >
             <Icon className="size-3.5" aria-hidden />
             {meta.label}
+            {key === "concierge" && concierge_badge && concierge_badge > 0 ? (
+              <span
+                className={`ml-1 inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 text-[10px] font-semibold leading-4 ${
+                  active
+                    ? "bg-primary-foreground text-primary"
+                    : "bg-primary text-primary-foreground"
+                }`}
+                aria-label={`${concierge_badge} propuesta(s) pendiente(s)`}
+              >
+                {concierge_badge}
+              </span>
+            ) : null}
           </button>
         );
       })}
     </nav>
+  );
+}
+
+/** CV5.9 · Aviso destacado cuando hay propuestas del Concierge listas para confirmar. */
+function PendingProposalsSpotlight({ count }: { count: number }) {
+  const navigate = useNavigate({ from: Route.fullPath });
+  return (
+    <section className="rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-background to-background p-4 sm:p-5">
+      <div className="flex flex-wrap items-start gap-3">
+        <div className="grid size-10 place-items-center rounded-xl bg-primary/15 text-primary">
+          <Bell className="size-5" aria-hidden />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+            Tu Concierge te envió una propuesta
+          </p>
+          <h2 className="mt-0.5 font-serif text-base text-foreground">
+            {count === 1
+              ? "Tienes 1 propuesta lista para confirmar tu viaje"
+              : `Tienes ${count} propuestas listas para confirmar tu viaje`}
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Revisa lo que armaron para ti y confirma cuando estés listo. Nada se
+            cobra sin tu aprobación.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() =>
+            navigate({
+              search: (prev: { vista?: MiViajeVista }) => ({
+                ...prev,
+                vista: "concierge",
+              }),
+              replace: true,
+              resetScroll: false,
+            })
+          }
+          className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-pill bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-soft transition hover:opacity-90"
+        >
+          <Headset className="size-3.5" aria-hidden />
+          Ver propuestas
+        </button>
+      </div>
+    </section>
   );
 }
 
