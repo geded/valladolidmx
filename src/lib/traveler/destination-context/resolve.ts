@@ -20,7 +20,6 @@ import {
 import type {
   DestinationContributorInput,
   DestinationSignal,
-  DestinationSignalKind,
   ResolvedDestinationContext,
 } from "./types";
 
