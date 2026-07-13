@@ -233,7 +233,11 @@ function MiViajePage() {
         </p>
       </header>
 
-      <MiViajeVistaTabs current={vista} phase={phase} />
+      <MiViajeVistaTabs
+        current={vista}
+        phase={phase}
+        concierge_badge={pendingProposalsCount}
+      />
 
       {pendingProposalsCount > 0 && vista !== "concierge" ? (
         <PendingProposalsSpotlight count={pendingProposalsCount} />
