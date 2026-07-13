@@ -358,7 +358,10 @@ function ProposalCard({
   }
 
   return (
-    <li className="rounded-md border border-border bg-card p-3 text-sm">
+    <li
+      id={`proposal-${p.proposal_id}`}
+      className="scroll-mt-24 rounded-md border border-border bg-card p-3 text-sm"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="font-medium">
           Propuesta v{p.version} · {money(p.total_amount_cents, p.currency)}
