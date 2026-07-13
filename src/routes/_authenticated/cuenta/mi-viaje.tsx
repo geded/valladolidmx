@@ -296,6 +296,7 @@ function MiViajeVistaBody({
   plan: TravelPlanWithItems;
   confirmed:
     | (Parameters<typeof ConfirmedTravelBanner>[0]["data"] & {
+        order_id: string;
         status: string;
         email_t14_sent_at: string | null;
         email_t3_sent_at: string | null;
