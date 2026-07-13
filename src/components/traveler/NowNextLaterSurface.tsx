@@ -42,6 +42,8 @@ import {
 import { useRef } from "react";
 import { deriveOnTripConciergeState } from "@/lib/traveler/on-trip-concierge";
 import { OnTripConciergePriorityBanner } from "@/components/traveler/OnTripConciergePriorityBanner";
+import { deriveLiveRecap } from "@/lib/traveler/live-recap";
+import { LiveRecapSurface } from "@/components/traveler/LiveRecapSurface";
 import { useNavigate } from "@tanstack/react-router";
 
 type LoosePlan = {
@@ -295,8 +297,29 @@ export function NowNextLaterSurface({
     });
   }, [phase, plan, activeCase, order]);
 
+  // CV6.8 · Live Recap & Handoff · Pure Domain derivado del cierre de día.
+  const recap = useMemo(() => {
+    const at = new Date();
+    const adaptedItems = adaptItems(plan?.items ?? null);
+    const adapted: LiveDayPlanInput = {
+      start_date: plan?.start_date ?? null,
+      end_date: plan?.end_date ?? null,
+      items: adaptedItems,
+    };
+    const liveDay = deriveLiveDay(adapted, at);
+    return deriveLiveRecap({
+      phase,
+      liveDay,
+      planItems: adaptedItems,
+      endDate: (plan?.end_date as string | null | undefined) ?? null,
+      decisionCenter: center,
+      assistance: { state: assistanceState.state, visible: assistanceState.visible },
+      at,
+    });
+  }, [phase, plan, center, assistanceState]);
+
   // Auto-Hide global: sólo si NINGUNA capa aporta valor.
-  if (center.empty && !assistanceState.visible) return null;
+  if (center.empty && !assistanceState.visible && !recap.visible) return null;
 
   // Handler stateless: sólo navega. Las mutaciones (promotePlanToCase)
   // viven en la ruta destino /cuenta/mi-viaje (Strict Reuse).
@@ -309,6 +332,10 @@ export function NowNextLaterSurface({
         search: { vista: "concierge", accion: "contactar" } as never,
       });
     }
+  };
+
+  const handleOpenTomorrow = () => {
+    navigate({ to: "/cuenta/mi-viaje", search: { vista: "itinerario" } as never });
   };
 
   return (
@@ -409,6 +436,13 @@ export function NowNextLaterSurface({
               </article>
             ))}
           </div>
+        </div>
+      ) : null}
+
+      {/* CV6.8 · Live Recap & Handoff — Auto-Hide si no hay valor real. */}
+      {recap.visible ? (
+        <div className="mt-5 border-t border-border/60 pt-4">
+          <LiveRecapSurface recap={recap} onOpenTomorrow={handleOpenTomorrow} />
         </div>
       ) : null}
     </section>
