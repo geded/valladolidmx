@@ -419,10 +419,12 @@ function TravelNotificationsBell({
   pendingProposals,
   confirmed,
   latestConciergeEvent,
+  firstPendingProposalId,
 }: {
   pendingProposals: number;
   confirmed: { days_to_trip: number | null; folio: string | null } | null;
   latestConciergeEvent: { event_type?: string; summary?: string; created_at?: string } | null;
+  firstPendingProposalId: string | null;
 }) {
   const navigate = useNavigate({ from: Route.fullPath });
   const daysToTrip = confirmed?.days_to_trip ?? null;
@@ -442,9 +444,13 @@ function TravelNotificationsBell({
     (tripMilestone !== null ? 1 : 0) +
     (hasEvent ? 1 : 0);
 
-  const goTo = (vista: MiViajeVista) =>
+  const goTo = (vista: MiViajeVista, focus?: string) =>
     navigate({
-      search: (prev: { vista?: MiViajeVista }) => ({ ...prev, vista }),
+      search: (prev: { vista?: MiViajeVista; focus?: string }) => ({
+        ...prev,
+        vista,
+        focus: focus ?? undefined,
+      }),
       replace: true,
       resetScroll: false,
     });
@@ -477,7 +483,14 @@ function TravelNotificationsBell({
             <li>
               <button
                 type="button"
-                onClick={() => goTo("concierge")}
+                onClick={() =>
+                  goTo(
+                    "concierge",
+                    firstPendingProposalId
+                      ? `proposal:${firstPendingProposalId}`
+                      : "proposals",
+                  )
+                }
                 className="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-accent"
               >
                 <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary">
@@ -528,7 +541,7 @@ function TravelNotificationsBell({
             <li>
               <button
                 type="button"
-                onClick={() => goTo("concierge")}
+                onClick={() => goTo("concierge", "timeline")}
                 className="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-accent"
               >
                 <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-muted text-foreground">
