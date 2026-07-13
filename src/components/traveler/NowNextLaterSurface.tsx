@@ -17,6 +17,8 @@
  */
 
 import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, MapPin, Navigation2, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import {
@@ -26,9 +28,12 @@ import {
 } from "@/lib/traveler/live-day";
 import {
   deriveDecisionCenter,
+  CV6_2_BASE_CONTRIBUTORS,
   type DecisionCard,
   type DecisionTone,
 } from "@/lib/traveler/decision-center";
+import { CV6_5_DESTINATION_CONTRIBUTORS } from "@/lib/traveler/decision-center-destination";
+import { resolveTravelerDestinationContext } from "@/lib/traveler/destination-context.functions";
 import type { TripPhase } from "@/lib/traveler/trip-phase";
 
 type LoosePlan = {
@@ -137,9 +142,30 @@ function CardView({ card }: { card: DecisionCard }) {
 export interface NowNextLaterSurfaceProps {
   phase: TripPhase;
   plan: LoosePlan | null | undefined;
+  /** Coordenadas del destino/viajero para resolver contexto. Opcional. */
+  geo?: { lat: number; lon: number } | null;
+  destination?: string | null;
 }
 
-export function NowNextLaterSurface({ phase, plan }: NowNextLaterSurfaceProps) {
+export function NowNextLaterSurface({ phase, plan, geo, destination }: NowNextLaterSurfaceProps) {
+  // Consumidores acceden EXCLUSIVAMENTE a ResolvedDestinationContext
+  // vía server fn (Guardrail vinculante).
+  const resolveFn = useServerFn(resolveTravelerDestinationContext);
+  const enabled = phase === "onsite";
+  const ctxQuery = useQuery({
+    queryKey: ["traveler.destination-context", geo?.lat ?? null, geo?.lon ?? null, destination ?? null],
+    queryFn: () =>
+      resolveFn({
+        data: {
+          geo: geo ?? null,
+          destination: destination ?? null,
+        },
+      }),
+    enabled,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
   const center = useMemo(() => {
     const at = new Date();
     const adapted: LiveDayPlanInput = {
@@ -148,8 +174,16 @@ export function NowNextLaterSurface({ phase, plan }: NowNextLaterSurfaceProps) {
       items: adaptItems(plan?.items ?? null),
     };
     const liveDay = deriveLiveDay(adapted, at);
-    return deriveDecisionCenter({ phase, liveDay, at });
-  }, [phase, plan]);
+    return deriveDecisionCenter(
+      {
+        phase,
+        liveDay,
+        at,
+        destination: (ctxQuery.data ?? undefined) as never,
+      },
+      [...CV6_2_BASE_CONTRIBUTORS, ...CV6_5_DESTINATION_CONTRIBUTORS],
+    );
+  }, [phase, plan, ctxQuery.data]);
 
   // Auto-Hide global (Founder Decision Center Principle).
   if (center.empty) return null;
