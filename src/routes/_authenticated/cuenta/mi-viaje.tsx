@@ -636,6 +636,7 @@ function MiViajeVistaBody({
   focus?: string;
 }) {
   if (vista === "resumen") {
+    const empty = plan.items.length === 0 && !confirmed;
     return (
       <div className="space-y-6">
         {confirmed ? (
@@ -646,10 +647,43 @@ function MiViajeVistaBody({
         ) : null}
         <AluxPlanProposalsInbox onChanged={onChanged} />
         <PlanMetaEditor data={plan} onSaved={onChanged} />
+        {empty ? (
+          <VistaEmpty
+            eyebrow="Comienza tu viaje"
+            title="Tu expediente del Oriente Maya está listo para empezar"
+            body="Agrega tus primeras paradas — un pueblo mágico, un cenote, una hacienda — o pídele a Alux que te proponga una ruta a la medida. Todo lo que guardes vivirá aquí."
+            icon={SparklesIcon}
+            cta={{ label: "Explorar el Oriente Maya", to: "/oriente-maya" }}
+            secondary={{
+              label: "Pedirle una ruta a Alux",
+              to: "/alux",
+              search: { prompt: "Propóneme una ruta de 3 días por el Oriente Maya de Yucatán." },
+            }}
+          />
+        ) : null}
       </div>
     );
   }
   if (vista === "itinerario") {
+    if (plan.items.length === 0) {
+      return (
+        <div className="space-y-6">
+          {confirmed ? <ConfirmedTripTimeline data={confirmed} /> : null}
+          <VistaEmpty
+            eyebrow="Tu itinerario"
+            title="Aún no hay paradas en tu ruta"
+            body="Añade destinos, hoteles, experiencias o eventos para verlos aquí como lista, línea de tiempo y mapa. Alux puede sugerirte el orden más cómodo."
+            icon={RouteIcon}
+            cta={{ label: "Descubrir experiencias", to: "/oriente-maya" }}
+            secondary={{
+              label: "Optimizar con Alux",
+              to: "/alux",
+              search: { prompt: "Ayúdame a construir un itinerario por el Oriente Maya con paradas eficientes." },
+            }}
+          />
+        </div>
+      );
+    }
     return (
       <div className="space-y-6">
         {confirmed ? <ConfirmedTripTimeline data={confirmed} /> : null}
@@ -674,8 +708,11 @@ function MiViajeVistaBody({
           </>
         ) : (
           <VistaEmpty
-            title="Aún no tienes reservas confirmadas"
-            body="Cuando cierres tu viaje con el Concierge, tus reservas aparecerán aquí."
+            eyebrow="Reservas"
+            title="Tus reservas del Oriente Maya vivirán aquí"
+            body="Cuando confirmes tu viaje con el Concierge, cada reserva (hotel, tour, experiencia) aparecerá con su folio, horario y contacto directo."
+            icon={ReceiptText}
+            cta={{ label: "Hablar con el Concierge", to: "/cuenta/concierge" }}
           />
         )}
         <ShareExportSection data={plan} onChanged={onChanged} />
@@ -683,6 +720,19 @@ function MiViajeVistaBody({
     );
   }
   if (vista === "concierge") {
+    if (!plan.plan.case_id && cases.length === 0) {
+      return (
+        <div className="space-y-6">
+          <VistaEmpty
+            eyebrow="Concierge Oriente Maya"
+            title="Un Concierge local, listo para armar tu viaje contigo"
+            body="Cuando envíes tu plan al Concierge, aquí verás propuestas, mensajes y confirmaciones. Sin sentir que estás comprando: confirmando lo que armaron juntos."
+            icon={Headset}
+            cta={{ label: "Enviar mi plan al Concierge", to: "/cuenta/mi-viaje", search: { vista: "resumen" } }}
+          />
+        </div>
+      );
+    }
     return (
       <div className="space-y-6">
         {plan.plan.case_id ? (
@@ -712,9 +762,11 @@ function MiViajeVistaBody({
           />
         ) : (
           <VistaEmpty
-            title="Tus documentos en un solo lugar"
-            body="Cuando confirmes tu viaje aparecerán aquí tu voucher y recibo, listos para descargar como PDF."
+            eyebrow="Documentos"
+            title="Voucher y recibo, siempre a la mano"
+            body="Al confirmar tu viaje generamos tu voucher imprimible y tu recibo del Oriente Maya en PDF. Podrás descargarlos o compartirlos desde aquí."
             icon={FileText}
+            cta={{ label: "Ver mi resumen", to: "/cuenta/mi-viaje", search: { vista: "resumen" } }}
           />
         )}
       </div>
