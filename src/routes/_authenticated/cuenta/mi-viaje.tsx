@@ -13,7 +13,7 @@
  *  - Migración de cola de invitados (localStorage → plan activo).
  *  - Envío al Concierge sin cambiar la lógica del módulo (Sub-ola E).
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -262,7 +262,7 @@ function MiViajePage() {
             />
           </div>
         </div>
-        <h1 className="text-3xl font-semibold">Mi Viaje</h1>
+        <h1 className="text-2xl font-semibold sm:text-3xl">Mi Viaje</h1>
         <p className="text-sm text-muted-foreground">
           Tu compañero digital del Oriente Maya de Yucatán — antes, durante y
           después de tu visita. Todas las vistas comparten el mismo viaje.
@@ -314,11 +314,22 @@ function MiViajeVistaTabs({
 }) {
   const navigate = useNavigate({ from: Route.fullPath });
   const order = PHASE_VISTA_ORDER[phase];
+  const navRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const root = navRef.current;
+    if (!root) return;
+    const active = root.querySelector<HTMLButtonElement>('button[aria-pressed="true"]');
+    if (active) {
+      active.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }, [current, phase]);
   return (
-    <nav
-      className="scrollbar-none -mx-1 flex gap-1 overflow-x-auto rounded-xl border border-border/70 bg-card/40 p-1"
-      aria-label="Vistas de Mi Viaje"
-    >
+    <div className="relative">
+      <nav
+        ref={navRef}
+        className="scrollbar-none -mx-1 flex gap-1 overflow-x-auto rounded-xl border border-border/70 bg-card/40 p-1"
+        aria-label="Vistas de Mi Viaje"
+      >
       {order.map((key) => {
         const meta = VISTA_META[key];
         const Icon = meta.icon;
@@ -361,7 +372,12 @@ function MiViajeVistaTabs({
           </button>
         );
       })}
-    </nav>
+      </nav>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 w-6 rounded-r-xl bg-gradient-to-l from-background to-transparent"
+      />
+    </div>
   );
 }
 
