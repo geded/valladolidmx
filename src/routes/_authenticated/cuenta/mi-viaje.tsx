@@ -296,6 +296,7 @@ function MiViajePage() {
           reservedIds={reservedIds}
           phase={phase}
           onChanged={invalidatePlan}
+          focus={search.focus}
         />
       )}
     </div>
