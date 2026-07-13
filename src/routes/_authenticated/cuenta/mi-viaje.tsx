@@ -598,6 +598,7 @@ function MiViajeVistaBody({
   reservedIds: Set<string>;
   phase: TravelCompanionPhase;
   onChanged: () => void;
+  focus?: string;
 }) {
   if (vista === "resumen") {
     return (
