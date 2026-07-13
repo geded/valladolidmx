@@ -48,6 +48,7 @@ import { getPlanItemsGeo } from "@/lib/traveler/travel-plan-geo.functions";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
 import { List, Clock, Map as MapIcon } from "lucide-react";
 import { ReservationsList } from "@/components/traveler/ReservationsList";
+import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista } => {
@@ -297,6 +298,7 @@ function MiViajeVistaBody({
   confirmed:
     | (Parameters<typeof ConfirmedTravelBanner>[0]["data"] & {
         order_id: string;
+        paid_at: string | null;
         status: string;
         email_t14_sent_at: string | null;
         email_t3_sent_at: string | null;
