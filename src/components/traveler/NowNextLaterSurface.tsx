@@ -326,7 +326,9 @@ export function NowNextLaterSurface({
         </div>
       ) : null}
 
-      <header className="mb-3 flex items-center gap-2">
+      {!center.empty ? (
+        <>
+          <header className="mb-3 flex items-center gap-2">
         <span className="grid size-7 place-items-center rounded-full bg-primary/15 text-primary">
           <Sparkles className="size-4" aria-hidden />
         </span>
@@ -356,6 +358,8 @@ export function NowNextLaterSurface({
           );
         })}
       </div>
+        </>
+      ) : null}
 
       {/* CV6.6 · Alux Espacial — Auto-Hide si no hay propuestas. */}
       {aluxProposals.length > 0 ? (
