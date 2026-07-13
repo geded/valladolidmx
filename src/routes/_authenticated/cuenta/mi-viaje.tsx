@@ -649,7 +649,7 @@ function MiViajeVistaBody({
     return (
       <div className="space-y-6">
         {plan.plan.case_id ? (
-          <EmbeddedCaseFile caseId={plan.plan.case_id} />
+          <EmbeddedCaseFile caseId={plan.plan.case_id} focus={focus} />
         ) : null}
         <ConciergeSection data={plan} cases={cases} onChanged={onChanged} />
       </div>
