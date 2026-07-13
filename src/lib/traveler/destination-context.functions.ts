@@ -20,19 +20,27 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [k: string]: JsonValue };
+
 /** Señal serializable (payload libre JSON). */
 export interface SerializableDestinationSignal {
   kind: string;
-  scope: Record<string, unknown>;
+  scope: { [k: string]: JsonValue };
   at: string;
   ttlMs: number;
   explain: { rationale: string; provider: string; url?: string };
-  payload: Record<string, unknown>;
+  payload: { [k: string]: JsonValue };
 }
 
 /** Payload serializable devuelto al cliente. */
 export interface TravelerDestinationContextPayload {
-  signals: Record<string, SerializableDestinationSignal[]>;
+  signals: { [kind: string]: SerializableDestinationSignal[] };
   resolvedAt: string;
   contributors: string[];
 }
