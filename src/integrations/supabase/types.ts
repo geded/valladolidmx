@@ -44,6 +44,66 @@ export type Database = {
         }
         Relationships: []
       }
+      alux_evaluations: {
+        Row: {
+          created_at: string
+          expected_entities: string[]
+          forbidden_terms: string[]
+          id: string
+          last_answer: string | null
+          last_hallucination_risk: number | null
+          last_latency_ms: number | null
+          last_matched_entities: string[] | null
+          last_missing_entities: string[] | null
+          last_ok: boolean | null
+          last_run_at: string | null
+          last_score: number | null
+          locale: string
+          meta: Json
+          question: string
+          suite: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expected_entities?: string[]
+          forbidden_terms?: string[]
+          id?: string
+          last_answer?: string | null
+          last_hallucination_risk?: number | null
+          last_latency_ms?: number | null
+          last_matched_entities?: string[] | null
+          last_missing_entities?: string[] | null
+          last_ok?: boolean | null
+          last_run_at?: string | null
+          last_score?: number | null
+          locale?: string
+          meta?: Json
+          question: string
+          suite: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expected_entities?: string[]
+          forbidden_terms?: string[]
+          id?: string
+          last_answer?: string | null
+          last_hallucination_risk?: number | null
+          last_latency_ms?: number | null
+          last_matched_entities?: string[] | null
+          last_missing_entities?: string[] | null
+          last_ok?: boolean | null
+          last_run_at?: string | null
+          last_score?: number | null
+          locale?: string
+          meta?: Json
+          question?: string
+          suite?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       alux_feedback: {
         Row: {
           capability: string
