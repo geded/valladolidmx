@@ -19,11 +19,20 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { DestinationSignal } from "@/lib/traveler/destination-context";
+
+/** Señal serializable (payload libre JSON). */
+export interface SerializableDestinationSignal {
+  kind: string;
+  scope: Record<string, unknown>;
+  at: string;
+  ttlMs: number;
+  explain: { rationale: string; provider: string; url?: string };
+  payload: Record<string, unknown>;
+}
 
 /** Payload serializable devuelto al cliente. */
 export interface TravelerDestinationContextPayload {
-  signals: Record<string, DestinationSignal[]>;
+  signals: Record<string, SerializableDestinationSignal[]>;
   resolvedAt: string;
   contributors: string[];
 }
@@ -59,9 +68,11 @@ export const resolveTravelerDestinationContext = createServerFn({ method: "POST"
       at: new Date(),
       locale: data.locale,
     });
-    return {
-      signals: resolved.signals,
-      resolvedAt: resolved.resolvedAt,
-      contributors: resolved.contributors,
-    };
+    return JSON.parse(
+      JSON.stringify({
+        signals: resolved.signals,
+        resolvedAt: resolved.resolvedAt,
+        contributors: resolved.contributors,
+      }),
+    ) as TravelerDestinationContextPayload;
   });
