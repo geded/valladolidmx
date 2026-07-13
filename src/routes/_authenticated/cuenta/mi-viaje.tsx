@@ -2443,7 +2443,12 @@ function ConciergeSection({
 /* Fase activa del viaje (CV4.3-narrativa · Etapa 5)                   */
 /* ------------------------------------------------------------------ */
 
-type TripPhase = "planning" | "t14" | "t3" | "onsite" | "post" | "closed";
+/**
+ * Fase de countdown interna del `TripPhaseCard` (T-14, T-3, cerrado…).
+ * NO es la fase macro del viaje — para eso usar `TripPhase` desde
+ * `@/lib/traveler/trip-phase`.
+ */
+type CountdownPhase = "planning" | "t14" | "t3" | "onsite" | "post" | "closed";
 
 interface ChecklistItem {
   key: string;
@@ -2452,7 +2457,7 @@ interface ChecklistItem {
 }
 
 const PHASE_META: Record<
-  TripPhase,
+  CountdownPhase,
   {
     label: string;
     tagline: string;
@@ -2528,7 +2533,7 @@ const PHASE_META: Record<
 function derivePhase(data: {
   days_to_trip: number | null;
   plan_end_date: string | null;
-}): TripPhase {
+}): CountdownPhase {
   const d = data.days_to_trip;
   if (typeof d !== "number") return "planning";
   if (d > 14) return "planning";
