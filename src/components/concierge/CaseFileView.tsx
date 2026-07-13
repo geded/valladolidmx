@@ -274,9 +274,9 @@ function Header({ f }: { f: CaseFile }) {
   );
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+function Section({ title, children, id }: { title: string; children: ReactNode; id?: string }) {
   return (
-    <section>
+    <section id={id} className={id ? "scroll-mt-24" : undefined}>
       <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{title}</h3>
       <div className="mt-2">{children}</div>
     </section>
