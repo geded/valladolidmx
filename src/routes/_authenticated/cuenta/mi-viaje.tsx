@@ -58,11 +58,16 @@ import { DayWeatherChip } from "@/components/traveler/DayWeatherChip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
-  validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista } => {
+  validateSearch: (
+    raw: Record<string, unknown>,
+  ): { vista?: MiViajeVista; focus?: string } => {
     const v = raw.vista;
-    return typeof v === "string" && (V_KEYS as readonly string[]).includes(v)
-      ? { vista: v as MiViajeVista }
-      : {};
+    const f = raw.focus;
+    const out: { vista?: MiViajeVista; focus?: string } = {};
+    if (typeof v === "string" && (V_KEYS as readonly string[]).includes(v))
+      out.vista = v as MiViajeVista;
+    if (typeof f === "string" && f.length > 0 && f.length < 128) out.focus = f;
+    return out;
   },
   component: MiViajePage,
 });
