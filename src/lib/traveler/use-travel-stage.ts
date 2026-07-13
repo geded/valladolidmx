@@ -16,6 +16,7 @@ import {
   type TravelStage,
 } from "@/lib/traveler/journey-stage";
 import type { TravelerProfile } from "@/lib/traveler/traveler-account.functions";
+import { useAuth } from "@/hooks/useAuth";
 
 const VALID: readonly TravelStage[] = [
   "inspiration",
@@ -49,9 +50,16 @@ export interface ResolvedTravelStage {
 
 export function useTravelStage(sources: TravelStageSources): ResolvedTravelStage {
   const search = useRouterState({ select: (s) => s.location.search });
+  const { role } = useAuth();
+  // Founder Travel Companion First + gobernanza: el override `?stage=`
+  // sólo es válido para Founder/Admin o en entornos de desarrollo. Un
+  // viajero real jamás puede forzar una etapa distinta a la derivada
+  // (evita provocar solicitudes de permisos o superficies fuera de su Journey).
+  const canOverride =
+    import.meta.env.DEV === true || role === "super_admin" || role === "admin";
 
   return useMemo(() => {
-    const override = parseOverride(search);
+    const override = canOverride ? parseOverride(search) : null;
     if (override) return { stage: override, override: true };
     const p = sources.profile ?? null;
     const hasCompletedProfile = Boolean(
@@ -71,6 +79,7 @@ export function useTravelStage(sources: TravelStageSources): ResolvedTravelStage
     };
   }, [
     search,
+    canOverride,
     sources.profile,
     sources.hasTravelPlan,
     sources.hasPlanItems,
