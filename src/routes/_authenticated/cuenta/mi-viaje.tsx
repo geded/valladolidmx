@@ -52,6 +52,7 @@ import { List, Clock, Map as MapIcon, ChevronUp, ChevronDown, Wand2 } from "luci
 import { ReservationsList } from "@/components/traveler/ReservationsList";
 import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
 import { MemoriesSection } from "@/components/traveler/MemoriesSection";
+import { DayWeatherChip } from "@/components/traveler/DayWeatherChip";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista } => {
