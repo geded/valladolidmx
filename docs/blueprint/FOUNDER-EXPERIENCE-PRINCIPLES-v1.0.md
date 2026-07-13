@@ -201,3 +201,35 @@ Referencia: `mem://policies/founder-business-value.md`.
 _Documento mantenido por el Founder. Cualquier actualización se emite como
 `FOUNDER-EXPERIENCE-PRINCIPLES-vN.M.md` sin sobrescribir versiones
 anteriores._
+
+---
+
+## Adenda · Founder Behavioral First Principle (2026-07-13, vinculante)
+
+Complementa el **Founder Business Value Principle**. El software es únicamente
+un medio: el resultado real de cada épica es un **cambio observable en el
+comportamiento del viajero**. Una funcionalidad correctamente implementada
+que no modifica el comportamiento esperado NO cumple su propósito.
+
+### Behavioral Change Statement (obligatorio en todo Blueprint)
+
+Todo Blueprint debe abrir con una sección **Behavioral Change Statement**,
+antes de describir arquitectura o componentes, respondiendo:
+
+1. **¿Qué comportamiento actual del viajero queremos cambiar?**
+2. **¿Qué comportamiento esperamos observar después de implementar esta épica?** (observable y medible)
+3. **¿Por qué ese cambio acerca a Alux a su objetivo estratégico?**
+4. **¿Cómo comprobaremos que el comportamiento realmente cambió?** — indicadores verificables: confianza, continuidad, uso y retorno; no sólo conversión.
+
+### Orden obligatorio de todo Blueprint
+
+**Comportamiento → Experiencia → Arquitectura → Implementación → Métricas.**
+
+Ningún Blueprint puede comenzar describiendo componentes técnicos.
+
+### Checklist ampliado
+
+El checklist de 12 preguntas de esta Constitución se amplía con la validación
+conjunta **Business Value + Behavioral Change Statement** como requisito
+obligatorio para autorizar la emisión de cualquier Blueprint. Ver
+`mem://policies/founder-behavioral-first.md`.
