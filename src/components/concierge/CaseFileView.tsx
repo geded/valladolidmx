@@ -481,6 +481,98 @@ function ProposalCard({
 }
 
 function ProposalComposer({
+  ...args
+}: never) {
+  void args;
+  return null;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function ProposalCompare({
+  proposals,
+  internal,
+}: {
+  proposals: NonNullable<CaseFile["proposals"]>;
+  internal: boolean;
+}) {
+  const ordered = [...proposals].sort((a, b) => b.version - a.version);
+  const statusTone = (s: string) =>
+    s === "accepted"
+      ? "bg-success/10 text-success"
+      : s === "sent" || s === "viewed"
+        ? "bg-primary/10 text-primary"
+        : "bg-muted text-muted-foreground";
+  return (
+    <div className="-mx-3 overflow-x-auto px-3 pb-2">
+      <div
+        className="grid gap-3"
+        style={{
+          gridTemplateColumns: `repeat(${ordered.length}, minmax(240px, 1fr))`,
+        }}
+      >
+        {ordered.map((p) => (
+          <article
+            key={p.proposal_id}
+            id={`proposal-${p.proposal_id}`}
+            className="scroll-mt-24 flex flex-col gap-2 rounded-lg border border-border bg-card p-3 text-xs"
+          >
+            <header className="flex items-center justify-between gap-2">
+              <span className="text-sm font-semibold">v{p.version}</span>
+              <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${statusTone(p.status)}`}>
+                {p.status}
+              </span>
+            </header>
+            <div className="text-base font-semibold text-foreground">
+              {money(p.total_amount_cents, p.currency)}
+            </div>
+            {p.valid_until ? (
+              <p className="text-[10px] text-muted-foreground">
+                Vigente hasta {new Date(p.valid_until).toLocaleDateString("es-MX")}
+              </p>
+            ) : null}
+            {p.summary ? (
+              <p className="line-clamp-3 text-[11px] text-foreground/80">{p.summary}</p>
+            ) : null}
+            <div className="mt-1 border-t border-border/60 pt-2">
+              <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                Incluye
+              </p>
+              {p.items.length === 0 ? (
+                <p className="text-[11px] text-muted-foreground">Sin partidas.</p>
+              ) : (
+                <ul className="grid gap-1">
+                  {p.items.map((it) => (
+                    <li key={it.item_id} className="flex justify-between gap-2">
+                      <span className="truncate text-foreground/80">
+                        {it.business_name ?? "Empresa"} · {it.request_title}
+                      </span>
+                      <span className="shrink-0 font-mono text-muted-foreground">
+                        {money(it.amount_cents, it.currency)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <a
+              href={`#proposal-${p.proposal_id}`}
+              className="mt-auto text-[11px] font-medium text-primary hover:underline"
+            >
+              Ver detalle y acciones →
+            </a>
+          </article>
+        ))}
+      </div>
+      <p className="mt-2 text-[10px] text-muted-foreground">
+        {internal
+          ? "Vista comparativa · sólo lectura. Usa la lista para enviar o retirar."
+          : "Vista comparativa · toca una propuesta para confirmar o rechazar."}
+      </p>
+    </div>
+  );
+}
+
+function ProposalComposerReal({
   caseId,
   quotes,
 }: {
