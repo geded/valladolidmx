@@ -57,7 +57,7 @@ const emptyLiveDay: LiveDayContext = {
 describe("deriveAluxSpatialProposals (CV6.6)", () => {
   test("Auto-Hide · fase distinta de onsite retorna []", () => {
     const r = deriveAluxSpatialProposals({
-      phase: "pre-trip",
+      phase: "planning",
       liveDay: emptyLiveDay,
       decisionCenter: center([card({})]),
       at: NOW,
