@@ -235,6 +235,7 @@ function MiViajePage() {
           confirmed={activeConfirmed}
           cases={cases}
           reservedIds={reservedIds}
+          phase={phase}
           onChanged={invalidatePlan}
         />
       )}
@@ -297,6 +298,7 @@ function MiViajeVistaBody({
   confirmed,
   cases,
   reservedIds,
+  phase,
   onChanged,
 }: {
   vista: MiViajeVista;
@@ -314,6 +316,7 @@ function MiViajeVistaBody({
     | null;
   cases: CaseSummary[];
   reservedIds: Set<string>;
+  phase: TravelCompanionPhase;
   onChanged: () => void;
 }) {
   if (vista === "resumen") {
@@ -376,6 +379,7 @@ function MiViajeVistaBody({
   if (vista === "alux") {
     return (
       <div className="space-y-6">
+        <AluxWorkspaceHeader plan={plan} phase={phase} confirmed={confirmed} />
         <AluxPlanProposalsInbox onChanged={onChanged} />
         <AluxTravelerPanel />
       </div>
