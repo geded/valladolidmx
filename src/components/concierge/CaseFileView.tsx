@@ -300,21 +300,44 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
   const proposals = f.proposals ?? [];
   if (proposals.length === 0 && !internal) return null;
 
+  const [compareOpen, setCompareOpen] = useState(false);
+  const canCompare = proposals.length >= 2;
+
   return (
     <Section title="Propuestas" id="case-proposals">
       {proposals.length === 0 ? (
         <Empty>Sin propuestas todavía.</Empty>
       ) : (
-        <ul className="grid gap-3">
-          {proposals.map((p) => (
-            <ProposalCard
-              key={p.proposal_id}
-              p={p}
-              caseId={f.case.id}
-              internal={internal}
-            />
-          ))}
-        </ul>
+        <>
+          {canCompare ? (
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <p className="text-[11px] text-muted-foreground">
+                Tienes {proposals.length} propuestas disponibles.
+              </p>
+              <button
+                type="button"
+                onClick={() => setCompareOpen((v) => !v)}
+                className="rounded-full border border-border bg-background px-3 py-1 text-[11px] font-medium text-foreground/80 hover:bg-muted"
+              >
+                {compareOpen ? "Ver como lista" : "Comparar lado a lado"}
+              </button>
+            </div>
+          ) : null}
+          {compareOpen && canCompare ? (
+            <ProposalCompare proposals={proposals} internal={internal} />
+          ) : (
+            <ul className="grid gap-3">
+              {proposals.map((p) => (
+                <ProposalCard
+                  key={p.proposal_id}
+                  p={p}
+                  caseId={f.case.id}
+                  internal={internal}
+                />
+              ))}
+            </ul>
+          )}
+        </>
       )}
       {internal && f.quotes && f.quotes.some((q) => q.status === "submitted") ? (
         <ProposalComposer caseId={f.case.id} quotes={f.quotes} />
