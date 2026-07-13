@@ -42,21 +42,19 @@ export const getDemoPackStatus = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const sb = supabaseAdmin as unknown as {
       from: (t: string) => {
-        select: (s: string, o?: { count: "exact"; head: true }) => Promise<{ count: number | null }> & {
-          in: (col: string, vals: string[]) => Promise<{ count: number | null }>;
-          eq: (col: string, v: string) => Promise<{ count: number | null }>;
-          not: (col: string, op: string, v: unknown) => Promise<{ count: number | null }>;
-        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        select: (s: string, o?: { count: "exact"; head: true }) => any;
       };
     };
 
     const count = async (
       table: string,
-      filter?: (q: ReturnType<ReturnType<typeof sb.from>["select"]>) => Promise<{ count: number | null }>,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filter?: (q: any) => any,
     ): Promise<number> => {
       const base = sb.from(table).select("id", { count: "exact", head: true });
       const res = await (filter ? filter(base) : base);
-      return res.count ?? 0;
+      return (res?.count as number | null) ?? 0;
     };
 
     const [
@@ -80,7 +78,7 @@ export const getDemoPackStatus = createServerFn({ method: "POST" })
         "dddddddd-aaaa-4aaa-8aaa-000000000010",
         "dddddddd-aaaa-4aaa-8aaa-000000000011",
       ])),
-      count("products", (q) => q.eq("accepts_online_payment", "true" as unknown as string)),
+      count("products", (q) => q.eq("accepts_online_payment", true)),
       count("alux_knowledge_entries"),
       count("alux_knowledge_translations", (q) => q.eq("locale", "en")),
       count("reviews", (q) => q.eq("author_user_id", DEMO_USER)),
