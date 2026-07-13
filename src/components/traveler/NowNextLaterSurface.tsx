@@ -152,13 +152,45 @@ export function NowNextLaterSurface({ phase, plan, geo, destination }: NowNextLa
   // vía server fn (Guardrail vinculante).
   const resolveFn = useServerFn(resolveTravelerDestinationContext);
   const enabled = phase === "onsite";
+
+  // CV6.5.2 · Adaptamos ítems del día en curso a entidades del scope
+  // para que el Hours Contributor pueda evaluar horarios reales.
+  const todayEntities = useMemo(() => {
+    const at = new Date();
+    const adapted: LiveDayPlanInput = {
+      start_date: plan?.start_date ?? null,
+      end_date: plan?.end_date ?? null,
+      items: adaptItems(plan?.items ?? null),
+    };
+    const liveDay = deriveLiveDay(adapted, at);
+    const seen = new Set<string>();
+    const out: Array<{ id: string; type: string }> = [];
+    for (const it of liveDay.items) {
+      const id = it.entity_id ?? null;
+      const type = it.entity_type ?? null;
+      if (!id || !type) continue;
+      const key = `${type}:${id}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ id, type });
+    }
+    return out;
+  }, [plan]);
+
   const ctxQuery = useQuery({
-    queryKey: ["traveler.destination-context", geo?.lat ?? null, geo?.lon ?? null, destination ?? null],
+    queryKey: [
+      "traveler.destination-context",
+      geo?.lat ?? null,
+      geo?.lon ?? null,
+      destination ?? null,
+      todayEntities.map((e) => `${e.type}:${e.id}`).join("|"),
+    ],
     queryFn: () =>
       resolveFn({
         data: {
           geo: geo ?? null,
           destination: destination ?? null,
+          entities: todayEntities,
         },
       }),
     enabled,
