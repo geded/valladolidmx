@@ -366,6 +366,9 @@ function MiViajeVistaBody({
   if (vista === "concierge") {
     return (
       <div className="space-y-6">
+        {plan.case_id ? (
+          <EmbeddedCaseFile caseId={plan.case_id} />
+        ) : null}
         <ConciergeSection data={plan} cases={cases} onChanged={onChanged} />
       </div>
     );
