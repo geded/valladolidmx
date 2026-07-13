@@ -397,10 +397,9 @@ function MiViajeVistaBody({
   // recuerdos
   return (
     <div className="space-y-6">
-      <VistaEmpty
-        title="Tus recuerdos del Oriente Maya"
-        body="Cuando termine tu viaje, aquí verás tus reseñas y podrás inspirar tu próxima visita."
-        icon={Heart}
+      <MemoriesSection
+        planId={plan.plan.id}
+        orderId={confirmed?.order_id ?? null}
       />
     </div>
   );
