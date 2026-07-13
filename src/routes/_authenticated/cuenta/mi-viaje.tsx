@@ -392,6 +392,154 @@ function PendingProposalsSpotlight({ count }: { count: number }) {
   );
 }
 
+/**
+ * CV5.10 · Centro de avisos del viajero.
+ * Reúne en un solo bell las tres señales operativas más importantes:
+ * propuestas del Concierge por confirmar, próximo hito del viaje
+ * (cuenta regresiva) y última actualización del expediente.
+ */
+function TravelNotificationsBell({
+  pendingProposals,
+  confirmed,
+  latestConciergeEvent,
+}: {
+  pendingProposals: number;
+  confirmed: { days_to_trip: number | null; folio: string | null } | null;
+  latestConciergeEvent: { event_type?: string; summary?: string; created_at?: string } | null;
+}) {
+  const navigate = useNavigate({ from: Route.fullPath });
+  const daysToTrip = confirmed?.days_to_trip ?? null;
+  const tripMilestone =
+    daysToTrip !== null && daysToTrip >= 0 && daysToTrip <= 14
+      ? daysToTrip
+      : null;
+  const hasEvent =
+    !!latestConciergeEvent &&
+    !!latestConciergeEvent.created_at &&
+    // sólo si es de los últimos 7 días
+    Date.now() - new Date(latestConciergeEvent.created_at).getTime() <
+      7 * 86_400_000;
+
+  const count =
+    (pendingProposals > 0 ? 1 : 0) +
+    (tripMilestone !== null ? 1 : 0) +
+    (hasEvent ? 1 : 0);
+
+  const goTo = (vista: MiViajeVista) =>
+    navigate({
+      search: (prev: { vista?: MiViajeVista }) => ({ ...prev, vista }),
+      replace: true,
+      resetScroll: false,
+    });
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label={`Avisos (${count})`}
+          className="relative inline-flex items-center justify-center rounded-full border border-border/70 bg-background p-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+        >
+          <Bell className="size-4" aria-hidden />
+          {count > 0 ? (
+            <span className="absolute -right-0.5 -top-0.5 grid size-4 place-items-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+              {count}
+            </span>
+          ) : null}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-80 p-0">
+        <div className="border-b px-4 py-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            Centro de avisos
+          </p>
+          <p className="text-sm text-foreground">Novedades de tu viaje</p>
+        </div>
+        <ul className="max-h-96 divide-y overflow-y-auto text-sm">
+          {pendingProposals > 0 ? (
+            <li>
+              <button
+                type="button"
+                onClick={() => goTo("concierge")}
+                className="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-accent"
+              >
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary">
+                  <Headset className="size-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-medium text-foreground">
+                    {pendingProposals === 1
+                      ? "1 propuesta lista para confirmar"
+                      : `${pendingProposals} propuestas listas para confirmar`}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-muted-foreground">
+                    Tu concierge armó una propuesta. Nada se cobra sin tu
+                    aprobación.
+                  </span>
+                </span>
+              </button>
+            </li>
+          ) : null}
+
+          {tripMilestone !== null ? (
+            <li>
+              <button
+                type="button"
+                onClick={() => goTo("itinerario")}
+                className="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-accent"
+              >
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                  <CalendarCheck className="size-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-medium text-foreground">
+                    {tripMilestone === 0
+                      ? "Tu viaje empieza hoy"
+                      : tripMilestone === 1
+                        ? "Tu viaje empieza mañana"
+                        : `Faltan ${tripMilestone} días para tu viaje`}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-muted-foreground">
+                    {confirmed?.folio ? `Reservación ${confirmed.folio}` : "Revisa tu itinerario del día."}
+                  </span>
+                </span>
+              </button>
+            </li>
+          ) : null}
+
+          {hasEvent ? (
+            <li>
+              <button
+                type="button"
+                onClick={() => goTo("concierge")}
+                className="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-accent"
+              >
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-muted text-foreground">
+                  <MessageCircle className="size-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-medium text-foreground">
+                    Nuevo mensaje de tu Concierge
+                  </span>
+                  <span className="mt-0.5 line-clamp-2 block text-xs text-muted-foreground">
+                    {latestConciergeEvent?.summary ?? "Actualización en tu expediente."}
+                  </span>
+                </span>
+              </button>
+            </li>
+          ) : null}
+
+          {count === 0 ? (
+            <li className="px-4 py-6 text-center text-xs text-muted-foreground">
+              Sin avisos pendientes. Sigue armando tu viaje con calma.
+            </li>
+          ) : null}
+        </ul>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 /** Router de vistas — cada rama compone bloques existentes del mismo Travel Plan. */
 function MiViajeVistaBody({
   vista,
