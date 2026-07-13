@@ -16,7 +16,7 @@ describe("evaluateTrafficStatus (CV6.5.3)", () => {
     const r = evaluateTrafficStatus({
       durationSeconds: 15 * 60,
       staticDurationSeconds: 14 * 60,
-      arriveBy: addMin(45),
+      arriveBy: addMin(60),
       now: NOW,
     });
     expect(r.status).toBe("on_time");
@@ -42,15 +42,15 @@ describe("evaluateTrafficStatus (CV6.5.3)", () => {
     expect(r.status).toBe("leave_now");
   });
 
-  test("4 · riesgo de retraso por holgura mínima → delay_risk", () => {
+  test("4 · tráfico deteriora ETA significativamente → delay_risk", () => {
     const r = evaluateTrafficStatus({
-      durationSeconds: 55 * 60,
-      staticDurationSeconds: 50 * 60,
+      durationSeconds: 25 * 60,
+      staticDurationSeconds: 15 * 60,
       arriveBy: addMin(60),
       now: NOW,
     });
     expect(r.status).toBe("delay_risk");
-    expect(r.bufferMinutes).toBe(5);
+    expect(r.trafficDeltaMinutes).toBe(10);
   });
 
   test("5 · llegada probablemente tarde → likely_late", () => {
