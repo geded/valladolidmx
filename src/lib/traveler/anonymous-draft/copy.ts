@@ -34,6 +34,43 @@ export const ANON_COPY = {
     primary: "Guardar mi viaje",
     secondary: "Ahora no",
   },
+  /**
+   * AC1.2 · Founder Intent Recognition Principle.
+   *
+   * Microinteracciones conversacionales del Concierge para cada intención
+   * detectada. Prohibido usar aquí lenguaje técnico ("guardado",
+   * "agregado", "eliminado", "registro", "elemento"). Los mensajes
+   * describen SOLO la acción del viajero y el acompañamiento de Alux, sin
+   * inferir gustos, preferencias ni memoria paralela.
+   */
+  intent: {
+    favoriteAcknowledged: {
+      title: "Excelente elección.",
+      body: "Lo tendré presente para tu viaje.",
+    },
+    favoriteReleased: {
+      title: "Entendido.",
+      body: "Este lugar ya no forma parte de tu viaje.",
+    },
+    planAcknowledged: {
+      title: "Perfecto.",
+      body: "Seguimos construyendo tu viaje juntos.",
+    },
+    planAlready: {
+      title: "Ya quedó considerado.",
+      body: "Esta experiencia ya forma parte de tu viaje.",
+    },
+    planReleased: {
+      title: "Entiendo.",
+      body: "Esto ya no forma parte de tus planes.",
+    },
+    limitFriendly: {
+      title: "Tu viaje ya está tomando forma.",
+      body:
+        "Guárdalo para seguir sumando experiencias sin límite y " +
+        "continuar en cualquier dispositivo.",
+    },
+  },
 } as const;
 
 export type AnonCopyKey = keyof typeof ANON_COPY;

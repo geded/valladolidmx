@@ -36,7 +36,11 @@ import {
   getMyActivePlan,
   type TravelItemKind,
 } from "@/lib/traveler/travel-plans.functions";
-import { useProtectedAction } from "@/lib/protected-actions";
+import {
+  useAnonymousTrip,
+  ANON_COPY,
+  type AnonymousItemKind,
+} from "@/lib/traveler/anonymous-draft";
 
 export interface AddToTravelPlanButtonProps {
   kind: TravelItemKind;
@@ -68,6 +72,7 @@ export function AddToTravelPlanButton({
   const queryClient = useQueryClient();
   const fetchActive = useServerFn(getMyActivePlan);
   const addItem = useServerFn(addPlanItem);
+  const anon = useAnonymousTrip();
 
   // Solo lee el plan activo si hay sesión; determina si el item ya existe.
   const { data: active } = useQuery({
@@ -78,11 +83,18 @@ export function AddToTravelPlanButton({
   });
 
   const alreadyInPlan = useMemo(() => {
-    if (!active?.items) return false;
-    return active.items.some(
-      (it) => it.item_kind === kind && it.target_id === targetId,
+    if (user?.id) {
+      if (!active?.items) return false;
+      return active.items.some(
+        (it) => it.item_kind === kind && it.target_id === targetId,
+      );
+    }
+    return Boolean(
+      anon.trip?.plannedItems?.some(
+        (it) => it.kind === (kind as AnonymousItemKind) && it.targetId === targetId,
+      ),
     );
-  }, [active, kind, targetId]);
+  }, [active, kind, targetId, user?.id, anon.trip]);
 
   const [phase, setPhase] = useState<Phase>("idle");
   useEffect(() => {
@@ -116,42 +128,49 @@ export function AddToTravelPlanButton({
       void import("@/lib/alux/plan-signals").then(({ notifyPlanChanged }) =>
         notifyPlanChanged(res.created ? "add_item" : "already_in_plan"),
       );
-      toast.success(
-        res.created ? "Agregado a Mi Viaje" : "Ya estaba en Mi Viaje",
-        { description: title },
-      );
+      // AC1.2 · Founder Intent Recognition Principle.
+      const c = res.created
+        ? ANON_COPY.intent.planAcknowledged
+        : ANON_COPY.intent.planAlready;
+      toast(c.title, { description: c.body });
     },
     onError: (e) => {
       setPhase("error");
-      toast.error("No pudimos agregarlo a Mi Viaje", {
-        description: e instanceof Error ? e.message : "Intenta de nuevo.",
+      toast.error(e instanceof Error ? e.message : "Intenta de nuevo.");
+    },
+  });
+
+  const [anonBusy, setAnonBusy] = useState(false);
+
+  async function handleAnonymousAdd() {
+    if (anonBusy) return;
+    setAnonBusy(true);
+    setPhase("adding");
+    try {
+      const res = await anon.addPlannedItem({
+        kind: kind as AnonymousItemKind,
+        targetId,
+        title,
+        slug: slug ?? undefined,
+        imageUrl: imageUrl ?? undefined,
+        subtitle: subtitle ?? undefined,
+        notes: notes ?? undefined,
       });
-    },
-  });
+      if (!res.ok && res.reason === "limit") {
+        setPhase("idle");
+        const c = ANON_COPY.intent.limitFriendly;
+        toast(c.title, { description: c.body });
+        return;
+      }
+      setPhase("added");
+      const c = ANON_COPY.intent.planAcknowledged;
+      toast(c.title, { description: c.body });
+    } finally {
+      setAnonBusy(false);
+    }
+  }
 
-  // Envuelve la mutación en el sistema global de acciones protegidas.
-  // - `mode: "gate"` (default) → si no hay sesión abre `SignInPromptSheet`.
-  // - Tras auth exitoso, `ResumeRunner` re-ejecuta `action()` con el
-  //   payload original y dispara `mutation.mutate()` normalmente.
-  const protectedRun = useProtectedAction<void, void>({
-    kind: "travel_plan.add_item",
-    reason: "travel_plan.add_item",
-    gateCopy: {
-      title: "Inicia sesión para guardar en Mi Viaje",
-      description:
-        "Mi Viaje se sincroniza entre tus dispositivos. Necesitamos identificarte para conservar tu itinerario.",
-      primaryCta: "Iniciar sesión",
-      dismissCta: "Ahora no",
-    },
-    action: async () => {
-      // Delega en la mutación existente (mismos toasts, mismo estado,
-      // misma invalidación). No se duplica lógica.
-      await mutation.mutateAsync();
-    },
-  });
-
-  const busy =
-    phase === "adding" || mutation.isPending || protectedRun.pending;
+  const busy = phase === "adding" || mutation.isPending || anonBusy;
   const done = phase === "added" || phase === "exists";
 
   const base =
@@ -173,7 +192,11 @@ export function AddToTravelPlanButton({
         e.preventDefault();
         e.stopPropagation();
         if (busy || done) return;
-        protectedRun.run();
+        if (user?.id) {
+          mutation.mutate();
+        } else {
+          void handleAnonymousAdd();
+        }
       }}
       title={done ? "Ya está en Mi Viaje" : "Agregar a Mi Viaje"}
       className={[base, skin, className ?? ""].join(" ")}
