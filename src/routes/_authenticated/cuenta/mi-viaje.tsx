@@ -290,6 +290,10 @@ function MiViajePage() {
 
       <GuestImportBanner onImported={invalidatePlan} />
 
+      {activeQ.data?.plan ? (
+        <NowNextLaterSurface phase={phase} plan={activeQ.data.plan as never} />
+      ) : null}
+
       {activeQ.isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando tu plan…</p>
       ) : !activeQ.data ? (
