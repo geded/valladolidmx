@@ -178,14 +178,12 @@ function MiViajePage() {
     enabled: !!activeCaseId,
     staleTime: 30_000,
   });
-  const pendingProposals = useMemo(
-    () =>
-      (caseFile?.proposals ?? []).filter((p) =>
-        p.status === "sent" || p.status === "viewed",
-      ),
-    [caseFile],
-  );
-  const pendingProposalsCount = pendingProposals.length;
+  const pendingProposalsCount = useMemo(() => {
+    const cf = caseFile as { proposals?: Array<{ status?: string }> } | undefined;
+    return (cf?.proposals ?? []).filter(
+      (p) => p.status === "sent" || p.status === "viewed",
+    ).length;
+  }, [caseFile]);
   const reservedIds = useMemo(() => {
     const s = new Set<string>();
     if (!concierge?.has_concierge) return s;
