@@ -109,6 +109,7 @@ import { Route as AuthenticatedCmsPagosRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedCmsObservabilidadRouteImport } from './routes/_authenticated/cms/observabilidad'
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
 import { Route as AuthenticatedCmsExperienceBuilderRouteImport } from './routes/_authenticated/cms/experience-builder'
+import { Route as AuthenticatedCmsDemoPackRouteImport } from './routes/_authenticated/cms/demo-pack'
 import { Route as AuthenticatedCmsAluxRouteImport } from './routes/_authenticated/cms/alux'
 import { Route as AuthenticatedCmsAlertasRouteImport } from './routes/_authenticated/cms/alertas'
 import { Route as AuthenticatedCmsActividadRouteImport } from './routes/_authenticated/cms/actividad'
@@ -733,6 +734,12 @@ const AuthenticatedCmsExperienceBuilderRoute =
     path: '/experience-builder',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsDemoPackRoute =
+  AuthenticatedCmsDemoPackRouteImport.update({
+    id: '/demo-pack',
+    path: '/demo-pack',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsAluxRoute = AuthenticatedCmsAluxRouteImport.update({
   id: '/alux',
   path: '/alux',
@@ -1230,6 +1237,7 @@ export interface FileRoutesByFullPath {
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/alux': typeof AuthenticatedCmsAluxRouteWithChildren
+  '/cms/demo-pack': typeof AuthenticatedCmsDemoPackRoute
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
@@ -1397,6 +1405,7 @@ export interface FileRoutesByTo {
   '/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/cms/alux': typeof AuthenticatedCmsAluxRouteWithChildren
+  '/cms/demo-pack': typeof AuthenticatedCmsDemoPackRoute
   '/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
@@ -1571,6 +1580,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/actividad': typeof AuthenticatedCmsActividadRoute
   '/_authenticated/cms/alertas': typeof AuthenticatedCmsAlertasRoute
   '/_authenticated/cms/alux': typeof AuthenticatedCmsAluxRouteWithChildren
+  '/_authenticated/cms/demo-pack': typeof AuthenticatedCmsDemoPackRoute
   '/_authenticated/cms/experience-builder': typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
@@ -1747,6 +1757,7 @@ export interface FileRouteTypes {
     | '/cms/actividad'
     | '/cms/alertas'
     | '/cms/alux'
+    | '/cms/demo-pack'
     | '/cms/experience-builder'
     | '/cms/media'
     | '/cms/observabilidad'
@@ -1914,6 +1925,7 @@ export interface FileRouteTypes {
     | '/cms/actividad'
     | '/cms/alertas'
     | '/cms/alux'
+    | '/cms/demo-pack'
     | '/cms/experience-builder'
     | '/cms/media'
     | '/cms/observabilidad'
@@ -2087,6 +2099,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/actividad'
     | '/_authenticated/cms/alertas'
     | '/_authenticated/cms/alux'
+    | '/_authenticated/cms/demo-pack'
     | '/_authenticated/cms/experience-builder'
     | '/_authenticated/cms/media'
     | '/_authenticated/cms/observabilidad'
@@ -2965,6 +2978,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsExperienceBuilderRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/demo-pack': {
+      id: '/_authenticated/cms/demo-pack'
+      path: '/demo-pack'
+      fullPath: '/cms/demo-pack'
+      preLoaderRoute: typeof AuthenticatedCmsDemoPackRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/alux': {
       id: '/_authenticated/cms/alux'
       path: '/alux'
@@ -3750,6 +3770,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsActividadRoute: typeof AuthenticatedCmsActividadRoute
   AuthenticatedCmsAlertasRoute: typeof AuthenticatedCmsAlertasRoute
   AuthenticatedCmsAluxRoute: typeof AuthenticatedCmsAluxRouteWithChildren
+  AuthenticatedCmsDemoPackRoute: typeof AuthenticatedCmsDemoPackRoute
   AuthenticatedCmsExperienceBuilderRoute: typeof AuthenticatedCmsExperienceBuilderRouteWithChildren
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
   AuthenticatedCmsObservabilidadRoute: typeof AuthenticatedCmsObservabilidadRoute
@@ -3785,6 +3806,7 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsActividadRoute: AuthenticatedCmsActividadRoute,
   AuthenticatedCmsAlertasRoute: AuthenticatedCmsAlertasRoute,
   AuthenticatedCmsAluxRoute: AuthenticatedCmsAluxRouteWithChildren,
+  AuthenticatedCmsDemoPackRoute: AuthenticatedCmsDemoPackRoute,
   AuthenticatedCmsExperienceBuilderRoute:
     AuthenticatedCmsExperienceBuilderRouteWithChildren,
   AuthenticatedCmsMediaRoute: AuthenticatedCmsMediaRoute,
@@ -4014,13 +4036,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
