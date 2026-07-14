@@ -21,6 +21,13 @@ import {
   type SegmentDimension,
 } from "@/lib/visitor-intel/segments.functions";
 import {
+  detectJourneyOpportunities,
+  MIN_SAMPLE_FOR_OPPORTUNITY,
+  type Opportunity,
+  type OpportunitySeverity,
+  type OpportunitySnapshot,
+} from "@/lib/visitor-intel/opportunities.functions";
+import {
   KPI_CATALOG,
   JOURNEY_TRANSITIONS,
   type JourneyTransitionId,
@@ -98,6 +105,7 @@ function VisitorIntelCenter() {
 
       <IntelModules snapshot={q.data} loading={q.isLoading} />
       <SegmentationSection window={win} />
+      <OpportunitySection window={win} />
     </div>
   );
 }
@@ -534,5 +542,212 @@ function DecisionCard({
         </p>
       </div>
     </article>
+  );
+}
+/* --------------------------------------------------------------------- */
+/* CV8.5 · Benchmarks & Opportunity Intelligence                         */
+/* --------------------------------------------------------------------- */
+
+const SEVERITY_STYLE: Record<
+  OpportunitySeverity,
+  { label: string; badge: string; ring: string }
+> = {
+  critical: {
+    label: "Crítica",
+    badge: "bg-destructive/15 text-destructive",
+    ring: "border-destructive/40",
+  },
+  attention: {
+    label: "Atención",
+    badge: "bg-warning/15 text-warning",
+    ring: "border-warning/40",
+  },
+  opportunity: {
+    label: "Oportunidad",
+    badge: "bg-success/15 text-success",
+    ring: "border-success/40",
+  },
+  informative: {
+    label: "Informativa",
+    badge: "bg-muted text-muted-foreground",
+    ring: "border-border",
+  },
+};
+
+function OpportunitySection({ window: win }: { window: 7 | 30 | 90 }) {
+  const call = useServerFn(detectJourneyOpportunities);
+  const q = useQuery({
+    queryKey: ["cms", "visitor-intel", "opportunities", win],
+    queryFn: () => call({ data: { window_days: win } }),
+    staleTime: 60_000,
+  });
+
+  return (
+    <section className="space-y-4 rounded-2xl border border-border bg-surface p-5">
+      <header className="border-b border-border/60 pb-4">
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+          CV8.5 · Benchmarks & Oportunidades
+        </p>
+        <h2 className="mt-1 text-xl font-semibold tracking-tight">
+          ¿Qué acción concreta recomendamos ahora?
+        </h2>
+        <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
+          Detección automática de oportunidades: cada hallazgo compara la
+          ventana actual contra el periodo anterior y declara evidencia,
+          confianza y acción sugerida. Muestra mínima:{" "}
+          <strong>{MIN_SAMPLE_FOR_OPPORTUNITY}</strong> sujetos.
+        </p>
+      </header>
+      <OpportunityBody snapshot={q.data} loading={q.isLoading} error={!!q.error} />
+    </section>
+  );
+}
+
+function OpportunityBody({
+  snapshot,
+  loading,
+  error,
+}: {
+  snapshot: OpportunitySnapshot | undefined;
+  loading: boolean;
+  error: boolean;
+}) {
+  if (error) {
+    return (
+      <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+        No fue posible cargar oportunidades.
+      </p>
+    );
+  }
+  if (loading || !snapshot) {
+    return <p className="h-6 w-32 animate-pulse rounded bg-muted" />;
+  }
+
+  const b = snapshot.baseline;
+  const jprDelta = b.jpr_current - b.jpr_previous;
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 rounded-xl border border-border/60 bg-surface-raised p-4 text-xs md:grid-cols-3">
+        <div>
+          <p className="text-muted-foreground">Sujetos activos (actual · previo)</p>
+          <p className="mt-1 font-mono text-sm">
+            {b.active_subjects_current} · {b.active_subjects_previous}
+          </p>
+        </div>
+        <div>
+          <p className="text-muted-foreground">JPR actual vs previo</p>
+          <p className="mt-1 font-mono text-sm">
+            {(b.jpr_current * 100).toFixed(1)}% · {(b.jpr_previous * 100).toFixed(1)}%
+          </p>
+        </div>
+        <div>
+          <p className="text-muted-foreground">Δ JPR</p>
+          <p
+            className={
+              "mt-1 font-mono text-sm " +
+              (jprDelta > 0.005
+                ? "text-success"
+                : jprDelta < -0.005
+                  ? "text-destructive"
+                  : "text-muted-foreground")
+            }
+          >
+            {jprDelta > 0 ? "+" : ""}
+            {(jprDelta * 100).toFixed(1)} pp
+          </p>
+        </div>
+      </div>
+
+      {snapshot.status === "insufficient_data" ? (
+        <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
+          <p className="font-medium text-foreground">Muestra insuficiente</p>
+          <p className="mt-1">{snapshot.reason}</p>
+        </div>
+      ) : snapshot.opportunities.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
+          <p className="font-medium text-foreground">Sin hallazgos significativos</p>
+          <p className="mt-1">
+            Ninguna transición se movió más de ±10% frente al periodo previo con
+            muestra ≥ {MIN_SAMPLE_FOR_OPPORTUNITY}. El Journey se mantiene estable.
+          </p>
+        </div>
+      ) : (
+        <ul className="space-y-3">
+          {snapshot.opportunities.map((o) => (
+            <OpportunityCard key={o.id} o={o} />
+          ))}
+        </ul>
+      )}
+
+      <p className="text-[11px] text-muted-foreground">
+        Contrato v{snapshot.contract_version} · referencia:{" "}
+        <code>previous_period</code> · recomputado sin persistencia.
+      </p>
+    </div>
+  );
+}
+
+function OpportunityCard({ o }: { o: Opportunity }) {
+  const style = SEVERITY_STYLE[o.severity];
+  const ev = o.evidence;
+  return (
+    <li className={"rounded-xl border-2 bg-surface p-4 " + style.ring}>
+      <header className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <span
+            className={
+              "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide " +
+              style.badge
+            }
+          >
+            {style.label}
+          </span>
+          <h3 className="mt-2 text-sm font-semibold leading-snug">
+            {o.headline}
+          </h3>
+        </div>
+        <div className="text-right text-[11px] text-muted-foreground">
+          <p>
+            Transición: <code>{o.transition}</code>
+          </p>
+          <p>
+            Métrica: <code>{o.metric_id}</code>
+          </p>
+          <p>
+            Confianza: <strong>{ev.confidence}</strong> · n={ev.sample_size}
+          </p>
+        </div>
+      </header>
+
+      <dl className="mt-3 grid gap-2 text-xs md:grid-cols-2">
+        <div>
+          <dt className="font-semibold">¿Qué ocurre?</dt>
+          <dd className="text-muted-foreground">{o.what_happens}</dd>
+        </div>
+        <div>
+          <dt className="font-semibold">¿Por qué ocurre?</dt>
+          <dd className="text-muted-foreground">{o.why_it_happens}</dd>
+        </div>
+        <div>
+          <dt className="font-semibold">Impacto</dt>
+          <dd className="text-muted-foreground">{o.impact}</dd>
+        </div>
+        <div>
+          <dt className="font-semibold">Acción recomendada</dt>
+          <dd className="text-muted-foreground">{o.recommended_action}</dd>
+        </div>
+        <div className="md:col-span-2">
+          <dt className="font-semibold">KPI esperado</dt>
+          <dd className="text-muted-foreground">{o.expected_kpi}</dd>
+        </div>
+      </dl>
+
+      <p className="mt-3 rounded-lg bg-surface-raised p-2 text-[11px] font-mono text-muted-foreground">
+        Evidencia · actual={ev.current_value} · previo={ev.reference_value} · Δ
+        abs={ev.delta_absolute} · Δ rel={(ev.delta_relative * 100).toFixed(1)}% ·
+        vs {ev.reference}
+      </p>
+    </li>
   );
 }
