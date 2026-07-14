@@ -90,7 +90,18 @@ export const ingestVisitorEvent = createServerFn({ method: "POST" })
     if (canonicalError) return canonicalError;
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
+    // Generated types only cover the `public` schema; `visitor_intel` is
+    // an isolated append-only domain (see CV8.1 migration). Cast is safe.
+    const { error } = await (supabaseAdmin as unknown as {
+      schema: (s: string) => {
+        from: (t: string) => {
+          upsert: (
+            row: Record<string, unknown>,
+            opts: { onConflict: string; ignoreDuplicates: boolean },
+          ) => Promise<{ error: { code?: string; message: string } | null }>;
+        };
+      };
+    })
       .schema("visitor_intel")
       .from("events")
       .upsert(toRow(event), { onConflict: "event_id", ignoreDuplicates: true });
@@ -131,7 +142,16 @@ export const ingestAnonymousVisitorEvent = createServerFn({ method: "POST" })
     if (canonicalError) return canonicalError;
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
+    const { error } = await (supabaseAdmin as unknown as {
+      schema: (s: string) => {
+        from: (t: string) => {
+          upsert: (
+            row: Record<string, unknown>,
+            opts: { onConflict: string; ignoreDuplicates: boolean },
+          ) => Promise<{ error: { code?: string; message: string } | null }>;
+        };
+      };
+    })
       .schema("visitor_intel")
       .from("events")
       .upsert(toRow(event), { onConflict: "event_id", ignoreDuplicates: true });
