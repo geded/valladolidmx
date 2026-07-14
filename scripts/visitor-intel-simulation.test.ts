@@ -156,13 +156,93 @@ function main() {
   const distinctFinals = Object.keys(finals).length;
   assert(distinctFinals >= 3, `poca variedad de finales (${distinctFinals})`);
 
+  // 7. CV8.S.3 — Coherencia cruzada de sub-motores.
+  // 7a. Toda decision.offered de Alux/Concierge/Commerce/Reviews declara rationale.
+  for (const e of events) {
+    if (e.event.kind !== "decision.offered") continue;
+    const cap = e.event.decision.capability;
+    if (cap.startsWith("alux") || cap.startsWith("concierge") ||
+        cap.startsWith("commerce") || cap.startsWith("reviews")) {
+      assert(!!e.event.decision.rationale, `${cap} sin rationale`);
+    }
+  }
+
+  // 7b. Aceptación Alux siempre precedida por una recomendación con mismo rec_id.
+  const aluxRecEmitted = new Set<string>();
+  for (const e of events) {
+    if (e.event.kind !== "decision.offered") continue;
+    const cap = e.event.decision.capability;
+    if (!cap.startsWith("alux")) continue;
+    const recId = e.event.decision.recommendation_id;
+    if (e.event.decision.accepted === null) aluxRecEmitted.add(recId);
+    else assert(aluxRecEmitted.has(recId), `Alux resolve sin recomendación previa: ${recId}`);
+  }
+
+  // 7c. Concierge — toda apertura tiene asignación y primera respuesta antes de propuesta.
+  const perSubjectConcierge = new Map<string, string[]>();
+  for (const e of events) {
+    if (e.event.kind !== "decision.offered") continue;
+    const cap = e.event.decision.capability;
+    if (!cap.startsWith("concierge")) continue;
+    const arr = perSubjectConcierge.get(e.event.subject.subject_id) ?? [];
+    arr.push(cap);
+    perSubjectConcierge.set(e.event.subject.subject_id, arr);
+  }
+  for (const [sid, caps] of perSubjectConcierge.entries()) {
+    if (!caps.includes("concierge")) continue; // no abrió caso
+    const idxOpen = caps.indexOf("concierge");
+    const idxAssign = caps.indexOf("concierge.assign");
+    const idxFirst = caps.indexOf("concierge.first_response");
+    assert(idxAssign > idxOpen, `${sid} asignación antes de apertura`);
+    assert(idxFirst > idxAssign, `${sid} primera respuesta antes de asignación`);
+    const idxProp = caps.indexOf("concierge.proposal");
+    if (idxProp !== -1) assert(idxProp > idxFirst, `${sid} propuesta antes de primera respuesta`);
+  }
+
+  // 7d. Commerce — cero órdenes sin propuesta aceptada.
+  for (const t of runA.traces) {
+    if (t.interactions.commerce.status !== "not_created") {
+      assert(
+        t.interactions.concierge.status === "proposal_accepted",
+        `visitante ${t.subject_id} tiene commerce sin propuesta aceptada`,
+      );
+    }
+  }
+
+  // 7e. Reviews — cero reseñas publicadas sin experiencia completada (T8).
+  for (const t of runA.traces) {
+    if (t.interactions.reviews.published) {
+      assert(
+        t.final_stage === "traveler" || t.final_stage === "ambassador",
+        `visitante ${t.subject_id} reseñó sin experiencia (final=${t.final_stage})`,
+      );
+    }
+  }
+
+  // 7f. Volumen mínimo por sub-motor (evita motores desconectados).
+  const s = runA.stats;
+  assert(s.alux_totals.recommendations > 0, "Alux no emitió recomendaciones");
+  assert(s.alux_totals.accepted > 0, "Alux no registró aceptaciones");
+  assert(s.alux_totals.rejected > 0, "Alux no registró rechazos");
+  const conciergeOpened = Object.entries(s.concierge_status_histogram)
+    .filter(([k]) => k !== "none").reduce((a, [, n]) => a + n, 0);
+  assert(conciergeOpened > 0, "Concierge no abrió casos");
+  const paid = s.commerce_status_histogram.paid ?? 0;
+  assert(paid > 0, "Commerce no registró pagos exitosos");
+
   console.log(JSON.stringify({
     ok: true,
     visitors: runA.stats.visitors,
     events_total: runA.stats.events_total,
     events_by_transition: runA.stats.events_by_transition,
+    events_by_kind: runA.stats.events_by_kind,
     final_stage_histogram: finals,
     territorial_touches: runA.stats.territorial_touches,
+    alux_totals: runA.stats.alux_totals,
+    concierge_status_histogram: runA.stats.concierge_status_histogram,
+    commerce_status_histogram: runA.stats.commerce_status_histogram,
+    commerce_revenue_usd: runA.stats.commerce_revenue_usd,
+    reviews_summary: runA.stats.reviews_summary,
     digest: digestA,
   }, null, 2));
 }

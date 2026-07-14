@@ -32,6 +32,18 @@ export interface RunScenarioResult {
     events_by_kind: Record<string, number>;
     final_stage_histogram: Record<string, number>;
     territorial_touches: Record<string, number>;
+    // CV8.S.3 · Sub-motores.
+    alux_totals: {
+      asks: number; recommendations: number; accepted: number; rejected: number;
+      itinerary_optimizations: number; onsite_queries: number;
+    };
+    concierge_status_histogram: Record<string, number>;
+    commerce_status_histogram: Record<string, number>;
+    commerce_revenue_usd: number;
+    reviews_summary: {
+      requested: number; published: number; business_responded: number;
+      average_rating: number | null;
+    };
   };
 }
 
@@ -54,6 +66,18 @@ export function runScenario(params: {
   const events_by_kind: Record<string, number> = {};
   const final_stage_histogram: Record<string, number> = {};
   const territorial_touches: Record<string, number> = {};
+  const alux_totals = {
+    asks: 0, recommendations: 0, accepted: 0, rejected: 0,
+    itinerary_optimizations: 0, onsite_queries: 0,
+  };
+  const concierge_status_histogram: Record<string, number> = {};
+  const commerce_status_histogram: Record<string, number> = {};
+  let commerce_revenue_usd = 0;
+  let reviews_requested = 0;
+  let reviews_published = 0;
+  let reviews_business_responded = 0;
+  let ratings_sum = 0;
+  let ratings_count = 0;
 
   // Muestreamos la mezcla de perfiles como pesos.
   const profileEntries: Array<readonly [string, number]> = scenario.profile_mix.map(
@@ -87,6 +111,39 @@ export function runScenario(params: {
     for (const d of trace.path) {
       territorial_touches[d] = (territorial_touches[d] ?? 0) + 1;
     }
+
+    // Agregados de sub-motores.
+    const inx = trace.interactions;
+    alux_totals.asks += inx.alux.asks;
+    alux_totals.recommendations += inx.alux.recommendations;
+    alux_totals.accepted += inx.alux.accepted;
+    alux_totals.rejected += inx.alux.rejected;
+    alux_totals.itinerary_optimizations += inx.alux.itinerary_optimizations;
+    alux_totals.onsite_queries += inx.alux.onsite_queries;
+    concierge_status_histogram[inx.concierge.status] =
+      (concierge_status_histogram[inx.concierge.status] ?? 0) + 1;
+    commerce_status_histogram[inx.commerce.status] =
+      (commerce_status_histogram[inx.commerce.status] ?? 0) + 1;
+    if (inx.commerce.amount_usd != null && inx.commerce.status === "paid") {
+      commerce_revenue_usd += inx.commerce.amount_usd;
+    }
+    if (inx.concierge.opened) {
+      // Solicitud de reseña sólo se emite si hubo T8 y sub-motor Reviews entró;
+      // aquí contamos "publicaciones" y "requested" mediante el summary.
+    }
+    if (inx.reviews.published) reviews_published += 1;
+    if (inx.reviews.business_responded) reviews_business_responded += 1;
+    if (inx.reviews.rating != null) {
+      ratings_sum += inx.reviews.rating;
+      ratings_count += 1;
+    }
+    // Toda traza que alcanzó T8 recibió una solicitud de reseña.
+    if (
+      trace.final_stage === "traveler" ||
+      trace.final_stage === "ambassador"
+    ) {
+      reviews_requested += 1;
+    }
   }
 
   return {
@@ -103,6 +160,16 @@ export function runScenario(params: {
       events_by_kind,
       final_stage_histogram,
       territorial_touches,
+      alux_totals,
+      concierge_status_histogram,
+      commerce_status_histogram,
+      commerce_revenue_usd,
+      reviews_summary: {
+        requested: reviews_requested,
+        published: reviews_published,
+        business_responded: reviews_business_responded,
+        average_rating: ratings_count > 0 ? ratings_sum / ratings_count : null,
+      },
     },
   };
 }
