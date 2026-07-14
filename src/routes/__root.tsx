@@ -146,6 +146,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: SITE.name },
       { name: "format-detection", content: "telephone=no" },
+      // H1 · SEO Sweep — Directiva por defecto para crawlers y AI (indexable).
+      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
+      { name: "googlebot", content: "index, follow, max-image-preview:large, max-snippet:-1" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -186,6 +189,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           url: SITE.url,
           logo: `${SITE.url}/logo.png`,
           description: SITE.default_description,
+          areaServed: {
+            "@type": "AdministrativeArea",
+            name: "Oriente Maya de Yucatán, México",
+          },
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "Valladolid",
+            addressRegion: "Yucatán",
+            addressCountry: "MX",
+          },
+          slogan: SITE.tagline,
         }),
       },
     ],
