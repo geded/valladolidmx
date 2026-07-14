@@ -35,6 +35,11 @@ import {
   type RecommendationValidationSnapshot,
 } from "@/lib/visitor-intel/recommendations.functions";
 import {
+  prioritizeOpportunities,
+  PRIORITIZATION_WEIGHTS,
+  type PrioritizedOpportunity,
+} from "@/lib/visitor-intel/prioritization";
+import {
   KPI_CATALOG,
   JOURNEY_TRANSITIONS,
   type JourneyTransitionId,
@@ -113,6 +118,7 @@ function VisitorIntelCenter() {
       <IntelModules snapshot={q.data} loading={q.isLoading} />
       <SegmentationSection window={win} />
       <OpportunitySection window={win} />
+      <PrioritizationSection window={win} />
       <ValidationLoopSection />
     </div>
   );
