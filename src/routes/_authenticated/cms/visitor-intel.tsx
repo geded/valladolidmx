@@ -28,6 +28,13 @@ import {
   type OpportunitySnapshot,
 } from "@/lib/visitor-intel/opportunities.functions";
 import {
+  aggregateRecommendationValidation,
+  MIN_FAMILY_SIGNAL,
+  type FamilyLearningSignal,
+  type RecommendationRecord,
+  type RecommendationValidationSnapshot,
+} from "@/lib/visitor-intel/recommendations.functions";
+import {
   KPI_CATALOG,
   JOURNEY_TRANSITIONS,
   type JourneyTransitionId,
@@ -106,6 +113,7 @@ function VisitorIntelCenter() {
       <IntelModules snapshot={q.data} loading={q.isLoading} />
       <SegmentationSection window={win} />
       <OpportunitySection window={win} />
+      <ValidationLoopSection />
     </div>
   );
 }
