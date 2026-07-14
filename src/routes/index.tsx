@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
       canonical?: string;
       noindex?: boolean;
     };
-    const title = seo.title?.trim() || `${SITE.name} — Despierta en Valladolid y descubre el Oriente Maya`;
+    const title = seo.title?.trim() || `${SITE.name} · Despierta en el Oriente Maya`;
     const description = seo.description?.trim() || SITE.default_description;
     const path = seo.canonical?.trim() || "/";
     const ogImage = seo.og_image?.trim() || loaderData?.fallbackImage || undefined;

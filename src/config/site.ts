@@ -5,8 +5,8 @@
 export const SITE = {
   name: "Valladolid.mx",
   tagline: "Oriente Maya de Yucatán",
-  domain: "valladolid.mx",
-  url: "https://valladolid.mx",
+  domain: "quehacerenvalladolid.com",
+  url: "https://quehacerenvalladolid.com",
   default_description:
     "Despierta en Valladolid y descubre el Oriente Maya: cenotes, cultura, gastronomía y experiencias auténticas de Yucatán.",
   theme_color: "#EAA840",

@@ -82,7 +82,20 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
           title: `${loaderData.dest.name} — ${ORIENTE_MAYA.name} · ${SITE.name}`,
           description: loaderData.dest.tagline,
           path: `/oriente-maya/${params.destino}`,
-          ogType: "place",
+          ogType: "article",
+          jsonLd: [
+            {
+              "@context": "https://schema.org",
+              "@type": "Place",
+              name: loaderData.dest.name,
+              description: loaderData.dest.tagline,
+              url: `https://quehacerenvalladolid.com/oriente-maya/${params.destino}`,
+              containedInPlace: {
+                "@type": "TouristDestination",
+                name: ORIENTE_MAYA.name,
+              },
+            },
+          ],
         })
       : { meta: [], links: [], scripts: [] },
   component: DestinoPage,

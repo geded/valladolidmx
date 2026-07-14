@@ -17,6 +17,17 @@ export const Route = createFileRoute("/blog")({
       title: `Blog · ${SITE.name}`,
       description: "Historias, agenda y notas editoriales del Oriente Maya.",
       path: "/blog",
+      jsonLd: [
+        {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: `Blog · ${SITE.name}`,
+          description: "Historias, agenda cultural y notas editoriales del Oriente Maya.",
+          url: "https://quehacerenvalladolid.com/blog",
+          inLanguage: "es-MX",
+          isPartOf: { "@type": "WebSite", name: SITE.name, url: SITE.url },
+        },
+      ],
     }),
   component: BlogRoute,
 });

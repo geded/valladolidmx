@@ -1,0 +1,19 @@
+# Valladolid.mx — Oriente Maya de Yucatán
+
+> Guía turística y directorio del Oriente Maya: Valladolid, Chichén Itzá, Ek Balam, Izamal, Espita, Río Lagartos, cenotes y comunidades. Despierta en Valladolid, descubre experiencias, hoteles, restaurantes y arma tu viaje con Alux, el copiloto de viajes.
+
+## Pages
+
+- [Inicio](/): Puerta de entrada al Oriente Maya de Yucatán.
+- [Oriente Maya](/oriente-maya): Destinos, pueblos y regiones del Oriente Maya.
+- [Experiencias](/experiencias): Actividades, tours y experiencias auténticas.
+- [Hoteles](/hoteles): Hospedaje boutique y hotelería local en el Oriente Maya.
+- [Restaurantes](/restaurantes): Cocina yucateca, mercados y experiencias gastronómicas.
+- [Eventos](/eventos): Agenda cultural, festivales y eventos del Oriente Maya.
+- [Casas de vacaciones](/casas-de-vacaciones): Rentas vacacionales en Valladolid y alrededores.
+- [Qué hacer](/que-hacer): Ideas y planes para disfrutar el destino.
+- [Promociones](/promociones): Ofertas vigentes de empresas del Oriente Maya.
+- [Arma tu viaje](/arma-tu-viaje): Planea tu viaje con Alux, el copiloto turístico.
+- [Empresas](/empresas): Directorio de empresas certificadas del Oriente Maya.
+- [Blog](/blog): Historias, agenda y notas editoriales.
+- [Contacto](/contacto): Contacto y directorio de Valladolid.mx.

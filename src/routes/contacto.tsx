@@ -12,7 +12,7 @@ import { SITE } from "@/config/site";
 export const Route = createFileRoute("/contacto")({
   head: () =>
     buildPublicHead({
-      title: `Contacto · ${SITE.name}`,
+      title: `Contacto y directorio · ${SITE.name}`,
       description: "Habla con el equipo de Valladolid.mx: turistas, empresas y prensa.",
       path: "/contacto",
     }),
@@ -23,7 +23,7 @@ function ContactoRoute() {
   return (
     <PublicShell
       eyebrow="Contáctanos"
-      title="Estamos para ayudarte"
+      title="Contacto y directorio de Valladolid.mx"
       description="Escríbenos según lo que necesites. Respondemos en horario del Oriente Maya."
       crumbs={[{ label: "Contacto" }]}
     >

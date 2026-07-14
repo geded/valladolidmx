@@ -129,6 +129,35 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Tangerine:wght@400;700&display=swap",
       },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: SITE.name,
+          url: SITE.url,
+          inLanguage: "es-MX",
+          description: SITE.default_description,
+          potentialAction: {
+            "@type": "SearchAction",
+            target: `${SITE.url}/buscar?q={search_term_string}`,
+            "query-input": "required name=search_term_string",
+          },
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: SITE.name,
+          url: SITE.url,
+          logo: `${SITE.url}/logo.png`,
+          description: SITE.default_description,
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,

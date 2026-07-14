@@ -28,7 +28,7 @@ export interface DiscoveryHead {
   scripts: Array<{ type: string; children: string }>;
 }
 
-export const DISCOVERY_ORIGIN = "https://valladolidmx.lovable.app";
+export const DISCOVERY_ORIGIN = "https://quehacerenvalladolid.com";
 
 function absoluteUrl(path: string): string {
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
