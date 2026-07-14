@@ -20,6 +20,13 @@ export interface DiscoveryHeadOptions {
    *  se emite "noindex, nofollow"; si no, se omite el tag. */
   robots?: string;
   jsonLd?: ReadonlyArray<Record<string, unknown>>;
+  /**
+   * H1 · SEO Metadata Sweep — Breadcrumbs semánticos.
+   * Cuando se especifican, se emite automáticamente un JSON-LD
+   * `BreadcrumbList` adicional (además de cualquier otro `jsonLd`).
+   * Los ítems deben venir en orden jerárquico (raíz → hoja).
+   */
+  breadcrumbs?: ReadonlyArray<{ label: string; path: string }>;
 }
 
 export interface DiscoveryHead {
@@ -53,16 +60,16 @@ export function buildPublicHead(options: DiscoveryHeadOptions): DiscoveryHead {
 
   const meta: Array<Record<string, string>> = [
     { title },
-    { name: "description", content: description },
+    { name: "description", content: truncateDescription(description) },
     { property: "og:title", content: title },
-    { property: "og:description", content: description },
+    { property: "og:description", content: truncateDescription(description) },
     { property: "og:type", content: ogType },
     { property: "og:url", content: url },
     { property: "og:locale", content: locale },
     { property: "og:site_name", content: SITE.name },
     { name: "twitter:card", content: ogImage ? "summary_large_image" : "summary" },
     { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
+    { name: "twitter:description", content: truncateDescription(description) },
   ];
 
   if (ogImage) {
@@ -77,12 +84,259 @@ export function buildPublicHead(options: DiscoveryHeadOptions): DiscoveryHead {
 
   const links: Array<Record<string, string>> = [{ rel: "canonical", href: url }];
 
-  const scripts: Array<{ type: string; children: string }> = (jsonLd ?? []).map((obj) => ({
+  const allJsonLd: Record<string, unknown>[] = [];
+  if (options.breadcrumbs && options.breadcrumbs.length) {
+    allJsonLd.push(breadcrumbListJsonLd(options.breadcrumbs));
+  }
+  if (jsonLd) allJsonLd.push(...jsonLd);
+  const scripts: Array<{ type: string; children: string }> = allJsonLd.map((obj) => ({
     type: "application/ld+json",
     children: JSON.stringify(obj),
   }));
 
   return { meta, links, scripts };
+}
+
+/**
+ * H1 · SEO Sweep — Recorta y compacta descripciones para meta tags.
+ * Google truncará >160c y motores IA prefieren texto compacto.
+ */
+export function truncateDescription(input: string, max = 160): string {
+  const clean = (input ?? "").replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  const slice = clean.slice(0, max - 1);
+  const lastSpace = slice.lastIndexOf(" ");
+  return `${slice.slice(0, lastSpace > 100 ? lastSpace : slice.length)}…`;
+}
+
+/**
+ * H1 · JSON-LD BreadcrumbList — nutrición semántica para Google Rich
+ * Results y motores de IA (ChatGPT, Perplexity, Claude, Gemini).
+ */
+export function breadcrumbListJsonLd(
+  items: ReadonlyArray<{ label: string; path: string }>,
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.label,
+      item: absoluteUrl(item.path),
+    })),
+  };
+}
+
+/**
+ * H1 · JSON-LD TouristDestination — Destino turístico (región o pueblo).
+ * Establece relaciones explícitas con la región contenedora.
+ */
+export function touristDestinationJsonLd(input: {
+  name: string;
+  description: string;
+  path: string;
+  image?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  containedIn?: { name: string; url?: string };
+  touristType?: string[];
+  keywords?: string[];
+}): Record<string, unknown> {
+  const url = absoluteUrl(input.path);
+  const jsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "TouristDestination",
+    name: input.name,
+    description: input.description,
+    url,
+    inLanguage: "es-MX",
+  };
+  if (input.image) jsonLd.image = input.image;
+  if (input.latitude != null && input.longitude != null) {
+    jsonLd.geo = {
+      "@type": "GeoCoordinates",
+      latitude: input.latitude,
+      longitude: input.longitude,
+    };
+  }
+  if (input.containedIn) {
+    jsonLd.containedInPlace = {
+      "@type": "TouristDestination",
+      name: input.containedIn.name,
+      ...(input.containedIn.url ? { url: input.containedIn.url } : {}),
+    };
+  }
+  if (input.touristType?.length) jsonLd.touristType = input.touristType;
+  if (input.keywords?.length) jsonLd.keywords = input.keywords.join(", ");
+  return jsonLd;
+}
+
+/**
+ * H1 · JSON-LD LocalBusiness — Empresa/hotel/restaurante.
+ */
+export function localBusinessJsonLd(input: {
+  name: string;
+  description: string;
+  path: string;
+  image?: string;
+  telephone?: string;
+  email?: string;
+  addressLine?: string | null;
+  addressLocality?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  priceRange?: string;
+  categorySlug?: string;
+  destinationName?: string;
+  aggregateRating?: { ratingValue: number; reviewCount: number };
+  areaServed?: string;
+}): Record<string, unknown> {
+  const url = absoluteUrl(input.path);
+  const type = mapCategoryToLocalBusinessType(input.categorySlug);
+  const jsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": type,
+    name: input.name,
+    description: input.description,
+    url,
+    inLanguage: "es-MX",
+  };
+  if (input.image) jsonLd.image = input.image;
+  if (input.telephone) jsonLd.telephone = input.telephone;
+  if (input.email) jsonLd.email = input.email;
+  jsonLd.address = {
+    "@type": "PostalAddress",
+    ...(input.addressLine ? { streetAddress: input.addressLine } : {}),
+    addressLocality: input.addressLocality ?? input.destinationName ?? "Valladolid",
+    addressRegion: "Yucatán",
+    addressCountry: "MX",
+  };
+  if (input.latitude != null && input.longitude != null) {
+    jsonLd.geo = {
+      "@type": "GeoCoordinates",
+      latitude: input.latitude,
+      longitude: input.longitude,
+    };
+  }
+  if (input.priceRange) jsonLd.priceRange = input.priceRange;
+  if (input.aggregateRating && input.aggregateRating.reviewCount > 0) {
+    jsonLd.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: input.aggregateRating.ratingValue,
+      reviewCount: input.aggregateRating.reviewCount,
+    };
+  }
+  if (input.areaServed) jsonLd.areaServed = input.areaServed;
+  return jsonLd;
+}
+
+function mapCategoryToLocalBusinessType(slug?: string): string {
+  if (!slug) return "LocalBusiness";
+  const s = slug.toLowerCase();
+  if (s.includes("hotel") || s.includes("hosped")) return "LodgingBusiness";
+  if (s.includes("restaur") || s.includes("gastro")) return "Restaurant";
+  if (s.includes("tour") || s.includes("experien")) return "TouristAttraction";
+  if (s.includes("spa")) return "HealthAndBeautyBusiness";
+  if (s.includes("bar")) return "BarOrPub";
+  if (s.includes("cafe") || s.includes("cafeter")) return "CafeOrCoffeeShop";
+  if (s.includes("tienda") || s.includes("shop") || s.includes("boutique")) return "Store";
+  return "LocalBusiness";
+}
+
+/**
+ * H1 · JSON-LD Product — Producto/experiencia comercializable.
+ * Emite `Offer` con precio cuando está disponible.
+ */
+export function productJsonLd(input: {
+  name: string;
+  description: string;
+  path: string;
+  image?: string;
+  sku?: string;
+  brandName?: string;
+  priceAmount?: number | null;
+  priceCurrency?: string;
+  availability?: "InStock" | "OutOfStock" | "PreOrder";
+  aggregateRating?: { ratingValue: number; reviewCount: number };
+}): Record<string, unknown> {
+  const url = absoluteUrl(input.path);
+  const jsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: input.name,
+    description: input.description,
+    url,
+  };
+  if (input.image) jsonLd.image = input.image;
+  if (input.sku) jsonLd.sku = input.sku;
+  if (input.brandName) {
+    jsonLd.brand = { "@type": "Brand", name: input.brandName };
+  }
+  if (input.priceAmount != null && input.priceAmount > 0) {
+    jsonLd.offers = {
+      "@type": "Offer",
+      price: input.priceAmount,
+      priceCurrency: input.priceCurrency ?? "MXN",
+      availability: `https://schema.org/${input.availability ?? "InStock"}`,
+      url,
+    };
+  }
+  if (input.aggregateRating && input.aggregateRating.reviewCount > 0) {
+    jsonLd.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: input.aggregateRating.ratingValue,
+      reviewCount: input.aggregateRating.reviewCount,
+    };
+  }
+  return jsonLd;
+}
+
+/**
+ * H1 · JSON-LD FAQPage — Preguntas frecuentes de un producto/servicio.
+ */
+export function faqPageJsonLd(
+  faqs: ReadonlyArray<{ question: string; answer: string }>,
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: { "@type": "Answer", text: f.answer },
+    })),
+  };
+}
+
+/**
+ * H1 · JSON-LD CollectionPage — Listados territoriales por categoría/destino.
+ */
+export function collectionPageJsonLd(input: {
+  name: string;
+  description: string;
+  path: string;
+  items: ReadonlyArray<{ name: string; path: string }>;
+}): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: input.name,
+    description: input.description,
+    url: absoluteUrl(input.path),
+    inLanguage: "es-MX",
+    isPartOf: { "@type": "WebSite", name: SITE.name, url: DISCOVERY_ORIGIN },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: input.items.length,
+      itemListElement: input.items.slice(0, 30).map((it, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: it.name,
+        url: absoluteUrl(it.path),
+      })),
+    },
+  };
 }
 
 /**
