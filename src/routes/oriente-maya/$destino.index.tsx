@@ -9,7 +9,7 @@
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead } from "@/lib/discovery/seo";
+import { buildPublicHead, touristDestinationJsonLd } from "@/lib/discovery/seo";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
@@ -80,21 +80,36 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
     loaderData
       ? buildPublicHead({
           title: `${loaderData.dest.name} — ${ORIENTE_MAYA.name} · ${SITE.name}`,
-          description: loaderData.dest.tagline,
+          description:
+            loaderData.db?.description?.trim() ||
+            loaderData.dest.tagline ||
+            `${loaderData.dest.name}, destino turístico del ${ORIENTE_MAYA.name} de Yucatán.`,
           path: `/oriente-maya/${params.destino}`,
           ogType: "article",
+          ogImage: loaderData.db?.hero_url ?? undefined,
+          breadcrumbs: [
+            { label: "Inicio", path: "/" },
+            { label: ORIENTE_MAYA.name, path: "/oriente-maya" },
+            { label: loaderData.dest.name, path: `/oriente-maya/${params.destino}` },
+          ],
           jsonLd: [
-            {
-              "@context": "https://schema.org",
-              "@type": "Place",
+            touristDestinationJsonLd({
               name: loaderData.dest.name,
-              description: loaderData.dest.tagline,
-              url: `https://quehacerenvalladolid.com/oriente-maya/${params.destino}`,
-              containedInPlace: {
-                "@type": "TouristDestination",
+              description:
+                loaderData.db?.description?.trim() ||
+                loaderData.dest.tagline ||
+                loaderData.dest.name,
+              path: `/oriente-maya/${params.destino}`,
+              image: loaderData.db?.hero_url ?? undefined,
+              latitude: loaderData.db?.latitude ?? null,
+              longitude: loaderData.db?.longitude ?? null,
+              containedIn: {
                 name: ORIENTE_MAYA.name,
+                url: "https://quehacerenvalladolid.com/oriente-maya",
               },
-            },
+              keywords: loaderData.dest.highlights,
+              touristType: ["Cultural", "Naturaleza", "Gastronomía", "Historia Maya"],
+            }),
           ],
         })
       : { meta: [], links: [], scripts: [] },
