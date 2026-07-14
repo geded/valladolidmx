@@ -958,6 +958,297 @@ const STATUS_STYLE: Record<
   discarded: { label: "Descartada", badge: "bg-destructive/15 text-destructive" },
 };
 
+/* --------------------------------------------------------------------- */
+/* CV8.8 · Priorización por Segmento                                     */
+/* --------------------------------------------------------------------- */
+
+const FINDING_TYPE_META: Record<
+  SegmentFindingType,
+  { label: string; badge: string; short: string }
+> = {
+  commercial_opportunity: {
+    label: "Oportunidad comercial",
+    badge: "bg-success/15 text-success",
+    short: "Amplificar",
+  },
+  experience_opportunity: {
+    label: "Oportunidad de experiencia",
+    badge: "bg-info/15 text-info",
+    short: "Reducir fricción",
+  },
+  inclusion_opportunity: {
+    label: "Oportunidad de inclusión",
+    badge: "bg-primary/15 text-primary",
+    short: "Auditar barreras",
+  },
+  abandonment_risk: {
+    label: "Riesgo de abandono",
+    badge: "bg-destructive/15 text-destructive",
+    short: "Intervenir",
+  },
+  insufficient_data: {
+    label: "Evidencia insuficiente",
+    badge: "bg-muted text-muted-foreground",
+    short: "Recolectar",
+  },
+};
+
+function SegmentPrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) {
+  const callSeg = useServerFn(aggregateJourneySegments);
+  const callVal = useServerFn(aggregateRecommendationValidation);
+
+  const localeQ = useQuery({
+    queryKey: ["cms", "visitor-intel", "seg-prio", "locale", win],
+    queryFn: () => callSeg({ data: { dimension: "locale" as const, window_days: win } }),
+    staleTime: 60_000,
+  });
+  const destQ = useQuery({
+    queryKey: ["cms", "visitor-intel", "seg-prio", "destination", win],
+    queryFn: () => callSeg({ data: { dimension: "destination" as const, window_days: win } }),
+    staleTime: 60_000,
+  });
+  const capQ = useQuery({
+    queryKey: ["cms", "visitor-intel", "seg-prio", "capability", win],
+    queryFn: () => callSeg({ data: { dimension: "capability" as const, window_days: win } }),
+    staleTime: 60_000,
+  });
+  const valQ = useQuery({
+    queryKey: ["cms", "visitor-intel", "seg-prio", "validation", 90 as const],
+    queryFn: () => callVal({ data: { window_days: 90 } }),
+    staleTime: 60_000,
+  });
+
+  const loading =
+    localeQ.isLoading || destQ.isLoading || capQ.isLoading || valQ.isLoading;
+  const anyError = !!(localeQ.error || destQ.error || capQ.error);
+
+  const result = useMemo(() => {
+    const segments = [localeQ.data, destQ.data, capQ.data].filter(
+      (s): s is NonNullable<typeof s> => Boolean(s),
+    );
+    if (segments.length === 0) return null;
+    return prioritizeSegments({
+      segments,
+      validation: valQ.data ?? null,
+    });
+  }, [localeQ.data, destQ.data, capQ.data, valQ.data]);
+
+  const pendingDims = [localeQ.data, destQ.data, capQ.data]
+    .filter((s): s is NonNullable<typeof s> => Boolean(s))
+    .filter((s) => s.status === "contract_pending")
+    .map((s) => s.dimension);
+
+  return (
+    <section className="space-y-4 rounded-2xl border-2 border-primary/40 bg-surface p-5">
+      <header className="border-b border-border/60 pb-4">
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+          CV8.8 · Priorización por Segmento
+        </p>
+        <h2 className="mt-1 text-xl font-semibold tracking-tight">
+          ¿Dónde actuar por segmento — con equidad?
+        </h2>
+        <p className="mt-1 max-w-3xl text-xs text-muted-foreground">
+          Cruza segmentos oficiales de <strong>CV8.4</strong> con la confianza
+          aprendida de <strong>CV8.6</strong>. Distingue oportunidad
+          comercial, de experiencia, de inclusión, riesgo de abandono y
+          evidencia insuficiente. Cada fila declara muestra, delta vs
+          baseline, confianza, impacto esperado, riesgo de sesgo y
+          explicación alternativa. Cero snapshots persistidos. Cero
+          identidades individuales. Sujeto a{" "}
+          <code>MIN_SEGMENT_POPULATION = {MIN_SEGMENT_POPULATION}</code>.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-1 text-[10px] font-mono text-muted-foreground">
+          {Object.entries(SEGMENT_PRIORITIZATION_WEIGHTS).map(([k, v]) => (
+            <span
+              key={k}
+              className="rounded-full border border-border bg-surface-raised px-2 py-0.5"
+            >
+              {k}: {(v * 100).toFixed(0)}%
+            </span>
+          ))}
+        </div>
+      </header>
+
+      {anyError ? (
+        <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+          No fue posible cargar la priorización por segmento.
+        </p>
+      ) : null}
+
+      {pendingDims.length > 0 ? (
+        <p className="rounded-xl border border-border bg-surface-raised p-3 text-[11px] text-muted-foreground">
+          Dimensiones en <code>contract_pending</code>: {pendingDims.join(", ")}. Se
+          activarán cuando el contrato de evento las incluya.
+        </p>
+      ) : null}
+
+      {loading || !result ? (
+        <p className="h-6 w-48 animate-pulse rounded bg-muted" />
+      ) : result.findings.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
+          <p className="font-medium text-foreground">Sin segmentos priorizables aún</p>
+          <p className="mt-1">
+            Aparecerán aquí cuando existan buckets con población ≥ {result.min_population}.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="grid gap-2 text-[11px] md:grid-cols-5">
+            {(Object.entries(result.summary.by_type) as [SegmentFindingType, number][]).map(
+              ([t, n]) => (
+                <span
+                  key={t}
+                  className={
+                    "rounded-full px-2 py-1 text-center font-semibold " +
+                    FINDING_TYPE_META[t].badge
+                  }
+                >
+                  {FINDING_TYPE_META[t].short}: {n}
+                </span>
+              ),
+            )}
+          </div>
+          <ol className="space-y-3">
+            {result.findings.map((f) => (
+              <SegmentFindingCard key={`${f.dimension}:${f.segment_key}`} f={f} />
+            ))}
+          </ol>
+        </>
+      )}
+    </section>
+  );
+}
+
+function SegmentFindingCard({ f }: { f: SegmentFinding }) {
+  const meta = FINDING_TYPE_META[f.type];
+  const biasBadge =
+    f.bias_risk === "low"
+      ? "bg-success/15 text-success"
+      : f.bias_risk === "medium"
+        ? "bg-warning/15 text-warning"
+        : "bg-destructive/15 text-destructive";
+  return (
+    <li className="rounded-xl border border-border bg-surface-raised p-4">
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+            #{f.rank}
+          </span>
+          <div>
+            <h3 className="text-sm font-semibold leading-snug">
+              {f.segment_label}
+            </h3>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              <code>{f.dimension}</code> · n={f.sample_size} · JPR{" "}
+              {(f.jpr * 100).toFixed(1)}% vs baseline{" "}
+              {(f.baseline_jpr * 100).toFixed(1)}% ·{" "}
+              <strong
+                className={
+                  f.delta_vs_baseline >= 0 ? "text-success" : "text-destructive"
+                }
+              >
+                Δ {(f.delta_vs_baseline * 100).toFixed(1)}%
+              </strong>
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-1 text-right">
+          {f.type !== "insufficient_data" ? (
+            <p className="text-2xl font-bold tracking-tight">
+              {(f.score * 100).toFixed(0)}
+            </p>
+          ) : (
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              n.d.
+            </p>
+          )}
+          <span
+            className={
+              "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide " +
+              meta.badge
+            }
+          >
+            {meta.label}
+          </span>
+          <span
+            className={
+              "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide " +
+              biasBadge
+            }
+          >
+            sesgo: {f.bias_risk}
+          </span>
+        </div>
+      </header>
+
+      <p className="mt-3 rounded-lg bg-surface p-2 text-xs italic text-foreground">
+        {f.rationale}
+      </p>
+
+      <dl className="mt-3 grid gap-2 text-xs md:grid-cols-2">
+        <div>
+          <dt className="font-semibold">Acción recomendada</dt>
+          <dd className="text-muted-foreground">{f.recommended_action}</dd>
+        </div>
+        <div>
+          <dt className="font-semibold">Impacto esperado</dt>
+          <dd className="text-muted-foreground">{f.expected_impact}</dd>
+        </div>
+      </dl>
+
+      <details className="mt-3">
+        <summary className="cursor-pointer text-[11px] font-semibold text-primary hover:underline">
+          Explicaciones alternativas (revisar antes de concluir)
+        </summary>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-[11px] text-muted-foreground">
+          {f.alternative_explanations.map((e, i) => (
+            <li key={i}>{e}</li>
+          ))}
+        </ul>
+      </details>
+
+      {f.type !== "insufficient_data" ? (
+        <details className="mt-2">
+          <summary className="cursor-pointer text-[11px] font-semibold text-primary hover:underline">
+            Ver factores del score
+          </summary>
+          <ul className="mt-2 space-y-1 text-[11px]">
+            {f.factors.map((fac) => (
+              <li
+                key={fac.key}
+                className="flex items-start justify-between gap-2 rounded-md bg-surface p-2"
+              >
+                <div className="flex-1">
+                  <p className="font-mono font-semibold">
+                    {fac.key} · peso {(fac.weight * 100).toFixed(0)}% · valor{" "}
+                    {(fac.value * 100).toFixed(0)}%
+                  </p>
+                  <p className="text-muted-foreground">{fac.explanation}</p>
+                </div>
+                <span className="font-mono font-semibold text-primary">
+                  +{(fac.contribution * 100).toFixed(1)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </details>
+      ) : null}
+    </li>
+  );
+}
+
+const _STATUS_STYLE_UNUSED_MARKER: Record<
+  string,
+  { label: string; badge: string }
+> = {
+  detected: { label: "Detectada", badge: "bg-muted text-muted-foreground" },
+  accepted: { label: "Aceptada", badge: "bg-info/15 text-info" },
+  implemented: { label: "Implementada", badge: "bg-primary/15 text-primary" },
+  observed: { label: "Observada", badge: "bg-warning/15 text-warning" },
+  validated: { label: "Validada", badge: "bg-success/15 text-success" },
+  discarded: { label: "Descartada", badge: "bg-destructive/15 text-destructive" },
+};
+
 function ValidationLoopSection() {
   const [win, setWin] = useState<30 | 90 | 180>(90);
   const call = useServerFn(aggregateRecommendationValidation);
