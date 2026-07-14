@@ -66,7 +66,7 @@ function SimulationConsole() {
 
   const info = useQuery({
     queryKey: ["cv8s4", "info"],
-    queryFn: () => infoFn({ data: {} }),
+    queryFn: () => infoFn(),
     staleTime: 5 * 60_000,
   });
 
