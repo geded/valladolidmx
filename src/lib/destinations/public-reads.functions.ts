@@ -114,13 +114,12 @@ export const getDestinationMapPoints = createServerFn({ method: "GET" })
     const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data: dest } = await sb
-      .from("destinations").select("id").eq("slug", data.slug).maybeSingle();
-    if (!dest) return [];
+    // H2·P1 — Un solo roundtrip: filtramos por `destinations.slug` vía
+    // inner join en lugar de resolver `destination_id` en dos pasos.
     const { data: rows, error } = await sb
       .from("businesses")
-      .select("id, slug, display_name, tagline, status, deleted_at, business_locations!inner(latitude, longitude, address_line1, is_primary)")
-      .eq("destination_id", dest.id)
+      .select("id, slug, display_name, tagline, status, deleted_at, business_locations!inner(latitude, longitude, address_line1, is_primary), destinations!inner(slug)")
+      .eq("destinations.slug", data.slug)
       .eq("status", "published")
       .is("deleted_at", null)
       .limit(80);
