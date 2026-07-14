@@ -759,3 +759,265 @@ function OpportunityCard({ o }: { o: Opportunity }) {
     </li>
   );
 }
+
+/* --------------------------------------------------------------------- */
+/* CV8.6 · Recommendation Validation Loop                                */
+/* --------------------------------------------------------------------- */
+
+const STATUS_STYLE: Record<
+  string,
+  { label: string; badge: string }
+> = {
+  detected: { label: "Detectada", badge: "bg-muted text-muted-foreground" },
+  accepted: { label: "Aceptada", badge: "bg-info/15 text-info" },
+  implemented: { label: "Implementada", badge: "bg-primary/15 text-primary" },
+  observed: { label: "Observada", badge: "bg-warning/15 text-warning" },
+  validated: { label: "Validada", badge: "bg-success/15 text-success" },
+  discarded: { label: "Descartada", badge: "bg-destructive/15 text-destructive" },
+};
+
+function ValidationLoopSection() {
+  const [win, setWin] = useState<30 | 90 | 180>(90);
+  const call = useServerFn(aggregateRecommendationValidation);
+  const q = useQuery({
+    queryKey: ["cms", "visitor-intel", "recommendation-validation", win],
+    queryFn: () => call({ data: { window_days: win } }),
+    staleTime: 60_000,
+  });
+
+  return (
+    <section className="space-y-4 rounded-2xl border border-border bg-surface p-5">
+      <header className="flex flex-wrap items-end justify-between gap-3 border-b border-border/60 pb-4">
+        <div>
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+            CV8.6 · Recommendation Validation Loop
+          </p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight">
+            ¿Nuestras recomendaciones mejoraron el Journey?
+          </h2>
+          <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
+            Ciclo de vida completo de cada recomendación: detectada → aceptada →
+            implementada → observada → validada / descartada. Confianza aprendida
+            desde resultados observados (n ≥ <strong>{MIN_FAMILY_SIGNAL}</strong>
+            por familia). Sin reglas manuales ocultas.
+          </p>
+        </div>
+        <div className="flex gap-1 rounded-full border border-border p-1 text-xs">
+          {[30, 90, 180].map((n) => (
+            <button
+              key={n}
+              type="button"
+              onClick={() => setWin(n as 30 | 90 | 180)}
+              className={
+                "rounded-full px-3 py-1 " +
+                (win === n
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground")
+              }
+            >
+              {n}d
+            </button>
+          ))}
+        </div>
+      </header>
+
+      <ValidationLoopBody snapshot={q.data} loading={q.isLoading} error={!!q.error} />
+    </section>
+  );
+}
+
+function ValidationLoopBody({
+  snapshot,
+  loading,
+  error,
+}: {
+  snapshot: RecommendationValidationSnapshot | undefined;
+  loading: boolean;
+  error: boolean;
+}) {
+  if (error) {
+    return (
+      <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+        No fue posible cargar el ciclo de validación.
+      </p>
+    );
+  }
+  if (loading || !snapshot) return <p className="h-6 w-32 animate-pulse rounded bg-muted" />;
+
+  const total =
+    snapshot.active.length + snapshot.closed.length;
+
+  if (total === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
+        <p className="font-medium text-foreground">Sin recomendaciones registradas</p>
+        <p className="mt-1">
+          Cuando el equipo marque una oportunidad como <em>aceptada</em>, aparecerá
+          aquí y podrá recorrer su ciclo de vida completo hasta la validación.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
+        {Object.entries(snapshot.totals).map(([status, count]) => (
+          <div
+            key={status}
+            className="rounded-xl border border-border bg-surface-raised p-3"
+          >
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              {STATUS_STYLE[status]?.label ?? status}
+            </p>
+            <p className="mt-1 text-xl font-semibold">{count}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div>
+          <h3 className="mb-2 text-sm font-semibold">Ciclo activo</h3>
+          {snapshot.active.length === 0 ? (
+            <p className="text-xs text-muted-foreground">Ninguna en curso.</p>
+          ) : (
+            <ul className="space-y-2">
+              {snapshot.active.map((r) => (
+                <RecommendationLifecycleCard key={r.recommendation_id} r={r} />
+              ))}
+            </ul>
+          )}
+        </div>
+        <div>
+          <h3 className="mb-2 text-sm font-semibold">Cerradas (aprendizaje)</h3>
+          {snapshot.closed.length === 0 ? (
+            <p className="text-xs text-muted-foreground">
+              Aún no hay recomendaciones validadas o descartadas.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {snapshot.closed.slice(0, 8).map((r) => (
+                <RecommendationLifecycleCard key={r.recommendation_id} r={r} />
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="mb-2 text-sm font-semibold">
+          Confianza aprendida por familia de KPI
+        </h3>
+        {snapshot.family_confidence.length === 0 ? (
+          <p className="text-xs text-muted-foreground">
+            Aún no hay resultados observados. La confianza se aprenderá al cerrar
+            recomendaciones con evidencia.
+          </p>
+        ) : (
+          <div className="overflow-x-auto rounded-xl border border-border">
+            <table className="w-full text-xs">
+              <thead className="bg-surface-raised text-left text-[10px] uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="p-2">Métrica</th>
+                  <th className="p-2">Muestra</th>
+                  <th className="p-2">Validadas</th>
+                  <th className="p-2">Descartadas</th>
+                  <th className="p-2">Confianza aprendida</th>
+                  <th className="p-2">Fiabilidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                {snapshot.family_confidence.map((f) => (
+                  <FamilyRow key={f.metric_id} f={f} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <p className="text-[11px] text-muted-foreground">
+        Contrato v{snapshot.contract_version} · Estado recomputado desde el
+        historial append-only (Founder Journey State).
+      </p>
+    </div>
+  );
+}
+
+function RecommendationLifecycleCard({ r }: { r: RecommendationRecord }) {
+  const style = STATUS_STYLE[r.current_status];
+  return (
+    <li className="rounded-xl border border-border bg-surface p-3">
+      <header className="flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="truncate text-xs font-semibold">{r.recommendation_id}</p>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
+            <code>{r.metric_id}</code> · <code>{r.transition}</code>
+          </p>
+        </div>
+        <span
+          className={
+            "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide " +
+            (style?.badge ?? "bg-muted text-muted-foreground")
+          }
+        >
+          {style?.label ?? r.current_status}
+        </span>
+      </header>
+      <ol className="mt-2 flex flex-wrap gap-1 text-[10px]">
+        {r.timeline.map((s, i) => (
+          <li
+            key={i}
+            className={
+              "rounded-full px-2 py-0.5 " +
+              (STATUS_STYLE[s.status]?.badge ?? "bg-muted text-muted-foreground")
+            }
+            title={`${s.actor} · ${new Date(s.occurred_at).toLocaleString()}`}
+          >
+            {STATUS_STYLE[s.status]?.label ?? s.status}
+          </li>
+        ))}
+      </ol>
+      {r.latest_outcome ? (
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          Evidencia: {r.latest_outcome.kpi_before.toFixed(3)} →{" "}
+          {r.latest_outcome.kpi_after.toFixed(3)} (
+          {(r.latest_outcome.delta_relative * 100).toFixed(1)}%){" "}
+          {r.latest_outcome.transition_advanced ? "· transición avanzada" : ""}
+        </p>
+      ) : null}
+    </li>
+  );
+}
+
+function FamilyRow({ f }: { f: FamilyLearningSignal }) {
+  const badge =
+    f.reliability === "reliable"
+      ? "bg-success/15 text-success"
+      : f.reliability === "learning"
+        ? "bg-warning/15 text-warning"
+        : "bg-muted text-muted-foreground";
+  return (
+    <tr className="border-t border-border">
+      <td className="p-2 font-mono text-[11px]">{f.metric_id}</td>
+      <td className="p-2">{f.sample_size}</td>
+      <td className="p-2 text-success">{f.validated}</td>
+      <td className="p-2 text-destructive">{f.discarded}</td>
+      <td className="p-2 font-semibold">
+        {(f.learned_confidence * 100).toFixed(0)}%
+      </td>
+      <td className="p-2">
+        <span
+          className={
+            "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide " +
+            badge
+          }
+        >
+          {f.reliability === "insufficient_data"
+            ? "muestra insuficiente"
+            : f.reliability}
+        </span>
+      </td>
+    </tr>
+  );
+}
