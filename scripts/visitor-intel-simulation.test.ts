@@ -162,7 +162,7 @@ function main() {
     events_total: runA.stats.events_total,
     events_by_transition: runA.stats.events_by_transition,
     final_stage_histogram: finals,
-    territorial_touches: touches,
+    territorial_touches: runA.stats.territorial_touches,
     digest: digestA,
   }, null, 2));
 }
