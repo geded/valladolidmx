@@ -40,6 +40,12 @@ import {
   type PrioritizedOpportunity,
 } from "@/lib/visitor-intel/prioritization";
 import {
+  prioritizeSegments,
+  SEGMENT_PRIORITIZATION_WEIGHTS,
+  type SegmentFinding,
+  type SegmentFindingType,
+} from "@/lib/visitor-intel/segment-prioritization";
+import {
   KPI_CATALOG,
   JOURNEY_TRANSITIONS,
   type JourneyTransitionId,
@@ -119,6 +125,7 @@ function VisitorIntelCenter() {
       <SegmentationSection window={win} />
       <OpportunitySection window={win} />
       <PrioritizationSection window={win} />
+      <SegmentPrioritizationSection window={win} />
       <ValidationLoopSection />
     </div>
   );
