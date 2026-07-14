@@ -12,6 +12,8 @@ MATCHES=$(rg -n "\\balt_text\\b" src \
   --glob '!src/lib/**' \
   --glob '!src/components/cms/**' \
   --glob '!src/routes/_authenticated/cms/**' \
+  --glob '!src/routes/_authenticated/portal/**' \
+  --glob '!src/components/portal/**' \
   --glob '!src/integrations/supabase/**' \
   || true)
 
