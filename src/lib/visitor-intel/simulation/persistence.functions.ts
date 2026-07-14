@@ -31,15 +31,8 @@ import type { SimulatedEvent } from "./behavior";
 const BULK_CHUNK = 500;
 
 // ── Guard: sólo admin/super_admin ──────────────────────────────────────
-async function requireAdmin(context: {
-  supabase: {
-    rpc: (
-      fn: string,
-      args: Record<string, unknown>,
-    ) => Promise<{ data: boolean | null; error: unknown }>;
-  };
-  userId: string;
-}): Promise<void> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function requireAdmin(context: { supabase: any; userId: string }): Promise<void> {
   const [{ data: isAdmin }, { data: isSuper }] = await Promise.all([
     context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }),
     context.supabase.rpc("has_role", { _user_id: context.userId, _role: "super_admin" }),
@@ -239,7 +232,7 @@ export const listSimulationRuns = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) =>
     z.object({ limit: z.number().min(1).max(200).default(50) }).parse(data ?? {}),
   )
-  .handler(async ({ data, context }): Promise<SimulationRunSummary[]> => {
+  .handler(async ({ data, context }) => {
     await requireAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const admin = supabaseAdmin as unknown as AdminChain;
@@ -255,7 +248,7 @@ export const listSimulationRuns = createServerFn({ method: "POST" })
       console.error("[cv8.s.4] list runs failed", error);
       throw new Response("Read failed", { status: 500 });
     }
-    return (rows ?? []) as SimulationRunSummary[];
+    return { runs: (rows ?? []) as SimulationRunSummary[] };
   });
 
 // ── Wipe seguro (por run_id únicamente) ────────────────────────────────
