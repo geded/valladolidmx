@@ -8,7 +8,11 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead } from "@/lib/discovery/seo";
+import {
+  buildPublicHead,
+  touristDestinationJsonLd,
+  collectionPageJsonLd,
+} from "@/lib/discovery/seo";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
@@ -53,12 +57,46 @@ export const Route = createFileRoute("/oriente-maya/")({
     ]);
     return { composition, destinations };
   },
-  head: () =>
-    buildPublicHead({
-      title: `Oriente Maya — Destinos · ${SITE.name}`,
+  head: ({ loaderData }) => {
+    const destinations = loaderData?.destinations ?? [];
+    return buildPublicHead({
+      title: `Oriente Maya — Destinos turísticos de Yucatán · ${SITE.name}`,
       description: ORIENTE_MAYA.short_description,
       path: "/oriente-maya",
-    }),
+      breadcrumbs: [
+        { label: "Inicio", path: "/" },
+        { label: ORIENTE_MAYA.name, path: "/oriente-maya" },
+      ],
+      jsonLd: [
+        touristDestinationJsonLd({
+          name: ORIENTE_MAYA.name,
+          description: ORIENTE_MAYA.short_description,
+          path: "/oriente-maya",
+          touristType: ["Cultural", "Naturaleza", "Historia Maya", "Gastronomía", "Cenotes"],
+          keywords: [
+            "Valladolid",
+            "Chichén Itzá",
+            "Ek Balam",
+            "Izamal",
+            "Espita",
+            "Río Lagartos",
+            "Las Coloradas",
+            "cenotes",
+            "Yucatán",
+          ],
+        }),
+        collectionPageJsonLd({
+          name: `Destinos del ${ORIENTE_MAYA.name}`,
+          description: ORIENTE_MAYA.short_description,
+          path: "/oriente-maya",
+          items: destinations.map((d: { slug: string; name: string }) => ({
+            name: d.name,
+            path: `/oriente-maya/${d.slug}`,
+          })),
+        }),
+      ],
+    });
+  },
   component: OrienteMayaIndex,
   errorComponent: () => (
     <PublicShell title={ORIENTE_MAYA.name} crumbs={[{ label: ORIENTE_MAYA.name }]}>
