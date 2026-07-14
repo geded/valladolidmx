@@ -1,11 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Suspense, lazy } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { PublicShell } from "@/components/discovery";
-import { ContinuityWelcomeSurface } from "@/components/traveler/ContinuityWelcomeSurface";
+// H2·P3 — `ContinuityWelcomeSurface` sólo se muestra a viajeros con
+// estado de continuidad (visita previa detectada). Para el primer
+// visitante y para SSR renderiza null: lo diferimos para no cargarlo
+// en el entry principal. Fallback: null (sin CLS).
+const ContinuityWelcomeSurface = lazy(() =>
+  import("@/components/traveler/ContinuityWelcomeSurface").then((m) => ({
+    default: m.ContinuityWelcomeSurface,
+  })),
+);
 import { useSectionEditWrap } from "@/components/experience-builder/SectionEditOverlay";
 import { buildPublicHead, pickFirstMediaUrl, webPageJsonLd } from "@/lib/discovery/seo";
 import heroLcpImage from "@/assets/brand/hero/bg01.webp";
@@ -80,7 +89,9 @@ function HomePage() {
   if (published?.snapshot) {
     return (
       <PublicShell variant="hero">
-        <ContinuityWelcomeSurface />
+        <Suspense fallback={null}>
+          <ContinuityWelcomeSurface />
+        </Suspense>
         <CompositionRenderer tree={published.snapshot} pageType="home" wrap={editWrap} />
       </PublicShell>
     );
@@ -113,7 +124,9 @@ const HOME_FALLBACK_SECTIONS: readonly DiscoverySectionKind[] = [
 function LegacyHome() {
   return (
     <PublicShell variant="hero">
-      <ContinuityWelcomeSurface />
+      <Suspense fallback={null}>
+        <ContinuityWelcomeSurface />
+      </Suspense>
       {HOME_FALLBACK_SECTIONS.map((kind) => {
         const Section = getDiscoverySection(kind).component;
         return <Section key={kind} />;
