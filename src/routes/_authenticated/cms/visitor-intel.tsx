@@ -21,6 +21,13 @@ import {
   type SegmentDimension,
 } from "@/lib/visitor-intel/segments.functions";
 import {
+  detectJourneyOpportunities,
+  MIN_SAMPLE_FOR_OPPORTUNITY,
+  type Opportunity,
+  type OpportunitySeverity,
+  type OpportunitySnapshot,
+} from "@/lib/visitor-intel/opportunities.functions";
+import {
   KPI_CATALOG,
   JOURNEY_TRANSITIONS,
   type JourneyTransitionId,
@@ -98,6 +105,7 @@ function VisitorIntelCenter() {
 
       <IntelModules snapshot={q.data} loading={q.isLoading} />
       <SegmentationSection window={win} />
+      <OpportunitySection window={win} />
     </div>
   );
 }
