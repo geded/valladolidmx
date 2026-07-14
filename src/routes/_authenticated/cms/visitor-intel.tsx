@@ -1237,18 +1237,6 @@ function SegmentFindingCard({ f }: { f: SegmentFinding }) {
   );
 }
 
-const _STATUS_STYLE_UNUSED_MARKER: Record<
-  string,
-  { label: string; badge: string }
-> = {
-  detected: { label: "Detectada", badge: "bg-muted text-muted-foreground" },
-  accepted: { label: "Aceptada", badge: "bg-info/15 text-info" },
-  implemented: { label: "Implementada", badge: "bg-primary/15 text-primary" },
-  observed: { label: "Observada", badge: "bg-warning/15 text-warning" },
-  validated: { label: "Validada", badge: "bg-success/15 text-success" },
-  discarded: { label: "Descartada", badge: "bg-destructive/15 text-destructive" },
-};
-
 function ValidationLoopSection() {
   const [win, setWin] = useState<30 | 90 | 180>(90);
   const call = useServerFn(aggregateRecommendationValidation);
