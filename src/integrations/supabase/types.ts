@@ -3411,6 +3411,77 @@ export type Database = {
           },
         ]
       }
+      media_asset_variants: {
+        Row: {
+          asset_id: string
+          bucket: string
+          bytes: number | null
+          checksum: string | null
+          created_at: string
+          engine: string
+          error: string | null
+          format: string
+          height: number | null
+          id: string
+          metadata: Json
+          path: string
+          processing_ms: number | null
+          quality: number | null
+          status: string
+          updated_at: string
+          usage_context: string | null
+          width: number
+        }
+        Insert: {
+          asset_id: string
+          bucket?: string
+          bytes?: number | null
+          checksum?: string | null
+          created_at?: string
+          engine: string
+          error?: string | null
+          format: string
+          height?: number | null
+          id?: string
+          metadata?: Json
+          path: string
+          processing_ms?: number | null
+          quality?: number | null
+          status?: string
+          updated_at?: string
+          usage_context?: string | null
+          width: number
+        }
+        Update: {
+          asset_id?: string
+          bucket?: string
+          bytes?: number | null
+          checksum?: string | null
+          created_at?: string
+          engine?: string
+          error?: string | null
+          format?: string
+          height?: number | null
+          id?: string
+          metadata?: Json
+          path?: string
+          processing_ms?: number | null
+          quality?: number | null
+          status?: string
+          updated_at?: string
+          usage_context?: string | null
+          width?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_asset_variants_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media_assets: {
         Row: {
           alt_text: string | null
@@ -3436,6 +3507,18 @@ export type Database = {
           kind: Database["public"]["Enums"]["media_kind"]
           metadata: Json
           mime_type: string | null
+          original_bucket: string | null
+          original_bytes: number | null
+          original_checksum: string | null
+          original_height: number | null
+          original_immutable: boolean
+          original_mime: string | null
+          original_path: string | null
+          original_width: number | null
+          pipeline_engine: string | null
+          pipeline_last_error: string | null
+          pipeline_processed_at: string | null
+          pipeline_status: string
           review_state: Database["public"]["Enums"]["media_review_state"]
           reviewed_at: string | null
           reviewed_by: string | null
@@ -3473,6 +3556,18 @@ export type Database = {
           kind: Database["public"]["Enums"]["media_kind"]
           metadata?: Json
           mime_type?: string | null
+          original_bucket?: string | null
+          original_bytes?: number | null
+          original_checksum?: string | null
+          original_height?: number | null
+          original_immutable?: boolean
+          original_mime?: string | null
+          original_path?: string | null
+          original_width?: number | null
+          pipeline_engine?: string | null
+          pipeline_last_error?: string | null
+          pipeline_processed_at?: string | null
+          pipeline_status?: string
           review_state?: Database["public"]["Enums"]["media_review_state"]
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -3510,6 +3605,18 @@ export type Database = {
           kind?: Database["public"]["Enums"]["media_kind"]
           metadata?: Json
           mime_type?: string | null
+          original_bucket?: string | null
+          original_bytes?: number | null
+          original_checksum?: string | null
+          original_height?: number | null
+          original_immutable?: boolean
+          original_mime?: string | null
+          original_path?: string | null
+          original_width?: number | null
+          pipeline_engine?: string | null
+          pipeline_last_error?: string | null
+          pipeline_processed_at?: string | null
+          pipeline_status?: string
           review_state?: Database["public"]["Enums"]["media_review_state"]
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -3524,6 +3631,83 @@ export type Database = {
           width?: number | null
         }
         Relationships: []
+      }
+      media_pipeline_benchmarks: {
+        Row: {
+          asset_id: string | null
+          cache_status: string | null
+          created_at: string
+          delivery_ms: number | null
+          engine: string
+          format: string
+          id: string
+          metadata: Json
+          output_bytes: number | null
+          processing_ms: number | null
+          psnr: number | null
+          quality: number | null
+          run_id: string
+          sample_label: string
+          source_bytes: number | null
+          source_height: number | null
+          source_width: number | null
+          ssim: number | null
+          target_width: number
+          visual_notes: string | null
+        }
+        Insert: {
+          asset_id?: string | null
+          cache_status?: string | null
+          created_at?: string
+          delivery_ms?: number | null
+          engine: string
+          format: string
+          id?: string
+          metadata?: Json
+          output_bytes?: number | null
+          processing_ms?: number | null
+          psnr?: number | null
+          quality?: number | null
+          run_id: string
+          sample_label: string
+          source_bytes?: number | null
+          source_height?: number | null
+          source_width?: number | null
+          ssim?: number | null
+          target_width: number
+          visual_notes?: string | null
+        }
+        Update: {
+          asset_id?: string | null
+          cache_status?: string | null
+          created_at?: string
+          delivery_ms?: number | null
+          engine?: string
+          format?: string
+          id?: string
+          metadata?: Json
+          output_bytes?: number | null
+          processing_ms?: number | null
+          psnr?: number | null
+          quality?: number | null
+          run_id?: string
+          sample_label?: string
+          source_bytes?: number | null
+          source_height?: number | null
+          source_width?: number | null
+          ssim?: number | null
+          target_width?: number
+          visual_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_pipeline_benchmarks_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notification_deliveries: {
         Row: {
