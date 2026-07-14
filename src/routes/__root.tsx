@@ -21,20 +21,41 @@ import {
   SyncStatusBanner,
   UpdateBanner,
 } from "@/components/discovery";
-import { AluxFloatingTrigger } from "@/components/layout/AluxFloatingTrigger";
-import { FloatingTravelPlanDock } from "@/components/travel-plan/FloatingTravelPlanDock";
-import { ConciergeProposalObserver } from "@/components/travel-plan/ConciergeProposalObserver";
 import { Toaster } from "@/components/ui/sonner";
-// H2·P2 — Aislamiento del Studio: `EditThisPageButton` renderiza `null`
-// para el 100 % de visitantes anónimos, pero su código estaba en el
-// entry principal (grep "Editar esta página" en el bundle). Lo diferimos
-// vía React.lazy + Suspense sin fallback para eliminarlo del entry
-// público sin cambiar el comportamiento visible (los editores lo verán
-// tras un microtick).
+// H2·P3 — Diferimos widgets globales que sólo aportan comportamiento
+// post-hidratación (chip flotante, observadores, sheets on-demand).
+// Cada uno reserva un fallback null: al renderizar únicamente después
+// del primer paint no hay saltos visuales (CLS = 0). El `Suspense`
+// mantiene disponibilidad funcional intacta — cuando el usuario
+// interactúa (clic, hidratación completa, evento) el chunk ya está en
+// caché del router (`preload` durante idle vía onIdlePrefetchWidgets).
 import * as React from "react";
+const AluxFloatingTrigger = React.lazy(() =>
+  import("@/components/layout/AluxFloatingTrigger").then((m) => ({
+    default: m.AluxFloatingTrigger,
+  })),
+);
+const FloatingTravelPlanDock = React.lazy(() =>
+  import("@/components/travel-plan/FloatingTravelPlanDock").then((m) => ({
+    default: m.FloatingTravelPlanDock,
+  })),
+);
+const ConciergeProposalObserver = React.lazy(() =>
+  import("@/components/travel-plan/ConciergeProposalObserver").then((m) => ({
+    default: m.ConciergeProposalObserver,
+  })),
+);
+// H2·P2 — Aislamiento del Studio: el botón "Editar esta página"
+// renderiza null para todo visitante que no sea editor. Se difiere
+// para que su código no viaje en el entry principal.
 const EditThisPageButton = React.lazy(() =>
   import("@/components/experience-builder/EditThisPageButton").then((m) => ({
     default: m.EditThisPageButton,
+  })),
+);
+const SignInPromptSheet = React.lazy(() =>
+  import("@/components/protected-actions/SignInPromptSheet").then((m) => ({
+    default: m.SignInPromptSheet,
   })),
 );
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
@@ -42,7 +63,6 @@ import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { ProtectedActionResumeRunner } from "@/lib/protected-actions";
-import { SignInPromptSheet } from "@/components/protected-actions/SignInPromptSheet";
 import { GlobalNavigationSessionBridge } from "@/components/navigation/NavigationSessionBridge";
 
 const rootPublishedHomeQuery = queryOptions({
@@ -217,6 +237,27 @@ function RootComponent() {
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, []);
 
+  // H2·P3 — Prefetch idle de los widgets diferidos. Se invoca en el
+  // primer `requestIdleCallback` (o setTimeout fallback) tras la
+  // hidratación para que estén listos antes de la primera
+  // interacción. Nunca bloquea el primer paint.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const prefetch = () => {
+      void import("@/components/layout/AluxFloatingTrigger");
+      void import("@/components/travel-plan/FloatingTravelPlanDock");
+      void import("@/components/travel-plan/ConciergeProposalObserver");
+      void import("@/components/protected-actions/SignInPromptSheet");
+    };
+    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number })
+      .requestIdleCallback;
+    if (typeof ric === "function") {
+      ric(prefetch, { timeout: 2500 });
+    } else {
+      window.setTimeout(prefetch, 1200);
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
@@ -233,9 +274,17 @@ function RootComponent() {
         <UpdateBanner />
         <Outlet />
         {!isAppShellRoute ? <PublicChrome pathname={pathname} headerVariant={headerVariant} position="footer" /> : null}
-        {!isAppShellRoute ? <AluxFloatingTrigger /> : null}
-        <FloatingTravelPlanDock />
-        <ConciergeProposalObserver />
+        {!isAppShellRoute ? (
+          <React.Suspense fallback={null}>
+            <AluxFloatingTrigger />
+          </React.Suspense>
+        ) : null}
+        <React.Suspense fallback={null}>
+          <FloatingTravelPlanDock />
+        </React.Suspense>
+        <React.Suspense fallback={null}>
+          <ConciergeProposalObserver />
+        </React.Suspense>
         <Toaster />
         {!isAppShellRoute ? (
           <React.Suspense fallback={null}>
@@ -245,7 +294,9 @@ function RootComponent() {
         {/* OLA H-01 · Épica 1 · I1 — no-op mientras no haya consumidores. */}
         <ProtectedActionResumeRunner />
         {/* OLA H-01 · Épica 1 · I2 — host global del gate de identidad. */}
-        <SignInPromptSheet />
+        <React.Suspense fallback={null}>
+          <SignInPromptSheet />
+        </React.Suspense>
         {/*
           Navigation Blueprint · N3 — Único punto de suscripción global
           al Context Engine para persistir la cadena territorial en
