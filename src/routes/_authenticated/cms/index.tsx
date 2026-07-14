@@ -41,6 +41,7 @@ const ENTITIES: EntityCard[] = [
   { key: "reviews", name: "Reseñas", description: "Moderación de reseñas y respuestas.", to: "/cms/reviews" },
   { key: "visibility_plans", name: "Paquetes de visibilidad", description: "Catálogo comercial editable: precios, ciclos, límites y palancas por paquete.", to: "/cms/visibilidad" },
   { key: "travel_plans_ops", name: "Viajes en curso (CV1.1)", description: "Vista operativa read-only de Travel Plans activos, Alux y Concierge.", to: "/cms/travel-plans" },
+  { key: "visitor_intel", name: "Visitor Intelligence (CV8.3)", description: "Centro de Inteligencia del Visitante — decisiones accionables sobre el Journey.", to: "/cms/visitor-intel" },
   { key: "demo_pack", name: "Demo Pack v1", description: "Estado del Demo World Oriente Maya: catálogo, KB multilingüe, reseñas y orden VMX-DEMO01.", to: "/cms/demo-pack" },
 ];
 

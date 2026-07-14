@@ -103,6 +103,7 @@ import { Route as AuthenticatedCuentaConciergeRouteImport } from './routes/_auth
 import { Route as AuthenticatedCuentaCarritoRouteImport } from './routes/_authenticated/cuenta/carrito'
 import { Route as AuthenticatedCuentaAnfitrionRouteImport } from './routes/_authenticated/cuenta/anfitrion'
 import { Route as AuthenticatedCuentaActividadRouteImport } from './routes/_authenticated/cuenta/actividad'
+import { Route as AuthenticatedCmsVisitorIntelRouteImport } from './routes/_authenticated/cms/visitor-intel'
 import { Route as AuthenticatedCmsVisibilidadRouteImport } from './routes/_authenticated/cms/visibilidad'
 import { Route as AuthenticatedCmsVentasEnLineaRouteImport } from './routes/_authenticated/cms/ventas-en-linea'
 import { Route as AuthenticatedCmsTravelPlansRouteImport } from './routes/_authenticated/cms/travel-plans'
@@ -702,6 +703,12 @@ const AuthenticatedCuentaActividadRoute =
     path: '/actividad',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
+const AuthenticatedCmsVisitorIntelRoute =
+  AuthenticatedCmsVisitorIntelRouteImport.update({
+    id: '/visitor-intel',
+    path: '/visitor-intel',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsVisibilidadRoute =
   AuthenticatedCmsVisibilidadRouteImport.update({
     id: '/visibilidad',
@@ -1259,6 +1266,7 @@ export interface FileRoutesByFullPath {
   '/cms/travel-plans': typeof AuthenticatedCmsTravelPlansRoute
   '/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
   '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
+  '/cms/visitor-intel': typeof AuthenticatedCmsVisitorIntelRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -1429,6 +1437,7 @@ export interface FileRoutesByTo {
   '/cms/travel-plans': typeof AuthenticatedCmsTravelPlansRoute
   '/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
   '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
+  '/cms/visitor-intel': typeof AuthenticatedCmsVisitorIntelRoute
   '/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -1606,6 +1615,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/travel-plans': typeof AuthenticatedCmsTravelPlansRoute
   '/_authenticated/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
   '/_authenticated/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
+  '/_authenticated/cms/visitor-intel': typeof AuthenticatedCmsVisitorIntelRoute
   '/_authenticated/cuenta/actividad': typeof AuthenticatedCuentaActividadRoute
   '/_authenticated/cuenta/anfitrion': typeof AuthenticatedCuentaAnfitrionRoute
   '/_authenticated/cuenta/carrito': typeof AuthenticatedCuentaCarritoRoute
@@ -1785,6 +1795,7 @@ export interface FileRouteTypes {
     | '/cms/travel-plans'
     | '/cms/ventas-en-linea'
     | '/cms/visibilidad'
+    | '/cms/visitor-intel'
     | '/cuenta/actividad'
     | '/cuenta/anfitrion'
     | '/cuenta/carrito'
@@ -1955,6 +1966,7 @@ export interface FileRouteTypes {
     | '/cms/travel-plans'
     | '/cms/ventas-en-linea'
     | '/cms/visibilidad'
+    | '/cms/visitor-intel'
     | '/cuenta/actividad'
     | '/cuenta/anfitrion'
     | '/cuenta/carrito'
@@ -2131,6 +2143,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/travel-plans'
     | '/_authenticated/cms/ventas-en-linea'
     | '/_authenticated/cms/visibilidad'
+    | '/_authenticated/cms/visitor-intel'
     | '/_authenticated/cuenta/actividad'
     | '/_authenticated/cuenta/anfitrion'
     | '/_authenticated/cuenta/carrito'
@@ -2961,6 +2974,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/cuenta/actividad'
       preLoaderRoute: typeof AuthenticatedCuentaActividadRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
+    '/_authenticated/cms/visitor-intel': {
+      id: '/_authenticated/cms/visitor-intel'
+      path: '/visitor-intel'
+      fullPath: '/cms/visitor-intel'
+      preLoaderRoute: typeof AuthenticatedCmsVisitorIntelRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
     }
     '/_authenticated/cms/visibilidad': {
       id: '/_authenticated/cms/visibilidad'
@@ -3824,6 +3844,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsTravelPlansRoute: typeof AuthenticatedCmsTravelPlansRoute
   AuthenticatedCmsVentasEnLineaRoute: typeof AuthenticatedCmsVentasEnLineaRoute
   AuthenticatedCmsVisibilidadRoute: typeof AuthenticatedCmsVisibilidadRouteWithChildren
+  AuthenticatedCmsVisitorIntelRoute: typeof AuthenticatedCmsVisitorIntelRoute
   AuthenticatedCmsIndexRoute: typeof AuthenticatedCmsIndexRoute
   AuthenticatedCmsCategoriasNuevaRoute: typeof AuthenticatedCmsCategoriasNuevaRoute
   AuthenticatedCmsDestinosNuevaRoute: typeof AuthenticatedCmsDestinosNuevaRoute
@@ -3862,6 +3883,7 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsVentasEnLineaRoute: AuthenticatedCmsVentasEnLineaRoute,
   AuthenticatedCmsVisibilidadRoute:
     AuthenticatedCmsVisibilidadRouteWithChildren,
+  AuthenticatedCmsVisitorIntelRoute: AuthenticatedCmsVisitorIntelRoute,
   AuthenticatedCmsIndexRoute: AuthenticatedCmsIndexRoute,
   AuthenticatedCmsCategoriasNuevaRoute: AuthenticatedCmsCategoriasNuevaRoute,
   AuthenticatedCmsDestinosNuevaRoute: AuthenticatedCmsDestinosNuevaRoute,
