@@ -35,6 +35,11 @@ import {
   type RecommendationValidationSnapshot,
 } from "@/lib/visitor-intel/recommendations.functions";
 import {
+  prioritizeOpportunities,
+  PRIORITIZATION_WEIGHTS,
+  type PrioritizedOpportunity,
+} from "@/lib/visitor-intel/prioritization";
+import {
   KPI_CATALOG,
   JOURNEY_TRANSITIONS,
   type JourneyTransitionId,
@@ -113,6 +118,7 @@ function VisitorIntelCenter() {
       <IntelModules snapshot={q.data} loading={q.isLoading} />
       <SegmentationSection window={win} />
       <OpportunitySection window={win} />
+      <PrioritizationSection window={win} />
       <ValidationLoopSection />
     </div>
   );
@@ -763,6 +769,175 @@ function OpportunityCard({ o }: { o: Opportunity }) {
 /* --------------------------------------------------------------------- */
 /* CV8.6 · Recommendation Validation Loop                                */
 /* --------------------------------------------------------------------- */
+
+/* --------------------------------------------------------------------- */
+/* CV8.7 · Prescriptive Decision Prioritization                          */
+/* --------------------------------------------------------------------- */
+
+function PrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) {
+  const callOpps = useServerFn(detectJourneyOpportunities);
+  const callVal = useServerFn(aggregateRecommendationValidation);
+  const oppsQ = useQuery({
+    queryKey: ["cms", "visitor-intel", "prio-opps", win],
+    queryFn: () => callOpps({ data: { window_days: win } }),
+    staleTime: 60_000,
+  });
+  const valQ = useQuery({
+    queryKey: ["cms", "visitor-intel", "prio-validation", 90 as const],
+    queryFn: () => callVal({ data: { window_days: 90 } }),
+    staleTime: 60_000,
+  });
+
+  const ranked = useMemo(() => {
+    if (!oppsQ.data) return null;
+    return prioritizeOpportunities({
+      opportunities: oppsQ.data.opportunities,
+      validation: valQ.data ?? null,
+    });
+  }, [oppsQ.data, valQ.data]);
+
+  return (
+    <section className="space-y-4 rounded-2xl border-2 border-primary/40 bg-surface p-5">
+      <header className="border-b border-border/60 pb-4">
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+          CV8.7 · Prescriptive Decision Prioritization
+        </p>
+        <h2 className="mt-1 text-xl font-semibold tracking-tight">
+          ¿Qué deberíamos hacer hoy?
+        </h2>
+        <p className="mt-1 max-w-3xl text-xs text-muted-foreground">
+          Ranking prescriptivo derivado — cero persistencia. Combina{" "}
+          <strong>confianza aprendida (CV8.6)</strong>, impacto, urgencia,
+          alcance, etapa del Journey y beneficio para el ecosistema. Cada
+          posición se justifica con factores auditables.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-1 text-[10px] font-mono text-muted-foreground">
+          {Object.entries(PRIORITIZATION_WEIGHTS).map(([k, v]) => (
+            <span
+              key={k}
+              className="rounded-full border border-border bg-surface-raised px-2 py-0.5"
+            >
+              {k}: {(v * 100).toFixed(0)}%
+            </span>
+          ))}
+        </div>
+      </header>
+
+      {oppsQ.error ? (
+        <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+          No fue posible cargar oportunidades para priorización.
+        </p>
+      ) : null}
+
+      {oppsQ.isLoading || !ranked ? (
+        <p className="h-6 w-40 animate-pulse rounded bg-muted" />
+      ) : ranked.ranked.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
+          <p className="font-medium text-foreground">
+            Sin oportunidades priorizables en la ventana actual
+          </p>
+          <p className="mt-1">
+            Cuando existan hallazgos con muestra suficiente, el motor los
+            ordenará por impacto esperado.
+          </p>
+        </div>
+      ) : (
+        <ol className="space-y-3">
+          {ranked.ranked.slice(0, 10).map((p) => (
+            <PrioritizedCard key={p.opportunity.id} p={p} />
+          ))}
+        </ol>
+      )}
+    </section>
+  );
+}
+
+function PrioritizedCard({ p }: { p: PrioritizedOpportunity }) {
+  const reliabilityBadge =
+    p.confidence_reliability === "reliable"
+      ? "bg-success/15 text-success"
+      : p.confidence_reliability === "learning"
+        ? "bg-info/15 text-info"
+        : p.confidence_reliability === "insufficient_data"
+          ? "bg-warning/15 text-warning"
+          : "bg-muted text-muted-foreground";
+  return (
+    <li className="rounded-xl border border-border bg-surface-raised p-4">
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+            #{p.rank}
+          </span>
+          <div>
+            <h3 className="text-sm font-semibold leading-snug">
+              {p.opportunity.headline}
+            </h3>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              <code>{p.opportunity.transition}</code> ·{" "}
+              <code>{p.opportunity.metric_id}</code>
+            </p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-2xl font-bold tracking-tight">
+            {(p.score * 100).toFixed(0)}
+          </p>
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+            score / 100
+          </p>
+          <span
+            className={
+              "mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide " +
+              reliabilityBadge
+            }
+          >
+            confianza: {p.confidence_reliability === "insufficient_data" ? "n.d." : p.confidence_reliability}
+          </span>
+        </div>
+      </header>
+
+      <p className="mt-3 rounded-lg bg-surface p-2 text-xs italic text-foreground">
+        {p.rationale}
+      </p>
+
+      <dl className="mt-3 grid gap-2 text-xs md:grid-cols-2">
+        <div>
+          <dt className="font-semibold">Acción recomendada</dt>
+          <dd className="text-muted-foreground">{p.opportunity.recommended_action}</dd>
+        </div>
+        <div>
+          <dt className="font-semibold">Resultado esperado</dt>
+          <dd className="text-muted-foreground">{p.expected_effect}</dd>
+        </div>
+      </dl>
+
+      <details className="mt-3">
+        <summary className="cursor-pointer text-[11px] font-semibold text-primary hover:underline">
+          Ver factores del score
+        </summary>
+        <ul className="mt-2 space-y-1 text-[11px]">
+          {p.factors.map((f) => (
+            <li
+              key={f.key}
+              className="flex items-start justify-between gap-2 rounded-md bg-surface p-2"
+            >
+              <div className="flex-1">
+                <p className="font-mono font-semibold">
+                  {f.key} · peso {(f.weight * 100).toFixed(0)}% · valor{" "}
+                  {(f.value * 100).toFixed(0)}%
+                </p>
+                <p className="text-muted-foreground">{f.explanation}</p>
+              </div>
+              <span className="font-mono font-semibold text-primary">
+                +{(f.contribution * 100).toFixed(1)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </details>
+    </li>
+  );
+}
 
 const STATUS_STYLE: Record<
   string,
