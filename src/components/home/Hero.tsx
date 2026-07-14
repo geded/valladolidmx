@@ -16,8 +16,8 @@ import { Container } from "@/components/layout/Container";
 import { useTranslation } from "@/i18n/context";
 import { HeroSearchPill } from "@/components/home/HeroSearchPill";
 import { readFieldTypography, typographyToStyle, type FieldTypography } from "@/lib/experience-builder/typography";
-import heroBg01 from "@/assets/brand/hero/bg01.jpg";
-import heroBg02 from "@/assets/brand/hero/bg02.jpg";
+import heroBg01 from "@/assets/brand/hero/bg01.webp";
+import heroBg02 from "@/assets/brand/hero/bg02.webp";
 
 const DEFAULT_SLIDES = [heroBg01, heroBg02] as const;
 const DEFAULT_SLIDE_INTERVAL_MS = 7000;
