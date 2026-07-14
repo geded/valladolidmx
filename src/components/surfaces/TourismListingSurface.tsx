@@ -55,6 +55,10 @@ export interface TourismListingHeroSpec {
 
 function heroSpecToDTO(spec: TourismListingHeroSpec): ExperienceHeroDTO {
   const hasMedia = !!spec.mediaUrl;
+  // Alt fallback descriptivo: "<Título> en Valladolid, Oriente Maya"
+  // Evita alts de una sola palabra tipo "Hoteles" cuando el editor
+  // no captura un mediaAlt específico.
+  const fallbackAlt = `${spec.title} en Valladolid, Oriente Maya`;
   return {
     variant: hasMedia ? "cinematic" : "editorial",
     eyebrow: spec.eyebrow ?? null,
@@ -62,10 +66,10 @@ function heroSpecToDTO(spec: TourismListingHeroSpec): ExperienceHeroDTO {
     title: spec.title,
     description: spec.subtitle ?? null,
     media: hasMedia
-      ? { url: spec.mediaUrl as string, alt: spec.mediaAlt ?? spec.title, overlay: 0.45 }
+      ? { url: spec.mediaUrl as string, alt: spec.mediaAlt ?? fallbackAlt, overlay: 0.45 }
       : null,
     mediaSlides: hasMedia
-      ? [{ url: spec.mediaUrl as string, alt: spec.mediaAlt ?? spec.title }]
+      ? [{ url: spec.mediaUrl as string, alt: spec.mediaAlt ?? fallbackAlt }]
       : [],
     overlapHeader: hasMedia,
     badges: spec.badges ?? [],
