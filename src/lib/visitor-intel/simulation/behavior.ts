@@ -17,6 +17,17 @@ import type { ProfileDefinition } from "./profiles";
 import type { Prng } from "./prng";
 import { simulatedSubjectId } from "./scenario";
 import type { SimulationScenario } from "./scenario";
+import {
+  emitAluxInteractions,
+  emitConciergeCase,
+  emitCommerceOrder,
+  emitReviewLoop,
+  type SubMotorContext,
+  type AluxOutcome,
+  type ConciergeOutcome,
+  type CommerceOutcome,
+  type ReviewsOutcome,
+} from "./sub-motors";
 
 export interface CausalityMeta {
   prerequisite: string;
@@ -39,6 +50,24 @@ export interface VisitorTrace {
   path: DestinationSlug[];
   final_stage: string;
   events: SimulatedEvent[];
+  /** Matriz Perfil→Alux→Concierge→Commerce→Reviews→Outcome (CV8.S.3). */
+  interactions: {
+    alux: AluxOutcome["interactions"];
+    concierge: {
+      opened: boolean;
+      status: ConciergeOutcome["status"] | "none";
+      slow_response: boolean;
+    };
+    commerce: {
+      status: CommerceOutcome["status"];
+      amount_usd: number | null;
+    };
+    reviews: {
+      published: boolean;
+      rating: number | null;
+      business_responded: boolean;
+    };
+  };
 }
 
 function trustFor(stageIndex: number, transitionId: JourneyTransitionId): TrustLevel {
@@ -93,6 +122,27 @@ export function simulateVisitor(params: {
   let cursorMs = session.ms;
   let finalStage = "stranger";
 
+  // Acumuladores de sub-motores (CV8.S.3).
+  let aluxTotals: AluxOutcome["interactions"] = {
+    asks: 0, recommendations: 0, accepted: 0, rejected: 0,
+    itinerary_optimizations: 0, onsite_queries: 0,
+  };
+  let conciergeSummary: VisitorTrace["interactions"]["concierge"] = {
+    opened: false, status: "none", slow_response: false,
+  };
+  let commerceSummary: VisitorTrace["interactions"]["commerce"] = {
+    status: "not_created", amount_usd: null,
+  };
+  let reviewsSummary: VisitorTrace["interactions"]["reviews"] = {
+    published: false, rating: null, business_responded: false,
+  };
+  /** Estado inter-sub-motor: última propuesta aceptada (Concierge). */
+  let conciergeOutcome: ConciergeOutcome | null = null;
+  /** Ajuste probabilístico acumulado (Alux). */
+  let nextTransitionModifier = 1;
+  /** Ajuste multiplicativo para T9 (Reviews). */
+  let ambassadorModifier = 1;
+
   for (let ti = 0; ti < CANONICAL_ORDER.length; ti += 1) {
     const transitionId = CANONICAL_ORDER[ti]!;
     const rule = CAUSALITY_RULES[transitionId];
@@ -111,6 +161,18 @@ export function simulateVisitor(params: {
     }
     // Late proposals penaliza T6→T7.
     if (ti === 6) prob *= 1 - scenario.planted_issues.late_proposals_rate;
+
+    // CV8.S.3 · Modificadores por sub-motor.
+    prob *= nextTransitionModifier;
+    nextTransitionModifier = 1; // consume el boost una sola vez
+    // T7 requiere propuesta aceptada Y pago exitoso (regla de cohesión).
+    if (ti === 6) {
+      if (conciergeOutcome?.status !== "proposal_accepted") {
+        // sin Concierge exitoso no puede avanzar a reservation
+        prob *= 0.05;
+      }
+    }
+    if (ti === 8) prob *= ambassadorModifier;
 
     prob = Math.max(0, Math.min(1, prob));
     const roll = prng.next();
@@ -192,11 +254,108 @@ export function simulateVisitor(params: {
       });
     }
 
+    // ==========================================================
+    // CV8.S.3 · Hooks causales de sub-motores por transición.
+    // ==========================================================
+    const subCtx: SubMotorContext = {
+      runId, subject_id, locale, profile,
+      destination: dest, scenario, prng,
+      cursor_ms: cursorMs,
+      from_transition: transitionId,
+      trust_level: trust,
+      is_authenticated: isAuth,
+    };
+
+    // Alux post-T3 (explorer): preguntas exploratorias.
+    if (ti === 2) {
+      const a = emitAluxInteractions(subCtx, "explorer");
+      events.push(...a.events);
+      cursorMs = a.cursor_ms;
+      aluxTotals = mergeAluxTotals(aluxTotals, a.interactions);
+      nextTransitionModifier *= a.probability_modifier;
+    }
+    // Alux post-T4 (interested): recomendaciones + aceptaciones.
+    if (ti === 3) {
+      const a = emitAluxInteractions({ ...subCtx, cursor_ms: cursorMs }, "interested");
+      events.push(...a.events);
+      cursorMs = a.cursor_ms;
+      aluxTotals = mergeAluxTotals(aluxTotals, a.interactions);
+      nextTransitionModifier *= a.probability_modifier;
+    }
+    // Alux post-T5 (travel_plan): optimización de itinerario.
+    if (ti === 4) {
+      const a = emitAluxInteractions({ ...subCtx, cursor_ms: cursorMs }, "travel_plan");
+      events.push(...a.events);
+      cursorMs = a.cursor_ms;
+      aluxTotals = mergeAluxTotals(aluxTotals, a.interactions);
+      nextTransitionModifier *= a.probability_modifier;
+    }
+    // Concierge post-T6 (case abierto).
+    if (ti === 5) {
+      const c = emitConciergeCase({ ...subCtx, cursor_ms: cursorMs });
+      events.push(...c.events);
+      cursorMs = c.cursor_ms;
+      conciergeOutcome = c;
+      conciergeSummary = {
+        opened: true, status: c.status, slow_response: c.slow_response,
+      };
+    }
+    // Commerce post-T7 (sólo si propuesta aceptada).
+    if (ti === 6 && conciergeOutcome) {
+      const co = emitCommerceOrder({ ...subCtx, cursor_ms: cursorMs }, conciergeOutcome);
+      events.push(...co.events);
+      cursorMs = co.cursor_ms;
+      commerceSummary = { status: co.status, amount_usd: co.amount_usd };
+      // Sin pago exitoso, la reservation no se materializa realmente:
+      // el evento T7 ya fue emitido, pero prevenimos T8 si no hubo pago.
+      if (co.status !== "paid" && co.status !== "refunded") {
+        nextTransitionModifier *= 0.05;
+      }
+    }
+    // Alux onsite + Reviews post-T8.
+    if (ti === 7) {
+      const a = emitAluxInteractions({ ...subCtx, cursor_ms: cursorMs }, "onsite");
+      events.push(...a.events);
+      cursorMs = a.cursor_ms;
+      aluxTotals = mergeAluxTotals(aluxTotals, a.interactions);
+      const r = emitReviewLoop({ ...subCtx, cursor_ms: cursorMs });
+      events.push(...r.events);
+      cursorMs = r.cursor_ms;
+      reviewsSummary = {
+        published: r.review_published,
+        rating: r.rating,
+        business_responded: r.business_responded,
+      };
+      ambassadorModifier = r.ambassador_modifier;
+    }
+
     // Regresos posteriores (multi-sesión): 40% de gap → +días.
     if (ti >= 3 && prng.bool(0.4)) {
       cursorMs += prng.int(1, 3) * DAY_MS;
     }
   }
 
-  return { subject_id, profile: profile.id, locale, path, final_stage: finalStage, events };
+  return {
+    subject_id, profile: profile.id, locale, path, final_stage: finalStage, events,
+    interactions: {
+      alux: aluxTotals,
+      concierge: conciergeSummary,
+      commerce: commerceSummary,
+      reviews: reviewsSummary,
+    },
+  };
+}
+
+function mergeAluxTotals(
+  a: AluxOutcome["interactions"],
+  b: AluxOutcome["interactions"],
+): AluxOutcome["interactions"] {
+  return {
+    asks: a.asks + b.asks,
+    recommendations: a.recommendations + b.recommendations,
+    accepted: a.accepted + b.accepted,
+    rejected: a.rejected + b.rejected,
+    itinerary_optimizations: a.itinerary_optimizations + b.itinerary_optimizations,
+    onsite_queries: a.onsite_queries + b.onsite_queries,
+  };
 }
