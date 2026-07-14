@@ -13,6 +13,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { resolveBusinessPlanTier } from "@/lib/plans/plans-catalog";
+import { resolveMediaAlt, type MediaLocale } from "@/lib/media/resolve-alt";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -229,7 +230,7 @@ export interface MarketplaceProductDetail {
  * - Sólo columnas seguras. Sin escrituras. Sin PII.
  */
 export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
-  .inputValidator((input: { slug: string }) => {
+  .inputValidator((input: { slug: string; locale?: string }) => {
     if (
       !input ||
       typeof input.slug !== "string" ||
@@ -238,10 +239,14 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
     ) {
       throw new Error("invalid_slug");
     }
-    return { slug: input.slug };
+    return {
+      slug: input.slug,
+      locale: typeof input.locale === "string" ? input.locale.toLowerCase().slice(0, 2) : "es",
+    };
   })
   .handler(async ({ data }): Promise<MarketplaceProductDetail | null> => {
     const supabase = publicClient();
+    const locale = (data.locale as MediaLocale) ?? "es";
     const { data: prod, error } = await supabase
       .from("products")
       .select(
@@ -278,7 +283,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
       supabase
         .from("product_media")
         .select(
-          "id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, alt_text, width, height )",
+          "id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, media_asset_translations ( locale, alt_text, alt_text_ai, source, review_state ) )",
         )
         .eq("product_id", prod.id)
         .order("sort_order", { ascending: true })
@@ -353,10 +358,22 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         storage_bucket: string;
         storage_path: string;
         alt_text: string | null;
+        alt_text_ai: string | null;
+        alt_text_source: string | null;
+        review_state: string | null;
+        title: string | null;
         width: number | null;
         height: number | null;
+        media_asset_translations?: Array<{
+          locale: string;
+          alt_text: string | null;
+          alt_text_ai: string | null;
+          source: string | null;
+          review_state: string | null;
+        }> | null;
       } | null;
     }>;
+    const productFallback = prod.name ?? "";
     if (rows.length > 0) {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -374,7 +391,15 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
           id: row.id,
           role: row.role,
           url,
-          alt: row.media_assets?.alt_text ?? null,
+          alt: resolveMediaAlt(
+            row.media_assets
+              ? {
+                  ...row.media_assets,
+                  translations: row.media_assets.media_asset_translations ?? [],
+                }
+              : null,
+            { locale, fallback: productFallback },
+          ),
           width: row.media_assets?.width ?? null,
           height: row.media_assets?.height ?? null,
           sort_order: Number(row.sort_order ?? 0),
@@ -386,7 +411,15 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
           id: r.id,
           role: r.role,
           url: null,
-          alt: r.media_assets?.alt_text ?? null,
+          alt: resolveMediaAlt(
+            r.media_assets
+              ? {
+                  ...r.media_assets,
+                  translations: r.media_assets.media_asset_translations ?? [],
+                }
+              : null,
+            { locale, fallback: productFallback },
+          ),
           width: r.media_assets?.width ?? null,
           height: r.media_assets?.height ?? null,
           sort_order: Number(r.sort_order ?? 0),
