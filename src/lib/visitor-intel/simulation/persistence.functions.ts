@@ -24,6 +24,7 @@ import {
   buildOrienteMayaScenario,
   DEFAULT_SCENARIO_ID,
   DEFAULT_SCENARIO_VERSION,
+  DEFAULT_SCENARIO_SEED,
   estimateVolume,
 } from "./scenarios/oriente-maya-90d";
 import type { SimulatedEvent } from "./behavior";
@@ -294,6 +295,7 @@ export const getDefaultScenarioInfo = createServerFn({ method: "POST" })
     return {
       scenario_id: DEFAULT_SCENARIO_ID,
       scenario_version: DEFAULT_SCENARIO_VERSION,
+      default_seed: DEFAULT_SCENARIO_SEED,
       volumes: {
         light: estimateVolume("light"),
         medium: estimateVolume("medium"),
