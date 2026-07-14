@@ -57,7 +57,7 @@ export const Route = createFileRoute("/")({
       ...head,
       links: [
         ...(head.links ?? []),
-        { rel: "preload", as: "image", href: heroLcpImage, fetchpriority: "high" as const },
+        { rel: "preload", as: "image", href: heroLcpImage, fetchPriority: "high" as const },
       ],
     };
   },

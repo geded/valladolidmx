@@ -148,11 +148,27 @@ function fromSession(snap: ReturnType<typeof useNavigationSession>): AluxContext
 }
 
 export function useAluxContext(): AluxContext {
-  const [live, setLive] = useState<ResolvedContext | null>(() =>
-    typeof window === "undefined" ? null : getLatestResolvedContext(),
-  );
-  useEffect(() => subscribeResolvedContext(setLive), []);
+  // H2·P5 · Hydration Consistency Fix.
+  // El primer render (SSR y cliente) DEBE ser idéntico. Aunque el
+  // Context Engine ya tenga un snapshot en memoria en el cliente al
+  // montar (deep-link navegado previamente), leerlo en el
+  // `useState` initializer diverge del SSR (`null`) y produce un
+  // hydration mismatch en `AluxFloatingTrigger` (title/label).
+  // Iniciamos siempre en `null` y sincronizamos en effect: la
+  // suscripción ya emite el snapshot vigente inmediatamente.
+  const [live, setLive] = useState<ResolvedContext | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+    const current = getLatestResolvedContext();
+    if (current) setLive(current);
+    return subscribeResolvedContext(setLive);
+  }, []);
   const session = useNavigationSession();
+
+  // Antes de hidratar, devolvemos el mismo contexto vacío que el SSR
+  // para garantizar markup determinista en el primer render.
+  if (!hydrated) return EMPTY;
 
   if (live) {
     const built = fromLive(live);
