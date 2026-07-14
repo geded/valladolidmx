@@ -9,3 +9,4 @@ export * from "./journey";
 export * from "./events";
 export * from "./kpis";
 export * from "./learning";
+export * from "./projection";
