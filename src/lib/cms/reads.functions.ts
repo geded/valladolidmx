@@ -179,7 +179,7 @@ export const listMediaCms = createServerFn({ method: "POST" })
     let q = context.supabase
       .from("media_assets")
       .select(
-        "id, kind, storage_bucket, storage_path, alt_text, mime_type, width, height, status, updated_at",
+        "id, kind, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, entity_kind, entity_id, usage_context, mime_type, width, height, status, updated_at",
         { count: "exact" },
       )
       .is("deleted_at", null)

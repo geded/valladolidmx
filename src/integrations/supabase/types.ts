@@ -3349,9 +3349,74 @@ export type Database = {
         }
         Relationships: []
       }
+      media_asset_translations: {
+        Row: {
+          alt_text: string | null
+          alt_text_ai: string | null
+          caption: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          intelligence: Json
+          locale: string
+          media_id: string
+          review_state: Database["public"]["Enums"]["media_review_state"]
+          source: Database["public"]["Enums"]["media_text_source"]
+          title: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          alt_text?: string | null
+          alt_text_ai?: string | null
+          caption?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          intelligence?: Json
+          locale: string
+          media_id: string
+          review_state?: Database["public"]["Enums"]["media_review_state"]
+          source?: Database["public"]["Enums"]["media_text_source"]
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          alt_text?: string | null
+          alt_text_ai?: string | null
+          caption?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          intelligence?: Json
+          locale?: string
+          media_id?: string
+          review_state?: Database["public"]["Enums"]["media_review_state"]
+          source?: Database["public"]["Enums"]["media_text_source"]
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_asset_translations_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media_assets: {
         Row: {
           alt_text: string | null
+          alt_text_ai: string | null
+          alt_text_locale: string
+          alt_text_source: Database["public"]["Enums"]["media_text_source"]
           caption: string | null
           created_at: string
           created_by: string | null
@@ -3360,23 +3425,35 @@ export type Database = {
           deleted_by: string | null
           demo_seed_batch: string | null
           demo_source_url: string | null
+          description: string | null
           duration_seconds: number | null
+          entity_id: string | null
+          entity_kind: string | null
           height: number | null
           id: string
+          intelligence: Json
           is_demo_seed: boolean
           kind: Database["public"]["Enums"]["media_kind"]
           metadata: Json
           mime_type: string | null
+          review_state: Database["public"]["Enums"]["media_review_state"]
+          reviewed_at: string | null
+          reviewed_by: string | null
           size_bytes: number | null
           status: Database["public"]["Enums"]["content_status"]
           storage_bucket: string
           storage_path: string
+          title: string | null
           updated_at: string
           updated_by: string | null
+          usage_context: string | null
           width: number | null
         }
         Insert: {
           alt_text?: string | null
+          alt_text_ai?: string | null
+          alt_text_locale?: string
+          alt_text_source?: Database["public"]["Enums"]["media_text_source"]
           caption?: string | null
           created_at?: string
           created_by?: string | null
@@ -3385,23 +3462,35 @@ export type Database = {
           deleted_by?: string | null
           demo_seed_batch?: string | null
           demo_source_url?: string | null
+          description?: string | null
           duration_seconds?: number | null
+          entity_id?: string | null
+          entity_kind?: string | null
           height?: number | null
           id?: string
+          intelligence?: Json
           is_demo_seed?: boolean
           kind: Database["public"]["Enums"]["media_kind"]
           metadata?: Json
           mime_type?: string | null
+          review_state?: Database["public"]["Enums"]["media_review_state"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           size_bytes?: number | null
           status?: Database["public"]["Enums"]["content_status"]
           storage_bucket: string
           storage_path: string
+          title?: string | null
           updated_at?: string
           updated_by?: string | null
+          usage_context?: string | null
           width?: number | null
         }
         Update: {
           alt_text?: string | null
+          alt_text_ai?: string | null
+          alt_text_locale?: string
+          alt_text_source?: Database["public"]["Enums"]["media_text_source"]
           caption?: string | null
           created_at?: string
           created_by?: string | null
@@ -3410,19 +3499,28 @@ export type Database = {
           deleted_by?: string | null
           demo_seed_batch?: string | null
           demo_source_url?: string | null
+          description?: string | null
           duration_seconds?: number | null
+          entity_id?: string | null
+          entity_kind?: string | null
           height?: number | null
           id?: string
+          intelligence?: Json
           is_demo_seed?: boolean
           kind?: Database["public"]["Enums"]["media_kind"]
           metadata?: Json
           mime_type?: string | null
+          review_state?: Database["public"]["Enums"]["media_review_state"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           size_bytes?: number | null
           status?: Database["public"]["Enums"]["content_status"]
           storage_bucket?: string
           storage_path?: string
+          title?: string | null
           updated_at?: string
           updated_by?: string | null
+          usage_context?: string | null
           width?: number | null
         }
         Relationships: []
@@ -7597,6 +7695,12 @@ export type Database = {
       invitation_status: "pending" | "accepted" | "revoked" | "expired"
       locale_code: "es" | "en" | "fr" | "de" | "it" | "pt"
       media_kind: "image" | "video" | "document" | "audio"
+      media_review_state:
+        | "unreviewed"
+        | "ai_suggested"
+        | "approved"
+        | "needs_revision"
+      media_text_source: "none" | "ai_pending" | "ai" | "human"
       membership_status: "active" | "suspended" | "removed" | "pending"
       notification_category:
         | "transactional"
@@ -7881,6 +7985,13 @@ export const Constants = {
       invitation_status: ["pending", "accepted", "revoked", "expired"],
       locale_code: ["es", "en", "fr", "de", "it", "pt"],
       media_kind: ["image", "video", "document", "audio"],
+      media_review_state: [
+        "unreviewed",
+        "ai_suggested",
+        "approved",
+        "needs_revision",
+      ],
+      media_text_source: ["none", "ai_pending", "ai", "human"],
       membership_status: ["active", "suspended", "removed", "pending"],
       notification_category: [
         "transactional",
