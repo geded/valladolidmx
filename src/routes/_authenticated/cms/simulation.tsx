@@ -76,6 +76,7 @@ function SimulationConsole() {
     staleTime: 60_000,
     enabled: seed.length > 0,
   });
+  // (info fn takes no input; wrapper accepts empty object)
 
   const runs = useQuery({
     queryKey: ["cv8s4", "runs"],
