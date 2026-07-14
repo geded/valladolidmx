@@ -6,9 +6,10 @@
  * Reutiliza KPI_CATALOG (CV8.0) y `aggregateJourneyIntel` (CV8.3).
  */
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 
 import {
   aggregateJourneyIntel,
@@ -52,6 +53,10 @@ import {
 } from "@/lib/visitor-intel";
 
 export const Route = createFileRoute("/_authenticated/cms/visitor-intel")({
+  validateSearch: z.object({
+    mode: z.enum(["real", "simulation", "combined"]).optional(),
+    run: z.string().uuid().optional(),
+  }),
   head: () => ({
     meta: [
       { title: "Visitor Intelligence Center · CMS · Valladolid.mx" },
@@ -69,16 +74,47 @@ export const Route = createFileRoute("/_authenticated/cms/visitor-intel")({
 type Windw = 7 | 30 | 90;
 
 function VisitorIntelCenter() {
+  const search = Route.useSearch();
+  const mode = search.mode ?? "real";
+  const runId = search.run;
   const [win, setWin] = useState<Windw>(30);
   const call = useServerFn(aggregateJourneyIntel);
   const q = useQuery({
-    queryKey: ["cms", "visitor-intel", win],
-    queryFn: () => call({ data: { window_days: win } }),
+    queryKey: ["cms", "visitor-intel", win, mode, runId ?? "none"],
+    queryFn: () =>
+      call({ data: { window_days: win, mode, simulation_run_id: runId } }),
     staleTime: 60_000,
   });
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6">
+      {mode !== "real" && (
+        <div
+          className={
+            "flex flex-wrap items-center justify-between gap-3 rounded-lg border-2 px-4 py-3 text-sm font-medium " +
+            (mode === "simulation"
+              ? "border-amber-500 bg-amber-50 text-amber-900 dark:bg-amber-950/40 dark:text-amber-100"
+              : "border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-950/40 dark:text-blue-100")
+          }
+          role="status"
+        >
+          <span>
+            {mode === "simulation" ? "🧪 MODO SIMULACIÓN" : "🔀 MODO COMBINADO (real + simulación)"}
+            {runId ? ` · run ${runId.slice(0, 8)}…` : ""}
+            {" · "}
+            <span className="font-normal opacity-80">
+              Los KPIs principales aplican filtro. Oportunidades / segmentos / validación aún combinan fuentes.
+            </span>
+          </span>
+          <Link
+            to="/cms/visitor-intel"
+            search={{}}
+            className="rounded-md border border-current px-3 py-1 text-xs uppercase tracking-wider"
+          >
+            Salir a modo real
+          </Link>
+        </div>
+      )}
       <header className="border-b border-border pb-5">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
           CV8.3 · Centro de Inteligencia
