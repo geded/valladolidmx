@@ -89,7 +89,7 @@ export const Route = createFileRoute("/api/dev/media-pipeline-derive")({
             asset_id: body.assetId!,
             format,
             width,
-            engine: body.engine,
+            engine: body.engine!,
             usage_context: body.usageContext ?? "generic",
             bucket: "media-derived",
             path: `dev/${body.assetId}/${body.engine}/${format}/${width}.${format}`,
