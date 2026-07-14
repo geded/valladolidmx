@@ -312,8 +312,13 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
     // son independientes. Se lanzan business_media y products en
     // paralelo; product_media entra en su propia oleada al conocer
     // prodIds.
-    let bmedia: Array<Record<string, unknown>> | null = null;
-    let prods: Array<Record<string, unknown>> | null = null;
+    // Row types locales como `any`: preserva el shape con embeddings
+    // que devuelve PostgREST sin re-tipar cada campo. El DTO final se
+    // construye/tipifica más abajo (MarketplaceProductCard).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let bmedia: any[] | null = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let prods: any[] | null = null;
     let pErr: unknown = null;
     if (bizIds.length > 0) {
       const [bmediaRes, prodsRes] = await Promise.all([
@@ -332,8 +337,8 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
           .order("name", { ascending: true })
           .limit(24),
       ]);
-      bmedia = bmediaRes.data as Array<Record<string, unknown>> | null;
-      prods = prodsRes.data as Array<Record<string, unknown>> | null;
+      bmedia = (bmediaRes.data ?? null) as unknown as typeof bmedia;
+      prods = (prodsRes.data ?? null) as unknown as typeof prods;
       pErr = prodsRes.error;
     }
 
