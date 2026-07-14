@@ -46,6 +46,8 @@ export interface JourneyIntelSnapshot {
 
 const InputSchema = z.object({
   window_days: z.union([z.literal(7), z.literal(30), z.literal(90)]).default(30),
+  mode: z.enum(["real", "simulation", "combined"]).default("real"),
+  simulation_run_id: z.string().uuid().optional(),
 });
 
 export const aggregateJourneyIntel = createServerFn({ method: "POST" })
@@ -65,27 +67,28 @@ export const aggregateJourneyIntel = createServerFn({ method: "POST" })
     const since = new Date(Date.now() - data.window_days * 86_400_000).toISOString();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: rows, error } = await (
-      supabaseAdmin as unknown as {
-        schema: (s: string) => {
-          from: (t: string) => {
-            select: (c: string) => {
-              gte: (
-                c: string,
-                v: string,
-              ) => Promise<{
-                data: Array<{ subject_id: string; payload: unknown }> | null;
-                error: unknown;
-              }>;
-            };
-          };
-        };
-      }
-    )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query: any = (supabaseAdmin as any)
       .schema("visitor_intel")
       .from("events")
-      .select("subject_id, payload")
+      .select("subject_id, payload, is_simulation, simulation_run_id")
       .gte("occurred_at", since);
+    if (data.mode === "real") {
+      query = query.eq("is_simulation", false);
+    } else if (data.mode === "simulation") {
+      query = query.eq("is_simulation", true);
+      if (data.simulation_run_id) {
+        query = query.eq("simulation_run_id", data.simulation_run_id);
+      }
+    } else if (data.mode === "combined" && data.simulation_run_id) {
+      query = query.or(
+        `is_simulation.eq.false,simulation_run_id.eq.${data.simulation_run_id}`,
+      );
+    }
+    const { data: rows, error } = (await query) as {
+      data: Array<{ subject_id: string; payload: unknown }> | null;
+      error: unknown;
+    };
 
     if (error) {
       console.error("[visitor_intel.intel-aggregate] read failed", error);
