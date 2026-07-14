@@ -13,7 +13,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { resolveCanonicalPath } from "@/lib/navigation";
 
-const BASE_URL = "https://valladolidmx.lovable.app";
+const BASE_URL = "https://quehacerenvalladolid.com";
 
 interface SitemapEntry {
   path: string;
@@ -31,6 +31,9 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/eventos", changefreq: "weekly", priority: "0.8" },
   { path: "/arma-tu-viaje", changefreq: "monthly", priority: "0.9" },
   { path: "/empresas", changefreq: "monthly", priority: "0.7" },
+  { path: "/blog", changefreq: "weekly", priority: "0.6" },
+  { path: "/casas-de-vacaciones", changefreq: "weekly", priority: "0.7" },
+  { path: "/contacto", changefreq: "monthly", priority: "0.5" },
 ];
 
 const LANDING_KINDS = new Set(["landing", "campaign", "micrositio", "promotion"]);
