@@ -21,17 +21,44 @@ import {
 } from "react";
 import { ACTIVE_LOCALES, DEFAULT_LOCALE, type LocaleCode } from "@/config/languages";
 import { listActiveLocales, type PlatformLocaleDTO } from "@/lib/i18n/locales.functions";
+// H2·P3 — Sólo el diccionario del locale por defecto viaja en el entry
+// principal. Los demás se cargan on-demand cuando `setLocale` lo pide
+// o cuando la hidratación detecta una preferencia distinta. Si el
+// diccionario aún no está listo, `t()` cae al default (mismo
+// comportamiento actual para claves faltantes) — nunca queda en
+// blanco ni bloquea el primer paint.
 import es from "./locales/es.json";
-import en from "./locales/en.json";
-import fr from "./locales/fr.json";
-import de from "./locales/de.json";
-import it from "./locales/it.json";
-import pt from "./locales/pt.json";
 import type { UiAutoTranslatorHandle } from "@/lib/i18n/ui-auto-translate";
 
 type Dict = Record<string, unknown>;
 
-const DICTS: Record<LocaleCode, Dict> = { es, en, fr, de, it, pt };
+const DICTS: Partial<Record<LocaleCode, Dict>> = { es };
+
+// Cargadores diferidos — devuelven la misma promesa si ya se pidió.
+const LOADERS: Record<Exclude<LocaleCode, "es">, () => Promise<Dict>> = {
+  en: () => import("./locales/en.json").then((m) => (m.default ?? m) as Dict),
+  fr: () => import("./locales/fr.json").then((m) => (m.default ?? m) as Dict),
+  de: () => import("./locales/de.json").then((m) => (m.default ?? m) as Dict),
+  it: () => import("./locales/it.json").then((m) => (m.default ?? m) as Dict),
+  pt: () => import("./locales/pt.json").then((m) => (m.default ?? m) as Dict),
+};
+const loadingLocales: Partial<Record<LocaleCode, Promise<Dict>>> = {};
+
+function ensureLocaleLoaded(code: LocaleCode): Promise<Dict> | Dict | null {
+  const cached = DICTS[code];
+  if (cached) return cached;
+  if (code === "es") return es;
+  const loader = LOADERS[code as Exclude<LocaleCode, "es">];
+  if (!loader) return null;
+  if (!loadingLocales[code]) {
+    loadingLocales[code] = loader().then((dict) => {
+      DICTS[code] = dict;
+      return dict;
+    });
+  }
+  return loadingLocales[code]!;
+}
+
 const STORAGE_KEY = "vlx.locale";
 
 function staticLocales(): PlatformLocaleDTO[] {
@@ -73,6 +100,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<LocaleCode>(DEFAULT_LOCALE);
   const [locales, setLocales] = useState<PlatformLocaleDTO[]>(() => staticLocales());
   const [defaultLocale, setDefaultLocale] = useState<LocaleCode>(DEFAULT_LOCALE);
+  // H2·P3 — Bump que dispara re-render cuando un diccionario diferido
+  // termina de cargarse, para que `t()` reemplace los textos por sus
+  // traducciones sin requerir cambio de estado del consumidor.
+  const [, setDictVersion] = useState(0);
 
   // Hidratación: lee localStorage sólo en cliente.
   useEffect(() => {
@@ -83,6 +114,25 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Asegura que el diccionario del locale activo se cargue en cliente.
+  useEffect(() => {
+    const result = ensureLocaleLoaded(locale);
+    if (result && typeof (result as Promise<Dict>).then === "function") {
+      (result as Promise<Dict>).then(() => setDictVersion((v) => v + 1)).catch(() => undefined);
+    }
+  }, [locale]);
+
+  // Precarga el diccionario del default si es distinto del activo — se
+  // usa como fallback en `t()`. Se hace en idle para no competir con
+  // el paint inicial.
+  useEffect(() => {
+    if (defaultLocale === locale) return;
+    const result = ensureLocaleLoaded(defaultLocale);
+    if (result && typeof (result as Promise<Dict>).then === "function") {
+      (result as Promise<Dict>).then(() => setDictVersion((v) => v + 1)).catch(() => undefined);
+    }
+  }, [defaultLocale, locale]);
+
   // Carga la lista real de idiomas desde BD (respeta administración).
   useEffect(() => {
     let cancelled = false;
@@ -91,7 +141,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         if (cancelled || !Array.isArray(rows) || rows.length === 0) return;
         setLocales(rows);
         const def = rows.find((r) => r.is_default)?.code as LocaleCode | undefined;
-        if (def && DICTS[def]) setDefaultLocale(def);
+        if (def) setDefaultLocale(def);
       })
       .catch(() => undefined);
     return () => {
@@ -100,6 +150,13 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setLocale = useCallback((l: LocaleCode) => {
+    // Dispara la carga on-demand ANTES de actualizar el estado — así
+    // el próximo render ya encuentra el diccionario listo (o al menos
+    // en camino).
+    const result = ensureLocaleLoaded(l);
+    if (result && typeof (result as Promise<Dict>).then === "function") {
+      (result as Promise<Dict>).then(() => setDictVersion((v) => v + 1)).catch(() => undefined);
+    }
     setLocaleState(l);
     if (typeof window !== "undefined") {
       window.localStorage.setItem(STORAGE_KEY, l);
@@ -142,9 +199,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const t = useCallback(
     (key: string): string => {
-      const primary = DICTS[locale] ? resolveKey(DICTS[locale], key) : undefined;
+      const activeDict = DICTS[locale];
+      const primary = activeDict ? resolveKey(activeDict, key) : undefined;
       if (primary !== undefined) return primary;
-      const fallback = resolveKey(DICTS[defaultLocale] ?? DICTS[DEFAULT_LOCALE], key);
+      const fbDict = DICTS[defaultLocale] ?? DICTS[DEFAULT_LOCALE];
+      const fallback = fbDict ? resolveKey(fbDict, key) : undefined;
       return fallback ?? key;
     },
     [locale, defaultLocale],
@@ -162,10 +221,11 @@ export function useTranslation(): I18nContextValue {
   const ctx = useContext(I18nContext);
   if (!ctx) {
     // Fallback seguro fuera de provider (no debería ocurrir).
+    const defDict = DICTS[DEFAULT_LOCALE];
     return {
       locale: DEFAULT_LOCALE,
       setLocale: () => undefined,
-      t: (k) => resolveKey(DICTS[DEFAULT_LOCALE], k) ?? k,
+      t: (k) => (defDict ? resolveKey(defDict, k) ?? k : k),
       locales: staticLocales(),
       defaultLocale: DEFAULT_LOCALE,
     };
