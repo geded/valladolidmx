@@ -114,13 +114,12 @@ export const getDestinationMapPoints = createServerFn({ method: "GET" })
     const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data: dest } = await sb
-      .from("destinations").select("id").eq("slug", data.slug).maybeSingle();
-    if (!dest) return [];
+    // H2·P1 — Un solo roundtrip: filtramos por `destinations.slug` vía
+    // inner join en lugar de resolver `destination_id` en dos pasos.
     const { data: rows, error } = await sb
       .from("businesses")
-      .select("id, slug, display_name, tagline, status, deleted_at, business_locations!inner(latitude, longitude, address_line1, is_primary)")
-      .eq("destination_id", dest.id)
+      .select("id, slug, display_name, tagline, status, deleted_at, business_locations!inner(latitude, longitude, address_line1, is_primary), destinations!inner(slug)")
+      .eq("destinations.slug", data.slug)
       .eq("status", "published")
       .is("deleted_at", null)
       .limit(80);
@@ -167,28 +166,30 @@ export const getDestinationGalleryUrls = createServerFn({ method: "GET" })
     const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data: dest } = await sb
-      .from("destinations").select("id").eq("slug", data.slug).maybeSingle();
-    if (!dest) return [];
+    // H2·P1 — Un solo roundtrip vía inner-join sobre `destinations.slug`.
     const { data: rows, error } = await sb
       .from("destination_media")
-      .select("sort_order, media_assets:media_asset_id ( storage_bucket, storage_path )")
-      .eq("destination_id", dest.id)
+      .select("sort_order, media_assets:media_asset_id ( storage_bucket, storage_path ), destinations!inner(slug)")
+      .eq("destinations.slug", data.slug)
       .order("sort_order", { ascending: true })
       .limit(12);
     if (error || !rows) return [];
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const urls: string[] = [];
-    for (const r of rows) {
-      const m = (r as unknown as {
-        media_assets?: { storage_bucket: string; storage_path: string } | null;
-      }).media_assets;
-      if (!m?.storage_bucket || !m?.storage_path) continue;
-      const { data: signed } = await supabaseAdmin.storage
-        .from(m.storage_bucket).createSignedUrl(m.storage_path, 60 * 60);
-      if (signed?.signedUrl) urls.push(signed.signedUrl);
-    }
-    return urls;
+    // H2·P1 — Firma en paralelo. Antes: N storage.createSignedUrl
+    // secuenciales; hoy: una sola oleada Promise.all.
+    const signed = await Promise.all(
+      rows.map(async (r) => {
+        const m = (r as unknown as {
+          media_assets?: { storage_bucket: string; storage_path: string } | null;
+        }).media_assets;
+        if (!m?.storage_bucket || !m?.storage_path) return null;
+        const { data: s } = await supabaseAdmin.storage
+          .from(m.storage_bucket)
+          .createSignedUrl(m.storage_path, 60 * 60);
+        return s?.signedUrl ?? null;
+      }),
+    );
+    return signed.filter((u): u is string => Boolean(u));
   });
 
 const HOTEL_CATS = new Set(["hoteles", "hospedaje"]);
@@ -219,13 +220,39 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
       .from("destinations").select("id, slug").eq("slug", data.slug).maybeSingle();
     if (dErr || !dest) return empty;
 
-    // E6 · Overrides (pin/hide) para la ficha de destino.
-    const { data: overridesRows } = await sb
-      .from("related_overrides")
-      .select("related_entity_type, related_entity_id, mode")
-      .eq("entity_type", "destination")
-      .eq("entity_id", dest.id)
-      .eq("surface", "destination-detail");
+    // H2·P1 — Overrides, businesses y events son independientes entre
+    // sí: sólo dependen de `dest.id`. Se lanzan en paralelo.
+    const nowIso = new Date().toISOString();
+    const [overridesRes, bizRes, evsRes] = await Promise.all([
+      sb
+        .from("related_overrides")
+        .select("related_entity_type, related_entity_id, mode")
+        .eq("entity_type", "destination")
+        .eq("entity_id", dest.id)
+        .eq("surface", "destination-detail"),
+      sb
+        .from("businesses")
+        .select("id, slug, display_name, tagline, verified, status, deleted_at, business_categories!businesses_primary_category_id_fkey ( slug )")
+        .eq("destination_id", dest.id)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("display_name", { ascending: true })
+        .limit(60),
+      sb
+        .from("events")
+        .select("id, slug, title, summary, starts_at, ends_at, venue_name, is_free, destination_id")
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .eq("destination_id", dest.id)
+        .gte("starts_at", nowIso)
+        .order("starts_at", { ascending: true })
+        .limit(6),
+    ]);
+    const overridesRows = overridesRes.data;
+    const biz = bizRes.data;
+    const bErr = bizRes.error;
+    const evs = evsRes.data;
+    const eErr = evsRes.error;
     const hidden = {
       business: new Set<string>(),
       product: new Set<string>(),
@@ -242,15 +269,6 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
       if (o.mode === "hide") hidden[t].add(o.related_entity_id as string);
       else if (o.mode === "pin") pinnedIds[t].push(o.related_entity_id as string);
     }
-
-    const { data: biz, error: bErr } = await sb
-      .from("businesses")
-      .select("id, slug, display_name, tagline, verified, status, deleted_at, business_categories!businesses_primary_category_id_fkey ( slug )")
-      .eq("destination_id", dest.id)
-      .eq("status", "published")
-      .is("deleted_at", null)
-      .order("display_name", { ascending: true })
-      .limit(60);
     if (bErr) { console.error("[getDestinationRelated] biz", bErr); return empty; }
 
     const cards: MarketplaceBusinessCard[] = (biz ?? []).map((row) => {
@@ -290,15 +308,44 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
     }
 
     const bizIds = cards.map((c) => c.id);
-    // Covers de empresas (business_media role=cover).
+    // H2·P1 — business_media, products (y en cascada product_media)
+    // son independientes. Se lanzan business_media y products en
+    // paralelo; product_media entra en su propia oleada al conocer
+    // prodIds.
+    // Row types locales como `any`: preserva el shape con embeddings
+    // que devuelve PostgREST sin re-tipar cada campo. El DTO final se
+    // construye/tipifica más abajo (MarketplaceProductCard).
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    let bmedia: any[] | null = null;
+    let prods: any[] | null = null;
+    let pErr: unknown = null;
+    /* eslint-enable @typescript-eslint/no-explicit-any */
     if (bizIds.length > 0) {
-      const { data: bmedia } = await sb
-        .from("business_media")
-        .select("business_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path )")
-        .in("business_id", bizIds)
-        .eq("role", "cover")
-        .order("sort_order", { ascending: true });
-      if (bmedia && bmedia.length > 0) {
+      const [bmediaRes, prodsRes] = await Promise.all([
+        sb
+          .from("business_media")
+          .select("business_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path )")
+          .in("business_id", bizIds)
+          .eq("role", "cover")
+          .order("sort_order", { ascending: true }),
+        sb
+          .from("products")
+          .select("id, slug, name, tagline, product_type, price_amount, price_currency, business_id, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, status, deleted_at")
+          .in("business_id", bizIds)
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .order("name", { ascending: true })
+          .limit(24),
+      ]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      bmedia = (bmediaRes.data ?? null) as any[] | null;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      prods = (prodsRes.data ?? null) as any[] | null;
+      pErr = prodsRes.error;
+    }
+
+    if (bizIds.length > 0 && bmedia && bmedia.length > 0) {
+      {
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const seen = new Set<string>();
@@ -331,16 +378,8 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
       }
     }
 
-    if (bizIds.length > 0) {
-      const { data: prods, error: pErr } = await sb
-        .from("products")
-        .select("id, slug, name, tagline, product_type, price_amount, price_currency, business_id, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, status, deleted_at")
-        .in("business_id", bizIds)
-        .eq("status", "published")
-        .is("deleted_at", null)
-        .order("name", { ascending: true })
-        .limit(24);
-      if (!pErr && prods) {
+    if (bizIds.length > 0 && !pErr && prods) {
+      {
         grouped.productos = prods.filter((p) => !hidden.product.has(p.id as string)).map((p) => {
           const parent = bizById.get(p.business_id as string);
           return {
@@ -419,16 +458,6 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
       }
     }
 
-    // Eventos próximos publicados asociados al destino.
-    const { data: evs, error: eErr } = await sb
-      .from("events")
-      .select("id, slug, title, summary, starts_at, ends_at, venue_name, is_free, destination_id")
-      .eq("status", "published")
-      .is("deleted_at", null)
-      .eq("destination_id", dest.id)
-      .gte("starts_at", new Date().toISOString())
-      .order("starts_at", { ascending: true })
-      .limit(6);
     if (!eErr && evs) {
       grouped.eventos = evs.filter((e) => !hidden.event.has(e.id as string)).map((e) => ({
         id: e.id as string,

@@ -25,7 +25,18 @@ import { AluxFloatingTrigger } from "@/components/layout/AluxFloatingTrigger";
 import { FloatingTravelPlanDock } from "@/components/travel-plan/FloatingTravelPlanDock";
 import { ConciergeProposalObserver } from "@/components/travel-plan/ConciergeProposalObserver";
 import { Toaster } from "@/components/ui/sonner";
-import { EditThisPageButton } from "@/components/experience-builder/EditThisPageButton";
+// H2·P2 — Aislamiento del Studio: `EditThisPageButton` renderiza `null`
+// para el 100 % de visitantes anónimos, pero su código estaba en el
+// entry principal (grep "Editar esta página" en el bundle). Lo diferimos
+// vía React.lazy + Suspense sin fallback para eliminarlo del entry
+// público sin cambiar el comportamiento visible (los editores lo verán
+// tras un microtick).
+import * as React from "react";
+const EditThisPageButton = React.lazy(() =>
+  import("@/components/experience-builder/EditThisPageButton").then((m) => ({
+    default: m.EditThisPageButton,
+  })),
+);
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
@@ -226,7 +237,11 @@ function RootComponent() {
         <FloatingTravelPlanDock />
         <ConciergeProposalObserver />
         <Toaster />
-        {!isAppShellRoute ? <EditThisPageButton pathname={pathname} /> : null}
+        {!isAppShellRoute ? (
+          <React.Suspense fallback={null}>
+            <EditThisPageButton pathname={pathname} />
+          </React.Suspense>
+        ) : null}
         {/* OLA H-01 · Épica 1 · I1 — no-op mientras no haya consumidores. */}
         <ProtectedActionResumeRunner />
         {/* OLA H-01 · Épica 1 · I2 — host global del gate de identidad. */}
