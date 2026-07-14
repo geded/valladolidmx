@@ -58,7 +58,7 @@ export interface SimulationRunSummary {
   started_at: string;
   completed_at: string | null;
   wiped_at: string | null;
-  rows_inserted: Record<string, unknown>;
+  rows_inserted: Record<string, number | string | null>;
   triggered_by: string | null;
   error_message: string | null;
 }
