@@ -4,7 +4,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import { listMediaCms } from "@/lib/cms/reads.functions";
-import { suggestMediaAlt } from "@/lib/cms/media-intelligence.functions";
+import {
+  suggestMediaAlt,
+  suggestMediaAltBatch,
+} from "@/lib/cms/media-intelligence.functions";
+import { MediaTranslationsSheet } from "@/components/cms/media/MediaTranslationsSheet";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -70,6 +74,60 @@ function SuggestAltButton({ mediaId, disabled }: { mediaId: string; disabled?: b
   );
 }
 
+function TranslateButton({ mediaId }: { mediaId: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button size="sm" variant="ghost" onClick={() => setOpen(true)}>
+        Traducir
+      </Button>
+      {open && (
+        <MediaTranslationsSheet mediaId={mediaId} onClose={() => setOpen(false)} />
+      )}
+    </>
+  );
+}
+
+function BatchToolbar() {
+  const batch = useServerFn(suggestMediaAltBatch);
+  const [loading, setLoading] = useState(false);
+  return (
+    <Button
+      size="sm"
+      variant="outline"
+      disabled={loading}
+      onClick={async () => {
+        const raw = prompt(
+          "IDs de media separados por coma (máx 25). Idiomas: es,en,fr,de,it,pt (o subconjunto).",
+          "",
+        );
+        if (!raw) return;
+        const mediaIds = raw
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .slice(0, 25);
+        if (!mediaIds.length) return;
+        try {
+          setLoading(true);
+          const r = await batch({
+            data: { mediaIds, locales: ["es", "en"] },
+          });
+          toast.success(
+            `Lote: ${r.ok}/${r.total} ok · ${r.skipped} preservados · ${r.failed} fallos`,
+          );
+        } catch (e) {
+          toast.error(e instanceof Error ? e.message : "Error en lote");
+        } finally {
+          setLoading(false);
+        }
+      }}
+    >
+      {loading ? "Procesando…" : "Lote IA"}
+    </Button>
+  );
+}
+
 function MediaPage() {
   return (
     <CmsEntityPage<Row>
@@ -80,6 +138,7 @@ function MediaPage() {
       description="Media Intelligence Pipeline · IA propone, el editor decide."
       rowKey={(r) => r.id}
       emptyMessage="Sin activos multimedia todavía."
+      headerActions={<BatchToolbar />}
       columns={[
         {
           key: "alt",
@@ -112,7 +171,12 @@ function MediaPage() {
         {
           key: "actions",
           header: "IA",
-          render: (r) => <SuggestAltButton mediaId={r.id} />,
+          render: (r) => (
+            <div className="flex gap-1">
+              <SuggestAltButton mediaId={r.id} />
+              <TranslateButton mediaId={r.id} />
+            </div>
+          ),
         },
       ]}
     />

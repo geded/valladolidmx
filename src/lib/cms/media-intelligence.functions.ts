@@ -287,6 +287,132 @@ export const listMediaTranslations = createServerFn({ method: "POST" })
     return { rows: rows ?? [] };
   });
 
+/* ─────────────────────  suggestMediaAltBatch  ──────────────────────
+ * Lote controlado: procesa ≤ 25 media/llamada, con concurrencia 3
+ * y locales explícitos. IA nunca sobrescribe humano (delegado al
+ * trigger `media_alt_protect_human` + a `suggestMediaAlt`).
+ */
+
+const BatchInput = z.object({
+  mediaIds: z.array(z.string().uuid()).min(1).max(25),
+  locales: z.array(z.enum(SUPPORTED_LOCALES)).min(1).max(6),
+});
+
+export const suggestMediaAltBatch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => BatchInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await assertEditorial(context);
+
+    const tasks: Array<{ mediaId: string; locale: Locale }> = [];
+    for (const id of data.mediaIds) {
+      for (const loc of data.locales) tasks.push({ mediaId: id, locale: loc });
+    }
+
+    const CONCURRENCY = 3;
+    const results: Array<{
+      mediaId: string;
+      locale: Locale;
+      ok: boolean;
+      skipped?: boolean;
+      error?: string;
+    }> = [];
+    let cursor = 0;
+    async function worker() {
+      while (cursor < tasks.length) {
+        const idx = cursor++;
+        const t = tasks[idx]!;
+        try {
+          const r = await suggestMediaAlt({
+            data: { mediaId: t.mediaId, locale: t.locale },
+          });
+          results.push({ mediaId: t.mediaId, locale: t.locale, ok: true, skipped: r.skipped });
+        } catch (err) {
+          results.push({
+            mediaId: t.mediaId,
+            locale: t.locale,
+            ok: false,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
+      }
+    }
+    await Promise.all(
+      Array.from({ length: Math.min(CONCURRENCY, tasks.length) }, worker),
+    );
+
+    const ok = results.filter((r) => r.ok).length;
+    const skipped = results.filter((r) => r.skipped).length;
+    const failed = results.filter((r) => !r.ok).length;
+    return { total: tasks.length, ok, skipped, failed, results };
+  });
+
+/* ─────────────────────  approveMediaTranslation  ────────────────── */
+
+const ApproveInput = z.object({
+  mediaId: z.string().uuid(),
+  locale: z.enum(SUPPORTED_LOCALES),
+  altText: z.string().min(1).max(500).optional(),
+});
+
+/**
+ * Aprueba una propuesta IA (idioma primario o traducción). Si
+ * `altText` viene, marca la aprobación como edición humana.
+ */
+export const approveMediaTranslation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => ApproveInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await assertEditorial(context);
+
+    if (data.locale === "es") {
+      const { data: media } = await context.supabase
+        .from("media_assets")
+        .select("alt_text_ai")
+        .eq("id", data.mediaId)
+        .maybeSingle();
+      const finalAlt = data.altText ?? (media?.alt_text_ai ?? null);
+      if (!finalAlt) throw new Error("nothing_to_approve");
+      const { error } = await context.supabase
+        .from("media_assets")
+        .update({
+          alt_text: finalAlt,
+          alt_text_source: data.altText ? "human" : "ai",
+          review_state: "approved",
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: context.userId,
+        } as never)
+        .eq("id", data.mediaId);
+      if (error) throw error;
+      return { ok: true };
+    }
+
+    // Traducción
+    const { data: t } = await context.supabase
+      .from("media_asset_translations")
+      .select("alt_text_ai")
+      .eq("media_id", data.mediaId)
+      .eq("locale", data.locale)
+      .maybeSingle();
+    const finalAlt = data.altText ?? (t?.alt_text_ai ?? null);
+    if (!finalAlt) throw new Error("nothing_to_approve");
+    const { error } = await context.supabase
+      .from("media_asset_translations")
+      .upsert(
+        {
+          media_id: data.mediaId,
+          locale: data.locale,
+          alt_text: finalAlt,
+          source: data.altText ? "human" : "ai",
+          review_state: "approved",
+          updated_by: context.userId,
+        } as never,
+        { onConflict: "media_id,locale" },
+      );
+    if (error) throw error;
+    return { ok: true };
+  });
+
 /* ─────────────────────────  helpers  ──────────────────────────────── */
 
 function buildSystemPrompt(locale: Locale): string {

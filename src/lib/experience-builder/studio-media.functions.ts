@@ -14,6 +14,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { resolveMediaAlt } from "@/lib/media/resolve-alt";
 
 const BUCKET = "studio-media";
 
@@ -62,7 +63,7 @@ export const listStudioMediaLibrary = createServerFn({ method: "POST" })
     let q = context.supabase
       .from("media_assets")
       .select(
-        "id, storage_path, alt_text, width, height, mime_type, updated_at",
+        "id, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, width, height, mime_type, updated_at, media_asset_translations ( locale, alt_text, alt_text_ai, source, review_state )",
         { count: "exact" },
       )
       .eq("storage_bucket", BUCKET)
@@ -78,13 +79,27 @@ export const listStudioMediaLibrary = createServerFn({ method: "POST" })
           id: string;
           storage_path: string;
           alt_text: string | null;
+          alt_text_ai: string | null;
+          alt_text_source: string | null;
+          review_state: string | null;
+          title: string | null;
           width: number | null;
           height: number | null;
           mime_type: string | null;
+          media_asset_translations?: Array<{
+            locale: string;
+            alt_text: string | null;
+            alt_text_ai: string | null;
+            source: string | null;
+            review_state: string | null;
+          }> | null;
         }) => ({
           id: r.id,
           url: publicProxyUrl(r.storage_path),
-          alt: r.alt_text,
+          alt: resolveMediaAlt(
+            { ...r, translations: r.media_asset_translations ?? [] },
+            { locale: "es", fallback: r.title ?? "" },
+          ),
           width: r.width,
           height: r.height,
           mime: r.mime_type,
