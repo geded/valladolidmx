@@ -33,6 +33,8 @@ const BASE_MIX = [
 
 export const DEFAULT_SCENARIO_ID = "oriente-maya-90d" as const;
 export const DEFAULT_SCENARIO_VERSION = "1.0.0" as const;
+/** Semilla oficial de referencia (Founder Reproducible Simulation Principle). */
+export const DEFAULT_SCENARIO_SEED = "0xVMX2026" as const;
 
 export function buildOrienteMayaScenario(params: {
   seed: string;
@@ -66,6 +68,8 @@ export function buildOrienteMayaScenario(params: {
         "rio-lagartos": 5,
         "las-coloradas": 5,
         espita: 4,
+        uayma: 3,
+        "cenotes-comunidades": 7,
       },
     },
     profile_mix: BASE_MIX.map((entry) => ({
@@ -74,12 +78,13 @@ export function buildOrienteMayaScenario(params: {
       propensities: PROFILE_CATALOG[entry.profile].propensities,
     })),
     planted_issues: {
-      early_abandonment_rate: 0.08,
-      low_conversion_categories: [],
-      wrong_language_rate: 0.03,
-      slow_business_response_rate: 0.05,
-      late_proposals_rate: 0.04,
-      underexplored_destinations: [],
+      // Anomalías intencionales — deben ser detectadas por CV8.5/CV8.7/CV8.8.
+      early_abandonment_rate: 0.11,
+      low_conversion_categories: ["restaurantes", "experiencias-aventura"],
+      wrong_language_rate: 0.07, // fricción en 'fr' (baja conversión por idioma)
+      slow_business_response_rate: 0.09, // empresas con alto tráfico y poca respuesta
+      late_proposals_rate: 0.08, // propuestas Concierge tardías
+      underexplored_destinations: ["uayma", "espita"], // destinos secundarios subexplorados
     },
     locales: ["es", "en", "fr"],
   };
