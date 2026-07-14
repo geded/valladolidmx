@@ -8,6 +8,7 @@ import { PublicShell } from "@/components/discovery";
 import { ContinuityWelcomeSurface } from "@/components/traveler/ContinuityWelcomeSurface";
 import { useSectionEditWrap } from "@/components/experience-builder/SectionEditOverlay";
 import { buildPublicHead, pickFirstMediaUrl, webPageJsonLd } from "@/lib/discovery/seo";
+import heroLcpImage from "@/assets/brand/hero/bg01.webp";
 import {
   getDiscoverySection,
   type DiscoverySectionKind,
@@ -33,7 +34,7 @@ export const Route = createFileRoute("/")({
     const description = seo.description?.trim() || SITE.default_description;
     const path = seo.canonical?.trim() || "/";
     const ogImage = seo.og_image?.trim() || loaderData?.fallbackImage || undefined;
-    return buildPublicHead({
+    const head = buildPublicHead({
       title,
       description,
       path,
@@ -42,6 +43,14 @@ export const Route = createFileRoute("/")({
       noindex: Boolean(seo.noindex),
       jsonLd: seo.noindex ? undefined : [webPageJsonLd({ title, description, path, image: ogImage })],
     });
+    // H2 · LCP preload: la imagen del hero de la Home es el LCP dominante en móvil.
+    return {
+      ...head,
+      links: [
+        ...(head.links ?? []),
+        { rel: "preload", as: "image", href: heroLcpImage, fetchpriority: "high" as const },
+      ],
+    };
   },
   loader: async ({ context }) => {
     // Prefetch para SSR; nunca lanza — getPublishedHomeComposition cae a null
