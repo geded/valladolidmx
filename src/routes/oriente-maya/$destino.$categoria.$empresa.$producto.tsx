@@ -7,7 +7,7 @@
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead } from "@/lib/discovery/seo";
+import { buildPublicHead, productJsonLd, faqPageJsonLd } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getMarketplaceProductBySlug } from "@/lib/catalog/marketplace-reads.functions";
 import { getProductRelated } from "@/lib/catalog/product-related.functions";
@@ -59,16 +59,51 @@ export const Route = createFileRoute(
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
     const p = loaderData.product;
+    const destName = loaderData.resolution.destination?.label ?? params.destino;
+    const catName = loaderData.resolution.category?.label ?? params.categoria;
     const path = `/oriente-maya/${params.destino}/${params.categoria}/${params.empresa}/${params.producto}`;
+    const description =
+      p.tagline ||
+      p.description.slice(0, 300) ||
+      `${p.name} en ${p.business.display_name}, Oriente Maya de Yucatán.`;
+    const jsonLd: Record<string, unknown>[] = [
+      productJsonLd({
+        name: p.name,
+        description,
+        path,
+        image: p.cover_url ?? p.media?.[0]?.url ?? undefined,
+        sku: p.slug,
+        brandName: p.business.display_name,
+        priceAmount: p.price_amount,
+        priceCurrency: p.price_currency,
+        availability: "InStock",
+        aggregateRating:
+          p.review_stats && p.review_stats.count > 0
+            ? {
+                ratingValue: Number(p.review_stats.average.toFixed(2)),
+                reviewCount: p.review_stats.count,
+              }
+            : undefined,
+      }),
+    ];
+    if (p.faqs && p.faqs.length > 0) {
+      jsonLd.push(faqPageJsonLd(p.faqs.map((f) => ({ question: f.question, answer: f.answer }))));
+    }
     return buildPublicHead({
       title: `${p.name} · ${p.business.display_name} — ${SITE.name}`,
-      description:
-        p.tagline ||
-        p.description.slice(0, 160) ||
-        `${p.name} en ${p.business.display_name}, Oriente Maya de Yucatán.`,
+      description,
       path,
       ogType: "product",
       ogImage: p.cover_url ?? undefined,
+      breadcrumbs: [
+        { label: "Inicio", path: "/" },
+        { label: "Oriente Maya", path: "/oriente-maya" },
+        { label: destName, path: `/oriente-maya/${params.destino}` },
+        { label: catName, path: `/oriente-maya/${params.destino}/${params.categoria}` },
+        { label: p.business.display_name, path: `/oriente-maya/${params.destino}/${params.categoria}/${params.empresa}` },
+        { label: p.name, path },
+      ],
+      jsonLd,
     });
   },
   component: ProductoTerritorialPage,
