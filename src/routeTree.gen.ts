@@ -76,6 +76,7 @@ import { Route as ResenarNegocioSlugRouteImport } from './routes/resenar.negocio
 import { Route as PreviewCompositionTokenRouteImport } from './routes/preview/composition.$token'
 import { Route as OrienteMayaDestinoCategoriaRouteImport } from './routes/oriente-maya/$destino.$categoria'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiDevMediaPipelineDeriveRouteImport } from './routes/api/dev/media-pipeline-derive'
 import { Route as AuthenticatedPortalVisibilidadRouteImport } from './routes/_authenticated/portal/visibilidad'
 import { Route as AuthenticatedPortalVentasEnLineaRouteImport } from './routes/_authenticated/portal/ventas-en-linea'
 import { Route as AuthenticatedPortalReportesRouteImport } from './routes/_authenticated/portal/reportes'
@@ -542,6 +543,12 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDevMediaPipelineDeriveRoute =
+  ApiDevMediaPipelineDeriveRouteImport.update({
+    id: '/api/dev/media-pipeline-derive',
+    path: '/api/dev/media-pipeline-derive',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedPortalVisibilidadRoute =
   AuthenticatedPortalVisibilidadRouteImport.update({
     id: '/visibilidad',
@@ -1302,6 +1309,7 @@ export interface FileRoutesByFullPath {
   '/portal/reportes': typeof AuthenticatedPortalReportesRoute
   '/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   '/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
+  '/api/dev/media-pipeline-derive': typeof ApiDevMediaPipelineDeriveRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
@@ -1474,6 +1482,7 @@ export interface FileRoutesByTo {
   '/portal/reportes': typeof AuthenticatedPortalReportesRoute
   '/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   '/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
+  '/api/dev/media-pipeline-derive': typeof ApiDevMediaPipelineDeriveRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/resenar/negocio/$slug': typeof ResenarNegocioSlugRoute
@@ -1653,6 +1662,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/reportes': typeof AuthenticatedPortalReportesRoute
   '/_authenticated/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   '/_authenticated/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
+  '/api/dev/media-pipeline-derive': typeof ApiDevMediaPipelineDeriveRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/oriente-maya/$destino/$categoria': typeof OrienteMayaDestinoCategoriaRouteWithChildren
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
@@ -1834,6 +1844,7 @@ export interface FileRouteTypes {
     | '/portal/reportes'
     | '/portal/ventas-en-linea'
     | '/portal/visibilidad'
+    | '/api/dev/media-pipeline-derive'
     | '/lovable/email/suppression'
     | '/oriente-maya/$destino/$categoria'
     | '/preview/composition/$token'
@@ -2006,6 +2017,7 @@ export interface FileRouteTypes {
     | '/portal/reportes'
     | '/portal/ventas-en-linea'
     | '/portal/visibilidad'
+    | '/api/dev/media-pipeline-derive'
     | '/lovable/email/suppression'
     | '/preview/composition/$token'
     | '/resenar/negocio/$slug'
@@ -2184,6 +2196,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/reportes'
     | '/_authenticated/portal/ventas-en-linea'
     | '/_authenticated/portal/visibilidad'
+    | '/api/dev/media-pipeline-derive'
     | '/lovable/email/suppression'
     | '/oriente-maya/$destino/$categoria'
     | '/preview/composition/$token'
@@ -2308,6 +2321,7 @@ export interface RootRouteChildren {
   ViajeCompartidoTokenRoute: typeof ViajeCompartidoTokenRoute
   ViajeroHandleRoute: typeof ViajeroHandleRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
+  ApiDevMediaPipelineDeriveRoute: typeof ApiDevMediaPipelineDeriveRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
   ResenarNegocioSlugRoute: typeof ResenarNegocioSlugRoute
@@ -2797,6 +2811,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/suppression'
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/dev/media-pipeline-derive': {
+      id: '/api/dev/media-pipeline-derive'
+      path: '/api/dev/media-pipeline-derive'
+      fullPath: '/api/dev/media-pipeline-derive'
+      preLoaderRoute: typeof ApiDevMediaPipelineDeriveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/portal/visibilidad': {
@@ -4101,6 +4122,7 @@ const rootRouteChildren: RootRouteChildren = {
   ViajeCompartidoTokenRoute: ViajeCompartidoTokenRoute,
   ViajeroHandleRoute: ViajeroHandleRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
+  ApiDevMediaPipelineDeriveRoute: ApiDevMediaPipelineDeriveRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
   ResenarNegocioSlugRoute: ResenarNegocioSlugRoute,
