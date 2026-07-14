@@ -1,0 +1,349 @@
+/**
+ * CV8.3 · Visitor Intelligence Center — Console v1.0
+ *
+ * Superficie ejecutiva compuesta por Decision Cards. Cada tarjeta
+ * responde 3 preguntas: qué ocurre, por qué y qué decisión permite.
+ * Reutiliza KPI_CATALOG (CV8.0) y `aggregateJourneyIntel` (CV8.3).
+ */
+import { useMemo, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+
+import {
+  aggregateJourneyIntel,
+  type JourneyIntelSnapshot,
+} from "@/lib/visitor-intel/intel-aggregate.functions";
+import {
+  KPI_CATALOG,
+  JOURNEY_TRANSITIONS,
+  type JourneyTransitionId,
+} from "@/lib/visitor-intel";
+
+export const Route = createFileRoute("/_authenticated/cms/visitor-intel")({
+  head: () => ({
+    meta: [
+      { title: "Visitor Intelligence Center · CMS · Valladolid.mx" },
+      {
+        name: "description",
+        content:
+          "Centro de Inteligencia del Visitante — cada módulo responde una pregunta de negocio y declara la decisión que permite tomar.",
+      },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
+  component: VisitorIntelCenter,
+});
+
+type Windw = 7 | 30 | 90;
+
+function VisitorIntelCenter() {
+  const [win, setWin] = useState<Windw>(30);
+  const call = useServerFn(aggregateJourneyIntel);
+  const q = useQuery({
+    queryKey: ["cms", "visitor-intel", win],
+    queryFn: () => call({ data: { window_days: win } }),
+    staleTime: 60_000,
+  });
+
+  return (
+    <div className="mx-auto w-full max-w-7xl space-y-6">
+      <header className="border-b border-border pb-5">
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+          CV8.3 · Centro de Inteligencia
+        </p>
+        <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight">
+              Visitor Intelligence Center
+            </h1>
+            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+              Cada módulo responde una pregunta de negocio y declara la
+              decisión que permite tomar. No es un dashboard — es un Centro
+              de Decisiones. Ventana:{" "}
+              <strong>{win} días</strong>.
+            </p>
+          </div>
+          <div className="flex gap-1 rounded-full border border-border p-1 text-xs">
+            {[7, 30, 90].map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setWin(n as Windw)}
+                className={
+                  "rounded-full px-3 py-1 " +
+                  (win === n
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground")
+                }
+              >
+                {n}d
+              </button>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      {q.error ? (
+        <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+          No fue posible cargar la inteligencia. Verifica tu rol admin/super_admin.
+        </p>
+      ) : null}
+
+      <IntelModules snapshot={q.data} loading={q.isLoading} />
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+
+function IntelModules({
+  snapshot,
+  loading,
+}: {
+  snapshot: JourneyIntelSnapshot | undefined;
+  loading: boolean;
+}) {
+  const kpi = useMemo(
+    () => Object.fromEntries(KPI_CATALOG.map((k) => [k.id, k])),
+    [],
+  );
+
+  const t = (id: JourneyTransitionId) =>
+    snapshot?.transitions.find((x) => x.id === id);
+
+  return (
+    <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <DecisionCard
+        title="Journey Funnel"
+        question="¿Dónde se está fugando el viajero en el Journey?"
+        why="Compara conteos de cada transición canónica T1..T9."
+        decision={kpi["JPR_30D"]?.actionable_decision ?? ""}
+        value={
+          snapshot
+            ? `${snapshot.progressed_subjects} / ${snapshot.active_subjects} avanzaron`
+            : undefined
+        }
+        detail={
+          snapshot ? (
+            <ul className="mt-3 space-y-1 text-xs">
+              {snapshot.transitions.map((row) => (
+                <li
+                  key={row.id}
+                  className="flex items-center justify-between border-b border-border/60 py-1"
+                >
+                  <span className="text-muted-foreground">
+                    {row.id.replace(/^T(\d).*/, "T$1")} ·{" "}
+                    {JOURNEY_TRANSITIONS[row.id].from} →{" "}
+                    {JOURNEY_TRANSITIONS[row.id].to}
+                  </span>
+                  <span className="font-mono">
+                    {row.distinct_subjects}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : null
+        }
+        activatesWhen="lleguen eventos journey.transition (CV8.1)."
+        loading={loading}
+      />
+
+      <DecisionCard
+        title="Conversión del Journey (JPR)"
+        question="¿Qué % avanza ≥1 etapa en la ventana?"
+        why="Journey Progression Rate — North Star."
+        decision={kpi["JPR_30D"]?.actionable_decision ?? ""}
+        value={snapshot ? `${(snapshot.jpr * 100).toFixed(1)} %` : undefined}
+        activatesWhen="haya ≥1 subject activo con eventos."
+        loading={loading}
+      />
+
+      <DecisionCard
+        title="Visitantes Anónimos → Identificados"
+        question="¿Cuántos anónimos se registran?"
+        why="Transición T2 · momentos de valor (AC1.4)."
+        decision={kpi["T2_conversion"]?.actionable_decision ?? ""}
+        value={
+          snapshot
+            ? `${t("T2_anonymous_to_identified")?.distinct_subjects ?? 0} personas`
+            : undefined
+        }
+        activatesWhen="lleguen transiciones T2."
+        loading={loading}
+      />
+
+      <DecisionCard
+        title="Travel Plans creados"
+        question="¿Cuántos planes reales se están creando?"
+        why="Transición T5 · Bridge Alux↔Plan."
+        decision={kpi["T5_conversion"]?.actionable_decision ?? ""}
+        value={
+          snapshot
+            ? `${t("T5_interested_to_travel_plan")?.distinct_subjects ?? 0} viajeros`
+            : undefined
+        }
+        activatesWhen="Travel Plan emita journey.transition T5."
+        loading={loading}
+      />
+
+      <DecisionCard
+        title="Alux · Intención capturada"
+        question="¿Qué volumen de señales de intención genera Alux/Discovery?"
+        why="Suma de intent.signal en la ventana."
+        decision="Repriorizar surfaces/recomendaciones con menor generación de intención."
+        value={
+          snapshot ? `${snapshot.intent_signals_total} señales` : undefined
+        }
+        activatesWhen="las superficies emitan intent.signal."
+        loading={loading}
+      />
+
+      <DecisionCard
+        title="Concierge · Promoción a caso"
+        question="¿Cuántos planes se promueven a Concierge?"
+        why="Transición T6 · propuesta Alux."
+        decision={kpi["T6_conversion"]?.actionable_decision ?? ""}
+        value={
+          snapshot
+            ? `${t("T6_travel_plan_to_concierge")?.distinct_subjects ?? 0} casos`
+            : undefined
+        }
+        activatesWhen="lleguen transiciones T6."
+        loading={loading}
+      />
+
+      <DecisionCard
+        title="Revenue · Concierge → Reserva"
+        question="¿Cuánto está convirtiendo el Concierge en reservas?"
+        why="Transición T7 · checkout narrativo."
+        decision={kpi["T7_conversion"]?.actionable_decision ?? ""}
+        value={
+          snapshot
+            ? `${t("T7_concierge_to_reservation")?.distinct_subjects ?? 0} reservas`
+            : undefined
+        }
+        activatesWhen="Concierge emita transición T7."
+        loading={loading}
+      />
+
+      <DecisionCard
+        title="Empresas · Intención por capacidad"
+        question="¿Qué empresas generan más intención?"
+        why="Requiere segmentación por capability (CV8.4)."
+        decision="Priorizar publicación / spotlight en empresas de alta intención y baja conversión."
+        activatesWhen="CV8.4 habilite segmentación por capability."
+        loading={loading}
+      />
+
+      <DecisionCard
+        title="Destinos · Avance de Journey"
+        question="¿Qué destinos generan más avance del Journey?"
+        why="Requiere segmentación por destination_id (CV8.4)."
+        decision="Reasignar recursos editoriales hacia destinos con mejor progresión."
+        activatesWhen="CV8.4 habilite segmentación por destino."
+        loading={loading}
+      />
+
+      <DecisionCard
+        title="Permanencia · Continuity Rate"
+        question="¿Los viajeros regresan y reconocen su viaje?"
+        why="Contrapeso oficial CONTINUITY_RATE."
+        decision={kpi["CONTINUITY_RATE"]?.actionable_decision ?? ""}
+        activatesWhen="lleguen señales continuity.recognized (post CV8.3)."
+        loading={loading}
+      />
+
+      <DecisionCard
+        title="Embajadores"
+        question="¿Cuántos viajeros regresan como advocates?"
+        why="Transición T9 · post-trip loops."
+        decision={kpi["T9_conversion"]?.actionable_decision ?? ""}
+        value={
+          snapshot
+            ? `${t("T9_traveler_to_ambassador")?.distinct_subjects ?? 0} embajadores`
+            : undefined
+        }
+        activatesWhen="lleguen transiciones T9."
+        loading={loading}
+      />
+
+      <DecisionCard
+        title="Alertas de conversión"
+        question="¿Hay transiciones cayendo bajo benchmark?"
+        why="Requiere motor de umbrales (CV8.5)."
+        decision="Intervención inmediata en la transición degradada."
+        activatesWhen="CV8.5 defina benchmarks y umbrales."
+        loading={loading}
+      />
+    </section>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+
+function DecisionCard({
+  title,
+  question,
+  why,
+  decision,
+  value,
+  detail,
+  activatesWhen,
+  loading,
+}: {
+  title: string;
+  question: string;
+  why: string;
+  decision: string;
+  value?: string;
+  detail?: React.ReactNode;
+  activatesWhen: string;
+  loading: boolean;
+}) {
+  const hasData = value !== undefined;
+  return (
+    <article className="flex flex-col rounded-2xl border border-border bg-surface p-5">
+      <header className="flex items-start justify-between gap-3">
+        <h2 className="text-base font-semibold leading-snug">{title}</h2>
+        <span
+          className={
+            "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide " +
+            (hasData
+              ? "bg-success/15 text-success"
+              : "bg-muted text-muted-foreground")
+          }
+        >
+          {hasData ? "Accionable" : "Pendiente"}
+        </span>
+      </header>
+
+      <p className="mt-2 text-xs text-muted-foreground">
+        <strong className="text-foreground">Pregunta:</strong> {question}
+      </p>
+
+      {loading ? (
+        <p className="mt-3 h-6 w-24 animate-pulse rounded bg-muted" />
+      ) : hasData ? (
+        <p className="mt-3 font-display text-2xl">{value}</p>
+      ) : (
+        <p className="mt-3 rounded-lg border border-dashed border-border bg-surface-raised p-3 text-xs text-muted-foreground">
+          Se activará cuando {activatesWhen}
+        </p>
+      )}
+
+      {detail}
+
+      <div className="mt-4 space-y-1 border-t border-border/60 pt-3 text-xs">
+        <p>
+          <strong>Por qué:</strong>{" "}
+          <span className="text-muted-foreground">{why}</span>
+        </p>
+        <p>
+          <strong>Decisión:</strong>{" "}
+          <span className="text-muted-foreground">{decision}</span>
+        </p>
+      </div>
+    </article>
+  );
+}
