@@ -166,28 +166,30 @@ export const getDestinationGalleryUrls = createServerFn({ method: "GET" })
     const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data: dest } = await sb
-      .from("destinations").select("id").eq("slug", data.slug).maybeSingle();
-    if (!dest) return [];
+    // H2·P1 — Un solo roundtrip vía inner-join sobre `destinations.slug`.
     const { data: rows, error } = await sb
       .from("destination_media")
-      .select("sort_order, media_assets:media_asset_id ( storage_bucket, storage_path )")
-      .eq("destination_id", dest.id)
+      .select("sort_order, media_assets:media_asset_id ( storage_bucket, storage_path ), destinations!inner(slug)")
+      .eq("destinations.slug", data.slug)
       .order("sort_order", { ascending: true })
       .limit(12);
     if (error || !rows) return [];
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const urls: string[] = [];
-    for (const r of rows) {
-      const m = (r as unknown as {
-        media_assets?: { storage_bucket: string; storage_path: string } | null;
-      }).media_assets;
-      if (!m?.storage_bucket || !m?.storage_path) continue;
-      const { data: signed } = await supabaseAdmin.storage
-        .from(m.storage_bucket).createSignedUrl(m.storage_path, 60 * 60);
-      if (signed?.signedUrl) urls.push(signed.signedUrl);
-    }
-    return urls;
+    // H2·P1 — Firma en paralelo. Antes: N storage.createSignedUrl
+    // secuenciales; hoy: una sola oleada Promise.all.
+    const signed = await Promise.all(
+      rows.map(async (r) => {
+        const m = (r as unknown as {
+          media_assets?: { storage_bucket: string; storage_path: string } | null;
+        }).media_assets;
+        if (!m?.storage_bucket || !m?.storage_path) return null;
+        const { data: s } = await supabaseAdmin.storage
+          .from(m.storage_bucket)
+          .createSignedUrl(m.storage_path, 60 * 60);
+        return s?.signedUrl ?? null;
+      }),
+    );
+    return signed.filter((u): u is string => Boolean(u));
   });
 
 const HOTEL_CATS = new Set(["hoteles", "hospedaje"]);
