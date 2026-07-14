@@ -111,11 +111,60 @@ export const OutcomeObservedEventSchema = VisitorEventBaseSchema.extend({
   }),
 });
 
+/**
+ * CV8.6 · Recommendation lifecycle transition.
+ *
+ * Traza el ciclo de vida de una recomendación emitida por Visitor Intelligence:
+ * detected → accepted → implemented → observed → validated | discarded.
+ * Append-only (Founder Journey State). Sin persistencia adicional: el estado
+ * actual se recomputa siempre desde el historial de estos eventos.
+ */
+export const RECOMMENDATION_LIFECYCLE_STATUSES = [
+  "detected",
+  "accepted",
+  "implemented",
+  "observed",
+  "validated",
+  "discarded",
+] as const;
+export type RecommendationLifecycleStatus =
+  (typeof RECOMMENDATION_LIFECYCLE_STATUSES)[number];
+
+export const RecommendationLifecycleEventSchema = VisitorEventBaseSchema.extend({
+  kind: z.literal("recommendation.lifecycle"),
+  recommendation: z.object({
+    /** Identificador estable de la recomendación (compartido a lo largo del ciclo). */
+    recommendation_id: z.string().min(1),
+    /** Métrica/KPI a la que apunta la recomendación (ver KPI_CATALOG). */
+    metric_id: z.string().min(1),
+    /** Transición canónica implicada (T1..T9) o "aggregate". */
+    transition: z.string().min(1),
+    /** Severidad original en el momento de la detección. */
+    severity: z.enum(["opportunity", "attention", "critical", "informative"]),
+    /** Estado alcanzado por este evento. */
+    status: z.enum(RECOMMENDATION_LIFECYCLE_STATUSES),
+    /** Actor humano/sistema responsable (rol admin, alux, concierge…). */
+    actor: z.string().min(1),
+    /** Nota narrativa opcional. */
+    note: z.string().max(500).optional(),
+    /** Evidencia observada tras la acción (sólo para observed/validated/discarded). */
+    outcome: z
+      .object({
+        kpi_before: z.number(),
+        kpi_after: z.number(),
+        delta_relative: z.number(),
+        transition_advanced: z.boolean(),
+      })
+      .optional(),
+  }),
+});
+
 export const VisitorEventSchema = z.discriminatedUnion("kind", [
   JourneyTransitionEventSchema,
   IntentSignalEventSchema,
   DecisionOfferedEventSchema,
   OutcomeObservedEventSchema,
+  RecommendationLifecycleEventSchema,
 ]);
 
 export type VisitorEvent = z.infer<typeof VisitorEventSchema>;
@@ -123,6 +172,9 @@ export type JourneyTransitionEvent = z.infer<typeof JourneyTransitionEventSchema
 export type IntentSignalEvent = z.infer<typeof IntentSignalEventSchema>;
 export type DecisionOfferedEvent = z.infer<typeof DecisionOfferedEventSchema>;
 export type OutcomeObservedEvent = z.infer<typeof OutcomeObservedEventSchema>;
+export type RecommendationLifecycleEvent = z.infer<
+  typeof RecommendationLifecycleEventSchema
+>;
 
 /**
  * Helper de tipado — garantiza que las transiciones publicadas correspondan
