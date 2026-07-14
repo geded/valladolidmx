@@ -315,11 +315,11 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
     // Row types locales como `any`: preserva el shape con embeddings
     // que devuelve PostgREST sin re-tipar cada campo. El DTO final se
     // construye/tipifica más abajo (MarketplaceProductCard).
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     let bmedia: any[] | null = null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let prods: any[] | null = null;
     let pErr: unknown = null;
+    /* eslint-enable @typescript-eslint/no-explicit-any */
     if (bizIds.length > 0) {
       const [bmediaRes, prodsRes] = await Promise.all([
         sb
@@ -337,8 +337,10 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
           .order("name", { ascending: true })
           .limit(24),
       ]);
-      bmedia = (bmediaRes.data ?? null) as unknown as typeof bmedia;
-      prods = (prodsRes.data ?? null) as unknown as typeof prods;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      bmedia = (bmediaRes.data ?? null) as any[] | null;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      prods = (prodsRes.data ?? null) as any[] | null;
       pErr = prodsRes.error;
     }
 
