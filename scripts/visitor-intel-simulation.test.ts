@@ -128,15 +128,24 @@ function main() {
     }
   }
 
-  // 5. Territorial — Valladolid concentra el mayor número de touches.
-  const touches = runA.stats.territorial_touches;
-  const vallCount = touches["valladolid"] ?? 0;
-  const others = Object.entries(touches).filter(([k]) => k !== "valladolid");
-  for (const [k, v] of others) {
-    assert(vallCount > v, `Valladolid (${vallCount}) no concentra vs ${k} (${v})`);
+  // 5. Territorial — Valladolid es nodo base de todos los visitantes
+  //    (concentración medida por visitantes únicos, no touches).
+  const uniqueByDest = new Map<string, Set<string>>();
+  for (const t of runA.traces) {
+    for (const d of t.path) {
+      const s = uniqueByDest.get(d) ?? new Set<string>();
+      s.add(t.subject_id);
+      uniqueByDest.set(d, s);
+    }
   }
-  // Distribución no uniforme: coeficiente de variación > 0.15.
-  const values = Object.values(touches);
+  const vallUnique = uniqueByDest.get("valladolid")?.size ?? 0;
+  assert(vallUnique === runA.stats.visitors, `Valladolid no es nodo base de todos (${vallUnique}/${runA.stats.visitors})`);
+  for (const [k, s] of uniqueByDest.entries()) {
+    if (k === "valladolid") continue;
+    assert(s.size < vallUnique, `${k} (${s.size}) supera a Valladolid (${vallUnique})`);
+  }
+  // Distribución no uniforme: coeficiente de variación > 0.15 sobre touches.
+  const values = Object.values(runA.stats.territorial_touches);
   const mean = values.reduce((a, b) => a + b, 0) / values.length;
   const variance = values.reduce((a, b) => a + (b - mean) ** 2, 0) / values.length;
   const cv = Math.sqrt(variance) / mean;
