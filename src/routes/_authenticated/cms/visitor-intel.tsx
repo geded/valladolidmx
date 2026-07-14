@@ -783,10 +783,6 @@ const STATUS_STYLE: Record<
 };
 
 function ValidationLoopSection() {
-  return <ValidationLoopSectionImpl />;
-}
-
-function ValidationLoopSectionImpl() {
   const [win, setWin] = useState<30 | 90 | 180>(90);
   const call = useServerFn(aggregateRecommendationValidation);
   const q = useQuery({
