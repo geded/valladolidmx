@@ -14,3 +14,4 @@ export * from "./calendar";
 export * from "./causality";
 export * from "./behavior";
 export * from "./engine";
+export * from "./sub-motors";
