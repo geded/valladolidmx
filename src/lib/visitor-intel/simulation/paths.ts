@@ -15,7 +15,9 @@ export type DestinationSlug =
   | "izamal"
   | "rio-lagartos"
   | "las-coloradas"
-  | "espita";
+  | "espita"
+  | "uayma"
+  | "cenotes-comunidades";
 
 export const ORIENTE_MAYA_NODES: readonly DestinationSlug[] = [
   "valladolid",
@@ -25,6 +27,8 @@ export const ORIENTE_MAYA_NODES: readonly DestinationSlug[] = [
   "rio-lagartos",
   "las-coloradas",
   "espita",
+  "uayma",
+  "cenotes-comunidades",
 ];
 
 /** Aristas válidas partiendo de Valladolid (nodo base del escenario oficial). */
@@ -37,6 +41,8 @@ export const EDGES_FROM_VALLADOLID: Readonly<
   "rio-lagartos": { travel_min: 90, travel_max: 130 },
   "las-coloradas":{ travel_min: 95, travel_max: 140 },
   "espita":       { travel_min: 25, travel_max: 40 },
+  "uayma":        { travel_min: 15, travel_max: 25 },
+  "cenotes-comunidades": { travel_min: 20, travel_max: 50 },
 };
 
 /** Pesos base por destino (concentración en Valladolid). */
@@ -48,6 +54,8 @@ export const BASE_DESTINATION_WEIGHTS: Readonly<Record<DestinationSlug, number>>
   "rio-lagartos": 1.4,
   "las-coloradas": 1.4,
   espita: 0.8,
+  uayma: 0.9,
+  "cenotes-comunidades": 3.2,
 };
 
 /**
@@ -58,15 +66,15 @@ const PROFILE_TERRITORIAL_BIAS: Partial<
   Record<TravelerProfileId, Partial<Record<DestinationSlug, number>>>
 > = {
   cultural:              { "chichen-itza": 1.6, "ek-balam": 1.6, izamal: 1.5 },
-  nature:                { "rio-lagartos": 2.2, "las-coloradas": 2.2, "ek-balam": 1.3 },
+  nature:                { "rio-lagartos": 2.2, "las-coloradas": 2.2, "ek-balam": 1.3, "cenotes-comunidades": 2.4 },
   gastronomic:           { valladolid: 1.4, espita: 1.6, izamal: 1.3 },
   luxury:                { valladolid: 1.3, "chichen-itza": 1.5 },
-  backpacker:            { "ek-balam": 1.5, espita: 1.4 },
+  backpacker:            { "ek-balam": 1.5, espita: 1.4, "cenotes-comunidades": 1.6, uayma: 1.2 },
   day_tripper:           { "chichen-itza": 2.0, valladolid: 1.2 },
-  self_drive:            { "rio-lagartos": 1.6, "las-coloradas": 1.6, izamal: 1.4, espita: 1.3 },
+  self_drive:            { "rio-lagartos": 1.6, "las-coloradas": 1.6, izamal: 1.4, espita: 1.3, uayma: 1.2, "cenotes-comunidades": 1.5 },
   hotel_guest:           { valladolid: 1.5 },
   couple_international:  { "chichen-itza": 1.4, izamal: 1.2 },
-  family:                { "chichen-itza": 1.5, "las-coloradas": 1.2 },
+  family:                { "chichen-itza": 1.5, "las-coloradas": 1.2, "cenotes-comunidades": 1.4 },
   retirees:              { izamal: 1.4, valladolid: 1.3 },
 };
 
