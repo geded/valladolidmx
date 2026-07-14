@@ -92,6 +92,11 @@ export const Route = createFileRoute("/eventos/$slug")({
       path: `/eventos/${e.slug}`,
       ogType: "article",
       ogImage: e.cover_url ?? undefined,
+      breadcrumbs: [
+        { label: "Inicio", path: "/" },
+        { label: "Eventos", path: "/eventos" },
+        { label: e.title, path: `/eventos/${e.slug}` },
+      ],
       jsonLd: [eventJsonLd],
     });
   },

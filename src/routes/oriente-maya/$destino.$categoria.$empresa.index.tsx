@@ -8,7 +8,7 @@
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead } from "@/lib/discovery/seo";
+import { buildPublicHead, localBusinessJsonLd } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getMarketplaceBusinessBySlug } from "@/lib/catalog/marketplace-reads.functions";
 import { getBusinessRelated } from "@/lib/catalog/business-related.functions";
@@ -55,14 +55,47 @@ export const Route = createFileRoute(
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
     const b = loaderData.business;
+    const destName = loaderData.resolution.destination?.label ?? params.destino;
+    const catName = loaderData.resolution.category?.label ?? params.categoria;
+    const path = `/oriente-maya/${params.destino}/${params.categoria}/${params.empresa}`;
+    const description =
+      b.tagline ||
+      b.description.slice(0, 300) ||
+      `${b.display_name} en ${destName}, Oriente Maya de Yucatán.`;
     return buildPublicHead({
-      title: `${b.display_name} · ${loaderData.resolution.destination?.label ?? params.destino} — ${SITE.name}`,
-      description:
-        b.tagline ||
-        b.description.slice(0, 160) ||
-        `${b.display_name} en ${loaderData.resolution.destination?.label ?? params.destino}, Oriente Maya de Yucatán.`,
-      path: `/oriente-maya/${params.destino}/${params.categoria}/${params.empresa}`,
+      title: `${b.display_name} · ${destName} — ${SITE.name}`,
+      description,
+      path,
       ogType: "profile",
+      ogImage: b.cover_url ?? undefined,
+      breadcrumbs: [
+        { label: "Inicio", path: "/" },
+        { label: "Oriente Maya", path: "/oriente-maya" },
+        { label: destName, path: `/oriente-maya/${params.destino}` },
+        { label: catName, path: `/oriente-maya/${params.destino}/${params.categoria}` },
+        { label: b.display_name, path },
+      ],
+      jsonLd: [
+        localBusinessJsonLd({
+          name: b.display_name,
+          description,
+          path,
+          image: b.cover_url ?? undefined,
+          telephone:
+            b.primary_contact?.type === "phone" || b.primary_contact?.type === "whatsapp"
+              ? b.primary_contact.value
+              : undefined,
+          email: b.primary_contact?.type === "email" ? b.primary_contact.value : undefined,
+          addressLine:
+            b.primary_location?.address_line1 ?? b.address_line1 ?? null,
+          addressLocality: destName,
+          latitude: b.primary_location?.latitude ?? b.latitude ?? null,
+          longitude: b.primary_location?.longitude ?? b.longitude ?? null,
+          categorySlug: b.category_slug,
+          destinationName: destName,
+          areaServed: `${destName}, Yucatán`,
+        }),
+      ],
     });
   },
   component: EmpresaTerritorialPage,

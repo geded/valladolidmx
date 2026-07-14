@@ -13,7 +13,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { PublicShell } from "@/components/discovery";
 import { BusinessQuickViewDialog } from "@/components/discovery/BusinessQuickViewDialog";
-import { buildPublicHead } from "@/lib/discovery/seo";
+import { buildPublicHead, collectionPageJsonLd } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import {
   resolveTerritorialPath,
@@ -76,11 +76,30 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
     const { resolution } = loaderData;
     const dest = resolution.destination?.label ?? params.destino;
     const cat = resolution.category?.label ?? params.categoria;
+    const path = `/oriente-maya/${params.destino}/${params.categoria}`;
+    const items = (loaderData.items ?? []).map((b) => ({
+      name: b.display_name,
+      path: `/oriente-maya/${params.destino}/${params.categoria}/${b.slug}`,
+    }));
     return buildPublicHead({
       title: `${cat} en ${dest} — Oriente Maya · ${SITE.name}`,
       description: `Descubre ${cat.toLowerCase()} en ${dest}, Oriente Maya de Yucatán. Selección editorial de ${SITE.name}.`,
-      path: `/oriente-maya/${params.destino}/${params.categoria}`,
+      path,
       ogType: "website",
+      breadcrumbs: [
+        { label: "Inicio", path: "/" },
+        { label: "Oriente Maya", path: "/oriente-maya" },
+        { label: dest, path: `/oriente-maya/${params.destino}` },
+        { label: cat, path },
+      ],
+      jsonLd: [
+        collectionPageJsonLd({
+          name: `${cat} en ${dest}`,
+          description: `Selección editorial de ${cat.toLowerCase()} en ${dest}, Oriente Maya de Yucatán.`,
+          path,
+          items,
+        }),
+      ],
     });
   },
   component: CategoriaEnDestinoPage,
