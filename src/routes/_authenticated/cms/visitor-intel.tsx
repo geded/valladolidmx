@@ -15,6 +15,12 @@ import {
   type JourneyIntelSnapshot,
 } from "@/lib/visitor-intel/intel-aggregate.functions";
 import {
+  aggregateJourneySegments,
+  MIN_SEGMENT_POPULATION,
+  type JourneySegmentSnapshot,
+  type SegmentDimension,
+} from "@/lib/visitor-intel/segments.functions";
+import {
   KPI_CATALOG,
   JOURNEY_TRANSITIONS,
   type JourneyTransitionId,
@@ -91,7 +97,190 @@ function VisitorIntelCenter() {
       ) : null}
 
       <IntelModules snapshot={q.data} loading={q.isLoading} />
+      <SegmentationSection window={win} />
     </div>
+  );
+}
+
+/* --------------------------------------------------------------------- */
+/* CV8.4 · Segmentación                                                  */
+/* --------------------------------------------------------------------- */
+
+const DIMENSIONS: Array<{ id: SegmentDimension; label: string; hint: string }> = [
+  { id: "locale", label: "Idioma", hint: "subject.locale" },
+  { id: "destination", label: "Destino", hint: "context.destination_id" },
+  { id: "capability", label: "Capability", hint: "context.surface (prefijo)" },
+  { id: "country", label: "País", hint: "requiere ampliar contrato" },
+  { id: "channel", label: "Canal", hint: "requiere ampliar contrato" },
+  { id: "device", label: "Dispositivo", hint: "requiere ampliar contrato" },
+];
+
+function SegmentationSection({ window: win }: { window: 7 | 30 | 90 }) {
+  const [dim, setDim] = useState<SegmentDimension>("locale");
+  const call = useServerFn(aggregateJourneySegments);
+  const q = useQuery({
+    queryKey: ["cms", "visitor-intel", "segments", dim, win],
+    queryFn: () => call({ data: { dimension: dim, window_days: win } }),
+    staleTime: 60_000,
+  });
+
+  return (
+    <section className="space-y-4 rounded-2xl border border-border bg-surface p-5">
+      <header className="flex flex-wrap items-end justify-between gap-3 border-b border-border/60 pb-4">
+        <div>
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+            CV8.4 · Segmentación
+          </p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight">
+            ¿Cómo recorre el Journey cada grupo?
+          </h2>
+          <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
+            Segmentación ética: sólo datos mínimos, agregados, con umbral
+            mínimo de <strong>{MIN_SEGMENT_POPULATION}</strong> sujetos.
+            Segmentos menores se agrupan como <em>Otros</em>. Cero
+            identidades individuales.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-1 rounded-full border border-border p-1 text-xs">
+          {DIMENSIONS.map((d) => (
+            <button
+              key={d.id}
+              type="button"
+              onClick={() => setDim(d.id)}
+              className={
+                "rounded-full px-3 py-1 " +
+                (dim === d.id
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground")
+              }
+              title={d.hint}
+            >
+              {d.label}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      <SegmentationBody snapshot={q.data} loading={q.isLoading} error={!!q.error} />
+    </section>
+  );
+}
+
+function SegmentationBody({
+  snapshot,
+  loading,
+  error,
+}: {
+  snapshot: JourneySegmentSnapshot | undefined;
+  loading: boolean;
+  error: boolean;
+}) {
+  if (error) {
+    return (
+      <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+        No fue posible cargar la segmentación.
+      </p>
+    );
+  }
+  if (loading || !snapshot) {
+    return <p className="h-6 w-32 animate-pulse rounded bg-muted" />;
+  }
+
+  if (snapshot.status === "contract_pending") {
+    return (
+      <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
+        <p className="font-medium text-foreground">
+          Segmentación pendiente de contrato
+        </p>
+        <p className="mt-1">{snapshot.pending_reason}</p>
+      </div>
+    );
+  }
+
+  if (snapshot.status === "empty" || snapshot.buckets.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
+        <p className="font-medium text-foreground">
+          Sin muestra suficiente en la ventana seleccionada
+        </p>
+        <p className="mt-1">
+          Baseline: <strong>{snapshot.baseline.active_subjects}</strong> sujetos ·
+          JPR {(snapshot.baseline.jpr * 100).toFixed(1)}%. Se activará cuando
+          existan segmentos con ≥ {snapshot.min_population} sujetos activos.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-muted-foreground">
+        Baseline global · <strong>{snapshot.baseline.active_subjects}</strong>{" "}
+        sujetos · JPR{" "}
+        <strong>{(snapshot.baseline.jpr * 100).toFixed(1)}%</strong>. Delta ={" "}
+        JPR del segmento − baseline.
+      </p>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[640px] text-sm">
+          <thead className="text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th className="py-2">Segmento</th>
+              <th>Activos</th>
+              <th>Avanzaron</th>
+              <th>JPR</th>
+              <th>Δ vs baseline</th>
+              <th>Intención</th>
+              <th>T2</th>
+              <th>T5</th>
+              <th>T7</th>
+            </tr>
+          </thead>
+          <tbody>
+            {snapshot.buckets.map((b) => (
+              <SegmentRow key={b.key} b={b} />
+            ))}
+            {snapshot.others ? <SegmentRow b={snapshot.others} /> : null}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-[11px] text-muted-foreground">
+        Contrato v{snapshot.contract_version} · dimensión{" "}
+        <code>{snapshot.dimension}</code> · recomputado sin persistencia.
+      </p>
+    </div>
+  );
+}
+
+function SegmentRow({
+  b,
+}: {
+  b: JourneySegmentSnapshot["buckets"][number];
+}) {
+  const delta = b.jpr_delta_vs_baseline;
+  const deltaColor =
+    delta > 0.02 ? "text-success" : delta < -0.02 ? "text-destructive" : "text-muted-foreground";
+  return (
+    <tr className="border-t border-border/60">
+      <td className="py-2 font-medium">
+        {b.label}
+        {b.suppressed ? (
+          <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+            agregado
+          </span>
+        ) : null}
+      </td>
+      <td className="font-mono">{b.active_subjects}</td>
+      <td className="font-mono">{b.progressed_subjects}</td>
+      <td className="font-mono">{(b.jpr * 100).toFixed(1)}%</td>
+      <td className={"font-mono " + deltaColor}>
+        {delta > 0 ? "+" : ""}
+        {(delta * 100).toFixed(1)} pp
+      </td>
+      <td className="font-mono">{b.intent_signals}</td>
+      <td className="font-mono">{b.transitions.T2_anonymous_to_identified}</td>
+      <td className="font-mono">{b.transitions.T5_interested_to_travel_plan}</td>
+      <td className="font-mono">{b.transitions.T7_concierge_to_reservation}</td>
+    </tr>
   );
 }
 
