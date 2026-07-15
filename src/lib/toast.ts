@@ -24,6 +24,20 @@ type SonnerToast = SonnerModule["toast"];
 
 let mod: SonnerModule | null = null;
 let loading: Promise<SonnerModule> | null = null;
+const mountListeners = new Set<() => void>();
+let mountRequested = false;
+
+function requestMount() {
+  if (mountRequested) return;
+  mountRequested = true;
+  mountListeners.forEach((l) => l());
+}
+
+export function subscribeToasterMount(cb: () => void): () => void {
+  mountListeners.add(cb);
+  if (mountRequested) cb();
+  return () => mountListeners.delete(cb);
+}
 
 function loadSonner(): Promise<SonnerModule> {
   if (mod) return Promise.resolve(mod);
@@ -37,6 +51,7 @@ function loadSonner(): Promise<SonnerModule> {
 }
 
 function call(method: string | null, args: unknown[]): unknown {
+  requestMount();
   if (mod) {
     const target: any = method ? (mod.toast as any)[method] : mod.toast;
     return target(...args);
@@ -75,5 +90,6 @@ export const toast: ToastFacade = facade;
 
 /** Permite precargar sonner en idle desde el shell. */
 export function prefetchToaster(): Promise<unknown> {
+  requestMount();
   return loadSonner();
 }
