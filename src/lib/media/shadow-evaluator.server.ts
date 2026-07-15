@@ -195,7 +195,11 @@ function pickPreferredVariant(
   return { chosen: null, formatPreferred };
 }
 
-function emitShadowDecisionEvent(decision: ShadowDecision, assetId: string): void {
+function emitShadowDecisionEvent(
+  decision: ShadowDecision,
+  assetId: string,
+  preload?: { latencyMs: number; queryCount: number; error?: "db_timeout" | "db_error" },
+): void {
   // Evento sanitizado — sin URLs, tokens, IP, cookies, query strings,
   // referrer ni datos personales. Sólo forma/latencia de la decisión.
   const event = {
@@ -211,6 +215,9 @@ function emitShadowDecisionEvent(decision: ShadowDecision, assetId: string): voi
     latency_ms: decision.latencyMs ?? null,
     signed_url_latency_ms: decision.signedUrlLatencyMs ?? null,
     signed_url_ok: decision.signedUrlOk ?? null,
+    preload_latency_ms: preload?.latencyMs ?? null,
+    preload_query_count: preload?.queryCount ?? null,
+    preload_error: preload?.error ?? null,
   };
   console.log(JSON.stringify(event));
 }
