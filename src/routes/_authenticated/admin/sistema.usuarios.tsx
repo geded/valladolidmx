@@ -27,7 +27,7 @@ import {
   updateRole,
   deleteRole,
 } from "@/lib/admin/roles-catalog.functions";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { ZoneScopesDialog } from "@/components/admin/ZoneScopesDialog";
 
 interface AdminUserRow {

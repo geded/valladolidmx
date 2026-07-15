@@ -9,7 +9,7 @@
  */
 import { useRef, useState } from "react";
 import { Camera, Loader2, Upload } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const MAX_ORIGINAL_BYTES = 5 * 1024 * 1024;

@@ -34,7 +34,7 @@ import {
 } from "@/lib/profile-mode/mode.functions";
 import { ROLE_LABELS } from "@/types/auth";
 import { AvatarUploader } from "@/components/traveler/AvatarUploader";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 export const Route = createFileRoute("/_authenticated/cuenta/perfil")({
   component: CuentaPerfilPage,

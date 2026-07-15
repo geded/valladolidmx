@@ -25,7 +25,7 @@ import {
 import { listMyBusinesses } from "@/lib/portal/portal-reads.functions";
 import { ProductAdvancedPanel } from "@/components/portal/ProductAdvancedPanel";
 import { toPlanLimitMessage } from "@/lib/visibility/plan-limit-errors";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 const PRODUCT_TYPES: ProductType[] = [

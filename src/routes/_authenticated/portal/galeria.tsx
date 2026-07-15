@@ -23,7 +23,7 @@ import {
 import { listMyBusinesses } from "@/lib/portal/portal-reads.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { toPlanLimitMessage } from "@/lib/visibility/plan-limit-errors";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 

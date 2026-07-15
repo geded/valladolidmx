@@ -16,7 +16,7 @@ import {
   type DemoEvaluation,
 } from "@/lib/demo-pack/goldenset.functions";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 export const Route = createFileRoute("/_authenticated/cms/demo-pack")({
   head: () => ({
