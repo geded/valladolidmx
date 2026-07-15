@@ -1,0 +1,185 @@
+{
+  "asset_id": "642cb15f-0a13-410c-8027-c4ab92034bf5",
+  "started_utc": "2026-07-15T03:35:23.597Z",
+  "scenarios": {
+    "B1_cold": {
+      "total_ms": 478,
+      "phase": {
+        "authMs": 1,
+        "preflightMs": 0,
+        "selectMs": 0,
+        "signMs": 475,
+        "parityMs": 1,
+        "totalMs": 477
+      },
+      "sign_source": "cache_miss",
+      "decision": "would_use_pipeline",
+      "preload_query_count": 2,
+      "preload_latency_ms": 611,
+      "cache": {
+        "hits": 0,
+        "misses": 1,
+        "coalesced": 0,
+        "errors": 0,
+        "expiredEvictions": 0,
+        "networkCalls": 1,
+        "size": 1,
+        "memoryBytes": 1332
+      }
+    },
+    "B2_first_miss": {
+      "ok": true,
+      "source": "cache_miss",
+      "total_ms": 480,
+      "cacheLookupMs": 0,
+      "networkMs": 480,
+      "cache": {
+        "hits": 0,
+        "misses": 1,
+        "coalesced": 0,
+        "errors": 0,
+        "expiredEvictions": 0,
+        "networkCalls": 1,
+        "size": 1,
+        "memoryBytes": 1326
+      }
+    },
+    "B3_warm_100": {
+      "totals": {
+        "count": 100,
+        "p50": 0,
+        "p95": 1,
+        "max": 1,
+        "min": 0
+      },
+      "sign_phase": {
+        "count": 100,
+        "p50": 0,
+        "p95": 0,
+        "max": 1,
+        "min": 0
+      },
+      "resolver_pure": {
+        "count": 100,
+        "p50": 0,
+        "p95": 0,
+        "max": 1,
+        "min": 0
+      },
+      "cache_lookup": {
+        "count": 100,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "min": 0
+      },
+      "sources": {
+        "cache_hit": 100,
+        "cache_miss": 0,
+        "coalesced": 0,
+        "undefined": 0
+      },
+      "cache_hit_ratio": 0.9901,
+      "cache": {
+        "hits": 100,
+        "misses": 1,
+        "coalesced": 0,
+        "errors": 0,
+        "expiredEvictions": 0,
+        "networkCalls": 1,
+        "size": 1,
+        "memoryBytes": 1332
+      }
+    },
+    "B4_concurrent_50": {
+      "concurrent": 50,
+      "wall_ms": 172,
+      "totals": {
+        "count": 50,
+        "p50": 170,
+        "p95": 171,
+        "max": 171,
+        "min": 170
+      },
+      "sign_phase": {
+        "count": 50,
+        "p50": 170,
+        "p95": 171,
+        "max": 171,
+        "min": 170
+      },
+      "sources": {
+        "cache_hit": 0,
+        "cache_miss": 1,
+        "coalesced": 49,
+        "undefined": 0
+      },
+      "network_calls": 1,
+      "coalesced": 49,
+      "cache": {
+        "hits": 0,
+        "misses": 1,
+        "coalesced": 49,
+        "errors": 0,
+        "expiredEvictions": 0,
+        "networkCalls": 1,
+        "size": 1,
+        "memoryBytes": 1332
+      }
+    },
+    "B5_restart": {
+      "cache_size_before_reset": 1,
+      "cache_size_after_reset": 0,
+      "first_eval_after_restart_ms": 482,
+      "sign_source": "cache_miss",
+      "phase": {
+        "authMs": 0,
+        "preflightMs": 0,
+        "selectMs": 0,
+        "signMs": 482,
+        "parityMs": 0,
+        "totalMs": 482
+      }
+    },
+    "B6_near_expiry": {
+      "second_call_source": "cache_miss",
+      "forced_miss": true,
+      "expired_evictions": 1,
+      "passes_guardrail": true
+    },
+    "B7_storage_timeout": {
+      "ok": false,
+      "reason": "storage_unreachable",
+      "cache_size": 0,
+      "errors": 1,
+      "fallback_safe": true
+    },
+    "B8_variant_key_rotation": {
+      "invalidated": true,
+      "second_call_source": "cache_miss",
+      "forced_miss": true,
+      "cache_stats": {
+        "hits": 0,
+        "misses": 2,
+        "coalesced": 0,
+        "errors": 0,
+        "expiredEvictions": 0,
+        "networkCalls": 2,
+        "size": 1,
+        "memoryBytes": 152
+      }
+    }
+  },
+  "thresholds": {
+    "resolver_pure_p95_lt_5ms": true,
+    "cache_lookup_p95_lt_5ms": true,
+    "warm_total_p95_le_50ms": true,
+    "cache_hit_ratio_ge_95": true,
+    "single_flight_ok": true,
+    "zero_expired_urls": true,
+    "zero_client_exposure": true,
+    "cold_path_ms": 478,
+    "cold_path_over_250ms": true
+  },
+  "finished_utc": "2026-07-15T03:35:27.618Z"
+}
