@@ -6874,6 +6874,7 @@ export type Database = {
             }
             Returns: string
           }
+      dearmor: { Args: { "": string }; Returns: string }
       delete_business_product_faq: {
         Args: { _faq_id: string }
         Returns: undefined
@@ -7063,6 +7064,8 @@ export type Database = {
       expire_stale_coupons: { Args: never; Returns: undefined }
       expire_visibility_grants: { Args: never; Returns: number }
       founder_dashboard_kpis: { Args: never; Returns: Json }
+      gen_random_uuid: { Args: never; Returns: string }
+      gen_salt: { Args: { "": string }; Returns: string }
       get_available_modes: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["profile_mode"][]
@@ -7238,6 +7241,7 @@ export type Database = {
         Args: { _nonce: string; _ttl?: string; _used_by?: string }
         Returns: boolean
       }
+      masu_bootstrap_secret: { Args: { _value: string }; Returns: string }
       masu_claim_renewal_batch: {
         Args: { _batch_size?: number; _lock_ttl?: string; _worker_id: string }
         Returns: {
@@ -7250,10 +7254,13 @@ export type Database = {
           variant_key: string
         }[]
       }
+      masu_get_renew_secret: { Args: never; Returns: string }
+      masu_purge_stale: { Args: { _variant_key: string }; Returns: number }
       masu_record_failure: {
         Args: { _error: string; _variant_key: string; _worker_id: string }
         Returns: undefined
       }
+      masu_trigger_renewal: { Args: never; Returns: undefined }
       masu_upsert_monotonic: {
         Args: {
           _asset_id: string
@@ -7392,6 +7399,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      pgp_armor_headers: {
+        Args: { "": string }
+        Returns: Record<string, unknown>[]
       }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
       publish_business: {
