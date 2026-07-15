@@ -24,6 +24,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import type { MediaAssetInput, MediaFallbackReason, MediaUsageContext, MediaVariantFormat } from "./resolve-source";
+import { resolveMediaSource } from "./resolve-source";
 
 /** Allowlist explícita autorizada por el Founder. */
 export const SHADOW_ALLOWLIST: ReadonlySet<string> = new Set<string>([
@@ -114,6 +115,29 @@ interface VariantRow {
 }
 
 /**
+ * M2.2: Bundle precargado por el server (una sola pareja de queries batched
+ * por lote, ver `shadow-preloader.server.ts`). Se pasa al evaluador para
+ * evitar consultas redundantes y garantizar query-count estable.
+ */
+export interface PreloadedShadowBundle {
+  asset: {
+    id: string;
+    original_width: number | null;
+    original_height: number | null;
+    pipeline_status:
+      | "disabled"
+      | "pending"
+      | "processing"
+      | "ready"
+      | "failed"
+      | "skipped"
+      | null;
+    has_original_checksum: boolean;
+  };
+  variants: VariantRow[];
+}
+
+/**
  * Firma una URL con timeout duro y devuelve sólo `{ok, latency, reason?}`.
  * NUNCA devuelve ni loguea la URL firmada. Se descarta al retornar.
  */
@@ -194,6 +218,14 @@ function emitShadowDecisionEvent(decision: ShadowDecision, assetId: string): voi
 export interface EvaluateOptions {
   context?: MediaUsageContext;
   targetWidth?: number;
+  /** M2.2 (recomendado): bundle precargado por el server. Si se provee, no toca DB. */
+  preloaded?: PreloadedShadowBundle | null;
+  /** M2.2: telemetría del preloader propagada al evento. */
+  preloadTelemetry?: {
+    latencyMs: number;
+    queryCount: number;
+    error?: "db_timeout" | "db_error";
+  };
   /** Test-only: permite inyectar un fetcher de variantes sin tocar Supabase. */
   _variantFetcher?: (assetId: string) => Promise<VariantRow[]>;
   /** Test-only: permite inyectar un firmador sin tocar Storage. */
@@ -223,7 +255,34 @@ export async function evaluateMediaSourceShadow(
   const decision: ShadowDecision = { authorized: true, decision: "would_use_legacy" };
 
   try {
-    const fetcher =
+    // Si hay bundle precargado, no tocamos DB.
+    let variants: VariantRow[];
+    let assetPipelineStatus: PreloadedShadowBundle["asset"]["pipeline_status"] | undefined;
+    if (options.preloaded) {
+      if (options.preloaded.asset.id !== asset.id) {
+        decision.fallbackReason = "no_variants_for_context";
+        decision.latencyMs = Date.now() - started;
+        if (!options._silent) emitShadowDecisionEvent(decision, asset.id, options.preloadTelemetry);
+        return decision;
+      }
+      // Preflight: checksum faltante en el original → no elegible aún.
+      if (!options.preloaded.asset.has_original_checksum) {
+        decision.fallbackReason = "variant_key_missing";
+        decision.latencyMs = Date.now() - started;
+        if (!options._silent) emitShadowDecisionEvent(decision, asset.id, options.preloadTelemetry);
+        return decision;
+      }
+      // Preflight: preloader reportó error de DB.
+      if (options.preloadTelemetry?.error) {
+        decision.fallbackReason = "storage_unreachable";
+        decision.latencyMs = Date.now() - started;
+        if (!options._silent) emitShadowDecisionEvent(decision, asset.id, options.preloadTelemetry);
+        return decision;
+      }
+      variants = options.preloaded.variants;
+      assetPipelineStatus = options.preloaded.asset.pipeline_status;
+    } else {
+      const fetcher =
       options._variantFetcher ??
       (async (assetId: string) => {
         const { data, error } = await supabaseAdmin
@@ -246,8 +305,9 @@ export async function evaluateMediaSourceShadow(
             }) satisfies VariantRow,
         );
       });
+      variants = await fetcher(asset.id);
+    }
 
-    const variants = await fetcher(asset.id);
     if (variants.length === 0) {
       decision.fallbackReason = "no_variants_for_context";
     } else {
@@ -274,13 +334,50 @@ export async function evaluateMediaSourceShadow(
         }
       }
     }
+    // M2.2: parity check con el resolver puro. Si el pipeline_status no es
+    // 'ready' según el asset, `resolveMediaSource` no elegiría variantes
+    // ⇒ marcamos `pipeline_disabled` como razón declarativa.
+    if (assetPipelineStatus && assetPipelineStatus !== "ready" && decision.decision === "would_use_pipeline") {
+      decision.decision = "would_use_legacy";
+      decision.fallbackReason = "pipeline_disabled";
+    }
+    // Sanity: el resolver puro consumiría exactamente estas mismas variantes
+    // (byte-identidad de decisión). Si difiere, se marca variant_key_missing
+    // para caer al legacy. `resolveMediaSource` sólo se ejerce con datos
+    // ya en memoria; no hace red.
+    if (options.preloaded && decision.decision === "would_use_pipeline") {
+      const resolved = resolveMediaSource(
+        {
+          id: asset.id,
+          file_url: null,
+          original_width: options.preloaded.asset.original_width,
+          original_height: options.preloaded.asset.original_height,
+          pipeline_status: options.preloaded.asset.pipeline_status ?? "ready",
+          variants: options.preloaded.variants.map((v) => ({
+            format: v.format,
+            width: v.width,
+            height: v.height,
+            url: "opaque://" + (v.variant_key ?? "no-key"),
+            status: "ready",
+            usage_context: v.usage_context,
+            variant_key: v.variant_key,
+          })),
+        },
+        { context: options.context, targetWidth: options.targetWidth },
+      );
+      // Confirmamos que el resolver también habría elegido pipeline.
+      if (!resolved.usedPipeline) {
+        decision.decision = "would_use_legacy";
+        decision.fallbackReason = "no_variants_for_context";
+      }
+    }
   } catch {
     decision.decision = "would_use_legacy";
     decision.fallbackReason = "signed_url_error";
   }
 
   decision.latencyMs = Date.now() - started;
-  if (!options._silent) emitShadowDecisionEvent(decision, asset.id);
+  if (!options._silent) emitShadowDecisionEvent(decision, asset.id, options.preloadTelemetry);
   return decision;
 }
 
