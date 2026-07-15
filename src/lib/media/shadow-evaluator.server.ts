@@ -25,6 +25,7 @@ import { timingSafeEqual } from "node:crypto";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import type { MediaAssetInput, MediaFallbackReason, MediaUsageContext, MediaVariantFormat } from "./resolve-source";
 import { resolveMediaSource } from "./resolve-source";
+import { probeSignedUrl, type SignResult } from "./sign.server";
 
 /** Allowlist explícita autorizada por el Founder. */
 export const SHADOW_ALLOWLIST: ReadonlySet<string> = new Set<string>([
@@ -73,6 +74,20 @@ export interface ShadowDecision {
   fallbackReason?: MediaFallbackReason;
   signedUrlLatencyMs?: number;
   signedUrlOk?: boolean;
+  /** M2.3: fase por fase para diagnóstico de latencia. */
+  phaseTiming?: {
+    authMs: number;
+    preflightMs: number;
+    selectMs: number;
+    signMs: number;
+    parityMs: number;
+    totalMs: number;
+  };
+  /** M2.3: origen de la firma (cache_hit/miss/coalesced). */
+  signSource?: SignResult["source"];
+  /** M2.3: desglose de la firma. */
+  signCacheLookupMs?: number;
+  signNetworkMs?: number;
 }
 
 /** Comparación en tiempo constante para strings. */
@@ -237,6 +252,9 @@ export interface EvaluateOptions {
   _variantFetcher?: (assetId: string) => Promise<VariantRow[]>;
   /** Test-only: permite inyectar un firmador sin tocar Storage. */
   _signer?: (bucket: string, path: string) => Promise<{ ok: boolean; latencyMs: number; reason?: MediaFallbackReason }>;
+  /** M2.3: usa la ruta cached del `sign.server`. Cae al `_signer` legacy si se
+   * inyecta explícitamente en tests. */
+  useSignCache?: boolean;
   /** Test-only: silenciar el evento de log. */
   _silent?: boolean;
 }
@@ -251,7 +269,9 @@ export async function evaluateMediaSourceShadow(
   options: EvaluateOptions,
   ctx: ShadowContext,
 ): Promise<ShadowDecision> {
+  const t0 = Date.now();
   const auth = shadowAuthorization(ctx, asset.id);
+  const authMs = Date.now() - t0;
   if (!auth.ok) {
     // No emitimos evento para peticiones no autorizadas (evita ruido y
     // exfiltración incremental por conteo).
@@ -260,15 +280,20 @@ export async function evaluateMediaSourceShadow(
 
   const started = Date.now();
   const decision: ShadowDecision = { authorized: true, decision: "would_use_legacy" };
+  const timings = { authMs, preflightMs: 0, selectMs: 0, signMs: 0, parityMs: 0, totalMs: 0 };
 
   try {
     // Si hay bundle precargado, no tocamos DB.
+    const preflightStart = Date.now();
     let variants: VariantRow[];
     let assetPipelineStatus: PreloadedShadowBundle["asset"]["pipeline_status"] | undefined;
     if (options.preloaded) {
       if (options.preloaded.asset.id !== asset.id) {
         decision.fallbackReason = "no_variants_for_context";
         decision.latencyMs = Date.now() - started;
+        timings.preflightMs = Date.now() - preflightStart;
+        timings.totalMs = Date.now() - t0;
+        decision.phaseTiming = timings;
         if (!options._silent) emitShadowDecisionEvent(decision, asset.id, options.preloadTelemetry);
         return decision;
       }
@@ -276,6 +301,9 @@ export async function evaluateMediaSourceShadow(
       if (!options.preloaded.asset.has_original_checksum) {
         decision.fallbackReason = "variant_key_missing";
         decision.latencyMs = Date.now() - started;
+        timings.preflightMs = Date.now() - preflightStart;
+        timings.totalMs = Date.now() - t0;
+        decision.phaseTiming = timings;
         if (!options._silent) emitShadowDecisionEvent(decision, asset.id, options.preloadTelemetry);
         return decision;
       }
@@ -283,6 +311,9 @@ export async function evaluateMediaSourceShadow(
       if (options.preloadTelemetry?.error) {
         decision.fallbackReason = "storage_unreachable";
         decision.latencyMs = Date.now() - started;
+        timings.preflightMs = Date.now() - preflightStart;
+        timings.totalMs = Date.now() - t0;
+        decision.phaseTiming = timings;
         if (!options._silent) emitShadowDecisionEvent(decision, asset.id, options.preloadTelemetry);
         return decision;
       }
@@ -314,13 +345,16 @@ export async function evaluateMediaSourceShadow(
       });
       variants = await fetcher(asset.id);
     }
+    timings.preflightMs = Date.now() - preflightStart;
 
+    const selectStart = Date.now();
     if (variants.length === 0) {
       decision.fallbackReason = "no_variants_for_context";
     } else {
       const target = options.targetWidth ?? asset.original_width ?? 800;
       const ctxFilter: MediaUsageContext = options.context ?? "generic";
       const { chosen, formatPreferred } = pickPreferredVariant(variants, target, ctxFilter);
+      timings.selectMs = Date.now() - selectStart;
       if (!chosen) {
         decision.fallbackReason = "no_variants_for_context";
       } else if (!chosen.variant_key) {
@@ -331,19 +365,36 @@ export async function evaluateMediaSourceShadow(
         decision.formatPreferred = formatPreferred;
         decision.widthChosen = chosen.width;
 
-        const signer = options._signer ?? attemptSignAndDiscard;
-        const signRes = await signer(chosen.bucket, chosen.path);
-        decision.signedUrlLatencyMs = signRes.latencyMs;
-        decision.signedUrlOk = signRes.ok;
-        if (!signRes.ok) {
-          decision.fallbackReason = signRes.reason ?? "signed_url_error";
-          decision.decision = "would_use_legacy";
+        const signStart = Date.now();
+        // M2.3: preferimos el cache path por defecto en el shadow evaluator.
+        // Un legacy `_signer` inyectado (para tests) tiene prioridad.
+        if (options._signer) {
+          const signRes = await options._signer(chosen.bucket, chosen.path);
+          decision.signedUrlLatencyMs = signRes.latencyMs;
+          decision.signedUrlOk = signRes.ok;
+          if (!signRes.ok) {
+            decision.fallbackReason = signRes.reason ?? "signed_url_error";
+            decision.decision = "would_use_legacy";
+          }
+        } else {
+          const probe = await probeSignedUrl({ bucket: chosen.bucket, path: chosen.path, variantKey: chosen.variant_key });
+          decision.signedUrlLatencyMs = probe.latencyMs;
+          decision.signedUrlOk = probe.ok;
+          decision.signSource = probe.source;
+          decision.signCacheLookupMs = probe.cacheLookupMs;
+          decision.signNetworkMs = probe.networkMs;
+          if (!probe.ok) {
+            decision.fallbackReason = probe.reason;
+            decision.decision = "would_use_legacy";
+          }
         }
+        timings.signMs = Date.now() - signStart;
       }
     }
     // M2.2: parity check con el resolver puro. Si el pipeline_status no es
     // 'ready' según el asset, `resolveMediaSource` no elegiría variantes
     // ⇒ marcamos `pipeline_disabled` como razón declarativa.
+    const parityStart = Date.now();
     if (assetPipelineStatus && assetPipelineStatus !== "ready" && decision.decision === "would_use_pipeline") {
       decision.decision = "would_use_legacy";
       decision.fallbackReason = "pipeline_disabled";
@@ -378,12 +429,15 @@ export async function evaluateMediaSourceShadow(
         decision.fallbackReason = "no_variants_for_context";
       }
     }
+    timings.parityMs = Date.now() - parityStart;
   } catch {
     decision.decision = "would_use_legacy";
     decision.fallbackReason = "signed_url_error";
   }
 
   decision.latencyMs = Date.now() - started;
+  timings.totalMs = Date.now() - t0;
+  decision.phaseTiming = timings;
   if (!options._silent) emitShadowDecisionEvent(decision, asset.id, options.preloadTelemetry);
   return decision;
 }
