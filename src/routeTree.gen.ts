@@ -148,6 +148,7 @@ import { Route as ApiPublicStudioMediaSplatRouteImport } from './routes/api/publ
 import { Route as ApiPublicMapsStaticRouteImport } from './routes/api/public/maps/static'
 import { Route as ApiPublicHooksVisibilityNotificationsRouteImport } from './routes/api/public/hooks/visibility-notifications'
 import { Route as ApiPublicHooksTripJourneyEmailsRouteImport } from './routes/api/public/hooks/trip-journey-emails'
+import { Route as ApiPublicHooksMediaSignatureRenewRouteImport } from './routes/api/public/hooks/media-signature-renew'
 import { Route as ApiPublicHooksEbProcessScheduledPublishRouteImport } from './routes/api/public/hooks/eb-process-scheduled-publish'
 import { Route as ApiPublicHooksCouponReviewRemindersRouteImport } from './routes/api/public/hooks/coupon-review-reminders'
 import { Route as ApiPublicHealthMapsRouteImport } from './routes/api/public/health/maps'
@@ -967,6 +968,12 @@ const ApiPublicHooksTripJourneyEmailsRoute =
     path: '/api/public/hooks/trip-journey-emails',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksMediaSignatureRenewRoute =
+  ApiPublicHooksMediaSignatureRenewRouteImport.update({
+    id: '/api/public/hooks/media-signature-renew',
+    path: '/api/public/hooks/media-signature-renew',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksEbProcessScheduledPublishRoute =
   ApiPublicHooksEbProcessScheduledPublishRouteImport.update({
     id: '/api/public/hooks/eb-process-scheduled-publish',
@@ -1355,6 +1362,7 @@ export interface FileRoutesByFullPath {
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  '/api/public/hooks/media-signature-renew': typeof ApiPublicHooksMediaSignatureRenewRoute
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
@@ -1528,6 +1536,7 @@ export interface FileRoutesByTo {
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  '/api/public/hooks/media-signature-renew': typeof ApiPublicHooksMediaSignatureRenewRoute
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
@@ -1710,6 +1719,7 @@ export interface FileRoutesById {
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  '/api/public/hooks/media-signature-renew': typeof ApiPublicHooksMediaSignatureRenewRoute
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
@@ -1893,6 +1903,7 @@ export interface FileRouteTypes {
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
+    | '/api/public/hooks/media-signature-renew'
     | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
@@ -2066,6 +2077,7 @@ export interface FileRouteTypes {
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
+    | '/api/public/hooks/media-signature-renew'
     | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
@@ -2247,6 +2259,7 @@ export interface FileRouteTypes {
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/eb-process-scheduled-publish'
+    | '/api/public/hooks/media-signature-renew'
     | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/maps/static'
@@ -2343,6 +2356,7 @@ export interface RootRouteChildren {
   ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
   ApiPublicHooksCouponReviewRemindersRoute: typeof ApiPublicHooksCouponReviewRemindersRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
+  ApiPublicHooksMediaSignatureRenewRoute: typeof ApiPublicHooksMediaSignatureRenewRoute
   ApiPublicHooksTripJourneyEmailsRoute: typeof ApiPublicHooksTripJourneyEmailsRoute
   ApiPublicHooksVisibilityNotificationsRoute: typeof ApiPublicHooksVisibilityNotificationsRoute
   ApiPublicMapsStaticRoute: typeof ApiPublicMapsStaticRoute
@@ -3330,6 +3344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksTripJourneyEmailsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/media-signature-renew': {
+      id: '/api/public/hooks/media-signature-renew'
+      path: '/api/public/hooks/media-signature-renew'
+      fullPath: '/api/public/hooks/media-signature-renew'
+      preLoaderRoute: typeof ApiPublicHooksMediaSignatureRenewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/eb-process-scheduled-publish': {
       id: '/api/public/hooks/eb-process-scheduled-publish'
       path: '/api/public/hooks/eb-process-scheduled-publish'
@@ -4154,6 +4175,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicHooksCouponReviewRemindersRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:
     ApiPublicHooksEbProcessScheduledPublishRoute,
+  ApiPublicHooksMediaSignatureRenewRoute:
+    ApiPublicHooksMediaSignatureRenewRoute,
   ApiPublicHooksTripJourneyEmailsRoute: ApiPublicHooksTripJourneyEmailsRoute,
   ApiPublicHooksVisibilityNotificationsRoute:
     ApiPublicHooksVisibilityNotificationsRoute,
@@ -4169,13 +4192,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
