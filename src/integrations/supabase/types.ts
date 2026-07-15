@@ -3349,6 +3349,87 @@ export type Database = {
         }
         Relationships: []
       }
+      media_asset_signed_urls: {
+        Row: {
+          asset_id: string
+          attempt_count: number
+          bucket: string
+          created_at: string
+          expires_at: string
+          issued_at: string
+          last_error: string | null
+          locked_at: string | null
+          locked_by: string | null
+          next_retry_at: string | null
+          path: string
+          refresh_after: string
+          servable_until: string
+          signed_url: string
+          state: string
+          updated_at: string
+          variant_id: string
+          variant_key: string
+          worker_generation: number
+        }
+        Insert: {
+          asset_id: string
+          attempt_count?: number
+          bucket: string
+          created_at?: string
+          expires_at: string
+          issued_at: string
+          last_error?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          next_retry_at?: string | null
+          path: string
+          refresh_after: string
+          servable_until: string
+          signed_url: string
+          state?: string
+          updated_at?: string
+          variant_id: string
+          variant_key: string
+          worker_generation?: number
+        }
+        Update: {
+          asset_id?: string
+          attempt_count?: number
+          bucket?: string
+          created_at?: string
+          expires_at?: string
+          issued_at?: string
+          last_error?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          next_retry_at?: string | null
+          path?: string
+          refresh_after?: string
+          servable_until?: string
+          signed_url?: string
+          state?: string
+          updated_at?: string
+          variant_id?: string
+          variant_key?: string
+          worker_generation?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_asset_signed_urls_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_asset_signed_urls_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "media_asset_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media_asset_translations: {
         Row: {
           alt_text: string | null
@@ -3736,6 +3817,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      media_signature_renew_nonces: {
+        Row: {
+          expires_at: string
+          issued_at: string
+          nonce: string
+          used_by: string | null
+        }
+        Insert: {
+          expires_at: string
+          issued_at?: string
+          nonce: string
+          used_by?: string | null
+        }
+        Update: {
+          expires_at?: string
+          issued_at?: string
+          nonce?: string
+          used_by?: string | null
+        }
+        Relationships: []
       }
       notification_deliveries: {
         Row: {
@@ -7131,6 +7233,45 @@ export type Database = {
       log_business_presence_audit: {
         Args: { _action: string; _business_id: string; _notes?: string }
         Returns: undefined
+      }
+      masr_consume_nonce: {
+        Args: { _nonce: string; _ttl?: string; _used_by?: string }
+        Returns: boolean
+      }
+      masu_claim_renewal_batch: {
+        Args: { _batch_size?: number; _lock_ttl?: string; _worker_id: string }
+        Returns: {
+          asset_id: string
+          attempt_count: number
+          bucket: string
+          path: string
+          state: string
+          variant_id: string
+          variant_key: string
+        }[]
+      }
+      masu_record_failure: {
+        Args: { _error: string; _variant_key: string; _worker_id: string }
+        Returns: undefined
+      }
+      masu_upsert_monotonic: {
+        Args: {
+          _asset_id: string
+          _bucket: string
+          _expires_at: string
+          _issued_at: string
+          _path: string
+          _refresh_after: string
+          _servable_until: string
+          _signed_url: string
+          _variant_id: string
+          _variant_key: string
+          _worker_id: string
+        }
+        Returns: {
+          applied: boolean
+          existing_issued_at: string
+        }[]
       }
       match_alux_knowledge: {
         Args: {
