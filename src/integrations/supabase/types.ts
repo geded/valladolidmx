@@ -3419,17 +3419,24 @@ export type Database = {
           checksum: string | null
           created_at: string
           engine: string
+          engine_version: string | null
           error: string | null
           format: string
           height: number | null
           id: string
+          is_current: boolean
           metadata: Json
           path: string
           processing_ms: number | null
           quality: number | null
+          quality_effective: number | null
+          source_checksum: string | null
           status: string
+          superseded_at: string | null
+          superseded_by: string | null
           updated_at: string
           usage_context: string | null
+          variant_key: string | null
           width: number
         }
         Insert: {
@@ -3439,17 +3446,24 @@ export type Database = {
           checksum?: string | null
           created_at?: string
           engine: string
+          engine_version?: string | null
           error?: string | null
           format: string
           height?: number | null
           id?: string
+          is_current?: boolean
           metadata?: Json
           path: string
           processing_ms?: number | null
           quality?: number | null
+          quality_effective?: number | null
+          source_checksum?: string | null
           status?: string
+          superseded_at?: string | null
+          superseded_by?: string | null
           updated_at?: string
           usage_context?: string | null
+          variant_key?: string | null
           width: number
         }
         Update: {
@@ -3459,17 +3473,24 @@ export type Database = {
           checksum?: string | null
           created_at?: string
           engine?: string
+          engine_version?: string | null
           error?: string | null
           format?: string
           height?: number | null
           id?: string
+          is_current?: boolean
           metadata?: Json
           path?: string
           processing_ms?: number | null
           quality?: number | null
+          quality_effective?: number | null
+          source_checksum?: string | null
           status?: string
+          superseded_at?: string | null
+          superseded_by?: string | null
           updated_at?: string
           usage_context?: string | null
+          variant_key?: string | null
           width?: number
         }
         Relationships: [
@@ -3478,6 +3499,13 @@ export type Database = {
             columns: ["asset_id"]
             isOneToOne: false
             referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_asset_variants_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "media_asset_variants"
             referencedColumns: ["id"]
           },
         ]
