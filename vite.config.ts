@@ -15,7 +15,6 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
-    build: { sourcemap: true },
     plugins: [
       mcpPlugin(),
       VitePWA({
