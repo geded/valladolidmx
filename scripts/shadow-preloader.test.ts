@@ -263,7 +263,7 @@ describe("V10/V11. Contract: preloader NO expone URLs firmadas ni columnas prohi
     const { bundle } = await preloadShadowAssetBundle(ALLOWED, { supabase: client });
     const serialized = JSON.stringify(bundle);
     expect(serialized).not.toContain("abc123");      // checksum real
-    expect(serialized).not.toContain("original_checksum"); // sólo el booleano
+    expect(serialized).not.toContain("\"original_checksum\""); // sólo se expone has_original_checksum:boolean
     expect(serialized).not.toContain("http:");
     expect(serialized).not.toContain("https:");
     expect(serialized).not.toContain("signedUrl");
