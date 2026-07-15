@@ -94,7 +94,7 @@ async function deriveOne(sb, assetId, report, dryRun) {
   // 1. Cargar asset
   const { data: asset, error: aErr } = await sb
     .from("media_assets")
-    .select("id, file_url, original_bucket, original_path, original_checksum, original_bytes, original_width, usage_context, pipeline_status")
+    .select("id, storage_bucket, storage_path, original_bucket, original_path, original_checksum, original_bytes, original_width, usage_context, pipeline_status")
     .eq("id", assetId)
     .maybeSingle();
   if (aErr || !asset) {
@@ -104,23 +104,17 @@ async function deriveOne(sb, assetId, report, dryRun) {
 
   // 2. Descargar original
   let originalBuf;
-  if (asset.original_bucket && asset.original_path) {
-    const dl = await sb.storage.from(asset.original_bucket).download(asset.original_path);
+  const srcBucket = asset.original_bucket || asset.storage_bucket;
+  const srcPath = asset.original_path || asset.storage_path;
+  if (srcBucket && srcPath) {
+    const dl = await sb.storage.from(srcBucket).download(srcPath);
     if (dl.error || !dl.data) {
-      perAsset.errors.push(`download failed from ${asset.original_bucket}/${asset.original_path}: ${dl.error?.message}`);
+      perAsset.errors.push(`download failed from ${srcBucket}/${srcPath}: ${dl.error?.message}`);
       return;
     }
     originalBuf = Buffer.from(await dl.data.arrayBuffer());
-  } else if (asset.file_url) {
-    // Legacy fallback (asset heredado sin original_bucket/path aún). Sólo lectura.
-    const res = await fetch(asset.file_url);
-    if (!res.ok) {
-      perAsset.errors.push(`legacy fetch ${asset.file_url} → HTTP ${res.status}`);
-      return;
-    }
-    originalBuf = Buffer.from(await res.arrayBuffer());
   } else {
-    perAsset.errors.push("asset has no original_bucket/path nor file_url");
+    perAsset.errors.push("asset has no original_bucket/path nor storage_bucket/path");
     return;
   }
 
