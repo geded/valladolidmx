@@ -287,8 +287,13 @@ describe("F. Respuesta del evaluador NO expone URLs firmadas", () => {
       goodCtx,
     );
     const serialized = JSON.stringify(d);
-    expect(serialized).not.toContain("http");
-    expect(serialized).not.toContain("signedUrl");
-    expect(serialized).not.toContain("token");
+    // Ninguna URL, path de storage, bucket, ni token pueden estar en el shape.
+    expect(serialized).not.toContain("http:");
+    expect(serialized).not.toContain("https:");
+    expect(serialized).not.toContain("supabase.co");
+    expect(serialized).not.toContain("token=");
+    expect(serialized).not.toContain("\"signedUrl\"");
+    expect(serialized).not.toContain("\"bucket\"");
+    expect(serialized).not.toContain("\"path\"");
   });
 });
