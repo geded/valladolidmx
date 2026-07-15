@@ -61,6 +61,9 @@ const SignInPromptSheet = React.lazy(() =>
     default: m.SignInPromptSheet,
   })),
 );
+const Toaster = React.lazy(() =>
+  import("@/components/ui/sonner").then((m) => ({ default: m.Toaster })),
+);
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
@@ -302,7 +305,9 @@ function RootComponent() {
         <React.Suspense fallback={null}>
           <ConciergeProposalObserver />
         </React.Suspense>
-        <Toaster />
+        <React.Suspense fallback={null}>
+          <Toaster />
+        </React.Suspense>
         {!isAppShellRoute ? (
           <React.Suspense fallback={null}>
             <EditThisPageButton pathname={pathname} />
