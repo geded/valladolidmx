@@ -125,6 +125,7 @@ import { Route as AuthenticatedAdminIaRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
 import { Route as AuthenticatedAdminConciergeRouteImport } from './routes/_authenticated/admin/concierge'
 import { Route as AuthenticatedAdminAnfitrionesRouteImport } from './routes/_authenticated/admin/anfitriones'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as OrienteMayaDestinoCategoriaIndexRouteImport } from './routes/oriente-maya/$destino.$categoria.index'
 import { Route as AuthenticatedPortalResenasIndexRouteImport } from './routes/_authenticated/portal/resenas.index'
 import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './routes/_authenticated/portal/invitaciones.index'
@@ -833,6 +834,11 @@ const AuthenticatedAdminAnfitrionesRoute =
     path: '/anfitriones',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrienteMayaDestinoCategoriaIndexRoute =
   OrienteMayaDestinoCategoriaIndexRouteImport.update({
     id: '/',
@@ -1275,6 +1281,7 @@ export interface FileRoutesByFullPath {
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/anfitriones': typeof AuthenticatedAdminAnfitrionesRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1451,6 +1458,7 @@ export interface FileRoutesByTo {
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/anfitriones': typeof AuthenticatedAdminAnfitrionesRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1632,6 +1640,7 @@ export interface FileRoutesById {
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/admin/anfitriones': typeof AuthenticatedAdminAnfitrionesRoute
   '/_authenticated/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1816,6 +1825,7 @@ export interface FileRouteTypes {
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/oriente-maya/'
+    | '/.lovable/oauth/consent'
     | '/admin/anfitriones'
     | '/admin/concierge'
     | '/admin/empresas'
@@ -1992,6 +2002,7 @@ export interface FileRouteTypes {
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/oriente-maya'
+    | '/.lovable/oauth/consent'
     | '/admin/anfitriones'
     | '/admin/concierge'
     | '/admin/empresas'
@@ -2172,6 +2183,7 @@ export interface FileRouteTypes {
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/oriente-maya/'
+    | '/.lovable/oauth/consent'
     | '/_authenticated/admin/anfitriones'
     | '/_authenticated/admin/concierge'
     | '/_authenticated/admin/empresas'
@@ -2346,6 +2358,7 @@ export interface RootRouteChildren {
   ViajeCompartidoTokenRoute: typeof ViajeCompartidoTokenRoute
   ViajeroHandleRoute: typeof ViajeroHandleRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiDevMediaPipelineDeriveRoute: typeof ApiDevMediaPipelineDeriveRoute
   ApiDevMediaShadowEvalRoute: typeof ApiDevMediaShadowEvalRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -3182,6 +3195,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/anfitriones'
       preLoaderRoute: typeof AuthenticatedAdminAnfitrionesRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/oriente-maya/$destino/$categoria/': {
       id: '/oriente-maya/$destino/$categoria/'
@@ -4163,6 +4183,7 @@ const rootRouteChildren: RootRouteChildren = {
   ViajeCompartidoTokenRoute: ViajeCompartidoTokenRoute,
   ViajeroHandleRoute: ViajeroHandleRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiDevMediaPipelineDeriveRoute: ApiDevMediaPipelineDeriveRoute,
   ApiDevMediaShadowEvalRoute: ApiDevMediaShadowEvalRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
