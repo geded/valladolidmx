@@ -37,6 +37,23 @@ export type MediaUsageContext =
 
 export type MediaVariantFormat = "avif" | "webp" | "jpeg" | "png";
 
+/**
+ * M2 (aditivo): tipo formal de razón de fallback. Los consumidores actuales
+ * no leen este campo; se expone en `ResolvedMediaSource.fallbackReason?` de
+ * forma opcional para futura telemetría/RUM (no se emplea en el render).
+ */
+export type MediaFallbackReason =
+  | "pipeline_disabled"
+  | "asset_not_ready"
+  | "no_variants_for_context"
+  | "variant_key_missing"
+  | "signed_url_error"
+  | "storage_unreachable"
+  | "url_expired_hit"
+  | "cohort_control"
+  | "crawler_forced_control"
+  | "shadow_only";
+
 export interface MediaVariantInput {
   format: MediaVariantFormat;
   width: number;
@@ -45,6 +62,8 @@ export interface MediaVariantInput {
   bytes?: number | null;
   status?: "pending" | "processing" | "ready" | "failed";
   usage_context?: MediaUsageContext | null;
+  /** M2 (aditivo): identidad reproducible de la variante (§10 M1). */
+  variant_key?: string | null;
 }
 
 export interface MediaAssetInput {
@@ -69,6 +88,10 @@ export interface ResolveMediaSourceOptions {
   targetWidth?: number;
   densities?: number[];
   fallbackUrl?: string;
+  /** M2 (aditivo): `sizes` sugerido para el elemento `<img>`/`<source>`. */
+  sizes?: string;
+  /** M2 (aditivo): hint de prioridad para el consumidor (LCP). */
+  priority?: "high" | "low" | "auto";
 }
 
 export interface ResolvedMediaSource {
@@ -79,6 +102,12 @@ export interface ResolvedMediaSource {
   height?: number;
   usedPipeline: boolean;
   pipelineStatus: NonNullable<MediaAssetInput["pipeline_status"]> | "unknown";
+  /** M2 (aditivo): razón de fallback si `usedPipeline=false`. Opcional. */
+  fallbackReason?: MediaFallbackReason;
+  /** M2 (aditivo): `sizes` propagado desde opciones para render moderno. */
+  sizes?: string;
+  /** M2 (aditivo): hint de prioridad para consumidores LCP-aware. */
+  priority?: "high" | "low" | "auto";
 }
 
 const MIME_BY_FORMAT: Record<MediaVariantFormat, string> = {
