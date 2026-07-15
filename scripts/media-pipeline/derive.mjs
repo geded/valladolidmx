@@ -41,7 +41,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, "out");
 
 const ENGINE = "sharp";
-const ENGINE_VERSION = `sharp@${(await import("sharp/package.json", { with: { type: "json" } })).default.version}`;
+async function detectEngineVersion() {
+  try {
+    const p = join(__dirname, "..", "..", "node_modules", "sharp", "package.json");
+    const raw = await readFile(p, "utf8");
+    return `sharp@${JSON.parse(raw).version}`;
+  } catch { return "sharp@unknown"; }
+}
+const ENGINE_VERSION = await detectEngineVersion();
 
 // Matriz oficial por contexto (adenda benchmark M0).
 const MATRIX = {
