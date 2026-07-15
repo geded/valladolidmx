@@ -1,0 +1,28 @@
+{
+  "timestamp_utc": "2026-07-15T03:28:30.596Z",
+  "runtime_ms": 16885,
+  "volume": 30,
+  "asset_id": "642cb15f-0a13-410c-8027-c4ab92034bf5",
+  "authorized_count": 30,
+  "pipeline_candidate_count": 30,
+  "legacy_count": 0,
+  "pipeline_candidate_ratio": 1,
+  "fallback_reason_distribution": {
+    "none": 30
+  },
+  "latency_ms": {
+    "total_p50": 187,
+    "total_p95": 481,
+    "preload_p50": 341,
+    "preload_p95": 364,
+    "sign_p50": 187,
+    "sign_p95": 481
+  },
+  "db_errors": 0,
+  "sign_errors": 0,
+  "client_exposure": {
+    "signed_urls_returned": 0,
+    "variants_serialized_to_client": 0,
+    "render_path_touched": false
+  }
+}
