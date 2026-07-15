@@ -21,7 +21,10 @@ import {
   SyncStatusBanner,
   UpdateBanner,
 } from "@/components/discovery";
-import { Toaster } from "@/components/ui/sonner";
+// H2·P3 · C1 — Lazy Toaster: `sonner` y su `<Toaster />` sólo se
+// descargan cuando el shim `@/lib/toast` dispara el primer toast, o
+// tras el prefetch en idle. Antes viajaban en el entry para el 100 %
+// de visitantes anónimos.
 // H2·P3 — Diferimos widgets globales que sólo aportan comportamiento
 // post-hidratación (chip flotante, observadores, sheets on-demand).
 // Cada uno reserva un fallback null: al renderizar únicamente después
@@ -56,6 +59,11 @@ const EditThisPageButton = React.lazy(() =>
 const SignInPromptSheet = React.lazy(() =>
   import("@/components/protected-actions/SignInPromptSheet").then((m) => ({
     default: m.SignInPromptSheet,
+  })),
+);
+const LazyToasterHost = React.lazy(() =>
+  import("@/components/ui/LazyToasterHost").then((m) => ({
+    default: m.LazyToasterHost,
   })),
 );
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
@@ -299,7 +307,9 @@ function RootComponent() {
         <React.Suspense fallback={null}>
           <ConciergeProposalObserver />
         </React.Suspense>
-        <Toaster />
+        <React.Suspense fallback={null}>
+          <LazyToasterHost />
+        </React.Suspense>
         {!isAppShellRoute ? (
           <React.Suspense fallback={null}>
             <EditThisPageButton pathname={pathname} />

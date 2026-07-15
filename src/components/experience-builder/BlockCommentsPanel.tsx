@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Check, Loader2, MessageCircle, RefreshCw, Trash2 } from "lucide-react";
 import {
   listBlockComments,

@@ -13,7 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { submitAluxFeedback } from "@/lib/alux/feedback.functions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import type { AluxTravelerSuggestion } from "@/lib/traveler/alux-traveler.functions";
 
 export interface AluxFeedbackButtonsProps {

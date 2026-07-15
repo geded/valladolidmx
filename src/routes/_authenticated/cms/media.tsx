@@ -10,7 +10,7 @@ import {
 } from "@/lib/cms/media-intelligence.functions";
 import { MediaTranslationsSheet } from "@/components/cms/media/MediaTranslationsSheet";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 type Row = {
   id: string;

@@ -9,7 +9,7 @@
  * usuario, así que aquí no filtramos por caso — confiamos en la política.
  */
 import { useEffect, useRef } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { notifyPlanChanged } from "@/lib/alux/plan-signals";

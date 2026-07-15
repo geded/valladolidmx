@@ -4,7 +4,7 @@
  * mantiene el mismo `user_id` y añade el proveedor `google` al usuario.
  */
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
