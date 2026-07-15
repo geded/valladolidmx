@@ -21,7 +21,10 @@ import {
   SyncStatusBanner,
   UpdateBanner,
 } from "@/components/discovery";
-import { Toaster } from "@/components/ui/sonner";
+// H2·P3 · C1 — Lazy Toaster: `sonner` y su `<Toaster />` sólo se
+// descargan cuando el shim `@/lib/toast` dispara el primer toast, o
+// tras el prefetch en idle. Antes viajaban en el entry para el 100 %
+// de visitantes anónimos.
 // H2·P3 — Diferimos widgets globales que sólo aportan comportamiento
 // post-hidratación (chip flotante, observadores, sheets on-demand).
 // Cada uno reserva un fallback null: al renderizar únicamente después
