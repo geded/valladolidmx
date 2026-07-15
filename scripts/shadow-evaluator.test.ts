@@ -237,6 +237,9 @@ describe("D. Sanitización del evento", () => {
         "kind","latency_ms","signed_url_latency_ms","signed_url_ok","ts",
         "variant_key","width_chosen",
         "preload_latency_ms","preload_query_count","preload_error",
+        "sign_source","sign_cache_lookup_ms","sign_network_ms",
+        "phase_auth_ms","phase_preflight_ms","phase_select_ms",
+        "phase_sign_ms","phase_parity_ms","phase_total_ms",
       ].sort(),
     );
   });
