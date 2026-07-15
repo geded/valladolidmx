@@ -24,7 +24,14 @@ export const RENEWAL_BUCKET_ALLOWLIST: ReadonlySet<string> = new Set<string>(["m
 export const SIGN_TTL_SECONDS = 60 * 60 * 24 * 7;       // 7 días
 export const REFRESH_AFTER_SECONDS = Math.floor(SIGN_TTL_SECONDS / 2);
 export const SERVABLE_MARGIN_SECONDS = 6 * 60 * 60;     // 6h (v1.2 §6)
-export const SIGN_ONDEMAND_DEADLINE_MS = 250;           // v1.2 §6
+// Deadline duro para el futuro fallback ON-DEMAND (Fase C). NO se aplica
+// al renovador asíncrono, cuyo p95 real de `createSignedUrl` ≈475ms.
+export const SIGN_ONDEMAND_DEADLINE_MS = 250;
+// Renovador asíncrono: timeout por firma amplio, timeout total de lote
+// y concurrencia limitada. Cancelación cooperativa vía AbortController.
+export const SIGN_ASYNC_DEADLINE_MS   = 5_000;
+export const BATCH_TOTAL_DEADLINE_MS  = 45_000;
+export const RENEWAL_CONCURRENCY      = 4;
 export const CLAIM_BATCH_MAX = 50;
 
 export interface RenewalStats {
@@ -69,7 +76,22 @@ export async function runRenewalBatch(): Promise<RenewalStats> {
   stats.claimed = claimed.length;
   if (claimed.length === 0) return stats;
 
-  for (const row of claimed) {
+  const batchStart = Date.now();
+  const batchAbort = new AbortController();
+  const batchTimer = setTimeout(() => batchAbort.abort(), BATCH_TOTAL_DEADLINE_MS);
+
+  const processOne = async (row: ClaimedRow) => {
+    if (batchAbort.signal.aborted) {
+      // Fail seguro: la fila queda con lock_expires; la máquina de
+      // estados la volverá a reclamar en el siguiente ciclo.
+      await supabaseAdmin.rpc("masu_record_failure", {
+        _variant_key: row.variant_key,
+        _error: "batch_deadline",
+        _worker_id: workerId,
+      });
+      stats.failed++;
+      return;
+    }
     try {
       // §5 / §6 revalidación estricta contra la variante actual.
       if (
@@ -78,7 +100,7 @@ export async function runRenewalBatch(): Promise<RenewalStats> {
       ) {
         await supabaseAdmin.rpc("masu_purge_stale", { _variant_key: row.variant_key });
         stats.stale++;
-        continue;
+        return;
       }
       const { data: variant, error: vErr } = await supabaseAdmin
         .from("media_asset_variants")
@@ -99,11 +121,11 @@ export async function runRenewalBatch(): Promise<RenewalStats> {
       ) {
         await supabaseAdmin.rpc("masu_purge_stale", { _variant_key: row.variant_key });
         stats.stale++;
-        continue;
+        return;
       }
 
-      // Firma con deadline duro (v1.2 §6).
-      const signed = await signWithDeadline(variant.bucket, variant.path, SIGN_ONDEMAND_DEADLINE_MS);
+      // Renovador asíncrono: deadline amplio por firma (Founder §1 Fase B v1.1).
+      const signed = await signWithDeadline(variant.bucket, variant.path, SIGN_ASYNC_DEADLINE_MS);
       if (!signed.ok) {
         await supabaseAdmin.rpc("masu_record_failure", {
           _variant_key: row.variant_key,
@@ -111,7 +133,7 @@ export async function runRenewalBatch(): Promise<RenewalStats> {
           _worker_id: workerId,
         });
         stats.failed++;
-        continue;
+        return;
       }
 
       const issuedAt = new Date();
@@ -139,7 +161,7 @@ export async function runRenewalBatch(): Promise<RenewalStats> {
           _worker_id: workerId,
         });
         stats.failed++;
-        continue;
+        return;
       }
       const applied = Array.isArray(upsert) && upsert[0]?.applied === true;
       if (applied) stats.applied++;
@@ -153,7 +175,21 @@ export async function runRenewalBatch(): Promise<RenewalStats> {
       });
       stats.failed++;
     }
-  }
+  };
+
+  // Pool de concurrencia limitada.
+  const queue = [...claimed];
+  const workers = Array.from({ length: Math.min(RENEWAL_CONCURRENCY, queue.length) }, async () => {
+    while (queue.length > 0 && !batchAbort.signal.aborted) {
+      const next = queue.shift();
+      if (!next) break;
+      await processOne(next);
+    }
+  });
+  await Promise.all(workers);
+  clearTimeout(batchTimer);
+  // batchStart se registra en logs sanitizados externos si aplica.
+  void batchStart;
 
   return stats;
 }
