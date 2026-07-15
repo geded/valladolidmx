@@ -112,15 +112,27 @@ function ConsentPage() {
     <PublicShell>
       <main className="mx-auto max-w-lg px-6 py-16">
         <h1 className="text-3xl font-serif mb-4">
-          Conectar {clientName} a tu cuenta
+          Conectar {clientName} a tu cuenta de Valladolid.mx
         </h1>
-        <p className="text-base text-muted-foreground mb-6">
-          Esto permite que <strong>{clientName}</strong> use Valladolid.mx como tú:
-          buscar en el catálogo público y, cuando aplique, leer tu perfil de viajero
-          y tus planes de viaje respetando tus permisos.
+        <p className="text-base text-foreground mb-6">
+          Si aceptas, <strong>{clientName}</strong> podrá actuar como tú dentro del
+          servidor turístico oficial de Valladolid y el Oriente Maya de Yucatán.
+          En concreto, esta aplicación podrá:
         </p>
-        <p className="text-sm text-muted-foreground mb-8">
-          No se comparte tu contraseña. Puedes revocar el acceso cuando quieras.
+        <ul className="mb-6 space-y-2 text-sm text-foreground">
+          <li className="flex gap-2"><span aria-hidden>•</span><span><strong>Consultar tu perfil de viajero</strong> (nombre, preferencias, idioma).</span></li>
+          <li className="flex gap-2"><span aria-hidden>•</span><span><strong>Consultar tus planes de viaje</strong> (Mi Viaje) para ayudarte a organizarlos.</span></li>
+          <li className="flex gap-2"><span aria-hidden>•</span><span><strong>Buscar información turística pública</strong> del catálogo de Valladolid.mx (destinos, negocios, experiencias, eventos).</span></li>
+        </ul>
+        <p className="text-sm text-muted-foreground mb-2">
+          En esta versión <em>no</em> puede reservar, pagar, modificar tus planes ni
+          contactar empresas en tu nombre. Todo acceso queda registrado en auditoría
+          y respeta tus permisos.
+        </p>
+        <p className="text-xs text-muted-foreground mb-8">
+          No se comparte tu contraseña. Puedes revocar el acceso cuando quieras desde
+          tu cuenta. Servidor oficial:{" "}
+          <code className="text-xs">https://quehacerenvalladolid.com/mcp</code>.
         </p>
         {error ? (
           <div role="alert" className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">

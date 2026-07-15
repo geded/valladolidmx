@@ -31,15 +31,28 @@
           "properties": {
             "query": {
               "type": "string",
-              "minLength": 1,
-              "description": "Texto de búsqueda (nombre, categoría, especialidad)."
+              "minLength": 3,
+              "maxLength": 60,
+              "description": "Texto de búsqueda (mínimo 3 caracteres alfanuméricos)."
             },
             "limit": {
               "default": 10,
               "type": "integer",
               "minimum": 1,
-              "maximum": 25,
-              "description": "Cantidad máxima de resultados a devolver (1-25)."
+              "maximum": 25
+            },
+            "locale": {
+              "default": "es",
+              "description": "Idioma preferido de respuesta (fallback explícito a 'es').",
+              "type": "string",
+              "enum": [
+                "es",
+                "en",
+                "fr",
+                "de",
+                "it",
+                "pt"
+              ]
             }
           },
           "required": [
@@ -51,7 +64,7 @@
       {
         "name": "get_my_traveler_profile",
         "title": "Obtener mi perfil de viajero",
-        "description": "Devuelve el perfil de viajero (handle, nombre, preferencias, idioma) del usuario autenticado.",
+        "description": "Devuelve el perfil de viajero (handle, nombre, preferencias, idioma) del usuario autenticado. Requiere OAuth.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,
@@ -60,14 +73,28 @@
         "inputSchema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "locale": {
+              "default": "es",
+              "description": "Idioma preferido de respuesta (fallback explícito a 'es').",
+              "type": "string",
+              "enum": [
+                "es",
+                "en",
+                "fr",
+                "de",
+                "it",
+                "pt"
+              ]
+            }
+          }
         },
         "outputSchema": null
       },
       {
         "name": "list_my_travel_plans",
         "title": "Listar mis planes de viaje",
-        "description": "Lista los planes de viaje (Mi Viaje) del usuario autenticado, con título, fechas y estatus. Respeta RLS.",
+        "description": "Lista los planes de viaje (Mi Viaje) del usuario autenticado, con título, fechas y estatus. Requiere OAuth. Respeta RLS.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,
@@ -76,7 +103,21 @@
         "inputSchema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "locale": {
+              "default": "es",
+              "description": "Idioma preferido de respuesta (fallback explícito a 'es').",
+              "type": "string",
+              "enum": [
+                "es",
+                "en",
+                "fr",
+                "de",
+                "it",
+                "pt"
+              ]
+            }
+          }
         },
         "outputSchema": null
       }
