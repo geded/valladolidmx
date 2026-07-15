@@ -1,63 +1,52 @@
-## Ola CV3 · "Tu viaje" siempre presente en Discovery
+# MCP M1 · Discovery-Grade Tools — Plan de Ejecución
 
-Cerramos CV2 (Bridge bidireccional Alux ↔ Plan ↔ Concierge, incluida la Ola A19 y locale-aware). Toca CV3 del roadmap CV: hacer que el Travel Plan sea **visible y actuable en toda la superficie pública**, sin salir a `/cuenta/mi-viaje`.
+**Autorizado:** GO Founder · Alcance: sólo lecturas · Fuera: mutaciones, pagos, Alux-as-a-Service.
 
-### Objetivo
+## Sub-olas (una a la vez, con Completion Report y Founder GO/NO-GO entre cada una)
 
-Que cualquier visitante autenticado, mientras explora destinos / experiencias / hoteles / restaurantes / promociones, vea un contador vivo de su plan y pueda:
+### M1.0 · Foundations & Hardening (R1, R2, R3)
+**Objetivo:** dejar operativa la infraestructura transversal que todas las tools consumirán.
 
-1. Ver los ítems que ya guardó y su estatus.
-2. Añadir un ítem desde la tarjeta activa sin recargar.
-3. Escalar a Concierge desde el drawer.
-4. Ver una micro-narrativa de Alux ("Vas 3 ítems, aún te falta hospedaje").
-5. Recibir notificación in-site cuando el concierge proponga algo nuevo.
+- **R2 · Auditoría MCP:** migración `mcp_tool_invocations` (invocation_id, client_id, user_id, tool_name, contract_version, input_hash SHA-256, duration_ms, success, error_code, locale, timestamp). RLS: sólo admin lee; inserta un helper `logMcpInvocation()` (RPC `SECURITY DEFINER` acotado a llamar desde el servidor). Prohibido registrar tokens/PII.
+- **R1 · Rate limiter:** tabla `mcp_rate_buckets` (client_id, user_id/IP fallback, tool_name, window_started_at, count) + helper `enforceRateLimit(ctx, tool, {perMin, perHour})`. Respuesta 429 con `Retry-After`. Registra en auditoría.
+- **R3 · Protección de búsqueda:** helper `sanitizeSearchQuery(q)` — mínimo 3 alfanuméricos, rechaza `%%`/`__`/wildcards puros, escapa `%_\`, cap a 60 chars, cap resultados 25. Base para FTS futura sin bloquear M1.
+- **Output schemas Zod** en `search_businesses`, `get_my_traveler_profile`, `list_my_travel_plans` + añadir `locale` input (`es|en|fr|de|it|pt`).
+- **Helper compartido** `src/lib/mcp/lib/` con: `ctx-supabase.ts` (cliente por token/anón), `audit.ts`, `rate-limit.ts`, `sanitize.ts`, `locale.ts` (fallback explícito auditable), `contracts.ts` (schemas comunes: `GeoPoint`, `LocalizedText`, `SourceCitation`).
+- **Consent screen** (`src/routes/[.]lovable.oauth.consent.tsx`): copy claro en lenguaje humano ("consultar tu perfil de viajero", "consultar tus planes", "buscar información turística"), no scopes técnicos. Enlace al dominio canónico `https://quehacerenvalladolid.com/mcp`.
 
-### Alcance funcional
+**DoD M1.0:** typecheck+build limpios, migración aplicada con GRANTs, RLS probado (anon no lee auditoría), 3 tools existentes con outputSchema tipado + locale, consent screen actualizada. Completion Report M1.0.
 
-- **FloatingTravelPlanDock** (mobile-first): botón flotante bottom-right con badge `N` (nº ítems). Al tap → abre `TravelPlanSheet` (sheet lateral en desktop, bottom-sheet en móvil). Reutiliza el Sheet Stack del Workspace/Discovery Layer.
-- **Contenido del sheet**:
-  - Encabezado con destino y fechas (o CTA para definirlas).
-  - Lista de ítems con `source` badge (`viajero` / `alux` / `concierge`).
-  - Botón "Enviar a mi concierge" → `travel_plan_request_concierge`.
-  - Bloque **Alux narra tu viaje**: llama `runAluxTraveler("narrate_plan", …)` en `locale` activo, cacheado por hash del plan.
-  - Sección "Novedades del concierge": lee `concierge_proposals` en estado `pending`, badge distintivo, botón "Aceptar" (usa CV2.4).
-- **Presencia global**: montar `FloatingTravelPlanDock` en `PublicShell` (Discovery Layer), oculto para invitados y en rutas `/cuenta/**` (donde ya existe la vista dedicada).
-- **Notificación in-site**: hook `useConciergeProposalToasts` que suscribe realtime a `concierge_proposals` del usuario y dispara toast + incrementa un dot en el dock.
+### M1.1 · Discovery Tools Batch A (contenido)
+- `search_experiences` (products tipo experiencia) — reutiliza `catalog/marketplace-reads`.
+- `search_events` — reutiliza `events/public-reads`.
+- `get_business(slug)` — reutiliza `catalog/business-related`.
+- `get_destination_context(slug)` — reutiliza `destinations/public-reads` + zonas + badges Pueblo Mágico.
 
-### Cambios de código
+Todas con: contractVersion 1.0.0, outputSchema Zod tipado, locale, rate limit, auditoría, explainability (`sources[]`, `rationale`, `freshness`, `limitations`). Cero motores paralelos: sólo wrappers sobre server functions aprobadas.
 
-- `src/components/travel-plan/FloatingTravelPlanDock.tsx` (nuevo).
-- `src/components/travel-plan/TravelPlanSheet.tsx` (nuevo, extraído/compartido con `/cuenta/mi-viaje`).
-- `src/components/travel-plan/AluxPlanNarrationCard.tsx` (nuevo, consume nueva capacidad).
-- `src/lib/traveler/alux-traveler.functions.ts`: añadir capacidad `narrate_plan` (respeta prompt corto, locale-aware, sin CTA de escritura).
-- `src/lib/travel-plan/plan-realtime.ts` (nuevo): hook realtime + queryClient invalidations.
-- `src/routes/__root.tsx` o el shell público (`PublicShell`): montar el dock condicional.
+### M1.2 · Discovery Tools Batch B (territorio)
+- `nearby_from_coords(lat, lng, radius_m, categories?)` — **Geolocation Mandatory**: sólo devuelve entidades con lat/lng; incluye `distance_m` por Haversine RPC ya existente.
+- `list_destinations` — con badge Pueblo Mágico.
+- `list_pueblos_magicos` — filtro derivado del registry (Valladolid/Izamal/Espita).
+- `list_categories` — categorías oficiales de negocios.
 
-### Datos
+### M1.3 · Validación & Cierre
+- Prueba RLS: token válido, sin token (401), token de otro usuario (rows scoped).
+- Prueba multi-idioma (es/en/fr mínimo).
+- Prueba real desde ChatGPT y Claude con dominio canónico.
+- Regenerar manifiesto (`app_mcp_server--extract_mcp_manifest`).
+- **Completion Report** con matriz Tool → Fuente → Permiso → Schema → Rate limit → Auditoría → Fallback.
+- Outcome Validation + Veredicto GO/NO-GO para beta cerrada.
 
-Sin nuevas tablas ni RLS. Sólo suscripción realtime a `concierge_proposals` (RLS ya lo cubre) y lectura ligera de `travel_plans` + `travel_plan_items` (server fn ya existente `getActiveTravelPlan`).
+## Reglas vinculantes durante toda la ola
+- Cero `SUPABASE_SERVICE_ROLE_KEY` en `src/lib/mcp/`.
+- Cero motores paralelos: toda tool consume server functions/RPCs aprobados.
+- Explainable-by-Default: cada respuesta incluye `sources`, `freshness_hint`, `limitations` cuando aplique.
+- Geolocation Mandatory en toda tool territorial.
+- Documentación y consent apuntan sólo a `https://quehacerenvalladolid.com/mcp`.
 
-### Contratos y reglas ya vigentes que respetamos
+## Fuera de alcance (M2+)
+Mutaciones Travel Plan, Concierge handoff, Commerce, Pagos, Alux-as-a-Service, tools para empresas.
 
-- Workspace/Discovery First: usamos SheetStack existente, sin motor nuevo.
-- Todas las mutaciones vía Write API oficial (CV2.1).
-- Alux nunca escribe al plan sin confirmación; `narrate_plan` es sólo lectura.
-- Locale-aware end-to-end (A18/A19).
-
-### Fuera de alcance
-
-- Panel admin (CV1).
-- Stripe / cierre de venta (CV4).
-- Edición avanzada del plan en el sheet (drag reorder, fechas por ítem).
-
-### DoD
-
-- Typecheck + build limpio.
-- Dock visible sólo autenticado, sólo en Discovery, oculto en `/cuenta/**`.
-- Sheet abre/cierra sin romper scroll ni foco.
-- `narrate_plan` responde en el locale activo, con encabezados oficiales.
-- Realtime dispara toast al recibir `concierge_proposal` nueva.
-- Demo Pack: viajero demo con 3 ítems + 1 propuesta pendiente + captura móvil/desktop + reproducción en es/en.
-- Completion Report en `docs/blueprint/16.CV3-…md`.
-
-Confirmo y arranco con la primera micro-ola (CV3.1 · Sheet reutilizable + Dock básico con contador vivo) o ajustas alcance antes de empezar.
+## Siguiente paso
+Ejecutar **M1.0 · Foundations & Hardening** ahora y presentar Completion Report antes de abrir M1.1.
