@@ -88,8 +88,29 @@ function admin() {
 
 async function deriveOne(sb, assetId, report, dryRun) {
   const t0 = performance.now();
-  const perAsset = { assetId, variants: [], errors: [], skipped: 0, generated: 0, failed: 0 };
+  const perAsset = { assetId, variants: [], errors: [], skipped: 0, generated: 0, failed: 0, asset_failed: false };
   report.assets.push(perAsset);
+
+  // Envolvemos toda la fase de "preparación" (carga asset, descarga
+  // original, sharp().metadata()) en un try/catch: una excepción aquí
+  // es un fallo REAL de derivación a nivel asset y debe reflejarse
+  // como pipeline_status='failed' + pipeline_last_error poblado.
+  async function markAssetFailed(msg) {
+    perAsset.asset_failed = true;
+    perAsset.errors.push(msg);
+    if (!dryRun) {
+      try {
+        await sb.from("media_assets").update({
+          pipeline_status: "failed",
+          pipeline_engine: ENGINE,
+          pipeline_processed_at: new Date().toISOString(),
+          pipeline_last_error: `M1: ${msg}`.slice(0, 500),
+        }).eq("id", assetId);
+      } catch (u) {
+        perAsset.errors.push(`mark-failed update: ${u?.message ?? u}`);
+      }
+    }
+  }
 
   // 1. Cargar asset
   const { data: asset, error: aErr } = await sb
@@ -109,12 +130,12 @@ async function deriveOne(sb, assetId, report, dryRun) {
   if (srcBucket && srcPath) {
     const dl = await sb.storage.from(srcBucket).download(srcPath);
     if (dl.error || !dl.data) {
-      perAsset.errors.push(`download failed from ${srcBucket}/${srcPath}: ${dl.error?.message}`);
+      await markAssetFailed(`download failed from ${srcBucket}/${srcPath}: ${dl.error?.message}`);
       return;
     }
     originalBuf = Buffer.from(await dl.data.arrayBuffer());
   } else {
-    perAsset.errors.push("asset has no original_bucket/path nor storage_bucket/path");
+    await markAssetFailed("asset has no original_bucket/path nor storage_bucket/path");
     return;
   }
 
@@ -122,7 +143,13 @@ async function deriveOne(sb, assetId, report, dryRun) {
   perAsset.source_checksum = sourceChecksum;
   perAsset.source_bytes = originalBuf.length;
 
-  const meta = await sharp(originalBuf).metadata();
+  let meta;
+  try {
+    meta = await sharp(originalBuf).metadata();
+  } catch (e) {
+    await markAssetFailed(`sharp.metadata: ${e?.message ?? e}`);
+    return;
+  }
   const ctx = asset.usage_context || "generic";
   const plan = MATRIX[ctx] || MATRIX.generic;
 
@@ -273,7 +300,20 @@ async function main() {
   for (const id of ids) {
     console.log(`\n→ ${id}`);
     try { await deriveOne(sb, id, report, args.dryRun); }
-    catch (e) { console.error(`  fatal: ${e?.message ?? e}`); report.assets.push({ assetId: id, fatal: String(e?.message ?? e) }); }
+    catch (e) {
+      console.error(`  fatal: ${e?.message ?? e}`);
+      report.assets.push({ assetId: id, fatal: String(e?.message ?? e), asset_failed: true });
+      if (!args.dryRun) {
+        try {
+          await sb.from("media_assets").update({
+            pipeline_status: "failed",
+            pipeline_engine: ENGINE,
+            pipeline_processed_at: new Date().toISOString(),
+            pipeline_last_error: `M1 fatal: ${String(e?.message ?? e)}`.slice(0, 500),
+          }).eq("id", id);
+        } catch { /* no-op */ }
+      }
+    }
   }
 
   report.finishedAt = new Date().toISOString();
@@ -284,10 +324,11 @@ async function main() {
     generated: a.generated + (r.generated || 0),
     skipped: a.skipped + (r.skipped || 0),
     failed: a.failed + (r.failed || 0),
-  }), { generated: 0, skipped: 0, failed: 0 });
-  console.log(`\n✓ run ${runId} · generated=${totals.generated} skipped=${totals.skipped} failed=${totals.failed}`);
+    asset_failed: a.asset_failed + (r.asset_failed ? 1 : 0),
+  }), { generated: 0, skipped: 0, failed: 0, asset_failed: 0 });
+  console.log(`\n✓ run ${runId} · generated=${totals.generated} skipped=${totals.skipped} failed=${totals.failed} asset_failed=${totals.asset_failed}`);
   console.log(`  report → ${outPath}`);
-  if (totals.failed > 0) process.exit(1);
+  if (totals.failed > 0 || totals.asset_failed > 0) process.exit(1);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
