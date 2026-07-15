@@ -51,12 +51,25 @@ export const Route = createFileRoute("/api/dev/media-shadow-eval")({
         const { evaluateMediaSourceShadow } = await import(
           "@/lib/media/shadow-evaluator.server"
         );
+        const { preloadShadowAssetBundle } = await import(
+          "@/lib/media/shadow-preloader.server"
+        );
+
+        // M2.2: precarga server-side batched (0..2 queries). Allowlist se
+        // valida dentro del preloader; ids ajenos se descartan silenciosamente.
+        const { bundle, result: preloadResult } = await preloadShadowAssetBundle(body.assetId);
 
         const decision = await evaluateMediaSourceShadow(
           { id: body.assetId, original_width: null, file_url: null } as never,
           {
             context: (body.context as never) ?? "generic",
             targetWidth: body.targetWidth,
+            preloaded: bundle,
+            preloadTelemetry: {
+              latencyMs: preloadResult.latencyMs,
+              queryCount: preloadResult.queryCount,
+              error: preloadResult.error,
+            },
           },
           { headerToken, host: hostHeader },
         );
@@ -78,6 +91,10 @@ export const Route = createFileRoute("/api/dev/media-shadow-eval")({
           latency_ms: decision.latencyMs ?? null,
           signed_url_latency_ms: decision.signedUrlLatencyMs ?? null,
           signed_url_ok: decision.signedUrlOk ?? null,
+          preload_latency_ms: preloadResult.latencyMs,
+          preload_query_count: preloadResult.queryCount,
+          preload_error: preloadResult.error ?? null,
+          bundle_present: bundle !== null,
         });
       },
     },
