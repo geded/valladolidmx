@@ -7,7 +7,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
-import { SITE } from "@/config/site";
+import { SITE, absoluteUrl } from "@/config/site";
 import { listPublishedEvents, type PublicEventCard } from "@/lib/events/public-reads.functions";
 
 export const Route = createFileRoute("/blog")({
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/blog")({
           "@type": "CollectionPage",
           name: `Blog · ${SITE.name}`,
           description: "Historias, agenda cultural y notas editoriales del Oriente Maya.",
-          url: "https://quehacerenvalladolid.com/blog",
+          url: absoluteUrl("/blog"),
           inLanguage: "es-MX",
           isPartOf: { "@type": "WebSite", name: SITE.name, url: SITE.url },
         },
