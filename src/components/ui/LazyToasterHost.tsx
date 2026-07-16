@@ -22,13 +22,17 @@ export function LazyToasterHost() {
     if (!mount || Cmp) return;
     let alive = true;
     void import("@/components/ui/sonner").then((m) => {
+      // eslint-disable-next-line no-console
+      console.log("[C1] sonner resolved, setting Cmp", typeof m.Toaster);
       if (alive) setCmp(() => m.Toaster);
-    });
+    }).catch(e => { console.error("[C1] sonner err", e); });
     return () => {
       alive = false;
     };
   }, [mount, Cmp]);
 
+  // eslint-disable-next-line no-console
+  console.log("[C1] render mount=", mount, "hasCmp=", !!Cmp);
   if (!mount || !Cmp) return null;
   return <Cmp />;
 }
