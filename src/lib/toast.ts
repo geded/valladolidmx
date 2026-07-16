@@ -61,7 +61,11 @@ function call(method: string | null, args: unknown[]): unknown {
   // up any toast we enqueue here.
   void loadSonner().then((m) => {
     const target: any = method ? (m.toast as any)[method] : m.toast;
-    target(...args);
+    // eslint-disable-next-line no-console
+    console.log("[C1 shim] firing sonner.toast", method, args, "ToastState?", typeof (m as any).ToastState);
+    const id = target(...args);
+    // eslint-disable-next-line no-console
+    console.log("[C1 shim] sonner returned id=", id);
   });
   return undefined;
 }
