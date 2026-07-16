@@ -49,6 +49,33 @@ export const ORG_ID = `${DISCOVERY_ORIGIN}/#organization` as const;
 export const WEBSITE_ID = `${DISCOVERY_ORIGIN}/#website` as const;
 export const LOGO_ID = `${DISCOVERY_ORIGIN}/#logo` as const;
 
+/**
+ * SEO.A1.1 · PR-2 — Identificadores canónicos de entidades territoriales.
+ *
+ * Genera `@id` estables y absolutos que reutilizan la URL canónica de la
+ * entidad + un fragmento tipado. Reglas:
+ *  · Nunca inventar host, ruta ni fragmento.
+ *  · El fragmento describe el rol semántico (place, business, product),
+ *    NO el tipo Schema.org (para no romper si evoluciona el subtipo).
+ *  · Se usan como ancla de referencia (containedInPlace, isPartOf) sin
+ *    reemitir la entidad completa desde otras páginas.
+ */
+export function placeId(path: string): string {
+  return `${absoluteUrl(path)}#place`;
+}
+export function businessEntityId(path: string): string {
+  return `${absoluteUrl(path)}#business`;
+}
+export function productEntityId(path: string): string {
+  return `${absoluteUrl(path)}#product`;
+}
+export function collectionId(path: string): string {
+  return `${absoluteUrl(path)}#collection`;
+}
+
+/** Región raíz — `@id` canónico del Oriente Maya. Referencia territorial global. */
+export const ORIENTE_MAYA_PLACE_ID = placeId("/oriente-maya");
+
 function absoluteUrl(path: string): string {
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
   const normalized = path.startsWith("/") ? path : `/${path}`;
@@ -207,6 +234,10 @@ export function touristDestinationJsonLd(input: {
   latitude?: number | null;
   longitude?: number | null;
   containedIn?: { name: string; url?: string };
+  /** SEO.A1.1 · PR-2 — Referencia al @id de la entidad territorial padre
+   *  (p. ej. la Región Oriente Maya). Cuando se pasa, `containedInPlace`
+   *  usa `{ "@id": ... }` en lugar de repetir la entidad completa. */
+  containedInId?: string;
   touristType?: string[];
   keywords?: string[];
 }): Record<string, unknown> {
@@ -214,10 +245,12 @@ export function touristDestinationJsonLd(input: {
   const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "TouristDestination",
+    "@id": placeId(input.path),
     name: input.name,
     description: input.description,
     url,
     inLanguage: "es-MX",
+    isPartOf: { "@id": WEBSITE_ID },
   };
   if (input.image) jsonLd.image = input.image;
   if (input.latitude != null && input.longitude != null) {
@@ -227,7 +260,9 @@ export function touristDestinationJsonLd(input: {
       longitude: input.longitude,
     };
   }
-  if (input.containedIn) {
+  if (input.containedInId) {
+    jsonLd.containedInPlace = { "@id": input.containedInId };
+  } else if (input.containedIn) {
     jsonLd.containedInPlace = {
       "@type": "TouristDestination",
       name: input.containedIn.name,
@@ -258,12 +293,16 @@ export function localBusinessJsonLd(input: {
   destinationName?: string;
   aggregateRating?: { ratingValue: number; reviewCount: number };
   areaServed?: string;
+  /** SEO.A1.1 · PR-2 — `@id` del destino contenedor. Referencia
+   *  territorial: la empresa está dentro del destino, no de la marca. */
+  destinationPlaceId?: string;
 }): Record<string, unknown> {
   const url = absoluteUrl(input.path);
   const type = mapCategoryToLocalBusinessType(input.categorySlug);
   const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": type,
+    "@id": businessEntityId(input.path),
     name: input.name,
     description: input.description,
     url,
@@ -295,15 +334,24 @@ export function localBusinessJsonLd(input: {
     };
   }
   if (input.areaServed) jsonLd.areaServed = input.areaServed;
+  if (input.destinationPlaceId) {
+    jsonLd.containedInPlace = { "@id": input.destinationPlaceId };
+  }
+  // Publisher editorial del contenido (ficha en Valladolid.mx). No es la
+  // marca del negocio ni su proveedor operativo — sólo publica la ficha.
+  jsonLd.publisher = { "@id": ORG_ID };
   return jsonLd;
 }
 
 function mapCategoryToLocalBusinessType(slug?: string): string {
   if (!slug) return "LocalBusiness";
   const s = slug.toLowerCase();
-  if (s.includes("hotel") || s.includes("hosped")) return "LodgingBusiness";
+  if (s.includes("hotel") || s.includes("hosped")) return "Hotel";
   if (s.includes("restaur") || s.includes("gastro")) return "Restaurant";
-  if (s.includes("tour") || s.includes("experien")) return "TouristAttraction";
+  if (s.includes("cenote") || s.includes("zona-arqueolog") || s.includes("ruinas") || s.includes("atractivo")) return "TouristAttraction";
+  if (s.includes("museo")) return "Museum";
+  if (s.includes("tour") || s.includes("agencia")) return "TravelAgency";
+  if (s.includes("experien")) return "TouristAttraction";
   if (s.includes("spa")) return "HealthAndBeautyBusiness";
   if (s.includes("bar")) return "BarOrPub";
   if (s.includes("cafe") || s.includes("cafeter")) return "CafeOrCoffeeShop";
@@ -326,18 +374,24 @@ export function productJsonLd(input: {
   priceCurrency?: string;
   availability?: "InStock" | "OutOfStock" | "PreOrder";
   aggregateRating?: { ratingValue: number; reviewCount: number };
+  /** SEO.A1.1 · PR-2 — `@id` del negocio proveedor (brand real). */
+  providerBusinessId?: string;
 }): Record<string, unknown> {
   const url = absoluteUrl(input.path);
   const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": productEntityId(input.path),
     name: input.name,
     description: input.description,
     url,
   };
   if (input.image) jsonLd.image = input.image;
   if (input.sku) jsonLd.sku = input.sku;
-  if (input.brandName) {
+  if (input.providerBusinessId) {
+    // El negocio operador ES la marca real del producto — no Valladolid.mx.
+    jsonLd.brand = { "@id": input.providerBusinessId };
+  } else if (input.brandName) {
     jsonLd.brand = { "@type": "Brand", name: input.brandName };
   }
   if (input.priceAmount != null && input.priceAmount > 0) {
@@ -384,15 +438,18 @@ export function collectionPageJsonLd(input: {
   description: string;
   path: string;
   items: ReadonlyArray<{ name: string; path: string }>;
+  /** SEO.A1.1 · PR-2 — `@id` del lugar del que trata el listado. */
+  aboutPlaceId?: string;
 }): Record<string, unknown> {
-  return {
+  const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
+    "@id": collectionId(input.path),
     name: input.name,
     description: input.description,
     url: absoluteUrl(input.path),
     inLanguage: "es-MX",
-    isPartOf: { "@type": "WebSite", name: SITE.name, url: DISCOVERY_ORIGIN },
+    isPartOf: { "@id": WEBSITE_ID },
     mainEntity: {
       "@type": "ItemList",
       numberOfItems: input.items.length,
@@ -404,6 +461,8 @@ export function collectionPageJsonLd(input: {
       })),
     },
   };
+  if (input.aboutPlaceId) jsonLd.about = { "@id": input.aboutPlaceId };
+  return jsonLd;
 }
 
 /**
@@ -495,8 +554,12 @@ export function webPageJsonLd(input: {
     description: input.description,
     url,
     inLanguage: "es-MX",
-    isPartOf: { "@type": "WebSite", name: SITE.name, url: DISCOVERY_ORIGIN },
+    // Housekeeping SEO.A1.1 · PR-2 — reconciliar con WebSite canónico.
+    isPartOf: { "@id": WEBSITE_ID },
   };
-  if (input.image) jsonLd.primaryImageOfPage = { "@type": "ImageObject", url: input.image };
+  if (input.image) {
+    // Housekeeping SEO.A1.1 · PR-2 — absolutizar URL de imagen principal.
+    jsonLd.primaryImageOfPage = { "@type": "ImageObject", url: absoluteUrl(input.image) };
+  }
   return jsonLd;
 }

@@ -7,7 +7,7 @@
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead, productJsonLd, faqPageJsonLd } from "@/lib/discovery/seo";
+import { buildPublicHead, productJsonLd, faqPageJsonLd, businessEntityId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getMarketplaceProductBySlug } from "@/lib/catalog/marketplace-reads.functions";
 import { getProductRelated } from "@/lib/catalog/product-related.functions";
@@ -74,6 +74,9 @@ export const Route = createFileRoute(
         image: p.cover_url ?? p.media?.[0]?.url ?? undefined,
         sku: p.slug,
         brandName: p.business.display_name,
+        providerBusinessId: businessEntityId(
+          `/oriente-maya/${params.destino}/${params.categoria}/${params.empresa}`,
+        ),
         priceAmount: p.price_amount,
         priceCurrency: p.price_currency,
         availability: "InStock",
