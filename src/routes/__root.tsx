@@ -61,11 +61,10 @@ const SignInPromptSheet = React.lazy(() =>
     default: m.SignInPromptSheet,
   })),
 );
-const LazyToasterHost = React.lazy(() =>
-  import("@/components/ui/LazyToasterHost").then((m) => ({
-    default: m.LazyToasterHost,
-  })),
-);
+// H2·P3 · C1 — el host es tiny y necesita montar su useEffect cuanto
+// antes para suscribirse al bus del shim; el peso real de `sonner` se
+// difiere dentro de `LazyToasterHost` con un React.lazy interno.
+import { LazyToasterHost } from "@/components/ui/LazyToasterHost";
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
@@ -307,9 +306,7 @@ function RootComponent() {
         <React.Suspense fallback={null}>
           <ConciergeProposalObserver />
         </React.Suspense>
-        <React.Suspense fallback={null}>
-          <LazyToasterHost />
-        </React.Suspense>
+        <LazyToasterHost />
         {!isAppShellRoute ? (
           <React.Suspense fallback={null}>
             <EditThisPageButton pathname={pathname} />

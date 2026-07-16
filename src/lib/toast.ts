@@ -26,6 +26,24 @@ let mod: SonnerModule | null = null;
 let loading: Promise<SonnerModule> | null = null;
 const mountListeners = new Set<() => void>();
 let mountRequested = false;
+let toasterReady = false;
+const pending: Array<{ method: string | null; args: unknown[] }> = [];
+
+function flushPending() {
+  if (!mod || !toasterReady) return;
+  const queue = pending.splice(0);
+  for (const { method, args } of queue) {
+    const target: any = method ? (mod.toast as any)[method] : mod.toast;
+    try { target(...args); } catch { /* noop */ }
+  }
+}
+
+/** Called by LazyToasterHost once <Toaster /> has mounted. */
+export function markToasterReady() {
+  toasterReady = true;
+  // Give sonner a microtask to subscribe its internal listener.
+  queueMicrotask(flushPending);
+}
 
 function requestMount() {
   if (mountRequested) return;
@@ -52,17 +70,14 @@ function loadSonner(): Promise<SonnerModule> {
 
 function call(method: string | null, args: unknown[]): unknown {
   requestMount();
-  if (mod) {
+  if (mod && toasterReady) {
     const target: any = method ? (mod.toast as any)[method] : mod.toast;
     return target(...args);
   }
-  // Kick off the load and forward once ready. Sonner's global ToastState
-  // subscribers list is shared, so a late-mounted <Toaster /> still picks
-  // up any toast we enqueue here.
-  void loadSonner().then((m) => {
-    const target: any = method ? (m.toast as any)[method] : m.toast;
-    target(...args);
-  });
+  // Buffer until <Toaster /> is mounted so the first toast isn't lost:
+  // sonner drops toasts emitted before any Toaster has subscribed.
+  pending.push({ method, args });
+  void loadSonner().then(flushPending);
   return undefined;
 }
 
@@ -92,4 +107,20 @@ export const toast: ToastFacade = facade;
 export function prefetchToaster(): Promise<unknown> {
   requestMount();
   return loadSonner();
+}
+
+// H2·P3 · C1 protocol probe. Attach a window handle only when the URL
+// carries `?__c1_probe=1` so the §4 functional protocol can drive the
+// lazy shim from an automated browser without shipping a debug API to
+// real users. Zero cost otherwise.
+if (typeof window !== "undefined") {
+  try {
+    if (new URLSearchParams(window.location.search).has("__c1_probe")) {
+      (window as unknown as Record<string, unknown>).__lvToast = toast;
+      (window as unknown as Record<string, unknown>).__lvPrefetchToaster =
+        prefetchToaster;
+    }
+  } catch {
+    /* noop */
+  }
 }

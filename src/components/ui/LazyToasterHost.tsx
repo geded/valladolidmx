@@ -8,19 +8,31 @@
  * dejando fuera del entry a `sonner` completo.
  */
 import * as React from "react";
-import { subscribeToasterMount } from "@/lib/toast";
+import { subscribeToasterMount, markToasterReady } from "@/lib/toast";
 
-const Toaster = React.lazy(() =>
-  import("@/components/ui/sonner").then((m) => ({ default: m.Toaster })),
-);
+type ToasterMod = typeof import("@/components/ui/sonner");
 
 export function LazyToasterHost() {
   const [mount, setMount] = React.useState(false);
+  const [Cmp, setCmp] = React.useState<ToasterMod["Toaster"] | null>(null);
+
   React.useEffect(() => subscribeToasterMount(() => setMount(true)), []);
-  if (!mount) return null;
-  return (
-    <React.Suspense fallback={null}>
-      <Toaster />
-    </React.Suspense>
-  );
+
+  React.useEffect(() => {
+    if (!mount || Cmp) return;
+    let alive = true;
+    void import("@/components/ui/sonner").then((m) => {
+      if (alive) setCmp(() => m.Toaster);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [mount, Cmp]);
+
+  React.useEffect(() => {
+    if (Cmp) markToasterReady();
+  }, [Cmp]);
+
+  if (!mount || !Cmp) return null;
+  return <Cmp />;
 }
