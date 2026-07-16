@@ -306,9 +306,7 @@ function RootComponent() {
         <React.Suspense fallback={null}>
           <ConciergeProposalObserver />
         </React.Suspense>
-        <React.Suspense fallback={null}>
-          <LazyToasterHost />
-        </React.Suspense>
+        <LazyToasterHost />
         {!isAppShellRoute ? (
           <React.Suspense fallback={null}>
             <EditThisPageButton pathname={pathname} />
