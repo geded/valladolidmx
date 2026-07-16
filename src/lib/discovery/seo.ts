@@ -87,9 +87,7 @@ export function collectionId(path: string): string {
 export const ORIENTE_MAYA_PLACE_ID = placeId("/oriente-maya");
 
 function absoluteUrl(path: string): string {
-  if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  const normalized = path.startsWith("/") ? path : `/${path}`;
-  return `${DISCOVERY_ORIGIN}${normalized}`;
+  return siteAbsoluteUrl(path);
 }
 
 export function buildPublicHead(options: DiscoveryHeadOptions): DiscoveryHead {
