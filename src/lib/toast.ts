@@ -28,6 +28,7 @@ const mountListeners = new Set<() => void>();
 let mountRequested = false;
 let toasterReady = false;
 const pending: Array<{ method: string | null; args: unknown[] }> = [];
+const PENDING_MAX = 32;
 
 function flushPending() {
   if (!mod || !toasterReady) return;
@@ -60,10 +61,18 @@ export function subscribeToasterMount(cb: () => void): () => void {
 function loadSonner(): Promise<SonnerModule> {
   if (mod) return Promise.resolve(mod);
   if (!loading) {
-    loading = import("sonner").then((m) => {
-      mod = m;
-      return m;
-    });
+    loading = import("sonner")
+      .then((m) => {
+        mod = m;
+        return m;
+      })
+      .catch((err) => {
+        // Allow a future call to retry the import; drop buffered
+        // toasts so they don't leak forever if sonner never loads.
+        loading = null;
+        pending.length = 0;
+        throw err;
+      });
   }
   return loading;
 }
@@ -77,7 +86,8 @@ function call(method: string | null, args: unknown[]): unknown {
   // Buffer until <Toaster /> is mounted so the first toast isn't lost:
   // sonner drops toasts emitted before any Toaster has subscribed.
   pending.push({ method, args });
-  void loadSonner().then(flushPending);
+  if (pending.length > PENDING_MAX) pending.shift();
+  void loadSonner().then(flushPending).catch(() => {});
   return undefined;
 }
 
@@ -107,20 +117,4 @@ export const toast: ToastFacade = facade;
 export function prefetchToaster(): Promise<unknown> {
   requestMount();
   return loadSonner();
-}
-
-// H2·P3 · C1 protocol probe. Attach a window handle only when the URL
-// carries `?__c1_probe=1` so the §4 functional protocol can drive the
-// lazy shim from an automated browser without shipping a debug API to
-// real users. Zero cost otherwise.
-if (typeof window !== "undefined") {
-  try {
-    if (new URLSearchParams(window.location.search).has("__c1_probe")) {
-      (window as unknown as Record<string, unknown>).__lvToast = toast;
-      (window as unknown as Record<string, unknown>).__lvPrefetchToaster =
-        prefetchToaster;
-    }
-  } catch {
-    /* noop */
-  }
 }
