@@ -86,7 +86,7 @@ en el critical path del primer visitante.
 | Guardrail | Verificación |
 |---|---|
 | Cero regresión funcional | 46 sites migrados por sed puntual; API `toast.*` idéntica; superficies auth/errores/forms/Travel Plan/Concierge/Commerce/CMS/admin conservan su import (sólo cambió la ruta del módulo). |
-| Cero pérdida primer toast | Shim usa `import()` dinámico + `toast()` diferido; sonner acumula en `ToastState` global antes del mount del Toaster. |
+| Cero pérdida primer toast | El shim conserva los toasts previos al montaje mediante su buffer FIFO interno y los despacha una sola vez después de `markToasterReady()`. Sonner, por sí solo, descartaba los eventos emitidos antes de la suscripción del Toaster. |
 | SSR-safe | `import("sonner")` sólo se dispara al llamar `toast()`, cosa que no ocurre en SSR. `LazyToasterHost` renderiza `null` en SSR (state inicial `false`). |
 | Sin sistema paralelo | Es una fachada de sonner; no hay segundo motor. |
 | Rollback simple | Restaurar `import { Toaster } from "@/components/ui/sonner"` + `<Toaster />` en `__root.tsx` y revertir imports masivos (`sed -i 's|@/lib/toast|sonner|g'`). |
