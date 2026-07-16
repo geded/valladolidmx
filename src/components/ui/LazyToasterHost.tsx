@@ -10,36 +10,25 @@
 import * as React from "react";
 import { subscribeToasterMount } from "@/lib/toast";
 
-const Toaster = React.lazy(() =>
-  import("@/components/ui/sonner").then((m) => {
-    // eslint-disable-next-line no-console
-    console.log("[C1] sonner chunk resolved", Object.keys(m));
-    return { default: m.Toaster };
-  }).catch((e) => {
-    // eslint-disable-next-line no-console
-    console.error("[C1] sonner chunk failed", e);
-    throw e;
-  }),
-);
+type ToasterMod = typeof import("@/components/ui/sonner");
 
 export function LazyToasterHost() {
   const [mount, setMount] = React.useState(false);
+  const [Cmp, setCmp] = React.useState<ToasterMod["Toaster"] | null>(null);
+
+  React.useEffect(() => subscribeToasterMount(() => setMount(true)), []);
+
   React.useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log("[C1] LazyToasterHost useEffect subscribed");
-    const un = subscribeToasterMount(() => {
-      // eslint-disable-next-line no-console
-      console.log("[C1] LazyToasterHost cb fired -> setMount(true)");
-      setMount(true);
+    if (!mount || Cmp) return;
+    let alive = true;
+    void import("@/components/ui/sonner").then((m) => {
+      if (alive) setCmp(() => m.Toaster);
     });
-    return un;
-  }, []);
-  // eslint-disable-next-line no-console
-  console.log("[C1] LazyToasterHost render mount=", mount);
-  if (!mount) return null;
-  return (
-    <React.Suspense fallback={null}>
-      <Toaster />
-    </React.Suspense>
-  );
+    return () => {
+      alive = false;
+    };
+  }, [mount, Cmp]);
+
+  if (!mount || !Cmp) return null;
+  return <Cmp />;
 }
