@@ -1,27 +1,60 @@
 /**
  * U-VISUAL · V4 — `vmx.experience.map` (Founder Discovery Map Principle)
  *
- * Única familia oficial de mapas. Regla de Compatibilidad Evolutiva:
- * este bloque crece sólo por `variant`, `capabilities`, `permissions` y
- * `extensions[]`. No se crearán `experience.map-pro`, `-v2`, `-cluster`.
+ * C2.F1 Piloto (Render-Only Block Contracts). Split-file, single-source:
+ *  - `types.ts`     → tipos canónicos (fuente única). Sin Zod.
+ *  - `defaults.ts`  → defaults + `applyExperienceMapDefaults()`. Sin Zod.
+ *  - `contract.ts`  → schemas Zod para Studio/CMS/server (validación
+ *                     runtime en la ruta de ESCRITURA). Re-exporta los
+ *                     tipos y defaults canónicos.
  *
- * Variantes:
- *  - single    → un punto (ficha empresa/producto).
- *  - multi     → varios puntos (destino, "qué hay cerca").
- *  - list-sync → mapa sincronizado con grid + facets (TourismListing).
- *  - cluster   → territorial con agrupación (futuro).
+ * Equivalencia enforced por:
+ *  - `satisfies z.ZodType<T>` (compile-time) sobre `experienceMapDTOSchema`.
+ *  - Fixtures en `scripts/experience-map-defaults.test.ts` (runtime).
+ *
+ * Regla de Compatibilidad Evolutiva: este bloque crece sólo por
+ * `variant`, `capabilities`, `permissions` y `extensions[]`. Prohibido
+ * `-pro`, `-v2`, `-cluster` o duplicar schemas/defaults.
  */
 import { z } from "zod";
+import type {
+  ExperienceMapCapabilities,
+  ExperienceMapCenter,
+  ExperienceMapDTO,
+  ExperienceMapEntityKind,
+  ExperienceMapPoint,
+  ExperienceMapVariant,
+} from "./types";
+import {
+  EXPERIENCE_MAP_DEFAULT_CAPABILITIES,
+  EXPERIENCE_MAP_DEFAULT_CENTER_ZOOM,
+  EXPERIENCE_MAP_DEFAULT_VARIANT,
+} from "./defaults";
 
-export const EXPERIENCE_MAP_CONTRACT_VERSION = "1.0.0";
+// Re-exports: fuente única para todos los consumidores.
+export type {
+  ExperienceMapCapabilities,
+  ExperienceMapCenter,
+  ExperienceMapDTO,
+  ExperienceMapEntityKind,
+  ExperienceMapPoint,
+  ExperienceMapVariant,
+} from "./types";
+export {
+  EXPERIENCE_MAP_CONTRACT_VERSION,
+} from "./types";
+export {
+  EXPERIENCE_MAP_DEFAULT_CAPABILITIES,
+  EXPERIENCE_MAP_DEFAULT_VARIANT,
+  applyExperienceMapDefaults,
+} from "./defaults";
 
 export const experienceMapVariantSchema = z.enum([
   "single",
   "multi",
   "list-sync",
   "cluster",
-]);
-export type ExperienceMapVariant = z.infer<typeof experienceMapVariantSchema>;
+]) satisfies z.ZodType<ExperienceMapVariant>;
 
 export const experienceMapEntityKindSchema = z.enum([
   "business",
@@ -29,10 +62,7 @@ export const experienceMapEntityKindSchema = z.enum([
   "destination",
   "event",
   "promotion",
-]);
-export type ExperienceMapEntityKind = z.infer<
-  typeof experienceMapEntityKindSchema
->;
+]) satisfies z.ZodType<ExperienceMapEntityKind>;
 
 export const experienceMapPointSchema = z.object({
   id: z.string().min(1),
@@ -45,37 +75,32 @@ export const experienceMapPointSchema = z.object({
   thumbUrl: z.string().url().nullable().optional(),
   badge: z.string().nullable().optional(),
   priceLabel: z.string().nullable().optional(),
-});
-export type ExperienceMapPoint = z.infer<typeof experienceMapPointSchema>;
+}) satisfies z.ZodType<ExperienceMapPoint>;
 
 export const experienceMapCapabilitiesSchema = z.object({
-  showDistance: z.boolean().default(true),
-  showDirections: z.boolean().default(true),
-  clustering: z.boolean().default(false),
-  syncList: z.boolean().default(false),
-  staticFallback: z.boolean().default(true),
-  allowInteractiveToggle: z.boolean().default(true),
+  showDistance: z.boolean().default(EXPERIENCE_MAP_DEFAULT_CAPABILITIES.showDistance),
+  showDirections: z.boolean().default(EXPERIENCE_MAP_DEFAULT_CAPABILITIES.showDirections),
+  clustering: z.boolean().default(EXPERIENCE_MAP_DEFAULT_CAPABILITIES.clustering),
+  syncList: z.boolean().default(EXPERIENCE_MAP_DEFAULT_CAPABILITIES.syncList),
+  staticFallback: z.boolean().default(EXPERIENCE_MAP_DEFAULT_CAPABILITIES.staticFallback),
+  allowInteractiveToggle: z
+    .boolean()
+    .default(EXPERIENCE_MAP_DEFAULT_CAPABILITIES.allowInteractiveToggle),
 });
-export type ExperienceMapCapabilities = z.infer<
-  typeof experienceMapCapabilitiesSchema
->;
+
+export const experienceMapCenterSchema = z.object({
+  lat: z.number(),
+  lng: z.number(),
+  zoom: z.number().default(EXPERIENCE_MAP_DEFAULT_CENTER_ZOOM),
+}) satisfies z.ZodType<ExperienceMapCenter>;
 
 export const experienceMapDTOSchema = z.object({
-  variant: experienceMapVariantSchema.default("single"),
+  variant: experienceMapVariantSchema.default(EXPERIENCE_MAP_DEFAULT_VARIANT),
   heading: z.string().nullable().optional(),
-  center: z
-    .object({ lat: z.number(), lng: z.number(), zoom: z.number().default(14) })
-    .nullable()
-    .optional(),
+  center: experienceMapCenterSchema.nullable().optional(),
   points: z.array(experienceMapPointSchema).default([]),
   capabilities: experienceMapCapabilitiesSchema.default({
-    showDistance: true,
-    showDirections: true,
-    clustering: false,
-    syncList: false,
-    staticFallback: true,
-    allowInteractiveToggle: true,
+    ...EXPERIENCE_MAP_DEFAULT_CAPABILITIES,
   }),
   emptyMessage: z.string().nullable().optional(),
 });
-export type ExperienceMapDTO = z.infer<typeof experienceMapDTOSchema>;
