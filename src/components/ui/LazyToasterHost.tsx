@@ -8,7 +8,7 @@
  * dejando fuera del entry a `sonner` completo.
  */
 import * as React from "react";
-import { subscribeToasterMount } from "@/lib/toast";
+import { subscribeToasterMount, markToasterReady } from "@/lib/toast";
 
 type ToasterMod = typeof import("@/components/ui/sonner");
 
@@ -22,17 +22,17 @@ export function LazyToasterHost() {
     if (!mount || Cmp) return;
     let alive = true;
     void import("@/components/ui/sonner").then((m) => {
-      // eslint-disable-next-line no-console
-      console.log("[C1] sonner resolved, setting Cmp", typeof m.Toaster);
       if (alive) setCmp(() => m.Toaster);
-    }).catch(e => { console.error("[C1] sonner err", e); });
+    });
     return () => {
       alive = false;
     };
   }, [mount, Cmp]);
 
-  // eslint-disable-next-line no-console
-  console.log("[C1] render mount=", mount, "hasCmp=", !!Cmp);
+  React.useEffect(() => {
+    if (Cmp) markToasterReady();
+  }, [Cmp]);
+
   if (!mount || !Cmp) return null;
   return <Cmp />;
 }
