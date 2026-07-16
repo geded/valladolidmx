@@ -8,7 +8,7 @@
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead, localBusinessJsonLd } from "@/lib/discovery/seo";
+import { buildPublicHead, localBusinessJsonLd, placeId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getMarketplaceBusinessBySlug } from "@/lib/catalog/marketplace-reads.functions";
 import { getBusinessRelated } from "@/lib/catalog/business-related.functions";
@@ -94,6 +94,7 @@ export const Route = createFileRoute(
           categorySlug: b.category_slug,
           destinationName: destName,
           areaServed: `${destName}, Yucatán`,
+          destinationPlaceId: placeId(`/oriente-maya/${params.destino}`),
         }),
       ],
     });
