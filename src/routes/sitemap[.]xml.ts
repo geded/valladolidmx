@@ -31,7 +31,8 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/eventos", changefreq: "weekly", priority: "0.8" },
   { path: "/arma-tu-viaje", changefreq: "monthly", priority: "0.9" },
   { path: "/empresas", changefreq: "monthly", priority: "0.7" },
-  { path: "/blog", changefreq: "weekly", priority: "0.6" },
+  // SEO.A1.2 · D3 — `/blog` fuera del sitemap hasta que exista contenido
+  // editorial real (modelo `/blog/$slug`, artículos publicados).
   { path: "/casas-de-vacaciones", changefreq: "weekly", priority: "0.7" },
   { path: "/contacto", changefreq: "monthly", priority: "0.5" },
 ];

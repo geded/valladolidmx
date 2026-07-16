@@ -17,6 +17,11 @@ export const Route = createFileRoute("/blog")({
       title: `Blog · ${SITE.name}`,
       description: "Historias, agenda y notas editoriales del Oriente Maya.",
       path: "/blog",
+      // SEO.A1.2 · D3 — Mientras no exista contenido editorial real
+      // (modelo `/blog/$slug`, artículos publicados, autor/fecha,
+      // imagen editorial), `/blog` permanece accesible pero `noindex,
+      // follow` — retirado también del sitemap.
+      robots: "noindex, follow",
       jsonLd: [
         {
           "@context": "https://schema.org",

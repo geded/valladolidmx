@@ -38,6 +38,16 @@ export interface DiscoveryHead {
 export const DISCOVERY_ORIGIN = "https://quehacerenvalladolid.com";
 
 /**
+ * SEO.A1.2 · D1/D2 — Imagen social oficial estable.
+ * Fallback aplicado por `buildPublicHead` únicamente en superficies
+ * públicas e indexables (`noindex` desactiva el fallback).
+ */
+export const SITE_DEFAULT_OG_IMAGE =
+  "https://quehacerenvalladolid.com/og/default-1200x630.jpg" as const;
+export const SITE_DEFAULT_OG_WIDTH = 1200 as const;
+export const SITE_DEFAULT_OG_HEIGHT = 630 as const;
+
+/**
  * SEO.A1.1 · PR-1 — Identificadores canónicos de entidades globales.
  * Se usan como `@id` estables para que Google/IA reconcilien la misma
  * entidad a lo largo del grafo semántico del sitio.
@@ -97,6 +107,19 @@ export function buildPublicHead(options: DiscoveryHeadOptions): DiscoveryHead {
 
   const url = absoluteUrl(path);
 
+  // SEO.A1.2 · D2 — Fallback social centralizado.
+  // Reglas: absolutizar URLs relativas con DISCOVERY_ORIGIN; aplicar
+  // fallback oficial ÚNICAMENTE cuando la superficie es indexable
+  // (sin noindex y sin robots="noindex,*"); nunca sobre superficies
+  // privadas/técnicas/temporales.
+  const robotsExplicit = robots ?? (noindex ? "noindex, nofollow" : undefined);
+  const isIndexable = !noindex && !(robotsExplicit?.includes("noindex"));
+  const resolvedOgImage = ogImage
+    ? absoluteUrl(ogImage)
+    : isIndexable
+      ? SITE_DEFAULT_OG_IMAGE
+      : undefined;
+
   const meta: Array<Record<string, string>> = [
     { title },
     { name: "description", content: truncateDescription(description) },
@@ -106,19 +129,24 @@ export function buildPublicHead(options: DiscoveryHeadOptions): DiscoveryHead {
     { property: "og:url", content: url },
     { property: "og:locale", content: locale },
     { property: "og:site_name", content: SITE.name },
-    { name: "twitter:card", content: ogImage ? "summary_large_image" : "summary" },
+    { name: "twitter:card", content: resolvedOgImage ? "summary_large_image" : "summary" },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: truncateDescription(description) },
   ];
 
-  if (ogImage) {
-    meta.push({ property: "og:image", content: ogImage });
-    meta.push({ name: "twitter:image", content: ogImage });
+  if (resolvedOgImage) {
+    meta.push({ property: "og:image", content: resolvedOgImage });
+    // Cuando se usa el fallback oficial, conocemos dimensiones exactas.
+    // Para heros publicados, se emiten los mismos anchos por convención
+    // 1200×630 (contrato editorial de portadas OG). Consumidores que
+    // requieran otras dimensiones deberán ampliar el contrato.
+    meta.push({ property: "og:image:width", content: String(SITE_DEFAULT_OG_WIDTH) });
+    meta.push({ property: "og:image:height", content: String(SITE_DEFAULT_OG_HEIGHT) });
+    meta.push({ name: "twitter:image", content: resolvedOgImage });
   }
 
-  const robotsContent = robots ?? (noindex ? "noindex, nofollow" : undefined);
-  if (robotsContent) {
-    meta.push({ name: "robots", content: robotsContent });
+  if (robotsExplicit) {
+    meta.push({ name: "robots", content: robotsExplicit });
   }
 
   const links: Array<Record<string, string>> = [{ rel: "canonical", href: url }];
