@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { SITE } from '@/config/site'
 import { Text } from '@react-email/components'
 import { VisibilityShell } from './_visibility-shared'
 import type { TemplateEntry } from './registry'
@@ -20,7 +21,7 @@ const Email = ({
   startDateLabel,
   partySize,
   daysToTrip = 14,
-  planUrl = 'https://valladolid.mx/cuenta/mi-viaje',
+  planUrl = `${SITE.url}/cuenta/mi-viaje`,
 }: Props) => (
   <VisibilityShell
     preview={`Faltan ${daysToTrip} días para tu llegada al Oriente Maya`}

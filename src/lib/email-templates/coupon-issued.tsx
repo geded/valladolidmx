@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { SITE } from '@/config/site'
 import {
   Body,
   Button,
@@ -30,7 +31,7 @@ const CouponIssuedEmail = ({
   discountPercent,
   businessName,
   validUntil,
-  couponUrl = 'https://valladolid.mx/cuenta/mis-cupones',
+  couponUrl = `${SITE.url}/cuenta/mis-cupones`,
   terms,
 }: Props) => {
   const validUntilLabel = validUntil
@@ -98,7 +99,7 @@ export const template = {
     discountPercent: 20,
     businessName: 'Restaurante Maya',
     validUntil: new Date(Date.now() + 30 * 86400000).toISOString(),
-    couponUrl: 'https://valladolid.mx/cuenta/mis-cupones',
+    couponUrl: `${SITE.url}/cuenta/mis-cupones`,
     terms: 'Presenta el código en caja. No acumulable con otras promos.',
   },
 } satisfies TemplateEntry

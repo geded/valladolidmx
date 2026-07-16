@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { SITE } from '@/config/site'
 import {
   Body,
   Button,
@@ -29,7 +30,7 @@ const CouponRedeemedEmail = ({
   discountPercent,
   businessName,
   redeemedAt,
-  reviewUrl = 'https://valladolid.mx',
+  reviewUrl = `${SITE.url}`,
 }: Props) => {
   const dateLabel = redeemedAt
     ? new Date(redeemedAt).toLocaleString('es-MX', {
@@ -93,7 +94,7 @@ export const template = {
     discountPercent: 20,
     businessName: 'Restaurante Maya',
     redeemedAt: new Date().toISOString(),
-    reviewUrl: 'https://valladolid.mx/resenar/negocio/restaurante-maya',
+    reviewUrl: `${SITE.url}/resenar/negocio/restaurante-maya`,
   },
 } satisfies TemplateEntry
 
