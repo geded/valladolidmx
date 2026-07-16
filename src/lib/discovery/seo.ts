@@ -37,6 +37,18 @@ export interface DiscoveryHead {
 
 export const DISCOVERY_ORIGIN = "https://quehacerenvalladolid.com";
 
+/**
+ * SEO.A1.1 · PR-1 — Identificadores canónicos de entidades globales.
+ * Se usan como `@id` estables para que Google/IA reconcilien la misma
+ * entidad a lo largo del grafo semántico del sitio.
+ *
+ * Nota Founder: SearchAction queda **postponed** hasta que exista una
+ * superficie pública, indexable y sin autenticación en `/buscar`.
+ */
+export const ORG_ID = `${DISCOVERY_ORIGIN}/#organization` as const;
+export const WEBSITE_ID = `${DISCOVERY_ORIGIN}/#website` as const;
+export const LOGO_ID = `${DISCOVERY_ORIGIN}/#logo` as const;
+
 function absoluteUrl(path: string): string {
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
   const normalized = path.startsWith("/") ? path : `/${path}`;
@@ -116,15 +128,70 @@ export function truncateDescription(input: string, max = 160): string {
 export function breadcrumbListJsonLd(
   items: ReadonlyArray<{ label: string; path: string }>,
 ): Record<string, unknown> {
+  const lastPath = items.length ? items[items.length - 1].path : "/";
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
+    "@id": `${absoluteUrl(lastPath)}#breadcrumb`,
     itemListElement: items.map((item, i) => ({
       "@type": "ListItem",
       position: i + 1,
       name: item.label,
       item: absoluteUrl(item.path),
     })),
+  };
+}
+
+/**
+ * SEO.A1.1 · PR-1 — Organization (fuente única).
+ * Emitida una sola vez desde `__root.tsx`. Referenciable por otros
+ * nodos vía `{ "@id": ORG_ID }` (publisher, brand, provider…).
+ */
+export function organizationJsonLd(): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": ORG_ID,
+    name: SITE.name,
+    url: SITE.url,
+    description: SITE.default_description,
+    slogan: SITE.tagline,
+    logo: {
+      "@type": "ImageObject",
+      "@id": LOGO_ID,
+      url: `${SITE.url}/logo.png`,
+      caption: SITE.name,
+    },
+    image: { "@id": LOGO_ID },
+    areaServed: {
+      "@type": "AdministrativeArea",
+      name: "Oriente Maya de Yucatán, México",
+    },
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Valladolid",
+      addressRegion: "Yucatán",
+      addressCountry: "MX",
+    },
+  };
+}
+
+/**
+ * SEO.A1.1 · PR-1 — WebSite (fuente única).
+ * `publisher` referencia Organization por `@id`. `potentialAction`
+ * (SearchAction) queda **postponed** hasta contar con búsqueda pública
+ * indexable/estable/sin auth — no se emite para evitar señales rotas.
+ */
+export function websiteJsonLd(): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": WEBSITE_ID,
+    url: SITE.url,
+    name: SITE.name,
+    description: SITE.default_description,
+    inLanguage: "es-MX",
+    publisher: { "@id": ORG_ID },
   };
 }
 

@@ -42,6 +42,10 @@ export const Route = createFileRoute("/viajero/$handle")({
       path: `/viajero/${p.handle}`,
       ogType: "profile",
       ogImage: p.avatar_url ?? undefined,
+      // SEO.A1.1 · PR-1 · Founder Decision — /viajero fuera del índice.
+      // Toda superficie personal permanece no indexable, aun cuando el
+      // perfil sea público dentro del producto.
+      noindex: true,
     });
   },
   component: ViajeroPublicRoute,

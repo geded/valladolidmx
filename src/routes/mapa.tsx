@@ -19,6 +19,11 @@ export const Route = createFileRoute("/mapa")({
       title: `Mapa · ${SITE.name}`,
       description: "Explora el territorio del Oriente Maya destino por destino.",
       path: "/mapa",
+      // SEO.A1.1 · PR-1 · Founder Decision — /mapa NO se indexa.
+      // La superficie es funcional (navegación al territorio) y no
+      // aporta contenido editorial independiente. Permanece descubrible
+      // sólo por navegación interna.
+      noindex: true,
     }),
   component: MapaRoute,
 });
