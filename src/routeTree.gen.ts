@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TerminosRouteImport } from './routes/terminos'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as RestaurantesRouteImport } from './routes/restaurantes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as QueHacerRouteImport } from './routes/que-hacer'
@@ -209,6 +210,11 @@ const TerminosRoute = TerminosRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RestaurantesRoute = RestaurantesRouteImport.update({
@@ -1273,6 +1279,7 @@ export interface FileRoutesByFullPath {
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos': typeof TerminosRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -1460,6 +1467,7 @@ export interface FileRoutesByTo {
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos': typeof TerminosRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -1640,6 +1648,7 @@ export interface FileRoutesById {
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos': typeof TerminosRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -1829,6 +1838,7 @@ export interface FileRouteTypes {
     | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/terminos'
     | '/unsubscribe'
@@ -2016,6 +2026,7 @@ export interface FileRouteTypes {
     | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/terminos'
     | '/unsubscribe'
@@ -2195,6 +2206,7 @@ export interface FileRouteTypes {
     | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/terminos'
     | '/unsubscribe'
@@ -2384,6 +2396,7 @@ export interface RootRouteChildren {
   QueHacerRoute: typeof QueHacerRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RestaurantesRoute: typeof RestaurantesRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerminosRoute: typeof TerminosRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
@@ -2458,6 +2471,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/restaurantes': {
@@ -4237,6 +4257,7 @@ const rootRouteChildren: RootRouteChildren = {
   QueHacerRoute: QueHacerRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RestaurantesRoute: RestaurantesRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerminosRoute: TerminosRoute,
   UnsubscribeRoute: UnsubscribeRoute,
