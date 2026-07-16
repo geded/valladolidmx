@@ -17,7 +17,12 @@ import {
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
-import { DestinationSurface } from "@/components/surfaces/DestinationSurface";
+import {
+  DestinationSurface,
+  DestinationSurfaceProvider,
+} from "@/components/surfaces/DestinationSurface";
+import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
+import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import {
   getPublicDestinationBySlug,
   getDestinationRelated,
@@ -63,11 +68,17 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
     const mock = DESTINOS_MOCK.find(
       (d) => d.slug === params.destino && d.region_slug === ORIENTE_MAYA.slug,
     );
-    const [db, related, mapPoints, galleryUrls] = await Promise.all([
+    // SEO.A2.M1 · Territorial Landing MVP — se resuelve primero una
+    // composición específica por slug (`dest-<slug>`) y, en su ausencia,
+    // la plantilla oficial `__tpl_destination__`. Misma arquitectura que
+    // `/oriente-maya` (Región).
+    const [db, related, mapPoints, galleryUrls, specific, template] = await Promise.all([
       getPublicDestinationBySlug({ data: { slug: params.destino } }).catch(() => null),
       getDestinationRelated({ data: { slug: params.destino } }).catch(() => null),
       getDestinationMapPoints({ data: { slug: params.destino } }).catch(() => []),
       getDestinationGalleryUrls({ data: { slug: params.destino } }).catch(() => []),
+      getPublishedCompositionBySlug({ data: { slug: `dest-${params.destino}` } }).catch(() => null),
+      getPublishedCompositionBySlug({ data: { slug: "__tpl_destination__" } }).catch(() => null),
     ]);
     if (!mock && !db) throw notFound();
     const dest = {
@@ -78,7 +89,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
         "territorio" | "selva" | "cenote" | "atardecer",
       highlights: (db?.highlights?.length ? db.highlights : mock?.highlights ?? []) as string[],
     };
-    return { dest, db, related, mapPoints, galleryUrls };
+    const composition = specific ?? template ?? null;
+    return { dest, db, related, mapPoints, galleryUrls, composition };
   },
   head: ({ loaderData, params }) =>
     loaderData
@@ -119,20 +131,32 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
 });
 
 function DestinoPage() {
-  const { dest, db, related, mapPoints, galleryUrls } = Route.useLoaderData();
+  const { dest, db, related, mapPoints, galleryUrls, composition } = Route.useLoaderData();
   const declaration = buildDestinationContext(dest.slug, dest.name);
-  // H-02 · I3 — Sólo la RUTA monta el provider. La superficie
-  // (`DestinationSurface`) mantiene su propio `PublicShell` intacto —
-  // el breadcrumb visible NO cambia. Este provider persiste `previous`
-  // en `sessionStorage` para habilitar herencia en I4 (categorías).
+  // SEO.A2.M1 — La ruta hidrata `DestinationSurfaceProvider` con los
+  // datos server-side. Si existe composición publicada (plantilla o
+  // específica), se renderiza vía Experience Builder; en su ausencia
+  // cae al render directo de `<DestinationSurface />` (misma UI).
   return (
     <ContextEngineProvider declaration={declaration}>
-      <DestinationSurface
-        dbData={db ?? undefined}
-        related={related ?? undefined}
+      <DestinationSurfaceProvider
+        db={db ?? null}
+        related={related ?? null}
+        slug={dest.slug}
         mapPoints={mapPoints ?? []}
         galleryUrls={galleryUrls ?? []}
-      />
+      >
+        {composition ? (
+          <CompositionRenderer tree={composition.snapshot} />
+        ) : (
+          <DestinationSurface
+            dbData={db ?? undefined}
+            related={related ?? undefined}
+            mapPoints={mapPoints ?? []}
+            galleryUrls={galleryUrls ?? []}
+          />
+        )}
+      </DestinationSurfaceProvider>
     </ContextEngineProvider>
   );
 }
