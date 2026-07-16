@@ -15,6 +15,12 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated")({
+  // SEO.A1.2 · D6 — Defensa en profundidad: todo el árbol autenticado
+  // hereda `noindex, nofollow`. Las hojas pueden añadir title/description
+  // para UX, pero nunca deben sobrescribir esta política de indexación.
+  head: () => ({
+    meta: [{ name: "robots", content: "noindex, nofollow" }],
+  }),
   component: AuthenticatedLayout,
 });
 
