@@ -12,8 +12,11 @@ import { listPublishedPagesForSitemap } from "@/lib/experience-builder/eb-sitema
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { resolveCanonicalPath } from "@/lib/navigation";
+import { absoluteUrl } from "@/config/site";
 
-const BASE_URL = "https://quehacerenvalladolid.com";
+// PR-2 · Infrastructure Externalization:
+// Base URL derivada de la fuente única de verdad (`src/config/site.ts`).
+// No hardcodear el dominio en este archivo.
 
 interface SitemapEntry {
   path: string;
@@ -120,7 +123,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const urls = entries.map((e) =>
           [
             `  <url>`,
-            `    <loc>${BASE_URL}${e.path}</loc>`,
+            `    <loc>${absoluteUrl(e.path)}</loc>`,
             e.lastmod ? `    <lastmod>${new Date(e.lastmod).toISOString()}</lastmod>` : null,
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,
