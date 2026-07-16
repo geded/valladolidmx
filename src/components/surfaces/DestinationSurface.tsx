@@ -61,6 +61,10 @@ export interface DestinationSurfaceContextValue {
   db: PublicDestinationDTO | null;
   related: DestinationRelatedDTO | null;
   slug: string | null;
+  /** SEO.A2.M1 — puntos del mapa territorial (hidratado por la ruta). */
+  mapPoints?: ExperienceMapPoint[];
+  /** SEO.A2.M1 — galería (URLs) hidratada por la ruta. */
+  galleryUrls?: string[];
 }
 
 export const DestinationSurfaceContext =
@@ -70,10 +74,14 @@ export function DestinationSurfaceProvider({
   db,
   related,
   slug,
+  mapPoints,
+  galleryUrls,
   children,
 }: DestinationSurfaceContextValue & { children: React.ReactNode }) {
   return (
-    <DestinationSurfaceContext.Provider value={{ db, related, slug }}>
+    <DestinationSurfaceContext.Provider
+      value={{ db, related, slug, mapPoints, galleryUrls }}
+    >
       {children}
     </DestinationSurfaceContext.Provider>
   );
@@ -110,6 +118,8 @@ export function DestinationSurface({
   const slug = destinationSlug ?? params.destino ?? ctx?.slug ?? undefined;
   const db = dbData ?? ctx?.db ?? null;
   const rel = related ?? ctx?.related ?? null;
+  const effectiveMapPoints = mapPoints ?? ctx?.mapPoints ?? [];
+  const effectiveGalleryUrls = galleryUrls ?? ctx?.galleryUrls ?? [];
   const mock = slug
     ? DESTINOS_MOCK.find(
         (d) => d.slug === slug && d.region_slug === ORIENTE_MAYA.slug,
