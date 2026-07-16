@@ -1,4 +1,5 @@
 import { AlertTriangle, Globe, Share2 } from "lucide-react";
+import { SITE } from "@/config/site";
 
 type SeoConfig = {
   title?: string;
@@ -29,7 +30,7 @@ function stripHtml(input: string): string {
   return input.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
 }
 
-export function SeoPreview({ config, slug, siteName = "Valladolid MX", siteHost = "valladolidmx.lovable.app" }: Props) {
+export function SeoPreview({ config, slug, siteName = SITE.name, siteHost = SITE.domain }: Props) {
   const title = (config.title || "").trim();
   const description = stripHtml(config.description || "");
   const image = (config.og_image || "").trim();

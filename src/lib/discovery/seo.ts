@@ -4,7 +4,7 @@
  * Helper único para construir `head()` de superficies públicas con
  * SEO/OG consistentes y canonical/og:url self-referenciales.
  */
-import { SITE } from "@/config/site";
+import { SITE, absoluteUrl as siteAbsoluteUrl } from "@/config/site";
 
 export type DiscoveryOgType = "website" | "article" | "product" | "place" | "profile";
 
@@ -35,15 +35,22 @@ export interface DiscoveryHead {
   scripts: Array<{ type: string; children: string }>;
 }
 
-export const DISCOVERY_ORIGIN = "https://quehacerenvalladolid.com";
+/**
+ * @deprecated PR-1 · Canonical Core Consolidation — alias legado.
+ * Fuente única: `SITE.url` en `@/config/site`. Se mantiene por
+ * compatibilidad con consumidores existentes; nuevos módulos deben
+ * importar `SITE.url` o `absoluteUrl()` desde `@/config/site`.
+ */
+export const DISCOVERY_ORIGIN = SITE.url;
 
 /**
  * SEO.A1.2 · D1/D2 — Imagen social oficial estable.
  * Fallback aplicado por `buildPublicHead` únicamente en superficies
  * públicas e indexables (`noindex` desactiva el fallback).
+ *
+ * PR-1: derivada de `SITE.og_image` (fuente única).
  */
-export const SITE_DEFAULT_OG_IMAGE =
-  "https://quehacerenvalladolid.com/og/default-1200x630.jpg" as const;
+export const SITE_DEFAULT_OG_IMAGE = SITE.og_image;
 export const SITE_DEFAULT_OG_WIDTH = 1200 as const;
 export const SITE_DEFAULT_OG_HEIGHT = 630 as const;
 
@@ -87,9 +94,7 @@ export function collectionId(path: string): string {
 export const ORIENTE_MAYA_PLACE_ID = placeId("/oriente-maya");
 
 function absoluteUrl(path: string): string {
-  if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  const normalized = path.startsWith("/") ? path : `/${path}`;
-  return `${DISCOVERY_ORIGIN}${normalized}`;
+  return siteAbsoluteUrl(path);
 }
 
 export function buildPublicHead(options: DiscoveryHeadOptions): DiscoveryHead {

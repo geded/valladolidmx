@@ -1,11 +1,13 @@
 import * as React from 'react'
 import { render } from '@react-email/render'
 import { TEMPLATES } from '@/lib/email-templates/registry'
+import { SITE } from '@/config/site'
 
 const SITE_NAME = 'valladolidmx'
 const SENDER_DOMAIN = 'notify.alux.travel'
 const FROM_DOMAIN = 'notify.alux.travel'
-const PUBLIC_ORIGIN = 'https://valladolid.mx'
+// PR-1 · Canonical Core Consolidation — consume la fuente única de verdad.
+const PUBLIC_ORIGIN = SITE.url
 
 function generateToken(): string {
   const bytes = new Uint8Array(32)
