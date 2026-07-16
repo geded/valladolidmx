@@ -151,8 +151,8 @@ export function DestinationSurface({
       productos: rel?.productos.length ?? 0,
       eventos: rel?.eventos?.length ?? 0,
     },
-    galleryUrls: galleryUrls ?? [],
-    mapPoints: mapPoints ?? [],
+    galleryUrls: effectiveGalleryUrls,
+    mapPoints: effectiveMapPoints,
   });
 
   const galleryDto = destinationToGalleryDTO(input);
