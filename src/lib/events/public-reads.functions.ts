@@ -33,6 +33,17 @@ export interface PublicEventDetail extends PublicEventCard {
   destination_id: string | null;
   published_at: string | null;
   updated_at: string | null;
+  /**
+   * SEO.A1.1 · PR-3 — Datos mínimos del organizador REAL cuando el
+   * evento fue publicado con `business_id`. Se emiten sólo cuando la
+   * empresa está publicada, con destino + categoría primaria + slug
+   * conocidos: sólo así se puede construir un `@id` canónico y
+   * estable para Schema.org.
+   */
+  organizer_business_slug: string | null;
+  organizer_business_name: string | null;
+  organizer_destination_slug: string | null;
+  organizer_category_slug: string | null;
 }
 
 function pubClient() {
