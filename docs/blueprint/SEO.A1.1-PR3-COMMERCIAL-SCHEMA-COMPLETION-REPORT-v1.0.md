@@ -6,6 +6,12 @@
 **Estado:** Entregado — recomendación GO
 **Principio vinculante:** *No markup without visible evidence.*
 
+> **Actualización v1.1 · Founder Acceptance Review PR-3.**
+> Se corrigen dos desviaciones semánticas exigidas por el Founder:
+> (1) `organizer` deja de usar `ORG_ID` como fallback genérico;
+> (2) se ratifica que `price: 0` sólo se emite bajo la bandera
+> canónica `is_free = true` visible en la UI ("Entrada: Gratuita").
+
 ## 1. Alcance
 
 Ampliar el marcado estructurado de las entidades comerciales y de reputación visibles al viajero: `Product`, `Offer`, `Event`, `Review`, `AggregateRating`, `FAQPage`. Se reutilizan helpers y datos ya publicados por PR-1/PR-2. Cero duplicación de contratos. Cero datos inventados.
@@ -15,7 +21,7 @@ Ampliar el marcado estructurado de las entidades comerciales y de reputación vi
 | Ruta | Entidades emitidas |
 | --- | --- |
 | `/oriente-maya/{destino}/{categoria}/{empresa}/{producto}` | `Product` (con `Offer`, `AggregateRating`, `Review[]`, `brand=@id`, `seller=@id`, `category`) + `FAQPage` con `about=@id(product)` |
-| `/eventos/{slug}` | `Event` (con `location`, `offers`, `organizer=ORG_ID`, `eventStatus`, `eventAttendanceMode`) |
+| `/eventos/{slug}` | `Event` (con `location`, `offers` sólo con evidencia, `organizer` sólo con evidencia real, `eventStatus`, `eventAttendanceMode`) |
 
 Ninguna otra ruta cambia — PR-1/PR-2 permanecen intactos.
 
@@ -28,7 +34,7 @@ Ninguna otra ruta cambia — PR-1/PR-2 permanecen intactos.
 | `reviews` (subset visible) | `Review[]` | `reviews` status=published, deleted_at null | `reviewRating`, `author`, `reviewBody`, `datePublished`, `inLanguage`, `itemReviewed=@id(product)` | Reseñas moderadas / borradores / eliminadas |
 | `review_stats` | `AggregateRating` | agregado visible | `ratingValue`, `reviewCount`, `bestRating=5`, `worstRating=1` | Se omite entero si `count == 0` |
 | `faqs` (product) | `FAQPage` | `faqs` publicadas | `@id`, `about=@id(product)`, `mainEntity[]` | Se omite si no hay FAQs visibles |
-| `events` | `Event` | `getEventBySlug` publicado | `name`, `description`, `image`, `startDate`, `endDate`, `eventStatus`, `eventAttendanceMode`, `location`, `offers`, `organizer=ORG_ID`, `url`, `@id` | `performer` (no publicado); dirección sólo si `venue_name` presente |
+| `events` | `Event` | `getEventBySlug` publicado | `name`, `description`, `image`, `startDate`, `endDate`, `eventStatus`, `eventAttendanceMode`, `location`, `offers` (sólo con `is_free=true` o `external_url`), `organizer` (sólo cuando `business_id` referencia empresa publicada con destino + categoría + slug), `url`, `@id` | `performer` (no publicado); dirección sólo si `venue_name` presente; `organizer` omitido si no hay evidencia — `ORG_ID` NUNCA como fallback |
 
 ## 4. Ejemplos SSR
 
@@ -69,10 +75,16 @@ Ninguna otra ruta cambia — PR-1/PR-2 permanecen intactos.
     "name": "Ex-convento de Sisal",
     "address": { "@type":"PostalAddress","addressLocality":"Valladolid","addressRegion":"Yucatán","addressCountry":"MX" }
   },
-  "offers": { "@type":"Offer","url":"…","availability":"https://schema.org/InStock","price":0,"priceCurrency":"MXN" },
-  "organizer": { "@id": "https://quehacerenvalladolid.com/#organization" }
+  "offers": { "@type":"Offer","url":"…","availability":"https://schema.org/InStock","price":0,"priceCurrency":"MXN" }
+  // organizer omitido: el evento no fue publicado con business_id
+  // organizador real; Valladolid.mx sólo publica/lista el evento.
 }
 ```
+
+> `price: 0` aparece porque este evento tiene `is_free = true` visible
+> en la ficha ("Entrada: Gratuita"). Cuando `is_free = false` y no
+> hay `external_url`, se omite `offers`. `price_amount null` / ausente
+> **nunca** se traduce a `price: 0`.
 
 ### 4.3 FAQPage vinculada al Product
 
@@ -107,10 +119,11 @@ Ninguna otra ruta cambia — PR-1/PR-2 permanecen intactos.
 | Cero borradores | queries filtran `status='published'` y `deleted_at IS NULL` |
 | Cero simulaciones | Reviews sólo de `public.reviews`; Simulation Pack aislado |
 | Sin `priceValidUntil` inventado | omitido si no hay dato canónico |
-| Sin `Offer` vacío | Product: `price_amount > 0`; Event: `externalUrl \|\| isFree` |
+| Sin `Offer` vacío | Product: `price_amount > 0`; Event: `externalUrl \|\| isFree`. `price: 0` sólo con `is_free=true` visible; nunca por ausencia de precio |
 | Sin `AggregateRating` inflado | omitido si `reviewCount == 0`; mismo agregado que la UI |
 | FAQ visible | sólo si la ficha lista FAQs publicadas |
 | Event cancelado ≠ activo | `eventStatus` viene del CMS (default `EventScheduled`); helper soporta `EventCancelled/Postponed/Rescheduled/MovedOnline` cuando el CMS los exponga |
+| Organizer con evidencia | `organizer` emitido sólo si el evento fue publicado con `business_id` que referencia empresa publicada con destino + categoría + slug — se emite por `@id`. Si sólo hay nombre publicado, se emite `Organization` con `name`. **Sin evidencia ⇒ `organizer` se omite.** ORG_ID prohibido como fallback |
 | Datos externos sin licencia | prohibidos |
 
 ## 6. Validación
@@ -119,7 +132,9 @@ Ninguna otra ruta cambia — PR-1/PR-2 permanecen intactos.
 | --- | --- |
 | Experiencia con precio (`tour-cenote-suytun-guiado-demo`) | ✅ Product+Offer con seller |
 | Experiencia sin precio | ✅ Product sin Offer |
-| Evento vigente (`festival-sac-be-valladolid`) | ✅ Event `EventScheduled` con location + offers + organizer |
+| Evento vigente (`festival-sac-be-valladolid`) | ✅ Event `EventScheduled` con location + offers (`price:0`, `is_free=true`); `organizer` OMITIDO (sin `business_id` publicado) |
+| Evento con `is_free=false` sin `external_url` | ✅ `offers` omitido (sin evidencia de venta) |
+| Evento con `business_id` publicado (empresa organizadora) | ✅ `organizer = { @id: businessEntityId(...) }` — referencia por `@id`, cero duplicación |
 | Evento cancelado | Helper preparado; sin datos publicados hoy |
 | Ficha con reseñas | ✅ `Review[]` + `AggregateRating` |
 | Ficha sin reseñas (demo) | ✅ silencio limpio |
@@ -135,7 +150,10 @@ Ninguna otra ruta cambia — PR-1/PR-2 permanecen intactos.
 
 ```
 Organization (ORG_ID)
- ├── publisher de WebSite
+ └── publisher de WebSite
+    (NUNCA organizer de Event de terceros)
+
+LocalBusiness (#business, cuando publica el evento)
  └── organizer de Event
 
 Region (ORIENTE_MAYA_PLACE_ID)
@@ -160,11 +178,31 @@ Cambios aislados en 3 archivos: `src/lib/discovery/seo.ts`, `src/routes/oriente-
 - Cero datos inventados, cero `Offer` vacío, cero rating inflado.
 - Helper preparado para estados de evento (Cancelled/Postponed/Rescheduled/MovedOnline) y hasta 10 reseñas visibles cuando el CMS/moderación las publiquen.
 
-## 10. Veredicto final de SEO.A1.1
+## 10. Ratificación Founder Acceptance Review PR-3
+
+| Requisito | Estado |
+| --- | --- |
+| `organizer` nunca cae en `ORG_ID` como fallback | ✅ Corregido en `src/routes/eventos.$slug.tsx` (ORG_ID eliminado) |
+| `organizer` emite `@id` de la empresa cuando existe evidencia | ✅ vía DTO extendido `organizer_business_slug/destination_slug/category_slug` |
+| `organizer` como `Organization`/`Person` cuando sólo hay nombre | ✅ soportado por `organizerName` del helper |
+| `organizer` omitido sin evidencia | ✅ default en helper y en la ruta |
+| `price: 0` sólo con gratuidad explícita visible (`is_free=true`) | ✅ verificado en helper — `price_amount null ≠ price 0` |
+| `Offer` de evento sin gratuidad y sin `external_url` | ✅ omitido |
+| `Review[]` = reseñas publicadas visibles en la misma página | ✅ top 5 publicadas via `getMarketplaceProductBySlug` |
+| `AggregateRating.reviewCount` refleja la misma población visible | ✅ mismo `review_stats` que la UI |
+| Sin datos personales fuera de la UI | ✅ `Person.name` = nombre público mostrado |
+| `itemReviewed` referencia al Product correcto | ✅ por `@id` estable |
+| `FAQPage` sólo con FAQs visibles sin auth | ✅ mismo dataset de la ficha |
+| `about` de FAQPage → `@id(Product)` | ✅ |
+| SSR post-ajuste en producto y evento | ✅ re-verificado con `curl` |
+| Canonical + robots | ✅ intactos |
+| Typecheck sin errores nuevos | ✅ |
+
+## 11. Veredicto final de SEO.A1.1
 
 - PR-1 Foundation — ratificado y cerrado.
 - PR-2 Territorial — ratificado y cerrado.
-- PR-3 Commercial — entregado; recomendación **GO** para aceptación final.
+- PR-3 Commercial — ajustado tras Founder Acceptance Review; recomendación **GO** para cierre automático de SEO.A1.1.
 
 Grafo semántico Region → Destination → LocalBusiness → Product/Offer/Review/FAQPage + Event/Offer completo y reconciliado por `@id`, con SSR verificado y sin datos inventados.
 
