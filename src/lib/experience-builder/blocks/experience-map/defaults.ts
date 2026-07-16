@@ -156,18 +156,18 @@ export function applyExperienceMapDefaults(input: unknown): ExperienceMapDTO {
         .filter((p): p is ExperienceMapPoint => p !== null))
     : [];
 
-  const dto: ExperienceMapDTO = {
-    variant: coerceVariant(src.variant),
-    points,
-    capabilities: coerceCapabilities(src.capabilities),
-  };
-
+  // Orden de claves canónico (paridad byte-exact con
+  // `experienceMapDTOSchema.parse` para JSON estable):
+  // variant → heading → center → points → capabilities → emptyMessage.
+  const dto = {} as ExperienceMapDTO;
+  dto.variant = coerceVariant(src.variant);
   const heading = coerceNullableString(src.heading);
   if (heading !== undefined) dto.heading = heading;
   const center = coerceCenter(src.center);
   if (center !== undefined) dto.center = center;
+  dto.points = points;
+  dto.capabilities = coerceCapabilities(src.capabilities);
   const emptyMessage = coerceNullableString(src.emptyMessage);
   if (emptyMessage !== undefined) dto.emptyMessage = emptyMessage;
-
   return dto;
 }
