@@ -108,19 +108,3 @@ export function prefetchToaster(): Promise<unknown> {
   requestMount();
   return loadSonner();
 }
-
-// H2·P3 · C1 protocol probe. Attach a window handle only when the URL
-// carries `?__c1_probe=1` so the §4 functional protocol can drive the
-// lazy shim from an automated browser without shipping a debug API to
-// real users. Zero cost otherwise.
-if (typeof window !== "undefined") {
-  try {
-    if (new URLSearchParams(window.location.search).has("__c1_probe")) {
-      (window as unknown as Record<string, unknown>).__lvToast = toast;
-      (window as unknown as Record<string, unknown>).__lvPrefetchToaster =
-        prefetchToaster;
-    }
-  } catch {
-    /* noop */
-  }
-}
