@@ -22,6 +22,7 @@ import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as MapaRouteImport } from './routes/mapa'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as HotelesRouteImport } from './routes/hoteles'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
 import { Route as EventosRouteImport } from './routes/eventos'
@@ -260,6 +261,11 @@ const MarketplaceRoute = MarketplaceRouteImport.update({
 const MapaRoute = MapaRouteImport.update({
   id: '/mapa',
   path: '/mapa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HotelesRoute = HotelesRouteImport.update({
@@ -1270,6 +1276,7 @@ export interface FileRoutesByFullPath {
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
@@ -1458,6 +1465,7 @@ export interface FileRoutesByTo {
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
@@ -1639,6 +1647,7 @@ export interface FileRoutesById {
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
@@ -1829,6 +1838,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/llms.txt'
     | '/mapa'
     | '/marketplace'
     | '/mcp'
@@ -2017,6 +2027,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/llms.txt'
     | '/mapa'
     | '/marketplace'
     | '/mcp'
@@ -2197,6 +2208,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/llms.txt'
     | '/mapa'
     | '/marketplace'
     | '/mcp'
@@ -2387,6 +2399,7 @@ export interface RootRouteChildren {
   EventosRoute: typeof EventosRouteWithChildren
   ExperienciasRoute: typeof ExperienciasRoute
   HotelesRoute: typeof HotelesRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   MapaRoute: typeof MapaRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   McpRoute: typeof McpRoute
@@ -2541,6 +2554,13 @@ declare module '@tanstack/react-router' {
       path: '/mapa'
       fullPath: '/mapa'
       preLoaderRoute: typeof MapaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hoteles': {
@@ -4248,6 +4268,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventosRoute: EventosRouteWithChildren,
   ExperienciasRoute: ExperienciasRoute,
   HotelesRoute: HotelesRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   MapaRoute: MapaRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
   McpRoute: McpRoute,
