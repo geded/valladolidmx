@@ -7,7 +7,7 @@
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead } from "@/lib/discovery/seo";
+import { buildPublicHead, eventJsonLd, ORG_ID } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import {
   getEventBySlug,
@@ -60,32 +60,27 @@ export const Route = createFileRoute("/eventos/$slug")({
       });
     }
     const e = loaderData.event;
-    const eventJsonLd: Record<string, unknown> = {
-      "@context": "https://schema.org",
-      "@type": "Event",
+    // SEO.A1.1 · PR-3 — Event JSON-LD basado exclusivamente en datos
+    // publicados y visibles en la página. `venue_name` sólo se emite si
+    // el CMS lo publicó (nunca se inventa dirección). El editor puede
+    // marcar cancelación/reprogramación en el futuro; hoy sólo emitimos
+    // eventos activos ("EventScheduled") — este loader ya filtra por
+    // `status='published'` y `deleted_at IS NULL`.
+    const eventNode = eventJsonLd({
       name: e.title,
-      description: e.summary ?? undefined,
-      url: `https://quehacerenvalladolid.com/eventos/${e.slug}`,
-      image: e.cover_url ?? undefined,
-      startDate: (e as unknown as { starts_at?: string; start_date?: string }).starts_at
-        ?? (e as unknown as { start_date?: string }).start_date
-        ?? undefined,
-      endDate: (e as unknown as { ends_at?: string; end_date?: string }).ends_at
-        ?? (e as unknown as { end_date?: string }).end_date
-        ?? undefined,
-      eventStatus: "https://schema.org/EventScheduled",
-      eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-      location: {
-        "@type": "Place",
-        name: (e as unknown as { location_name?: string }).location_name ?? "Valladolid, Yucatán",
-        address: {
-          "@type": "PostalAddress",
-          addressLocality: "Valladolid",
-          addressRegion: "Yucatán",
-          addressCountry: "MX",
-        },
-      },
-    };
+      description: e.summary,
+      path: `/eventos/${e.slug}`,
+      image: e.cover_url,
+      startDate: e.starts_at,
+      endDate: e.ends_at,
+      eventStatus: "EventScheduled",
+      eventAttendanceMode: "Offline",
+      venueName: e.venue_name,
+      addressLocality: e.destination_name ?? "Valladolid",
+      externalUrl: e.external_url,
+      isFree: e.is_free,
+      organizerId: ORG_ID,
+    });
     return buildPublicHead({
       title: `${e.title} · Eventos — ${SITE.name}`,
       description: e.summary ?? `Evento en ${SITE.name}: ${e.title}.`,
@@ -97,7 +92,7 @@ export const Route = createFileRoute("/eventos/$slug")({
         { label: "Eventos", path: "/eventos" },
         { label: e.title, path: `/eventos/${e.slug}` },
       ],
-      jsonLd: [eventJsonLd],
+      jsonLd: [eventNode],
     });
   },
   component: EventoPage,

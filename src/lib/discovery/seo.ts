@@ -370,12 +370,25 @@ export function productJsonLd(input: {
   image?: string;
   sku?: string;
   brandName?: string;
+  category?: string;
   priceAmount?: number | null;
   priceCurrency?: string;
   availability?: "InStock" | "OutOfStock" | "PreOrder";
   aggregateRating?: { ratingValue: number; reviewCount: number };
   /** SEO.A1.1 · PR-2 — `@id` del negocio proveedor (brand real). */
   providerBusinessId?: string;
+  /** SEO.A1.1 · PR-3 — Reseñas reales, publicadas y visibles en la
+   *  misma página. Ya deben venir filtradas (status=published, no
+   *  eliminadas, no moderadas). Nunca inyectar simuladas ni externas
+   *  sin licencia. Vacío ⇒ no se emite `review`. */
+  reviews?: ReadonlyArray<{
+    author: string;
+    rating: number;
+    title?: string | null;
+    body: string;
+    publishedAt?: string | null;
+    language?: string | null;
+  }>;
 }): Record<string, unknown> {
   const url = absoluteUrl(input.path);
   const jsonLd: Record<string, unknown> = {
@@ -388,6 +401,7 @@ export function productJsonLd(input: {
   };
   if (input.image) jsonLd.image = input.image;
   if (input.sku) jsonLd.sku = input.sku;
+  if (input.category) jsonLd.category = input.category;
   if (input.providerBusinessId) {
     // El negocio operador ES la marca real del producto — no Valladolid.mx.
     jsonLd.brand = { "@id": input.providerBusinessId };
@@ -395,22 +409,152 @@ export function productJsonLd(input: {
     jsonLd.brand = { "@type": "Brand", name: input.brandName };
   }
   if (input.priceAmount != null && input.priceAmount > 0) {
-    jsonLd.offers = {
+    // SEO.A1.1 · PR-3 — Offer sólo con datos reales de venta.
+    // `priceValidUntil` NUNCA se inventa; se omite si no hay dato canónico.
+    // `seller` referencia al negocio real por `@id` cuando existe.
+    const offer: Record<string, unknown> = {
       "@type": "Offer",
       price: input.priceAmount,
       priceCurrency: input.priceCurrency ?? "MXN",
       availability: `https://schema.org/${input.availability ?? "InStock"}`,
       url,
     };
+    if (input.providerBusinessId) {
+      offer.seller = { "@id": input.providerBusinessId };
+    }
+    jsonLd.offers = offer;
   }
   if (input.aggregateRating && input.aggregateRating.reviewCount > 0) {
     jsonLd.aggregateRating = {
       "@type": "AggregateRating",
       ratingValue: input.aggregateRating.ratingValue,
       reviewCount: input.aggregateRating.reviewCount,
+      bestRating: 5,
+      worstRating: 1,
     };
   }
+  if (input.reviews && input.reviews.length > 0) {
+    const productId = productEntityId(input.path);
+    jsonLd.review = input.reviews.slice(0, 10).map((r) => {
+      const node: Record<string, unknown> = {
+        "@type": "Review",
+        reviewRating: {
+          "@type": "Rating",
+          ratingValue: r.rating,
+          bestRating: 5,
+          worstRating: 1,
+        },
+        author: { "@type": "Person", name: r.author },
+        reviewBody: r.body,
+        itemReviewed: { "@id": productId },
+      };
+      if (r.title) node.name = r.title;
+      if (r.publishedAt) node.datePublished = r.publishedAt;
+      if (r.language) node.inLanguage = r.language;
+      return node;
+    });
+  }
   return jsonLd;
+}
+
+/**
+ * SEO.A1.1 · PR-3 — JSON-LD Event.
+ *
+ * Principio "No markup without visible evidence": el evento debe estar
+ * publicado, vigente y sus datos visibles en la página. `eventStatus`
+ * se emite tal cual lo declara el CMS (default `EventScheduled`); un
+ * evento cancelado o reprogramado usa el estado Schema.org que aplique.
+ * `location` se emite como `Place` con dirección postal sólo si el CMS
+ * proporcionó `venue_name`; nunca se inventa dirección.
+ */
+export function eventJsonLd(input: {
+  name: string;
+  description?: string | null;
+  path: string;
+  image?: string | null;
+  startDate: string;
+  endDate?: string | null;
+  eventStatus?:
+    | "EventScheduled"
+    | "EventCancelled"
+    | "EventPostponed"
+    | "EventRescheduled"
+    | "EventMovedOnline";
+  eventAttendanceMode?: "Offline" | "Online" | "Mixed";
+  venueName?: string | null;
+  addressLocality?: string;
+  addressRegion?: string;
+  addressCountry?: string;
+  /** `@id` del destino contenedor (Place). */
+  locationPlaceId?: string;
+  /** URL externa de compra/registro (si existe). */
+  externalUrl?: string | null;
+  isFree?: boolean;
+  /** Organizador referenciado por `@id` (opcional). */
+  organizerId?: string;
+  organizerName?: string;
+}): Record<string, unknown> {
+  const url = absoluteUrl(input.path);
+  const attendanceMap = {
+    Offline: "https://schema.org/OfflineEventAttendanceMode",
+    Online: "https://schema.org/OnlineEventAttendanceMode",
+    Mixed: "https://schema.org/MixedEventAttendanceMode",
+  } as const;
+  const node: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "@id": `${url}#event`,
+    name: input.name,
+    url,
+    startDate: input.startDate,
+    eventStatus: `https://schema.org/${input.eventStatus ?? "EventScheduled"}`,
+    eventAttendanceMode: attendanceMap[input.eventAttendanceMode ?? "Offline"],
+  };
+  if (input.description) node.description = input.description;
+  if (input.image) node.image = input.image;
+  if (input.endDate) node.endDate = input.endDate;
+
+  // Location: preferimos referenciar el destino (Place) por @id cuando
+  // exista. Si además hay venue con nombre, lo declaramos como Place
+  // anidado. Nunca inventamos dirección.
+  if (input.venueName) {
+    const place: Record<string, unknown> = {
+      "@type": "Place",
+      name: input.venueName,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: input.addressLocality ?? "Valladolid",
+        addressRegion: input.addressRegion ?? "Yucatán",
+        addressCountry: input.addressCountry ?? "MX",
+      },
+    };
+    if (input.locationPlaceId) place.containedInPlace = { "@id": input.locationPlaceId };
+    node.location = place;
+  } else if (input.locationPlaceId) {
+    node.location = { "@id": input.locationPlaceId };
+  }
+
+  // Offers — sólo si hay datos reales (URL externa de compra/registro
+  // o entrada gratuita declarada). Nunca inventamos precio.
+  if (input.externalUrl || input.isFree) {
+    const offer: Record<string, unknown> = {
+      "@type": "Offer",
+      url: input.externalUrl ?? url,
+      availability: "https://schema.org/InStock",
+    };
+    if (input.isFree) {
+      offer.price = 0;
+      offer.priceCurrency = "MXN";
+    }
+    node.offers = offer;
+  }
+
+  if (input.organizerId) {
+    node.organizer = { "@id": input.organizerId };
+  } else if (input.organizerName) {
+    node.organizer = { "@type": "Organization", name: input.organizerName };
+  }
+  return node;
 }
 
 /**
@@ -418,8 +562,9 @@ export function productJsonLd(input: {
  */
 export function faqPageJsonLd(
   faqs: ReadonlyArray<{ question: string; answer: string }>,
+  options?: { path?: string; mainEntityId?: string },
 ): Record<string, unknown> {
-  return {
+  const node: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: faqs.map((f) => ({
@@ -428,6 +573,12 @@ export function faqPageJsonLd(
       acceptedAnswer: { "@type": "Answer", text: f.answer },
     })),
   };
+  if (options?.path) node["@id"] = `${absoluteUrl(options.path)}#faq`;
+  // SEO.A1.1 · PR-3 — Reconciliar la FAQ con la entidad principal de la
+  // página (Product/Event/…) por `@id` cuando se conoce, para que Google
+  // e IA asocien las preguntas a la entidad correcta.
+  if (options?.mainEntityId) node.about = { "@id": options.mainEntityId };
+  return node;
 }
 
 /**
