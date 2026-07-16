@@ -7,7 +7,11 @@
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead, eventJsonLd, ORG_ID } from "@/lib/discovery/seo";
+import {
+  buildPublicHead,
+  eventJsonLd,
+  businessEntityId,
+} from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import {
   getEventBySlug,
@@ -66,6 +70,25 @@ export const Route = createFileRoute("/eventos/$slug")({
     // marcar cancelación/reprogramación en el futuro; hoy sólo emitimos
     // eventos activos ("EventScheduled") — este loader ya filtra por
     // `status='published'` y `deleted_at IS NULL`.
+    // SEO.A1.1 · PR-3 (Founder Acceptance Review) — Organizer sólo se
+    // emite con evidencia canónica: si el evento fue publicado con una
+    // empresa organizadora real y publicada, referenciamos su `@id`;
+    // si no hay evidencia, omitimos `organizer`. Prohibido usar
+    // ORG_ID como fallback genérico — Valladolid.mx no organiza
+    // eventos de terceros.
+    const organizerBusinessPath =
+      e.organizer_business_slug &&
+      e.organizer_destination_slug &&
+      e.organizer_category_slug
+        ? `/oriente-maya/${e.organizer_destination_slug}/${e.organizer_category_slug}/${e.organizer_business_slug}`
+        : null;
+    const organizerId = organizerBusinessPath
+      ? businessEntityId(organizerBusinessPath)
+      : undefined;
+    const organizerName =
+      !organizerId && e.organizer_business_name
+        ? e.organizer_business_name
+        : undefined;
     const eventNode = eventJsonLd({
       name: e.title,
       description: e.summary,
@@ -79,7 +102,8 @@ export const Route = createFileRoute("/eventos/$slug")({
       addressLocality: e.destination_name ?? "Valladolid",
       externalUrl: e.external_url,
       isFree: e.is_free,
-      organizerId: ORG_ID,
+      organizerId,
+      organizerName,
     });
     return buildPublicHead({
       title: `${e.title} · Eventos — ${SITE.name}`,
