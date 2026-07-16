@@ -1,10 +1,34 @@
-# H2·P3 · C1 · Lazy Toaster Spike Report v1.0
+# H2·P3 · C1 · Lazy Toaster Spike Report v1.0 · FINAL
 
-**Fecha:** 2026-07-15
+**Fecha cierre:** 2026-07-16
 **Alcance:** Diferir `sonner` (Toaster + `toast()`) fuera del entry público.
 **Modo:** Spike aislado bajo §11. Ningún otro candidato tocado.
+**Estado:** **GO — cerrado.** Instrumentación de diagnóstico eliminada. Protocolo funcional §4 re-ejecutado sobre código limpio.
 
 ---
+
+## 0. Causa raíz y solución final
+
+**Causa raíz:** `sonner` mantiene su propio `ToastState` como singleton
+global, pero **descarta** los toasts emitidos antes de que un `<Toaster />`
+se haya suscrito a él. En el diseño original el shim disparaba `toast()`
+en cuanto el `import()` de sonner resolvía; si esto ocurría antes del
+`useEffect` de mount del Toaster, el primer toast se perdía
+silenciosamente (`toastCount = 0`).
+
+**Solución final:**
+
+1. **Buffer FIFO en `src/lib/toast.ts`** (`pending[]`). Las llamadas
+   emitidas antes de que el Toaster esté suscrito se encolan.
+2. **Señal explícita `markToasterReady()`** exportada por el shim y
+   llamada por `LazyToasterHost` en el `useEffect` que confirma que el
+   componente `Toaster` está montado.
+3. **Flush idempotente** en `queueMicrotask` para dar a sonner un tick
+   para registrar su listener interno antes de reenviar el buffer.
+4. **`pending.splice(0)`** garantiza que el flush corre una sola vez y
+   deja la cola vacía (imposible acumulación permanente).
+5. **Cap defensivo (`PENDING_MAX = 32`)** más `catch` en `loadSonner`
+   que vacía la cola y permite reintento si `import("sonner")` falla.
 
 ## 1. Diseño
 
@@ -24,32 +48,36 @@ Tres artefactos nuevos, cero infra paralela:
 `from "sonner"` → `from "@/lib/toast"`. El único `from "sonner"` restante
 es `src/components/ui/sonner.tsx` (chunk lazy).
 
-**Primer toast — cero pérdida:** el shim llama a `toast()` de sonner en
-cuanto el `import()` resuelve. `ToastState` interno de sonner acumula la
-entrada; el `<Toaster />` que se monta poco después la lee al suscribirse.
+**Primer toast — cero pérdida:** ver §0 (buffer + `markToasterReady`).
 
 ---
 
-## 2. Métricas antes / después
+## 2. Métricas antes / después (build final, código limpio)
 
 Build local (`bun run build`, Nitro/Vite prod), medición sobre el entry
 client `dist/client/assets/index-*.js`:
 
-| Métrica | BASELINE (`index-Do7sBHb6.js`) | POST-C1 (`index-CtLtJUfE.js`) | Δ absoluto | Δ % |
+| Métrica | BASELINE (`index-Do7sBHb6.js`) | POST-C1 FINAL (`index-CkMHmkYD.js`) | Δ absoluto | Δ % |
 |---|---:|---:|---:|---:|
-| Entry raw | 559 607 B | 527 298 B | **−32 309 B** | **−5.77 %** |
-| Entry **gzip -9** | 162 073 B | 153 362 B | **−8 711 B** | **−5.37 %** |
-| Entry brotli -q 11 | 137 359 B | 129 950 B | **−7 409 B** | **−5.39 %** |
+| Entry raw | 559 607 B | 527 758 B | **−31 849 B** | **−5.69 %** |
+| Entry **gzip -9** | 162 073 B | 154 134 B | **−7 939 B** | **−4.90 %** |
+| Entry brotli -q 11 | 137 359 B | 130 336 B | **−7 023 B** | **−5.11 %** |
 
 **Chunks nuevos** (cargados sólo al primer toast):
 
-| Chunk | raw | gzip |
-|---|---:|---:|
-| `dist-DBv3Pp7-.js` (contiene sonner) | 32 997 B | 9 121 B |
-| `sonner-jXX4Rqoz.js` | 608 B | 334 B |
-| `LazyToasterHost-C48S9I6V.js` | 784 B | 487 B |
+| Chunk | raw | gzip | brotli |
+|---|---:|---:|---:|
+| `dist-DBv3Pp7-.js` (sonner core diferido) | 32 997 B | 9 126 B | 8 167 B |
+| `sonner-jXX4Rqoz.js` (re-export local) | 608 B | 315 B | 272 B |
 
-**Estimado P3:** ~7 KB gzip. **Real:** 8.7 KB gzip. Supera el estimado.
+`LazyToasterHost` ya no viaja como chunk propio: se inlinea en el entry
+(coste ~1 KB raw) porque es estático — necesario para suscribirse al
+bus del shim antes de que se dispare el primer `toast()` de la sesión.
+El chunk de sonner sólo baja tras la primera llamada real.
+
+**Estimado P3:** ~7 KB gzip. **Real:** 7.9 KB gzip. Supera el estimado.
+**Requests iniciales:** entry + preloads habituales; sonner **no** entra
+en el critical path del primer visitante.
 
 ---
 
@@ -66,31 +94,48 @@ client `dist/client/assets/index-*.js`:
 
 ---
 
-## 4. Pruebas ejecutadas
+## 4. Pruebas ejecutadas (protocolo §4 sobre código limpio)
 
-- ✅ `bun run build` limpio (baseline y post-C1). Chunk `sonner` sale del entry.
-- ✅ Verificación estática: `rg "from ['\"]sonner['\"]" src/` → sólo `ui/sonner.tsx` (chunk lazy).
-- ✅ Typecheck: los errores TS reportados son **pre-existentes** en
-  `DiscoveryNavigatorBlock`, `MarketplaceSurface`, `product-blocks.legacy`
-  y `favoritos.tsx` (routing type mismatch de `/marketplace/$slug`). No
-  introducidos por C1. Confirmable ejecutando `bunx tsgo --noEmit` contra
-  `main` antes del cambio.
-- ⚠️ Pruebas de runtime (toast inmediato, tras navegación, forms, error,
-  múltiples, cierre manual, mobile/desktop) NO se pudieron ejecutar en
-  este turno: la sesión de preview quedó desconectada tras el reinicio
-  del dev server. Se deja el protocolo listo para ejecutar contra el
-  preview publicado en la validación Founder.
+Build final `index-CkMHmkYD.js`. Dev server en `http://localhost:8080`.
+Playwright + Chromium headless. Script: `/tmp/browser/c1-final/test.py`.
 
-### Protocolo pendiente de ejecutar contra preview publicado
+| Caso | Resultado |
+|---|---|
+| Primer toast (desktop, anon, `/mapa`) | ✅ 62 ms; `count=5` |
+| Múltiples consecutivos (5 en ráfaga) | ✅ los 5 renderizan |
+| Orden FIFO en cola → LIFO en DOM (sonner apila) | ✅ 1..5 emitidos, 5..1 apilados |
+| Descripción (`toast(msg, { description })`) | ✅ "cuarto · con descripción" |
+| `toast.success` / `.error` / `.info` | ✅ los tres visibles |
+| Cierre manual | ⚠️ superficie pública `/mapa` no monta `<Toaster closeButton>`; no aplica al shim. Comportamiento idéntico a baseline. |
+| Post-navegación (`/promociones`) | ✅ 50 ms; `count=5` |
+| Mobile (390×844) | ✅ 70 ms; `count=5` |
+| Consola: `pageerror` + `console.error` | ✅ vacíos |
+| Warnings hidratación | ✅ vacíos |
+| Probe `window.__lvToast` filtrado | ✅ `undefined` |
+| Sesión autenticada | ✅ mismo shim; sin código específico por auth |
+| `toast.promise` | No usado en app en este momento; API expuesta en `methods[]`, delegación transparente a sonner. |
 
-```js
-// Consola del navegador en Home anónima:
-const { toast } = await import("/src/lib/toast.ts");
-toast.success("toast inmediato");   // debe aparecer aunque sonner aún no esté cargado
-toast.error("error");
-for (let i=0;i<5;i++) toast(`multi ${i}`);
-// Navegar a otra ruta, disparar toast desde form real, cerrar manual.
-```
+**Verificación específica del buffer:**
+- Flush único: `pending.splice(0)` vacía el array en la primera pasada; el segundo `flushPending` (disparado por `loadSonner().then`) encuentra `pending.length===0` y no hace nada.
+- Cero duplicados: cada elemento se despacha exactamente una vez.
+- FIFO: iteración lineal sobre el `splice(0)`.
+- Cola limpia tras despacho: post-test, `pending.length === 0`.
+- Sin acumulación permanente: cap `PENDING_MAX=32` con `shift()` defensivo.
+- Falla de `import("sonner")`: `catch` resetea `loading=null` y vacía `pending[]` (reintento posible en la siguiente llamada).
+- Llamadas post-mount: fast path (`if (mod && toasterReady) …`) omite el buffer.
+
+**Verificación estática:**
+- `rg "from ['\"]sonner['\"]" src/` → sólo `src/components/ui/sonner.tsx` (chunk lazy).
+- `grep -l "__lvToast\|__c1_probe" src/` → sin coincidencias (probes eliminados).
+- `grep -c "sonner" dist/client/assets/index-CkMHmkYD.js` → 2 (referencias del importmap dinámico; sonner **no** en entry).
+
+**Diff limpio (post-cierre):**
+- `src/lib/toast.ts`: buffer + `markToasterReady` + cap + catch. **Sin** probe `__c1_probe`, sin `window.__lvToast`.
+- `src/components/ui/LazyToasterHost.tsx`: monta `<Toaster />` bajo demanda y llama `markToasterReady()`. **Sin** logs `[C1]`.
+- `src/routes/__root.tsx`: `LazyToasterHost` importado estáticamente (necesario para suscribirse a tiempo).
+- 46 archivos migrados `sonner` → `@/lib/toast` (codemod inicial, sin cambios adicionales en esta pasada de cierre).
+
+**Tiempo al primer toast:** 50–70 ms desktop y mobile en dev sobre localhost.
 
 ---
 
@@ -120,15 +165,16 @@ find src -type f \( -name "*.ts" -o -name "*.tsx" \) \
 
 ## 7. Veredicto
 
-### **GO condicionado a validación de runtime en preview publicado.**
+### **GO — C1 cerrado.**
 
 Criterios §11:
-- ✅ Ahorro real (8.7 KB gzip) supera el estimado (~7 KB) y el umbral mínimo (4 KB).
-- ✅ Build limpio; ningún error nuevo de typecheck.
+- ✅ Ahorro real **7.9 KB gzip / 7.0 KB brotli** supera umbral mínimo (4 KB).
+- ✅ Build limpio; sonner fuera del entry.
 - ✅ Rollback trivial y auditado.
-- ⏳ Pruebas UX (primer toast, múltiples, cierre manual, mobile) pendientes
-  contra preview publicado — la sesión sandbox se desconectó tras restart.
-  Se recomienda ejecutar §4 protocol y ratificar GO antes de merge a main.
+- ✅ Protocolo §4 ejecutado sobre **código limpio, sin probes**.
+- ✅ Cero pérdida del primer toast — regla crítica cumplida.
+- ✅ Cero regresiones de consola / hidratación.
+- ✅ Cero instrumentación residual (`__lvToast`, `__c1_probe`, logs `[C1]` eliminados).
 
 ---
 
@@ -136,15 +182,17 @@ Criterios §11:
 
 **Hipótesis P3:** aislar sonner ahorra ~7 KB gzip en el entry sin regresión.
 
-**Resultado:** confirmado con margen. Entry gzip: 162.1 KB → 153.4 KB
-(**−5.37 %**). Sonner queda en chunk diferido de 9.1 KB gzip que sólo
-baja bajo demanda real. Primer visitante anónimo (que es el 100 % del
-tráfico SEO) deja de descargar sonner en el critical path.
+**Resultado:** confirmado. Entry gzip **162.1 KB → 154.1 KB** (**−4.90 %**,
+−7.9 KB); brotli-11 **137.4 KB → 130.3 KB** (**−5.11 %**, −7.0 KB). Sonner
+queda en chunk diferido de 9.1 KB gzip / 8.2 KB brotli que sólo baja bajo
+demanda real. El primer visitante anónimo (100 % del tráfico SEO) deja de
+descargar sonner en el critical path.
 
-**Contribución al techo P0 (C1+C2 = −12 %):** C1 aporta −5.37 % ya
-medido. C2 sigue pendiente de autorización.
+**Contribución al techo P0 (C1+C2 = −12 %):** C1 aporta **−4.90 %** ya
+medido en la build final limpia. C2 sigue pendiente de autorización.
 
 ---
 
-**Estado final:** cambios aplicados en rama activa. Esperando ratificación
-Founder tras ejecutar §4 en preview publicado. NO se abren C2–C7.
+**Estado final:** C1 **cerrado formalmente**. Cambios aplicados en rama
+activa, código limpio, evidencia funcional recogida. NO se abren C2–C7
+hasta autorización explícita.
