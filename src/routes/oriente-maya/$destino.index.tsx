@@ -143,6 +143,8 @@ function DestinoPage() {
         db={db ?? null}
         related={related ?? null}
         slug={dest.slug}
+        mapPoints={mapPoints ?? []}
+        galleryUrls={galleryUrls ?? []}
       >
         {composition ? (
           <CompositionRenderer tree={composition.snapshot} />
