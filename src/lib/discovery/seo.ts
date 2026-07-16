@@ -562,8 +562,9 @@ export function eventJsonLd(input: {
  */
 export function faqPageJsonLd(
   faqs: ReadonlyArray<{ question: string; answer: string }>,
+  options?: { path?: string; mainEntityId?: string },
 ): Record<string, unknown> {
-  return {
+  const node: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: faqs.map((f) => ({
@@ -572,6 +573,12 @@ export function faqPageJsonLd(
       acceptedAnswer: { "@type": "Answer", text: f.answer },
     })),
   };
+  if (options?.path) node["@id"] = `${absoluteUrl(options.path)}#faq`;
+  // SEO.A1.1 · PR-3 — Reconciliar la FAQ con la entidad principal de la
+  // página (Product/Event/…) por `@id` cuando se conoce, para que Google
+  // e IA asocien las preguntas a la entidad correcta.
+  if (options?.mainEntityId) node.about = { "@id": options.mainEntityId };
+  return node;
 }
 
 /**
