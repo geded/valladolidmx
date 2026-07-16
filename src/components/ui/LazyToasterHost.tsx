@@ -16,7 +16,18 @@ const Toaster = React.lazy(() =>
 
 export function LazyToasterHost() {
   const [mount, setMount] = React.useState(false);
-  React.useEffect(() => subscribeToasterMount(() => setMount(true)), []);
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log("[C1] LazyToasterHost useEffect subscribed");
+    const un = subscribeToasterMount(() => {
+      // eslint-disable-next-line no-console
+      console.log("[C1] LazyToasterHost cb fired -> setMount(true)");
+      setMount(true);
+    });
+    return un;
+  }, []);
+  // eslint-disable-next-line no-console
+  console.log("[C1] LazyToasterHost render mount=", mount);
   if (!mount) return null;
   return (
     <React.Suspense fallback={null}>
