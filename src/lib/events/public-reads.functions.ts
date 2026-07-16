@@ -276,7 +276,7 @@ export const getEventBySlug = createServerFn({ method: "GET" })
     const { data: row, error } = await sb
       .from("events")
       .select(
-        "id, slug, title, summary, body, starts_at, ends_at, venue_name, is_free, external_url, destination_id, business_id, cover_media_id, published_at, updated_at, destinations:destination_id ( slug, name ), media_assets:cover_media_id ( storage_bucket, storage_path )",
+        "id, slug, title, summary, body, starts_at, ends_at, venue_name, is_free, external_url, destination_id, business_id, cover_media_id, published_at, updated_at, destinations:destination_id ( slug, name ), media_assets:cover_media_id ( storage_bucket, storage_path ), businesses:business_id ( slug, display_name, status, deleted_at, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )",
       )
       .eq("slug", data.slug)
       .eq("status", "published")
@@ -294,8 +294,30 @@ export const getEventBySlug = createServerFn({ method: "GET" })
       published_at: string | null;
       updated_at: string | null;
       destinations?: { slug?: string | null; name?: string | null } | null;
+      businesses?: {
+        slug?: string | null;
+        display_name?: string | null;
+        status?: string | null;
+        deleted_at?: string | null;
+        destinations?: { slug?: string | null } | null;
+        business_categories?: { slug?: string | null } | null;
+      } | null;
     };
     const cover = await signMedia(r.media_assets?.storage_bucket, r.media_assets?.storage_path);
+    // Sólo consideramos organizador si la empresa está publicada, no
+    // eliminada, y expone destino + categoría primaria + slug — datos
+    // necesarios para construir un `@id` canónico y visible.
+    const biz = r.businesses ?? null;
+    const bizIsPublished =
+      !!biz && biz.status === "published" && !biz.deleted_at;
+    const organizer_business_slug = bizIsPublished ? biz!.slug ?? null : null;
+    const organizer_business_name = bizIsPublished ? biz!.display_name ?? null : null;
+    const organizer_destination_slug = bizIsPublished
+      ? biz!.destinations?.slug ?? null
+      : null;
+    const organizer_category_slug = bizIsPublished
+      ? biz!.business_categories?.slug ?? null
+      : null;
     return {
       id: r.id,
       slug: r.slug,
@@ -314,5 +336,9 @@ export const getEventBySlug = createServerFn({ method: "GET" })
       cover_url: cover,
       published_at: r.published_at ?? null,
       updated_at: r.updated_at ?? null,
+      organizer_business_slug,
+      organizer_business_name,
+      organizer_destination_slug,
+      organizer_category_slug,
     };
   });
