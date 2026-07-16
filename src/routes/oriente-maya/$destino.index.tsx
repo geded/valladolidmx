@@ -9,7 +9,11 @@
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead, touristDestinationJsonLd } from "@/lib/discovery/seo";
+import {
+  buildPublicHead,
+  touristDestinationJsonLd,
+  ORIENTE_MAYA_PLACE_ID,
+} from "@/lib/discovery/seo";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
@@ -103,10 +107,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
               image: loaderData.db?.hero_url ?? undefined,
               latitude: loaderData.db?.latitude ?? null,
               longitude: loaderData.db?.longitude ?? null,
-              containedIn: {
-                name: ORIENTE_MAYA.name,
-                url: "https://quehacerenvalladolid.com/oriente-maya",
-              },
+              containedInId: ORIENTE_MAYA_PLACE_ID,
               keywords: loaderData.dest.highlights,
               touristType: ["Cultural", "Naturaleza", "Gastronomía", "Historia Maya"],
             }),
