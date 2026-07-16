@@ -11,7 +11,15 @@ import * as React from "react";
 import { subscribeToasterMount } from "@/lib/toast";
 
 const Toaster = React.lazy(() =>
-  import("@/components/ui/sonner").then((m) => ({ default: m.Toaster })),
+  import("@/components/ui/sonner").then((m) => {
+    // eslint-disable-next-line no-console
+    console.log("[C1] sonner chunk resolved", Object.keys(m));
+    return { default: m.Toaster };
+  }).catch((e) => {
+    // eslint-disable-next-line no-console
+    console.error("[C1] sonner chunk failed", e);
+    throw e;
+  }),
 );
 
 export function LazyToasterHost() {
