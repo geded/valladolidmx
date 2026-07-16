@@ -7,7 +7,7 @@
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead, productJsonLd, faqPageJsonLd, businessEntityId } from "@/lib/discovery/seo";
+import { buildPublicHead, productJsonLd, faqPageJsonLd, businessEntityId, productEntityId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getMarketplaceProductBySlug } from "@/lib/catalog/marketplace-reads.functions";
 import { getProductRelated } from "@/lib/catalog/product-related.functions";
@@ -74,6 +74,7 @@ export const Route = createFileRoute(
         image: p.cover_url ?? p.media?.[0]?.url ?? undefined,
         sku: p.slug,
         brandName: p.business.display_name,
+        category: catName,
         providerBusinessId: businessEntityId(
           `/oriente-maya/${params.destino}/${params.categoria}/${params.empresa}`,
         ),
@@ -87,10 +88,30 @@ export const Route = createFileRoute(
                 reviewCount: p.review_stats.count,
               }
             : undefined,
+        // SEO.A1.1 · PR-3 — Reseñas reales, publicadas, visibles en la
+        // ficha (top 5, orden cronológico ya viene del server). El DTO
+        // filtra `status=published` y `deleted_at is null` — ninguna
+        // moderada o simulada llega hasta aquí.
+        reviews:
+          p.reviews && p.reviews.length > 0
+            ? p.reviews.slice(0, 5).map((r) => ({
+                author: r.author_display_name,
+                rating: r.rating,
+                title: r.title,
+                body: r.body,
+                publishedAt: r.published_at,
+                language: r.language,
+              }))
+            : undefined,
       }),
     ];
     if (p.faqs && p.faqs.length > 0) {
-      jsonLd.push(faqPageJsonLd(p.faqs.map((f) => ({ question: f.question, answer: f.answer }))));
+      jsonLd.push(
+        faqPageJsonLd(
+          p.faqs.map((f) => ({ question: f.question, answer: f.answer })),
+          { path, mainEntityId: productEntityId(path) },
+        ),
+      );
     }
     return buildPublicHead({
       title: `${p.name} · ${p.business.display_name} — ${SITE.name}`,
