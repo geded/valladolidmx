@@ -68,6 +68,7 @@ import { LazyToasterHost } from "@/components/ui/LazyToasterHost";
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
+import { organizationJsonLd, websiteJsonLd } from "@/lib/discovery/seo";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { ProtectedActionResumeRunner } from "@/lib/protected-actions";
 import { GlobalNavigationSessionBridge } from "@/components/navigation/NavigationSessionBridge";
@@ -173,41 +174,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: SITE.name,
-          url: SITE.url,
-          inLanguage: "es-MX",
-          description: SITE.default_description,
-          potentialAction: {
-            "@type": "SearchAction",
-            target: `${SITE.url}/buscar?q={search_term_string}`,
-            "query-input": "required name=search_term_string",
-          },
-        }),
+        // SEO.A1.1 · PR-1 — WebSite (fuente única, sin SearchAction).
+        // SearchAction queda **postponed**: no existe superficie pública
+        // indexable y sin auth en /buscar. Reintroducir cuando aplique.
+        children: JSON.stringify(websiteJsonLd()),
       },
       {
         type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          name: SITE.name,
-          url: SITE.url,
-          logo: `${SITE.url}/logo.png`,
-          description: SITE.default_description,
-          areaServed: {
-            "@type": "AdministrativeArea",
-            name: "Oriente Maya de Yucatán, México",
-          },
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: "Valladolid",
-            addressRegion: "Yucatán",
-            addressCountry: "MX",
-          },
-          slogan: SITE.tagline,
-        }),
+        // SEO.A1.1 · PR-1 — Organization con @id estable reutilizable
+        // como publisher/brand/provider por otras entidades del grafo.
+        children: JSON.stringify(organizationJsonLd()),
       },
     ],
   }),
