@@ -19,6 +19,8 @@ import {
 import { navigationContextToDeclaration } from "@/lib/navigation";
 import { ContextEngineProvider } from "@/lib/context-engine";
 import { BusinessSurface, BusinessSurfaceProvider } from "@/components/surfaces/BusinessSurface";
+import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
+import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 
 export const Route = createFileRoute(
   "/oriente-maya/$destino/$categoria/$empresa/",
@@ -32,9 +34,21 @@ export const Route = createFileRoute(
       },
     });
     if (resolution.reason !== "ok" || !resolution.business) throw notFound();
-    const business = await getMarketplaceBusinessBySlug({
-      data: { slug: params.empresa },
-    });
+    const [business, specific, template] = await Promise.all([
+      getMarketplaceBusinessBySlug({ data: { slug: params.empresa } }),
+      // SEO.A3.M1 · Authority Business Landing — composition-first.
+      // Se resuelve primero una composición específica por slug
+      // (`biz-<slug>`) que permite landings editoriales premium; en su
+      // ausencia la ruta cae a la plantilla oficial de negocio y, en
+      // último término, al render directo de `BusinessSurface`. Misma
+      // arquitectura que Región y Destino — cero excepciones por empresa.
+      getPublishedCompositionBySlug({
+        data: { slug: `biz-${params.empresa}`, variant_key: params.empresa },
+      }).catch(() => null),
+      getPublishedCompositionBySlug({
+        data: { slug: "__tpl_business__" },
+      }).catch(() => null),
+    ]);
     if (!business) throw notFound();
     // E2 · US-E2.1 — Related Collection contextual del negocio.
     // Fallback silencioso: si falla no rompe el render de la ficha.
@@ -50,7 +64,8 @@ export const Route = createFileRoute(
     } catch {
       related = null;
     }
-    return { resolution, business, related };
+    const composition = specific ?? template ?? null;
+    return { resolution, business, related, composition };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
@@ -110,7 +125,7 @@ export const Route = createFileRoute(
 });
 
 function EmpresaTerritorialPage() {
-  const { resolution, business, related } = Route.useLoaderData();
+  const { resolution, business, related, composition } = Route.useLoaderData();
   const { destino } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
   // N2.2: fuente única = Navigation Contract. El adapter deriva
@@ -124,7 +139,11 @@ function EmpresaTerritorialPage() {
   return (
     <ContextEngineProvider declaration={declaration}>
       <BusinessSurfaceProvider business={business} related={related}>
-        <BusinessSurface />
+        {composition ? (
+          <CompositionRenderer tree={composition.snapshot} />
+        ) : (
+          <BusinessSurface />
+        )}
       </BusinessSurfaceProvider>
     </ContextEngineProvider>
   );
