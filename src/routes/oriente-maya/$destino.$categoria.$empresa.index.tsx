@@ -43,7 +43,7 @@ export const Route = createFileRoute(
       // último término, al render directo de `BusinessSurface`. Misma
       // arquitectura que Región y Destino — cero excepciones por empresa.
       getPublishedCompositionBySlug({
-        data: { slug: `biz-${params.empresa}` },
+        data: { slug: `biz-${params.empresa}`, variant_key: params.empresa },
       }).catch(() => null),
       getPublishedCompositionBySlug({
         data: { slug: "__tpl_business__" },
