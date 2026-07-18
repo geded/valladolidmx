@@ -232,3 +232,106 @@ Toda publicación deberá cumplir los siguientes principios:
 El contenido no tendrá como objetivo llenar páginas.
 
 Su propósito será ayudar al visitante a tomar mejores decisiones.
+
+---
+
+# 11. Principios de Inteligencia Artificial (Alux)
+
+Alux constituye la inteligencia turística oficial de Valladolid.mx.
+
+Su propósito no es sustituir a las personas ni convertirse en un simple chatbot conversacional.
+
+Su función es actuar como un Concierge Inteligente capaz de acompañar al viajero durante todo su recorrido, ayudándolo a descubrir experiencias, tomar mejores decisiones y conectar con el ecosistema turístico del Oriente Maya de Yucatán.
+
+Toda evolución de Alux deberá respetar los siguientes principios:
+
+## 11.1 La IA existe para ayudar, no para reemplazar
+
+La inteligencia artificial complementa la hospitalidad humana.
+
+Siempre que la intervención de una persona genere mayor confianza o valor para el viajero, la plataforma deberá facilitar esa interacción.
+
+## 11.2 Contexto antes que respuestas
+
+Alux deberá comprender el contexto completo del visitante antes de generar recomendaciones.
+
+Idioma, ubicación, etapa del viaje, intereses, presupuesto, historial y preferencias deberán formar parte de la inteligencia del sistema.
+
+## 11.3 Recomendaciones útiles
+
+El éxito de Alux no se medirá por la cantidad de respuestas generadas sino por la utilidad real que produce para el visitante.
+
+## 11.4 Transparencia
+
+Cuando una recomendación sea generada mediante inteligencia artificial, el sistema deberá comunicarlo de manera clara cuando sea relevante para la confianza del usuario.
+
+## 11.5 Aprendizaje continuo
+
+La inteligencia del sistema evolucionará constantemente mediante información del destino, comportamiento agregado de los viajeros y retroalimentación de empresas y usuarios, respetando siempre la privacidad y la legislación aplicable.
+
+---
+
+# 12. Principios del Ecosistema Turístico
+
+Valladolid.mx no pertenece únicamente a una empresa tecnológica.
+
+Pertenece al ecosistema turístico del Oriente Maya de Yucatán.
+
+La plataforma deberá generar beneficios para todos los participantes del destino.
+
+Estos principios regirán esa relación.
+
+## 12.1 Beneficio compartido
+
+Cada nueva funcionalidad deberá crear valor para al menos uno de los siguientes actores sin perjudicar a los demás:
+
+- Viajeros.
+- Empresas.
+- Comunidades.
+- Instituciones.
+- Operadores turísticos.
+- Prestadores de servicios.
+
+## 12.2 Promoción del consumo local
+
+La plataforma priorizará experiencias, empresas y productos que fortalezcan la economía regional.
+
+## 12.3 Respeto cultural
+
+Toda comunicación deberá promover el patrimonio histórico, cultural, gastronómico y natural del Oriente Maya de Yucatán con respeto y responsabilidad.
+
+## 12.4 Turismo sostenible
+
+Las decisiones del producto deberán favorecer un turismo que preserve el patrimonio para las futuras generaciones.
+
+## 12.5 Información abierta y colaborativa
+
+Siempre que sea posible, la plataforma facilitará la colaboración entre empresas, comunidades y autoridades para mantener información útil y actualizada.
+
+---
+
+# 13. Reglas Inmutables
+
+Las siguientes reglas constituyen principios permanentes del proyecto.
+
+No podrán modificarse sin una revisión formal del CANON.
+
+1. El viajero siempre será el centro del sistema.
+
+2. La plataforma deberá generar valor para todo el ecosistema turístico.
+
+3. La tecnología nunca será un fin en sí misma.
+
+4. Ninguna funcionalidad podrá deteriorar la experiencia del usuario para favorecer intereses internos.
+
+5. La información deberá ser confiable.
+
+6. La arquitectura privilegiará reutilización sobre duplicación.
+
+7. La inteligencia artificial deberá complementar a las personas.
+
+8. Toda evolución deberá fortalecer la misión original de Valladolid.mx.
+
+9. El respeto por la cultura maya y el patrimonio regional constituye un principio permanente.
+
+10. La confianza del viajero será el activo más importante del proyecto.
