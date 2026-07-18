@@ -607,7 +607,7 @@ Cada respuesta de Alux es explicable, contextual, respetuosa con el patrimonio y
 
 ---
 
-# 16. Control de Versiones
+# 22. Control de Versiones
 
 El CANON constituye un documento vivo con vocación de permanencia.
 
