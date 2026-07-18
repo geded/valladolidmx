@@ -3349,6 +3349,81 @@ export type Database = {
         }
         Relationships: []
       }
+      mcp_rate_buckets: {
+        Row: {
+          count: number
+          id: number
+          scope_key: string
+          tool_name: string
+          updated_at: string
+          window_seconds: number
+          window_started_at: string
+        }
+        Insert: {
+          count?: number
+          id?: number
+          scope_key: string
+          tool_name: string
+          updated_at?: string
+          window_seconds: number
+          window_started_at: string
+        }
+        Update: {
+          count?: number
+          id?: number
+          scope_key?: string
+          tool_name?: string
+          updated_at?: string
+          window_seconds?: number
+          window_started_at?: string
+        }
+        Relationships: []
+      }
+      mcp_tool_invocations: {
+        Row: {
+          client_id: string | null
+          contract_version: string
+          created_at: string
+          duration_ms: number | null
+          error_code: string | null
+          input_hash: string | null
+          invocation_id: string
+          locale: string | null
+          result_count: number | null
+          success: boolean
+          tool_name: string
+          user_id: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          contract_version: string
+          created_at?: string
+          duration_ms?: number | null
+          error_code?: string | null
+          input_hash?: string | null
+          invocation_id?: string
+          locale?: string | null
+          result_count?: number | null
+          success: boolean
+          tool_name: string
+          user_id?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          contract_version?: string
+          created_at?: string
+          duration_ms?: number | null
+          error_code?: string | null
+          input_hash?: string | null
+          invocation_id?: string
+          locale?: string | null
+          result_count?: number | null
+          success?: boolean
+          tool_name?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       media_asset_signed_urls: {
         Row: {
           asset_id: string
@@ -7319,6 +7394,34 @@ export type Database = {
           summary: string
           tags: string[]
           title: string
+        }[]
+      }
+      mcp_log_invocation: {
+        Args: {
+          p_client_id: string
+          p_contract_version: string
+          p_duration_ms: number
+          p_error_code: string
+          p_input_hash: string
+          p_locale: string
+          p_result_count: number
+          p_success: boolean
+          p_tool_name: string
+          p_user_id: string
+        }
+        Returns: string
+      }
+      mcp_rate_hit: {
+        Args: {
+          p_limit: number
+          p_scope_key: string
+          p_tool_name: string
+          p_window_seconds: number
+        }
+        Returns: {
+          allowed: boolean
+          current_count: number
+          retry_after_seconds: number
         }[]
       }
       move_to_dlq: {
