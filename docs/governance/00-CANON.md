@@ -335,3 +335,85 @@ No podrán modificarse sin una revisión formal del CANON.
 9. El respeto por la cultura maya y el patrimonio regional constituye un principio permanente.
 
 10. La confianza del viajero será el activo más importante del proyecto.
+
+---
+
+# 14. Cómo Evaluar una Nueva Funcionalidad
+
+Toda propuesta de nueva funcionalidad, mejora o integración deberá responder afirmativamente a las siguientes preguntas antes de ser aprobada:
+
+## 14.1 Valor para el viajero
+
+¿Resuelve un problema real o mejora de forma significativa la experiencia del visitante?
+
+## 14.2 Valor para el ecosistema
+
+¿Genera beneficios para empresas, comunidades, instituciones o para el destino en su conjunto?
+
+## 14.3 Coherencia con la misión
+
+¿Está alineada con la misión y visión de Valladolid.mx?
+
+## 14.4 Reutilización
+
+¿Puede construirse reutilizando capacidades existentes antes de crear nuevos componentes?
+
+## 14.5 Escalabilidad
+
+¿Funcionará correctamente cuando la plataforma incorpore nuevos destinos, regiones y miles de empresas adicionales?
+
+## 14.6 Simplicidad
+
+¿Reduce la complejidad para el usuario en lugar de aumentarla?
+
+## 14.7 Medición
+
+¿Existen indicadores claros que permitan evaluar su impacto?
+
+Si alguna de estas respuestas es negativa, la funcionalidad deberá replantearse antes de iniciar su desarrollo.
+
+---
+
+# 15. Jerarquía Documental
+
+Toda la documentación oficial del proyecto seguirá el siguiente orden de autoridad.
+
+1. CANON
+2. Documentación de Gobernanza
+3. Blueprints
+4. PRD (Product Requirement Documents)
+5. ADR (Architecture Decision Records)
+6. Documentación Técnica
+7. Manuales Operativos
+8. Investigación y Benchmark
+9. Documentación Temporal
+
+Cuando exista conflicto entre documentos, prevalecerá siempre el documento ubicado en el nivel superior de esta jerarquía.
+
+---
+
+# 16. Control de Versiones
+
+El CANON constituye un documento vivo con vocación de permanencia.
+
+Las modificaciones deberán realizarse mediante nuevas versiones documentadas.
+
+Cada versión deberá indicar:
+
+- Número de versión.
+- Fecha.
+- Autor o responsable.
+- Resumen de cambios.
+- Justificación del cambio.
+
+No deberán realizarse modificaciones que contradigan la misión, visión o principios fundamentales sin una revisión integral del propio CANON.
+
+---
+
+# Conclusión
+
+El presente CANON establece la identidad permanente de Valladolid.mx como el Destination Operating System del Oriente Maya de Yucatán.
+
+Más que una plataforma tecnológica, representa una visión de largo plazo para impulsar el desarrollo turístico de la región mediante un ecosistema digital centrado en las personas, la colaboración y la innovación responsable.
+
+Toda decisión futura deberá contribuir a fortalecer esta visión.
