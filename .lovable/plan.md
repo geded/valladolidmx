@@ -42,7 +42,7 @@ Este archivo es una instrucción de ejecución subordinada a `docs/governance/00
    - contrato `Action Queue` v1.0.0 congelado;
    - oportunidades y prioridades CV8.5–CV8.8 reutilizadas por adaptadores puros;
    - proyección pura, sin snapshots paralelos;
-   - Completion Report emitido; pendiente validación Founder.
+   - Completion Report aprobado por el Founder el 2026-07-20.
 2. [ ] **CV8.9.2 · Persistencia, roles y auditoría**
    - implementar estados y transiciones autorizadas;
    - RLS/GRANTs por rol;
