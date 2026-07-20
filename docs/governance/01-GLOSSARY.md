@@ -1,8 +1,9 @@
 # 01 · GLOSSARY
 
 **Estado:** Approved
-**Versión:** 1.0
-**Última actualización:** Julio 2026
+**Versión:** 1.1
+
+**Última actualización:** 2026-07-20
 
 ---
 
@@ -883,15 +884,10 @@ No se permite utilizar un término nuevo en documentos oficiales, PRD, ADR, cód
 
 El Glosario constituye un documento vivo con vocación de permanencia.
 
-Las modificaciones deberán realizarse mediante nuevas versiones documentadas.
-
-Cada versión deberá indicar:
-
-- Número de versión.
-- Fecha.
-- Autor o responsable.
-- Resumen de cambios.
-- Justificación del cambio.
+| Versión | Fecha | Autor | Descripción |
+|---|---|---|---|
+| v1.0 | 2026-07-18 | Founder | Emisión inicial del vocabulario oficial de Valladolid.mx. |
+| v1.1 | 2026-07-20 | Founder | Consolidación del placeholder `04-CANONICAL-VOCABULARY.md` y formalización del historial de versiones. |
 
 No deberán realizarse modificaciones que contradigan la misión, visión o principios fundamentales del CANON sin una revisión integral del propio Glosario y del CANON.
 

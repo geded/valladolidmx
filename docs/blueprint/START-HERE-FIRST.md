@@ -3,11 +3,19 @@
 # Valladolid.mx – Blueprint Master
 ## Documento de Inicio para Lovable
 
-**Versión:** 2.0
+**Estado:** Active — entrada al Blueprint histórico
+
+**Versión:** 2.1
+
+**Última actualización:** 2026-07-20
 
 ---
 
-# LEER ESTE DOCUMENTO ANTES QUE CUALQUIER OTRO
+# LEER PRIMERO LA GOBERNANZA CANÓNICA
+
+Antes de utilizar este documento se debe leer [`docs/governance/README.md`](../governance/README.md) y la serie canónica `00–05`.
+
+El documento de mayor jerarquía es [`00-CANON.md`](../governance/00-CANON.md). Este archivo es el punto de entrada operativo al Blueprint histórico y no puede modificar, reemplazar ni contradecir la gobernanza aprobada.
 
 Este documento define la forma en que deberá desarrollarse el proyecto.
 
@@ -142,18 +150,19 @@ Hasta recibir autorización.
 
 # Prioridad de documentos
 
-1. START-HERE-FIRST.md
-2. 00-README.md
-3. 01-PRODUCT-VISION.md
-4. 02-ARCHITECTURE-PRINCIPLES.md
-5. 03-INFORMATION-ARCHITECTURE.md
-6. 04-DOMAIN-MODEL.md
-7. 05-BRAND-AND-DESIGN-PHILOSOPHY.md
-8. 06-AUTHENTICATION-AND-PROFILES.md
-9. 07-CMS-ARCHITECTURE.md
-10. 08-ALUX-INTELLIGENCE-SYSTEM.md
-11. 09-UX-UI-DESIGN-SYSTEM.md
-12. 10-GLOSSARY.md
+La precedencia obligatoria es:
+
+1. `docs/governance/00-CANON.md`.
+2. `docs/governance/01-GLOSSARY.md`.
+3. `docs/governance/02-ARCHITECTURAL-PRINCIPLES.md`.
+4. `docs/governance/03-DOCUMENTATION-STANDARD.md`.
+5. `docs/governance/04-DECISION-MAKING.md`.
+6. `docs/governance/05-BLUEPRINT-STANDARD.md`.
+7. Roadmap oficial vigente.
+8. `START-HERE-FIRST.md` como guía operativa del Blueprint histórico.
+9. Serie Blueprint `00–10` y documentos posteriores, respetando sus dependencias y versiones aprobadas.
+
+Los documentos Draft `06-BLUEPRINT-MASTER-INDEX.md`, `07-BLUEPRINT-DEPENDENCY-MAP.md` y `08-KNOWLEDGE-GRAPH.md` apoyarán la navegación cuando sean completados, pero no alteran la precedencia mientras permanezcan en Draft.
 
 ---
 

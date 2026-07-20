@@ -1,8 +1,9 @@
 # 03 · DOCUMENTATION STANDARD
 
 **Estado:** Approved
-**Versión:** 1.0
-**Última actualización:** Julio 2026
+**Versión:** 1.1
+
+**Última actualización:** 2026-07-20
 
 ---
 
@@ -15,6 +16,8 @@ Su propósito es preservar el conocimiento del proyecto, garantizar la continuid
 Este documento define el estándar oficial de documentación. No describe arquitectura, no describe código y no prescribe una sola tecnología. Describe cómo debe escribirse, organizarse, mantenerse y evolucionar toda la documentación del proyecto para que sea clara, consistente, trazable, reusable, mantenible y comprensible.
 
 Toda documentación que forme parte del repositorio oficial de Valladolid.mx deberá cumplir con este estándar. La calidad de la documentación se mide con los mismos criterios de rigor que la calidad del software.
+
+Este documento es también la fuente canónica de Documentation Governance. Sustituye cualquier placeholder anterior que pretendiera gobernar por separado la creación, mantenimiento, revisión o deprecación de documentación.
 
 ---
 
@@ -159,7 +162,7 @@ Cada documento del proyecto debe clasificarse en uno de los tipos oficiales. Cad
 
 **Propósito:** Registrar las decisiones significativas del proyecto de forma estandarizada.
 
-**Características:** Puede adoptar la forma de ADR, RFC, propuestas de gobierno o registros de aprobación. Siempre incluye contexto, alternativas, decisión, consecuencias y fecha.
+**Características:** El marco se define en `docs/governance/04-DECISION-MAKING.md`. Cada registro puede adoptar la forma de ADR, RFC, propuesta de gobierno o aprobación y siempre incluye contexto, alternativas, decisión, consecuencias y fecha.
 
 **Ubicación:** `docs/decisions/` o `docs/governance/decisions/` según la convención del proyecto.
 
@@ -625,6 +628,7 @@ Cuando surja un nuevo tipo de documento, un nuevo formato o una nueva convenció
 | Versión | Fecha       | Autor    | Descripción                                                                 |
 |---------|-------------|----------|-----------------------------------------------------------------------------|
 | v1.0    | 2026-07-18  | Founder  | Emisión inicial del estándar oficial de documentación de Valladolid.mx.     |
+| v1.1    | 2026-07-20  | Founder  | Consolidación de Documentation Governance y referencia al marco de decisiones. |
 
 Este documento se versiona junto al CANON, al GLOSSARY y a ARCHITECTURAL PRINCIPLES. Su versión mayor sólo cambia cuando se redefine su alcance o su filosofía; los cambios editoriales incrementan la versión menor.
 
