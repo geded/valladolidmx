@@ -158,7 +158,7 @@ La precedencia obligatoria es:
 4. `docs/governance/03-DOCUMENTATION-STANDARD.md`.
 5. `docs/governance/04-DECISION-MAKING.md`.
 6. `docs/governance/05-BLUEPRINT-STANDARD.md`.
-7. Roadmap oficial vigente.
+7. [`16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`](./16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md), única hoja de ruta oficial vigente.
 8. `START-HERE-FIRST.md` como guía operativa del Blueprint histórico.
 9. Serie Blueprint `00–10` y documentos posteriores, respetando sus dependencias y versiones aprobadas.
 

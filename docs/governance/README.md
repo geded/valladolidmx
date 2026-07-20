@@ -40,6 +40,8 @@ Los documentos del mismo nivel no se resuelven por fecha o conveniencia. La cont
 
 Después de leer esta carpeta, el recorrido del Blueprint comienza en [`docs/blueprint/START-HERE-FIRST.md`](../blueprint/START-HERE-FIRST.md). Ese archivo conserva su función de guía operativa, pero queda subordinado a esta jerarquía.
 
+La única hoja de ruta vigente es [`16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`](../blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md). El plan de ejecución `.lovable/plan.md` está subordinado a ella.
+
 ## Auditoría
 
 Las correcciones de estructura y gobernanza se registran en [`audit/`](./audit/). Los placeholders retirados no eran documentos aprobados; su consolidación y renumeración está documentada allí para preservar trazabilidad.

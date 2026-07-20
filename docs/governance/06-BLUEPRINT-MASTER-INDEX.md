@@ -12,7 +12,7 @@ Este documento reservará el catálogo canónico de todos los Blueprints de Vall
 
 ## 2. Alcance actual
 
-La numeración y la responsabilidad del documento quedan aprobadas como parte de la reconciliación de gobernanza. El inventario completo permanece pendiente de la rebase del roadmap y, mientras este archivo continúe en estado Draft, no sustituye al roadmap oficial ni modifica el estado de ningún Blueprint.
+La numeración y la responsabilidad del documento quedan aprobadas como parte de la reconciliación de gobernanza. El roadmap ya fue rebaselined en [`16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`](../blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md). El inventario exhaustivo de Blueprints permanece pendiente y, mientras este archivo continúe en estado Draft, no sustituye al roadmap oficial ni modifica el estado de ningún Blueprint.
 
 ## 3. Contrato del índice
 
@@ -28,7 +28,7 @@ La versión completa deberá incluir, como mínimo:
 
 ## 4. Fuente temporal
 
-Hasta completar este índice, el orden de ejecución se determina mediante el roadmap oficial vigente y las decisiones aprobadas. La existencia de un archivo en `docs/blueprint/` no implica por sí sola que esté aprobado, implementado o cerrado.
+Hasta completar este índice, el orden de ejecución se determina mediante el [roadmap oficial v2.1](../blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md) y las decisiones aprobadas. La existencia de un archivo en `docs/blueprint/` no implica por sí sola que esté aprobado, implementado o cerrado.
 
 ## 5. Control de versiones
 

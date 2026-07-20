@@ -1,52 +1,127 @@
-# MCP M1 · Discovery-Grade Tools — Plan de Ejecución
+# Plan operativo vigente · Reconciliación → Soft Launch
 
-**Autorizado:** GO Founder · Alcance: sólo lecturas · Fuera: mutaciones, pagos, Alux-as-a-Service.
+**Estado:** Activo
+**Última actualización:** 2026-07-20
+**Roadmap rector:** `docs/blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`
+**Rama de integración:** `reconciliation/main-benchmark-governance`
+**PR:** Draft PR #1 · Reconcile branches, governance, and package management
 
-## Sub-olas (una a la vez, con Completion Report y Founder GO/NO-GO entre cada una)
+Este archivo es una instrucción de ejecución subordinada a `docs/governance/00–05` y al roadmap oficial. No crea prioridades nuevas ni sustituye Completion Reports.
 
-### M1.0 · Foundations & Hardening (R1, R2, R3)
-**Objetivo:** dejar operativa la infraestructura transversal que todas las tools consumirán.
+## 1. Punto de partida recuperado
 
-- **R2 · Auditoría MCP:** migración `mcp_tool_invocations` (invocation_id, client_id, user_id, tool_name, contract_version, input_hash SHA-256, duration_ms, success, error_code, locale, timestamp). RLS: sólo admin lee; inserta un helper `logMcpInvocation()` (RPC `SECURITY DEFINER` acotado a llamar desde el servidor). Prohibido registrar tokens/PII.
-- **R1 · Rate limiter:** tabla `mcp_rate_buckets` (client_id, user_id/IP fallback, tool_name, window_started_at, count) + helper `enforceRateLimit(ctx, tool, {perMin, perHour})`. Respuesta 429 con `Retry-After`. Registra en auditoría.
-- **R3 · Protección de búsqueda:** helper `sanitizeSearchQuery(q)` — mínimo 3 alfanuméricos, rechaza `%%`/`__`/wildcards puros, escapa `%_\`, cap a 60 chars, cap resultados 25. Base para FTS futura sin bloquear M1.
-- **Output schemas Zod** en `search_businesses`, `get_my_traveler_profile`, `list_my_travel_plans` + añadir `locale` input (`es|en|fr|de|it|pt`).
-- **Helper compartido** `src/lib/mcp/lib/` con: `ctx-supabase.ts` (cliente por token/anón), `audit.ts`, `rate-limit.ts`, `sanitize.ts`, `locale.ts` (fallback explícito auditable), `contracts.ts` (schemas comunes: `GeoPoint`, `LocalizedText`, `SourceCitation`).
-- **Consent screen** (`src/routes/[.]lovable.oauth.consent.tsx`): copy claro en lenguaje humano ("consultar tu perfil de viajero", "consultar tus planes", "buscar información turística"), no scopes técnicos. Enlace al dominio canónico `https://quehacerenvalladolid.com/mcp`.
+- [x] Integración no destructiva de `main` con el trabajo benchmark H2.
+- [x] Numeración canónica de `docs/governance/00–08` y auditoría de reconciliación.
+- [x] Bun restaurado como gestor canónico; `bun.lock` recuperado y `package-lock.json` retirado.
+- [x] Instalación congelada reproducible con Bun 1.3.14.
+- [x] Typecheck sin errores.
+- [x] Suite de 143 tests aprobada.
+- [x] Build de producción aprobado y repetido.
+- [x] Deuda de lint heredada documentada; no se mezcla con esta reconciliación.
+- [x] Roadmap canónico rebaselined a v2.1 con estados respaldados por evidencia.
+- [x] Plan Lovable reescrito para reflejar el estado real.
 
-**DoD M1.0:** typecheck+build limpios, migración aplicada con GRANTs, RLS probado (anon no lee auditoría), 3 tools existentes con outputSchema tipado + locale, consent screen actualizada. Completion Report M1.0.
+## 2. Gate R4 · Cerrar reconciliación
 
-### M1.1 · Discovery Tools Batch A (contenido)
-- `search_experiences` (products tipo experiencia) — reutiliza `catalog/marketplace-reads`.
-- `search_events` — reutiliza `events/public-reads`.
-- `get_business(slug)` — reutiliza `catalog/business-related`.
-- `get_destination_context(slug)` — reutiliza `destinations/public-reads` + zonas + badges Pueblo Mágico.
+Antes de implementar producto:
 
-Todas con: contractVersion 1.0.0, outputSchema Zod tipado, locale, rate limit, auditoría, explainability (`sources[]`, `rationale`, `freshness`, `limitations`). Cero motores paralelos: sólo wrappers sobre server functions aprobadas.
+1. Revisar el diff completo del Draft PR #1.
+2. Confirmar que el PR apunta a `main` y sólo contiene la reconciliación autorizada.
+3. Verificar nuevamente `bun install --frozen-lockfile`, typecheck, tests y build en el entorno de integración.
+4. Revisar las migraciones Supabase incluidas en el historial y su orden de aplicación; no aplicar a producción por inferencia.
+5. Resolver observaciones del PR y convertirlo a Ready for review sólo por decisión del Founder.
+6. Integrar sin reescribir historia publicada.
 
-### M1.2 · Discovery Tools Batch B (territorio)
-- `nearby_from_coords(lat, lng, radius_m, categories?)` — **Geolocation Mandatory**: sólo devuelve entidades con lat/lng; incluye `distance_m` por Haversine RPC ya existente.
-- `list_destinations` — con badge Pueblo Mágico.
-- `list_pueblos_magicos` — filtro derivado del registry (Valladolid/Izamal/Espita).
-- `list_categories` — categorías oficiales de negocios.
+**DoD R4:** PR integrado, `main` limpio, checks reproducibles y commit base identificado para la siguiente épica.
 
-### M1.3 · Validación & Cierre
-- Prueba RLS: token válido, sin token (401), token de otro usuario (rows scoped).
-- Prueba multi-idioma (es/en/fr mínimo).
-- Prueba real desde ChatGPT y Claude con dominio canónico.
-- Regenerar manifiesto (`app_mcp_server--extract_mcp_manifest`).
-- **Completion Report** con matriz Tool → Fuente → Permiso → Schema → Rate limit → Auditoría → Fallback.
-- Outcome Validation + Veredicto GO/NO-GO para beta cerrada.
+## 3. Próxima épica única · CV8.9
 
-## Reglas vinculantes durante toda la ola
-- Cero `SUPABASE_SERVICE_ROLE_KEY` en `src/lib/mcp/`.
-- Cero motores paralelos: toda tool consume server functions/RPCs aprobados.
-- Explainable-by-Default: cada respuesta incluye `sources`, `freshness_hint`, `limitations` cuando aplique.
-- Geolocation Mandatory en toda tool territorial.
-- Documentación y consent apuntan sólo a `https://quehacerenvalladolid.com/mcp`.
+**Blueprint:** `docs/blueprint/16.CV8.9-ACTION-QUEUE-DECISION-WORKFLOW-v1.0.md`
+**Objetivo:** convertir recomendaciones prescriptivas de Visitor Intelligence en decisiones humanas trazables y ejecutables.
+**Inicio permitido:** después del DoD R4 y con GO Founder.
 
-## Fuera de alcance (M2+)
-Mutaciones Travel Plan, Concierge handoff, Commerce, Pagos, Alux-as-a-Service, tools para empresas.
+### Secuencia propuesta
 
-## Siguiente paso
-Ejecutar **M1.0 · Foundations & Hardening** ahora y presentar Completion Report antes de abrir M1.1.
+1. **CV8.9.1 · Contratos y proyección**
+   - congelar contrato `Action Queue` v1.0.0;
+   - reutilizar oportunidades y prioridades CV8.5–CV8.8;
+   - mantener proyección pura, sin snapshots paralelos.
+2. **CV8.9.2 · Persistencia, roles y auditoría**
+   - implementar estados y transiciones autorizadas;
+   - RLS/GRANTs por rol;
+   - traza de responsable, decisión, motivo y timestamps.
+3. **CV8.9.3 · Superficie operativa**
+   - cola filtrable y detalle explicable;
+   - acciones humanas explícitas, sin auto-ejecución;
+   - estados vacíos y errores operables.
+4. **CV8.9.4 · Métricas y cierre**
+   - medir tiempo a decisión, backlog, aceptación/rechazo y resultado;
+   - pruebas, smoke, no-regresión y Completion Report;
+   - aprobación Founder antes de abrir AC1.4.
+
+**DoD CV8.9:** contrato versionado, persistencia segura, UI operable, decisiones auditables, pruebas verdes y Completion Report aprobado.
+
+## 4. Siguiente después de CV8.9 · AC1.4
+
+**Contrato rector:** `docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md`
+
+Implementar registro progresivo sólo en los momentos de valor oficiales:
+
+- guardar de forma permanente;
+- continuar en otro dispositivo;
+- compartir;
+- recibir recordatorios.
+
+La continuidad anónima debe preservarse y `SignInPromptSheet` no puede actuar como gate genérico de identidad. El cierre requiere medición del paso anónimo → identificado sin pérdida de planes, favoritos o contexto.
+
+## 5. Trabajo operativo paralelo permitido
+
+Este trabajo puede prepararse sin abrir otra épica técnica:
+
+- checklist de verificación de negocio, ubicación, horarios, fotos y catálogo;
+- lista de 15–25 empresas fundadoras de Valladolid;
+- responsable y canal de onboarding;
+- runbooks iniciales de soporte e incidentes;
+- definición de cobertura Concierge y escalación;
+- checklist de GSC, analítica, monitoreo, privacidad, términos y CFDI.
+
+No registrar como empresa onboarded a un mock, seed o registro sin validación humana.
+
+## 6. Secuencia de lanzamiento
+
+1. Reconciliación integrada.
+2. CV8.9 cerrado.
+3. AC1.4 cerrado.
+4. Quince empresas reales verificadas como mínimo; objetivo 25.
+5. Operación mínima lista: soporte, runbooks, notificaciones, monitoreo, medición y proceso comercial/fiscal.
+6. Soft launch por invitación.
+7. Lectura de datos reales y Launch Readiness Report actualizado.
+8. Decisión GO/NO-GO para apertura comercial y para CV7.
+
+## 7. No abrir ahora
+
+- MCP M1.1–M1.3; M1.0 ya está cerrado y no es el siguiente paso.
+- CV7 antes de cerrar la base operativa, salvo nueva decisión basada en evidencia.
+- Header/Navigation Builder, Hero Vivo o Navigation Intelligence.
+- nuevas superficies de CMS o capacidades de Alux sin dolor real observado.
+- simulación `full`, PWA offline total o expansión territorial automática.
+- refactor masivo de lint o performance mezclado con épicas de producto.
+
+## 8. Deuda de evidencia que no debe propagarse
+
+- No afirmar que H2 P1+P2 redujo 15% el entry: el benchmark aislado registra ~−0.1% gzip.
+- No afirmar que P1 corrigió TTFB de producción hasta medirlo en un preview o despliegue comparable.
+- No presentar datos CV8.S como usuarios, ventas o tracción reales.
+- Mantener visibles las aprobaciones Founder y outcome validations pendientes de CV8 y SEO.
+
+## 9. Regla para actualizar este plan
+
+Al cerrar una ola:
+
+1. crear su Completion Report;
+2. actualizar el roadmap v2.1;
+3. registrar dependencias o contradicciones;
+4. reemplazar aquí sólo el próximo paso operativo;
+5. no mantener instrucciones ya ejecutadas como si siguieran pendientes.
+
+**Siguiente acción:** completar revisión e integración del Draft PR #1; después solicitar GO Founder para CV8.9.1.
