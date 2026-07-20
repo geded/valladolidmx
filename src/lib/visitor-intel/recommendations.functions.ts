@@ -21,7 +21,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   RECOMMENDATION_LIFECYCLE_STATUSES,
   VisitorEventSchema,
-  type RecommendationLifecycleEvent,
+  type RecommendationLifecycle,
   type RecommendationLifecycleStatus,
 } from "./events";
 
@@ -35,19 +35,19 @@ export interface RecommendationLifecycleStep {
   occurred_at: string;
   actor: string;
   note?: string;
-  outcome?: RecommendationLifecycleEvent["recommendation"]["outcome"];
+  outcome?: RecommendationLifecycle["outcome"];
 }
 
 export interface RecommendationRecord {
   recommendation_id: string;
   metric_id: string;
   transition: string;
-  severity: RecommendationLifecycleEvent["recommendation"]["severity"];
+  severity: RecommendationLifecycle["severity"];
   current_status: RecommendationLifecycleStatus;
   first_seen_at: string;
   last_updated_at: string;
   timeline: RecommendationLifecycleStep[];
-  latest_outcome?: RecommendationLifecycleEvent["recommendation"]["outcome"];
+  latest_outcome?: RecommendationLifecycle["outcome"];
 }
 
 export interface FamilyLearningSignal {
@@ -73,9 +73,7 @@ export interface RecommendationValidationSnapshot {
 }
 
 const InputSchema = z.object({
-  window_days: z
-    .union([z.literal(30), z.literal(90), z.literal(180)])
-    .default(90),
+  window_days: z.union([z.literal(30), z.literal(90), z.literal(180)]).default(90),
 });
 
 function rankStatus(s: RecommendationLifecycleStatus): number {
@@ -94,6 +92,10 @@ export const recordRecommendationLifecycleEvent = createServerFn({ method: "POST
   .handler(async ({ data, context }) => {
     if (data.event.kind !== "recommendation.lifecycle") {
       throw new Response("Wrong event kind", { status: 400 });
+    }
+    // CV8.9.1 congela el contrato, pero no abre todavía su canal de escritura.
+    if (data.event.subtype === "decision") {
+      throw new Response("Decision ingestion is not active", { status: 400 });
     }
     const { data: isAdmin } = await context.supabase.rpc("has_role", {
       _user_id: context.userId,
@@ -204,6 +206,8 @@ export const aggregateRecommendationValidation = createServerFn({ method: "POST"
       const parsed = VisitorEventSchema.safeParse(r.payload);
       if (!parsed.success || parsed.data.kind !== "recommendation.lifecycle") continue;
       const evt = parsed.data;
+      // CV8.9 tiene proyección propia; CV8.6 conserva semántica y resultados.
+      if (evt.subtype === "decision" || !evt.recommendation) continue;
       const rec = evt.recommendation;
       const existing = records.get(rec.recommendation_id);
       const step: RecommendationLifecycleStep = {
@@ -266,7 +270,9 @@ export const aggregateRecommendationValidation = createServerFn({ method: "POST"
 
     const sortByRecent = (a: RecommendationRecord, b: RecommendationRecord) =>
       b.last_updated_at.localeCompare(a.last_updated_at);
-    active.sort((a, b) => rankStatus(b.current_status) - rankStatus(a.current_status) || sortByRecent(a, b));
+    active.sort(
+      (a, b) => rankStatus(b.current_status) - rankStatus(a.current_status) || sortByRecent(a, b),
+    );
     closed.sort(sortByRecent);
 
     const family_confidence: FamilyLearningSignal[] = Array.from(family.entries())
