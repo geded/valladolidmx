@@ -14,6 +14,7 @@ import {
 import { VISITOR_EVENT_SCHEMA_VERSION, VisitorEventSchema } from "@/lib/visitor-intel/events";
 import type { PrioritizedOpportunity } from "@/lib/visitor-intel/prioritization";
 import type { SegmentFinding } from "@/lib/visitor-intel/segment-prioritization";
+import { validateIngestEvent } from "@/lib/visitor-intel/ingest.functions";
 
 const NOW = new Date("2026-07-20T18:00:00.000Z");
 const ACTOR = "10000000-0000-4000-8000-000000000001";
@@ -147,6 +148,11 @@ describe("CV8.9.1 · Action Queue contract", () => {
     });
     expect(legacy.success).toBe(true);
     expect(decision.success).toBe(true);
+    if (!decision.success) throw new Error("decision event should parse");
+    expect(validateIngestEvent(decision.data)).toEqual({
+      accepted: false,
+      reason: "decision_channel_required",
+    });
   });
 });
 
