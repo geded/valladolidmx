@@ -7,7 +7,11 @@
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead } from "@/lib/discovery/seo";
+import {
+  buildPublicHead,
+  eventJsonLd,
+  businessEntityId,
+} from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import {
   getEventBySlug,
@@ -60,32 +64,47 @@ export const Route = createFileRoute("/eventos/$slug")({
       });
     }
     const e = loaderData.event;
-    const eventJsonLd: Record<string, unknown> = {
-      "@context": "https://schema.org",
-      "@type": "Event",
+    // SEO.A1.1 · PR-3 — Event JSON-LD basado exclusivamente en datos
+    // publicados y visibles en la página. `venue_name` sólo se emite si
+    // el CMS lo publicó (nunca se inventa dirección). El editor puede
+    // marcar cancelación/reprogramación en el futuro; hoy sólo emitimos
+    // eventos activos ("EventScheduled") — este loader ya filtra por
+    // `status='published'` y `deleted_at IS NULL`.
+    // SEO.A1.1 · PR-3 (Founder Acceptance Review) — Organizer sólo se
+    // emite con evidencia canónica: si el evento fue publicado con una
+    // empresa organizadora real y publicada, referenciamos su `@id`;
+    // si no hay evidencia, omitimos `organizer`. Prohibido usar
+    // ORG_ID como fallback genérico — Valladolid.mx no organiza
+    // eventos de terceros.
+    const organizerBusinessPath =
+      e.organizer_business_slug &&
+      e.organizer_destination_slug &&
+      e.organizer_category_slug
+        ? `/oriente-maya/${e.organizer_destination_slug}/${e.organizer_category_slug}/${e.organizer_business_slug}`
+        : null;
+    const organizerId = organizerBusinessPath
+      ? businessEntityId(organizerBusinessPath)
+      : undefined;
+    const organizerName =
+      !organizerId && e.organizer_business_name
+        ? e.organizer_business_name
+        : undefined;
+    const eventNode = eventJsonLd({
       name: e.title,
-      description: e.summary ?? undefined,
-      url: `https://quehacerenvalladolid.com/eventos/${e.slug}`,
-      image: e.cover_url ?? undefined,
-      startDate: (e as unknown as { starts_at?: string; start_date?: string }).starts_at
-        ?? (e as unknown as { start_date?: string }).start_date
-        ?? undefined,
-      endDate: (e as unknown as { ends_at?: string; end_date?: string }).ends_at
-        ?? (e as unknown as { end_date?: string }).end_date
-        ?? undefined,
-      eventStatus: "https://schema.org/EventScheduled",
-      eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-      location: {
-        "@type": "Place",
-        name: (e as unknown as { location_name?: string }).location_name ?? "Valladolid, Yucatán",
-        address: {
-          "@type": "PostalAddress",
-          addressLocality: "Valladolid",
-          addressRegion: "Yucatán",
-          addressCountry: "MX",
-        },
-      },
-    };
+      description: e.summary,
+      path: `/eventos/${e.slug}`,
+      image: e.cover_url,
+      startDate: e.starts_at,
+      endDate: e.ends_at,
+      eventStatus: "EventScheduled",
+      eventAttendanceMode: "Offline",
+      venueName: e.venue_name,
+      addressLocality: e.destination_name ?? "Valladolid",
+      externalUrl: e.external_url,
+      isFree: e.is_free,
+      organizerId,
+      organizerName,
+    });
     return buildPublicHead({
       title: `${e.title} · Eventos — ${SITE.name}`,
       description: e.summary ?? `Evento en ${SITE.name}: ${e.title}.`,
@@ -97,7 +116,7 @@ export const Route = createFileRoute("/eventos/$slug")({
         { label: "Eventos", path: "/eventos" },
         { label: e.title, path: `/eventos/${e.slug}` },
       ],
-      jsonLd: [eventJsonLd],
+      jsonLd: [eventNode],
     });
   },
   component: EventoPage,

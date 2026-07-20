@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Search, Trash2, Sparkles, Plus, Languages, CheckCircle2, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cms/alux/conocimiento")({

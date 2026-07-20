@@ -1,63 +1,127 @@
-## Ola CV3 · "Tu viaje" siempre presente en Discovery
+# Plan operativo vigente · Reconciliación → Soft Launch
 
-Cerramos CV2 (Bridge bidireccional Alux ↔ Plan ↔ Concierge, incluida la Ola A19 y locale-aware). Toca CV3 del roadmap CV: hacer que el Travel Plan sea **visible y actuable en toda la superficie pública**, sin salir a `/cuenta/mi-viaje`.
+**Estado:** Activo
+**Última actualización:** 2026-07-20
+**Roadmap rector:** `docs/blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`
+**Rama de integración:** `reconciliation/main-benchmark-governance`
+**PR:** Draft PR #1 · Reconcile branches, governance, and package management
 
-### Objetivo
+Este archivo es una instrucción de ejecución subordinada a `docs/governance/00–05` y al roadmap oficial. No crea prioridades nuevas ni sustituye Completion Reports.
 
-Que cualquier visitante autenticado, mientras explora destinos / experiencias / hoteles / restaurantes / promociones, vea un contador vivo de su plan y pueda:
+## 1. Punto de partida recuperado
 
-1. Ver los ítems que ya guardó y su estatus.
-2. Añadir un ítem desde la tarjeta activa sin recargar.
-3. Escalar a Concierge desde el drawer.
-4. Ver una micro-narrativa de Alux ("Vas 3 ítems, aún te falta hospedaje").
-5. Recibir notificación in-site cuando el concierge proponga algo nuevo.
+- [x] Integración no destructiva de `main` con el trabajo benchmark H2.
+- [x] Numeración canónica de `docs/governance/00–08` y auditoría de reconciliación.
+- [x] Bun restaurado como gestor canónico; `bun.lock` recuperado y `package-lock.json` retirado.
+- [x] Instalación congelada reproducible con Bun 1.3.14.
+- [x] Typecheck sin errores.
+- [x] Suite de 143 tests aprobada.
+- [x] Build de producción aprobado y repetido.
+- [x] Deuda de lint heredada documentada; no se mezcla con esta reconciliación.
+- [x] Roadmap canónico rebaselined a v2.1 con estados respaldados por evidencia.
+- [x] Plan Lovable reescrito para reflejar el estado real.
 
-### Alcance funcional
+## 2. Gate R4 · Cerrar reconciliación
 
-- **FloatingTravelPlanDock** (mobile-first): botón flotante bottom-right con badge `N` (nº ítems). Al tap → abre `TravelPlanSheet` (sheet lateral en desktop, bottom-sheet en móvil). Reutiliza el Sheet Stack del Workspace/Discovery Layer.
-- **Contenido del sheet**:
-  - Encabezado con destino y fechas (o CTA para definirlas).
-  - Lista de ítems con `source` badge (`viajero` / `alux` / `concierge`).
-  - Botón "Enviar a mi concierge" → `travel_plan_request_concierge`.
-  - Bloque **Alux narra tu viaje**: llama `runAluxTraveler("narrate_plan", …)` en `locale` activo, cacheado por hash del plan.
-  - Sección "Novedades del concierge": lee `concierge_proposals` en estado `pending`, badge distintivo, botón "Aceptar" (usa CV2.4).
-- **Presencia global**: montar `FloatingTravelPlanDock` en `PublicShell` (Discovery Layer), oculto para invitados y en rutas `/cuenta/**` (donde ya existe la vista dedicada).
-- **Notificación in-site**: hook `useConciergeProposalToasts` que suscribe realtime a `concierge_proposals` del usuario y dispara toast + incrementa un dot en el dock.
+Antes de implementar producto:
 
-### Cambios de código
+1. Revisar el diff completo del Draft PR #1.
+2. Confirmar que el PR apunta a `main` y sólo contiene la reconciliación autorizada.
+3. Verificar nuevamente `bun install --frozen-lockfile`, typecheck, tests y build en el entorno de integración.
+4. Revisar las migraciones Supabase incluidas en el historial y su orden de aplicación; no aplicar a producción por inferencia.
+5. Resolver observaciones del PR y convertirlo a Ready for review sólo por decisión del Founder.
+6. Integrar sin reescribir historia publicada.
 
-- `src/components/travel-plan/FloatingTravelPlanDock.tsx` (nuevo).
-- `src/components/travel-plan/TravelPlanSheet.tsx` (nuevo, extraído/compartido con `/cuenta/mi-viaje`).
-- `src/components/travel-plan/AluxPlanNarrationCard.tsx` (nuevo, consume nueva capacidad).
-- `src/lib/traveler/alux-traveler.functions.ts`: añadir capacidad `narrate_plan` (respeta prompt corto, locale-aware, sin CTA de escritura).
-- `src/lib/travel-plan/plan-realtime.ts` (nuevo): hook realtime + queryClient invalidations.
-- `src/routes/__root.tsx` o el shell público (`PublicShell`): montar el dock condicional.
+**DoD R4:** PR integrado, `main` limpio, checks reproducibles y commit base identificado para la siguiente épica.
 
-### Datos
+## 3. Próxima épica única · CV8.9
 
-Sin nuevas tablas ni RLS. Sólo suscripción realtime a `concierge_proposals` (RLS ya lo cubre) y lectura ligera de `travel_plans` + `travel_plan_items` (server fn ya existente `getActiveTravelPlan`).
+**Blueprint:** `docs/blueprint/16.CV8.9-ACTION-QUEUE-DECISION-WORKFLOW-v1.0.md`
+**Objetivo:** convertir recomendaciones prescriptivas de Visitor Intelligence en decisiones humanas trazables y ejecutables.
+**Inicio permitido:** después del DoD R4 y con GO Founder.
 
-### Contratos y reglas ya vigentes que respetamos
+### Secuencia propuesta
 
-- Workspace/Discovery First: usamos SheetStack existente, sin motor nuevo.
-- Todas las mutaciones vía Write API oficial (CV2.1).
-- Alux nunca escribe al plan sin confirmación; `narrate_plan` es sólo lectura.
-- Locale-aware end-to-end (A18/A19).
+1. **CV8.9.1 · Contratos y proyección**
+   - congelar contrato `Action Queue` v1.0.0;
+   - reutilizar oportunidades y prioridades CV8.5–CV8.8;
+   - mantener proyección pura, sin snapshots paralelos.
+2. **CV8.9.2 · Persistencia, roles y auditoría**
+   - implementar estados y transiciones autorizadas;
+   - RLS/GRANTs por rol;
+   - traza de responsable, decisión, motivo y timestamps.
+3. **CV8.9.3 · Superficie operativa**
+   - cola filtrable y detalle explicable;
+   - acciones humanas explícitas, sin auto-ejecución;
+   - estados vacíos y errores operables.
+4. **CV8.9.4 · Métricas y cierre**
+   - medir tiempo a decisión, backlog, aceptación/rechazo y resultado;
+   - pruebas, smoke, no-regresión y Completion Report;
+   - aprobación Founder antes de abrir AC1.4.
 
-### Fuera de alcance
+**DoD CV8.9:** contrato versionado, persistencia segura, UI operable, decisiones auditables, pruebas verdes y Completion Report aprobado.
 
-- Panel admin (CV1).
-- Stripe / cierre de venta (CV4).
-- Edición avanzada del plan en el sheet (drag reorder, fechas por ítem).
+## 4. Siguiente después de CV8.9 · AC1.4
 
-### DoD
+**Contrato rector:** `docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md`
 
-- Typecheck + build limpio.
-- Dock visible sólo autenticado, sólo en Discovery, oculto en `/cuenta/**`.
-- Sheet abre/cierra sin romper scroll ni foco.
-- `narrate_plan` responde en el locale activo, con encabezados oficiales.
-- Realtime dispara toast al recibir `concierge_proposal` nueva.
-- Demo Pack: viajero demo con 3 ítems + 1 propuesta pendiente + captura móvil/desktop + reproducción en es/en.
-- Completion Report en `docs/blueprint/16.CV3-…md`.
+Implementar registro progresivo sólo en los momentos de valor oficiales:
 
-Confirmo y arranco con la primera micro-ola (CV3.1 · Sheet reutilizable + Dock básico con contador vivo) o ajustas alcance antes de empezar.
+- guardar de forma permanente;
+- continuar en otro dispositivo;
+- compartir;
+- recibir recordatorios.
+
+La continuidad anónima debe preservarse y `SignInPromptSheet` no puede actuar como gate genérico de identidad. El cierre requiere medición del paso anónimo → identificado sin pérdida de planes, favoritos o contexto.
+
+## 5. Trabajo operativo paralelo permitido
+
+Este trabajo puede prepararse sin abrir otra épica técnica:
+
+- checklist de verificación de negocio, ubicación, horarios, fotos y catálogo;
+- lista de 15–25 empresas fundadoras de Valladolid;
+- responsable y canal de onboarding;
+- runbooks iniciales de soporte e incidentes;
+- definición de cobertura Concierge y escalación;
+- checklist de GSC, analítica, monitoreo, privacidad, términos y CFDI.
+
+No registrar como empresa onboarded a un mock, seed o registro sin validación humana.
+
+## 6. Secuencia de lanzamiento
+
+1. Reconciliación integrada.
+2. CV8.9 cerrado.
+3. AC1.4 cerrado.
+4. Quince empresas reales verificadas como mínimo; objetivo 25.
+5. Operación mínima lista: soporte, runbooks, notificaciones, monitoreo, medición y proceso comercial/fiscal.
+6. Soft launch por invitación.
+7. Lectura de datos reales y Launch Readiness Report actualizado.
+8. Decisión GO/NO-GO para apertura comercial y para CV7.
+
+## 7. No abrir ahora
+
+- MCP M1.1–M1.3; M1.0 ya está cerrado y no es el siguiente paso.
+- CV7 antes de cerrar la base operativa, salvo nueva decisión basada en evidencia.
+- Header/Navigation Builder, Hero Vivo o Navigation Intelligence.
+- nuevas superficies de CMS o capacidades de Alux sin dolor real observado.
+- simulación `full`, PWA offline total o expansión territorial automática.
+- refactor masivo de lint o performance mezclado con épicas de producto.
+
+## 8. Deuda de evidencia que no debe propagarse
+
+- No afirmar que H2 P1+P2 redujo 15% el entry: el benchmark aislado registra ~−0.1% gzip.
+- No afirmar que P1 corrigió TTFB de producción hasta medirlo en un preview o despliegue comparable.
+- No presentar datos CV8.S como usuarios, ventas o tracción reales.
+- Mantener visibles las aprobaciones Founder y outcome validations pendientes de CV8 y SEO.
+
+## 9. Regla para actualizar este plan
+
+Al cerrar una ola:
+
+1. crear su Completion Report;
+2. actualizar el roadmap v2.1;
+3. registrar dependencias o contradicciones;
+4. reemplazar aquí sólo el próximo paso operativo;
+5. no mantener instrucciones ya ejecutadas como si siguieran pendientes.
+
+**Siguiente acción:** completar revisión e integración del Draft PR #1; después solicitar GO Founder para CV8.9.1.

@@ -12,14 +12,18 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TerminosRouteImport } from './routes/terminos'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as RestaurantesRouteImport } from './routes/restaurantes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as QueHacerRouteImport } from './routes/que-hacer'
 import { Route as PromocionesRouteImport } from './routes/promociones'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as OfflineRouteImport } from './routes/offline'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as MapaRouteImport } from './routes/mapa'
+import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as HotelesRouteImport } from './routes/hoteles'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
 import { Route as EventosRouteImport } from './routes/eventos'
@@ -62,6 +66,8 @@ import { Route as AuthenticatedPaginasRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedMiViajeRouteImport } from './routes/_authenticated/mi-viaje'
 import { Route as AuthenticatedEmpresaRouteImport } from './routes/_authenticated/empresa'
 import { Route as AuthenticatedCmsRouteImport } from './routes/_authenticated/cms'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedPortalRouteRouteImport } from './routes/_authenticated/portal/route'
 import { Route as AuthenticatedCuentaRouteRouteImport } from './routes/_authenticated/cuenta/route'
 import { Route as AuthenticatedConciergeRouteRouteImport } from './routes/_authenticated/concierge/route'
@@ -125,6 +131,8 @@ import { Route as AuthenticatedAdminIaRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
 import { Route as AuthenticatedAdminConciergeRouteImport } from './routes/_authenticated/admin/concierge'
 import { Route as AuthenticatedAdminAnfitrionesRouteImport } from './routes/_authenticated/admin/anfitriones'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as OrienteMayaDestinoCategoriaIndexRouteImport } from './routes/oriente-maya/$destino.$categoria.index'
 import { Route as AuthenticatedPortalResenasIndexRouteImport } from './routes/_authenticated/portal/resenas.index'
 import { Route as AuthenticatedPortalInvitacionesIndexRouteImport } from './routes/_authenticated/portal/invitaciones.index'
@@ -206,6 +214,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RestaurantesRoute = RestaurantesRouteImport.update({
   id: '/restaurantes',
   path: '/restaurantes',
@@ -236,6 +249,11 @@ const OfflineRoute = OfflineRouteImport.update({
   path: '/offline',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MarketplaceRoute = MarketplaceRouteImport.update({
   id: '/marketplace',
   path: '/marketplace',
@@ -244,6 +262,16 @@ const MarketplaceRoute = MarketplaceRouteImport.update({
 const MapaRoute = MapaRouteImport.update({
   id: '/mapa',
   path: '/mapa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManifestDotwebmanifestRoute = ManifestDotwebmanifestRouteImport.update({
+  id: '/manifest.webmanifest',
+  path: '/manifest.webmanifest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HotelesRoute = HotelesRouteImport.update({
@@ -468,6 +496,18 @@ const AuthenticatedCmsRoute = AuthenticatedCmsRouteImport.update({
   path: '/cms',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedPortalRouteRoute =
   AuthenticatedPortalRouteRouteImport.update({
     id: '/portal',
@@ -833,6 +873,17 @@ const AuthenticatedAdminAnfitrionesRoute =
     path: '/anfitriones',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrienteMayaDestinoCategoriaIndexRoute =
   OrienteMayaDestinoCategoriaIndexRouteImport.update({
     id: '/',
@@ -1231,14 +1282,18 @@ export interface FileRoutesByFullPath {
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
+  '/mcp': typeof McpRoute
   '/offline': typeof OfflineRoute
   '/privacidad': typeof PrivacidadRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos': typeof TerminosRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -1246,6 +1301,8 @@ export interface FileRoutesByFullPath {
   '/concierge': typeof AuthenticatedConciergeRouteRouteWithChildren
   '/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/portal': typeof AuthenticatedPortalRouteRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/cms': typeof AuthenticatedCmsRouteWithChildren
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
@@ -1275,6 +1332,8 @@ export interface FileRoutesByFullPath {
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/anfitriones': typeof AuthenticatedAdminAnfitrionesRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1413,17 +1472,23 @@ export interface FileRoutesByTo {
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
+  '/mcp': typeof McpRoute
   '/offline': typeof OfflineRoute
   '/privacidad': typeof PrivacidadRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos': typeof TerminosRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
@@ -1451,6 +1516,8 @@ export interface FileRoutesByTo {
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/anfitriones': typeof AuthenticatedAdminAnfitrionesRoute
   '/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1588,14 +1655,18 @@ export interface FileRoutesById {
   '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/mapa': typeof MapaRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
+  '/mcp': typeof McpRoute
   '/offline': typeof OfflineRoute
   '/privacidad': typeof PrivacidadRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restaurantes': typeof RestaurantesRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos': typeof TerminosRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -1603,6 +1674,8 @@ export interface FileRoutesById {
   '/_authenticated/concierge': typeof AuthenticatedConciergeRouteRouteWithChildren
   '/_authenticated/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRouteRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/cms': typeof AuthenticatedCmsRouteWithChildren
   '/_authenticated/empresa': typeof AuthenticatedEmpresaRoute
   '/_authenticated/mi-viaje': typeof AuthenticatedMiViajeRoute
@@ -1632,6 +1705,8 @@ export interface FileRoutesById {
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/anfitriones': typeof AuthenticatedAdminAnfitrionesRoute
   '/_authenticated/admin/concierge': typeof AuthenticatedAdminConciergeRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -1772,14 +1847,18 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/llms.txt'
+    | '/manifest.webmanifest'
     | '/mapa'
     | '/marketplace'
+    | '/mcp'
     | '/offline'
     | '/privacidad'
     | '/promociones'
     | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/terminos'
     | '/unsubscribe'
@@ -1787,6 +1866,8 @@ export interface FileRouteTypes {
     | '/concierge'
     | '/cuenta'
     | '/portal'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/cms'
     | '/empresa'
     | '/mi-viaje'
@@ -1816,6 +1897,8 @@ export interface FileRouteTypes {
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/oriente-maya/'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/anfitriones'
     | '/admin/concierge'
     | '/admin/empresas'
@@ -1954,17 +2037,23 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/llms.txt'
+    | '/manifest.webmanifest'
     | '/mapa'
     | '/marketplace'
+    | '/mcp'
     | '/offline'
     | '/privacidad'
     | '/promociones'
     | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/terminos'
     | '/unsubscribe'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/empresa'
     | '/mi-viaje'
     | '/paginas'
@@ -1992,6 +2081,8 @@ export interface FileRouteTypes {
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/oriente-maya'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/anfitriones'
     | '/admin/concierge'
     | '/admin/empresas'
@@ -2128,14 +2219,18 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/experiencias'
     | '/hoteles'
+    | '/llms.txt'
+    | '/manifest.webmanifest'
     | '/mapa'
     | '/marketplace'
+    | '/mcp'
     | '/offline'
     | '/privacidad'
     | '/promociones'
     | '/que-hacer'
     | '/reset-password'
     | '/restaurantes'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/terminos'
     | '/unsubscribe'
@@ -2143,6 +2238,8 @@ export interface FileRouteTypes {
     | '/_authenticated/concierge'
     | '/_authenticated/cuenta'
     | '/_authenticated/portal'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/cms'
     | '/_authenticated/empresa'
     | '/_authenticated/mi-viaje'
@@ -2172,6 +2269,8 @@ export interface FileRouteTypes {
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
     | '/oriente-maya/'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/anfitriones'
     | '/_authenticated/admin/concierge'
     | '/_authenticated/admin/empresas'
@@ -2312,17 +2411,23 @@ export interface RootRouteChildren {
   EventosRoute: typeof EventosRouteWithChildren
   ExperienciasRoute: typeof ExperienciasRoute
   HotelesRoute: typeof HotelesRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
+  ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
   MapaRoute: typeof MapaRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
+  McpRoute: typeof McpRoute
   OfflineRoute: typeof OfflineRoute
   PrivacidadRoute: typeof PrivacidadRoute
   PromocionesRoute: typeof PromocionesRoute
   QueHacerRoute: typeof QueHacerRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RestaurantesRoute: typeof RestaurantesRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerminosRoute: typeof TerminosRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   LSlugRoute: typeof LSlugRoute
   LovableBusinessMotherTemplatePreviewRoute: typeof LovableBusinessMotherTemplatePreviewRoute
@@ -2346,6 +2451,8 @@ export interface RootRouteChildren {
   ViajeCompartidoTokenRoute: typeof ViajeCompartidoTokenRoute
   ViajeroHandleRoute: typeof ViajeroHandleRoute
   OrienteMayaIndexRoute: typeof OrienteMayaIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiDevMediaPipelineDeriveRoute: typeof ApiDevMediaPipelineDeriveRoute
   ApiDevMediaShadowEvalRoute: typeof ApiDevMediaShadowEvalRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -2392,6 +2499,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/restaurantes': {
       id: '/restaurantes'
       path: '/restaurantes'
@@ -2434,6 +2548,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OfflineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/marketplace': {
       id: '/marketplace'
       path: '/marketplace'
@@ -2446,6 +2567,20 @@ declare module '@tanstack/react-router' {
       path: '/mapa'
       fullPath: '/mapa'
       preLoaderRoute: typeof MapaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manifest.webmanifest': {
+      id: '/manifest.webmanifest'
+      path: '/manifest.webmanifest'
+      fullPath: '/manifest.webmanifest'
+      preLoaderRoute: typeof ManifestDotwebmanifestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hoteles': {
@@ -2741,6 +2876,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/cms'
       preLoaderRoute: typeof AuthenticatedCmsRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/portal': {
       id: '/_authenticated/portal'
@@ -3182,6 +3331,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/anfitriones'
       preLoaderRoute: typeof AuthenticatedAdminAnfitrionesRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/oriente-maya/$destino/$categoria/': {
       id: '/oriente-maya/$destino/$categoria/'
@@ -4125,17 +4288,24 @@ const rootRouteChildren: RootRouteChildren = {
   EventosRoute: EventosRouteWithChildren,
   ExperienciasRoute: ExperienciasRoute,
   HotelesRoute: HotelesRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
+  ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
   MapaRoute: MapaRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
+  McpRoute: McpRoute,
   OfflineRoute: OfflineRoute,
   PrivacidadRoute: PrivacidadRoute,
   PromocionesRoute: PromocionesRoute,
   QueHacerRoute: QueHacerRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RestaurantesRoute: RestaurantesRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerminosRoute: TerminosRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   LSlugRoute: LSlugRoute,
   LovableBusinessMotherTemplatePreviewRoute:
@@ -4163,6 +4333,8 @@ const rootRouteChildren: RootRouteChildren = {
   ViajeCompartidoTokenRoute: ViajeCompartidoTokenRoute,
   ViajeroHandleRoute: ViajeroHandleRoute,
   OrienteMayaIndexRoute: OrienteMayaIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiDevMediaPipelineDeriveRoute: ApiDevMediaPipelineDeriveRoute,
   ApiDevMediaShadowEvalRoute: ApiDevMediaShadowEvalRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
@@ -4192,3 +4364,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

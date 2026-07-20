@@ -2,7 +2,7 @@
  * Toast & Undo bus (15.10.5b) — capa única sobre sonner con stack de undo
  * accesible por Alux. Conforma "Interaction Consistency Policy".
  */
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 export interface UndoEntry {
   id: string;

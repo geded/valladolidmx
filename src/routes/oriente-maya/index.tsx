@@ -12,6 +12,7 @@ import {
   buildPublicHead,
   touristDestinationJsonLd,
   collectionPageJsonLd,
+  ORIENTE_MAYA_PLACE_ID,
 } from "@/lib/discovery/seo";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
@@ -89,6 +90,7 @@ export const Route = createFileRoute("/oriente-maya/")({
           name: `Destinos del ${ORIENTE_MAYA.name}`,
           description: ORIENTE_MAYA.short_description,
           path: "/oriente-maya",
+          aboutPlaceId: ORIENTE_MAYA_PLACE_ID,
           items: destinations.map((d: { slug: string; name: string }) => ({
             name: d.name,
             path: `/oriente-maya/${d.slug}`,

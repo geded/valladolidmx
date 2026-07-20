@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { SITE } from '@/config/site'
 import { Text } from '@react-email/components'
 import { VisibilityShell } from './_visibility-shared'
 import type { TemplateEntry } from './registry'
@@ -14,7 +15,7 @@ const Email = ({
   travelerName,
   folio = 'VMX-XXXXXX',
   destinationName = 'el Oriente Maya',
-  planUrl = 'https://valladolid.mx/cuenta/mi-viaje',
+  planUrl = `${SITE.url}/cuenta/mi-viaje`,
 }: Props) => (
   <VisibilityShell
     preview="Bienvenido al Oriente Maya de Yucatán"

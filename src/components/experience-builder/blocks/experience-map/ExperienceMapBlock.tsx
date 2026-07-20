@@ -24,7 +24,8 @@ import { cn } from "@/lib/utils";
 import type {
   ExperienceMapDTO,
   ExperienceMapPoint,
-} from "@/lib/experience-builder/blocks/experience-map/contract";
+} from "@/lib/experience-builder/blocks/experience-map/types";
+import { applyExperienceMapDefaults } from "@/lib/experience-builder/blocks/experience-map/defaults";
 
 const InteractiveMap = lazy(() =>
   import("@/components/maps/InteractiveMap").then((m) => ({
@@ -48,7 +49,11 @@ export interface ExperienceMapBlockProps {
   className?: string;
 }
 
-export function ExperienceMapBlock({ dto, className }: ExperienceMapBlockProps) {
+export function ExperienceMapBlock({ dto: rawDto, className }: ExperienceMapBlockProps) {
+  // C2.F1 · Piloto Render-Only. Normalizamos vía defaults render-only
+  // (equivalente runtime a `schema.parse` para inputs válidos, ver
+  // `scripts/experience-map-defaults.test.ts`). Sin Zod en el árbol público.
+  const dto = useMemo(() => applyExperienceMapDefaults(rawDto), [rawDto]);
   const [interactive, setInteractive] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(
     dto.points[0]?.id ?? null,

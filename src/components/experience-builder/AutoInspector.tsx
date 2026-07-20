@@ -13,7 +13,7 @@ import { MediaPickerDialog } from "./MediaPickerDialog";
 import { ReferencePicker } from "./ReferencePicker";
 import { useServerFn } from "@tanstack/react-start";
 import { importUrlToStudioMedia } from "@/lib/experience-builder/studio-media.functions";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import type {
   BlockContract,
   BlockFieldSchema,

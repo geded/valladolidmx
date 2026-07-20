@@ -14,7 +14,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Camera, CameraOff, Check, History, Search, Ticket, UserCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import {
   lookupCoupon,
   redeemCoupon,

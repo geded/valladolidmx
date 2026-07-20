@@ -7,7 +7,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
-import { SITE } from "@/config/site";
+import { SITE, absoluteUrl } from "@/config/site";
 import { listPublishedEvents, type PublicEventCard } from "@/lib/events/public-reads.functions";
 
 export const Route = createFileRoute("/blog")({
@@ -17,13 +17,18 @@ export const Route = createFileRoute("/blog")({
       title: `Blog · ${SITE.name}`,
       description: "Historias, agenda y notas editoriales del Oriente Maya.",
       path: "/blog",
+      // SEO.A1.2 · D3 — Mientras no exista contenido editorial real
+      // (modelo `/blog/$slug`, artículos publicados, autor/fecha,
+      // imagen editorial), `/blog` permanece accesible pero `noindex,
+      // follow` — retirado también del sitemap.
+      robots: "noindex, follow",
       jsonLd: [
         {
           "@context": "https://schema.org",
           "@type": "CollectionPage",
           name: `Blog · ${SITE.name}`,
           description: "Historias, agenda cultural y notas editoriales del Oriente Maya.",
-          url: "https://quehacerenvalladolid.com/blog",
+          url: absoluteUrl("/blog"),
           inLanguage: "es-MX",
           isPartOf: { "@type": "WebSite", name: SITE.name, url: SITE.url },
         },

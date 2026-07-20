@@ -1,8 +1,9 @@
 # 00 · CANON
 
 **Estado:** Approved
-**Versión:** 1.1
-**Última actualización:** Julio 2026
+**Versión:** 1.2
+
+**Última actualización:** 2026-07-20
 
 ---
 
@@ -51,8 +52,6 @@ Ser el sistema operativo que permita administrar, promocionar y hacer crecer el 
 La visión de largo plazo es demostrar que un destino puede organizar toda su oferta turística alrededor de una plataforma común que beneficie simultáneamente al visitante, a las empresas locales y al desarrollo regional.
 
 ---
-
-**Fin de la Sección 1**
 
 # 5. Problema que Resolvemos
 
@@ -611,15 +610,11 @@ Cada respuesta de Alux es explicable, contextual, respetuosa con el patrimonio y
 
 El CANON constituye un documento vivo con vocación de permanencia.
 
-Las modificaciones deberán realizarse mediante nuevas versiones documentadas.
-
-Cada versión deberá indicar:
-
-- Número de versión.
-- Fecha.
-- Autor o responsable.
-- Resumen de cambios.
-- Justificación del cambio.
+| Versión | Fecha | Autor | Descripción |
+|---|---|---|---|
+| v1.0 | 2026-07-18 | Founder | Emisión inicial del CANON de Valladolid.mx. |
+| v1.1 | 2026-07-18 | Founder | Ampliación de principios, North Stars y filosofía de Alux. |
+| v1.2 | 2026-07-20 | Founder | Corrección editorial y formalización del historial de versiones durante la reconciliación de gobernanza. |
 
 No deberán realizarse modificaciones que contradigan la misión, visión o principios fundamentales sin una revisión integral del propio CANON.
 

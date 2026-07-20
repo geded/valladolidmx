@@ -21,7 +21,10 @@ import {
   SyncStatusBanner,
   UpdateBanner,
 } from "@/components/discovery";
-import { Toaster } from "@/components/ui/sonner";
+// H2·P3 · C1 — Lazy Toaster: `sonner` y su `<Toaster />` sólo se
+// descargan cuando el shim `@/lib/toast` dispara el primer toast, o
+// tras el prefetch en idle. Antes viajaban en el entry para el 100 %
+// de visitantes anónimos.
 // H2·P3 — Diferimos widgets globales que sólo aportan comportamiento
 // post-hidratación (chip flotante, observadores, sheets on-demand).
 // Cada uno reserva un fallback null: al renderizar únicamente después
@@ -58,9 +61,14 @@ const SignInPromptSheet = React.lazy(() =>
     default: m.SignInPromptSheet,
   })),
 );
+// H2·P3 · C1 — el host es tiny y necesita montar su useEffect cuanto
+// antes para suscribirse al bus del shim; el peso real de `sonner` se
+// difiere dentro de `LazyToasterHost` con un React.lazy interno.
+import { LazyToasterHost } from "@/components/ui/LazyToasterHost";
 import { registerServiceWorker, checkForUpdate } from "@/pwa/register-sw";
 import { startSyncRunner } from "@/pwa/sync-runner";
 import { SITE } from "@/config/site";
+import { organizationJsonLd, websiteJsonLd } from "@/lib/discovery/seo";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { ProtectedActionResumeRunner } from "@/lib/protected-actions";
 import { GlobalNavigationSessionBridge } from "@/components/navigation/NavigationSessionBridge";
@@ -166,41 +174,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: SITE.name,
-          url: SITE.url,
-          inLanguage: "es-MX",
-          description: SITE.default_description,
-          potentialAction: {
-            "@type": "SearchAction",
-            target: `${SITE.url}/buscar?q={search_term_string}`,
-            "query-input": "required name=search_term_string",
-          },
-        }),
+        // SEO.A1.1 · PR-1 — WebSite (fuente única, sin SearchAction).
+        // SearchAction queda **postponed**: no existe superficie pública
+        // indexable y sin auth en /buscar. Reintroducir cuando aplique.
+        children: JSON.stringify(websiteJsonLd()),
       },
       {
         type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          name: SITE.name,
-          url: SITE.url,
-          logo: `${SITE.url}/logo.png`,
-          description: SITE.default_description,
-          areaServed: {
-            "@type": "AdministrativeArea",
-            name: "Oriente Maya de Yucatán, México",
-          },
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: "Valladolid",
-            addressRegion: "Yucatán",
-            addressCountry: "MX",
-          },
-          slogan: SITE.tagline,
-        }),
+        // SEO.A1.1 · PR-1 — Organization con @id estable reutilizable
+        // como publisher/brand/provider por otras entidades del grafo.
+        children: JSON.stringify(organizationJsonLd()),
       },
     ],
   }),
@@ -299,7 +282,7 @@ function RootComponent() {
         <React.Suspense fallback={null}>
           <ConciergeProposalObserver />
         </React.Suspense>
-        <Toaster />
+        <LazyToasterHost />
         {!isAppShellRoute ? (
           <React.Suspense fallback={null}>
             <EditThisPageButton pathname={pathname} />

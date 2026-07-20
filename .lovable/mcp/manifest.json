@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "sdk_version": "0.22.2",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://qjlfwsqsrzikjilicoad.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "valladolid-mx-mcp",
+      "version": "0.1.0",
+      "title": "Valladolid.mx MCP"
+    },
+    "tools": [
+      {
+        "name": "search_businesses",
+        "title": "Buscar negocios y experiencias en Valladolid",
+        "description": "Busca hoteles, restaurantes, tours, experiencias y demás negocios turísticos publicados en Valladolid y el Oriente Maya. Devuelve resultados públicos del catálogo.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 60,
+              "description": "Texto de búsqueda (mínimo 3 caracteres alfanuméricos)."
+            },
+            "limit": {
+              "default": 10,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 25
+            },
+            "locale": {
+              "default": "es",
+              "description": "Idioma preferido de respuesta (fallback explícito a 'es').",
+              "type": "string",
+              "enum": [
+                "es",
+                "en",
+                "fr",
+                "de",
+                "it",
+                "pt"
+              ]
+            }
+          },
+          "required": [
+            "query"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_my_traveler_profile",
+        "title": "Obtener mi perfil de viajero",
+        "description": "Devuelve el perfil de viajero (handle, nombre, preferencias, idioma) del usuario autenticado. Requiere OAuth.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "locale": {
+              "default": "es",
+              "description": "Idioma preferido de respuesta (fallback explícito a 'es').",
+              "type": "string",
+              "enum": [
+                "es",
+                "en",
+                "fr",
+                "de",
+                "it",
+                "pt"
+              ]
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_travel_plans",
+        "title": "Listar mis planes de viaje",
+        "description": "Lista los planes de viaje (Mi Viaje) del usuario autenticado, con título, fechas y estatus. Requiere OAuth. Respeta RLS.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "locale": {
+              "default": "es",
+              "description": "Idioma preferido de respuesta (fallback explícito a 'es').",
+              "type": "string",
+              "enum": [
+                "es",
+                "en",
+                "fr",
+                "de",
+                "it",
+                "pt"
+              ]
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
