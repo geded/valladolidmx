@@ -13,7 +13,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { PublicShell } from "@/components/discovery";
 import { BusinessQuickViewDialog } from "@/components/discovery/BusinessQuickViewDialog";
-import { buildPublicHead, collectionPageJsonLd } from "@/lib/discovery/seo";
+import { buildPublicHead, collectionPageJsonLd, placeId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import {
   resolveTerritorialPath,
@@ -97,6 +97,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
           name: `${cat} en ${dest}`,
           description: `Selección editorial de ${cat.toLowerCase()} en ${dest}, Oriente Maya de Yucatán.`,
           path,
+          aboutPlaceId: placeId(`/oriente-maya/${params.destino}`),
           items,
         }),
       ],

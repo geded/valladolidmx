@@ -15,7 +15,7 @@ import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import { useAuth } from "@/hooks/useAuth";
 import { useServerFn } from "@tanstack/react-start";
 import { proposeAluxPlanAddition } from "@/lib/alux/plan-proposals.functions";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useTranslation } from "@/i18n/context";
 
 type Proposal = {

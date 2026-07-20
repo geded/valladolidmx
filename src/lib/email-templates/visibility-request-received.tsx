@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { SITE } from '@/config/site'
 import { Text } from '@react-email/components'
 import type { TemplateEntry } from './registry'
 import { VisibilityShell, bodyText, highlightBox, highlightLabel, highlightLine } from './_visibility-shared'
@@ -16,7 +17,7 @@ const Email = ({
   businessName = 'tu negocio',
   planName = 'un plan de visibilidad',
   cycleLabel,
-  portalUrl = 'https://valladolid.mx/portal/visibilidad',
+  portalUrl = `${SITE.url}/portal/visibilidad`,
 }: Props) => (
   <VisibilityShell
     preview={`Recibimos tu solicitud de ${planName} para ${businessName}`}

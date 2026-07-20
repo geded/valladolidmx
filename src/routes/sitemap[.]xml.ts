@@ -12,8 +12,11 @@ import { listPublishedPagesForSitemap } from "@/lib/experience-builder/eb-sitema
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { resolveCanonicalPath } from "@/lib/navigation";
+import { absoluteUrl } from "@/config/site";
 
-const BASE_URL = "https://quehacerenvalladolid.com";
+// PR-2 · Infrastructure Externalization:
+// Base URL derivada de la fuente única de verdad (`src/config/site.ts`).
+// No hardcodear el dominio en este archivo.
 
 interface SitemapEntry {
   path: string;
@@ -31,7 +34,8 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/eventos", changefreq: "weekly", priority: "0.8" },
   { path: "/arma-tu-viaje", changefreq: "monthly", priority: "0.9" },
   { path: "/empresas", changefreq: "monthly", priority: "0.7" },
-  { path: "/blog", changefreq: "weekly", priority: "0.6" },
+  // SEO.A1.2 · D3 — `/blog` fuera del sitemap hasta que exista contenido
+  // editorial real (modelo `/blog/$slug`, artículos publicados).
   { path: "/casas-de-vacaciones", changefreq: "weekly", priority: "0.7" },
   { path: "/contacto", changefreq: "monthly", priority: "0.5" },
 ];
@@ -119,7 +123,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const urls = entries.map((e) =>
           [
             `  <url>`,
-            `    <loc>${BASE_URL}${e.path}</loc>`,
+            `    <loc>${absoluteUrl(e.path)}</loc>`,
             e.lastmod ? `    <lastmod>${new Date(e.lastmod).toISOString()}</lastmod>` : null,
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,

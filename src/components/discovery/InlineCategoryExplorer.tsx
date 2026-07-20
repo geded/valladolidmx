@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/sheet";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import {
   inlineExplorerQueryOptions,
   type InlineExplorerItem,

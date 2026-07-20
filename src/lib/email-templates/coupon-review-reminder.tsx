@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { SITE } from '@/config/site'
 import {
   Body,
   Button,
@@ -23,7 +24,7 @@ const CouponReviewReminderEmail = ({
   travelerName,
   businessName = 'el negocio',
   reminderNumber = 1,
-  reviewUrl = 'https://valladolid.mx',
+  reviewUrl = `${SITE.url}`,
 }: Props) => {
   const isSecond = reminderNumber === 2
   const heading = isSecond
@@ -84,7 +85,7 @@ export const template = {
     travelerName: 'Ana',
     businessName: 'Restaurante Maya',
     reminderNumber: 1,
-    reviewUrl: 'https://valladolid.mx/resenar/negocio/restaurante-maya',
+    reviewUrl: `${SITE.url}/resenar/negocio/restaurante-maya`,
   },
 } satisfies TemplateEntry
 

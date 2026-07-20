@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { SITE } from '@/config/site'
 import { Text } from '@react-email/components'
 import type { TemplateEntry } from './registry'
 import {
@@ -23,7 +24,7 @@ const Email = ({
   businessName = 'tu negocio',
   planName = 'tu plan de visibilidad',
   expiresAt,
-  portalUrl = 'https://valladolid.mx/portal/visibilidad',
+  portalUrl = `${SITE.url}/portal/visibilidad`,
 }: Props) => {
   const expiryLabel = formatDate(expiresAt)
   return (

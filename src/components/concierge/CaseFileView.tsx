@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter, useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import {
   acceptConciergeProposal,
   rejectConciergeProposal,
