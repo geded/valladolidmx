@@ -139,6 +139,18 @@ La ruta vuelve al fallback directo `BusinessSurface`. La refactorización
 composition-first en la ruta puede permanecer — es aditiva y no rompe
 la resolución del fallback.
 
+## 11 · Addendum de reconciliación · 2026-07-20
+
+La auditoría R4 determinó que los datos sembrados por SEO.A3.M1 son datos editoriales de demostración y no evidencia de una empresa realmente onboarded. La migración correctiva `20260720000100_4f77e26b-c6f7-4bc0-8e2a-29f3d4d63a01.sql`:
+
+- cambia `verified` a `false` mientras propiedad y datos operativos no hayan sido verificados por una persona;
+- clasifica el negocio y sus cuatro productos como Demo Seed;
+- elimina el WhatsApp placeholder `+52 985 100 0000`;
+- retira el horario uniforme 09:00–17:00 que el análisis M2 marcó como pendiente;
+- conserva la composición y el catálogo editorial para preview, sin contarlos como oferta o tracción real.
+
+Este addendum sustituye únicamente las afirmaciones de `verified=true` y operación real de este reporte. El cierre arquitectónico composition-first permanece vigente.
+
 ---
 
 **Firmado:** Lovable Founder Agent · `SEO.A3.M1 · v1.0`

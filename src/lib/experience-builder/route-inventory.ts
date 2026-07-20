@@ -81,7 +81,17 @@ function toPublicPath(routeId: string): string {
 function inferCategory(routeId: string): RouteCategory {
   if (routeId.startsWith("src/routes/api/")) return "system";
   if (routeId.startsWith("src/routes/lovable/")) return "system";
-  if (routeId === "src/routes/sitemap[.]xml.ts") return "system";
+  if (routeId.startsWith("src/routes/email/")) return "system";
+  if (routeId.startsWith("src/routes/[.")) return "system";
+  if (
+    routeId === "src/routes/llms[.]txt.ts" ||
+    routeId === "src/routes/manifest[.]webmanifest.ts" ||
+    routeId === "src/routes/mcp.ts" ||
+    routeId === "src/routes/robots[.]txt.ts" ||
+    routeId === "src/routes/sitemap[.]xml.ts"
+  ) {
+    return "system";
+  }
   if (
     routeId.startsWith("src/routes/preview") ||
     routeId.startsWith("src/routes/_authenticated") ||
@@ -103,7 +113,10 @@ function inferCategory(routeId: string): RouteCategory {
   return "pending-migration";
 }
 
-function inferDefaults(routeId: string, category: RouteCategory): {
+function inferDefaults(
+  routeId: string,
+  category: RouteCategory,
+): {
   maturity: RouteMaturity;
   priority: RouteBusinessPriority;
   migration: RouteMigrationStatus;
@@ -115,9 +128,19 @@ function inferDefaults(routeId: string, category: RouteCategory): {
     case "dynamic-template":
       return { maturity: "L4", priority: "high", migration: "template-cms", owner: "CMS" };
     case "technical":
-      return { maturity: "L3", priority: "medium", migration: "technical-exception", owner: "Platform" };
+      return {
+        maturity: "L3",
+        priority: "medium",
+        migration: "technical-exception",
+        owner: "Platform",
+      };
     case "system":
-      return { maturity: "L3", priority: "medium", migration: "technical-exception", owner: "Platform" };
+      return {
+        maturity: "L3",
+        priority: "medium",
+        migration: "technical-exception",
+        owner: "Platform",
+      };
     case "pending-migration":
       return { maturity: "L2", priority: "medium", migration: "planned", owner: "Product" };
   }
@@ -177,27 +200,107 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     dependencies: ["route-inventory"],
     notes: "Panel de sólo lectura — inventario oficial del DOS.",
   },
-  "src/routes/auth.tsx": { businessPriority: "critical", maturity: "L4", notes: "Puerta de entrada — gate de sesión." },
+  "src/routes/auth.tsx": {
+    businessPriority: "critical",
+    maturity: "L4",
+    notes: "Puerta de entrada — gate de sesión.",
+  },
   "src/routes/reset-password.tsx": { businessPriority: "high", maturity: "L4" },
-  "src/routes/offline.tsx": { businessPriority: "low", maturity: "L2", notes: "PWA offline fallback." },
-  "src/routes/sitemap[.]xml.ts": { businessPriority: "high", maturity: "L4", notes: "SEO — sitemap dinámico." },
+  "src/routes/offline.tsx": {
+    businessPriority: "low",
+    maturity: "L2",
+    notes: "PWA offline fallback.",
+  },
+  "src/routes/sitemap[.]xml.ts": {
+    businessPriority: "high",
+    maturity: "L4",
+    notes: "SEO — sitemap dinámico.",
+  },
   // Rutas públicas editoriales pendientes de migrar al Experience Builder.
-  "src/routes/blog.tsx": { businessPriority: "medium", maturity: "L2", migrationStatus: "planned", notes: "Migrar a composición EB." },
-  "src/routes/contacto.tsx": { businessPriority: "medium", maturity: "L2", migrationStatus: "planned" },
+  "src/routes/blog.tsx": {
+    businessPriority: "medium",
+    maturity: "L2",
+    migrationStatus: "planned",
+    notes: "Migrar a composición EB.",
+  },
+  "src/routes/contacto.tsx": {
+    businessPriority: "medium",
+    maturity: "L2",
+    migrationStatus: "planned",
+  },
   "src/routes/mapa.tsx": { businessPriority: "medium", maturity: "L2", migrationStatus: "planned" },
-  "src/routes/convertir-en-anfitrion.tsx": { businessPriority: "high", maturity: "L2", migrationStatus: "planned" },
-  "src/routes/casas-de-vacaciones.tsx": { businessPriority: "medium", maturity: "L2", migrationStatus: "planned" },
-  "src/routes/promociones.tsx": { businessPriority: "medium", maturity: "L2", migrationStatus: "planned" },
-  "src/routes/que-hacer.tsx": { businessPriority: "medium", maturity: "L2", migrationStatus: "planned" },
-  "src/routes/eventos.tsx": { businessPriority: "high", maturity: "L3", migrationStatus: "planned" },
-  "src/routes/hoteles.tsx": { businessPriority: "high", maturity: "L3", migrationStatus: "planned" },
-  "src/routes/restaurantes.tsx": { businessPriority: "high", maturity: "L3", migrationStatus: "planned" },
-  "src/routes/experiencias.tsx": { businessPriority: "high", maturity: "L3", migrationStatus: "planned" },
-  "src/routes/empresas.tsx": { businessPriority: "high", maturity: "L3", migrationStatus: "planned" },
-  "src/routes/marketplace.tsx": { businessPriority: "high", maturity: "L3", migrationStatus: "planned", notes: "Retirar terminología marketplace (backlog)." },
-  "src/routes/marketplace.$.tsx": { category: "dynamic-template", businessPriority: "high", maturity: "L3", migrationStatus: "planned" },
-  "src/routes/alux.tsx": { category: "studio", businessPriority: "critical", maturity: "L4", migrationStatus: "native-studio", functionalOwner: "Founder", notes: "Superficie Alux — página consultiva." },
-  "src/routes/arma-tu-viaje.tsx": { category: "studio", businessPriority: "critical", maturity: "L3", migrationStatus: "native-studio", functionalOwner: "Product" },
+  "src/routes/convertir-en-anfitrion.tsx": {
+    businessPriority: "high",
+    maturity: "L2",
+    migrationStatus: "planned",
+  },
+  "src/routes/casas-de-vacaciones.tsx": {
+    businessPriority: "medium",
+    maturity: "L2",
+    migrationStatus: "planned",
+  },
+  "src/routes/promociones.tsx": {
+    businessPriority: "medium",
+    maturity: "L2",
+    migrationStatus: "planned",
+  },
+  "src/routes/que-hacer.tsx": {
+    businessPriority: "medium",
+    maturity: "L2",
+    migrationStatus: "planned",
+  },
+  "src/routes/eventos.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "planned",
+  },
+  "src/routes/hoteles.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "planned",
+  },
+  "src/routes/restaurantes.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "planned",
+  },
+  "src/routes/experiencias.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "planned",
+  },
+  "src/routes/empresas.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "planned",
+  },
+  "src/routes/marketplace.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "planned",
+    notes: "Retirar terminología marketplace (backlog).",
+  },
+  "src/routes/marketplace.$.tsx": {
+    category: "dynamic-template",
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "planned",
+  },
+  "src/routes/alux.tsx": {
+    category: "studio",
+    businessPriority: "critical",
+    maturity: "L4",
+    migrationStatus: "native-studio",
+    functionalOwner: "Founder",
+    notes: "Superficie Alux — página consultiva.",
+  },
+  "src/routes/arma-tu-viaje.tsx": {
+    category: "studio",
+    businessPriority: "critical",
+    maturity: "L3",
+    migrationStatus: "native-studio",
+    functionalOwner: "Product",
+  },
 };
 
 /* ------------------------------------------------------------------ *
@@ -206,6 +309,10 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
  * ------------------------------------------------------------------ */
 
 export const SCANNED_ROUTE_FILES: readonly string[] = [
+  "src/routes/[.]lovable.oauth.consent.tsx",
+  "src/routes/[.mcp]/invoke-tool/$tool.ts",
+  "src/routes/[.mcp]/list-tools.ts",
+  "src/routes/[.well-known]/oauth-protected-resource.ts",
   "src/routes/__root.tsx",
   "src/routes/_authenticated.tsx",
   "src/routes/_authenticated/admin/anfitriones.tsx",
@@ -221,6 +328,10 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/admin/turistas.tsx",
   "src/routes/_authenticated/cms.tsx",
   "src/routes/_authenticated/cms/actividad.tsx",
+  "src/routes/_authenticated/cms/alux.calidad.tsx",
+  "src/routes/_authenticated/cms/alux.conocimiento.tsx",
+  "src/routes/_authenticated/cms/alux.feedback.tsx",
+  "src/routes/_authenticated/cms/alux.tsx",
   "src/routes/_authenticated/cms/alertas.tsx",
   "src/routes/_authenticated/cms/categorias.$id.editar.tsx",
   "src/routes/_authenticated/cms/categorias.index.tsx",
@@ -228,6 +339,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/cms/destinos.$destinationId.editar.tsx",
   "src/routes/_authenticated/cms/destinos.index.tsx",
   "src/routes/_authenticated/cms/destinos.nueva.tsx",
+  "src/routes/_authenticated/cms/demo-pack.tsx",
   "src/routes/_authenticated/cms/empresas.$businessId.editar.tsx",
   "src/routes/_authenticated/cms/empresas.index.tsx",
   "src/routes/_authenticated/cms/empresas.nueva.tsx",
@@ -247,7 +359,13 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/cms/relacionados.index.tsx",
   "src/routes/_authenticated/cms/reviews.$id.moderar.tsx",
   "src/routes/_authenticated/cms/reviews.index.tsx",
+  "src/routes/_authenticated/cms/simulation.tsx",
+  "src/routes/_authenticated/cms/travel-plans.tsx",
   "src/routes/_authenticated/cms/ventas-en-linea.tsx",
+  "src/routes/_authenticated/cms/visibilidad.solicitudes.tsx",
+  "src/routes/_authenticated/cms/visibilidad.spotlight.tsx",
+  "src/routes/_authenticated/cms/visibilidad.tsx",
+  "src/routes/_authenticated/cms/visitor-intel.tsx",
   "src/routes/_authenticated/cms/zonas.$id.editar.tsx",
   "src/routes/_authenticated/cms/zonas.index.tsx",
   "src/routes/_authenticated/cms/zonas.nueva.tsx",
@@ -257,25 +375,31 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/cuenta/actividad.tsx",
   "src/routes/_authenticated/cuenta/anfitrion.tsx",
   "src/routes/_authenticated/cuenta/carrito.tsx",
+  "src/routes/_authenticated/cuenta/checkout.$orderId.tsx",
   "src/routes/_authenticated/cuenta/concierge.$caseId.evaluar.tsx",
   "src/routes/_authenticated/cuenta/concierge.$caseId.tsx",
   "src/routes/_authenticated/cuenta/concierge.tsx",
+  "src/routes/_authenticated/cuenta/documentos.$orderId.tsx",
   "src/routes/_authenticated/cuenta/empresa.$businessId.publicacion.tsx",
   "src/routes/_authenticated/cuenta/favoritos.tsx",
   "src/routes/_authenticated/cuenta/historial.tsx",
   "src/routes/_authenticated/cuenta/index.tsx",
   "src/routes/_authenticated/cuenta/mi-viaje.tsx",
+  "src/routes/_authenticated/cuenta/mis-cupones.tsx",
   "src/routes/_authenticated/cuenta/notificaciones.tsx",
   "src/routes/_authenticated/cuenta/pagos.error.tsx",
   "src/routes/_authenticated/cuenta/pagos.exito.tsx",
   "src/routes/_authenticated/cuenta/perfil-publico.tsx",
   "src/routes/_authenticated/cuenta/perfil.tsx",
   "src/routes/_authenticated/cuenta/route.tsx",
+  "src/routes/_authenticated/cuenta/stage-simulator.tsx",
   "src/routes/_authenticated/empresa.tsx",
   "src/routes/_authenticated/mi-viaje.tsx",
   "src/routes/_authenticated/paginas.$.tsx",
   "src/routes/_authenticated/paginas.tsx",
   "src/routes/_authenticated/portal/actividad.tsx",
+  "src/routes/_authenticated/portal/canjear.tsx",
+  "src/routes/_authenticated/portal/canjes.tsx",
   "src/routes/_authenticated/portal/catalogo.tsx",
   "src/routes/_authenticated/portal/concierge.tsx",
   "src/routes/_authenticated/portal/empresas.$businessId.tsx",
@@ -285,17 +409,27 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/portal/index.tsx",
   "src/routes/_authenticated/portal/invitaciones.$token.tsx",
   "src/routes/_authenticated/portal/invitaciones.index.tsx",
+  "src/routes/_authenticated/portal/metricas.tsx",
   "src/routes/_authenticated/portal/pagos.tsx",
   "src/routes/_authenticated/portal/presencia.tsx",
   "src/routes/_authenticated/portal/productos.$productId.preview.tsx",
   "src/routes/_authenticated/portal/propiedad.tsx",
+  "src/routes/_authenticated/portal/reportes.tsx",
   "src/routes/_authenticated/portal/resenas.index.tsx",
   "src/routes/_authenticated/portal/route.tsx",
   "src/routes/_authenticated/portal/ventas-en-linea.tsx",
   "src/routes/_authenticated/portal/ventas-en-linea.ordenes.tsx",
+  "src/routes/_authenticated/portal/visibilidad.tsx",
   "src/routes/alux.tsx",
+  "src/routes/api/dev/media-pipeline-derive.ts",
+  "src/routes/api/dev/media-shadow-eval.ts",
+  "src/routes/api/public/alux/signal.ts",
   "src/routes/api/public/health/maps.ts",
+  "src/routes/api/public/hooks/coupon-review-reminders.ts",
   "src/routes/api/public/hooks/eb-process-scheduled-publish.ts",
+  "src/routes/api/public/hooks/media-signature-renew.ts",
+  "src/routes/api/public/hooks/trip-journey-emails.ts",
+  "src/routes/api/public/hooks/visibility-notifications.ts",
   "src/routes/api/public/maps/static.ts",
   "src/routes/api/public/alux/chat.ts",
   "src/routes/api/public/payments/$provider/webhook.ts",
@@ -306,6 +440,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/casas-de-vacaciones.tsx",
   "src/routes/contacto.tsx",
   "src/routes/convertir-en-anfitrion.tsx",
+  "src/routes/email/unsubscribe.ts",
   "src/routes/empresas.tsx",
   "src/routes/eventos.$slug.tsx",
   "src/routes/eventos.tsx",
@@ -313,11 +448,16 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/hoteles.tsx",
   "src/routes/index.tsx",
   "src/routes/l.$slug.tsx",
+  "src/routes/llms[.]txt.ts",
   "src/routes/lovable/business-mother-template-preview.tsx",
   "src/routes/lovable/context-engine-preview.tsx",
   "src/routes/lovable/email/auth/preview.ts",
   "src/routes/lovable/email/auth/webhook.ts",
   "src/routes/lovable/email/queue/process.ts",
+  "src/routes/lovable/email/suppression.ts",
+  "src/routes/lovable/email/transactional/preview.ts",
+  "src/routes/lovable/email/transactional/send.ts",
+  "src/routes/lovable/experience-map-preview.tsx",
   "src/routes/lovable/experience-hero-preview.tsx",
   "src/routes/lovable/experience-i1c-preview.tsx",
   "src/routes/lovable/experience-products-preview.tsx",
@@ -326,11 +466,14 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/lovable/experience-reviews-preview.tsx",
   "src/routes/lovable/experience-subnav-ctabar-preview.tsx",
   "src/routes/lovable/protected-actions-preview.tsx",
+  "src/routes/lovable/tourism-card-preview.tsx",
   "src/routes/lovable/workspace-foundations.tsx",
   "src/routes/lovable/workspace-preview.tsx",
   "src/routes/mapa.tsx",
+  "src/routes/manifest[.]webmanifest.ts",
   "src/routes/marketplace.$.tsx",
   "src/routes/marketplace.tsx",
+  "src/routes/mcp.ts",
   "src/routes/offline.tsx",
   "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx",
   "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
@@ -345,10 +488,15 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/preview/composition.$token.tsx",
   "src/routes/producto.$slug.tsx",
   "src/routes/promociones.tsx",
+  "src/routes/privacidad.tsx",
   "src/routes/que-hacer.tsx",
+  "src/routes/resenar.negocio.$slug.tsx",
   "src/routes/reset-password.tsx",
   "src/routes/restaurantes.tsx",
+  "src/routes/robots[.]txt.ts",
   "src/routes/sitemap[.]xml.ts",
+  "src/routes/terminos.tsx",
+  "src/routes/unsubscribe.tsx",
   "src/routes/viaje-compartido.$token.tsx",
   "src/routes/viajero.$handle.tsx",
 ];
@@ -440,7 +588,8 @@ export function assertRouteInventoryCoverage(actualRouteFiles: readonly string[]
   }
   if (problems.length) {
     throw new Error(
-      "Route Inventory coverage failed:\n\n" + problems.join("\n\n") +
+      "Route Inventory coverage failed:\n\n" +
+        problems.join("\n\n") +
         "\n\nRegla: Route Inventory Rule (DOS) — toda ruta debe existir con metadatos completos.",
     );
   }

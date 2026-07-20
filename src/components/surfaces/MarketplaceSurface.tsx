@@ -25,7 +25,13 @@ export function MarketplaceSurface(props: MarketplaceSurfaceProps = {}) {
   return <MarketplaceSurfaceList items={props.items ?? []} emptyMessage={props.emptyMessage} />;
 }
 
-function MarketplaceSurfaceList({ items, emptyMessage }: { items: MarketplaceBusinessCard[]; emptyMessage?: string }) {
+function MarketplaceSurfaceList({
+  items,
+  emptyMessage,
+}: {
+  items: MarketplaceBusinessCard[];
+  emptyMessage?: string;
+}) {
   const list = items;
   if (list.length === 0) {
     return (
@@ -60,7 +66,7 @@ export function BusinessTile({ item }: { item: MarketplaceBusinessCard }) {
           <BusinessTileHeader item={item} />
         </Link>
       ) : (
-        <Link to="/marketplace/$slug" params={{ slug: item.slug }} className="block">
+        <Link to="/marketplace/$" params={{ _splat: item.slug }} className="block">
           <BusinessTileHeader item={item} />
         </Link>
       )}
@@ -80,20 +86,20 @@ export function BusinessTile({ item }: { item: MarketplaceBusinessCard }) {
 function BusinessTileHeader({ item }: { item: MarketplaceBusinessCard }) {
   return (
     <>
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold">{item.display_name}</h2>
-          {item.verified ? (
-            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
-              Verificada
-            </span>
-          ) : null}
-        </div>
-        {item.tagline ? (
-          <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{item.tagline}</p>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold">{item.display_name}</h2>
+        {item.verified ? (
+          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
+            Verificada
+          </span>
         ) : null}
-        <p className="mt-3 text-xs text-muted-foreground">
-          {item.category_slug || "—"} · {item.destination_slug || "—"}
-        </p>
+      </div>
+      {item.tagline ? (
+        <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{item.tagline}</p>
+      ) : null}
+      <p className="mt-3 text-xs text-muted-foreground">
+        {item.category_slug || "—"} · {item.destination_slug || "—"}
+      </p>
     </>
   );
 }

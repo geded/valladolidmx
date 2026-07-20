@@ -56,11 +56,7 @@ function formatPrice(amount: number | null, currency: string): string | null {
  * 1) Shell — Contenedor con PublicShell + breadcrumbs canónicos.
  * ------------------------------------------------------------------ */
 
-export function ProductShellBlock({
-  renderChildren,
-}: {
-  renderChildren?: () => React.ReactNode;
-}) {
+export function ProductShellBlock({ renderChildren }: { renderChildren?: () => React.ReactNode }) {
   const p = useProduct();
   if (!p) {
     return (
@@ -128,7 +124,10 @@ export function ProductGalleryBlock() {
   if (!cover && gallery.length === 0) {
     return (
       <section className="mt-8">
-        <div className="aspect-[16/9] rounded-2xl bg-gradient-to-br from-muted to-muted/60 ring-1 ring-border" aria-hidden />
+        <div
+          className="aspect-[16/9] rounded-2xl bg-gradient-to-br from-muted to-muted/60 ring-1 ring-border"
+          aria-hidden
+        />
         <p className="mt-2 text-[11px] text-muted-foreground">
           Sin fotografías. Súbelas desde el CMS de producto.
         </p>
@@ -145,7 +144,10 @@ export function ProductGalleryBlock() {
           loading="eager"
         />
       ) : (
-        <div className="aspect-[16/9] rounded-2xl bg-gradient-to-br from-muted to-muted/60 ring-1 ring-border" aria-hidden />
+        <div
+          className="aspect-[16/9] rounded-2xl bg-gradient-to-br from-muted to-muted/60 ring-1 ring-border"
+          aria-hidden
+        />
       )}
       {gallery.length > 0 ? (
         <ul className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible sm:px-0">
@@ -253,15 +255,13 @@ export function ProductBusinessContextBlock() {
       <div className="mt-1 flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <Link
-            to="/marketplace/$slug"
-            params={{ slug: b.slug }}
+            to="/marketplace/$"
+            params={{ _splat: b.slug }}
             className="text-lg font-semibold text-foreground hover:underline"
           >
             {b.display_name}
           </Link>
-          {b.tagline ? (
-            <p className="mt-1 text-sm text-muted-foreground">{b.tagline}</p>
-          ) : null}
+          {b.tagline ? <p className="mt-1 text-sm text-muted-foreground">{b.tagline}</p> : null}
         </div>
         {b.verified ? (
           <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
@@ -279,7 +279,10 @@ export function ProductBusinessContextBlock() {
               </dt>
               <dd className="mt-1 text-foreground">
                 {b.primary_location.label ? (
-                  <span className="font-medium">{b.primary_location.label}<br /></span>
+                  <span className="font-medium">
+                    {b.primary_location.label}
+                    <br />
+                  </span>
                 ) : null}
                 {b.primary_location.address_line1}
                 {b.primary_location.address_line2 ? `, ${b.primary_location.address_line2}` : ""}
