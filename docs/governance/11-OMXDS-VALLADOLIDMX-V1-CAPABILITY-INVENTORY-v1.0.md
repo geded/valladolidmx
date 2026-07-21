@@ -1,11 +1,11 @@
 # OMXDS · Inventario de Capacidades Valladolid.mx V1.0
 
-**Estado:** Proposed for Founder Approval  
+**Estado:** Approved by Founder  
 **Fecha:** 2026-07-21  
 **Owner:** Founder / Product Governance  
 **Dominio primario:** D01 · product-governance  
 **Depende de:** OMXDS Foundation V1.0, Visitor Journey Intelligence & Measurement Blueprint V1.0, Product Evolution Roadmap v2.1 y Completion Reports vigentes.  
-**Alcance:** diagnóstico y priorización documental. No autoriza contacto con empresas, cambios de código, migraciones, instrumentación, cobros ni producción.
+**Alcance:** diagnóstico y priorización documental aprobados. Autoriza actualizar roadmap y plan operativo. No autoriza contactar empresas, incorporar una cohorte real, activar cobros, cambiar código, ejecutar migraciones, instrumentar analítica ni modificar producción.
 
 ---
 
@@ -216,7 +216,7 @@ Se prohíbe crear un segundo CRM, tracker, perfil del viajero, onboarding, catá
 
 Este vertical reutiliza la mayor parte de la plataforma, genera la oferta necesaria para cualquier recorrido de viajero y produce la primera evidencia real para decidir qué construir después.
 
-No autoriza todavía contactar empresas. Requiere GO Founder sobre oferta comercial, responsable del programa, canal de soporte y tratamiento de consentimiento.
+El Programa Fundadores Valladolid queda confirmado como primer vertical de OMXDS. Esta decisión autoriza su preparación documental, pero no contactar empresas ni activar cobros. La operación requiere un GO Founder posterior sobre oferta comercial, responsable del programa, canal de soporte, tratamiento de consentimiento y modalidad de cobro.
 
 ---
 
@@ -339,9 +339,11 @@ No se declara tracción con seeds, demos, simulación o visitas internas.
 
 ### Gate A · Aprobar inventario
 
-- [ ] Founder acepta la clasificación y las fuentes únicas.
-- [ ] Founder confirma Programa Fundadores como primer vertical.
-- [ ] Roadmap y plan operativo se actualizan sin abrir épicas paralelas.
+- [x] Founder acepta la clasificación y las fuentes únicas.
+- [x] Founder confirma Programa Fundadores Valladolid como primer vertical de OMXDS.
+- [x] Roadmap y plan operativo autorizados para actualización sin abrir épicas paralelas.
+
+**Gate A aprobado el 2026-07-21.** Esta aprobación no satisface el Gate B.
 
 ### Gate B · Autorizar operación
 
@@ -361,14 +363,14 @@ No se declara tracción con seeds, demos, simulación o visitas internas.
 
 ---
 
-## 12. Registro de decisión pendiente
+## 12. Registro de decisión Founder
 
-Este inventario propone:
+Por aprobación Founder del 2026-07-21, este inventario decide:
 
-1. aceptar que la plataforma base es suficiente para iniciar operación controlada;
-2. seleccionar Programa Fundadores Valladolid como primer vertical OMXDS V1;
+1. aceptar que la plataforma base es suficiente para preparar una operación controlada;
+2. confirmar Programa Fundadores Valladolid como primer vertical OMXDS V1;
 3. congelar las capacidades “Not now” hasta obtener evidencia real;
-4. actualizar roadmap y plan sólo después de aprobación Founder;
+4. actualizar el roadmap y el plan operativo dentro de este PR;
 5. no activar instrumentación nueva del Blueprint 10 dentro de este PR.
 
 La aprobación de este documento no autoriza contactar empresas, activar cobros ni modificar producción. Esas acciones requieren el Gate B.
@@ -379,4 +381,4 @@ La aprobación de este documento no autoriza contactar empresas, activar cobros 
 
 | Versión | Fecha | Estado | Descripción |
 |---|---|---|---|
-| 1.0 | 2026-07-21 | Proposed | Inventario de las diez capas OMXDS, fuentes únicas, brechas V1, selección recomendada del Programa Fundadores y corte Must/Should/Could/Not now. |
+| 1.0 | 2026-07-21 | Approved | Inventario aprobado; Programa Fundadores Valladolid confirmado como primer vertical; roadmap y plan operativo autorizados. Contacto con empresas y cobros permanecen fuera de alcance. |
