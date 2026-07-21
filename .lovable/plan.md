@@ -1,9 +1,9 @@
 # Plan operativo vigente · Reconciliación → Soft Launch
 
 **Estado:** Activo
-**Última actualización:** 2026-07-20
+**Última actualización:** 2026-07-21
 **Roadmap rector:** `docs/blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`
-**Rama activa:** cierre documental AC1.4–AC1.5 · siguiente hito: Programa Fundadores Valladolid.
+**Rama activa:** aprobación documental OMXDS Commerce · siguiente gate posible: C0, todavía no autorizado.
 **Base integrada:** `main` · merge `234a8c5f` (PR #6)
 **Canal de publicación:** conexión directa de GitHub como vía principal; `gh` sólo como alternativa y nunca como requisito para el Founder.
 
@@ -143,7 +143,38 @@ No registrar como empresa onboarded a un mock, seed o registro sin validación h
 - No presentar datos CV8.S como usuarios, ventas o tracción reales.
 - Mantener visibles las aprobaciones Founder y outcome validations pendientes de CV8 y SEO.
 
-## 9. Regla para actualizar este plan
+## 9. Commerce, Experiences & Settlement · plan preparado
+
+**Blueprint aprobado:** `docs/governance/13-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-BLUEPRINT-v1.0.md`  
+**PRD:** `docs/blueprint/18.01-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-PRD-SUITE-v1.0.md`  
+**Plan de etapas:** `docs/blueprint/18.02-OMXDS-COMMERCE-LOVABLE-PLAN-C0-C8-v1.0.md`
+
+Decisión Founder del 2026-07-21:
+
+- Administración autoriza exclusivamente venta y comisión;
+- Valladolid.mx usa checkout central;
+- aprobación editorial y comercial permanecen separadas;
+- existirán paneles Admin y Empresa;
+- se autoriza preparar C0–C8;
+- todos los flags permanecen OFF;
+- Gate B2 permanece cerrado;
+- no hay GO de implementación para C0.
+
+Secuencia preparada:
+
+- [ ] C0 · Contención y baseline.
+- [ ] C1 · Autoridad comercial.
+- [ ] C2 · Panel Admin de Experiencias.
+- [ ] C3 · Inventario y reservas.
+- [ ] C4 · Checkout sandbox y órdenes.
+- [ ] C5 · Ledger.
+- [ ] C6 · Conciliación, reembolsos y disputas.
+- [ ] C7 · Liquidaciones Admin.
+- [ ] C8 · Portal Empresa de ventas y pagos.
+
+No iniciar una etapa por inferencia. Cada una requiere Scope Report, GO, pruebas, flags OFF, Completion Report y autorización para continuar.
+
+## 10. Regla para actualizar este plan
 
 Al cerrar una ola:
 
@@ -153,4 +184,4 @@ Al cerrar una ola:
 4. reemplazar aquí sólo el próximo paso operativo;
 5. no mantener instrucciones ya ejecutadas como si siguieran pendientes.
 
-**Siguiente acción:** aplicar, validar e integrar Baseline Reconciliation v1.2. Una vez certificada la línea base, solicitar el gate Founder para abrir OMXDS como siguiente iniciativa. Programa Fundadores (`17.1-PROGRAMA-FUNDADORES-VALLADOLID-OPERATING-PLAN-v1.0.md`) permanece preservado como iniciativa pendiente, no sustituida ni cancelada; el mínimo de salida sigue siendo 15 empresas reales publicables (objetivo 25). El smoke assigned-only de CV8.9 permanece como seguimiento condicionado a operadores Concierge Lead/Editor reales.
+**Siguiente acción:** revisar e integrar la aprobación documental de Commerce. Después, el siguiente gate técnico elegible es C0 · Contención y Baseline, pero no debe iniciarse sin GO Founder explícito. Programa Fundadores (`17.1-PROGRAMA-FUNDADORES-VALLADOLID-OPERATING-PLAN-v1.0.md`) permanece como primer vertical; Gate B1 y Gate B2 continúan cerrados. El smoke assigned-only de CV8.9 permanece condicionado a operadores Concierge Lead/Editor reales.
