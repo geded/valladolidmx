@@ -26,6 +26,9 @@ import { MapPin } from "lucide-react";
 import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
+import type { TravelItemKind } from "@/lib/traveler/travel-plans.functions";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import {
   TourismCard,
@@ -120,6 +123,14 @@ export interface TourismListingSurfaceProps {
   mapSlot?: React.ReactNode;
   /** Entidad favoritable por card (fallback: se deduce por entityKind). */
   favoriteKindFor?: (vm: TourismCardVM) => "business" | "product" | "promotion" | null;
+  /**
+   * TP1.4 · Universal "Agregar a Mi Viaje".
+   * Por defecto `true`: la superficie renderiza el botón cuando la
+   * política central de elegibilidad (`evaluateTripEligibility`) lo
+   * autoriza. Superficies que deban excluirlo explícitamente pueden
+   * pasar `false` sin romper consumidores existentes.
+   */
+  showAddToTrip?: boolean;
   className?: string;
 }
 
@@ -139,6 +150,7 @@ export function TourismListingSurface({
   capabilities,
   mapSlot,
   favoriteKindFor,
+  showAddToTrip = true,
   className,
 }: TourismListingSurfaceProps) {
   const [active, setActive] = useState<Record<string, string | null>>({});
@@ -315,8 +327,34 @@ export function TourismListingSurface({
                 renderActions={(v) => {
                   const kind =
                     favoriteKindFor?.(v) ?? favoriteKindFromEntity(v.entityKind);
-                  if (!kind) return null;
-                  return <FavoriteButton entityKind={kind} entityId={v.id} />;
+                  const travelKind = travelKindFromEntity(v.entityKind);
+                  const canAddToTrip =
+                    showAddToTrip &&
+                    travelKind != null &&
+                    evaluateTripEligibility({
+                      kind: travelKind,
+                      targetId: v.id,
+                      title: v.name,
+                      mode: "universal",
+                    }).eligible;
+                  if (!kind && !canAddToTrip) return null;
+                  return (
+                    <div className="flex flex-wrap items-center gap-2">
+                      {kind ? (
+                        <FavoriteButton entityKind={kind} entityId={v.id} />
+                      ) : null}
+                      {canAddToTrip ? (
+                        <AddToTravelPlanButton
+                          kind={travelKind as TravelItemKind}
+                          targetId={v.id}
+                          title={v.name}
+                          slug={null}
+                          imageUrl={v.mediaUrl}
+                          subtitle={v.tagline ?? v.businessName ?? null}
+                        />
+                      ) : null}
+                    </div>
+                  );
                 }}
               />
             </li>
@@ -335,6 +373,30 @@ function favoriteKindFromEntity(
       return "product";
     case "promotion":
       return "promotion";
+    case "business":
+    case "hotel":
+    case "restaurant":
+    case "experience":
+      return "business";
+    default:
+      return null;
+  }
+}
+
+/**
+ * TP1.4 · Deriva el `TravelItemKind` universal a partir del
+ * `TourismEntityKind`. Sólo se autorizan `product`, `business` y `event`
+ * en TourismCard (destination, region, promotion, landing, route,
+ * category, mixed y desconocidos → null).
+ */
+function travelKindFromEntity(
+  kind: TourismEntityKind | null,
+): TravelItemKind | null {
+  switch (kind) {
+    case "product":
+      return "product";
+    case "event":
+      return "event";
     case "business":
     case "hotel":
     case "restaurant":
