@@ -14,7 +14,7 @@ Este documento contiene el catálogo canónico del universo documental bajo `doc
 
 ## 2. Alcance actual
 
-Esta versión proyecta integralmente el ledger probatorio cerrado en Fase 6B sobre las **439 filas** del universo verificado. Los estados fueron adjudicados con autoridad Founder y conservan las reservas individuales de la matriz de decisión. La taxonomía de dominios y sus 439 asignaciones fueron aprobadas por el Founder y formalizadas en [`ADR-GOV-0001`](../decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md). `07` se deriva desde esta versión aprobada; `08` permanece pendiente hasta la aprobación del mapa de dependencias. Esta versión constituye la base congelada de derivación autorizada por el Founder.
+Esta versión proyecta integralmente el ledger probatorio cerrado en Fase 6B sobre las **442 filas** del universo verificado (439 filas cerradas en v0.5 + 3 Closure Reports incorporados bajo Founder Directive 442). Los estados fueron adjudicados con autoridad Founder y conservan las reservas individuales de la matriz de decisión. La taxonomía de dominios y sus 442 asignaciones fueron aprobadas por el Founder y formalizadas en [`ADR-GOV-0001`](../decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md). `07` se deriva desde esta versión aprobada. Esta versión constituye la base congelada de derivación autorizada por el Founder.
 
 Las asociaciones técnicas de esta propuesta fueron validadas localmente contra el árbol actual del repositorio: se conservan sólo rutas resolubles, se normalizan expresiones truncadas y se eliminan autorreferencias. La evidencia documental autocontenida se distingue expresamente de una prueba operativa externa.
 
@@ -22,24 +22,24 @@ El orden de ejecución continúa determinado por el [roadmap oficial v2.1](../bl
 
 ## 2.1 Universo documental verificable
 
-El universo total bajo `docs/blueprint/` es de **439 archivos únicos**:
+El universo total bajo `docs/blueprint/` es de **442 archivos únicos**:
 
-- **424** archivos en la raíz de `docs/blueprint/`.
+- **427** archivos en la raíz de `docs/blueprint/`.
 - **15** archivos en 5 subdirectorios: `artifacts/`, `audits/`, `project-constitution/`, `roadmap/`, `templates/`.
-- **424 + 15 = 439**.
+- **427 + 15 = 442**.
 
 El conteo previo de 429 mezclaba archivos con subdirectorios y queda descartado como base de inventario.
 
 ## 2.2 Metodología reproducible
 
 ```text
-find docs/blueprint -type f | wc -l                    # 439 archivos únicos
-find docs/blueprint -maxdepth 1 -type f | wc -l        # 424 raíz
+find docs/blueprint -type f | wc -l                    # 442 archivos únicos
+find docs/blueprint -maxdepth 1 -type f | wc -l        # 427 raíz
 find docs/blueprint -mindepth 2 -type f | wc -l        # 15 en subdirectorios
 find docs/blueprint -mindepth 1 -type d                # 5 subdirectorios
 ```
 
-Los 439 identificadores canónicos y sus hashes fueron reconciliados contra la base de gobernanza `bdadd72750cfde4977a18c392d0808bbed352cde`. La proyección integral v0.4 fue publicada por el PR [#12](https://github.com/geded/valladolidmx/pull/12), con head `a832c568b0e77e92dc46d9ef51bf7aa4cc5f07a3`, fusionada mediante `2e50745e7efcb8bf5dc2cdc3034c3197332e9713` y verificada en `main` como blob `0d047f0209a285fbc971d0ef07d342953bc2670c`. El cierre registra **3 derivas autorizadas** por el superseded-pass de Fase 4 y **0 derivas inesperadas**.
+Los 439 identificadores canónicos originales y sus hashes fueron reconciliados contra la base de gobernanza `bdadd72750cfde4977a18c392d0808bbed352cde`. La proyección integral v0.4 fue publicada por el PR [#12](https://github.com/geded/valladolidmx/pull/12), con head `a832c568b0e77e92dc46d9ef51bf7aa4cc5f07a3`, fusionada mediante `2e50745e7efcb8bf5dc2cdc3034c3197332e9713` y verificada en `main` como blob `0d047f0209a285fbc971d0ef07d342953bc2670c`. El cierre registra **3 derivas autorizadas** por el superseded-pass de Fase 4 y **0 derivas inesperadas**. La versión v0.6 (Founder Directive 442) amplía el universo a 442 filas incorporando los Closure Reports `RT-1`, `TP1.4B` y `TP1.4B-PHASE2` sin alterar las adjudicaciones v0.5.
 
 ## 3. Contrato del índice
 
@@ -64,12 +64,12 @@ Semántica obligatoria:
 
 | Estado | Documentos |
 |---|---:|
-| `Approved` | 150 |
+| `Approved` | 153 |
 | `Draft` | 285 |
 | `Superseded` | 3 |
 | `Historical` | 1 |
 | `Deprecated` | 0 |
-| **Total** | **439** |
+| **Total** | **442** |
 
 Cobertura validada: 274 filas con implementación resoluble, 14 con migración vinculada, 251 con pruebas o evidencia y 0 con un Completion Report distinto y asociado. De las 251 filas de pruebas/evidencia, 218 son evidencia documental autocontenida y 33 enlazan artefactos externos resolubles.
 
@@ -78,20 +78,20 @@ Cobertura validada: 274 filas con implementación resoluble, 14 con migración v
 | ID | Dominio | Documentos |
 |---|---|---:|
 | `D01` | `product-governance` | 31 |
-| `D02` | `platform-foundation` | 20 |
+| `D02` | `platform-foundation` | 21 |
 | `D03` | `identity-security` | 45 |
 | `D04` | `content-experience` | 76 |
 | `D05` | `destination-discovery` | 35 |
 | `D06` | `marketplace-commerce` | 23 |
 | `D07` | `provider-operations` | 24 |
-| `D08` | `traveler-lifecycle` | 52 |
+| `D08` | `traveler-lifecycle` | 54 |
 | `D09` | `concierge-service` | 29 |
 | `D10` | `alux-ai` | 16 |
 | `D11` | `visitor-intelligence` | 28 |
 | `D12` | `engagement-notifications` | 14 |
 | `D13` | `media-delivery` | 29 |
 | `D14` | `growth-reliability` | 17 |
-|  | **Total** | **439** |
+|  | **Total** | **442** |
 
 La asignación primaria expresa accountability documental. Las dependencias e impactos transversales se modelarán como aristas en `07`; no crean owners múltiples en este índice.
 
@@ -538,16 +538,19 @@ La asignación primaria expresa accountability documental. Las dependencias e im
 | [`docs/blueprint/project-constitution/PROJECT-CONSTITUTION.md`](../blueprint/project-constitution/PROJECT-CONSTITUTION.md) | Project Constitution · Valladolid.mx | `Not explicit` | `Approved` | Blueprint · project-constitution | `D03 · identity-security` | — | — | `src/components/layout/SiteHeader.tsx; src/routes/_authenticated/mi-viaje.tsx` | — | `Not established` | — | Founder approval recorded in Phase 6B final batch · Adjudica exclusivamente el estado documental; no amplía implementación, permisos, roadmap ni resuelve pendientes internos. La fuente registra autoridad documental suficiente: L4: Estado: Oficial · Vigente. · L4: Estado: Oficial · Vigente | 2026-07-20 |
 | [`docs/blueprint/roadmap/cv5-intelligent-travel-workspace.md`](../blueprint/roadmap/cv5-intelligent-travel-workspace.md) | cv5-intelligent-travel-workspace.md | `1.0` | `Approved` | Plan · cv5-intelligent-travel-workspace | `D08 · traveler-lifecycle` | — | — | `Not established` | — | `Not established` | — | Founder approval recorded in Phase 6B final batch · Adjudica exclusivamente el estado documental; no amplía implementación, permisos, roadmap ni resuelve pendientes internos. La fuente registra autoridad documental suficiente: L6: Doc oficial; apunta al CV5 aprobado como visión. · L17: Estado: NO IMPLEMENTAR hasta autorización explícita. Se dividirá en épicas priorizadas contra Roadmap v2.0. | 2026-07-20 |
 | [`docs/blueprint/templates/VISUAL-GATES-CHECKLIST.md`](../blueprint/templates/VISUAL-GATES-CHECKLIST.md) | Visual Gates Checklist — Plantilla oficial | `Not explicit` | `Approved` | Blueprint · visual-gates-checklist | `D04 · content-experience` | — | — | `Not established` | — | `Not established` | — | Founder approval recorded in Phase 6B final batch · Adjudica exclusivamente el estado documental; no amplía implementación, permisos, roadmap ni resuelve pendientes internos. La fuente registra autoridad documental suficiente: L1: Visual Gates Checklist — Plantilla oficial. · L39: - [ ] Documentación actualizada (Blueprint + reporte del Gate). | 2026-07-20 |
+| [`docs/blueprint/RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md`](../blueprint/RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md) | RT-1 · Event Detail Route Restoration · Closure Report | `1.0` | `Approved` | Closure Report · rt-1-event-detail-route-restoration | `D02 · platform-foundation` | — | — | `src/routes/eventos.index.tsx` | — | `Self-contained documentary evidence; external operational artifact not established` | RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0 | Founder Directive 442 · Cierre RT-1 aprobado; adjudica exclusivamente el estado documental del Closure Report. Los commits llegaron a `origin/main`; el merge del PR de gobernanza continúa sin autorización. | 2026-07-21 |
+| [`docs/blueprint/TP1.4B-EVENT-SURFACE-INTEGRATION-CLOSURE-REPORT-v1.0.md`](../blueprint/TP1.4B-EVENT-SURFACE-INTEGRATION-CLOSURE-REPORT-v1.0.md) | TP1.4B · Event Surface Integration · Closure Report | `1.0` | `Approved` | Closure Report · tp1-4b-event-surface-integration | `D08 · traveler-lifecycle` | — | — | `src/lib/traveler/trip-eligibility.ts` | — | `Self-contained documentary evidence; external operational artifact not established` | TP1.4B-EVENT-SURFACE-INTEGRATION-CLOSURE-REPORT-v1.0 | Founder Directive 442 · Cierre TP1.4B aceptado con límites (flujo autenticado no ejecutado por límite de entorno). Adjudica exclusivamente el estado documental. | 2026-07-21 |
+| [`docs/blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md`](../blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md) | TP1.4B Phase 2 · EventSurface Evidence · Closure Report | `1.0` | `Approved` | Closure Report · tp1-4b-phase2-eventsurface-evidence | `D08 · traveler-lifecycle` | — | — | `Not established` | — | `scripts/tp1-trip-eligibility.test.ts` | TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0 | Founder Directive 442 · Evidencia funcional entregada y auditoría universal documentada; superficies diferidas no implementadas. Adjudica exclusivamente el estado documental. | 2026-07-21 |
 
 ## 5. Criterios objetivos para salir de Draft
 
 | Gate | Estado en v0.4 | Evidencia o pendiente |
 |---|---|---|
-| 439 filas pobladas | Cumplido | 439 identificadores únicos; 0 estados pendientes. |
+| 442 filas pobladas | Cumplido | 442 identificadores únicos (439 v0.5 + 3 Closure Reports v0.6); 0 estados pendientes. |
 | Rutas y artefactos existentes | Cumplido para referencias conservadas | Las rutas técnicas retenidas resuelven contra el árbol local; la matriz conserva cada corrección o descarte. La evidencia autocontenida no se presenta como prueba externa. |
 | Superseded-pass cerrado | Cumplido | 3 `Superseded` con relaciones aprobadas; 0 derivas inesperadas. |
 | ADR de dominios aprobado | Cumplido | `ADR-GOV-0001` formaliza los 14 dominios aprobados por el Founder. |
-| 439 dominios primarios asignados | Cumplido | Cada fila contiene exactamente un dominio `D01`–`D14`; 0 asignaciones pendientes. |
+| 442 dominios primarios asignados | Cumplido | Cada fila contiene exactamente un dominio `D01`–`D14`; 0 asignaciones pendientes. |
 | Base de derivación para `07` definida | Cumplido | `07` deberá derivarse desde la última versión de `06` aprobada por el Founder. La aprobación o completitud de `07` no es gate de `06`. |
 | Evidencia reproducible del PR #12 | Cumplido | PR #12, head `a832c568…`, merge `2e50745e…` y blob `0d047f02…`; actualización v0.5 y ADR publicada mediante PR #13, merge `497d08e3…`, blob `8153c886…`. |
 | Aprobación Founder de v0.5 | Cumplido | El Founder aprobó expresamente la propuesta local v0.5 y autorizó su publicación; PR #13 fue fusionado en `main`. |
@@ -563,3 +566,4 @@ Por lo anterior, el documento alcanza estado **`Approved`** y queda congelado co
 | v0.3 | 2026-07-21 | Founder | Overlay provisional con las tres relaciones `Superseded` aprobadas y fusionadas en Fase 4. |
 | v0.4 | 2026-07-21 | Founder | Proyección integral de las 439 adjudicaciones cerradas en Fase 6B; asociaciones técnicas validadas localmente; mantiene `Draft` y los gates pendientes. |
 | v0.5 | 2026-07-21 | Founder | Proyección de 14 dominios aprobados sobre 439 filas; evidencia del PR #12; secuencia `06 Approved → derivación de 07` para eliminar el gate circular. Aprobada por el Founder y congelada como base de derivación de `07`; publicación material registrada mediante PR #13. |
+| v0.6 | 2026-07-21 | Founder | Ampliación autorizada del universo documental a **442 filas** bajo Founder Directive 442. Incorpora los Closure Reports `RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md` (D02), `TP1.4B-EVENT-SURFACE-INTEGRATION-CLOSURE-REPORT-v1.0.md` (D08) y `TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md` (D08) con evidencia de implementación resoluble. No relaja validadores ni degrada documentos formales. |

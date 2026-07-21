@@ -2,7 +2,7 @@
 
 Rama HEAD: `81594514b85b27074613ac8b21c6437f5e8e1f12`
 RT-1: FUNCTIONALLY CLOSED (referencia: `RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md`).
-MERGE: no autorizado · MAIN: no modificado · OMXDS: cerrado · Inventario de gobernanza: no regenerado.
+MERGE del PR de gobernanza: no autorizado · Commits TP1.4B publicados en `origin/main` (workflow `Governance Integrity` disparado por `push` a `main`) · OMXDS: cerrado · Inventario de gobernanza: pendiente de regeneración canónica bajo Founder Directive 442.
 
 ---
 

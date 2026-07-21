@@ -15,7 +15,7 @@ const rowPaths = index.split('\n')
     return match[1];
   });
 
-if (rowPaths.length !== 439) throw new Error(`Expected 439 rows in 06; found ${rowPaths.length}`);
+if (rowPaths.length !== 442) throw new Error(`Expected 442 rows in 06; found ${rowPaths.length}`);
 if (new Set(rowPaths).size !== rowPaths.length) throw new Error('Duplicate document path in 06');
 if (map.derived_from?.version !== '0.5' || map.derived_from?.state !== 'Approved') throw new Error('Map is not derived from 06 v0.5 Approved');
 
@@ -27,7 +27,7 @@ for (const node of map.nodes || []) {
 }
 
 const documentNodes = [...nodes.values()].filter(node => node.id.startsWith('DOC:'));
-if (documentNodes.length !== 439) throw new Error(`Expected 439 document nodes; found ${documentNodes.length}`);
+if (documentNodes.length !== 442) throw new Error(`Expected 442 document nodes; found ${documentNodes.length}`);
 for (const p of rowPaths) if (!nodes.has(`DOC:${p}`)) throw new Error(`Missing document node: ${p}`);
 
 const edgeKeys = new Set();

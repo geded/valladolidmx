@@ -128,7 +128,7 @@ A  docs/blueprint/RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md
 - ✅ `governance:generate` **NO** ejecutado.
 - ✅ Inventario de gobernanza **NO** modificado.
 - ✅ `src/routeTree.gen.ts` **NO** editado a mano.
-- ✅ MAIN no modificado.
+- ✅ Merge del PR de gobernanza no autorizado; los commits funcionales RT-1 sí llegaron a `origin/main` (workflow `Governance Integrity` disparado legítimamente por `push` a `main`).
 - ✅ OMXDS permanece cerrado.
 - ✅ Regeneración canónica del inventario diferida al cierre conjunto RT-1 + TP1.4B, con atribución separada.
 
