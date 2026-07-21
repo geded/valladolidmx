@@ -153,4 +153,4 @@ Al cerrar una ola:
 4. reemplazar aquí sólo el próximo paso operativo;
 5. no mantener instrucciones ya ejecutadas como si siguieran pendientes.
 
-**Siguiente acción:** revisar y aprobar `17.1-PROGRAMA-FUNDADORES-VALLADOLID-OPERATING-PLAN-v1.0.md`; congelar la oferta comercial y designar al responsable antes de contactar la primera cohorte. El mínimo de salida es 15 empresas reales publicables y el objetivo 25. El smoke assigned-only de CV8.9 permanece como seguimiento condicionado a operadores Concierge Lead/Editor reales.
+**Siguiente acción:** cerrar en el Carril B la revisión Founder de Gobernanza `06–08` y reconciliar las contradicciones documentales de plantillas/SEO sin abrir código. En el Carril A permanece después el gate de `17.1`: congelar la oferta comercial y designar responsable antes de contactar la primera cohorte. El smoke assigned-only de CV8.9 continúa condicionado a operadores Concierge Lead/Editor reales.
