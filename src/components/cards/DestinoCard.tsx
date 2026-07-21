@@ -78,6 +78,7 @@ export function DestinoCard({ destination }: { destination: Destination }) {
           slug={destination.slug}
           imageUrl={destination.image_url ?? null}
           subtitle={destination.tagline}
+          eligibilityMode="legacy"
         />
       )}
     />

@@ -38,6 +38,7 @@ export function SmartDestinationsGrid({
                   slug={d.slug ?? null}
                   imageUrl={d.hero_image_url ?? null}
                   subtitle={d.short_description ?? null}
+                  eligibilityMode="legacy"
                 />
               ) : null
             }
