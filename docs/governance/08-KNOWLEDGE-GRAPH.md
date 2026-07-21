@@ -1,8 +1,8 @@
 # 08 · KNOWLEDGE GRAPH
 
-**Estado:** Draft
+**Estado:** Approved
 
-**Versión:** 0.3
+**Versión:** 0.4
 
 **Última actualización:** 2026-07-21
 
@@ -10,81 +10,76 @@
 
 ## 1. Propósito
 
-Este documento reservará el grafo de conocimiento que conecta conceptos oficiales, documentos, decisiones y artefactos de implementación de Valladolid.mx.
+Este documento define la vista semántica canónica de Valladolid.mx. Conecta el vocabulario oficial, los documentos gobernados, los dominios responsables y los artefactos de implementación sin redefinir ninguna fuente.
 
-## 2. Alcance actual
+El grafo responde cuatro preguntas operativas: **qué significa un concepto, quién lo gobierna, qué lo implementa y qué puede verse afectado por un cambio**.
 
-La numeración y la responsabilidad del documento quedan aprobadas como parte de la reconciliación de gobernanza. El modelo semántico completo permanece pendiente y este Draft no reemplaza definiciones del GLOSSARY ni dependencias del mapa `07`.
+## 2. Fuentes y precedencia
 
-Este documento depende explícitamente de:
+| Fuente | Estado | Función en el grafo |
+|---|---|---|
+| `01-GLOSSARY.md` v1.1 | Approved | Conceptos y definiciones oficiales. |
+| `06-BLUEPRINT-MASTER-INDEX.md` v0.5 | Approved | Accountability documental por dominio. |
+| `ADR-GOV-0001` | Approved | Taxonomía de 14 dominios. |
+| `07-BLUEPRINT-DEPENDENCY-MAP.md` v0.4 | Approved | Nodos técnicos y 1,116 relaciones verificadas. |
 
-- `01-GLOSSARY.md` como única fuente de conceptos y definiciones.
-- `07-BLUEPRINT-DEPENDENCY-MAP.md` como única fuente de relaciones verificadas entre artefactos.
+Ante contradicción prevalece la fuente canónica originaria. `08` enlaza conocimiento; no modifica definiciones, estados, owners ni evidencia.
 
-Este PR no puebla el grafo integral; incorpora únicamente la proyección provisional de cinco nodos documentales y tres relaciones verificadas de §4.1.
+## 3. Modelo semántico
 
-## 3. Fuentes canónicas
+Cada nodo declara `id`, `type`, `source` y `evidence`. Cada arista declara `origin`, `relation`, `destination`, `source`, `evidence` y `verified_at`.
 
-El grafo deberá derivarse únicamente de:
+Relaciones autorizadas: `defines`, `refines`, `authorizes`, `implements`, `requires`, `demonstrates`, `depends_on`, `part_of`, `governed_by` y `supersedes`.
 
-- términos aprobados en `01-GLOSSARY.md`;
-- principios y reglas de los documentos `00–05`;
-- Blueprints y ADR aprobados;
-- relaciones verificadas en `07-BLUEPRINT-DEPENDENCY-MAP.md`;
-- código, migraciones y evidencia operativa existentes.
+No se admiten nodos huérfanos de fuente, aristas con extremos inexistentes, autorreferencias, duplicados ni relaciones sin evidencia.
 
-## 3.1 Modelo mínimo
+## 4. Proyección canónica v0.4
 
-Cada elemento del grafo debe registrarse con la estructura mínima:
+| Métrica | Total |
+|---|---:|
+| Conceptos del Glosario | 56 |
+| Dominios canónicos | 14 |
+| Nodos heredados de `07` | 982 |
+| Nodos totales | 1055 |
+| Relaciones heredadas de `07` | 1116 |
+| Relaciones de accountability documental | 439 |
+| Relaciones totales | 1625 |
 
-- **nodo**: identificador único del concepto o artefacto.
-- **tipo**: `concept`, `document`, `principle`, `capability`, `artifact`, `role`, `surface`.
-- **relación**: `defines`, `refines`, `authorizes`, `implements`, `depends_on`, `part_of`, `governed_by`, `supersedes`.
-- **fuente**: documento canónico que origina la entidad o relación (`01-GLOSSARY`, `00-CANON`, blueprint aprobado, ADR).
-- **evidencia**: ruta o referencia verificable que sostiene la relación.
+El dataset completo reside en `docs/governance/generated/08-KNOWLEDGE-GRAPH.json`. No se duplica dentro de este Markdown para evitar dos fuentes divergentes.
 
-Nodos sin fuente canónica o relaciones sin evidencia verificable no pueden entrar al grafo.
+## 5. Vistas de consulta
 
-## 4. Regla semántica
+| Vista | Pregunta que resuelve | Recorrido |
+|---|---|---|
+| Autoridad | ¿Dónde está definida y autorizada una idea? | concepto ← `defines` ← Glosario; dominio ← `authorizes` ← ADR |
+| Accountability | ¿Quién responde por un documento? | documento → `governed_by` → dominio |
+| Implementación | ¿Qué código, migración o prueba materializa una decisión? | artefacto → relaciones verificadas de `07` → documento |
+| Impacto | ¿Qué puede cambiar si se modifica un nodo? | aristas entrantes y salientes del nodo |
 
-El grafo enlaza conocimiento; no redefine conceptos. Ante cualquier contradicción prevalece el documento canónico que origina la entidad o relación.
+## 6. Reglas de evolución
 
-## 4.1 Proyección provisional · superseded-pass Fase 4
+1. Los conceptos sólo se crean o redefinen en `01-GLOSSARY.md`.
+2. Los dominios y owners sólo cambian mediante `ADR-GOV-0001` y `06`.
+3. Las dependencias técnicas sólo se incorporan después de verificarse en `07`.
+4. `08` se regenera cuando cambia cualquiera de sus fuentes; no se corrige manualmente el JSON derivado.
+5. Toda actualización debe ejecutar `node scripts/governance/validate-knowledge-graph.mjs`.
 
-Esta proyección incorpora únicamente los nodos y relaciones documentales ya verificados en `06` y `07`. No constituye el grafo completo ni introduce conceptos nuevos.
+## 7. Criterios de aprobación
 
-### Nodos documentales
+| Criterio | Estado | Evidencia |
+|---|---|---|
+| Glosario de referencia armonizado | Cumplido | `01` v1.1 Approved; 56 conceptos proyectados. |
+| Mapa de dependencias aprobado | Cumplido | `07` v0.4 Approved; PR #14 fusionado en `963b3e9a…`. |
+| Fuente canónica por nodo | Cumplido | Validación rechaza nodos sin `source` o `evidence`. |
+| Evidencia por relación | Cumplido | Validación rechaza aristas sin fuente, evidencia o fecha. |
+| Validación reproducible | Cumplido | `scripts/governance/validate-knowledge-graph.mjs`. |
+| Aprobación Founder de v0.4 | Cumplido | El Founder aprobó expresamente el contenido de v0.4 y autorizó elevarlo a `Approved`. |
 
-| Nodo | Tipo | Fuente canónica | Evidencia |
-|---|---|---|---|
-| [`Persisted Signature Blueprint v1.0`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.0.md) | `document` | Documento enlazado | Cabecera `Superseded` + overlay `06` |
-| [`Persisted Signature Blueprint v1.1`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.1.md) | `document` | Documento enlazado | Cabecera `Superseded`, referencia a v1.2 + overlay `06` |
-| [`Persisted Signature Blueprint v1.2`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.2.md) | `document` | Documento enlazado | Documento sucesor existente + overlay `06` |
-| [`Phase B Completion Report v1.0`](../blueprint/18.H3-A4-M2.3.1-PHASE-B-COMPLETION-REPORT-v1.0.md) | `document` | Documento enlazado | Cabecera `Superseded` + overlay `06` |
-| [`Phase B Completion Report v1.1 FINAL`](../blueprint/18.H3-A4-M2.3.1-PHASE-B-COMPLETION-REPORT-v1.1.md) | `document` | Documento enlazado | Documento sucesor existente + overlay `06` |
-
-### Relaciones verificadas
-
-| Origen | Relación | Destino | Fuente | Evidencia |
-|---|---|---|---|---|
-| `Persisted Signature Blueprint v1.1` | `supersedes` | `Persisted Signature Blueprint v1.0` | `07-BLUEPRINT-DEPENDENCY-MAP` | Commit [`a42d3a6d`](https://github.com/geded/valladolidmx/commit/a42d3a6d3546d192b1ea5fda8b11b891ca0cec1e) |
-| `Persisted Signature Blueprint v1.2` | `supersedes` | `Persisted Signature Blueprint v1.1` | `07-BLUEPRINT-DEPENDENCY-MAP` | Commit [`a42d3a6d`](https://github.com/geded/valladolidmx/commit/a42d3a6d3546d192b1ea5fda8b11b891ca0cec1e) |
-| `Phase B Completion Report v1.1 FINAL` | `supersedes` | `Phase B Completion Report v1.0` | `07-BLUEPRINT-DEPENDENCY-MAP` | Commit [`a42d3a6d`](https://github.com/geded/valladolidmx/commit/a42d3a6d3546d192b1ea5fda8b11b891ca0cec1e) |
-
-## 5. Criterios objetivos para salir de Draft
-
-Este documento sólo puede pasar a `Approved` cuando:
-
-1. `01-GLOSSARY.md` esté armonizado en su versión de referencia y cubra los conceptos que el grafo pretenda representar.
-2. `07-BLUEPRINT-DEPENDENCY-MAP.md` esté `Approved` con aristas verificables.
-3. Todo nodo del grafo tenga fuente canónica declarada.
-4. Toda relación tenga evidencia enlazada a un artefacto existente o a una decisión aprobada.
-5. Exista un mecanismo reproducible de validación que rechace nodos o relaciones sin fuente y sin evidencia.
-
-## 6. Control de versiones
+## 8. Control de versiones
 
 | Versión | Fecha | Autor | Descripción |
 |---|---|---|---|
 | v0.1 | 2026-07-20 | Founder | Reserva del grafo canónico y definición de sus fuentes. |
-| v0.2 | 2026-07-21 | Founder | Modelo mínimo (nodo/tipo/relación/fuente/evidencia), dependencia explícita de `01` y `07`, owner y criterios de salida de Draft. No pobla grafo. |
-| v0.3 | 2026-07-21 | Founder | Proyección provisional de cinco nodos documentales y tres relaciones `supersedes` verificadas en Fase 4. |
+| v0.2 | 2026-07-21 | Founder | Modelo mínimo, dependencia explícita de `01` y `07`, owner y criterios de salida. |
+| v0.3 | 2026-07-21 | Founder | Proyección provisional de cinco nodos y tres relaciones `supersedes`. |
+| v0.4 | 2026-07-21 | Founder | Proyección integral reproducible de conceptos, dominios, documentos, artefactos y relaciones verificadas; aprobada por el Founder como cierre final. |
