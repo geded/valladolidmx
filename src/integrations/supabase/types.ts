@@ -7138,6 +7138,10 @@ export type Database = {
       }
       expire_stale_coupons: { Args: never; Returns: undefined }
       expire_visibility_grants: { Args: never; Returns: number }
+      faq_parent_is_public: {
+        Args: { _id: string; _kind: Database["public"]["Enums"]["entity_kind"] }
+        Returns: boolean
+      }
       founder_dashboard_kpis: { Args: never; Returns: Json }
       gen_random_uuid: { Args: never; Returns: string }
       gen_salt: { Args: { "": string }; Returns: string }
