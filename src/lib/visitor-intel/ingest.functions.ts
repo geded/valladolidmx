@@ -28,20 +28,23 @@ export interface IngestResult {
   reason?:
     | "invalid_schema"
     | "non_canonical_transition"
+    | "decision_channel_required"
     | "trust_mismatch"
     | "duplicate"
     | "insert_failed";
   event_id?: string;
 }
 
-function validateCanonical(event: VisitorEvent): IngestResult | null {
+export function validateIngestEvent(event: VisitorEvent): IngestResult | null {
   if (event.schema_version !== VISITOR_EVENT_SCHEMA_VERSION) {
     return { accepted: false, reason: "invalid_schema" };
   }
-  if (
-    event.kind === "journey.transition" &&
-    !isCanonicalTransition(event.transition.id)
-  ) {
+  // CV8.9 decisions are operational mutations. They must only pass through
+  // the role-aware, state-aware functions introduced by CV8.9.2.
+  if (event.kind === "recommendation.lifecycle" && event.subtype === "decision") {
+    return { accepted: false, reason: "decision_channel_required" };
+  }
+  if (event.kind === "journey.transition" && !isCanonicalTransition(event.transition.id)) {
     return { accepted: false, reason: "non_canonical_transition" };
   }
   return null;
@@ -86,22 +89,24 @@ export const ingestVisitorEvent = createServerFn({ method: "POST" })
     if (!event.subject.is_authenticated || event.subject.trust_level === "N0_anonymous") {
       return { accepted: false, reason: "trust_mismatch" };
     }
-    const canonicalError = validateCanonical(event);
+    const canonicalError = validateIngestEvent(event);
     if (canonicalError) return canonicalError;
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Generated types only cover the `public` schema; `visitor_intel` is
     // an isolated append-only domain (see CV8.1 migration). Cast is safe.
-    const { error } = await (supabaseAdmin as unknown as {
-      schema: (s: string) => {
-        from: (t: string) => {
-          upsert: (
-            row: Record<string, unknown>,
-            opts: { onConflict: string; ignoreDuplicates: boolean },
-          ) => Promise<{ error: { code?: string; message: string } | null }>;
+    const { error } = await (
+      supabaseAdmin as unknown as {
+        schema: (s: string) => {
+          from: (t: string) => {
+            upsert: (
+              row: Record<string, unknown>,
+              opts: { onConflict: string; ignoreDuplicates: boolean },
+            ) => Promise<{ error: { code?: string; message: string } | null }>;
+          };
         };
-      };
-    })
+      }
+    )
       .schema("visitor_intel")
       .from("events")
       .upsert(toRow(event), { onConflict: "event_id", ignoreDuplicates: true });
@@ -138,20 +143,22 @@ export const ingestAnonymousVisitorEvent = createServerFn({ method: "POST" })
     if (event.subject.is_authenticated || event.subject.trust_level !== "N0_anonymous") {
       return { accepted: false, reason: "trust_mismatch" };
     }
-    const canonicalError = validateCanonical(event);
+    const canonicalError = validateIngestEvent(event);
     if (canonicalError) return canonicalError;
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await (supabaseAdmin as unknown as {
-      schema: (s: string) => {
-        from: (t: string) => {
-          upsert: (
-            row: Record<string, unknown>,
-            opts: { onConflict: string; ignoreDuplicates: boolean },
-          ) => Promise<{ error: { code?: string; message: string } | null }>;
+    const { error } = await (
+      supabaseAdmin as unknown as {
+        schema: (s: string) => {
+          from: (t: string) => {
+            upsert: (
+              row: Record<string, unknown>,
+              opts: { onConflict: string; ignoreDuplicates: boolean },
+            ) => Promise<{ error: { code?: string; message: string } | null }>;
+          };
         };
-      };
-    })
+      }
+    )
       .schema("visitor_intel")
       .from("events")
       .upsert(toRow(event), { onConflict: "event_id", ignoreDuplicates: true });

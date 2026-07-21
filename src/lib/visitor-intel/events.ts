@@ -10,6 +10,7 @@
  */
 import { z } from "zod";
 
+import { DecisionEventPayloadSchema } from "./decisions";
 import type { JourneyTransitionId, TrustLevel, VisitorStage } from "./journey";
 
 export const VISITOR_EVENT_SCHEMA_VERSION = "1.0.0" as const;
@@ -66,7 +67,7 @@ export const JourneyTransitionEventSchema = VisitorEventBaseSchema.extend({
   transition: z.object({
     id: z.string(), // JourneyTransitionId
     from: z.string(), // VisitorStage
-    to: z.string(),   // VisitorStage
+    to: z.string(), // VisitorStage
     /** Acción proximal que provocó la transición (ver AttributionSchema). */
     attributed_action: z.string().optional(),
     /** Capacidad(es) del sistema que influyeron. */
@@ -127,36 +128,74 @@ export const RECOMMENDATION_LIFECYCLE_STATUSES = [
   "validated",
   "discarded",
 ] as const;
-export type RecommendationLifecycleStatus =
-  (typeof RECOMMENDATION_LIFECYCLE_STATUSES)[number];
+export type RecommendationLifecycleStatus = (typeof RECOMMENDATION_LIFECYCLE_STATUSES)[number];
+
+export const RecommendationLifecycleSchema = z.object({
+  /** Identificador estable de la recomendación (compartido a lo largo del ciclo). */
+  recommendation_id: z.string().min(1),
+  /** Métrica/KPI a la que apunta la recomendación (ver KPI_CATALOG). */
+  metric_id: z.string().min(1),
+  /** Transición canónica implicada (T1..T9) o "aggregate". */
+  transition: z.string().min(1),
+  /** Severidad original en el momento de la detección. */
+  severity: z.enum(["opportunity", "attention", "critical", "informative"]),
+  /** Estado alcanzado por este evento. */
+  status: z.enum(RECOMMENDATION_LIFECYCLE_STATUSES),
+  /** Actor humano/sistema responsable (rol admin, alux, concierge…). */
+  actor: z.string().min(1),
+  /** Nota narrativa opcional. */
+  note: z.string().max(500).optional(),
+  /** Evidencia observada tras la acción (sólo para observed/validated/discarded). */
+  outcome: z
+    .object({
+      kpi_before: z.number(),
+      kpi_after: z.number(),
+      delta_relative: z.number(),
+      transition_advanced: z.boolean(),
+    })
+    .optional(),
+});
+export type RecommendationLifecycle = z.infer<typeof RecommendationLifecycleSchema>;
 
 export const RecommendationLifecycleEventSchema = VisitorEventBaseSchema.extend({
   kind: z.literal("recommendation.lifecycle"),
-  recommendation: z.object({
-    /** Identificador estable de la recomendación (compartido a lo largo del ciclo). */
-    recommendation_id: z.string().min(1),
-    /** Métrica/KPI a la que apunta la recomendación (ver KPI_CATALOG). */
-    metric_id: z.string().min(1),
-    /** Transición canónica implicada (T1..T9) o "aggregate". */
-    transition: z.string().min(1),
-    /** Severidad original en el momento de la detección. */
-    severity: z.enum(["opportunity", "attention", "critical", "informative"]),
-    /** Estado alcanzado por este evento. */
-    status: z.enum(RECOMMENDATION_LIFECYCLE_STATUSES),
-    /** Actor humano/sistema responsable (rol admin, alux, concierge…). */
-    actor: z.string().min(1),
-    /** Nota narrativa opcional. */
-    note: z.string().max(500).optional(),
-    /** Evidencia observada tras la acción (sólo para observed/validated/discarded). */
-    outcome: z
-      .object({
-        kpi_before: z.number(),
-        kpi_after: z.number(),
-        delta_relative: z.number(),
-        transition_advanced: z.boolean(),
-      })
-      .optional(),
-  }),
+  /** Ausente = contrato legacy CV8.6; `decision` = payload CV8.9. */
+  subtype: z.literal("decision").optional(),
+  recommendation: RecommendationLifecycleSchema.optional(),
+  payload: DecisionEventPayloadSchema.optional(),
+}).superRefine((event, ctx) => {
+  if (event.subtype === "decision") {
+    if (!event.payload) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["payload"],
+        message: "recommendation.lifecycle subtype=decision requiere payload CV8.9.",
+      });
+    }
+    if (event.recommendation) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["recommendation"],
+        message: "Un evento decision no duplica el payload legacy de recomendación.",
+      });
+    }
+    return;
+  }
+
+  if (!event.recommendation) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["recommendation"],
+      message: "El evento legacy CV8.6 requiere recommendation.",
+    });
+  }
+  if (event.payload) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["payload"],
+      message: "payload CV8.9 requiere subtype=decision.",
+    });
+  }
 });
 
 export const VisitorEventSchema = z.discriminatedUnion("kind", [
@@ -172,9 +211,7 @@ export type JourneyTransitionEvent = z.infer<typeof JourneyTransitionEventSchema
 export type IntentSignalEvent = z.infer<typeof IntentSignalEventSchema>;
 export type DecisionOfferedEvent = z.infer<typeof DecisionOfferedEventSchema>;
 export type OutcomeObservedEvent = z.infer<typeof OutcomeObservedEventSchema>;
-export type RecommendationLifecycleEvent = z.infer<
-  typeof RecommendationLifecycleEventSchema
->;
+export type RecommendationLifecycleEvent = z.infer<typeof RecommendationLifecycleEventSchema>;
 
 /**
  * Helper de tipado — garantiza que las transiciones publicadas correspondan

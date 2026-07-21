@@ -21,18 +21,14 @@ Este archivo es una instrucción de ejecución subordinada a `docs/governance/00
 - [x] Roadmap canónico rebaselined a v2.1 con estados respaldados por evidencia.
 - [x] Plan Lovable reescrito para reflejar el estado real.
 
-## 2. Gate R4 · Cerrar reconciliación
+## 2. Gate R4 · Reconciliación cerrada
 
-Antes de implementar producto:
+- [x] Draft PR #1 revisado e integrado sin reescribir historia publicada.
+- [x] `main` alineado con el árbol validado en `47065f81`.
+- [x] Bun 1.3.14, lockfile congelado, typecheck, 143 pruebas base y build reproducibles.
+- [x] Orden de migraciones revisado y migración correctiva autorizada aplicada.
 
-1. Revisar el diff completo del Draft PR #1.
-2. Confirmar que el PR apunta a `main` y sólo contiene la reconciliación autorizada.
-3. Verificar nuevamente `bun install --frozen-lockfile`, typecheck, tests y build en el entorno de integración.
-4. Revisar las migraciones Supabase incluidas en el historial y su orden de aplicación; no aplicar a producción por inferencia.
-5. Resolver observaciones del PR y convertirlo a Ready for review sólo por decisión del Founder.
-6. Integrar sin reescribir historia publicada.
-
-**DoD R4:** PR integrado, `main` limpio, checks reproducibles y commit base identificado para la siguiente épica.
+**DoD R4:** cumplido.
 
 ## 3. Próxima épica única · CV8.9
 
@@ -42,19 +38,26 @@ Antes de implementar producto:
 
 ### Secuencia propuesta
 
-1. **CV8.9.1 · Contratos y proyección**
-   - congelar contrato `Action Queue` v1.0.0;
-   - reutilizar oportunidades y prioridades CV8.5–CV8.8;
-   - mantener proyección pura, sin snapshots paralelos.
-2. **CV8.9.2 · Persistencia, roles y auditoría**
-   - implementar estados y transiciones autorizadas;
-   - RLS/GRANTs por rol;
-   - traza de responsable, decisión, motivo y timestamps.
-3. **CV8.9.3 · Superficie operativa**
+1. [x] **CV8.9.1 · Contratos y proyección**
+   - contrato `Action Queue` v1.0.0 congelado;
+   - oportunidades y prioridades CV8.5–CV8.8 reutilizadas por adaptadores puros;
+   - proyección pura, sin snapshots paralelos;
+   - Completion Report aprobado por el Founder el 2026-07-20.
+2. **CV8.9.2 · Persistencia, roles y auditoría — aprobada para integración**
+   - [x] estados y transiciones autorizadas;
+   - [x] `has_role`, lectura assigned-only y escritura service-only;
+   - [x] traza de responsable, decisión, motivo y timestamps;
+   - [x] append atómico sin tablas ni snapshots nuevos;
+   - [x] aplicar migración y ejecutar smoke DB con autorización Founder;
+   - [x] aplicar migración correctiva de orden autoritativo y supersesión única;
+   - [x] publicar la rama y su corrección en el PR #2;
+   - [x] Completion Report aprobado por el Founder y PR #2 autorizado para integración;
+   - [ ] integrar o desplegar y completar smoke end-to-end con cuentas autenticadas.
+3. [ ] **CV8.9.3 · Superficie operativa**
    - cola filtrable y detalle explicable;
    - acciones humanas explícitas, sin auto-ejecución;
    - estados vacíos y errores operables.
-4. **CV8.9.4 · Métricas y cierre**
+4. [ ] **CV8.9.4 · Métricas y cierre**
    - medir tiempo a decisión, backlog, aceptación/rechazo y resultado;
    - pruebas, smoke, no-regresión y Completion Report;
    - aprobación Founder antes de abrir AC1.4.
@@ -124,4 +127,4 @@ Al cerrar una ola:
 4. reemplazar aquí sólo el próximo paso operativo;
 5. no mantener instrucciones ya ejecutadas como si siguieran pendientes.
 
-**Siguiente acción:** completar revisión e integración del Draft PR #1; después solicitar GO Founder para CV8.9.1.
+**Siguiente acción:** verificar el despliegue resultante del PR #2 y completar smoke end-to-end con cuentas autenticadas; CV8.9.3 permanece cerrada.
