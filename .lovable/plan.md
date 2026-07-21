@@ -5,6 +5,7 @@
 **Roadmap rector:** `docs/blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`
 **Rama activa:** cierre documental AC1.4–AC1.5 · siguiente hito: Programa Fundadores Valladolid.
 **Base integrada:** `main` · merge `234a8c5f` (PR #6)
+**Canal de publicación:** conexión directa de GitHub como vía principal; `gh` sólo como alternativa y nunca como requisito para el Founder.
 
 Este archivo es una instrucción de ejecución subordinada a `docs/governance/00–05` y al roadmap oficial. No crea prioridades nuevas ni sustituye Completion Reports.
 
