@@ -2,10 +2,11 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.5",
+    "version": "0.6",
     "state": "Approved",
     "main_commit": "497d08e3139265828784c4270a8cbaea45b30d84",
-    "blob": "8153c886ce5719939b9a0aaeb25284564fe84ad5"
+    "blob": "8153c886ce5719939b9a0aaeb25284564fe84ad5",
+    "notes": "Amplía v0.5 con los 3 Closure Reports autorizados bajo Founder Directive 442."
   },
   "generated_at": "2026-07-21",
   "nodes": [
@@ -6235,6 +6236,45 @@
       "id": "ART:supabase/migrations/20260720000200_7b6db1f9-2f0b-4bcf-9e82-3f57f9eac901.sql",
       "type": "migration",
       "path": "supabase/migrations/20260720000200_7b6db1f9-2f0b-4bcf-9e82-3f57f9eac901.sql"
+    },
+    {
+      "id": "DOC:docs/blueprint/RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md",
+      "owner": "D02 · platform-foundation",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/routes/eventos.index.tsx",
+      "type": "artifact",
+      "path": "src/routes/eventos.index.tsx"
+    },
+    {
+      "id": "DOC:docs/blueprint/TP1.4B-EVENT-SURFACE-INTEGRATION-CLOSURE-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/TP1.4B-EVENT-SURFACE-INTEGRATION-CLOSURE-REPORT-v1.0.md",
+      "owner": "D08 · traveler-lifecycle",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/traveler/trip-eligibility.ts",
+      "type": "artifact",
+      "path": "src/lib/traveler/trip-eligibility.ts"
+    },
+    {
+      "id": "DOC:docs/blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md",
+      "owner": "D08 · traveler-lifecycle",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:scripts/tp1-trip-eligibility.test.ts",
+      "type": "artifact",
+      "path": "scripts/tp1-trip-eligibility.test.ts"
     }
   ],
   "edges": [
@@ -16280,6 +16320,33 @@
       "destination": "DOC:docs/blueprint/project-constitution/PROJECT-CONSTITUTION.md",
       "evidence": "docs/blueprint/project-constitution/PROJECT-CONSTITUTION.md § asociación de implementación validada",
       "source_row": "docs/blueprint/project-constitution/PROJECT-CONSTITUTION.md",
+      "verified_at": "2026-07-21"
+    },
+    {
+      "id": "E1117",
+      "origin": "ART:src/routes/eventos.index.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md § restauración del listado tras convertir `eventos.tsx` en layout",
+      "source_row": "docs/blueprint/RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md",
+      "verified_at": "2026-07-21"
+    },
+    {
+      "id": "E1118",
+      "origin": "ART:src/lib/traveler/trip-eligibility.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/TP1.4B-EVENT-SURFACE-INTEGRATION-CLOSURE-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/TP1.4B-EVENT-SURFACE-INTEGRATION-CLOSURE-REPORT-v1.0.md § contrato canónico TP1 integrado en EventSurface",
+      "source_row": "docs/blueprint/TP1.4B-EVENT-SURFACE-INTEGRATION-CLOSURE-REPORT-v1.0.md",
+      "verified_at": "2026-07-21"
+    },
+    {
+      "id": "E1119",
+      "origin": "ART:scripts/tp1-trip-eligibility.test.ts",
+      "relation": "demonstrates",
+      "destination": "DOC:docs/blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md § evidencia funcional Playwright + prueba TP1",
+      "source_row": "docs/blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md",
       "verified_at": "2026-07-21"
     }
   ],

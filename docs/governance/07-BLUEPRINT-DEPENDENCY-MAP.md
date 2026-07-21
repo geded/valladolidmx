@@ -2,7 +2,7 @@
 
 **Estado:** Approved
 
-**Versión:** 0.4
+**Versión:** 0.5
 
 **Última actualización:** 2026-07-21
 
@@ -10,11 +10,11 @@
 
 ## 1. Propósito
 
-Mapa canónico y reproducible de relaciones verificadas entre los 439 documentos registrados en `06` y sus artefactos asociados de implementación, migración y prueba. Una ausencia significa `Not established`; nunca se rellena mediante inferencia silenciosa.
+Mapa canónico y reproducible de relaciones verificadas entre los 442 documentos registrados en `06` y sus artefactos asociados de implementación, migración y prueba. Una ausencia significa `Not established`; nunca se rellena mediante inferencia silenciosa.
 
 ## 2. Base congelada y alcance
 
-Esta versión deriva exclusivamente de `06 v0.5 Approved`, publicado en `main@497d08e3139265828784c4270a8cbaea45b30d84` como blob `8153c886ce5719939b9a0aaeb25284564fe84ad5`. Conserva los 439 nodos documentales y convierte únicamente asociaciones validadas de `06` en aristas. La evidencia autocontenida no se presenta como una prueba externa independiente.
+Esta versión deriva exclusivamente de `06 v0.6 Approved` (que amplía v0.5 con los 3 Closure Reports autorizados bajo Founder Directive 442). Conserva los 442 nodos documentales y convierte únicamente asociaciones validadas de `06` en aristas. La evidencia autocontenida no se presenta como una prueba externa independiente.
 
 El dataset legible por máquina se publica junto a este documento en `docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json`; este Markdown resume el contrato y contiene el inventario completo de artefactos y aristas.
 
@@ -36,16 +36,16 @@ Toda arista registra origen, destino, relación, evidencia, fila fuente y fecha.
 
 ## 4. Cobertura
 
-- Nodos documentales: **439**.
-- Nodos de artefacto únicos: **543**.
-- Nodos totales: **982**.
-- Aristas verificadas: **1116**.
+- Nodos documentales: **442**.
+- Nodos de artefacto únicos: **546**.
+- Nodos totales: **988**.
+- Aristas verificadas: **1119**.
 - Aristas inválidas: **0**.
 
 | Relación | Aristas |
 |---|---:|
-| `demonstrates` | 44 |
-| `implements` | 1051 |
+| `demonstrates` | 45 |
+| `implements` | 1053 |
 | `requires` | 18 |
 | `supersedes` | 3 |
 
@@ -62,7 +62,7 @@ Las cadenas están representadas sin fabricar dependencias. Los huecos explícit
 
 ## 5. Nodos de artefacto
 
-Los 439 nodos documentales se heredan íntegramente de `06`; aquí se enumeran los artefactos únicos adicionales.
+Los 442 nodos documentales se heredan íntegramente de `06`; aquí se enumeran los artefactos únicos adicionales.
 
 | ID | Tipo | Ruta |
 |---|---|---|
@@ -1730,18 +1730,21 @@ Los 439 nodos documentales se heredan íntegramente de `06`; aquí se enumeran l
 | `E1114` | `ART:src/lib/workspace/alux-registry.ts` | `implements` | `DOC:docs/blueprint/project-constitution/06-AI-Policy.md` | docs/blueprint/project-constitution/06-AI-Policy.md § asociación de implementación validada | 2026-07-21 |
 | `E1115` | `ART:src/components/layout/SiteHeader.tsx` | `implements` | `DOC:docs/blueprint/project-constitution/PROJECT-CONSTITUTION.md` | docs/blueprint/project-constitution/PROJECT-CONSTITUTION.md § asociación de implementación validada | 2026-07-21 |
 | `E1116` | `ART:src/routes/_authenticated/mi-viaje.tsx` | `implements` | `DOC:docs/blueprint/project-constitution/PROJECT-CONSTITUTION.md` | docs/blueprint/project-constitution/PROJECT-CONSTITUTION.md § asociación de implementación validada | 2026-07-21 |
+| `E1117` | `ART:src/routes/eventos.index.tsx` | `implements` | `DOC:docs/blueprint/RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md` | docs/blueprint/RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md § restauración del listado tras convertir `eventos.tsx` en layout | 2026-07-21 |
+| `E1118` | `ART:src/lib/traveler/trip-eligibility.ts` | `implements` | `DOC:docs/blueprint/TP1.4B-EVENT-SURFACE-INTEGRATION-CLOSURE-REPORT-v1.0.md` | docs/blueprint/TP1.4B-EVENT-SURFACE-INTEGRATION-CLOSURE-REPORT-v1.0.md § contrato canónico TP1 integrado en EventSurface | 2026-07-21 |
+| `E1119` | `ART:scripts/tp1-trip-eligibility.test.ts` | `demonstrates` | `DOC:docs/blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md` | docs/blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md § evidencia funcional Playwright + prueba TP1 | 2026-07-21 |
 
 ## 7. Validación reproducible
 
-El validador portable `scripts/governance/validate-dependency-map.mjs` rechaza: filas distintas de 439, IDs duplicados, nodos sin ruta o tipo, aristas con extremos inexistentes, aristas sin evidencia, autorreferencias y relaciones duplicadas. El paquete de revisión incluye el validador, JSON canónico, reporte y hashes.
+El validador portable `scripts/governance/validate-dependency-map.mjs` rechaza: filas distintas de 442, IDs duplicados, nodos sin ruta o tipo, aristas con extremos inexistentes, aristas sin evidencia, autorreferencias y relaciones duplicadas. El paquete de revisión incluye el validador, JSON canónico, reporte y hashes.
 
 ## 8. Criterios para salir de Draft
 
 | Gate | Estado | Evidencia |
 |---|---|---|
-| `06 v0.5` aprobado | Cumplido | Aprobación Founder y PR #13 fusionado en `main@497d08e3…`. |
-| 439 nodos documentales | Cumplido | Derivación uno a uno; 0 duplicados. |
-| Nodos y aristas verificables | Cumplido | 982 nodos; 1116 aristas; 0 extremos inválidos. |
+| `06 v0.6` aprobado | Cumplido | Aprobación Founder y Founder Directive 442 (amplía v0.5 con 3 Closure Reports). |
+| 442 nodos documentales | Cumplido | Derivación uno a uno; 0 duplicados. |
+| Nodos y aristas verificables | Cumplido | 988 nodos; 1119 aristas; 0 extremos inválidos. |
 | Cadenas críticas representadas | Cumplido con reservas explícitas | Se registran artefactos acreditados y huecos sin convertirlos en hechos. |
 | Validación reproducible | Cumplido | Validador portable, JSON canónico, validación y manifiesto incluidos. |
 | Aprobación Founder de v0.4 | Cumplido | Aprobación expresa del Founder para registrar y publicar `07 v0.4` como `Approved`. |
@@ -1755,4 +1758,6 @@ Todos los gates de salida quedaron cumplidos; `07 v0.4` se registra como `Approv
 | v0.1 | 2026-07-20 | Founder | Reserva del mapa canónico. |
 | v0.2 | 2026-07-21 | Founder | Esquema mínimo, dependencia de `06` y criterios de salida. |
 | v0.3 | 2026-07-21 | Founder | Overlay de tres aristas `supersedes`. |
+| v0.4 | 2026-07-21 | Founder | Proyección integral reproducible sobre 439 documentos de `06 v0.5`. |
+| v0.5 | 2026-07-21 | Founder | Derivación desde `06 v0.6`: incorpora 3 DOC + 3 ART (routes/eventos.index, lib/traveler/trip-eligibility, scripts/tp1-trip-eligibility.test) y 3 aristas verificadas bajo Founder Directive 442. |
 | v0.4 | 2026-07-21 | Founder | Derivación integral aprobada de `06 v0.5`: 439 documentos, 543 artefactos y 1116 aristas verificadas. |

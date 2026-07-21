@@ -404,4 +404,4 @@ No se ha ejecutado atribución definitiva. Pendiente investigación bajo la inic
 - **Superficies diferidas (§4.1, §4.5):** requieren decisión editorial.
 - **Hallazgo H-1:** requiere aclaración del alcance de "eliminación inmediata".
 
-**RT-1 CLOSED. TP1.4B PHASE 2 EVIDENCE DELIVERED. MATRIZ CORREGIDA. MERGE NOT AUTHORIZED. MAIN NOT MODIFIED. OMXDS CLOSED. GOVERNANCE INVENTORY NOT REGENERATED.**
+**RT-1 CLOSED. TP1.4B PHASE 2 EVIDENCE DELIVERED. MATRIZ CORREGIDA. MERGE del PR de gobernanza NOT AUTHORIZED. Commits RT-1 y TP1.4B publicados en `origin/main` (workflow `Governance Integrity` disparado legítimamente por `push` a `main`). OMXDS CLOSED. GOVERNANCE INVENTORY pendiente de regeneración canónica bajo Founder Directive 442.**
