@@ -8,7 +8,7 @@
  * dura sigue ocurriendo server-side en cada server function).
  */
 import { useMemo } from "react";
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { type AppRole } from "@/types/auth";
 import { WorkspaceProvider } from "@/components/workspace/WorkspaceProvider";
@@ -22,12 +22,16 @@ export const Route = createFileRoute("/_authenticated/cms")({
 
 function CmsLayout() {
   const { roles } = useAuth();
+  const location = useLocation();
   const isEditorial = useMemo(
     () => roles.some((r) => EDITORIAL_ROLES.includes(r)),
     [roles],
   );
+  const isAssignedDecisionOperator =
+    roles.includes("concierge_lead") &&
+    location.pathname === "/cms/visitor-intel/decisions";
 
-  if (!isEditorial) {
+  if (!isEditorial && !isAssignedDecisionOperator) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="max-w-md text-center">

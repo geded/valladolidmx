@@ -172,6 +172,7 @@ import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes
 import { Route as AuthenticatedCuentaCheckoutOrderIdRouteImport } from './routes/_authenticated/cuenta/checkout.$orderId'
 import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId'
 import { Route as AuthenticatedCmsZonasNuevaRouteImport } from './routes/_authenticated/cms/zonas.nueva'
+import { Route as AuthenticatedCmsVisitorIntelDecisionsRouteImport } from './routes/_authenticated/cms/visitor-intel_.decisions'
 import { Route as AuthenticatedCmsVisibilidadSpotlightRouteImport } from './routes/_authenticated/cms/visibilidad.spotlight'
 import { Route as AuthenticatedCmsVisibilidadSolicitudesRouteImport } from './routes/_authenticated/cms/visibilidad.solicitudes'
 import { Route as AuthenticatedCmsRegionesNuevaRouteImport } from './routes/_authenticated/cms/regiones.nueva'
@@ -1112,6 +1113,12 @@ const AuthenticatedCmsZonasNuevaRoute =
     path: '/zonas/nueva',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsVisitorIntelDecisionsRoute =
+  AuthenticatedCmsVisitorIntelDecisionsRouteImport.update({
+    id: '/visitor-intel_/decisions',
+    path: '/visitor-intel/decisions',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsVisibilidadSpotlightRoute =
   AuthenticatedCmsVisibilidadSpotlightRouteImport.update({
     id: '/spotlight',
@@ -1406,6 +1413,7 @@ export interface FileRoutesByFullPath {
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/cms/visibilidad/solicitudes': typeof AuthenticatedCmsVisibilidadSolicitudesRoute
   '/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
+  '/cms/visitor-intel/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
   '/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
@@ -1588,6 +1596,7 @@ export interface FileRoutesByTo {
   '/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/cms/visibilidad/solicitudes': typeof AuthenticatedCmsVisibilidadSolicitudesRoute
   '/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
+  '/cms/visitor-intel/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
   '/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
@@ -1779,6 +1788,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/regiones/nueva': typeof AuthenticatedCmsRegionesNuevaRoute
   '/_authenticated/cms/visibilidad/solicitudes': typeof AuthenticatedCmsVisibilidadSolicitudesRoute
   '/_authenticated/cms/visibilidad/spotlight': typeof AuthenticatedCmsVisibilidadSpotlightRoute
+  '/_authenticated/cms/visitor-intel_/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/_authenticated/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRoute
   '/_authenticated/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
@@ -1971,6 +1981,7 @@ export interface FileRouteTypes {
     | '/cms/regiones/nueva'
     | '/cms/visibilidad/solicitudes'
     | '/cms/visibilidad/spotlight'
+    | '/cms/visitor-intel/decisions'
     | '/cms/zonas/nueva'
     | '/concierge/expedientes/$caseId'
     | '/cuenta/checkout/$orderId'
@@ -2153,6 +2164,7 @@ export interface FileRouteTypes {
     | '/cms/regiones/nueva'
     | '/cms/visibilidad/solicitudes'
     | '/cms/visibilidad/spotlight'
+    | '/cms/visitor-intel/decisions'
     | '/cms/zonas/nueva'
     | '/concierge/expedientes/$caseId'
     | '/cuenta/checkout/$orderId'
@@ -2343,6 +2355,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/regiones/nueva'
     | '/_authenticated/cms/visibilidad/solicitudes'
     | '/_authenticated/cms/visibilidad/spotlight'
+    | '/_authenticated/cms/visitor-intel_/decisions'
     | '/_authenticated/cms/zonas/nueva'
     | '/_authenticated/concierge/expedientes/$caseId'
     | '/_authenticated/cuenta/checkout/$orderId'
@@ -3619,6 +3632,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsZonasNuevaRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/visitor-intel_/decisions': {
+      id: '/_authenticated/cms/visitor-intel_/decisions'
+      path: '/visitor-intel/decisions'
+      fullPath: '/cms/visitor-intel/decisions'
+      preLoaderRoute: typeof AuthenticatedCmsVisitorIntelDecisionsRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/visibilidad/spotlight': {
       id: '/_authenticated/cms/visibilidad/spotlight'
       path: '/spotlight'
@@ -4097,6 +4117,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsEmpresasNuevaRoute: typeof AuthenticatedCmsEmpresasNuevaRoute
   AuthenticatedCmsProductosNuevaRoute: typeof AuthenticatedCmsProductosNuevaRoute
   AuthenticatedCmsRegionesNuevaRoute: typeof AuthenticatedCmsRegionesNuevaRoute
+  AuthenticatedCmsVisitorIntelDecisionsRoute: typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   AuthenticatedCmsZonasNuevaRoute: typeof AuthenticatedCmsZonasNuevaRoute
   AuthenticatedCmsCategoriasIndexRoute: typeof AuthenticatedCmsCategoriasIndexRoute
   AuthenticatedCmsDestinosIndexRoute: typeof AuthenticatedCmsDestinosIndexRoute
@@ -4137,6 +4158,8 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsEmpresasNuevaRoute: AuthenticatedCmsEmpresasNuevaRoute,
   AuthenticatedCmsProductosNuevaRoute: AuthenticatedCmsProductosNuevaRoute,
   AuthenticatedCmsRegionesNuevaRoute: AuthenticatedCmsRegionesNuevaRoute,
+  AuthenticatedCmsVisitorIntelDecisionsRoute:
+    AuthenticatedCmsVisitorIntelDecisionsRoute,
   AuthenticatedCmsZonasNuevaRoute: AuthenticatedCmsZonasNuevaRoute,
   AuthenticatedCmsCategoriasIndexRoute: AuthenticatedCmsCategoriasIndexRoute,
   AuthenticatedCmsDestinosIndexRoute: AuthenticatedCmsDestinosIndexRoute,

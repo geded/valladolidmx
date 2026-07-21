@@ -7,9 +7,10 @@
  */
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { toast } from "sonner";
 
 import {
   aggregateJourneyIntel,
@@ -51,6 +52,15 @@ import {
   JOURNEY_TRANSITIONS,
   type JourneyTransitionId,
 } from "@/lib/visitor-intel";
+import {
+  decisionSourceFromPrioritizedOpportunity,
+  decisionSourceFromSegmentFinding,
+  type DecisionSource,
+} from "@/lib/visitor-intel/decisions";
+import {
+  getDecisionActorAccess,
+  proposeDecision,
+} from "@/lib/visitor-intel/decisions.functions";
 
 export const Route = createFileRoute("/_authenticated/cms/visitor-intel")({
   validateSearch: z.object({
@@ -131,22 +141,30 @@ function VisitorIntelCenter() {
               <strong>{win} días</strong>.
             </p>
           </div>
-          <div className="flex gap-1 rounded-full border border-border p-1 text-xs">
-            {[7, 30, 90].map((n) => (
-              <button
-                key={n}
-                type="button"
-                onClick={() => setWin(n as Windw)}
-                className={
-                  "rounded-full px-3 py-1 " +
-                  (win === n
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground")
-                }
-              >
-                {n}d
-              </button>
-            ))}
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              to="/cms/visitor-intel/decisions"
+              className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+            >
+              Abrir cola de decisiones
+            </Link>
+            <div className="flex gap-1 rounded-full border border-border p-1 text-xs">
+              {[7, 30, 90].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setWin(n as Windw)}
+                  className={
+                    "rounded-full px-3 py-1 " +
+                    (win === n
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground")
+                  }
+                >
+                  {n}d
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </header>
@@ -826,7 +844,7 @@ function PrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) {
     staleTime: 60_000,
   });
   const valQ = useQuery({
-    queryKey: ["cms", "visitor-intel", "prio-validation", 90 as const],
+    queryKey: ["cms", "visitor-intel", "recommendation-validation", 90 as const],
     queryFn: () => callVal({ data: { window_days: 90 } }),
     staleTime: 60_000,
   });
@@ -978,6 +996,7 @@ function PrioritizedCard({ p }: { p: PrioritizedOpportunity }) {
           ))}
         </ul>
       </details>
+      <DecisionProposalButton source={decisionSourceFromPrioritizedOpportunity(p)} />
     </li>
   );
 }
@@ -1049,7 +1068,7 @@ function SegmentPrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) 
     staleTime: 60_000,
   });
   const valQ = useQuery({
-    queryKey: ["cms", "visitor-intel", "seg-prio", "validation", 90 as const],
+    queryKey: ["cms", "visitor-intel", "recommendation-validation", 90 as const],
     queryFn: () => callVal({ data: { window_days: 90 } }),
     staleTime: 60_000,
   });
@@ -1244,32 +1263,81 @@ function SegmentFindingCard({ f }: { f: SegmentFinding }) {
       </details>
 
       {f.type !== "insufficient_data" ? (
-        <details className="mt-2">
-          <summary className="cursor-pointer text-[11px] font-semibold text-primary hover:underline">
-            Ver factores del score
-          </summary>
-          <ul className="mt-2 space-y-1 text-[11px]">
-            {f.factors.map((fac) => (
-              <li
-                key={fac.key}
-                className="flex items-start justify-between gap-2 rounded-md bg-surface p-2"
-              >
-                <div className="flex-1">
-                  <p className="font-mono font-semibold">
-                    {fac.key} · peso {(fac.weight * 100).toFixed(0)}% · valor{" "}
-                    {(fac.value * 100).toFixed(0)}%
-                  </p>
-                  <p className="text-muted-foreground">{fac.explanation}</p>
-                </div>
-                <span className="font-mono font-semibold text-primary">
-                  +{(fac.contribution * 100).toFixed(1)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </details>
+        <>
+          <details className="mt-2">
+            <summary className="cursor-pointer text-[11px] font-semibold text-primary hover:underline">
+              Ver factores del score
+            </summary>
+            <ul className="mt-2 space-y-1 text-[11px]">
+              {f.factors.map((fac) => (
+                <li
+                  key={fac.key}
+                  className="flex items-start justify-between gap-2 rounded-md bg-surface p-2"
+                >
+                  <div className="flex-1">
+                    <p className="font-mono font-semibold">
+                      {fac.key} · peso {(fac.weight * 100).toFixed(0)}% · valor{" "}
+                      {(fac.value * 100).toFixed(0)}%
+                    </p>
+                    <p className="text-muted-foreground">{fac.explanation}</p>
+                  </div>
+                  <span className="font-mono font-semibold text-primary">
+                    +{(fac.contribution * 100).toFixed(1)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </details>
+          <DecisionProposalButton
+            source={decisionSourceFromSegmentFinding(f, {
+              opportunity_id: `cv88:${f.dimension}:${f.segment_key}`,
+            })}
+          />
+        </>
       ) : null}
     </li>
+  );
+}
+
+function DecisionProposalButton({ source }: { source: DecisionSource | null }) {
+  const accessCall = useServerFn(getDecisionActorAccess);
+  const proposeCall = useServerFn(proposeDecision);
+  const queryClient = useQueryClient();
+  const access = useQuery({
+    queryKey: ["cms", "visitor-intel", "decisions", "access"],
+    queryFn: () => accessCall({ data: {} }),
+    staleTime: 5 * 60_000,
+    retry: false,
+  });
+  const proposal = useMutation({
+    mutationFn: () => {
+      if (!source) throw new Error("El hallazgo no produce una fuente accionable.");
+      return proposeCall({ data: { source } });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["cms", "visitor-intel", "decisions"],
+      });
+      toast.success("Propuesta añadida a la cola de decisiones.");
+    },
+    onError: () => toast.error("No fue posible registrar la propuesta."),
+  });
+
+  if (!source || !access.data?.manage_all) return null;
+  return (
+    <div className="mt-3 border-t border-border/60 pt-3">
+      <button
+        type="button"
+        disabled={proposal.isPending}
+        onClick={() => proposal.mutate()}
+        className="rounded-full bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground disabled:opacity-50"
+      >
+        {proposal.isPending ? "Registrando…" : "Convertir en decisión"}
+      </button>
+      <span className="ml-2 text-[10px] text-muted-foreground">
+        Crea una propuesta; no ejecuta la acción.
+      </span>
+    </div>
   );
 }
 
