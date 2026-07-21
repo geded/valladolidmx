@@ -38,6 +38,7 @@ import { Route as AluxRouteImport } from './routes/alux'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrienteMayaIndexRouteImport } from './routes/oriente-maya/index'
+import { Route as EventosIndexRouteImport } from './routes/eventos.index'
 import { Route as ViajeroHandleRouteImport } from './routes/viajero.$handle'
 import { Route as ViajeCompartidoTokenRouteImport } from './routes/viaje-compartido.$token'
 import { Route as ProductoSlugRouteImport } from './routes/producto.$slug'
@@ -343,6 +344,11 @@ const OrienteMayaIndexRoute = OrienteMayaIndexRouteImport.update({
   id: '/oriente-maya/',
   path: '/oriente-maya/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const EventosIndexRoute = EventosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EventosRoute,
 } as any)
 const ViajeroHandleRoute = ViajeroHandleRouteImport.update({
   id: '/viajero/$handle',
@@ -1338,6 +1344,7 @@ export interface FileRoutesByFullPath {
   '/producto/$slug': typeof ProductoSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
+  '/eventos/': typeof EventosIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1477,7 +1484,6 @@ export interface FileRoutesByTo {
   '/contacto': typeof ContactoRoute
   '/convertir-en-anfitrion': typeof ConvertirEnAnfitrionRoute
   '/empresas': typeof EmpresasRoute
-  '/eventos': typeof EventosRouteWithChildren
   '/experiencias': typeof ExperienciasRoute
   '/hoteles': typeof HotelesRoute
   '/llms.txt': typeof LlmsDottxtRoute
@@ -1523,6 +1529,7 @@ export interface FileRoutesByTo {
   '/producto/$slug': typeof ProductoSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
+  '/eventos': typeof EventosIndexRoute
   '/oriente-maya': typeof OrienteMayaIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1713,6 +1720,7 @@ export interface FileRoutesById {
   '/producto/$slug': typeof ProductoSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
+  '/eventos/': typeof EventosIndexRoute
   '/oriente-maya/': typeof OrienteMayaIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1906,6 +1914,7 @@ export interface FileRouteTypes {
     | '/producto/$slug'
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
+    | '/eventos/'
     | '/oriente-maya/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -2045,7 +2054,6 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/convertir-en-anfitrion'
     | '/empresas'
-    | '/eventos'
     | '/experiencias'
     | '/hoteles'
     | '/llms.txt'
@@ -2091,6 +2099,7 @@ export interface FileRouteTypes {
     | '/producto/$slug'
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
+    | '/eventos'
     | '/oriente-maya'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -2280,6 +2289,7 @@ export interface FileRouteTypes {
     | '/producto/$slug'
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
+    | '/eventos/'
     | '/oriente-maya/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -2693,6 +2703,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/oriente-maya/'
       preLoaderRoute: typeof OrienteMayaIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/eventos/': {
+      id: '/eventos/'
+      path: '/'
+      fullPath: '/eventos/'
+      preLoaderRoute: typeof EventosIndexRouteImport
+      parentRoute: typeof EventosRoute
     }
     '/viajero/$handle': {
       id: '/viajero/$handle'
@@ -4226,10 +4243,12 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 interface EventosRouteChildren {
   EventosSlugRoute: typeof EventosSlugRoute
+  EventosIndexRoute: typeof EventosIndexRoute
 }
 
 const EventosRouteChildren: EventosRouteChildren = {
   EventosSlugRoute: EventosSlugRoute,
+  EventosIndexRoute: EventosIndexRoute,
 }
 
 const EventosRouteWithChildren =
