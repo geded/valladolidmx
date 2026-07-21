@@ -2,7 +2,7 @@
 
 **Estado:** Draft
 
-**Versión:** 0.2
+**Versión:** 0.3
 
 **Última actualización:** 2026-07-21
 
@@ -55,6 +55,18 @@ Aristas sin ruta existente o sin evidencia verificable no pueden entrar al mapa.
 
 Toda relación deberá enlazar artefactos existentes y verificables. Una dependencia inferida se marcará como tal hasta quedar confirmada mediante código, historial o decisión aprobada.
 
+## 4.1 Overlay provisional de aristas · superseded-pass Fase 4
+
+Estas son las únicas aristas pobladas antes del levantamiento integral. Su dirección expresa que el documento sucesor `supersedes` al documento antecedente. Todas fueron aprobadas por el Founder y fusionadas en `main` mediante el commit [`a42d3a6d3546d192b1ea5fda8b11b891ca0cec1e`](https://github.com/geded/valladolidmx/commit/a42d3a6d3546d192b1ea5fda8b11b891ca0cec1e).
+
+| Origen | Relación | Destino | Evidencia | Última verificación |
+|---|---|---|---|---|
+| [`Persisted Signature Blueprint v1.1`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.1.md) | `supersedes` | [`Persisted Signature Blueprint v1.0`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.0.md) | Cabecera `Superseded` del destino + commit de autoridad | 2026-07-20 |
+| [`Persisted Signature Blueprint v1.2`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.2.md) | `supersedes` | [`Persisted Signature Blueprint v1.1`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.1.md) | Cabecera `Superseded` del destino + commit de autoridad | 2026-07-20 |
+| [`Phase B Completion Report v1.1 FINAL`](../blueprint/18.H3-A4-M2.3.1-PHASE-B-COMPLETION-REPORT-v1.1.md) | `supersedes` | [`Phase B Completion Report v1.0`](../blueprint/18.H3-A4-M2.3.1-PHASE-B-COMPLETION-REPORT-v1.0.md) | Cabecera `Superseded` del destino + commit de autoridad | 2026-07-20 |
+
+Este overlay no implica que el mapa esté completo ni autoriza agregar aristas inferidas. Las demás relaciones siguen pendientes del levantamiento verificable exigido por §5.
+
 ## 5. Criterios objetivos para salir de Draft
 
 Este documento sólo puede pasar a `Approved` cuando:
@@ -71,3 +83,4 @@ Este documento sólo puede pasar a `Approved` cuando:
 |---|---|---|---|
 | v0.1 | 2026-07-20 | Founder | Reserva del mapa canónico y definición de sus relaciones mínimas. |
 | v0.2 | 2026-07-21 | Founder | Esquema mínimo de nodo/arista, dependencia explícita de `06`, owner y criterios de salida de Draft. No pobla mapa. |
+| v0.3 | 2026-07-21 | Founder | Overlay provisional de las tres aristas `supersedes` aprobadas en Fase 4; el mapa integral continúa pendiente. |
