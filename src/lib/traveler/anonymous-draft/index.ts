@@ -11,6 +11,7 @@ export * from "./limits";
 export * from "./copy";
 export * from "./store";
 export * from "./hooks";
+export * from "./items";
 export * from "./legacy";
 export * from "./import-contract";
 export * from "./registration";

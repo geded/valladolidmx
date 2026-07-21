@@ -10,6 +10,7 @@ import {
   anonymousRegistrationCopy,
 } from "../src/lib/traveler/anonymous-draft/registration";
 import { importThenClearAnonymousDraft } from "../src/lib/traveler/anonymous-draft/import-runner";
+import { selectAnonymousTravelItems } from "../src/lib/traveler/anonymous-draft/items";
 
 const NOW = 1_800_000_000_000;
 
@@ -85,6 +86,36 @@ describe("AC1 local-first continuity", () => {
     for (const reason of ANONYMOUS_REGISTRATION_TRIGGERS) {
       expect(anonymousRegistrationCopy(reason).dismissCta).toBeTruthy();
     }
+  });
+
+  it("feeds the page and floating dock from the same deduplicated local trip", () => {
+    const draft = createEmptyDraft({ now: NOW, draftId: uuid(101) });
+    draft.plannedItems = [
+      {
+        kind: "destination",
+        targetId: uuid(1),
+        title: "Río Lagartos",
+        addedAt: NOW,
+      },
+    ];
+    draft.favorites = [
+      {
+        kind: "destination",
+        id: uuid(1),
+        title: "Río Lagartos",
+        addedAt: NOW - 1,
+      },
+      {
+        kind: "business",
+        id: uuid(2),
+        title: "Restaurante",
+        addedAt: NOW + 1,
+      },
+    ];
+    expect(selectAnonymousTravelItems(draft).map((item) => item.title)).toEqual([
+      "Restaurante",
+      "Río Lagartos",
+    ]);
   });
 
   it("clears the local draft only after a successful authenticated import", async () => {

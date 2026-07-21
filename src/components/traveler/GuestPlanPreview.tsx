@@ -1,7 +1,11 @@
 /** Vista del único AnonymousTravelDraft local. No consulta ni escribe red. */
 import { Landmark, Package, CalendarDays, MapPin, StickyNote, BadgePercent } from "lucide-react";
 import { useEffect } from "react";
-import { useAnonymousTrip, type AnonymousItemKind } from "@/lib/traveler/anonymous-draft";
+import {
+  selectAnonymousTravelItems,
+  useAnonymousTrip,
+  type AnonymousItemKind,
+} from "@/lib/traveler/anonymous-draft";
 
 const KIND_LABEL: Record<AnonymousItemKind, string> = {
   destination: "Destino",
@@ -30,21 +34,7 @@ export interface GuestPlanPreviewProps {
 
 export function GuestPlanPreview({ limit = 6, onCount }: GuestPlanPreviewProps) {
   const { trip, status } = useAnonymousTrip();
-  const planned = trip?.plannedItems ?? [];
-  const plannedKeys = new Set(planned.map((item) => `${item.kind}:${item.targetId ?? ""}`));
-  const favorites = (trip?.favorites ?? [])
-    .filter((favorite) => !plannedKeys.has(`${favorite.kind}:${favorite.id}`))
-    .map((favorite) => ({
-      kind: favorite.kind as AnonymousItemKind,
-      targetId: favorite.id,
-      title: favorite.title,
-      slug: favorite.slug,
-      imageUrl: favorite.imageUrl,
-      subtitle: undefined,
-      notes: undefined,
-      addedAt: favorite.addedAt,
-    }));
-  const items = [...planned, ...favorites].sort((a, b) => b.addedAt - a.addedAt);
+  const items = selectAnonymousTravelItems(trip);
   useEffect(() => {
     onCount?.(items.length);
   }, [items.length, onCount]);

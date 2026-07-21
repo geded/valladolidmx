@@ -26,6 +26,17 @@ export const ANON_COPY = {
     primary: "Guardar mi viaje",
     secondary: "Continuar sin registrarme",
   },
+  dock: {
+    button: "Tu viaje",
+    title: "Tu viaje ya está tomando forma.",
+    oneItem: "Tienes 1 lugar en tu viaje.",
+    manyItems: "Tienes {count} lugares en tu viaje.",
+    scope:
+      "Puedes seguir planeando en este dispositivo o guardarlo en tu cuenta para continuar donde quieras.",
+    open: "Ver mi viaje",
+    save: "Guardar mi viaje",
+    continue: "Seguir explorando",
+  },
   limitReached: {
     title: "Tu viaje está creciendo bonito.",
     body:

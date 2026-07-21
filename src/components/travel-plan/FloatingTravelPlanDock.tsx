@@ -7,15 +7,17 @@
  * completa (/cuenta/mi-viaje) sin sacar al viajero del recorrido.
  *
  * Reglas (CV3 · Discovery First):
- *  · Sólo autenticado. Oculto en shells operativos (/cuenta, /cms, /portal,
- *    /admin, /concierge, /empresa, /auth) para no duplicar chrome.
+ *  · Autenticado: lee el Travel Plan canónico. Anónimo: observa únicamente
+ *    AnonymousTravelDraft local y ofrece registro progresivo opt-in.
+ *  · Oculto en shells operativos (/cuenta, /cms, /portal, /admin,
+ *    /concierge, /empresa, /auth) para no duplicar chrome.
  *  · Cero escritura directa a BD: sólo lectura (`getMyActivePlan`) y
  *    navegación a la vista completa. Cualquier mutación sigue viajando
  *    por la Write API oficial (CV2.1).
  *  · Se refresca automáticamente cuando otro punto del sitio emite
  *    `alux:plan-changed` (bus de señales A15).
  */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -37,18 +39,19 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  getMyActivePlan,
-  type TravelItemKind,
-} from "@/lib/traveler/travel-plans.functions";
+import { getMyActivePlan, type TravelItemKind } from "@/lib/traveler/travel-plans.functions";
 import { getMyConfirmedTravel } from "@/lib/concierge/orders.functions";
-import {
-  narratePlan,
-  type AluxTravelerSuggestion,
-} from "@/lib/traveler/alux-traveler.functions";
+import { narratePlan, type AluxTravelerSuggestion } from "@/lib/traveler/alux-traveler.functions";
 import { onPlanChanged } from "@/lib/alux/plan-signals";
 import { useTranslation } from "@/i18n/context";
 import { ALUX_KB_LOCALES, type AluxKbLocale } from "@/lib/alux/knowledge.functions";
+import {
+  ANON_COPY,
+  selectAnonymousTravelItems,
+  useAnonymousTrip,
+  type AnonymousItemKind,
+} from "@/lib/traveler/anonymous-draft";
+import { ProgressiveRegistrationButton } from "@/components/traveler/ProgressiveRegistrationButton";
 
 const HIDE_PREFIXES = [
   "/cuenta",
@@ -61,10 +64,7 @@ const HIDE_PREFIXES = [
   "/carrito",
 ];
 
-const KIND_ICON: Record<
-  TravelItemKind,
-  React.ComponentType<{ className?: string }>
-> = {
+const KIND_ICON: Record<TravelItemKind, React.ComponentType<{ className?: string }>> = {
   destination: MapPin,
   business: Building2,
   product: ShoppingBag,
@@ -80,11 +80,34 @@ const KIND_LABEL: Record<TravelItemKind, string> = {
   note: "Nota",
 };
 
+const ANON_KIND_ICON: Record<AnonymousItemKind, React.ComponentType<{ className?: string }>> = {
+  destination: MapPin,
+  business: Building2,
+  product: ShoppingBag,
+  event: Ticket,
+  note: StickyNote,
+  promotion: Ticket,
+  custom: StickyNote,
+};
+
+const ANON_KIND_LABEL: Record<AnonymousItemKind, string> = {
+  destination: "Destino",
+  business: "Lugar",
+  product: "Experiencia",
+  event: "Evento",
+  note: "Nota",
+  promotion: "Promoción",
+  custom: "Idea",
+};
+
 export function FloatingTravelPlanDock() {
   const { user } = useAuth();
+  const { trip: anonymousTrip } = useAnonymousTrip();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHiddenRoute = HIDE_PREFIXES.some((p) => pathname.startsWith(p));
   const enabled = !!user && !isHiddenRoute;
+
+  const anonymousItems = useMemo(() => selectAnonymousTravelItems(anonymousTrip), [anonymousTrip]);
 
   const fetchActive = useServerFn(getMyActivePlan);
   const q = useQuery({
@@ -103,15 +126,12 @@ export function FloatingTravelPlanDock() {
 
   const [open, setOpen] = useState(false);
   const { locale: rawLocale } = useTranslation();
-  const locale: AluxKbLocale = (ALUX_KB_LOCALES as readonly string[]).includes(
-    rawLocale,
-  )
+  const locale: AluxKbLocale = (ALUX_KB_LOCALES as readonly string[]).includes(rawLocale)
     ? (rawLocale as AluxKbLocale)
     : "es";
   const narrate = useServerFn(narratePlan);
   const narration = useMutation({
-    mutationFn: async () =>
-      (await narrate({ data: { locale } })) as AluxTravelerSuggestion,
+    mutationFn: async () => (await narrate({ data: { locale } })) as AluxTravelerSuggestion,
   });
 
   useEffect(() => {
@@ -122,6 +142,99 @@ export function FloatingTravelPlanDock() {
       narration.reset();
     });
   }, [enabled, q, confirmedQ]);
+
+  if (isHiddenRoute) return null;
+
+  if (!user) {
+    const count = anonymousItems.length;
+    if (count === 0 && !open) return null;
+    const description =
+      count === 1
+        ? ANON_COPY.dock.oneItem
+        : ANON_COPY.dock.manyItems.replace("{count}", String(count));
+
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label={`${ANON_COPY.dock.button} (${count})`}
+          className="fixed bottom-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/95 px-3.5 py-2.5 text-sm font-semibold text-foreground shadow-elevated backdrop-blur transition-colors hover:bg-card md:left-6"
+        >
+          <span className="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground">
+            <Luggage className="h-4 w-4" aria-hidden />
+          </span>
+          <span className="hidden sm:inline">{ANON_COPY.dock.button}</span>
+          <span className="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-primary/15 px-1.5 text-[11px] font-bold text-primary">
+            {count}
+          </span>
+        </button>
+
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetContent side="right" className="flex w-full flex-col sm:max-w-md">
+            <SheetHeader>
+              <SheetTitle>{ANON_COPY.dock.title}</SheetTitle>
+              <SheetDescription>
+                {description} {ANON_COPY.dock.scope}
+              </SheetDescription>
+            </SheetHeader>
+
+            <div className="mt-5 flex-1 space-y-2 overflow-y-auto pr-1">
+              {anonymousItems.slice(0, 6).map((item, index) => {
+                const Icon = ANON_KIND_ICON[item.kind] ?? MapPin;
+                return (
+                  <div
+                    key={`${item.kind}:${item.targetId ?? "note"}:${item.addedAt}:${index}`}
+                    className="flex items-start gap-3 rounded-xl border border-border bg-card p-3"
+                  >
+                    <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                      <Icon className="h-4 w-4" aria-hidden />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">
+                        {item.title ?? "Parte de tu viaje"}
+                      </p>
+                      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                        {ANON_KIND_LABEL[item.kind]}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+              {count > 6 ? (
+                <p className="px-2 text-xs text-muted-foreground">+ {count - 6} más</p>
+              ) : null}
+            </div>
+
+            <div className="mt-5 flex flex-col gap-2 border-t border-border pt-4">
+              <Link
+                to="/arma-tu-viaje"
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2.5 text-sm font-semibold text-primary hover:bg-primary/15"
+              >
+                {ANON_COPY.dock.open}
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </Link>
+              <ProgressiveRegistrationButton
+                reason="save_permanently"
+                onBeforeRun={() => setOpen(false)}
+                className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-95"
+              >
+                {ANON_COPY.dock.save}
+              </ProgressiveRegistrationButton>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center justify-center rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent"
+              >
+                {ANON_COPY.dock.continue}
+              </button>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </>
+    );
+  }
 
   if (!enabled) return null;
 
@@ -160,9 +273,7 @@ export function FloatingTravelPlanDock() {
         >
           <Luggage className="h-4 w-4" aria-hidden />
         </span>
-        <span className="hidden sm:inline">
-          {isConfirmed ? "Viaje confirmado" : "Tu viaje"}
-        </span>
+        <span className="hidden sm:inline">{isConfirmed ? "Viaje confirmado" : "Tu viaje"}</span>
         {isConfirmed ? (
           <span className="inline-flex items-center rounded-full bg-success/20 px-2 text-[11px] font-bold tracking-wider text-success-foreground">
             {confirmed!.folio}
@@ -175,18 +286,15 @@ export function FloatingTravelPlanDock() {
       </button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent
-          side="right"
-          className="flex w-full flex-col sm:max-w-md"
-        >
+        <SheetContent side="right" className="flex w-full flex-col sm:max-w-md">
           <SheetHeader>
             <SheetTitle className="truncate">{planTitle}</SheetTitle>
             <SheetDescription>
               {isConfirmed
                 ? `Tu viaje al Oriente Maya de Yucatán está confirmado. Folio ${confirmed!.folio}.`
                 : count === 0
-                ? "Aún no has guardado nada. Añade destinos, empresas, productos o eventos desde cualquier ficha."
-                : `${count} ${count === 1 ? "ítem guardado" : "ítems guardados"}. Abre la vista completa para editar fechas, notas y enviar a tu concierge.`}
+                  ? "Aún no has guardado nada. Añade destinos, empresas, productos o eventos desde cualquier ficha."
+                  : `${count} ${count === 1 ? "ítem guardado" : "ítems guardados"}. Abre la vista completa para editar fechas, notas y enviar a tu concierge.`}
             </SheetDescription>
           </SheetHeader>
 
@@ -246,10 +354,7 @@ export function FloatingTravelPlanDock() {
             {items.map((it) => {
               const Icon = KIND_ICON[it.item_kind] ?? MapPin;
               const snap = it.snapshot ?? {};
-              const title =
-                (snap.title && snap.title.trim()) ||
-                KIND_LABEL[it.item_kind] ||
-                "Ítem";
+              const title = (snap.title && snap.title.trim()) || KIND_LABEL[it.item_kind] || "Ítem";
               return (
                 <div
                   key={it.id}
@@ -259,13 +364,9 @@ export function FloatingTravelPlanDock() {
                     <Icon className="h-4 w-4" aria-hidden />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-foreground">
-                      {title}
-                    </p>
+                    <p className="truncate text-sm font-medium text-foreground">{title}</p>
                     {snap.subtitle ? (
-                      <p className="truncate text-xs text-muted-foreground">
-                        {snap.subtitle}
-                      </p>
+                      <p className="truncate text-xs text-muted-foreground">{snap.subtitle}</p>
                     ) : (
                       <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
                         {KIND_LABEL[it.item_kind]}
