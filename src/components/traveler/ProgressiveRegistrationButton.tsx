@@ -6,17 +6,22 @@ export function ProgressiveRegistrationButton({
   reason,
   children,
   className,
+  onBeforeRun,
 }: {
   reason: AnonymousRegistrationReason;
   children: ReactNode;
   className?: string;
+  onBeforeRun?: () => void;
 }) {
   const action = useProgressiveRegistration(reason);
   return (
     <button
       type="button"
       disabled={action.pending}
-      onClick={() => action.run()}
+      onClick={() => {
+        onBeforeRun?.();
+        action.run();
+      }}
       className={className}
     >
       {children}
