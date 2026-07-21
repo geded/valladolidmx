@@ -327,8 +327,34 @@ export function TourismListingSurface({
                 renderActions={(v) => {
                   const kind =
                     favoriteKindFor?.(v) ?? favoriteKindFromEntity(v.entityKind);
-                  if (!kind) return null;
-                  return <FavoriteButton entityKind={kind} entityId={v.id} />;
+                  const travelKind = travelKindFromEntity(v.entityKind);
+                  const canAddToTrip =
+                    showAddToTrip &&
+                    travelKind != null &&
+                    evaluateTripEligibility({
+                      kind: travelKind,
+                      targetId: v.id,
+                      title: v.name,
+                      mode: "universal",
+                    }).eligible;
+                  if (!kind && !canAddToTrip) return null;
+                  return (
+                    <div className="flex flex-wrap items-center gap-2">
+                      {kind ? (
+                        <FavoriteButton entityKind={kind} entityId={v.id} />
+                      ) : null}
+                      {canAddToTrip ? (
+                        <AddToTravelPlanButton
+                          kind={travelKind as TravelItemKind}
+                          targetId={v.id}
+                          title={v.name}
+                          slug={null}
+                          imageUrl={v.mediaUrl}
+                          subtitle={v.tagline ?? v.businessName ?? null}
+                        />
+                      ) : null}
+                    </div>
+                  );
                 }}
               />
             </li>
