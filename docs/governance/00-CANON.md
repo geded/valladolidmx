@@ -1,7 +1,7 @@
 # 00 · CANON
 
 **Estado:** Approved
-**Versión:** 1.2
+**Versión:** 1.3
 
 **Última actualización:** 2026-07-20
 
@@ -606,7 +606,26 @@ Cada respuesta de Alux es explicable, contextual, respetuosa con el patrimonio y
 
 ---
 
-# 21. Control de Versiones
+# 21. OMXDS — Oriente Maya Experience & Destination System
+
+OMXDS es el ecosistema regional que organiza capacidades, datos, inteligencia, relaciones y reglas compartidas para la experiencia turística del Oriente Maya de Yucatán.
+
+La jerarquía vinculante es:
+
+1. **OMXDS** gobierna la arquitectura común y el ecosistema regional.
+2. **Valladolid.mx** es su primer producto público, plataforma principal y Destination Operating System.
+3. **Alux** es la capa de inteligencia transversal y compañero del viajero.
+4. Los productos especializados reutilizan capacidades del ecosistema y no adquieren permiso para duplicar sus motores centrales.
+
+La North Star operativa inicial de OMXDS es **noches adicionales atribuibles al ecosistema por cada 1,000 viajeros activos**. Esta métrica desarrolla el principio de permanencia del §19.1 y no sustituye los demás North Stars del CANON.
+
+El primer vertical operativo se decidirá después del inventario de capacidades. Debe priorizarse el candidato que permita lanzar más rápido la V1 de Valladolid.mx, reutilizando la mayor cantidad de capacidades existentes y sin deteriorar confianza, experiencia o valor territorial.
+
+La definición, límites, capacidades y roadmap fundacional aprobados se encuentran en [OMXDS Foundation V1.0](./09-OMXDS-FOUNDATION-v1.0.md).
+
+---
+
+# 22. Control de Versiones
 
 El CANON constituye un documento vivo con vocación de permanencia.
 
@@ -615,6 +634,7 @@ El CANON constituye un documento vivo con vocación de permanencia.
 | v1.0 | 2026-07-18 | Founder | Emisión inicial del CANON de Valladolid.mx. |
 | v1.1 | 2026-07-18 | Founder | Ampliación de principios, North Stars y filosofía de Alux. |
 | v1.2 | 2026-07-20 | Founder | Corrección editorial y formalización del historial de versiones durante la reconciliación de gobernanza. |
+| v1.3 | 2026-07-21 | Founder | Incorpora OMXDS, su jerarquía, North Star operativa y regla para seleccionar el primer vertical después del inventario de capacidades. |
 
 No deberán realizarse modificaciones que contradigan la misión, visión o principios fundamentales sin una revisión integral del propio CANON.
 
