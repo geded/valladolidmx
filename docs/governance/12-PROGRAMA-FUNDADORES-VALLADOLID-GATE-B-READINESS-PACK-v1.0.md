@@ -103,7 +103,7 @@ La cohorte debe cubrir un recorrido real de estancia, no cinco negocios idéntic
 4. un operador, guía o servicio de movilidad turística;
 5. una segunda experiencia diferenciada de alto potencial narrativo.
 
-Zazil Tunich puede evaluarse como empresa piloto por su madurez de producto y contenido, pero deberá pasar el mismo checklist y no recibir excepciones por relación con el Founder.
+Cualquier empresa vinculada al Founder deberá pasar el mismo checklist y no recibirá excepciones por esa relación.
 
 ### 4.2 Requisitos eliminatorios
 
