@@ -19,7 +19,7 @@
  *  - Separado de FavoriteButton (favoritos = guardado rápido;
  *    Mi Viaje = expediente estructurado del viajero).
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Plus, Check, Loader2 } from "lucide-react";
@@ -58,7 +58,16 @@ export interface AddToTravelPlanButtonProps {
   eligibilityMode?: "universal" | "legacy";
 }
 
-type Phase = "idle" | "adding" | "added" | "exists" | "error";
+/**
+ * TP1.4A-R1 · Phase reactivo mínimo.
+ *
+ * `phase` describe SOLO la transición local (idle → adding → error). El
+ * estado "pertenece al viaje" se deriva de la fuente canónica
+ * (`alreadyInPlan`) más un override optimista efímero que se limpia en
+ * cuanto la fuente canónica confirma la operación. De esta forma dos
+ * tarjetas de la misma entidad se sincronizan sin duplicar stores.
+ */
+type Phase = "idle" | "adding" | "error";
 
 export function AddToTravelPlanButton({
   kind,
@@ -111,9 +120,15 @@ export function AddToTravelPlanButton({
   }, [active, kind, targetId, user?.id, anon.trip]);
 
   const [phase, setPhase] = useState<Phase>("idle");
+  // Override optimista: `true` mientras se está agregando y aún no llega la
+  // fuente canónica; se limpia en cuanto `alreadyInPlan` confirma o al
+  // detectar error. Nunca se convierte en segunda fuente de verdad.
+  const [optimisticDone, setOptimisticDone] = useState<boolean | null>(null);
   useEffect(() => {
-    if (alreadyInPlan && phase === "idle") setPhase("exists");
-  }, [alreadyInPlan, phase]);
+    if (optimisticDone !== null && optimisticDone === alreadyInPlan) {
+      setOptimisticDone(null);
+    }
+  }, [alreadyInPlan, optimisticDone]);
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -132,9 +147,12 @@ export function AddToTravelPlanButton({
         },
       });
     },
-    onMutate: () => setPhase("adding"),
+    onMutate: () => {
+      setPhase("adding");
+      setOptimisticDone(true);
+    },
     onSuccess: (res) => {
-      setPhase(res.created ? "added" : "exists");
+      setPhase("idle");
       void queryClient.invalidateQueries({
         queryKey: ["traveler", "active-plan", user?.id],
       });
@@ -147,17 +165,25 @@ export function AddToTravelPlanButton({
       toast(c.title, { description: c.body });
     },
     onError: (e) => {
+      // Rollback visual: la fuente canónica queda intacta.
+      setOptimisticDone(null);
       setPhase("error");
       toast.error(e instanceof Error ? e.message : "Intenta de nuevo.");
     },
   });
 
+  const anonBusyRef = useRef(false);
   const [anonBusy, setAnonBusy] = useState(false);
 
   async function handleAnonymousAdd() {
-    if (anonBusy) return;
+    // Guard contra doble-click (aria-pressed + disabled ya lo bloquean tras
+    // el primer render, pero un doble-click rápido puede colarse antes de
+    // que React reprocese). El ref garantiza idempotencia.
+    if (anonBusyRef.current) return;
+    anonBusyRef.current = true;
     setAnonBusy(true);
     setPhase("adding");
+    setOptimisticDone(true);
     try {
       const res = await anon.addPlannedItem({
         kind: kind as AnonymousItemKind,
@@ -169,22 +195,31 @@ export function AddToTravelPlanButton({
         notes: notes ?? undefined,
       });
       if (!res.ok && res.reason === "limit") {
+        setOptimisticDone(null);
         setPhase("idle");
         const c = ANON_COPY.intent.limitFriendly;
         toast(c.title, { description: c.body });
         limitRegistration.run();
         return;
       }
-      setPhase("added");
+      // No forzamos `optimisticDone` a null aquí: el efecto lo limpia en
+      // cuanto la suscripción canónica reporta `alreadyInPlan = true`.
+      setPhase("idle");
       const c = ANON_COPY.intent.planAcknowledged;
       toast(c.title, { description: c.body });
+    } catch (e) {
+      setOptimisticDone(null);
+      setPhase("error");
+      toast.error(e instanceof Error ? e.message : "Intenta de nuevo.");
     } finally {
+      anonBusyRef.current = false;
       setAnonBusy(false);
     }
   }
 
   const busy = phase === "adding" || mutation.isPending || anonBusy;
-  const done = phase === "added" || phase === "exists";
+  // Fuente de verdad = canónica; override optimista sólo si aún no confirma.
+  const done = optimisticDone ?? alreadyInPlan;
 
   const base =
     variant === "compact"
@@ -214,7 +249,7 @@ export function AddToTravelPlanButton({
       title={done ? "Ya está en Mi Viaje" : "Agregar a Mi Viaje"}
       className={[base, skin, className ?? ""].join(" ")}
     >
-      {busy ? (
+      {busy && !done ? (
         <Loader2 className="size-3.5 animate-spin" aria-hidden />
       ) : done ? (
         <Check className="size-3.5" aria-hidden />
@@ -222,13 +257,7 @@ export function AddToTravelPlanButton({
         <Plus className="size-3.5" aria-hidden />
       )}
       <span>
-        {busy
-          ? "Agregando…"
-          : phase === "exists"
-            ? "En Mi Viaje"
-            : phase === "added"
-              ? "Agregado"
-              : "Agregar a Mi Viaje"}
+        {done ? "Ya está en Mi Viaje" : busy ? "Agregando…" : "Agregar a Mi Viaje"}
       </span>
     </button>
   );
