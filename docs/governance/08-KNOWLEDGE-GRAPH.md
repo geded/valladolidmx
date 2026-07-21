@@ -2,7 +2,7 @@
 
 **Estado:** Draft
 
-**Versión:** 0.2
+**Versión:** 0.3
 
 **Última actualización:** 2026-07-21
 
@@ -21,7 +21,7 @@ Este documento depende explícitamente de:
 - `01-GLOSSARY.md` como única fuente de conceptos y definiciones.
 - `07-BLUEPRINT-DEPENDENCY-MAP.md` como única fuente de relaciones verificadas entre artefactos.
 
-No se pobla grafo alguno en este PR.
+Este PR no puebla el grafo integral; incorpora únicamente la proyección provisional de cinco nodos documentales y tres relaciones verificadas de §4.1.
 
 ## 3. Fuentes canónicas
 
@@ -49,6 +49,28 @@ Nodos sin fuente canónica o relaciones sin evidencia verificable no pueden entr
 
 El grafo enlaza conocimiento; no redefine conceptos. Ante cualquier contradicción prevalece el documento canónico que origina la entidad o relación.
 
+## 4.1 Proyección provisional · superseded-pass Fase 4
+
+Esta proyección incorpora únicamente los nodos y relaciones documentales ya verificados en `06` y `07`. No constituye el grafo completo ni introduce conceptos nuevos.
+
+### Nodos documentales
+
+| Nodo | Tipo | Fuente canónica | Evidencia |
+|---|---|---|---|
+| [`Persisted Signature Blueprint v1.0`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.0.md) | `document` | Documento enlazado | Cabecera `Superseded` + overlay `06` |
+| [`Persisted Signature Blueprint v1.1`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.1.md) | `document` | Documento enlazado | Cabecera `Superseded`, referencia a v1.2 + overlay `06` |
+| [`Persisted Signature Blueprint v1.2`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.2.md) | `document` | Documento enlazado | Documento sucesor existente + overlay `06` |
+| [`Phase B Completion Report v1.0`](../blueprint/18.H3-A4-M2.3.1-PHASE-B-COMPLETION-REPORT-v1.0.md) | `document` | Documento enlazado | Cabecera `Superseded` + overlay `06` |
+| [`Phase B Completion Report v1.1 FINAL`](../blueprint/18.H3-A4-M2.3.1-PHASE-B-COMPLETION-REPORT-v1.1.md) | `document` | Documento enlazado | Documento sucesor existente + overlay `06` |
+
+### Relaciones verificadas
+
+| Origen | Relación | Destino | Fuente | Evidencia |
+|---|---|---|---|---|
+| `Persisted Signature Blueprint v1.1` | `supersedes` | `Persisted Signature Blueprint v1.0` | `07-BLUEPRINT-DEPENDENCY-MAP` | Commit [`a42d3a6d`](https://github.com/geded/valladolidmx/commit/a42d3a6d3546d192b1ea5fda8b11b891ca0cec1e) |
+| `Persisted Signature Blueprint v1.2` | `supersedes` | `Persisted Signature Blueprint v1.1` | `07-BLUEPRINT-DEPENDENCY-MAP` | Commit [`a42d3a6d`](https://github.com/geded/valladolidmx/commit/a42d3a6d3546d192b1ea5fda8b11b891ca0cec1e) |
+| `Phase B Completion Report v1.1 FINAL` | `supersedes` | `Phase B Completion Report v1.0` | `07-BLUEPRINT-DEPENDENCY-MAP` | Commit [`a42d3a6d`](https://github.com/geded/valladolidmx/commit/a42d3a6d3546d192b1ea5fda8b11b891ca0cec1e) |
+
 ## 5. Criterios objetivos para salir de Draft
 
 Este documento sólo puede pasar a `Approved` cuando:
@@ -65,3 +87,4 @@ Este documento sólo puede pasar a `Approved` cuando:
 |---|---|---|---|
 | v0.1 | 2026-07-20 | Founder | Reserva del grafo canónico y definición de sus fuentes. |
 | v0.2 | 2026-07-21 | Founder | Modelo mínimo (nodo/tipo/relación/fuente/evidencia), dependencia explícita de `01` y `07`, owner y criterios de salida de Draft. No pobla grafo. |
+| v0.3 | 2026-07-21 | Founder | Proyección provisional de cinco nodos documentales y tres relaciones `supersedes` verificadas en Fase 4. |
