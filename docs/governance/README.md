@@ -22,7 +22,7 @@ Este directorio contiene el sistema canónico que gobierna Valladolid.mx. Su lec
 |    09 | [OMXDS FOUNDATION](./09-OMXDS-FOUNDATION-v1.0.md)          | Approved | Ecosistema regional, jerarquía de productos, North Star y regla de priorización V1. |
 |    10 | [OMXDS VISITOR JOURNEY INTELLIGENCE](./10-OMXDS-VISITOR-JOURNEY-INTELLIGENCE-MEASUREMENT-BLUEPRINT-v1.0.md) | Approved | Medición responsable del recorrido completo, identidad progresiva, atribución, paneles y privacidad. |
 |    11 | [OMXDS VALLADOLID.MX V1 CAPABILITY INVENTORY](./11-OMXDS-VALLADOLIDMX-V1-CAPABILITY-INVENTORY-v1.0.md) | Approved | Inventario de las diez capas OMXDS, brechas para soft launch y Programa Fundadores confirmado como primer vertical. |
-|    12 | [PROGRAMA FUNDADORES VALLADOLID · GATE B READINESS PACK](./12-PROGRAMA-FUNDADORES-VALLADOLID-GATE-B-READINESS-PACK-v1.0.md) | Proposed | Oferta piloto, selección, consentimiento, soporte y gates B1/B2 para decidir la primera cohorte de cinco empresas. |
+|    12 | [PROGRAMA FUNDADORES VALLADOLID · GATE B READINESS PACK](./12-PROGRAMA-FUNDADORES-VALLADOLID-GATE-B-READINESS-PACK-v1.0.md) | Decision-ready | Oferta comercial aprobada, owner interino y cohorte codificada; Gate B1/B2 continúan cerrados. |
 
 Los documentos `00–11` gobiernan dentro de la responsabilidad declarada por cada uno. `06` acredita autoridad documental, no implementación. `07` registra sólo relaciones demostrables; una ausencia significa `Not established`. `08` enlaza fuentes canónicas sin redefinirlas.
 
@@ -129,6 +129,6 @@ OMXDS Visitor Journey Intelligence & Measurement Blueprint V1.0 gobierna la obse
 
 OMXDS Valladolid.mx V1 Capability Inventory confirma el Programa Fundadores Valladolid como primer vertical. Autoriza actualizar roadmap y plan operativo, pero no contactar empresas, incorporar la cohorte, activar cobros ni modificar producción.
 
-Programa Fundadores Valladolid Gate B Readiness Pack v1.0 prepara la decisión operativa y separa invitación/incorporación (`B1`) de comercio (`B2`). Permanece `Proposed`; no autoriza contactos, publicación ni cobros.
+Programa Fundadores Valladolid Gate B Readiness Pack v1.0 registra la oferta comercial aprobada, la asignación interina al Founder y la cohorte PFV-01 a PFV-05. Permanece `Decision-ready`: no autoriza contactos, publicación ni cobros.
 
 El cierre no congela el proyecto. Establece el procedimiento para evolucionarlo sin perder identidad, trazabilidad ni sentido de destino.
