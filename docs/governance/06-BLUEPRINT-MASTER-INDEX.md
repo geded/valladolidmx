@@ -2,7 +2,7 @@
 
 **Estado:** Draft
 
-**Versión:** 0.2
+**Versión:** 0.3
 
 **Última actualización:** 2026-07-21
 
@@ -62,6 +62,18 @@ Las dependencias entre blueprints se registran en `07-BLUEPRINT-DEPENDENCY-MAP.m
 
 Este PR no puebla las 439 filas del inventario. La población de filas requiere un PR dedicado posterior al superseded-pass y depende del ADR de dominios pendiente cuando toque asignar canonical por superficie.
 
+## 3.2 Overlay provisional de autoridad · superseded-pass Fase 4
+
+Mientras el inventario de 439 filas permanece pendiente, este overlay registra únicamente las tres relaciones `Superseded` aprobadas por el Founder y fusionadas en `main` mediante el commit [`a42d3a6d3546d192b1ea5fda8b11b891ca0cec1e`](https://github.com/geded/valladolidmx/commit/a42d3a6d3546d192b1ea5fda8b11b891ca0cec1e). No constituye el poblado completo del índice ni autoriza inferir estados para otros documentos.
+
+| Identificador canónico | Versión | Estado real | Predecesor | `superseded-by` | Dominio | Evidencia | Última revisión |
+|---|---:|---|---|---|---|---|---|
+| [`18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.0.md`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.0.md) | v1.0 | `Superseded` | — | [`v1.1`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.1.md) | Media pipeline · firmas persistidas | Cabecera del documento + commit de autoridad | 2026-07-20 |
+| [`18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.1.md`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.1.md) | v1.1 | `Superseded` | [`v1.0`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.0.md) | [`v1.2`](../blueprint/18.H3-A4-M2.3.1-PERSISTED-SIGNATURE-PRECOMPUTATION-BLUEPRINT-v1.2.md) | Media pipeline · firmas persistidas | Cabecera del documento + commit de autoridad | 2026-07-20 |
+| [`18.H3-A4-M2.3.1-PHASE-B-COMPLETION-REPORT-v1.0.md`](../blueprint/18.H3-A4-M2.3.1-PHASE-B-COMPLETION-REPORT-v1.0.md) | v1.0 | `Superseded` | — | [`v1.1 FINAL`](../blueprint/18.H3-A4-M2.3.1-PHASE-B-COMPLETION-REPORT-v1.1.md) | Media pipeline · Fase B | Cabecera del documento + commit de autoridad | 2026-07-20 |
+
+Los campos restantes del contrato §3 —implementación, migración, pruebas y Completion Report asociado— se incorporarán durante el poblado integral. Este overlay sólo tiene autoridad sobre estado, precedencia y sustitución.
+
 ## 4. Fuente temporal
 
 Hasta completar este índice, el orden de ejecución se determina mediante el [roadmap oficial v2.1](../blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md) y las decisiones aprobadas. La existencia de un archivo en `docs/blueprint/` no implica por sí sola que esté aprobado, implementado o cerrado.
@@ -83,3 +95,4 @@ Este documento sólo puede pasar a `Approved` cuando se cumplan, verificablement
 |---|---|---|---|
 | v0.1 | 2026-07-20 | Founder | Reserva del índice canónico y definición de su contrato mínimo. |
 | v0.2 | 2026-07-21 | Founder | Universo verificable (439), metodología reproducible, campos mínimos, owner y criterios de salida de Draft. No pobla filas. |
+| v0.3 | 2026-07-21 | Founder | Overlay provisional con las tres relaciones `Superseded` aprobadas y fusionadas en Fase 4; el inventario integral continúa pendiente. |
