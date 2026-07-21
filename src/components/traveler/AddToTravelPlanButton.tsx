@@ -36,6 +36,7 @@ import {
   type AnonymousItemKind,
 } from "@/lib/traveler/anonymous-draft";
 import { useProgressiveRegistration } from "@/lib/traveler/anonymous-draft/use-progressive-registration";
+import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 
 export interface AddToTravelPlanButtonProps {
   kind: TravelItemKind;
@@ -48,6 +49,13 @@ export interface AddToTravelPlanButtonProps {
   /** Compacto por defecto para caber en tarjetas. */
   variant?: "compact" | "full";
   className?: string;
+  /**
+   * TP1.1 · Modo de elegibilidad.
+   *  - `universal` (default): sólo renderiza para kinds universalizados
+   *    (`product`, `business`, `event`) con identidad canónica UUID.
+   *  - `legacy`: preserva integraciones previas (destinos ya en producción).
+   */
+  eligibilityMode?: "universal" | "legacy";
 }
 
 type Phase = "idle" | "adding" | "added" | "exists" | "error";
@@ -62,7 +70,19 @@ export function AddToTravelPlanButton({
   notes,
   variant = "compact",
   className,
+  eligibilityMode = "universal",
 }: AddToTravelPlanButtonProps) {
+  // TP1.1 · Política central de elegibilidad. Superficies existentes que
+  // integran `destination` deben pasar `eligibilityMode="legacy"` para
+  // preservar comportamiento.
+  const eligibility = evaluateTripEligibility({
+    kind,
+    targetId,
+    title,
+    mode: eligibilityMode,
+  });
+  if (!eligibility.eligible) return null;
+
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const fetchActive = useServerFn(getMyActivePlan);
