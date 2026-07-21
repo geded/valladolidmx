@@ -47,21 +47,48 @@ const TransitionTargetSchema = z.enum([
   "blocked",
 ]);
 
-const TransitionDecisionInputSchema = z.object({
-  decision_id: z.string().uuid(),
-  expected_from_state: z.enum(DECISION_STATES),
-  to_state: TransitionTargetSchema,
-  agreement: DecisionAgreementSchema.optional(),
-  reason: z.string().trim().min(1).max(2_000).optional(),
-});
+const TransitionDecisionInputSchema = z
+  .object({
+    decision_id: z.string().uuid(),
+    expected_from_state: z.enum(DECISION_STATES),
+    to_state: TransitionTargetSchema,
+    agreement: DecisionAgreementSchema.optional(),
+    reason: z.string().trim().min(1).max(2_000).optional(),
+  })
+  .superRefine((input, context) => {
+    if (input.to_state === "accepted" && !input.agreement) {
+      context.addIssue({
+        code: "custom",
+        path: ["agreement"],
+        message: "accepted requiere un acuerdo humano completo.",
+      });
+    }
+    if (["deferred", "dismissed", "blocked"].includes(input.to_state) && !input.reason) {
+      context.addIssue({
+        code: "custom",
+        path: ["reason"],
+        message: `${input.to_state} requiere motivo humano.`,
+      });
+    }
+  });
 
-const AttachEvidenceInputSchema = z.object({
-  decision_id: z.string().uuid(),
-  expected_from_state: z.literal("implemented"),
-  outcome: z.enum(["validated", "rejected"]),
-  evidence: DecisionEvidenceSchema,
-  reason: z.string().trim().min(1).max(2_000).optional(),
-});
+const AttachEvidenceInputSchema = z
+  .object({
+    decision_id: z.string().uuid(),
+    expected_from_state: z.literal("implemented"),
+    outcome: z.enum(["validated", "rejected"]),
+    evidence: DecisionEvidenceSchema,
+    reason: z.string().trim().min(1).max(2_000).optional(),
+  })
+  .superRefine((input, context) => {
+    if (input.outcome === "rejected" && !input.reason) {
+      context.addIssue({
+        code: "custom",
+        path: ["reason"],
+        message: "rejected requiere motivo humano.",
+      });
+    }
+  });
 
 const SupersedeDecisionInputSchema = z.object({
   decision_id: z.string().uuid(),
@@ -76,16 +103,15 @@ type AuthContext = {
 };
 
 type DecisionEventRow = { payload: unknown };
+type DecisionEventPage = {
+  data: DecisionEventRow[] | null;
+  error: { message: string } | null;
+};
 type DecisionEventQuery = {
   eq: (column: string, value: string) => DecisionEventQuery;
   like: (column: string, pattern: string) => DecisionEventQuery;
-  order: (
-    column: string,
-    options: { ascending: boolean },
-  ) => Promise<{
-    data: DecisionEventRow[] | null;
-    error: { message: string } | null;
-  }>;
+  order: (column: string, options: { ascending: boolean }) => DecisionEventQuery;
+  range: (from: number, to: number) => Promise<DecisionEventPage>;
 };
 type DecisionAdminClient = {
   schema: (schema: string) => {
@@ -128,22 +154,30 @@ async function resolveActor(context: AuthContext): Promise<DecisionActorAccess> 
 
 async function loadDecisionProjection(now = new Date()): Promise<DecisionQueueProjection> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const query = (supabaseAdmin as unknown as DecisionAdminClient)
-    .schema("visitor_intel")
-    .from("events")
-    .select("payload")
-    .eq("kind", "recommendation.lifecycle")
-    .like("subject_id", "decision:%");
-  const { data: rows, error } = await query.order("occurred_at", {
-    ascending: true,
-  });
-  if (error) {
-    console.error("[visitor_intel.decisions] read failed", error);
-    throw new Response("Read failed", { status: 500 });
+  const admin = supabaseAdmin as unknown as DecisionAdminClient;
+  const pageSize = 1_000;
+  const rows: DecisionEventRow[] = [];
+
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await admin
+      .schema("visitor_intel")
+      .from("events")
+      .select("payload")
+      .eq("kind", "recommendation.lifecycle")
+      .like("subject_id", "decision:%")
+      .order("occurred_at", { ascending: true })
+      .order("ingested_at", { ascending: true })
+      .range(from, from + pageSize - 1);
+    if (error) {
+      console.error("[visitor_intel.decisions] read failed", error);
+      throw new Response("Read failed", { status: 500 });
+    }
+    rows.push(...(data ?? []));
+    if ((data?.length ?? 0) < pageSize) break;
   }
 
   const payloads: DecisionEventPayload[] = [];
-  for (const row of rows ?? []) {
+  for (const row of rows) {
     const parsed = VisitorEventSchema.safeParse(row.payload);
     if (
       parsed.success &&
@@ -190,7 +224,7 @@ async function appendDecisionEvent(
     });
   if (error) {
     console.error("[visitor_intel.decisions] append failed", error);
-    const status = error.code === "40001" || error.code === "23514" ? 409 : 500;
+    const status = ["40001", "23503", "23505", "23514"].includes(error.code ?? "") ? 409 : 500;
     throw new Response(status === 409 ? "Decision conflict" : "Append failed", {
       status,
     });
