@@ -22,6 +22,7 @@ import {
   type FavoriteEntityKind,
 } from "@/lib/traveler/traveler-favorites.functions";
 import { useAnonymousTrip, ANON_COPY } from "@/lib/traveler/anonymous-draft";
+import { useProgressiveRegistration } from "@/lib/traveler/anonymous-draft/use-progressive-registration";
 
 interface Props {
   entityKind: FavoriteEntityKind;
@@ -46,6 +47,7 @@ export function FavoriteButton({
   const fetchFavorites = useServerFn(listMyFavorites);
   const toggle = useServerFn(toggleFavorite);
   const anon = useAnonymousTrip();
+  const limitRegistration = useProgressiveRegistration("hard_limit");
 
   const { data } = useQuery({
     queryKey: ["traveler", "favorites", user?.id],
@@ -82,7 +84,9 @@ export function FavoriteButton({
       const wasActive = isActive;
       try {
         await mutation.mutateAsync();
-        const c = wasActive ? ANON_COPY.intent.favoriteReleased : ANON_COPY.intent.favoriteAcknowledged;
+        const c = wasActive
+          ? ANON_COPY.intent.favoriteReleased
+          : ANON_COPY.intent.favoriteAcknowledged;
         toast(c.title, { description: c.body });
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Intenta de nuevo.";
@@ -112,6 +116,7 @@ export function FavoriteButton({
           setOptimistic(null);
           const c = ANON_COPY.intent.limitFriendly;
           toast(c.title, { description: c.body });
+          limitRegistration.run();
           return;
         }
         const c = ANON_COPY.intent.favoriteAcknowledged;

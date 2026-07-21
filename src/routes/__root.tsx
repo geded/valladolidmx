@@ -61,6 +61,11 @@ const SignInPromptSheet = React.lazy(() =>
     default: m.SignInPromptSheet,
   })),
 );
+const AnonymousDraftImportRunner = React.lazy(() =>
+  import("@/components/traveler/AnonymousDraftImportRunner").then((m) => ({
+    default: m.AnonymousDraftImportRunner,
+  })),
+);
 // H2·P3 · C1 — el host es tiny y necesita montar su useEffect cuanto
 // antes para suscribirse al bus del shim; el peso real de `sonner` se
 // difiere dentro de `LazyToasterHost` con un React.lazy interno.
@@ -293,6 +298,9 @@ function RootComponent() {
         {/* OLA H-01 · Épica 1 · I2 — host global del gate de identidad. */}
         <React.Suspense fallback={null}>
           <SignInPromptSheet />
+        </React.Suspense>
+        <React.Suspense fallback={null}>
+          <AnonymousDraftImportRunner />
         </React.Suspense>
         {/*
           Navigation Blueprint · N3 — Único punto de suscripción global

@@ -9,16 +9,10 @@
  * Reglas:
  *  - No escribe directo a Supabase. Toda operación pasa por
  *    `addPlanItem()` (Sub-ola B) que a su vez respeta RLS y auth.
- *  - Mi Viaje forma parte del perfil permanente del viajero (decisión
- *    de negocio, OLA H-01 · Épica 1 · I4). La persistencia del
- *    itinerario es exclusiva para usuarios autenticados. Si el usuario
- *    no tiene sesión, se abre el `SignInPromptSheet` global mediante
- *    `useProtectedAction` (kind `travel_plan.add_item`) y la acción se
- *    reanuda automáticamente tras el login (ResumeRunner).
+ *  - Sin sesión escribe exclusivamente en AnonymousTravelDraft local; no
+ *    abre gate ni crea filas remotas por interacción.
  *  - La navegación pública NO cambia. El botón sigue visible siempre.
- *  - `guest-queue` (localStorage) queda intacto pero ya no se escribe
- *    desde este componente. Candidato a retiro documentado para una
- *    futura ola de Product Hardening — NO eliminar en I4.
+ *  - Tras registro, el runner global importa el draft al Travel Plan.
  *  - Idempotente: el servidor detecta duplicados por
  *    `(plan_id, item_kind, target_id)` y devuelve `created:false`.
  *  - No rediseña la tarjeta contenedora. Se inserta como acción compacta.
@@ -41,6 +35,7 @@ import {
   ANON_COPY,
   type AnonymousItemKind,
 } from "@/lib/traveler/anonymous-draft";
+import { useProgressiveRegistration } from "@/lib/traveler/anonymous-draft/use-progressive-registration";
 
 export interface AddToTravelPlanButtonProps {
   kind: TravelItemKind;
@@ -73,6 +68,7 @@ export function AddToTravelPlanButton({
   const fetchActive = useServerFn(getMyActivePlan);
   const addItem = useServerFn(addPlanItem);
   const anon = useAnonymousTrip();
+  const limitRegistration = useProgressiveRegistration("hard_limit");
 
   // Solo lee el plan activo si hay sesión; determina si el item ya existe.
   const { data: active } = useQuery({
@@ -85,9 +81,7 @@ export function AddToTravelPlanButton({
   const alreadyInPlan = useMemo(() => {
     if (user?.id) {
       if (!active?.items) return false;
-      return active.items.some(
-        (it) => it.item_kind === kind && it.target_id === targetId,
-      );
+      return active.items.some((it) => it.item_kind === kind && it.target_id === targetId);
     }
     return Boolean(
       anon.trip?.plannedItems?.some(
@@ -129,9 +123,7 @@ export function AddToTravelPlanButton({
         notifyPlanChanged(res.created ? "add_item" : "already_in_plan"),
       );
       // AC1.2 · Founder Intent Recognition Principle.
-      const c = res.created
-        ? ANON_COPY.intent.planAcknowledged
-        : ANON_COPY.intent.planAlready;
+      const c = res.created ? ANON_COPY.intent.planAcknowledged : ANON_COPY.intent.planAlready;
       toast(c.title, { description: c.body });
     },
     onError: (e) => {
@@ -160,6 +152,7 @@ export function AddToTravelPlanButton({
         setPhase("idle");
         const c = ANON_COPY.intent.limitFriendly;
         toast(c.title, { description: c.body });
+        limitRegistration.run();
         return;
       }
       setPhase("added");

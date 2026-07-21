@@ -3,8 +3,8 @@
 **Estado:** Activo
 **Última actualización:** 2026-07-20
 **Roadmap rector:** `docs/blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`
-**Rama activa:** ninguna · CV8.9 cerrada; AC1.4 sin GO.
-**Base integrada:** `main` · merge `1f65b510`
+**Rama activa:** `agent/ac1-local-first-alignment` · CV8.9 cerrada; AC1.4–AC1.5 con GO Founder.
+**Base integrada:** `main` · merge `dc422572` (PR #4)
 
 Este archivo es una instrucción de ejecución subordinada a `docs/governance/00–05` y al roadmap oficial. No crea prioridades nuevas ni sustituye Completion Reports.
 
@@ -73,7 +73,7 @@ Este archivo es una instrucción de ejecución subordinada a `docs/governance/00
 
 **DoD CV8.9:** contrato versionado, persistencia segura, UI operable, decisiones auditables, pruebas verdes y Completion Report aprobado.
 
-## 4. Siguiente después de CV8.9 · AC1.4
+## 4. Épica activa después de CV8.9 · AC1.4–AC1.5
 
 **Contrato rector:** `docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md`
 
@@ -85,6 +85,14 @@ Implementar registro progresivo sólo en los momentos de valor oficiales:
 - recibir recordatorios.
 
 La continuidad anónima debe preservarse y `SignInPromptSheet` no puede actuar como gate genérico de identidad. El cierre requiere medición del paso anónimo → identificado sin pérdida de planes, favoritos o contexto.
+
+Decisión Founder del 2026-07-20: GO explícito al modelo local-first. Invariantes vinculantes:
+
+- `AnonymousTravelDraft` es la única fuente local durante la etapa anónima;
+- cero cuenta, fila DB o escritura remota por interacción anónima;
+- `guest-queue` se retira como contrato activo y sólo se lee una vez para compatibilidad;
+- `importAnonymousDraft` se ejecuta exclusivamente con sesión autenticada, es idempotente y borra lo local sólo tras éxito;
+- la validación incluye 1,000 sesiones con 20 interacciones y cero llamadas de red.
 
 ## 5. Trabajo operativo paralelo permitido
 
@@ -136,4 +144,4 @@ Al cerrar una ola:
 4. reemplazar aquí sólo el próximo paso operativo;
 5. no mantener instrucciones ya ejecutadas como si siguieran pendientes.
 
-**Siguiente acción:** solicitar decisión GO/NO-GO explícita para AC1.4. No iniciar su implementación antes de esa autorización. El smoke assigned-only de CV8.9 permanece como seguimiento operativo cuando existan operadores Concierge Lead/Editor reales.
+**Siguiente acción:** revisar el Completion Report AC1.4–AC1.5 y, con autorización, publicar la rama como Draft PR. Después de integrar y desplegar, ejecutar el smoke autenticado sin datos artificiales. El smoke assigned-only de CV8.9 permanece como seguimiento operativo cuando existan operadores Concierge Lead/Editor reales.

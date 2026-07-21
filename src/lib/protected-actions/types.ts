@@ -36,7 +36,7 @@ export interface ProtectedActionRequirements {
   custom?: Record<string, unknown>;
 }
 
-/** Modo del consumidor. Compatible con el patrón "queue" de `guest-queue`. */
+/** Modo del consumidor. `queue` delega en un fallback local del dominio. */
 export type ProtectedActionMode = "gate" | "queue";
 
 /** Entrada persistida (sólo metadatos: id, kind, ts). NUNCA payload. */
