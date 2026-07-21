@@ -1,7 +1,7 @@
 # Gobernanza documental de Valladolid.mx
 
 **Estado:** Approved  
-**Versión:** 2.5  
+**Versión:** 2.6  
 **Última actualización:** 2026-07-21
 
 Este directorio contiene el sistema canónico que gobierna Valladolid.mx. Su lectura comienza siempre por el CANON. Ningún Blueprint, roadmap, ADR, PRD, plan de Lovable, decisión técnica o implementación puede contradecir esta jerarquía.
@@ -23,6 +23,7 @@ Este directorio contiene el sistema canónico que gobierna Valladolid.mx. Su lec
 |    10 | [OMXDS VISITOR JOURNEY INTELLIGENCE](./10-OMXDS-VISITOR-JOURNEY-INTELLIGENCE-MEASUREMENT-BLUEPRINT-v1.0.md) | Approved | Medición responsable del recorrido completo, identidad progresiva, atribución, paneles y privacidad. |
 |    11 | [OMXDS VALLADOLID.MX V1 CAPABILITY INVENTORY](./11-OMXDS-VALLADOLIDMX-V1-CAPABILITY-INVENTORY-v1.0.md) | Approved | Inventario de las diez capas OMXDS, brechas para soft launch y Programa Fundadores confirmado como primer vertical. |
 |    12 | [PROGRAMA FUNDADORES VALLADOLID · GATE B READINESS PACK](./12-PROGRAMA-FUNDADORES-VALLADOLID-GATE-B-READINESS-PACK-v1.0.md) | Decision-ready | Oferta comercial aprobada, owner interino y cohorte codificada; Gate B1/B2 continúan cerrados. |
+|    13 | [OMXDS COMMERCE, EXPERIENCES & SETTLEMENT BLUEPRINT](./13-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-BLUEPRINT-v1.0.md) | Proposed | Autoridad comercial, inventario, checkout central, ledger, conciliación, liquidaciones y paneles Admin/Empresa; Gate B2 cerrado. |
 
 Los documentos `00–11` gobiernan dentro de la responsabilidad declarada por cada uno. `06` acredita autoridad documental, no implementación. `07` registra sólo relaciones demostrables; una ausencia significa `Not established`. `08` enlaza fuentes canónicas sin redefinirlas.
 
