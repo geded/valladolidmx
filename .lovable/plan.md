@@ -3,8 +3,9 @@
 **Estado:** Activo
 **Última actualización:** 2026-07-20
 **Roadmap rector:** `docs/blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`
-**Rama activa:** `agent/ac1-local-first-alignment` · CV8.9 cerrada; AC1.4–AC1.5 con GO Founder.
-**Base integrada:** `main` · merge `dc422572` (PR #4)
+**Rama activa:** cierre documental AC1.4–AC1.5 · siguiente hito: Programa Fundadores Valladolid.
+**Base integrada:** `main` · merge `234a8c5f` (PR #6)
+**Canal de publicación:** conexión directa de GitHub como vía principal; `gh` sólo como alternativa y nunca como requisito para el Founder.
 
 Este archivo es una instrucción de ejecución subordinada a `docs/governance/00–05` y al roadmap oficial. No crea prioridades nuevas ni sustituye Completion Reports.
 
@@ -73,7 +74,7 @@ Este archivo es una instrucción de ejecución subordinada a `docs/governance/00
 
 **DoD CV8.9:** contrato versionado, persistencia segura, UI operable, decisiones auditables, pruebas verdes y Completion Report aprobado.
 
-## 4. Épica activa después de CV8.9 · AC1.4–AC1.5
+## 4. Épica cerrada después de CV8.9 · AC1.4–AC1.5
 
 **Contrato rector:** `docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md`
 
@@ -93,6 +94,14 @@ Decisión Founder del 2026-07-20: GO explícito al modelo local-first. Invariant
 - `guest-queue` se retira como contrato activo y sólo se lee una vez para compatibilidad;
 - `importAnonymousDraft` se ejecuta exclusivamente con sesión autenticada, es idempotente y borra lo local sólo tras éxito;
 - la validación incluye 1,000 sesiones con 20 interacciones y cero llamadas de red.
+
+Evidencia de cierre:
+
+- [x] PR #5 integrado y desplegado;
+- [x] continuidad anónimo → autenticado confirmada con Río Lagartos;
+- [x] PR #6 integrado en `main` mediante `234a8c5f`;
+- [x] Lovable sincronizado y deployment `bbcf898c-f4db-43d2-9f67-79547c8000f9` completado;
+- [x] dock “Tu viaje (1)” y registro progresivo verificados en producción sin cuentas ni datos artificiales.
 
 ## 5. Trabajo operativo paralelo permitido
 
@@ -144,4 +153,4 @@ Al cerrar una ola:
 4. reemplazar aquí sólo el próximo paso operativo;
 5. no mantener instrucciones ya ejecutadas como si siguieran pendientes.
 
-**Siguiente acción:** revisar el Completion Report AC1.4–AC1.5 y, con autorización, publicar la rama como Draft PR. Después de integrar y desplegar, ejecutar el smoke autenticado sin datos artificiales. El smoke assigned-only de CV8.9 permanece como seguimiento operativo cuando existan operadores Concierge Lead/Editor reales.
+**Siguiente acción:** iniciar el Programa Fundadores Valladolid con checklist verificable y una primera cohorte real; mínimo de salida 15 empresas y objetivo 25. El smoke assigned-only de CV8.9 permanece como seguimiento condicionado a operadores Concierge Lead/Editor reales.
