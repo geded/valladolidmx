@@ -66,7 +66,7 @@ Este PR no puebla las 439 filas del inventario. La población de filas requiere 
 
 Mientras el inventario de 439 filas permanece pendiente, este overlay registra únicamente las tres relaciones `Superseded` aprobadas por el Founder y fusionadas en `main` mediante el commit [`a42d3a6d3546d192b1ea5fda8b11b891ca0cec1e`](https://github.com/geded/valladolidmx/commit/a42d3a6d3546d192b1ea5fda8b11b891ca0cec1e). No constituye el poblado completo del índice ni autoriza inferir estados para otros documentos.
 
-Para este overlay provisional, los tres antecedentes cuentan como registros poblados y los dos sucesores enlazados cuentan únicamente como identificadores referenciados por `07` y `08`. Los sucesores no reciben aquí una fila propia ni un estado documental hasta que exista una clasificación aprobada durante el poblado integral.
+Para este overlay provisional, los tres antecedentes cuentan como registros poblados y los dos sucesores sin fila propia enlazados cuentan únicamente como identificadores referenciados por `07` y `08`. Los sucesores no reciben aquí una fila propia ni un estado documental hasta que exista una clasificación aprobada durante el poblado integral.
 
 | Identificador canónico | Versión | Estado real | Predecesor | `superseded-by` | Dominio | Evidencia | Última revisión |
 |---|---:|---|---|---|---|---|---|
