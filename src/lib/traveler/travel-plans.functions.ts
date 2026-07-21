@@ -23,6 +23,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database, Json } from "@/integrations/supabase/types";
 import { createClient } from "@supabase/supabase-js";
+import {
+  anonymousImportNoteId,
+  prepareAnonymousDraftImport,
+} from "./anonymous-draft/import-contract";
 
 // -------------------------------------------------------------------------
 // Contrato público (estable)
@@ -318,6 +322,126 @@ export const ensureActivePlan = createServerFn({ method: "POST" })
     if (error) throw new Error(`ensure_active_failed: ${error.message}`);
     return { planId: data as string };
   });
+
+/**
+ * importAnonymousDraft — único puente local → cuenta.
+ *
+ * Sólo existe tras autenticar. Es reintentable: targets usan sus uniques,
+ * notas usan ids deterministas y favoritos usan upsert. El draft se marca en
+ * `travel_plans.meta` al final; no requiere tablas, cuentas ni filas anónimas.
+ */
+export const importAnonymousDraft = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => prepareAnonymousDraftImport(raw))
+  .handler(
+    async ({
+      context,
+      data,
+    }): Promise<{
+      planId: string;
+      importedItems: number;
+      importedFavorites: number;
+      alreadyImported: boolean;
+    }> => {
+      const { data: planIdRaw, error: ensureError } = await context.supabase.rpc(
+        "travel_plan_ensure_active",
+      );
+      if (ensureError) throw new Error(`ensure_active_failed: ${ensureError.message}`);
+      const planId = planIdRaw as string;
+
+      const { data: planRow, error: planError } = await context.supabase
+        .from("travel_plans")
+        .select("id, meta, start_date, end_date, party_size")
+        .eq("id", planId)
+        .single();
+      if (planError) throw new Error(`anonymous_import_plan_read_failed: ${planError.message}`);
+      const meta =
+        planRow.meta && typeof planRow.meta === "object" && !Array.isArray(planRow.meta)
+          ? { ...(planRow.meta as Record<string, Json>) }
+          : {};
+      const history = Array.isArray(meta.anonymous_draft_imports)
+        ? (meta.anonymous_draft_imports as Array<Record<string, unknown>>)
+        : [];
+      if (history.some((entry) => entry?.draft_id === data.draftId)) {
+        return { planId, importedItems: 0, importedFavorites: 0, alreadyImported: true };
+      }
+
+      const { data: existingRows, error: itemsError } = await context.supabase
+        .from("travel_plan_items")
+        .select("id, item_kind, target_id, position")
+        .eq("plan_id", planId);
+      if (itemsError) throw new Error(`anonymous_import_items_read_failed: ${itemsError.message}`);
+      const existingTargets = new Set(
+        (existingRows ?? [])
+          .filter((row) => row.target_id)
+          .map((row) => `${row.item_kind}:${row.target_id}`),
+      );
+      const existingIds = new Set((existingRows ?? []).map((row) => row.id));
+      let nextPosition = Math.max(-1, ...(existingRows ?? []).map((row) => row.position ?? -1)) + 1;
+      let importedItems = 0;
+
+      for (const item of data.items) {
+        const targetKey = item.targetId ? `${item.kind}:${item.targetId}` : null;
+        if (targetKey && existingTargets.has(targetKey)) continue;
+        const noteId =
+          item.kind === "note" ? anonymousImportNoteId(data.draftId, item.sourceKey) : null;
+        if (noteId && existingIds.has(noteId)) continue;
+        const { error } = await context.supabase.from("travel_plan_items").insert({
+          ...(noteId ? { id: noteId } : {}),
+          plan_id: planId,
+          item_kind: item.kind,
+          target_id: item.targetId,
+          position: nextPosition,
+          day_index: null,
+          notes: item.notes,
+          snapshot: item.snapshot as unknown as Json,
+        });
+        if (error && !/duplicate key/i.test(error.message)) {
+          throw new Error(`anonymous_import_item_failed: ${error.message}`);
+        }
+        if (!error) {
+          importedItems += 1;
+          nextPosition += 1;
+        }
+        if (targetKey) existingTargets.add(targetKey);
+        if (noteId) existingIds.add(noteId);
+      }
+
+      let importedFavorites = 0;
+      if (data.favorites.length > 0) {
+        const { error } = await context.supabase.from("traveler_favorites").upsert(
+          data.favorites.map((favorite) => ({
+            user_id: context.userId,
+            entity_kind: favorite.kind,
+            entity_id: favorite.targetId,
+          })),
+          { onConflict: "user_id,entity_kind,entity_id", ignoreDuplicates: true },
+        );
+        if (error) throw new Error(`anonymous_import_favorites_failed: ${error.message}`);
+        importedFavorites = data.favorites.length;
+      }
+
+      const patch: Database["public"]["Tables"]["travel_plans"]["Update"] = {
+        meta: {
+          ...meta,
+          anonymous_draft_imports: [
+            ...history.slice(-49),
+            { draft_id: data.draftId, imported_at: new Date().toISOString() },
+          ],
+        } as unknown as Json,
+      };
+      if (!planRow.start_date && data.startDate) patch.start_date = data.startDate;
+      if (!planRow.end_date && data.endDate) patch.end_date = data.endDate;
+      if (!planRow.party_size && data.partySize) patch.party_size = data.partySize;
+      const { error: updateError } = await context.supabase
+        .from("travel_plans")
+        .update(patch)
+        .eq("id", planId);
+      if (updateError) throw new Error(`anonymous_import_finalize_failed: ${updateError.message}`);
+
+      return { planId, importedItems, importedFavorites, alreadyImported: false };
+    },
+  );
 
 /**
  * addPlanItem — Agrega un item al plan indicado (o al activo si se omite).

@@ -1,13 +1,4 @@
-/**
- * Store local-first para AnonymousTravelDraft (AC1.1).
- *
- * - Persistencia: IndexedDB (base) con fallback a localStorage cuando IDB no
- *   está disponible (Safari privado, cuota llena, etc.).
- * - Un único registro por dispositivo (key `current`).
- * - Validación estricta al leer/escribir vía Zod (contract.ts).
- * - Sin llamadas de red. Sin cookies. Sin Realtime.
- * - SSR-safe: todas las funciones son NO-OP si `window` no existe.
- */
+/** Store local-first coherente para AnonymousTravelDraft. Cero red. */
 import {
   AnonymousTravelDraftSchema,
   createEmptyDraft,
@@ -15,6 +6,7 @@ import {
   type AnonymousTravelDraft,
 } from "./contract";
 import { ANON_LIMITS } from "./limits";
+import { LEGACY_GUEST_QUEUE_KEY, migrateLegacyGuestQueue } from "./legacy";
 
 const DB_NAME = "vmx.alux.companion";
 const DB_VERSION = 1;
@@ -23,18 +15,29 @@ const RECORD_KEY = "current";
 const LS_FALLBACK_KEY = "vmx.alux.companion.current.v1";
 const LS_META_KEY = "vmx.alux.companion.meta.v1";
 
+type Listener = (draft: AnonymousTravelDraft | null) => void;
+const listeners = new Set<Listener>();
+let snapshot: AnonymousTravelDraft | null = null;
+let loaded = false;
+let loading: Promise<AnonymousTravelDraft | null> | null = null;
+let pending: AnonymousTravelDraft | null = null;
+let timer: ReturnType<typeof setTimeout> | null = null;
+
 function hasWindow(): boolean {
-  return typeof window !== "undefined" && typeof indexedDB !== "undefined";
+  return typeof window !== "undefined";
+}
+
+function notify(): void {
+  for (const listener of listeners) listener(snapshot);
 }
 
 function openDb(): Promise<IDBDatabase | null> {
-  if (!hasWindow()) return Promise.resolve(null);
+  if (!hasWindow() || typeof indexedDB === "undefined") return Promise.resolve(null);
   return new Promise((resolve) => {
     try {
       const req = indexedDB.open(DB_NAME, DB_VERSION);
       req.onupgradeneeded = () => {
-        const db = req.result;
-        if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
+        if (!req.result.objectStoreNames.contains(STORE)) req.result.createObjectStore(STORE);
       };
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => resolve(null);
@@ -50,8 +53,7 @@ async function idbGet(): Promise<unknown> {
   if (!db) return null;
   return new Promise((resolve) => {
     try {
-      const tx = db.transaction(STORE, "readonly");
-      const req = tx.objectStore(STORE).get(RECORD_KEY);
+      const req = db.transaction(STORE, "readonly").objectStore(STORE).get(RECORD_KEY);
       req.onsuccess = () => resolve(req.result ?? null);
       req.onerror = () => resolve(null);
     } catch {
@@ -66,9 +68,10 @@ async function idbPut(value: AnonymousTravelDraft): Promise<boolean> {
   return new Promise((resolve) => {
     try {
       const tx = db.transaction(STORE, "readwrite");
-      const req = tx.objectStore(STORE).put(value, RECORD_KEY);
-      req.onsuccess = () => resolve(true);
-      req.onerror = () => resolve(false);
+      tx.objectStore(STORE).put(value, RECORD_KEY);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+      tx.onabort = () => resolve(false);
     } catch {
       resolve(false);
     }
@@ -81,94 +84,165 @@ async function idbDelete(): Promise<void> {
   try {
     db.transaction(STORE, "readwrite").objectStore(STORE).delete(RECORD_KEY);
   } catch {
-    /* noop */
+    // El fallback local se elimina de todas formas.
   }
 }
 
-function lsGet(): unknown {
+function parseLocal(key: string): unknown {
   if (!hasWindow()) return null;
   try {
-    const raw = window.localStorage.getItem(LS_FALLBACK_KEY);
+    const raw = window.localStorage.getItem(key);
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
 }
 
-function lsPut(value: AnonymousTravelDraft): boolean {
+function putLocal(value: AnonymousTravelDraft): boolean {
   if (!hasWindow()) return false;
   try {
     const payload = JSON.stringify(value);
-    if (payload.length > ANON_LIMITS.payloadBytes) return false;
+    if (new TextEncoder().encode(payload).byteLength > ANON_LIMITS.payloadBytes) return false;
     window.localStorage.setItem(LS_FALLBACK_KEY, payload);
+    window.localStorage.setItem(
+      LS_META_KEY,
+      JSON.stringify({
+        draftId: value.draftId,
+        updatedAt: value.updatedAt,
+        travelStage: value.travelStage,
+      }),
+    );
     return true;
   } catch {
     return false;
   }
 }
 
-function lsDelete(): void {
+function deleteLocal(): void {
   if (!hasWindow()) return;
   try {
     window.localStorage.removeItem(LS_FALLBACK_KEY);
     window.localStorage.removeItem(LS_META_KEY);
   } catch {
-    /* noop */
+    // noop
   }
 }
 
-function writeMeta(draft: AnonymousTravelDraft): void {
-  if (!hasWindow()) return;
-  try {
-    window.localStorage.setItem(
-      LS_META_KEY,
-      JSON.stringify({
-        draftId: draft.draftId,
-        updatedAt: draft.updatedAt,
-        travelStage: draft.travelStage,
-      }),
-    );
-  } catch {
-    /* noop */
-  }
+async function persist(draft: AnonymousTravelDraft, now = Date.now()): Promise<boolean> {
+  const next = { ...draft, updatedAt: now };
+  const validated = AnonymousTravelDraftSchema.safeParse(next);
+  if (!validated.success) return false;
+  if (
+    new TextEncoder().encode(JSON.stringify(validated.data)).byteLength > ANON_LIMITS.payloadBytes
+  )
+    return false;
+  const ok = (await idbPut(validated.data)) || putLocal(validated.data);
+  if (ok && snapshot?.draftId === validated.data.draftId) snapshot = validated.data;
+  return ok;
 }
 
-export async function readAnonymousTrip(
-  now: number = Date.now(),
-): Promise<AnonymousTravelDraft | null> {
+export function getAnonymousTripSnapshot(): AnonymousTravelDraft | null {
+  return snapshot;
+}
+
+export function subscribeAnonymousTrip(listener: Listener): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+export async function readAnonymousTrip(now = Date.now()): Promise<AnonymousTravelDraft | null> {
   if (!hasWindow()) return null;
-  const raw = (await idbGet()) ?? lsGet();
-  const draft = migrateDraft(raw, now);
-  if (!draft) {
-    await clearAnonymousTrip();
-    return null;
-  }
-  return draft;
+  if (loaded) return snapshot;
+  if (loading) return loading;
+  loading = (async () => {
+    const idbDraft = migrateDraft(await idbGet(), now);
+    const localDraft = migrateDraft(parseLocal(LS_FALLBACK_KEY), now);
+    let draft =
+      idbDraft && localDraft
+        ? idbDraft.updatedAt >= localDraft.updatedAt
+          ? idbDraft
+          : localDraft
+        : (idbDraft ?? localDraft);
+    // `pagehide` puede haber alcanzado localStorage antes del debounce de IDB.
+    // Reconciliamos por updatedAt y reponemos IDB en segundo plano.
+    if (draft === localDraft && localDraft) void persist(localDraft, localDraft.updatedAt);
+    if (!draft) {
+      const legacy = migrateLegacyGuestQueue(parseLocal(LEGACY_GUEST_QUEUE_KEY), { now });
+      if (legacy && (await persist(legacy, now))) {
+        draft = legacy;
+        try {
+          window.localStorage.removeItem(LEGACY_GUEST_QUEUE_KEY);
+        } catch {
+          /* noop */
+        }
+      } else {
+        await idbDelete();
+        deleteLocal();
+      }
+    }
+    snapshot = draft;
+    loaded = true;
+    loading = null;
+    notify();
+    return snapshot;
+  })();
+  return loading;
 }
 
 export async function writeAnonymousTrip(
   draft: AnonymousTravelDraft,
-  now: number = Date.now(),
+  now = Date.now(),
 ): Promise<boolean> {
   if (!hasWindow()) return false;
-  const next: AnonymousTravelDraft = { ...draft, updatedAt: now };
-  const validated = AnonymousTravelDraftSchema.safeParse(next);
-  if (!validated.success) return false;
-  const size = new Blob([JSON.stringify(validated.data)]).size;
-  if (size > ANON_LIMITS.payloadBytes) return false;
-  const ok = (await idbPut(validated.data)) || lsPut(validated.data);
-  if (ok) writeMeta(validated.data);
+  const ok = await persist(draft, now);
+  if (ok) {
+    snapshot = { ...draft, updatedAt: now };
+    loaded = true;
+    notify();
+  }
+  return ok;
+}
+
+/** Publica en memoria inmediatamente y consolida una sola escritura a 400 ms. */
+export function scheduleAnonymousTripWrite(draft: AnonymousTravelDraft): void {
+  snapshot = draft;
+  loaded = true;
+  pending = draft;
+  notify();
+  if (timer) clearTimeout(timer);
+  timer = setTimeout(() => {
+    void flushAnonymousTrip();
+  }, ANON_LIMITS.writeDebounceMs);
+}
+
+export async function flushAnonymousTrip(): Promise<boolean> {
+  if (timer) clearTimeout(timer);
+  timer = null;
+  const draft = pending;
+  pending = null;
+  if (!draft) return true;
+  const ok = await persist(draft);
+  if (!ok) pending = draft;
   return ok;
 }
 
 export async function clearAnonymousTrip(): Promise<void> {
+  if (timer) clearTimeout(timer);
+  timer = null;
+  pending = null;
+  snapshot = null;
+  loaded = true;
+  notify();
   await idbDelete();
-  lsDelete();
+  deleteLocal();
 }
 
-export async function ensureAnonymousTrip(
-  now: number = Date.now(),
-): Promise<AnonymousTravelDraft> {
-  const existing = await readAnonymousTrip(now);
-  return existing ?? createEmptyDraft({ now });
+export async function ensureAnonymousTrip(now = Date.now()): Promise<AnonymousTravelDraft> {
+  return (await readAnonymousTrip(now)) ?? createEmptyDraft({ now });
+}
+
+if (hasWindow()) {
+  window.addEventListener("pagehide", () => {
+    if (pending) putLocal(pending);
+  });
 }

@@ -10,7 +10,7 @@
  *  - Editor de metadatos del plan (título, fechas, party_size, notas).
  *  - Items agrupados por kind (destinos, empresas, productos, eventos, notas).
  *  - Eliminar item, editar notas del item.
- *  - Migración de cola de invitados (localStorage → plan activo).
+ *  - La continuidad anónima se importa globalmente al autenticar.
  *  - Envío al Concierge sin cambiar la lógica del módulo (Sub-ola E).
  */
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -36,11 +36,6 @@ import {
 } from "@/lib/traveler/travel-plans.functions";
 import { getAluxConciergeContext } from "@/lib/alux/concierge-context.functions";
 import { getMyConfirmedTravel } from "@/lib/concierge/orders.functions";
-import {
-  clearGuestQueue,
-  readGuestQueue,
-  type GuestQueueItem,
-} from "@/lib/traveler/guest-queue";
 import { ccListMyCases, ccTimelineAppend } from "@/lib/concierge/cc.functions";
 import { getConciergeCaseFile } from "@/lib/concierge/concierge.functions";
 import { CaseFileView } from "@/components/concierge/CaseFileView";
@@ -287,8 +282,6 @@ function MiViajePage() {
       {pendingProposalsCount > 0 && vista !== "concierge" ? (
         <PendingProposalsSpotlight count={pendingProposalsCount} />
       ) : null}
-
-      <GuestImportBanner onImported={invalidatePlan} />
 
       {activeQ.data?.plan ? (
         <NowNextLaterSurface phase={phase} plan={activeQ.data.plan as never} />
@@ -1288,98 +1281,6 @@ function ItinerarioMap({ data }: { data: TravelPlanWithItems }) {
       <p className="border-t px-3 py-2 text-xs text-muted-foreground">
         {markers.length} ubicación{markers.length === 1 ? "" : "es"} en tu viaje. Los pines muestran destinos y empresas guardadas.
       </p>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Guest queue → migración post-login                                  */
-/* ------------------------------------------------------------------ */
-
-function GuestImportBanner({ onImported }: { onImported: () => void }) {
-  const addItem = useServerFn(addPlanItem);
-  const [queue, setQueue] = useState<GuestQueueItem[]>([]);
-  const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    setQueue(readGuestQueue());
-  }, []);
-
-  if (queue.length === 0) return null;
-
-  async function handleImport() {
-    setBusy(true);
-    let ok = 0;
-    let fail = 0;
-    for (const it of queue) {
-      if (it.kind !== "note" && !it.targetId) {
-        fail += 1;
-        continue;
-      }
-      try {
-        await addItem({
-          data: {
-            kind: it.kind,
-            targetId: it.targetId ?? undefined,
-            snapshot: {
-              title: it.title ?? null,
-              slug: it.slug ?? null,
-              image_url: it.imageUrl ?? null,
-              subtitle: it.subtitle ?? null,
-            },
-            notes: it.notes ?? null,
-          },
-        });
-        ok += 1;
-      } catch {
-        fail += 1;
-      }
-    }
-    clearGuestQueue();
-    setQueue([]);
-    setBusy(false);
-    onImported();
-    toast.success(`Se importaron ${ok} elementos a Mi Viaje`, {
-      description: fail > 0 ? `${fail} no pudieron migrarse.` : undefined,
-    });
-  }
-
-  function handleDiscard() {
-    clearGuestQueue();
-    setQueue([]);
-    toast("Elementos provisionales descartados");
-  }
-
-  return (
-    <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-medium">
-            Tienes {queue.length} elemento{queue.length === 1 ? "" : "s"} guardado{queue.length === 1 ? "" : "s"} en este dispositivo
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Fueron agregados antes de iniciar sesión. ¿Los movemos a Mi Viaje?
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={handleDiscard}
-            disabled={busy}
-            className="rounded-md border px-3 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
-          >
-            Descartar
-          </button>
-          <button
-            type="button"
-            onClick={handleImport}
-            disabled={busy}
-            className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground disabled:opacity-50"
-          >
-            {busy ? "Importando…" : "Importar a Mi Viaje"}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

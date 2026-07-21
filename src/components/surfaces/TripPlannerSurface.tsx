@@ -11,16 +11,15 @@
  *  · "Agregar a Mi Viaje" = acción universal desde tarjetas.
  *  · Toda lectura pasa por travel-plans.functions.ts.
  *  · Cero engines, cero rutas, cero modelos paralelos. Reutiliza
- *    travel_plans, guest-queue, Context Engine, Navigation Contract
+ *    travel_plans, AnonymousTravelDraft, Context Engine, Navigation Contract
  *    y Alux Traveler ya construidos.
  *
  * Estados:
- *  · empty          → visitante sin sesión ni guest-queue.
- *  · guest          → visitante sin sesión con guest-queue > 0.
+ *  · empty          → visitante sin sesión ni progreso local.
+ *  · guest          → visitante sin sesión con AnonymousTravelDraft.
  *  · authed-empty   → usuario autenticado sin ítems en plan activo.
  *  · authed-active  → usuario autenticado con plan activo poblado.
  */
-import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -36,14 +35,16 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { getMyActivePlan } from "@/lib/traveler/travel-plans.functions";
-import { readGuestQueue } from "@/lib/traveler/guest-queue";
+import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
 import { useAluxContext } from "@/lib/alux/use-alux-context";
 import { GuestPlanPreview } from "@/components/traveler/GuestPlanPreview";
 import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
+import { ProgressiveRegistrationButton } from "@/components/traveler/ProgressiveRegistrationButton";
 
 export function TripPlannerSurface() {
   const { user } = useAuth();
   const fetchActive = useServerFn(getMyActivePlan);
+  const anonymous = useAnonymousTrip();
 
   const { data: active, isLoading: loadingPlan } = useQuery({
     queryKey: ["traveler", "active-plan", user?.id],
@@ -52,14 +53,11 @@ export function TripPlannerSurface() {
     staleTime: 30_000,
   });
 
-  const [guestCount, setGuestCount] = useState<number | null>(null);
-  useEffect(() => {
-    if (user) {
-      setGuestCount(0);
-      return;
-    }
-    setGuestCount(readGuestQueue().length);
-  }, [user]);
+  const guestCount = user
+    ? 0
+    : (anonymous.trip?.plannedItems.length ?? 0) +
+      (anonymous.trip?.favorites.length ?? 0) +
+      (anonymous.trip?.destinationIds.length ?? 0);
 
   const alux = useAluxContext();
   const itemCount = active?.items.length ?? 0;
@@ -68,7 +66,7 @@ export function TripPlannerSurface() {
     ? itemCount > 0
       ? "authed-active"
       : "authed-empty"
-    : (guestCount ?? 0) > 0
+    : guestCount > 0
       ? "guest"
       : "empty";
 
@@ -79,18 +77,15 @@ export function TripPlannerSurface() {
         user={Boolean(user)}
         planTitle={active?.plan.title ?? null}
         itemCount={itemCount}
-        guestCount={guestCount ?? 0}
+        guestCount={guestCount}
         loadingPlan={loadingPlan && Boolean(user)}
         aluxReason={alux.hasContext ? alux.reason : null}
         aluxCanonical={alux.canonical ?? null}
       />
 
-      {state === "guest" ? <GuestSection guestCount={guestCount ?? 0} /> : null}
+      {state === "guest" ? <GuestSection guestCount={guestCount} /> : null}
       {state === "authed-active" ? (
-        <AuthedActiveSection
-          planTitle={active?.plan.title ?? "Mi Viaje"}
-          itemCount={itemCount}
-        />
+        <AuthedActiveSection planTitle={active?.plan.title ?? "Mi Viaje"} itemCount={itemCount} />
       ) : null}
       {state === "authed-empty" ? <AuthedEmptySection /> : null}
 
@@ -136,7 +131,7 @@ function TripPlannerHero({
 
   const title =
     state === "authed-active"
-      ? planTitle ?? "Mi Viaje"
+      ? (planTitle ?? "Mi Viaje")
       : state === "guest"
         ? "Continúa armando tu viaje"
         : "Arma tu viaje al Oriente Maya";
@@ -150,15 +145,9 @@ function TripPlannerHero({
 
   return (
     <header className="rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-6 sm:p-10">
-      <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">
-        {eyebrow}
-      </p>
-      <h1 className="text-balance text-3xl font-semibold sm:text-4xl">
-        {title}
-      </h1>
-      <p className="mt-3 max-w-2xl text-base text-muted-foreground sm:text-lg">
-        {subtitle}
-      </p>
+      <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">{eyebrow}</p>
+      <h1 className="text-balance text-3xl font-semibold sm:text-4xl">{title}</h1>
+      <p className="mt-3 max-w-2xl text-base text-muted-foreground sm:text-lg">{subtitle}</p>
 
       <div className="mt-5 flex flex-wrap items-center gap-3">
         {state === "authed-active" ? (
@@ -172,13 +161,13 @@ function TripPlannerHero({
         ) : null}
 
         {state === "guest" ? (
-          <Link
-            to="/auth"
+          <ProgressiveRegistrationButton
+            reason="save_permanently"
             className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
           >
             <ShieldCheck className="size-4" aria-hidden />
             Guardar mi viaje
-          </Link>
+          </ProgressiveRegistrationButton>
         ) : null}
 
         {state === "authed-empty" || state === "empty" ? (
@@ -199,10 +188,7 @@ function TripPlannerHero({
         </Link>
 
         {!user ? (
-          <Link
-            to="/auth"
-            className="text-sm font-medium text-primary hover:underline"
-          >
+          <Link to="/auth" className="text-sm font-medium text-primary hover:underline">
             Ya tengo cuenta
           </Link>
         ) : null}
@@ -216,10 +202,7 @@ function TripPlannerHero({
             {aluxCanonical ? (
               <>
                 {" · "}
-                <Link
-                  to={aluxCanonical}
-                  className="underline underline-offset-2"
-                >
+                <Link to={aluxCanonical} className="underline underline-offset-2">
                   Retomar
                 </Link>
               </>
@@ -229,10 +212,7 @@ function TripPlannerHero({
       ) : null}
 
       {loadingPlan ? (
-        <p
-          role="status"
-          className="mt-4 text-xs text-muted-foreground"
-        >
+        <p role="status" className="mt-4 text-xs text-muted-foreground">
           Cargando tu expediente…
         </p>
       ) : null}
@@ -241,7 +221,7 @@ function TripPlannerHero({
 }
 
 /* ------------------------------------------------------------------ */
-/* Guest-queue visible                                                */
+/* Viaje local visible                                                */
 /* ------------------------------------------------------------------ */
 
 function GuestSection({ guestCount }: { guestCount: number }) {
@@ -253,22 +233,42 @@ function GuestSection({ guestCount }: { guestCount: number }) {
             En tu expediente ({guestCount})
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Guardaste esto sin iniciar sesión. Vive en este navegador hasta que
-            lo guardes en tu cuenta.
+            Guardaste esto sin iniciar sesión. Vive en este navegador hasta que lo guardes en tu
+            cuenta.
           </p>
         </div>
-        <Link
-          to="/auth"
+        <ProgressiveRegistrationButton
+          reason="save_permanently"
           className="hidden shrink-0 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 sm:inline-flex"
         >
           Guardar mi viaje
-        </Link>
+        </ProgressiveRegistrationButton>
       </div>
       <GuestPlanPreview limit={6} />
+      <div className="mt-4 grid gap-2 sm:grid-cols-3">
+        <ProgressiveRegistrationButton
+          reason="other_device"
+          className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium hover:bg-accent"
+        >
+          Continuar en otro dispositivo
+        </ProgressiveRegistrationButton>
+        <ProgressiveRegistrationButton
+          reason="share"
+          className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium hover:bg-accent"
+        >
+          Compartir mi viaje
+        </ProgressiveRegistrationButton>
+        <ProgressiveRegistrationButton
+          reason="reminders"
+          className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium hover:bg-accent"
+        >
+          Recibir recordatorios
+        </ProgressiveRegistrationButton>
+      </div>
       <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm text-foreground">
         <p>
-          <strong>Importante:</strong> si borras el historial del navegador
-          perderás este expediente. Guárdalo en tu cuenta con un solo paso.
+          <strong>Importante:</strong> si borras el historial del navegador perderás este
+          expediente. Guárdalo en tu cuenta con un solo paso.
         </p>
       </div>
     </section>
@@ -279,28 +279,20 @@ function GuestSection({ guestCount }: { guestCount: number }) {
 /* Autenticado con plan activo poblado                                */
 /* ------------------------------------------------------------------ */
 
-function AuthedActiveSection({
-  planTitle,
-  itemCount,
-}: {
-  planTitle: string;
-  itemCount: number;
-}) {
+function AuthedActiveSection({ planTitle, itemCount }: { planTitle: string; itemCount: number }) {
   return (
     <section
       aria-labelledby="ayv-active-h"
       className="rounded-2xl border border-primary/30 bg-primary/5 p-6 sm:p-8"
     >
-      <p className="text-xs uppercase tracking-wide text-primary">
-        Expediente activo
-      </p>
+      <p className="text-xs uppercase tracking-wide text-primary">Expediente activo</p>
       <h2 id="ayv-active-h" className="mt-1 text-2xl font-semibold">
         {planTitle}
       </h2>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
         {itemCount} elemento{itemCount === 1 ? "" : "s"} guardado
-        {itemCount === 1 ? "" : "s"}. Organiza el recorrido, añade notas y —
-        cuando esté listo — envíalo a tu concierge humano desde Mi Viaje.
+        {itemCount === 1 ? "" : "s"}. Organiza el recorrido, añade notas y — cuando esté listo —
+        envíalo a tu concierge humano desde Mi Viaje.
       </p>
       <div className="mt-5 flex flex-wrap gap-3">
         <Link
@@ -338,9 +330,8 @@ function AuthedEmptySection() {
         Empieza por lo que te llama la atención
       </h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-        Recorre destinos, hoteles, restaurantes y experiencias. En cada tarjeta
-        pulsa <strong>➕ Agregar a Mi Viaje</strong> — se guarda directamente en
-        tu expediente.
+        Recorre destinos, hoteles, restaurantes y experiencias. En cada tarjeta pulsa{" "}
+        <strong>➕ Agregar a Mi Viaje</strong> — se guarda directamente en tu expediente.
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <Link
@@ -404,10 +395,7 @@ function HowItWorksSection() {
       </div>
       <ol className="grid gap-4 md:grid-cols-3">
         {steps.map(({ n, Icon, title, body }) => (
-          <li
-            key={n}
-            className="rounded-2xl border border-border bg-card p-6"
-          >
+          <li key={n} className="rounded-2xl border border-border bg-card p-6">
             <div className="flex items-center gap-3">
               <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
                 <Icon className="size-5" aria-hidden />
@@ -440,10 +428,7 @@ function AluxTeaserSection({ authed }: { authed: boolean }) {
           <Sparkles className="size-5" aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
-          <h2
-            id="ayv-alux-teaser-h"
-            className="text-xl font-semibold sm:text-2xl"
-          >
+          <h2 id="ayv-alux-teaser-h" className="text-xl font-semibold sm:text-2xl">
             Alux, tu copiloto de viaje
           </h2>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
@@ -474,29 +459,34 @@ function NextStepSection({
   const cta =
     state === "authed-active"
       ? { to: "/cuenta/mi-viaje" as const, label: "Abrir Mi Viaje" }
-      : state === "guest"
-        ? { to: "/auth" as const, label: "Guardar mi viaje" }
-        : { to: "/oriente-maya" as const, label: "Explorar el Oriente Maya" };
+      : { to: "/oriente-maya" as const, label: "Explorar el Oriente Maya" };
 
   return (
     <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold sm:text-2xl">
-            ¿Listo para dar el siguiente paso?
-          </h2>
+          <h2 className="text-xl font-semibold sm:text-2xl">¿Listo para dar el siguiente paso?</h2>
           <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-            El expediente es tuyo. Nadie contacta al concierge hasta que tú lo
-            decides — este es tu espacio para planear con calma.
+            El expediente es tuyo. Nadie contacta al concierge hasta que tú lo decides — este es tu
+            espacio para planear con calma.
           </p>
         </div>
-        <Link
-          to={cta.to}
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-95"
-        >
-          {cta.label}
-          <ArrowRight className="size-4" aria-hidden />
-        </Link>
+        {state === "guest" ? (
+          <ProgressiveRegistrationButton
+            reason="save_permanently"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-95"
+          >
+            Guardar mi viaje <ArrowRight className="size-4" aria-hidden />
+          </ProgressiveRegistrationButton>
+        ) : (
+          <Link
+            to={cta.to}
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-95"
+          >
+            {cta.label}
+            <ArrowRight className="size-4" aria-hidden />
+          </Link>
+        )}
       </div>
     </section>
   );

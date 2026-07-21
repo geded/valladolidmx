@@ -202,7 +202,7 @@ function GateBody({
           disabled={busy !== null || !email || !password}
           className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-95 disabled:opacity-60"
         >
-          {busy === "email" ? t("auth.processing") : t("auth.enter")}
+          {busy === "email" ? t("auth.processing") : (gate.copy.primaryCta ?? t("auth.enter"))}
         </button>
       </form>
 

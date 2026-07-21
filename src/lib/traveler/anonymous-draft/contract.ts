@@ -25,9 +25,13 @@ export const AnonymousFavoriteKindSchema = z.enum([
 export type AnonymousFavoriteKind = z.infer<typeof AnonymousFavoriteKindSchema>;
 
 export const AnonymousItemKindSchema = z.enum([
+  "destination",
   "business",
   "product",
   "event",
+  "note",
+  // Compatibilidad de lectura con la cola local anterior. Al importar se
+  // normalizan a los contratos canónicos de Travel Plan.
   "promotion",
   "custom",
 ]);
@@ -131,6 +135,9 @@ function cryptoRandomUuid(): string {
     return crypto.randomUUID();
   }
   // Fallback determinista suficiente para entornos sin crypto.randomUUID.
-  const rnd = () => Math.floor(Math.random() * 0xffffffff).toString(16).padStart(8, "0");
+  const rnd = () =>
+    Math.floor(Math.random() * 0xffffffff)
+      .toString(16)
+      .padStart(8, "0");
   return `${rnd()}-${rnd().slice(0, 4)}-4${rnd().slice(0, 3)}-a${rnd().slice(0, 3)}-${rnd()}${rnd().slice(0, 4)}`;
 }
