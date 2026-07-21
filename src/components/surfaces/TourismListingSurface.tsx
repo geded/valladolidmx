@@ -383,6 +383,30 @@ function favoriteKindFromEntity(
   }
 }
 
+/**
+ * TP1.4 · Deriva el `TravelItemKind` universal a partir del
+ * `TourismEntityKind`. Sólo se autorizan `product`, `business` y `event`
+ * en TourismCard (destination, region, promotion, landing, route,
+ * category, mixed y desconocidos → null).
+ */
+function travelKindFromEntity(
+  kind: TourismEntityKind | null,
+): TravelItemKind | null {
+  switch (kind) {
+    case "product":
+      return "product";
+    case "event":
+      return "event";
+    case "business":
+    case "hotel":
+    case "restaurant":
+    case "experience":
+      return "business";
+    default:
+      return null;
+  }
+}
+
 function FacetChipGroup({
   facet,
   value,
