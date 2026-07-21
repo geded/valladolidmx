@@ -9,6 +9,8 @@
 import { PublicShell } from "@/components/discovery";
 import { Link } from "@tanstack/react-router";
 import type { PublicEventDetail } from "@/lib/events/public-reads.functions";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 
 function fmt(iso?: string | null): string {
   if (!iso) return "";
@@ -24,6 +26,15 @@ export function EventSurface({ event }: { event: PublicEventDetail }) {
   const when = event.ends_at
     ? `${fmt(event.starts_at)} – ${fmt(event.ends_at)}`
     : fmt(event.starts_at);
+  // TP1.4B · Universal "Agregar a Mi Viaje" en la ficha canónica de
+  // evento. Reutiliza exclusivamente la política centralizada
+  // (`evaluateTripEligibility`) + botón oficial + store reactivo.
+  // Identidad = UUID canónico (`event.id`). Prohibido usar slug.
+  const tripEligibility = evaluateTripEligibility({
+    kind: "event",
+    targetId: event.id,
+    title: event.title,
+  });
   return (
     <PublicShell
       eyebrow="Evento"
@@ -71,6 +82,18 @@ export function EventSurface({ event }: { event: PublicEventDetail }) {
               Entrada
             </p>
             <p className="mt-1">{event.is_free ? "Gratuita" : "De paga"}</p>
+            {tripEligibility.eligible && tripEligibility.identity ? (
+              <div className="mt-5">
+                <AddToTravelPlanButton
+                  kind={tripEligibility.identity.kind}
+                  targetId={tripEligibility.identity.targetId}
+                  title={event.title}
+                  slug={event.slug ?? null}
+                  imageUrl={event.cover_url ?? null}
+                  subtitle={when || null}
+                />
+              </div>
+            ) : null}
             {event.external_url ? (
               <a
                 href={event.external_url}
