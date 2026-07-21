@@ -11,7 +11,9 @@
     "preview": "nitro preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "governance:generate": "bun scripts/governance/generate-artifact-inventory.mjs",
+    "governance:validate": "bun scripts/governance/validate-dependency-map.mjs && bun scripts/governance/validate-knowledge-graph.mjs && bun scripts/governance/validate-governance-integrity.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.1",

@@ -1,9 +1,7 @@
 # Gobernanza documental de Valladolid.mx
 
-**Estado:** Approved
-
-**Versión:** 2.0
-
+**Estado:** Approved  
+**Versión:** 2.1  
 **Última actualización:** 2026-07-21
 
 Este directorio contiene el sistema canónico que gobierna Valladolid.mx. Su lectura comienza siempre por el CANON. Ningún Blueprint, roadmap, ADR, PRD, plan de Lovable, decisión técnica o implementación puede contradecir esta jerarquía.
@@ -28,10 +26,11 @@ Los documentos `00–08` gobiernan dentro de la responsabilidad declarada por ca
 
 Las vistas legibles por máquina son artefactos canónicos derivados, no fuentes editoriales independientes:
 
-| Proyección                 | Dataset                                                                                      | Validador                                                                                                  |
-| -------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Mapa de dependencias `07`  | [`generated/07-BLUEPRINT-DEPENDENCY-MAP.json`](./generated/07-BLUEPRINT-DEPENDENCY-MAP.json) | [`scripts/governance/validate-dependency-map.mjs`](../../scripts/governance/validate-dependency-map.mjs)   |
-| Grafo de conocimiento `08` | [`generated/08-KNOWLEDGE-GRAPH.json`](./generated/08-KNOWLEDGE-GRAPH.json)                   | [`scripts/governance/validate-knowledge-graph.mjs`](../../scripts/governance/validate-knowledge-graph.mjs) |
+| Proyección                 | Dataset                                                                                          | Validador                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Mapa de dependencias `07`  | [`generated/07-BLUEPRINT-DEPENDENCY-MAP.json`](./generated/07-BLUEPRINT-DEPENDENCY-MAP.json)     | [`validate-dependency-map.mjs`](../../scripts/governance/validate-dependency-map.mjs)             |
+| Grafo de conocimiento `08` | [`generated/08-KNOWLEDGE-GRAPH.json`](./generated/08-KNOWLEDGE-GRAPH.json)                       | [`validate-knowledge-graph.mjs`](../../scripts/governance/validate-knowledge-graph.mjs)           |
+| Inventario de integridad   | [`generated/GOVERNANCE-ARTIFACT-INVENTORY.json`](./generated/GOVERNANCE-ARTIFACT-INVENTORY.json) | [`validate-governance-integrity.mjs`](../../scripts/governance/validate-governance-integrity.mjs) |
 
 Estado aprobado de las proyecciones:
 
@@ -42,11 +41,10 @@ Estado aprobado de las proyecciones:
 Validación reproducible desde la raíz del repositorio:
 
 ```bash
-bun scripts/governance/validate-dependency-map.mjs
-bun scripts/governance/validate-knowledge-graph.mjs
+bun run governance:validate
 ```
 
-Toda modificación a una fuente, dataset o regla de derivación debe actualizar sus proyecciones en el mismo cambio y conservar ambos validadores en verde.
+Toda modificación a una fuente, dataset o regla de derivación debe actualizar sus proyecciones en el mismo cambio y conservar los validadores en verde.
 
 ## Regla de precedencia
 
@@ -74,7 +72,7 @@ Después de leer esta carpeta:
 
 1. Consultar [`docs/blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`](../blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md), única fuente oficial de priorización vigente.
 2. Usar [`docs/blueprint/START-HERE-FIRST.md`](../blueprint/START-HERE-FIRST.md) como entrada al Blueprint histórico.
-3. Localizar el documento pertinente y su estado en [`06-BLUEPRINT-MASTER-INDEX.md`](./06-BLUEPRINT-MASTER-INDEX.md).
+3. Localizar el documento pertinente y su estado en `06`.
 4. Revisar dependencias y evidencia en `07` antes de modificar una capacidad existente.
 5. Consultar `08` para análisis de autoridad, accountability, implementación e impacto.
 6. Ejecutar únicamente el trabajo autorizado por el roadmap y reflejado en `.lovable/plan.md`.
@@ -101,6 +99,21 @@ La estrategia de dominios web continúa sujeta a decisiones específicas y evide
 - Los cambios al universo documental se reflejan en `06`; sus dependencias y relaciones derivadas se regeneran en `07–08`.
 - Las correcciones históricas y de estructura se registran en [`audit/`](./audit/).
 - Un estado `Approved` acredita autoridad documental; no equivale automáticamente a implementación, despliegue u operación real.
+
+### Frescura automática
+
+El workflow `Governance Integrity` compara cada PR contra el inventario canónico. Detecta altas, cambios, renombres y bajas en Blueprints, rutas, migraciones, plantillas, SEO, configuración de dominio, código y pruebas.
+
+La política es incremental:
+
+- las brechas heredadas permanecen visibles y no pueden aumentar;
+- todo artefacto nuevo exige trazabilidad exacta en `07/08`;
+- todo Blueprint nuevo debe aparecer en `06`;
+- las migraciones publicadas son inmutables;
+- los cambios sensibles de SEO, dominio o plantillas requieren evidencia documental en el mismo PR;
+- el inventario debe regenerarse desde el commit que pretende integrarse.
+
+La línea base, sus límites y el plan de cierre están documentados en [`audit/2026-07-21-GOVERNANCE-INTEGRITY-COVERAGE-AUDIT-v1.0.md`](./audit/2026-07-21-GOVERNANCE-INTEGRITY-COVERAGE-AUDIT-v1.0.md).
 
 ## Cierre canónico
 
