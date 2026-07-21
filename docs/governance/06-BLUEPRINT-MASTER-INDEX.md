@@ -1,6 +1,6 @@
 # 06 · BLUEPRINT MASTER INDEX
 
-**Estado:** Draft
+**Estado:** Approved
 
 **Versión:** 0.5
 
@@ -14,7 +14,7 @@ Este documento contiene el catálogo canónico del universo documental bajo `doc
 
 ## 2. Alcance actual
 
-Esta versión proyecta integralmente el ledger probatorio cerrado en Fase 6B sobre las **439 filas** del universo verificado. Los estados fueron adjudicados con autoridad Founder y conservan las reservas individuales de la matriz de decisión. La taxonomía de dominios y sus 439 asignaciones fueron aprobadas por el Founder y formalizadas en [`ADR-GOV-0001`](../decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md). `07–08` todavía no han sido derivados desde esta fuente. El índice permanece `Draft` únicamente hasta la aprobación Founder de esta versión 0.5; la aprobación posterior de `07` no es precondición para aprobar `06`.
+Esta versión proyecta integralmente el ledger probatorio cerrado en Fase 6B sobre las **439 filas** del universo verificado. Los estados fueron adjudicados con autoridad Founder y conservan las reservas individuales de la matriz de decisión. La taxonomía de dominios y sus 439 asignaciones fueron aprobadas por el Founder y formalizadas en [`ADR-GOV-0001`](../decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md). `07` se deriva desde esta versión aprobada; `08` permanece pendiente hasta la aprobación del mapa de dependencias. Esta versión constituye la base congelada de derivación autorizada por el Founder.
 
 Las asociaciones técnicas de esta propuesta fueron validadas localmente contra el árbol actual del repositorio: se conservan sólo rutas resolubles, se normalizan expresiones truncadas y se eliminan autorreferencias. La evidencia documental autocontenida se distingue expresamente de una prueba operativa externa.
 
@@ -549,10 +549,10 @@ La asignación primaria expresa accountability documental. Las dependencias e im
 | ADR de dominios aprobado | Cumplido | `ADR-GOV-0001` formaliza los 14 dominios aprobados por el Founder. |
 | 439 dominios primarios asignados | Cumplido | Cada fila contiene exactamente un dominio `D01`–`D14`; 0 asignaciones pendientes. |
 | Base de derivación para `07` definida | Cumplido | `07` deberá derivarse desde la última versión de `06` aprobada por el Founder. La aprobación o completitud de `07` no es gate de `06`. |
-| Evidencia reproducible del PR #12 | Cumplido | PR #12, head `a832c568…`, merge `2e50745e…` y blob en `main` `0d047f02…` registrados y verificados. |
-| Aprobación Founder de v0.5 | Pendiente | Esta preparación local no publica ni eleva por sí sola el estado documental de `06`. |
+| Evidencia reproducible del PR #12 | Cumplido | PR #12, head `a832c568…`, merge `2e50745e…` y blob `0d047f02…`; actualización v0.5 y ADR publicada mediante PR #13, merge `497d08e3…`, blob `8153c886…`. |
+| Aprobación Founder de v0.5 | Cumplido | El Founder aprobó expresamente la propuesta local v0.5 y autorizó su publicación; PR #13 fue fusionado en `main`. |
 
-Por lo anterior, el documento **permanece en estado `Draft`** hasta la aprobación Founder de v0.5. Una vez aprobado, `07` podrá derivarse sin circularidad desde esa base congelada.
+Por lo anterior, el documento alcanza estado **`Approved`** y queda congelado como base de derivación de `07`. Cambios posteriores requieren control de versión y actualización coordinada conforme a `ADR-GOV-0001`.
 
 ## 6. Control de versiones
 
@@ -562,4 +562,4 @@ Por lo anterior, el documento **permanece en estado `Draft`** hasta la aprobaci�
 | v0.2 | 2026-07-21 | Founder | Universo verificable (439), metodología reproducible, campos mínimos, owner y criterios de salida de Draft. No puebla filas. |
 | v0.3 | 2026-07-21 | Founder | Overlay provisional con las tres relaciones `Superseded` aprobadas y fusionadas en Fase 4. |
 | v0.4 | 2026-07-21 | Founder | Proyección integral de las 439 adjudicaciones cerradas en Fase 6B; asociaciones técnicas validadas localmente; mantiene `Draft` y los gates pendientes. |
-| v0.5 | 2026-07-21 | Founder | Proyección de 14 dominios aprobados sobre 439 filas; evidencia del PR #12; secuencia `06 Approved → derivación de 07` para eliminar el gate circular. Permanece `Draft` pendiente de aprobación de esta versión. |
+| v0.5 | 2026-07-21 | Founder | Proyección de 14 dominios aprobados sobre 439 filas; evidencia del PR #12; secuencia `06 Approved → derivación de 07` para eliminar el gate circular. Aprobada por el Founder y congelada como base de derivación de `07`; publicación material registrada mediante PR #13. |
