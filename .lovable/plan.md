@@ -66,7 +66,8 @@ Este archivo es una instrucción de ejecución subordinada a `docs/governance/00
    - [x] aceptación 7d/30d, p50 a aceptar/implementar, validación, sesgo y SLA;
    - [x] proyección pura, cero tablas, snapshots o migraciones;
    - [x] pruebas focalizadas, typecheck, lint acotado y build;
-   - [ ] publicar PR, desplegar, ejecutar smoke autenticado y aprobar Completion Report.
+   - [x] publicar la rama y abrir el Draft PR #3;
+   - [ ] revisar, integrar, desplegar, ejecutar smoke autenticado y aprobar Completion Report.
 
 **DoD CV8.9:** contrato versionado, persistencia segura, UI operable, decisiones auditables, pruebas verdes y Completion Report aprobado.
 
@@ -133,4 +134,4 @@ Al cerrar una ola:
 4. reemplazar aquí sólo el próximo paso operativo;
 5. no mantener instrucciones ya ejecutadas como si siguieran pendientes.
 
-**Siguiente acción:** revisar e integrar el PR de CV8.9.3–CV8.9.4; después desplegar y ejecutar el smoke autenticado con Founder/Admin y con Concierge Lead/Editor cuando existan operadores reales. AC1.4 permanece cerrada hasta la aprobación del Completion Report CV8.9.
+**Siguiente acción:** revisar e integrar el Draft PR #3 de CV8.9.3–CV8.9.4; después desplegar y ejecutar el smoke autenticado con Founder/Admin y con Concierge Lead/Editor cuando existan operadores reales. AC1.4 permanece cerrada hasta la aprobación del Completion Report CV8.9.
