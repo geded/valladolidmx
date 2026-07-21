@@ -153,4 +153,4 @@ Al cerrar una ola:
 4. reemplazar aquí sólo el próximo paso operativo;
 5. no mantener instrucciones ya ejecutadas como si siguieran pendientes.
 
-**Siguiente acción:** revisar y aprobar `17.1-PROGRAMA-FUNDADORES-VALLADOLID-OPERATING-PLAN-v1.0.md`; congelar la oferta comercial y designar al responsable antes de contactar la primera cohorte. El mínimo de salida es 15 empresas reales publicables y el objetivo 25. El smoke assigned-only de CV8.9 permanece como seguimiento condicionado a operadores Concierge Lead/Editor reales.
+**Siguiente acción:** aplicar, validar e integrar Baseline Reconciliation v1.2. Una vez certificada la línea base, solicitar el gate Founder para abrir OMXDS como siguiente iniciativa. Programa Fundadores (`17.1-PROGRAMA-FUNDADORES-VALLADOLID-OPERATING-PLAN-v1.0.md`) permanece preservado como iniciativa pendiente, no sustituida ni cancelada; el mínimo de salida sigue siendo 15 empresas reales publicables (objetivo 25). El smoke assigned-only de CV8.9 permanece como seguimiento condicionado a operadores Concierge Lead/Editor reales.
