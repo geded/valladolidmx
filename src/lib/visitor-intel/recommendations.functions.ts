@@ -24,11 +24,17 @@ import {
   type RecommendationLifecycle,
   type RecommendationLifecycleStatus,
 } from "./events";
+import { loadDecisionProjection } from "./decision-projection.server";
+import {
+  MIN_FAMILY_SIGNAL,
+  projectFamilyLearningSignals,
+  type FamilyLearningOutcome,
+  type FamilyLearningSignal,
+} from "./recommendation-learning";
+
+export { MIN_FAMILY_SIGNAL, type FamilyLearningSignal } from "./recommendation-learning";
 
 export const RECOMMENDATION_VALIDATION_CONTRACT_VERSION = "1.0.0" as const;
-
-/** Muestra mínima para aprender confianza sobre una familia (metric_id). */
-export const MIN_FAMILY_SIGNAL = 5 as const;
 
 export interface RecommendationLifecycleStep {
   status: RecommendationLifecycleStatus;
@@ -48,17 +54,6 @@ export interface RecommendationRecord {
   last_updated_at: string;
   timeline: RecommendationLifecycleStep[];
   latest_outcome?: RecommendationLifecycle["outcome"];
-}
-
-export interface FamilyLearningSignal {
-  metric_id: string;
-  sample_size: number;
-  validated: number;
-  discarded: number;
-  /** Confianza aprendida ∈ [0,1] = validated / (validated + discarded). */
-  learned_confidence: number;
-  /** Estado explicable: null si muestra < MIN_FAMILY_SIGNAL. */
-  reliability: "insufficient_data" | "learning" | "reliable";
 }
 
 export interface RecommendationValidationSnapshot {
@@ -93,9 +88,9 @@ export const recordRecommendationLifecycleEvent = createServerFn({ method: "POST
     if (data.event.kind !== "recommendation.lifecycle") {
       throw new Response("Wrong event kind", { status: 400 });
     }
-    // CV8.9.1 congela el contrato, pero no abre todavía su canal de escritura.
+    // CV8.9 decisions use their dedicated role-aware, atomic ingestion path.
     if (data.event.subtype === "decision") {
-      throw new Response("Decision ingestion is not active", { status: 400 });
+      throw new Response("Use governed decision ingestion", { status: 400 });
     }
     const { data: isAdmin } = await context.supabase.rpc("has_role", {
       _user_id: context.userId,
@@ -253,16 +248,13 @@ export const aggregateRecommendationValidation = createServerFn({ method: "POST"
     ) as Record<RecommendationLifecycleStatus, number>;
     const active: RecommendationRecord[] = [];
     const closed: RecommendationRecord[] = [];
-    const family = new Map<string, { validated: number; discarded: number }>();
+    const learningOutcomes: FamilyLearningOutcome[] = [];
 
     for (const rec of records.values()) {
       totals[rec.current_status] += 1;
       if (rec.current_status === "validated" || rec.current_status === "discarded") {
         closed.push(rec);
-        const f = family.get(rec.metric_id) ?? { validated: 0, discarded: 0 };
-        if (rec.current_status === "validated") f.validated += 1;
-        else f.discarded += 1;
-        family.set(rec.metric_id, f);
+        learningOutcomes.push({ metric_id: rec.metric_id, outcome: rec.current_status });
       } else {
         active.push(rec);
       }
@@ -275,26 +267,15 @@ export const aggregateRecommendationValidation = createServerFn({ method: "POST"
     );
     closed.sort(sortByRecent);
 
-    const family_confidence: FamilyLearningSignal[] = Array.from(family.entries())
-      .map(([metric_id, f]) => {
-        const sample = f.validated + f.discarded;
-        const conf = sample === 0 ? 0 : f.validated / sample;
-        const reliability: FamilyLearningSignal["reliability"] =
-          sample < MIN_FAMILY_SIGNAL
-            ? "insufficient_data"
-            : sample < MIN_FAMILY_SIGNAL * 3
-              ? "learning"
-              : "reliable";
-        return {
-          metric_id,
-          sample_size: sample,
-          validated: f.validated,
-          discarded: f.discarded,
-          learned_confidence: Number(conf.toFixed(4)),
-          reliability,
-        };
-      })
-      .sort((a, b) => b.sample_size - a.sample_size);
+    const decisionProjection = await loadDecisionProjection();
+    for (const feedback of decisionProjection.feedback_to_cv86) {
+      if (feedback.occurred_at < since) continue;
+      learningOutcomes.push({
+        metric_id: feedback.metric_id,
+        outcome: feedback.outcome === "validated" ? "validated" : "discarded",
+      });
+    }
+    const family_confidence = projectFamilyLearningSignals(learningOutcomes);
 
     return {
       window_days: data.window_days,

@@ -17,7 +17,6 @@ import {
   DecisionEventPayloadSchema,
   DecisionSourceSchema,
   DECISION_STATES,
-  projectDecisionQueue,
   type DecisionEventPayload,
   type DecisionQueueProjection,
   type DecisionState,
@@ -32,7 +31,7 @@ import {
   type DecisionActorAccess,
   type DecisionRoleFlags,
 } from "./decision-operations";
-import { VisitorEventSchema } from "./events";
+import { loadDecisionProjection } from "./decision-projection.server";
 
 const ProposeDecisionInputSchema = z.object({
   source: DecisionSourceSchema,
@@ -102,22 +101,8 @@ type AuthContext = {
   userId: string;
 };
 
-type DecisionEventRow = { payload: unknown };
-type DecisionEventPage = {
-  data: DecisionEventRow[] | null;
-  error: { message: string } | null;
-};
-type DecisionEventQuery = {
-  eq: (column: string, value: string) => DecisionEventQuery;
-  like: (column: string, pattern: string) => DecisionEventQuery;
-  order: (column: string, options: { ascending: boolean }) => DecisionEventQuery;
-  range: (from: number, to: number) => Promise<DecisionEventPage>;
-};
 type DecisionAdminClient = {
   schema: (schema: string) => {
-    from: (table: string) => {
-      select: (columns: string) => DecisionEventQuery;
-    };
     rpc: (
       fn: string,
       args: { _event: unknown; _expected_from_state: string | null },
@@ -127,6 +112,12 @@ type DecisionAdminClient = {
     }>;
   };
 };
+
+export interface DecisionAssignableOwner {
+  user_id: string;
+  display_name: string | null;
+  role: "super_admin" | "admin" | "concierge_lead" | "editor";
+}
 
 async function resolveActor(context: AuthContext): Promise<DecisionActorAccess> {
   const roleNames = ["super_admin", "admin", "concierge_lead", "editor"] as const;
@@ -150,45 +141,6 @@ async function resolveActor(context: AuthContext): Promise<DecisionActorAccess> 
   const actor = resolveDecisionActorAccess(context.userId, flags);
   if (!actor) throw new Response("Forbidden", { status: 403 });
   return actor;
-}
-
-async function loadDecisionProjection(now = new Date()): Promise<DecisionQueueProjection> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const admin = supabaseAdmin as unknown as DecisionAdminClient;
-  const pageSize = 1_000;
-  const rows: DecisionEventRow[] = [];
-
-  for (let from = 0; ; from += pageSize) {
-    const { data, error } = await admin
-      .schema("visitor_intel")
-      .from("events")
-      .select("payload")
-      .eq("kind", "recommendation.lifecycle")
-      .like("subject_id", "decision:%")
-      .order("occurred_at", { ascending: true })
-      .order("ingested_at", { ascending: true })
-      .range(from, from + pageSize - 1);
-    if (error) {
-      console.error("[visitor_intel.decisions] read failed", error);
-      throw new Response("Read failed", { status: 500 });
-    }
-    rows.push(...(data ?? []));
-    if ((data?.length ?? 0) < pageSize) break;
-  }
-
-  const payloads: DecisionEventPayload[] = [];
-  for (const row of rows) {
-    const parsed = VisitorEventSchema.safeParse(row.payload);
-    if (
-      parsed.success &&
-      parsed.data.kind === "recommendation.lifecycle" &&
-      parsed.data.subtype === "decision" &&
-      parsed.data.payload
-    ) {
-      payloads.push(parsed.data.payload);
-    }
-  }
-  return projectDecisionQueue(payloads, { now });
 }
 
 function requireDecision(
@@ -239,6 +191,63 @@ export const getDecisionQueue = createServerFn({ method: "POST" })
     const actor = await resolveActor(context);
     const projection = await loadDecisionProjection();
     return filterDecisionQueueForActor(projection, actor);
+  });
+
+/**
+ * Exposes only the authenticated operator's workflow capabilities. The UI
+ * uses this to hide actions that the server would reject; authorization
+ * remains enforced independently in every mutation below.
+ */
+export const getDecisionActorAccess = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => QueueInputSchema.parse(input))
+  .handler(async ({ context }): Promise<DecisionActorAccess> => resolveActor(context));
+
+/** Minimal owner directory: operational identity only, never email or visitor data. */
+export const getDecisionAssignableOwners = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => QueueInputSchema.parse(input))
+  .handler(async ({ context }): Promise<DecisionAssignableOwner[]> => {
+    const actor = await resolveActor(context);
+    if (!actor.manage_all) throw new Response("Forbidden", { status: 403 });
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: roleRows, error: roleError } = await supabaseAdmin
+      .from("user_roles")
+      .select("user_id, role")
+      .in("role", ["super_admin", "admin", "concierge_lead", "editor"]);
+    if (roleError) throw new Response("Owner role lookup failed", { status: 500 });
+
+    const priority = ["super_admin", "admin", "concierge_lead", "editor"] as const;
+    const roleByUser = new Map<string, DecisionAssignableOwner["role"]>();
+    for (const role of priority) {
+      for (const row of roleRows ?? []) {
+        if (row.role === role && !roleByUser.has(row.user_id)) roleByUser.set(row.user_id, role);
+      }
+    }
+    const userIds = [...roleByUser.keys()];
+    if (userIds.length === 0) return [];
+
+    const { data: profiles, error: profileError } = await supabaseAdmin
+      .from("profiles")
+      .select("user_id, display_name")
+      .in("user_id", userIds);
+    if (profileError) throw new Response("Owner profile lookup failed", { status: 500 });
+    const nameByUser = new Map(
+      (profiles ?? []).map((profile) => [profile.user_id, profile.display_name]),
+    );
+
+    return userIds
+      .map((user_id) => ({
+        user_id,
+        display_name: nameByUser.get(user_id) ?? null,
+        role: roleByUser.get(user_id)!,
+      }))
+      .sort(
+        (left, right) =>
+          priority.indexOf(left.role) - priority.indexOf(right.role) ||
+          (left.display_name ?? left.user_id).localeCompare(right.display_name ?? right.user_id),
+      );
   });
 
 export const proposeDecision = createServerFn({ method: "POST" })

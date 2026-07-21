@@ -3,8 +3,8 @@
 **Estado:** Activo
 **Última actualización:** 2026-07-20
 **Roadmap rector:** `docs/blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`
-**Rama de integración:** `reconciliation/main-benchmark-governance`
-**PR:** Draft PR #1 · Reconcile branches, governance, and package management
+**Rama activa:** `agent/cv8-9-3-action-queue-ui`
+**Base integrada:** `main` · merge `b3a43282`
 
 Este archivo es una instrucción de ejecución subordinada a `docs/governance/00–05` y al roadmap oficial. No crea prioridades nuevas ni sustituye Completion Reports.
 
@@ -43,7 +43,7 @@ Este archivo es una instrucción de ejecución subordinada a `docs/governance/00
    - oportunidades y prioridades CV8.5–CV8.8 reutilizadas por adaptadores puros;
    - proyección pura, sin snapshots paralelos;
    - Completion Report aprobado por el Founder el 2026-07-20.
-2. **CV8.9.2 · Persistencia, roles y auditoría — aprobada para integración**
+2. [x] **CV8.9.2 · Persistencia, roles y auditoría**
    - [x] estados y transiciones autorizadas;
    - [x] `has_role`, lectura assigned-only y escritura service-only;
    - [x] traza de responsable, decisión, motivo y timestamps;
@@ -52,15 +52,22 @@ Este archivo es una instrucción de ejecución subordinada a `docs/governance/00
    - [x] aplicar migración correctiva de orden autoritativo y supersesión única;
    - [x] publicar la rama y su corrección en el PR #2;
    - [x] Completion Report aprobado por el Founder y PR #2 autorizado para integración;
-   - [ ] integrar o desplegar y completar smoke end-to-end con cuentas autenticadas.
-3. [ ] **CV8.9.3 · Superficie operativa**
-   - cola filtrable y detalle explicable;
-   - acciones humanas explícitas, sin auto-ejecución;
-   - estados vacíos y errores operables.
-4. [ ] **CV8.9.4 · Métricas y cierre**
-   - medir tiempo a decisión, backlog, aceptación/rechazo y resultado;
-   - pruebas, smoke, no-regresión y Completion Report;
-   - aprobación Founder antes de abrir AC1.4.
+   - [x] integrar PR #2 y desplegar el merge `b3a43282`;
+   - [x] verificar que producción sirve exactamente el merge autorizado;
+   - [ ] ejecutar smoke humano por roles después de desplegar CV8.9.3 y contar con operadores reales.
+3. [x] **CV8.9.3 · Superficie operativa — cierre técnico**
+   - [x] cola filtrable, buckets, detalle e historial explicable;
+   - [x] propuesta desde CV8.7/CV8.8 y propuesta manual;
+   - [x] aceptación, owner, KPI, dirección, magnitud, ventana y fecha objetivo;
+   - [x] acciones humanas por rol, evidencia, corrección y estados de error/vacío;
+   - [x] cero auto-ejecución y cero datos de visitantes.
+4. [x] **CV8.9.4 · Feedback, métricas y cierre técnico**
+   - [x] `validated/rejected/dismissed` alimentan `family_confidence` CV8.6;
+   - [x] aceptación 7d/30d, p50 a aceptar/implementar, validación, sesgo y SLA;
+   - [x] proyección pura, cero tablas, snapshots o migraciones;
+   - [x] pruebas focalizadas, typecheck, lint acotado y build;
+   - [x] publicar la rama y abrir el Draft PR #3;
+   - [ ] revisar, integrar, desplegar, ejecutar smoke autenticado y aprobar Completion Report.
 
 **DoD CV8.9:** contrato versionado, persistencia segura, UI operable, decisiones auditables, pruebas verdes y Completion Report aprobado.
 
@@ -127,4 +134,4 @@ Al cerrar una ola:
 4. reemplazar aquí sólo el próximo paso operativo;
 5. no mantener instrucciones ya ejecutadas como si siguieran pendientes.
 
-**Siguiente acción:** verificar el despliegue resultante del PR #2 y completar smoke end-to-end con cuentas autenticadas; CV8.9.3 permanece cerrada.
+**Siguiente acción:** revisar e integrar el Draft PR #3 de CV8.9.3–CV8.9.4; después desplegar y ejecutar el smoke autenticado con Founder/Admin y con Concierge Lead/Editor cuando existan operadores reales. AC1.4 permanece cerrada hasta la aprobación del Completion Report CV8.9.

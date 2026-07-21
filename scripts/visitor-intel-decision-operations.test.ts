@@ -13,6 +13,10 @@ import {
   type DecisionEventPayload,
   type DecisionSource,
 } from "@/lib/visitor-intel/decisions";
+import {
+  availableDecisionTransitions,
+  decisionSearchText,
+} from "@/lib/visitor-intel/decision-workspace";
 
 const NOW = new Date("2026-07-20T18:00:00.000Z");
 const FOUNDER = "10000000-0000-4000-8000-000000000001";
@@ -148,5 +152,41 @@ describe("CV8.9.2 · auditable envelope", () => {
     expect(event.subject.subject_id).toBe(decisionSubjectId(DECISION_A));
     expect(event.subject.subject_id).not.toBe(payload.actor_user_id);
     expect(event.payload?.actor_role).toBe("founder");
+  });
+});
+
+describe("CV8.9.3 · workspace presentation policy", () => {
+  const projection = projectDecisionQueue(
+    [proposed(DECISION_A, 0), accepted(DECISION_A, OWNER, 1)],
+    { now: NOW },
+  );
+  const decision = projection.decisions[0]!;
+  const founder = resolveDecisionActorAccess(FOUNDER, {
+    super_admin: true,
+    admin: false,
+    concierge_lead: false,
+    editor: false,
+  })!;
+  const assignee = resolveDecisionActorAccess(OWNER, {
+    super_admin: false,
+    admin: false,
+    concierge_lead: false,
+    editor: true,
+  })!;
+
+  it("shows every contract-valid action to Founder and only assigned progress to Editor", () => {
+    expect(availableDecisionTransitions(founder, decision)).toEqual([
+      "in_progress",
+      "deferred",
+      "dismissed",
+    ]);
+    expect(availableDecisionTransitions(assignee, decision)).toEqual(["in_progress"]);
+  });
+
+  it("builds a privacy-safe operator search index from decision fields", () => {
+    const text = decisionSearchText(decision);
+    expect(text).toContain("jpr_30d");
+    expect(text).toContain("corregir fricción");
+    expect(text).toContain(OWNER);
   });
 });
