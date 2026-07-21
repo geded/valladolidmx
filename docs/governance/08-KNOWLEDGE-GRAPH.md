@@ -21,7 +21,7 @@ Este documento depende explícitamente de:
 - `01-GLOSSARY.md` como única fuente de conceptos y definiciones.
 - `07-BLUEPRINT-DEPENDENCY-MAP.md` como única fuente de relaciones verificadas entre artefactos.
 
-No se pobla grafo alguno en este PR.
+Este PR no puebla el grafo integral; incorpora únicamente la proyección provisional de cinco nodos documentales y tres relaciones verificadas de §4.1.
 
 ## 3. Fuentes canónicas
 
