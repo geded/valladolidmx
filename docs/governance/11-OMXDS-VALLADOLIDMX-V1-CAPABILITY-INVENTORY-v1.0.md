@@ -127,7 +127,7 @@ Las brechas dominantes son operativas:
 | Capacidad | Estado | Evidencia | Deuda V1 | Decisión |
 |---|---|---|---|---|
 | Portal de Empresas | Reusable técnicamente | cierre multibusiness | 15–25 operadores reales | Vertical V1 |
-| Programa Fundadores | Operational pending | plan 17.1 Proposed | Oferta, responsable y cohorte | Primer vertical |
+| Programa Fundadores | Operational pending | plan 17.1 Approved para preparación; Gate B pendiente | Oferta, responsable y cohorte | Primer vertical confirmado |
 | Concierge Workspace | Reusable técnicamente | CV4/CV6/CV8.9 | Turnos, SLA y cobertura | Gate operativo |
 | Action Queue | Reusable técnicamente | CV8.9 cerrado | Datos y owners reales | Activar con cohorte |
 | Soporte e incidentes | Missing blocker | assessment 17 | Runbooks, canal y guardia | Resolver |
