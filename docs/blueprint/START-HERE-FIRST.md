@@ -5,15 +5,15 @@
 
 **Estado:** Active — entrada al Blueprint histórico
 
-**Versión:** 2.1
+**Versión:** 2.2
 
-**Última actualización:** 2026-07-20
+**Última actualización:** 2026-07-21
 
 ---
 
 # LEER PRIMERO LA GOBERNANZA CANÓNICA
 
-Antes de utilizar este documento se debe leer [`docs/governance/README.md`](../governance/README.md) y la serie canónica `00–05`.
+Antes de utilizar este documento se debe leer [`docs/governance/README.md`](../governance/README.md) y la serie canónica `00–08`.
 
 El documento de mayor jerarquía es [`00-CANON.md`](../governance/00-CANON.md). Este archivo es el punto de entrada operativo al Blueprint histórico y no puede modificar, reemplazar ni contradecir la gobernanza aprobada.
 
@@ -158,11 +158,18 @@ La precedencia obligatoria es:
 4. `docs/governance/03-DOCUMENTATION-STANDARD.md`.
 5. `docs/governance/04-DECISION-MAKING.md`.
 6. `docs/governance/05-BLUEPRINT-STANDARD.md`.
-7. [`16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`](./16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md), única hoja de ruta oficial vigente.
-8. `START-HERE-FIRST.md` como guía operativa del Blueprint histórico.
-9. Serie Blueprint `00–10` y documentos posteriores, respetando sus dependencias y versiones aprobadas.
+7. `docs/governance/06-BLUEPRINT-MASTER-INDEX.md` (Approved v0.5) — índice canónico de los 439 blueprints históricos.
+8. `docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md` (Approved v0.4) — mapa de dependencias; su proyección legible por máquina vive en `docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json` y no sustituye al rector.
+9. `docs/governance/08-KNOWLEDGE-GRAPH.md` (Approved v0.4) — grafo semántico; su proyección vive en `docs/governance/generated/08-KNOWLEDGE-GRAPH.json` y no sustituye al rector.
+10. [`16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`](./16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md), única hoja de ruta oficial vigente.
+11. `START-HERE-FIRST.md` como guía operativa del Blueprint histórico.
+12. Serie Blueprint `00–10` y documentos posteriores, respetando sus dependencias y versiones aprobadas.
 
-Los documentos Draft `06-BLUEPRINT-MASTER-INDEX.md`, `07-BLUEPRINT-DEPENDENCY-MAP.md` y `08-KNOWLEDGE-GRAPH.md` apoyarán la navegación cuando sean completados, pero no alteran la precedencia mientras permanezcan en Draft.
+**Gate obligatorio y notas de gobernanza:**
+- Toda propuesta de cambio debe pasar `bun run governance:validate` antes de solicitarse merge; sin PASS no hay revisión Founder.
+- La organización de dominios documentales está regida por [`ADR-GOV-0001`](../decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md).
+- [`.lovable/plan.md`](../../.lovable/plan.md) es estado operativo subordinado a esta precedencia; nunca la sustituye.
+- "Valladolid.mx" es la marca del ecosistema; el dominio técnico canónico está pendiente de resolución por `ADR-GOV-0002` y no debe inferirse de la marca.
 
 ---
 
