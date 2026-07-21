@@ -16,7 +16,7 @@ Este documento reservará el mapa canónico de dependencias entre Blueprints, AD
 
 La numeración y la responsabilidad del documento quedan aprobadas como parte de la reconciliación de gobernanza. El levantamiento completo permanece pendiente y este Draft no crea dependencias nuevas ni modifica las ya aprobadas en documentos de mayor jerarquía.
 
-Este documento depende de `06-BLUEPRINT-MASTER-INDEX.md`: cada nodo y cada arista debe referenciar un identificador existente en el inventario 06. No se pobla mapa alguno en este PR.
+Este documento depende de `06-BLUEPRINT-MASTER-INDEX.md`: cada nodo y cada arista debe referenciar un identificador registrado o referenciado en el overlay provisional de `06`. Este PR no puebla el mapa integral; incorpora únicamente las tres aristas verificadas de §4.1.
 
 ## 3. Relaciones mínimas
 
