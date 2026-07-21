@@ -1,7 +1,7 @@
 # Gobernanza documental de Valladolid.mx
 
 **Estado:** Approved  
-**Versión:** 2.3  
+**Versión:** 2.4  
 **Última actualización:** 2026-07-21
 
 Este directorio contiene el sistema canónico que gobierna Valladolid.mx. Su lectura comienza siempre por el CANON. Ningún Blueprint, roadmap, ADR, PRD, plan de Lovable, decisión técnica o implementación puede contradecir esta jerarquía.
@@ -21,8 +21,9 @@ Este directorio contiene el sistema canónico que gobierna Valladolid.mx. Su lec
 |    08 | [KNOWLEDGE GRAPH](./08-KNOWLEDGE-GRAPH.md)                   | Approved | Vista semántica de conceptos, dominios, documentos y artefactos.                  |
 |    09 | [OMXDS FOUNDATION](./09-OMXDS-FOUNDATION-v1.0.md)          | Approved | Ecosistema regional, jerarquía de productos, North Star y regla de priorización V1. |
 |    10 | [OMXDS VISITOR JOURNEY INTELLIGENCE](./10-OMXDS-VISITOR-JOURNEY-INTELLIGENCE-MEASUREMENT-BLUEPRINT-v1.0.md) | Approved | Medición responsable del recorrido completo, identidad progresiva, atribución, paneles y privacidad. |
+|    11 | [OMXDS VALLADOLID.MX V1 CAPABILITY INVENTORY](./11-OMXDS-VALLADOLIDMX-V1-CAPABILITY-INVENTORY-v1.0.md) | Approved | Inventario de las diez capas OMXDS, brechas para soft launch y Programa Fundadores confirmado como primer vertical. |
 
-Los documentos `00–10` gobiernan dentro de la responsabilidad declarada por cada uno. `06` acredita autoridad documental, no implementación. `07` registra sólo relaciones demostrables; una ausencia significa `Not established`. `08` enlaza fuentes canónicas sin redefinirlas.
+Los documentos `00–11` gobiernan dentro de la responsabilidad declarada por cada uno. `06` acredita autoridad documental, no implementación. `07` registra sólo relaciones demostrables; una ausencia significa `Not established`. `08` enlaza fuentes canónicas sin redefinirlas.
 
 ## Activos derivados y validación
 
@@ -53,7 +54,7 @@ Toda modificación a una fuente, dataset o regla de derivación debe actualizar 
 Cuando dos documentos entren en conflicto, se aplica este orden:
 
 1. `00-CANON.md`.
-2. Documentos aprobados `01–10`, dentro de la responsabilidad que gobierna cada uno.
+2. Documentos aprobados `01–11`, dentro de la responsabilidad que gobierna cada uno.
 3. Roadmap oficial vigente.
 4. Blueprints y ADR aprobados.
 5. PRD, runbooks, Completion Reports, auditorías y guías.
@@ -119,10 +120,12 @@ La línea base, sus límites y el plan de cierre están documentados en [`audit/
 
 ## Cierre canónico
 
-La gobernanza `00–10`, la taxonomía de 14 dominios, el mapa de dependencias y el grafo de conocimiento están aprobados y constituyen la base oficial para decisiones, Blueprints, auditorías e implementación futura de Valladolid.mx.
+La gobernanza `00–11`, la taxonomía de 14 dominios, el mapa de dependencias y el grafo de conocimiento están aprobados y constituyen la base oficial para decisiones, Blueprints, auditorías e implementación futura de Valladolid.mx.
 
 OMXDS Foundation V1.0 establece el marco regional superior sin renombrar Valladolid.mx ni predeterminar el primer vertical operativo.
 
 OMXDS Visitor Journey Intelligence & Measurement Blueprint V1.0 gobierna la observación responsable del viaje completo y no autoriza por sí mismo instrumentación, nuevos tratamientos de datos ni cambios en producción.
+
+OMXDS Valladolid.mx V1 Capability Inventory confirma el Programa Fundadores Valladolid como primer vertical. Autoriza actualizar roadmap y plan operativo, pero no contactar empresas, incorporar la cohorte, activar cobros ni modificar producción.
 
 El cierre no congela el proyecto. Establece el procedimiento para evolucionarlo sin perder identidad, trazabilidad ni sentido de destino.
