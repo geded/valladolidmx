@@ -26,6 +26,9 @@ import { MapPin } from "lucide-react";
 import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
+import type { TravelItemKind } from "@/lib/traveler/travel-plans.functions";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import {
   TourismCard,
@@ -120,6 +123,14 @@ export interface TourismListingSurfaceProps {
   mapSlot?: React.ReactNode;
   /** Entidad favoritable por card (fallback: se deduce por entityKind). */
   favoriteKindFor?: (vm: TourismCardVM) => "business" | "product" | "promotion" | null;
+  /**
+   * TP1.4 · Universal "Agregar a Mi Viaje".
+   * Por defecto `true`: la superficie renderiza el botón cuando la
+   * política central de elegibilidad (`evaluateTripEligibility`) lo
+   * autoriza. Superficies que deban excluirlo explícitamente pueden
+   * pasar `false` sin romper consumidores existentes.
+   */
+  showAddToTrip?: boolean;
   className?: string;
 }
 
@@ -139,6 +150,7 @@ export function TourismListingSurface({
   capabilities,
   mapSlot,
   favoriteKindFor,
+  showAddToTrip = true,
   className,
 }: TourismListingSurfaceProps) {
   const [active, setActive] = useState<Record<string, string | null>>({});
