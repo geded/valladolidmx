@@ -20,7 +20,8 @@ Este directorio contiene el sistema canónico que gobierna Valladolid.mx. Su lec
 |    07 | [BLUEPRINT DEPENDENCY MAP](./07-BLUEPRINT-DEPENDENCY-MAP.md) | Approved | Dependencias verificadas entre documentos, implementación, migraciones y pruebas. |
 |    08 | [KNOWLEDGE GRAPH](./08-KNOWLEDGE-GRAPH.md)                   | Approved | Vista semántica de conceptos, dominios, documentos y artefactos.                  |
 |    09 | [OMXDS FOUNDATION](./09-OMXDS-FOUNDATION-v1.0.md)          | Approved | Ecosistema regional, jerarquía de productos, North Star y regla de priorización V1. |
-|    10 | [OMXDS VISITOR JOURNEY INTELLIGENCE](./10-OMXDS-VISITOR-JOURNEY-INTELLIGENCE-MEASUREMENT-BLUEPRINT-v1.0.md) | Approved | Medición responsable del recorrido completo, identidad progresiva, atribución, paneles y privacidad. |\n|    11 | [OMXDS VALLADOLID.MX V1 CAPABILITY INVENTORY](./11-OMXDS-VALLADOLIDMX-V1-CAPABILITY-INVENTORY-v1.0.md) | Proposed | Inventario de las diez capas OMXDS, brechas para soft launch y primer vertical recomendado. |
+|    10 | [OMXDS VISITOR JOURNEY INTELLIGENCE](./10-OMXDS-VISITOR-JOURNEY-INTELLIGENCE-MEASUREMENT-BLUEPRINT-v1.0.md) | Approved | Medición responsable del recorrido completo, identidad progresiva, atribución, paneles y privacidad. |
+|    11 | [OMXDS VALLADOLID.MX V1 CAPABILITY INVENTORY](./11-OMXDS-VALLADOLIDMX-V1-CAPABILITY-INVENTORY-v1.0.md) | Approved | Inventario de las diez capas OMXDS, brechas para soft launch y Programa Fundadores confirmado como primer vertical. |
 
 Los documentos `00–11` gobiernan dentro de la responsabilidad declarada por cada uno. `06` acredita autoridad documental, no implementación. `07` registra sólo relaciones demostrables; una ausencia significa `Not established`. `08` enlaza fuentes canónicas sin redefinirlas.
 
@@ -123,6 +124,8 @@ La gobernanza `00–11`, la taxonomía de 14 dominios, el mapa de dependencias y
 
 OMXDS Foundation V1.0 establece el marco regional superior sin renombrar Valladolid.mx ni predeterminar el primer vertical operativo.
 
-OMXDS Visitor Journey Intelligence & Measurement Blueprint V1.0 gobierna la observación responsable del viaje completo y no autoriza por sí mismo instrumentación, nuevos tratamientos de datos ni cambios en producción.\n\nOMXDS Valladolid.mx V1 Capability Inventory propone el Programa Fundadores Valladolid como primer vertical; permanece en estado Proposed y no autoriza contacto, cobros ni cambios en producción.
+OMXDS Visitor Journey Intelligence & Measurement Blueprint V1.0 gobierna la observación responsable del viaje completo y no autoriza por sí mismo instrumentación, nuevos tratamientos de datos ni cambios en producción.
+
+OMXDS Valladolid.mx V1 Capability Inventory confirma el Programa Fundadores Valladolid como primer vertical. Autoriza actualizar roadmap y plan operativo, pero no contactar empresas, incorporar la cohorte, activar cobros ni modificar producción.
 
 El cierre no congela el proyecto. Establece el procedimiento para evolucionarlo sin perder identidad, trazabilidad ni sentido de destino.
