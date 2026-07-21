@@ -71,14 +71,21 @@ El servidor de desarrollo usa Vite. La aplicación se construye con TanStack Sta
 
 ## Validación de gobernanza
 
-Las proyecciones canónicas de dependencias y conocimiento deben seguir siendo reproducibles:
+Las proyecciones canónicas y el inventario vivo deben seguir siendo reproducibles:
 
 ```bash
 bun scripts/governance/validate-dependency-map.mjs
 bun scripts/governance/validate-knowledge-graph.mjs
+bun scripts/governance/validate-governance-integrity.mjs
 ```
 
-Un cambio que afecte `06`, `07`, `08`, sus JSON derivados o sus fuentes debe ejecutar ambos validadores y registrar la evidencia resultante.
+También puede ejecutarse el conjunto completo:
+
+```bash
+bun run governance:validate
+```
+
+Un cambio que afecte `06`, `07`, `08`, sus JSON derivados o sus fuentes debe ejecutar los tres validadores y registrar la evidencia resultante. El workflow `Governance Integrity` impide incorporar archivos, migraciones, rutas, plantillas, piezas SEO o configuraciones sensibles nuevas sin actualizar su inventario y trazabilidad.
 
 ## Reglas de contribución
 
