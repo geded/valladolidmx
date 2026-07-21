@@ -1,6 +1,6 @@
 # 12 · Programa Fundadores Valladolid — Gate B Readiness Pack v1.0
 
-**Estado:** Proposed · pendiente de aprobación Founder  
+**Estado:** Decision-ready · oferta comercial aprobada; Gate B1 y Gate B2 permanecen cerrados  
 **Fecha:** 2026-07-21  
 **Owner de decisión:** Founder  
 **Dependencias:** `11-OMXDS-VALLADOLIDMX-V1-CAPABILITY-INVENTORY-v1.0.md` · `17.1-PROGRAMA-FUNDADORES-VALLADOLID-OPERATING-PLAN-v1.0.md`  
@@ -42,7 +42,7 @@ El éxito del piloto no se mide por firmas ceremoniales ni por fichas incompleta
 
 ---
 
-## 3. Propuesta comercial recomendada
+## 3. Propuesta comercial aprobada
 
 ### 3.1 Promesa central
 
@@ -50,9 +50,9 @@ El éxito del piloto no se mide por firmas ceremoniales ni por fichas incompleta
 
 La propuesta vende valor operativo y visibilidad de destino. No debe prometer volumen de ventas, posicionamiento garantizado, exclusividad, número de prospectos ni preferencia algorítmica.
 
-### 3.2 Oferta piloto recomendada
+### 3.2 Oferta piloto aprobada
 
-| Elemento | Condición propuesta |
+| Elemento | Condición aprobada |
 |---|---|
 | Cupo | Cinco empresas piloto en la primera ola. |
 | Duración de onboarding | Hasta 30 días por empresa desde aceptación. |
@@ -139,6 +139,20 @@ Además de las cinco seleccionadas, se recomienda aprobar hasta cinco candidatas
 
 La lista nominal y los datos personales deben permanecer en una superficie de acceso restringido; nunca en este repositorio público.
 
+### 4.5 Cohorte titular codificada
+
+La selección preliminar queda registrada públicamente sólo mediante códigos anónimos y el lugar funcional que cubre cada candidata. Los nombres, puntajes, personas de contacto y brechas de verificación permanecen en el expediente restringido.
+
+| Código | Lugar en la mezcla del piloto | Estado autorizado |
+|---|---|---|
+| PFV-01 | experiencia cultural, natural o comunitaria | preseleccionada; no contactar |
+| PFV-02 | alojamiento | preseleccionada; no contactar |
+| PFV-03 | restaurante o experiencia gastronómica | preseleccionada; no contactar |
+| PFV-04 | operador, guía o movilidad turística | preseleccionada; no contactar |
+| PFV-05 | segunda experiencia diferenciada | preseleccionada; no contactar |
+
+La codificación no constituye verificación, aceptación, incorporación ni autorización de uso de marca. Gate B1 continúa cerrado.
+
 ---
 
 ## 5. Obligaciones de las partes
@@ -219,10 +233,10 @@ Este expediente define requisitos de producto y operación; no sustituye asesor�
 | Rol | Responsable nominal | Función | Requisito para B1 |
 |---|---|---|---|
 | Sponsor y decisión | Founder | aprueba oferta, candidatas, excepciones y gates | obligatorio |
-| Responsable del programa | Por designar | controla cohorte, agenda, estados y reporte | obligatorio |
-| Verificación | Por designar | valida identidad, propiedad, ubicación y operación | obligatorio |
-| Edición | Por designar | normaliza ficha y catálogo sin inventar | obligatorio |
-| Soporte empresas | Por designar | acompaña alta, portal y correcciones | obligatorio |
+| Responsable del programa | Founder · interino | controla cohorte, agenda, estados y reporte | obligatorio |
+| Verificación | Founder · interino | valida identidad, propiedad, ubicación y operación | delegar antes del primer contacto |
+| Edición | Founder · interino | normaliza ficha y catálogo sin inventar | delegar antes del primer contacto |
+| Soporte empresas | Founder · interino | acompaña alta, portal y correcciones | delegar antes del primer contacto |
 | Concierge/viajeros | Por designar | atiende solicitudes activadas durante piloto | antes de viajeros reales |
 | Legal/fiscal | Por designar o externo | valida textos y flujo comercial | legal para B1; legal/fiscal para B2 |
 
@@ -423,12 +437,12 @@ Hasta cerrar B2, “ventas en línea” puede existir técnicamente, pero no for
 
 ### 13.1 Gate B1 · GO para invitar e incorporar
 
-- [ ] oferta comercial aprobada por Founder;
-- [ ] responsable del programa nombrado;
-- [ ] responsables o suplentes de verificación, edición y soporte nombrados;
+- [x] oferta comercial aprobada por Founder;
+- [x] responsable del programa nombrado de forma interina;
+- [x] verificación, edición y soporte asignados interinamente al Founder; deben delegarse antes del primer contacto;
 - [ ] canal, horario y escalación confirmados;
 - [ ] aviso de privacidad, consentimiento y términos del piloto revisados;
-- [ ] cinco candidatas titulares seleccionadas mediante scorecard;
+- [x] cinco candidatas titulares preseleccionadas y registradas como PFV-01 a PFV-05; identidad y scorecard bajo acceso restringido;
 - [ ] hasta cinco reservas seleccionadas;
 - [ ] registro restringido preparado;
 - [ ] paquete de invitación aprobado;
@@ -470,23 +484,31 @@ Este expediente está completo en estructura, pero Gate B1 no puede aprobarse ha
 
 | Decisión | Valor pendiente |
 |---|---|
-| Responsable del programa | — |
-| Suplente | — |
-| Responsable de verificación | — |
-| Responsable de edición | — |
-| Soporte empresas | — |
+| Responsable del programa | Founder · interino |
+| Suplente | pendiente antes del primer contacto |
+| Responsable de verificación | Founder · interino; delegación pendiente |
+| Responsable de edición | Founder · interino; delegación pendiente |
+| Soporte empresas | Founder · interino; delegación pendiente |
 | Canal WhatsApp Business | — |
 | Correo operativo | — |
 | Horario definitivo | — |
 | Responsable legal/privacidad | — |
-| Cinco candidatas titulares | registro restringido, no GitHub |
+| Cinco candidatas titulares | PFV-01 a PFV-05 en GitHub; identidades y scorecard en registro restringido |
 | Hasta cinco reservas | registro restringido, no GitHub |
-| Aceptación de oferta 0% × 6 meses | aprobar / modificar / rechazar |
-| Modalidad B1 sin cobro | aprobar / modificar / rechazar |
+| Aceptación de oferta 0% × 6 meses | aprobada por Founder el 2026-07-21 |
+| Modalidad B1 sin cobro | aprobada por Founder el 2026-07-21 |
 
 ---
 
-## 15. Plantilla de resolución Founder
+## 15. Resolución parcial Founder y plantilla de Gate B1
+
+### 15.1 Resolución registrada · 2026-07-21
+
+El Founder aprueba la oferta del Programa Fundadores Valladolid: cuota de alta de $0 MXN, comisión de plataforma de 0% durante seis meses y piloto inicial sin cobros procesados por Valladolid.mx. También autoriza la asignación operativa interina al Founder y la preselección codificada PFV-01 a PFV-05.
+
+Esta resolución no abre Gate B1 ni Gate B2. No autoriza publicar nombres, contactar candidatas, enviar invitaciones, iniciar onboarding, publicar fichas reales ni activar checkout o cobros.
+
+### 15.2 Plantilla de resolución pendiente para Gate B1
 
 ### Opción A · GO B1
 
@@ -526,7 +548,7 @@ No se debe abrir una campaña pública “Sé Fundador” antes de demostrar que
 
 | Versión | Fecha | Estado | Descripción |
 |---|---|---|---|
-| 1.0 | 2026-07-21 | Proposed | Expediente completo para decidir Gate B1, separar Gate B2 comercial y pilotear cinco empresas sin contacto ni cobro todavía. |
+| 1.0 | 2026-07-21 | Decision-ready | Oferta comercial aprobada; Founder asignado interinamente; cohorte registrada como PFV-01 a PFV-05; Gate B1/B2 cerrados y sin contacto ni cobro. |
 
 ---
 
