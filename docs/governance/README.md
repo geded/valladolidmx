@@ -1,7 +1,7 @@
 # Gobernanza documental de Valladolid.mx
 
 **Estado:** Approved  
-**Versión:** 2.6  
+**Versión:** 2.7  
 **Última actualización:** 2026-07-21
 
 Este directorio contiene el sistema canónico que gobierna Valladolid.mx. Su lectura comienza siempre por el CANON. Ningún Blueprint, roadmap, ADR, PRD, plan de Lovable, decisión técnica o implementación puede contradecir esta jerarquía.
@@ -23,9 +23,9 @@ Este directorio contiene el sistema canónico que gobierna Valladolid.mx. Su lec
 |    10 | [OMXDS VISITOR JOURNEY INTELLIGENCE](./10-OMXDS-VISITOR-JOURNEY-INTELLIGENCE-MEASUREMENT-BLUEPRINT-v1.0.md) | Approved | Medición responsable del recorrido completo, identidad progresiva, atribución, paneles y privacidad. |
 |    11 | [OMXDS VALLADOLID.MX V1 CAPABILITY INVENTORY](./11-OMXDS-VALLADOLIDMX-V1-CAPABILITY-INVENTORY-v1.0.md) | Approved | Inventario de las diez capas OMXDS, brechas para soft launch y Programa Fundadores confirmado como primer vertical. |
 |    12 | [PROGRAMA FUNDADORES VALLADOLID · GATE B READINESS PACK](./12-PROGRAMA-FUNDADORES-VALLADOLID-GATE-B-READINESS-PACK-v1.0.md) | Decision-ready | Oferta comercial aprobada, owner interino y cohorte codificada; Gate B1/B2 continúan cerrados. |
-|    13 | [OMXDS COMMERCE, EXPERIENCES & SETTLEMENT BLUEPRINT](./13-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-BLUEPRINT-v1.0.md) | Proposed | Autoridad comercial, inventario, checkout central, ledger, conciliación, liquidaciones y paneles Admin/Empresa; Gate B2 cerrado. |
+|    13 | [OMXDS COMMERCE, EXPERIENCES & SETTLEMENT BLUEPRINT](./13-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-BLUEPRINT-v1.0.md) | Approved | Autoridad comercial exclusiva de Administración, checkout central, ledger, conciliación, liquidaciones y paneles Admin/Empresa; Gate B2 cerrado. |
 
-Los documentos `00–11` gobiernan dentro de la responsabilidad declarada por cada uno. `06` acredita autoridad documental, no implementación. `07` registra sólo relaciones demostrables; una ausencia significa `Not established`. `08` enlaza fuentes canónicas sin redefinirlas.
+Los documentos `00–11` y `13` gobiernan dentro de la responsabilidad declarada por cada uno. `06` acredita autoridad documental, no implementación. `07` registra sólo relaciones demostrables; una ausencia significa `Not established`. `08` enlaza fuentes canónicas sin redefinirlas.
 
 ## Activos derivados y validación
 
@@ -56,7 +56,7 @@ Toda modificación a una fuente, dataset o regla de derivación debe actualizar 
 Cuando dos documentos entren en conflicto, se aplica este orden:
 
 1. `00-CANON.md`.
-2. Documentos aprobados `01–11`, dentro de la responsabilidad que gobierna cada uno.
+2. Documentos aprobados `01–11` y `13`, dentro de la responsabilidad que gobierna cada uno.
 3. Roadmap oficial vigente.
 4. Blueprints y ADR aprobados.
 5. PRD, runbooks, Completion Reports, auditorías y guías.
@@ -132,4 +132,4 @@ OMXDS Valladolid.mx V1 Capability Inventory confirma el Programa Fundadores Vall
 
 Programa Fundadores Valladolid Gate B Readiness Pack v1.0 registra la oferta comercial aprobada, la asignación interina al Founder y la cohorte PFV-01 a PFV-05. Permanece `Decision-ready`: no autoriza contactos, publicación ni cobros.
 
-El cierre no congela el proyecto. Establece el procedimiento para evolucionarlo sin perder identidad, trazabilidad ni sentido de destino.
+OMXDS Commerce, Experiences & Settlement Blueprint V1.0 aprueba el modelo central de autorización comercial, checkout, comisiones, ledger, conciliación y liquidaciones. Autoriza preparar PRD, roadmap y plan C0–C8 con flags OFF; no inicia implementación ni abre Gate B2.\n\nEl cierre no congela el proyecto. Establece el procedimiento para evolucionarlo sin perder identidad, trazabilidad ni sentido de destino.
