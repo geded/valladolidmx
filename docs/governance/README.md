@@ -18,9 +18,9 @@ Este directorio contiene la jerarquía documental que gobierna Valladolid.mx. Su
 | 03 | [DOCUMENTATION STANDARD](./03-DOCUMENTATION-STANDARD.md) | Approved | Creación, mantenimiento y deprecación documental. |
 | 04 | [DECISION MAKING](./04-DECISION-MAKING.md) | Approved | Evaluación, aprobación y trazabilidad de decisiones. |
 | 05 | [BLUEPRINT STANDARD](./05-BLUEPRINT-STANDARD.md) | Approved | Contrato de calidad para nuevos Blueprints. |
-| 06 | [BLUEPRINT MASTER INDEX](./06-BLUEPRINT-MASTER-INDEX.md) | Draft | Catálogo único de Blueprints y su estado. |
-| 07 | [BLUEPRINT DEPENDENCY MAP](./07-BLUEPRINT-DEPENDENCY-MAP.md) | Draft | Dependencias entre documentos, decisiones e implementación. |
-| 08 | [KNOWLEDGE GRAPH](./08-KNOWLEDGE-GRAPH.md) | Draft | Relaciones semánticas entre conceptos y artefactos. |
+| 06 | [BLUEPRINT MASTER INDEX](./06-BLUEPRINT-MASTER-INDEX.md) | Review Candidate | Catálogo del portafolio vigente y las 424 entradas históricas por familia. |
+| 07 | [BLUEPRINT DEPENDENCY MAP](./07-BLUEPRINT-DEPENDENCY-MAP.md) | Review Candidate | Trazabilidad entre autoridad, diseño, implementación, datos y evidencia. |
+| 08 | [KNOWLEDGE GRAPH](./08-KNOWLEDGE-GRAPH.md) | Review Candidate | Relaciones semánticas entre conceptos, actores, capacidades y artefactos. |
 
 ## Regla de precedencia
 
