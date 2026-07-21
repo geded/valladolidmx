@@ -1,12 +1,12 @@
 # 13 · OMXDS Commerce, Experiences & Settlement Blueprint
 
-**Estado:** Proposed  
+**Estado:** Approved by Founder  
 **Versión:** 1.0  
 **Fecha:** 2026-07-21  
 **Owner documental:** Founder  
 **Dominios primarios:** D06 · marketplace-commerce; D07 · provider-operations  
 **Gate operativo:** Gate B2 cerrado  
-**Alcance de esta versión:** Diseño vinculable; no implementación ni activación
+**Alcance de esta versión:** Modelo vinculante y preparación de PRD/roadmap/plan; no implementación ni activación
 
 ---
 
@@ -1195,17 +1195,20 @@ La aprobación documental de este Blueprint:
 
 ---
 
-# 33. Solicitud de decisión Founder
+# 33. Decisión Founder registrada
 
-Para elevar este documento de Proposed a Approved se requiere una declaración explícita que confirme:
+**Aprobado el 2026-07-21.** La decisión confirma:
 
-- autoridad exclusiva de Administración para venta y comisión;
+- autoridad exclusiva de Administración para autorizar ventas y definir comisiones;
 - checkout central de Valladolid.mx;
-- separación editorial/comercial;
+- separación de aprobación editorial y comercial;
 - panel Admin de Experiencias;
-- panel empresarial de ventas y pagos;
-- implementación por etapas con flags OFF;
-- Gate B2 cerrado hasta nueva autorización.
+- panel Empresa para ventas, comisiones, liquidaciones y pagos;
+- autorización para actualizar roadmap y preparar PRD y plan Lovable C0–C8;
+- todos los feature flags permanecen OFF;
+- Gate B2 permanece cerrado: no se autorizan cobros ni liquidaciones reales.
+
+Esta aprobación otorga autoridad documental al modelo. No inicia C0 ni ninguna etapa técnica; cada etapa requiere GO posterior y Completion Report.
 
 ---
 
