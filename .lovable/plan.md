@@ -43,7 +43,7 @@ Este archivo es una instrucción de ejecución subordinada a `docs/governance/00
    - oportunidades y prioridades CV8.5–CV8.8 reutilizadas por adaptadores puros;
    - proyección pura, sin snapshots paralelos;
    - Completion Report aprobado por el Founder el 2026-07-20.
-2. **CV8.9.2 · Persistencia, roles y auditoría — hardening DB completo**
+2. **CV8.9.2 · Persistencia, roles y auditoría — aprobada para integración**
    - [x] estados y transiciones autorizadas;
    - [x] `has_role`, lectura assigned-only y escritura service-only;
    - [x] traza de responsable, decisión, motivo y timestamps;
@@ -51,6 +51,7 @@ Este archivo es una instrucción de ejecución subordinada a `docs/governance/00
    - [x] aplicar migración y ejecutar smoke DB con autorización Founder;
    - [x] aplicar migración correctiva de orden autoritativo y supersesión única;
    - [x] publicar la rama y su corrección en el PR #2;
+   - [x] Completion Report aprobado por el Founder y PR #2 autorizado para integración;
    - [ ] integrar o desplegar y completar smoke end-to-end con cuentas autenticadas.
 3. [ ] **CV8.9.3 · Superficie operativa**
    - cola filtrable y detalle explicable;
@@ -126,4 +127,4 @@ Al cerrar una ola:
 4. reemplazar aquí sólo el próximo paso operativo;
 5. no mantener instrucciones ya ejecutadas como si siguieran pendientes.
 
-**Siguiente acción:** aprobar e integrar el PR #2, desplegar sus funciones de servidor y completar smoke end-to-end con cuentas autenticadas; CV8.9.3 permanece cerrada.
+**Siguiente acción:** verificar el despliegue resultante del PR #2 y completar smoke end-to-end con cuentas autenticadas; CV8.9.3 permanece cerrada.
