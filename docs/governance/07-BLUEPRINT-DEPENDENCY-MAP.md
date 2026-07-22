@@ -2,7 +2,7 @@
 
 **Estado:** Approved
 
-**Versión:** 0.6
+**Versión:** 0.7
 
 **Última actualización:** 2026-07-21
 
@@ -10,11 +10,11 @@
 
 ## 1. Propósito
 
-Mapa canónico y reproducible de relaciones verificadas entre los 444 documentos registrados en `06` y sus artefactos asociados de implementación, migración y prueba. Una ausencia significa `Not established`; nunca se rellena mediante inferencia silenciosa.
+Mapa canónico y reproducible de relaciones verificadas entre los 447 documentos registrados en `06` y sus artefactos asociados de implementación, migración y prueba. Una ausencia significa `Not established`; nunca se rellena mediante inferencia silenciosa.
 
 ## 2. Base congelada y alcance
 
-Esta versión deriva exclusivamente de `06 v0.7 Approved`. Conserva los 444 nodos documentales, incluidos PRD Suite `18.01` y Plan Lovable `18.02` de Commerce, y convierte únicamente asociaciones validadas de `06` en aristas. La evidencia autocontenida no se presenta como una prueba externa independiente.
+Esta versión deriva exclusivamente de `06 v0.8 Approved`. Conserva los 447 nodos documentales, incluidos Audit `18.03`, PRD Suite `18.04` y Plan Lovable `18.05` del programa Visual, además de Commerce `18.01–18.02`, y convierte únicamente asociaciones validadas de `06` en aristas. La evidencia autocontenida no se presenta como una prueba externa independiente.
 
 El dataset legible por máquina se publica junto a este documento en `docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json`; este Markdown resume el contrato y contiene el inventario completo de artefactos y aristas.
 
@@ -36,9 +36,9 @@ Toda arista registra origen, destino, relación, evidencia, fila fuente y fecha.
 
 ## 4. Cobertura
 
-- Nodos documentales: **444**.
+- Nodos documentales: **447**.
 - Nodos de artefacto únicos: **546**.
-- Nodos totales: **990**.
+- Nodos totales: **993**.
 - Aristas verificadas: **1119**.
 - Aristas inválidas: **0**.
 
@@ -62,7 +62,7 @@ Las cadenas están representadas sin fabricar dependencias. Los huecos explícit
 
 ## 5. Nodos de artefacto
 
-Los 444 nodos documentales se heredan íntegramente de `06`; aquí se enumeran los artefactos únicos adicionales.
+Los 447 nodos documentales se heredan íntegramente de `06`; aquí se enumeran los artefactos únicos adicionales.
 
 | ID | Tipo | Ruta |
 |---|---|---|
@@ -1057,7 +1057,7 @@ Los 444 nodos documentales se heredan íntegramente de `06`; aquí se enumeran l
 | `E0441` | `ART:src/components/discovery/index.ts` | `implements` | `DOC:docs/blueprint/15.10.6.2-OFFLINE-FIRST.md` | docs/blueprint/15.10.6.2-OFFLINE-FIRST.md § asociación de implementación validada | 2026-07-21 |
 | `E0442` | `ART:src/routes/__root.tsx` | `implements` | `DOC:docs/blueprint/15.10.6.2-OFFLINE-FIRST.md` | docs/blueprint/15.10.6.2-OFFLINE-FIRST.md § asociación de implementación validada | 2026-07-21 |
 | `E0443` | `ART:src/routes/offline.tsx` | `implements` | `DOC:docs/blueprint/15.10.6.2-OFFLINE-FIRST.md` | docs/blueprint/15.10.6.2-OFFLINE-FIRST.md § asociación de implementación validada | 2026-07-21 |
-| `E0444` | `ART:src/components/discovery/SyncStatusBanner.tsx` | `implements` | `DOC:docs/blueprint/15.10.6.3-SYNC-QUEUE.md` | docs/blueprint/15.10.6.3-SYNC-QUEUE.md § asociación de implementación validada | 2026-07-21 |
+| `E0447` | `ART:src/components/discovery/SyncStatusBanner.tsx` | `implements` | `DOC:docs/blueprint/15.10.6.3-SYNC-QUEUE.md` | docs/blueprint/15.10.6.3-SYNC-QUEUE.md § asociación de implementación validada | 2026-07-21 |
 | `E0445` | `ART:src/components/discovery/index.ts` | `implements` | `DOC:docs/blueprint/15.10.6.3-SYNC-QUEUE.md` | docs/blueprint/15.10.6.3-SYNC-QUEUE.md § asociación de implementación validada | 2026-07-21 |
 | `E0446` | `ART:src/pwa/sync-queue.ts` | `implements` | `DOC:docs/blueprint/15.10.6.3-SYNC-QUEUE.md` | docs/blueprint/15.10.6.3-SYNC-QUEUE.md § asociación de implementación validada | 2026-07-21 |
 | `E0447` | `ART:src/pwa/sync-runner.ts` | `implements` | `DOC:docs/blueprint/15.10.6.3-SYNC-QUEUE.md` | docs/blueprint/15.10.6.3-SYNC-QUEUE.md § asociación de implementación validada | 2026-07-21 |
@@ -1603,7 +1603,7 @@ Los 444 nodos documentales se heredan íntegramente de `06`; aquí se enumeran l
 | `E0987` | `ART:src/lib/experience-builder/blocks/experience-map/contract.ts` | `implements` | `DOC:docs/blueprint/C2.F1-EXPERIENCE-MAP-PILOT-COMPLETION-REPORT-v1.0.md` | docs/blueprint/C2.F1-EXPERIENCE-MAP-PILOT-COMPLETION-REPORT-v1.0.md § asociación de implementación validada | 2026-07-21 |
 | `E0988` | `ART:src/lib/experience-builder/blocks/experience-map/defaults.ts` | `implements` | `DOC:docs/blueprint/C2.F1-EXPERIENCE-MAP-PILOT-COMPLETION-REPORT-v1.0.md` | docs/blueprint/C2.F1-EXPERIENCE-MAP-PILOT-COMPLETION-REPORT-v1.0.md § asociación de implementación validada | 2026-07-21 |
 | `E0989` | `ART:src/lib/experience-builder/blocks/experience-map/types.ts` | `implements` | `DOC:docs/blueprint/C2.F1-EXPERIENCE-MAP-PILOT-COMPLETION-REPORT-v1.0.md` | docs/blueprint/C2.F1-EXPERIENCE-MAP-PILOT-COMPLETION-REPORT-v1.0.md § asociación de implementación validada | 2026-07-21 |
-| `E0990` | `ART:scripts/experience-map-defaults.test.ts` | `demonstrates` | `DOC:docs/blueprint/C2.F1-EXPERIENCE-MAP-PILOT-COMPLETION-REPORT-v1.0.md` | docs/blueprint/C2.F1-EXPERIENCE-MAP-PILOT-COMPLETION-REPORT-v1.0.md § prueba/evidencia externa validada | 2026-07-21 |
+| `E0993` | `ART:scripts/experience-map-defaults.test.ts` | `demonstrates` | `DOC:docs/blueprint/C2.F1-EXPERIENCE-MAP-PILOT-COMPLETION-REPORT-v1.0.md` | docs/blueprint/C2.F1-EXPERIENCE-MAP-PILOT-COMPLETION-REPORT-v1.0.md § prueba/evidencia externa validada | 2026-07-21 |
 | `E0991` | `ART:public/push-sw.js` | `implements` | `DOC:docs/blueprint/CANONICAL-DOMAIN-AUDIT-v1.0.md` | docs/blueprint/CANONICAL-DOMAIN-AUDIT-v1.0.md § asociación de implementación validada | 2026-07-21 |
 | `E0992` | `ART:src/components/experience-builder/PagesPanel.tsx` | `implements` | `DOC:docs/blueprint/CANONICAL-DOMAIN-AUDIT-v1.0.md` | docs/blueprint/CANONICAL-DOMAIN-AUDIT-v1.0.md § asociación de implementación validada | 2026-07-21 |
 | `E0993` | `ART:src/components/experience-builder/SeoPreview.tsx` | `implements` | `DOC:docs/blueprint/CANONICAL-DOMAIN-AUDIT-v1.0.md` | docs/blueprint/CANONICAL-DOMAIN-AUDIT-v1.0.md § asociación de implementación validada | 2026-07-21 |
@@ -1736,14 +1736,14 @@ Los 444 nodos documentales se heredan íntegramente de `06`; aquí se enumeran l
 
 ## 7. Validación reproducible
 
-El validador portable `scripts/governance/validate-dependency-map.mjs` rechaza: filas distintas de 444, IDs duplicados, nodos sin ruta o tipo, aristas con extremos inexistentes, aristas sin evidencia, autorreferencias y relaciones duplicadas. El paquete de revisión incluye el validador, JSON canónico, reporte y hashes.
+El validador portable `scripts/governance/validate-dependency-map.mjs` rechaza: filas distintas de 447, IDs duplicados, nodos sin ruta o tipo, aristas con extremos inexistentes, aristas sin evidencia, autorreferencias y relaciones duplicadas. El paquete de revisión incluye el validador, JSON canónico, reporte y hashes.
 
 ## 8. Criterios para salir de Draft
 
 | Gate | Estado | Evidencia |
 |---|---|---|
 | `06 v0.6` aprobado | Cumplido | Aprobación Founder y Founder Directive 442 (amplía v0.5 con 3 Closure Reports). |
-| 444 nodos documentales | Cumplido | Derivación uno a uno; 0 duplicados. |
+| 447 nodos documentales | Cumplido | Derivación uno a uno; 0 duplicados. |
 | Nodos y aristas verificables | Cumplido | 988 nodos; 1119 aristas; 0 extremos inválidos. |
 | Cadenas críticas representadas | Cumplido con reservas explícitas | Se registran artefactos acreditados y huecos sin convertirlos en hechos. |
 | Validación reproducible | Cumplido | Validador portable, JSON canónico, validación y manifiesto incluidos. |
@@ -1759,5 +1759,5 @@ Todos los gates de salida quedaron cumplidos; `07 v0.4` se registra como `Approv
 | v0.2 | 2026-07-21 | Founder | Esquema mínimo, dependencia de `06` y criterios de salida. |
 | v0.3 | 2026-07-21 | Founder | Overlay de tres aristas `supersedes`. |
 | v0.4 | 2026-07-21 | Founder | Proyección integral reproducible sobre 439 documentos de `06 v0.5`. |
-| v0.5 | 2026-07-21 | Founder | Derivación desde `06 v0.6`: incorpora 3 DOC + 3 ART (routes/eventos.index, lib/traveler/trip-eligibility, scripts/tp1-trip-eligibility.test) y 3 aristas verificadas bajo Founder Directive 442. |\n| v0.6 | 2026-07-21 | Founder | Derivación desde `06 v0.7`: incorpora 2 nodos DOC de Commerce sin fabricar implementación ni aristas técnicas; Gate B2 cerrado. |
+| v0.5 | 2026-07-21 | Founder | Derivación desde `06 v0.6`: incorpora 3 DOC + 3 ART (routes/eventos.index, lib/traveler/trip-eligibility, scripts/tp1-trip-eligibility.test) y 3 aristas verificadas bajo Founder Directive 442. |\n| v0.6 | 2026-07-21 | Founder | Derivación desde `06 v0.8`: incorpora 2 nodos DOC de Commerce sin fabricar implementación ni aristas técnicas; Gate B2 cerrado. |
 | v0.4 | 2026-07-21 | Founder | Derivación integral aprobada de `06 v0.5`: 439 documentos, 543 artefactos y 1116 aristas verificadas. |
