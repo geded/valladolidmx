@@ -11,11 +11,11 @@
     },
     "dependency_map": {
       "document": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md",
-      "version": "0.8",
+      "version": "0.9",
       "state": "Approved",
       "data_blob": "LOCAL_RECONCILIATION_2026-07-22",
       "merge_commit": "LOCAL_RECONCILIATION_2026-07-22",
-      "notes": "06 v0.10 / 07 v0.8: incorpora 23 DOC nuevos por Adjudicación Integral Controlada (Opción A) del Baseline V0 CP1–CP6 y RV0.1/RV0.2."
+      "notes": "06 v0.11 / 07 v0.9: incorpora 24 DOC nuevos (Adjudicación Integral Controlada CP1–CP6 + RV0.1/RV0.2 + Closure Certificate RV0.2 `19.13`)."
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -9272,6 +9272,16 @@
       "version": "1.0",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.13-RV0.2-CLOSURE-CERTIFICATE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.13-RV0.2-CLOSURE-CERTIFICATE-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.11 · Closure Certificate RV0.2 registrado por Founder Decision 2026-07-22"
     }
   ],
   "edges": [
@@ -25323,6 +25333,15 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0024",
+      "origin": "DOC:docs/blueprint/19.13-RV0.2-CLOSURE-CERTIFICATE-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.11 · dominio primario adjudicado por evidencia canónica (Closure Certificate RV0.2)",
       "verified_at": "2026-07-22"
     }
   ],
