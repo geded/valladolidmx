@@ -166,3 +166,41 @@ Ningún artefacto contiene cookies, tokens, claves, headers de autenticación, U
 ### SHA de trabajo
 
 `8f7bfc17271c907339fe484a449650c3ca766b1d`
+
+---
+
+## Checkpoint 5 · Zazil Tunich y Empresa Premium (America/Merida · UTC)
+
+Ventana de ejecución: UTC `2026-07-22 03:35 → 04:12` · `America/Merida` `2026-07-21 21:35 → 22:12` (no cruzó medianoche local).
+
+Serie reservada definitiva: **E37…E48** (12 artefactos). Documento receptor único: `docs/blueprint/18.14-OMXDS-VISUAL-PREMIUM-CASE-ZAZIL-TUNICH-v1.0.md`.
+
+### E37…E48 · 10 campos canónicos por artefacto
+
+| # | Ruta / Fuente | Superficie | Viewport | Dimensiones | Bytes | Fecha (UTC) | Entorno | Estado datos | Observaciones | Documento receptor |
+|---|---|---|---:|---|---:|---|---|---|---|---|
+| E37 | `/oriente-maya/valladolid/cenotes/zazil-tunich` | S05 detalle | 390 | 390×1800 | 116 066 | 2026-07-22 | preview local | demo-pack (0 medios) | Hero débil sin imagen propia. | 18.14 §3 ZT-01/09 |
+| E38 | `/oriente-maya/valladolid/cenotes/zazil-tunich` | S05 detalle | 1440 | 1440×1800 | 191 898 | 2026-07-22 | preview local | demo-pack (0 medios) | Peso muy inferior a destino con hero (E42). | 18.14 §3 ZT-01/09 |
+| E39 | `/oriente-maya/valladolid/cenotes` | S04 categoría | 390 | 390×1800 | 177 807 | 2026-07-22 | preview local | demo-pack | Contexto Zazil en listado. | 18.14 §2 D2 |
+| E40 | `/oriente-maya/valladolid/cenotes` | S04 categoría | 1440 | 1440×1800 | 219 389 | 2026-07-22 | preview local | demo-pack | — | 18.14 §2 D2 |
+| E41 | `/oriente-maya/valladolid` | S03 destino | 390 | 390×1800 | 247 966 | 2026-07-22 | preview local | demo-pack | Contraste con ZT (hay hero). | 18.14 §3 ZT-09 |
+| E42 | `/oriente-maya/valladolid` | S03 destino | 1440 | 1440×1800 | 1 620 721 | 2026-07-22 | preview local | demo-pack | Referencia de peso con hero real. | 18.14 §3 ZT-09 |
+| E43 | `/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote` | S06 producto | 390 | 390×1800 | 201 226 | 2026-07-22 | preview local | demo-pack (sin cubierta) | Sin foto de producto. | 18.14 §3 ZT-04/11 |
+| E44 | `/…/nado-en-cenote` | S06 producto | 1440 | 1440×1800 | 383 682 | 2026-07-22 | preview local | demo-pack (sin cubierta) | — | 18.14 §3 ZT-04/11 |
+| E45 | `/empresas` | S10 editorial B2B | 390 | 390×1800 | 69 763 | 2026-07-22 | preview local | estático | Contexto Premium. | 18.14 §2 D2 |
+| E46 | `/empresas` | S10 editorial B2B | 1440 | 1440×1800 | 70 617 | 2026-07-22 | preview local | estático | — | 18.14 §2 D2 |
+| E47 | JSON-LD renderizado en detalle ZT (`<script type="application/ld+json">`) | S05 detalle | 1440 | — | 2 306 | 2026-07-22 | preview local | render-time | `TouristAttraction` mínimo (falta `image`, `geo`, `openingHours`, `priceRange`). | 18.14 §3 ZT-07 |
+| E48 | Consulta SQL READ-ONLY de ausencia + entidad (Supabase) | DB pública | — | — | ≈ 1 700 | 2026-07-22 | Supabase (svc-read) | columnas mínimas · sin PII | Confirma D1/D3/D4/D10 y ausencias. | 18.14 §3 ZT-02/04/05/12/13 |
+
+Notas:
+
+- E37…E46 son PNG bajo `premium-case-zazil-tunich/screenshots/`.
+- E47 es JSON bajo `premium-case-zazil-tunich/extracts/E47_jsonld_detail.json`.
+- E48 es SQL bajo `premium-case-zazil-tunich/queries/E48_absence_report.sql`.
+- Sin PII de propietario ni viajeros en ningún artefacto (`leak=false` verificado en las 10 capturas).
+- Sin reejecución de Lighthouse/axe (política Checkpoint 5).
+- Ausencias registradas como `N/A – ausencia verificada` en 18.14 §8.
+
+### SHA de trabajo Checkpoint 5
+
+Por confirmar en cierre Founder.
