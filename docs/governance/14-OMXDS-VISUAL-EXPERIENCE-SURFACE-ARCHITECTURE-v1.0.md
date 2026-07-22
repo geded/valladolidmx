@@ -444,3 +444,470 @@ Antes de autorizar V0 deberá existir:
 
 Este documento queda **Proposed** hasta aprobación explícita posterior del Founder. Su preparación no equivale a autorización de implementación.
 
+
+---
+
+# Anexo A · Auditoría de reconciliación visual
+
+## 1. Veredicto
+
+Valladolid.mx tiene una base técnica visual madura, pero no una experiencia pública visualmente terminada. La documentación histórica demuestra tokens, componentes, responsive, accesibilidad y reutilización. No demuestra que Home, destinos, empresas, productos, experiencias, eventos y rutas posean jerarquías diferenciadas, fotografía suficiente o una narrativa editorial coherente.
+
+La brecha principal es de **sistema de composición**, no de librería UI.
+
+## 2. Evidencia recuperada
+
+| Fuente | Aporte vigente | Limitación detectada |
+|---|---|---|
+| `09-UX-UI-DESIGN-SYSTEM` | Componentes y filosofía base | Define “Cards” genéricas sin taxonomía visual completa |
+| `12-HOME-MASTER-EXPERIENCE` | Secciones funcionales del Home | No resuelve ritmo editorial integral en todas las superficies |
+| `12A-v2` | Dirección de arte “evolucionar, no rediseñar” | Aspiracional; faltan contratos ejecutables por entidad |
+| `12D.00/12D.01` | Gobernanza, accesibilidad y gates | Auditoría anterior confundió cumplimiento de infraestructura con cierre visual |
+| Colonial Design System | Tokens y lenguaje territorial | No basta para diferenciar entidades ni composiciones |
+| Surface Kit | Primitives y adapters reutilizables | La reutilización actual puede producir monotonía |
+| Experience Builder | Fuente única de composición | Carece de familias visuales canónicas y restricciones completas |
+| BusinessSurface | Orquestador puro | No formaliza Estándar versus Premium |
+| Destination parity | Hero y badges | “Parity” no prueba riqueza editorial ni calidad de toda la página |
+| Discovery Navigator | Conexión territorial | Resuelve orientación, no jerarquía completa del contenido |
+
+## 3. Hallazgos
+
+### VR-01 · Hero aislado
+
+El Hero del Home concentra identidad y fotografía; la mayoría de los bloques posteriores regresan a tratamientos homogéneos. Riesgo: la promesa emocional se evapora después del primer scroll.
+
+### VR-02 · Tarjeta universal de facto
+
+Destinos, empresas, productos y experiencias comparten patrones demasiado próximos. Riesgo: el visitante no distingue territorio, anfitrión, actividad y objeto comprable.
+
+### VR-03 · Densidad sin edición
+
+Grids y carruseles muestran oferta, pero no establecen protagonista, contraste, pausa o secuencia. Riesgo: fatiga y baja exploración.
+
+### VR-04 · Empresa Estándar y Premium sin contrato canónico
+
+Existen planes y bloques parciales, pero Premium no está definido como una composición visual distinta con límites, derechos y neutralidad.
+
+### VR-05 · Familias visuales ausentes del canon
+
+No existe una taxonomía oficial que gobierne Territory, Landmark, Business, Premium, Editorial, Collection, Event y Journey.
+
+### VR-06 · Medios incompletos
+
+El sistema contempla pipeline y galerías, pero muchas entidades carecen de paquete visual mínimo, focal point, derechos y fallback editorial específico.
+
+### VR-07 · “Done” visual demasiado permisivo
+
+Reportes de cierre usan typecheck, paridad y ausencia de duplicados como evidencia principal. Son necesarias, no suficientes. Falta aceptación visual Founder por pantalla y dispositivo.
+
+### VR-08 · SEO y diseño no unidos en un contrato
+
+Existen políticas SEO avanzadas, pero no una matriz única que vincule familia visual, URL, H1, breadcrumb, schema, medios, hreflang y contenido indexable.
+
+## 4. Matriz conservar / extender / retirar
+
+| Elemento | Decisión | Razón |
+|---|---|---|
+| Tokens oficiales | Conservar | Coherencia y bajo riesgo |
+| Fraunces + Inter | Conservar | Editorial + legibilidad |
+| Tangerine | Restringir | Sólo acentos breves |
+| PublicHeader/Footer | Conservar | Navegación única |
+| BreadcrumbTerritorial | Conservar | Contexto y SEO |
+| Surface Kit | Extender | Variantes por familia, no duplicados |
+| Experience Builder | Extender | Único compositor |
+| `page_compositions` | Conservar | Single Source of Truth |
+| Hero oficial | Extender | Variantes por familia sobre el mismo contrato |
+| Tarjeta genérica única | Retirar como patrón público | Sustituir por contratos especializados |
+| Placeholders grises repetidos | Retirar | Fallbacks editoriales por categoría |
+| Premium como “más bloques” | Retirar | Debe ser narrativa y capacidades gobernadas |
+| Recomendación pagada de Alux | Prohibir | Confianza y neutralidad |
+
+## 5. Superficies prioritarias para Masterboard
+
+1. Home.
+2. Región Oriente Maya de Yucatán.
+3. Destino.
+4. Landmark.
+5. Exploración/resultados.
+6. Empresa Estándar.
+7. Empresa Premium.
+8. Experiencia/tour.
+9. Producto.
+10. Evento.
+11. Ruta/colección.
+12. Arma tu Viaje.
+13. Estados móviles críticos.
+
+## 6. Riesgos de implementación prematura
+
+- embellecer tarjetas actuales sin resolver jerarquía;
+- crear un segundo set de componentes paralelo;
+- duplicar URL para Premium;
+- mezclar visibilidad pagada con relevancia;
+- cargar videos/fotos sin presupuesto y degradar LCP;
+- declarar cierre con capturas desktop únicamente;
+- incorporar Commerce mientras los CTA todavía no tienen gramática consistente.
+
+## 7. Recomendación
+
+Aprobar primero el Blueprint `14`, el PRD `18.04` y el plan `18.05`. Implementar después por gates V0–V8, comenzando con baseline y Masterboard, sin tocar rutas públicas hasta obtener aprobación visual Founder.
+
+
+# Anexo B · PRD Suite y Visual Masterboard
+
+## 1. Objetivo
+
+Definir con precisión las superficies, jerarquías, tarjetas, medios, SEO y estados que Lovable deberá construir cuando reciba un GO independiente. El resultado será un sistema visual coherente, editorial y territorial sobre la arquitectura existente.
+
+## 2. Personas y necesidades
+
+| Persona | Necesidad visual |
+|---|---|
+| Visitante inspiracional | Entender rápidamente por qué quedarse y qué vivir |
+| Visitante planificador | Comparar sin perder contexto territorial |
+| Visitante onsite | Encontrar información decisiva con poca fricción |
+| Anfitrión estándar | Presencia digna, clara y confiable |
+| Anfitrión Premium | Narrativa diferenciada sin romper el sistema |
+| Editor/Admin | Componer con reglas y previsualizar estados |
+| SEO/Contenido | Mantener entidad, URL, schema y medios consistentes |
+
+## 3. Requisitos transversales
+
+### FR-VIS-001 · Jerarquía
+
+Toda superficie declarará H1 Hero, H2 destacado, H3 tarjeta y H4 compacto aplicables. Una página pública no puede ser sólo una cuadrícula H3.
+
+### FR-VIS-002 · Familias
+
+Toda composición declarará una de ocho familias y sólo podrá usar bloques/variantes permitidos para ella.
+
+### FR-VIS-003 · CTA
+
+Cada bloque tendrá máximo un CTA primario. El CTA se deriva de la modalidad y permisos reales; el diseño no puede insinuar reserva si Commerce está apagado.
+
+### FR-VIS-004 · Media
+
+Cada render seleccionará la variante adecuada, preservará focal point, dimensiones, alt y fallback. No habrá layout shift por medios.
+
+### FR-VIS-005 · Mobile
+
+El orden semántico se define primero para móvil; desktop puede recomponer sin alterar lectura ni prioridad.
+
+### FR-VIS-006 · Estados
+
+Loading, vacío, error, sin media, expirado, no autorizado y offline deberán estar diseñados. Ninguno puede convertirse en una cuadrícula rota o botón engañoso.
+
+### FR-VIS-007 · Neutralidad
+
+Selección editorial, ranking orgánico y patrocinio tendrán etiquetas y fuentes diferenciadas. Premium no altera reputación ni Alux.
+
+### FR-VIS-008 · Preview
+
+Toda nueva composición se validará en rutas aisladas o preview tokens antes de sustituir una ruta pública.
+
+## 4. Masterboard canónico
+
+Cada pantalla del Masterboard se entregará en móvil 390 px y desktop 1440 px, con anotaciones de jerarquía, bloques, datos, ratio de imagen, CTA, schema, estados y presupuesto.
+
+### MB-01 Home
+
+Objetivo: inspirar y orientar hacia una primera decisión relevante.
+
+Orden base: Hero → Intent Selector → Capital Turística → Territory Mosaic → Experiences Now → Routes → Hosts/Stories → Events → Trip Continuity → Alux → Trust.
+
+Aceptación:
+
+- Hero no excede una promesa principal y dos acciones;
+- primera pantalla explica Valladolid y Oriente Maya de Yucatán;
+- después del Hero existe contraste editorial, no una cuadrícula monótona;
+- ningún carrusel crítico oculta contenido indexable;
+- Arma tu Viaje aparece como continuidad, no carrito.
+
+### MB-02 Región
+
+Objetivo: presentar el Oriente Maya de Yucatán como sistema territorial conectado.
+
+Debe incluir mapa/contexto, destinos destacados, temas, rutas, agenda y rol de Valladolid como capital turística sin borrar la identidad de otros destinos.
+
+### MB-03 Destino
+
+Objetivo: convertir un lugar en base de exploración. Incluye Hero, identidad, Discovery Navigator, mapa, destacados, oferta por jerarquía, rutas cercanas, agenda, historias y continuidad.
+
+### MB-04 Landmark
+
+Objetivo: explicar valor patrimonial/natural, reglas de visita, contexto cultural, conservación, acceso y experiencias relacionadas.
+
+### MB-05 Exploración
+
+Objetivo: comparar con claridad. Combina un destacado H2, filtros compactos y resultados H3/H4. No muestra más de un bloque editorial grande antes de la lista útil.
+
+### MB-06 Empresa Estándar
+
+Objetivo: confianza y decisión. Usa portada, propuesta, verificación, oferta, galería, información operativa, CTA autorizado y cercanía.
+
+### MB-07 Empresa Premium
+
+Objetivo: inmersión narrativa. Usa Hero cinematic, historia, insignia, galería secuencial, oferta curada, itinerario, evidencia y CTA. Mantiene URL y datos canónicos de la empresa.
+
+### MB-08 Experiencia/Tour
+
+Objetivo: comprender vivencia y condiciones. Hero humano, datos decisivos, anfitrión, inclusiones, itinerario, galería, políticas, reseñas y relacionados.
+
+### MB-09 Producto
+
+Objetivo: entender exactamente qué se obtiene. Media de producto, empresa, variante/unidad, condiciones y CTA conforme al gate comercial.
+
+### MB-10 Evento
+
+Objetivo: decidir en tiempo. Fecha/estado, visual, lugar, acceso, programa, organizador y recomendaciones cercanas.
+
+### MB-11 Ruta/Colección
+
+Objetivo: conectar entidades en secuencia. Tema, mapa, paradas, duración, dificultad, recomendaciones y agregar al viaje.
+
+### MB-12 Arma tu Viaje
+
+Objetivo: pasar de inspiración a plan. Utiliza H4 compacto, días/secuencia, mapa, estados de continuidad y asistencia contextual. No reusa cards teatrales dentro del workspace.
+
+## 5. Contratos de tarjetas
+
+| Contrato | Ratio | Campos obligatorios | CTA |
+|---|---:|---|---|
+| TerritoryCard | 16:9 | nombre, identidad, territorio, distancia/tiempo | Descubrir |
+| BusinessCard | 4:3 | nombre, categoría, ubicación, promesa, media | Ver perfil/acción autorizada |
+| ExperienceCard | 3:2 o 4:5 | promesa, anfitrión, duración, modalidad | Vivir/Agregar/Cotizar/Reservar |
+| ProductCard | 1:1 o 4:3 | producto, empresa, unidad/variante | Ver/Agregar/Comprar autorizado |
+| EventCard | 4:5 | fecha, estado, lugar, título | Ver evento |
+| JourneyCard | 16:9 | tema, paradas, duración | Explorar/Agregar |
+| CompactResult | 1:1 miniatura | nombre, tipo, metadato decisivo | Acción contextual |
+
+Reglas comunes: título máximo controlado, fallback específico, badges limitados, acción completa accesible, sin nested links, foco visible y tracking futuro sin PII.
+
+## 6. Empresa Estándar vs Premium
+
+| Capacidad | Estándar | Premium |
+|---|---|---|
+| URL/entidad | Canónica | La misma canónica |
+| Hero | Fotográfico/editorial contenido | Cinematográfico foto/video |
+| Historia | Resumen + descripción | Narrativa modular extensa |
+| Galería | Estándar | Secuencial y ampliada |
+| Productos | Lista completa | Curaduría + lista completa |
+| Itinerarios | Relacionados automáticos | Bloques editoriales autorizados |
+| Bloques personalizados | No | Whitelist Premium |
+| Analítica futura | Base | Avanzada con consentimiento |
+| Posición orgánica | Sin privilegio | Sin privilegio |
+| Alux neutral | Sí | Sí, sin sesgo pagado |
+| Venta online | Sólo autorización Commerce | Sólo autorización Commerce |
+
+## 7. Matriz SEO
+
+| Superficie | Schema principal | Breadcrumb | Riesgo a evitar |
+|---|---|---|---|
+| Home | WebSite/Organization | No obligatorio | saturar H1 |
+| Región/Destino | TouristDestination | Sí | páginas territoriales duplicadas |
+| Landmark | TouristAttraction | Sí | datos culturales imprecisos |
+| Empresa | LocalBusiness/subtipo | Sí | Premium duplicado |
+| Experiencia | Product + Offer sólo autorizado | Sí | precio falso o stale |
+| Producto | Product | Sí | confundir empresa y producto |
+| Evento | Event | Sí | estado/fecha caducos |
+| Ruta | Trip/ItemList | Sí | orden no indexable |
+| Editorial | Article | Sí contextual | contenido delgado |
+
+Todos deberán definir canonical, title, H1, meta description, OG, social media, alternates y seis locales sólo cuando la traducción exista.
+
+## 8. Presupuestos no funcionales
+
+- LCP objetivo ≤ 2.5 s p75 en móvil realista.
+- CLS ≤ 0.1.
+- INP ≤ 200 ms p75.
+- imágenes con width/height y `srcset`.
+- Hero móvil sin descargar video desktop innecesario.
+- JavaScript de interacción diferido; contenido esencial SSR.
+- WCAG 2.2 AA.
+- sin autoplay sonoro.
+- respeto a reduced motion y data saver cuando aplique.
+
+## 9. Analytics futuro, no autorizado ahora
+
+Cuando el monitor reciba autorización separada, sólo se medirán eventos definidos por resultado: impresión de bloque, selección de entidad, cambio de contexto territorial, agregar al viaje, CTA autorizado y profundidad útil. Este PRD no autoriza instrumentación, identificadores ni captura de visitantes.
+
+## 10. Criterios de aceptación global
+
+1. Un usuario identifica tipo de entidad sin leer la URL.
+2. Home, destino, empresa y experiencia tienen siluetas distintas.
+3. Estándar y Premium son claramente diferentes sin perder marca compartida.
+4. Mobile conserva prioridad y no sólo apila desktop.
+5. Fallbacks parecen diseñados, no errores.
+6. SEO, accesibilidad y rendimiento pasan sus gates.
+7. No se duplica CMS, renderer, URL ni entidad.
+8. Evidencia comparativa obtiene aprobación Founder.
+
+## 11. Fuera de alcance
+
+Commerce C0–C8, inventario, checkout, pagos, reservaciones reales, liquidaciones, Visitor Intelligence, tracking, producción, contacto con empresas y creación definitiva del banco de medios.
+
+
+# Anexo C · Plan Lovable V0–V8
+
+## 1. Regla de ejecución
+
+Lovable ejecutará una etapa por vez. Cada etapa requiere Scope Report, GO Founder explícito, preview aislado, pruebas, evidencia visual, Closure Report y autorización para continuar. No se permite ejecutar V0–V8 en un solo prompt.
+
+## 2. Feature flags propuestos
+
+Todos nacen `false` y deberán negar también del lado servidor cuando corresponda:
+
+- `visual_v1_masterboard_preview`
+- `visual_v1_home`
+- `visual_v1_territory`
+- `visual_v1_business_standard`
+- `visual_v1_business_premium`
+- `visual_v1_entity_cards`
+- `visual_v1_editorial_event_journey`
+- `visual_v1_public_rollout`
+
+Crear estos nombres en documentación no autoriza crear configuración o migraciones.
+
+## 3. V0 · Baseline y reconciliación técnica
+
+Objetivo: mapear rutas, superficies, adapters, bloques, contratos, flags, medios y deuda sin modificar UI pública.
+
+Entregables futuros:
+
+- inventario route → surface → composition → blocks;
+- capturas baseline móvil/desktop;
+- matriz reutilizar/extender/retirar;
+- mapa de datos y medios faltantes;
+- presupuesto actual de rendimiento;
+- Scope Report de V1.
+
+DoD: cero cambios visibles, cero componentes paralelos y baseline aprobado.
+
+## 4. V1 · Visual Masterboard
+
+Objetivo: construir previews no públicos de las 12 superficies canónicas con datos controlados.
+
+Condiciones:
+
+- sólo rutas de preview protegidas/no indexables;
+- móvil 390 y desktop 1440;
+- anotaciones H1–H4;
+- estados sin media/error/vacío;
+- comparación contra baseline;
+- Founder Visual Acceptance.
+
+DoD: Masterboard aprobado. Ninguna ruta pública sustituida.
+
+## 5. V2 · Contratos, tokens y tarjetas
+
+Objetivo: evolucionar el Surface Kit y contratos existentes para las seis tarjetas especializadas y niveles de jerarquía.
+
+Guardrails:
+
+- extender bloques oficiales;
+- prohibido crear segundo Design System;
+- compatibilidad hacia atrás;
+- Storybook/preview o equivalente;
+- pruebas visuales y accesibles;
+- no instrumentación de visitantes.
+
+## 6. V3 · Home
+
+Objetivo: implantar la portada editorial aprobada detrás de `visual_v1_home`.
+
+Incluye ritmo, intención, territorio, experiencias, rutas, historias, agenda, viaje y Alux. No incluye Commerce ni monitoreo.
+
+Rollback: desactivar flag y mantener composición previa intacta.
+
+## 7. V4 · Territorio y Landmark
+
+Objetivo: implantar Región, Destino y Landmark sobre contratos compartidos.
+
+Incluye Discovery Navigator, mapa/contexto disponible, jerarquía de oferta, rutas y agenda. Preserva breadcrumbs, canonical y Context Engine.
+
+## 8. V5 · Empresa Estándar
+
+Objetivo: implantar la presencia base para empresas existentes sin cambiar planes, permisos o aprobación comercial.
+
+CTA deberá respetar gates actuales; con Commerce OFF nunca mostrará compra/reserva activa.
+
+## 9. V6 · Empresa Premium
+
+Objetivo: implantar composición Premium en preview con whitelist, aprobación Admin y misma URL canónica.
+
+No autoriza asignar Premium a empresas reales, contactar anfitriones ni cobrar planes. La prueba usará fixtures claramente marcados.
+
+## 10. V7 · Experiencia, producto, evento, editorial y journey
+
+Objetivo: completar las familias restantes y sustituir monotonía de tarjetas por jerarquías aprobadas.
+
+La experiencia/producto mostrará modalidad informativa o Arma tu Viaje mientras Commerce permanezca cerrado.
+
+## 11. V8 · Certificación y rollout controlado
+
+Objetivo: certificar, no lanzar automáticamente.
+
+Debe entregar:
+
+- regresión visual móvil/desktop;
+- accesibilidad WCAG 2.2 AA;
+- SEO/canonical/hreflang/schema;
+- Core Web Vitals y peso de medios;
+- estados y permisos;
+- prueba de rollback;
+- evidencia Founder;
+- recomendación GO/NO-GO.
+
+Activar `visual_v1_public_rollout` requiere autorización Founder posterior y específica.
+
+## 12. Orden obligatorio
+
+`V0 → V1 → V2 → V3 → V4 → V5 → V6 → V7 → V8`
+
+Puede dividirse una etapa; no puede saltarse el Masterboard ni la certificación. Commerce C0 continúa después del programa visual sólo mediante un GO independiente.
+
+## 13. Formato obligatorio de Scope Report
+
+1. etapa y objetivo conductual;
+2. rutas y archivos candidatos;
+3. contratos reutilizados;
+4. cambios visibles esperados;
+5. datos/fixtures;
+6. SEO, accesibilidad y rendimiento;
+7. flag y rollback;
+8. pruebas;
+9. exclusiones;
+10. confirmación de no tocar Commerce, reservas, monitoreo o producción.
+
+## 14. Formato obligatorio de Closure Report
+
+1. alcance ejecutado;
+2. diff real;
+3. screenshots comparativas 390/1440;
+4. estados probados;
+5. accesibilidad;
+6. SEO;
+7. performance;
+8. pruebas/typecheck/build;
+9. flag confirmado OFF;
+10. rollback probado;
+11. deuda y decisiones;
+12. Founder Visual Acceptance pendiente/aprobada.
+
+## 15. Gates que permanecen cerrados
+
+- todos los flags visuales;
+- sustitución de rutas públicas;
+- Commerce C0–C8;
+- Gate B1 y Gate B2;
+- checkout, cobros y liquidaciones;
+- reservaciones reales;
+- monitor de visitantes;
+- producción;
+- contacto y asignación de planes a empresas.
+
+## 16. Próxima autorización posible
+
+Después de aprobar e integrar la documentación, la única autorización técnica elegible será **V0 · Baseline y reconciliación técnica**. V0 no cambia UI pública.
+
+
