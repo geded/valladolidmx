@@ -1,0 +1,18 @@
+id	url	http	redir	ttfb_ms	total_ms	size_bytes	content_type	cache_control
+S01	/	200	1	2.026552	2.032651	108113	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S02	/oriente-maya	200	1	1.944574	1.947164	55480	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S03	/oriente-maya/valladolid	200	1	3.011975	3.018841	101910	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S04	/oriente-maya/valladolid/cenotes	200	1	2.127054	2.129544	53529	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S05	/oriente-maya/valladolid/cenotes/zazil-tunich	200	1	2.288234	2.293658	99183	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S06	/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote	200	1	2.931992	2.933043	50012	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S07	/hoteles	200	1	2.044997	2.046510	50291	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S08	/restaurantes	200	1	1.760180	1.764282	49965	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S09	/experiencias	200	1	1.757455	1.761674	55869	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S10	/eventos	200	1	1.048036	1.049962	49696	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S11	/casas-de-vacaciones	200	1	1.388516	1.391016	31224	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S12	/promociones	200	1	1.114393	1.116189	42247	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S13	/arma-tu-viaje	200	1	1.535808	1.537295	30733	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S14	/marketplace	200	2	1.484321	1.487069	55480	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S15	/empresas	200	1	0.819090	0.820286	17455	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S16	/contacto	200	1	1.050631	1.052115	30897	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
+S17	/blog	200	1	1.064740	1.065912	34970	text/html; charset=utf-8	no-cache, must-revalidate, max-age=0
