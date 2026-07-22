@@ -9327,6 +9327,13 @@
       "path": "package.json",
       "source": "package.json",
       "evidence": "package.json"
+    },
+    {
+      "id": "ART:scripts/governance/generate-artifact-inventory.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/generate-artifact-inventory.mjs",
+      "source": "scripts/governance/generate-artifact-inventory.mjs",
+      "evidence": "scripts/governance/generate-artifact-inventory.mjs"
     }
   ],
   "edges": [
@@ -25447,6 +25454,16 @@
       "destination": "DOMAIN:D01",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.12 · docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md → D01 · product-governance"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/governance/generate-artifact-inventory.mjs:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "origin": "ART:scripts/governance/generate-artifact-inventory.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     }
   ],
   "views": {
