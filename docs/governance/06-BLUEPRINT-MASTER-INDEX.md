@@ -559,7 +559,7 @@ La asignación primaria expresa accountability documental. Las dependencias e im
 
 | Gate | Estado en v0.4 | Evidencia o pendiente |
 |---|---|---|
-| 447 filas pobladas | Cumplido | 447 identificadores únicos (444 v0.7 + 3 documentos Visual v0.8); 0 estados pendientes. |
+| 453 filas pobladas | Cumplido | 453 identificadores únicos (444 v0.7 + 3 documentos Visual v0.8 + 6 documentos RV0.1); 0 estados pendientes. |
 | Rutas y artefactos existentes | Cumplido para referencias conservadas | Las rutas técnicas retenidas resuelven contra el árbol local; la matriz conserva cada corrección o descarte. La evidencia autocontenida no se presenta como prueba externa. |
 | Superseded-pass cerrado | Cumplido | 3 `Superseded` con relaciones aprobadas; 0 derivas inesperadas. |
 | ADR de dominios aprobado | Cumplido | `ADR-GOV-0001` formaliza los 14 dominios aprobados por el Founder. |
