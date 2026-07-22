@@ -2,7 +2,7 @@
 
 **Estado:** Approved
 
-**Versión:** 0.12
+**Versión:** 0.13
 
 **Última actualización:** 2026-07-22
 
@@ -16,30 +16,30 @@ Este documento contiene el catálogo canónico del universo documental bajo `doc
 
 Esta sección se reemitió el 2026-07-22 conforme al mandato Founder de revisión RV0.2. El alcance del índice sigue siendo registrar autoridad documental adjudicada; no acredita por sí mismo implementación, despliegue, tráfico real ni cierre de dependencias. El orden de ejecución continúa determinado por el [roadmap oficial v2.1](../blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md).
 
-El universo total del árbol `docs/blueprint/` es actualmente de **472 archivos** verificados. El índice registra **472 filas** adjudicadas tras incorporar Governance Automation v1 por autorización Founder expresa. El árbol y la tabla quedan reconciliados sin brecha operativa. Las cifras anteriores se conservan únicamente como historia de versiones.
+El universo total del árbol `docs/blueprint/` es actualmente de **473 archivos** verificados. El índice registra **473 filas** adjudicadas tras abrir documentalmente RV0.3 por autorización Founder expresa. El árbol y la tabla quedan reconciliados sin brecha operativa. Las cifras anteriores se conservan únicamente como historia de versiones.
 
 Las asociaciones técnicas de las filas adjudicadas fueron validadas localmente contra el árbol actual del repositorio: se conservan sólo rutas resolubles, se normalizan expresiones truncadas y se eliminan autorreferencias. La evidencia documental autocontenida se distingue expresamente de una prueba operativa externa.
 
 ## 2.1 Universo documental verificable
 
-El universo total bajo `docs/blueprint/` es de **471 archivos únicos** (medición 2026-07-22 posterior a la incorporación del Closure Certificate RV0.2):
+El universo total bajo `docs/blueprint/` es de **473 archivos únicos** (medición 2026-07-22 posterior a la apertura documental de RV0.3):
 
-- **456** archivos en la raíz de `docs/blueprint/`.
+- **458** archivos en la raíz de `docs/blueprint/`.
 - **15** archivos en 5 subdirectorios: `artifacts/`, `audits/`, `project-constitution/`, `roadmap/`, `templates/`.
-- **456 + 15 = 471**.
+- **458 + 15 = 473**.
 
-El índice registra actualmente **471 filas** en `§4`. La brecha se mantiene en `0` (reconciliada en v0.10 y preservada en v0.11 tras incorporar `19.13`). Los 119 hallazgos congelados y el contenido sustantivo de `18.06`–`18.16` y `19.07`–`19.12` no fueron reabiertos.
+El índice registra actualmente **473 filas** en `§4`. La brecha se mantiene en `0`; v0.13 incorpora únicamente `19.14` como apertura documental de RV0.3. Los 119 hallazgos congelados y el contenido sustantivo de `18.06`–`18.16` y `19.07`–`19.13` no fueron reabiertos.
 
 Los conteos previos (`429`, `432`, `439`, `442`, `444`, `447`, `453`) reflejan medidas históricas del árbol o del índice; ninguno representa el universo actual y no deben citarse fuera del `§6 Control de versiones`.
 
 ## 2.2 Metodología reproducible
 
 ```text
-find docs/blueprint -type f | wc -l                    # 471 archivos únicos (2026-07-22)
-find docs/blueprint -maxdepth 1 -type f | wc -l        # 456 raíz
+find docs/blueprint -type f | wc -l                    # 473 archivos únicos (2026-07-22)
+find docs/blueprint -maxdepth 1 -type f | wc -l        # 458 raíz
 find docs/blueprint -mindepth 2 -type f | wc -l        # 15 en subdirectorios
 find docs/blueprint -mindepth 1 -type d                # 5 subdirectorios (artifacts, audits, project-constitution, roadmap, templates)
-grep -c '^| \[`docs/blueprint/' docs/governance/06-BLUEPRINT-MASTER-INDEX.md   # 471 filas adjudicadas
+grep -c '^| \[`docs/blueprint/' docs/governance/06-BLUEPRINT-MASTER-INDEX.md   # 473 filas adjudicadas
 ```
 
 Delta reproducible tabla ↔ árbol:
@@ -75,31 +75,31 @@ Semántica obligatoria:
 
 ## 3.1 Resumen de adjudicación
 
-Recomputado sobre las 471 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $5 }' | sort | uniq -c`, 2026-07-22):
+Recomputado sobre las 473 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $5 }' | sort | uniq -c`, 2026-07-22):
 
 | Estado | Documentos |
 |---|---:|
-| `Approved` | 173 |
+| `Approved` | 174 |
 | `Draft` | 294 |
 | `Superseded` | 3 |
 | `Historical` | 1 |
 | `Deprecated` | 0 |
-| **Total adjudicado** | **472** |
+| **Total adjudicado** | **473** |
 | No adjudicado | 0 |
-| **Total del árbol** | **472** |
+| **Total del árbol** | **473** |
 
 Los conteos previos (`155 / 285`, `442`) se conservan sólo para el `§6 Control de versiones`; no representan el estado actual. La cobertura declarada en versiones anteriores (274 implementaciones, 14 migraciones, 251 pruebas/evidencia) queda como métrica histórica de la versión v0.5 y se recomputará cuando la brecha de 11 filas se adjudique.
 
 ## 3.2 Resumen por dominio primario
 
-Recomputado sobre las 471 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $7 }' | sort | uniq -c`, 2026-07-22):
+Recomputado sobre las 473 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $7 }' | sort | uniq -c`, 2026-07-22):
 
 | ID | Dominio | Documentos |
 |---|---|---:|
 | `D01` | `product-governance` | 33 |
 | `D02` | `platform-foundation` | 22 |
 | `D03` | `identity-security` | 45 |
-| `D04` | `content-experience` | 93 |
+| `D04` | `content-experience` | 94 |
 | `D05` | `destination-discovery` | 37 |
 | `D06` | `marketplace-commerce` | 25 |
 | `D07` | `provider-operations` | 24 |
@@ -110,9 +110,9 @@ Recomputado sobre las 471 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ {
 | `D12` | `engagement-notifications` | 14 |
 | `D13` | `media-delivery` | 30 |
 | `D14` | `growth-reliability` | 21 |
-|  | **Total adjudicado** | **471** |
+|  | **Total adjudicado** | **473** |
 
-Verificación aritmética: `33+22+45+93+37+25+24+54+29+16+28+14+30+21 = 471`. Las 11 filas Baseline V0 (`18.06`–`18.16`) quedan adjudicadas por evidencia canónica en v0.10; la nueva fila `19.13-RV0.2-CLOSURE-CERTIFICATE-v1.0.md` se adjudica en v0.11 a D04 (Closure Certificate de RV0.2). Los registros se conservan en `docs/governance/audit/2026-07-22-BASELINE-V0-ADJUDICATION-v1.0.md` y en el propio Closure Certificate.
+Verificación aritmética: `33+22+45+94+37+25+24+54+29+16+28+14+30+21 = 473`. `19.14-RV0.3-SCOPE-VALIDATION-PROTOCOL-v1.0.md` se adjudica en v0.13 a D04 como apertura documental autorizada de RV0.3, sin autorizar prototipos ejecutables ni producto.
 
 La asignación primaria expresa accountability documental. Las dependencias e impactos transversales se modelarán como aristas en `07`; no crean owners múltiples en este índice.
 
@@ -582,6 +582,7 @@ La asignación primaria expresa accountability documental. Las dependencias e im
 | [`docs/blueprint/19.11-RV0.2-RESPONSIVE-ACCESSIBILITY-CONSISTENCY-v1.0.md`](../blueprint/19.11-RV0.2-RESPONSIVE-ACCESSIBILITY-CONSISTENCY-v1.0.md) | RV0.2 · Responsive, Accessibility & Cross-Surface Consistency (AC-01…AC-14) | `1.0` | `Approved` | Responsive/A11y · rv0-2-responsive | `D04 · content-experience` | `19.07`, `19.08`, `19.09` | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Approval 2026-07-22 · RV0.2 Approved · Closed (Closure Certificate `19.13`); clasificaciones H/E/C preservadas; sin valores finales de breakpoints/tipografía/color. | 2026-07-22 |
 | [`docs/blueprint/19.12-RV0.2-DECISION-REGISTER-VALIDATION-BACKLOG-v1.0.md`](../blueprint/19.12-RV0.2-DECISION-REGISTER-VALIDATION-BACKLOG-v1.0.md) | RV0.2 · Decision Register & Validation Backlog (DR-01…DR-34, PT-01…PT-08, VB-01…VB-07) | `1.0` | `Approved` | Decision Register · rv0-2-decisions | `D04 · content-experience` | `19.07–19.11` | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Approval 2026-07-22 · RV0.2 Approved · Closed (Closure Certificate `19.13`); clasificaciones H/E/C preservadas; RV0.3, pilotos y V1 no autorizados. | 2026-07-22 |
 | [`docs/blueprint/19.13-RV0.2-CLOSURE-CERTIFICATE-v1.0.md`](../blueprint/19.13-RV0.2-CLOSURE-CERTIFICATE-v1.0.md) | RV0.2 · Closure Certificate v1.0 | `1.0` | `Approved` | Closure Certificate · rv0-2-closure | `D04 · content-experience` | `19.07–19.12` | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Cierre documental de RV0.2 (`Approved · Closed`). No convierte en vinculantes H/E/C ni autoriza RV0.3, pilotos, V1, cambios de producto, refactor de gobernanza o Governance Automation v1. Precedente canónico: `19.06-RV0.1-CLOSURE-CERTIFICATE-v1.0.md`. | 2026-07-22 |
+| [`docs/blueprint/19.14-RV0.3-SCOPE-VALIDATION-PROTOCOL-v1.0.md`](../blueprint/19.14-RV0.3-SCOPE-VALIDATION-PROTOCOL-v1.0.md) | RV0.3 · Scope & Validation Protocol v1.0 | `1.0` | `Approved` | Scope & Validation Protocol · rv0-3-opening | `D04 · content-experience` | `19.13`, `19.07–19.12`, `20.00` | — | `Not established` | — | `Self-contained documentary protocol; executable prototype evidence not established` | — | Founder Decision 2026-07-22 · Autoriza exclusivamente la apertura documental de RV0.3 y el registro del protocolo. Prototipos ejecutables, producto, superficies públicas y V1 permanecen no autorizados. | 2026-07-22 |
 | [`docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md`](../blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md) | 20.00 · Governance Automation v1 | `1.0` | `Approved` | Blueprint · governance-automation-v1 | `D01 · product-governance` | `19.13` | — | `scripts/governance/lib/master-index.mjs; scripts/governance/sync-governance.mjs; scripts/governance/generate-artifact-inventory.mjs; scripts/governance/validate-dependency-map.mjs; .github/workflows/governance-integrity.yml; package.json` | — | `Not established` | — | Founder Directive 2026-07-22 · Governance Automation v1 autorizada después del cierre RV0.2; automatiza admisión y sincronización sin adjudicar autoridad, crear dominios ni modificar producto. | 2026-07-22 |
 
 | [`docs/blueprint/18.06-OMXDS-VISUAL-ROUTE-INVENTORY-AUDIT-v1.0.md`](../blueprint/18.06-OMXDS-VISUAL-ROUTE-INVENTORY-AUDIT-v1.0.md) | 18.06 · OMXDS Visual — Route Inventory Audit v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.06-omxds-visual-route-inventory-audit | `D02 · platform-foundation` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Route census del árbol `src/routes/` alineado con la política DOS Route Inventory (SSC-01·P2). El propio documento declara accountability de `platform-foundations`; no es proximidad temática. | 2026-07-22 |
@@ -599,17 +600,17 @@ La asignación primaria expresa accountability documental. Las dependencias e im
 
 | Gate | Estado 2026-07-22 | Evidencia o pendiente |
 |---|---|---|
-| Filas adjudicadas | 471 sobre 471 del árbol | Cerrado por v0.11 (Closure Certificate RV0.2), preserva v0.10 (Opción A · Baseline V0). |
+| Filas adjudicadas | 473 sobre 473 del árbol | Cerrado por v0.13 (apertura documental RV0.3). |
 | Rutas y artefactos existentes | Cumplido para referencias conservadas | Las rutas técnicas retenidas resuelven contra el árbol local. La evidencia autocontenida no se presenta como prueba externa. |
 | Superseded-pass cerrado | Cumplido | 3 `Superseded` con relaciones aprobadas; 0 derivas inesperadas. |
 | ADR de dominios aprobado | Cumplido | `ADR-GOV-0001` formaliza los 14 dominios aprobados por el Founder. |
-| Dominios primarios asignados | Cumplido | Las 471 filas contienen exactamente un dominio `D01`–`D14`; la justificación por evidencia de las 11 filas Baseline V0 se registra en `docs/governance/audit/2026-07-22-BASELINE-V0-ADJUDICATION-v1.0.md`. |
+| Dominios primarios asignados | Cumplido | Las 473 filas contienen exactamente un dominio `D01`–`D14`. |
 | Base de derivación para `07` definida | Cumplido | `07` deberá derivarse desde la última versión de `06` aprobada por el Founder. |
 | Evidencia reproducible del PR #12 | Cumplido | PR #12, head `a832c568…`, merge `2e50745e…`, blob `0d047f02…`; ADR publicada mediante PR #13, merge `497d08e3…`, blob `8153c886…`. |
 | Aprobación Founder de v0.5 | Cumplido | El Founder aprobó la propuesta local v0.5; PR #13 fue fusionado en `main`. |
-| Reconciliación tabla ↔ árbol | Cumplido | Universo reconciliado a **471 = 471** en v0.11; sin brecha operativa. |
+| Reconciliación tabla ↔ árbol | Cumplido | Universo reconciliado a **473 = 473** en v0.13; sin brecha operativa. |
 
-El documento permanece **operativamente Approved** para las 471 filas adjudicadas; la reconciliación tabla ↔ árbol está cerrada en v0.11. RV0.2 quedó `Approved · Closed` por decisión Founder del 2026-07-22 (Closure Certificate `19.13`); RV0.3, pilotos, V1, refactor de gobernanza y Governance Automation v1 no autorizados.
+El documento permanece **operativamente Approved** para las 473 filas adjudicadas. RV0.2 está `Approved · Closed`; RV0.3 queda abierto sólo documentalmente. Prototipos ejecutables, cambios de producto, superficies públicas y V1 permanecen no autorizados.
 
 ## 6. Control de versiones
 
@@ -628,3 +629,4 @@ El documento permanece **operativamente Approved** para las 471 filas adjudicada
 | v0.10 | 2026-07-22 | Founder | Adjudicación Integral Controlada (Opción A) del Baseline V0 CP1–CP6. Incorpora los 11 documentos `18.06`–`18.16` como `Approved` (D01=+2, D02=+1, D04=+1, D05=+2, D13=+1, D14=+4). Universo reconciliado: **470 filas / 470 archivos**. No reabre contenido sustantivo ni los 119 hallazgos congelados. Justificación por evidencia registrada en `docs/governance/audit/2026-07-22-BASELINE-V0-ADJUDICATION-v1.0.md`. |
 | v0.11 | 2026-07-22 | Founder | Registra el cierre formal de RV0.2: los 6 entregables `19.07`–`19.12` pasan de `Draft` a `Approved` y se incorpora el Closure Certificate `19.13-RV0.2-CLOSURE-CERTIFICATE-v1.0.md` en `D04`. Universo reconciliado: **471 = 471**. Clasificaciones H/E/C preservadas; 119 hallazgos Baseline V0 y `GAP-TZ-01` intactos; RV0.3, pilotos, V1, refactor de gobernanza y Governance Automation v1 no autorizados. |
 | v0.12 | 2026-07-22 | Founder | Incorpora `20.00-GOVERNANCE-AUTOMATION-v1.0.md` en D01 por autorización Founder expresa. Universo reconciliado: **472 = 472**. Elimina conteos rígidos de validación y establece 06 como puerta canónica de admisión; RV0.3, pilotos, V1 y cambios de producto permanecen fuera de alcance. |
+| v0.13 | 2026-07-22 | Founder | Incorpora `19.14-RV0.3-SCOPE-VALIDATION-PROTOCOL-v1.0.md` en D04 y abre RV0.3 exclusivamente en alcance documental. Universo reconciliado: **473 = 473**. No autoriza prototipos ejecutables, producto, superficies públicas ni V1. |
