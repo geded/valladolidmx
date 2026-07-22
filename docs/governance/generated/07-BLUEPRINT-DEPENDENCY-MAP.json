@@ -2,11 +2,11 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.6",
+    "version": "0.7",
     "state": "Approved",
-    "main_commit": "497d08e3139265828784c4270a8cbaea45b30d84",
-    "blob": "8153c886ce5719939b9a0aaeb25284564fe84ad5",
-    "notes": "Amplía v0.5 con los 3 Closure Reports autorizados bajo Founder Directive 442."
+    "main_commit": "PENDING_PR_25",
+    "blob": "PENDING_PR_25",
+    "notes": "Amplía v0.6 con PRD Suite 18.01 y Plan Lovable 18.02 de Commerce, aprobados para planeación; flags OFF y Gate B2 cerrado."
   },
   "generated_at": "2026-07-21",
   "nodes": [
@@ -3521,6 +3521,22 @@
       "owner": "D04 · content-experience",
       "state": "Approved",
       "version": "Not explicit"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.01-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-PRD-SUITE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.01-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-PRD-SUITE-v1.0.md",
+      "owner": "D06 · marketplace-commerce",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.02-OMXDS-COMMERCE-LOVABLE-PLAN-C0-C8-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.02-OMXDS-COMMERCE-LOVABLE-PLAN-C0-C8-v1.0.md",
+      "owner": "D06 · marketplace-commerce",
+      "state": "Approved",
+      "version": "1.0"
     },
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",

@@ -11,11 +11,11 @@
     },
     "dependency_map": {
       "document": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md",
-      "version": "0.5",
+      "version": "0.6",
       "state": "Approved",
-      "data_blob": "4c3f514555d405171dbb3415d4ec07db3d540723",
-      "merge_commit": "963b3e9aad7c1d6ff9312bb7bb2c2e637ea4ccce",
-      "notes": "Founder Directive 442: incorpora 3 Closure Reports."
+      "data_blob": "PENDING_PR_25",
+      "merge_commit": "PENDING_PR_25",
+      "notes": "06 v0.7 / 07 v0.6: incorpora PRD Suite 18.01 y Plan Lovable 18.02 de Commerce; no infiere implementación."
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -8992,6 +8992,26 @@
       "path": "scripts/tp1-trip-eligibility.test.ts",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md",
       "evidence": "07 v0.5 · ART:scripts/tp1-trip-eligibility.test.ts"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.01-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-PRD-SUITE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.01-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-PRD-SUITE-v1.0.md",
+      "owner": "D06 · marketplace-commerce",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.01-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-PRD-SUITE-v1.0.md",
+      "evidence": "docs/blueprint/18.01-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-PRD-SUITE-v1.0.md + docs/governance/06-BLUEPRINT-MASTER-INDEX.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.02-OMXDS-COMMERCE-LOVABLE-PLAN-C0-C8-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.02-OMXDS-COMMERCE-LOVABLE-PLAN-C0-C8-v1.0.md",
+      "owner": "D06 · marketplace-commerce",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.02-OMXDS-COMMERCE-LOVABLE-PLAN-C0-C8-v1.0.md",
+      "evidence": "docs/blueprint/18.02-OMXDS-COMMERCE-LOVABLE-PLAN-C0-C8-v1.0.md + docs/governance/06-BLUEPRINT-MASTER-INDEX.md"
     }
   ],
   "edges": [
@@ -24792,6 +24812,24 @@
       "destination": "DOMAIN:D08",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.6 · docs/blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md → D08 · traveler-lifecycle"
+    },
+    {
+      "id": "SEM:0513",
+      "verified_at": "2026-07-21",
+      "origin": "DOC:docs/blueprint/18.01-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-PRD-SUITE-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D06",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.7 · docs/blueprint/18.01-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-PRD-SUITE-v1.0.md → D06 · marketplace-commerce"
+    },
+    {
+      "id": "SEM:0514",
+      "verified_at": "2026-07-21",
+      "origin": "DOC:docs/blueprint/18.02-OMXDS-COMMERCE-LOVABLE-PLAN-C0-C8-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D06",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.7 · docs/blueprint/18.02-OMXDS-COMMERCE-LOVABLE-PLAN-C0-C8-v1.0.md → D06 · marketplace-commerce"
     }
   ],
   "views": {
