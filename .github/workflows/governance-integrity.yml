@@ -23,11 +23,11 @@ jobs:
         with:
           bun-version: 1.3.14
 
-      - name: Validate dependency map
-        run: bun scripts/governance/validate-dependency-map.mjs
+      - name: Check canonical admission and generated projections
+        run: bun scripts/governance/sync-governance.mjs --check
 
-      - name: Validate knowledge graph
-        run: bun scripts/governance/validate-knowledge-graph.mjs
+      - name: Validate dependency map and knowledge graph
+        run: bun scripts/governance/validate-dependency-map.mjs && bun scripts/governance/validate-knowledge-graph.mjs
 
       - name: Validate inventory and PR freshness
         if: github.event_name == 'pull_request'

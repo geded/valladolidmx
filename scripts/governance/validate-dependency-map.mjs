@@ -1,11 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { readMasterIndex, validateMasterIndex } from './lib/master-index.mjs';
 
 const root = process.cwd();
 const indexPath = path.join(root, 'docs/governance/06-BLUEPRINT-MASTER-INDEX.md');
 const mapPath = path.join(root, 'docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json');
 const index = fs.readFileSync(indexPath, 'utf8');
 const map = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
+const masterIndex = readMasterIndex(root);
+const admissionErrors = validateMasterIndex(masterIndex, root);
+if (admissionErrors.length) throw new Error(`Governance admission failed:\n- ${admissionErrors.join('\n- ')}`);
 
 const rowPaths = index.split('\n')
   .filter(line => line.startsWith('| [`docs/blueprint/'))
@@ -15,9 +19,8 @@ const rowPaths = index.split('\n')
     return match[1];
   });
 
-if (rowPaths.length !== 471) throw new Error(`Expected 471 rows in 06; found ${rowPaths.length}`);
 if (new Set(rowPaths).size !== rowPaths.length) throw new Error('Duplicate document path in 06');
-if (map.derived_from?.version !== '0.11' || map.derived_from?.state !== 'Approved') throw new Error('Map is not derived from 06 v0.11 Approved');
+if (map.derived_from?.version !== masterIndex.version || map.derived_from?.state !== masterIndex.state) throw new Error(`Map is not derived from 06 v${masterIndex.version} ${masterIndex.state}`);
 
 const nodes = new Map();
 for (const node of map.nodes || []) {
@@ -27,7 +30,7 @@ for (const node of map.nodes || []) {
 }
 
 const documentNodes = [...nodes.values()].filter(node => node.id.startsWith('DOC:'));
-if (documentNodes.length !== 471) throw new Error(`Expected 471 document nodes; found ${documentNodes.length}`);
+if (documentNodes.length !== rowPaths.length) throw new Error(`Expected ${rowPaths.length} document nodes; found ${documentNodes.length}`);
 for (const p of rowPaths) if (!nodes.has(`DOC:${p}`)) throw new Error(`Missing document node: ${p}`);
 
 const edgeKeys = new Set();
