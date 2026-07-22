@@ -14,32 +14,45 @@ Este documento contiene el catálogo canónico del universo documental bajo `doc
 
 ## 2. Alcance actual
 
-Esta versión proyecta integralmente el ledger probatorio cerrado en Fase 6B sobre las **447 filas** del universo verificado (444 filas de v0.7 + 3 documentos Visual propuestos por decisión Founder del 2026-07-21). Los estados fueron adjudicados con autoridad Founder y conservan las reservas individuales de la matriz de decisión. La taxonomía de dominios y sus 444 asignaciones fueron aprobadas por el Founder y formalizadas en [`ADR-GOV-0001`](../decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md). `07` se deriva desde esta versión aprobada. Esta versión constituye la base congelada de derivación autorizada por el Founder.
+Esta sección se reemitió el 2026-07-22 conforme al mandato Founder de revisión RV0.2. El alcance del índice sigue siendo registrar autoridad documental adjudicada; no acredita por sí mismo implementación, despliegue, tráfico real ni cierre de dependencias. El orden de ejecución continúa determinado por el [roadmap oficial v2.1](../blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md).
 
-Las asociaciones técnicas de esta propuesta fueron validadas localmente contra el árbol actual del repositorio: se conservan sólo rutas resolubles, se normalizan expresiones truncadas y se eliminan autorreferencias. La evidencia documental autocontenida se distingue expresamente de una prueba operativa externa.
+El universo total del árbol `docs/blueprint/` es actualmente de **470 archivos** verificados. El índice registra **459 filas** adjudicadas. La diferencia (**11 archivos**) corresponde a los documentos del Baseline V0 (Checkpoints 1–6) `18.06`–`18.16`, que existen físicamente en el árbol pero no han sido adjudicados en este índice porque su incorporación se dejó explícitamente fuera del alcance de RV0.1 y RV0.2. Esa brecha reemplaza y reconcilia la inconsistencia previamente enunciada como `458 ↔ 452`: el universo real observado hoy es `470` en árbol y `459` en tabla; la brecha operativa es de `11` filas pendientes de adjudicación en una iniciativa dedicada de gobernanza. Ninguna cifra heredada (`429`, `439`, `442`, `447`, `453`) representa ya el universo actual; las cifras conservadas en el `§6 Control de versiones` describen únicamente el estado histórico de cada versión.
 
-El orden de ejecución continúa determinado por el [roadmap oficial v2.1](../blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md) y por las decisiones aprobadas. La existencia de una fila `Approved` acredita autoridad documental, no prueba automáticamente implementación, despliegue, tráfico real o cierre de dependencias.
+Las asociaciones técnicas de las filas adjudicadas fueron validadas localmente contra el árbol actual del repositorio: se conservan sólo rutas resolubles, se normalizan expresiones truncadas y se eliminan autorreferencias. La evidencia documental autocontenida se distingue expresamente de una prueba operativa externa.
 
 ## 2.1 Universo documental verificable
 
-El universo total bajo `docs/blueprint/` es de **447 archivos únicos**:
+El universo total bajo `docs/blueprint/` es de **470 archivos únicos** (medición 2026-07-22):
 
-- **432** archivos en la raíz de `docs/blueprint/`.
+- **455** archivos en la raíz de `docs/blueprint/`.
 - **15** archivos en 5 subdirectorios: `artifacts/`, `audits/`, `project-constitution/`, `roadmap/`, `templates/`.
-- **432 + 15 = 447**.
+- **455 + 15 = 470**.
 
-El conteo previo de 429 mezclaba archivos con subdirectorios y queda descartado como base de inventario.
+El índice registra actualmente **459 filas** en `§4`. La brecha `470 − 459 = 11` corresponde íntegramente a los documentos Baseline V0 `18.06`–`18.16` (CP1–CP6), que no han sido adjudicados aquí y permanecen dentro del alcance del Baseline V0 congelado (`18.15`, `18.16`).
+
+Los conteos previos (`429`, `432`, `439`, `442`, `444`, `447`, `453`) reflejan medidas históricas del árbol o del índice; ninguno representa el universo actual y no deben citarse fuera del `§6 Control de versiones`.
 
 ## 2.2 Metodología reproducible
 
 ```text
-find docs/blueprint -type f | wc -l                    # 447 archivos únicos
-find docs/blueprint -maxdepth 1 -type f | wc -l        # 432 raíz
+find docs/blueprint -type f | wc -l                    # 470 archivos únicos (2026-07-22)
+find docs/blueprint -maxdepth 1 -type f | wc -l        # 455 raíz
 find docs/blueprint -mindepth 2 -type f | wc -l        # 15 en subdirectorios
-find docs/blueprint -mindepth 1 -type d                # 5 subdirectorios
+find docs/blueprint -mindepth 1 -type d                # 5 subdirectorios (artifacts, audits, project-constitution, roadmap, templates)
+grep -c '^| \[`docs/blueprint/' docs/governance/06-BLUEPRINT-MASTER-INDEX.md   # 459 filas adjudicadas
 ```
 
-Los 439 identificadores canónicos originales y sus hashes fueron reconciliados contra la base de gobernanza `bdadd72750cfde4977a18c392d0808bbed352cde`. La proyección integral v0.4 fue publicada por el PR [#12](https://github.com/geded/valladolidmx/pull/12), con head `a832c568b0e77e92dc46d9ef51bf7aa4cc5f07a3`, fusionada mediante `2e50745e7efcb8bf5dc2cdc3034c3197332e9713` y verificada en `main` como blob `0d047f0209a285fbc971d0ef07d342953bc2670c`. El cierre registra **3 derivas autorizadas** por el superseded-pass de Fase 4 y **0 derivas inesperadas**. La versión v0.6 (Founder Directive 442) amplió el universo a 442 filas. La versión v0.7 incorpora los documentos Commerce `18.01` y `18.02`, aprobados para planeación y subordinados al Blueprint `13`; no inicia implementación ni abre Gate B2.
+Delta reproducible tabla ↔ árbol:
+
+```text
+find docs/blueprint -type f | sort > /tmp/tree.txt
+grep -oE '\[`docs/blueprint/[^`]+`\]' docs/governance/06-BLUEPRINT-MASTER-INDEX.md \
+  | sed 's/^\[`//;s/`\]$//' | sort -u > /tmp/idx.txt
+comm -23 /tmp/tree.txt /tmp/idx.txt   # 11 archivos: 18.06 … 18.16 (Baseline V0 CP1–CP6)
+comm -13 /tmp/tree.txt /tmp/idx.txt   # 0 filas indexadas sin archivo
+```
+
+Los 439 identificadores canónicos originales y sus hashes fueron reconciliados contra la base de gobernanza `bdadd72750cfde4977a18c392d0808bbed352cde`. La proyección integral v0.4 fue publicada por el PR [#12](https://github.com/geded/valladolidmx/pull/12), con head `a832c568b0e77e92dc46d9ef51bf7aa4cc5f07a3`, fusionada mediante `2e50745e7efcb8bf5dc2cdc3034c3197332e9713` y verificada en `main` como blob `0d047f0209a285fbc971d0ef07d342953bc2670c`. El cierre registra **3 derivas autorizadas** por el superseded-pass de Fase 4 y **0 derivas inesperadas**.
 
 ## 3. Contrato del índice
 
@@ -62,27 +75,33 @@ Semántica obligatoria:
 
 ## 3.1 Resumen de adjudicación
 
+Recomputado sobre las 459 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $5 }' | sort | uniq -c`, 2026-07-22):
+
 | Estado | Documentos |
 |---|---:|
-| `Approved` | 155 |
-| `Draft` | 285 |
+| `Approved` | 161 |
+| `Draft` | 294 |
 | `Superseded` | 3 |
 | `Historical` | 1 |
 | `Deprecated` | 0 |
-| **Total** | **442** |
+| **Total adjudicado** | **459** |
+| No adjudicado (Baseline V0 `18.06`–`18.16`) | 11 |
+| **Total del árbol** | **470** |
 
-Cobertura validada: 274 filas con implementación resoluble, 14 con migración vinculada, 251 con pruebas o evidencia y 0 con un Completion Report distinto y asociado. De las 251 filas de pruebas/evidencia, 218 son evidencia documental autocontenida y 33 enlazan artefactos externos resolubles.
+Los conteos previos (`155 / 285`, `442`) se conservan sólo para el `§6 Control de versiones`; no representan el estado actual. La cobertura declarada en versiones anteriores (274 implementaciones, 14 migraciones, 251 pruebas/evidencia) queda como métrica histórica de la versión v0.5 y se recomputará cuando la brecha de 11 filas se adjudique.
 
 ## 3.2 Resumen por dominio primario
+
+Recomputado sobre las 459 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $7 }' | sort | uniq -c`, 2026-07-22):
 
 | ID | Dominio | Documentos |
 |---|---|---:|
 | `D01` | `product-governance` | 31 |
 | `D02` | `platform-foundation` | 21 |
 | `D03` | `identity-security` | 45 |
-| `D04` | `content-experience` | 76 |
+| `D04` | `content-experience` | 91 |
 | `D05` | `destination-discovery` | 35 |
-| `D06` | `marketplace-commerce` | 23 |
+| `D06` | `marketplace-commerce` | 25 |
 | `D07` | `provider-operations` | 24 |
 | `D08` | `traveler-lifecycle` | 54 |
 | `D09` | `concierge-service` | 29 |
@@ -91,7 +110,9 @@ Cobertura validada: 274 filas con implementación resoluble, 14 con migración v
 | `D12` | `engagement-notifications` | 14 |
 | `D13` | `media-delivery` | 29 |
 | `D14` | `growth-reliability` | 17 |
-|  | **Total** | **442** |
+|  | **Total adjudicado** | **459** |
+
+Verificación aritmética: `31+21+45+91+35+25+24+54+29+16+28+14+29+17 = 459`. Las 11 filas no adjudicadas (`18.06`–`18.16`) pertenecen conceptualmente a `D04 · content-experience` como Baseline V0, pero no se contabilizan aquí hasta su adjudicación formal.
 
 La asignación primaria expresa accountability documental. Las dependencias e impactos transversales se modelarán como aristas en `07`; no crean owners múltiples en este índice.
 
@@ -563,28 +584,31 @@ La asignación primaria expresa accountability documental. Las dependencias e im
 
 ## 5. Criterios objetivos para salir de Draft
 
-| Gate | Estado en v0.4 | Evidencia o pendiente |
+| Gate | Estado 2026-07-22 | Evidencia o pendiente |
 |---|---|---|
-| 459 filas pobladas | Cumplido | 459 identificadores únicos (453 v0.8 + 6 documentos RV0.2); RV0.2 permanece `Draft · Pending Founder Review`. |
-| Rutas y artefactos existentes | Cumplido para referencias conservadas | Las rutas técnicas retenidas resuelven contra el árbol local; la matriz conserva cada corrección o descarte. La evidencia autocontenida no se presenta como prueba externa. |
+| Filas adjudicadas | 459 sobre 470 del árbol | 11 filas pendientes (`18.06`–`18.16`), fuera del alcance de RV0.2. |
+| Rutas y artefactos existentes | Cumplido para referencias conservadas | Las rutas técnicas retenidas resuelven contra el árbol local. La evidencia autocontenida no se presenta como prueba externa. |
 | Superseded-pass cerrado | Cumplido | 3 `Superseded` con relaciones aprobadas; 0 derivas inesperadas. |
 | ADR de dominios aprobado | Cumplido | `ADR-GOV-0001` formaliza los 14 dominios aprobados por el Founder. |
-| 447 dominios primarios asignados | Cumplido | Cada fila contiene exactamente un dominio `D01`–`D14`; 0 asignaciones pendientes. |
-| Base de derivación para `07` definida | Cumplido | `07` deberá derivarse desde la última versión de `06` aprobada por el Founder. La aprobación o completitud de `07` no es gate de `06`. |
-| Evidencia reproducible del PR #12 | Cumplido | PR #12, head `a832c568…`, merge `2e50745e…` y blob `0d047f02…`; actualización v0.5 y ADR publicada mediante PR #13, merge `497d08e3…`, blob `8153c886…`. |
-| Aprobación Founder de v0.5 | Cumplido | El Founder aprobó expresamente la propuesta local v0.5 y autorizó su publicación; PR #13 fue fusionado en `main`. |
+| Dominios primarios asignados | Cumplido en filas adjudicadas | Cada fila registrada contiene exactamente un dominio `D01`–`D14`. Las 11 filas no adjudicadas requieren asignación en iniciativa dedicada. |
+| Base de derivación para `07` definida | Cumplido | `07` deberá derivarse desde la última versión de `06` aprobada por el Founder. |
+| Evidencia reproducible del PR #12 | Cumplido | PR #12, head `a832c568…`, merge `2e50745e…`, blob `0d047f02…`; ADR publicada mediante PR #13, merge `497d08e3…`, blob `8153c886…`. |
+| Aprobación Founder de v0.5 | Cumplido | El Founder aprobó la propuesta local v0.5; PR #13 fue fusionado en `main`. |
+| Reconciliación tabla ↔ árbol | Pendiente | Adjudicar los 11 documentos Baseline V0 `18.06`–`18.16` en una versión posterior. |
 
-Por lo anterior, el documento alcanza estado **`Approved`** y queda congelado como base de derivación de `07`. Cambios posteriores requieren control de versión y actualización coordinada conforme a `ADR-GOV-0001`.
+El documento permanece **operativamente Approved** para las 459 filas adjudicadas y **abierto por reconciliación** en cuanto a las 11 filas Baseline V0 pendientes. RV0.2 permanece `Draft · Pending Founder Review`; RV0.3, pilotos y V1 no autorizados.
 
 ## 6. Control de versiones
 
 | Versión | Fecha | Autor | Descripción |
 |---|---|---|---|
 | v0.1 | 2026-07-20 | Founder | Reserva del índice canónico y definición de su contrato mínimo. |
-| v0.2 | 2026-07-21 | Founder | Universo verificable (439), metodología reproducible, campos mínimos, owner y criterios de salida de Draft. No puebla filas. |
+| v0.2 | 2026-07-21 | Founder | Universo verificable histórico (439), metodología reproducible, campos mínimos, owner y criterios de salida de Draft. No puebla filas. |
 | v0.3 | 2026-07-21 | Founder | Overlay provisional con las tres relaciones `Superseded` aprobadas y fusionadas en Fase 4. |
 | v0.4 | 2026-07-21 | Founder | Proyección integral de las 439 adjudicaciones cerradas en Fase 6B; asociaciones técnicas validadas localmente; mantiene `Draft` y los gates pendientes. |
-| v0.5 | 2026-07-21 | Founder | Proyección de 14 dominios aprobados sobre 439 filas; evidencia del PR #12; secuencia `06 Approved → derivación de 07` para eliminar el gate circular. Aprobada por el Founder y congelada como base de derivación de `07`; publicación material registrada mediante PR #13. |
-| v0.6 | 2026-07-21 | Founder | Ampliación autorizada del universo documental a **442 filas** bajo Founder Directive 442. Incorpora los Closure Reports `RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md` (D02), `TP1.4B-EVENT-SURFACE-INTEGRATION-CLOSURE-REPORT-v1.0.md` (D08) y `TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md` (D08) con evidencia de implementación resoluble. No relaja validadores ni degrada documentos formales. |\n| v0.7 | 2026-07-21 | Founder | Incorpora PRD Suite `18.01` y Plan Lovable `18.02` de Commerce como documentos Approved for planning en D06. Amplía el universo a 444; no acredita implementación ni abre Gate B2. |
-| v0.8 | 2026-07-22 | Founder | Registra cierre formal de RV0.1 (documents 19.01–19.06) como documentos de investigación Approved for visual reference en D04. No resuelve la inconsistencia documental 458 ↔ 452, ni GAP-TZ-01, ni los 119 hallazgos congelados del Baseline V0. RV0.2 y V1 permanecen no autorizados. |
-| v0.9 | 2026-07-22 | Founder | Registra los seis entregables normativos de RV0.2 (`19.07`–`19.12`) como `Draft · Pending Founder Review` en D04. Amplía el catálogo a 459 filas registradas. No resuelve la inconsistencia documental 458 ↔ 452, ni `GAP-TZ-01`, ni los 119 hallazgos congelados. RV0.3, pilotos y V1 permanecen no autorizados. |
+| v0.5 | 2026-07-21 | Founder | Proyección de 14 dominios aprobados sobre 439 filas; evidencia del PR #12; secuencia `06 Approved → derivación de 07`. Aprobada por el Founder; publicación material registrada mediante PR #13. |
+| v0.6 | 2026-07-21 | Founder | Ampliación autorizada del universo a **442 filas** (Founder Directive 442). Incorpora los Closure Reports `RT-1`, `TP1.4B` y `TP1.4B-PHASE2` (D02/D08). |
+| v0.7 | 2026-07-21 | Founder | Incorpora PRD Suite `18.01` y Plan Lovable `18.02` de Commerce como Approved for planning en D06. Universo adjudicado 444. |
+| v0.8 | 2026-07-22 | Founder | Registra cierre formal de RV0.1: incorpora **9 documentos** en D04, distribuidos en **3 documentos Visual** (`18.03`, `18.04`, `18.05`) y **6 documentos RV0.1** (`19.01`–`19.06`). Universo adjudicado: `444 + 3 + 6 = 453`. No resuelve `GAP-TZ-01` ni los 119 hallazgos congelados. RV0.2 y V1 no autorizados. |
+| v0.9 | 2026-07-22 | Founder | Registra los **6 entregables normativos de RV0.2** (`19.07`–`19.12`) como `Draft · Pending Founder Review` en D04. Universo adjudicado: `453 + 6 = 459`. No resuelve `GAP-TZ-01` ni los 119 hallazgos. RV0.3, pilotos y V1 no autorizados. |
+| v0.9.1 | 2026-07-22 | Founder | Fe de erratas de Founder Review RV0.2 sobre `§2`, `§2.1`, `§2.2`, `§3.1`, `§3.2`, `§5` y `§6`. Reconcilia el universo real del árbol (`470`) con las filas adjudicadas (`459`) y registra la brecha de 11 documentos Baseline V0 (`18.06`–`18.16`). Recomputa `§3.1` (Approved 161, Draft 294, Superseded 3, Historical 1) y `§3.2` (D04=91, D06=25). Retira las cifras heredadas (`155/285`, `442`, `447`, `453`) del estado actual y las conserva sólo en `§6`. Elimina el `\n` literal previamente presente en la línea de v0.6/v0.7. No adjudica los 11 documentos pendientes; no aprueba RV0.2; RV0.3, pilotos y V1 permanecen no autorizados. |
