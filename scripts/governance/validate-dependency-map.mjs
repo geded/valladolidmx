@@ -15,9 +15,9 @@ const rowPaths = index.split('\n')
     return match[1];
   });
 
-if (rowPaths.length !== 444) throw new Error(`Expected 444 rows in 06; found ${rowPaths.length}`);
+if (rowPaths.length !== 447) throw new Error(`Expected 447 rows in 06; found ${rowPaths.length}`);
 if (new Set(rowPaths).size !== rowPaths.length) throw new Error('Duplicate document path in 06');
-if (map.derived_from?.version !== '0.7' || map.derived_from?.state !== 'Approved') throw new Error('Map is not derived from 06 v0.7 Approved');
+if (map.derived_from?.version !== '0.8' || map.derived_from?.state !== 'Approved') throw new Error('Map is not derived from 06 v0.8 Approved');
 
 const nodes = new Map();
 for (const node of map.nodes || []) {
@@ -27,7 +27,7 @@ for (const node of map.nodes || []) {
 }
 
 const documentNodes = [...nodes.values()].filter(node => node.id.startsWith('DOC:'));
-if (documentNodes.length !== 444) throw new Error(`Expected 444 document nodes; found ${documentNodes.length}`);
+if (documentNodes.length !== 447) throw new Error(`Expected 447 document nodes; found ${documentNodes.length}`);
 for (const p of rowPaths) if (!nodes.has(`DOC:${p}`)) throw new Error(`Missing document node: ${p}`);
 
 const edgeKeys = new Set();
