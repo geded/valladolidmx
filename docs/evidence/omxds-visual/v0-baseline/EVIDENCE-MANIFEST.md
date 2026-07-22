@@ -205,3 +205,16 @@ Notas:
 ### SHA de trabajo Checkpoint 5
 
 Por confirmar en cierre Founder.
+
+---
+
+## Índice consolidado Checkpoint 6 (READ-ONLY · sin nuevas evidencias)
+
+Checkpoint 6 no genera E49 ni amplía la serie E01…E48. Sólo actualiza este índice para trazar los documentos consolidados y su relación con las evidencias existentes.
+
+| Documento CP6 | Ruta | Rol | Evidencias trazadas |
+|---|---|---|---|
+| 18.15 · Cross-Cutting Findings Matrix | `docs/blueprint/18.15-OMXDS-VISUAL-CROSS-CUTTING-FINDINGS-MATRIX-v1.0.md` | Matriz consolidada de 119 hallazgos | E01…E48 (por referencia; sin re-lectura) |
+| 18.16 · V0 Baseline & Readiness Gate | `docs/blueprint/18.16-OMXDS-VISUAL-V0-BASELINE-READINESS-GATE-v1.0.md` | Cierre documental V0 y gate `READY WITH CONDITIONS` propuesto | E01…E48 + `http-meta.json` (auxiliar) |
+
+La clasificación de `http-meta.json` permanece como **archivo auxiliar** vinculado a E37…E46. No amplía la serie ni recibe identificador propio. Ninguna evidencia previa se modifica.
