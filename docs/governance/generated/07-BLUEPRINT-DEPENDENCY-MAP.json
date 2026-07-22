@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.11",
+    "version": "0.12",
     "state": "Approved",
     "main_commit": "LOCAL_RECONCILIATION_2026-07-22",
     "blob": "LOCAL_RECONCILIATION_2026-07-22",
@@ -6457,7 +6457,7 @@
       "type": "blueprint",
       "path": "docs/blueprint/19.07-RV0.2-VISUAL-PRINCIPLES-v1.0.md",
       "owner": "D04 · content-experience",
-      "state": "Draft",
+      "state": "Approved",
       "version": "1.0"
     },
     {
@@ -6465,7 +6465,7 @@
       "type": "blueprint",
       "path": "docs/blueprint/19.08-RV0.2-CARD-TAXONOMY-INFORMATION-HIERARCHY-v1.0.md",
       "owner": "D04 · content-experience",
-      "state": "Draft",
+      "state": "Approved",
       "version": "1.0"
     },
     {
@@ -6473,7 +6473,7 @@
       "type": "blueprint",
       "path": "docs/blueprint/19.09-RV0.2-ACTION-PRIORITY-STATE-MATRIX-v1.0.md",
       "owner": "D04 · content-experience",
-      "state": "Draft",
+      "state": "Approved",
       "version": "1.0"
     },
     {
@@ -6481,7 +6481,7 @@
       "type": "blueprint",
       "path": "docs/blueprint/19.10-RV0.2-TRUST-PREMIUM-SYSTEM-v1.0.md",
       "owner": "D04 · content-experience",
-      "state": "Draft",
+      "state": "Approved",
       "version": "1.0"
     },
     {
@@ -6489,7 +6489,7 @@
       "type": "blueprint",
       "path": "docs/blueprint/19.11-RV0.2-RESPONSIVE-ACCESSIBILITY-CONSISTENCY-v1.0.md",
       "owner": "D04 · content-experience",
-      "state": "Draft",
+      "state": "Approved",
       "version": "1.0"
     },
     {
@@ -6497,7 +6497,7 @@
       "type": "blueprint",
       "path": "docs/blueprint/19.12-RV0.2-DECISION-REGISTER-VALIDATION-BACKLOG-v1.0.md",
       "owner": "D04 · content-experience",
-      "state": "Draft",
+      "state": "Approved",
       "version": "1.0"
     },
     {
@@ -6507,6 +6507,44 @@
       "owner": "D04 · content-experience",
       "state": "Approved",
       "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:scripts/governance/lib/master-index.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/lib/master-index.mjs"
+    },
+    {
+      "id": "ART:scripts/governance/sync-governance.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/sync-governance.mjs"
+    },
+    {
+      "id": "ART:scripts/governance/validate-dependency-map.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/validate-dependency-map.mjs"
+    },
+    {
+      "id": "ART:.github/workflows/governance-integrity.yml",
+      "type": "artifact",
+      "path": ".github/workflows/governance-integrity.yml"
+    },
+    {
+      "id": "ART:package.json",
+      "type": "artifact",
+      "path": "package.json"
+    },
+    {
+      "id": "ART:scripts/governance/generate-artifact-inventory.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/generate-artifact-inventory.mjs"
     }
   ],
   "edges": [
@@ -16580,6 +16618,60 @@
       "evidence": "docs/blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md § evidencia funcional Playwright + prueba TP1",
       "source_row": "docs/blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md",
       "verified_at": "2026-07-21"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/lib/master-index.mjs:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "origin": "ART:scripts/governance/lib/master-index.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/sync-governance.mjs:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "origin": "ART:scripts/governance/sync-governance.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/validate-dependency-map.mjs:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "origin": "ART:scripts/governance/validate-dependency-map.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:.github/workflows/governance-integrity.yml:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "origin": "ART:.github/workflows/governance-integrity.yml",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/generate-artifact-inventory.mjs:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "origin": "ART:scripts/governance/generate-artifact-inventory.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22"
     }
   ],
   "critical_chain_coverage": [

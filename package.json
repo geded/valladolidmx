@@ -13,6 +13,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "governance:generate": "bun scripts/governance/generate-artifact-inventory.mjs",
+    "governance:sync": "bun scripts/governance/sync-governance.mjs",
+    "governance:check": "bun scripts/governance/sync-governance.mjs --check && bun run governance:validate",
     "governance:validate": "bun scripts/governance/validate-dependency-map.mjs && bun scripts/governance/validate-knowledge-graph.mjs && bun scripts/governance/validate-governance-integrity.mjs"
   },
   "dependencies": {

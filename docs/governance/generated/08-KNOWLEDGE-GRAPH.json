@@ -9218,7 +9218,7 @@
       "type": "blueprint",
       "path": "docs/blueprint/19.07-RV0.2-VISUAL-PRINCIPLES-v1.0.md",
       "owner": "D04 · content-experience",
-      "state": "Draft",
+      "state": "Approved",
       "version": "1.0",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
@@ -9228,7 +9228,7 @@
       "type": "blueprint",
       "path": "docs/blueprint/19.08-RV0.2-CARD-TAXONOMY-INFORMATION-HIERARCHY-v1.0.md",
       "owner": "D04 · content-experience",
-      "state": "Draft",
+      "state": "Approved",
       "version": "1.0",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
@@ -9238,7 +9238,7 @@
       "type": "blueprint",
       "path": "docs/blueprint/19.09-RV0.2-ACTION-PRIORITY-STATE-MATRIX-v1.0.md",
       "owner": "D04 · content-experience",
-      "state": "Draft",
+      "state": "Approved",
       "version": "1.0",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
@@ -9248,7 +9248,7 @@
       "type": "blueprint",
       "path": "docs/blueprint/19.10-RV0.2-TRUST-PREMIUM-SYSTEM-v1.0.md",
       "owner": "D04 · content-experience",
-      "state": "Draft",
+      "state": "Approved",
       "version": "1.0",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
@@ -9258,7 +9258,7 @@
       "type": "blueprint",
       "path": "docs/blueprint/19.11-RV0.2-RESPONSIVE-ACCESSIBILITY-CONSISTENCY-v1.0.md",
       "owner": "D04 · content-experience",
-      "state": "Draft",
+      "state": "Approved",
       "version": "1.0",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
@@ -9268,7 +9268,7 @@
       "type": "blueprint",
       "path": "docs/blueprint/19.12-RV0.2-DECISION-REGISTER-VALIDATION-BACKLOG-v1.0.md",
       "owner": "D04 · content-experience",
-      "state": "Draft",
+      "state": "Approved",
       "version": "1.0",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
@@ -9282,6 +9282,58 @@
       "version": "1.0",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.11 · Closure Certificate RV0.2 registrado por Founder Decision 2026-07-22"
+    },
+    {
+      "id": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md"
+    },
+    {
+      "id": "ART:scripts/governance/lib/master-index.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/lib/master-index.mjs",
+      "source": "scripts/governance/lib/master-index.mjs",
+      "evidence": "scripts/governance/lib/master-index.mjs"
+    },
+    {
+      "id": "ART:scripts/governance/sync-governance.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/sync-governance.mjs",
+      "source": "scripts/governance/sync-governance.mjs",
+      "evidence": "scripts/governance/sync-governance.mjs"
+    },
+    {
+      "id": "ART:scripts/governance/validate-dependency-map.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/validate-dependency-map.mjs",
+      "source": "scripts/governance/validate-dependency-map.mjs",
+      "evidence": "scripts/governance/validate-dependency-map.mjs"
+    },
+    {
+      "id": "ART:.github/workflows/governance-integrity.yml",
+      "type": "artifact",
+      "path": ".github/workflows/governance-integrity.yml",
+      "source": ".github/workflows/governance-integrity.yml",
+      "evidence": ".github/workflows/governance-integrity.yml"
+    },
+    {
+      "id": "ART:package.json",
+      "type": "artifact",
+      "path": "package.json",
+      "source": "package.json",
+      "evidence": "package.json"
+    },
+    {
+      "id": "ART:scripts/governance/generate-artifact-inventory.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/generate-artifact-inventory.mjs",
+      "source": "scripts/governance/generate-artifact-inventory.mjs",
+      "evidence": "scripts/governance/generate-artifact-inventory.mjs"
     }
   ],
   "edges": [
@@ -25343,6 +25395,75 @@
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.11 · dominio primario adjudicado por evidencia canónica (Closure Certificate RV0.2)",
       "verified_at": "2026-07-22"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/governance/lib/master-index.mjs:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "origin": "ART:scripts/governance/lib/master-index.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/governance/sync-governance.mjs:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "origin": "ART:scripts/governance/sync-governance.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/governance/validate-dependency-map.mjs:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "origin": "ART:scripts/governance/validate-dependency-map.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:.github/workflows/governance-integrity.yml:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "origin": "ART:.github/workflows/governance-integrity.yml",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:package.json:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22",
+      "origin": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D01",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.12 · docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md → D01 · product-governance"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/governance/generate-artifact-inventory.mjs:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "origin": "ART:scripts/governance/generate-artifact-inventory.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     }
   ],
   "views": {

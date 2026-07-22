@@ -16,7 +16,7 @@ Este directorio contiene el sistema canónico que gobierna Valladolid.mx. Su lec
 |    03 | [DOCUMENTATION STANDARD](./03-DOCUMENTATION-STANDARD.md)     | Approved | Creación, mantenimiento y deprecación documental.                                 |
 |    04 | [DECISION MAKING](./04-DECISION-MAKING.md)                   | Approved | Evaluación, aprobación y trazabilidad de decisiones.                              |
 |    05 | [BLUEPRINT STANDARD](./05-BLUEPRINT-STANDARD.md)             | Approved | Contrato de calidad para nuevos Blueprints.                                       |
-|    06 | [BLUEPRINT MASTER INDEX](./06-BLUEPRINT-MASTER-INDEX.md)     | Approved | Catálogo canónico de 439 documentos, sus estados y dominios responsables.         |
+|    06 | [BLUEPRINT MASTER INDEX](./06-BLUEPRINT-MASTER-INDEX.md)     | Approved | Catálogo canónico del universo Blueprint, sus estados y dominios responsables.    |
 |    07 | [BLUEPRINT DEPENDENCY MAP](./07-BLUEPRINT-DEPENDENCY-MAP.md) | Approved | Dependencias verificadas entre documentos, implementación, migraciones y pruebas. |
 |    08 | [KNOWLEDGE GRAPH](./08-KNOWLEDGE-GRAPH.md)                   | Approved | Vista semántica de conceptos, dominios, documentos y artefactos.                  |
 |    09 | [OMXDS FOUNDATION](./09-OMXDS-FOUNDATION-v1.0.md)          | Approved | Ecosistema regional, jerarquía de productos, North Star y regla de priorización V1. |
@@ -36,6 +36,21 @@ Las vistas legibles por máquina son artefactos canónicos derivados, no fuentes
 | Mapa de dependencias `07`  | [`generated/07-BLUEPRINT-DEPENDENCY-MAP.json`](./generated/07-BLUEPRINT-DEPENDENCY-MAP.json)     | [`validate-dependency-map.mjs`](../../scripts/governance/validate-dependency-map.mjs)             |
 | Grafo de conocimiento `08` | [`generated/08-KNOWLEDGE-GRAPH.json`](./generated/08-KNOWLEDGE-GRAPH.json)                       | [`validate-knowledge-graph.mjs`](../../scripts/governance/validate-knowledge-graph.mjs)           |
 | Inventario de integridad   | [`generated/GOVERNANCE-ARTIFACT-INVENTORY.json`](./generated/GOVERNANCE-ARTIFACT-INVENTORY.json) | [`validate-governance-integrity.mjs`](../../scripts/governance/validate-governance-integrity.mjs) |
+
+## Flujo automatizado de admisión y sincronización
+
+`06-BLUEPRINT-MASTER-INDEX.md` es la puerta canónica de admisión. Crear un archivo bajo `docs/blueprint/` no le concede autoridad: debe existir exactamente una fila en 06 con estado permitido, dominio D01–D14 y evidencia de cumplimiento canónico o autorización Founder.
+
+Después de admitir o actualizar un documento:
+
+```bash
+bun run governance:sync
+bun run governance:check
+```
+
+`governance:sync` actualiza las proyecciones 07/08 y el inventario como una unidad. `governance:check` no escribe archivos: bloquea Blueprints huérfanos, admisiones incompletas, versiones o conteos derivados obsoletos y cualquier deriva del inventario. GitHub Actions ejecuta esta segunda modalidad en cada PR y push a `main`.
+
+La automatización no selecciona dominios, no cambia estados documentales y no infiere autorización. Una contradicción con CANON/ADR, una decisión nueva o una clasificación ambigua requiere Founder Review antes de modificar 06.
 
 Estado aprobado de las proyecciones:
 
