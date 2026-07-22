@@ -3,7 +3,7 @@
 **Estado:** Activo
 **Última actualización:** 2026-07-21
 **Roadmap rector:** `docs/blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`
-**Rama activa:** aprobación documental OMXDS Commerce · siguiente gate posible: C0, todavía no autorizado.
+**Rama activa:** preparación documental OMXDS Visual Experience · ninguna etapa técnica autorizada.
 **Base integrada:** `main` · merge `234a8c5f` (PR #6)
 **Canal de publicación:** conexión directa de GitHub como vía principal; `gh` sólo como alternativa y nunca como requisito para el Founder.
 
@@ -174,7 +174,37 @@ Secuencia preparada:
 
 No iniciar una etapa por inferencia. Cada una requiere Scope Report, GO, pruebas, flags OFF, Completion Report y autorización para continuar.
 
-## 10. Regla para actualizar este plan
+## 10. OMXDS Visual Experience & Surface Architecture · prioridad documental
+
+**Blueprint propuesto:** `docs/governance/14-OMXDS-VISUAL-EXPERIENCE-SURFACE-ARCHITECTURE-v1.0.md`  
+**Auditoría:** `docs/blueprint/18.03-OMXDS-VISUAL-RECONCILIATION-AUDIT-v1.0.md`  
+**PRD Suite:** `docs/blueprint/18.04-OMXDS-VISUAL-SURFACES-PRD-SUITE-v1.0.md`  
+**Plan Lovable:** `docs/blueprint/18.05-OMXDS-VISUAL-LOVABLE-PLAN-V0-V8-v1.0.md`
+
+Decisión Founder del 2026-07-21:
+
+- preparar la arquitectura visual antes de Commerce, reservaciones y monitoreo;
+- reconciliar Home, territorios, Empresa Estándar y Empresa Premium;
+- canonizar ocho familias visuales y jerarquías H1–H4;
+- integrar SEO, medios, accesibilidad, rendimiento y gobernanza;
+- mantener todos los flags OFF;
+- no iniciar V0 ni modificar código, rutas públicas o producción.
+
+Secuencia preparada:
+
+- [ ] V0 · Baseline y reconciliación técnica.
+- [ ] V1 · Visual Masterboard.
+- [ ] V2 · Contratos, tokens y tarjetas.
+- [ ] V3 · Home.
+- [ ] V4 · Territorio y Landmark.
+- [ ] V5 · Empresa Estándar.
+- [ ] V6 · Empresa Premium.
+- [ ] V7 · Experiencia, producto, evento, editorial y journey.
+- [ ] V8 · Certificación y recomendación GO/NO-GO.
+
+Commerce C0–C8 permanece documentado y pausado. Ninguna etapa visual puede iniciarse por inferencia.
+
+## 11. Regla para actualizar este plan
 
 Al cerrar una ola:
 
@@ -184,4 +214,4 @@ Al cerrar una ola:
 4. reemplazar aquí sólo el próximo paso operativo;
 5. no mantener instrucciones ya ejecutadas como si siguieran pendientes.
 
-**Siguiente acción:** revisar e integrar la aprobación documental de Commerce. Después, el siguiente gate técnico elegible es C0 · Contención y Baseline, pero no debe iniciarse sin GO Founder explícito. Programa Fundadores (`17.1-PROGRAMA-FUNDADORES-VALLADOLID-OPERATING-PLAN-v1.0.md`) permanece como primer vertical; Gate B1 y Gate B2 continúan cerrados. El smoke assigned-only de CV8.9 permanece condicionado a operadores Concierge Lead/Editor reales.
+**Siguiente acción:** revisar y aprobar la documentación OMXDS Visual Experience. Después de integrarla en `main`, el único gate técnico elegible será V0 · Baseline y reconciliación técnica, que requiere GO Founder independiente y no modifica superficies públicas. Commerce C0–C8, Programa Fundadores, Gate B1, Gate B2, reservaciones y monitoreo continúan cerrados.
