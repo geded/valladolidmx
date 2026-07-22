@@ -11,6 +11,21 @@
 
 ## Convenciones
 
+El `#` (E01…E36) es un identificador, no un campo. Cada captura documenta **exactamente 10 campos canónicos**:
+
+1. **Ruta:** URL relativa capturada (sin dominio).
+2. **Superficie:** ID (S01–S17) alineado con `docs/blueprint/18.07-OMXDS-VISUAL-SURFACE-INVENTORY-AUDIT-v1.0.md` §2.
+3. **Viewport:** desktop = `1440` · móvil = `390`.
+4. **Dimensiones:** `<width>×<height>` px del PNG resultante.
+5. **Bytes:** tamaño del archivo PNG en bytes (referencia de integridad).
+6. **Fecha:** día en que se ejecutó Playwright (mismo lote para las 36).
+7. **Entorno:** siempre `preview local` — no producción.
+8. **Estado datos:** `demo-pack` uniforme. `N/A` para 404. `estático` para páginas sin dataset.
+9. **Observaciones:** hallazgo saliente visible en la captura.
+10. **Documento receptor:** documento canónico donde la evidencia sustenta afirmaciones.
+
+Detalle expandido:
+
 - **Ruta:** URL relativa capturada (sin dominio).
 - **Superficie:** ID (S01–S17) alineado con `docs/blueprint/18.07-OMXDS-VISUAL-SURFACE-INVENTORY-AUDIT-v1.0.md` §2.
 - **Viewport:** desktop = `1440` · móvil = `390`.
@@ -81,6 +96,37 @@
 1. Cualquier futura recaptura debe conservar el mismo nombre de archivo para preservar los IDs `E01…E36`.
 2. Los IDs `E16`, `E17`, `E33`, `E34` documentan brechas de ruta (404) y no deben eliminarse hasta cerrar `RI-01` y `RI-02` en V1.
 3. Este manifiesto es **no canónico** — no incrementa el universo documental gobernado (447 → 449 sólo cuentan `18.06` y `18.07`).
+4. Con Checkpoint 2 el universo documental gobernado pasa a **451** al incluir `18.08 · Media Inventory` y `18.09 · Map Audit`.
+
+---
+
+## 4. Inventario de medios (Checkpoint 2 · `18.08`)
+
+CSVs sanitizados (sin URLs firmadas, tokens ni valores privados):
+
+| Archivo | Filas | Contenido | Documento receptor |
+|---|---:|---|---|
+| `media/media_assets_inventory.csv` | 11 | `storage_bucket, storage_path, kind, mime_type, width, height, size_bytes, alt_text, is_demo_seed` | `18.08 §4/§7` |
+| `media/storage_objects_inventory.csv` | 45 | `bucket_id, object_path, bytes, mime` | `18.08 §3/§7` |
+
+Zazil Tunich (piloto Premium): sin filas en `business_media`, sin `cover_media_id`, sin fotos propias en Storage. Referencia expandida en `18.08 §8`.
+
+---
+
+## 5. Inventario de mapas (Checkpoint 2 · `18.09`)
+
+CSV sanitizado (sin coordenadas fuera del territorio y sin credenciales):
+
+| Archivo | Filas | Contenido | Documento receptor |
+|---|---:|---|---|
+| `maps/business_coordinates.csv` | 26 | `business_slug, latitude, longitude, address_line1, is_primary` | `18.09 §4/§5` |
+
+Notas:
+
+- **1 par duplicado exacto:** `(20.7186, -88.1483)` — hallazgo `MA-04`.
+- **1 registro sin coordenadas:** hallazgo `MA-10`.
+- **Zazil Tunich:** `(20.7167, -88.25)` — precisión ~±1 km en longitud; hallazgo `MA-03`.
+- **Sin capturas Playwright adicionales:** los mapas quedan documentados textualmente porque el diagnóstico se realiza sobre configuración y datos, no sobre superficies nuevas. Las capturas de `BusinessLocationBlock` renderizado ya están dentro de E05 y E22.
 
 ---
 
