@@ -197,6 +197,7 @@ Notas:
 - E37…E46 son PNG bajo `premium-case-zazil-tunich/screenshots/`.
 - E47 es JSON bajo `premium-case-zazil-tunich/extracts/E47_jsonld_detail.json`.
 - E48 es SQL bajo `premium-case-zazil-tunich/queries/E48_absence_report.sql`.
+- **Auxiliar (no evidencia independiente):** `premium-case-zazil-tunich/extracts/http-meta.json` es un índice técnico de soporte para las capturas E37…E46. Contiene, por cada `eid` (E37…E46), el `path`, `viewport`, HTTP `status`, `title`, `meta` (title/desc/og/canonical/h1), `jsonld_count`, `leak` y el nombre del PNG asociado. No incorpora observación probatoria adicional a las entradas E37…E46, no amplía la serie más allá de E48 y no recibe identificador propio. Queda vinculado como archivo auxiliar de E37…E46.
 - Sin PII de propietario ni viajeros en ningún artefacto (`leak=false` verificado en las 10 capturas).
 - Sin reejecución de Lighthouse/axe (política Checkpoint 5).
 - Ausencias registradas como `N/A – ausencia verificada` en 18.14 §8.
