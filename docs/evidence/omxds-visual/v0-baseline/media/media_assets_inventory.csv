@@ -1,0 +1,12 @@
+storage_bucket,storage_path,kind,mime_type,width,height,size_bytes,alt_text,is_demo_seed
+companies,55555555-aaaa-4aaa-8aaa-000000000002/1783106258270-x8a55u-85b97f6a-d2fd-4983-8a60-b61ec914f50d.jpg,image,image/jpeg,,,539683,85B97F6A-D2FD-4983-8A60-B61EC914F50D.jpeg,f
+demo-media,destinations/hero_ek_balam.jpg,image,image/jpeg,1536,1024,,Acrópolis maya de Ek Balam rodeada de selva,t
+demo-media,destinations/hero_izamal.jpg,image,image/jpeg,1536,1024,,Convento de San Antonio de Padua en la ciudad amarilla de Izamal,t
+demo-media,destinations/hero_las_coloradas.jpg,image,image/jpeg,1536,1024,,Piscinas rosadas de Las Coloradas con cielo turquesa,t
+demo-media,destinations/hero_rio_lagartos.jpg,image,image/jpeg,1536,1024,,Colonia de flamencos rosados en la Ría Lagartos,t
+demo-media,destinations/hero_uayma.jpg,image,image/jpeg,1536,1024,,Fachada barroca roja y blanca del ex convento de Uayma,t
+demo-media,destinations/hero_valladolid.jpg,image,image/jpeg,1536,1024,,"Plaza principal colonial de Valladolid, Yucatán al atardecer",t
+destinations,11111111-aaaa-4aaa-8aaa-000000000001/1783106483564-edcvzn-img_6663.jpg,image,image/jpeg,,,643148,IMG_6663.jpeg,f
+media-original,pilot-v11/vertical-2400h-1784083179392.jpg,image,image/jpeg,1600,2400,87509,,t
+studio-media,2026/imported-1783037277673-6evkkz-bg01-dv5sczwm.jpg,image,image/jpeg,,,405604,,f
+studio-media,2026/imported-1783037283528-xv523j-bg02-ddstg3xc.jpg,image,image/jpeg,,,577687,,f
