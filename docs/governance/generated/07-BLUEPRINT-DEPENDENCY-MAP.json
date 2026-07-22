@@ -2,11 +2,11 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.10",
+    "version": "0.11",
     "state": "Approved",
     "main_commit": "LOCAL_RECONCILIATION_2026-07-22",
     "blob": "LOCAL_RECONCILIATION_2026-07-22",
-    "notes": "Deriva de `06 v0.10` Approved. Incorpora 23 DOC nuevos (11 Baseline V0 `18.06`–`18.16` + 12 RV0.1/RV0.2 `19.01`–`19.12`) sin fabricar aristas técnicas. Adjudicación Integral Controlada (Opción A)."
+    "notes": "Deriva de `06 v0.11` Approved. Incorpora 24 DOC nuevos (11 Baseline V0 `18.06`–`18.16` + 12 RV0.1/RV0.2 `19.01`–`19.12` + 1 Closure Certificate `19.13-RV0.2-CLOSURE-CERTIFICATE-v1.0.md`) sin fabricar aristas técnicas. Adjudicación Integral Controlada (Opción A) + RV0.2 Closure."
   },
   "generated_at": "2026-07-22T14:50:44.000Z",
   "nodes": [
@@ -6498,6 +6498,14 @@
       "path": "docs/blueprint/19.12-RV0.2-DECISION-REGISTER-VALIDATION-BACKLOG-v1.0.md",
       "owner": "D04 · content-experience",
       "state": "Draft",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.13-RV0.2-CLOSURE-CERTIFICATE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.13-RV0.2-CLOSURE-CERTIFICATE-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
       "version": "1.0"
     }
   ],
