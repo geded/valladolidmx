@@ -1,0 +1,192 @@
+[
+  {
+    "eid": "E37",
+    "path": "/oriente-maya/valladolid/cenotes/zazil-tunich",
+    "vp": "mobile",
+    "status": 200,
+    "title": "Zazil Tunich · Valladolid — Valladolid.mx",
+    "meta": {
+      "title": "Zazil Tunich · Valladolid — Valladolid.mx",
+      "desc": "El primer Cenote Museo del mundo — puerta al Inframundo Maya, a 20 minutos de Chichén Itzá.",
+      "og": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+      "canonical": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich",
+      "h1": [
+        "Zazil Tunich"
+      ]
+    },
+    "jsonld_count": 4,
+    "leak": false,
+    "file": "E37_mobile.png"
+  },
+  {
+    "eid": "E38",
+    "path": "/oriente-maya/valladolid/cenotes/zazil-tunich",
+    "vp": "desktop",
+    "status": 200,
+    "title": "Zazil Tunich · Valladolid — Valladolid.mx",
+    "meta": {
+      "title": "Zazil Tunich · Valladolid — Valladolid.mx",
+      "desc": "El primer Cenote Museo del mundo — puerta al Inframundo Maya, a 20 minutos de Chichén Itzá.",
+      "og": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+      "canonical": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich",
+      "h1": [
+        "Zazil Tunich"
+      ]
+    },
+    "jsonld_count": 4,
+    "leak": false,
+    "file": "E38_desktop.png"
+  },
+  {
+    "eid": "E39",
+    "path": "/oriente-maya/valladolid/cenotes",
+    "vp": "mobile",
+    "status": 200,
+    "title": "Cenotes en Valladolid — Oriente Maya · Valladolid.mx",
+    "meta": {
+      "title": "Cenotes en Valladolid — Oriente Maya · Valladolid.mx",
+      "desc": "Descubre cenotes en Valladolid, Oriente Maya de Yucatán. Selección editorial de Valladolid.mx.",
+      "og": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+      "canonical": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes",
+      "h1": [
+        "Cenotes en Valladolid"
+      ]
+    },
+    "jsonld_count": 4,
+    "leak": false,
+    "file": "E39_mobile.png"
+  },
+  {
+    "eid": "E40",
+    "path": "/oriente-maya/valladolid/cenotes",
+    "vp": "desktop",
+    "status": 200,
+    "title": "Cenotes en Valladolid — Oriente Maya · Valladolid.mx",
+    "meta": {
+      "title": "Cenotes en Valladolid — Oriente Maya · Valladolid.mx",
+      "desc": "Descubre cenotes en Valladolid, Oriente Maya de Yucatán. Selección editorial de Valladolid.mx.",
+      "og": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+      "canonical": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes",
+      "h1": [
+        "Cenotes en Valladolid"
+      ]
+    },
+    "jsonld_count": 4,
+    "leak": false,
+    "file": "E40_desktop.png"
+  },
+  {
+    "eid": "E41",
+    "path": "/oriente-maya/valladolid",
+    "vp": "mobile",
+    "status": 200,
+    "title": "Valladolid — Oriente Maya · Valladolid.mx",
+    "meta": {
+      "title": "Valladolid — Oriente Maya · Valladolid.mx",
+      "desc": "Valladolid, fundada en 1543 sobre el pueblo maya de Zací, es la puerta colonial del oriente de Yucatán y sede oficial del Pueblo Mágico más completo de la…",
+      "og": "https://qjlfwsqsrzikjilicoad.supabase.co/storage/v1/object/sign/destinations/11111111-aaaa-4aaa-8aaa-000000000001/1783106483564-edcvzn-img_6663.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xNzA1MWQ2Mi0zYmQxLTQ4MzMtODk1OC1lNmI4M2Q3NjU0NTMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkZXN0aW5hdGlvbnMvMTExMTExMTEtYWFhYS00YWFhLThhYWEtMDAwMDAwMDAwMDAxLzE3ODMxMDY0ODM1NjQtZWRjdnpuLWltZ182NjYzLmpwZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODQ2OTI3OTQsImV4cCI6MTc4NDY5NjM5NH0.ABS8AV5-MD6KkELXyOgp33_WFCvsIxk8pioqwhaVxno",
+      "canonical": "https://quehacerenvalladolid.com/oriente-maya/valladolid",
+      "h1": [
+        "Valladolid"
+      ]
+    },
+    "jsonld_count": 4,
+    "leak": false,
+    "file": "E41_mobile.png"
+  },
+  {
+    "eid": "E42",
+    "path": "/oriente-maya/valladolid",
+    "vp": "desktop",
+    "status": 200,
+    "title": "Valladolid — Oriente Maya · Valladolid.mx",
+    "meta": {
+      "title": "Valladolid — Oriente Maya · Valladolid.mx",
+      "desc": "Valladolid, fundada en 1543 sobre el pueblo maya de Zací, es la puerta colonial del oriente de Yucatán y sede oficial del Pueblo Mágico más completo de la…",
+      "og": "https://qjlfwsqsrzikjilicoad.supabase.co/storage/v1/object/sign/destinations/11111111-aaaa-4aaa-8aaa-000000000001/1783106483564-edcvzn-img_6663.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xNzA1MWQ2Mi0zYmQxLTQ4MzMtODk1OC1lNmI4M2Q3NjU0NTMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkZXN0aW5hdGlvbnMvMTExMTExMTEtYWFhYS00YWFhLThhYWEtMDAwMDAwMDAwMDAxLzE3ODMxMDY0ODM1NjQtZWRjdnpuLWltZ182NjYzLmpwZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODQ2OTI4MDAsImV4cCI6MTc4NDY5NjQwMH0.Dbxob_tXVQ6lAZfaeDBuZeGUEbSr4-kaEY0Sm_y6CWk",
+      "canonical": "https://quehacerenvalladolid.com/oriente-maya/valladolid",
+      "h1": [
+        "Valladolid"
+      ]
+    },
+    "jsonld_count": 4,
+    "leak": false,
+    "file": "E42_desktop.png"
+  },
+  {
+    "eid": "E43",
+    "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote",
+    "vp": "mobile",
+    "status": 200,
+    "title": "Nado en el Cenote Sagrado · Zazil Tunich — Valladolid.mx",
+    "meta": {
+      "title": "Nado en el Cenote Sagrado · Zazil Tunich — Valladolid.mx",
+      "desc": "Nado consciente en aguas turquesa de más de 40 metros de profundidad.",
+      "og": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+      "canonical": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote",
+      "h1": [
+        "Nado en el Cenote Sagrado"
+      ]
+    },
+    "jsonld_count": 4,
+    "leak": false,
+    "file": "E43_mobile.png"
+  },
+  {
+    "eid": "E44",
+    "path": "/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote",
+    "vp": "desktop",
+    "status": 200,
+    "title": "Nado en el Cenote Sagrado · Zazil Tunich — Valladolid.mx",
+    "meta": {
+      "title": "Nado en el Cenote Sagrado · Zazil Tunich — Valladolid.mx",
+      "desc": "Nado consciente en aguas turquesa de más de 40 metros de profundidad.",
+      "og": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+      "canonical": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote",
+      "h1": [
+        "Nado en el Cenote Sagrado"
+      ]
+    },
+    "jsonld_count": 4,
+    "leak": false,
+    "file": "E44_desktop.png"
+  },
+  {
+    "eid": "E45",
+    "path": "/empresas",
+    "vp": "mobile",
+    "status": 200,
+    "title": "Empresas · Valladolid.mx",
+    "meta": {
+      "title": "Empresas · Valladolid.mx",
+      "desc": "Hoteles, restaurantes, experiencias y servicios del Oriente Maya: administra tu presencia con visibilidad real basada en confianza.",
+      "og": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+      "canonical": "https://quehacerenvalladolid.com/empresas",
+      "h1": [
+        "Tu negocio en el Oriente Maya"
+      ]
+    },
+    "jsonld_count": 2,
+    "leak": false,
+    "file": "E45_mobile.png"
+  },
+  {
+    "eid": "E46",
+    "path": "/empresas",
+    "vp": "desktop",
+    "status": 200,
+    "title": "Empresas · Valladolid.mx",
+    "meta": {
+      "title": "Empresas · Valladolid.mx",
+      "desc": "Hoteles, restaurantes, experiencias y servicios del Oriente Maya: administra tu presencia con visibilidad real basada en confianza.",
+      "og": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+      "canonical": "https://quehacerenvalladolid.com/empresas",
+      "h1": [
+        "Tu negocio en el Oriente Maya"
+      ]
+    },
+    "jsonld_count": 2,
+    "leak": false,
+    "file": "E46_desktop.png"
+  }
+]
