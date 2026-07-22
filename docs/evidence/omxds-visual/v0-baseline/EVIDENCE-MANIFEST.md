@@ -1,0 +1,87 @@
+# Evidence Manifest — OMXDS Visual V0 · Baseline
+
+**Estado:** No canónico (evidencia, no ingresa al universo documental gobernado).
+**Baseline SHA:** `79ad4fa1ddb79490874dbe228cf96f0274caf281`
+**Fecha de captura:** 2026-07-22
+**Entorno:** Preview local · `http://localhost:8080` · Vite dev server · Chromium headless (Playwright).
+**Viewports fijados:** desktop `1440×900` / móvil `390×844`; screenshots a alto extendido (3200 / 2400) para cubrir contenido below-the-fold sin usar `full_page`.
+**Estado de datos:** Demo Pack Oriente Maya cargado en Supabase (proyecto ref `qjlfwsqsrzikjilicoad`).
+
+---
+
+## Convenciones
+
+- **Ruta:** URL relativa capturada (sin dominio).
+- **Superficie:** ID (S01–S17) alineado con `docs/blueprint/18.07-OMXDS-VISUAL-SURFACE-INVENTORY-AUDIT-v1.0.md` §2.
+- **Viewport:** desktop = `1440` · móvil = `390`.
+- **Dimensiones completas:** `<width>×<height>` px del PNG resultante.
+- **Bytes:** tamaño del archivo PNG en bytes (referencia integridad).
+- **Fecha:** día en que se ejecutó Playwright (mismo lote para las 36).
+- **Entorno:** siempre `preview local` — no producción.
+- **Estado datos:** `demo-pack` uniforme. Casos `404` = evidencia de brecha, no dataset roto.
+- **Documento que la referencia:** documento canónico donde la evidencia sustenta afirmaciones.
+
+---
+
+## 1440 px · Desktop (18 archivos)
+
+| # | Ruta | Superficie | Viewport | Dimensiones | Bytes | Fecha | Entorno | Estado datos | Observaciones | Documento receptor |
+|---|------|------------|----------|-------------|-------|-------|---------|--------------|---------------|--------------------|
+| E01 | `/` | S01 · Home | 1440 | 1440×3200 | 3 047 040 | 2026-07-22 | preview local | demo-pack | LCP hero `bg01.webp` visible; composición publicada. | 18.06 §6 · 18.07 §3/§4/S01 |
+| E02 | `/oriente-maya` | S02 · Región | 1440 | 1440×3200 | 402 580 | 2026-07-22 | preview local | demo-pack | Grid de destinos publicados. | 18.06 §6 · 18.07 S02 |
+| E03 | `/oriente-maya/valladolid` | S03 · Destino | 1440 | 1440×3200 | 1 925 450 | 2026-07-22 | preview local | demo-pack | Hero destino + mapa Mapbox + colecciones. | 18.06 §6 · 18.07 S03 |
+| E04 | `/oriente-maya/valladolid/cenotes` | S04 · Categoría-en-destino | 1440 | 1440×3200 | 523 250 | 2026-07-22 | preview local | demo-pack | Grid mínimo N2.1 (sin plantilla EB dedicada). | 18.06 §6 · 18.07 S04 |
+| E05 | `/oriente-maya/valladolid/cenotes/zazil-tunich` | S05 · Empresa | 1440 | 1440×3200 | 1 185 497 | 2026-07-22 | preview local | demo-pack (0 medios) | `cover_media_id = NULL`; hero débil. | 18.06 §6 · 18.07 S05 · 18.14 (piloto) |
+| E06 | `/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote` | S06 · Producto | 1440 | 1440×3200 | 715 537 | 2026-07-22 | preview local | demo-pack | Precio MXN 650; `product_type = experiencia`. | 18.06 §6 · 18.07 S06 |
+| E07 | `/experiencias` | S07 · Listado plano | 1440 | 1440×3200 | 444 767 | 2026-07-22 | preview local | demo-pack | `TourismListingSurface` sin distinción empresa/producto. | 18.06 §6 · 18.07 S07 |
+| E08 | `/hoteles` | S08 · Listado plano | 1440 | 1440×3200 | 327 671 | 2026-07-22 | preview local | demo-pack | Sin precio/disponibilidad. | 18.07 S08 |
+| E09 | `/restaurantes` | S09 · Listado plano | 1440 | 1440×3200 | 303 783 | 2026-07-22 | preview local | demo-pack | Sin cocina/menú/precio. | 18.07 S09 |
+| E10 | `/empresas` | S10 · Editorial B2B | 1440 | 1440×3200 | 79 583 | 2026-07-22 | preview local | estático | Layout con lucide icons + CTAs Portal. | 18.07 S10 |
+| E11 | `/eventos` | S11 · Eventos | 1440 | 1440×3200 | 384 144 | 2026-07-22 | preview local | demo-pack (`upcomingOnly`, `limit=60`) | Sin JSON-LD `Event`. | 18.07 S11 |
+| E12 | `/marketplace` | S12 · Redirect 301 | 1440 | 1440×3200 | 403 350 | 2026-07-22 | preview local | N/A | Captura equivale a `/oriente-maya` tras 301. | 18.07 S12 |
+| E13 | `/arma-tu-viaje` | S13 · Trip Planner | 1440 | 1440×3200 | 85 683 | 2026-07-22 | preview local | sesión anónima vacía | Onboarding + planner con 0 items. | 18.07 S13 |
+| E14 | `/blog` | S14 · Editorial · Agenda | 1440 | 1440×3200 | 117 222 | 2026-07-22 | preview local | demo-pack eventos | Contenido de transición (SEO.A1.2·D3). | 18.07 S14 |
+| E15 | `/contacto` | S15 · Editorial · Contacto | 1440 | 1440×3200 | 103 265 | 2026-07-22 | preview local | estático | Sin `ContactPoint` JSON-LD. | 18.07 S15 |
+| E16 | `/destinos` | S16 · Legacy 404 | 1440 | 1440×3200 | 58 694 | 2026-07-22 | preview local | N/A | Evidencia RI-01. | 18.06 §7 · 18.07 S16 |
+| E17 | `/valladolid` | S17 · Legacy 404 | 1440 | 1440×3200 | 58 694 | 2026-07-22 | preview local | N/A | Evidencia RI-02. Tamaño idéntico a E16 confirma misma `notFoundComponent`. | 18.06 §7 · 18.07 S17 |
+| E36a | `/oriente-maya/valladolid/cenotes/zazil-tunich` | S05 · piloto ZT | 1440 | 1440×3200 | 1 185 497 | 2026-07-22 | preview local | demo-pack | Captura dedicada (bytes idénticos a E05). | 18.14 |
+
+## 390 px · Móvil (18 archivos)
+
+| # | Ruta | Superficie | Viewport | Dimensiones | Bytes | Fecha | Entorno | Estado datos | Observaciones | Documento receptor |
+|---|------|------------|----------|-------------|-------|-------|---------|--------------|---------------|--------------------|
+| E18 | `/` | S01 · Home | 390 | 390×2400 | 694 694 | 2026-07-22 | preview local | demo-pack | Hero legible; secciones apiladas. | 18.11 |
+| E19 | `/oriente-maya` | S02 · Región | 390 | 390×2400 | 291 187 | 2026-07-22 | preview local | demo-pack | — | 18.11 |
+| E20 | `/oriente-maya/valladolid` | S03 · Destino | 390 | 390×2400 | 259 860 | 2026-07-22 | preview local | demo-pack | Riesgo SI-28: mapa antes de secciones. | 18.11 · SI-28 |
+| E21 | `/oriente-maya/valladolid/cenotes` | S04 · Categoría | 390 | 390×2400 | 246 757 | 2026-07-22 | preview local | demo-pack | Grid vertical denso. | 18.11 |
+| E22 | `/oriente-maya/valladolid/cenotes/zazil-tunich` | S05 · Empresa | 390 | 390×2400 | 154 419 | 2026-07-22 | preview local | demo-pack (0 medios) | Hero débil; productos como primer contenido significativo. | 18.11 · SI-04 |
+| E23 | `/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote` | S06 · Producto | 390 | 390×2400 | 271 706 | 2026-07-22 | preview local | demo-pack | Precio y CTA legibles. | 18.11 |
+| E24 | `/experiencias` | S07 · Listado | 390 | 390×2400 | 320 575 | 2026-07-22 | preview local | demo-pack | Cards sin diferenciación vertical. | 18.11 · SI-09 |
+| E25 | `/hoteles` | S08 · Listado | 390 | 390×2400 | 292 502 | 2026-07-22 | preview local | demo-pack | — | 18.11 · SI-10 |
+| E26 | `/restaurantes` | S09 · Listado | 390 | 390×2400 | 267 910 | 2026-07-22 | preview local | demo-pack | — | 18.11 · SI-11 |
+| E27 | `/empresas` | S10 · Editorial B2B | 390 | 390×2400 | 73 713 | 2026-07-22 | preview local | estático | H2 repetidos como etiquetas (SI-12). | 18.11 · 18.13 |
+| E28 | `/eventos` | S11 · Eventos | 390 | 390×2400 | 315 701 | 2026-07-22 | preview local | demo-pack | Cards con exceso tipográfico (SI-29). | 18.11 · SI-29 |
+| E29 | `/marketplace` | S12 · Redirect | 390 | 390×2400 | 291 187 | 2026-07-22 | preview local | N/A | Bytes coinciden con E19 tras 301 → mismo destino. | 18.07 S12 |
+| E30 | `/arma-tu-viaje` | S13 · Planner | 390 | 390×2400 | 59 739 | 2026-07-22 | preview local | sesión vacía | Onboarding móvil. | 18.11 · S13 |
+| E31 | `/blog` | S14 · Editorial | 390 | 390×2400 | 97 160 | 2026-07-22 | preview local | demo-pack eventos | Agenda cultural. | 18.11 · SI-17 |
+| E32 | `/contacto` | S15 · Editorial | 390 | 390×2400 | 81 880 | 2026-07-22 | preview local | estático | — | 18.11 |
+| E33 | `/destinos` | S16 · Legacy 404 | 390 | 390×2400 | 35 254 | 2026-07-22 | preview local | N/A | Evidencia RI-01 móvil. | 18.06 §7 |
+| E34 | `/valladolid` | S17 · Legacy 404 | 390 | 390×2400 | 35 254 | 2026-07-22 | preview local | N/A | Evidencia RI-02 móvil. | 18.06 §7 |
+| E36b | `/oriente-maya/valladolid/cenotes/zazil-tunich` | S05 · piloto ZT | 390 | 390×2400 | 154 419 | 2026-07-22 | preview local | demo-pack (0 medios) | Captura dedicada (bytes idénticos a E22). | 18.14 |
+
+## Totales
+
+- **1440 px:** 17 capturas + 1 dedicada ZT = 18 archivos bajo `1440/` y `zazil-tunich/zt_desktop_1440x3200.png`.
+- **390 px:** 17 capturas + 1 dedicada ZT = 18 archivos bajo `390/` y `zazil-tunich/zt_mobile_390x2400.png`.
+- **Total archivos:** 36 PNG.
+- **Tamaño total en disco:** ≈ 15 MB (confirmado con `du -sh`).
+
+## Reglas de trazabilidad
+
+1. Cualquier futura recaptura debe conservar el mismo nombre de archivo para preservar los IDs `E01…E36`.
+2. Los IDs `E16`, `E17`, `E33`, `E34` documentan brechas de ruta (404) y no deben eliminarse hasta cerrar `RI-01` y `RI-02` en V1.
+3. Este manifiesto es **no canónico** — no incrementa el universo documental gobernado (447 → 449 sólo cuentan `18.06` y `18.07`).
+
+---
+
+**Fin del manifiesto.**
