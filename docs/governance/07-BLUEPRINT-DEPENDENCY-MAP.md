@@ -2,19 +2,19 @@
 
 **Estado:** Approved
 
-**Versión:** 0.8
+**Versión:** 0.9
 
-**Última actualización:** 2026-07-21
+**Última actualización:** 2026-07-22
 
 **Owner:** Founder (documental) · Núcleo de Gobernanza (mantenimiento)
 
 ## 1. Propósito
 
-Mapa canónico y reproducible de relaciones verificadas entre los 470 documentos registrados en `06` y sus artefactos asociados de implementación, migración y prueba. Una ausencia significa `Not established`; nunca se rellena mediante inferencia silenciosa.
+Mapa canónico y reproducible de relaciones verificadas entre los 471 documentos registrados en `06` y sus artefactos asociados de implementación, migración y prueba. Una ausencia significa `Not established`; nunca se rellena mediante inferencia silenciosa.
 
 ## 2. Base congelada y alcance
 
-Esta versión deriva exclusivamente de `06 v0.10 Approved`. Conserva los 470 nodos documentales (incluidos los 11 documentos Baseline V0 `18.06`–`18.16` incorporados por Adjudicación Integral Controlada Opción A del 2026-07-22 y los 12 documentos RV0.1/RV0.2 `19.01`–`19.12`), y convierte únicamente asociaciones validadas de `06` en aristas. La evidencia autocontenida no se presenta como una prueba externa independiente.
+Esta versión deriva exclusivamente de `06 v0.11 Approved`. Conserva los 471 nodos documentales (los 470 incorporados en v0.10 más el Closure Certificate `19.13-RV0.2-CLOSURE-CERTIFICATE-v1.0.md` registrado por la aprobación Founder de RV0.2 del 2026-07-22), y convierte únicamente asociaciones validadas de `06` en aristas. La evidencia autocontenida no se presenta como una prueba externa independiente.
 
 El dataset legible por máquina se publica junto a este documento en `docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json`; este Markdown resume el contrato y contiene el inventario completo de artefactos y aristas.
 
