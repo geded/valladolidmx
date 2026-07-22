@@ -1,0 +1,25 @@
+{
+  "id": "S04",
+  "label": "Categoria Cenotes",
+  "url": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes",
+  "final": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes",
+  "http": "200",
+  "redirects": "0",
+  "title": "Cenotes en Valladolid \u2014 Oriente Maya \u00b7 Valladolid.mx",
+  "desc": "Descubre cenotes en Valladolid, Oriente Maya de Yucat\u00e1n. Selecci\u00f3n editorial de Valladolid.mx.",
+  "canonical": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes",
+  "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "og_type": "website",
+  "og_image": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+  "og_url": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes",
+  "twitter_card": "summary_large_image",
+  "html_lang": "es",
+  "h1": "Cenotes en Valladolid",
+  "hreflang_count": 0,
+  "jsonld_types": [
+    "WebSite",
+    "Organization",
+    "BreadcrumbList",
+    "CollectionPage"
+  ]
+}

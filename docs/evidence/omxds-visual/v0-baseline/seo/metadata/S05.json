@@ -1,0 +1,25 @@
+{
+  "id": "S05",
+  "label": "Empresa (Zazil Tunich)",
+  "url": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich",
+  "final": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich",
+  "http": "200",
+  "redirects": "0",
+  "title": "Zazil Tunich \u00b7 Valladolid \u2014 Valladolid.mx",
+  "desc": "El primer Cenote Museo del mundo \u2014 puerta al Inframundo Maya, a 20 minutos de Chich\u00e9n Itz\u00e1.",
+  "canonical": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich",
+  "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "og_type": "profile",
+  "og_image": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+  "og_url": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich",
+  "twitter_card": "summary_large_image",
+  "html_lang": "es",
+  "h1": "Zazil Tunich",
+  "hreflang_count": 0,
+  "jsonld_types": [
+    "WebSite",
+    "Organization",
+    "BreadcrumbList",
+    "TouristAttraction"
+  ]
+}

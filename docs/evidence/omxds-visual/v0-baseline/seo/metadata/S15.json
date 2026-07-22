@@ -1,0 +1,23 @@
+{
+  "id": "S15",
+  "label": "Empresas (portal)",
+  "url": "https://quehacerenvalladolid.com/empresas",
+  "final": "https://quehacerenvalladolid.com/empresas",
+  "http": "200",
+  "redirects": "0",
+  "title": "Empresas \u00b7 Valladolid.mx",
+  "desc": "Hoteles, restaurantes, experiencias y servicios del Oriente Maya: administra tu presencia con visibilidad real basada en confianza.",
+  "canonical": "https://quehacerenvalladolid.com/empresas",
+  "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "og_type": "website",
+  "og_image": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+  "og_url": "https://quehacerenvalladolid.com/empresas",
+  "twitter_card": "summary_large_image",
+  "html_lang": "es",
+  "h1": "Tu negocio en el Oriente Maya",
+  "hreflang_count": 0,
+  "jsonld_types": [
+    "WebSite",
+    "Organization"
+  ]
+}

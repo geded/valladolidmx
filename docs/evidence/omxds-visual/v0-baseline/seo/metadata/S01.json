@@ -1,0 +1,24 @@
+{
+  "id": "S01",
+  "label": "Home",
+  "url": "https://quehacerenvalladolid.com/",
+  "final": "https://quehacerenvalladolid.com/",
+  "http": "200",
+  "redirects": "0",
+  "title": "Valladolid.mx \u00b7 Despierta en el Oriente Maya",
+  "desc": "Despierta en Valladolid y descubre el Oriente Maya: cenotes, cultura, gastronom\u00eda y experiencias aut\u00e9nticas de Yucat\u00e1n.",
+  "canonical": "https://quehacerenvalladolid.com/",
+  "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "og_type": "website",
+  "og_image": "https://quehacerenvalladolid.com/api/public/studio-media/2026/imported-1783037283528-xv523j-bg02-ddstg3xc.jpg",
+  "og_url": "https://quehacerenvalladolid.com/",
+  "twitter_card": "summary_large_image",
+  "html_lang": "es",
+  "h1": "Despierta en Valladolid y descubre el Oriente Maya de Yucat\u00e1n.",
+  "hreflang_count": 0,
+  "jsonld_types": [
+    "WebSite",
+    "Organization",
+    "WebPage"
+  ]
+}

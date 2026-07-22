@@ -1,0 +1,23 @@
+{
+  "id": "S13",
+  "label": "Arma tu Viaje",
+  "url": "https://quehacerenvalladolid.com/arma-tu-viaje",
+  "final": "https://quehacerenvalladolid.com/arma-tu-viaje",
+  "http": "200",
+  "redirects": "0",
+  "title": "Arma tu Viaje \u00b7 Valladolid.mx",
+  "desc": "Tu expediente personal del Oriente Maya. Guarda destinos, experiencias y notas. Tu concierge humano lo recibe cuando est\u00e9s listo.",
+  "canonical": "https://quehacerenvalladolid.com/arma-tu-viaje",
+  "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "og_type": "website",
+  "og_image": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+  "og_url": "https://quehacerenvalladolid.com/arma-tu-viaje",
+  "twitter_card": "summary_large_image",
+  "html_lang": "es",
+  "h1": "Arma tu Viaje",
+  "hreflang_count": 0,
+  "jsonld_types": [
+    "WebSite",
+    "Organization"
+  ]
+}

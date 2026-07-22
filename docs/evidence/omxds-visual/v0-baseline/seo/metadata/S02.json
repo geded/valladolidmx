@@ -1,0 +1,26 @@
+{
+  "id": "S02",
+  "label": "Region",
+  "url": "https://quehacerenvalladolid.com/oriente-maya",
+  "final": "https://quehacerenvalladolid.com/oriente-maya",
+  "http": "200",
+  "redirects": "0",
+  "title": "Oriente Maya \u2014 Destinos tur\u00edsticos de Yucat\u00e1n \u00b7 Valladolid.mx",
+  "desc": "Una ruta cultural y natural por el oriente de Yucat\u00e1n: ciudades coloniales, cenotes, ruinas mayas y pueblos vivos.",
+  "canonical": "https://quehacerenvalladolid.com/oriente-maya",
+  "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "og_type": "website",
+  "og_image": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+  "og_url": "https://quehacerenvalladolid.com/oriente-maya",
+  "twitter_card": "summary_large_image",
+  "html_lang": "es",
+  "h1": "Oriente Maya",
+  "hreflang_count": 0,
+  "jsonld_types": [
+    "WebSite",
+    "Organization",
+    "BreadcrumbList",
+    "TouristDestination",
+    "CollectionPage"
+  ]
+}

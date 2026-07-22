@@ -1,0 +1,24 @@
+{
+  "id": "S17",
+  "label": "Blog editorial",
+  "url": "https://quehacerenvalladolid.com/blog",
+  "final": "https://quehacerenvalladolid.com/blog",
+  "http": "200",
+  "redirects": "0",
+  "title": "Blog \u00b7 Valladolid.mx",
+  "desc": "Historias, agenda y notas editoriales del Oriente Maya.",
+  "canonical": "https://quehacerenvalladolid.com/blog",
+  "robots": "noindex, follow",
+  "og_type": "website",
+  "og_image": "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/451dae27-7852-4208-a44a-50306b30f806/id-preview-75119557--fd89b51f-9afc-4e15-8ee2-21fe468f6aa9.lovable.app-1782672665144.png",
+  "og_url": "https://quehacerenvalladolid.com/blog",
+  "twitter_card": "summary",
+  "html_lang": "es",
+  "h1": "Blog del Oriente Maya",
+  "hreflang_count": 0,
+  "jsonld_types": [
+    "WebSite",
+    "Organization",
+    "CollectionPage"
+  ]
+}

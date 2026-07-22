@@ -1,0 +1,23 @@
+{
+  "id": "S07",
+  "label": "Hoteles (flat)",
+  "url": "https://quehacerenvalladolid.com/hoteles",
+  "final": "https://quehacerenvalladolid.com/hoteles",
+  "http": "200",
+  "redirects": "0",
+  "title": "Hoteles \u00b7 Valladolid.mx",
+  "desc": "Haciendas restauradas, posadas familiares y refugios en el coraz\u00f3n del Oriente Maya.",
+  "canonical": "https://quehacerenvalladolid.com/hoteles",
+  "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "og_type": "website",
+  "og_image": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+  "og_url": "https://quehacerenvalladolid.com/hoteles",
+  "twitter_card": "summary_large_image",
+  "html_lang": "es",
+  "h1": "Hoteles",
+  "hreflang_count": 0,
+  "jsonld_types": [
+    "WebSite",
+    "Organization"
+  ]
+}

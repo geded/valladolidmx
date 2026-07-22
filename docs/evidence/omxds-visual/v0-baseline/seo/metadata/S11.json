@@ -1,0 +1,23 @@
+{
+  "id": "S11",
+  "label": "Casas de Vacaciones",
+  "url": "https://quehacerenvalladolid.com/casas-de-vacaciones",
+  "final": "https://quehacerenvalladolid.com/casas-de-vacaciones",
+  "http": "200",
+  "redirects": "0",
+  "title": "Casas de vacaciones \u00b7 Valladolid.mx",
+  "desc": "Casas, villas y rentas vacacionales para explorar el Oriente Maya a tu ritmo.",
+  "canonical": "https://quehacerenvalladolid.com/casas-de-vacaciones",
+  "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "og_type": "website",
+  "og_image": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+  "og_url": "https://quehacerenvalladolid.com/casas-de-vacaciones",
+  "twitter_card": "summary_large_image",
+  "html_lang": "es",
+  "h1": "Casas de vacaciones",
+  "hreflang_count": 0,
+  "jsonld_types": [
+    "WebSite",
+    "Organization"
+  ]
+}

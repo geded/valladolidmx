@@ -1,0 +1,25 @@
+{
+  "id": "S03",
+  "label": "Destino Valladolid",
+  "url": "https://quehacerenvalladolid.com/oriente-maya/valladolid",
+  "final": "https://quehacerenvalladolid.com/oriente-maya/valladolid",
+  "http": "200",
+  "redirects": "0",
+  "title": "Valladolid \u2014 Oriente Maya \u00b7 Valladolid.mx",
+  "desc": "Valladolid, fundada en 1543 sobre el pueblo maya de Zac\u00ed, es la puerta colonial del oriente de Yucat\u00e1n y sede oficial del Pueblo M\u00e1gico m\u00e1s completo de la\u2026",
+  "canonical": "https://quehacerenvalladolid.com/oriente-maya/valladolid",
+  "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "og_type": "article",
+  "og_image": "https://qjlfwsqsrzikjilicoad.supabase.co/storage/v1/object/sign/destinations/11111111-aaaa-4aaa-8aaa-000000000001/1783106483564-edcvzn-img_6663.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xNzA1MWQ2Mi0zYmQxLTQ4MzMtODk1OC1lNmI4M2Q3NjU0NTMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkZXN0aW5hdGlvbnMvMTExMTExMTEtYWFhYS00YWFhLThhYWEtMDAwMDAwMDAwMDAxLzE3ODMxMDY0ODM1NjQtZWRjdnpuLWltZ182NjYzLmpwZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODQ2ODk0NDIsImV4cCI6MTc4NDY5MzA0Mn0.36dUc-eRsS0ifpNECRFKG7G17LK5GiSVXEyyOmQdjHk",
+  "og_url": "https://quehacerenvalladolid.com/oriente-maya/valladolid",
+  "twitter_card": "summary_large_image",
+  "html_lang": "es",
+  "h1": "Valladolid",
+  "hreflang_count": 0,
+  "jsonld_types": [
+    "WebSite",
+    "Organization",
+    "BreadcrumbList",
+    "TouristDestination"
+  ]
+}

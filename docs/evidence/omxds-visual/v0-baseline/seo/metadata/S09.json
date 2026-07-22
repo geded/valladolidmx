@@ -1,0 +1,23 @@
+{
+  "id": "S09",
+  "label": "Experiencias",
+  "url": "https://quehacerenvalladolid.com/experiencias",
+  "final": "https://quehacerenvalladolid.com/experiencias",
+  "http": "200",
+  "redirects": "0",
+  "title": "Experiencias \u00b7 Valladolid.mx",
+  "desc": "Vivencias aut\u00e9nticas con comunidades, cocineros y gu\u00edas locales del Oriente Maya.",
+  "canonical": "https://quehacerenvalladolid.com/experiencias",
+  "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "og_type": "website",
+  "og_image": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+  "og_url": "https://quehacerenvalladolid.com/experiencias",
+  "twitter_card": "summary_large_image",
+  "html_lang": "es",
+  "h1": "Experiencias",
+  "hreflang_count": 0,
+  "jsonld_types": [
+    "WebSite",
+    "Organization"
+  ]
+}
