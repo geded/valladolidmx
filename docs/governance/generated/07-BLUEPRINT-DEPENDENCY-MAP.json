@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.13",
+    "version": "0.14",
     "state": "Approved",
     "main_commit": "LOCAL_RECONCILIATION_2026-07-22",
     "blob": "LOCAL_RECONCILIATION_2026-07-22",
@@ -6550,6 +6550,14 @@
       "id": "DOC:docs/blueprint/19.14-RV0.3-SCOPE-VALIDATION-PROTOCOL-v1.0.md",
       "type": "blueprint",
       "path": "docs/blueprint/19.14-RV0.3-SCOPE-VALIDATION-PROTOCOL-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.15-RV0.3-COHORT-1-HYPOTHESIS-EVIDENCE-DECISION-MATRIX-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.15-RV0.3-COHORT-1-HYPOTHESIS-EVIDENCE-DECISION-MATRIX-v1.0.md",
       "owner": "D04 · content-experience",
       "state": "Approved",
       "version": "1.0"
