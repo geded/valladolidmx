@@ -2,7 +2,7 @@
 
 **Estado:** Approved
 
-**Versión:** 0.9
+**Versión:** 0.10
 
 **Última actualización:** 2026-07-22
 
@@ -16,7 +16,7 @@ Este documento contiene el catálogo canónico del universo documental bajo `doc
 
 Esta sección se reemitió el 2026-07-22 conforme al mandato Founder de revisión RV0.2. El alcance del índice sigue siendo registrar autoridad documental adjudicada; no acredita por sí mismo implementación, despliegue, tráfico real ni cierre de dependencias. El orden de ejecución continúa determinado por el [roadmap oficial v2.1](../blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md).
 
-El universo total del árbol `docs/blueprint/` es actualmente de **470 archivos** verificados. El índice registra **459 filas** adjudicadas. La diferencia (**11 archivos**) corresponde a los documentos del Baseline V0 (Checkpoints 1–6) `18.06`–`18.16`, que existen físicamente en el árbol pero no han sido adjudicados en este índice porque su incorporación se dejó explícitamente fuera del alcance de RV0.1 y RV0.2. Esa brecha reemplaza y reconcilia la inconsistencia previamente enunciada como `458 ↔ 452`: el universo real observado hoy es `470` en árbol y `459` en tabla; la brecha operativa es de `11` filas pendientes de adjudicación en una iniciativa dedicada de gobernanza. Ninguna cifra heredada (`429`, `439`, `442`, `447`, `453`) representa ya el universo actual; las cifras conservadas en el `§6 Control de versiones` describen únicamente el estado histórico de cada versión.
+El universo total del árbol `docs/blueprint/` es actualmente de **470 archivos** verificados. El índice registra **470 filas** adjudicadas tras la Adjudicación Integral Controlada (Opción A) autorizada por el Founder el 2026-07-22, que incorporó los 11 documentos Baseline V0 (Checkpoints 1–6) `18.06`–`18.16`. El árbol y la tabla quedan reconciliados sin brecha operativa. Ninguna cifra heredada (`429`, `439`, `442`, `447`, `453`, `459`) representa ya el universo actual; las cifras conservadas en el `§6 Control de versiones` describen únicamente el estado histórico de cada versión.
 
 Las asociaciones técnicas de las filas adjudicadas fueron validadas localmente contra el árbol actual del repositorio: se conservan sólo rutas resolubles, se normalizan expresiones truncadas y se eliminan autorreferencias. La evidencia documental autocontenida se distingue expresamente de una prueba operativa externa.
 
@@ -28,7 +28,7 @@ El universo total bajo `docs/blueprint/` es de **470 archivos únicos** (medici�
 - **15** archivos en 5 subdirectorios: `artifacts/`, `audits/`, `project-constitution/`, `roadmap/`, `templates/`.
 - **455 + 15 = 470**.
 
-El índice registra actualmente **459 filas** en `§4`. La brecha `470 − 459 = 11` corresponde íntegramente a los documentos Baseline V0 `18.06`–`18.16` (CP1–CP6), que no han sido adjudicados aquí y permanecen dentro del alcance del Baseline V0 congelado (`18.15`, `18.16`).
+El índice registra actualmente **470 filas** en `§4`. La brecha `470 − 459 = 11` fue cerrada por v0.10 mediante la Adjudicación Integral Controlada (Opción A) del Baseline V0. Los 119 hallazgos congelados y el contenido sustantivo de `18.06`–`18.16` no fueron reabiertos.
 
 Los conteos previos (`429`, `432`, `439`, `442`, `444`, `447`, `453`) reflejan medidas históricas del árbol o del índice; ninguno representa el universo actual y no deben citarse fuera del `§6 Control de versiones`.
 
@@ -39,7 +39,7 @@ find docs/blueprint -type f | wc -l                    # 470 archivos únicos (2
 find docs/blueprint -maxdepth 1 -type f | wc -l        # 455 raíz
 find docs/blueprint -mindepth 2 -type f | wc -l        # 15 en subdirectorios
 find docs/blueprint -mindepth 1 -type d                # 5 subdirectorios (artifacts, audits, project-constitution, roadmap, templates)
-grep -c '^| \[`docs/blueprint/' docs/governance/06-BLUEPRINT-MASTER-INDEX.md   # 459 filas adjudicadas
+grep -c '^| \[`docs/blueprint/' docs/governance/06-BLUEPRINT-MASTER-INDEX.md   # 470 filas adjudicadas
 ```
 
 Delta reproducible tabla ↔ árbol:
@@ -48,7 +48,7 @@ Delta reproducible tabla ↔ árbol:
 find docs/blueprint -type f | sort > /tmp/tree.txt
 grep -oE '\[`docs/blueprint/[^`]+`\]' docs/governance/06-BLUEPRINT-MASTER-INDEX.md \
   | sed 's/^\[`//;s/`\]$//' | sort -u > /tmp/idx.txt
-comm -23 /tmp/tree.txt /tmp/idx.txt   # 11 archivos: 18.06 … 18.16 (Baseline V0 CP1–CP6)
+comm -23 /tmp/tree.txt /tmp/idx.txt   # 0 archivos (reconciliado en v0.10)
 comm -13 /tmp/tree.txt /tmp/idx.txt   # 0 filas indexadas sin archivo
 ```
 
@@ -75,32 +75,32 @@ Semántica obligatoria:
 
 ## 3.1 Resumen de adjudicación
 
-Recomputado sobre las 459 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $5 }' | sort | uniq -c`, 2026-07-22):
+Recomputado sobre las 470 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $5 }' | sort | uniq -c`, 2026-07-22):
 
 | Estado | Documentos |
 |---|---:|
-| `Approved` | 161 |
+| `Approved` | 172 |
 | `Draft` | 294 |
 | `Superseded` | 3 |
 | `Historical` | 1 |
 | `Deprecated` | 0 |
-| **Total adjudicado** | **459** |
-| No adjudicado (Baseline V0 `18.06`–`18.16`) | 11 |
+| **Total adjudicado** | **470** |
+| No adjudicado | 0 |
 | **Total del árbol** | **470** |
 
 Los conteos previos (`155 / 285`, `442`) se conservan sólo para el `§6 Control de versiones`; no representan el estado actual. La cobertura declarada en versiones anteriores (274 implementaciones, 14 migraciones, 251 pruebas/evidencia) queda como métrica histórica de la versión v0.5 y se recomputará cuando la brecha de 11 filas se adjudique.
 
 ## 3.2 Resumen por dominio primario
 
-Recomputado sobre las 459 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $7 }' | sort | uniq -c`, 2026-07-22):
+Recomputado sobre las 470 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $7 }' | sort | uniq -c`, 2026-07-22):
 
 | ID | Dominio | Documentos |
 |---|---|---:|
-| `D01` | `product-governance` | 31 |
-| `D02` | `platform-foundation` | 21 |
+| `D01` | `product-governance` | 33 |
+| `D02` | `platform-foundation` | 22 |
 | `D03` | `identity-security` | 45 |
-| `D04` | `content-experience` | 91 |
-| `D05` | `destination-discovery` | 35 |
+| `D04` | `content-experience` | 92 |
+| `D05` | `destination-discovery` | 37 |
 | `D06` | `marketplace-commerce` | 25 |
 | `D07` | `provider-operations` | 24 |
 | `D08` | `traveler-lifecycle` | 54 |
@@ -108,11 +108,11 @@ Recomputado sobre las 459 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ {
 | `D10` | `alux-ai` | 16 |
 | `D11` | `visitor-intelligence` | 28 |
 | `D12` | `engagement-notifications` | 14 |
-| `D13` | `media-delivery` | 29 |
-| `D14` | `growth-reliability` | 17 |
-|  | **Total adjudicado** | **459** |
+| `D13` | `media-delivery` | 30 |
+| `D14` | `growth-reliability` | 21 |
+|  | **Total adjudicado** | **470** |
 
-Verificación aritmética: `31+21+45+91+35+25+24+54+29+16+28+14+29+17 = 459`. Las 11 filas no adjudicadas (`18.06`–`18.16`) pertenecen conceptualmente a `D04 · content-experience` como Baseline V0, pero no se contabilizan aquí hasta su adjudicación formal.
+Verificación aritmética: `33+22+45+92+37+25+24+54+29+16+28+14+30+21 = 470`. Las 11 filas Baseline V0 (`18.06`–`18.16`) quedan adjudicadas por evidencia canónica en la presente versión v0.10; la asignación por documento se registra en `docs/governance/audit/2026-07-22-BASELINE-V0-ADJUDICATION-v1.0.md`.
 
 La asignación primaria expresa accountability documental. Las dependencias e impactos transversales se modelarán como aristas en `07`; no crean owners múltiples en este índice.
 
@@ -582,21 +582,32 @@ La asignación primaria expresa accountability documental. Las dependencias e im
 | [`docs/blueprint/19.11-RV0.2-RESPONSIVE-ACCESSIBILITY-CONSISTENCY-v1.0.md`](../blueprint/19.11-RV0.2-RESPONSIVE-ACCESSIBILITY-CONSISTENCY-v1.0.md) | RV0.2 · Responsive, Accessibility & Cross-Surface Consistency (AC-01…AC-14) | `1.0` | `Draft` | Responsive/A11y · rv0-2-responsive | `D04 · content-experience` | `19.07`, `19.08`, `19.09` | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Mandate 2026-07-22 · Pending Founder Review; sin valores finales de breakpoints/tipografía/color. | 2026-07-22 |
 | [`docs/blueprint/19.12-RV0.2-DECISION-REGISTER-VALIDATION-BACKLOG-v1.0.md`](../blueprint/19.12-RV0.2-DECISION-REGISTER-VALIDATION-BACKLOG-v1.0.md) | RV0.2 · Decision Register & Validation Backlog (DR-01…DR-34, PT-01…PT-08, VB-01…VB-07) | `1.0` | `Draft` | Decision Register · rv0-2-decisions | `D04 · content-experience` | `19.07–19.11` | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Mandate 2026-07-22 · Pending Founder Review; RV0.3, pilotos y V1 no autorizados. | 2026-07-22 |
 
+| [`docs/blueprint/18.06-OMXDS-VISUAL-ROUTE-INVENTORY-AUDIT-v1.0.md`](../blueprint/18.06-OMXDS-VISUAL-ROUTE-INVENTORY-AUDIT-v1.0.md) | 18.06 · OMXDS Visual — Route Inventory Audit v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.06-omxds-visual-route-inventory-audit | `D02 · platform-foundation` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Route census del árbol `src/routes/` alineado con la política DOS Route Inventory (SSC-01·P2). El propio documento declara accountability de `platform-foundations`; no es proximidad temática. | 2026-07-22 |
+| [`docs/blueprint/18.07-OMXDS-VISUAL-SURFACE-INVENTORY-AUDIT-v1.0.md`](../blueprint/18.07-OMXDS-VISUAL-SURFACE-INVENTORY-AUDIT-v1.0.md) | 18.07 · OMXDS Visual — Surface Inventory Audit v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.07-omxds-visual-surface-inventory-audit | `D05 · destination-discovery` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Auditoría de superficies del Discovery Layer (15.10.5d). Precedentes 15.10.5d.*, 15.10.5d.1 y `PUBLIC-SURFACES-*` → D05. | 2026-07-22 |
+| [`docs/blueprint/18.08-OMXDS-VISUAL-MEDIA-INVENTORY-v1.0.md`](../blueprint/18.08-OMXDS-VISUAL-MEDIA-INVENTORY-v1.0.md) | 18.08 · OMXDS Visual · Media Inventory v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.08-omxds-visual-media-inventory | `D13 · media-delivery` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Inventario técnico de activos multimedia. Precedente: `18.H3-A2 Storage Media Audit` → D13 y toda la serie `18.H3-A3/A4` → D13. | 2026-07-22 |
+| [`docs/blueprint/18.09-OMXDS-VISUAL-MAP-AUDIT-v1.0.md`](../blueprint/18.09-OMXDS-VISUAL-MAP-AUDIT-v1.0.md) | 18.09 · OMXDS Visual · Map Audit v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.09-omxds-visual-map-audit | `D05 · destination-discovery` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Mapas territoriales, pines y coordenadas del ecosistema Oriente Maya. Precedente: `Geolocation Mandatory` (D05) y `15.11-NAVIGATION-BLUEPRINT` (D05). | 2026-07-22 |
+| [`docs/blueprint/18.10-OMXDS-VISUAL-SEO-BASELINE-v1.0.md`](../blueprint/18.10-OMXDS-VISUAL-SEO-BASELINE-v1.0.md) | 18.10 · OMXDS Visual V0 — SEO Baseline v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.10-omxds-visual-seo-baseline | `D14 · growth-reliability` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Baseline SEO. Precedentes: `18.H0-PERFORMANCE-SEO-BASELINE-COMPLETION-REPORT` y `18.H1-SEO-METADATA-SWEEP` → D14. | 2026-07-22 |
+| [`docs/blueprint/18.11-OMXDS-VISUAL-RESPONSIVE-BASELINE-v1.0.md`](../blueprint/18.11-OMXDS-VISUAL-RESPONSIVE-BASELINE-v1.0.md) | 18.11 · OMXDS Visual V0 — Responsive & Visual Hierarchy Baseline v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.11-omxds-visual-responsive-baseline | `D14 · growth-reliability` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Baseline responsive/QA de experiencia. Precedentes: `12C.2-Responsive-Mobile-First-Performance-Final-Acceptance` → D14 y serie `18.H0` → D14. | 2026-07-22 |
+| [`docs/blueprint/18.12-OMXDS-VISUAL-PERFORMANCE-BASELINE-v1.0.md`](../blueprint/18.12-OMXDS-VISUAL-PERFORMANCE-BASELINE-v1.0.md) | 18.12 · OMXDS Visual V0 — Performance Baseline v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.12-omxds-visual-performance-baseline | `D14 · growth-reliability` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Baseline de performance en laboratorio. Precedente: `18.H0` → D14 y `12D-COMPLIANCE-REPORT` → D14. | 2026-07-22 |
+| [`docs/blueprint/18.13-OMXDS-VISUAL-ACCESSIBILITY-BASELINE-v1.0.md`](../blueprint/18.13-OMXDS-VISUAL-ACCESSIBILITY-BASELINE-v1.0.md) | 18.13 · OMXDS Visual V0 — Accessibility Baseline v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.13-omxds-visual-accessibility-baseline | `D14 · growth-reliability` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Baseline diagnóstico de accesibilidad. QA de experiencia y readiness pertenecen a D14 por definición del ADR. | 2026-07-22 |
+| [`docs/blueprint/18.14-OMXDS-VISUAL-PREMIUM-CASE-ZAZIL-TUNICH-v1.0.md`](../blueprint/18.14-OMXDS-VISUAL-PREMIUM-CASE-ZAZIL-TUNICH-v1.0.md) | 18.14 · OMXDS Visual V0 · Caso Piloto Empresa Premium · Zazil Tunich v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.14-omxds-visual-premium-case-zazil-tunich | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Piloto vertical de composición de superficie empresa premium. Precedente: `15.10.H-03-EPICA-1-I2d-BUSINESS-SURFACE-FINAL-CLOSURE` → D04. No es proveedor/operación (D07); es composición y branding de superficie. | 2026-07-22 |
+| [`docs/blueprint/18.15-OMXDS-VISUAL-CROSS-CUTTING-FINDINGS-MATRIX-v1.0.md`](../blueprint/18.15-OMXDS-VISUAL-CROSS-CUTTING-FINDINGS-MATRIX-v1.0.md) | 18.15 · OMXDS Visual · Cross-Cutting Findings Matrix v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.15-omxds-visual-cross-cutting-findings-matrix | `D01 · product-governance` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Matriz consolidada de hallazgos CP1–CP5. Instrumento de gobernanza documental (agregación de decisiones), no capacidad técnica específica. | 2026-07-22 |
+| [`docs/blueprint/18.16-OMXDS-VISUAL-V0-BASELINE-READINESS-GATE-v1.0.md`](../blueprint/18.16-OMXDS-VISUAL-V0-BASELINE-READINESS-GATE-v1.0.md) | 18.16 · OMXDS Visual · V0 Baseline & Readiness Gate v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.16-omxds-visual-v0-baseline-readinness-gate | `D01 · product-governance` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Gate documental de cierre CP6 aprobado por el Founder. Decisión de gobernanza sobre el ciclo V0. | 2026-07-22 |
 ## 5. Criterios objetivos para salir de Draft
 
 | Gate | Estado 2026-07-22 | Evidencia o pendiente |
 |---|---|---|
-| Filas adjudicadas | 459 sobre 470 del árbol | 11 filas pendientes (`18.06`–`18.16`), fuera del alcance de RV0.2. |
+| Filas adjudicadas | 470 sobre 470 del árbol | Cerrado por v0.10 mediante Adjudicación Integral Controlada (Opción A). |
 | Rutas y artefactos existentes | Cumplido para referencias conservadas | Las rutas técnicas retenidas resuelven contra el árbol local. La evidencia autocontenida no se presenta como prueba externa. |
 | Superseded-pass cerrado | Cumplido | 3 `Superseded` con relaciones aprobadas; 0 derivas inesperadas. |
 | ADR de dominios aprobado | Cumplido | `ADR-GOV-0001` formaliza los 14 dominios aprobados por el Founder. |
-| Dominios primarios asignados | Cumplido en filas adjudicadas | Cada fila registrada contiene exactamente un dominio `D01`–`D14`. Las 11 filas no adjudicadas requieren asignación en iniciativa dedicada. |
+| Dominios primarios asignados | Cumplido | Las 470 filas contienen exactamente un dominio `D01`–`D14`; la justificación por evidencia de las 11 filas Baseline V0 se registra en `docs/governance/audit/2026-07-22-BASELINE-V0-ADJUDICATION-v1.0.md`. |
 | Base de derivación para `07` definida | Cumplido | `07` deberá derivarse desde la última versión de `06` aprobada por el Founder. |
 | Evidencia reproducible del PR #12 | Cumplido | PR #12, head `a832c568…`, merge `2e50745e…`, blob `0d047f02…`; ADR publicada mediante PR #13, merge `497d08e3…`, blob `8153c886…`. |
 | Aprobación Founder de v0.5 | Cumplido | El Founder aprobó la propuesta local v0.5; PR #13 fue fusionado en `main`. |
-| Reconciliación tabla ↔ árbol | Pendiente | Adjudicar los 11 documentos Baseline V0 `18.06`–`18.16` en una versión posterior. |
+| Reconciliación tabla ↔ árbol | Cumplido | Universo reconciliado a **470 = 470** en v0.10; sin brecha operativa. |
 
-El documento permanece **operativamente Approved** para las 459 filas adjudicadas y **abierto por reconciliación** en cuanto a las 11 filas Baseline V0 pendientes. RV0.2 permanece `Draft · Pending Founder Review`; RV0.3, pilotos y V1 no autorizados.
+El documento permanece **operativamente Approved** para las 470 filas adjudicadas; la reconciliación tabla ↔ árbol está cerrada en v0.10. RV0.2 permanece `Draft · Pending Founder Review`; RV0.3, pilotos y V1 no autorizados.
 
 ## 6. Control de versiones
 
@@ -612,3 +623,4 @@ El documento permanece **operativamente Approved** para las 459 filas adjudicada
 | v0.8 | 2026-07-22 | Founder | Registra cierre formal de RV0.1: incorpora **9 documentos** en D04, distribuidos en **3 documentos Visual** (`18.03`, `18.04`, `18.05`) y **6 documentos RV0.1** (`19.01`–`19.06`). Universo adjudicado: `444 + 3 + 6 = 453`. No resuelve `GAP-TZ-01` ni los 119 hallazgos congelados. RV0.2 y V1 no autorizados. |
 | v0.9 | 2026-07-22 | Founder | Registra los **6 entregables normativos de RV0.2** (`19.07`–`19.12`) como `Draft · Pending Founder Review` en D04. Universo adjudicado: `453 + 6 = 459`. No resuelve `GAP-TZ-01` ni los 119 hallazgos. RV0.3, pilotos y V1 no autorizados. |
 | v0.9.1 | 2026-07-22 | Founder | Fe de erratas de Founder Review RV0.2 sobre `§2`, `§2.1`, `§2.2`, `§3.1`, `§3.2`, `§5` y `§6`. Reconcilia el universo real del árbol (`470`) con las filas adjudicadas (`459`) y registra la brecha de 11 documentos Baseline V0 (`18.06`–`18.16`). Recomputa `§3.1` (Approved 161, Draft 294, Superseded 3, Historical 1) y `§3.2` (D04=91, D06=25). Retira las cifras heredadas (`155/285`, `442`, `447`, `453`) del estado actual y las conserva sólo en `§6`. Elimina el `\n` literal previamente presente en la línea de v0.6/v0.7. No adjudica los 11 documentos pendientes; no aprueba RV0.2; RV0.3, pilotos y V1 permanecen no autorizados. |
+| v0.10 | 2026-07-22 | Founder | Adjudicación Integral Controlada (Opción A) del Baseline V0 CP1–CP6. Incorpora los 11 documentos `18.06`–`18.16` como `Approved` (D01=+2, D02=+1, D04=+1, D05=+2, D13=+1, D14=+4). Universo reconciliado: **470 filas / 470 archivos**. No reabre contenido sustantivo ni los 119 hallazgos congelados. Justificación por evidencia registrada en `docs/governance/audit/2026-07-22-BASELINE-V0-ADJUDICATION-v1.0.md`. |
