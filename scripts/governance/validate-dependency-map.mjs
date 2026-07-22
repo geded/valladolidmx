@@ -17,7 +17,7 @@ const rowPaths = index.split('\n')
 
 if (rowPaths.length !== 447) throw new Error(`Expected 447 rows in 06; found ${rowPaths.length}`);
 if (new Set(rowPaths).size !== rowPaths.length) throw new Error('Duplicate document path in 06');
-if (map.derived_from?.version !== '0.7' || map.derived_from?.state !== 'Approved') throw new Error('Map is not derived from 06 v0.7 Approved');
+if (map.derived_from?.version !== '0.8' || map.derived_from?.state !== 'Approved') throw new Error('Map is not derived from 06 v0.8 Approved');
 
 const nodes = new Map();
 for (const node of map.nodes || []) {
