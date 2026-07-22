@@ -133,7 +133,9 @@ Notas:
 **Fin del manifiesto.**
 ---
 
-## Checkpoint 4 · Rendimiento y Accesibilidad (2026-07-22)
+## Checkpoint 4 · Rendimiento y Accesibilidad (2026-07-21 America/Mexico_City · 2026-07-22 UTC)
+
+Fecha local de ejecución: **2026-07-21 (America/Mexico_City, UTC−6)**, ventana nocturna 21:12–01:20 hora local, equivalente a **2026-07-22 03:12–07:20 UTC**. La reentrega previa registró la fecha en UTC; se corrige a la fecha local del Founder. Las entradas E01…E36 del índice canónico (Checkpoints 1–3, ya aprobados) conservan sus marcas temporales originales por estar fuera del alcance de esta corrección.
 
 Evidencia adicional bajo `performance/` y `accessibility/`. Reportes tabulares/JSON — no capturas — por lo que el índice canónico E01…E36 se conserva sin ampliar; los nuevos artefactos son referencias documentales para `18.12` y `18.13` y **no incorporan documentos al universo canónico**.
 
