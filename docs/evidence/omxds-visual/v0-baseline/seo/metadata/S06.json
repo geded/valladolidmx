@@ -1,0 +1,23 @@
+{
+  "id": "S06",
+  "label": "Producto (uno de ZT)",
+  "url": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich/recorrido-guiado",
+  "final": "https://quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich/recorrido-guiado",
+  "http": "404",
+  "redirects": "0",
+  "title": "Valladolid.mx \u2014 Oriente Maya de Yucat\u00e1n",
+  "desc": "Despierta en Valladolid y descubre el Oriente Maya: cenotes, cultura, gastronom\u00eda y experiencias aut\u00e9nticas de Yucat\u00e1n.",
+  "canonical": "",
+  "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "og_type": "website",
+  "og_image": "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/451dae27-7852-4208-a44a-50306b30f806/id-preview-75119557--fd89b51f-9afc-4e15-8ee2-21fe468f6aa9.lovable.app-1782672665144.png",
+  "og_url": "",
+  "twitter_card": "summary_large_image",
+  "html_lang": "es",
+  "h1": "Producto no disponible",
+  "hreflang_count": 0,
+  "jsonld_types": [
+    "WebSite",
+    "Organization"
+  ]
+}

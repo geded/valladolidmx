@@ -1,0 +1,23 @@
+{
+  "id": "S10",
+  "label": "Eventos",
+  "url": "https://quehacerenvalladolid.com/eventos",
+  "final": "https://quehacerenvalladolid.com/eventos",
+  "http": "200",
+  "redirects": "0",
+  "title": "Eventos \u00b7 Valladolid.mx",
+  "desc": "Fiestas, festivales y celebraciones del calendario maya.",
+  "canonical": "https://quehacerenvalladolid.com/eventos",
+  "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "og_type": "website",
+  "og_image": "https://quehacerenvalladolid.com/og/default-1200x630.jpg",
+  "og_url": "https://quehacerenvalladolid.com/eventos",
+  "twitter_card": "summary_large_image",
+  "html_lang": "es",
+  "h1": "Eventos",
+  "hreflang_count": 0,
+  "jsonld_types": [
+    "WebSite",
+    "Organization"
+  ]
+}
