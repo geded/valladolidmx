@@ -133,9 +133,19 @@ Notas:
 **Fin del manifiesto.**
 ---
 
-## Checkpoint 4 · Rendimiento y Accesibilidad (2026-07-21 America/Mexico_City · 2026-07-22 UTC)
+## Checkpoint 4 · Rendimiento y Accesibilidad (America/Merida · UTC)
 
-Fecha local de ejecución: **2026-07-21 (America/Mexico_City, UTC−6)**, ventana nocturna 21:12–01:20 hora local, equivalente a **2026-07-22 03:12–07:20 UTC**. La reentrega previa registró la fecha en UTC; se corrige a la fecha local del Founder. Las entradas E01…E36 del índice canónico (Checkpoints 1–3, ya aprobados) conservan sus marcas temporales originales por estar fuera del alcance de esta corrección.
+Zona operativa canónica: **`America/Merida`** (UTC−6, sin DST). Los reportes JSON/TSV bajo `performance/` y `accessibility/` conservan timestamps ISO-8601 en **UTC**; la conversión a `America/Merida` se documenta exclusivamente en los documentos canónicos `18.12` y `18.13`. La reentrega previa etiquetó la zona local como `America/Mexico_City`; se corrige a `America/Merida` (offset y fechas locales idénticos hasta hoy).
+
+**Ventanas definitivas:**
+
+- `18.12 · Performance Baseline` — Inicio UTC `2026-07-22 03:12` · Fin UTC `2026-07-22 05:47` · Inicio `America/Merida` `2026-07-21 21:12` · Fin `America/Merida` `2026-07-21 23:47` · **No cruzó medianoche local**.
+- `18.13 · Accessibility Baseline` — Inicio UTC `2026-07-22 05:50` · Fin UTC `2026-07-22 07:20` · Inicio `America/Merida` `2026-07-21 23:50` · Fin `America/Merida` `2026-07-22 01:20` · **Sí cruzó medianoche local**.
+- **Ventana global Checkpoint 4** — UTC `2026-07-22 03:12–07:20` · `America/Merida` `2026-07-21 21:12 → 2026-07-22 01:20`.
+
+Las entradas E01…E36 del índice canónico (Checkpoints 1–3, ya aprobados) conservan sus marcas temporales originales por estar fuera del alcance de esta corrección.
+
+> **GAP-TZ-01 · Política canónica de zona horaria ausente.** UTC continúa como base de almacenamiento; `America/Merida` queda como zona comercial y operativa canónica. La aplicación pública renderiza actualmente numerosas fechas con la zona del navegador. Remediación en fase posterior. No modifica hallazgos `PF-01…PF-10` ni `AX-01…AX-12` y no genera documento canónico adicional.
 
 Evidencia adicional bajo `performance/` y `accessibility/`. Reportes tabulares/JSON — no capturas — por lo que el índice canónico E01…E36 se conserva sin ampliar; los nuevos artefactos son referencias documentales para `18.12` y `18.13` y **no incorporan documentos al universo canónico**.
 
