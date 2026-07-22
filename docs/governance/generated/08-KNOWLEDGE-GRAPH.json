@@ -9334,6 +9334,16 @@
       "path": "scripts/governance/generate-artifact-inventory.mjs",
       "source": "scripts/governance/generate-artifact-inventory.mjs",
       "evidence": "scripts/governance/generate-artifact-inventory.mjs"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.14-RV0.3-SCOPE-VALIDATION-PROTOCOL-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.14-RV0.3-SCOPE-VALIDATION-PROTOCOL-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.14-RV0.3-SCOPE-VALIDATION-PROTOCOL-v1.0.md",
+      "evidence": "docs/blueprint/19.14-RV0.3-SCOPE-VALIDATION-PROTOCOL-v1.0.md"
     }
   ],
   "edges": [
@@ -25464,6 +25474,15 @@
       "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
       "verified_at": "2026-07-22",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.14-RV0.3-SCOPE-VALIDATION-PROTOCOL-v1.0.md",
+      "verified_at": "2026-07-22",
+      "origin": "DOC:docs/blueprint/19.14-RV0.3-SCOPE-VALIDATION-PROTOCOL-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.13 · docs/blueprint/19.14-RV0.3-SCOPE-VALIDATION-PROTOCOL-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {
