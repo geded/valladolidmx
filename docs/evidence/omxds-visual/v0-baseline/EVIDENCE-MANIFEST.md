@@ -131,3 +131,26 @@ Notas:
 ---
 
 **Fin del manifiesto.**
+---
+
+## Checkpoint 4 · Rendimiento y Accesibilidad (2026-07-22)
+
+Evidencia adicional bajo `performance/` y `accessibility/`. Reportes tabulares/JSON — no capturas — por lo que el índice canónico E01…E36 se conserva sin ampliar; los nuevos artefactos son referencias documentales para `18.12` y `18.13` y **no incorporan documentos al universo canónico**.
+
+### Performance
+
+- `performance/http-baseline.tsv` — HTTP/TTFB/tamaño/cache-control de las 17 superficies (sandbox). Documento receptor: `18.12`.
+- `performance/lab/lab-metrics.json` — Métricas de laboratorio (LCP, FCP, CLS, TBT, recursos, terceros) sobre muestra 9 × 2 viewports. Documento receptor: `18.12`.
+
+### Accessibility
+
+- `accessibility/axe.min.js` — axe-core 4.10.2 congelado localmente para reproducibilidad. Documento receptor: `18.13`.
+- `accessibility/axe-report.json` — Violaciones + estructura semántica sobre muestra 9 × 2 viewports. Documento receptor: `18.13`.
+
+### Sanitización
+
+Ningún artefacto contiene cookies, tokens, claves, headers de autenticación, URLs firmadas utilizables (los signed URLs de Supabase se citan truncados como host + prefijo), datos personales, secretos ni contenido privado.
+
+### SHA de trabajo
+
+`8f7bfc17271c907339fe484a449650c3ca766b1d`
