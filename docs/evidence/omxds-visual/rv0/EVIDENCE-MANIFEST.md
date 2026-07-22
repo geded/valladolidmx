@@ -55,20 +55,45 @@ Clasificación de evidencia:
 
 ---
 
-## 3. Reconciliación numérica
+## 3. Reconciliación numérica (fe de erratas v1.1.1)
 
-| Concepto | Valor |
-|---|---|
-| Referencias externas seleccionadas (19.01) | 24 |
-| Evidencias externas RV-E capturadas | 24 archivos (`RV-E01…RV-E25` menos `RV-E24`, más `RV-E05` mobile de R07) |
-| Referencias con evidencia clasificada **OK** | 15 (R01, R02, R04, R05, R06, R07, R08, R09, R10, R11, R15, R16, R18, R20, R21, R23) — 16 filas |
-| Referencias con evidencia **Limitada** | 7 (R03, R12, R13, R14, R17, R19, R24) |
-| Referencias **No accesibles** | 1 (R22) |
-| Referencias con captura mobile adicional | 1 (R07 · RV-E05), justificada porque aporta evidencia distinta |
-| Referencias Founder (`FRV-*`) | 2 (no cuentan como externas) |
-| Total archivos visuales en `screenshots/` | 24 |
+### 3.1 Referencias externas (universo = 24, subtotales exhaustivos y excluyentes)
 
-Nota aritmética: R08 Booking figura como OK por render visible aunque el status HTTP fue 202 (challenge intermedio).
+| Estado de la referencia | Refs | Cuenta |
+|---|---|---:|
+| **OK** — render útil de la superficie evaluada | R01, R02, R04, R05, R06, R07, R08, R09, R10, R11, R15, R16, R18, R20, R21, R23 | 16 |
+| **Limitada** — página accedida pero evidencia parcial (consent / anti-bot / interstitial / URL específica no disponible) | R03, R12, R13, R14, R17, R19, R24 | 7 |
+| **No accesible** — imposible capturar desde la infraestructura externa el día de consulta | R22 | 1 |
+| **Total** | — | **24** |
+
+### 3.2 Archivos probatorios físicos (universo = 26, categorías separadas del estado de referencia)
+
+| Origen | Archivos | Cuenta |
+|---|---|---:|
+| Archivos externos `RV-E*` en `screenshots/` | `RV-E01…RV-E25` **menos `RV-E24`** (24 identificadores consecutivos con un hueco) | 24 |
+| Archivos Founder `FRV-*` en `founder-refs/` | `FRV-01-destino.png`, `FRV-02-zazil-premium-mobile.png` | 2 |
+| **Total físico de archivos probatorios** | — | **26** |
+
+### 3.3 Cobertura archivo ↔ referencia
+
+| Universo | Cuenta |
+|---:|---:|
+| Referencias externas evaluadas | 24 |
+| Referencias externas con archivo probatorio propio | 23 (todas excepto R22) |
+| Referencias externas sin ningún archivo probatorio | 1 (R22 — sólo registro textual del error `net::ERR_HTTP2_PROTOCOL_ERROR`) |
+| Referencias externas con captura visual **satisfactoria** (=OK) | 16 |
+| Referencias externas con evidencia **Limitada** | 7 |
+| Referencias externas **No accesibles** | 1 |
+| Referencias con captura mobile adicional | 1 (R07 · RV-E05, aporta evidencia distinta) |
+| Referencias Founder (subtotal separado, fuera de las 24) | 2 |
+
+### 3.4 Aclaraciones y correcciones
+
+- **`RV-E24` omitido intencionalmente**: R22 Culture Trip no produjo captura (error de protocolo HTTP2 persistente en `/` y `/travel`); no se creó el archivo `RV-E24_*.png` ni se rellenó el identificador para no fabricar continuidad numérica. La serie `RV-E01…RV-E25` contiene por tanto **24 identificadores efectivos** con un hueco explícito en `RV-E24`.
+- **R22 sólo tiene registro textual**: fila 22 de §2 (Estado = "No accesible", archivo = "—"). No existe archivo probatorio del intento fallido; el error queda registrado únicamente como texto en URL, HTTP y limitación.
+- **R07 duplicación autorizada**: `RV-E04` (desktop) y `RV-E05` (mobile) son dos archivos para una sola referencia; por eso 23 referencias con archivo generan 24 archivos externos.
+- **R08 Booking** figura como OK por render visible aunque el status HTTP fue 202 (challenge intermedio).
+- **Nota nomenclatura**: el reporte previo en §3 y en `19.05 §2` mencionó "13 evidencias adicionales"; el conteo real de la ampliación es **12 archivos nuevos** (`RV-E13…RV-E25` sin `RV-E24`). Fe de erratas emitida en `19.05 §10`.
 
 ---
 
