@@ -1,0 +1,1531 @@
+[
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Valladolid.mx \u00b7 Despierta en el Oriente Maya",
+      "mains": 1,
+      "h1s": [
+        "Despierta en Valladolid y descubre el Oriente Maya de Yucat\u00e1n."
+      ],
+      "landmarks": {
+        "header": 1,
+        "nav": 1,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 4,
+      "iconOnlyButtons": 0,
+      "forms": 1,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "help": "Elements must only use permitted ARIA attributes",
+        "tags": [
+          "cat.aria",
+          "wcag2a",
+          "wcag412",
+          "EN-301-549",
+          "EN-9.4.1.2"
+        ],
+        "count": 3,
+        "sample": [
+          {
+            "target": [
+              ".p-6.gap-4:nth-child(1) > .items-end.pt-2.justify-between > .gap-0\\.5.flex[aria-label=\"5 de 5\"]"
+            ],
+            "html": "<div class=\"flex gap-0.5\" aria-label=\"5 de 5\">"
+          },
+          {
+            "target": [
+              ".p-6.gap-4:nth-child(2) > .items-end.pt-2.justify-between > .gap-0\\.5.flex[aria-label=\"5 de 5\"]"
+            ],
+            "html": "<div class=\"flex gap-0.5\" aria-label=\"5 de 5\">"
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 11,
+        "sample": [
+          {
+            "target": [
+              "button[aria-controls=\"radix-_R_1ngm9iq_\"] > .min-w-0.leading-tight > .text-muted-foreground\\/80.truncate.text-\\[13px\\]"
+            ],
+            "html": "<span class=\"truncate text-[13px] text-muted-foreground/80\">\u00bfA d\u00f3nde vas?</span>"
+          },
+          {
+            "target": [
+              "button[aria-controls=\"radix-_R_3ngm9iq_\"] > .min-w-0.leading-tight > .text-muted-foreground\\/80.truncate.text-\\[13px\\]"
+            ],
+            "html": "<span class=\"truncate text-[13px] text-muted-foreground/80\">\u00bfQu\u00e9 buscas?</span>"
+          }
+        ]
+      }
+    ],
+    "id": "S01",
+    "viewport": "m",
+    "url": "https://www.quehacerenvalladolid.com/"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Oriente Maya \u2014 Destinos tur\u00edsticos de Yucat\u00e1n \u00b7 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Oriente Maya"
+      ],
+      "landmarks": {
+        "header": 2,
+        "nav": 3,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 2,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 7,
+        "sample": [
+          {
+            "target": [
+              ".mb-2"
+            ],
+            "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">Regi\u00f3n tur\u00edstica</p>"
+          },
+          {
+            "target": [
+              "article:nth-child(1) > .p-5.flex-1.flex-col > .mt-auto.pt-4 > .mt-2.gap-2.flex-col > .disabled\\:opacity-60.border-primary\\/30.bg-primary\\/5 > span"
+            ],
+            "html": "<span>Agregar a Mi Viaje</span>"
+          }
+        ]
+      },
+      {
+        "id": "heading-order",
+        "impact": "moderate",
+        "help": "Heading levels should only increase by one",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              "article:nth-child(1) > .p-5.flex-1.flex-col > .text-base.leading-tight"
+            ],
+            "html": "<h3 class=\"mt-1 text-base font-semibold leading-tight\"><a href=\"/oriente-maya/valladolid\" class=\"hover:underline\">Valladolid</a></h3>"
+          }
+        ]
+      }
+    ],
+    "id": "S02",
+    "viewport": "m",
+    "url": "https://www.quehacerenvalladolid.com/oriente-maya"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Valladolid \u2014 Oriente Maya \u00b7 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Valladolid"
+      ],
+      "landmarks": {
+        "header": 10,
+        "nav": 4,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 70,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 5,
+        "sample": [
+          {
+            "target": [
+              "div:nth-child(1) > .mb-3.items-end > .hover\\:underline.shrink-0.text-primary"
+            ],
+            "html": "<a href=\"/oriente-maya/valladolid/hoteles\" class=\"shrink-0 text-sm font-medium text-primary hover:underline\">Ver hoteles</a>"
+          },
+          {
+            "target": [
+              "div:nth-child(2) > .mb-3.items-end > .hover\\:underline.shrink-0.text-primary"
+            ],
+            "html": "<a href=\"/oriente-maya/valladolid/restaurantes\" class=\"shrink-0 text-sm font-medium text-primary hover:underline\">Ver restaurantes</a>"
+          }
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "help": "Interactive controls must not be nested",
+        "tags": [
+          "cat.keyboard",
+          "wcag2a",
+          "wcag412",
+          "TTv5",
+          "TT6.a",
+          "EN-301-549",
+          "EN-9.4.1.2"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              ".h-\\[420px\\]"
+            ],
+            "html": "<div class=\"h-[420px] w-full rounded-2xl border border-border sm:h-[520px]\" aria-label=\"Mapa interactivo\" role=\"img\" data-ready=\"true\" style=\"position: relative; overflow: hidden;\""
+          }
+        ]
+      },
+      {
+        "id": "role-img-alt",
+        "impact": "serious",
+        "help": "[role=\"img\"] elements must have an alternative text",
+        "tags": [
+          "cat.text-alternatives",
+          "wcag2a",
+          "wcag111",
+          "section508",
+          "section508.22.a",
+          "TTv5",
+          "TT7.a",
+          "EN-301-549",
+          "EN-9.1.1.1",
+          "ACT"
+        ],
+        "count": 3,
+        "sample": [
+          {
+            "target": [
+              ".sm\\:hidden[role=\"list\"] > .inline-flex:nth-child(1) > .duration-\\[160ms\\].motion-reduce\\:transition-none.hover\\:shadow-\\[var\\(--shadow-raised\\)\\]"
+            ],
+            "html": "<span role=\"img\" class=\"inline-flex items-center justify-center select-none transition-shadow duration-[160ms] motion-reduce:transition-none hover:shadow-[var(--shadow-raised)]\" st"
+          },
+          {
+            "target": [
+              ".inline-flex:nth-child(2) > .duration-\\[160ms\\].motion-reduce\\:transition-none.hover\\:shadow-\\[var\\(--shadow-raised\\)\\]"
+            ],
+            "html": "<span role=\"img\" class=\"inline-flex items-center justify-center select-none transition-shadow duration-[160ms] motion-reduce:transition-none hover:shadow-[var(--shadow-raised)]\" st"
+          }
+        ]
+      },
+      {
+        "id": "scrollable-region-focusable",
+        "impact": "serious",
+        "help": "Scrollable region must have keyboard access",
+        "tags": [
+          "cat.keyboard",
+          "wcag2a",
+          "wcag211",
+          "wcag213",
+          "TTv5",
+          "TT4.a",
+          "EN-301-549",
+          "EN-9.2.1.1",
+          "EN-9.2.1.3"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              "#hero-gallery-Valladolid"
+            ],
+            "html": "<ul id=\"hero-gallery-Valladolid\" class=\"flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden\" aria-label=\"Galer\u00eda de Va"
+          }
+        ]
+      }
+    ],
+    "id": "S03",
+    "viewport": "m",
+    "url": "https://www.quehacerenvalladolid.com/oriente-maya/valladolid"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Cenotes en Valladolid \u2014 Oriente Maya \u00b7 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Cenotes en Valladolid"
+      ],
+      "landmarks": {
+        "header": 3,
+        "nav": 3,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 52,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 10,
+        "sample": [
+          {
+            "target": [
+              ".tracking-\\[0\\.14em\\]"
+            ],
+            "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Valladolid</p>"
+          },
+          {
+            "target": [
+              ".py-1.bg-primary\\/10.px-3"
+            ],
+            "html": "<span class=\"inline-flex items-center gap-1 rounded-pill bg-primary/10 px-3 py-1 text-xs font-semibold text-primary\">Explorando en Valladolid</span>"
+          }
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "help": "Interactive controls must not be nested",
+        "tags": [
+          "cat.keyboard",
+          "wcag2a",
+          "wcag412",
+          "TTv5",
+          "TT6.a",
+          "EN-301-549",
+          "EN-9.4.1.2"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              ".h-\\[320px\\]"
+            ],
+            "html": "<div class=\"h-[320px] w-full rounded-2xl border border-border md:h-[420px]\" aria-label=\"Mapa de Cenote Suytun\" role=\"img\" data-ready=\"true\" style=\"position: relative; overflow: hid"
+          }
+        ]
+      }
+    ],
+    "id": "S04",
+    "viewport": "m",
+    "url": "https://www.quehacerenvalladolid.com/oriente-maya/valladolid/cenotes"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Zazil Tunich \u00b7 Valladolid \u2014 Valladolid.mx",
+      "mains": 0,
+      "h1s": [
+        "Zazil Tunich"
+      ],
+      "landmarks": {
+        "header": 6,
+        "nav": 3,
+        "main": 0,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 8,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 17,
+        "sample": [
+          {
+            "target": [
+              ".tracking-\\[0\\.14em\\]"
+            ],
+            "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Cenote Museo del Xibalb\u00e1</p>"
+          },
+          {
+            "target": [
+              ".bg-primary\\/15"
+            ],
+            "html": "<li class=\"inline-flex items-center gap-1.5 rounded-pill border px-2.5 py-1 text-xs font-medium backdrop-blur-sm bg-primary/15 text-primary border-primary/30\">Cenote Museo</li>"
+          }
+        ]
+      },
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              "html"
+            ],
+            "html": "<html lang=\"es\">"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice"
+        ],
+        "count": 15,
+        "sample": [
+          {
+            "target": [
+              ".sr-only"
+            ],
+            "html": "<a href=\"#main\" class=\"sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-"
+          },
+          {
+            "target": [
+              ".tracking-\\[0\\.14em\\]"
+            ],
+            "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Cenote Museo del Xibalb\u00e1</p>"
+          }
+        ]
+      },
+      {
+        "id": "role-img-alt",
+        "impact": "serious",
+        "help": "[role=\"img\"] elements must have an alternative text",
+        "tags": [
+          "cat.text-alternatives",
+          "wcag2a",
+          "wcag111",
+          "section508",
+          "section508.22.a",
+          "TTv5",
+          "TT7.a",
+          "EN-301-549",
+          "EN-9.1.1.1",
+          "ACT"
+        ],
+        "count": 3,
+        "sample": [
+          {
+            "target": [
+              "li:nth-child(1) > .duration-\\[160ms\\].motion-reduce\\:transition-none.hover\\:shadow-\\[var\\(--shadow-raised\\)\\]"
+            ],
+            "html": "<span role=\"img\" class=\"inline-flex items-center justify-center select-none transition-shadow duration-[160ms] motion-reduce:transition-none hover:shadow-[var(--shadow-raised)]\" st"
+          },
+          {
+            "target": [
+              "li:nth-child(2) > .duration-\\[160ms\\].motion-reduce\\:transition-none.hover\\:shadow-\\[var\\(--shadow-raised\\)\\]"
+            ],
+            "html": "<span role=\"img\" class=\"inline-flex items-center justify-center select-none transition-shadow duration-[160ms] motion-reduce:transition-none hover:shadow-[var(--shadow-raised)]\" st"
+          }
+        ]
+      },
+      {
+        "id": "skip-link",
+        "impact": "moderate",
+        "help": "The skip-link target should exist and be focusable",
+        "tags": [
+          "cat.keyboard",
+          "best-practice"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              ".sr-only"
+            ],
+            "html": "<a href=\"#main\" class=\"sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-"
+          }
+        ]
+      }
+    ],
+    "id": "S05",
+    "viewport": "m",
+    "url": "https://www.quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Nado en el Cenote Sagrado \u00b7 Zazil Tunich \u2014 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Nado en el Cenote Sagrado"
+      ],
+      "landmarks": {
+        "header": 6,
+        "nav": 3,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 2,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 11,
+        "sample": [
+          {
+            "target": [
+              ".mb-2"
+            ],
+            "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">experiencia</p>"
+          },
+          {
+            "target": [
+              "div:nth-child(1) > .mb-3.items-end > .shrink-0.hover\\:underline.text-primary"
+            ],
+            "html": "<a href=\"/oriente-maya/valladolid/cenotes/zazil-tunich\" class=\"shrink-0 text-sm font-medium text-primary hover:underline\">Ver empresa</a>"
+          }
+        ]
+      }
+    ],
+    "id": "S06",
+    "viewport": "m",
+    "url": "https://www.quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Eventos \u00b7 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Eventos"
+      ],
+      "landmarks": {
+        "header": 1,
+        "nav": 3,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 2,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 4,
+        "sample": [
+          {
+            "target": [
+              ".tracking-\\[0\\.14em\\]"
+            ],
+            "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Agenda cultural</p>"
+          },
+          {
+            "target": [
+              ".text-foreground\\/80.hover\\:bg-muted\\/70.px-3:nth-child(2) > .opacity-70.ml-1"
+            ],
+            "html": "<span class=\"ml-1 opacity-70\">(<!-- -->2<!-- -->)</span>"
+          }
+        ]
+      },
+      {
+        "id": "heading-order",
+        "impact": "moderate",
+        "help": "Heading levels should only increase by one",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              "li:nth-child(1) > article > .flex-1.p-5.flex-col > .text-base.leading-tight"
+            ],
+            "html": "<h3 class=\"mt-1 text-base font-semibold leading-tight\"><a href=\"/eventos/festival-sac-be-valladolid\" class=\"hover:underline\">Festival Sac-Be Valladolid</a></h3>"
+          }
+        ]
+      }
+    ],
+    "id": "S10",
+    "viewport": "m",
+    "url": "https://www.quehacerenvalladolid.com/eventos"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Arma tu Viaje \u00b7 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Arma tu Viaje"
+      ],
+      "landmarks": {
+        "header": 2,
+        "nav": 3,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 2,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              ".mb-2"
+            ],
+            "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">Plataforma</p>"
+          }
+        ]
+      },
+      {
+        "id": "heading-order",
+        "impact": "moderate",
+        "help": "Heading levels should only increase by one",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              "div:nth-child(2) > h3"
+            ],
+            "html": "<h3 class=\"text-sm font-semibold text-foreground\">Explorar</h3>"
+          }
+        ]
+      }
+    ],
+    "id": "S13",
+    "viewport": "m",
+    "url": "https://www.quehacerenvalladolid.com/arma-tu-viaje"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Blog \u00b7 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Blog del Oriente Maya"
+      ],
+      "landmarks": {
+        "header": 2,
+        "nav": 3,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 2,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              ".mb-2"
+            ],
+            "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">Editorial</p>"
+          }
+        ]
+      }
+    ],
+    "id": "S17",
+    "viewport": "m",
+    "url": "https://www.quehacerenvalladolid.com/blog"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Valladolid.mx \u00b7 Despierta en el Oriente Maya",
+      "mains": 1,
+      "h1s": [
+        "Despierta en Valladolid y descubre el Oriente Maya de Yucat\u00e1n."
+      ],
+      "landmarks": {
+        "header": 1,
+        "nav": 1,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 4,
+      "iconOnlyButtons": 0,
+      "forms": 1,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "help": "Elements must only use permitted ARIA attributes",
+        "tags": [
+          "cat.aria",
+          "wcag2a",
+          "wcag412",
+          "EN-301-549",
+          "EN-9.4.1.2"
+        ],
+        "count": 3,
+        "sample": [
+          {
+            "target": [
+              ".p-6.gap-4:nth-child(1) > .items-end.pt-2.justify-between > .gap-0\\.5.flex[aria-label=\"5 de 5\"]"
+            ],
+            "html": "<div class=\"flex gap-0.5\" aria-label=\"5 de 5\">"
+          },
+          {
+            "target": [
+              ".p-6.gap-4:nth-child(2) > .items-end.pt-2.justify-between > .gap-0\\.5.flex[aria-label=\"5 de 5\"]"
+            ],
+            "html": "<div class=\"flex gap-0.5\" aria-label=\"5 de 5\">"
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 11,
+        "sample": [
+          {
+            "target": [
+              "button[aria-controls=\"radix-_R_1ngm9iq_\"] > .min-w-0.leading-tight > .text-muted-foreground\\/80.truncate.text-\\[13px\\]"
+            ],
+            "html": "<span class=\"truncate text-[13px] text-muted-foreground/80\">\u00bfA d\u00f3nde vas?</span>"
+          },
+          {
+            "target": [
+              "button[aria-controls=\"radix-_R_3ngm9iq_\"] > .min-w-0.leading-tight > .text-muted-foreground\\/80.truncate.text-\\[13px\\]"
+            ],
+            "html": "<span class=\"truncate text-[13px] text-muted-foreground/80\">\u00bfQu\u00e9 buscas?</span>"
+          }
+        ]
+      }
+    ],
+    "id": "S01",
+    "viewport": "d",
+    "url": "https://www.quehacerenvalladolid.com/"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Oriente Maya \u2014 Destinos tur\u00edsticos de Yucat\u00e1n \u00b7 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Oriente Maya"
+      ],
+      "landmarks": {
+        "header": 2,
+        "nav": 3,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 2,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 7,
+        "sample": [
+          {
+            "target": [
+              ".mb-2"
+            ],
+            "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">Regi\u00f3n tur\u00edstica</p>"
+          },
+          {
+            "target": [
+              "article:nth-child(1) > .p-5.flex-1.flex-col > .mt-auto.pt-4 > .mt-2.gap-2.flex-col > .disabled\\:opacity-60.border-primary\\/30.bg-primary\\/5 > span"
+            ],
+            "html": "<span>Agregar a Mi Viaje</span>"
+          }
+        ]
+      },
+      {
+        "id": "heading-order",
+        "impact": "moderate",
+        "help": "Heading levels should only increase by one",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              "article:nth-child(1) > .p-5.flex-1.flex-col > .text-base.leading-tight"
+            ],
+            "html": "<h3 class=\"mt-1 text-base font-semibold leading-tight\"><a href=\"/oriente-maya/valladolid\" class=\"hover:underline\">Valladolid</a></h3>"
+          }
+        ]
+      }
+    ],
+    "id": "S02",
+    "viewport": "d",
+    "url": "https://www.quehacerenvalladolid.com/oriente-maya"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Valladolid \u2014 Oriente Maya \u00b7 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Valladolid"
+      ],
+      "landmarks": {
+        "header": 10,
+        "nav": 4,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 80,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 5,
+        "sample": [
+          {
+            "target": [
+              "div:nth-child(1) > .mb-3.items-end > .hover\\:underline.shrink-0.text-primary"
+            ],
+            "html": "<a href=\"/oriente-maya/valladolid/hoteles\" class=\"shrink-0 text-sm font-medium text-primary hover:underline\">Ver hoteles</a>"
+          },
+          {
+            "target": [
+              "div:nth-child(2) > .mb-3.items-end > .hover\\:underline.shrink-0.text-primary"
+            ],
+            "html": "<a href=\"/oriente-maya/valladolid/restaurantes\" class=\"shrink-0 text-sm font-medium text-primary hover:underline\">Ver restaurantes</a>"
+          }
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "help": "Interactive controls must not be nested",
+        "tags": [
+          "cat.keyboard",
+          "wcag2a",
+          "wcag412",
+          "TTv5",
+          "TT6.a",
+          "EN-301-549",
+          "EN-9.4.1.2"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              ".h-\\[420px\\]"
+            ],
+            "html": "<div class=\"h-[420px] w-full rounded-2xl border border-border sm:h-[520px]\" aria-label=\"Mapa interactivo\" role=\"img\" data-ready=\"true\" style=\"position: relative; overflow: hidden;\""
+          }
+        ]
+      },
+      {
+        "id": "role-img-alt",
+        "impact": "serious",
+        "help": "[role=\"img\"] elements must have an alternative text",
+        "tags": [
+          "cat.text-alternatives",
+          "wcag2a",
+          "wcag111",
+          "section508",
+          "section508.22.a",
+          "TTv5",
+          "TT7.a",
+          "EN-301-549",
+          "EN-9.1.1.1",
+          "ACT"
+        ],
+        "count": 3,
+        "sample": [
+          {
+            "target": [
+              ".inline-flex:nth-child(1) > .inline-flex[data-state=\"closed\"] > .duration-\\[160ms\\].motion-reduce\\:transition-none.hover\\:shadow-\\[var\\(--shadow-raised\\)\\]"
+            ],
+            "html": "<span role=\"img\" class=\"inline-flex items-center justify-center select-none transition-shadow duration-[160ms] motion-reduce:transition-none hover:shadow-[var(--shadow-raised)]\" st"
+          },
+          {
+            "target": [
+              ".inline-flex:nth-child(2) > .inline-flex[data-state=\"closed\"] > .duration-\\[160ms\\].motion-reduce\\:transition-none.hover\\:shadow-\\[var\\(--shadow-raised\\)\\]"
+            ],
+            "html": "<span role=\"img\" class=\"inline-flex items-center justify-center select-none transition-shadow duration-[160ms] motion-reduce:transition-none hover:shadow-[var(--shadow-raised)]\" st"
+          }
+        ]
+      }
+    ],
+    "id": "S03",
+    "viewport": "d",
+    "url": "https://www.quehacerenvalladolid.com/oriente-maya/valladolid"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Cenotes en Valladolid \u2014 Oriente Maya \u00b7 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Cenotes en Valladolid"
+      ],
+      "landmarks": {
+        "header": 3,
+        "nav": 3,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 59,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 10,
+        "sample": [
+          {
+            "target": [
+              ".tracking-\\[0\\.14em\\]"
+            ],
+            "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Valladolid</p>"
+          },
+          {
+            "target": [
+              ".py-1.bg-primary\\/10.px-3"
+            ],
+            "html": "<span class=\"inline-flex items-center gap-1 rounded-pill bg-primary/10 px-3 py-1 text-xs font-semibold text-primary\">Explorando en Valladolid</span>"
+          }
+        ]
+      },
+      {
+        "id": "nested-interactive",
+        "impact": "serious",
+        "help": "Interactive controls must not be nested",
+        "tags": [
+          "cat.keyboard",
+          "wcag2a",
+          "wcag412",
+          "TTv5",
+          "TT6.a",
+          "EN-301-549",
+          "EN-9.4.1.2"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              ".h-\\[320px\\]"
+            ],
+            "html": "<div class=\"h-[320px] w-full rounded-2xl border border-border md:h-[420px]\" aria-label=\"Mapa de Cenote Suytun\" role=\"img\" data-ready=\"true\" style=\"position: relative; overflow: hid"
+          }
+        ]
+      }
+    ],
+    "id": "S04",
+    "viewport": "d",
+    "url": "https://www.quehacerenvalladolid.com/oriente-maya/valladolid/cenotes"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Zazil Tunich \u00b7 Valladolid \u2014 Valladolid.mx",
+      "mains": 0,
+      "h1s": [
+        "Zazil Tunich"
+      ],
+      "landmarks": {
+        "header": 6,
+        "nav": 3,
+        "main": 0,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 8,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 17,
+        "sample": [
+          {
+            "target": [
+              ".tracking-\\[0\\.14em\\]"
+            ],
+            "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Cenote Museo del Xibalb\u00e1</p>"
+          },
+          {
+            "target": [
+              ".bg-primary\\/15"
+            ],
+            "html": "<li class=\"inline-flex items-center gap-1.5 rounded-pill border px-2.5 py-1 text-xs font-medium backdrop-blur-sm bg-primary/15 text-primary border-primary/30\">Cenote Museo</li>"
+          }
+        ]
+      },
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              "html"
+            ],
+            "html": "<html lang=\"es\">"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice"
+        ],
+        "count": 15,
+        "sample": [
+          {
+            "target": [
+              ".sr-only"
+            ],
+            "html": "<a href=\"#main\" class=\"sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-"
+          },
+          {
+            "target": [
+              ".tracking-\\[0\\.14em\\]"
+            ],
+            "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Cenote Museo del Xibalb\u00e1</p>"
+          }
+        ]
+      },
+      {
+        "id": "role-img-alt",
+        "impact": "serious",
+        "help": "[role=\"img\"] elements must have an alternative text",
+        "tags": [
+          "cat.text-alternatives",
+          "wcag2a",
+          "wcag111",
+          "section508",
+          "section508.22.a",
+          "TTv5",
+          "TT7.a",
+          "EN-301-549",
+          "EN-9.1.1.1",
+          "ACT"
+        ],
+        "count": 5,
+        "sample": [
+          {
+            "target": [
+              "li:nth-child(1) > span[data-state=\"closed\"] > .duration-\\[160ms\\].motion-reduce\\:transition-none.hover\\:shadow-\\[var\\(--shadow-raised\\)\\]"
+            ],
+            "html": "<span role=\"img\" class=\"inline-flex items-center justify-center select-none transition-shadow duration-[160ms] motion-reduce:transition-none hover:shadow-[var(--shadow-raised)]\" st"
+          },
+          {
+            "target": [
+              "li:nth-child(2) > span[data-state=\"closed\"] > .duration-\\[160ms\\].motion-reduce\\:transition-none.hover\\:shadow-\\[var\\(--shadow-raised\\)\\]"
+            ],
+            "html": "<span role=\"img\" class=\"inline-flex items-center justify-center select-none transition-shadow duration-[160ms] motion-reduce:transition-none hover:shadow-[var(--shadow-raised)]\" st"
+          }
+        ]
+      },
+      {
+        "id": "skip-link",
+        "impact": "moderate",
+        "help": "The skip-link target should exist and be focusable",
+        "tags": [
+          "cat.keyboard",
+          "best-practice"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              ".sr-only"
+            ],
+            "html": "<a href=\"#main\" class=\"sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-"
+          }
+        ]
+      }
+    ],
+    "id": "S05",
+    "viewport": "d",
+    "url": "https://www.quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Nado en el Cenote Sagrado \u00b7 Zazil Tunich \u2014 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Nado en el Cenote Sagrado"
+      ],
+      "landmarks": {
+        "header": 6,
+        "nav": 3,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 2,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 11,
+        "sample": [
+          {
+            "target": [
+              ".mb-2"
+            ],
+            "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">experiencia</p>"
+          },
+          {
+            "target": [
+              "div:nth-child(1) > .mb-3.items-end > .shrink-0.hover\\:underline.text-primary"
+            ],
+            "html": "<a href=\"/oriente-maya/valladolid/cenotes/zazil-tunich\" class=\"shrink-0 text-sm font-medium text-primary hover:underline\">Ver empresa</a>"
+          }
+        ]
+      }
+    ],
+    "id": "S06",
+    "viewport": "d",
+    "url": "https://www.quehacerenvalladolid.com/oriente-maya/valladolid/cenotes/zazil-tunich/nado-en-cenote"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Eventos \u00b7 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Eventos"
+      ],
+      "landmarks": {
+        "header": 1,
+        "nav": 3,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 2,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 4,
+        "sample": [
+          {
+            "target": [
+              ".tracking-\\[0\\.14em\\]"
+            ],
+            "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Agenda cultural</p>"
+          },
+          {
+            "target": [
+              ".text-foreground\\/80.hover\\:bg-muted\\/70.px-3:nth-child(2) > .opacity-70.ml-1"
+            ],
+            "html": "<span class=\"ml-1 opacity-70\">(<!-- -->2<!-- -->)</span>"
+          }
+        ]
+      },
+      {
+        "id": "heading-order",
+        "impact": "moderate",
+        "help": "Heading levels should only increase by one",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              "li:nth-child(1) > article > .flex-1.p-5.flex-col > .text-base.leading-tight"
+            ],
+            "html": "<h3 class=\"mt-1 text-base font-semibold leading-tight\"><a href=\"/eventos/festival-sac-be-valladolid\" class=\"hover:underline\">Festival Sac-Be Valladolid</a></h3>"
+          }
+        ]
+      }
+    ],
+    "id": "S10",
+    "viewport": "d",
+    "url": "https://www.quehacerenvalladolid.com/eventos"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Arma tu Viaje \u00b7 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Arma tu Viaje"
+      ],
+      "landmarks": {
+        "header": 2,
+        "nav": 3,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 2,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              ".mb-2"
+            ],
+            "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">Plataforma</p>"
+          }
+        ]
+      },
+      {
+        "id": "heading-order",
+        "impact": "moderate",
+        "help": "Heading levels should only increase by one",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              "div:nth-child(2) > h3"
+            ],
+            "html": "<h3 class=\"text-sm font-semibold text-foreground\">Explorar</h3>"
+          }
+        ]
+      }
+    ],
+    "id": "S13",
+    "viewport": "d",
+    "url": "https://www.quehacerenvalladolid.com/arma-tu-viaje"
+  },
+  {
+    "structure": {
+      "htmlLang": "es",
+      "title": "Blog \u00b7 Valladolid.mx",
+      "mains": 1,
+      "h1s": [
+        "Blog del Oriente Maya"
+      ],
+      "landmarks": {
+        "header": 2,
+        "nav": 3,
+        "main": 1,
+        "footer": 1
+      },
+      "imgsNoAlt": 0,
+      "imgsTotal": 2,
+      "iconOnlyButtons": 0,
+      "forms": 0,
+      "inputs": 0,
+      "skipLink": true
+    },
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "count": 1,
+        "sample": [
+          {
+            "target": [
+              ".mb-2"
+            ],
+            "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">Editorial</p>"
+          }
+        ]
+      }
+    ],
+    "id": "S17",
+    "viewport": "d",
+    "url": "https://www.quehacerenvalladolid.com/blog"
+  }
+]
