@@ -2,13 +2,13 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.8",
+    "version": "0.10",
     "state": "Approved",
-    "main_commit": "PENDING_PR_26",
-    "blob": "PENDING_PR_26",
-    "notes": "Amplía v0.7 con Audit 18.03, PRD Suite 18.04 y Plan Lovable 18.05 del programa Visual; documentación propuesta, flags OFF y V0–V8 no iniciados."
+    "main_commit": "LOCAL_RECONCILIATION_2026-07-22",
+    "blob": "LOCAL_RECONCILIATION_2026-07-22",
+    "notes": "Deriva de `06 v0.10` Approved. Incorpora 23 DOC nuevos (11 Baseline V0 `18.06`–`18.16` + 12 RV0.1/RV0.2 `19.01`–`19.12`) sin fabricar aristas técnicas. Adjudicación Integral Controlada (Opción A)."
   },
-  "generated_at": "2026-07-22T01:25:02.200Z",
+  "generated_at": "2026-07-22T14:50:44.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -6314,6 +6314,190 @@
       "path": "docs/blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md",
       "owner": "D08 · traveler-lifecycle",
       "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.06-OMXDS-VISUAL-ROUTE-INVENTORY-AUDIT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.06-OMXDS-VISUAL-ROUTE-INVENTORY-AUDIT-v1.0.md",
+      "owner": "D02 · platform-foundation",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.07-OMXDS-VISUAL-SURFACE-INVENTORY-AUDIT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.07-OMXDS-VISUAL-SURFACE-INVENTORY-AUDIT-v1.0.md",
+      "owner": "D05 · destination-discovery",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.08-OMXDS-VISUAL-MEDIA-INVENTORY-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.08-OMXDS-VISUAL-MEDIA-INVENTORY-v1.0.md",
+      "owner": "D13 · media-delivery",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.09-OMXDS-VISUAL-MAP-AUDIT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.09-OMXDS-VISUAL-MAP-AUDIT-v1.0.md",
+      "owner": "D05 · destination-discovery",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.10-OMXDS-VISUAL-SEO-BASELINE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.10-OMXDS-VISUAL-SEO-BASELINE-v1.0.md",
+      "owner": "D14 · growth-reliability",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.11-OMXDS-VISUAL-RESPONSIVE-BASELINE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.11-OMXDS-VISUAL-RESPONSIVE-BASELINE-v1.0.md",
+      "owner": "D14 · growth-reliability",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.12-OMXDS-VISUAL-PERFORMANCE-BASELINE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.12-OMXDS-VISUAL-PERFORMANCE-BASELINE-v1.0.md",
+      "owner": "D14 · growth-reliability",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.13-OMXDS-VISUAL-ACCESSIBILITY-BASELINE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.13-OMXDS-VISUAL-ACCESSIBILITY-BASELINE-v1.0.md",
+      "owner": "D14 · growth-reliability",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.14-OMXDS-VISUAL-PREMIUM-CASE-ZAZIL-TUNICH-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.14-OMXDS-VISUAL-PREMIUM-CASE-ZAZIL-TUNICH-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.15-OMXDS-VISUAL-CROSS-CUTTING-FINDINGS-MATRIX-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.15-OMXDS-VISUAL-CROSS-CUTTING-FINDINGS-MATRIX-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.16-OMXDS-VISUAL-V0-BASELINE-READINESS-GATE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.16-OMXDS-VISUAL-V0-BASELINE-READINESS-GATE-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.01-RV0.1-REFERENCE-SAMPLE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.01-RV0.1-REFERENCE-SAMPLE-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.02-RV0.1-15-AXIS-EVALUATION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.02-RV0.1-15-AXIS-EVALUATION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.03-RV0.1-FRV-ANALYSIS-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.03-RV0.1-FRV-ANALYSIS-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.04-RV0.1-PATTERNS-CROSS-SURFACE-LIMITATIONS-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.04-RV0.1-PATTERNS-CROSS-SURFACE-LIMITATIONS-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.05-RV0.1-CORRECTION-ADDENDUM-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.05-RV0.1-CORRECTION-ADDENDUM-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.06-RV0.1-CLOSURE-CERTIFICATE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.06-RV0.1-CLOSURE-CERTIFICATE-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.07-RV0.2-VISUAL-PRINCIPLES-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.07-RV0.2-VISUAL-PRINCIPLES-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Draft",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.08-RV0.2-CARD-TAXONOMY-INFORMATION-HIERARCHY-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.08-RV0.2-CARD-TAXONOMY-INFORMATION-HIERARCHY-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Draft",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.09-RV0.2-ACTION-PRIORITY-STATE-MATRIX-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.09-RV0.2-ACTION-PRIORITY-STATE-MATRIX-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Draft",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.10-RV0.2-TRUST-PREMIUM-SYSTEM-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.10-RV0.2-TRUST-PREMIUM-SYSTEM-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Draft",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.11-RV0.2-RESPONSIVE-ACCESSIBILITY-CONSISTENCY-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.11-RV0.2-RESPONSIVE-ACCESSIBILITY-CONSISTENCY-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Draft",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.12-RV0.2-DECISION-REGISTER-VALIDATION-BACKLOG-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.12-RV0.2-DECISION-REGISTER-VALIDATION-BACKLOG-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Draft",
       "version": "1.0"
     }
   ],

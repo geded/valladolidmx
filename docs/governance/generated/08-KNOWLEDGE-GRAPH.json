@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "status": "Approved",
-  "generated_at": "2026-07-22T01:25:52.626Z",
+  "generated_at": "2026-07-22T14:50:44.000Z",
   "derived_from": {
     "glossary": {
       "document": "docs/governance/01-GLOSSARY.md",
@@ -11,11 +11,11 @@
     },
     "dependency_map": {
       "document": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md",
-      "version": "0.7",
+      "version": "0.8",
       "state": "Approved",
-      "data_blob": "PENDING_PR_26",
-      "merge_commit": "PENDING_PR_26",
-      "notes": "06 v0.8 / 07 v0.7: incorpora Audit 18.03, PRD Suite 18.04 y Plan Lovable 18.05 del programa Visual; no infiere implementación."
+      "data_blob": "LOCAL_RECONCILIATION_2026-07-22",
+      "merge_commit": "LOCAL_RECONCILIATION_2026-07-22",
+      "notes": "06 v0.10 / 07 v0.8: incorpora 23 DOC nuevos por Adjudicación Integral Controlada (Opción A) del Baseline V0 CP1–CP6 y RV0.1/RV0.2."
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -9042,6 +9042,236 @@
       "version": "1.0",
       "source": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
       "evidence": "Approved; PR #13 merge 497d08e3139265828784c4270a8cbaea45b30d84"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.06-OMXDS-VISUAL-ROUTE-INVENTORY-AUDIT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.06-OMXDS-VISUAL-ROUTE-INVENTORY-AUDIT-v1.0.md",
+      "owner": "D02 · platform-foundation",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.07-OMXDS-VISUAL-SURFACE-INVENTORY-AUDIT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.07-OMXDS-VISUAL-SURFACE-INVENTORY-AUDIT-v1.0.md",
+      "owner": "D05 · destination-discovery",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.08-OMXDS-VISUAL-MEDIA-INVENTORY-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.08-OMXDS-VISUAL-MEDIA-INVENTORY-v1.0.md",
+      "owner": "D13 · media-delivery",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.09-OMXDS-VISUAL-MAP-AUDIT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.09-OMXDS-VISUAL-MAP-AUDIT-v1.0.md",
+      "owner": "D05 · destination-discovery",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.10-OMXDS-VISUAL-SEO-BASELINE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.10-OMXDS-VISUAL-SEO-BASELINE-v1.0.md",
+      "owner": "D14 · growth-reliability",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.11-OMXDS-VISUAL-RESPONSIVE-BASELINE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.11-OMXDS-VISUAL-RESPONSIVE-BASELINE-v1.0.md",
+      "owner": "D14 · growth-reliability",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.12-OMXDS-VISUAL-PERFORMANCE-BASELINE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.12-OMXDS-VISUAL-PERFORMANCE-BASELINE-v1.0.md",
+      "owner": "D14 · growth-reliability",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.13-OMXDS-VISUAL-ACCESSIBILITY-BASELINE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.13-OMXDS-VISUAL-ACCESSIBILITY-BASELINE-v1.0.md",
+      "owner": "D14 · growth-reliability",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.14-OMXDS-VISUAL-PREMIUM-CASE-ZAZIL-TUNICH-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.14-OMXDS-VISUAL-PREMIUM-CASE-ZAZIL-TUNICH-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.15-OMXDS-VISUAL-CROSS-CUTTING-FINDINGS-MATRIX-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.15-OMXDS-VISUAL-CROSS-CUTTING-FINDINGS-MATRIX-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.16-OMXDS-VISUAL-V0-BASELINE-READINESS-GATE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.16-OMXDS-VISUAL-V0-BASELINE-READINESS-GATE-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.01-RV0.1-REFERENCE-SAMPLE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.01-RV0.1-REFERENCE-SAMPLE-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.02-RV0.1-15-AXIS-EVALUATION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.02-RV0.1-15-AXIS-EVALUATION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.03-RV0.1-FRV-ANALYSIS-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.03-RV0.1-FRV-ANALYSIS-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.04-RV0.1-PATTERNS-CROSS-SURFACE-LIMITATIONS-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.04-RV0.1-PATTERNS-CROSS-SURFACE-LIMITATIONS-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.05-RV0.1-CORRECTION-ADDENDUM-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.05-RV0.1-CORRECTION-ADDENDUM-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.06-RV0.1-CLOSURE-CERTIFICATE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.06-RV0.1-CLOSURE-CERTIFICATE-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.07-RV0.2-VISUAL-PRINCIPLES-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.07-RV0.2-VISUAL-PRINCIPLES-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Draft",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.08-RV0.2-CARD-TAXONOMY-INFORMATION-HIERARCHY-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.08-RV0.2-CARD-TAXONOMY-INFORMATION-HIERARCHY-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Draft",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.09-RV0.2-ACTION-PRIORITY-STATE-MATRIX-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.09-RV0.2-ACTION-PRIORITY-STATE-MATRIX-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Draft",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.10-RV0.2-TRUST-PREMIUM-SYSTEM-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.10-RV0.2-TRUST-PREMIUM-SYSTEM-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Draft",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.11-RV0.2-RESPONSIVE-ACCESSIBILITY-CONSISTENCY-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.11-RV0.2-RESPONSIVE-ACCESSIBILITY-CONSISTENCY-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Draft",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.12-RV0.2-DECISION-REGISTER-VALIDATION-BACKLOG-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.12-RV0.2-DECISION-REGISTER-VALIDATION-BACKLOG-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Draft",
+      "version": "1.0",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · fila adjudicada por Founder Decision 2026-07-22 (Opción A)"
     }
   ],
   "edges": [
@@ -24887,6 +25117,213 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.8 · docs/blueprint/18.05-OMXDS-VISUAL-LOVABLE-PLAN-V0-V8-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "GOV:0001",
+      "origin": "DOC:docs/blueprint/18.06-OMXDS-VISUAL-ROUTE-INVENTORY-AUDIT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D02",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0002",
+      "origin": "DOC:docs/blueprint/18.07-OMXDS-VISUAL-SURFACE-INVENTORY-AUDIT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D05",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0003",
+      "origin": "DOC:docs/blueprint/18.08-OMXDS-VISUAL-MEDIA-INVENTORY-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D13",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0004",
+      "origin": "DOC:docs/blueprint/18.09-OMXDS-VISUAL-MAP-AUDIT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D05",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0005",
+      "origin": "DOC:docs/blueprint/18.10-OMXDS-VISUAL-SEO-BASELINE-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D14",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0006",
+      "origin": "DOC:docs/blueprint/18.11-OMXDS-VISUAL-RESPONSIVE-BASELINE-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D14",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0007",
+      "origin": "DOC:docs/blueprint/18.12-OMXDS-VISUAL-PERFORMANCE-BASELINE-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D14",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0008",
+      "origin": "DOC:docs/blueprint/18.13-OMXDS-VISUAL-ACCESSIBILITY-BASELINE-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D14",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0009",
+      "origin": "DOC:docs/blueprint/18.14-OMXDS-VISUAL-PREMIUM-CASE-ZAZIL-TUNICH-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0010",
+      "origin": "DOC:docs/blueprint/18.15-OMXDS-VISUAL-CROSS-CUTTING-FINDINGS-MATRIX-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D01",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0011",
+      "origin": "DOC:docs/blueprint/18.16-OMXDS-VISUAL-V0-BASELINE-READINESS-GATE-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D01",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0012",
+      "origin": "DOC:docs/blueprint/19.01-RV0.1-REFERENCE-SAMPLE-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0013",
+      "origin": "DOC:docs/blueprint/19.02-RV0.1-15-AXIS-EVALUATION-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0014",
+      "origin": "DOC:docs/blueprint/19.03-RV0.1-FRV-ANALYSIS-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0015",
+      "origin": "DOC:docs/blueprint/19.04-RV0.1-PATTERNS-CROSS-SURFACE-LIMITATIONS-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0016",
+      "origin": "DOC:docs/blueprint/19.05-RV0.1-CORRECTION-ADDENDUM-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0017",
+      "origin": "DOC:docs/blueprint/19.06-RV0.1-CLOSURE-CERTIFICATE-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0018",
+      "origin": "DOC:docs/blueprint/19.07-RV0.2-VISUAL-PRINCIPLES-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0019",
+      "origin": "DOC:docs/blueprint/19.08-RV0.2-CARD-TAXONOMY-INFORMATION-HIERARCHY-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0020",
+      "origin": "DOC:docs/blueprint/19.09-RV0.2-ACTION-PRIORITY-STATE-MATRIX-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0021",
+      "origin": "DOC:docs/blueprint/19.10-RV0.2-TRUST-PREMIUM-SYSTEM-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0022",
+      "origin": "DOC:docs/blueprint/19.11-RV0.2-RESPONSIVE-ACCESSIBILITY-CONSISTENCY-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "GOV:0023",
+      "origin": "DOC:docs/blueprint/19.12-RV0.2-DECISION-REGISTER-VALIDATION-BACKLOG-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.10 · dominio primario adjudicado por evidencia canónica (Founder Decision 2026-07-22)",
+      "verified_at": "2026-07-22"
     }
   ],
   "views": {
