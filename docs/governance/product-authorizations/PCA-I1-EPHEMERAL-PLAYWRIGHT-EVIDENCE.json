@@ -1,0 +1,23 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-I1-EPHEMERAL-PLAYWRIGHT-EVIDENCE",
+  "title": "I1 ephemeral Playwright operational evidence",
+  "status": "Approved",
+  "branch": "agent/i1-skip-link-focus",
+  "blueprint": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Addendum 2026-07-23 · Playwright autorizado exclusivamente dentro del runner efímero de GitHub Actions, fijado a versión exacta, sin package.json ni bun.lock, para evidencias I1 sobre 21ac5ddd7e4caafe1fa916ee7962acc2e2204339; datos ficticios, secretos aislados y OFF → ON → OFF; sin producción, merge, ampliación de I1 ni I2.",
+  "permissions": [
+    {
+      "operation": "add",
+      "path": ".github/workflows/i1-operational-evidence.yml"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_foundations_v1_enabled"
+  ],
+  "required_tests": [
+    "I1 operational evidence workflow",
+    "bun run governance:check"
+  ]
+}
