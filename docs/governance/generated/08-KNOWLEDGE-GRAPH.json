@@ -9559,6 +9559,13 @@
       "path": ".github/workflows/i1-operational-evidence.yml",
       "source": ".github/workflows/i1-operational-evidence.yml",
       "evidence": ".github/workflows/i1-operational-evidence.yml"
+    },
+    {
+      "id": "ART:scripts/omxds/i1/operational-evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/i1/operational-evidence.mjs",
+      "source": "scripts/omxds/i1/operational-evidence.mjs",
+      "evidence": "scripts/omxds/i1/operational-evidence.mjs"
     }
   ],
   "edges": [
@@ -25961,6 +25968,16 @@
     {
       "id": "DEP:AUTO:IMPLEMENTS:.github/workflows/i1-operational-evidence.yml:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
       "origin": "ART:.github/workflows/i1-operational-evidence.yml",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i1/operational-evidence.mjs:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i1/operational-evidence.mjs",
       "relation": "implements",
       "destination": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
       "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
