@@ -130,9 +130,9 @@ jobs:
             await page.goto("file://"+process.env.RUNNER_TEMP+"/i1-evidence/index.html");
             results.sequence.push({viewport:viewport.name,state:await page.locator("html").getAttribute("data-flag")});
             await page.keyboard.press("Tab");
-            if(!(await page.locator(".skip").isFocused())) throw new Error("skip-link not first keyboard target");
+            if(!(await page.locator(".skip").evaluate(el=>el===document.activeElement))) throw new Error("skip-link not first keyboard target");
             await page.keyboard.press("Enter");
-            if(!(await page.locator("#main").isFocused())) throw new Error("skip-link did not transfer focus");
+            if(!(await page.locator("#main").evaluate(el=>el===document.activeElement))) throw new Error("skip-link did not transfer focus");
             const alux=page.getByRole("note",{name:"Alux · contexto de esta ficha"});
             await alux.waitFor();
             if(!((await alux.textContent())||"").includes("Empresa") && !((await alux.textContent())||"").includes("Abierto")) {
