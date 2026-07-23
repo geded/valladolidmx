@@ -10,7 +10,10 @@
     { "operation": "create", "path": "docs/governance/product-authorizations/I1-PLAYWRIGHT-TEMPORARY-ADDENDUM.md" },
     { "operation": "create", "path": "docs/governance/product-authorizations/PCA-I1-EPHEMERAL-PLAYWRIGHT-EVIDENCE.json" },
     { "operation": "create", "path": ".github/workflows/i1-operational-evidence.yml" },
-    { "operation": "create", "path": "scripts/omxds/i1/operational-evidence.mjs" }
+    { "operation": "create", "path": "scripts/omxds/i1/operational-evidence.mjs" },
+    { "operation": "modify", "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json" },
+    { "operation": "modify", "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json" },
+    { "operation": "modify", "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json" }
   ],
   "public_routes": [],
   "required_feature_flags": [
