@@ -28,6 +28,8 @@ export interface DiscoveryCardDefinition<TProps = any> {
   kind: DiscoveryCardKind;
   component: ComponentType<TProps>;
   description: string;
+  contractFamily?: "destination";
+  contractVariants?: readonly ["compact", "standard", "editorial", "featured"];
 }
 
 export const DISCOVERY_CARDS_REGISTRY: Readonly<
@@ -42,6 +44,8 @@ export const DISCOVERY_CARDS_REGISTRY: Readonly<
     kind: "destino",
     component: DestinoCard as ComponentType<any>,
     description: "Teaser de destino territorial.",
+    contractFamily: "destination",
+    contractVariants: ["compact", "standard", "editorial", "featured"],
   },
   categoria: {
     kind: "categoria",

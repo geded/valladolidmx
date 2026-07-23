@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.16",
+    "version": "0.17",
     "state": "Approved",
     "main_commit": "LOCAL_RECONCILIATION_2026-07-22",
     "blob": "LOCAL_RECONCILIATION_2026-07-22",
@@ -6721,6 +6721,14 @@
       "id": "ART:scripts/omxds/i1/operational-evidence.mjs",
       "type": "artifact",
       "path": "scripts/omxds/i1/operational-evidence.mjs"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
     }
   ],
   "edges": [

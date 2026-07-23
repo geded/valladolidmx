@@ -308,6 +308,9 @@ export interface TourismCardProps {
   className?: string;
   /** Slot para inyectar acciones interactivas (FavoriteButton, etc.). */
   renderActions?: (vm: TourismCardVM) => ReactNode;
+  /** Contrato semántico I2; ausente conserva el renderer legacy. */
+  contractFamily?: "destination";
+  contractVariant?: "compact" | "standard" | "editorial" | "featured";
 }
 
 export function TourismCard({
@@ -315,6 +318,8 @@ export function TourismCard({
   capabilities,
   className,
   renderActions,
+  contractFamily,
+  contractVariant,
 }: TourismCardProps) {
   const caps = withDefaultCapabilities(capabilities);
   const price = caps.showPrice ? formatPrice(vm.priceAmount, vm.priceCurrency) : null;
@@ -331,6 +336,8 @@ export function TourismCard({
     <article
       data-eb-entity={vm.entityKind ?? undefined}
       data-tourism-card="grid"
+      data-omxds-contract={contractFamily}
+      data-omxds-variant={contractVariant}
       className={cn(
         "group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-shadow hover:shadow-elevated",
         className,

@@ -12,6 +12,8 @@
     "typecheck": "tsc --noEmit",
     "test:i1": "bun test scripts/omxds/i1",
     "validate:i1": "bun run test:i1 && bun scripts/omxds/i1/contrast.mjs",
+    "test:i2a": "bun test scripts/omxds/i2/destination-card.contract.test.ts",
+    "validate:i2a": "bun run test:i2a && bun scripts/omxds/i2/destination-card.evidence.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "governance:generate": "bun scripts/governance/generate-artifact-inventory.mjs",

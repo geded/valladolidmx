@@ -9566,6 +9566,16 @@
       "path": "scripts/omxds/i1/operational-evidence.mjs",
       "source": "scripts/omxds/i1/operational-evidence.mjs",
       "evidence": "scripts/omxds/i1/operational-evidence.mjs"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md"
     }
   ],
   "edges": [
@@ -25984,6 +25994,15 @@
       "source_row": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
       "verified_at": "2026-07-22",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-23",
+      "origin": "DOC:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.17 · docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {

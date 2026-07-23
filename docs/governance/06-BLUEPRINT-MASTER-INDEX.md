@@ -2,9 +2,9 @@
 
 **Estado:** Approved
 
-**Versión:** 0.16
+**Versión:** 0.17
 
-**Última actualización:** 2026-07-22
+**Última actualización:** 2026-07-23
 
 **Owner:** Founder (documental) · Núcleo de Gobernanza (mantenimiento)
 
@@ -16,30 +16,30 @@ Este documento contiene el catálogo canónico del universo documental bajo `doc
 
 Esta sección se reemitió el 2026-07-22 conforme al mandato Founder de revisión RV0.2. El alcance del índice sigue siendo registrar autoridad documental adjudicada; no acredita por sí mismo implementación, despliegue, tráfico real ni cierre de dependencias. El orden de ejecución continúa determinado por el [roadmap oficial v2.1](../blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md).
 
-El universo total del árbol `docs/blueprint/` es actualmente de **484 archivos** verificados. El índice registra **484 filas** adjudicadas tras admitir `18.17`–`18.25` y conservar `20.01` Product Change Authorization Gate v1, ambos por autorización Founder expresa. El árbol y la tabla quedan reconciliados sin brecha operativa. Las cifras anteriores se conservan únicamente como historia de versiones.
+El universo total del árbol `docs/blueprint/` es actualmente de **485 archivos** verificados. El índice registra **485 filas** adjudicadas tras admitir `18.26` I2-A DestinationCard Authorization Pack y conservar la admisión de `18.17`–`18.25` y `20.01` Product Change Authorization Gate v1, por autorización Founder expresa. El árbol y la tabla quedan reconciliados sin brecha operativa. Las cifras anteriores se conservan únicamente como historia de versiones.
 
 Las asociaciones técnicas de las filas adjudicadas fueron validadas localmente contra el árbol actual del repositorio: se conservan sólo rutas resolubles, se normalizan expresiones truncadas y se eliminan autorreferencias. La evidencia documental autocontenida se distingue expresamente de una prueba operativa externa.
 
 ## 2.1 Universo documental verificable
 
-El universo total bajo `docs/blueprint/` es de **484 archivos únicos** (medición 2026-07-22 posterior a la admisión gobernada de `18.17`–`18.25` y al registro de `20.01`):
+El universo total bajo `docs/blueprint/` es de **485 archivos únicos** (medición 2026-07-23 posterior a la admisión gobernada de `18.26`):
 
-- **468** archivos en la raíz de `docs/blueprint/`.
+- **470** archivos en la raíz de `docs/blueprint/`.
 - **15** archivos en 5 subdirectorios: `artifacts/`, `audits/`, `project-constitution/`, `roadmap/`, `templates/`.
-- **469 + 15 = 484**.
+- **470 + 15 = 485**.
 
-El índice registra actualmente **484 filas** en `§4`. La brecha se mantiene en `0`; v0.16 reconcilia la admisión de `18.17`–`18.25` con `20.01`, sin ampliar el alcance de ninguno. Los 119 hallazgos congelados y el contenido sustantivo de `18.06`–`18.16` y `19.07`–`19.15` no fueron reabiertos.
+El índice registra actualmente **485 filas** en `§4`. La brecha se mantiene en `0`; v0.17 admite `18.26` exclusivamente como paquete de autorización I2-A, sin ampliar su alcance. Los 119 hallazgos congelados y el contenido sustantivo de `18.06`–`18.25` y `19.07`–`19.15` no fueron reabiertos.
 
 Los conteos previos (`429`, `432`, `439`, `442`, `444`, `447`, `453`) reflejan medidas históricas del árbol o del índice; ninguno representa el universo actual y no deben citarse fuera del `§6 Control de versiones`.
 
 ## 2.2 Metodología reproducible
 
 ```text
-find docs/blueprint -type f | wc -l                    # 484 archivos únicos (2026-07-22)
-find docs/blueprint -maxdepth 1 -type f | wc -l        # 469 raíz
+find docs/blueprint -type f | wc -l                    # 485 archivos únicos (2026-07-23)
+find docs/blueprint -maxdepth 1 -type f | wc -l        # 470 raíz
 find docs/blueprint -mindepth 2 -type f | wc -l        # 15 en subdirectorios
 find docs/blueprint -mindepth 1 -type d                # 5 subdirectorios (artifacts, audits, project-constitution, roadmap, templates)
-grep -c '^| \[`docs/blueprint/' docs/governance/06-BLUEPRINT-MASTER-INDEX.md   # 484 filas adjudicadas
+grep -c '^| \[`docs/blueprint/' docs/governance/06-BLUEPRINT-MASTER-INDEX.md   # 485 filas adjudicadas
 ```
 
 Delta reproducible tabla ↔ árbol:
@@ -75,31 +75,31 @@ Semántica obligatoria:
 
 ## 3.1 Resumen de adjudicación
 
-Recomputado sobre las 484 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $5 }' | sort | uniq -c`, 2026-07-22):
+Recomputado sobre las 485 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $5 }' | sort | uniq -c`, 2026-07-23):
 
 | Estado | Documentos |
 |---|---:|
-| `Approved` | 192 |
+| `Approved` | 193 |
 | `Draft` | 288 |
 | `Superseded` | 3 |
 | `Historical` | 1 |
 | `Deprecated` | 0 |
-| **Total adjudicado** | **484** |
+| **Total adjudicado** | **485** |
 | No adjudicado | 0 |
-| **Total del árbol** | **484** |
+| **Total del árbol** | **485** |
 
 Los conteos previos (`155 / 285`, `442`) se conservan sólo para el `§6 Control de versiones`; no representan el estado actual. La cobertura declarada en versiones anteriores (274 implementaciones, 14 migraciones, 251 pruebas/evidencia) queda como métrica histórica de la versión v0.5 y se recomputará cuando la brecha de 11 filas se adjudique.
 
 ## 3.2 Resumen por dominio primario
 
-Recomputado sobre las 484 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $7 }' | sort | uniq -c`, 2026-07-22):
+Recomputado sobre las 485 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $7 }' | sort | uniq -c`, 2026-07-23):
 
 | ID | Dominio | Documentos |
 |---|---|---:|
 | `D01` | `product-governance` | 35 |
 | `D02` | `platform-foundation` | 22 |
 | `D03` | `identity-security` | 45 |
-| `D04` | `content-experience` | 104 |
+| `D04` | `content-experience` | 105 |
 | `D05` | `destination-discovery` | 37 |
 | `D06` | `marketplace-commerce` | 25 |
 | `D07` | `provider-operations` | 24 |
@@ -110,9 +110,9 @@ Recomputado sobre las 484 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ {
 | `D12` | `engagement-notifications` | 14 |
 | `D13` | `media-delivery` | 30 |
 | `D14` | `growth-reliability` | 21 |
-|  | **Total adjudicado** | **484** |
+|  | **Total adjudicado** | **485** |
 
-Verificación aritmética: `35+22+45+104+37+25+24+54+29+16+28+14+30+21 = 484`. `20.01` permanece adjudicado en D01; `18.15`–`18.16` permanecen en D01; y `18.17`–`18.25` se adjudican en D04. La reconciliación documental no autoriza cambios adicionales de producto ni producción.
+Verificación aritmética: `35+22+45+105+37+25+24+54+29+16+28+14+30+21 = 485`. `20.01` permanece adjudicado en D01; `18.15`–`18.16` permanecen en D01; y `18.17`–`18.26` se adjudican en D04. La reconciliación documental no autoriza cambios adicionales de producto ni producción.
 
 La asignación primaria expresa accountability documental. Las dependencias e impactos transversales se modelarán como aristas en `07`; no crean owners múltiples en este índice.
 
@@ -607,21 +607,22 @@ La asignación primaria expresa accountability documental. Las dependencias e im
 | [`docs/blueprint/18.23-OMXDS-V1-R1-CRITICAL-READINESS-DECISIONS-v1.0.md`](../blueprint/18.23-OMXDS-V1-R1-CRITICAL-READINESS-DECISIONS-v1.0.md) | 18.23-OMXDS-V1-R1-CRITICAL-READINESS-DECISIONS-v1.0.md | `1.0` | `Approved` | Blueprint · 18.23-omxds-v1-r1-critical-readiness-decisions-v1.0 | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder approval recorded 2026-07-22 · Admisión documental autorizada para OMXDS Visual V1; no autoriza implementación, flags, merge ni producción. | 2026-07-22 |
 | [`docs/blueprint/18.24-OMXDS-V1-I1-SHARED-VISUAL-FOUNDATIONS-SCOPE-REPORT-v1.0.md`](../blueprint/18.24-OMXDS-V1-I1-SHARED-VISUAL-FOUNDATIONS-SCOPE-REPORT-v1.0.md) | 18.24-OMXDS-V1-I1-SHARED-VISUAL-FOUNDATIONS-SCOPE-REPORT-v1.0.md | `1.0` | `Approved` | Blueprint · 18.24-omxds-v1-i1-shared-visual-foundations-scope-report-v1.0 | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder approval recorded 2026-07-22 · Admisión documental autorizada para OMXDS Visual V1; no autoriza implementación, flags, merge ni producción. | 2026-07-22 |
 | [`docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md`](../blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md) | 18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md | `1.0` | `Approved` | Blueprint · 18.25-omxds-v1-i1-implementation-authorization-pack-v1.0 | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder approval recorded 2026-07-22 · Admisión documental autorizada para OMXDS Visual V1; no autoriza implementación, flags, merge ni producción. | 2026-07-22 |
+| [`docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md`](../blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md) | 18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md | `1.0` | `Approved` | Blueprint · 18.26-omxds-v1-i2a-destination-card-authorization-pack-v1.0 | `D04 · content-experience` | — | — | `src/lib/omxds/cards/destination-card.contract.ts`; `src/components/cards/DestinoCard.tsx` | `supabase/migrations/20260723093000_omxds_visual_v1_contracts_flag.sql` | `scripts/omxds/i2/destination-card.contract.test.ts`; `scripts/omxds/i2/destination-card.evidence.mjs` | — | Founder approval recorded 2026-07-23 · Autoriza exclusivamente I2-A DestinationCard Contract con fixtures ficticios, flag OFF y G1; excluye producción, activación pública, BusinessCard y ampliación de I2-A. | 2026-07-23 |
 ## 5. Criterios objetivos para salir de Draft
 
-| Gate | Estado 2026-07-22 | Evidencia o pendiente |
+| Gate | Estado 2026-07-23 | Evidencia o pendiente |
 |---|---|---|
-| Filas adjudicadas | 484 sobre 484 del árbol | Cerrado por v0.16 (Gate v1 y admisión OMXDS `18.17`–`18.25` reconciliados). |
+| Filas adjudicadas | 485 sobre 485 del árbol | Cerrado por v0.17 (admisión documental de `18.26` reconciliada). |
 | Rutas y artefactos existentes | Cumplido para referencias conservadas | Las rutas técnicas retenidas resuelven contra el árbol local. La evidencia autocontenida no se presenta como prueba externa. |
 | Superseded-pass cerrado | Cumplido | 3 `Superseded` con relaciones aprobadas; 0 derivas inesperadas. |
 | ADR de dominios aprobado | Cumplido | `ADR-GOV-0001` formaliza los 14 dominios aprobados por el Founder. |
-| Dominios primarios asignados | Cumplido | Las 484 filas contienen exactamente un dominio `D01`–`D14`. |
+| Dominios primarios asignados | Cumplido | Las 485 filas contienen exactamente un dominio `D01`–`D14`. |
 | Base de derivación para `07` definida | Cumplido | `07` deberá derivarse desde la última versión de `06` aprobada por el Founder. |
 | Evidencia reproducible del PR #12 | Cumplido | PR #12, head `a832c568…`, merge `2e50745e…`, blob `0d047f02…`; ADR publicada mediante PR #13, merge `497d08e3…`, blob `8153c886…`. |
 | Aprobación Founder de v0.5 | Cumplido | El Founder aprobó la propuesta local v0.5; PR #13 fue fusionado en `main`. |
-| Reconciliación tabla ↔ árbol | Cumplido | Universo reconciliado a **484 = 484** en v0.16; sin brecha operativa. |
+| Reconciliación tabla ↔ árbol | Cumplido | Universo reconciliado a **485 = 485** en v0.17; sin brecha operativa. |
 
-El documento permanece **operativamente Approved** para las 484 filas adjudicadas. RV0.2 está `Approved · Closed`; la cohorte 1 de RV0.3 queda definida sólo documentalmente; el gate `20.01` permanece autorizado como control de gobernanza; y `18.17`–`18.25` quedan admitidos documentalmente. La implementación se rige por una autorización PCA separada y explícita.
+El documento permanece **operativamente Approved** para las 485 filas adjudicadas. RV0.2 está `Approved · Closed`; la cohorte 1 de RV0.3 queda definida sólo documentalmente; el gate `20.01` permanece autorizado como control de gobernanza; y `18.17`–`18.26` quedan admitidos documentalmente. La implementación se rige por una autorización PCA separada y explícita.
 
 ## 6. Control de versiones
 
@@ -644,3 +645,4 @@ El documento permanece **operativamente Approved** para las 484 filas adjudicada
 | v0.14 | 2026-07-22 | Founder | Incorpora `19.15-RV0.3-COHORT-1-HYPOTHESIS-EVIDENCE-DECISION-MATRIX-v1.0.md` en D04. Define documentalmente `VB-01`, `VB-04` y `VB-05`, sus variantes 390/1440, métricas y guion Founder; registra Zazil Tunich como caso Premium oficial y Google Travel, Airbnb y Tripadvisor como benchmarks mínimos obligatorios. Universo reconciliado: **474 = 474**. No autoriza prototipos, código, producto, superficies públicas ni V1. |
 | v0.15 | 2026-07-22 | Founder | Incorpora `20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md` en D01 y autoriza exclusivamente la construcción del gate ejecutable. Universo reconciliado: **475 = 475**. Ningún cambio de producto queda autorizado por esta incorporación. |
 | v0.16 | 2026-07-22 | Founder | Reconcilia `20.01` con la admisión documental de `18.17`–`18.25`. Universo reconciliado: **484 = 484**. Conserva el Gate y autoriza únicamente las proyecciones canónicas derivadas de 07, 08 e inventario; no amplía implementación, flags ni producción. |
+| v0.17 | 2026-07-23 | Founder | Admite `18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md` en D04. Universo reconciliado: **485 = 485**. Autoriza únicamente I2-A DestinationCard Contract y sus proyecciones canónicas derivadas; excluye producción, datos reales, activación pública, BusinessCard y ampliación de I2-A. |
