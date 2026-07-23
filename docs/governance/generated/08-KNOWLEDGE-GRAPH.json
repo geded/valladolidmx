@@ -9356,6 +9356,96 @@
       "evidence": "docs/blueprint/19.15-RV0.3-COHORT-1-HYPOTHESIS-EVIDENCE-DECISION-MATRIX-v1.0.md"
     },
     {
+      "id": "DOC:docs/blueprint/18.17-OMXDS-VISUAL-DESIGN-SYSTEM-FINAL-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.17-OMXDS-VISUAL-DESIGN-SYSTEM-FINAL-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.17-OMXDS-VISUAL-DESIGN-SYSTEM-FINAL-v1.0.md",
+      "evidence": "docs/blueprint/18.17-OMXDS-VISUAL-DESIGN-SYSTEM-FINAL-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.18-OMXDS-CARD-AND-SURFACE-SPECIFICATION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.18-OMXDS-CARD-AND-SURFACE-SPECIFICATION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.18-OMXDS-CARD-AND-SURFACE-SPECIFICATION-v1.0.md",
+      "evidence": "docs/blueprint/18.18-OMXDS-CARD-AND-SURFACE-SPECIFICATION-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.19-OMXDS-EDITORIAL-BUILDER-CONTRACT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.19-OMXDS-EDITORIAL-BUILDER-CONTRACT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.19-OMXDS-EDITORIAL-BUILDER-CONTRACT-v1.0.md",
+      "evidence": "docs/blueprint/18.19-OMXDS-EDITORIAL-BUILDER-CONTRACT-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.20-OMXDS-ACCEPTANCE-AND-GOVERNANCE-MATRIX-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.20-OMXDS-ACCEPTANCE-AND-GOVERNANCE-MATRIX-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.20-OMXDS-ACCEPTANCE-AND-GOVERNANCE-MATRIX-v1.0.md",
+      "evidence": "docs/blueprint/18.20-OMXDS-ACCEPTANCE-AND-GOVERNANCE-MATRIX-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.21-OMXDS-V1-IMPLEMENTATION-READINESS-AND-PHASING-PLAN-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.21-OMXDS-V1-IMPLEMENTATION-READINESS-AND-PHASING-PLAN-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.21-OMXDS-V1-IMPLEMENTATION-READINESS-AND-PHASING-PLAN-v1.0.md",
+      "evidence": "docs/blueprint/18.21-OMXDS-V1-IMPLEMENTATION-READINESS-AND-PHASING-PLAN-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.22-OMXDS-V1-R0-INVENTORY-AND-IMPACT-MAP-COMPLETION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.22-OMXDS-V1-R0-INVENTORY-AND-IMPACT-MAP-COMPLETION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.22-OMXDS-V1-R0-INVENTORY-AND-IMPACT-MAP-COMPLETION-v1.0.md",
+      "evidence": "docs/blueprint/18.22-OMXDS-V1-R0-INVENTORY-AND-IMPACT-MAP-COMPLETION-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.23-OMXDS-V1-R1-CRITICAL-READINESS-DECISIONS-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.23-OMXDS-V1-R1-CRITICAL-READINESS-DECISIONS-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.23-OMXDS-V1-R1-CRITICAL-READINESS-DECISIONS-v1.0.md",
+      "evidence": "docs/blueprint/18.23-OMXDS-V1-R1-CRITICAL-READINESS-DECISIONS-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.24-OMXDS-V1-I1-SHARED-VISUAL-FOUNDATIONS-SCOPE-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.24-OMXDS-V1-I1-SHARED-VISUAL-FOUNDATIONS-SCOPE-REPORT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.24-OMXDS-V1-I1-SHARED-VISUAL-FOUNDATIONS-SCOPE-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/18.24-OMXDS-V1-I1-SHARED-VISUAL-FOUNDATIONS-SCOPE-REPORT-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md"
+    },
+    {
       "id": "DOC:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
       "type": "blueprint",
       "path": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
@@ -25540,6 +25630,87 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.14 · docs/blueprint/19.15-RV0.3-COHORT-1-HYPOTHESIS-EVIDENCE-DECISION-MATRIX-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.17-OMXDS-VISUAL-DESIGN-SYSTEM-FINAL-v1.0.md",
+      "verified_at": "2026-07-22",
+      "origin": "DOC:docs/blueprint/18.17-OMXDS-VISUAL-DESIGN-SYSTEM-FINAL-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.15 · docs/blueprint/18.17-OMXDS-VISUAL-DESIGN-SYSTEM-FINAL-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.18-OMXDS-CARD-AND-SURFACE-SPECIFICATION-v1.0.md",
+      "verified_at": "2026-07-22",
+      "origin": "DOC:docs/blueprint/18.18-OMXDS-CARD-AND-SURFACE-SPECIFICATION-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.15 · docs/blueprint/18.18-OMXDS-CARD-AND-SURFACE-SPECIFICATION-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.19-OMXDS-EDITORIAL-BUILDER-CONTRACT-v1.0.md",
+      "verified_at": "2026-07-22",
+      "origin": "DOC:docs/blueprint/18.19-OMXDS-EDITORIAL-BUILDER-CONTRACT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.15 · docs/blueprint/18.19-OMXDS-EDITORIAL-BUILDER-CONTRACT-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.20-OMXDS-ACCEPTANCE-AND-GOVERNANCE-MATRIX-v1.0.md",
+      "verified_at": "2026-07-22",
+      "origin": "DOC:docs/blueprint/18.20-OMXDS-ACCEPTANCE-AND-GOVERNANCE-MATRIX-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.15 · docs/blueprint/18.20-OMXDS-ACCEPTANCE-AND-GOVERNANCE-MATRIX-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.21-OMXDS-V1-IMPLEMENTATION-READINESS-AND-PHASING-PLAN-v1.0.md",
+      "verified_at": "2026-07-22",
+      "origin": "DOC:docs/blueprint/18.21-OMXDS-V1-IMPLEMENTATION-READINESS-AND-PHASING-PLAN-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.15 · docs/blueprint/18.21-OMXDS-V1-IMPLEMENTATION-READINESS-AND-PHASING-PLAN-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.22-OMXDS-V1-R0-INVENTORY-AND-IMPACT-MAP-COMPLETION-v1.0.md",
+      "verified_at": "2026-07-22",
+      "origin": "DOC:docs/blueprint/18.22-OMXDS-V1-R0-INVENTORY-AND-IMPACT-MAP-COMPLETION-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.15 · docs/blueprint/18.22-OMXDS-V1-R0-INVENTORY-AND-IMPACT-MAP-COMPLETION-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.23-OMXDS-V1-R1-CRITICAL-READINESS-DECISIONS-v1.0.md",
+      "verified_at": "2026-07-22",
+      "origin": "DOC:docs/blueprint/18.23-OMXDS-V1-R1-CRITICAL-READINESS-DECISIONS-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.15 · docs/blueprint/18.23-OMXDS-V1-R1-CRITICAL-READINESS-DECISIONS-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.24-OMXDS-V1-I1-SHARED-VISUAL-FOUNDATIONS-SCOPE-REPORT-v1.0.md",
+      "verified_at": "2026-07-22",
+      "origin": "DOC:docs/blueprint/18.24-OMXDS-V1-I1-SHARED-VISUAL-FOUNDATIONS-SCOPE-REPORT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.15 · docs/blueprint/18.24-OMXDS-V1-I1-SHARED-VISUAL-FOUNDATIONS-SCOPE-REPORT-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-22",
+      "origin": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.15 · docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md → D04 · content-experience"
     },
     {
       "id": "DEP:AUTO:IMPLEMENTS:scripts/governance/lib/product-authorization.mjs:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
