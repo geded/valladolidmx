@@ -52,6 +52,8 @@ export interface BadgeRegistryEntry {
   tooltip: string;
   /** Restricciones opcionales (p. ej. Pueblos Mágicos autorizados). */
   restrictedSlugs?: string[];
+  /** Política de verdad: registry, evidencia por item o bloqueo total. */
+  verificationMode: "registry" | "evidence" | "disabled";
 }
 
 /**
@@ -71,6 +73,7 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     group: "identity",
     tooltip: "Distintivo Pueblo Mágico otorgado por la SECTUR",
     restrictedSlugs: [...PUEBLOS_MAGICOS_AUTORIZADOS],
+    verificationMode: "registry",
   },
   patrimonio: {
     kind: "patrimonio",
@@ -81,6 +84,7 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     priority: 20,
     group: "identity",
     tooltip: "Patrimonio cultural reconocido",
+    verificationMode: "evidence",
   },
   "oriente-maya": {
     kind: "oriente-maya",
@@ -91,6 +95,7 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     priority: 30,
     group: "identity",
     tooltip: "Marca territorial Oriente Maya de Yucatán",
+    verificationMode: "registry",
   },
   "despierta-en-valladolid": {
     kind: "despierta-en-valladolid",
@@ -101,6 +106,7 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     priority: 40,
     group: "identity",
     tooltip: "Programa oficial Despierta en Valladolid",
+    verificationMode: "registry",
   },
   award: {
     kind: "award",
@@ -111,6 +117,7 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     priority: 50,
     group: "recognition",
     tooltip: "Reconocimiento otorgado por institución oficial",
+    verificationMode: "evidence",
   },
   "official-recognition": {
     kind: "official-recognition",
@@ -121,6 +128,7 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     priority: 60,
     group: "recognition",
     tooltip: "Reconocimiento institucional adicional",
+    verificationMode: "evidence",
   },
   certification: {
     kind: "certification",
@@ -131,6 +139,7 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     priority: 70,
     group: "recognition",
     tooltip: "Certificación oficial vigente",
+    verificationMode: "evidence",
   },
   "verified-business": {
     kind: "verified-business",
@@ -141,6 +150,7 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     priority: 80,
     group: "trust",
     tooltip: "Empresa verificada por Valladolid.mx",
+    verificationMode: "evidence",
   },
   "alux-recommended": {
     kind: "alux-recommended",
@@ -151,6 +161,7 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     priority: 90,
     group: "trust",
     tooltip: "Recomendación validada por Alux, el asistente oficial",
+    verificationMode: "evidence",
   },
   custom: {
     kind: "custom",
@@ -161,6 +172,7 @@ export const INSTITUTIONAL_BADGE_REGISTRY: Record<BadgeKind, BadgeRegistryEntry>
     priority: 100,
     group: "custom",
     tooltip: "Distintivo institucional",
+    verificationMode: "disabled",
   },
 };
 
@@ -174,4 +186,40 @@ export function isBadgeAuthorized(kind: BadgeKind, subjectSlug?: string): boolea
   if (!entry.restrictedSlugs) return true;
   if (!subjectSlug) return false;
   return entry.restrictedSlugs.includes(subjectSlug.toLowerCase());
+}
+
+export interface BadgeEvidence {
+  kind: BadgeKind;
+  sourceOwner?: string;
+  verificationStatus?: "verified" | "unverified" | "expired" | "legacy";
+  verifiedAt?: string;
+  expiresAt?: string;
+  evidenceUrl?: string;
+}
+
+function isValidInstant(value: string | undefined): boolean {
+  return Boolean(value) && !Number.isNaN(new Date(value as string).getTime());
+}
+
+export function isBadgeEligible(
+  item: BadgeEvidence,
+  subjectSlug?: string,
+  now = new Date(),
+): boolean {
+  const entry = getBadgeRegistryEntry(item.kind);
+  if (!isBadgeAuthorized(item.kind, subjectSlug)) return false;
+  if (entry.verificationMode === "disabled") return false;
+  if (entry.verificationMode === "registry") return true;
+  if (item.verificationStatus !== "verified") return false;
+  if (!item.sourceOwner?.trim() || !item.evidenceUrl || !isValidInstant(item.verifiedAt)) return false;
+  try {
+    new URL(item.evidenceUrl);
+  } catch {
+    return false;
+  }
+  if (item.expiresAt) {
+    if (!isValidInstant(item.expiresAt)) return false;
+    if (new Date(item.expiresAt).getTime() <= now.getTime()) return false;
+  }
+  return true;
 }

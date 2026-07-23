@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sheet";
 import {
   getBadgeRegistryEntry,
-  isBadgeAuthorized,
+  isBadgeEligible,
 } from "@/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry";
 import type {
   ExperienceBadgesDTO,
@@ -59,6 +59,7 @@ function BadgeChip({
   const entry = getBadgeRegistryEntry(item.kind);
   const Icon = entry.icon;
   const label = item.label || entry.label;
+  const accessibleLabel = item.accessibleLabel || label;
 
   // Estilos derivados 100% de tokens M1. Sin colores literales.
   const colorVar = monochrome ? "var(--color-foreground)" : `var(--color-${entry.colorToken})`;
@@ -127,7 +128,7 @@ function BadgeChip({
         target="_blank"
         rel="noopener noreferrer"
         role="link"
-        aria-label={variant === "icon-only" ? label : undefined}
+        aria-label={accessibleLabel}
         className={commonClass}
         style={{ ...style, ...variantStyle }}
       >
@@ -138,8 +139,8 @@ function BadgeChip({
 
   return (
     <span
-      role={variant === "icon-only" ? "img" : "img"}
-      aria-label={variant === "icon-only" ? label : undefined}
+      role="img"
+      aria-label={accessibleLabel}
       className={commonClass}
       style={{ ...style, ...variantStyle }}
     >
@@ -161,7 +162,7 @@ export function InstitutionalBadges({
   const { variant, size, layout, items, ariaLabel, capabilities } = dto;
 
   // 1) Autorización institucional (§12).
-  const authorized = items.filter((it) => isBadgeAuthorized(it.kind, subjectSlug));
+  const authorized = items.filter((it) => isBadgeEligible(it, subjectSlug));
   if (authorized.length === 0) return null;
 
   // 2) Orden fijo por prioridad institucional (§8, no configurable).

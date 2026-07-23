@@ -10,6 +10,8 @@
     "build:dev": "vite build --mode development",
     "preview": "nitro preview",
     "typecheck": "tsc --noEmit",
+    "test:i1": "bun test scripts/omxds/i1",
+    "validate:i1": "bun run test:i1 && bun scripts/omxds/i1/contrast.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "governance:generate": "bun scripts/governance/generate-artifact-inventory.mjs",

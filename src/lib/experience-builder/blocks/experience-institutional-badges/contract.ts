@@ -21,6 +21,12 @@ export const badgeSourceSchema = z.enum([
   "product",
   "event",
 ]);
+export const badgeVerificationStatusSchema = z.enum([
+  "verified",
+  "unverified",
+  "expired",
+  "legacy",
+]);
 
 export const institutionalBadgeItemSchema = z.object({
   kind: badgeKindSchema,
@@ -30,6 +36,12 @@ export const institutionalBadgeItemSchema = z.object({
   programUrl: z.string().url().optional(),
   issuedAt: z.string().optional(),
   source: badgeSourceSchema.default("manual"),
+  sourceOwner: z.string().min(1).optional(),
+  verificationStatus: badgeVerificationStatusSchema.optional(),
+  verifiedAt: z.string().datetime({ offset: true }).optional(),
+  expiresAt: z.string().datetime({ offset: true }).optional(),
+  evidenceUrl: z.string().url().optional(),
+  accessibleLabel: z.string().min(1).optional(),
 });
 export type InstitutionalBadgeItem = z.infer<typeof institutionalBadgeItemSchema>;
 

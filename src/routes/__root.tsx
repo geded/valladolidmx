@@ -77,6 +77,11 @@ import { organizationJsonLd, websiteJsonLd } from "@/lib/discovery/seo";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { ProtectedActionResumeRunner } from "@/lib/protected-actions";
 import { GlobalNavigationSessionBridge } from "@/components/navigation/NavigationSessionBridge";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { SkipLink } from "@/components/ui/SkipLink";
+import { getOmxdsVisualFoundationsFlag } from "@/lib/omxds/visual-foundations-flag.server";
+
+const OMXDS_THEME_BOOTSTRAP = `(()=>{try{const r=document.documentElement;if(r.dataset.omxdsVisualFoundations!=="enabled")return;const k="valladolidmx:theme";const s=localStorage.getItem(k);const t=s==="sol"||s==="luna"?s:matchMedia("(prefers-color-scheme: dark)").matches?"luna":"sol";r.classList.toggle("dark",t==="luna");r.dataset.theme=t;r.style.colorScheme=t==="luna"?"dark":"light"}catch{}})();`;
 
 const rootPublishedHomeQuery = queryOptions({
   queryKey: ["eb", "published-home", "default"],
@@ -140,6 +145,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  loader: async () => ({
+    omxdsVisualFoundationsEnabled: await getOmxdsVisualFoundationsFlag(),
+  }),
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -199,10 +207,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const { omxdsVisualFoundationsEnabled } = Route.useLoaderData();
   return (
-    <html lang="es">
+    <html
+      lang="es"
+      suppressHydrationWarning
+      data-omxds-visual-foundations={omxdsVisualFoundationsEnabled ? "enabled" : "disabled"}
+    >
       <head>
         <HeadContent />
+        {omxdsVisualFoundationsEnabled ? (
+          <script dangerouslySetInnerHTML={{ __html: OMXDS_THEME_BOOTSTRAP }} />
+        ) : null}
       </head>
       <body>
         {children}
@@ -214,6 +230,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const { omxdsVisualFoundationsEnabled } = Route.useLoaderData();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const headerVariant = pathname === "/" ? "overlay" : "solid";
   // Rutas con shell propio (CMS Studio, Portal Empresarial, Admin, Cuenta).
@@ -264,12 +281,8 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <AuthProvider>
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground"
-        >
-          Saltar al contenido
-        </a>
+        {!isAppShellRoute ? <SkipLink /> : null}
+        {!isAppShellRoute && omxdsVisualFoundationsEnabled ? <ThemeToggle /> : null}
         {!isAppShellRoute ? <PublicChrome pathname={pathname} headerVariant={headerVariant} position="header" /> : null}
         {!isAppShellRoute ? <OfflineBanner /> : null}
         <SyncStatusBanner />
