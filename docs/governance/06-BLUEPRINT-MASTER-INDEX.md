@@ -2,7 +2,7 @@
 
 **Estado:** Approved
 
-**Versión:** 0.14
+**Versión:** 0.15
 
 **Última actualización:** 2026-07-22
 
@@ -16,30 +16,30 @@ Este documento contiene el catálogo canónico del universo documental bajo `doc
 
 Esta sección se reemitió el 2026-07-22 conforme al mandato Founder de revisión RV0.2. El alcance del índice sigue siendo registrar autoridad documental adjudicada; no acredita por sí mismo implementación, despliegue, tráfico real ni cierre de dependencias. El orden de ejecución continúa determinado por el [roadmap oficial v2.1](../blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md).
 
-El universo total del árbol `docs/blueprint/` es actualmente de **474 archivos** verificados. El índice registra **474 filas** adjudicadas tras definir documentalmente la primera cohorte de RV0.3 por autorización Founder expresa. El árbol y la tabla quedan reconciliados sin brecha operativa. Las cifras anteriores se conservan únicamente como historia de versiones.
+El universo total del árbol `docs/blueprint/` es actualmente de **483 archivos** verificados. El índice registra **483 filas** adjudicadas tras admitir `18.17`–`18.25` por autorización Founder expresa. El árbol y la tabla quedan reconciliados sin brecha operativa. Las cifras anteriores se conservan únicamente como historia de versiones.
 
 Las asociaciones técnicas de las filas adjudicadas fueron validadas localmente contra el árbol actual del repositorio: se conservan sólo rutas resolubles, se normalizan expresiones truncadas y se eliminan autorreferencias. La evidencia documental autocontenida se distingue expresamente de una prueba operativa externa.
 
 ## 2.1 Universo documental verificable
 
-El universo total bajo `docs/blueprint/` es de **474 archivos únicos** (medición 2026-07-22 posterior a la definición documental de la primera cohorte RV0.3):
+El universo total bajo `docs/blueprint/` es de **483 archivos únicos** (medición 2026-07-22 posterior a la admisión gobernada de `18.17`–`18.25`):
 
-- **459** archivos en la raíz de `docs/blueprint/`.
+- **468** archivos en la raíz de `docs/blueprint/`.
 - **15** archivos en 5 subdirectorios: `artifacts/`, `audits/`, `project-constitution/`, `roadmap/`, `templates/`.
-- **459 + 15 = 474**.
+- **468 + 15 = 483**.
 
-El índice registra actualmente **474 filas** en `§4`. La brecha se mantiene en `0`; v0.14 incorpora únicamente `19.15` como definición documental de la cohorte `VB-01`, `VB-04` y `VB-05`. Los 119 hallazgos congelados y el contenido sustantivo de `18.06`–`18.16` y `19.07`–`19.14` no fueron reabiertos.
+El índice registra actualmente **483 filas** en `§4`. La brecha se mantiene en `0`; v0.15 admite únicamente `18.17`–`18.25` como expediente documental OMXDS Visual V1. Los 119 hallazgos congelados y el contenido sustantivo de `18.06`–`18.16` y `19.07`–`19.14` no fueron reabiertos.
 
 Los conteos previos (`429`, `432`, `439`, `442`, `444`, `447`, `453`) reflejan medidas históricas del árbol o del índice; ninguno representa el universo actual y no deben citarse fuera del `§6 Control de versiones`.
 
 ## 2.2 Metodología reproducible
 
 ```text
-find docs/blueprint -type f | wc -l                    # 474 archivos únicos (2026-07-22)
-find docs/blueprint -maxdepth 1 -type f | wc -l        # 459 raíz
+find docs/blueprint -type f | wc -l                    # 483 archivos únicos (2026-07-22)
+find docs/blueprint -maxdepth 1 -type f | wc -l        # 468 raíz
 find docs/blueprint -mindepth 2 -type f | wc -l        # 15 en subdirectorios
 find docs/blueprint -mindepth 1 -type d                # 5 subdirectorios (artifacts, audits, project-constitution, roadmap, templates)
-grep -c '^| \[`docs/blueprint/' docs/governance/06-BLUEPRINT-MASTER-INDEX.md   # 474 filas adjudicadas
+grep -c '^| \[`docs/blueprint/' docs/governance/06-BLUEPRINT-MASTER-INDEX.md   # 483 filas adjudicadas
 ```
 
 Delta reproducible tabla ↔ árbol:
@@ -75,31 +75,31 @@ Semántica obligatoria:
 
 ## 3.1 Resumen de adjudicación
 
-Recomputado sobre las 474 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $5 }' | sort | uniq -c`, 2026-07-22):
+Recomputado sobre las 483 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $5 }' | sort | uniq -c`, 2026-07-22):
 
 | Estado | Documentos |
 |---|---:|
-| `Approved` | 175 |
+| `Approved` | 184 |
 | `Draft` | 294 |
 | `Superseded` | 3 |
 | `Historical` | 1 |
 | `Deprecated` | 0 |
-| **Total adjudicado** | **474** |
+| **Total adjudicado** | **483** |
 | No adjudicado | 0 |
-| **Total del árbol** | **474** |
+| **Total del árbol** | **483** |
 
 Los conteos previos (`155 / 285`, `442`) se conservan sólo para el `§6 Control de versiones`; no representan el estado actual. La cobertura declarada en versiones anteriores (274 implementaciones, 14 migraciones, 251 pruebas/evidencia) queda como métrica histórica de la versión v0.5 y se recomputará cuando la brecha de 11 filas se adjudique.
 
 ## 3.2 Resumen por dominio primario
 
-Recomputado sobre las 474 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $7 }' | sort | uniq -c`, 2026-07-22):
+Recomputado sobre las 483 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $7 }' | sort | uniq -c`, 2026-07-22):
 
 | ID | Dominio | Documentos |
 |---|---|---:|
 | `D01` | `product-governance` | 33 |
 | `D02` | `platform-foundation` | 22 |
 | `D03` | `identity-security` | 45 |
-| `D04` | `content-experience` | 95 |
+| `D04` | `content-experience` | 104 |
 | `D05` | `destination-discovery` | 37 |
 | `D06` | `marketplace-commerce` | 25 |
 | `D07` | `provider-operations` | 24 |
@@ -110,9 +110,9 @@ Recomputado sobre las 474 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ {
 | `D12` | `engagement-notifications` | 14 |
 | `D13` | `media-delivery` | 30 |
 | `D14` | `growth-reliability` | 21 |
-|  | **Total adjudicado** | **474** |
+|  | **Total adjudicado** | **483** |
 
-Verificación aritmética: `33+22+45+95+37+25+24+54+29+16+28+14+30+21 = 474`. `19.15-RV0.3-COHORT-1-HYPOTHESIS-EVIDENCE-DECISION-MATRIX-v1.0.md` se adjudica en v0.14 a D04 como definición documental autorizada de la primera cohorte RV0.3, sin autorizar prototipos ejecutables ni producto.
+Verificación aritmética: `33+22+45+104+37+25+24+54+29+16+28+14+30+21 = 483`. `19.15-RV0.3-COHORT-1-HYPOTHESIS-EVIDENCE-DECISION-MATRIX-v1.0.md` se adjudica en v0.14 a D04 como definición documental autorizada de la primera cohorte RV0.3, sin autorizar prototipos ejecutables ni producto.
 
 La asignación primaria expresa accountability documental. Las dependencias e impactos transversales se modelarán como aristas en `07`; no crean owners múltiples en este índice.
 
@@ -597,6 +597,15 @@ La asignación primaria expresa accountability documental. Las dependencias e im
 | [`docs/blueprint/18.14-OMXDS-VISUAL-PREMIUM-CASE-ZAZIL-TUNICH-v1.0.md`](../blueprint/18.14-OMXDS-VISUAL-PREMIUM-CASE-ZAZIL-TUNICH-v1.0.md) | 18.14 · OMXDS Visual V0 · Caso Piloto Empresa Premium · Zazil Tunich v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.14-omxds-visual-premium-case-zazil-tunich | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Piloto vertical de composición de superficie empresa premium. Precedente: `15.10.H-03-EPICA-1-I2d-BUSINESS-SURFACE-FINAL-CLOSURE` → D04. No es proveedor/operación (D07); es composición y branding de superficie. | 2026-07-22 |
 | [`docs/blueprint/18.15-OMXDS-VISUAL-CROSS-CUTTING-FINDINGS-MATRIX-v1.0.md`](../blueprint/18.15-OMXDS-VISUAL-CROSS-CUTTING-FINDINGS-MATRIX-v1.0.md) | 18.15 · OMXDS Visual · Cross-Cutting Findings Matrix v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.15-omxds-visual-cross-cutting-findings-matrix | `D01 · product-governance` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Matriz consolidada de hallazgos CP1–CP5. Instrumento de gobernanza documental (agregación de decisiones), no capacidad técnica específica. | 2026-07-22 |
 | [`docs/blueprint/18.16-OMXDS-VISUAL-V0-BASELINE-READINESS-GATE-v1.0.md`](../blueprint/18.16-OMXDS-VISUAL-V0-BASELINE-READINESS-GATE-v1.0.md) | 18.16 · OMXDS Visual · V0 Baseline & Readiness Gate v1.0 | `1.0` | `Approved` | Evidence/Audit · 18.16-omxds-visual-v0-baseline-readinness-gate | `D01 · product-governance` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder Decision 2026-07-22 · Adjudicación integral controlada (Opción A) del Baseline V0 CP1–CP6; incorpora al índice sin reabrir contenido sustantivo ni los 119 hallazgos congelados. Dominio primario asignado por evidencia: Gate documental de cierre CP6 aprobado por el Founder. Decisión de gobernanza sobre el ciclo V0. | 2026-07-22 |
+| [`docs/blueprint/18.17-OMXDS-VISUAL-DESIGN-SYSTEM-FINAL-v1.0.md`](../blueprint/18.17-OMXDS-VISUAL-DESIGN-SYSTEM-FINAL-v1.0.md) | 18.17-OMXDS-VISUAL-DESIGN-SYSTEM-FINAL-v1.0.md | `1.0` | `Approved` | Blueprint · 18.17-omxds-visual-design-system-final-v1.0 | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder approval recorded 2026-07-22 · Admisión documental autorizada para OMXDS Visual V1; no autoriza implementación, flags, merge ni producción. | 2026-07-22 |
+| [`docs/blueprint/18.18-OMXDS-CARD-AND-SURFACE-SPECIFICATION-v1.0.md`](../blueprint/18.18-OMXDS-CARD-AND-SURFACE-SPECIFICATION-v1.0.md) | 18.18-OMXDS-CARD-AND-SURFACE-SPECIFICATION-v1.0.md | `1.0` | `Approved` | Blueprint · 18.18-omxds-card-and-surface-specification-v1.0 | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder approval recorded 2026-07-22 · Admisión documental autorizada para OMXDS Visual V1; no autoriza implementación, flags, merge ni producción. | 2026-07-22 |
+| [`docs/blueprint/18.19-OMXDS-EDITORIAL-BUILDER-CONTRACT-v1.0.md`](../blueprint/18.19-OMXDS-EDITORIAL-BUILDER-CONTRACT-v1.0.md) | 18.19-OMXDS-EDITORIAL-BUILDER-CONTRACT-v1.0.md | `1.0` | `Approved` | Blueprint · 18.19-omxds-editorial-builder-contract-v1.0 | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder approval recorded 2026-07-22 · Admisión documental autorizada para OMXDS Visual V1; no autoriza implementación, flags, merge ni producción. | 2026-07-22 |
+| [`docs/blueprint/18.20-OMXDS-ACCEPTANCE-AND-GOVERNANCE-MATRIX-v1.0.md`](../blueprint/18.20-OMXDS-ACCEPTANCE-AND-GOVERNANCE-MATRIX-v1.0.md) | 18.20-OMXDS-ACCEPTANCE-AND-GOVERNANCE-MATRIX-v1.0.md | `1.0` | `Approved` | Blueprint · 18.20-omxds-acceptance-and-governance-matrix-v1.0 | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder approval recorded 2026-07-22 · Admisión documental autorizada para OMXDS Visual V1; no autoriza implementación, flags, merge ni producción. | 2026-07-22 |
+| [`docs/blueprint/18.21-OMXDS-V1-IMPLEMENTATION-READINESS-AND-PHASING-PLAN-v1.0.md`](../blueprint/18.21-OMXDS-V1-IMPLEMENTATION-READINESS-AND-PHASING-PLAN-v1.0.md) | 18.21-OMXDS-V1-IMPLEMENTATION-READINESS-AND-PHASING-PLAN-v1.0.md | `1.0` | `Approved` | Blueprint · 18.21-omxds-v1-implementation-readiness-and-phasing-plan-v1.0 | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder approval recorded 2026-07-22 · Admisión documental autorizada para OMXDS Visual V1; no autoriza implementación, flags, merge ni producción. | 2026-07-22 |
+| [`docs/blueprint/18.22-OMXDS-V1-R0-INVENTORY-AND-IMPACT-MAP-COMPLETION-v1.0.md`](../blueprint/18.22-OMXDS-V1-R0-INVENTORY-AND-IMPACT-MAP-COMPLETION-v1.0.md) | 18.22-OMXDS-V1-R0-INVENTORY-AND-IMPACT-MAP-COMPLETION-v1.0.md | `1.0` | `Approved` | Blueprint · 18.22-omxds-v1-r0-inventory-and-impact-map-completion-v1.0 | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder approval recorded 2026-07-22 · Admisión documental autorizada para OMXDS Visual V1; no autoriza implementación, flags, merge ni producción. | 2026-07-22 |
+| [`docs/blueprint/18.23-OMXDS-V1-R1-CRITICAL-READINESS-DECISIONS-v1.0.md`](../blueprint/18.23-OMXDS-V1-R1-CRITICAL-READINESS-DECISIONS-v1.0.md) | 18.23-OMXDS-V1-R1-CRITICAL-READINESS-DECISIONS-v1.0.md | `1.0` | `Approved` | Blueprint · 18.23-omxds-v1-r1-critical-readiness-decisions-v1.0 | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder approval recorded 2026-07-22 · Admisión documental autorizada para OMXDS Visual V1; no autoriza implementación, flags, merge ni producción. | 2026-07-22 |
+| [`docs/blueprint/18.24-OMXDS-V1-I1-SHARED-VISUAL-FOUNDATIONS-SCOPE-REPORT-v1.0.md`](../blueprint/18.24-OMXDS-V1-I1-SHARED-VISUAL-FOUNDATIONS-SCOPE-REPORT-v1.0.md) | 18.24-OMXDS-V1-I1-SHARED-VISUAL-FOUNDATIONS-SCOPE-REPORT-v1.0.md | `1.0` | `Approved` | Blueprint · 18.24-omxds-v1-i1-shared-visual-foundations-scope-report-v1.0 | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder approval recorded 2026-07-22 · Admisión documental autorizada para OMXDS Visual V1; no autoriza implementación, flags, merge ni producción. | 2026-07-22 |
+| [`docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md`](../blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md) | 18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md | `1.0` | `Approved` | Blueprint · 18.25-omxds-v1-i1-implementation-authorization-pack-v1.0 | `D04 · content-experience` | — | — | `Not established` | — | `Self-contained documentary evidence; external operational artifact not established` | — | Founder approval recorded 2026-07-22 · Admisión documental autorizada para OMXDS Visual V1; no autoriza implementación, flags, merge ni producción. | 2026-07-22 |
 ## 5. Criterios objetivos para salir de Draft
 
 | Gate | Estado 2026-07-22 | Evidencia o pendiente |
@@ -614,6 +623,8 @@ La asignación primaria expresa accountability documental. Las dependencias e im
 El documento permanece **operativamente Approved** para las 474 filas adjudicadas. RV0.2 está `Approved · Closed`; la cohorte 1 de RV0.3 queda definida sólo documentalmente. Prototipos ejecutables, cambios de producto, superficies públicas y V1 permanecen no autorizados.
 
 ## 6. Control de versiones
+
+| `0.15` | 2026-07-22 | Admite exclusivamente `18.17`–`18.25`; universo reconciliado a 483 documentos. Autoriza únicamente proyecciones canónicas derivadas de 07, 08 e inventario; sin implementación visual, flags, merge ni producción. |
 
 | Versión | Fecha | Autor | Descripción |
 |---|---|---|---|
