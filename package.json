@@ -15,7 +15,9 @@
     "governance:generate": "bun scripts/governance/generate-artifact-inventory.mjs",
     "governance:sync": "bun scripts/governance/sync-governance.mjs",
     "governance:check": "bun scripts/governance/sync-governance.mjs --check && bun run governance:validate",
-    "governance:validate": "bun scripts/governance/validate-dependency-map.mjs && bun scripts/governance/validate-knowledge-graph.mjs && bun scripts/governance/validate-governance-integrity.mjs"
+    "governance:validate": "bun scripts/governance/validate-dependency-map.mjs && bun scripts/governance/validate-knowledge-graph.mjs && bun scripts/governance/validate-governance-integrity.mjs && bun scripts/governance/validate-product-authorization.mjs",
+    "governance:product-check": "bun scripts/governance/validate-product-authorization.mjs",
+    "governance:product-test": "bun scripts/governance/test-product-authorization.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.1",
