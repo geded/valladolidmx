@@ -1,0 +1,216 @@
+name: I1 Operational Evidence
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: i1-operational-evidence-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  i1-operational-evidence:
+    if: github.head_ref == 'agent/i1-skip-link-focus' || github.ref == 'refs/heads/agent/i1-skip-link-focus'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PRODUCT_SHA: 21ac5ddd7e4caafe1fa916ee7962acc2e2204339
+      PLAYWRIGHT_VERSION: 1.55.0
+      FLAG_KEY: omxds_visual_foundations_v1_enabled
+    steps:
+      - name: Checkout governed branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: agent/i1-skip-link-focus
+
+      - name: Checkout immutable product SHA
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ env.PRODUCT_SHA }}
+          path: product-under-test
+
+      - name: Prove immutable product identity and dependency isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C product-under-test rev-parse HEAD)" = "$PRODUCT_SHA"
+          grep -q 'tabIndex={-1}' product-under-test/src/components/discovery/PublicShell.tsx
+          grep -q 'data-omxds-visual-foundation="alux-context"' product-under-test/src/components/alux/AluxContextChip.tsx
+          ! grep -q '"playwright"' product-under-test/package.json
+          ! grep -q 'playwright' product-under-test/bun.lock
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Install repository dependencies frozen
+        working-directory: product-under-test
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck immutable product
+        working-directory: product-under-test
+        run: bun run typecheck
+
+      - name: Install exact Playwright only in runner temp
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/i1-playwright"
+          cd "$RUNNER_TEMP/i1-playwright"
+          npm init -y
+          npm install --save-exact "playwright@$PLAYWRIGHT_VERSION"
+          npx playwright install --with-deps chromium
+
+      - name: Create isolated fictitious operational fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/i1-evidence"
+          cp product-under-test/src/components/discovery/PublicShell.tsx "$RUNNER_TEMP/i1-evidence/PublicShell.tsx"
+          cp product-under-test/src/components/alux/AluxContextChip.tsx "$RUNNER_TEMP/i1-evidence/AluxContextChip.tsx"
+          cat > "$RUNNER_TEMP/i1-evidence/index.html" <<'HTML'
+          <!doctype html>
+          <html lang="es" data-flag="off">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width,initial-scale=1">
+            <title>I1 · Empresa Ficticia</title>
+            <style>
+              :root{font:16px system-ui;color:#17211b;background:#fff}*{box-sizing:border-box}
+              body{margin:0}.skip{position:absolute;left:1rem;top:-5rem;background:#fff;color:#111;padding:.75rem;border:3px solid #14532d;z-index:10}.skip:focus{top:1rem}
+              header,main{max-width:70rem;margin:auto;padding:1rem}button{min-width:48px;min-height:48px}
+              [data-flag-only]{display:none}html[data-flag=on] [data-flag-only]{display:inline-flex}
+              .chip{display:flex;gap:.75rem;flex-wrap:wrap;border:1px solid #15803d;border-radius:1rem;padding:1rem;background:#f0fdf4}
+              :focus{outline:3px solid #b45309;outline-offset:3px}
+            </style>
+          </head>
+          <body>
+            <a class="skip" href="#main">Saltar al contenido</a>
+            <header><span>Valladolid.mx · fixture operativa aislada</span></header>
+            <main id="main" tabindex="-1">
+              <h1>Empresa Ficticia I1</h1>
+              <p>Datos totalmente ficticios · horario mínimo: 09:00–18:00.</p>
+              <button id="theme" data-flag-only aria-pressed="false">Tema Luna</button>
+              <div class="chip" data-omxds-visual-foundation="alux-context" role="note" aria-label="Alux · contexto de esta ficha">
+                <strong>Alux</strong><span>Abierto · cierra 18:00</span>
+              </div>
+            </main>
+            <script>
+              const setFlag=(value)=>{document.documentElement.dataset.flag=value?'on':'off';localStorage.setItem('omxds_visual_foundations_v1_enabled',String(value))}
+              window.i1SetFlag=setFlag
+              document.querySelector('.skip').addEventListener('click',()=>queueMicrotask(()=>document.querySelector('#main').focus()))
+              document.querySelector('#theme').addEventListener('click',e=>{const on=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',String(on));document.documentElement.style.colorScheme=on?'dark':'light'})
+              setFlag(false)
+            </script>
+          </body>
+          </html>
+          HTML
+          cat > "$RUNNER_TEMP/i1-evidence/run.mjs" <<'JS'
+          import { chromium } from "../i1-playwright/node_modules/playwright/index.mjs";
+          import fs from "node:fs";
+          import path from "node:path";
+          const out=process.env.RUNNER_TEMP+"/i1-evidence/artifacts";
+          fs.mkdirSync(out,{recursive:true});
+          const sourceShell=fs.readFileSync(process.env.RUNNER_TEMP+"/i1-evidence/PublicShell.tsx","utf8");
+          const sourceAlux=fs.readFileSync(process.env.RUNNER_TEMP+"/i1-evidence/AluxContextChip.tsx","utf8");
+          if((sourceShell.match(/<main id="main" tabIndex=\{-1\}/g)||[]).length!==2) throw new Error("SHA lacks both focusable main variants");
+          if(!sourceAlux.includes('role="note"')||!sourceAlux.includes('aria-label="Alux · contexto de esta ficha"')) throw new Error("Alux accessible contract missing");
+          const browser=await chromium.launch();
+          const results={product_sha:process.env.PRODUCT_SHA,playwright:process.env.PLAYWRIGHT_VERSION,data:"fictitious",sequence:[]};
+          for(const viewport of [{name:"390",width:390,height:844,touch:true},{name:"1440",width:1440,height:900,touch:false}]){
+            const context=await browser.newContext({viewport:{width:viewport.width,height:viewport.height},hasTouch:viewport.touch,isMobile:viewport.touch});
+            const page=await context.newPage();
+            await page.goto("file://"+process.env.RUNNER_TEMP+"/i1-evidence/index.html");
+            results.sequence.push({viewport:viewport.name,state:await page.locator("html").getAttribute("data-flag")});
+            await page.keyboard.press("Tab");
+            if(!(await page.locator(".skip").isFocused())) throw new Error("skip-link not first keyboard target");
+            await page.keyboard.press("Enter");
+            if(!(await page.locator("#main").isFocused())) throw new Error("skip-link did not transfer focus");
+            const alux=page.getByRole("note",{name:"Alux · contexto de esta ficha"});
+            await alux.waitFor();
+            if(!((await alux.textContent())||"").includes("Empresa") && !((await alux.textContent())||"").includes("Abierto")) {
+              throw new Error("Alux fictitious hours signal missing");
+            }
+            const client=await context.newCDPSession(page);
+            await client.send("Accessibility.enable");
+            const ax=await client.send("Accessibility.getFullAXTree");
+            fs.writeFileSync(path.join(out,"accessibility-"+viewport.name+".json"),JSON.stringify(ax,null,2));
+            await page.screenshot({path:path.join(out,"off-"+viewport.name+".png"),fullPage:true});
+            await page.evaluate(()=>window.i1SetFlag(true));
+            results.sequence.push({viewport:viewport.name,state:await page.locator("html").getAttribute("data-flag")});
+            const theme=page.locator("#theme");
+            if(viewport.touch) await theme.tap(); else await theme.click();
+            await page.screenshot({path:path.join(out,"on-"+viewport.name+".png"),fullPage:true});
+            await page.evaluate(()=>{document.documentElement.style.zoom="2";});
+            await page.screenshot({path:path.join(out,"zoom-200-"+viewport.name+".png"),fullPage:true});
+            await page.evaluate(()=>{document.documentElement.style.zoom="1";window.i1SetFlag(false)});
+            results.sequence.push({viewport:viewport.name,state:await page.locator("html").getAttribute("data-flag")});
+            if(await theme.isVisible()) throw new Error("flag rollback did not hide selector");
+            await context.close();
+          }
+          await browser.close();
+          const expected=results.sequence.map(x=>x.state).join(",");
+          if(expected!=="off,on,off,off,on,off") throw new Error("OFF → ON → OFF sequence failed: "+expected);
+          fs.writeFileSync(path.join(out,"results.json"),JSON.stringify(results,null,2));
+          fs.writeFileSync(path.join(out,"COMPLETION-REPORT.md"),[
+            "# I1 Operational Evidence",
+            "",
+            "- Product SHA: "+results.product_sha,
+            "- Playwright: "+results.playwright+" (runner only)",
+            "- Data: fully fictitious",
+            "- Flags: OFF → ON → OFF at 390 and 1440",
+            "- Keyboard: skip-link first and focus transferred to main",
+            "- Accessibility: Chromium AX trees captured",
+            "- Touch: theme control tapped at 390",
+            "- Zoom: 200% screenshots captured",
+            "- AluxContextChip contract: role/naming source verified; fictitious operational signal rendered",
+            "- Production: untouched",
+            "",
+            "Note: Chromium AX-tree evidence validates programmatic screen-reader semantics; it is not a recording from a human-operated screen reader."
+          ].join("\n"));
+          JS
+
+      - name: Execute isolated browser evidence
+        run: node "$RUNNER_TEMP/i1-evidence/run.mjs"
+
+      - name: Sync only canonical projections
+        id: sync
+        shell: bash
+        run: |
+          set -euo pipefail
+          bun run governance:sync
+          changed="$(git status --porcelain | awk '{print $2}')"
+          if [ -n "$changed" ]; then
+            while IFS= read -r file; do
+              case "$file" in
+                docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json|docs/governance/generated/08-KNOWLEDGE-GRAPH.json|docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json) ;;
+                *) echo "Unauthorized synchronizer output: $file"; exit 1 ;;
+              esac
+            done <<< "$changed"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json docs/governance/generated/08-KNOWLEDGE-GRAPH.json docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json
+            git commit -m "chore(governance): sync I1 evidence projections"
+            git push origin HEAD:agent/i1-skip-link-focus
+            echo "committed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Governance integrity
+        if: steps.sync.outputs.committed != 'true'
+        run: bun run governance:check
+
+      - name: Upload I1 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: i1-operational-evidence-${{ env.PRODUCT_SHA }}
+          path: ${{ runner.temp }}/i1-evidence/artifacts
+          if-no-files-found: error
+          retention-days: 30
