@@ -214,3 +214,4 @@ jobs:
           path: ${{ runner.temp }}/i1-evidence/artifacts
           if-no-files-found: error
           retention-days: 30
+# Canonical projections synchronized by the governed runner.
