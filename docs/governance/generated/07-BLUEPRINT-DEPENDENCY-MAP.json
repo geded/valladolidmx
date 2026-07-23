@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.15",
+    "version": "0.16",
     "state": "Approved",
     "main_commit": "LOCAL_RECONCILIATION_2026-07-22",
     "blob": "LOCAL_RECONCILIATION_2026-07-22",
@@ -6633,6 +6633,34 @@
       "owner": "D04 · content-experience",
       "state": "Approved",
       "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:scripts/governance/lib/product-authorization.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/lib/product-authorization.mjs"
+    },
+    {
+      "id": "ART:scripts/governance/validate-product-authorization.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/validate-product-authorization.mjs"
+    },
+    {
+      "id": "ART:scripts/governance/test-product-authorization.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/test-product-authorization.mjs"
+    },
+    {
+      "id": "ART:scripts/governance/schemas/product-authorization.schema.json",
+      "type": "artifact",
+      "path": "scripts/governance/schemas/product-authorization.schema.json"
     }
   ],
   "edges": [
@@ -16759,6 +16787,60 @@
       "destination": "DOC:docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
       "evidence": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/20.00-GOVERNANCE-AUTOMATION-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/lib/product-authorization.mjs:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "origin": "ART:scripts/governance/lib/product-authorization.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "evidence": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/validate-product-authorization.mjs:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "origin": "ART:scripts/governance/validate-product-authorization.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "evidence": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/test-product-authorization.mjs:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "origin": "ART:scripts/governance/test-product-authorization.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "evidence": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/schemas/product-authorization.schema.json:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "origin": "ART:scripts/governance/schemas/product-authorization.schema.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "evidence": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:.github/workflows/governance-integrity.yml:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "origin": "ART:.github/workflows/governance-integrity.yml",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "evidence": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "evidence": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
       "verified_at": "2026-07-22"
     }
   ],

@@ -33,6 +33,14 @@ jobs:
         if: github.event_name == 'pull_request'
         run: bun scripts/governance/validate-governance-integrity.mjs --base=${{ github.event.pull_request.base.sha }}
 
+      - name: Enforce product change authorization
+        if: github.event_name == 'pull_request'
+        run: bun scripts/governance/validate-product-authorization.mjs --base=${{ github.event.pull_request.base.sha }}
+
       - name: Validate inventory on main
         if: github.event_name == 'push'
         run: bun scripts/governance/validate-governance-integrity.mjs
+
+      - name: Validate product authorization manifests on main
+        if: github.event_name == 'push'
+        run: bun scripts/governance/validate-product-authorization.mjs

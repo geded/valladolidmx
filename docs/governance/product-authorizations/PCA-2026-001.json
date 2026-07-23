@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-001",
+  "title": "Construcción de Product Change Authorization Gate v1",
+  "status": "Approved",
+  "branch": "governance/product-change-authorization-gate-v1",
+  "blueprint": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+  "founder_authority": "Founder Directive 2026-07-22 · Registrar y construir el Product Change Authorization Gate v1 con permisos explícitos por operación y ruta, sin inferir autorización.",
+  "permissions": [
+    { "operation": "modify", "path": "package.json" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun run governance:product-test",
+    "bun run governance:check"
+  ]
+}
