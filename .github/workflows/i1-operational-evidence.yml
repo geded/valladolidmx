@@ -203,7 +203,6 @@ jobs:
           fi
 
       - name: Governance integrity
-        if: steps.sync.outputs.committed != 'true'
         run: bun run governance:check
 
       - name: Upload I1 evidence
