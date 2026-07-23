@@ -5,7 +5,7 @@
   "status": "Approved",
   "branch": "feature/omxds-i1-shared-visual-foundations-v1",
   "blueprint": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
-  "founder_authority": "Founder Directive 2026-07-22 · Implementar exclusivamente OMXDS V1 I1 Shared Visual Foundations conforme a 18.24 y 18.25; tema Sol/Luna, tokens y contraste WCAG 2.2 AA, selector accesible, skip-link, helper America/Merida, Institutional Badges fail-closed, adaptación visual mínima de Alux, flag OFF y harness I1; sin rutas, dependencias, schema, RLS, I2, I3, I4, Premium, Zazil Tunich, comercio ni producción.",
+  "founder_authority": "Founder Directive 2026-07-22 · Implementar exclusivamente OMXDS V1 I1 Shared Visual Foundations conforme a 18.24 y 18.25; tema Sol/Luna, tokens y contraste WCAG 2.2 AA, selector accesible, skip-link, helper America/Merida, Institutional Badges fail-closed, adaptación visual mínima de Alux, flag OFF y harness I1; sin rutas, dependencias, schema, RLS, I2, I3, I4, Premium, Zazil Tunich, comercio ni producción. Founder Directive 2026-07-22 · Corrección de trazabilidad autorizada exclusivamente en docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md, docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json, docs/governance/generated/08-KNOWLEDGE-GRAPH.json, docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json y este manifiesto; no son permisos de producto.",
   "permissions": [
     { "operation": "modify", "path": "src/styles.css" },
     { "operation": "modify", "path": "src/routes/__root.tsx" },

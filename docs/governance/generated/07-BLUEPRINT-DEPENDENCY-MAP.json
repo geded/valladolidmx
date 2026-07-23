@@ -6661,6 +6661,56 @@
       "id": "ART:scripts/governance/schemas/product-authorization.schema.json",
       "type": "artifact",
       "path": "scripts/governance/schemas/product-authorization.schema.json"
+    },
+    {
+      "id": "ART:scripts/omxds/i1/contrast.mjs",
+      "type": "test",
+      "path": "scripts/omxds/i1/contrast.mjs"
+    },
+    {
+      "id": "ART:scripts/omxds/i1/institutional-badges.test.ts",
+      "type": "test",
+      "path": "scripts/omxds/i1/institutional-badges.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i1/merida.test.ts",
+      "type": "test",
+      "path": "scripts/omxds/i1/merida.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i1/theme.test.ts",
+      "type": "test",
+      "path": "scripts/omxds/i1/theme.test.ts"
+    },
+    {
+      "id": "ART:src/components/ui/SkipLink.tsx",
+      "type": "component",
+      "path": "src/components/ui/SkipLink.tsx"
+    },
+    {
+      "id": "ART:src/components/ui/ThemeToggle.tsx",
+      "type": "component",
+      "path": "src/components/ui/ThemeToggle.tsx"
+    },
+    {
+      "id": "ART:src/lib/omxds/visual-foundations-flag.server.ts",
+      "type": "module",
+      "path": "src/lib/omxds/visual-foundations-flag.server.ts"
+    },
+    {
+      "id": "ART:src/lib/theme/theme.ts",
+      "type": "module",
+      "path": "src/lib/theme/theme.ts"
+    },
+    {
+      "id": "ART:src/lib/time/merida.ts",
+      "type": "module",
+      "path": "src/lib/time/merida.ts"
+    },
+    {
+      "id": "ART:supabase/migrations/20260723030000_omxds_visual_foundations_v1_flag.sql",
+      "type": "migration",
+      "path": "supabase/migrations/20260723030000_omxds_visual_foundations_v1_flag.sql"
     }
   ],
   "edges": [
@@ -16841,6 +16891,96 @@
       "destination": "DOC:docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
       "evidence": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md § Implementación",
       "source_row": "docs/blueprint/20.01-PRODUCT-CHANGE-AUTHORIZATION-GATE-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "PCA-2026-002:IMPLEMENTS:scripts/omxds/i1/contrast.mjs",
+      "origin": "ART:scripts/omxds/i1/contrast.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § 15. Evidencia gobernada de implementación I1",
+      "source_row": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "PCA-2026-002:IMPLEMENTS:scripts/omxds/i1/institutional-badges.test.ts",
+      "origin": "ART:scripts/omxds/i1/institutional-badges.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § 15. Evidencia gobernada de implementación I1",
+      "source_row": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "PCA-2026-002:IMPLEMENTS:scripts/omxds/i1/merida.test.ts",
+      "origin": "ART:scripts/omxds/i1/merida.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § 15. Evidencia gobernada de implementación I1",
+      "source_row": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "PCA-2026-002:IMPLEMENTS:scripts/omxds/i1/theme.test.ts",
+      "origin": "ART:scripts/omxds/i1/theme.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § 15. Evidencia gobernada de implementación I1",
+      "source_row": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "PCA-2026-002:IMPLEMENTS:src/components/ui/SkipLink.tsx",
+      "origin": "ART:src/components/ui/SkipLink.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § 15. Evidencia gobernada de implementación I1",
+      "source_row": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "PCA-2026-002:IMPLEMENTS:src/components/ui/ThemeToggle.tsx",
+      "origin": "ART:src/components/ui/ThemeToggle.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § 15. Evidencia gobernada de implementación I1",
+      "source_row": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "PCA-2026-002:IMPLEMENTS:src/lib/omxds/visual-foundations-flag.server.ts",
+      "origin": "ART:src/lib/omxds/visual-foundations-flag.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § 15. Evidencia gobernada de implementación I1",
+      "source_row": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "PCA-2026-002:IMPLEMENTS:src/lib/theme/theme.ts",
+      "origin": "ART:src/lib/theme/theme.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § 15. Evidencia gobernada de implementación I1",
+      "source_row": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "PCA-2026-002:IMPLEMENTS:src/lib/time/merida.ts",
+      "origin": "ART:src/lib/time/merida.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § 15. Evidencia gobernada de implementación I1",
+      "source_row": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-22"
+    },
+    {
+      "id": "PCA-2026-002:IMPLEMENTS:supabase/migrations/20260723030000_omxds_visual_foundations_v1_flag.sql",
+      "origin": "ART:supabase/migrations/20260723030000_omxds_visual_foundations_v1_flag.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § 15. Evidencia gobernada de implementación I1",
+      "source_row": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
       "verified_at": "2026-07-22"
     }
   ],
