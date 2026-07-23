@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-002",
+  "title": "OMXDS V1 · I1 Shared Visual Foundations",
+  "status": "Approved",
+  "branch": "feature/omxds-i1-shared-visual-foundations-v1",
+  "blueprint": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-07-22 · Implementar exclusivamente OMXDS V1 I1 Shared Visual Foundations conforme a 18.24 y 18.25; tema Sol/Luna, tokens y contraste WCAG 2.2 AA, selector accesible, skip-link, helper America/Merida, Institutional Badges fail-closed, adaptación visual mínima de Alux, flag OFF y harness I1; sin rutas, dependencias, schema, RLS, I2, I3, I4, Premium, Zazil Tunich, comercio ni producción.",
+  "permissions": [
+    { "operation": "modify", "path": "src/styles.css" },
+    { "operation": "modify", "path": "src/routes/__root.tsx" },
+    { "operation": "modify", "path": "src/components/discovery/PublicShell.tsx" },
+    { "operation": "modify", "path": "src/components/ui/badge.tsx" },
+    { "operation": "modify", "path": "src/components/ui/skeleton.tsx" },
+    { "operation": "modify", "path": "src/components/alux/AluxContextChip.tsx" },
+    { "operation": "modify", "path": "src/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadges.tsx" },
+    { "operation": "modify", "path": "src/lib/experience-builder/blocks/experience-institutional-badges/contract.ts" },
+    { "operation": "modify", "path": "src/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry.ts" },
+    { "operation": "modify", "path": "package.json" },
+    { "operation": "create", "path": "src/lib/theme/theme.ts" },
+    { "operation": "create", "path": "src/components/ui/ThemeToggle.tsx" },
+    { "operation": "create", "path": "src/lib/time/merida.ts" },
+    { "operation": "create", "path": "src/components/ui/SkipLink.tsx" },
+    { "operation": "create", "path": "src/lib/omxds/visual-foundations-flag.server.ts" },
+    { "operation": "create", "path": "supabase/migrations/20260723030000_omxds_visual_foundations_v1_flag.sql" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_foundations_v1_enabled=false"
+  ],
+  "required_tests": [
+    "bun --version",
+    "bun install --frozen-lockfile",
+    "bun run typecheck",
+    "bun run build",
+    "bun run governance:product-test",
+    "bun run governance:check",
+    "bun run test:i1",
+    "bun run validate:i1"
+  ]
+}
