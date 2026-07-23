@@ -186,7 +186,7 @@ jobs:
         run: |
           set -euo pipefail
           bun run governance:sync
-          changed="$(git status --porcelain | awk '{print $2}')"
+          changed="$(git status --porcelain --untracked-files=no | awk '{print $2}')"
           if [ -n "$changed" ]; then
             while IFS= read -r file; do
               case "$file" in
