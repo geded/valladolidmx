@@ -106,7 +106,7 @@ function PublicShellBody({
 }: PublicShellBodyProps) {
   if (variant === "minimal" || variant === "hero") {
     return (
-      <main id="main" className={cn("pb-24", className)}>
+      <main id="main" tabIndex={-1} className={cn("pb-24", className)}>
         {children}
       </main>
     );
@@ -116,7 +116,7 @@ function PublicShellBody({
   const hasCrumbs = useContextCrumbs || Boolean(crumbs && crumbs.length > 0);
 
   return (
-    <main id="main" className={cn("pb-24 pt-8 md:pt-12", className)}>
+    <main id="main" tabIndex={-1} className={cn("pb-24 pt-8 md:pt-12", className)}>
       <Container>
         {hasCrumbs ? (
           <BreadcrumbTerritorial

@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-I1-SKIP-LINK-FOCUS",
+  "title": "I1 skip-link focus correction",
+  "status": "Approved",
+  "branch": "agent/i1-skip-link-focus",
+  "blueprint": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Decision 2026-07-23 · Autorizada exclusivamente la corrección del foco del skip-link mediante modify sobre src/components/discovery/PublicShell.tsx en el PR #34.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/discovery/PublicShell.tsx"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun scripts/governance/validate-product-authorization.mjs --base=1ada9d0b8611a8bac84335753e04c2f7a34257eb"
+  ]
+}
