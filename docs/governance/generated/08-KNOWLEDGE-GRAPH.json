@@ -9566,6 +9566,65 @@
       "path": "scripts/omxds/i1/operational-evidence.mjs",
       "source": "scripts/omxds/i1/operational-evidence.mjs",
       "evidence": "scripts/omxds/i1/operational-evidence.mjs"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md"
+    },
+    {
+      "id": "ART:scripts/omxds/i2/destination-card.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/i2/destination-card.contract.test.ts",
+      "source": "scripts/omxds/i2/destination-card.contract.test.ts",
+      "evidence": "scripts/omxds/i2/destination-card.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i2/destination-card.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/i2/destination-card.evidence.mjs",
+      "source": "scripts/omxds/i2/destination-card.evidence.mjs",
+      "evidence": "scripts/omxds/i2/destination-card.evidence.mjs"
+    },
+    {
+      "id": "ART:src/lib/omxds/card-contracts-flag.server.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/card-contracts-flag.server.ts",
+      "source": "src/lib/omxds/card-contracts-flag.server.ts",
+      "evidence": "src/lib/omxds/card-contracts-flag.server.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/cards/card-contract.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/cards/card-contract.ts",
+      "source": "src/lib/omxds/cards/card-contract.ts",
+      "evidence": "src/lib/omxds/cards/card-contract.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/cards/card-states.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/cards/card-states.ts",
+      "source": "src/lib/omxds/cards/card-states.ts",
+      "evidence": "src/lib/omxds/cards/card-states.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/cards/destination-card.contract.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/cards/destination-card.contract.ts",
+      "source": "src/lib/omxds/cards/destination-card.contract.ts",
+      "evidence": "src/lib/omxds/cards/destination-card.contract.ts"
+    },
+    {
+      "id": "ART:supabase/migrations/20260723093000_omxds_visual_v1_contracts_flag.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260723093000_omxds_visual_v1_contracts_flag.sql",
+      "source": "supabase/migrations/20260723093000_omxds_visual_v1_contracts_flag.sql",
+      "evidence": "supabase/migrations/20260723093000_omxds_visual_v1_contracts_flag.sql"
     }
   ],
   "edges": [
@@ -25983,6 +26042,95 @@
       "evidence": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/18.25-OMXDS-V1-I1-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
       "verified_at": "2026-07-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-23",
+      "origin": "DOC:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.17 · docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i2/destination-card.contract.test.ts:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i2/destination-card.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-23",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i2/destination-card.evidence.mjs:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i2/destination-card.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-23",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/omxds/card-contracts-flag.server.ts:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/card-contracts-flag.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-23",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/omxds/cards/card-contract.ts:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/card-contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-23",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/omxds/cards/card-states.ts:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/card-states.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-23",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/omxds/cards/destination-card.contract.ts:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/destination-card.contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-23",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260723093000_omxds_visual_v1_contracts_flag.sql:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:supabase/migrations/20260723093000_omxds_visual_v1_contracts_flag.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-23",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/cards/DestinoCard.tsx:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/components/cards/DestinoCard.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-07-23",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     }
   ],

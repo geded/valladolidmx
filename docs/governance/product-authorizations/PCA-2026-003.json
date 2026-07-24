@@ -1,0 +1,30 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-003",
+  "title": "OMXDS V1 · I2-A DestinationCard Contract",
+  "status": "Approved",
+  "branch": "feature/omxds-i2a-destination-card-contract-v1",
+  "blueprint": "docs/blueprint/18.26-OMXDS-V1-I2A-DESTINATION-CARD-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-07-23 · Implementar exclusivamente I2-A DestinationCard Contract desde main@de093558760dda89fc4a2e177cfd6134d492a291, con fixtures ficticios, flag OFF, G1 y rollback; sin datos reales, producción, rutas, dependencias, schema adicional, superficies completas, Builder, Premium, Zazil Tunich, BusinessCard, otras familias ni auto-merge.",
+  "permissions": [
+    { "operation": "create", "path": "src/lib/omxds/cards/card-contract.ts" },
+    { "operation": "create", "path": "src/lib/omxds/cards/destination-card.contract.ts" },
+    { "operation": "create", "path": "src/lib/omxds/cards/card-states.ts" },
+    { "operation": "create", "path": "src/lib/omxds/card-contracts-flag.server.ts" },
+    { "operation": "modify", "path": "src/components/experience-builder/tourism-card/TourismCard.tsx" },
+    { "operation": "modify", "path": "src/components/cards/DestinoCard.tsx" },
+    { "operation": "modify", "path": "src/lib/discovery/cards-registry.ts" },
+    { "operation": "modify", "path": "package.json" },
+    { "operation": "create", "path": "supabase/migrations/20260723093000_omxds_visual_v1_contracts_flag.sql" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run typecheck",
+    "bun run build",
+    "bun run test:i2a",
+    "bun run validate:i2a",
+    "bun run governance:check"
+  ]
+}

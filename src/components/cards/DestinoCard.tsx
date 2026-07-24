@@ -13,6 +13,11 @@ import {
   TourismCard,
   type TourismCardVM,
 } from "@/components/experience-builder/tourism-card/TourismCard";
+import type { OmxdsCardVariant } from "@/lib/omxds/cards/card-contract";
+import {
+  validateDestinationCardContract,
+  type DestinationCardContract,
+} from "@/lib/omxds/cards/destination-card.contract";
 
 // Multi-región ready: añadir aquí nuevas regiones cuando existan.
 const REGION_TO_HREF: Record<string, (slug: string) => string> = {
@@ -83,4 +88,34 @@ export function DestinoCard({ destination }: { destination: Destination }) {
       )}
     />
   );
+}
+
+export function toDestinationCardContract(
+  destination: Destination,
+  variant: OmxdsCardVariant = "standard",
+): DestinationCardContract | null {
+  const builder = REGION_TO_HREF[destination.region_slug];
+  const canonicalUrl = builder?.(destination.slug);
+  if (!canonicalUrl) return null;
+  const contract: DestinationCardContract = {
+    family: "destination",
+    id: `destination:${destination.id}`,
+    name: destination.name,
+    territorialType: "Destino",
+    identityPromise: destination.tagline,
+    parentTerritory: destination.region_slug,
+    canonicalUrl,
+    media: destination.image_url
+      ? {
+          url: destination.image_url,
+          alt: `${destination.name} — ${destination.tagline}`,
+          focalPoint: "center",
+        }
+      : null,
+    reasons: [...destination.highlights].slice(0, 3),
+    variant,
+    state: destination.image_url ? "ready" : "no_media",
+    actions: [{ id: "discover", label: "Descubrir destino", href: canonicalUrl }],
+  };
+  return validateDestinationCardContract(contract).valid ? contract : null;
 }
