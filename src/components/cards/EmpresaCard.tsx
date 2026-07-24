@@ -7,36 +7,32 @@
  * listado, sin fabricar variantes visuales paralelas.
  */
 import type { BusinessTeaser } from "@/types/entities";
-import { resolveCanonicalPath } from "@/lib/navigation";
 import { TrustBadge } from "@/components/reviews/TrustBadge";
+import {
+  resolveBusinessCanonicalUrl,
+  toBusinessCardContract,
+} from "@/lib/omxds/cards/business-card.adapter";
 import {
   TourismCard,
   type TourismCardVM,
 } from "@/components/experience-builder/tourism-card/TourismCard";
 
 function toVM(business: BusinessTeaser): TourismCardVM {
-  const href =
-    business.destination_slug && business.category_slug
-      ? resolveCanonicalPath({
-          kind: "business",
-          slug: business.slug,
-          category: business.category_slug,
-          destination: business.destination_slug,
-        })
-      : `/marketplace/${business.slug}`;
+  const contract = toBusinessCardContract(business);
+  const href = contract?.canonicalUrl ?? resolveBusinessCanonicalUrl(business);
   return {
     id: `business:${business.id}`,
     entityKind: "business",
-    eyebrow: business.category_slug ?? null,
-    name: business.name,
+    eyebrow: contract?.category ?? business.category_slug ?? null,
+    name: contract?.name ?? business.name,
     href,
-    tagline: business.tagline ?? null,
+    tagline: contract?.summary ?? business.tagline ?? null,
     businessName: null,
     mediaUrl: null,
     mediaAlt: business.name,
     rating: null,
-    location: business.destination_slug
-      ? { label: business.destination_slug, distanceKm: null }
+    location: (contract?.territory ?? business.destination_slug)
+      ? { label: contract?.territory ?? business.destination_slug, distanceKm: null }
       : null,
     territorialContext: null,
     highlights: [],

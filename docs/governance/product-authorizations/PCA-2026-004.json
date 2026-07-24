@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-004",
+  "title": "OMXDS V1 · I2-B BusinessCard Contract",
+  "status": "Approved",
+  "branch": "feature/omxds-i2b-business-card-contract-v1",
+  "blueprint": "docs/blueprint/18.28-OMXDS-V1-I2B-BUSINESSCARD-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-07-24 · Implementar exclusivamente I2-B BusinessCard sobre main@58556a48ac7e0d37def8215d27e4af3baf096661 conforme a 18.28, con el flag omxds_visual_v1_contracts_enabled OFF y fail-closed, validación completa y PR borrador; sin merge, producción, datos reales, Premium, rutas nuevas ni otras familias.",
+  "permissions": [
+    { "operation": "modify", "path": "src/lib/omxds/cards/card-contract.ts" },
+    { "operation": "modify", "path": "src/components/cards/EmpresaCard.tsx" },
+    { "operation": "modify", "path": "package.json" },
+    { "operation": "create", "path": "src/lib/omxds/cards/business-card.contract.ts" },
+    { "operation": "create", "path": "src/lib/omxds/cards/business-card.adapter.ts" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run test:i2a",
+    "bun run validate:i2a",
+    "bun run test:i2b",
+    "bun run validate:i2b",
+    "bun run typecheck",
+    "bun run build",
+    "bun run governance:check",
+    "bun run governance:product-check"
+  ]
+}
