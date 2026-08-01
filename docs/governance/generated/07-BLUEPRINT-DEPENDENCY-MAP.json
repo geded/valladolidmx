@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.18",
+    "version": "0.19",
     "state": "Approved",
     "main_commit": "LOCAL_RECONCILIATION_2026-07-22",
     "blob": "LOCAL_RECONCILIATION_2026-07-22",
@@ -6805,6 +6805,87 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-004.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-004.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.30-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-SCOPE-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.30-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-SCOPE-REPORT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/omxds/cards/experience-card.contract.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/cards/experience-card.contract.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/cards/experience-card.adapter.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/cards/experience-card.adapter.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/cards/hotel-card.contract.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/cards/hotel-card.contract.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/cards/hotel-card.adapter.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/cards/hotel-card.adapter.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/cards/restaurant-card.contract.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/cards/restaurant-card.contract.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/cards/restaurant-card.adapter.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/cards/restaurant-card.adapter.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/cards/event-card.contract.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/cards/event-card.contract.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/cards/event-card.adapter.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/cards/event-card.adapter.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/cards/product-card.contract.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/cards/product-card.contract.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/cards/product-card.adapter.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/cards/product-card.adapter.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i2/remaining-card-families.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/i2/remaining-card-families.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i2/remaining-card-families.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/i2/remaining-card-families.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-005.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-005.json"
     }
   ],
   "edges": [
@@ -17238,6 +17319,141 @@
       "evidence": "docs/blueprint/18.28-OMXDS-V1-I2B-BUSINESSCARD-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/18.28-OMXDS-V1-I2B-BUSINESSCARD-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
       "verified_at": "2026-07-24"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/cards/card-contract.ts:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/card-contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/cards/experience-card.contract.ts:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/experience-card.contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/cards/experience-card.adapter.ts:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/experience-card.adapter.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/cards/hotel-card.contract.ts:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/hotel-card.contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/cards/hotel-card.adapter.ts:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/hotel-card.adapter.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/cards/restaurant-card.contract.ts:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/restaurant-card.contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/cards/restaurant-card.adapter.ts:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/restaurant-card.adapter.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/cards/event-card.contract.ts:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/event-card.contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/cards/event-card.adapter.ts:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/event-card.adapter.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/cards/product-card.contract.ts:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/product-card.contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/cards/product-card.adapter.ts:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/cards/product-card.adapter.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i2/remaining-card-families.contract.test.ts:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i2/remaining-card-families.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i2/remaining-card-families.evidence.mjs:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i2/remaining-card-families.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-005.json:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-005.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
     }
   ],
   "critical_chain_coverage": [

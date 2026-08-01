@@ -1,13 +1,15 @@
-export const OMXDS_CARD_VARIANTS = [
-  "compact",
-  "standard",
-  "editorial",
-  "featured",
-] as const;
+export const OMXDS_CARD_VARIANTS = ["compact", "standard", "editorial", "featured"] as const;
 
 export type OmxdsCardVariant = (typeof OMXDS_CARD_VARIANTS)[number];
 export type OmxdsCardTheme = "sol" | "luna";
-export type OmxdsCardFamily = "destination" | "business";
+export type OmxdsCardFamily =
+  | "destination"
+  | "business"
+  | "experience"
+  | "hotel"
+  | "restaurant"
+  | "event"
+  | "product";
 
 export interface CardActionContract {
   id: "save" | "add_to_trip" | "discover";
