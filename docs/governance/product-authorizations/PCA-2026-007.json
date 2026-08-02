@@ -1,0 +1,32 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-007",
+  "title": "OMXDS V1 · I3-0 Shared Surface Contract",
+  "status": "Approved",
+  "branch": "feature/omxds-i3-0-shared-surface-contract-v1",
+  "blueprint": "docs/blueprint/18.37-OMXDS-V1-I3-0-SHARED-SURFACE-CONTRACT-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-02 · Implementar exclusivamente I3-0 sobre main@799cf248, con trece archivos exactos, fixtures ficticios, flag existente OFF/fail-closed y publicación en PR borrador sólo si todos los controles quedan en PASS; sin merge, producción ni lotes I3 posteriores.",
+  "permissions": [
+    { "operation": "create", "path": "src/lib/omxds/surfaces/surface-contract.ts" },
+    { "operation": "create", "path": "src/lib/omxds/surfaces/surface-state.ts" },
+    { "operation": "create", "path": "src/lib/omxds/surfaces/surface-actions.ts" },
+    { "operation": "create", "path": "src/lib/omxds/surfaces/surface-contracts-flag.server.ts" },
+    { "operation": "modify", "path": "package.json" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run lint",
+    "bun run validate:i1",
+    "bun run validate:i2a",
+    "bun run validate:i2b",
+    "bun run validate:i2c",
+    "bun run test:i3:0",
+    "bun run validate:i3:0",
+    "bun run typecheck",
+    "bun run build",
+    "bun run governance:check",
+    "bun run governance:product-check"
+  ]
+}
