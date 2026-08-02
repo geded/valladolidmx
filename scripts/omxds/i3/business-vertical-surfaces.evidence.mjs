@@ -1,0 +1,129 @@
+import { strict as assert } from "node:assert";
+import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+
+const base = "bc04fc43008c506c967ee2034a724533f254e7d6";
+const routePath = "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx";
+const destinationRoutePath = "src/routes/oriente-maya/$destino.index.tsx";
+const allowed = new Set([
+  "docs/blueprint/18.39-OMXDS-V1-I3-B-BUSINESS-VERTICAL-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+  "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+  "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
+  "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
+  "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
+  "docs/governance/product-authorizations/PCA-2026-009.json",
+  "package.json",
+  "scripts/omxds/i3/business-vertical-surfaces.contract.test.ts",
+  "scripts/omxds/i3/business-vertical-surfaces.evidence.mjs",
+  "scripts/omxds/i3/destination-surface.evidence.mjs",
+  "scripts/omxds/i3/shared-surface.evidence.mjs",
+  "src/components/surfaces/BusinessSurface.tsx",
+  "src/lib/omxds/surfaces/business-surface.contract.ts",
+  "src/lib/omxds/surfaces/hotel-surface.adapter.ts",
+  "src/lib/omxds/surfaces/restaurant-surface.adapter.ts",
+  routePath,
+]);
+
+function gitLines(args) {
+  return execFileSync("git", args, { encoding: "utf8" }).trim().split("\n").filter(Boolean);
+}
+
+const changed = new Set([
+  ...gitLines(["diff", "--name-only", `${base}...HEAD`]),
+  ...gitLines(["diff", "--name-only", "HEAD"]),
+  ...gitLines(["ls-files", "--others", "--exclude-standard"]),
+]);
+assert.equal(changed.size, 16, `I3-B must contain exactly 16 files, found ${changed.size}`);
+for (const file of changed) assert.ok(allowed.has(file), `I3-B scope violation: ${file}`);
+for (const file of allowed) assert.ok(changed.has(file), `I3-B authorized file missing: ${file}`);
+
+const basePackage = JSON.parse(
+  execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
+);
+const currentPackage = JSON.parse(readFileSync("package.json", "utf8"));
+assert.deepEqual(currentPackage.dependencies, basePackage.dependencies);
+assert.deepEqual(currentPackage.devDependencies, basePackage.devDependencies);
+assert.equal(
+  execFileSync("git", ["diff", "--name-only", base, "--", "bun.lock"], {
+    encoding: "utf8",
+  }),
+  "",
+);
+
+const route = readFileSync(routePath, "utf8");
+assert.match(route, /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/);
+assert.match(route, /surfaceContractsEnabled/);
+assert.match(route, /BusinessSurfaceContractBoundary/);
+assert.match(route, /CompositionRenderer tree=\{composition\.snapshot\}/);
+assert.match(route, /legacy=/);
+
+const surface = readFileSync("src/components/surfaces/BusinessSurface.tsx", "utf8");
+assert.match(surface, /BusinessSurfaceContractBoundary/);
+assert.match(surface, /adaptHotelSurfaceContract/);
+assert.match(surface, /adaptRestaurantSurfaceContract/);
+assert.doesNotMatch(
+  surface,
+  /(?:function|const)\s+(?:HotelSurface|RestaurantSurface)\b|<(?:HotelSurface|RestaurantSurface)\b/,
+);
+
+const contract = readFileSync("src/lib/omxds/surfaces/business-surface.contract.ts", "utf8");
+for (const family of ["business", "hotel", "restaurant"])
+  assert.match(contract, new RegExp(`"${family}"`));
+for (const omission of ["offer", "price", "availability", "reservation", "reputation"])
+  assert.match(contract, new RegExp(`"${omission}"`));
+assert.match(contract, /id: "contact"/);
+assert.doesNotMatch(contract, /checkout|purchase|book|open_now/);
+
+const hotelAdapter = readFileSync("src/lib/omxds/surfaces/hotel-surface.adapter.ts", "utf8");
+const restaurantAdapter = readFileSync(
+  "src/lib/omxds/surfaces/restaurant-surface.adapter.ts",
+  "utf8",
+);
+for (const category of ["hotel", "hoteles", "hospedaje", "hospedajes"])
+  assert.match(hotelAdapter, new RegExp(`"${category}"`));
+for (const category of ["restaurante", "restaurantes", "cafeteria", "cafeterias"])
+  assert.match(restaurantAdapter, new RegExp(`"${category}"`));
+
+const flagConsumers = gitLines([
+  "grep",
+  "-l",
+  "surface-contracts-flag.server",
+  "--",
+  "src/routes",
+]).sort();
+assert.deepEqual(flagConsumers, [destinationRoutePath, routePath].sort());
+
+const sharedEvidence = readFileSync("scripts/omxds/i3/shared-surface.evidence.mjs", "utf8");
+assert.match(sharedEvidence, /authorizedRouteConsumers/);
+assert.doesNotMatch(sharedEvidence, /deepEqual\(flagConsumers/);
+const destinationEvidence = readFileSync(
+  "scripts/omxds/i3/destination-surface.evidence.mjs",
+  "utf8",
+);
+assert.match(destinationEvidence, /historical I3-A scope violation/);
+assert.match(destinationEvidence, /I3-A regression/);
+
+for (const forbiddenPath of [
+  "src/lib/discovery/seo.ts",
+  "src/lib/experience-builder/page-kind-registry.ts",
+  "src/lib/experience-builder/preview-registry.tsx",
+  "src/lib/experience-builder/composition-renderer.tsx",
+])
+  assert.equal(
+    execFileSync("git", ["diff", "--name-only", base, "--", forbiddenPath], {
+      encoding: "utf8",
+    }),
+    "",
+  );
+
+for (const forbiddenRoot of ["supabase", "src/integrations/supabase"])
+  assert.equal(
+    execFileSync("git", ["diff", "--name-only", base, "--", forbiddenRoot], {
+      encoding: "utf8",
+    }),
+    "",
+  );
+
+console.log(
+  "I3-B evidence: PASS (Business owner; Hotel/Restaurant adapters; PCA-authorized SSR; exact OFF legacy branch).",
+);

@@ -18,13 +18,16 @@ import {
 } from "@/lib/navigation/territorial-resolver.functions";
 import { navigationContextToDeclaration } from "@/lib/navigation";
 import { ContextEngineProvider } from "@/lib/context-engine";
-import { BusinessSurface, BusinessSurfaceProvider } from "@/components/surfaces/BusinessSurface";
+import {
+  BusinessSurface,
+  BusinessSurfaceContractBoundary,
+  BusinessSurfaceProvider,
+} from "@/components/surfaces/BusinessSurface";
+import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contracts-flag.server";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 
-export const Route = createFileRoute(
-  "/oriente-maya/$destino/$categoria/$empresa/",
-)({
+export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa/")({
   loader: async ({ params }) => {
     const resolution = await resolveTerritorialPath({
       data: {
@@ -34,7 +37,7 @@ export const Route = createFileRoute(
       },
     });
     if (resolution.reason !== "ok" || !resolution.business) throw notFound();
-    const [business, specific, template] = await Promise.all([
+    const [business, specific, template, surfaceContractsEnabled] = await Promise.all([
       getMarketplaceBusinessBySlug({ data: { slug: params.empresa } }),
       // SEO.A3.M1 · Authority Business Landing — composition-first.
       // Se resuelve primero una composición específica por slug
@@ -48,6 +51,7 @@ export const Route = createFileRoute(
       getPublishedCompositionBySlug({
         data: { slug: "__tpl_business__" },
       }).catch(() => null),
+      getOmxdsSurfaceContractsFlag().catch(() => false),
     ]);
     if (!business) throw notFound();
     // E2 · US-E2.1 — Related Collection contextual del negocio.
@@ -65,7 +69,13 @@ export const Route = createFileRoute(
       related = null;
     }
     const composition = specific ?? template ?? null;
-    return { resolution, business, related, composition };
+    return {
+      resolution,
+      business,
+      related,
+      composition,
+      surfaceContractsEnabled,
+    };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
@@ -101,8 +111,7 @@ export const Route = createFileRoute(
               ? b.primary_contact.value
               : undefined,
           email: b.primary_contact?.type === "email" ? b.primary_contact.value : undefined,
-          addressLine:
-            b.primary_location?.address_line1 ?? b.address_line1 ?? null,
+          addressLine: b.primary_location?.address_line1 ?? b.address_line1 ?? null,
           addressLocality: destName,
           latitude: b.primary_location?.latitude ?? b.latitude ?? null,
           longitude: b.primary_location?.longitude ?? b.longitude ?? null,
@@ -125,7 +134,8 @@ export const Route = createFileRoute(
 });
 
 function EmpresaTerritorialPage() {
-  const { resolution, business, related, composition } = Route.useLoaderData();
+  const { resolution, business, related, composition, surfaceContractsEnabled } =
+    Route.useLoaderData();
   const { destino } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
   // N2.2: fuente única = Navigation Contract. El adapter deriva
@@ -139,11 +149,14 @@ function EmpresaTerritorialPage() {
   return (
     <ContextEngineProvider declaration={declaration}>
       <BusinessSurfaceProvider business={business} related={related}>
-        {composition ? (
-          <CompositionRenderer tree={composition.snapshot} />
-        ) : (
-          <BusinessSurface />
-        )}
+        <BusinessSurfaceContractBoundary
+          enabled={surfaceContractsEnabled}
+          business={business}
+          related={related}
+          legacy={
+            composition ? <CompositionRenderer tree={composition.snapshot} /> : <BusinessSurface />
+          }
+        />
       </BusinessSurfaceProvider>
     </ContextEngineProvider>
   );

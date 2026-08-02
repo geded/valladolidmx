@@ -22,7 +22,8 @@
  * `BusinessSurfaceContext` (que la ruta pública popula tras cargar la
  * empresa en el loader — patrón consistente con Region/Destination).
  */
-import { createContext, useContext } from "react";
+/* eslint-disable react-refresh/only-export-components -- I3-B keeps the legacy contexts and pure category resolver in the authorized surface module. */
+import { createContext, useContext, type ReactNode } from "react";
 import { PublicShell } from "@/components/discovery";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
@@ -47,6 +48,16 @@ import {
 import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
 import { Share2 } from "lucide-react";
 import { AluxContextChip } from "@/components/alux/AluxContextChip";
+import {
+  createBusinessSurfaceContract,
+  type BusinessSurfaceContractInput,
+} from "@/lib/omxds/surfaces/business-surface.contract";
+import { adaptHotelSurfaceContract } from "@/lib/omxds/surfaces/hotel-surface.adapter";
+import { adaptRestaurantSurfaceContract } from "@/lib/omxds/surfaces/restaurant-surface.adapter";
+import {
+  isOmxdsSurfaceContract,
+  type OmxdsSurfaceContract,
+} from "@/lib/omxds/surfaces/surface-contract";
 
 /* ------------------------------------------------------------------ *
  * Contexto — poblado por la ruta pública (SSR-safe).
@@ -59,8 +70,7 @@ export const BusinessSurfaceContext = createContext<MarketplaceBusinessDetail | 
  * Se mantiene independiente para no romper consumidores existentes
  * de `BusinessSurfaceContext` (Section/Reviews/Products/…).
  */
-export const BusinessSurfaceRelatedContext =
-  createContext<BusinessRelatedDTO | null>(null);
+export const BusinessSurfaceRelatedContext = createContext<BusinessRelatedDTO | null>(null);
 
 export function BusinessSurfaceProvider({
   business,
@@ -92,17 +102,61 @@ type CategoryVariant = {
 };
 
 const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
-  hotel:        { eyebrow: "Hospedaje",   productsHeading: "Habitaciones y experiencias", productsEmpty: "Sin habitaciones publicadas." },
-  hospedaje:    { eyebrow: "Hospedaje",   productsHeading: "Habitaciones y experiencias", productsEmpty: "Sin habitaciones publicadas." },
-  restaurante:  { eyebrow: "Gastronomía", productsHeading: "Menú y reservaciones",         productsEmpty: "Sin menú publicado." },
-  cafeteria:    { eyebrow: "Gastronomía", productsHeading: "Menú",                          productsEmpty: "Sin menú publicado." },
-  cenote:       { eyebrow: "Naturaleza",  productsHeading: "Accesos y experiencias",       productsEmpty: "Sin accesos publicados." },
-  museo:        { eyebrow: "Cultura",     productsHeading: "Entradas y visitas guiadas",   productsEmpty: "Sin entradas publicadas." },
-  agencia:      { eyebrow: "Operador",    productsHeading: "Tours y paquetes",              productsEmpty: "Sin tours publicados." },
-  tour:         { eyebrow: "Experiencia", productsHeading: "Tours disponibles",             productsEmpty: "Sin tours publicados." },
-  transporte:   { eyebrow: "Transporte",  productsHeading: "Rutas y traslados",             productsEmpty: "Sin traslados publicados." },
-  tienda:       { eyebrow: "Tienda",      productsHeading: "Catálogo",                       productsEmpty: "Sin productos publicados." },
-  servicio:     { eyebrow: "Servicio",    productsHeading: "Servicios",                      productsEmpty: "Sin servicios publicados." },
+  hotel: {
+    eyebrow: "Hospedaje",
+    productsHeading: "Habitaciones y experiencias",
+    productsEmpty: "Sin habitaciones publicadas.",
+  },
+  hospedaje: {
+    eyebrow: "Hospedaje",
+    productsHeading: "Habitaciones y experiencias",
+    productsEmpty: "Sin habitaciones publicadas.",
+  },
+  restaurante: {
+    eyebrow: "Gastronomía",
+    productsHeading: "Menú y reservaciones",
+    productsEmpty: "Sin menú publicado.",
+  },
+  cafeteria: {
+    eyebrow: "Gastronomía",
+    productsHeading: "Menú",
+    productsEmpty: "Sin menú publicado.",
+  },
+  cenote: {
+    eyebrow: "Naturaleza",
+    productsHeading: "Accesos y experiencias",
+    productsEmpty: "Sin accesos publicados.",
+  },
+  museo: {
+    eyebrow: "Cultura",
+    productsHeading: "Entradas y visitas guiadas",
+    productsEmpty: "Sin entradas publicadas.",
+  },
+  agencia: {
+    eyebrow: "Operador",
+    productsHeading: "Tours y paquetes",
+    productsEmpty: "Sin tours publicados.",
+  },
+  tour: {
+    eyebrow: "Experiencia",
+    productsHeading: "Tours disponibles",
+    productsEmpty: "Sin tours publicados.",
+  },
+  transporte: {
+    eyebrow: "Transporte",
+    productsHeading: "Rutas y traslados",
+    productsEmpty: "Sin traslados publicados.",
+  },
+  tienda: {
+    eyebrow: "Tienda",
+    productsHeading: "Catálogo",
+    productsEmpty: "Sin productos publicados.",
+  },
+  servicio: {
+    eyebrow: "Servicio",
+    productsHeading: "Servicios",
+    productsEmpty: "Sin servicios publicados.",
+  },
 };
 
 export function resolveBusinessVariant(categorySlug: string): CategoryVariant {
@@ -122,9 +176,68 @@ export function resolveBusinessVariant(categorySlug: string): CategoryVariant {
 export interface BusinessSurfaceProps {
   /** Cuando falta, se lee del `BusinessSurfaceContext`. */
   business?: MarketplaceBusinessDetail | null;
+  /** I3-B · contrato validado; ausente conserva exactamente el renderer vigente. */
+  surfaceContract?: OmxdsSurfaceContract;
 }
 
-export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps = {}) {
+function businessRelatedCount(related?: BusinessRelatedDTO | null): number {
+  return (related?.sameCategory.length ?? 0) + (related?.sameDestinationOther.length ?? 0);
+}
+
+function businessToSurfaceContractInput(
+  business: MarketplaceBusinessDetail,
+  related?: BusinessRelatedDTO | null,
+): BusinessSurfaceContractInput {
+  return {
+    id: business.id,
+    slug: business.slug,
+    displayName: business.display_name,
+    destinationSlug: business.destination_slug,
+    categorySlug: business.category_slug,
+    coverUrl: business.cover_url ?? null,
+    latitude: business.primary_location?.latitude ?? null,
+    longitude: business.primary_location?.longitude ?? null,
+    verified: business.verified,
+    relatedCount: businessRelatedCount(related),
+  };
+}
+
+function resolveBusinessVerticalSurfaceContract(
+  input: BusinessSurfaceContractInput,
+): OmxdsSurfaceContract | null {
+  return (
+    adaptHotelSurfaceContract(input) ??
+    adaptRestaurantSurfaceContract(input) ??
+    createBusinessSurfaceContract(input)
+  );
+}
+
+export interface BusinessSurfaceContractBoundaryProps extends BusinessSurfaceProps {
+  enabled: boolean;
+  legacy: ReactNode;
+  related?: BusinessRelatedDTO | null;
+}
+
+export function BusinessSurfaceContractBoundary({
+  enabled,
+  legacy,
+  business,
+  related,
+}: BusinessSurfaceContractBoundaryProps) {
+  if (!enabled || !business) return legacy;
+
+  const surfaceContract = resolveBusinessVerticalSurfaceContract(
+    businessToSurfaceContractInput(business, related),
+  );
+  if (!surfaceContract) return legacy;
+
+  return <BusinessSurface business={business} surfaceContract={surfaceContract} />;
+}
+
+export function BusinessSurface({
+  business: propBusiness,
+  surfaceContract,
+}: BusinessSurfaceProps = {}) {
   const ctxBusiness = useContext(BusinessSurfaceContext);
   const b = propBusiness ?? ctxBusiness;
   const related = useContext(BusinessSurfaceRelatedContext);
@@ -135,16 +248,21 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
         title="Empresa no disponible"
         crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: "—" }]}
       >
-        <p className="text-sm text-muted-foreground">
-          Aún no publicamos esta empresa.
-        </p>
+        <p className="text-sm text-muted-foreground">Aún no publicamos esta empresa.</p>
       </PublicShell>
     );
   }
 
+  const activeContract =
+    surfaceContract &&
+    isOmxdsSurfaceContract(surfaceContract) &&
+    ["business", "hotel", "restaurant"].includes(surfaceContract.family)
+      ? surfaceContract
+      : null;
   const variant = resolveBusinessVariant(b.category_slug);
   const tier = b.plan_tier;
-  const showPromotions = planAllows(tier, "promotions") && b.promotions.length > 0;
+  const showPromotions =
+    !activeContract && planAllows(tier, "promotions") && b.promotions.length > 0;
 
   // H-03 · Ola I2.d — Refactor final: BusinessSurface es orquestador
   // puro. Cero JSX visual propio. Toda la presentación proviene
@@ -154,9 +272,43 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
   // bloques + anchors que la sub-navegación necesita.
   const heroDto = businessToHeroDTO(b);
   const subnavDto = businessToSubnavDTO(b);
+  const effectiveSubnavDto = activeContract
+    ? {
+        ...subnavDto,
+        anchors: subnavDto.anchors.filter((anchor) => {
+          if (
+            activeContract.omissions.includes("offer") &&
+            ["servicios", "promociones"].includes(anchor.id)
+          )
+            return false;
+          if (activeContract.omissions.includes("map") && anchor.id === "ubicacion") return false;
+          if (activeContract.omissions.includes("reputation") && anchor.id === "opiniones")
+            return false;
+          if (activeContract.omissions.includes("collection") && anchor.id === "descubre")
+            return false;
+          return true;
+        }),
+      }
+    : subnavDto;
   const descriptionSection = businessToDescriptionSectionDTO(b);
   const infoGridDto = businessToInfoGridDTO(b);
-  const ctaBarDto = businessToCtaBarDTO(b);
+  const legacyCtaBarDto = businessToCtaBarDTO(b);
+  const dominantAction = activeContract?.actions.find((action) => action.role === "dominant");
+  const ctaBarDto = activeContract
+    ? {
+        ...legacyCtaBarDto,
+        actions: dominantAction?.href
+          ? [
+              {
+                label: dominantAction.label,
+                action: "contact" as const,
+                href: dominantAction.href,
+                emphasis: "primary" as const,
+              },
+            ]
+          : [],
+      }
+    : legacyCtaBarDto;
 
   return (
     <PublicShell
@@ -183,7 +335,7 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
         longitude={b.primary_location?.longitude ?? b.longitude ?? null}
       />
 
-      <ExperienceSubnav dto={subnavDto} className="mt-6 mb-6" />
+      <ExperienceSubnav dto={effectiveSubnavDto} className="mt-6 mb-6" />
 
       {descriptionSection || infoGridDto ? (
         <section id="resumen" data-eb-anchor className="scroll-mt-24">
@@ -192,19 +344,23 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
         </section>
       ) : null}
 
-      <section id="servicios" data-eb-anchor className="mt-10 scroll-mt-24">
-        <ExperienceProductsBlock
-          config={{
-            source: "business",
-            variant: "grid",
-            heading: variant.productsHeading,
-            emptyMessage: variant.productsEmpty,
-            columns: 2,
-          }}
-        />
-      </section>
+      {!activeContract?.omissions.includes("offer") ? (
+        <section id="servicios" data-eb-anchor className="mt-10 scroll-mt-24">
+          <ExperienceProductsBlock
+            config={{
+              source: "business",
+              variant: "grid",
+              heading: variant.productsHeading,
+              emptyMessage: variant.productsEmpty,
+              columns: 2,
+            }}
+          />
+        </section>
+      ) : null}
 
-      {b.primary_location?.latitude != null && b.primary_location?.longitude != null ? (
+      {!activeContract?.omissions.includes("map") &&
+      b.primary_location?.latitude != null &&
+      b.primary_location?.longitude != null ? (
         <section id="ubicacion" data-eb-anchor className="mt-10 scroll-mt-24">
           <BusinessLocationBlock
             lat={b.primary_location.latitude}
@@ -229,21 +385,23 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
         </section>
       ) : null}
 
-      <section id="opiniones" data-eb-anchor className="mt-10 scroll-mt-24">
-        <ExperienceReviewsBlock
-          config={{
-            source: "business",
-            variant: "list",
-            heading: "Opiniones de viajeros",
-            emptyMessage:
-              "Aún no hay reseñas publicadas de esta empresa. Sé la primera persona en compartir tu experiencia.",
-          }}
-        />
-      </section>
+      {!activeContract?.omissions.includes("reputation") ? (
+        <section id="opiniones" data-eb-anchor className="mt-10 scroll-mt-24">
+          <ExperienceReviewsBlock
+            config={{
+              source: "business",
+              variant: "list",
+              heading: "Opiniones de viajeros",
+              emptyMessage:
+                "Aún no hay reseñas publicadas de esta empresa. Sé la primera persona en compartir tu experiencia.",
+            }}
+          />
+        </section>
+      ) : null}
 
       {related &&
-      (related.sameCategory.length > 0 ||
-        related.sameDestinationOther.length > 0) ? (
+      !activeContract?.omissions.includes("collection") &&
+      (related.sameCategory.length > 0 || related.sameDestinationOther.length > 0) ? (
         <section id="descubre" data-eb-anchor className="mt-10 scroll-mt-24">
           <ExperienceRelatedCollectionBlock
             config={{
@@ -253,8 +411,7 @@ export function BusinessSurface({ business: propBusiness }: BusinessSurfaceProps
               columns: 2,
               heading: "Sigue descubriendo",
               subheading: `Otras opciones en ${b.destination_slug || "el destino"} para continuar armando tu viaje.`,
-              emptyMessage:
-                "Aún no hay empresas hermanas publicadas en este destino.",
+              emptyMessage: "Aún no hay empresas hermanas publicadas en este destino.",
               ariaLabel: `Descubrimiento contextual desde ${b.display_name}`,
               groups: [
                 {

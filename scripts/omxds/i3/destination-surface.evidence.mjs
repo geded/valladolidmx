@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
 const base = "6ca2ebc61dbea827a28c80f5d8254096a9123e7b";
+const i3aHead = "d47a41fe6f96edf4dad95f273a95fc2a8ebb63d5";
 const routePath = "src/routes/oriente-maya/$destino.index.tsx";
 const allowed = new Set([
   "docs/blueprint/18.38-OMXDS-V1-I3-A-DESTINATION-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
@@ -24,17 +25,30 @@ function gitLines(args) {
   return execFileSync("git", args, { encoding: "utf8" }).trim().split("\n").filter(Boolean);
 }
 
-const changed = new Set([
-  ...gitLines(["diff", "--name-only", `${base}...HEAD`]),
-  ...gitLines(["diff", "--name-only", "HEAD"]),
-  ...gitLines(["ls-files", "--others", "--exclude-standard"]),
-]);
-for (const file of changed) assert.ok(allowed.has(file), `I3-A scope violation: ${file}`);
-assert.ok(changed.has(routePath), "the canonical destination route must own the flag boundary");
+const originalI3AFiles = gitLines(["diff", "--name-only", `${base}...${i3aHead}`]);
+for (const file of originalI3AFiles)
+  assert.ok(allowed.has(file), `historical I3-A scope violation: ${file}`);
 assert.ok(
-  changed.has("src/components/surfaces/DestinationSurface.tsx"),
+  originalI3AFiles.includes(routePath),
+  "the canonical destination route must own the flag boundary",
+);
+assert.ok(
+  originalI3AFiles.includes("src/components/surfaces/DestinationSurface.tsx"),
   "DestinationSurface must consume the shared contract",
 );
+
+for (const file of [
+  routePath,
+  "src/components/surfaces/DestinationSurface.tsx",
+  "scripts/omxds/i3/destination-surface.contract.test.ts",
+])
+  assert.equal(
+    execFileSync("git", ["diff", "--name-only", i3aHead, "--", file], {
+      encoding: "utf8",
+    }),
+    "",
+    `I3-A regression: ${file}`,
+  );
 
 const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
@@ -91,5 +105,5 @@ assert.equal(
 );
 
 console.log(
-  "I3-A evidence: PASS (canonical route only; SSR flag boundary; exact OFF legacy branch; fictitious contract fixture).",
+  "I3-A evidence: PASS (historical scope preserved; Destination contract intact; exact OFF legacy branch).",
 );

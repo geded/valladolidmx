@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-009",
+  "title": "OMXDS V1 · I3-B Business Vertical Surfaces",
+  "status": "Approved",
+  "branch": "feature/omxds-i3-b-business-vertical-surfaces-v1",
+  "blueprint": "docs/blueprint/18.39-OMXDS-V1-I3-B-BUSINESS-VERTICAL-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-02 · Implementar exclusivamente I3-B sobre main@bc04fc43: Business Standard owner de BusinessSurface, Hotel y Restaurant como adaptadores semánticos, loader existente como único consumidor SSR nuevo, flag OFF/fail-closed y fallback exacto; publicar un PR borrador sólo con todos los controles en PASS; sin merge, producción, Premium, Builder ni I3-C/D.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/surfaces/BusinessSurface.tsx" },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
+    },
+    { "operation": "create", "path": "src/lib/omxds/surfaces/business-surface.contract.ts" },
+    { "operation": "create", "path": "src/lib/omxds/surfaces/hotel-surface.adapter.ts" },
+    { "operation": "create", "path": "src/lib/omxds/surfaces/restaurant-surface.adapter.ts" },
+    { "operation": "modify", "path": "package.json" }
+  ],
+  "public_routes": ["/oriente-maya/$destino/$categoria/$empresa/"],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run lint",
+    "bun run validate:i1",
+    "bun run validate:i2a",
+    "bun run validate:i2b",
+    "bun run validate:i2c",
+    "bun run test:i3:0",
+    "bun run validate:i3:0",
+    "bun run test:i3:a",
+    "bun run validate:i3:a",
+    "bun run test:i3:b",
+    "bun run validate:i3:b",
+    "bun run typecheck",
+    "bun run build",
+    "bun run governance:check",
+    "bun run governance:product-check"
+  ]
+}
