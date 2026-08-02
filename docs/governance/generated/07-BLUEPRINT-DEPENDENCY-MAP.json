@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.19",
+    "version": "0.20",
     "state": "Approved",
     "main_commit": "LOCAL_RECONCILIATION_2026-07-22",
     "blob": "LOCAL_RECONCILIATION_2026-07-22",
@@ -6886,6 +6886,34 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-005.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-005.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:eslint.config.js",
+      "type": "artifact",
+      "path": "eslint.config.js"
+    },
+    {
+      "id": "ART:scripts/lint/lint-baseline.mjs",
+      "type": "artifact",
+      "path": "scripts/lint/lint-baseline.mjs"
+    },
+    {
+      "id": "ART:scripts/lint/lint-baseline.json",
+      "type": "artifact",
+      "path": "scripts/lint/lint-baseline.json"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-006.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-006.json"
     }
   ],
   "edges": [
@@ -17453,6 +17481,51 @@
       "destination": "DOC:docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
       "evidence": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:eslint.config.js:docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "origin": "ART:eslint.config.js",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/lint/lint-baseline.mjs:docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "origin": "ART:scripts/lint/lint-baseline.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/lint/lint-baseline.json:docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "origin": "ART:scripts/lint/lint-baseline.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "verified_at": "2026-08-01"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-006.json:docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-006.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.36-OMXDS-V1-I3-LINT-REMEDIATION-PACK-v1.0.md",
       "verified_at": "2026-08-01"
     }
   ],
