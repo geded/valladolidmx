@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
 const base = "ec9ae951412e8cb5223ba9fbf60d51d6814b0552";
+const i3DHead = "43c8ca6de4c10cf2430285aa8261adeda82dbf10";
 const routePath = "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx";
 const surfacePath = "src/components/surfaces/BusinessSurface.tsx";
 const contractPath = "src/lib/omxds/surfaces/business-premium-surface.contract.ts";
@@ -29,13 +30,25 @@ function gitLines(args) {
   return execFileSync("git", args, { encoding: "utf8" }).trim().split("\n").filter(Boolean);
 }
 
-const changed = new Set([
-  ...gitLines(["diff", "--name-only", base]),
-  ...gitLines(["ls-files", "--others", "--exclude-standard"]),
-]);
+const changed = new Set(gitLines(["diff", "--name-only", `${base}...${i3DHead}`]));
 assert.equal(changed.size, 15, "I3-D must contain exactly 15 files");
 for (const file of changed) assert.ok(allowed.has(file), `I3-D scope violation: ${file}`);
 for (const file of allowed) assert.ok(changed.has(file), `I3-D authorized file missing: ${file}`);
+
+for (const protectedPath of [
+  routePath,
+  surfacePath,
+  contractPath,
+  eligibilityPath,
+  "scripts/omxds/i3/business-premium-surface.contract.test.ts",
+])
+  assert.equal(
+    execFileSync("git", ["diff", "--name-only", i3DHead, "--", protectedPath], {
+      encoding: "utf8",
+    }),
+    "",
+    `I3-D protected artifact regressed after its authorized batch: ${protectedPath}`,
+  );
 
 const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
