@@ -22,8 +22,10 @@ import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-r
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import {
   ProductSurface,
+  ProductSurfaceContractBoundary,
   ProductSurfaceProvider,
 } from "@/components/surfaces/ProductSurface";
+import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contracts-flag.server";
 import {
   ContextEngineProvider,
   defineRouteContext,
@@ -123,17 +125,21 @@ export const Route = createFileRoute("/producto/$slug")({
   loader: async ({ params }) => {
     const product = await getMarketplaceProductBySlug({ data: { slug: params.slug } });
     if (!product) throw notFound();
-    const composition = await getPublishedCompositionBySlug({
-      data: { slug: "__tpl_product__" },
-    }).catch(() => null);
-    return { product, composition };
+    const [composition, surfaceContractsEnabled] = await Promise.all([
+      getPublishedCompositionBySlug({
+        data: { slug: "__tpl_product__" },
+      }).catch(() => null),
+      getOmxdsSurfaceContractsFlag().catch(() => false),
+    ]);
+    return { product, composition, surfaceContractsEnabled };
   },
   head: ({ loaderData }) => {
     if (!loaderData) return { meta: [] };
     const p: MarketplaceProductDetail = loaderData.product;
     const title = `${p.name} · ${p.business.display_name} — ${SITE.name}`;
     const description =
-      p.tagline || p.description.slice(0, 160) ||
+      p.tagline ||
+      p.description.slice(0, 160) ||
       `${p.name} en ${p.business.display_name}, publicado en ${SITE.name}.`;
     const cover = p.cover_url ?? undefined;
     const offers: Record<string, unknown> = {
@@ -162,8 +168,7 @@ export const Route = createFileRoute("/producto/$slug")({
     };
     if (cover) jsonLd.image = cover;
     if (p.reviews.length > 0) {
-      const avg =
-        p.reviews.reduce((s, r) => s + Number(r.rating || 0), 0) / p.reviews.length;
+      const avg = p.reviews.reduce((s, r) => s + Number(r.rating || 0), 0) / p.reviews.length;
       jsonLd.aggregateRating = {
         "@type": "AggregateRating",
         ratingValue: Math.round(avg * 10) / 10,
@@ -224,16 +229,18 @@ export const Route = createFileRoute("/producto/$slug")({
 });
 
 function MarketplaceProductPage() {
-  const { product, composition } = Route.useLoaderData();
+  const { product, composition, surfaceContractsEnabled } = Route.useLoaderData();
   const declaration = buildProductContext(product);
   return (
     <ContextEngineProvider declaration={declaration}>
       <ProductSurfaceProvider product={product}>
-        {composition ? (
-          <CompositionRenderer tree={composition.snapshot} />
-        ) : (
-          <ProductSurface />
-        )}
+        <ProductSurfaceContractBoundary
+          enabled={surfaceContractsEnabled}
+          product={product}
+          legacy={
+            composition ? <CompositionRenderer tree={composition.snapshot} /> : <ProductSurface />
+          }
+        />
       </ProductSurfaceProvider>
     </ContextEngineProvider>
   );

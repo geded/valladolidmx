@@ -7,7 +7,13 @@
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import { buildPublicHead, productJsonLd, faqPageJsonLd, businessEntityId, productEntityId } from "@/lib/discovery/seo";
+import {
+  buildPublicHead,
+  productJsonLd,
+  faqPageJsonLd,
+  businessEntityId,
+  productEntityId,
+} from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getMarketplaceProductBySlug } from "@/lib/catalog/marketplace-reads.functions";
 import { getProductRelated } from "@/lib/catalog/product-related.functions";
@@ -19,12 +25,12 @@ import { navigationContextToDeclaration } from "@/lib/navigation";
 import { ContextEngineProvider } from "@/lib/context-engine";
 import {
   ProductSurface,
+  ProductSurfaceContractBoundary,
   ProductSurfaceProvider,
 } from "@/components/surfaces/ProductSurface";
+import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contracts-flag.server";
 
-export const Route = createFileRoute(
-  "/oriente-maya/$destino/$categoria/$empresa/$producto",
-)({
+export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa/$producto")({
   loader: async ({ params }) => {
     const resolution = await resolveTerritorialPath({
       data: {
@@ -35,9 +41,12 @@ export const Route = createFileRoute(
       },
     });
     if (resolution.reason !== "ok" || !resolution.product) throw notFound();
-    const product = await getMarketplaceProductBySlug({
-      data: { slug: params.producto },
-    });
+    const [product, surfaceContractsEnabled] = await Promise.all([
+      getMarketplaceProductBySlug({
+        data: { slug: params.producto },
+      }),
+      getOmxdsSurfaceContractsFlag().catch(() => false),
+    ]);
     if (!product) throw notFound();
     // E2 · US-E2.2 — Related Collection contextual del producto.
     // Fallback silencioso: no debe romper el render de la ficha.
@@ -54,7 +63,7 @@ export const Route = createFileRoute(
     } catch {
       related = null;
     }
-    return { resolution, product, related };
+    return { resolution, product, related, surfaceContractsEnabled };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
@@ -124,7 +133,10 @@ export const Route = createFileRoute(
         { label: "Oriente Maya", path: "/oriente-maya" },
         { label: destName, path: `/oriente-maya/${params.destino}` },
         { label: catName, path: `/oriente-maya/${params.destino}/${params.categoria}` },
-        { label: p.business.display_name, path: `/oriente-maya/${params.destino}/${params.categoria}/${params.empresa}` },
+        {
+          label: p.business.display_name,
+          path: `/oriente-maya/${params.destino}/${params.categoria}/${params.empresa}`,
+        },
         { label: p.name, path },
       ],
       jsonLd,
@@ -141,7 +153,7 @@ export const Route = createFileRoute(
 });
 
 function ProductoTerritorialPage() {
-  const { resolution, product, related } = Route.useLoaderData();
+  const { resolution, product, related, surfaceContractsEnabled } = Route.useLoaderData();
   const { destino } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
   // N2.2: fuente única = Navigation Contract. El adapter deriva
@@ -155,7 +167,12 @@ function ProductoTerritorialPage() {
   return (
     <ContextEngineProvider declaration={declaration}>
       <ProductSurfaceProvider product={product} related={related}>
-        <ProductSurface />
+        <ProductSurfaceContractBoundary
+          enabled={surfaceContractsEnabled}
+          product={product}
+          related={related}
+          legacy={<ProductSurface />}
+        />
       </ProductSurfaceProvider>
     </ContextEngineProvider>
   );

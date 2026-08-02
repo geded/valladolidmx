@@ -1,0 +1,45 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-010",
+  "title": "OMXDS V1 · I3-C Product, Experience and Event Surfaces",
+  "status": "Approved",
+  "branch": "feature/omxds-i3-c-product-experience-event-surfaces-v1",
+  "blueprint": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-02 · Implementar exclusivamente I3-C sobre main@c3d663e5: Product owner de ProductSurface, Experience como adaptador semántico y Event owner de EventSurface; tres loaders existentes como únicos consumidores SSR nuevos, flag OFF/fail-closed y fallback exacto; publicar un PR borrador sólo con todos los controles en PASS; sin merge, producción, Premium, Builder ni I3-D.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/surfaces/ProductSurface.tsx" },
+    { "operation": "modify", "path": "src/components/surfaces/EventSurface.tsx" },
+    { "operation": "modify", "path": "src/routes/producto.$slug.tsx" },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx"
+    },
+    { "operation": "modify", "path": "src/routes/eventos.$slug.tsx" },
+    { "operation": "create", "path": "src/lib/omxds/surfaces/product-surface.contract.ts" },
+    { "operation": "create", "path": "src/lib/omxds/surfaces/experience-surface.adapter.ts" },
+    { "operation": "create", "path": "src/lib/omxds/surfaces/event-surface.contract.ts" },
+    { "operation": "modify", "path": "package.json" }
+  ],
+  "public_routes": [
+    "/producto/$slug",
+    "/oriente-maya/$destino/$categoria/$empresa/$producto",
+    "/eventos/$slug"
+  ],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run lint",
+    "bun run validate:i1",
+    "bun run validate:i2a",
+    "bun run validate:i2b",
+    "bun run validate:i2c",
+    "bun run validate:i3:0",
+    "bun run validate:i3:a",
+    "bun run validate:i3:b",
+    "bun run validate:i3:c",
+    "bun run typecheck",
+    "bun run build",
+    "bun run governance:check",
+    "bun run governance:product-check"
+  ]
+}

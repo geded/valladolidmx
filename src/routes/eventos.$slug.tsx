@@ -7,17 +7,11 @@
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
-import {
-  buildPublicHead,
-  eventJsonLd,
-  businessEntityId,
-} from "@/lib/discovery/seo";
+import { buildPublicHead, eventJsonLd, businessEntityId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
-import {
-  getEventBySlug,
-  type PublicEventDetail,
-} from "@/lib/events/public-reads.functions";
-import { EventSurface } from "@/components/surfaces/EventSurface";
+import { getEventBySlug, type PublicEventDetail } from "@/lib/events/public-reads.functions";
+import { EventSurface, EventSurfaceContractBoundary } from "@/components/surfaces/EventSurface";
+import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contracts-flag.server";
 import {
   ContextEngineProvider,
   defineRouteContext,
@@ -42,17 +36,18 @@ function buildEventContext(e: PublicEventDetail): RouteContextDeclaration {
     },
     inherit: ["region", "destination", "category"],
     canonical: `/eventos/${e.slug}`,
-    kindDefaults: [
-      { kind: "site_section", label: "Eventos", href: "/eventos" },
-    ],
+    kindDefaults: [{ kind: "site_section", label: "Eventos", href: "/eventos" }],
   });
 }
 
 export const Route = createFileRoute("/eventos/$slug")({
   loader: async ({ params }) => {
-    const event = await getEventBySlug({ data: { slug: params.slug } });
+    const [event, surfaceContractsEnabled] = await Promise.all([
+      getEventBySlug({ data: { slug: params.slug } }),
+      getOmxdsSurfaceContractsFlag().catch(() => false),
+    ]);
     if (!event) throw notFound();
-    return { event };
+    return { event, surfaceContractsEnabled };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
@@ -77,18 +72,12 @@ export const Route = createFileRoute("/eventos/$slug")({
     // ORG_ID como fallback genérico — Valladolid.mx no organiza
     // eventos de terceros.
     const organizerBusinessPath =
-      e.organizer_business_slug &&
-      e.organizer_destination_slug &&
-      e.organizer_category_slug
+      e.organizer_business_slug && e.organizer_destination_slug && e.organizer_category_slug
         ? `/oriente-maya/${e.organizer_destination_slug}/${e.organizer_category_slug}/${e.organizer_business_slug}`
         : null;
-    const organizerId = organizerBusinessPath
-      ? businessEntityId(organizerBusinessPath)
-      : undefined;
+    const organizerId = organizerBusinessPath ? businessEntityId(organizerBusinessPath) : undefined;
     const organizerName =
-      !organizerId && e.organizer_business_name
-        ? e.organizer_business_name
-        : undefined;
+      !organizerId && e.organizer_business_name ? e.organizer_business_name : undefined;
     const eventNode = eventJsonLd({
       name: e.title,
       description: e.summary,
@@ -139,11 +128,15 @@ export const Route = createFileRoute("/eventos/$slug")({
 });
 
 function EventoPage() {
-  const { event } = Route.useLoaderData();
+  const { event, surfaceContractsEnabled } = Route.useLoaderData();
   const declaration = buildEventContext(event);
   return (
     <ContextEngineProvider declaration={declaration}>
-      <EventSurface event={event} />
+      <EventSurfaceContractBoundary
+        enabled={surfaceContractsEnabled}
+        event={event}
+        legacy={<EventSurface event={event} />}
+      />
     </ContextEngineProvider>
   );
 }
