@@ -20,6 +20,8 @@
     "validate:i2c": "bun run test:i2c && bun scripts/omxds/i2/remaining-card-families.evidence.mjs",
     "test:i3:0": "bun test scripts/omxds/i3/shared-surface.contract.test.ts",
     "validate:i3:0": "bun run test:i3:0 && bun scripts/omxds/i3/shared-surface.evidence.mjs",
+    "test:i3:a": "bun test scripts/omxds/i3/destination-surface.contract.test.ts",
+    "validate:i3:a": "bun run test:i3:a && bun scripts/omxds/i3/destination-surface.evidence.mjs",
     "lint": "bun scripts/lint/lint-baseline.mjs",
     "lint:full": "eslint .",
     "lint:baseline:check": "bun scripts/lint/lint-baseline.mjs",

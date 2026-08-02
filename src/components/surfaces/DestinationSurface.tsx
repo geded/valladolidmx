@@ -21,7 +21,8 @@
  * (Motor de Descubrimiento) declarado con `source: "destination"` y
  * `groups[]` heterogéneos (business/event/product).
  */
-import { createContext, useContext } from "react";
+/* eslint-disable react-refresh/only-export-components -- I3-A keeps the legacy context and pure contract builder in the authorized surface module. */
+import { createContext, useContext, type ReactNode } from "react";
 import { useParams, useSearch } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
@@ -51,7 +52,14 @@ import {
   destinationToBadgeItems,
   destinationToMapDTO,
   destinationToGalleryDTO,
+  type DestinationBlockInput,
 } from "@/lib/experience-builder/adapters/destination-to-blocks";
+import {
+  createOmxdsSurfaceContract,
+  isOmxdsSurfaceContract,
+  type OmxdsSurfaceContract,
+  type OmxdsSurfaceOmission,
+} from "@/lib/omxds/surfaces/surface-contract";
 
 /* ------------------------------------------------------------------ *
  * Contexto — poblado por la ruta pública (SSR-safe).
@@ -67,8 +75,7 @@ export interface DestinationSurfaceContextValue {
   galleryUrls?: string[];
 }
 
-export const DestinationSurfaceContext =
-  createContext<DestinationSurfaceContextValue | null>(null);
+export const DestinationSurfaceContext = createContext<DestinationSurfaceContextValue | null>(null);
 
 export function DestinationSurfaceProvider({
   db,
@@ -79,9 +86,7 @@ export function DestinationSurfaceProvider({
   children,
 }: DestinationSurfaceContextValue & { children: React.ReactNode }) {
   return (
-    <DestinationSurfaceContext.Provider
-      value={{ db, related, slug, mapPoints, galleryUrls }}
-    >
+    <DestinationSurfaceContext.Provider value={{ db, related, slug, mapPoints, galleryUrls }}>
       {children}
     </DestinationSurfaceContext.Provider>
   );
@@ -102,6 +107,106 @@ export interface DestinationSurfaceProps {
   mapPoints?: ExperienceMapPoint[];
   /** U-VISUAL · V4.2 — URLs de galería (BD) para `vmx.experience.gallery`. */
   galleryUrls?: string[];
+  /** I3-A · contrato validado; ausente conserva exactamente el renderer vigente. */
+  surfaceContract?: OmxdsSurfaceContract;
+}
+
+function destinationRelatedCounts(related?: DestinationRelatedDTO | null) {
+  return {
+    hoteles: related?.hoteles.length ?? 0,
+    restaurantes: related?.restaurantes.length ?? 0,
+    experiencias: related?.experiencias.length ?? 0,
+    otras: related?.otras.length ?? 0,
+    productos: related?.productos.length ?? 0,
+    eventos: related?.eventos?.length ?? 0,
+  };
+}
+
+export function buildDestinationSurfaceContract(
+  input: DestinationBlockInput,
+  provenanceKind: "fixture" | "governed_source" = "governed_source",
+): OmxdsSurfaceContract | null {
+  const omissions: OmxdsSurfaceOmission[] = [];
+  const hasMedia = Boolean(input.heroUrl) || input.galleryUrls.length > 0;
+  const hasMap =
+    input.mapPoints.length > 0 || (input.latitude !== null && input.longitude !== null);
+  const relatedTotal = Object.values(input.relatedCounts).reduce(
+    (total, count) => total + count,
+    0,
+  );
+
+  if (!hasMedia) omissions.push("media");
+  if (!hasMap) omissions.push("map");
+  if (relatedTotal === 0) omissions.push("collection");
+
+  return createOmxdsSurfaceContract({
+    contractVersion: "i3-0",
+    entityId: `destination:${input.slug}`,
+    family: "destination",
+    title: input.name,
+    state: hasMedia ? "ready" : "no_media",
+    provenance: {
+      kind: provenanceKind,
+      reference:
+        provenanceKind === "fixture"
+          ? `fixture:fictional:i3-a:${input.slug}`
+          : `destination:${input.slug}`,
+    },
+    actions: [
+      {
+        id: "discover",
+        label: `Explorar ${input.name}`,
+        role: "dominant",
+        href: `/oriente-maya/${encodeURIComponent(input.slug)}#explora`,
+      },
+    ],
+    omissions,
+  });
+}
+
+export interface DestinationSurfaceContractBoundaryProps extends DestinationSurfaceProps {
+  enabled: boolean;
+  legacy: ReactNode;
+}
+
+export function DestinationSurfaceContractBoundary({
+  enabled,
+  legacy,
+  destinationSlug,
+  dbData,
+  related,
+  mapPoints,
+  galleryUrls,
+}: DestinationSurfaceContractBoundaryProps) {
+  if (!enabled || !destinationSlug) return legacy;
+
+  const mock = DESTINOS_MOCK.find(
+    (destination) =>
+      destination.slug === destinationSlug && destination.region_slug === ORIENTE_MAYA.slug,
+  );
+  if (!dbData && !mock) return legacy;
+
+  const input = toDestinationBlockInput(dbData, mock ?? null, {
+    slug: destinationSlug,
+    regionSlug: ORIENTE_MAYA.slug,
+    regionName: ORIENTE_MAYA.name,
+    counts: destinationRelatedCounts(related),
+    galleryUrls: galleryUrls ?? [],
+    mapPoints: mapPoints ?? [],
+  });
+  const surfaceContract = buildDestinationSurfaceContract(input);
+  if (!surfaceContract) return legacy;
+
+  return (
+    <DestinationSurface
+      destinationSlug={destinationSlug}
+      dbData={dbData}
+      related={related}
+      mapPoints={mapPoints}
+      galleryUrls={galleryUrls}
+      surfaceContract={surfaceContract}
+    />
+  );
 }
 
 export function DestinationSurface({
@@ -110,6 +215,7 @@ export function DestinationSurface({
   related,
   mapPoints,
   galleryUrls,
+  surfaceContract,
 }: DestinationSurfaceProps = {}) {
   const params = useParams({ strict: false }) as { destino?: string };
   const routeSearch = useSearch({ strict: false }) as { explora?: string };
@@ -121,9 +227,7 @@ export function DestinationSurface({
   const effectiveMapPoints = mapPoints ?? ctx?.mapPoints ?? [];
   const effectiveGalleryUrls = galleryUrls ?? ctx?.galleryUrls ?? [];
   const mock = slug
-    ? DESTINOS_MOCK.find(
-        (d) => d.slug === slug && d.region_slug === ORIENTE_MAYA.slug,
-      )
+    ? DESTINOS_MOCK.find((d) => d.slug === slug && d.region_slug === ORIENTE_MAYA.slug)
     : undefined;
 
   if (!db && !mock) {
@@ -132,9 +236,7 @@ export function DestinationSurface({
         title="Destino no disponible"
         crumbs={[{ label: ORIENTE_MAYA.name, to: "/oriente-maya" }, { label: "—" }]}
       >
-        <p className="text-muted-foreground">
-          Aún no publicamos esta página de destino.
-        </p>
+        <p className="text-muted-foreground">Aún no publicamos esta página de destino.</p>
       </PublicShell>
     );
   }
@@ -143,14 +245,7 @@ export function DestinationSurface({
     slug: slug ?? "",
     regionSlug: ORIENTE_MAYA.slug,
     regionName: ORIENTE_MAYA.name,
-    counts: {
-      hoteles: rel?.hoteles.length ?? 0,
-      restaurantes: rel?.restaurantes.length ?? 0,
-      experiencias: rel?.experiencias.length ?? 0,
-      otras: rel?.otras.length ?? 0,
-      productos: rel?.productos.length ?? 0,
-      eventos: rel?.eventos?.length ?? 0,
-    },
+    counts: destinationRelatedCounts(rel),
     galleryUrls: effectiveGalleryUrls,
     mapPoints: effectiveMapPoints,
   });
@@ -165,7 +260,29 @@ export function DestinationSurface({
   const subnavDto = destinationToSubnavDTO(input);
   const descriptionSection = destinationToDescriptionSectionDTO(input);
   const highlightsFeatures = destinationToHighlightsFeaturesDTO(input);
-  const ctaBarDto = destinationToCtaBarDTO(input);
+  const activeContract =
+    surfaceContract &&
+    isOmxdsSurfaceContract(surfaceContract) &&
+    surfaceContract.family === "destination"
+      ? surfaceContract
+      : null;
+  const legacyCtaBarDto = destinationToCtaBarDTO(input);
+  const dominantAction = activeContract?.actions.find((action) => action.role === "dominant");
+  const ctaBarDto = activeContract
+    ? {
+        ...legacyCtaBarDto,
+        actions: dominantAction?.href
+          ? [
+              {
+                label: dominantAction.label,
+                action: "navigate" as const,
+                href: dominantAction.href,
+                emphasis: "primary" as const,
+              },
+            ]
+          : [],
+      }
+    : legacyCtaBarDto;
   const badgeItems = destinationToBadgeItems(input);
   void destinationToMapDTO; // mapa ahora se renderiza dentro del Explorador Inline
 
@@ -173,12 +290,7 @@ export function DestinationSurface({
   // para el banner proactivo de Alux (sólo se muestra si hay ≥3 cerca).
   const nearbyPoints = (() => {
     if (!rel) return [];
-    const src = [
-      ...rel.hoteles,
-      ...rel.restaurantes,
-      ...rel.experiencias,
-      ...rel.otras,
-    ];
+    const src = [...rel.hoteles, ...rel.restaurantes, ...rel.experiencias, ...rel.otras];
     return src
       .filter((b) => b.latitude != null && b.longitude != null)
       .map((b) => ({ id: b.id, lat: Number(b.latitude), lng: Number(b.longitude) }));
@@ -186,53 +298,51 @@ export function DestinationSurface({
 
   return (
     <DestinationSurfaceProvider db={db} related={rel} slug={slug ?? null}>
-    <PublicShell
-      crumbs={[
-        { label: ORIENTE_MAYA.name, to: "/oriente-maya" },
-        { label: input.name },
-      ]}
-      useContextCrumbs
-    >
-      {showGalleryMosaic && galleryDto ? (
-        <section id="galeria" data-eb-anchor className="scroll-mt-24">
-          <ExperienceGallery dto={galleryDto} />
-        </section>
-      ) : null}
+      <PublicShell
+        crumbs={[{ label: ORIENTE_MAYA.name, to: "/oriente-maya" }, { label: input.name }]}
+        useContextCrumbs
+      >
+        {showGalleryMosaic && galleryDto ? (
+          <section id="galeria" data-eb-anchor className="scroll-mt-24">
+            <ExperienceGallery dto={galleryDto} />
+          </section>
+        ) : null}
 
-      <ExperienceHero dto={heroDto} headingLevel="h1" className={showGalleryMosaic ? "mt-6" : undefined} />
-
-      {nearbyPoints.length >= 3 ? (
-        <AluxNearbySuggestionBanner
-          destinationLabel={input.name}
-          points={nearbyPoints}
+        <ExperienceHero
+          dto={heroDto}
+          headingLevel="h1"
+          className={showGalleryMosaic ? "mt-6" : undefined}
         />
-      ) : null}
 
-      {badgeItems.length > 0 ? (
-        <div className="mt-6">
-          <InstitutionalBadgesBlock
-            config={{
-              source: "destination",
-              subjectSlug: input.slug,
-              variant: "soft",
-              size: "md",
-              layout: "strip",
-              items: badgeItems,
-              ariaLabel: `Distintivos institucionales de ${input.name}`,
-              capabilities: {
-                showLabel: true,
-                showTooltip: true,
-                mobileVisibleMax: 3,
-              },
-            }}
-          />
-        </div>
-      ) : null}
+        {nearbyPoints.length >= 3 ? (
+          <AluxNearbySuggestionBanner destinationLabel={input.name} points={nearbyPoints} />
+        ) : null}
 
-      <ExperienceSubnav dto={subnavDto} className="mt-6 mb-6" />
+        {badgeItems.length > 0 ? (
+          <div className="mt-6">
+            <InstitutionalBadgesBlock
+              config={{
+                source: "destination",
+                subjectSlug: input.slug,
+                variant: "soft",
+                size: "md",
+                layout: "strip",
+                items: badgeItems,
+                ariaLabel: `Distintivos institucionales de ${input.name}`,
+                capabilities: {
+                  showLabel: true,
+                  showTooltip: true,
+                  mobileVisibleMax: 3,
+                },
+              }}
+            />
+          </div>
+        ) : null}
 
-      <div className="space-y-10">
-        {descriptionSection || highlightsFeatures ? (
+        <ExperienceSubnav dto={subnavDto} className="mt-6 mb-6" />
+
+        <div className="space-y-10">
+          {descriptionSection || highlightsFeatures ? (
             <section id="resumen" data-eb-anchor className="scroll-mt-24">
               {descriptionSection ? <ExperienceSection dto={descriptionSection} /> : null}
               {highlightsFeatures ? (
@@ -241,22 +351,22 @@ export function DestinationSurface({
             </section>
           ) : null}
 
-        <section id="explora" data-eb-anchor className="scroll-mt-24">
-          <DiscoveryNavigatorBlock
-            config={{
-              title: `Explora ${input.name}`,
-              scope: "destination",
-              manualDestinationSlug: slug ?? undefined,
-              mode: "inline",
-              variant: "grid",
-            }}
-          />
-        </section>
+          <section id="explora" data-eb-anchor className="scroll-mt-24">
+            <DiscoveryNavigatorBlock
+              config={{
+                title: `Explora ${input.name}`,
+                scope: "destination",
+                manualDestinationSlug: slug ?? undefined,
+                mode: "inline",
+                variant: "grid",
+              }}
+            />
+          </section>
 
-        {/* Mapa territorial ahora vive dentro del Explorador Inline
+          {/* Mapa territorial ahora vive dentro del Explorador Inline
             (`DiscoveryNavigatorBlock` mode="inline") para evitar duplicidad. */}
 
-        {rel && !activeExplora ? (
+          {rel && !activeExplora && !activeContract?.omissions.includes("collection") ? (
             <section id="descubre" data-eb-anchor className="scroll-mt-24">
               <ExperienceRelatedCollectionBlock
                 config={{
@@ -266,8 +376,7 @@ export function DestinationSurface({
                   columns: 2,
                   heading: "Sigue descubriendo",
                   subheading: `Empresas, eventos y experiencias de ${input.name} para continuar construyendo tu viaje.`,
-                  emptyMessage:
-                    "Aún no hay negocios ni experiencias publicadas para este destino.",
+                  emptyMessage: "Aún no hay negocios ni experiencias publicadas para este destino.",
                   ariaLabel: `Descubrimiento contextual en ${input.name}`,
                   groups: [
                     {
@@ -333,10 +442,10 @@ export function DestinationSurface({
               />
             </section>
           ) : null}
-      </div>
+        </div>
 
-      <ExperienceCtaBar dto={ctaBarDto} />
-    </PublicShell>
+        <ExperienceCtaBar dto={ctaBarDto} />
+      </PublicShell>
     </DestinationSurfaceProvider>
   );
 }

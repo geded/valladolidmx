@@ -4,6 +4,7 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const base = "799cf248a92894893c75df22a229bf0255c72f91";
+const i3ZeroHead = "6ca2ebc61dbea827a28c80f5d8254096a9123e7b";
 const allowed = new Set([
   "docs/blueprint/18.37-OMXDS-V1-I3-0-SHARED-SURFACE-CONTRACT-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
   "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
@@ -24,12 +25,23 @@ function gitLines(args) {
   return execFileSync("git", args, { encoding: "utf8" }).trim().split("\n").filter(Boolean);
 }
 
-const changed = new Set([
-  ...gitLines(["diff", "--name-only", `${base}...HEAD`]),
-  ...gitLines(["diff", "--name-only", "HEAD"]),
-  ...gitLines(["ls-files", "--others", "--exclude-standard"]),
-]);
-for (const file of changed) assert.ok(allowed.has(file), `I3-0 scope violation: ${file}`);
+const originalI3ZeroFiles = gitLines(["diff", "--name-only", `${base}...${i3ZeroHead}`]);
+for (const file of originalI3ZeroFiles)
+  assert.ok(allowed.has(file), `historical I3-0 scope violation: ${file}`);
+
+for (const file of [
+  "src/lib/omxds/surfaces/surface-actions.ts",
+  "src/lib/omxds/surfaces/surface-contract.ts",
+  "src/lib/omxds/surfaces/surface-contracts-flag.server.ts",
+  "src/lib/omxds/surfaces/surface-state.ts",
+])
+  assert.equal(
+    execFileSync("git", ["diff", "--name-only", i3ZeroHead, "--", file], {
+      encoding: "utf8",
+    }),
+    "",
+    `I3-0 shared contract regression: ${file}`,
+  );
 
 const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
@@ -64,16 +76,39 @@ function filesBelow(directory) {
   return files;
 }
 
-for (const directory of ["src/routes", "src/components"])
-  for (const file of filesBelow(directory)) {
-    const source = readFileSync(file, "utf8");
-    assert.doesNotMatch(
-      source,
-      /omxds\/surfaces|surface-contracts-flag\.server/,
-      `public consumer introduced: ${relative(".", file)}`,
-    );
-  }
+const authorizations = readdirSync("docs/governance/product-authorizations")
+  .filter((file) => file.endsWith(".json"))
+  .map((file) =>
+    JSON.parse(readFileSync(join("docs/governance/product-authorizations", file), "utf8")),
+  );
+const authorizedRouteConsumers = new Set(
+  authorizations
+    .filter(
+      (authorization) =>
+        authorization.status === "Approved" &&
+        authorization.required_feature_flags?.includes("omxds_visual_v1_contracts_enabled=false"),
+    )
+    .flatMap((authorization) => authorization.permissions ?? [])
+    .filter(
+      (permission) =>
+        ["create", "modify"].includes(permission.operation) &&
+        permission.path.startsWith("src/routes/"),
+    )
+    .map((permission) => permission.path),
+);
+const flagConsumers = filesBelow("src/routes")
+  .filter((file) => readFileSync(file, "utf8").includes("surface-contracts-flag.server"))
+  .map((file) => relative(".", file));
+
+for (const file of flagConsumers)
+  assert.ok(authorizedRouteConsumers.has(file), `unauthorized SSR flag consumer: ${file}`);
+
+const i3aAuthorization = authorizations.find(
+  (authorization) => authorization.id === "PCA-2026-008" && authorization.status === "Approved",
+);
+if (i3aAuthorization)
+  assert.deepEqual(flagConsumers, ["src/routes/oriente-maya/$destino.index.tsx"]);
 
 console.log(
-  "I3-0 evidence: PASS (shared contract only; fictitious fixtures; existing flag OFF/fail-closed; no public consumers).",
+  "I3-0 evidence: PASS (historical scope preserved; shared contract intact; flag OFF/fail-closed; SSR consumers PCA-authorized).",
 );

@@ -1,0 +1,32 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-008",
+  "title": "OMXDS V1 · I3-A Destination Surface",
+  "status": "Approved",
+  "branch": "feature/omxds-i3-a-destination-surface-v1",
+  "blueprint": "docs/blueprint/18.38-OMXDS-V1-I3-A-DESTINATION-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive and addenda 2026-08-02 · Implementar exclusivamente I3-A sobre main@6ca2ebc6, conectar sólo la ruta canónica Destination mediante su loader existente, conservar fallback exacto con el flag OFF/fail-closed y remediar únicamente scripts/omxds/i3/shared-surface.evidence.mjs para validar consumidores SSR contra PCAs aprobadas; publicar un PR borrador sólo si todos los controles quedan en PASS; sin merge, producción ni I3-B/C/D.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/surfaces/DestinationSurface.tsx" },
+    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.index.tsx" },
+    { "operation": "modify", "path": "package.json" }
+  ],
+  "public_routes": ["/oriente-maya/$destino/"],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run lint",
+    "bun run validate:i1",
+    "bun run validate:i2a",
+    "bun run validate:i2b",
+    "bun run validate:i2c",
+    "bun run test:i3:0",
+    "bun run validate:i3:0",
+    "bun run test:i3:a",
+    "bun run validate:i3:a",
+    "bun run typecheck",
+    "bun run build",
+    "bun run governance:check",
+    "bun run governance:product-check"
+  ]
+}
