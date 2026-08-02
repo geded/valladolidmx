@@ -19,8 +19,10 @@ import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
 import {
   DestinationSurface,
+  DestinationSurfaceContractBoundary,
   DestinationSurfaceProvider,
 } from "@/components/surfaces/DestinationSurface";
+import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contracts-flag.server";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import {
@@ -40,10 +42,7 @@ import {
  * destino. Se ejecuta en render (no en loader) para que la etiqueta
  * refleje siempre el nombre resuelto (BD > mock > slug crudo).
  */
-function buildDestinationContext(
-  slug: string,
-  displayName: string,
-): RouteContextDeclaration {
+function buildDestinationContext(slug: string, displayName: string): RouteContextDeclaration {
   return defineRouteContext({
     current: {
       kind: "destination",
@@ -72,25 +71,40 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
     // composición específica por slug (`dest-<slug>`) y, en su ausencia,
     // la plantilla oficial `__tpl_destination__`. Misma arquitectura que
     // `/oriente-maya` (Región).
-    const [db, related, mapPoints, galleryUrls, specific, template] = await Promise.all([
-      getPublicDestinationBySlug({ data: { slug: params.destino } }).catch(() => null),
-      getDestinationRelated({ data: { slug: params.destino } }).catch(() => null),
-      getDestinationMapPoints({ data: { slug: params.destino } }).catch(() => []),
-      getDestinationGalleryUrls({ data: { slug: params.destino } }).catch(() => []),
-      getPublishedCompositionBySlug({ data: { slug: `dest-${params.destino}` } }).catch(() => null),
-      getPublishedCompositionBySlug({ data: { slug: "__tpl_destination__" } }).catch(() => null),
-    ]);
+    const [db, related, mapPoints, galleryUrls, specific, template, surfaceContractsEnabled] =
+      await Promise.all([
+        getPublicDestinationBySlug({ data: { slug: params.destino } }).catch(() => null),
+        getDestinationRelated({ data: { slug: params.destino } }).catch(() => null),
+        getDestinationMapPoints({ data: { slug: params.destino } }).catch(() => []),
+        getDestinationGalleryUrls({ data: { slug: params.destino } }).catch(() => []),
+        getPublishedCompositionBySlug({ data: { slug: `dest-${params.destino}` } }).catch(
+          () => null,
+        ),
+        getPublishedCompositionBySlug({ data: { slug: "__tpl_destination__" } }).catch(() => null),
+        getOmxdsSurfaceContractsFlag().catch(() => false),
+      ]);
     if (!mock && !db) throw notFound();
     const dest = {
       slug: params.destino,
       name: db?.name ?? mock?.name ?? params.destino,
       tagline: db?.tagline ?? mock?.tagline ?? "",
       hero_palette: (db?.hero_palette ?? mock?.hero_palette ?? "territorio") as
-        "territorio" | "selva" | "cenote" | "atardecer",
-      highlights: (db?.highlights?.length ? db.highlights : mock?.highlights ?? []) as string[],
+        | "territorio"
+        | "selva"
+        | "cenote"
+        | "atardecer",
+      highlights: (db?.highlights?.length ? db.highlights : (mock?.highlights ?? [])) as string[],
     };
     const composition = specific ?? template ?? null;
-    return { dest, db, related, mapPoints, galleryUrls, composition };
+    return {
+      dest,
+      db,
+      related,
+      mapPoints,
+      galleryUrls,
+      composition,
+      surfaceContractsEnabled,
+    };
   },
   head: ({ loaderData, params }) =>
     loaderData
@@ -131,7 +145,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
 });
 
 function DestinoPage() {
-  const { dest, db, related, mapPoints, galleryUrls, composition } = Route.useLoaderData();
+  const { dest, db, related, mapPoints, galleryUrls, composition, surfaceContractsEnabled } =
+    Route.useLoaderData();
   const declaration = buildDestinationContext(dest.slug, dest.name);
   // SEO.A2.M1 — La ruta hidrata `DestinationSurfaceProvider` con los
   // datos server-side. Si existe composición publicada (plantilla o
@@ -146,16 +161,26 @@ function DestinoPage() {
         mapPoints={mapPoints ?? []}
         galleryUrls={galleryUrls ?? []}
       >
-        {composition ? (
-          <CompositionRenderer tree={composition.snapshot} />
-        ) : (
-          <DestinationSurface
-            dbData={db ?? undefined}
-            related={related ?? undefined}
-            mapPoints={mapPoints ?? []}
-            galleryUrls={galleryUrls ?? []}
-          />
-        )}
+        <DestinationSurfaceContractBoundary
+          enabled={surfaceContractsEnabled}
+          destinationSlug={dest.slug}
+          dbData={db ?? undefined}
+          related={related ?? undefined}
+          mapPoints={mapPoints ?? []}
+          galleryUrls={galleryUrls ?? []}
+          legacy={
+            composition ? (
+              <CompositionRenderer tree={composition.snapshot} />
+            ) : (
+              <DestinationSurface
+                dbData={db ?? undefined}
+                related={related ?? undefined}
+                mapPoints={mapPoints ?? []}
+                galleryUrls={galleryUrls ?? []}
+              />
+            )
+          }
+        />
       </DestinationSurfaceProvider>
     </ContextEngineProvider>
   );
