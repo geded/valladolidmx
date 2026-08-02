@@ -10068,6 +10068,36 @@
       "path": "docs/governance/product-authorizations/PCA-2026-011.json",
       "source": "docs/governance/product-authorizations/PCA-2026-011.json",
       "evidence": "docs/governance/product-authorizations/PCA-2026-011.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.33-OMXDS-V1-I3-SURFACE-CONTRACTS-SCOPE-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.33-OMXDS-V1-I3-SURFACE-CONTRACTS-SCOPE-REPORT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.33-OMXDS-V1-I3-SURFACE-CONTRACTS-SCOPE-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/18.33-OMXDS-V1-I3-SURFACE-CONTRACTS-SCOPE-REPORT-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.34-OMXDS-V1-I3-SURFACE-CONTRACTS-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.34-OMXDS-V1-I3-SURFACE-CONTRACTS-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.34-OMXDS-V1-I3-SURFACE-CONTRACTS-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.34-OMXDS-V1-I3-SURFACE-CONTRACTS-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.35-OMXDS-V1-I3-SURFACE-CONTRACTS-PREFLIGHT-v1.1.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.35-OMXDS-V1-I3-SURFACE-CONTRACTS-PREFLIGHT-v1.1.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.1",
+      "source": "docs/blueprint/18.35-OMXDS-V1-I3-SURFACE-CONTRACTS-PREFLIGHT-v1.1.md",
+      "evidence": "docs/blueprint/18.35-OMXDS-V1-I3-SURFACE-CONTRACTS-PREFLIGHT-v1.1.md"
     }
   ],
   "edges": [
@@ -27435,6 +27465,33 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.25 · docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.33-OMXDS-V1-I3-SURFACE-CONTRACTS-SCOPE-REPORT-v1.0.md",
+      "verified_at": "2026-08-02",
+      "origin": "DOC:docs/blueprint/18.33-OMXDS-V1-I3-SURFACE-CONTRACTS-SCOPE-REPORT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.26 · docs/blueprint/18.33-OMXDS-V1-I3-SURFACE-CONTRACTS-SCOPE-REPORT-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.34-OMXDS-V1-I3-SURFACE-CONTRACTS-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02",
+      "origin": "DOC:docs/blueprint/18.34-OMXDS-V1-I3-SURFACE-CONTRACTS-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.26 · docs/blueprint/18.34-OMXDS-V1-I3-SURFACE-CONTRACTS-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.35-OMXDS-V1-I3-SURFACE-CONTRACTS-PREFLIGHT-v1.1.md",
+      "verified_at": "2026-08-02",
+      "origin": "DOC:docs/blueprint/18.35-OMXDS-V1-I3-SURFACE-CONTRACTS-PREFLIGHT-v1.1.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.26 · docs/blueprint/18.35-OMXDS-V1-I3-SURFACE-CONTRACTS-PREFLIGHT-v1.1.md → D04 · content-experience"
     }
   ],
   "views": {
