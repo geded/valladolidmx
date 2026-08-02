@@ -1,0 +1,5108 @@
+{
+  "schema_version": 1,
+  "source_commit": "7084b2a7c15a05029cdbc7e62a483f49b47e05cb",
+  "excluded_paths": [
+    "docs/evidence/omxds-visual/v0-baseline/accessibility/axe.min.js",
+    "src/integrations/supabase/types.ts"
+  ],
+  "totals": {
+    "errors": 8640,
+    "warnings": 76
+  },
+  "entries": [
+    {
+      "path": "docs/loadtests/checkout.k6.js",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "docs/loadtests/marketplace-search.k6.js",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "public/push-sw.js",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "public/pwa-skipwaiting.js",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "scripts/alux-spatial.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "scripts/business-shim-regression.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "scripts/experience-map-defaults.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "scripts/governance/generate-artifact-inventory.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "scripts/governance/lib/master-index.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 31
+    },
+    {
+      "path": "scripts/governance/lib/product-authorization.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 31
+    },
+    {
+      "path": "scripts/governance/sync-governance.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 22
+    },
+    {
+      "path": "scripts/governance/test-product-authorization.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 22
+    },
+    {
+      "path": "scripts/governance/validate-dependency-map.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 27
+    },
+    {
+      "path": "scripts/governance/validate-knowledge-graph.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 36
+    },
+    {
+      "path": "scripts/governance/validate-product-authorization.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "scripts/hours-status.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "scripts/kit-blocks-smoke.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "scripts/live-recap.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "scripts/media-benchmark/run-local.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "scripts/media-benchmark/run.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "scripts/media-benchmark/run.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "scripts/media-pipeline/derive.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 71
+    },
+    {
+      "path": "scripts/media-pipeline/pilot-v11/prepare-assets.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 20
+    },
+    {
+      "path": "scripts/media-pipeline/pilot-v11/validate-visual.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 22
+    },
+    {
+      "path": "scripts/media-renewal-hmac.test.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "scripts/media-shadow-c0.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "scripts/media-shadow-m23-bench.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "scripts/omxds/i1/contrast.mjs",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "scripts/omxds/i1/institutional-badges.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "scripts/omxds/i2/destination-card.contract.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "scripts/on-trip-concierge.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "scripts/route-inventory-coverage.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "scripts/shadow-evaluator.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 23
+    },
+    {
+      "path": "scripts/shadow-preloader.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 27
+    },
+    {
+      "path": "scripts/sign-cache.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "scripts/surface-composer-smoke.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "scripts/tourism-guard.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "scripts/tp1-trip-eligibility.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "scripts/traffic-status.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "scripts/visitor-intel-ingest.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "scripts/visitor-intel-projection.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "scripts/visitor-intel-simulation.test.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 40
+    },
+    {
+      "path": "src/components/admin/AdminHub.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/admin/cockpit-blocks.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/admin/travel-plans/ActiveTravelPlansTable.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/components/admin/travel-plans/AttentionQueue.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/admin/travel-plans/badges.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/admin/travel-plans/TravelPlanOperationalDrawer.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/components/admin/travel-plans/TravelPlansFilters.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/admin/travel-plans/TravelPlansKpiStrip.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/admin/ZoneScopesDialog.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/alux/AluxContextChip.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/alux/AluxNearbySuggestionBanner.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/alux/PublicAluxChat.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/components/brand/BrandLogo.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/cards/CategoriaCard.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/cards/DestinoCard.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/cards/EmpresaCard.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/cards/ResenaCard.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/cms/BusinessEditor.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/cms/BusinessLocationPanel.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/cms/BusinessMediaPanels.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 13
+    },
+    {
+      "path": "src/components/cms/CmsEntityPage.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/cms/DestinationEditor.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/cms/DestinationLocationPanel.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/components/cms/DestinationMediaPanels.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 13
+    },
+    {
+      "path": "src/components/cms/EntityEditor.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 16
+    },
+    {
+      "path": "src/components/cms/EntityListView.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/cms/media/MediaTranslationsSheet.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/cms/ProductEditor.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/cms/ProductMediaPanels.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 13
+    },
+    {
+      "path": "src/components/cms/RegionEditor.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/cms/RelatedOverridesPanel.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/cms/ReviewModerator.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 12
+    },
+    {
+      "path": "src/components/cms/ZoneEditor.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/cms/ZoneMediaPanels.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "src/components/commerce/AddToCartButton.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/commerce/DirectSaleBuyButton.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/components/commerce/ProductActions.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/common/PageShell.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/common/SectionHeader.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/concierge/CaseFileView.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "src/components/concierge/CaseFileView.tsx",
+      "rule": "react-hooks/rules-of-hooks",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/concierge/RequestConciergeButton.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/discovery/BusinessQuickViewDialog.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/discovery/DiscoveryNavigator.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/discovery/index.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/discovery/InlineCategoryExplorer.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "src/components/discovery/InlineCategoryExplorer.tsx",
+      "rule": "react-hooks/exhaustive-deps",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/discovery/ListingMapHeader.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/discovery/OfflineBanner.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/discovery/PublicFooter.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/discovery/PublicHeader.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/discovery/PublicShell.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/discovery/SyncStatusBanner.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/discovery/UpdateBanner.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/AutoInspector.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 64
+    },
+    {
+      "path": "src/components/experience-builder/BlockCommentsPanel.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/experience-builder/blocks/DiscoveryNavigatorBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBarBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-features/ExperienceFeatures.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-features/ExperienceFeaturesBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-gallery/ExperienceGallery.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 12
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-gallery/ExperienceGalleryBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-hero/ExperienceHero.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-hero/ExperienceHeroBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-hero/ExperienceHeroFromProduct.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGrid.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGridBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadges.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-map/ExperienceMapBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-products/ExperienceProducts.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 12
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-products/ExperienceProductsBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-products/ExperienceProductsBlock.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-promotions/ExperiencePromotions.tsx",
+      "rule": "@next/next/no-img-element",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-promotions/ExperiencePromotions.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-promotions/ExperiencePromotionsBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-promotions/ExperiencePromotionsBlock.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollection.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-reviews/ExperienceReviews.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 23
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-reviews/ExperienceReviews.tsx",
+      "rule": "react/no-danger",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-reviews/ExperienceReviewsBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-section/ExperienceSection.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-section/ExperienceSectionBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-subnav/ExperienceSubnav.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-subnav/ExperienceSubnavBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/experience-builder/EditThisPageButton.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/MediaPickerDialog.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/experience-builder/OnboardingTour.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/OnboardingTour.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 2
+    },
+    {
+      "path": "src/components/experience-builder/PagesPanel.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "src/components/experience-builder/ReferencePicker.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "src/components/experience-builder/RouteInventoryPanel.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/components/experience-builder/SectionEditFrame.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/SectionEditOverlay.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/experience-builder/SeoPreview.tsx",
+      "rule": "@next/next/no-img-element",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/SeoPreview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/experience-builder/smart-blocks/index.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/smart-blocks/SmartBlockRuntime.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/experience-builder/smart-blocks/SmartBusinessesGrid.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/smart-blocks/SmartCard.tsx",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/smart-blocks/SmartCard.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/smart-blocks/SmartDestinationsGrid.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/smart-blocks/SmartEventsList.tsx",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/smart-blocks/SmartEventsList.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/experience-builder/smart-blocks/SmartProductsGrid.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/experience-builder/StudioPreviewContextBar.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/experience-builder/tourism-card/TourismCard.tsx",
+      "rule": "@next/next/no-img-element",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/experience-builder/tourism-card/TourismCard.tsx",
+      "rule": "@typescript-eslint/no-empty-object-type",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/experience-builder/tourism-card/TourismCard.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 19
+    },
+    {
+      "path": "src/components/experience-builder/tourism-card/TourismCard.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 3
+    },
+    {
+      "path": "src/components/experience-builder/useEditingLock.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/experience-builder/VariablePicker.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/experience-builder/VisualStudio.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 178
+    },
+    {
+      "path": "src/components/experience-builder/VisualStudio.tsx",
+      "rule": "react-hooks/exhaustive-deps",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/home/ArmaTuViajeSection.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/components/home/CategoriasSection.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/home/ConsejoAluxSection.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/home/DestinosSection.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/home/EmpresasSection.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/home/EnVivoSection.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/home/EventosSection.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/home/Hero.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/components/home/HeroSearchPill.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/home/PromocionesSection.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/home/ResenasSection.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/home/RutasSection.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/hosting/BecomeHostFlow.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 36
+    },
+    {
+      "path": "src/components/layout/AluxFloatingTrigger.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 74
+    },
+    {
+      "path": "src/components/layout/BreadcrumbTerritorial.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/layout/Container.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/layout/PrimaryMegaMenu.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/layout/ProfileModeSwitcher.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 26
+    },
+    {
+      "path": "src/components/layout/SiteFooter.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/components/layout/SiteHeader.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 57
+    },
+    {
+      "path": "src/components/layout/SiteHeader.tsx",
+      "rule": "react-hooks/exhaustive-deps",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/layout/SiteTopBar.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/layout/UserMenu.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/maps/BusinessLocationBlock.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/maps/DistanceBadge.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/components/maps/InteractiveMap.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/maps/LocationPickerMap.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/maps/StaticMap.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/maps/useVisitorGeolocation.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/navigation/DestinationSwitcher.tsx",
+      "rule": "<parser>",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/navigation/DestinationSwitcher.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/navigation/NavigationSessionBridge.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/navigation/TerritorialSwitcherMount.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/components/notifications/ActivityFeedView.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/portal/ProductAdvancedPanel.tsx",
+      "rule": "@next/next/no-img-element",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/portal/ProductAdvancedPanel.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 16
+    },
+    {
+      "path": "src/components/promociones/CouponIssueDialog.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/components/promociones/CouponQR.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/promociones/PromocionesGate.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 13
+    },
+    {
+      "path": "src/components/protected-actions/SignInPromptSheet.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/reviews/ReviewComposer.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/reviews/TrustBadge.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/surfaces/AluxSurface.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/surfaces/business-blocks.legacy.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/surfaces/business-blocks.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/surfaces/business/business-to-kit-vm.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/surfaces/BusinessSurface.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "src/components/surfaces/BusinessSurface.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 3
+    },
+    {
+      "path": "src/components/surfaces/CategorySurface.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/surfaces/CategorySurface.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/surfaces/DestinationSurface.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 58
+    },
+    {
+      "path": "src/components/surfaces/DestinationSurface.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/surfaces/EventSurface.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/surfaces/kit/Badges.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/surfaces/kit/CardGrid.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/surfaces/kit/Contact.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/surfaces/kit/EmptyHint.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/surfaces/kit/Faq.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/surfaces/kit/format.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/surfaces/kit/Gallery.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/surfaces/kit/Hero.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/surfaces/kit/index.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/surfaces/kit/InfoTable.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/surfaces/kit/Location.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/surfaces/kit/PriceCta.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/surfaces/kit/Promos.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/surfaces/kit/Reviews.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/surfaces/kit/RichText.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/surfaces/kit/Shell.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/surfaces/kit/types.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/surfaces/product-blocks.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/components/surfaces/product/product-to-kit-vm.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/surfaces/ProductSurface.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/surfaces/ProductSurface.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 3
+    },
+    {
+      "path": "src/components/surfaces/RegionSurface.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/surfaces/TourismListingSurface.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/surfaces/TourismListingSurface.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 2
+    },
+    {
+      "path": "src/components/surfaces/TravelerPublicProfileSurface.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/travel-plan/ConciergeProposalObserver.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/travel-plan/ConciergeProposalObserver.tsx",
+      "rule": "react-hooks/exhaustive-deps",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/travel-plan/FloatingTravelPlanDock.tsx",
+      "rule": "react-hooks/exhaustive-deps",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/travel-plan/MiViajeChip.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/traveler/AddToTravelPlanButton.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/traveler/AddToTravelPlanButton.tsx",
+      "rule": "react-hooks/rules-of-hooks",
+      "severity": "error",
+      "count": 14
+    },
+    {
+      "path": "src/components/traveler/AluxFeedbackButtons.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/traveler/AluxPlanProposalsInbox.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/traveler/AluxSourcesFooter.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/traveler/AluxSuggestionCard.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/traveler/AluxTravelerPanel.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 14
+    },
+    {
+      "path": "src/components/traveler/AvatarUploader.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/components/traveler/ContinuityWelcomeSurface.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/components/traveler/LinkGoogleCard.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/traveler/LiveRecapSurface.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/traveler/MemoriesSection.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/traveler/NowNextLaterSurface.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 34
+    },
+    {
+      "path": "src/components/traveler/OnTripConciergePriorityBanner.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/traveler/PendingReviewsBanner.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/traveler/PermissionMoment.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/traveler/ProfileCompletionMeter.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/traveler/PublicProfileBenefitsCard.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/traveler/ReservationsList.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/traveler/ReviewerBadge.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/traveler/StageAwareCompanionBoard.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/traveler/TravelDocumentsList.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/traveler/WelcomeOnboardingModal.tsx",
+      "rule": "no-empty",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/traveler/WelcomeOnboardingModal.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 12
+    },
+    {
+      "path": "src/components/traveler/WorkspaceOnboardingTour.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/traveler/WorkspaceOnboardingTour.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/ui/badge.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/ui/badge.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/ui/button.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/ui/button.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/ui/form.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/ui/LazyToasterHost.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/ui/navigation-menu.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/ui/sidebar.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/ui/toggle.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/workspace/AluxCopilotPanel.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 12
+    },
+    {
+      "path": "src/components/workspace/BottomSheet.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/workspace/cards/ActionCard.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/workspace/cards/EntityCard.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/workspace/cards/MetricCard.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/components/workspace/CommandPalette.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/workspace/ConnectivityIndicator.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/workspace/context/WorkspaceContextProvider.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/components/workspace/context/WorkspaceContextProvider.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 5
+    },
+    {
+      "path": "src/components/workspace/hooks/gestures/useLongPress.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/workspace/hooks/gestures/usePullToRefresh.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/workspace/hooks/gestures/useSwipeActions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/workspace/hooks/useWorkspaceBreakpoint.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/workspace/index.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/workspace/inspector/EmptyInspector.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/workspace/inspector/EntityInspector.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/workspace/inspector/index.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/workspace/inspector/registry.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/components/workspace/inspector/SelectionInspector.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/workspace/primitives/EmptyState.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/workspace/primitives/Skeletons.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/workspace/sheets/SheetStackProvider.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/workspace/sheets/SheetStackProvider.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/workspace/WorkspaceBottomNav.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/components/workspace/WorkspaceInspector.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/workspace/WorkspaceProvider.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/components/workspace/WorkspaceProvider.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/components/workspace/WorkspaceShell.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/components/workspace/WorkspaceSidebar.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/workspace/WorkspaceSwitcher.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/components/workspace/WorkspaceTopbar.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/config/site.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/hooks/useAuth.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/hooks/useAuth.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/i18n/context.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/i18n/context.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/integrations/lovable/index.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/integrations/supabase/auth-attacher.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/integrations/supabase/auth-middleware.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 39
+    },
+    {
+      "path": "src/integrations/supabase/client.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 11
+    },
+    {
+      "path": "src/integrations/supabase/client.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "src/lib/admin/cockpit.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/admin/direct-sales-commissions.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/lib/admin/founder.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/admin/roles-catalog.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/admin/travel-plans-operations.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/lib/admin/user-management.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/lib/admin/zone-scopes.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 13
+    },
+    {
+      "path": "src/lib/ai-gateway.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/alux/bind-session.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/alux/business-context.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/alux/concierge-context.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/alux/contextual-suggest.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 28
+    },
+    {
+      "path": "src/lib/alux/feedback.functions.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/alux/feedback.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/lib/alux/floating-bus.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/alux/floating-presence.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/lib/alux/knowledge.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 36
+    },
+    {
+      "path": "src/lib/alux/plan-proposals.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/lib/alux/plan-signals.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/alux/public-signals.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/alux/quality.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/alux/settings.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/alux/sticky-cta-presence.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/alux/territorial-memory.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/alux/travel-intent.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/alux/travel-intent.ts",
+      "rule": "react-hooks/exhaustive-deps",
+      "severity": "warning",
+      "count": 2
+    },
+    {
+      "path": "src/lib/alux/traveler-lens.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 44
+    },
+    {
+      "path": "src/lib/alux/use-alux-context.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/alux/weather.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/business/hours-status.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/lib/business/open-now.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/catalog/business-related.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 18
+    },
+    {
+      "path": "src/lib/catalog/cart.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/lib/catalog/category-related.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "src/lib/catalog/marketplace-reads.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 62
+    },
+    {
+      "path": "src/lib/catalog/product-related.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 11
+    },
+    {
+      "path": "src/lib/cms.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 14
+    },
+    {
+      "path": "src/lib/cms/business-locations.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/cms/businesses-media.functions.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/cms/businesses-media.functions.ts",
+      "rule": "<parser>",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/cms/businesses-media.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/lib/cms/destination-location.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/lib/cms/destinations-media.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/lib/cms/image-upload.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/lib/cms/media-intelligence.functions.ts",
+      "rule": "<parser>",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/cms/media-intelligence.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 36
+    },
+    {
+      "path": "src/lib/cms/moderation.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/cms/products-media.functions.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/cms/products-media.functions.ts",
+      "rule": "<parser>",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/cms/products-media.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/lib/cms/public-reads.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/lib/cms/reads.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/lib/cms/translate-content.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/cms/workflow.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "src/lib/cms/writes.functions.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/cms/writes.functions.ts",
+      "rule": "<parser>",
+      "severity": "warning",
+      "count": 2
+    },
+    {
+      "path": "src/lib/cms/writes.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "src/lib/cms/zones-media.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 18
+    },
+    {
+      "path": "src/lib/concierge/alux.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/concierge/cc.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/concierge/concierge.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 72
+    },
+    {
+      "path": "src/lib/concierge/orders.functions.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/concierge/orders.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/context-engine/events.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/context-engine/index.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/lib/context-engine/inheritance-rules.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/context-engine/previous-store.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/context-engine/provider.tsx",
+      "rule": "<parser>",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/context-engine/provider.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/lib/context-engine/provider.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 2
+    },
+    {
+      "path": "src/lib/context-engine/resolver.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/context-engine/types.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/demo-pack/goldenset.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/demo-pack/status.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 20
+    },
+    {
+      "path": "src/lib/destinations/public-reads.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 73
+    },
+    {
+      "path": "src/lib/discovery/cards-registry.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/lib/discovery/cards-registry.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/discovery/discovery-navigator.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/lib/discovery/index.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/discovery/inline-explorer.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/discovery/sections-registry.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 12
+    },
+    {
+      "path": "src/lib/discovery/sections-registry.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/discovery/seo.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 12
+    },
+    {
+      "path": "src/lib/email-templates/_visibility-shared.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 80
+    },
+    {
+      "path": "src/lib/email-templates/_visibility-shared.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 5
+    },
+    {
+      "path": "src/lib/email-templates/coupon-issued.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 103
+    },
+    {
+      "path": "src/lib/email-templates/coupon-issued.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/email-templates/coupon-redeemed.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 102
+    },
+    {
+      "path": "src/lib/email-templates/coupon-redeemed.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/email-templates/coupon-review-reminder.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 75
+    },
+    {
+      "path": "src/lib/email-templates/coupon-review-reminder.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/email-templates/email-change.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 22
+    },
+    {
+      "path": "src/lib/email-templates/invite.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 19
+    },
+    {
+      "path": "src/lib/email-templates/magic-link.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 16
+    },
+    {
+      "path": "src/lib/email-templates/reauthentication.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 13
+    },
+    {
+      "path": "src/lib/email-templates/recovery.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 30
+    },
+    {
+      "path": "src/lib/email-templates/registry.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/email-templates/registry.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 31
+    },
+    {
+      "path": "src/lib/email-templates/signup.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 50
+    },
+    {
+      "path": "src/lib/email-templates/trip-post.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 23
+    },
+    {
+      "path": "src/lib/email-templates/trip-post.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/email-templates/trip-t14.tsx",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/email-templates/trip-t14.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 28
+    },
+    {
+      "path": "src/lib/email-templates/trip-t14.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/email-templates/trip-t3.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 28
+    },
+    {
+      "path": "src/lib/email-templates/trip-t3.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/email-templates/trip-welcome.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 24
+    },
+    {
+      "path": "src/lib/email-templates/trip-welcome.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/email-templates/visibility-activated.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 24
+    },
+    {
+      "path": "src/lib/email-templates/visibility-activated.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/email-templates/visibility-expired.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 21
+    },
+    {
+      "path": "src/lib/email-templates/visibility-expired.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/email-templates/visibility-expiring.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 27
+    },
+    {
+      "path": "src/lib/email-templates/visibility-expiring.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/email-templates/visibility-rejected.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 22
+    },
+    {
+      "path": "src/lib/email-templates/visibility-rejected.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/email-templates/visibility-request-received.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 24
+    },
+    {
+      "path": "src/lib/email-templates/visibility-request-received.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/lib/email/send.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/events/public-reads.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 30
+    },
+    {
+      "path": "src/lib/experience-builder/adapters/business-related-to-block.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/experience-builder/adapters/business-to-blocks.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/lib/experience-builder/adapters/category-related-to-block.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/experience-builder/adapters/destination-related-to-block.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/experience-builder/adapters/destination-to-blocks.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/lib/experience-builder/adapters/entity-to-map-point.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/experience-builder/adapters/product-related-to-block.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/experience-builder/adapters/tourism-listing-adapters.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 23
+    },
+    {
+      "path": "src/lib/experience-builder/appearance.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 13
+    },
+    {
+      "path": "src/lib/experience-builder/block-contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/lib/experience-builder/block-library.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 141
+    },
+    {
+      "path": "src/lib/experience-builder/block-registry.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-cta-bar/contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-features/contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-gallery/contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-hero/contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-info-grid/contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-institutional-badges/contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-map/contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-map/defaults.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-map/types.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-products/contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 11
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-promotions/contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-related-collection/contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 38
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-reviews/contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 18
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-section/contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-subnav/contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/lib/experience-builder/composition-diff.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/experience-builder/composition-renderer.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 24
+    },
+    {
+      "path": "src/lib/experience-builder/composition-renderer.tsx",
+      "rule": "react-hooks/rules-of-hooks",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/experience-builder/composition-renderer.tsx",
+      "rule": "react/no-danger",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/experience-builder/composition-tree.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/lib/experience-builder/dynamic-variables.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 32
+    },
+    {
+      "path": "src/lib/experience-builder/eb-redirects.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/experience-builder/eb-route-resolver.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/experience-builder/eb-sitemap.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/lib/experience-builder/experience-builder.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/experience-builder/i18n-overlay.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/experience-builder/kit-blocks.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 85
+    },
+    {
+      "path": "src/lib/experience-builder/kit-seeds.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 16
+    },
+    {
+      "path": "src/lib/experience-builder/layout-engine.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/experience-builder/page-kind-registry.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 25
+    },
+    {
+      "path": "src/lib/experience-builder/preview-registry.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/lib/experience-builder/preview-registry.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 3
+    },
+    {
+      "path": "src/lib/experience-builder/public-reads.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/experience-builder/smart-blocks.functions.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/lib/experience-builder/smart-blocks.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 18
+    },
+    {
+      "path": "src/lib/experience-builder/studio-media.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/lib/experience-builder/studio.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 27
+    },
+    {
+      "path": "src/lib/experience-builder/surface-composer.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/experience-builder/translate.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/lib/experience-builder/typography.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 38
+    },
+    {
+      "path": "src/lib/hosting/hosting.functions.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/lib/hosting/hosting.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 67
+    },
+    {
+      "path": "src/lib/i18n/locales.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/i18n/ui-auto-translate.ts",
+      "rule": "no-useless-escape",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/i18n/ui-auto-translate.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/i18n/ui-translate.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/maps/maps.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "src/lib/maps/routes.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/mcp/lib/audit.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/mcp/lib/contracts.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/mcp/lib/rate-limit.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/mcp/lib/sanitize.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/mcp/lib/wrap.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/lib/mcp/tools/get-my-profile.ts",
+      "rule": "@typescript-eslint/no-empty-object-type",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/mcp/tools/get-my-profile.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/mcp/tools/list-my-travel-plans.ts",
+      "rule": "@typescript-eslint/no-empty-object-type",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/mcp/tools/list-my-travel-plans.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/mcp/tools/search-businesses.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/media/persisted-flag.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/media/pipeline-flag.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/media/renewal-bootstrap.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/media/renewal-hmac.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/lib/media/renewal-processor.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 18
+    },
+    {
+      "path": "src/lib/media/resolve-alt.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/media/resolve-source.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/media/shadow-evaluator.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 34
+    },
+    {
+      "path": "src/lib/media/shadow-preloader.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/media/sign.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "src/lib/navigation/breadcrumbs.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/navigation/breadcrumbs.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/navigation/canonical-paths.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/navigation/canonical-paths.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/navigation/context-adapter.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/navigation/destination-switch.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/navigation/index.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/navigation/session-context.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/lib/navigation/territorial-resolver.functions.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/navigation/territorial-resolver.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/navigation/types.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/notifications/_authz.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/notifications/activity.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/notifications/email.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/notifications/iac.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/notifications/notifications.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/notifications/preferences.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/notifications/push.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/notifications/router.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/notifications/webhooks.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/observability/observability.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 23
+    },
+    {
+      "path": "src/lib/omxds/cards/business-card.adapter.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/omxds/cards/business-card.contract.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/payments/admin.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/payments/demo-mode.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/payments/payments.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "src/lib/payments/provider.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/payments/public-status.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/payments/registry.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/payments/stripe.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/lib/plans/plans-catalog.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 24
+    },
+    {
+      "path": "src/lib/portal/business-card.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 22
+    },
+    {
+      "path": "src/lib/portal/business-catalog.functions.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 13
+    },
+    {
+      "path": "src/lib/portal/business-catalog.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 34
+    },
+    {
+      "path": "src/lib/portal/business-media.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 33
+    },
+    {
+      "path": "src/lib/portal/business-presence.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 32
+    },
+    {
+      "path": "src/lib/portal/direct-sales-orders.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/lib/portal/invitations.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 19
+    },
+    {
+      "path": "src/lib/portal/ownership-transfers.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 30
+    },
+    {
+      "path": "src/lib/portal/portal-product-faqs.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 23
+    },
+    {
+      "path": "src/lib/portal/portal-product-media.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/portal/portal-product-publish.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 30
+    },
+    {
+      "path": "src/lib/portal/portal-reads.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 32
+    },
+    {
+      "path": "src/lib/portal/publish-validators.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/profile-mode/mode.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 12
+    },
+    {
+      "path": "src/lib/promotions/coupon-metrics.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 13
+    },
+    {
+      "path": "src/lib/promotions/coupons.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 17
+    },
+    {
+      "path": "src/lib/promotions/public-reads.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/protected-actions/index.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/protected-actions/observability.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/protected-actions/registry.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/related/overrides.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "src/lib/reviews/business-response.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/lib/reviews/composer.functions.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/reviews/composer.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/reviews/public-reads.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 14
+    },
+    {
+      "path": "src/lib/reviews/resolve-business.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/theme/theme.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/time/merida.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/toast.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/lib/toast.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/traveler/alux-spatial.ts",
+      "rule": "prefer-const",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/traveler/alux-spatial.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/lib/traveler/alux-traveler.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 26
+    },
+    {
+      "path": "src/lib/traveler/decision-center-destination.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/lib/traveler/decision-center.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/traveler/destination-context.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/traveler/destination-context/contributors/hours.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/traveler/destination-context/contributors/traffic.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 14
+    },
+    {
+      "path": "src/lib/traveler/destination-context/contributors/weather.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/traveler/destination-context/registry.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/traveler/destination-context/resolve.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/traveler/destination-context/types.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/traveler/journey-stage.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/traveler/live-day.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "src/lib/traveler/live-recap.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/traveler/on-trip-concierge.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/lib/traveler/profile-personal.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/traveler/stage-experience.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 11
+    },
+    {
+      "path": "src/lib/traveler/traffic-status.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/traveler/travel-memories.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/traveler/travel-plan-geo.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/lib/traveler/travel-plan-optimize.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/lib/traveler/travel-plans.functions.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/traveler/travel-plans.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 213
+    },
+    {
+      "path": "src/lib/traveler/traveler-account.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/traveler/traveler-favorites.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 27
+    },
+    {
+      "path": "src/lib/traveler/traveler-public.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/lib/traveler/trip-eligibility.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/lib/traveler/trip-phase.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/traveler/use-travel-stage.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/visibility/admin-grants.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 17
+    },
+    {
+      "path": "src/lib/visibility/business-visibility-grants.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/visibility/effective-visibility.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/visibility/founder-spotlight.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/visibility/plan-limit-errors.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/visibility/plan-limits.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/visibility/presence-report.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/lib/visibility/visibility-notifications.server.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/visibility/visibility-notifications.server.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 79
+    },
+    {
+      "path": "src/lib/visibility/visibility-plans.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/lib/visitor-intel/intel-aggregate.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/visitor-intel/journey.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 11
+    },
+    {
+      "path": "src/lib/visitor-intel/kpis.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/visitor-intel/learning.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/visitor-intel/opportunities.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/lib/visitor-intel/prioritization.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 17
+    },
+    {
+      "path": "src/lib/visitor-intel/projection.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 17
+    },
+    {
+      "path": "src/lib/visitor-intel/projection.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/visitor-intel/segment-prioritization.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "src/lib/visitor-intel/segments.functions.ts",
+      "rule": "prefer-const",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/visitor-intel/segments.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/behavior.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 19
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/calendar.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/causality.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/engine.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/index.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/paths.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 24
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/persistence.functions.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/prng.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/profiles.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 37
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/scenario.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/scenarios/oriente-maya-90d.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/sub-motors/alux.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 47
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/sub-motors/commerce.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 77
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/sub-motors/concierge.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 141
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/sub-motors/index.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/sub-motors/reviews.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 46
+    },
+    {
+      "path": "src/lib/visitor-intel/simulation/sub-motors/types.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/lib/workspace/alux-registry.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/workspace/context-registry.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/lib/workspace/definitions/index.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 91
+    },
+    {
+      "path": "src/lib/workspace/navigation-registry.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/workspace/toast-bus.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/workspace/types.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/lib/workspace/workspace-registry.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/mocks/categorias.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/mocks/empresas.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/mocks/rutas.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/pwa/push.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/pwa/register-sw.ts",
+      "rule": "<parser>",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/pwa/sync-queue.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/pwa/sync-runner.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/router.tsx",
+      "rule": "react-refresh/only-export-components",
+      "severity": "warning",
+      "count": 1
+    },
+    {
+      "path": "src/routes/__root.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 42
+    },
+    {
+      "path": "src/routes/_authenticated.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/_authenticated/admin/anfitriones.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/routes/_authenticated/admin/concierge.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/_authenticated/admin/empresas.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/_authenticated/admin/ia.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/_authenticated/admin/index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/admin/operaciones.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/_authenticated/admin/route.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/admin/sistema.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/_authenticated/admin/sistema.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/_authenticated/admin/sistema.usuarios.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 40
+    },
+    {
+      "path": "src/routes/_authenticated/admin/turistas.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/cms.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/_authenticated/cms/alertas.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "src/routes/_authenticated/cms/alux.calidad.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/routes/_authenticated/cms/alux.conocimiento.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 16
+    },
+    {
+      "path": "src/routes/_authenticated/cms/alux.feedback.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 14
+    },
+    {
+      "path": "src/routes/_authenticated/cms/alux.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/routes/_authenticated/cms/categorias.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/_authenticated/cms/demo-pack.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 14
+    },
+    {
+      "path": "src/routes/_authenticated/cms/destinos.$destinationId.editar.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/cms/destinos.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/routes/_authenticated/cms/destinos.nueva.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/_authenticated/cms/empresas.$businessId.editar.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/cms/empresas.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/routes/_authenticated/cms/empresas.nueva.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/_authenticated/cms/experience-builder.inventory.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/cms/experience-builder.pages.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/cms/experience-builder.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/_authenticated/cms/index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 36
+    },
+    {
+      "path": "src/routes/_authenticated/cms/media.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 13
+    },
+    {
+      "path": "src/routes/_authenticated/cms/observabilidad.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/routes/_authenticated/cms/pagos.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 24
+    },
+    {
+      "path": "src/routes/_authenticated/cms/productos.$productId.editar.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/cms/productos.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/routes/_authenticated/cms/productos.nueva.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/_authenticated/cms/regiones.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/_authenticated/cms/relacionados.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 12
+    },
+    {
+      "path": "src/routes/_authenticated/cms/reviews.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/_authenticated/cms/simulation.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 18
+    },
+    {
+      "path": "src/routes/_authenticated/cms/travel-plans.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/_authenticated/cms/ventas-en-linea.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 19
+    },
+    {
+      "path": "src/routes/_authenticated/cms/visibilidad.solicitudes.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/routes/_authenticated/cms/visibilidad.solicitudes.tsx",
+      "rule": "react-hooks/exhaustive-deps",
+      "severity": "warning",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/cms/visibilidad.spotlight.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/routes/_authenticated/cms/visibilidad.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 47
+    },
+    {
+      "path": "src/routes/_authenticated/cms/visitor-intel.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 86
+    },
+    {
+      "path": "src/routes/_authenticated/cms/zonas.$id.editar.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/cms/zonas.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/routes/_authenticated/cms/zonas.nueva.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/concierge/expedientes.$caseId.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/_authenticated/concierge/index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 28
+    },
+    {
+      "path": "src/routes/_authenticated/concierge/route.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/anfitrion.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/carrito.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 8
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/checkout.$orderId.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/concierge.$caseId.evaluar.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/concierge.$caseId.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/concierge.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/documentos.$orderId.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 20
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/empresa.$businessId.publicacion.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 13
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/historial.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/mi-viaje.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 151
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/mis-cupones.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/notificaciones.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/pagos.error.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/pagos.exito.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 19
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/perfil-publico.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 11
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/perfil.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 19
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/route.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/cuenta/stage-simulator.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/routes/_authenticated/empresa.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/_authenticated/mi-viaje.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/_authenticated/paginas.$.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/paginas.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/portal/canjear.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 13
+    },
+    {
+      "path": "src/routes/_authenticated/portal/canjes.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 12
+    },
+    {
+      "path": "src/routes/_authenticated/portal/canjes.tsx",
+      "rule": "react-hooks/exhaustive-deps",
+      "severity": "warning",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/portal/catalogo.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 31
+    },
+    {
+      "path": "src/routes/_authenticated/portal/concierge.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/_authenticated/portal/empresas.$businessId.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/_authenticated/portal/empresas.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/_authenticated/portal/ficha.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 14
+    },
+    {
+      "path": "src/routes/_authenticated/portal/galeria.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/routes/_authenticated/portal/index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/_authenticated/portal/invitaciones.$token.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "src/routes/_authenticated/portal/invitaciones.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 11
+    },
+    {
+      "path": "src/routes/_authenticated/portal/metricas.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 24
+    },
+    {
+      "path": "src/routes/_authenticated/portal/pagos.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/routes/_authenticated/portal/presencia.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 29
+    },
+    {
+      "path": "src/routes/_authenticated/portal/productos.$productId.preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/_authenticated/portal/propiedad.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 23
+    },
+    {
+      "path": "src/routes/_authenticated/portal/reportes.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 28
+    },
+    {
+      "path": "src/routes/_authenticated/portal/resenas.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/_authenticated/portal/route.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 11
+    },
+    {
+      "path": "src/routes/_authenticated/portal/ventas-en-linea.ordenes.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 18
+    },
+    {
+      "path": "src/routes/_authenticated/portal/ventas-en-linea.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 18
+    },
+    {
+      "path": "src/routes/_authenticated/portal/visibilidad.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 18
+    },
+    {
+      "path": "src/routes/[.]lovable.oauth.consent.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 10
+    },
+    {
+      "path": "src/routes/[.mcp]/invoke-tool/$tool.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/[.mcp]/list-tools.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/[.well-known]/oauth-protected-resource.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/alux.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/api/dev/media-pipeline-derive.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/api/dev/media-shadow-eval.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/api/public/alux/chat.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 32
+    },
+    {
+      "path": "src/routes/api/public/alux/signal.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/routes/api/public/health/maps.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/api/public/hooks/coupon-review-reminders.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 109
+    },
+    {
+      "path": "src/routes/api/public/hooks/eb-process-scheduled-publish.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/api/public/hooks/media-signature-renew.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/api/public/hooks/trip-journey-emails.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/api/public/hooks/trip-journey-emails.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 116
+    },
+    {
+      "path": "src/routes/api/public/hooks/visibility-notifications.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 59
+    },
+    {
+      "path": "src/routes/api/public/maps/static.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/api/public/payments/$provider/webhook.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 22
+    },
+    {
+      "path": "src/routes/api/public/studio-media.$.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/arma-tu-viaje.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/auth.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 16
+    },
+    {
+      "path": "src/routes/blog.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/casas-de-vacaciones.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/routes/contacto.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/convertir-en-anfitrion.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/email/unsubscribe.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 60
+    },
+    {
+      "path": "src/routes/empresas.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/eventos.$slug.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/routes/eventos.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/experiencias.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/hoteles.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/l.$slug.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/llms[.]txt.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 15
+    },
+    {
+      "path": "src/routes/lovable/business-mother-template-preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/lovable/context-engine-preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/routes/lovable/email/auth/preview.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/lovable/email/auth/preview.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 31
+    },
+    {
+      "path": "src/routes/lovable/email/auth/webhook.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/lovable/email/auth/webhook.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 88
+    },
+    {
+      "path": "src/routes/lovable/email/queue/process.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/lovable/email/queue/process.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 121
+    },
+    {
+      "path": "src/routes/lovable/email/suppression.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 81
+    },
+    {
+      "path": "src/routes/lovable/email/transactional/preview.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 37
+    },
+    {
+      "path": "src/routes/lovable/email/transactional/send.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/lovable/email/transactional/send.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 130
+    },
+    {
+      "path": "src/routes/lovable/experience-hero-preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 11
+    },
+    {
+      "path": "src/routes/lovable/experience-i1c-preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/lovable/experience-map-preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 6
+    },
+    {
+      "path": "src/routes/lovable/experience-products-preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 20
+    },
+    {
+      "path": "src/routes/lovable/experience-promotions-preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/lovable/experience-related-collection-preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/lovable/experience-reviews-preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/lovable/experience-subnav-ctabar-preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/routes/lovable/protected-actions-preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/lovable/tourism-card-preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/lovable/workspace-foundations.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 23
+    },
+    {
+      "path": "src/routes/lovable/workspace-preview.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 39
+    },
+    {
+      "path": "src/routes/manifest[.]webmanifest.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/mapa.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/marketplace.$.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/marketplace.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/mcp.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/offline.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/oriente-maya/$destino.$categoria.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 98
+    },
+    {
+      "path": "src/routes/oriente-maya/$destino.$categoria.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/oriente-maya/$destino.index.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/p.$slug.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/preview.$token.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 2
+    },
+    {
+      "path": "src/routes/preview/composition.$token.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/privacidad.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 13
+    },
+    {
+      "path": "src/routes/producto.$slug.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/promociones.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/que-hacer.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 7
+    },
+    {
+      "path": "src/routes/resenar.negocio.$slug.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/reset-password.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/restaurantes.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/robots[.]txt.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 1
+    },
+    {
+      "path": "src/routes/sitemap[.]xml.ts",
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/routes/sitemap[.]xml.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 5
+    },
+    {
+      "path": "src/routes/terminos.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 12
+    },
+    {
+      "path": "src/routes/unsubscribe.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 9
+    },
+    {
+      "path": "src/routes/viaje-compartido.$token.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 4
+    },
+    {
+      "path": "src/routes/viajero.$handle.tsx",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    },
+    {
+      "path": "src/types/auth.ts",
+      "rule": "prettier/prettier",
+      "severity": "error",
+      "count": 3
+    }
+  ]
+}
