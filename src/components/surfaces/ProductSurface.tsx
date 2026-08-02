@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * ProductSurface — Plantilla Madre de Producto (US-R3 · Sub-ola 2.3a).
  *
@@ -7,11 +8,22 @@
  * el Experience Builder. En producción y en Studio se inyecta el
  * detalle vía `ProductSurfaceProvider`; los bloques leen del contexto.
  */
-import { createContext, useContext } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { PublicShell } from "@/components/discovery";
 import type { MarketplaceProductDetail } from "@/lib/catalog/marketplace-reads.functions";
 import type { ProductRelatedDTO } from "@/lib/catalog/product-related.functions";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
+import {
+  createProductSurfaceContract,
+  type ProductSurfaceContractInput,
+} from "@/lib/omxds/surfaces/product-surface.contract";
+import { adaptExperienceSurfaceContract } from "@/lib/omxds/surfaces/experience-surface.adapter";
+import {
+  isOmxdsSurfaceContract,
+  type OmxdsSurfaceContract,
+} from "@/lib/omxds/surfaces/surface-contract";
 
 export const ProductSurfaceContext = createContext<MarketplaceProductDetail | null>(null);
 
@@ -24,8 +36,7 @@ export function useProduct(): MarketplaceProductDetail | null {
  * Se mantiene independiente para no romper consumidores existentes
  * de `ProductSurfaceContext`.
  */
-export const ProductSurfaceRelatedContext =
-  createContext<ProductRelatedDTO | null>(null);
+export const ProductSurfaceRelatedContext = createContext<ProductRelatedDTO | null>(null);
 
 export function ProductSurfaceProvider({
   product,
@@ -45,6 +56,59 @@ export function ProductSurfaceProvider({
   );
 }
 
+function canonicalProductHref(product: MarketplaceProductDetail): string {
+  const destination = product.business.destination_slug;
+  const category = product.business.category_slug;
+  if (destination && category) {
+    return `/oriente-maya/${encodeURIComponent(destination)}/${encodeURIComponent(category)}/${encodeURIComponent(product.business.slug)}/${encodeURIComponent(product.slug)}`;
+  }
+  return `/producto/${encodeURIComponent(product.slug)}`;
+}
+
+function relatedCount(
+  product: MarketplaceProductDetail,
+  related?: ProductRelatedDTO | null,
+): number {
+  return (
+    product.related.length +
+    (related?.sameCategoryInDestination.length ?? 0) +
+    (related?.otherInDestination.length ?? 0)
+  );
+}
+
+export interface ProductSurfaceContractBoundaryProps {
+  enabled: boolean;
+  product: MarketplaceProductDetail | null;
+  related?: ProductRelatedDTO | null;
+  legacy: ReactNode;
+}
+
+export function ProductSurfaceContractBoundary({
+  enabled,
+  product,
+  related,
+  legacy,
+}: ProductSurfaceContractBoundaryProps) {
+  if (!enabled || !product) return legacy;
+
+  const input: ProductSurfaceContractInput = {
+    id: product.id,
+    slug: product.slug,
+    name: product.name,
+    productType: product.product_type,
+    businessName: product.business.display_name,
+    canonicalUrl: canonicalProductHref(product),
+    hasMedia: Boolean(product.cover_url || product.media.some((item) => item.url)),
+    hasCollection: relatedCount(product, related) > 0,
+    verifiedBusiness: product.business.verified,
+  };
+  const surfaceContract =
+    adaptExperienceSurfaceContract(input) ?? createProductSurfaceContract(input);
+  if (!surfaceContract) return legacy;
+
+  return <ProductSurface product={product} surfaceContract={surfaceContract} />;
+}
+
 /**
  * Fallback monolítico usado por la ruta pública cuando la composición
  * `__tpl_product__` no está publicada (contingencia). No se registra en
@@ -52,8 +116,10 @@ export function ProductSurfaceProvider({
  */
 export function ProductSurface({
   product: propProduct,
+  surfaceContract,
 }: {
   product?: MarketplaceProductDetail | null;
+  surfaceContract?: OmxdsSurfaceContract;
 } = {}) {
   const ctxProduct = useContext(ProductSurfaceContext);
   const p = propProduct ?? ctxProduct;
@@ -64,17 +130,31 @@ export function ProductSurface({
         title="Producto no disponible"
         crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: "—" }]}
       >
-        <p className="text-sm text-muted-foreground">
-          Aún no publicamos esta ficha.
-        </p>
+        <p className="text-sm text-muted-foreground">Aún no publicamos esta ficha.</p>
       </PublicShell>
     );
   }
 
+  const activeContract =
+    surfaceContract &&
+    isOmxdsSurfaceContract(surfaceContract) &&
+    ["product", "experience"].includes(surfaceContract.family)
+      ? surfaceContract
+      : null;
   const hasSameBusiness = (p.related?.length ?? 0) > 0;
   const hasSameCatDest = (related?.sameCategoryInDestination.length ?? 0) > 0;
   const hasOtherDest = (related?.otherInDestination.length ?? 0) > 0;
-  const showDescubre = hasSameBusiness || hasSameCatDest || hasOtherDest;
+  const showDescubre =
+    !activeContract?.omissions.includes("collection") &&
+    (hasSameBusiness || hasSameCatDest || hasOtherDest);
+  const dominantAction = activeContract?.actions.find(
+    (action) => action.role === "dominant" && action.id === "add_to_trip",
+  );
+  const tripEligibility = evaluateTripEligibility({
+    kind: "product",
+    targetId: p.id,
+    title: p.name,
+  });
 
   return (
     <PublicShell
@@ -90,6 +170,19 @@ export function ProductSurface({
     >
       {p.description ? (
         <p className="max-w-3xl text-sm text-foreground/80">{p.description}</p>
+      ) : null}
+
+      {dominantAction && tripEligibility.eligible && tripEligibility.identity ? (
+        <div className="mt-6">
+          <AddToTravelPlanButton
+            kind={tripEligibility.identity.kind}
+            targetId={tripEligibility.identity.targetId}
+            title={p.name}
+            slug={p.slug}
+            imageUrl={activeContract?.omissions.includes("media") ? null : p.cover_url}
+            subtitle={p.product_type}
+          />
+        </div>
       ) : null}
 
       {showDescubre ? (
@@ -145,7 +238,7 @@ export function ProductSurface({
                 showImage: true,
                 showMeta: true,
                 showBadges: true,
-                showPrice: true,
+                showPrice: !activeContract,
                 showKindBadge: true,
                 dedupe: true,
                 showRationale: true,

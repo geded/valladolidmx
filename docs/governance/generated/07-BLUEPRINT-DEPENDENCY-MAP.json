@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.23",
+    "version": "0.24",
     "state": "Approved",
     "main_commit": "LOCAL_RECONCILIATION_2026-07-22",
     "blob": "LOCAL_RECONCILIATION_2026-07-22",
@@ -7018,6 +7018,44 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-009.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-009.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/omxds/surfaces/product-surface.contract.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/surfaces/product-surface.contract.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/surfaces/experience-surface.adapter.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/surfaces/experience-surface.adapter.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/surfaces/event-surface.contract.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/surfaces/event-surface.contract.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i3/product-experience-event-surfaces.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/i3/product-experience-event-surfaces.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-010.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-010.json"
     }
   ],
   "edges": [
@@ -17864,6 +17902,123 @@
       "destination": "DOC:docs/blueprint/18.39-OMXDS-V1-I3-B-BUSINESS-VERTICAL-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
       "evidence": "docs/blueprint/18.39-OMXDS-V1-I3-B-BUSINESS-VERTICAL-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/18.39-OMXDS-V1-I3-B-BUSINESS-VERTICAL-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/surfaces/ProductSurface.tsx:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/components/surfaces/ProductSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/surfaces/EventSurface.tsx:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/components/surfaces/EventSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/producto.$slug.tsx:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/routes/producto.$slug.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/eventos.$slug.tsx:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/routes/eventos.$slug.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/surfaces/product-surface.contract.ts:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/surfaces/product-surface.contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/surfaces/experience-surface.adapter.ts:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/surfaces/experience-surface.adapter.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/surfaces/event-surface.contract.ts:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/surfaces/event-surface.contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/product-experience-event-surfaces.contract.test.ts:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/product-experience-event-surfaces.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/business-vertical-surfaces.evidence.mjs:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-vertical-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-010.json:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-010.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
       "verified_at": "2026-08-02"
     }
   ],

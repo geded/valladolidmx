@@ -11,21 +11,66 @@ import { Link } from "@tanstack/react-router";
 import type { PublicEventDetail } from "@/lib/events/public-reads.functions";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
+import type { ReactNode } from "react";
+import { createEventSurfaceContract } from "@/lib/omxds/surfaces/event-surface.contract";
+import {
+  isOmxdsSurfaceContract,
+  type OmxdsSurfaceContract,
+} from "@/lib/omxds/surfaces/surface-contract";
 
 function fmt(iso?: string | null): string {
   if (!iso) return "";
   try {
     return new Intl.DateTimeFormat("es-MX", {
-      day: "2-digit", month: "long", year: "numeric",
-      hour: "2-digit", minute: "2-digit",
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     }).format(new Date(iso));
-  } catch { return iso; }
+  } catch {
+    return iso;
+  }
 }
 
-export function EventSurface({ event }: { event: PublicEventDetail }) {
+export interface EventSurfaceContractBoundaryProps {
+  enabled: boolean;
+  event: PublicEventDetail | null;
+  legacy: ReactNode;
+}
+
+export function EventSurfaceContractBoundary({
+  enabled,
+  event,
+  legacy,
+}: EventSurfaceContractBoundaryProps) {
+  if (!enabled || !event) return legacy;
+  const surfaceContract = createEventSurfaceContract({
+    id: event.id,
+    slug: event.slug,
+    title: event.title,
+    startsAt: event.starts_at,
+    hasMedia: Boolean(event.cover_url),
+    hasOrganizer: Boolean(event.organizer_business_slug || event.organizer_business_name),
+  });
+  if (!surfaceContract) return legacy;
+  return <EventSurface event={event} surfaceContract={surfaceContract} />;
+}
+
+export function EventSurface({
+  event,
+  surfaceContract,
+}: {
+  event: PublicEventDetail;
+  surfaceContract?: OmxdsSurfaceContract;
+}) {
   const when = event.ends_at
     ? `${fmt(event.starts_at)} – ${fmt(event.ends_at)}`
     : fmt(event.starts_at);
+  const activeContract =
+    surfaceContract && isOmxdsSurfaceContract(surfaceContract) && surfaceContract.family === "event"
+      ? surfaceContract
+      : null;
   // TP1.4B · Universal "Agregar a Mi Viaje" en la ficha canónica de
   // evento. Reutiliza exclusivamente la política centralizada
   // (`evaluateTripEligibility`) + botón oficial + store reactivo.
@@ -35,6 +80,13 @@ export function EventSurface({ event }: { event: PublicEventDetail }) {
     targetId: event.id,
     title: event.title,
   });
+  const dominantAction = activeContract?.actions.find(
+    (action) => action.role === "dominant" && action.id === "add_to_trip",
+  );
+  const showTripAction =
+    tripEligibility.eligible &&
+    tripEligibility.identity &&
+    (!activeContract || Boolean(dominantAction));
   return (
     <PublicShell
       eyebrow="Evento"
@@ -52,7 +104,7 @@ export function EventSurface({ event }: { event: PublicEventDetail }) {
               className="aspect-video w-full rounded-2xl border border-border/60 object-cover"
               loading="eager"
             />
-          ) : (
+          ) : activeContract?.omissions.includes("media") ? null : (
             <div className="aspect-video w-full rounded-2xl border border-dashed border-border bg-muted/30" />
           )}
           {event.summary ? (
@@ -78,11 +130,15 @@ export function EventSurface({ event }: { event: PublicEventDetail }) {
                 <p className="mt-1">{event.venue_name}</p>
               </>
             ) : null}
-            <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Entrada
-            </p>
-            <p className="mt-1">{event.is_free ? "Gratuita" : "De paga"}</p>
-            {tripEligibility.eligible && tripEligibility.identity ? (
+            {!activeContract?.omissions.includes("price") ? (
+              <>
+                <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Entrada
+                </p>
+                <p className="mt-1">{event.is_free ? "Gratuita" : "De paga"}</p>
+              </>
+            ) : null}
+            {showTripAction && tripEligibility.identity ? (
               <div className="mt-5">
                 <AddToTravelPlanButton
                   kind={tripEligibility.identity.kind}
@@ -94,7 +150,7 @@ export function EventSurface({ event }: { event: PublicEventDetail }) {
                 />
               </div>
             ) : null}
-            {event.external_url ? (
+            {!activeContract && event.external_url ? (
               <a
                 href={event.external_url}
                 target="_blank"

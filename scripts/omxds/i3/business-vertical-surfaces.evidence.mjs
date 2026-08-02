@@ -1,8 +1,10 @@
 import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 
 const base = "bc04fc43008c506c967ee2034a724533f254e7d6";
+const i3BHead = "0f740b84cd72f7cb07672ff7e350e998f0f4bc45";
 const routePath = "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx";
 const destinationRoutePath = "src/routes/oriente-maya/$destino.index.tsx";
 const allowed = new Set([
@@ -28,14 +30,28 @@ function gitLines(args) {
   return execFileSync("git", args, { encoding: "utf8" }).trim().split("\n").filter(Boolean);
 }
 
-const changed = new Set([
-  ...gitLines(["diff", "--name-only", `${base}...HEAD`]),
-  ...gitLines(["diff", "--name-only", "HEAD"]),
-  ...gitLines(["ls-files", "--others", "--exclude-standard"]),
-]);
-assert.equal(changed.size, 16, `I3-B must contain exactly 16 files, found ${changed.size}`);
-for (const file of changed) assert.ok(allowed.has(file), `I3-B scope violation: ${file}`);
-for (const file of allowed) assert.ok(changed.has(file), `I3-B authorized file missing: ${file}`);
+const originalI3BFiles = gitLines(["diff", "--name-only", `${base}...${i3BHead}`]);
+assert.equal(originalI3BFiles.length, 16);
+for (const file of originalI3BFiles)
+  assert.ok(allowed.has(file), `historical I3-B scope violation: ${file}`);
+for (const file of allowed)
+  assert.ok(originalI3BFiles.includes(file), `historical I3-B file missing: ${file}`);
+
+for (const file of [
+  routePath,
+  "src/components/surfaces/BusinessSurface.tsx",
+  "src/lib/omxds/surfaces/business-surface.contract.ts",
+  "src/lib/omxds/surfaces/hotel-surface.adapter.ts",
+  "src/lib/omxds/surfaces/restaurant-surface.adapter.ts",
+  "scripts/omxds/i3/business-vertical-surfaces.contract.test.ts",
+])
+  assert.equal(
+    execFileSync("git", ["diff", "--name-only", i3BHead, "--", file], {
+      encoding: "utf8",
+    }),
+    "",
+    `I3-B regression: ${file}`,
+  );
 
 const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
@@ -91,7 +107,30 @@ const flagConsumers = gitLines([
   "--",
   "src/routes",
 ]).sort();
-assert.deepEqual(flagConsumers, [destinationRoutePath, routePath].sort());
+assert.ok(flagConsumers.includes(destinationRoutePath));
+assert.ok(flagConsumers.includes(routePath));
+const authorizations = readdirSync("docs/governance/product-authorizations")
+  .filter((file) => file.endsWith(".json"))
+  .map((file) =>
+    JSON.parse(readFileSync(join("docs/governance/product-authorizations", file), "utf8")),
+  );
+const authorizedRouteConsumers = new Set(
+  authorizations
+    .filter(
+      (authorization) =>
+        authorization.status === "Approved" &&
+        authorization.required_feature_flags?.includes("omxds_visual_v1_contracts_enabled=false"),
+    )
+    .flatMap((authorization) => authorization.permissions ?? [])
+    .filter(
+      (permission) =>
+        ["create", "modify"].includes(permission.operation) &&
+        permission.path.startsWith("src/routes/"),
+    )
+    .map((permission) => permission.path),
+);
+for (const file of flagConsumers)
+  assert.ok(authorizedRouteConsumers.has(file), `unauthorized SSR flag consumer: ${file}`);
 
 const sharedEvidence = readFileSync("scripts/omxds/i3/shared-surface.evidence.mjs", "utf8");
 assert.match(sharedEvidence, /authorizedRouteConsumers/);
