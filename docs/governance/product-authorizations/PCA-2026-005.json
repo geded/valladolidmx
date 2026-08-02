@@ -1,0 +1,38 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-005",
+  "title": "OMXDS V1 · I2-C Remaining Card Families Contract Batch",
+  "status": "Approved",
+  "branch": "feature/omxds-i2c-remaining-card-families-contract-v1",
+  "blueprint": "docs/blueprint/18.31-OMXDS-V1-I2C-REMAINING-CARD-FAMILIES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-01 · Reconstruir exclusivamente I2-C desde main@4144879a3e3dcfc97ff7456317ea0544f20a5f1f conforme a 18.30–18.32, reproducir las 21 rutas autorizadas, validar completamente y publicar sólo en PASS; flag OFF y fail-closed; sin merge, producción ni ampliación.",
+  "permissions": [
+    { "operation": "modify", "path": "src/lib/omxds/cards/card-contract.ts" },
+    { "operation": "modify", "path": "package.json" },
+    { "operation": "create", "path": "src/lib/omxds/cards/experience-card.contract.ts" },
+    { "operation": "create", "path": "src/lib/omxds/cards/experience-card.adapter.ts" },
+    { "operation": "create", "path": "src/lib/omxds/cards/hotel-card.contract.ts" },
+    { "operation": "create", "path": "src/lib/omxds/cards/hotel-card.adapter.ts" },
+    { "operation": "create", "path": "src/lib/omxds/cards/restaurant-card.contract.ts" },
+    { "operation": "create", "path": "src/lib/omxds/cards/restaurant-card.adapter.ts" },
+    { "operation": "create", "path": "src/lib/omxds/cards/event-card.contract.ts" },
+    { "operation": "create", "path": "src/lib/omxds/cards/event-card.adapter.ts" },
+    { "operation": "create", "path": "src/lib/omxds/cards/product-card.contract.ts" },
+    { "operation": "create", "path": "src/lib/omxds/cards/product-card.adapter.ts" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run test:i2a",
+    "bun run validate:i2a",
+    "bun run test:i2b",
+    "bun run validate:i2b",
+    "bun run test:i2c",
+    "bun run validate:i2c",
+    "bun run typecheck",
+    "bun run build",
+    "bun run governance:check",
+    "bun run governance:product-check"
+  ]
+}

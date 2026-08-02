@@ -16,6 +16,8 @@
     "validate:i2a": "bun run test:i2a && bun scripts/omxds/i2/destination-card.evidence.mjs",
     "test:i2b": "bun test scripts/omxds/i2/business-card.contract.test.ts",
     "validate:i2b": "bun run test:i2b && bun scripts/omxds/i2/business-card.evidence.mjs",
+    "test:i2c": "bun test scripts/omxds/i2/remaining-card-families.contract.test.ts",
+    "validate:i2c": "bun run test:i2c && bun scripts/omxds/i2/remaining-card-families.evidence.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "governance:generate": "bun scripts/governance/generate-artifact-inventory.mjs",
