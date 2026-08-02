@@ -103,12 +103,6 @@ const flagConsumers = filesBelow("src/routes")
 for (const file of flagConsumers)
   assert.ok(authorizedRouteConsumers.has(file), `unauthorized SSR flag consumer: ${file}`);
 
-const i3aAuthorization = authorizations.find(
-  (authorization) => authorization.id === "PCA-2026-008" && authorization.status === "Approved",
-);
-if (i3aAuthorization)
-  assert.deepEqual(flagConsumers, ["src/routes/oriente-maya/$destino.index.tsx"]);
-
 console.log(
   "I3-0 evidence: PASS (historical scope preserved; shared contract intact; flag OFF/fail-closed; SSR consumers PCA-authorized).",
 );
