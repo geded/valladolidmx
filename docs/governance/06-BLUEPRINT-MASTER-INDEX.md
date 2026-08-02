@@ -2,7 +2,7 @@
 
 **Estado:** Approved
 
-**Versión:** 0.24
+**Versión:** 0.25
 
 **Última actualización:** 2026-08-02
 
@@ -16,30 +16,30 @@ Este documento contiene el catálogo canónico del universo documental bajo `doc
 
 Esta sección se reemitió el 2026-07-22 conforme al mandato Founder de revisión RV0.2. El alcance del índice sigue siendo registrar autoridad documental adjudicada; no acredita por sí mismo implementación, despliegue, tráfico real ni cierre de dependencias. El orden de ejecución continúa determinado por el [roadmap oficial v2.1](../blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md).
 
-El universo total del árbol `docs/blueprint/` es actualmente de **494 archivos** verificados. El índice registra **494 filas** adjudicadas tras admitir `18.40` para I3-C Product, Experience and Event Surfaces y conservar las admisiones anteriores, por autorización Founder expresa. El árbol y la tabla quedan reconciliados sin brecha operativa. Las cifras anteriores se conservan únicamente como historia de versiones.
+El universo total del árbol `docs/blueprint/` es actualmente de **495 archivos** verificados. El índice registra **495 filas** adjudicadas tras admitir `18.41` para I3-D Business Premium Surface V1 conservadora y conservar las admisiones anteriores, por autorización Founder expresa. El árbol y la tabla quedan reconciliados sin brecha operativa. Las cifras anteriores se conservan únicamente como historia de versiones.
 
 Las asociaciones técnicas de las filas adjudicadas fueron validadas localmente contra el árbol actual del repositorio: se conservan sólo rutas resolubles, se normalizan expresiones truncadas y se eliminan autorreferencias. La evidencia documental autocontenida se distingue expresamente de una prueba operativa externa.
 
 ## 2.1 Universo documental verificable
 
-El universo total bajo `docs/blueprint/` es de **494 archivos únicos** (medición 2026-08-02 posterior a la admisión gobernada de `18.40`):
+El universo total bajo `docs/blueprint/` es de **495 archivos únicos** (medición 2026-08-02 posterior a la admisión gobernada de `18.41`):
 
-- **479** archivos en la raíz de `docs/blueprint/`.
+- **480** archivos en la raíz de `docs/blueprint/`.
 - **15** archivos en 5 subdirectorios: `artifacts/`, `audits/`, `project-constitution/`, `roadmap/`, `templates/`.
-- **479 + 15 = 494**.
+- **480 + 15 = 495**.
 
-El índice registra actualmente **494 filas** en `§4`. La brecha se mantiene en `0`; v0.24 admite `18.40` exclusivamente para I3-C. Los 119 hallazgos congelados y el contenido sustantivo anterior no fueron reabiertos.
+El índice registra actualmente **495 filas** en `§4`. La brecha se mantiene en `0`; v0.25 admite `18.41` exclusivamente para I3-D Business Premium Surface V1 conservadora. Los 119 hallazgos congelados y el contenido sustantivo anterior no fueron reabiertos.
 
 Los conteos previos (`429`, `432`, `439`, `442`, `444`, `447`, `453`) reflejan medidas históricas del árbol o del índice; ninguno representa el universo actual y no deben citarse fuera del `§6 Control de versiones`.
 
 ## 2.2 Metodología reproducible
 
 ```text
-find docs/blueprint -type f | wc -l                    # 494 archivos únicos (2026-08-02)
-find docs/blueprint -maxdepth 1 -type f | wc -l        # 479 raíz
+find docs/blueprint -type f | wc -l                    # 495 archivos únicos (2026-08-02)
+find docs/blueprint -maxdepth 1 -type f | wc -l        # 480 raíz
 find docs/blueprint -mindepth 2 -type f | wc -l        # 15 en subdirectorios
 find docs/blueprint -mindepth 1 -type d                # 5 subdirectorios (artifacts, audits, project-constitution, roadmap, templates)
-grep -c '^| \[`docs/blueprint/' docs/governance/06-BLUEPRINT-MASTER-INDEX.md   # 494 filas adjudicadas
+grep -c '^| \[`docs/blueprint/' docs/governance/06-BLUEPRINT-MASTER-INDEX.md   # 495 filas adjudicadas
 ```
 
 Delta reproducible tabla ↔ árbol:
@@ -75,31 +75,31 @@ Semántica obligatoria:
 
 ## 3.1 Resumen de adjudicación
 
-Recomputado sobre las 494 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $5 }' | sort | uniq -c`, 2026-08-02):
+Recomputado sobre las 495 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $5 }' | sort | uniq -c`, 2026-08-02):
 
 | Estado | Documentos |
 |---|---:|
-| `Approved` | 202 |
+| `Approved` | 203 |
 | `Draft` | 288 |
 | `Superseded` | 3 |
 | `Historical` | 1 |
 | `Deprecated` | 0 |
-| **Total adjudicado** | **494** |
+| **Total adjudicado** | **495** |
 | No adjudicado | 0 |
-| **Total del árbol** | **494** |
+| **Total del árbol** | **495** |
 
 Los conteos previos (`155 / 285`, `442`) se conservan sólo para el `§6 Control de versiones`; no representan el estado actual. La cobertura declarada en versiones anteriores (274 implementaciones, 14 migraciones, 251 pruebas/evidencia) queda como métrica histórica de la versión v0.5 y se recomputará cuando la brecha de 11 filas se adjudique.
 
 ## 3.2 Resumen por dominio primario
 
-Recomputado sobre las 494 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $7 }' | sort | uniq -c`, 2026-08-02):
+Recomputado sobre las 495 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $7 }' | sort | uniq -c`, 2026-08-02):
 
 | ID | Dominio | Documentos |
 |---|---|---:|
 | `D01` | `product-governance` | 35 |
 | `D02` | `platform-foundation` | 22 |
 | `D03` | `identity-security` | 45 |
-| `D04` | `content-experience` | 114 |
+| `D04` | `content-experience` | 115 |
 | `D05` | `destination-discovery` | 37 |
 | `D06` | `marketplace-commerce` | 25 |
 | `D07` | `provider-operations` | 24 |
@@ -110,9 +110,9 @@ Recomputado sobre las 494 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ {
 | `D12` | `engagement-notifications` | 14 |
 | `D13` | `media-delivery` | 30 |
 | `D14` | `growth-reliability` | 21 |
-|  | **Total adjudicado** | **494** |
+|  | **Total adjudicado** | **495** |
 
-Verificación aritmética: `35+22+45+114+37+25+24+54+29+16+28+14+30+21 = 494`. `20.01` permanece adjudicado en D01; `18.15`–`18.16` permanecen en D01; y `18.17`–`18.40` se adjudican en D04. La reconciliación documental sólo admite I3-C y no autoriza producción ni I3-D.
+Verificación aritmética: `35+22+45+115+37+25+24+54+29+16+28+14+30+21 = 495`. `20.01` permanece adjudicado en D01; `18.15`–`18.16` permanecen en D01; y `18.17`–`18.41` se adjudican en D04. La reconciliación documental sólo admite I3-D Business Premium Surface V1 conservadora y no autoriza merge, producción ni activación pública.
 
 La asignación primaria expresa accountability documental. Las dependencias e impactos transversales se modelarán como aristas en `07`; no crean owners múltiples en este índice.
 
@@ -617,21 +617,22 @@ La asignación primaria expresa accountability documental. Las dependencias e im
 | [`docs/blueprint/18.38-OMXDS-V1-I3-A-DESTINATION-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md`](../blueprint/18.38-OMXDS-V1-I3-A-DESTINATION-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md) | 18.38 · OMXDS V1 · I3-A Destination Surface · Implementation Authorization Pack v1.0 | `1.0` | `Approved` | Blueprint · 18.38-omxds-v1-i3-a-destination-surface-implementation-authorization-pack-v1.0 | `D04 · content-experience` | — | — | `src/components/surfaces/DestinationSurface.tsx; src/routes/oriente-maya/$destino.index.tsx; package.json; scripts/omxds/i3/destination-surface.contract.test.ts; scripts/omxds/i3/destination-surface.evidence.mjs; scripts/omxds/i3/shared-surface.evidence.mjs; docs/governance/product-authorizations/PCA-2026-008.json` | — | `bun run test:i3:0`; `bun run validate:i3:0`; `bun run test:i3:a`; `bun run validate:i3:a`; `bun run lint`; `bun run governance:check`; `bun run governance:product-check` | — | Founder approval and addenda recorded 2026-08-02 · Autoriza exclusivamente I3-A sobre `main@6ca2ebc6`: Destination Surface, el loader existente de su única ruta canónica como consumidor SSR y la remediación cerrada del gate I3-0 para PCAs posteriores; flag OFF/fail-closed y fallback exacto; sin rutas, consultas, Builder, comercio, reservas, producción ni I3-B/C/D. | 2026-08-02 |
 | [`docs/blueprint/18.39-OMXDS-V1-I3-B-BUSINESS-VERTICAL-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md`](../blueprint/18.39-OMXDS-V1-I3-B-BUSINESS-VERTICAL-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md) | 18.39 · OMXDS V1 · I3-B Business Vertical Surfaces · Implementation Authorization Pack v1.0 | `1.0` | `Approved` | Blueprint · 18.39-omxds-v1-i3-b-business-vertical-surfaces-implementation-authorization-pack-v1.0 | `D04 · content-experience` | — | — | `src/components/surfaces/BusinessSurface.tsx; src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx; src/lib/omxds/surfaces/business-surface.contract.ts; src/lib/omxds/surfaces/hotel-surface.adapter.ts; src/lib/omxds/surfaces/restaurant-surface.adapter.ts; package.json; scripts/omxds/i3/business-vertical-surfaces.contract.test.ts; scripts/omxds/i3/business-vertical-surfaces.evidence.mjs; scripts/omxds/i3/shared-surface.evidence.mjs; scripts/omxds/i3/destination-surface.evidence.mjs; docs/governance/product-authorizations/PCA-2026-009.json` | — | `bun run test:i3:b`; `bun run validate:i3:b`; `bun run validate:i3:0`; `bun run validate:i3:a`; `bun run lint`; `bun run governance:check`; `bun run governance:product-check` | — | Founder approval recorded 2026-08-02 · Autoriza exclusivamente I3-B sobre `main@bc04fc43`: Business Standard owner, Hotel/Restaurant como adaptadores, loader existente como consumidor SSR y fallback exacto OFF/fail-closed; sin rutas nuevas, consultas, Premium, Builder, comercio, reservas, producción ni I3-C/D. | 2026-08-02 |
 | [`docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md`](../blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md) | 18.40 · OMXDS V1 · I3-C Product, Experience and Event Surfaces · Implementation Authorization Pack v1.0 | `1.0` | `Approved` | Blueprint · 18.40-omxds-v1-i3-c-product-experience-event-surfaces-implementation-authorization-pack-v1.0 | `D04 · content-experience` | — | — | `src/components/surfaces/ProductSurface.tsx; src/components/surfaces/EventSurface.tsx; src/routes/producto.$slug.tsx; src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx; src/routes/eventos.$slug.tsx; src/lib/omxds/surfaces/product-surface.contract.ts; src/lib/omxds/surfaces/experience-surface.adapter.ts; src/lib/omxds/surfaces/event-surface.contract.ts; package.json; scripts/omxds/i3/product-experience-event-surfaces.contract.test.ts; scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs; scripts/omxds/i3/business-vertical-surfaces.evidence.mjs; docs/governance/product-authorizations/PCA-2026-010.json` | — | `bun run validate:i3:c`; `bun run validate:i3:0`; `bun run validate:i3:a`; `bun run validate:i3:b`; `bun run lint`; `bun run governance:check`; `bun run governance:product-check` | — | Founder approval recorded 2026-08-02 · Autoriza exclusivamente I3-C sobre `main@c3d663e5`: Product/Event conservan ownership, Experience es adaptador semántico y tres loaders existentes son consumidores SSR nuevos; flag OFF/fail-closed y fallback exacto; sin rutas nuevas, consultas, Builder, Premium, comercio, reservas, producción ni I3-D. | 2026-08-02 |
+| [`docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md`](../blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md) | 18.41 · OMXDS V1 · I3-D Business Premium Surface · Implementation Authorization Pack v1.0 | `1.0` | `Approved` | Blueprint · 18.41-omxds-v1-i3-d-business-premium-surface-implementation-authorization-pack-v1.0 | `D04 · content-experience` | — | — | `src/components/surfaces/BusinessSurface.tsx; src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx; src/lib/omxds/surfaces/business-premium-surface.contract.ts; src/lib/omxds/surfaces/business-premium-eligibility.server.ts; package.json; scripts/omxds/i3/business-premium-surface.contract.test.ts; scripts/omxds/i3/business-premium-surface.evidence.mjs; scripts/omxds/i3/business-vertical-surfaces.evidence.mjs; scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs; docs/governance/product-authorizations/PCA-2026-011.json` | — | `bun run validate:i3:d`; `bun run validate:i3:0`; `bun run validate:i3:a`; `bun run validate:i3:b`; `bun run validate:i3:c`; `bun run lint`; `bun run governance:check`; `bun run governance:product-check` | — | Founder approval recorded 2026-08-02 · Autoriza exclusivamente I3-D sobre `main@ec9ae951`: Business Premium V1 conservadora dentro del renderer y la ruta Business existentes, con una lectura SSR de elegibilidad sólo después del flag explícitamente true, degradación fail-closed a Business Standard y exclusión de Hotel/Restaurant; flag OFF y fallback exacto; sin rutas o loaders nuevos, schema, migraciones, APIs externas, dependencias, datos reales, Builder, comercio, reservas, producción ni activación pública. | 2026-08-02 |
 ## 5. Criterios objetivos para salir de Draft
 
 | Gate | Estado 2026-07-24 | Evidencia o pendiente |
 |---|---|---|
-| Filas adjudicadas | 494 sobre 494 del árbol | Cerrado por v0.24 (admisión documental de `18.40` reconciliada). |
+| Filas adjudicadas | 495 sobre 495 del árbol | Cerrado por v0.25 (admisión documental de `18.41` reconciliada). |
 | Rutas y artefactos existentes | Cumplido para referencias conservadas | Las rutas técnicas retenidas resuelven contra el árbol local. La evidencia autocontenida no se presenta como prueba externa. |
 | Superseded-pass cerrado | Cumplido | 3 `Superseded` con relaciones aprobadas; 0 derivas inesperadas. |
 | ADR de dominios aprobado | Cumplido | `ADR-GOV-0001` formaliza los 14 dominios aprobados por el Founder. |
-| Dominios primarios asignados | Cumplido | Las 494 filas contienen exactamente un dominio `D01`–`D14`. |
+| Dominios primarios asignados | Cumplido | Las 495 filas contienen exactamente un dominio `D01`–`D14`. |
 | Base de derivación para `07` definida | Cumplido | `07` deberá derivarse desde la última versión de `06` aprobada por el Founder. |
 | Evidencia reproducible del PR #12 | Cumplido | PR #12, head `a832c568…`, merge `2e50745e…`, blob `0d047f02…`; ADR publicada mediante PR #13, merge `497d08e3…`, blob `8153c886…`. |
 | Aprobación Founder de v0.5 | Cumplido | El Founder aprobó la propuesta local v0.5; PR #13 fue fusionado en `main`. |
-| Reconciliación tabla ↔ árbol | Cumplido | Universo reconciliado a **494 = 494** en v0.24; sin brecha operativa. |
+| Reconciliación tabla ↔ árbol | Cumplido | Universo reconciliado a **495 = 495** en v0.25; sin brecha operativa. |
 
-El documento permanece **operativamente Approved** para las 494 filas adjudicadas. RV0.2 está `Approved · Closed`; la cohorte 1 de RV0.3 queda definida sólo documentalmente; el gate `20.01` permanece autorizado como control de gobernanza; y `18.17`–`18.40` quedan admitidos documentalmente. La implementación se rige por una autorización PCA separada y explícita.
+El documento permanece **operativamente Approved** para las 495 filas adjudicadas. RV0.2 está `Approved · Closed`; la cohorte 1 de RV0.3 queda definida sólo documentalmente; el gate `20.01` permanece autorizado como control de gobernanza; y `18.17`–`18.41` quedan admitidos documentalmente. La implementación se rige por una autorización PCA separada y explícita.
 
 ## 6. Control de versiones
 
@@ -662,3 +663,4 @@ El documento permanece **operativamente Approved** para las 494 filas adjudicada
 | v0.22 | 2026-08-02 | Founder | Admite `18.38` en D04 y registra exclusivamente I3-A Destination Surface sobre la base congelada y su addendum. Universo reconciliado: **492 = 492**. Conecta sólo el loader existente de la ruta canónica como consumidor SSR, conserva el fallback exacto con el flag OFF/fail-closed y excluye merge, producción, I3-B/C/D, rutas nuevas, schema, APIs, dependencias, datos reales, Builder, comercio y reservas. |
 | v0.23 | 2026-08-02 | Founder | Admite `18.39` en D04 y registra exclusivamente I3-B Business Vertical Surfaces sobre la base congelada. Universo reconciliado: **493 = 493**. Business Standard conserva ownership; Hotel/Restaurant son adaptadores; el flag permanece OFF/fail-closed y se excluyen merge, producción, I3-C/D, rutas nuevas, schema, APIs, dependencias, datos reales, Premium, Builder, comercio y reservas. |
 | v0.24 | 2026-08-02 | Founder | Admite `18.40` en D04 y registra exclusivamente I3-C Product, Experience and Event Surfaces sobre la base congelada. Universo reconciliado: **494 = 494**. Product/Event conservan ownership; Experience es adaptador; el flag permanece OFF/fail-closed y se excluyen merge, producción, I3-D, rutas nuevas, schema, APIs, dependencias, consultas nuevas, datos reales, Premium, Builder, comercio y reservas. |
+| v0.25 | 2026-08-02 | Founder | Admite `18.41` en D04 y registra exclusivamente I3-D Business Premium Surface V1 conservadora sobre la base congelada. Universo reconciliado: **495 = 495**. La elegibilidad se evalúa sólo después del flag explícitamente true y degrada fail-closed a Business Standard; Hotel/Restaurant no son interceptados; se excluyen merge, producción, activación pública, rutas o loaders nuevos, schema, migraciones, APIs externas, dependencias, datos reales, Builder, comercio y reservas. |

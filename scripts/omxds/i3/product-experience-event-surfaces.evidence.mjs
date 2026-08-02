@@ -4,6 +4,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const base = "c3d663e5c74bcd5c0f1c96f01da2974c992d1dc6";
+const i3CHead = "1b67c610af4643f115a4901a2865f766c609018f";
 const productRoutePath = "src/routes/producto.$slug.tsx";
 const territorialProductRoutePath =
   "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx";
@@ -38,13 +39,31 @@ function gitLines(args) {
   return execFileSync("git", args, { encoding: "utf8" }).trim().split("\n").filter(Boolean);
 }
 
-const changed = new Set([
-  ...gitLines(["diff", "--name-only", base]),
-  ...gitLines(["ls-files", "--others", "--exclude-standard"]),
-]);
-assert.equal(changed.size, 18, "I3-C must contain exactly 18 files");
-for (const file of changed) assert.ok(allowed.has(file), `I3-C scope violation: ${file}`);
-for (const file of allowed) assert.ok(changed.has(file), `I3-C authorized file missing: ${file}`);
+const originalI3CFiles = gitLines(["diff", "--name-only", `${base}...${i3CHead}`]);
+assert.equal(originalI3CFiles.length, 18, "historical I3-C must contain exactly 18 files");
+for (const file of originalI3CFiles)
+  assert.ok(allowed.has(file), `historical I3-C scope violation: ${file}`);
+for (const file of allowed)
+  assert.ok(originalI3CFiles.includes(file), `historical I3-C file missing: ${file}`);
+
+for (const file of [
+  productRoutePath,
+  territorialProductRoutePath,
+  eventRoutePath,
+  "src/components/surfaces/ProductSurface.tsx",
+  "src/components/surfaces/EventSurface.tsx",
+  "src/lib/omxds/surfaces/product-surface.contract.ts",
+  "src/lib/omxds/surfaces/experience-surface.adapter.ts",
+  "src/lib/omxds/surfaces/event-surface.contract.ts",
+  "scripts/omxds/i3/product-experience-event-surfaces.contract.test.ts",
+])
+  assert.equal(
+    execFileSync("git", ["diff", "--name-only", i3CHead, "--", file], {
+      encoding: "utf8",
+    }),
+    "",
+    `I3-C regression: ${file}`,
+  );
 
 const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
@@ -181,5 +200,5 @@ assert.match(tests, /fictional/);
 assert.doesNotMatch(tests, /Zazil Tunich/i);
 
 console.log(
-  "I3-C evidence: PASS (Product/Event owners; Experience adapter; five PCA-authorized SSR consumers; exact OFF legacy branches).",
+  "I3-C evidence: PASS (historical scope preserved; Product/Event owners and Experience adapter intact; five PCA-authorized SSR consumers).",
 );

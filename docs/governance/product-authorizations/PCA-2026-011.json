@@ -1,0 +1,44 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-011",
+  "title": "OMXDS V1 · I3-D Conservative Business Premium Surface",
+  "status": "Approved",
+  "branch": "feature/omxds-i3-d-business-premium-surface-v1",
+  "blueprint": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-02 · Implementar exclusivamente I3-D V1 conservadora sobre main@ec9ae951: misma entidad, ruta y BusinessSurface; grant efectivo Premium/Elite, publicación Admin, documento y media portal auditada como elegibilidad; una lectura SSR sólo después del flag true; OFF exacto y fail-closed; PR borrador sólo con PASS total; sin merge, producción, Builder, comercio, reservas, schema, dependencias, datos reales ni Zazil Tunich.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/surfaces/BusinessSurface.tsx" },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/surfaces/business-premium-surface.contract.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/surfaces/business-premium-eligibility.server.ts"
+    },
+    { "operation": "modify", "path": "package.json" }
+  ],
+  "public_routes": ["/oriente-maya/$destino/$categoria/$empresa"],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run lint",
+    "bun run validate:i1",
+    "bun run validate:i2a",
+    "bun run validate:i2b",
+    "bun run validate:i2c",
+    "bun run validate:i3:0",
+    "bun run validate:i3:a",
+    "bun run validate:i3:b",
+    "bun run validate:i3:c",
+    "bun run validate:i3:d",
+    "bun run typecheck",
+    "bun run build",
+    "bun run governance:check",
+    "bun run governance:product-check"
+  ]
+}

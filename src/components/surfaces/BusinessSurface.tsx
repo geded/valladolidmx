@@ -38,6 +38,7 @@ import { ExperienceProductsBlock } from "@/components/experience-builder/blocks/
 import { ExperiencePromotionsBlock } from "@/components/experience-builder/blocks/experience-promotions/ExperiencePromotionsBlock";
 import { ExperienceReviewsBlock } from "@/components/experience-builder/blocks/experience-reviews/ExperienceReviewsBlock";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
+import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
 import {
   businessToHeroDTO,
   businessToSubnavDTO,
@@ -58,6 +59,10 @@ import {
   isOmxdsSurfaceContract,
   type OmxdsSurfaceContract,
 } from "@/lib/omxds/surfaces/surface-contract";
+import {
+  createBusinessPremiumSurfaceContract,
+  type BusinessPremiumEligibilityResult,
+} from "@/lib/omxds/surfaces/business-premium-surface.contract";
 
 /* ------------------------------------------------------------------ *
  * Contexto — poblado por la ruta pública (SSR-safe).
@@ -178,6 +183,8 @@ export interface BusinessSurfaceProps {
   business?: MarketplaceBusinessDetail | null;
   /** I3-B · contrato validado; ausente conserva exactamente el renderer vigente. */
   surfaceContract?: OmxdsSurfaceContract;
+  /** I3-D · presentación Premium sólo después de elegibilidad SSR completa. */
+  premiumEligibility?: BusinessPremiumEligibilityResult | null;
 }
 
 function businessRelatedCount(related?: BusinessRelatedDTO | null): number {
@@ -202,16 +209,6 @@ function businessToSurfaceContractInput(
   };
 }
 
-function resolveBusinessVerticalSurfaceContract(
-  input: BusinessSurfaceContractInput,
-): OmxdsSurfaceContract | null {
-  return (
-    adaptHotelSurfaceContract(input) ??
-    adaptRestaurantSurfaceContract(input) ??
-    createBusinessSurfaceContract(input)
-  );
-}
-
 export interface BusinessSurfaceContractBoundaryProps extends BusinessSurfaceProps {
   enabled: boolean;
   legacy: ReactNode;
@@ -223,12 +220,29 @@ export function BusinessSurfaceContractBoundary({
   legacy,
   business,
   related,
+  premiumEligibility,
 }: BusinessSurfaceContractBoundaryProps) {
   if (!enabled || !business) return legacy;
 
-  const surfaceContract = resolveBusinessVerticalSurfaceContract(
-    businessToSurfaceContractInput(business, related),
-  );
+  const input = businessToSurfaceContractInput(business, related);
+  const verticalContract =
+    adaptHotelSurfaceContract(input) ?? adaptRestaurantSurfaceContract(input);
+  if (verticalContract)
+    return <BusinessSurface business={business} surfaceContract={verticalContract} />;
+
+  const premiumResolution = premiumEligibility
+    ? createBusinessPremiumSurfaceContract(input, premiumEligibility)
+    : null;
+  if (premiumResolution)
+    return (
+      <BusinessSurface
+        business={business}
+        surfaceContract={premiumResolution.contract}
+        premiumEligibility={premiumResolution.eligibility}
+      />
+    );
+
+  const surfaceContract = createBusinessSurfaceContract(input);
   if (!surfaceContract) return legacy;
 
   return <BusinessSurface business={business} surfaceContract={surfaceContract} />;
@@ -237,12 +251,13 @@ export function BusinessSurfaceContractBoundary({
 export function BusinessSurface({
   business: propBusiness,
   surfaceContract,
+  premiumEligibility,
 }: BusinessSurfaceProps = {}) {
   const ctxBusiness = useContext(BusinessSurfaceContext);
-  const b = propBusiness ?? ctxBusiness;
+  const sourceBusiness = propBusiness ?? ctxBusiness;
   const related = useContext(BusinessSurfaceRelatedContext);
 
-  if (!b) {
+  if (!sourceBusiness) {
     return (
       <PublicShell
         title="Empresa no disponible"
@@ -259,6 +274,26 @@ export function BusinessSurface({
     ["business", "hotel", "restaurant"].includes(surfaceContract.family)
       ? surfaceContract
       : null;
+  const activePremium =
+    activeContract?.family === "business" && premiumEligibility?.eligible
+      ? premiumEligibility
+      : null;
+  const b: MarketplaceBusinessDetail = activePremium
+    ? {
+        ...sourceBusiness,
+        cover_url: activePremium.cover?.url ?? null,
+        primary_location: activePremium.location
+          ? {
+              label: null,
+              address_line1: activePremium.location.addressLine1,
+              address_line2: activePremium.location.addressLine2,
+              latitude: activePremium.location.latitude,
+              longitude: activePremium.location.longitude,
+            }
+          : null,
+        primary_contact: activePremium.contact,
+      }
+    : sourceBusiness;
   const variant = resolveBusinessVariant(b.category_slug);
   const tier = b.plan_tier;
   const showPromotions =
@@ -281,6 +316,7 @@ export function BusinessSurface({
             ["servicios", "promociones"].includes(anchor.id)
           )
             return false;
+          if (activeContract.omissions.includes("media") && anchor.id === "galeria") return false;
           if (activeContract.omissions.includes("map") && anchor.id === "ubicacion") return false;
           if (activeContract.omissions.includes("reputation") && anchor.id === "opiniones")
             return false;
@@ -309,6 +345,52 @@ export function BusinessSurface({
           : [],
       }
     : legacyCtaBarDto;
+  const premiumGalleryDto = activePremium
+    ? {
+        variant: "mosaic" as const,
+        heading: `Conoce ${b.display_name}`,
+        subheading: null,
+        items: [activePremium.cover, ...activePremium.gallery]
+          .filter((item): item is NonNullable<typeof item> => item !== null)
+          .map((item) => ({
+            kind: "image" as const,
+            url: item.url,
+            alt: item.alt,
+            ...(item.caption ? { caption: item.caption } : {}),
+            width: item.width,
+            height: item.height,
+          })),
+        maxVisible: 9,
+        aspect: "landscape" as const,
+        ariaLabel: `Galería de ${b.display_name}`,
+        capabilities: {
+          lightbox: true,
+          captions: true,
+          video: false,
+          panorama360: false,
+          model3d: false,
+          ar: false,
+          ugc: false,
+        },
+      }
+    : null;
+  const premiumContactDto = activePremium?.contact
+    ? {
+        variant: "cards" as const,
+        heading: "Contacto",
+        columns: 1,
+        items: [
+          {
+            iconKey: "message-circle",
+            label: activePremium.contact.label || "Contacto público",
+            value: activePremium.contact.value,
+            tone: "default" as const,
+          },
+        ],
+        ariaLabel: `Contacto de ${b.display_name}`,
+        capabilities: { copyable: true, livePricing: false, liveAvailability: false },
+      }
+    : null;
 
   return (
     <PublicShell
@@ -341,6 +423,12 @@ export function BusinessSurface({
         <section id="resumen" data-eb-anchor className="scroll-mt-24">
           {descriptionSection ? <ExperienceSection dto={descriptionSection} /> : null}
           {infoGridDto ? <ExperienceInfoGrid dto={infoGridDto} className="mt-6" /> : null}
+        </section>
+      ) : null}
+
+      {premiumGalleryDto ? (
+        <section id="galeria" data-eb-anchor className="mt-10 scroll-mt-24">
+          <ExperienceGallery dto={premiumGalleryDto} />
         </section>
       ) : null}
 
@@ -449,6 +537,12 @@ export function BusinessSurface({
               },
             }}
           />
+        </section>
+      ) : null}
+
+      {premiumContactDto ? (
+        <section id="contacto" data-eb-anchor className="mt-10 scroll-mt-24">
+          <ExperienceInfoGrid dto={premiumContactDto} />
         </section>
       ) : null}
 

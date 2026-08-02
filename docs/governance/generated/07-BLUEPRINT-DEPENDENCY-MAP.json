@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.24",
+    "version": "0.25",
     "state": "Approved",
     "main_commit": "LOCAL_RECONCILIATION_2026-07-22",
     "blob": "LOCAL_RECONCILIATION_2026-07-22",
@@ -7056,6 +7056,39 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-010.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-010.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/omxds/surfaces/business-premium-surface.contract.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/surfaces/business-premium-surface.contract.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/surfaces/business-premium-eligibility.server.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/surfaces/business-premium-eligibility.server.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i3/business-premium-surface.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/i3/business-premium-surface.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i3/business-premium-surface.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/i3/business-premium-surface.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-011.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-011.json"
     }
   ],
   "edges": [
@@ -18019,6 +18052,96 @@
       "destination": "DOC:docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
       "evidence": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/18.40-OMXDS-V1-I3-C-PRODUCT-EXPERIENCE-EVENT-SURFACES-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/surfaces/BusinessSurface.tsx:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/components/surfaces/BusinessSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/surfaces/business-premium-surface.contract.ts:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/surfaces/business-premium-surface.contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/surfaces/business-premium-eligibility.server.ts:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/omxds/surfaces/business-premium-eligibility.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/business-premium-surface.contract.test.ts:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-premium-surface.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/business-premium-surface.evidence.mjs:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-premium-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/business-vertical-surfaces.evidence.mjs:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-vertical-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-011.json:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-011.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
       "verified_at": "2026-08-02"
     }
   ],

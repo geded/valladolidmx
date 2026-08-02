@@ -24,6 +24,7 @@ import {
   BusinessSurfaceProvider,
 } from "@/components/surfaces/BusinessSurface";
 import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contracts-flag.server";
+import { getBusinessPremiumEligibility } from "@/lib/omxds/surfaces/business-premium-eligibility.server";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 
@@ -54,6 +55,11 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       getOmxdsSurfaceContractsFlag().catch(() => false),
     ]);
     if (!business) throw notFound();
+    // I3-D · lectura Premium estrictamente posterior al flag. OFF conserva
+    // incluso el mismo conjunto de consultas heredadas.
+    const premiumEligibility = surfaceContractsEnabled
+      ? await getBusinessPremiumEligibility({ data: { businessId: business.id } }).catch(() => null)
+      : null;
     // E2 · US-E2.1 — Related Collection contextual del negocio.
     // Fallback silencioso: si falla no rompe el render de la ficha.
     let related = null as Awaited<ReturnType<typeof getBusinessRelated>> | null;
@@ -75,11 +81,16 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       related,
       composition,
       surfaceContractsEnabled,
+      premiumEligibility,
     };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
     const b = loaderData.business;
+    const premium =
+      loaderData.surfaceContractsEnabled && loaderData.premiumEligibility?.eligible
+        ? loaderData.premiumEligibility
+        : null;
     const destName = loaderData.resolution.destination?.label ?? params.destino;
     const catName = loaderData.resolution.category?.label ?? params.categoria;
     const path = `/oriente-maya/${params.destino}/${params.categoria}/${params.empresa}`;
@@ -92,7 +103,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       description,
       path,
       ogType: "profile",
-      ogImage: b.cover_url ?? undefined,
+      ogImage: premium?.cover?.url ?? b.cover_url ?? undefined,
       breadcrumbs: [
         { label: "Inicio", path: "/" },
         { label: "Oriente Maya", path: "/oriente-maya" },
@@ -105,16 +116,26 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
           name: b.display_name,
           description,
           path,
-          image: b.cover_url ?? undefined,
+          image: premium?.cover?.url ?? b.cover_url ?? undefined,
           telephone:
-            b.primary_contact?.type === "phone" || b.primary_contact?.type === "whatsapp"
-              ? b.primary_contact.value
+            (premium?.contact ?? b.primary_contact)?.type === "phone" ||
+            (premium?.contact ?? b.primary_contact)?.type === "whatsapp"
+              ? (premium?.contact ?? b.primary_contact)?.value
               : undefined,
-          email: b.primary_contact?.type === "email" ? b.primary_contact.value : undefined,
-          addressLine: b.primary_location?.address_line1 ?? b.address_line1 ?? null,
+          email:
+            (premium?.contact ?? b.primary_contact)?.type === "email"
+              ? (premium?.contact ?? b.primary_contact)?.value
+              : undefined,
+          addressLine:
+            premium?.location?.addressLine1 ??
+            b.primary_location?.address_line1 ??
+            b.address_line1 ??
+            null,
           addressLocality: destName,
-          latitude: b.primary_location?.latitude ?? b.latitude ?? null,
-          longitude: b.primary_location?.longitude ?? b.longitude ?? null,
+          latitude:
+            premium?.location?.latitude ?? b.primary_location?.latitude ?? b.latitude ?? null,
+          longitude:
+            premium?.location?.longitude ?? b.primary_location?.longitude ?? b.longitude ?? null,
           categorySlug: b.category_slug,
           destinationName: destName,
           areaServed: `${destName}, Yucatán`,
@@ -134,8 +155,14 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
 });
 
 function EmpresaTerritorialPage() {
-  const { resolution, business, related, composition, surfaceContractsEnabled } =
-    Route.useLoaderData();
+  const {
+    resolution,
+    business,
+    related,
+    composition,
+    surfaceContractsEnabled,
+    premiumEligibility,
+  } = Route.useLoaderData();
   const { destino } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
   // N2.2: fuente única = Navigation Contract. El adapter deriva
@@ -153,6 +180,7 @@ function EmpresaTerritorialPage() {
           enabled={surfaceContractsEnabled}
           business={business}
           related={related}
+          premiumEligibility={premiumEligibility}
           legacy={
             composition ? <CompositionRenderer tree={composition.snapshot} /> : <BusinessSurface />
           }
