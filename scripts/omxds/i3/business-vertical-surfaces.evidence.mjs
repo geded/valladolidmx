@@ -38,8 +38,6 @@ for (const file of allowed)
   assert.ok(originalI3BFiles.includes(file), `historical I3-B file missing: ${file}`);
 
 for (const file of [
-  routePath,
-  "src/components/surfaces/BusinessSurface.tsx",
   "src/lib/omxds/surfaces/business-surface.contract.ts",
   "src/lib/omxds/surfaces/hotel-surface.adapter.ts",
   "src/lib/omxds/surfaces/restaurant-surface.adapter.ts",
@@ -129,6 +127,20 @@ const authorizedRouteConsumers = new Set(
     )
     .map((permission) => permission.path),
 );
+const authorizedChangedPaths = new Set(
+  authorizations
+    .filter((authorization) => authorization.status === "Approved")
+    .flatMap((authorization) => authorization.permissions ?? [])
+    .filter((permission) => ["create", "modify"].includes(permission.operation))
+    .map((permission) => permission.path),
+);
+for (const file of [routePath, "src/components/surfaces/BusinessSurface.tsx"]) {
+  const changedAfterI3B = execFileSync("git", ["diff", "--name-only", i3BHead, "--", file], {
+    encoding: "utf8",
+  });
+  if (changedAfterI3B)
+    assert.ok(authorizedChangedPaths.has(file), `post-I3-B change lacks Approved PCA: ${file}`);
+}
 for (const file of flagConsumers)
   assert.ok(authorizedRouteConsumers.has(file), `unauthorized SSR flag consumer: ${file}`);
 
