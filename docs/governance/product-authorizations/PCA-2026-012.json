@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-012",
+  "title": "OMXDS V1 · I4-0 Shared Editorial Builder Contract",
+  "status": "Approved",
+  "branch": "feature/omxds-i4-0-shared-editorial-builder-contract-v1",
+  "blueprint": "docs/blueprint/18.46-OMXDS-V1-I4-0-SHARED-EDITORIAL-BUILDER-CONTRACT-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-03 · Implementar exclusivamente I4-0 sobre main@69f4767ec2773f0948c4a61177d4141357dcc5a2: contrato interno puro, allowlists cerradas, vmx.custom.html legacy-only, pruebas positivas/negativas y evidence gate; exactamente 12 rutas, un commit y PR borrador sólo con PASS total; sin consumidores, Studio, Library, renderer, rutas, RPC, schema, migraciones, flags, producción, merge ni I4-A/B/C/D.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/editorial-builder-policy.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/block-contract.ts"
+    },
+    { "operation": "modify", "path": "package.json" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run lint",
+    "bun run validate:i1",
+    "bun run validate:i2a",
+    "bun run validate:i2b",
+    "bun run validate:i2c",
+    "bun run validate:i3:0",
+    "bun run validate:i3:a",
+    "bun run validate:i3:b",
+    "bun run validate:i3:c",
+    "bun run validate:i3:d",
+    "bun run validate:i4:0",
+    "bun run typecheck",
+    "bun run build",
+    "bun run governance:check",
+    "bun run governance:product-check"
+  ]
+}

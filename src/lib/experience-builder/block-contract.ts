@@ -12,6 +12,12 @@
  *    del Experience Builder (Adenda 15.10.1 · ampliación 2).
  */
 
+import {
+  type EditorialBlockMetadata,
+  type EditorialFieldMetadata,
+  validateEditorialBlockMetadata,
+} from "./editorial-builder-policy";
+
 export type BlockCategory = "static" | "smart";
 
 /**
@@ -64,6 +70,8 @@ export interface BlockFieldSchema {
   fields?: Record<string, BlockFieldSchema>;
   /** Para `list`: subesquema del item. */
   item?: BlockFieldSchema;
+  /** I4-0: metadata contractual opcional; no habilita consumidores ni autoría. */
+  editorial?: EditorialFieldMetadata;
 }
 
 export type BlockSchema = Record<string, BlockFieldSchema>;
@@ -224,6 +232,8 @@ export interface BlockContract {
   i18n?: BlockI18n;
   /** Eventos BEA emitidos por este bloque. */
   audit?: BlockAuditEvent[];
+  /** I4-0: policy declarativa opcional; el Registry activo permanece sin cambios. */
+  editorial?: EditorialBlockMetadata;
 }
 
 /** Resultado de validación. */
@@ -289,6 +299,15 @@ export function validateBlockContract(c: BlockContract): BlockContractValidation
   // Coherencia responsive: cada campo overridable debe existir.
   for (const f of c.responsive?.overridable_fields ?? []) {
     if (!c.schema[f]) errors.push(`responsive.overridable_fields references missing schema field "${f}"`);
+  }
+
+  if (c.editorial) {
+    const editorial = validateEditorialBlockMetadata(
+      c.editorial,
+      Object.keys(c.schema),
+      Object.fromEntries(Object.entries(c.schema).map(([field, schema]) => [field, schema.editorial])),
+    );
+    errors.push(...editorial.errors.map((error) => `editorial policy: ${error}`));
   }
 
   return { valid: errors.length === 0, errors };
