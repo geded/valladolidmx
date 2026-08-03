@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.30",
+    "version": "0.32",
     "state": "Approved",
-    "source_sha256": "4fcae7ff400b97a5827b37af2cf789f67100ba831404512f13d15d8992024832",
+    "source_sha256": "bd721703a1e968f73b5ad02756a95ea3556bf8e3f34af7b4d58e0c1aa5ce66eb",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -7191,6 +7191,14 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-012.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-012.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
     }
   ],
   "edges": [

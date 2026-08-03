@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "5edcda7116a5e53abd1bf6072cbb656411978b70f7362e948060f36aeaebdff8"
+      "source_sha256": "91c9d38b82a1a3363f10ef1627923d358fe9dfb71153b991c9b191e923841af6"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -10201,6 +10201,16 @@
       "path": "docs/governance/product-authorizations/PCA-2026-012.json",
       "source": "docs/governance/product-authorizations/PCA-2026-012.json",
       "evidence": "docs/governance/product-authorizations/PCA-2026-012.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md",
+      "evidence": "docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md"
     }
   ],
   "edges": [
@@ -27801,6 +27811,15 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.30 · docs/blueprint/18.46-OMXDS-V1-I4-0-SHARED-EDITORIAL-BUILDER-CONTRACT-AUTHORIZATION-PACK-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md",
+      "verified_at": "2026-08-03",
+      "origin": "DOC:docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.31 · docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {
