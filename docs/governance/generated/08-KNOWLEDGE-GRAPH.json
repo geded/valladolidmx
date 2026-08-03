@@ -10098,6 +10098,16 @@
       "version": "1.1",
       "source": "docs/blueprint/18.35-OMXDS-V1-I3-SURFACE-CONTRACTS-PREFLIGHT-v1.1.md",
       "evidence": "docs/blueprint/18.35-OMXDS-V1-I3-SURFACE-CONTRACTS-PREFLIGHT-v1.1.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md"
     }
   ],
   "edges": [
@@ -27492,6 +27502,25 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.26 · docs/blueprint/18.35-OMXDS-V1-I3-SURFACE-CONTRACTS-PREFLIGHT-v1.1.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i3/business-premium-surface.evidence.mjs:docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-premium-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02",
+      "origin": "DOC:docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.27 · docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {

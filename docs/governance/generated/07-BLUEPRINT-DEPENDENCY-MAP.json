@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.26",
+    "version": "0.27",
     "state": "Approved",
     "main_commit": "LOCAL_RECONCILIATION_2026-07-22",
     "blob": "LOCAL_RECONCILIATION_2026-07-22",
@@ -7113,6 +7113,14 @@
       "owner": "D04 · content-experience",
       "state": "Approved",
       "version": "1.1"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
     }
   ],
   "edges": [
@@ -18166,6 +18174,15 @@
       "destination": "DOC:docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
       "evidence": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/18.41-OMXDS-V1-I3-D-BUSINESS-PREMIUM-SURFACE-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/business-premium-surface.evidence.mjs:docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-premium-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
       "verified_at": "2026-08-02"
     }
   ],
