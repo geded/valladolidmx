@@ -2,13 +2,14 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.27",
+    "version": "0.28",
     "state": "Approved",
-    "main_commit": "LOCAL_RECONCILIATION_2026-07-22",
-    "blob": "LOCAL_RECONCILIATION_2026-07-22",
-    "notes": "Deriva de `06 v0.11` Approved. Incorpora 24 DOC nuevos (11 Baseline V0 `18.06`–`18.16` + 12 RV0.1/RV0.2 `19.01`–`19.12` + 1 Closure Certificate `19.13-RV0.2-CLOSURE-CERTIFICATE-v1.0.md`) sin fabricar aristas técnicas. Adjudicación Integral Controlada (Opción A) + RV0.2 Closure."
+    "source_sha256": "57144c936c0e7aba6c365c4856cf85c12ac4c3224396bd29924d7d39621c82b7",
+    "generator": "scripts/governance/sync-governance.mjs",
+    "projection_mode": "canonical-plus-frozen-curated-baseline",
+    "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-07-22T14:50:44.000Z",
+  "generated_at": "2026-08-03T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -7121,6 +7122,39 @@
       "owner": "D04 · content-experience",
       "state": "Approved",
       "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:scripts/governance/validate-knowledge-graph.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/validate-knowledge-graph.mjs"
+    },
+    {
+      "id": "ART:scripts/governance/validate-governance-integrity.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/validate-governance-integrity.mjs"
+    },
+    {
+      "id": "ART:scripts/governance/validate-full-suite.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/validate-full-suite.mjs"
+    },
+    {
+      "id": "ART:scripts/governance/validate-change-package.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/validate-change-package.mjs"
+    },
+    {
+      "id": "ART:scripts/governance/test-change-package.mjs",
+      "type": "artifact",
+      "path": "scripts/governance/test-change-package.mjs"
     }
   ],
   "edges": [
@@ -18184,6 +18218,87 @@
       "evidence": "docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/18.43-OMXDS-V1-I4-S1a-I3-D-EVIDENCE-ANCHORING-REMEDIATION-PACK-v1.0.md",
       "verified_at": "2026-08-02"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:.github/workflows/governance-integrity.yml:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "origin": "ART:.github/workflows/governance-integrity.yml",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-03"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/sync-governance.mjs:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/sync-governance.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-03"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/generate-artifact-inventory.mjs:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/generate-artifact-inventory.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-03"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/validate-dependency-map.mjs:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/validate-dependency-map.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-03"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/validate-knowledge-graph.mjs:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/validate-knowledge-graph.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-03"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/validate-governance-integrity.mjs:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/validate-governance-integrity.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-03"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/validate-full-suite.mjs:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/validate-full-suite.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-03"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/validate-change-package.mjs:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/validate-change-package.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-03"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/test-change-package.mjs:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/test-change-package.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-03"
     }
   ],
   "critical_chain_coverage": [

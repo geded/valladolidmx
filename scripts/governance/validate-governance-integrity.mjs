@@ -7,6 +7,7 @@ import {
   extractMasterIndexPaths,
   isRelevantArtifact,
   scanArtifacts,
+  sha256File,
   summarizeArtifacts,
 } from "./lib/artifact-inventory.mjs";
 
@@ -21,6 +22,20 @@ const dependencyMap = JSON.parse(
   read("docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json"),
 );
 const inventory = JSON.parse(read(INVENTORY_PATH));
+const expectedSourceBasis = {
+  master_index_sha256: sha256File(path.join(root, "docs/governance/06-BLUEPRINT-MASTER-INDEX.md")),
+  dependency_map_sha256: sha256File(
+    path.join(root, "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json"),
+  ),
+  knowledge_graph_sha256: sha256File(
+    path.join(root, "docs/governance/generated/08-KNOWLEDGE-GRAPH.json"),
+  ),
+  generator: "scripts/governance/generate-artifact-inventory.mjs",
+};
+if (inventory.source_commit !== undefined)
+  errors.push("Inventory retains legacy source_commit provenance");
+if (JSON.stringify(inventory.source_basis) !== JSON.stringify(expectedSourceBasis))
+  errors.push("Inventory source basis is stale or non-canonical");
 const bootstrapExceptions = new Set(inventory.policy?.bootstrap_exceptions || []);
 const currentArtifacts = scanArtifacts(root, dependencyMap);
 const currentByPath = new Map(currentArtifacts.map((artifact) => [artifact.path, artifact]));
@@ -56,12 +71,31 @@ for (const file of indexPaths)
   if (!blueprintFiles.includes(file)) errors.push(`06 references missing Blueprint: ${file}`);
 
 function changedFilesFromGit(baseRef) {
-  const output = childProcess.execFileSync(
+  const outputs = [
+    childProcess.execFileSync(
+      "git",
+      ["diff", "--name-status", "--find-renames", `${baseRef}...HEAD`],
+      { cwd: root, encoding: "utf8" },
+    ),
+    childProcess.execFileSync("git", ["diff", "--name-status", "--find-renames", "HEAD"], {
+      cwd: root,
+      encoding: "utf8",
+    }),
+  ];
+  const untracked = childProcess.execFileSync(
     "git",
-    ["diff", "--name-status", "--find-renames", `${baseRef}...HEAD`],
+    ["ls-files", "--others", "--exclude-standard"],
     { cwd: root, encoding: "utf8" },
   );
-  return output
+  outputs.push(
+    untracked
+      .split("\n")
+      .filter(Boolean)
+      .map((file) => `A\t${file}`)
+      .join("\n"),
+  );
+  const changes = outputs
+    .join("\n")
     .trim()
     .split("\n")
     .filter(Boolean)
@@ -72,6 +106,11 @@ function changedFilesFromGit(baseRef) {
       const previous = status.startsWith("R") ? parts[1] : null;
       return { status, file, previous };
     });
+  return [
+    ...new Map(
+      changes.map((change) => [`${change.status}:${change.file}:${change.previous || ""}`, change]),
+    ).values(),
+  ];
 }
 
 if (base) {
