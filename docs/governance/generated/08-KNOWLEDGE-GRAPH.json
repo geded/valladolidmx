@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "a9ad99393ee601ddfab7600835e9fa0b6500c18d56ae48fbbe8247fb7d98fef1"
+      "source_sha256": "c09f7332a8ffbf6b67eb142a5aed32de3f187849aadbf1d2d522d858e75822d1"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -10153,6 +10153,16 @@
       "path": "scripts/governance/test-change-package.mjs",
       "source": "scripts/governance/test-change-package.mjs",
       "evidence": "scripts/governance/test-change-package.mjs"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.45-OMXDS-V1-I4-EDITORIAL-BUILDER-ENABLEMENT-SCOPE-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.45-OMXDS-V1-I4-EDITORIAL-BUILDER-ENABLEMENT-SCOPE-REPORT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.45-OMXDS-V1-I4-EDITORIAL-BUILDER-ENABLEMENT-SCOPE-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/18.45-OMXDS-V1-I4-EDITORIAL-BUILDER-ENABLEMENT-SCOPE-REPORT-v1.0.md"
     }
   ],
   "edges": [
@@ -27665,6 +27675,15 @@
       "destination": "DOMAIN:D01",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.28 · docs/blueprint/18.44-OMXDS-V1-I4-S1b-GOVERNANCE-PREFLIGHT-STABILIZATION-PACK-v1.0.md → D01 · product-governance"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.45-OMXDS-V1-I4-EDITORIAL-BUILDER-ENABLEMENT-SCOPE-REPORT-v1.0.md",
+      "verified_at": "2026-08-03",
+      "origin": "DOC:docs/blueprint/18.45-OMXDS-V1-I4-EDITORIAL-BUILDER-ENABLEMENT-SCOPE-REPORT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.29 · docs/blueprint/18.45-OMXDS-V1-I4-EDITORIAL-BUILDER-ENABLEMENT-SCOPE-REPORT-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {
