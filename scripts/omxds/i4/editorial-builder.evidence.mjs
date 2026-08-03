@@ -4,6 +4,7 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const base = "69f4767ec2773f0948c4a61177d4141357dcc5a2";
+const authorizedCommit = "1e6541eef0c27d58dd1afc56863070ee2a1f4f88";
 const allowed = new Set([
   "src/lib/experience-builder/editorial-builder-policy.ts",
   "src/lib/experience-builder/block-contract.ts",
@@ -23,6 +24,54 @@ function gitLines(args) {
   return execFileSync("git", args, { encoding: "utf8" }).trim().split("\n").filter(Boolean);
 }
 
+function gitIsAncestor(ancestor, descendant) {
+  try {
+    execFileSync("git", ["merge-base", "--is-ancestor", ancestor, descendant], {
+      stdio: "ignore",
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function resolveMainPushContext({ eventName, ref, eventSha, head, isAncestor }) {
+  assert.equal(eventName, "push", "main post-merge validation requires a push event");
+  assert.equal(ref, "refs/heads/main", "post-merge push must target refs/heads/main");
+  assert.match(eventSha ?? "", /^[0-9a-f]{40}$/);
+  assert.equal(head, eventSha, "checked-out main commit must match GITHUB_SHA");
+  assert.ok(
+    isAncestor(authorizedCommit, head),
+    "authorized I4-0 commit must be an ancestor of main",
+  );
+  return authorizedCommit;
+}
+
+function verifyMainPushContextChecks() {
+  const valid = {
+    eventName: "push",
+    ref: "refs/heads/main",
+    eventSha: "f".repeat(40),
+    head: "f".repeat(40),
+    isAncestor: () => true,
+  };
+  assert.equal(resolveMainPushContext(valid), authorizedCommit);
+  assert.throws(
+    () => resolveMainPushContext({ ...valid, ref: "refs/heads/release" }),
+    /refs\/heads\/main/,
+  );
+  assert.throws(() => resolveMainPushContext({ ...valid, eventSha: "e".repeat(40) }), /GITHUB_SHA/);
+  assert.throws(
+    () => resolveMainPushContext({ ...valid, isAncestor: () => false }),
+    /must be an ancestor/,
+  );
+}
+
+verifyMainPushContextChecks();
+console.log(
+  "I4-0 main-push context checks: PASS (1 positive; 3 negative: wrong ref, SHA mismatch, missing ancestry).",
+);
+
 const head = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
 let comparisonTip = head;
 let validationMode = "single_commit";
@@ -32,12 +81,39 @@ if (head === base) {
 } else if (process.env.GITHUB_EVENT_NAME === "pull_request") {
   assert.ok(process.env.GITHUB_EVENT_PATH, "GitHub PR validation requires GITHUB_EVENT_PATH");
   const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8"));
-  assert.equal(event.pull_request?.base?.sha, base, "GitHub PR base must be the authorized SHA");
-  assert.match(event.pull_request?.head?.sha ?? "", /^[0-9a-f]{40}$/);
-  comparisonTip = event.pull_request.head.sha;
-  validationMode = "github_pr_merge";
+  const eventBase = event.pull_request?.base?.sha ?? "";
+  const eventHead = event.pull_request?.head?.sha ?? "";
+  assert.match(eventBase, /^[0-9a-f]{40}$/);
+  assert.match(eventHead, /^[0-9a-f]{40}$/);
   assert.equal(head, process.env.GITHUB_SHA, "checked-out PR merge must match GITHUB_SHA");
-  execFileSync("git", ["merge-base", "--is-ancestor", comparisonTip, head]);
+  assert.ok(gitIsAncestor(eventHead, head), "PR head must be an ancestor of its checked-out merge");
+  if (eventBase === base) {
+    comparisonTip = eventHead;
+    validationMode = "github_pr_merge";
+  } else {
+    assert.ok(
+      gitIsAncestor(authorizedCommit, eventBase),
+      "later PR base must contain the authorized I4-0 commit",
+    );
+    assert.ok(
+      gitIsAncestor(authorizedCommit, eventHead),
+      "later PR head must contain the authorized I4-0 commit",
+    );
+    comparisonTip = authorizedCommit;
+    validationMode = "post_merge_pr";
+  }
+} else if (process.env.GITHUB_EVENT_NAME === "push") {
+  comparisonTip = resolveMainPushContext({
+    eventName: process.env.GITHUB_EVENT_NAME,
+    ref: process.env.GITHUB_REF,
+    eventSha: process.env.GITHUB_SHA,
+    head,
+    isAncestor: gitIsAncestor,
+  });
+  validationMode = "main_push";
+} else if (gitIsAncestor(authorizedCommit, head)) {
+  comparisonTip = authorizedCommit;
+  validationMode = "post_merge_local";
 }
 
 if (validationMode !== "base_worktree") {
