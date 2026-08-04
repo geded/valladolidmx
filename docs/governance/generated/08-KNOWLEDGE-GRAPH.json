@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "status": "Approved",
-  "generated_at": "2026-08-03T00:00:00.000Z",
+  "generated_at": "2026-08-04T00:00:00.000Z",
   "derived_from": {
     "glossary": {
       "document": "docs/governance/01-GLOSSARY.md",
@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "91c9d38b82a1a3363f10ef1627923d358fe9dfb71153b991c9b191e923841af6"
+      "source_sha256": "93c82b896eb71b947d75f48bd06328fe5312a1d3dab6ab2bfc4aacd7a2ab2ab1"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -10211,6 +10211,37 @@
       "version": "1.0",
       "source": "docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md",
       "evidence": "docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md"
+    },
+    {
+      "id": "ART:scripts/omxds/i4/editorial-builder-authoring.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/i4/editorial-builder-authoring.test.ts",
+      "source": "scripts/omxds/i4/editorial-builder-authoring.test.ts",
+      "evidence": "scripts/omxds/i4/editorial-builder-authoring.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i4/editorial-builder-authoring.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/i4/editorial-builder-authoring.evidence.mjs",
+      "source": "scripts/omxds/i4/editorial-builder-authoring.evidence.mjs",
+      "evidence": "scripts/omxds/i4/editorial-builder-authoring.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-013.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-013.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-013.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-013.json"
     }
   ],
   "edges": [
@@ -27820,6 +27851,125 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.31 · docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/editorial-builder-policy.ts:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/editorial-builder-policy.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/block-registry.ts:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/block-registry.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/block-library.ts:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/block-library.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/experience-builder/VisualStudio.tsx:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/components/experience-builder/VisualStudio.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/studio.functions.ts:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/studio.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-authoring.test.ts:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-authoring.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-authoring.evidence.mjs:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-authoring.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder.evidence.mjs:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:package.json:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/governance/validate-full-suite.mjs:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/validate-full-suite.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-013.json:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-013.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04",
+      "origin": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.33 · docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {

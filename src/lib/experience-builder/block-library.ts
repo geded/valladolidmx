@@ -17,6 +17,7 @@
 import { registerBlock } from "./block-registry";
 import type { BlockContract } from "./block-contract";
 import { KIT_BLOCK_CONTRACTS } from "./kit-blocks";
+import { getEditorialBlockPolicy } from "./editorial-builder-policy";
 import heroBg01Url from "@/assets/brand/hero/bg01.webp";
 import heroBg02Url from "@/assets/brand/hero/bg02.webp";
 
@@ -183,7 +184,8 @@ const heroBlock: BlockContract = {
     background_images: {
       type: "list",
       label: "Imágenes de fondo (carrusel)",
-      description: "Agrega, edita o elimina imágenes del carrusel. Cada imagen tiene su botón para guardarla en la Biblioteca.",
+      description:
+        "Agrega, edita o elimina imágenes del carrusel. Cada imagen tiene su botón para guardarla en la Biblioteca.",
       default: [{ src: heroBg01Url }, { src: heroBg02Url }],
       item: {
         type: "object",
@@ -214,7 +216,8 @@ const heroBlock: BlockContract = {
     ctas: {
       type: "list",
       label: "Botones",
-      description: "Agrega, edita, reordena o elimina los botones del hero. Si la lista queda vacía se usan los botones por defecto — para ocultarlos usa el interruptor 'Mostrar botones'.",
+      description:
+        "Agrega, edita, reordena o elimina los botones del hero. Si la lista queda vacía se usan los botones por defecto — para ocultarlos usa el interruptor 'Mostrar botones'.",
       item: {
         type: "object",
         label: "Botón",
@@ -337,9 +340,25 @@ const heroBlock: BlockContract = {
     soporta_cache: true,
   },
   constraints: { surfaces: ["home", "landing"], unique_per_page: true },
-  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["background_images", "background_position", "cta_alignment", "text_alignment", "search_alignment"] },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: [
+      "background_images",
+      "background_position",
+      "cta_alignment",
+      "text_alignment",
+      "search_alignment",
+    ],
+  },
   i18n: {
-    translatable_fields: ["eyebrow", "title", "subtitle", "ctas", "search_placeholder", "search_helper"],
+    translatable_fields: [
+      "eyebrow",
+      "title",
+      "subtitle",
+      "ctas",
+      "search_placeholder",
+      "search_helper",
+    ],
     fallback: "base_language",
   },
   audit: ["Block.Registered", "Block.VersionPublished"],
@@ -351,7 +370,12 @@ const destinosBlock: BlockContract = {
   version: "1.0.0",
   display_name: "Sección Destinos",
   schema: {
-    heading: { type: "text", label: "Encabezado", translatable: true, default: "Destinos del Oriente Maya" },
+    heading: {
+      type: "text",
+      label: "Encabezado",
+      translatable: true,
+      default: "Destinos del Oriente Maya",
+    },
   },
   capabilities: {
     soporta_i18n: true,
@@ -371,7 +395,9 @@ const categoriasBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Sección Categorías",
-  schema: { heading: { type: "text", label: "Encabezado", translatable: true, default: "Qué te mueve" } },
+  schema: {
+    heading: { type: "text", label: "Encabezado", translatable: true, default: "Qué te mueve" },
+  },
   capabilities: {
     soporta_i18n: true,
     soporta_preview: true,
@@ -388,7 +414,9 @@ const rutasBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Sección Rutas",
-  schema: { heading: { type: "text", label: "Encabezado", translatable: true, default: "Rutas sugeridas" } },
+  schema: {
+    heading: { type: "text", label: "Encabezado", translatable: true, default: "Rutas sugeridas" },
+  },
   capabilities: {
     soporta_i18n: true,
     soporta_preview: true,
@@ -406,7 +434,14 @@ const consejoAluxBlock: BlockContract = {
   version: "1.0.0",
   display_name: "Consejo Alux",
   description: "Sección consultiva con sugerencias de Alux (modo read-only).",
-  schema: { heading: { type: "text", label: "Encabezado", translatable: true, default: "Un consejo de Alux" } },
+  schema: {
+    heading: {
+      type: "text",
+      label: "Encabezado",
+      translatable: true,
+      default: "Un consejo de Alux",
+    },
+  },
   capabilities: {
     soporta_i18n: true,
     soporta_preview: true,
@@ -428,9 +463,15 @@ const armaTuViajeBlock: BlockContract = {
       type: "rich_text",
       label: "Cuerpo",
       translatable: true,
-      default: "Tu expediente personal. Guarda destinos, experiencias y notas. Tu concierge humano lo recibe cuando estés listo.",
+      default:
+        "Tu expediente personal. Guarda destinos, experiencias y notas. Tu concierge humano lo recibe cuando estés listo.",
     },
-    cta_label: { type: "text", label: "Etiqueta CTA", translatable: true, default: "Arma tu viaje" },
+    cta_label: {
+      type: "text",
+      label: "Etiqueta CTA",
+      translatable: true,
+      default: "Arma tu viaje",
+    },
   },
   capabilities: {
     soporta_i18n: true,
@@ -448,7 +489,14 @@ const enVivoBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Oriente Maya EN VIVO",
-  schema: { heading: { type: "text", label: "Encabezado", translatable: true, default: "Oriente Maya en vivo" } },
+  schema: {
+    heading: {
+      type: "text",
+      label: "Encabezado",
+      translatable: true,
+      default: "Oriente Maya en vivo",
+    },
+  },
   capabilities: {
     soporta_i18n: true,
     soporta_preview: true,
@@ -465,7 +513,14 @@ const empresasSectionBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Sección Empresas",
-  schema: { heading: { type: "text", label: "Encabezado", translatable: true, default: "Empresas recomendadas" } },
+  schema: {
+    heading: {
+      type: "text",
+      label: "Encabezado",
+      translatable: true,
+      default: "Empresas recomendadas",
+    },
+  },
   capabilities: {
     soporta_i18n: true,
     soporta_preview: true,
@@ -482,7 +537,14 @@ const resenasSectionBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Sección Reseñas",
-  schema: { heading: { type: "text", label: "Encabezado", translatable: true, default: "Lo que cuentan quienes ya vinieron" } },
+  schema: {
+    heading: {
+      type: "text",
+      label: "Encabezado",
+      translatable: true,
+      default: "Lo que cuentan quienes ya vinieron",
+    },
+  },
   capabilities: {
     soporta_i18n: true,
     soporta_preview: true,
@@ -512,7 +574,12 @@ const destinoCardBlock: BlockContract = {
   version: "1.0.0",
   display_name: "Tarjeta de Destino",
   schema: { reference: { ...cardSchemaCommon.reference, references: "destination" } },
-  capabilities: { soporta_i18n: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
   constraints: { surfaces: ["home", "landing", "destination", "institutional"] },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
@@ -523,7 +590,12 @@ const empresaCardBlock: BlockContract = {
   version: "1.0.0",
   display_name: "Tarjeta de Empresa",
   schema: { reference: { ...cardSchemaCommon.reference, references: "business" } },
-  capabilities: { soporta_i18n: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
   constraints: { surfaces: ["home", "landing", "business", "institutional"] },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
@@ -573,8 +645,7 @@ const cockpitKpiGridBlock: BlockContract = {
   category: "smart",
   version: "1.0.0",
   display_name: "Cockpit · KPIs",
-  description:
-    "Cuadrícula de KPIs globales del Fundador (empresas, viajeros, casos, ventas).",
+  description: "Cuadrícula de KPIs globales del Fundador (empresas, viajeros, casos, ventas).",
   schema: {
     title: { type: "text", label: "Título", translatable: true, default: "Visión global" },
     window: {
@@ -609,9 +680,7 @@ const cockpitKpiGridBlock: BlockContract = {
     soporta_preview: true,
     soporta_responsive: true,
   },
-  data_sources: [
-    { domain: "bea", reader: "admin.getFounderKpis", read_only: true },
-  ],
+  data_sources: [{ domain: "bea", reader: "admin.getFounderKpis", read_only: true }],
   i18n: { translatable_fields: ["title"], fallback: "base_language" },
   responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: [] },
   audit: ["Block.Registered", "Block.VersionPublished"],
@@ -622,8 +691,7 @@ const cockpitAlertsBlock: BlockContract = {
   category: "smart",
   version: "1.0.0",
   display_name: "Cockpit · Alertas",
-  description:
-    "Stream de alertas críticas del Fundador (umbral KPI, SLA, pagos, accesos).",
+  description: "Stream de alertas críticas del Fundador (umbral KPI, SLA, pagos, accesos).",
   schema: {
     title: { type: "text", label: "Título", translatable: true, default: "Alertas" },
     limit: { type: "number", label: "Máximo de items", default: 10 },
@@ -636,9 +704,7 @@ const cockpitAlertsBlock: BlockContract = {
     soporta_preview: true,
     soporta_responsive: true,
   },
-  data_sources: [
-    { domain: "bea", reader: "notifications.listMyDeliveries", read_only: true },
-  ],
+  data_sources: [{ domain: "bea", reader: "notifications.listMyDeliveries", read_only: true }],
   i18n: { translatable_fields: ["title"], fallback: "base_language" },
   responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: [] },
   audit: ["Block.Registered", "Block.VersionPublished"],
@@ -662,9 +728,7 @@ const cockpitActivityStreamBlock: BlockContract = {
     soporta_preview: true,
     soporta_responsive: true,
   },
-  data_sources: [
-    { domain: "bea", reader: "observability.activityStream", read_only: true },
-  ],
+  data_sources: [{ domain: "bea", reader: "observability.activityStream", read_only: true }],
   i18n: { translatable_fields: ["title"], fallback: "base_language" },
   responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: [] },
   audit: ["Block.Registered", "Block.VersionPublished"],
@@ -753,14 +817,12 @@ const customHtmlBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "HTML / Código embebido",
-  description:
-    "Bloque avanzado: inserta HTML crudo (embeds, scripts de terceros, widgets).",
+  description: "Bloque avanzado: inserta HTML crudo (embeds, scripts de terceros, widgets).",
   schema: {
     html: {
       type: "rich_text",
       label: "HTML",
-      description:
-        "Se renderiza tal cual. Sólo pega código de fuentes en las que confíes.",
+      description: "Se renderiza tal cual. Sólo pega código de fuentes en las que confíes.",
       default: "<p>Escribe o pega tu HTML aquí.</p>",
     },
     max_width: {
@@ -785,8 +847,7 @@ const customFormBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Formulario",
-  description:
-    "Formulario configurable. Envía los datos a un webhook (Zapier, Make, correo…).",
+  description: "Formulario configurable. Envía los datos a un webhook (Zapier, Make, correo…).",
   schema: {
     heading: { type: "text", label: "Título", default: "Contáctanos" },
     subheading: { type: "text", label: "Subtítulo", default: "" },
@@ -888,7 +949,15 @@ const smartDestinationsGridBlock: BlockContract = {
       read_only: true,
       query: {
         table: "destinations",
-        select: ["id", "slug", "name", "short_description", "hero_image_url", "is_featured", "sort_order"],
+        select: [
+          "id",
+          "slug",
+          "name",
+          "short_description",
+          "hero_image_url",
+          "is_featured",
+          "sort_order",
+        ],
         filters: [{ column: "status", op: "eq", value: "published" }],
         order_by: [{ column: "sort_order", direction: "asc" }],
         limit: 6,
@@ -920,7 +989,15 @@ const smartBusinessesGridBlock: BlockContract = {
       read_only: true,
       query: {
         table: "businesses",
-        select: ["id", "slug", "name", "short_description", "cover_image_url", "logo_url", "is_featured"],
+        select: [
+          "id",
+          "slug",
+          "name",
+          "short_description",
+          "cover_image_url",
+          "logo_url",
+          "is_featured",
+        ],
         filters: [{ column: "status", op: "eq", value: "published" }],
         limit: 6,
       },
@@ -951,7 +1028,16 @@ const smartProductsGridBlock: BlockContract = {
       read_only: true,
       query: {
         table: "products",
-        select: ["id", "slug", "name", "short_description", "cover_image_url", "price", "currency", "is_featured"],
+        select: [
+          "id",
+          "slug",
+          "name",
+          "short_description",
+          "cover_image_url",
+          "price",
+          "currency",
+          "is_featured",
+        ],
         filters: [{ column: "status", op: "eq", value: "published" }],
         limit: 6,
       },
@@ -982,7 +1068,16 @@ const smartEventsListBlock: BlockContract = {
       read_only: true,
       query: {
         table: "events",
-        select: ["id", "slug", "name", "short_description", "cover_image_url", "starts_at", "ends_at", "is_featured"],
+        select: [
+          "id",
+          "slug",
+          "name",
+          "short_description",
+          "cover_image_url",
+          "starts_at",
+          "ends_at",
+          "is_featured",
+        ],
         filters: [{ column: "status", op: "eq", value: "published" }],
         order_by: [{ column: "starts_at", direction: "asc" }],
         limit: 6,
@@ -1030,8 +1125,7 @@ const surfaceAluxBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Superficie · Alux",
-  description:
-    "Plantilla oficial de la página pública consultiva de Alux (/alux).",
+  description: "Plantilla oficial de la página pública consultiva de Alux (/alux).",
   schema: {},
   capabilities: {
     soporta_preview: true,
@@ -1049,8 +1143,7 @@ const surfaceTripPlannerBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Superficie · Arma tu Viaje",
-  description:
-    "Plantilla oficial del constructor de viajes (/arma-tu-viaje).",
+  description: "Plantilla oficial del constructor de viajes (/arma-tu-viaje).",
   schema: {},
   capabilities: {
     soporta_preview: true,
@@ -1444,12 +1537,12 @@ const experienceHeroBlock: BlockContract = {
         { value: "editorial", label: "Editorial (sin media)" },
       ],
     },
-    eyebrow:     { type: "text", label: "Eyebrow", translatable: true },
-    title:       { type: "text", label: "Título", translatable: true },
+    eyebrow: { type: "text", label: "Eyebrow", translatable: true },
+    title: { type: "text", label: "Título", translatable: true },
     description: { type: "rich_text", label: "Descripción", translatable: true },
-    mediaUrl:    { type: "url", label: "URL de la media (imagen)" },
-    mediaAlt:    { type: "text", label: "Texto alternativo", translatable: true },
-    overlay:     { type: "number", label: "Overlay (0–1)", default: 0.45 },
+    mediaUrl: { type: "url", label: "URL de la media (imagen)" },
+    mediaAlt: { type: "text", label: "Texto alternativo", translatable: true },
+    overlay: { type: "number", label: "Overlay (0–1)", default: 0.45 },
     badges: {
       type: "list",
       label: "Badges",
@@ -1457,13 +1550,18 @@ const experienceHeroBlock: BlockContract = {
         type: "object",
         label: "Badge",
         fields: {
-          label:   { type: "text", label: "Texto", translatable: true, required: true },
-          tone:    { type: "select", label: "Tono", default: "neutral", options: [
-            { value: "neutral", label: "Neutro" },
-            { value: "primary", label: "Primario" },
-            { value: "success", label: "Éxito" },
-            { value: "warning", label: "Advertencia" },
-          ] },
+          label: { type: "text", label: "Texto", translatable: true, required: true },
+          tone: {
+            type: "select",
+            label: "Tono",
+            default: "neutral",
+            options: [
+              { value: "neutral", label: "Neutro" },
+              { value: "primary", label: "Primario" },
+              { value: "success", label: "Éxito" },
+              { value: "warning", label: "Advertencia" },
+            ],
+          },
           iconKey: { type: "text", label: "Icono (Lucide key)" },
         },
       },
@@ -1476,7 +1574,7 @@ const experienceHeroBlock: BlockContract = {
         label: "Meta",
         fields: {
           iconKey: { type: "text", label: "Icono (Lucide key)" },
-          label:   { type: "text", label: "Texto", translatable: true, required: true },
+          label: { type: "text", label: "Texto", translatable: true, required: true },
         },
       },
     },
@@ -1484,30 +1582,40 @@ const experienceHeroBlock: BlockContract = {
       type: "object",
       label: "CTA primario",
       fields: {
-        label:  { type: "text", label: "Texto", translatable: true, required: true },
-        href:   { type: "url", label: "URL" },
-        action: { type: "select", label: "Acción", default: "navigate", options: [
-          { value: "navigate", label: "Navegar" },
-          { value: "favorite", label: "Guardar" },
-          { value: "contact",  label: "Contactar" },
-          { value: "book",     label: "Reservar" },
-          { value: "share",    label: "Compartir" },
-        ] },
+        label: { type: "text", label: "Texto", translatable: true, required: true },
+        href: { type: "url", label: "URL" },
+        action: {
+          type: "select",
+          label: "Acción",
+          default: "navigate",
+          options: [
+            { value: "navigate", label: "Navegar" },
+            { value: "favorite", label: "Guardar" },
+            { value: "contact", label: "Contactar" },
+            { value: "book", label: "Reservar" },
+            { value: "share", label: "Compartir" },
+          ],
+        },
       },
     },
     ctaSecondary: {
       type: "object",
       label: "CTA secundario",
       fields: {
-        label:  { type: "text", label: "Texto", translatable: true, required: true },
-        href:   { type: "url", label: "URL" },
-        action: { type: "select", label: "Acción", default: "navigate", options: [
-          { value: "navigate", label: "Navegar" },
-          { value: "favorite", label: "Guardar" },
-          { value: "contact",  label: "Contactar" },
-          { value: "book",     label: "Reservar" },
-          { value: "share",    label: "Compartir" },
-        ] },
+        label: { type: "text", label: "Texto", translatable: true, required: true },
+        href: { type: "url", label: "URL" },
+        action: {
+          type: "select",
+          label: "Acción",
+          default: "navigate",
+          options: [
+            { value: "navigate", label: "Navegar" },
+            { value: "favorite", label: "Guardar" },
+            { value: "contact", label: "Contactar" },
+            { value: "book", label: "Reservar" },
+            { value: "share", label: "Compartir" },
+          ],
+        },
       },
     },
   },
@@ -1568,7 +1676,12 @@ const experienceSubnavBlock: BlockContract = {
     },
     sticky: { type: "boolean", label: "Fija arriba al hacer scroll", default: true },
     scrollOffset: { type: "number", label: "Offset de scroll (px)", default: 80 },
-    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Secciones de la página", translatable: true },
+    ariaLabel: {
+      type: "text",
+      label: "Etiqueta accesible",
+      default: "Secciones de la página",
+      translatable: true,
+    },
     anchors: {
       type: "list",
       label: "Anclas",
@@ -1646,7 +1759,12 @@ const experienceCtaBarBlock: BlockContract = {
     label: { type: "text", label: "Título", translatable: true },
     meta: { type: "text", label: "Subtítulo / precio", translatable: true },
     revealAfterScroll: { type: "number", label: "Aparecer tras scroll (px)", default: 320 },
-    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Acciones principales", translatable: true },
+    ariaLabel: {
+      type: "text",
+      label: "Etiqueta accesible",
+      default: "Acciones principales",
+      translatable: true,
+    },
     actions: {
       type: "list",
       label: "Acciones",
@@ -1715,7 +1833,9 @@ const experienceGalleryBlock: BlockContract = {
     "Galería de medios (imágenes, video futuro, 360°, 3D, AR) para cualquier Experience Page.",
   schema: {
     source: {
-      type: "select", label: "Fuente", default: "manual",
+      type: "select",
+      label: "Fuente",
+      default: "manual",
       options: [
         { value: "manual", label: "Manual" },
         { value: "business", label: "Ficha empresa (reservado)" },
@@ -1725,7 +1845,9 @@ const experienceGalleryBlock: BlockContract = {
       ],
     },
     variant: {
-      type: "select", label: "Variante", default: "mosaic",
+      type: "select",
+      label: "Variante",
+      default: "mosaic",
       options: [
         { value: "mosaic", label: "Mosaico editorial" },
         { value: "grid", label: "Grid uniforme" },
@@ -1734,7 +1856,9 @@ const experienceGalleryBlock: BlockContract = {
       ],
     },
     aspect: {
-      type: "select", label: "Proporción", default: "landscape",
+      type: "select",
+      label: "Proporción",
+      default: "landscape",
       options: [
         { value: "landscape", label: "Horizontal" },
         { value: "square", label: "Cuadrada" },
@@ -1745,11 +1869,18 @@ const experienceGalleryBlock: BlockContract = {
     heading: { type: "text", label: "Encabezado", translatable: true },
     subheading: { type: "text", label: "Subencabezado", translatable: true },
     maxVisible: { type: "number", label: "Máximo visible", default: 9 },
-    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Galería", translatable: true },
+    ariaLabel: {
+      type: "text",
+      label: "Etiqueta accesible",
+      default: "Galería",
+      translatable: true,
+    },
     items: {
-      type: "list", label: "Elementos",
+      type: "list",
+      label: "Elementos",
       item: {
-        type: "object", label: "Elemento",
+        type: "object",
+        label: "Elemento",
         fields: {
           url: { type: "media", label: "Imagen", accepts: ["image/*"] },
           alt: { type: "text", label: "Alt", translatable: true },
@@ -1759,11 +1890,17 @@ const experienceGalleryBlock: BlockContract = {
     },
   },
   capabilities: {
-    soporta_i18n: true, soporta_seo: true, soporta_preview: true,
-    soporta_responsive: true, soporta_cache: true,
+    soporta_i18n: true,
+    soporta_seo: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
   },
   constraints: {},
-  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "aspect", "maxVisible"] },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["variant", "aspect", "maxVisible"],
+  },
   i18n: { translatable_fields: ["heading", "subheading", "ariaLabel", "items"] },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
@@ -1773,10 +1910,13 @@ const experienceInfoGridBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Experience Info Grid",
-  description: "Rejilla de datos clave (horario, ubicación, teléfono, categoría, aforo…) reutilizable.",
+  description:
+    "Rejilla de datos clave (horario, ubicación, teléfono, categoría, aforo…) reutilizable.",
   schema: {
     source: {
-      type: "select", label: "Fuente", default: "manual",
+      type: "select",
+      label: "Fuente",
+      default: "manual",
       options: [
         { value: "manual", label: "Manual" },
         { value: "business", label: "Ficha empresa (auto)" },
@@ -1786,7 +1926,9 @@ const experienceInfoGridBlock: BlockContract = {
       ],
     },
     variant: {
-      type: "select", label: "Variante", default: "cards",
+      type: "select",
+      label: "Variante",
+      default: "cards",
       options: [
         { value: "cards", label: "Tarjetas" },
         { value: "list", label: "Lista" },
@@ -1795,18 +1937,27 @@ const experienceInfoGridBlock: BlockContract = {
     },
     heading: { type: "text", label: "Encabezado", translatable: true },
     columns: { type: "number", label: "Columnas", default: 3 },
-    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Información clave", translatable: true },
+    ariaLabel: {
+      type: "text",
+      label: "Etiqueta accesible",
+      default: "Información clave",
+      translatable: true,
+    },
     items: {
-      type: "list", label: "Datos",
+      type: "list",
+      label: "Datos",
       item: {
-        type: "object", label: "Dato",
+        type: "object",
+        label: "Dato",
         fields: {
           iconKey: { type: "text", label: "Icono (Lucide key)" },
           label: { type: "text", label: "Etiqueta", translatable: true },
           value: { type: "text", label: "Valor", translatable: true },
           href: { type: "url", label: "Enlace" },
           tone: {
-            type: "select", label: "Tono", default: "default",
+            type: "select",
+            label: "Tono",
+            default: "default",
             options: [
               { value: "default", label: "Neutro" },
               { value: "primary", label: "Primario" },
@@ -1818,9 +1969,17 @@ const experienceInfoGridBlock: BlockContract = {
       },
     },
   },
-  capabilities: { soporta_i18n: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
   constraints: {},
-  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "columns"] },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["variant", "columns"],
+  },
   i18n: { translatable_fields: ["heading", "ariaLabel", "items"] },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
@@ -1834,7 +1993,9 @@ const experienceSectionBlock: BlockContract = {
     "Sección editorial avanzada (eyebrow, título, lead, cuerpo, media, CTAs). Evolución del layout section, con jerarquía SEO y anclas.",
   schema: {
     source: {
-      type: "select", label: "Fuente", default: "manual",
+      type: "select",
+      label: "Fuente",
+      default: "manual",
       options: [
         { value: "manual", label: "Manual" },
         { value: "business", label: "Ficha empresa (auto)" },
@@ -1844,7 +2005,9 @@ const experienceSectionBlock: BlockContract = {
       ],
     },
     variant: {
-      type: "select", label: "Variante", default: "editorial",
+      type: "select",
+      label: "Variante",
+      default: "editorial",
       options: [
         { value: "editorial", label: "Editorial" },
         { value: "split", label: "Texto + media" },
@@ -1860,14 +2023,18 @@ const experienceSectionBlock: BlockContract = {
     mediaAlt: { type: "text", label: "Alt de imagen", translatable: true },
     attribution: { type: "text", label: "Atribución (cita)", translatable: true },
     align: {
-      type: "select", label: "Alineación", default: "left",
+      type: "select",
+      label: "Alineación",
+      default: "left",
       options: [
         { value: "left", label: "Izquierda" },
         { value: "center", label: "Centrada" },
       ],
     },
     tone: {
-      type: "select", label: "Tono", default: "default",
+      type: "select",
+      label: "Tono",
+      default: "default",
       options: [
         { value: "default", label: "Por defecto" },
         { value: "muted", label: "Atenuado" },
@@ -1875,14 +2042,18 @@ const experienceSectionBlock: BlockContract = {
       ],
     },
     ctas: {
-      type: "list", label: "Botones",
+      type: "list",
+      label: "Botones",
       item: {
-        type: "object", label: "Botón",
+        type: "object",
+        label: "Botón",
         fields: {
           label: { type: "text", label: "Texto", translatable: true },
           href: { type: "url", label: "URL" },
           emphasis: {
-            type: "select", label: "Énfasis", default: "primary",
+            type: "select",
+            label: "Énfasis",
+            default: "primary",
             options: [
               { value: "primary", label: "Primario" },
               { value: "secondary", label: "Secundario" },
@@ -1894,9 +2065,18 @@ const experienceSectionBlock: BlockContract = {
       },
     },
   },
-  capabilities: { soporta_i18n: true, soporta_seo: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_seo: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
   constraints: {},
-  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "align", "tone"] },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["variant", "align", "tone"],
+  },
   i18n: { translatable_fields: ["eyebrow", "title", "lead", "body", "attribution", "ctas"] },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
@@ -1906,10 +2086,13 @@ const experienceFeaturesBlock: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "Experience Features",
-  description: "Lista de características / amenities / servicios reutilizable en cualquier Experience Page.",
+  description:
+    "Lista de características / amenities / servicios reutilizable en cualquier Experience Page.",
   schema: {
     source: {
-      type: "select", label: "Fuente", default: "manual",
+      type: "select",
+      label: "Fuente",
+      default: "manual",
       options: [
         { value: "manual", label: "Manual" },
         { value: "business", label: "Ficha empresa (reservado)" },
@@ -1919,7 +2102,9 @@ const experienceFeaturesBlock: BlockContract = {
       ],
     },
     variant: {
-      type: "select", label: "Variante", default: "grid",
+      type: "select",
+      label: "Variante",
+      default: "grid",
       options: [
         { value: "grid", label: "Grid con icono" },
         { value: "checklist", label: "Checklist" },
@@ -1930,11 +2115,18 @@ const experienceFeaturesBlock: BlockContract = {
     heading: { type: "text", label: "Encabezado", translatable: true },
     subheading: { type: "text", label: "Subencabezado", translatable: true },
     columns: { type: "number", label: "Columnas", default: 3 },
-    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Características", translatable: true },
+    ariaLabel: {
+      type: "text",
+      label: "Etiqueta accesible",
+      default: "Características",
+      translatable: true,
+    },
     items: {
-      type: "list", label: "Características",
+      type: "list",
+      label: "Características",
       item: {
-        type: "object", label: "Característica",
+        type: "object",
+        label: "Característica",
         fields: {
           iconKey: { type: "text", label: "Icono (Lucide key)" },
           title: { type: "text", label: "Título", translatable: true },
@@ -1945,9 +2137,17 @@ const experienceFeaturesBlock: BlockContract = {
       },
     },
   },
-  capabilities: { soporta_i18n: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
   constraints: {},
-  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "columns"] },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["variant", "columns"],
+  },
   i18n: { translatable_fields: ["heading", "subheading", "ariaLabel", "items"] },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
@@ -1961,7 +2161,9 @@ const experienceInstitutionalBadgesBlock: BlockContract = {
     "Distintivos institucionales oficiales (Pueblo Mágico, Patrimonio, Oriente Maya, Despierta en Valladolid, premios, certificaciones, reconocimientos, Empresa Verificada, Recomendado por Alux). Único bloque autorizado; NUNCA se hardcodean en plantillas.",
   schema: {
     source: {
-      type: "select", label: "Fuente", default: "manual",
+      type: "select",
+      label: "Fuente",
+      default: "manual",
       options: [
         { value: "manual", label: "Manual" },
         { value: "destination", label: "Destino (reservado)" },
@@ -1971,7 +2173,9 @@ const experienceInstitutionalBadgesBlock: BlockContract = {
       ],
     },
     variant: {
-      type: "select", label: "Variante", default: "soft",
+      type: "select",
+      label: "Variante",
+      default: "soft",
       options: [
         { value: "filled", label: "Sólido (máxima jerarquía)" },
         { value: "soft", label: "Suave (default)" },
@@ -1980,7 +2184,9 @@ const experienceInstitutionalBadgesBlock: BlockContract = {
       ],
     },
     size: {
-      type: "select", label: "Tamaño", default: "md",
+      type: "select",
+      label: "Tamaño",
+      default: "md",
       options: [
         { value: "sm", label: "Pequeño" },
         { value: "md", label: "Medio" },
@@ -1988,7 +2194,9 @@ const experienceInstitutionalBadgesBlock: BlockContract = {
       ],
     },
     layout: {
-      type: "select", label: "Disposición", default: "strip",
+      type: "select",
+      label: "Disposición",
+      default: "strip",
       options: [
         { value: "strip", label: "Fila" },
         { value: "stack", label: "Columna" },
@@ -1999,16 +2207,21 @@ const experienceInstitutionalBadgesBlock: BlockContract = {
       label: "Slug del sujeto (destino/negocio/producto)",
     },
     ariaLabel: {
-      type: "text", label: "Etiqueta accesible",
-      default: "Distintivos institucionales", translatable: true,
+      type: "text",
+      label: "Etiqueta accesible",
+      default: "Distintivos institucionales",
+      translatable: true,
     },
     items: {
-      type: "list", label: "Distintivos",
+      type: "list",
+      label: "Distintivos",
       item: {
-        type: "object", label: "Distintivo",
+        type: "object",
+        label: "Distintivo",
         fields: {
           kind: {
-            type: "select", label: "Tipo",
+            type: "select",
+            label: "Tipo",
             options: [
               { value: "pueblo-magico", label: "Pueblo Mágico" },
               { value: "patrimonio", label: "Patrimonio" },
@@ -2031,13 +2244,20 @@ const experienceInstitutionalBadgesBlock: BlockContract = {
       },
     },
   },
-  capabilities: { soporta_i18n: true, soporta_seo: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
-  constraints: {
-    surfaces: [
-      "home", "landing", "institutional", "destination", "business", "product",
-    ],
+  capabilities: {
+    soporta_i18n: true,
+    soporta_seo: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
   },
-  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "size", "layout"] },
+  constraints: {
+    surfaces: ["home", "landing", "institutional", "destination", "business", "product"],
+  },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["variant", "size", "layout"],
+  },
   i18n: { translatable_fields: ["ariaLabel", "items"] },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
@@ -2051,7 +2271,9 @@ const experienceProductsBlock: BlockContract = {
     "Listado oficial de productos / habitaciones / tours / accesos / experiencias. Reutilizable en business, destination, region, category, landing y micrositios.",
   schema: {
     source: {
-      type: "select", label: "Fuente", default: "manual",
+      type: "select",
+      label: "Fuente",
+      default: "manual",
       options: [
         { value: "manual", label: "Manual" },
         { value: "business", label: "Ficha empresa (contexto)" },
@@ -2062,7 +2284,9 @@ const experienceProductsBlock: BlockContract = {
       ],
     },
     variant: {
-      type: "select", label: "Variante", default: "grid",
+      type: "select",
+      label: "Variante",
+      default: "grid",
       options: [
         { value: "grid", label: "Grid" },
         { value: "list", label: "Lista" },
@@ -2072,21 +2296,42 @@ const experienceProductsBlock: BlockContract = {
     },
     heading: { type: "text", label: "Encabezado", translatable: true },
     subheading: { type: "text", label: "Subencabezado", translatable: true },
-    emptyMessage: { type: "text", label: "Mensaje vacío", translatable: true, default: "Sin productos publicados." },
+    emptyMessage: {
+      type: "text",
+      label: "Mensaje vacío",
+      translatable: true,
+      default: "Sin productos publicados.",
+    },
     columns: { type: "number", label: "Columnas", default: 2 },
     maxItems: { type: "number", label: "Máximo de items" },
     groupBy: {
-      type: "select", label: "Agrupar por", default: "none",
+      type: "select",
+      label: "Agrupar por",
+      default: "none",
       options: [
         { value: "none", label: "Sin agrupar" },
         { value: "type", label: "Tipo de producto" },
       ],
     },
-    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Productos y experiencias", translatable: true },
+    ariaLabel: {
+      type: "text",
+      label: "Etiqueta accesible",
+      default: "Productos y experiencias",
+      translatable: true,
+    },
   },
-  capabilities: { soporta_i18n: true, soporta_seo: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_seo: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
   constraints: {},
-  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "columns"] },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["variant", "columns"],
+  },
   i18n: { translatable_fields: ["heading", "subheading", "emptyMessage", "ariaLabel"] },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
@@ -2100,7 +2345,9 @@ const experiencePromotionsBlock: BlockContract = {
     "Oportunidades comerciales reutilizables (promociones, ofertas, descuentos, paquetes, campañas, cupones). Complementa a `vmx.experience.products` sin depender de él.",
   schema: {
     source: {
-      type: "select", label: "Fuente", default: "manual",
+      type: "select",
+      label: "Fuente",
+      default: "manual",
       options: [
         { value: "manual", label: "Manual" },
         { value: "business", label: "Ficha empresa (contexto)" },
@@ -2112,7 +2359,9 @@ const experiencePromotionsBlock: BlockContract = {
       ],
     },
     variant: {
-      type: "select", label: "Variante", default: "grid",
+      type: "select",
+      label: "Variante",
+      default: "grid",
       options: [
         { value: "strip", label: "Franja compacta" },
         { value: "grid", label: "Grid" },
@@ -2124,22 +2373,43 @@ const experiencePromotionsBlock: BlockContract = {
     },
     heading: { type: "text", label: "Encabezado", translatable: true },
     subheading: { type: "text", label: "Subencabezado", translatable: true },
-    emptyMessage: { type: "text", label: "Mensaje vacío", translatable: true, default: "Sin promociones vigentes por ahora." },
+    emptyMessage: {
+      type: "text",
+      label: "Mensaje vacío",
+      translatable: true,
+      default: "Sin promociones vigentes por ahora.",
+    },
     columns: { type: "number", label: "Columnas", default: 2 },
     maxItems: { type: "number", label: "Máximo de items" },
     groupBy: {
-      type: "select", label: "Agrupar por", default: "none",
+      type: "select",
+      label: "Agrupar por",
+      default: "none",
       options: [
         { value: "none", label: "Sin agrupar" },
         { value: "business", label: "Negocio" },
         { value: "urgency", label: "Urgencia" },
       ],
     },
-    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Promociones y oportunidades", translatable: true },
+    ariaLabel: {
+      type: "text",
+      label: "Etiqueta accesible",
+      default: "Promociones y oportunidades",
+      translatable: true,
+    },
   },
-  capabilities: { soporta_i18n: true, soporta_seo: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_seo: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
   constraints: {},
-  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "columns"] },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["variant", "columns"],
+  },
   i18n: { translatable_fields: ["heading", "subheading", "emptyMessage", "ariaLabel"] },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
@@ -2153,7 +2423,9 @@ const experienceReviewsBlock: BlockContract = {
     "Confianza y prueba social — reputación agregada + reseñas multi-fuente (Google, TripAdvisor, propias, Alux, futuras) con respuestas del negocio y moderación.",
   schema: {
     source: {
-      type: "select", label: "Fuente", default: "manual",
+      type: "select",
+      label: "Fuente",
+      default: "manual",
       options: [
         { value: "manual", label: "Manual" },
         { value: "business", label: "Ficha empresa (contexto)" },
@@ -2166,7 +2438,9 @@ const experienceReviewsBlock: BlockContract = {
       ],
     },
     variant: {
-      type: "select", label: "Variante", default: "list",
+      type: "select",
+      label: "Variante",
+      default: "list",
       options: [
         { value: "summary", label: "Sólo resumen" },
         { value: "list", label: "Lista" },
@@ -2179,11 +2453,18 @@ const experienceReviewsBlock: BlockContract = {
     },
     heading: { type: "text", label: "Encabezado", translatable: true },
     subheading: { type: "text", label: "Subencabezado", translatable: true },
-    emptyMessage: { type: "text", label: "Mensaje vacío", translatable: true, default: "Aún no hay reseñas publicadas." },
+    emptyMessage: {
+      type: "text",
+      label: "Mensaje vacío",
+      translatable: true,
+      default: "Aún no hay reseñas publicadas.",
+    },
     columns: { type: "number", label: "Columnas", default: 2 },
     maxItems: { type: "number", label: "Máximo de items" },
     groupBy: {
-      type: "select", label: "Agrupar por", default: "none",
+      type: "select",
+      label: "Agrupar por",
+      default: "none",
       options: [
         { value: "none", label: "Sin agrupar" },
         { value: "platform", label: "Fuente" },
@@ -2193,7 +2474,9 @@ const experienceReviewsBlock: BlockContract = {
       ],
     },
     sortBy: {
-      type: "select", label: "Ordenar por", default: "recent",
+      type: "select",
+      label: "Ordenar por",
+      default: "recent",
       options: [
         { value: "recent", label: "Más recientes" },
         { value: "highest", label: "Mejor puntuadas" },
@@ -2202,11 +2485,25 @@ const experienceReviewsBlock: BlockContract = {
         { value: "recommendedByAlux", label: "Recomendadas por Alux (reservado)" },
       ],
     },
-    ariaLabel: { type: "text", label: "Etiqueta accesible", default: "Opiniones y reseñas", translatable: true },
+    ariaLabel: {
+      type: "text",
+      label: "Etiqueta accesible",
+      default: "Opiniones y reseñas",
+      translatable: true,
+    },
   },
-  capabilities: { soporta_i18n: true, soporta_seo: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_seo: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
   constraints: {},
-  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "columns"] },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["variant", "columns"],
+  },
   i18n: { translatable_fields: ["heading", "subheading", "emptyMessage", "ariaLabel"] },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
@@ -2220,7 +2517,9 @@ const experienceRelatedCollectionBlock: BlockContract = {
     "Motor de descubrimiento contextual — colecciones heterogéneas (empresas, productos, experiencias, hoteles, restaurantes, eventos, promociones, rutas, destinos, regiones) usando siempre el mismo bloque. Preparado para evolucionar hacia recomendaciones de Alux y Context Engine sin romper compatibilidad.",
   schema: {
     source: {
-      type: "select", label: "Fuente", default: "manual",
+      type: "select",
+      label: "Fuente",
+      default: "manual",
       options: [
         { value: "manual", label: "Manual" },
         { value: "destination", label: "Destino (contexto)" },
@@ -2233,7 +2532,9 @@ const experienceRelatedCollectionBlock: BlockContract = {
       ],
     },
     entityKind: {
-      type: "select", label: "Tipo de entidad", default: "mixed",
+      type: "select",
+      label: "Tipo de entidad",
+      default: "mixed",
       options: [
         { value: "mixed", label: "Mixto" },
         { value: "business", label: "Empresas" },
@@ -2250,7 +2551,9 @@ const experienceRelatedCollectionBlock: BlockContract = {
       ],
     },
     variant: {
-      type: "select", label: "Variante", default: "grid",
+      type: "select",
+      label: "Variante",
+      default: "grid",
       options: [
         { value: "grid", label: "Grid" },
         { value: "list", label: "Lista" },
@@ -2260,16 +2563,40 @@ const experienceRelatedCollectionBlock: BlockContract = {
         { value: "compact", label: "Compacto" },
       ],
     },
-    heading: { type: "text", label: "Encabezado", translatable: true, default: "Sigue descubriendo" },
+    heading: {
+      type: "text",
+      label: "Encabezado",
+      translatable: true,
+      default: "Sigue descubriendo",
+    },
     subheading: { type: "text", label: "Subencabezado", translatable: true },
-    emptyMessage: { type: "text", label: "Mensaje vacío", translatable: true, default: "Aún no hay contenido para descubrir aquí." },
+    emptyMessage: {
+      type: "text",
+      label: "Mensaje vacío",
+      translatable: true,
+      default: "Aún no hay contenido para descubrir aquí.",
+    },
     columns: { type: "number", label: "Columnas", default: 2 },
     maxItems: { type: "number", label: "Máximo de items" },
-    ariaLabel: { type: "text", label: "Etiqueta accesible", translatable: true, default: "Sigue descubriendo" },
+    ariaLabel: {
+      type: "text",
+      label: "Etiqueta accesible",
+      translatable: true,
+      default: "Sigue descubriendo",
+    },
   },
-  capabilities: { soporta_i18n: true, soporta_seo: true, soporta_preview: true, soporta_responsive: true, soporta_cache: true },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_seo: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
   constraints: {},
-  responsive: { breakpoints: ["desktop", "tablet", "mobile"], overridable_fields: ["variant", "columns"] },
+  responsive: {
+    breakpoints: ["desktop", "tablet", "mobile"],
+    overridable_fields: ["variant", "columns"],
+  },
   i18n: { translatable_fields: ["heading", "subheading", "emptyMessage", "ariaLabel"] },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
@@ -2323,13 +2650,7 @@ const experienceMapBlock: BlockContract = {
     soporta_cache: true,
   },
   constraints: {
-    surfaces: [
-      "home",
-      "landing",
-      "destination",
-      "business",
-      "product",
-    ],
+    surfaces: ["home", "landing", "destination", "business", "product"],
   },
   responsive: {
     breakpoints: ["desktop", "tablet", "mobile"],
@@ -2339,7 +2660,7 @@ const experienceMapBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
-export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
+const INITIAL_BLOCK_LIBRARY_SOURCE: BlockContract[] = [
   // NOTE: `experienceMapBlock` is appended near the end of this array.
   containerBlock,
   sectionBlock,
@@ -2425,6 +2746,24 @@ export const INITIAL_BLOCK_LIBRARY: BlockContract[] = [
   // U-VISUAL · V4 — Experience Map (Founder Discovery Map Principle).
   experienceMapBlock,
 ];
+
+/** I4-A: proyecta metadata de la única policy sobre los contratos runtime. */
+export const INITIAL_BLOCK_LIBRARY: BlockContract[] = INITIAL_BLOCK_LIBRARY_SOURCE.map(
+  (contract) => {
+    const policy = getEditorialBlockPolicy(contract.type);
+    return policy
+      ? {
+          ...contract,
+          editorial: {
+            mode: policy.mode,
+            family: policy.family,
+            variants: policy.variants,
+            allowed_sources: policy.allowed_sources,
+          },
+        }
+      : contract;
+  },
+);
 
 let bootstrapped = false;
 

@@ -162,7 +162,13 @@ function filesBelow(directory) {
   return files;
 }
 
-const forbiddenConsumers = filesBelow("src")
+const authorizedI4AConsumers = [
+  "src/lib/experience-builder/block-registry.ts",
+  "src/lib/experience-builder/block-library.ts",
+  "src/components/experience-builder/VisualStudio.tsx",
+  "src/lib/experience-builder/studio.functions.ts",
+];
+const i4AConsumers = filesBelow("src")
   .filter(
     (file) =>
       ![
@@ -171,12 +177,17 @@ const forbiddenConsumers = filesBelow("src")
       ].includes(relative(".", file)),
   )
   .filter((file) => readFileSync(file, "utf8").includes("editorial-builder-policy"))
-  .map((file) => relative(".", file));
-assert.deepEqual(
-  forbiddenConsumers,
-  [],
-  `I4-0 policy gained consumers: ${forbiddenConsumers.join(", ")}`,
-);
+  .map((file) => relative(".", file))
+  .sort();
+if (i4AConsumers.length) {
+  const i4AAuthorization = JSON.parse(
+    readFileSync("docs/governance/product-authorizations/PCA-2026-013.json", "utf8"),
+  );
+  assert.equal(i4AAuthorization.status, "Approved");
+  assert.deepEqual(i4AConsumers, [...authorizedI4AConsumers].sort());
+} else {
+  assert.deepEqual(i4AConsumers, []);
+}
 
 const policy = readFileSync("src/lib/experience-builder/editorial-builder-policy.ts", "utf8");
 assert.match(policy, /type: "vmx\.custom\.html"/);
@@ -215,5 +226,5 @@ assert.equal(
 );
 
 console.log(
-  `I4-0 evidence: PASS (${validationMode}; 12-path scope exact; pure contract isolated; no dependencies, routes, schema, flags or consumers; vmx.custom.html legacy-only).`,
+  `I4-0 evidence: PASS (${validationMode}; 12-path scope exact; no dependencies, routes, schema or flags; ${i4AConsumers.length ? "four PCA-2026-013 consumers exact" : "pure contract isolated"}; vmx.custom.html legacy-only).`,
 );

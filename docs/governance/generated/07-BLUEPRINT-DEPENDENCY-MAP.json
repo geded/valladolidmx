@@ -2,14 +2,14 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.32",
+    "version": "0.33",
     "state": "Approved",
-    "source_sha256": "bd721703a1e968f73b5ad02756a95ea3556bf8e3f34af7b4d58e0c1aa5ce66eb",
+    "source_sha256": "d37341852b09a7c00219c5b43040a253c9c75e9fb15ec6ee3f28aaf0314730a9",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-08-03T00:00:00.000Z",
+  "generated_at": "2026-08-04T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -7199,6 +7199,29 @@
       "owner": "D04 · content-experience",
       "state": "Approved",
       "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:scripts/omxds/i4/editorial-builder-authoring.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/i4/editorial-builder-authoring.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i4/editorial-builder-authoring.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/i4/editorial-builder-authoring.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-013.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-013.json"
     }
   ],
   "edges": [
@@ -18406,6 +18429,105 @@
       "evidence": "docs/blueprint/18.46-OMXDS-V1-I4-0-SHARED-EDITORIAL-BUILDER-CONTRACT-AUTHORIZATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/18.46-OMXDS-V1-I4-0-SHARED-EDITORIAL-BUILDER-CONTRACT-AUTHORIZATION-PACK-v1.0.md",
       "verified_at": "2026-08-03"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/editorial-builder-policy.ts:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/editorial-builder-policy.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/block-registry.ts:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/block-registry.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/block-library.ts:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/block-library.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/experience-builder/VisualStudio.tsx:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/components/experience-builder/VisualStudio.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/studio.functions.ts:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/studio.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-authoring.test.ts:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-authoring.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-authoring.evidence.mjs:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-authoring.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder.evidence.mjs:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/validate-full-suite.mjs:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/validate-full-suite.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-013.json:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-013.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
     }
   ],
   "critical_chain_coverage": [
