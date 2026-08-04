@@ -4,6 +4,8 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const base = "1fe83c8bfb8874468560c9c3c7d89ded0073a252";
+const authorizedCommit = "3c8e138ae768380f6656fad40b84515615002d7d";
+const authorizedMergeCommit = "860c4928a7c848b40d6f5f5f9fc3c1869d57c832";
 const branch = "feature/omxds-i4-a-authoring-allowlist-legacy-confinement-v1";
 const allowed = new Set([
   "src/lib/experience-builder/editorial-builder-policy.ts",
@@ -32,6 +34,60 @@ function lines(value) {
   return value.split("\n").filter(Boolean);
 }
 
+function words(value) {
+  return value.split(/\s+/).filter(Boolean);
+}
+
+function gitIsAncestor(ancestor, descendant) {
+  try {
+    execFileSync("git", ["merge-base", "--is-ancestor", ancestor, descendant], {
+      stdio: "ignore",
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function resolveMainPushContext({ eventName, ref, eventSha, head, isAncestor }) {
+  assert.equal(eventName, "push", "I4-A post-merge validation requires a push event");
+  assert.equal(ref, "refs/heads/main", "I4-A post-merge push must target refs/heads/main");
+  assert.match(eventSha ?? "", /^[0-9a-f]{40}$/);
+  assert.equal(head, eventSha, "checked-out main commit must match GITHUB_SHA");
+  assert.ok(
+    isAncestor(authorizedMergeCommit, head),
+    "authorized PR #51 merge commit must be an ancestor of main",
+  );
+  return authorizedCommit;
+}
+
+function verifyPostMergeContextChecks() {
+  const valid = {
+    eventName: "push",
+    ref: "refs/heads/main",
+    eventSha: "f".repeat(40),
+    head: "f".repeat(40),
+    isAncestor: () => true,
+  };
+  assert.equal(resolveMainPushContext(valid), authorizedCommit);
+  assert.throws(
+    () => resolveMainPushContext({ ...valid, ref: "refs/heads/release" }),
+    /refs\/heads\/main/,
+  );
+  assert.throws(() => resolveMainPushContext({ ...valid, eventSha: "e".repeat(40) }), /GITHUB_SHA/);
+  assert.throws(
+    () => resolveMainPushContext({ ...valid, isAncestor: () => false }),
+    /merge commit must be an ancestor/,
+  );
+}
+
+verifyPostMergeContextChecks();
+assert.deepEqual(words(git(["show", "-s", "--format=%P", authorizedCommit])), [base]);
+assert.deepEqual(words(git(["show", "-s", "--format=%P", authorizedMergeCommit])), [
+  base,
+  authorizedCommit,
+]);
+
 const head = git(["rev-parse", "HEAD"]);
 let comparisonTip = head;
 let mode = "single_commit";
@@ -40,14 +96,47 @@ if (head === base) {
 } else if (process.env.GITHUB_EVENT_NAME === "pull_request") {
   assert.ok(process.env.GITHUB_EVENT_PATH);
   const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8"));
-  assert.equal(event.pull_request?.base?.sha, base);
-  comparisonTip = event.pull_request?.head?.sha;
-  assert.match(comparisonTip, /^[0-9a-f]{40}$/);
+  const eventBase = event.pull_request?.base?.sha ?? "";
+  const eventHead = event.pull_request?.head?.sha ?? "";
+  assert.match(eventBase, /^[0-9a-f]{40}$/);
+  assert.match(eventHead, /^[0-9a-f]{40}$/);
   assert.equal(head, process.env.GITHUB_SHA);
-  mode = "github_pr_merge";
+  assert.ok(gitIsAncestor(eventHead, head), "PR head must be an ancestor of its checked-out merge");
+  if (eventBase === base) {
+    comparisonTip = eventHead;
+    mode = "github_authoring_pr_merge";
+  } else {
+    assert.ok(
+      gitIsAncestor(authorizedMergeCommit, eventBase),
+      "later PR base must contain the authorized PR #51 merge commit",
+    );
+    assert.ok(
+      gitIsAncestor(authorizedMergeCommit, eventHead),
+      "later PR head must contain the authorized PR #51 merge commit",
+    );
+    comparisonTip = authorizedCommit;
+    mode = "post_merge_pr";
+  }
+} else if (process.env.GITHUB_EVENT_NAME === "push") {
+  comparisonTip = resolveMainPushContext({
+    eventName: process.env.GITHUB_EVENT_NAME,
+    ref: process.env.GITHUB_REF,
+    eventSha: process.env.GITHUB_SHA,
+    head,
+    isAncestor: gitIsAncestor,
+  });
+  mode = "main_push";
+} else if (gitIsAncestor(authorizedMergeCommit, head)) {
+  comparisonTip = authorizedCommit;
+  mode = "post_merge_local";
 } else {
   assert.equal(git(["merge-base", base, head]), base);
   assert.equal(git(["rev-list", "--count", `${base}..${head}`]), "1");
+}
+
+if (mode !== "base_worktree") {
+  assert.equal(git(["merge-base", base, comparisonTip]), base);
+  assert.equal(git(["rev-list", "--count", `${base}..${comparisonTip}`]), "1");
 }
 
 const changed =
@@ -61,7 +150,8 @@ assert.equal(changed.size, 16, `I4-A must contain exactly 16 paths; found ${chan
 assert.deepEqual([...changed].sort(), [...allowed].sort());
 
 const currentBranch = process.env.GITHUB_HEAD_REF || git(["branch", "--show-current"]);
-if (currentBranch) assert.equal(currentBranch, branch);
+if (currentBranch && ["base_worktree", "single_commit", "github_authoring_pr_merge"].includes(mode))
+  assert.equal(currentBranch, branch);
 
 const basePackage = JSON.parse(git(["show", `${base}:package.json`]));
 const currentPackage = JSON.parse(readFileSync("package.json", "utf8"));
