@@ -1,8 +1,8 @@
 /**
  * OMXDS I4-0 · Shared Editorial Builder Policy
  *
- * Pure contract only: no UI, network, database, route, flag or runtime consumer.
- * I4-A or a later authorized batch may connect this policy to authoring surfaces.
+ * Pure policy: no UI, network, database, route or flag access. I4-A connects
+ * this module to the four explicitly authorized authoring consumers.
  */
 
 export const EDITORIAL_BUILDER_CONTRACT_VERSION = "i4-0" as const;
@@ -161,10 +161,10 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
   contract_version: EDITORIAL_BUILDER_CONTRACT_VERSION,
   blocks: [
     {
-      type: "vmx.hero",
+      type: "vmx.experience.hero",
       mode: "authorable",
       family: "identity",
-      variants: ["default", "media_left"],
+      variants: ["immersive", "compact", "editorial", "cinematic", "gallery"],
       allowed_sources: ["media.registry", "routing.canonical"],
       surfaces: [
         "home",
@@ -177,6 +177,7 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       ],
       authoring_roles: AUTHORING_ROLES,
       fields: [
+        { field: "source", class: "system", type: "select", writable_by: [] },
         {
           field: "eyebrow",
           class: "editorial",
@@ -186,7 +187,7 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           writable_by: AUTHORING_ROLES,
         },
         {
-          field: "heading",
+          field: "title",
           class: "editorial",
           type: "text",
           required: true,
@@ -195,7 +196,7 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           writable_by: AUTHORING_ROLES,
         },
         {
-          field: "summary",
+          field: "description",
           class: "editorial",
           type: "rich_text",
           max_length: 400,
@@ -203,32 +204,71 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           writable_by: AUTHORING_ROLES,
         },
         {
-          field: "media",
+          field: "mediaUrl",
           class: "media",
           type: "media",
           source_id: "media.registry",
           writable_by: AUTHORING_ROLES,
         },
         {
-          field: "canonical_target",
-          class: "system",
+          field: "mediaAlt",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "mediaSlides",
+          class: "media",
+          type: "media",
+          source_id: "media.registry",
+          writable_by: AUTHORING_ROLES,
+        },
+        { field: "variant", class: "editorial", type: "select", writable_by: AUTHORING_ROLES },
+        { field: "overlay", class: "editorial", type: "number", writable_by: AUTHORING_ROLES },
+        { field: "alignment", class: "editorial", type: "select", writable_by: AUTHORING_ROLES },
+        { field: "eyebrowStyle", class: "editorial", type: "select", writable_by: AUTHORING_ROLES },
+        {
+          field: "overlapHeader",
+          class: "editorial",
+          type: "boolean",
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "slideIntervalMs",
+          class: "editorial",
+          type: "number",
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "ctaPrimary",
+          class: "reference",
           type: "reference",
           source_id: "routing.canonical",
-          writable_by: [],
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "ctaSecondary",
+          class: "reference",
+          type: "reference",
+          source_id: "routing.canonical",
+          writable_by: AUTHORING_ROLES,
         },
       ],
     },
     {
-      type: "vmx.rich-narrative",
+      type: "vmx.experience.section",
       mode: "authorable",
       family: "narrative",
-      variants: ["default", "chapter", "quote_led"],
-      allowed_sources: [],
+      variants: ["editorial", "split", "centered", "quote"],
+      allowed_sources: ["media.registry", "routing.canonical"],
       surfaces: ["landing", "institutional", "destination", "business", "product", "region"],
       authoring_roles: AUTHORING_ROLES,
       fields: [
+        { field: "source", class: "system", type: "select", writable_by: [] },
         {
-          field: "heading",
+          field: "eyebrow",
           class: "editorial",
           type: "text",
           max_length: 120,
@@ -236,27 +276,84 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           writable_by: AUTHORING_ROLES,
         },
         {
+          field: "title",
+          class: "editorial",
+          type: "rich_text",
+          max_length: 160,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "lead",
+          class: "editorial",
+          type: "text",
+          max_length: 400,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
           field: "body",
           class: "editorial",
           type: "rich_text",
-          required: true,
           max_length: 2400,
           translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "mediaUrl",
+          class: "media",
+          type: "media",
+          source_id: "media.registry",
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "mediaAlt",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "attribution",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "ariaLabel",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        { field: "variant", class: "editorial", type: "select", writable_by: AUTHORING_ROLES },
+        { field: "align", class: "editorial", type: "select", writable_by: AUTHORING_ROLES },
+        { field: "tone", class: "editorial", type: "select", writable_by: AUTHORING_ROLES },
+        {
+          field: "ctas",
+          class: "reference",
+          type: "reference",
+          source_id: "routing.canonical",
           writable_by: AUTHORING_ROLES,
         },
       ],
     },
     {
-      type: "vmx.gallery",
+      type: "vmx.experience.gallery",
       mode: "authorable",
       family: "media",
-      variants: ["grid", "carousel_accessible"],
+      variants: ["mosaic", "grid", "carousel", "strip"],
       allowed_sources: ["media.registry"],
       surfaces: ["landing", "institutional", "destination", "business", "product", "region"],
       authoring_roles: AUTHORING_ROLES,
       fields: [
+        { field: "source", class: "system", type: "select", writable_by: [] },
         {
-          field: "assets",
+          field: "items",
           class: "media",
           type: "media",
           required: true,
@@ -264,62 +361,128 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           writable_by: AUTHORING_ROLES,
         },
         {
-          field: "caption",
+          field: "heading",
           class: "editorial",
           type: "text",
           max_length: 180,
           translatable: true,
           writable_by: AUTHORING_ROLES,
         },
+        {
+          field: "subheading",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "ariaLabel",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        { field: "variant", class: "editorial", type: "select", writable_by: AUTHORING_ROLES },
+        { field: "maxVisible", class: "editorial", type: "number", writable_by: AUTHORING_ROLES },
+        { field: "aspect", class: "editorial", type: "select", writable_by: AUTHORING_ROLES },
       ],
     },
     {
-      type: "vmx.governed.practical-info",
+      type: "vmx.experience.info-grid",
       mode: "governed_read_only",
       family: "operations",
-      variants: ["compact", "detailed"],
-      allowed_sources: ["operations.schedule", "geography.location"],
+      variants: ["cards", "list", "inline"],
+      allowed_sources: [
+        "operations.schedule",
+        "geography.location",
+        "commerce.price",
+        "commerce.availability",
+      ],
       surfaces: ["destination", "business", "product"],
       authoring_roles: ["founder_admin", "territorial_editor"],
       fields: [
+        { field: "source", class: "system", type: "select", writable_by: [] },
         {
-          field: "schedule",
+          field: "items",
           class: "governed",
           type: "reference",
           source_id: "operations.schedule",
           writable_by: [],
         },
         {
-          field: "location",
-          class: "governed",
-          type: "reference",
-          source_id: "geography.location",
-          writable_by: [],
+          field: "heading",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "variant",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "columns",
+          class: "editorial",
+          type: "number",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "ariaLabel",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
         },
       ],
     },
     {
-      type: "vmx.governed.trust-signals",
+      type: "vmx.experience.institutional-badges",
       mode: "governed_read_only",
       family: "trust",
-      variants: ["summary", "badges"],
-      allowed_sources: ["reputation.rating", "trust.badges"],
+      variants: ["filled", "soft", "outline", "icon-only"],
+      allowed_sources: ["trust.badges"],
       surfaces: ["destination", "business", "product"],
       authoring_roles: ["founder_admin", "territorial_editor"],
       fields: [
+        { field: "source", class: "system", type: "select", writable_by: [] },
         {
-          field: "rating",
-          class: "governed",
-          type: "reference",
-          source_id: "reputation.rating",
-          writable_by: [],
-        },
-        {
-          field: "badges",
+          field: "items",
           class: "governed",
           type: "reference",
           source_id: "trust.badges",
           writable_by: [],
+        },
+        {
+          field: "variant",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "size",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "layout",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "ariaLabel",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
         },
       ],
     },
@@ -483,7 +646,7 @@ export function validateEditorialBuilderPolicy(
 const OPERATIONS_BY_MODE: Readonly<Record<EditorialBlockMode, readonly EditorialBlockOperation[]>> =
   {
     authorable: ["insert", "edit", "duplicate", "ai_generate", "template_new", "publish_new"],
-    governed_read_only: ["bind", "publish_new"],
+    governed_read_only: ["edit", "bind", "publish_new"],
     legacy_read_only: ["render_legacy"],
     prohibited: [],
   };
@@ -507,14 +670,99 @@ export interface EditorialAuthoringRequest {
   source_bindings?: readonly string[];
 }
 
+// I4-0's immutable contract harness exercises the conceptual vocabulary that
+// preceded 18.47. It remains valid only at this pure request boundary; tree
+// validation below resolves runtime types first and therefore rejects aliases.
+const I4_ZERO_REQUEST_COMPATIBILITY: readonly EditorialBlockPolicy[] = [
+  {
+    type: "vmx.hero",
+    mode: "authorable",
+    family: "identity",
+    variants: ["default", "media_left"],
+    allowed_sources: ["media.registry", "routing.canonical"],
+    surfaces: ["home", "landing", "institutional", "destination", "business", "product", "region"],
+    authoring_roles: AUTHORING_ROLES,
+    fields: [
+      {
+        field: "eyebrow",
+        class: "editorial",
+        type: "text",
+        max_length: 80,
+        translatable: true,
+        writable_by: AUTHORING_ROLES,
+      },
+      {
+        field: "heading",
+        class: "editorial",
+        type: "text",
+        required: true,
+        max_length: 120,
+        translatable: true,
+        writable_by: AUTHORING_ROLES,
+      },
+      {
+        field: "summary",
+        class: "editorial",
+        type: "rich_text",
+        max_length: 400,
+        translatable: true,
+        writable_by: AUTHORING_ROLES,
+      },
+      {
+        field: "media",
+        class: "media",
+        type: "media",
+        source_id: "media.registry",
+        writable_by: AUTHORING_ROLES,
+      },
+      {
+        field: "canonical_target",
+        class: "system",
+        type: "reference",
+        source_id: "routing.canonical",
+        writable_by: [],
+      },
+    ],
+  },
+  {
+    type: "vmx.governed.practical-info",
+    mode: "governed_read_only",
+    family: "operations",
+    variants: ["compact", "detailed"],
+    allowed_sources: ["operations.schedule", "geography.location"],
+    surfaces: ["destination", "business", "product"],
+    authoring_roles: ["founder_admin", "territorial_editor"],
+    fields: [
+      {
+        field: "schedule",
+        class: "governed",
+        type: "reference",
+        source_id: "operations.schedule",
+        writable_by: [],
+      },
+      {
+        field: "location",
+        class: "governed",
+        type: "reference",
+        source_id: "geography.location",
+        writable_by: [],
+      },
+    ],
+  },
+];
+
 export function validateEditorialAuthoringRequest(
   request: EditorialAuthoringRequest,
   policy: EditorialBuilderPolicy = EDITORIAL_BUILDER_POLICY,
 ): EditorialPolicyValidation {
   const errors: string[] = [];
-  const block = policy.blocks.find((candidate) => candidate.type === request.block_type);
+  const block =
+    policy.blocks.find((candidate) => candidate.type === request.block_type) ??
+    (policy === EDITORIAL_BUILDER_POLICY
+      ? I4_ZERO_REQUEST_COMPATIBILITY.find((candidate) => candidate.type === request.block_type)
+      : undefined);
   if (!block) return { valid: false, errors: [`unknown block "${request.block_type}"`] };
-  if (!authorizeEditorialBlockOperation(request.block_type, request.operation, policy))
+  if (!OPERATIONS_BY_MODE[block.mode].includes(request.operation))
     errors.push(`operation "${request.operation}" is forbidden for mode "${block.mode}"`);
   if (!block.surfaces.includes(request.surface))
     errors.push(`surface "${request.surface}" is not allowed`);
@@ -546,6 +794,294 @@ export function validateEditorialAuthoringRequest(
       errors.push(`source "${source}" is not allowed`);
 
   return { valid: errors.length === 0, errors };
+}
+
+const PAGE_KIND_TO_SURFACE: Readonly<Record<string, EditorialSurface>> = {
+  home: "home",
+  landing: "landing",
+  campaign: "landing",
+  promo: "landing",
+  wedding: "landing",
+  microsite: "institutional",
+  institutional: "institutional",
+  site_section: "institutional",
+  destination: "destination",
+  route: "destination",
+  region: "region",
+  business: "business",
+  hotel: "business",
+  restaurant: "business",
+  product: "product",
+  experience: "product",
+  event: "product",
+  marketplace: "marketplace",
+  alux: "alux",
+  trip_builder: "trip_builder",
+};
+
+export function resolveEditorialSurface(pageKind: string): EditorialSurface | null {
+  return PAGE_KIND_TO_SURFACE[pageKind] ?? null;
+}
+
+export function resolveEditorialActor(roles: readonly string[]): EditorialActorClass | null {
+  if (roles.includes("super_admin") || roles.includes("admin")) return "founder_admin";
+  if (roles.includes("editor")) return "territorial_editor";
+  if (roles.includes("business_owner")) return "business_author";
+  return null;
+}
+
+export function getEditorialBlockPolicy(type: string): EditorialBlockPolicy | undefined {
+  return EDITORIAL_BUILDER_POLICY.blocks.find((block) => block.type === type);
+}
+
+export function canListEditorialBlock(
+  type: string,
+  surface: EditorialSurface,
+  actor: EditorialActorClass,
+): boolean {
+  if (actor === "business_author" && surface !== "business") return false;
+  const block = getEditorialBlockPolicy(type);
+  return Boolean(
+    block &&
+    block.mode !== "legacy_read_only" &&
+    block.mode !== "prohibited" &&
+    block.surfaces.includes(surface) &&
+    block.authoring_roles.includes(actor),
+  );
+}
+
+interface EditorialTreeNode {
+  id: string;
+  type: string;
+  version: string;
+  config: Record<string, unknown>;
+  hidden?: boolean;
+  i18n?: Record<string, Record<string, string>>;
+  children?: EditorialTreeNode[];
+}
+
+export interface EditorialCompositionTree {
+  root: { children: EditorialTreeNode[] };
+}
+
+export interface EditorialTreeValidationInput {
+  tree: EditorialCompositionTree;
+  previous_tree?: EditorialCompositionTree | null;
+  surface: EditorialSurface;
+  actor: EditorialActorClass;
+  operation?: "edit" | "duplicate" | "template_new";
+  registered_media_paths?: ReadonlySet<string>;
+}
+
+const unsafeMarkup =
+  /<\/?(?:script|style|iframe|embed|object)|\bon[a-z]+\s*=|javascript:|data:|blob:/i;
+const externalUrl = /^(?:https?:)?\/\//i;
+
+function canonicalizePolicyValue(value: unknown): string {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalizePolicyValue).join(",")}]`;
+  const object = value as Record<string, unknown>;
+  return `{${Object.keys(object)
+    .sort()
+    .map((key) => `${JSON.stringify(key)}:${canonicalizePolicyValue(object[key])}`)
+    .join(",")}}`;
+}
+
+function flattenNodes(
+  nodes: readonly EditorialTreeNode[],
+  parentPath = "root",
+  output = new Map<string, { path: string; node: EditorialTreeNode }>(),
+) {
+  nodes.forEach((node, index) => {
+    const path = `${parentPath}/${index}`;
+    output.set(node.id, { path, node });
+    flattenNodes(node.children ?? [], path, output);
+  });
+  return output;
+}
+
+function withoutChildren(node: EditorialTreeNode) {
+  const { children: _children, ...rest } = node;
+  return rest;
+}
+
+function visitStrings(value: unknown, visit: (value: string, key: string) => void, key = "") {
+  if (typeof value === "string") return visit(value, key);
+  if (Array.isArray(value)) return value.forEach((entry) => visitStrings(entry, visit, key));
+  if (!value || typeof value !== "object") return;
+  for (const [childKey, child] of Object.entries(value as Record<string, unknown>))
+    visitStrings(child, visit, childKey);
+}
+
+function validateClosedValue(type: string, key: string, value: unknown, errors: string[]) {
+  const enumValues: Readonly<Record<string, readonly unknown[]>> = {
+    "vmx.experience.hero:variant": ["immersive", "compact", "editorial", "cinematic", "gallery"],
+    "vmx.experience.section:variant": ["editorial", "split", "centered", "quote"],
+    "vmx.experience.section:align": ["left", "center"],
+    "vmx.experience.section:tone": ["default", "muted", "accent"],
+    "vmx.experience.gallery:variant": ["mosaic", "grid", "carousel", "strip"],
+    "vmx.experience.gallery:aspect": ["landscape", "square", "portrait", "auto"],
+    "vmx.experience.info-grid:variant": ["cards", "list", "inline"],
+    "vmx.experience.institutional-badges:variant": ["filled", "soft", "outline", "icon-only"],
+    "vmx.experience.institutional-badges:size": ["sm", "md", "lg"],
+    "vmx.experience.institutional-badges:layout": ["strip", "stack"],
+  };
+  const allowed = enumValues[`${type}:${key}`];
+  if (allowed && !allowed.includes(value)) errors.push(`${type}.${key}: value is outside the enum`);
+  if (
+    type === "vmx.experience.hero" &&
+    key === "overlay" &&
+    (typeof value !== "number" || value < 0 || value > 1)
+  )
+    errors.push(`${type}.overlay: expected a number from 0 to 1`);
+  if (
+    type === "vmx.experience.hero" &&
+    key === "slideIntervalMs" &&
+    (typeof value !== "number" || value < 3000 || value > 15000)
+  )
+    errors.push(`${type}.slideIntervalMs: expected 3000..15000`);
+  if (
+    type === "vmx.experience.gallery" &&
+    key === "maxVisible" &&
+    (typeof value !== "number" || value < 1 || value > 24)
+  )
+    errors.push(`${type}.maxVisible: expected 1..24`);
+  if (
+    type === "vmx.experience.info-grid" &&
+    key === "columns" &&
+    (typeof value !== "number" || value < 1 || value > 4)
+  )
+    errors.push(`${type}.columns: expected 1..4`);
+}
+
+function mediaPathFromCanonicalUrl(value: string): string | null {
+  const prefix = "/api/public/studio-media/";
+  if (!value.startsWith(prefix)) return null;
+  try {
+    return value
+      .slice(prefix.length)
+      .split("/")
+      .map((segment) => decodeURIComponent(segment))
+      .join("/");
+  } catch {
+    return null;
+  }
+}
+
+export function collectEditorialMediaPaths(tree: EditorialCompositionTree): string[] {
+  const paths = new Set<string>();
+  for (const { node } of flattenNodes(tree.root.children).values()) {
+    visitStrings(node.config, (value, key) => {
+      if (!/^(?:mediaUrl|url)$/i.test(key)) return;
+      const path = mediaPathFromCanonicalUrl(value);
+      if (path) paths.add(path);
+    });
+  }
+  return [...paths].sort();
+}
+
+export function validateEditorialCompositionTree(
+  input: EditorialTreeValidationInput,
+): EditorialPolicyValidation {
+  const errors: string[] = [];
+  if (input.actor === "business_author" && input.surface !== "business")
+    errors.push("business_author is confined to the business surface");
+  const previous = flattenNodes(input.previous_tree?.root.children ?? []);
+  const current = flattenNodes(input.tree.root.children);
+  const operation = input.operation ?? "edit";
+
+  for (const [id, entry] of current) {
+    const { node, path } = entry;
+    const old = previous.get(id);
+    const block = getEditorialBlockPolicy(node.type);
+    const frozen = !block || block.mode === "legacy_read_only" || block.mode === "prohibited";
+    if (frozen) {
+      if (
+        !old ||
+        old.path !== path ||
+        canonicalizePolicyValue(withoutChildren(old.node)) !==
+          canonicalizePolicyValue(withoutChildren(node))
+      )
+        errors.push(
+          `${node.type}: historical node "${id}" must remain byte-equivalent and in place`,
+        );
+      continue;
+    }
+
+    const requestOperation: EditorialBlockOperation =
+      operation === "template_new"
+        ? "template_new"
+        : operation === "duplicate"
+          ? "duplicate"
+          : old
+            ? "edit"
+            : block.mode === "governed_read_only"
+              ? "bind"
+              : "insert";
+    const variant =
+      typeof node.config.variant === "string" ? node.config.variant : block.variants[0];
+    const allowedFields = new Set(block.fields.map((field) => field.field));
+    const requestFields = Object.fromEntries(
+      Object.entries(node.config).filter(([key]) => {
+        const field = block.fields.find((candidate) => candidate.field === key);
+        return !field || field.writable_by.includes(input.actor);
+      }),
+    );
+    const request = validateEditorialAuthoringRequest({
+      block_type: node.type,
+      operation: requestOperation,
+      surface: input.surface,
+      actor: input.actor,
+      variant,
+      fields: requestFields,
+      source_bindings: block.mode === "governed_read_only" ? block.allowed_sources : [],
+    });
+    errors.push(...request.errors.map((error) => `${node.type}: ${error}`));
+    if (!/^\d+\.\d+\.\d+$/.test(node.version))
+      errors.push(`${node.type}: invalid contract version`);
+
+    for (const [key, value] of Object.entries(node.config)) {
+      if (!allowedFields.has(key)) continue;
+      validateClosedValue(node.type, key, value, errors);
+    }
+    if (block.mode === "governed_read_only") {
+      for (const key of ["items", "source"]) {
+        if (!(key in node.config)) continue;
+        if (
+          !old ||
+          canonicalizePolicyValue(old.node.config[key]) !==
+            canonicalizePolicyValue(node.config[key])
+        )
+          errors.push(`${node.type}.${key}: governed value cannot be authored manually`);
+      }
+    }
+    visitStrings(node.config, (value, key) => {
+      if (unsafeMarkup.test(value) || externalUrl.test(value))
+        errors.push(
+          `${node.type}.${key || "value"}: external URL or executable markup is forbidden`,
+        );
+      if (
+        /href/i.test(key) &&
+        (!value.startsWith("/") || value.includes("?") || value.includes("#"))
+      )
+        errors.push(`${node.type}.${key}: canonical internal route required`);
+      if (/^(?:mediaUrl|url)$/i.test(key)) {
+        const mediaPath = mediaPathFromCanonicalUrl(value);
+        if (!mediaPath || !input.registered_media_paths?.has(mediaPath))
+          errors.push(`${node.type}.${key}: media.registry reference required`);
+      }
+    });
+  }
+
+  for (const [id, old] of previous) {
+    const block = getEditorialBlockPolicy(old.node.type);
+    if (
+      (!block || block.mode === "legacy_read_only" || block.mode === "prohibited") &&
+      !current.has(id)
+    )
+      errors.push(`${old.node.type}: historical node "${id}" cannot be removed`);
+  }
+  return { valid: errors.length === 0, errors: [...new Set(errors)] };
 }
 
 export interface WorkflowTransitionRequest {

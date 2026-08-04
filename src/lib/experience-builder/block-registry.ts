@@ -12,11 +12,12 @@
  * el server function `syncBlockLibrary` (admin only).
  */
 
+import { validateBlockContract, type BlockContract, type BlockCategory } from "./block-contract";
 import {
-  validateBlockContract,
-  type BlockContract,
-  type BlockCategory,
-} from "./block-contract";
+  canListEditorialBlock,
+  type EditorialActorClass,
+  type EditorialSurface,
+} from "./editorial-builder-policy";
 
 export class BlockRegistryError extends Error {}
 
@@ -46,6 +47,16 @@ export function listBlocks(filter?: { category?: BlockCategory }): BlockContract
   const all = Array.from(registry.values());
   if (!filter?.category) return all;
   return all.filter((b) => b.category === filter.category);
+}
+
+/** I4-A: catálogo de nueva autoría cerrado por policy, superficie y actor. */
+export function listAuthorableBlocks(
+  surface: EditorialSurface,
+  actor: EditorialActorClass,
+): BlockContract[] {
+  return Array.from(registry.values()).filter((block) =>
+    canListEditorialBlock(block.type, surface, actor),
+  );
 }
 
 /** Limpia el Registry (uso interno para tests). */

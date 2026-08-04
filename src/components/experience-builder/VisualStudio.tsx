@@ -88,7 +88,14 @@ import {
   type CompositionJsonObject,
 } from "@/lib/experience-builder/composition-tree";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
-import { getBlock, listBlocks } from "@/lib/experience-builder/block-registry";
+import { getBlock, listAuthorableBlocks } from "@/lib/experience-builder/block-registry";
+import {
+  canListEditorialBlock,
+  resolveEditorialActor,
+  resolveEditorialSurface,
+  type EditorialActorClass,
+  type EditorialSurface,
+} from "@/lib/experience-builder/editorial-builder-policy";
 import type { BlockContract } from "@/lib/experience-builder/block-contract";
 import { diffCompositions, type SectionChange } from "@/lib/experience-builder/composition-diff";
 import { AutoInspector } from "@/components/experience-builder/AutoInspector";
@@ -125,10 +132,15 @@ const seoChromeContract: BlockContract = {
   category: "static",
   version: "1.0.0",
   display_name: "SEO de la página",
-  description: "Metadatos para buscadores y redes sociales (title, description, imagen de compartir).",
+  description:
+    "Metadatos para buscadores y redes sociales (title, description, imagen de compartir).",
   schema: {
     title: { type: "text", label: "Título (title)", description: "Ideal: 50–60 caracteres." },
-    description: { type: "rich_text", label: "Descripción (meta description)", description: "Ideal: 140–160 caracteres." },
+    description: {
+      type: "rich_text",
+      label: "Descripción (meta description)",
+      description: "Ideal: 140–160 caracteres.",
+    },
     og_image: { type: "media", label: "Imagen de compartir (og:image)", accepts: ["image/*"] },
     canonical: { type: "url", label: "URL canónica" },
     noindex: { type: "boolean", label: "Ocultar de buscadores (noindex)", default: false },
@@ -237,7 +249,8 @@ const headerChromeContract: BlockContract = {
           label: {
             type: "text",
             label: "Texto visible",
-            description: "Etiqueta del botón. Los de sistema usan su texto propio si lo dejas vacío.",
+            description:
+              "Etiqueta del botón. Los de sistema usan su texto propio si lo dejas vacío.",
           },
           href: {
             type: "url",
@@ -307,15 +320,26 @@ const headerChromeContract: BlockContract = {
         type: "object",
         label: "Enlace",
         fields: {
-          label: { type: "text", label: "Texto visible", required: true, description: "Lo que lee el visitante (ej. \"Destinos\")." },
-          href: { type: "url", label: "A dónde va", required: true, description: "URL destino (ej. /destinos)." },
+          label: {
+            type: "text",
+            label: "Texto visible",
+            required: true,
+            description: 'Lo que lee el visitante (ej. "Destinos").',
+          },
+          href: {
+            type: "url",
+            label: "A dónde va",
+            required: true,
+            description: "URL destino (ej. /destinos).",
+          },
         },
       },
     },
     cta_label: {
       type: "text",
       label: "Botón destacado — texto",
-      description: "Botón resaltado a la derecha del header. Ej.: \"Arma tu viaje\". Déjalo vacío para ocultarlo.",
+      description:
+        'Botón resaltado a la derecha del header. Ej.: "Arma tu viaje". Déjalo vacío para ocultarlo.',
     },
     cta_href: {
       type: "url",
@@ -332,7 +356,8 @@ const headerChromeContract: BlockContract = {
       type: "boolean",
       label: "Mostrar acceso de usuario",
       default: true,
-      description: "Muestra el avatar/menú de sesión (Iniciar sesión / Mi cuenta) a la derecha del header.",
+      description:
+        "Muestra el avatar/menú de sesión (Iniciar sesión / Mi cuenta) a la derecha del header.",
     },
   },
   capabilities: { soporta_preview: true, soporta_i18n: true },
@@ -353,7 +378,7 @@ const footerChromeContract: BlockContract = {
     },
     explore_links: {
       type: "list",
-      label: "Columna \"Explorar\" (2ª columna)",
+      label: 'Columna "Explorar" (2ª columna)',
       description: "Enlaces de la segunda columna del pie. Se listan verticalmente.",
       item: {
         type: "object",
@@ -366,7 +391,7 @@ const footerChromeContract: BlockContract = {
     },
     platform_links: {
       type: "list",
-      label: "Columna \"Plataforma\" (3ª columna)",
+      label: 'Columna "Plataforma" (3ª columna)',
       description: "Enlaces de la tercera columna del pie.",
       item: {
         type: "object",
@@ -380,12 +405,13 @@ const footerChromeContract: BlockContract = {
     legal_label: {
       type: "text",
       label: "Texto legal (barra inferior · izquierda)",
-      description: "Aparece en la franja inferior del pie, a la izquierda (ej. \"© 2026 Valladolid.mx\").",
+      description:
+        'Aparece en la franja inferior del pie, a la izquierda (ej. "© 2026 Valladolid.mx").',
     },
     privacy_label: {
       type: "text",
       label: "Texto privacidad (barra inferior · derecha)",
-      description: "Enlace corto de la franja inferior a la derecha (ej. \"Privacidad\").",
+      description: 'Enlace corto de la franja inferior a la derecha (ej. "Privacidad").',
     },
     show_language: {
       type: "boolean",
@@ -433,7 +459,11 @@ type CompoSummary = {
   title?: string;
 };
 
-function pickCompositionBySlug<T extends CompoSummary>(items: T[], slug: string, pageType: string): T | null {
+function pickCompositionBySlug<T extends CompoSummary>(
+  items: T[],
+  slug: string,
+  pageType: string,
+): T | null {
   const wantedSlug = normalizePageKey(slug);
   const matches = items.filter((item) => normalizePageKey(item.slug) === wantedSlug);
   return (
@@ -446,27 +476,96 @@ function pickCompositionBySlug<T extends CompoSummary>(items: T[], slug: string,
 }
 
 const SITE_PAGES: SitePage[] = [
-  { key: "home", slug: "home", page_type: "home", title: "Inicio",
+  {
+    key: "home",
+    slug: "home",
+    page_type: "home",
+    title: "Inicio",
     description: "Página principal que ve todo visitante al llegar a Valladolid.mx.",
-    publicPath: "/", status: "editable" },
-  { key: "experiencias", slug: "experiencias", page_type: "landing", title: "Experiencias",
-    description: "Catálogo de experiencias turísticas.", publicPath: "/p/experiencias", status: "editable" },
-  { key: "hoteles", slug: "hoteles", page_type: "landing", title: "Hoteles",
-    description: "Hospedaje disponible en el destino.", publicPath: "/p/hoteles", status: "editable" },
-  { key: "restaurantes", slug: "restaurantes", page_type: "landing", title: "Restaurantes",
-    description: "Gastronomía local y recomendada.", publicPath: "/p/restaurantes", status: "editable" },
-  { key: "eventos", slug: "eventos", page_type: "landing", title: "Eventos",
-    description: "Agenda de eventos y actividades.", publicPath: "/p/eventos", status: "editable" },
-  { key: "empresas", slug: "empresas", page_type: "landing", title: "Empresas",
-    description: "Directorio de empresas locales.", publicPath: "/p/empresas", status: "editable" },
-  { key: "marketplace", slug: "marketplace", page_type: "landing", title: "Catálogo Oriente Maya",
-    description: "Tienda y reservaciones.", publicPath: "/p/marketplace", status: "editable" },
-  { key: "arma-tu-viaje", slug: "arma-tu-viaje", page_type: "landing", title: "Arma tu viaje",
-    description: "Planificador interactivo del viaje.", publicPath: "/p/arma-tu-viaje", status: "editable" },
-  { key: "alux", slug: "alux", page_type: "landing", title: "Alux (IA)",
-    description: "Superficie de conversación con Alux.", publicPath: "/p/alux", status: "editable" },
-  { key: "oriente-maya", slug: "oriente-maya", page_type: "landing", title: "Oriente Maya",
-    description: "Portal territorial del Oriente Maya.", publicPath: "/p/oriente-maya", status: "editable" },
+    publicPath: "/",
+    status: "editable",
+  },
+  {
+    key: "experiencias",
+    slug: "experiencias",
+    page_type: "landing",
+    title: "Experiencias",
+    description: "Catálogo de experiencias turísticas.",
+    publicPath: "/p/experiencias",
+    status: "editable",
+  },
+  {
+    key: "hoteles",
+    slug: "hoteles",
+    page_type: "landing",
+    title: "Hoteles",
+    description: "Hospedaje disponible en el destino.",
+    publicPath: "/p/hoteles",
+    status: "editable",
+  },
+  {
+    key: "restaurantes",
+    slug: "restaurantes",
+    page_type: "landing",
+    title: "Restaurantes",
+    description: "Gastronomía local y recomendada.",
+    publicPath: "/p/restaurantes",
+    status: "editable",
+  },
+  {
+    key: "eventos",
+    slug: "eventos",
+    page_type: "landing",
+    title: "Eventos",
+    description: "Agenda de eventos y actividades.",
+    publicPath: "/p/eventos",
+    status: "editable",
+  },
+  {
+    key: "empresas",
+    slug: "empresas",
+    page_type: "landing",
+    title: "Empresas",
+    description: "Directorio de empresas locales.",
+    publicPath: "/p/empresas",
+    status: "editable",
+  },
+  {
+    key: "marketplace",
+    slug: "marketplace",
+    page_type: "landing",
+    title: "Catálogo Oriente Maya",
+    description: "Tienda y reservaciones.",
+    publicPath: "/p/marketplace",
+    status: "editable",
+  },
+  {
+    key: "arma-tu-viaje",
+    slug: "arma-tu-viaje",
+    page_type: "landing",
+    title: "Arma tu viaje",
+    description: "Planificador interactivo del viaje.",
+    publicPath: "/p/arma-tu-viaje",
+    status: "editable",
+  },
+  {
+    key: "alux",
+    slug: "alux",
+    page_type: "landing",
+    title: "Alux (IA)",
+    description: "Superficie de conversación con Alux.",
+    publicPath: "/p/alux",
+    status: "editable",
+  },
+  {
+    key: "oriente-maya",
+    slug: "oriente-maya",
+    page_type: "landing",
+    title: "Oriente Maya",
+    description: "Portal territorial del Oriente Maya.",
+    publicPath: "/p/oriente-maya",
+    status: "editable",
+  },
 ];
 
 export interface VisualStudioProps {
@@ -476,7 +575,11 @@ export interface VisualStudioProps {
   advanced?: boolean;
 }
 
-export function VisualStudio({ page = null, onSelectPage, advanced = false }: VisualStudioProps = {}) {
+export function VisualStudio({
+  page = null,
+  onSelectPage,
+  advanced = false,
+}: VisualStudioProps = {}) {
   const [internalKey, setInternalKey] = useState<string | null>(page);
   const [customPages, setCustomPages] = useState<SitePage[]>([]);
   const openKey = normalizePageKey(page ?? internalKey);
@@ -487,10 +590,12 @@ export function VisualStudio({ page = null, onSelectPage, advanced = false }: Vi
   };
   const allPages = useMemo(() => [...SITE_PAGES, ...customPages], [customPages]);
   const activePage = openKey
-    ? allPages.find((p) => normalizePageKey(p.key) === openKey) ?? null
+    ? (allPages.find((p) => normalizePageKey(p.key) === openKey) ?? null)
     : null;
   if (activePage) {
-    return <PageVisualEditor pageDef={activePage} onExit={() => setOpen(null)} advanced={advanced} />;
+    return (
+      <PageVisualEditor pageDef={activePage} onExit={() => setOpen(null)} advanced={advanced} />
+    );
   }
   return (
     <PagesPanel
@@ -508,10 +613,10 @@ export function VisualStudio({ page = null, onSelectPage, advanced = false }: Vi
         };
         setCustomPages((prev) =>
           prev.some((x) => normalizePageKey(x.key) === normalizePageKey(sitePage.key))
-            // Reemplazar la entrada previa para que `compositionId` quede
-            // actualizado si el usuario abre la misma página después de
-            // renombrar/duplicar.
-            ? prev.map((x) =>
+            ? // Reemplazar la entrada previa para que `compositionId` quede
+              // actualizado si el usuario abre la misma página después de
+              // renombrar/duplicar.
+              prev.map((x) =>
                 normalizePageKey(x.key) === normalizePageKey(sitePage.key) ? sitePage : x,
               )
             : [...prev, sitePage],
@@ -540,7 +645,11 @@ function PagesPicker({
   const [createError, setCreateError] = useState<string | null>(null);
   const [dbPages, setDbPages] = useState<SitePage[]>([]);
   const knownKeys = useMemo(
-    () => new Set([...SITE_PAGES.map((p) => normalizePageKey(p.key)), ...customPages.map((p) => normalizePageKey(p.key))]),
+    () =>
+      new Set([
+        ...SITE_PAGES.map((p) => normalizePageKey(p.key)),
+        ...customPages.map((p) => normalizePageKey(p.key)),
+      ]),
     [customPages],
   );
 
@@ -627,12 +736,15 @@ function PagesPicker({
     <div className="mx-auto w-full max-w-5xl px-4 py-4">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="max-w-2xl">
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Elige una página</p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
+            Elige una página
+          </p>
           <h2 className="mt-2 text-2xl font-semibold">¿Qué página quieres editar?</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Selecciona cualquier página del sitio para verla y modificarla tal como la ven los visitantes.
-            Todas las secciones ya son editables desde aquí; también puedes crear nuevas landing pages
-            (videomapping, campañas, eventos especiales) y publicarlas en <code>/p/&lt;identificador&gt;</code>.
+            Selecciona cualquier página del sitio para verla y modificarla tal como la ven los
+            visitantes. Todas las secciones ya son editables desde aquí; también puedes crear nuevas
+            landing pages (videomapping, campañas, eventos especiales) y publicarlas en{" "}
+            <code>/p/&lt;identificador&gt;</code>.
           </p>
         </div>
         <button
@@ -648,7 +760,8 @@ function PagesPicker({
         {allPages.map((p) => {
           const editable = p.status === "editable";
           const openPage = () => editable && onOpen(p.key);
-          const cardBase = "flex h-full flex-col justify-between rounded-2xl border p-5 text-left transition-colors";
+          const cardBase =
+            "flex h-full flex-col justify-between rounded-2xl border p-5 text-left transition-colors";
           const cardCls = editable
             ? `${cardBase} cursor-pointer border-primary/30 bg-primary/5 hover:bg-primary/10`
             : `${cardBase} border-border bg-card opacity-80`;
@@ -686,7 +799,9 @@ function PagesPicker({
                   )}
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">{p.description}</p>
-                <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">{p.publicPath}</p>
+                <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                  {p.publicPath}
+                </p>
               </div>
               <div className="mt-4 flex items-center justify-between gap-2">
                 {editable ? (
@@ -746,7 +861,10 @@ function PagesPicker({
 }
 
 function CreatePageModal({
-  busy, error, onCancel, onSubmit,
+  busy,
+  error,
+  onCancel,
+  onSubmit,
 }: {
   busy: boolean;
   error: string | null;
@@ -769,7 +887,9 @@ function CreatePageModal({
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-4 shadow-2xl">
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Nueva página</p>
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
+              Nueva página
+            </p>
             <h3 className="text-sm font-semibold">Crear una landing page</h3>
           </div>
           <button
@@ -806,7 +926,9 @@ function CreatePageModal({
           <label className="block text-xs font-medium">
             Dirección web
             <div className="mt-1 flex items-center gap-1">
-              <span className="rounded-md bg-muted px-2 py-1.5 text-xs text-muted-foreground">/p/</span>
+              <span className="rounded-md bg-muted px-2 py-1.5 text-xs text-muted-foreground">
+                /p/
+              </span>
               <input
                 type="text"
                 value={slug}
@@ -820,7 +942,8 @@ function CreatePageModal({
               />
             </div>
             <span className="mt-1 block text-[10px] text-muted-foreground">
-              Se usa en el enlace público. Solo minúsculas, números y guiones. Ejemplo: <code>videomapping-centro</code>.
+              Se usa en el enlace público. Solo minúsculas, números y guiones. Ejemplo:{" "}
+              <code>videomapping-centro</code>.
             </span>
           </label>
           <label className="block text-xs font-medium">
@@ -845,7 +968,11 @@ function CreatePageModal({
               disabled={busy}
               className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:opacity-95 disabled:opacity-60"
             >
-              {busy ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : <Plus className="size-3.5" aria-hidden />}
+              {busy ? (
+                <Loader2 className="size-3.5 animate-spin" aria-hidden />
+              ) : (
+                <Plus className="size-3.5" aria-hidden />
+              )}
               Crear y abrir editor
             </button>
           </div>
@@ -886,6 +1013,8 @@ function PageVisualEditor({
   const setWorkflow = useServerFn(setCompositionWorkflowState);
   const queryClient = useQueryClient();
   const { roles, user } = useAuth();
+  const editorialSurface = resolveEditorialSurface(pageDef.page_type);
+  const editorialActor = resolveEditorialActor(roles);
   const canPublish = roles.includes("admin") || roles.includes("super_admin");
   const isAdmin = canPublish;
   const canForceLock = canPublish;
@@ -898,8 +1027,20 @@ function PageVisualEditor({
     setWorkflowBusy(true);
     try {
       const res = await setWorkflow({ data: { id: page.id, next_state: next } });
-      setPage((p) => (p ? { ...p, workflow_state: res.workflow_state as CompositionDetail["workflow_state"], workflow_updated_at: new Date().toISOString() } : p));
-      const labels: Record<string, string> = { draft: "Borrador", in_review: "En revisión", approved: "Aprobado" };
+      setPage((p) =>
+        p
+          ? {
+              ...p,
+              workflow_state: res.workflow_state as CompositionDetail["workflow_state"],
+              workflow_updated_at: new Date().toISOString(),
+            }
+          : p,
+      );
+      const labels: Record<string, string> = {
+        draft: "Borrador",
+        in_review: "En revisión",
+        approved: "Aprobado",
+      };
       toast.success(`Estado actualizado: ${labels[res.workflow_state] ?? res.workflow_state}`);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -1093,7 +1234,16 @@ function PageVisualEditor({
     return () => {
       cancelled = true;
     };
-  }, [list, get, create, pageDef.compositionId, pageDef.slug, pageDef.page_type, pageDef.title, pageDef.description]);
+  }, [
+    list,
+    get,
+    create,
+    pageDef.compositionId,
+    pageDef.slug,
+    pageDef.page_type,
+    pageDef.title,
+    pageDef.description,
+  ]);
 
   const saveTimer = useRef<number | null>(null);
   useEffect(() => {
@@ -1119,35 +1269,31 @@ function PageVisualEditor({
   }, [tree]);
 
   const selectedNode = useMemo(
-    () => (tree && selectedId ? tree.root.children.find((n) => n.id === selectedId) ?? null : null),
+    () =>
+      tree && selectedId ? (tree.root.children.find((n) => n.id === selectedId) ?? null) : null,
     [tree, selectedId],
   );
   const selectedChrome: ChromeArea | "seo" | null =
     selectedId === HEADER_CHROME_ID
       ? "header"
       : selectedId === FOOTER_CHROME_ID
-      ? "footer"
-      : selectedId === SEO_CHROME_ID
-      ? "seo"
-      : null;
-  const selectedContract = useMemo(
-    () => {
-      if (selectedChrome === "header") return headerChromeContract;
-      if (selectedChrome === "footer") return footerChromeContract;
-      if (selectedChrome === "seo") return seoChromeContract;
-      return selectedNode ? getBlock(selectedNode.type) ?? null : null;
-    },
-    [selectedChrome, selectedNode],
-  );
-  const selectedConfig = useMemo(
-    () => {
-      if (!tree) return null;
-      if (selectedChrome === "header" || selectedChrome === "footer") return getChromeConfig(tree, selectedChrome);
-      if (selectedChrome === "seo") return getSeoConfig(tree);
-      return selectedNode?.config as Record<string, unknown> | null;
-    },
-    [selectedChrome, selectedNode, tree],
-  );
+        ? "footer"
+        : selectedId === SEO_CHROME_ID
+          ? "seo"
+          : null;
+  const selectedContract = useMemo(() => {
+    if (selectedChrome === "header") return headerChromeContract;
+    if (selectedChrome === "footer") return footerChromeContract;
+    if (selectedChrome === "seo") return seoChromeContract;
+    return selectedNode ? (getBlock(selectedNode.type) ?? null) : null;
+  }, [selectedChrome, selectedNode]);
+  const selectedConfig = useMemo(() => {
+    if (!tree) return null;
+    if (selectedChrome === "header" || selectedChrome === "footer")
+      return getChromeConfig(tree, selectedChrome);
+    if (selectedChrome === "seo") return getSeoConfig(tree);
+    return selectedNode?.config as Record<string, unknown> | null;
+  }, [selectedChrome, selectedNode, tree]);
 
   const onPublish = async () => {
     if (!page || !tree) return;
@@ -1198,7 +1344,9 @@ function PageVisualEditor({
     }
     setPublishDiff({ open: true, loading: true, changes: [], error: null });
     try {
-      const published = (await fetchPublishedTree({ data: { id: page.id } })) as CompositionTree | null;
+      const published = (await fetchPublishedTree({
+        data: { id: page.id },
+      })) as CompositionTree | null;
       const labelFor = (t: string) => getBlock(t)?.display_name ?? t;
       const changes = diffCompositions(published, tree, labelFor);
       setPublishDiff({ open: true, loading: false, changes, error: null });
@@ -1335,13 +1483,33 @@ function PageVisualEditor({
       return;
     }
     if (!selectedNode) return;
+    if (
+      !editorialSurface ||
+      !editorialActor ||
+      !canListEditorialBlock(selectedNode.type, editorialSurface, editorialActor)
+    ) {
+      toast.error("Este bloque histórico está protegido y no admite edición.");
+      return;
+    }
     commitTree(updateNodeConfig(tree, selectedNode.id, nextConfig));
+  };
+
+  const canMutateEditorialNode = (node: CompositionNode | undefined): node is CompositionNode => {
+    const allowed = Boolean(
+      node &&
+      editorialSurface &&
+      editorialActor &&
+      canListEditorialBlock(node.type, editorialSurface, editorialActor),
+    );
+    if (!allowed) toast.error("Este bloque histórico está confinado y no puede modificarse.");
+    return allowed;
   };
 
   const moveNode = (nodeId: string, dir: -1 | 1) => {
     if (!tree) return;
     const idx = tree.root.children.findIndex((n) => n.id === nodeId);
     if (idx < 0) return;
+    if (!canMutateEditorialNode(tree.root.children[idx])) return;
     const to = Math.max(0, Math.min(tree.root.children.length - 1, idx + dir));
     if (to === idx) return;
     const next = [...tree.root.children];
@@ -1353,7 +1521,7 @@ function PageVisualEditor({
   const duplicateNode = (nodeId: string) => {
     if (!tree) return;
     const src = tree.root.children.find((n) => n.id === nodeId);
-    if (!src) return;
+    if (!canMutateEditorialNode(src)) return;
     const clone: CompositionNode = { ...src, id: newNodeId(), config: { ...src.config } };
     const idx = tree.root.children.findIndex((n) => n.id === nodeId);
     const next = [...tree.root.children];
@@ -1367,6 +1535,7 @@ function PageVisualEditor({
     const idx = tree.root.children.findIndex((n) => n.id === nodeId);
     if (idx < 0) return;
     const removed = tree.root.children[idx];
+    if (!canMutateEditorialNode(removed)) return;
     const contract = getBlock(removed.type);
     const label = contract?.display_name ?? removed.type;
     const next = tree.root.children.filter((n) => n.id !== nodeId);
@@ -1389,6 +1558,7 @@ function PageVisualEditor({
 
   const toggleHiddenNode = (nodeId: string) => {
     if (!tree) return;
+    if (!canMutateEditorialNode(tree.root.children.find((node) => node.id === nodeId))) return;
     let becameHidden = false;
     let label = "";
     const nextChildren = tree.root.children.map((n) => {
@@ -1413,7 +1583,12 @@ function PageVisualEditor({
     for (const [k, def] of Object.entries(contract.schema)) {
       if (def.default !== undefined) config[k] = def.default;
     }
-    const node: CompositionNode = { id: newNodeId(), type: contract.type, version: contract.version, config };
+    const node: CompositionNode = {
+      id: newNodeId(),
+      type: contract.type,
+      version: contract.version,
+      config,
+    };
     const next = [...tree.root.children];
     const idx = atIndex ?? next.length;
     next.splice(idx, 0, node);
@@ -1424,6 +1599,14 @@ function PageVisualEditor({
 
   const insertReusable = (entry: ReusableBlock) => {
     if (!tree) return;
+    if (
+      !editorialSurface ||
+      !editorialActor ||
+      !canListEditorialBlock(entry.type, editorialSurface, editorialActor)
+    ) {
+      toast.error("El bloque reutilizable no está autorizado para esta superficie.");
+      return;
+    }
     const node: CompositionNode = {
       id: newNodeId(),
       type: entry.type,
@@ -1479,6 +1662,7 @@ function PageVisualEditor({
     const oldIdx = tree.root.children.findIndex((n) => n.id === e.active.id);
     const newIdx = tree.root.children.findIndex((n) => n.id === e.over!.id);
     if (oldIdx < 0 || newIdx < 0) return;
+    if (!canMutateEditorialNode(tree.root.children[oldIdx])) return;
     const next = arrayMove(tree.root.children, oldIdx, newIdx);
     commitTree({ ...tree, root: { children: next } });
   };
@@ -1534,8 +1718,19 @@ function PageVisualEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tree]);
 
-  if (loadError) return <FullScreenState title="No se pudo abrir el editor" detail={loadError} onExit={onExit} />;
-  if (!page || !tree) return <FullScreenState title="Preparando el editor…" detail={`Cargando ${pageDef.title}.`} spinner onExit={onExit} />;
+  if (loadError)
+    return (
+      <FullScreenState title="No se pudo abrir el editor" detail={loadError} onExit={onExit} />
+    );
+  if (!page || !tree)
+    return (
+      <FullScreenState
+        title="Preparando el editor…"
+        detail={`Cargando ${pageDef.title}.`}
+        spinner
+        onExit={onExit}
+      />
+    );
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -1550,13 +1745,19 @@ function PageVisualEditor({
           Páginas
         </button>
         <div className="min-w-0">
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Editando</p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Editando
+          </p>
           <h1 className="truncate text-sm font-semibold">{pageDef.title}</h1>
           <p className="truncate text-[10px] text-muted-foreground">{pageDef.publicPath}</p>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <SaveIndicator status={saveStatus} />
-          <div className="inline-flex items-center gap-0.5 rounded-md border border-border bg-background p-0.5" role="group" aria-label="Historial">
+          <div
+            className="inline-flex items-center gap-0.5 rounded-md border border-border bg-background p-0.5"
+            role="group"
+            aria-label="Historial"
+          >
             <button
               type="button"
               onClick={undo}
@@ -1674,7 +1875,9 @@ function PageVisualEditor({
               )}
             </button>
           ) : (
-            <span className="text-[11px] text-muted-foreground">Sólo administradores pueden publicar.</span>
+            <span className="text-[11px] text-muted-foreground">
+              Sólo administradores pueden publicar.
+            </span>
           )}
           {canPublish ? (
             page?.scheduled_publish_at ? (
@@ -1711,9 +1914,7 @@ function PageVisualEditor({
               title="Retira la página del sitio público. El borrador se conserva."
               className="inline-flex items-center gap-1 rounded-md border border-rose-300 bg-background px-3 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-50 disabled:opacity-60"
             >
-              {unpublishing ? (
-                <Loader2 className="size-3.5 animate-spin" aria-hidden />
-              ) : null}
+              {unpublishing ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : null}
               Despublicar
             </button>
           ) : null}
@@ -1722,7 +1923,8 @@ function PageVisualEditor({
 
       {advanced ? (
         <div className="border-b border-amber-300/60 bg-amber-50 px-4 py-1.5 text-center text-[11px] font-medium text-amber-900">
-          Modo Profesional activo · se muestran controles avanzados (JSON, variables dinámicas, bloques reutilizables).
+          Modo Profesional activo · se muestran controles avanzados (JSON, variables dinámicas,
+          bloques reutilizables).
         </div>
       ) : null}
 
@@ -1763,11 +1965,18 @@ function PageVisualEditor({
 
       <div className="relative flex flex-1">
         {!previewMode ? (
-          <aside className="hidden w-72 shrink-0 border-r border-border bg-card/40 md:flex md:flex-col" aria-label="Estructura de la página">
+          <aside
+            className="hidden w-72 shrink-0 border-r border-border bg-card/40 md:flex md:flex-col"
+            aria-label="Estructura de la página"
+          >
             <div className="border-b border-border p-3">
-              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Estructura</p>
+              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                Estructura
+              </p>
               <h2 className="mt-1 text-sm font-semibold">Secciones de la Home</h2>
-              <p className="mt-1 text-[10px] text-muted-foreground">Arrastra para reordenar. Clic para editar.</p>
+              <p className="mt-1 text-[10px] text-muted-foreground">
+                Arrastra para reordenar. Clic para editar.
+              </p>
             </div>
             <div className="flex-1 overflow-y-auto p-2">
               <ChromeItem
@@ -1776,8 +1985,15 @@ function PageVisualEditor({
                 selected={selectedId === HEADER_CHROME_ID}
                 onSelect={() => setSelectedId(HEADER_CHROME_ID)}
               />
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-                <SortableContext items={tree.root.children.map((n) => n.id)} strategy={verticalListSortingStrategy}>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={onDragEnd}
+              >
+                <SortableContext
+                  items={tree.root.children.map((n) => n.id)}
+                  strategy={verticalListSortingStrategy}
+                >
                   {tree.root.children.map((n) => (
                     <SortableSectionItem
                       key={n.id}
@@ -1820,27 +2036,37 @@ function PageVisualEditor({
               deviceViewport={deviceViewport}
               selectedId={selectedId}
               onSelect={(id) => setSelectedId(id)}
-              onSelectChrome={(area) => setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)}
+              onSelectChrome={(area) =>
+                setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)
+              }
               onDelete={(id) => {
-            if (typeof window !== "undefined") {
-              const node = tree?.root.children.find((n) => n.id === id);
-              const label = node ? getBlock(node.type)?.display_name ?? node.type : "esta sección";
-              if (!window.confirm(`¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`)) return;
-            }
-            removeNodeById(id);
-          }}
-          onDuplicate={duplicateNode}
-          onToggleHidden={toggleHiddenNode}
-          onMove={moveNode}
-          onReorderRoot={(activeId, overId) => {
-            if (!tree) return;
-            const oldIdx = tree.root.children.findIndex((n) => n.id === activeId);
-            const newIdx = tree.root.children.findIndex((n) => n.id === overId);
-            if (oldIdx < 0 || newIdx < 0) return;
-            const next = arrayMove(tree.root.children, oldIdx, newIdx);
-            commitTree({ ...tree, root: { children: next } });
-          }}
-          commentCounts={commentCounts}
+                if (typeof window !== "undefined") {
+                  const node = tree?.root.children.find((n) => n.id === id);
+                  const label = node
+                    ? (getBlock(node.type)?.display_name ?? node.type)
+                    : "esta sección";
+                  if (
+                    !window.confirm(
+                      `¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`,
+                    )
+                  )
+                    return;
+                }
+                removeNodeById(id);
+              }}
+              onDuplicate={duplicateNode}
+              onToggleHidden={toggleHiddenNode}
+              onMove={moveNode}
+              onReorderRoot={(activeId, overId) => {
+                if (!tree) return;
+                const oldIdx = tree.root.children.findIndex((n) => n.id === activeId);
+                const newIdx = tree.root.children.findIndex((n) => n.id === overId);
+                if (oldIdx < 0 || newIdx < 0) return;
+                if (!canMutateEditorialNode(tree.root.children[oldIdx])) return;
+                const next = arrayMove(tree.root.children, oldIdx, newIdx);
+                commitTree({ ...tree, root: { children: next } });
+              }}
+              commentCounts={commentCounts}
             />
           );
           if (!previewProvider) return canvas;
@@ -1865,8 +2091,12 @@ function PageVisualEditor({
           >
             <header className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Sección seleccionada</p>
-                <h2 className="truncate text-base font-semibold">{selectedContract.display_name}</h2>
+                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
+                  Sección seleccionada
+                </p>
+                <h2 className="truncate text-base font-semibold">
+                  {selectedContract.display_name}
+                </h2>
               </div>
               <button
                 type="button"
@@ -1880,18 +2110,38 @@ function PageVisualEditor({
 
             {selectedNode ? (
               <div className="flex flex-wrap gap-1.5">
-                <ToolBtn onClick={() => moveNode(selectedNode.id, -1)} icon={<ChevronUp className="size-3" />} label="Subir" />
-                <ToolBtn onClick={() => moveNode(selectedNode.id, 1)} icon={<ChevronDown className="size-3" />} label="Bajar" />
-                <ToolBtn onClick={() => duplicateNode(selectedNode.id)} icon={<Copy className="size-3" />} label="Duplicar" />
+                <ToolBtn
+                  onClick={() => moveNode(selectedNode.id, -1)}
+                  icon={<ChevronUp className="size-3" />}
+                  label="Subir"
+                />
+                <ToolBtn
+                  onClick={() => moveNode(selectedNode.id, 1)}
+                  icon={<ChevronDown className="size-3" />}
+                  label="Bajar"
+                />
+                <ToolBtn
+                  onClick={() => duplicateNode(selectedNode.id)}
+                  icon={<Copy className="size-3" />}
+                  label="Duplicar"
+                />
                 <ToolBtn
                   onClick={() => toggleHiddenNode(selectedNode.id)}
-                  icon={selectedNode.hidden ? <Eye className="size-3" /> : <EyeOff className="size-3" />}
+                  icon={
+                    selectedNode.hidden ? <Eye className="size-3" /> : <EyeOff className="size-3" />
+                  }
                   label={selectedNode.hidden ? "Mostrar" : "Ocultar"}
                 />
                 <ToolBtn
                   onClick={() => {
                     const label = getBlock(selectedNode.type)?.display_name ?? selectedNode.type;
-                    if (typeof window !== "undefined" && !window.confirm(`¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`)) return;
+                    if (
+                      typeof window !== "undefined" &&
+                      !window.confirm(
+                        `¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`,
+                      )
+                    )
+                      return;
                     removeNodeById(selectedNode.id);
                   }}
                   icon={<Trash2 className="size-3" />}
@@ -1949,13 +2199,19 @@ function PageVisualEditor({
         {showLibrary ? (
           <BlockLibraryModal
             advanced={advanced}
+            surface={editorialSurface}
+            actor={editorialActor}
             onClose={() => setShowLibrary(false)}
             onPick={(type) => insertBlock(type)}
             onPickReusable={(entry) => insertReusable(entry)}
           />
         ) : null}
         {showVersions ? (
-          <VersionsDrawer versions={versions} onClose={() => setShowVersions(false)} onRestore={doRollback} />
+          <VersionsDrawer
+            versions={versions}
+            onClose={() => setShowVersions(false)}
+            onRestore={doRollback}
+          />
         ) : null}
         {shareLink ? (
           <SharePreviewModal
@@ -1995,9 +2251,8 @@ function PageVisualEditor({
             </header>
             <div className="space-y-3 px-4 py-3 text-xs text-muted-foreground">
               <p>
-                Guardaremos el borrador actual y la publicaremos automáticamente
-                en la fecha y hora que elijas. Puedes cancelar la programación en
-                cualquier momento antes de esa fecha.
+                Guardaremos el borrador actual y la publicaremos automáticamente en la fecha y hora
+                que elijas. Puedes cancelar la programación en cualquier momento antes de esa fecha.
               </p>
               <label className="block">
                 <span className="mb-1 block text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -2006,16 +2261,12 @@ function PageVisualEditor({
                 <input
                   type="datetime-local"
                   value={scheduleValue}
-                  min={new Date(Date.now() + 60_000)
-                    .toISOString()
-                    .slice(0, 16)}
+                  min={new Date(Date.now() + 60_000).toISOString().slice(0, 16)}
                   onChange={(e) => setScheduleValue(e.target.value)}
                   className="w-full rounded-md border border-border bg-background px-3 py-2 text-xs text-foreground"
                 />
               </label>
-              {scheduleError ? (
-                <p className="text-rose-600">{scheduleError}</p>
-              ) : null}
+              {scheduleError ? <p className="text-rose-600">{scheduleError}</p> : null}
             </div>
             <footer className="flex items-center justify-end gap-2 border-t border-border bg-muted/30 px-4 py-3">
               <button
@@ -2066,12 +2317,12 @@ function PageVisualEditor({
             </header>
             <div className="space-y-2 px-4 py-3 text-xs text-muted-foreground">
               <p>
-                <span className="font-mono">{pageDef.publicPath}</span> dejará de estar
-                disponible para los visitantes y responderá 404.
+                <span className="font-mono">{pageDef.publicPath}</span> dejará de estar disponible
+                para los visitantes y responderá 404.
               </p>
               <p>
-                El borrador y el historial de versiones se conservan. Puedes volver a
-                publicar cuando quieras.
+                El borrador y el historial de versiones se conservan. Puedes volver a publicar
+                cuando quieras.
               </p>
             </div>
             <footer className="flex items-center justify-end gap-2 border-t border-border bg-muted/30 px-4 py-3">
@@ -2127,19 +2378,32 @@ function SharePreviewModal({
     }
   };
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-label="Compartir vista previa">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Compartir vista previa"
+    >
       <div className="w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-xl">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">Vista previa compartible</p>
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
+              Vista previa compartible
+            </p>
             <h2 className="text-base font-semibold">Enlace generado</h2>
           </div>
-          <button type="button" onClick={onClose} className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label="Cerrar">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+            aria-label="Cerrar"
+          >
             <X className="size-4" aria-hidden />
           </button>
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          Cualquiera con este enlace puede ver el borrador actual sin publicarlo. Caduca el {expiresLabel}.
+          Cualquiera con este enlace puede ver el borrador actual sin publicarlo. Caduca el{" "}
+          {expiresLabel}.
         </p>
         <div className="mt-4 flex items-center gap-2 rounded-md border border-border bg-background p-2">
           <input
@@ -2154,7 +2418,11 @@ function SharePreviewModal({
             onClick={() => void copy()}
             className="inline-flex items-center gap-1 rounded bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground hover:opacity-95"
           >
-            {copied ? <Check className="size-3.5" aria-hidden /> : <Copy className="size-3.5" aria-hidden />}
+            {copied ? (
+              <Check className="size-3.5" aria-hidden />
+            ) : (
+              <Copy className="size-3.5" aria-hidden />
+            )}
             {copied ? "Copiado" : "Copiar"}
           </button>
         </div>
@@ -2225,9 +2493,7 @@ function DeviceToggle({
             aria-pressed={active}
             title={it.label}
             className={`px-2.5 py-1.5 text-[11px] font-medium transition ${
-              active
-                ? "bg-primary text-primary-foreground"
-                : "text-foreground hover:bg-accent"
+              active ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-accent"
             }`}
           >
             {it.short}
@@ -2328,10 +2594,18 @@ function HomeCanvas({
           }}
         >
           <StudioDeviceCss />
-          <InertChrome label="Encabezado" selected={selectedId === HEADER_CHROME_ID} onSelect={() => onSelectChrome("header")}>
+          <InertChrome
+            label="Encabezado"
+            selected={selectedId === HEADER_CHROME_ID}
+            onSelect={() => onSelectChrome("header")}
+          >
             <PublicHeader variant="overlay" config={getChromeConfig(tree, "header")} />
           </InertChrome>
-          <DndContext sensors={canvasSensors} collisionDetection={closestCenter} onDragEnd={handleCanvasDragEnd}>
+          <DndContext
+            sensors={canvasSensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleCanvasDragEnd}
+          >
             <SortableContext items={rootIds} strategy={verticalListSortingStrategy}>
               <CompositionRenderer
                 tree={tree}
@@ -2360,7 +2634,11 @@ function HomeCanvas({
               />
             </SortableContext>
           </DndContext>
-          <InertChrome label="Pie de página" selected={selectedId === FOOTER_CHROME_ID} onSelect={() => onSelectChrome("footer")}>
+          <InertChrome
+            label="Pie de página"
+            selected={selectedId === FOOTER_CHROME_ID}
+            onSelect={() => onSelectChrome("footer")}
+          >
             <PublicFooter config={getChromeConfig(tree, "footer")} />
           </InertChrome>
         </div>
@@ -2426,8 +2704,16 @@ function StudioDeviceCss() {
 /* --------------------------------------------------------------------- */
 
 function InertChrome({
-  label, selected, onSelect, children,
-}: { label: string; selected: boolean; onSelect: () => void; children: React.ReactNode }) {
+  label,
+  selected,
+  onSelect,
+  children,
+}: {
+  label: string;
+  selected: boolean;
+  onSelect: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <div
       role="button"
@@ -2448,7 +2734,9 @@ function InertChrome({
       <div className="pointer-events-none select-none opacity-90" aria-hidden>
         {children}
       </div>
-      <span className={`pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-lg transition-opacity ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+      <span
+        className={`pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-lg transition-opacity ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+      >
         {label}
       </span>
     </div>
@@ -2456,8 +2744,16 @@ function InertChrome({
 }
 
 function ChromeItem({
-  label, note, selected, onSelect,
-}: { label: string; note: string; selected: boolean; onSelect: () => void }) {
+  label,
+  note,
+  selected,
+  onSelect,
+}: {
+  label: string;
+  note: string;
+  selected: boolean;
+  onSelect: () => void;
+}) {
   return (
     <button
       type="button"
@@ -2471,14 +2767,19 @@ function ChromeItem({
 }
 
 function SortableSectionItem({
-  node, selected, onSelect, onToggleHidden,
+  node,
+  selected,
+  onSelect,
+  onToggleHidden,
 }: {
   node: CompositionNode;
   selected: boolean;
   onSelect: () => void;
   onToggleHidden: () => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: node.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: node.id,
+  });
   const contract = getBlock(node.type);
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -2511,7 +2812,10 @@ function SortableSectionItem({
       </button>
       <button
         type="button"
-        onClick={(e) => { e.stopPropagation(); onToggleHidden(); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleHidden();
+        }}
         aria-label={node.hidden ? "Mostrar en el sitio" : "Ocultar en el sitio"}
         title={node.hidden ? "Mostrar en el sitio" : "Ocultar en el sitio"}
         className="inline-flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -2523,7 +2827,17 @@ function SortableSectionItem({
 }
 
 function BlockOverlay({
-  node, selected, onSelect, onDelete, onDuplicate, onToggleHidden, onMoveUp, onMoveDown, children, sortable = false, commentCount = 0,
+  node,
+  selected,
+  onSelect,
+  onDelete,
+  onDuplicate,
+  onToggleHidden,
+  onMoveUp,
+  onMoveDown,
+  children,
+  sortable = false,
+  commentCount = 0,
 }: {
   node: CompositionNode;
   selected: boolean;
@@ -2576,9 +2890,7 @@ function BlockOverlay({
         // Notifica al Inspector para enfocar el primer campo de texto
         // (edición inline "estilo doble-clic" — US-10).
         if (typeof window !== "undefined") {
-          window.dispatchEvent(
-            new CustomEvent("eb:inline-edit", { detail: { nodeId: node.id } }),
-          );
+          window.dispatchEvent(new CustomEvent("eb:inline-edit", { detail: { nodeId: node.id } }));
         }
       }}
       onKeyDown={(e) => {
@@ -2593,9 +2905,7 @@ function BlockOverlay({
       aria-label={`Editar ${contract?.display_name ?? node.type}`}
     >
       {node.hidden ? (
-        <span
-          className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-center gap-1 bg-muted-foreground/90 py-1 text-[10px] font-semibold uppercase tracking-wider text-background"
-        >
+        <span className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-center gap-1 bg-muted-foreground/90 py-1 text-[10px] font-semibold uppercase tracking-wider text-background">
           <EyeOff className="size-3" aria-hidden /> Oculto en el sitio publicado
         </span>
       ) : null}
@@ -2629,27 +2939,71 @@ function BlockOverlay({
               <GripVertical className="size-3" />
             </button>
           ) : null}
-          <IconBtn onClick={(e) => { e.stopPropagation(); onMoveUp(); }} icon={<ChevronUp className="size-3" />} label="Subir" />
-          <IconBtn onClick={(e) => { e.stopPropagation(); onMoveDown(); }} icon={<ChevronDown className="size-3" />} label="Bajar" />
-          <IconBtn onClick={(e) => { e.stopPropagation(); onDuplicate(); }} icon={<Copy className="size-3" />} label="Duplicar" />
           <IconBtn
-            onClick={(e) => { e.stopPropagation(); onToggleHidden(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveUp();
+            }}
+            icon={<ChevronUp className="size-3" />}
+            label="Subir"
+          />
+          <IconBtn
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveDown();
+            }}
+            icon={<ChevronDown className="size-3" />}
+            label="Bajar"
+          />
+          <IconBtn
+            onClick={(e) => {
+              e.stopPropagation();
+              onDuplicate();
+            }}
+            icon={<Copy className="size-3" />}
+            label="Duplicar"
+          />
+          <IconBtn
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleHidden();
+            }}
             icon={node.hidden ? <Eye className="size-3" /> : <EyeOff className="size-3" />}
             label={node.hidden ? "Mostrar en el sitio" : "Ocultar en el sitio"}
           />
-          <IconBtn onClick={(e) => { e.stopPropagation(); onDelete(); }} icon={<Trash2 className="size-3" />} label="Eliminar" tone="danger" />
+          <IconBtn
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            icon={<Trash2 className="size-3" />}
+            label="Eliminar"
+            tone="danger"
+          />
         </div>
       ) : null}
       {/* Bloqueamos interacciones internas: en modo edición los clics
           siempre seleccionan el bloque en vez de navegar/enviar. */}
-      <div className={`pointer-events-none select-none ${node.hidden ? "opacity-40 grayscale" : ""}`}>{children}</div>
+      <div
+        className={`pointer-events-none select-none ${node.hidden ? "opacity-40 grayscale" : ""}`}
+      >
+        {children}
+      </div>
     </div>
   );
 }
 
 function IconBtn({
-  onClick, icon, label, tone,
-}: { onClick: (e: React.MouseEvent) => void; icon: React.ReactNode; label: string; tone?: "danger" }) {
+  onClick,
+  icon,
+  label,
+  tone,
+}: {
+  onClick: (e: React.MouseEvent) => void;
+  icon: React.ReactNode;
+  label: string;
+  tone?: "danger";
+}) {
   return (
     <button
       type="button"
@@ -2664,8 +3018,16 @@ function IconBtn({
 }
 
 function ToolBtn({
-  onClick, icon, label, tone,
-}: { onClick: () => void; icon: React.ReactNode; label: string; tone?: "danger" }) {
+  onClick,
+  icon,
+  label,
+  tone,
+}: {
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+  tone?: "danger";
+}) {
   return (
     <button
       type="button"
@@ -2679,19 +3041,28 @@ function ToolBtn({
 }
 
 function BlockLibraryModal({
-  onClose, onPick, advanced = false, onPickReusable,
+  onClose,
+  onPick,
+  advanced = false,
+  onPickReusable,
+  surface,
+  actor,
 }: {
   onClose: () => void;
   onPick: (type: string) => void;
   advanced?: boolean;
   onPickReusable?: (entry: ReusableBlock) => void;
+  surface: EditorialSurface | null;
+  actor: EditorialActorClass | null;
 }) {
   const blocks = useMemo(
     () =>
-      listBlocks()
-        .filter((b) => (b.constraints?.surfaces ?? []).includes("home"))
-        .sort((a, b) => a.display_name.localeCompare(b.display_name)),
-    [],
+      surface && actor
+        ? listAuthorableBlocks(surface, actor).sort((a, b) =>
+            a.display_name.localeCompare(b.display_name),
+          )
+        : [],
+    [surface, actor],
   );
   const [reusable, setReusable] = useState<ReusableBlock[]>(() => loadReusableBlocks());
   const [query, setQuery] = useState("");
@@ -2758,7 +3129,10 @@ function BlockLibraryModal({
         </div>
         <div className="mb-3 flex flex-col gap-2">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden />
+            <Search
+              className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
+              aria-hidden
+            />
             <input
               type="text"
               value={query}
@@ -2792,7 +3166,10 @@ function BlockLibraryModal({
             </p>
             <div className="grid gap-1.5 sm:grid-cols-2">
               {reusable.map((r) => (
-                <div key={r.id} className="flex items-center gap-1 rounded-md border border-border bg-background p-2">
+                <div
+                  key={r.id}
+                  className="flex items-center gap-1 rounded-md border border-border bg-background p-2"
+                >
                   <button
                     type="button"
                     onClick={() => onPickReusable?.(r)}
@@ -2820,7 +3197,10 @@ function BlockLibraryModal({
               <p>No hay secciones que coincidan con “{query}”.</p>
               <button
                 type="button"
-                onClick={() => { setQuery(""); setActiveCategory("all"); }}
+                onClick={() => {
+                  setQuery("");
+                  setActiveCategory("all");
+                }}
                 className="mt-2 rounded-md border border-border bg-background px-2 py-1 text-[11px] hover:bg-accent"
               >
                 Limpiar filtros
@@ -2840,7 +3220,9 @@ function BlockLibraryModal({
                   </div>
                   <p className="text-xs font-semibold group-hover:text-primary">{b.display_name}</p>
                   {b.description ? (
-                    <p className="mt-1 line-clamp-2 text-[10px] text-muted-foreground">{b.description}</p>
+                    <p className="mt-1 line-clamp-2 text-[10px] text-muted-foreground">
+                      {b.description}
+                    </p>
                   ) : null}
                   <p className="mt-auto pt-2 text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
                     {categoryLabel[b.category] ?? b.category}
@@ -2924,12 +3306,11 @@ function AdvancedPanel({
 
   const saveAsReusable = () => {
     const defaultName =
-      (config.heading as string) ||
-      (config.title as string) ||
-      node.type.replace(/^vmx\./, "");
-    const name = typeof window !== "undefined"
-      ? window.prompt("Nombre del bloque reutilizable", defaultName)
-      : defaultName;
+      (config.heading as string) || (config.title as string) || node.type.replace(/^vmx\./, "");
+    const name =
+      typeof window !== "undefined"
+        ? window.prompt("Nombre del bloque reutilizable", defaultName)
+        : defaultName;
     if (!name) return;
     const entry: ReusableBlock = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -2958,9 +3339,7 @@ function AdvancedPanel({
           Guardar como reutilizable
         </button>
       </header>
-      {savedNote ? (
-        <p className="text-[10px] text-emerald-600">{savedNote}</p>
-      ) : null}
+      {savedNote ? <p className="text-[10px] text-emerald-600">{savedNote}</p> : null}
       <div>
         <label className="mb-1 block text-[11px] font-semibold">
           Configuración JSON del bloque
@@ -2971,9 +3350,7 @@ function AdvancedPanel({
           className="min-h-[160px] w-full rounded-md border border-border bg-background px-2 py-1 font-mono text-[10px]"
           spellCheck={false}
         />
-        {jsonError ? (
-          <p className="mt-1 text-[10px] text-destructive">{jsonError}</p>
-        ) : null}
+        {jsonError ? <p className="mt-1 text-[10px] text-destructive">{jsonError}</p> : null}
         <div className="mt-1 flex justify-end">
           <button
             type="button"
@@ -2992,7 +3369,9 @@ function AdvancedPanel({
 }
 
 function VersionsDrawer({
-  versions, onClose, onRestore,
+  versions,
+  onClose,
+  onRestore,
 }: {
   versions: CompositionRevisionSummary[];
   onClose: () => void;
@@ -3099,7 +3478,11 @@ function PublishDiffModal({
   const groups: Array<{ key: SectionChange["kind"]; label: string; tone: string }> = [
     { key: "added", label: "Añadidos", tone: "text-emerald-700 bg-emerald-50 border-emerald-200" },
     { key: "modified", label: "Modificados", tone: "text-amber-800 bg-amber-50 border-amber-200" },
-    { key: "visibility", label: "Visibilidad cambiada", tone: "text-sky-800 bg-sky-50 border-sky-200" },
+    {
+      key: "visibility",
+      label: "Visibilidad cambiada",
+      tone: "text-sky-800 bg-sky-50 border-sky-200",
+    },
     { key: "reordered", label: "Reordenados", tone: "text-slate-700 bg-slate-50 border-slate-200" },
     { key: "removed", label: "Eliminados", tone: "text-rose-800 bg-rose-50 border-rose-200" },
   ];
@@ -3146,7 +3529,8 @@ function PublishDiffModal({
             <p className="text-xs text-rose-700">No se pudo calcular el diff: {error}</p>
           ) : total === 0 ? (
             <p className="text-xs text-muted-foreground">
-              El borrador es idéntico a la versión publicada. Aún así puedes publicar para actualizar la marca de tiempo.
+              El borrador es idéntico a la versión publicada. Aún así puedes publicar para
+              actualizar la marca de tiempo.
             </p>
           ) : (
             grouped.map((g) => (
@@ -3163,7 +3547,9 @@ function PublishDiffModal({
                       <span className="truncate font-medium">{c.label}</span>
                       <span className="shrink-0 text-[10px] opacity-70">
                         {c.kind === "visibility"
-                          ? c.hidden ? "ocultado" : "visible"
+                          ? c.hidden
+                            ? "ocultado"
+                            : "visible"
                           : c.kind === "reordered"
                             ? `pos ${(c.from ?? 0) + 1} → ${(c.to ?? 0) + 1}`
                             : c.type}
@@ -3208,7 +3594,9 @@ function PublishDiffModal({
 }
 
 function _VersionsDrawerImpl({
-  versions, onClose, onRestore,
+  versions,
+  onClose,
+  onRestore,
 }: {
   versions: CompositionRevisionSummary[];
   onClose: () => void;
@@ -3221,7 +3609,9 @@ function _VersionsDrawerImpl({
     >
       <header className="flex items-center justify-between gap-2">
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Historial</p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Historial
+          </p>
           <h2 className="text-base font-semibold">Versiones publicadas</h2>
         </div>
         <button
@@ -3260,7 +3650,11 @@ function _VersionsDrawerImpl({
                   onClick={() => void onRestore(v)}
                   disabled={v.is_active}
                   className="rounded-md border border-border bg-background px-2 py-1 text-[10px] font-medium hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
-                  title={v.is_active ? "Esta es la versión publicada actualmente" : "Restaurar esta versión como borrador"}
+                  title={
+                    v.is_active
+                      ? "Esta es la versión publicada actualmente"
+                      : "Restaurar esta versión como borrador"
+                  }
                 >
                   Restaurar
                 </button>
@@ -3347,7 +3741,10 @@ function WorkflowChip({
           {state !== "draft" ? (
             <button
               type="button"
-              onClick={() => { setOpen(false); void onChange("draft"); }}
+              onClick={() => {
+                setOpen(false);
+                void onChange("draft");
+              }}
               className="block w-full rounded px-2 py-1.5 text-left text-xs hover:bg-accent"
             >
               Regresar a borrador
@@ -3356,7 +3753,10 @@ function WorkflowChip({
           {state !== "in_review" ? (
             <button
               type="button"
-              onClick={() => { setOpen(false); void onChange("in_review"); }}
+              onClick={() => {
+                setOpen(false);
+                void onChange("in_review");
+              }}
               className="block w-full rounded px-2 py-1.5 text-left text-xs hover:bg-accent"
             >
               Enviar a revisión
@@ -3365,7 +3765,10 @@ function WorkflowChip({
           {state !== "approved" ? (
             <button
               type="button"
-              onClick={() => { setOpen(false); void onChange("approved"); }}
+              onClick={() => {
+                setOpen(false);
+                void onChange("approved");
+              }}
               disabled={!canApprove}
               title={canApprove ? "Marcar como aprobado" : "Sólo administradores pueden aprobar"}
               className="block w-full rounded px-2 py-1.5 text-left text-xs hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
@@ -3393,7 +3796,12 @@ function AppearancePanel({
     // Limpia claves vacías/cero para que no persistan overrides inertes.
     Object.keys(next).forEach((k) => {
       const v = (next as Record<string, unknown>)[k];
-      if (v === "" || v === undefined || v === null || (typeof v === "number" && !Number.isFinite(v))) {
+      if (
+        v === "" ||
+        v === undefined ||
+        v === null ||
+        (typeof v === "number" && !Number.isFinite(v))
+      ) {
         delete (next as Record<string, unknown>)[k];
       }
     });
@@ -3426,7 +3834,9 @@ function AppearancePanel({
               className={input}
             >
               {FONT_FAMILY_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
               ))}
             </select>
           </label>
@@ -3483,7 +3893,9 @@ function AppearancePanel({
                 min={0}
                 max={400}
                 value={num(appearance.padding_y)}
-                onChange={(e) => set("padding_y", e.target.value === "" ? undefined : Number(e.target.value))}
+                onChange={(e) =>
+                  set("padding_y", e.target.value === "" ? undefined : Number(e.target.value))
+                }
                 className={input}
               />
             </label>
@@ -3494,7 +3906,9 @@ function AppearancePanel({
                 min={0}
                 max={400}
                 value={num(appearance.padding_x)}
-                onChange={(e) => set("padding_x", e.target.value === "" ? undefined : Number(e.target.value))}
+                onChange={(e) =>
+                  set("padding_x", e.target.value === "" ? undefined : Number(e.target.value))
+                }
                 className={input}
               />
             </label>
@@ -3507,7 +3921,9 @@ function AppearancePanel({
                 min={0}
                 max={2000}
                 value={num(appearance.min_height)}
-                onChange={(e) => set("min_height", e.target.value === "" ? undefined : Number(e.target.value))}
+                onChange={(e) =>
+                  set("min_height", e.target.value === "" ? undefined : Number(e.target.value))
+                }
                 className={input}
               />
             </label>
@@ -3518,7 +3934,9 @@ function AppearancePanel({
                 min={0}
                 max={2400}
                 value={num(appearance.max_width)}
-                onChange={(e) => set("max_width", e.target.value === "" ? undefined : Number(e.target.value))}
+                onChange={(e) =>
+                  set("max_width", e.target.value === "" ? undefined : Number(e.target.value))
+                }
                 className={input}
               />
             </label>
@@ -3530,7 +3948,9 @@ function AppearancePanel({
               min={0}
               max={80}
               value={num(appearance.radius)}
-              onChange={(e) => set("radius", e.target.value === "" ? undefined : Number(e.target.value))}
+              onChange={(e) =>
+                set("radius", e.target.value === "" ? undefined : Number(e.target.value))
+              }
               className={input}
             />
           </label>
@@ -3550,7 +3970,10 @@ function AppearancePanel({
 }
 
 function FullScreenState({
-  title, detail, spinner, onExit,
+  title,
+  detail,
+  spinner,
+  onExit,
 }: {
   title: string;
   detail?: string;
@@ -3559,7 +3982,9 @@ function FullScreenState({
 }) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
-      {spinner ? <Loader2 className="mb-3 size-6 animate-spin text-muted-foreground" aria-hidden /> : null}
+      {spinner ? (
+        <Loader2 className="mb-3 size-6 animate-spin text-muted-foreground" aria-hidden />
+      ) : null}
       <h1 className="text-lg font-semibold">{title}</h1>
       {detail ? <p className="mt-2 max-w-md text-sm text-muted-foreground">{detail}</p> : null}
       <button

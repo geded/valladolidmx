@@ -13,10 +13,20 @@
  */
 
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 import type { CompositionNode, CompositionTree } from "./composition-tree";
 import { EMPTY_TREE } from "./composition-tree";
 import { translateTreeBestEffort } from "./translate.functions";
+import {
+  collectEditorialMediaPaths,
+  resolveEditorialActor,
+  resolveEditorialSurface,
+  validateEditorialCompositionTree,
+  type EditorialActorClass,
+  type EditorialSurface,
+} from "./editorial-builder-policy";
 
 export interface CompositionSummary {
   id: string;
@@ -77,7 +87,10 @@ function mergeExistingNodeI18n(
   };
 }
 
-function mergeExistingI18n(incoming: CompositionTree, existing?: CompositionTree | null): CompositionTree {
+function mergeExistingI18n(
+  incoming: CompositionTree,
+  existing?: CompositionTree | null,
+): CompositionTree {
   if (!existing?.root?.children?.length) return incoming;
   const existingById = new Map<string, CompositionNode>();
   const visit = (nodes: CompositionNode[]) => {
@@ -91,9 +104,72 @@ function mergeExistingI18n(incoming: CompositionTree, existing?: CompositionTree
     ...incoming,
     root: {
       ...incoming.root,
-      children: (incoming.root.children ?? []).map((node) => mergeExistingNodeI18n(node, existingById)),
+      children: (incoming.root.children ?? []).map((node) =>
+        mergeExistingNodeI18n(node, existingById),
+      ),
     },
   };
+}
+
+// I4-A keeps the database and RPC surface unchanged: it resolves existing RBAC
+// and Media Registry records before any authoring RPC is allowed to run.
+type EditorialServerContext = { supabase: SupabaseClient<Database>; userId: string };
+
+async function resolveServerEditorialActor(
+  context: EditorialServerContext,
+): Promise<EditorialActorClass> {
+  const roles = ["super_admin", "admin", "editor", "business_owner"] as const;
+  const resolved: string[] = [];
+  for (const role of roles) {
+    const { data, error } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: role,
+    });
+    if (error) throw new Error(`i4_role_check_failed: ${error.message}`);
+    if (data) resolved.push(role);
+  }
+  const actor = resolveEditorialActor(resolved);
+  if (!actor) throw new Error("i4_authoring_forbidden: actor is outside the allowlist");
+  return actor;
+}
+
+async function loadRegisteredMediaPaths(
+  context: Pick<EditorialServerContext, "supabase">,
+  tree: CompositionTree,
+) {
+  const paths = collectEditorialMediaPaths(tree);
+  if (!paths.length) return new Set<string>();
+  const { data, error } = await context.supabase
+    .from("media_assets")
+    .select("storage_path")
+    .in("storage_path", paths)
+    .is("deleted_at", null);
+  if (error) throw new Error(`i4_media_registry_failed: ${error.message}`);
+  return new Set<string>((data ?? []).map((row: { storage_path: string }) => row.storage_path));
+}
+
+async function assertI4AuthoringTree(input: {
+  context: EditorialServerContext;
+  tree: CompositionTree;
+  previousTree?: CompositionTree | null;
+  pageType: string;
+  operation?: "edit" | "duplicate" | "template_new";
+}) {
+  const surface: EditorialSurface | null = resolveEditorialSurface(input.pageType);
+  if (!surface) throw new Error(`i4_authoring_forbidden: unknown page kind "${input.pageType}"`);
+  const actor = await resolveServerEditorialActor(input.context);
+  if (actor === "business_author" && surface !== "business")
+    throw new Error("i4_authoring_forbidden: business authors require business surface");
+  const registeredMediaPaths = await loadRegisteredMediaPaths(input.context, input.tree);
+  const validation = validateEditorialCompositionTree({
+    tree: input.tree,
+    previous_tree: input.previousTree,
+    surface,
+    actor,
+    operation: input.operation,
+    registered_media_paths: registeredMediaPaths,
+  });
+  if (!validation.valid) throw new Error(`i4_authoring_rejected: ${validation.errors.join("; ")}`);
 }
 
 export const listCompositions = createServerFn({ method: "GET" })
@@ -101,9 +177,7 @@ export const listCompositions = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<CompositionSummary[]> => {
     const { data, error } = await context.supabase
       .from("page_compositions")
-      .select(
-        "id, slug, title, description, status, page_type, active_revision_id, updated_at",
-      )
+      .select("id, slug, title, description, status, page_type, active_revision_id, updated_at")
       .order("updated_at", { ascending: false })
       .limit(100);
     if (error) throw new Error(error.message);
@@ -136,8 +210,12 @@ export const getComposition = createServerFn({ method: "GET" })
       }
     }
     return {
-      ...(row as unknown as Omit<CompositionDetail, "current_draft" | "published_hash" | "published_at">),
-      current_draft: ((row as { current_draft: unknown }).current_draft as CompositionTree) ?? EMPTY_TREE,
+      ...(row as unknown as Omit<
+        CompositionDetail,
+        "current_draft" | "published_hash" | "published_at"
+      >),
+      current_draft:
+        ((row as { current_draft: unknown }).current_draft as CompositionTree) ?? EMPTY_TREE,
       published_hash,
       published_at: (row as { published_at: string | null }).published_at ?? null,
       scheduled_publish_at:
@@ -161,7 +239,8 @@ export const getPublishedTree = createServerFn({ method: "GET" })
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    const activeId = (row as { active_revision_id: string | null } | null)?.active_revision_id ?? null;
+    const activeId =
+      (row as { active_revision_id: string | null } | null)?.active_revision_id ?? null;
     if (!activeId) return null;
     const { data: rev, error: revErr } = await context.supabase
       .from("page_revisions")
@@ -216,13 +295,20 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const { data: existingRow } = await context.supabase
       .from("page_compositions")
-      .select("current_draft")
+      .select("current_draft, page_type")
       .eq("id", data.id)
       .maybeSingle();
-    let treeToSave = mergeExistingI18n(
-      data.tree,
-      (existingRow?.current_draft as CompositionTree | undefined) ?? null,
-    );
+    if (!existingRow) throw new Error("i4_authoring_rejected: composition not found");
+    const previousTree =
+      (existingRow.current_draft as unknown as CompositionTree | undefined) ?? EMPTY_TREE;
+    let treeToSave = mergeExistingI18n(data.tree, previousTree);
+
+    await assertI4AuthoringTree({
+      context,
+      tree: treeToSave,
+      previousTree,
+      pageType: String(existingRow.page_type),
+    });
 
     try {
       const translated = await translateTreeBestEffort(treeToSave, context.supabase);
@@ -230,6 +316,13 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
     } catch {
       // La traducción automática nunca debe romper ni bloquear el guardado.
     }
+
+    await assertI4AuthoringTree({
+      context,
+      tree: treeToSave,
+      previousTree,
+      pageType: String(existingRow.page_type),
+    });
 
     const { error } = await context.supabase.rpc("eb_save_composition_draft", {
       _id: data.id,
@@ -265,7 +358,11 @@ export const listCompositionRevisions = createServerFn({ method: "GET" })
 
     // Autor: batch lookup en profiles (best-effort; RLS puede filtrar).
     const authorIds = Array.from(
-      new Set(list.map((r) => (r as { created_by: string | null }).created_by).filter((x): x is string => !!x)),
+      new Set(
+        list
+          .map((r) => (r as { created_by: string | null }).created_by)
+          .filter((x): x is string => !!x),
+      ),
     );
     const nameById = new Map<string, string>();
     if (authorIds.length > 0) {
@@ -273,7 +370,11 @@ export const listCompositionRevisions = createServerFn({ method: "GET" })
         .from("profiles")
         .select("user_id, display_name, email")
         .in("user_id", authorIds);
-      for (const p of (profs ?? []) as Array<{ user_id: string; display_name: string | null; email: string | null }>) {
+      for (const p of (profs ?? []) as Array<{
+        user_id: string;
+        display_name: string | null;
+        email: string | null;
+      }>) {
         nameById.set(p.user_id, p.display_name || p.email || "");
       }
     }
@@ -284,12 +385,13 @@ export const listCompositionRevisions = createServerFn({ method: "GET" })
       .select("active_revision_id")
       .eq("id", data.id)
       .maybeSingle();
-    const activeId = (comp as { active_revision_id: string | null } | null)?.active_revision_id ?? null;
+    const activeId =
+      (comp as { active_revision_id: string | null } | null)?.active_revision_id ?? null;
 
     return list.map((r) => {
-      const snap = (r as { snapshot: unknown }).snapshot as
-        | { root?: { children?: unknown[] } }
-        | null;
+      const snap = (r as { snapshot: unknown }).snapshot as {
+        root?: { children?: unknown[] };
+      } | null;
       const sectionCount = Array.isArray(snap?.root?.children) ? snap!.root!.children!.length : 0;
       return {
         id: r.id,
@@ -299,7 +401,7 @@ export const listCompositionRevisions = createServerFn({ method: "GET" })
         created_at: r.created_at,
         created_by: (r as { created_by: string | null }).created_by,
         author_name: (r as { created_by: string | null }).created_by
-          ? nameById.get((r as { created_by: string }).created_by) ?? null
+          ? (nameById.get((r as { created_by: string }).created_by) ?? null)
           : null,
         section_count: sectionCount,
         is_active: activeId === r.id,
@@ -330,10 +432,10 @@ export const publishComposition = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string; notes?: string }) => data)
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }): Promise<{ revision_id: string }> => {
-    const { data: rev_id, error } = await context.supabase.rpc(
-      "eb_publish_composition",
-      { _id: data.id, _notes: data.notes },
-    );
+    const { data: rev_id, error } = await context.supabase.rpc("eb_publish_composition", {
+      _id: data.id,
+      _notes: data.notes,
+    });
     if (error) throw new Error(error.message);
     return { revision_id: rev_id as unknown as string };
   });
@@ -448,7 +550,8 @@ export const issueCompositionPreviewLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }): Promise<CompositionPreviewLink> => {
     const ttl = Math.max(5, Math.min(60 * 24 * 7, data.ttl_minutes ?? 60 * 24)); // 5min..7d, default 24h
-    const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "").slice(0, 8);
+    const token =
+      crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "").slice(0, 8);
     const expires_at = new Date(Date.now() + ttl * 60_000).toISOString();
     const { error } = await context.supabase.from("composition_preview_tokens").insert({
       token,
@@ -509,7 +612,10 @@ export const resolveCompositionPreview = createServerFn({ method: "GET" })
  * - approved → draft: cualquier editor (para reabrir el ciclo).
  */
 export const setCompositionWorkflowState = createServerFn({ method: "POST" })
-  .inputValidator((data: { id: string; next_state: "draft" | "in_review" | "approved"; notes?: string | null }) => data)
+  .inputValidator(
+    (data: { id: string; next_state: "draft" | "in_review" | "approved"; notes?: string | null }) =>
+      data,
+  )
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }) => {
     const { data: result, error } = await context.supabase.rpc("eb_set_workflow_state", {
@@ -542,7 +648,9 @@ export const listBlockComments = createServerFn({ method: "GET" })
   .handler(async ({ data, context }): Promise<BlockComment[]> => {
     const { data: rows, error } = await context.supabase
       .from("eb_block_comments")
-      .select("id, composition_id, block_id, author_id, body, resolved_at, resolved_by, created_at, updated_at")
+      .select(
+        "id, composition_id, block_id, author_id, body, resolved_at, resolved_by, created_at, updated_at",
+      )
       .eq("composition_id", data.composition_id)
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
@@ -555,7 +663,12 @@ export const listBlockComments = createServerFn({ method: "GET" })
         .from("profiles")
         .select("id, display_name")
         .in("id", ids);
-      nameMap = new Map((profs ?? []).map((p: { id: string; display_name: string | null }) => [p.id, p.display_name]));
+      nameMap = new Map(
+        (profs ?? []).map((p: { id: string; display_name: string | null }) => [
+          p.id,
+          p.display_name,
+        ]),
+      );
     }
     return list.map((r) => ({ ...r, author_name: nameMap.get(r.author_id) ?? null }));
   });
@@ -674,14 +787,12 @@ export const listStudioPages = createServerFn({ method: "GET" })
       .order("updated_at", { ascending: false })
       .limit(500);
     if (error) throw new Error(error.message);
-    const rows = ((data ?? []) as unknown) as Array<Record<string, unknown>>;
+    const rows = (data ?? []) as unknown as Array<Record<string, unknown>>;
 
     // Autor: batch lookup en profiles (best-effort, RLS puede filtrar).
     const authorIds = Array.from(
       new Set(
-        rows
-          .map((r) => (r.updated_by as string | null) ?? null)
-          .filter((x): x is string => !!x),
+        rows.map((r) => (r.updated_by as string | null) ?? null).filter((x): x is string => !!x),
       ),
     );
     const nameById = new Map<string, string>();
@@ -720,7 +831,7 @@ export const listStudioPages = createServerFn({ method: "GET" })
     for (const r of rows) {
       const activeId = (r.active_revision_id as string | null) ?? null;
       const draftHash = await sha256Hex(canonicalize(r.current_draft));
-      const publishedHash = activeId ? publishedHashById.get(activeId) ?? null : null;
+      const publishedHash = activeId ? (publishedHashById.get(activeId) ?? null) : null;
       const hasChanges = publishedHash ? publishedHash !== draftHash : Boolean(r.current_draft);
       out.push({
         id: String(r.id),
@@ -733,15 +844,14 @@ export const listStudioPages = createServerFn({ method: "GET" })
         is_template: Boolean(r.is_template),
         template_of_kind: (r.template_of_kind as PageKind | null) ?? null,
         active_revision_id: activeId,
-        workflow_state:
-          (r.workflow_state as StudioPageRow["workflow_state"]) ?? "draft",
+        workflow_state: (r.workflow_state as StudioPageRow["workflow_state"]) ?? "draft",
         scheduled_publish_at: (r.scheduled_publish_at as string | null) ?? null,
         published_at: (r.published_at as string | null) ?? null,
         updated_at: String(r.updated_at),
         updated_by: (r.updated_by as string | null) ?? null,
         author_name:
           (r.updated_by as string | null) && nameById.has(r.updated_by as string)
-            ? nameById.get(r.updated_by as string) ?? null
+            ? (nameById.get(r.updated_by as string) ?? null)
             : null,
         has_unpublished_changes: hasChanges,
         editing_lock: (r.editing_lock as StudioPageRow["editing_lock"]) ?? null,
@@ -751,11 +861,22 @@ export const listStudioPages = createServerFn({ method: "GET" })
   });
 
 export const duplicateComposition = createServerFn({ method: "POST" })
-  .inputValidator(
-    (data: { id: string; new_slug: string; new_title?: string | null }) => data,
-  )
+  .inputValidator((data: { id: string; new_slug: string; new_title?: string | null }) => data)
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }): Promise<{ id: string }> => {
+    const { data: source, error: sourceError } = await context.supabase
+      .from("page_compositions")
+      .select("current_draft, page_type")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (sourceError) throw new Error(sourceError.message);
+    if (!source) throw new Error("i4_authoring_rejected: composition not found");
+    await assertI4AuthoringTree({
+      context,
+      tree: (source.current_draft as unknown as CompositionTree | undefined) ?? EMPTY_TREE,
+      pageType: String(source.page_type),
+      operation: "duplicate",
+    });
     const { data: id, error } = await context.supabase.rpc("eb_duplicate_composition", {
       _id: data.id,
       _new_slug: data.new_slug,
@@ -824,14 +945,25 @@ export const deleteComposition = createServerFn({ method: "POST" })
 
 export const markCompositionAsTemplate = createServerFn({ method: "POST" })
   .inputValidator(
-    (data: {
-      id: string;
-      is_template: boolean;
-      template_of_kind?: PageKind | null;
-    }) => data,
+    (data: { id: string; is_template: boolean; template_of_kind?: PageKind | null }) => data,
   )
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    if (data.is_template) {
+      const { data: source, error: sourceError } = await context.supabase
+        .from("page_compositions")
+        .select("current_draft, page_type")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (sourceError) throw new Error(sourceError.message);
+      if (!source) throw new Error("i4_authoring_rejected: composition not found");
+      await assertI4AuthoringTree({
+        context,
+        tree: (source.current_draft as unknown as CompositionTree | undefined) ?? EMPTY_TREE,
+        pageType: String(source.page_type),
+        operation: "template_new",
+      });
+    }
     const { error } = await context.supabase.rpc("eb_mark_composition_as_template", {
       _id: data.id,
       _is_template: data.is_template,
