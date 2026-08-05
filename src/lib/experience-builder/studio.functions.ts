@@ -68,6 +68,8 @@ export interface CompositionDetail extends CompositionSummary {
   approved_at: string | null;
   scheduled_revision_id: string | null;
   scheduled_snapshot_hash: string | null;
+  draft_version: number;
+  draft_hash: string | null;
 }
 
 export interface CompositionRevisionSummary {
@@ -198,7 +200,7 @@ export const getComposition = createServerFn({ method: "GET" })
     const { data: row, error } = await context.supabase
       .from("page_compositions")
       .select(
-        "id, slug, title, description, status, page_type, active_revision_id, updated_at, current_draft, published_at, scheduled_publish_at, workflow_state, workflow_updated_at, workflow_notes, draft_author_id, approved_revision_id, approved_snapshot_hash, approved_by, approved_at, scheduled_revision_id, scheduled_snapshot_hash",
+        "id, slug, title, description, status, page_type, active_revision_id, updated_at, current_draft, published_at, scheduled_publish_at, workflow_state, workflow_updated_at, workflow_notes, draft_author_id, approved_revision_id, approved_snapshot_hash, approved_by, approved_at, scheduled_revision_id, scheduled_snapshot_hash, draft_version, draft_hash",
       )
       .eq("id", data.id)
       .maybeSingle();
@@ -297,47 +299,63 @@ export const createComposition = createServerFn({ method: "POST" })
   });
 
 export const saveCompositionDraft = createServerFn({ method: "POST" })
-  .inputValidator((data: { id: string; tree: CompositionTree }) => data)
+  .inputValidator((data: { id: string; tree: CompositionTree; expected_hash?: string }) => data)
   .middleware([requireSupabaseAuth])
-  .handler(async ({ data, context }): Promise<{ ok: true }> => {
-    const { data: existingRow } = await context.supabase
-      .from("page_compositions")
-      .select("current_draft, page_type")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (!existingRow) throw new Error("i4_authoring_rejected: composition not found");
-    const previousTree =
-      (existingRow.current_draft as unknown as CompositionTree | undefined) ?? EMPTY_TREE;
-    let treeToSave = mergeExistingI18n(data.tree, previousTree);
+  .handler(
+    async ({ data, context }): Promise<{ ok: true; draft_hash: string; draft_version: number }> => {
+      const { data: existingRow } = await context.supabase
+        .from("page_compositions")
+        .select("current_draft, page_type, draft_hash")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (!existingRow) throw new Error("i4_authoring_rejected: composition not found");
+      const previousTree =
+        (existingRow.current_draft as unknown as CompositionTree | undefined) ?? EMPTY_TREE;
+      const serverDraftHash =
+        (existingRow as { draft_hash: string | null }).draft_hash ??
+        (await sha256Hex(canonicalize(previousTree)));
+      if (!data.expected_hash || data.expected_hash !== serverDraftHash) {
+        throw new Error(
+          "draft_conflict: El borrador cambió desde que lo abriste. Recarga antes de guardar.",
+        );
+      }
+      let treeToSave = mergeExistingI18n(data.tree, previousTree);
 
-    await assertI4AuthoringTree({
-      context,
-      tree: treeToSave,
-      previousTree,
-      pageType: String(existingRow.page_type),
-    });
+      await assertI4AuthoringTree({
+        context,
+        tree: treeToSave,
+        previousTree,
+        pageType: String(existingRow.page_type),
+      });
 
-    try {
-      const translated = await translateTreeBestEffort(treeToSave, context.supabase);
-      treeToSave = translated.tree;
-    } catch {
-      // La traducción automática nunca debe romper ni bloquear el guardado.
-    }
+      try {
+        const translated = await translateTreeBestEffort(treeToSave, context.supabase);
+        treeToSave = translated.tree;
+      } catch {
+        // La traducción automática nunca debe romper ni bloquear el guardado.
+      }
 
-    await assertI4AuthoringTree({
-      context,
-      tree: treeToSave,
-      previousTree,
-      pageType: String(existingRow.page_type),
-    });
+      await assertI4AuthoringTree({
+        context,
+        tree: treeToSave,
+        previousTree,
+        pageType: String(existingRow.page_type),
+      });
 
-    const { error } = await context.supabase.rpc("eb_save_composition_draft", {
-      _id: data.id,
-      _tree: treeToSave as never,
-    });
-    if (error) throw new Error(error.message);
-    return { ok: true };
-  });
+      const { data: result, error } = await context.supabase.rpc("eb_save_composition_draft", {
+        _id: data.id,
+        _tree: treeToSave as never,
+        _expected_hash: data.expected_hash,
+      });
+      if (error) throw new Error(error.message);
+      const payload = (result ?? {}) as { draft_hash?: string; draft_version?: number };
+      return {
+        ok: true,
+        draft_hash: String(payload.draft_hash),
+        draft_version: Number(payload.draft_version),
+      };
+    },
+  );
 
 export const createCompositionRevision = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string; notes?: string }) => data)
@@ -417,16 +435,54 @@ export const listCompositionRevisions = createServerFn({ method: "GET" })
   });
 
 export const restoreCompositionRevision = createServerFn({ method: "POST" })
-  .inputValidator((data: { id: string; revision_id: string }) => data)
+  .inputValidator((data: { id: string; revision_id: string; expected_hash: string }) => data)
   .middleware([requireSupabaseAuth])
-  .handler(async ({ data, context }): Promise<{ ok: true }> => {
-    const { error } = await context.supabase.rpc("eb_restore_revision", {
-      _id: data.id,
-      _revision_id: data.revision_id,
-    });
-    if (error) throw new Error(error.message);
-    return { ok: true };
-  });
+  .handler(
+    async ({ data, context }): Promise<{ ok: true; draft_hash: string; draft_version: number }> => {
+      const { data: rev, error: revErr } = await context.supabase
+        .from("page_revisions")
+        .select("snapshot")
+        .eq("id", data.revision_id)
+        .eq("composition_id", data.id)
+        .maybeSingle();
+      if (revErr) throw new Error(revErr.message);
+      if (!rev?.snapshot) throw new Error("revision not found for composition");
+      const { data: existingRow } = await context.supabase
+        .from("page_compositions")
+        .select("current_draft, page_type, draft_hash")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (!existingRow) throw new Error("i4_authoring_rejected: composition not found");
+      const previousTree =
+        (existingRow.current_draft as unknown as CompositionTree | undefined) ?? EMPTY_TREE;
+      const serverDraftHash =
+        (existingRow as { draft_hash: string | null }).draft_hash ??
+        (await sha256Hex(canonicalize(previousTree)));
+      if (!data.expected_hash || data.expected_hash !== serverDraftHash) {
+        throw new Error(
+          "draft_conflict: El borrador cambió desde que lo abriste. Recarga antes de restaurar.",
+        );
+      }
+      await assertI4AuthoringTree({
+        context,
+        tree: rev.snapshot as unknown as CompositionTree,
+        previousTree,
+        pageType: String(existingRow.page_type),
+      });
+      const { data: result, error } = await context.supabase.rpc("eb_restore_revision", {
+        _id: data.id,
+        _revision_id: data.revision_id,
+        _expected_hash: data.expected_hash,
+      });
+      if (error) throw new Error(error.message);
+      const payload = (result ?? {}) as { draft_hash?: string; draft_version?: number };
+      return {
+        ok: true,
+        draft_hash: String(payload.draft_hash),
+        draft_version: Number(payload.draft_version),
+      };
+    },
+  );
 
 /* ------------------------------------------------------------------ *
  * Etapa 15.10.3 · Publicación pública
@@ -544,6 +600,7 @@ export const releaseEditLock = createServerFn({ method: "POST" })
 export interface CompositionPreviewLink {
   token: string;
   expires_at: string;
+  snapshot_hash: string;
 }
 
 /**
@@ -558,17 +615,35 @@ export const issueCompositionPreviewLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }): Promise<CompositionPreviewLink> => {
     const ttl = Math.max(5, Math.min(60 * 24 * 7, data.ttl_minutes ?? 60 * 24)); // 5min..7d, default 24h
-    const token =
-      crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "").slice(0, 8);
-    const expires_at = new Date(Date.now() + ttl * 60_000).toISOString();
-    const { error } = await context.supabase.from("composition_preview_tokens").insert({
-      token,
-      composition_id: data.composition_id,
-      created_by: context.userId,
-      expires_at,
+    const raw = new Uint8Array(32);
+    crypto.getRandomValues(raw);
+    const token = Array.from(raw, (b) => b.toString(16).padStart(2, "0")).join("");
+    const token_digest = await sha256Hex(token);
+    const { data: result, error } = await context.supabase.rpc("eb_issue_composition_preview", {
+      _composition_id: data.composition_id,
+      _token_digest: token_digest,
+      _ttl_minutes: ttl,
     });
     if (error) throw new Error(error.message);
-    return { token, expires_at };
+    const payload = (result ?? {}) as { expires_at?: string; snapshot_hash?: string };
+    return {
+      token,
+      expires_at: String(payload.expires_at),
+      snapshot_hash: String(payload.snapshot_hash),
+    };
+  });
+
+export const revokeCompositionPreviewLink = createServerFn({ method: "POST" })
+  .inputValidator((data: { token: string; reason?: string | null }) => data)
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const token_digest = await sha256Hex(data.token);
+    const { error } = await context.supabase.rpc("eb_revoke_composition_preview", {
+      _token_digest: token_digest,
+      _reason: data.reason ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 
 export interface CompositionPreviewPayload {
@@ -577,6 +652,7 @@ export interface CompositionPreviewPayload {
   page_type: string;
   slug: string;
   expires_at: string;
+  snapshot_hash: string;
 }
 
 /**
@@ -588,29 +664,34 @@ export const resolveCompositionPreview = createServerFn({ method: "GET" })
   .inputValidator((data: { token: string }) => data)
   .handler(async ({ data }): Promise<CompositionPreviewPayload | null> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: tok, error: tokErr } = await supabaseAdmin
-      .from("composition_preview_tokens")
-      .select("composition_id, expires_at")
-      .eq("token", data.token)
-      .maybeSingle();
+    const { data: resolvedPreview, error: tokErr } = await supabaseAdmin.rpc(
+      "eb_resolve_composition_preview",
+      { _token: data.token },
+    );
     if (tokErr) throw new Error(tokErr.message);
+    const tok = resolvedPreview as {
+      composition_id: string;
+      expires_at: string;
+      snapshot_hash: string;
+      snapshot: unknown;
+    } | null;
     if (!tok) return null;
-    if (new Date(tok.expires_at).getTime() < Date.now()) return null;
 
     const { data: comp, error: compErr } = await supabaseAdmin
       .from("page_compositions")
-      .select("current_draft, title, page_type, slug")
+      .select("title, page_type, slug")
       .eq("id", tok.composition_id)
       .maybeSingle();
     if (compErr) throw new Error(compErr.message);
     if (!comp) return null;
 
     return {
-      tree: (comp.current_draft as unknown as CompositionTree) ?? EMPTY_TREE,
+      tree: (tok.snapshot as unknown as CompositionTree) ?? EMPTY_TREE,
       title: comp.title,
       page_type: comp.page_type,
       slug: comp.slug,
       expires_at: tok.expires_at,
+      snapshot_hash: tok.snapshot_hash,
     };
   });
 /**

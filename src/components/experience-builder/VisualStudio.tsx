@@ -1256,11 +1256,24 @@ function PageVisualEditor({
     if (saveTimer.current) window.clearTimeout(saveTimer.current);
     setSaveStatus("saving");
     saveTimer.current = window.setTimeout(() => {
-      void save({ data: { id: page.id, tree } })
-        .then(() => {
+      void save({ data: { id: page.id, tree, expected_hash: page.draft_hash ?? draftHash ?? "" } })
+        .then((res) => {
+          setPage((current) =>
+            current
+              ? { ...current, draft_hash: res.draft_hash, draft_version: res.draft_version }
+              : current,
+          );
           setSaveStatus("saved");
         })
-        .catch(() => setSaveStatus("error"));
+        .catch((e) => {
+          setSaveStatus("error");
+          const msg = e instanceof Error ? e.message : String(e);
+          if (msg.includes("draft_conflict")) {
+            setMessage(
+              "Conflicto de edición: el borrador cambió en el servidor. Recarga antes de guardar.",
+            );
+          }
+        });
     }, 900);
     return () => {
       if (saveTimer.current) window.clearTimeout(saveTimer.current);
@@ -1300,7 +1313,14 @@ function PageVisualEditor({
     setPublishing(true);
     setMessage(null);
     try {
-      await save({ data: { id: page.id, tree } });
+      const saveResult = await save({
+        data: { id: page.id, tree, expected_hash: page.draft_hash ?? draftHash ?? "" },
+      });
+      setPage((p) =>
+        p
+          ? { ...p, draft_hash: saveResult.draft_hash, draft_version: saveResult.draft_version }
+          : p,
+      );
       await publish({ data: { id: page.id, notes: "Publicado desde Modo Visual" } });
       if (pageDef.page_type === "home") {
         await queryClient.invalidateQueries({ queryKey: ["eb", "published-home", "default"] });
@@ -1422,7 +1442,14 @@ function PageVisualEditor({
         setScheduling(false);
         return;
       }
-      await save({ data: { id: page.id, tree } });
+      const saveResult = await save({
+        data: { id: page.id, tree, expected_hash: page.draft_hash ?? draftHash ?? "" },
+      });
+      setPage((p) =>
+        p
+          ? { ...p, draft_hash: saveResult.draft_hash, draft_version: saveResult.draft_version }
+          : p,
+      );
       await schedulePublish({
         data: {
           id: page.id,
@@ -1639,7 +1666,9 @@ function PageVisualEditor({
       )
     )
       return;
-    await restore({ data: { id: page.id, revision_id: rev.id } });
+    await restore({
+      data: { id: page.id, revision_id: rev.id, expected_hash: page.draft_hash ?? draftHash ?? "" },
+    });
     const detail = (await get({ data: { id: page.id } })) as CompositionDetail | null;
     if (detail) {
       setPage(detail);
@@ -1671,14 +1700,15 @@ function PageVisualEditor({
     if (!page || sharing) return;
     setSharing(true);
     try {
-      const { token, expires_at } = await issuePreview({
+      const { token, expires_at, snapshot_hash } = await issuePreview({
         data: { composition_id: page.id, ttl_minutes: 60 * 24 },
       });
       const url = `${window.location.origin}/preview/composition/${token}`;
       setShareLink({ url, expires_at });
+      setMessage(`Enlace de vista previa generado para el snapshot ${snapshot_hash.slice(0, 12)}…`);
       try {
         await navigator.clipboard.writeText(url);
-        setMessage("Enlace de vista previa copiado al portapapeles.");
+        setMessage(`Enlace de vista previa copiado. Snapshot ${snapshot_hash.slice(0, 12)}…`);
       } catch {
         setMessage("Enlace de vista previa generado.");
       }

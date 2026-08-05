@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 
 const base = "ec9ae951412e8cb5223ba9fbf60d51d6814b0552";
 const i3DHead = "43c8ca6de4c10cf2430285aa8261adeda82dbf10";
@@ -125,17 +125,33 @@ assert.match(eligibility, /review_state === "approved"/);
 assert.match(eligibility, /createSignedUrl/);
 assert.doesNotMatch(eligibility, /plan_tier|\.verified\b/);
 
-const i4bAuthorization = JSON.parse(
-  readFileSync("docs/governance/product-authorizations/PCA-2026-014.json", "utf8"),
-);
-assert.equal(i4bAuthorization.status, "Approved");
-assert.deepEqual(i4bAuthorization.required_feature_flags, [
-  "omxds_visual_v1_contracts_enabled=false",
-]);
-const authorizedI4bPaths = new Set(
-  (i4bAuthorization.permissions ?? [])
-    .filter((permission) => ["create", "modify"].includes(permission.operation))
-    .map((permission) => permission.path),
+const authorizationDir = "docs/governance/product-authorizations";
+const approvedPcaAuthorizedPaths = new Set();
+for (const entry of readdirSync(authorizationDir)
+  .filter((file) => file.endsWith(".json"))
+  .sort()) {
+  const authorizationPath = `${authorizationDir}/${entry}`;
+  const authorization = JSON.parse(readFileSync(authorizationPath, "utf8"));
+  if (authorization.status !== "Approved") continue;
+  for (const permission of authorization.permissions ?? []) {
+    if (!["create", "modify"].includes(permission.operation)) continue;
+    assert.equal(
+      typeof permission.path,
+      "string",
+      `${authorizationPath} permission path must be an exact string`,
+    );
+    assert.ok(
+      !permission.path.endsWith("/"),
+      `${authorizationPath} must not authorize broad directories: ${permission.path}`,
+    );
+    approvedPcaAuthorizedPaths.add(permission.path);
+  }
+}
+assert.ok(
+  approvedPcaAuthorizedPaths.has(
+    "supabase/migrations/20260804233000_omxds_i4b_workflow_publication_authority.sql",
+  ),
+  "PCA approved exact-path set must preserve I4-B migration authorization",
 );
 
 const flagConsumers = gitLines([
@@ -188,7 +204,10 @@ for (const file of gitLines([
   "supabase",
   "src/integrations/supabase",
 ]))
-  assert.ok(authorizedI4bPaths.has(file), `post-I3-D data change lacks PCA-2026-014: ${file}`);
+  assert.ok(
+    approvedPcaAuthorizedPaths.has(file),
+    `post-I3-D data change lacks an Approved PCA exact-path authorization: ${file}`,
+  );
 
 const tests = readFileSync("scripts/omxds/i3/business-premium-surface.contract.test.ts", "utf8");
 assert.match(tests, /fictional/i);

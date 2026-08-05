@@ -57,11 +57,17 @@ function PreviewCompositionView() {
     return <div className="p-8 text-sm text-muted-foreground">Cargando vista previa…</div>;
   }
 
-  const expiresLabel = new Date(payload.expires_at).toLocaleString();
+  const expiresLabel = new Intl.DateTimeFormat("es-MX", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "America/Merida",
+    timeZoneName: "short",
+  }).format(new Date(payload.expires_at));
   return (
     <div className="min-h-screen">
       <div className="border-b border-amber-300/60 bg-amber-50 px-4 py-2 text-center text-xs text-amber-900">
-        Vista previa del borrador · {payload.title} — enlace caduca el {expiresLabel}. No indexable.
+        Vista previa del borrador · {payload.title} — enlace caduca el {expiresLabel}{" "}
+        (America/Merida). Snapshot {payload.snapshot_hash.slice(0, 12)}…. No indexable.
       </div>
       <CompositionRenderer tree={payload.tree} variableContext={buildDemoContext()} />
     </div>
