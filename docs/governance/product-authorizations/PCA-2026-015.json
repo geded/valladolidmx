@@ -1,0 +1,64 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-015",
+  "title": "OMXDS V1 \u00b7 I4-C Preview, Concurrency, Audit & Rollback",
+  "status": "Approved",
+  "branch": "feature/omxds-i4-c-preview-concurrency-audit-rollback-v1",
+  "blueprint": "docs/blueprint/18.50-OMXDS-V1-I4-C-PREVIEW-CONCURRENCY-AUDIT-ROLLBACK-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-05 \u00b7 Ejecutar exclusivamente I4-C sobre main@dee315acdfc9521a0a75ad45f4a3bcf6c37ef846: preview aislado en /preview/composition/$token con tokens seguros expirables revocables digest-backed y snapshot-bound; compare-and-swap real; auditor\u00eda can\u00f3nica content_audit_log; rollback como nuevo draft revalidado; America/Merida; migraci\u00f3n PostgreSQL aditiva m\u00ednima autorizada por preflight indispensable. Sin producci\u00f3n, despliegue, datos reales, rutas p\u00fablicas nuevas, flag activo, dependencias, bun.lock, merge autom\u00e1tico ni I4-D.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260805090000_omxds_i4c_preview_concurrency_audit_rollback.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/studio.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/VisualStudio.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/preview/composition.$token.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    }
+  ],
+  "public_routes": [
+    "/preview/composition/$token"
+  ],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:i1",
+    "bun run validate:i2a",
+    "bun run validate:i2b",
+    "bun run validate:i2c",
+    "bun run validate:i3:0",
+    "bun run validate:i3:a",
+    "bun run validate:i3:b",
+    "bun run validate:i3:c",
+    "bun run validate:i3:d",
+    "bun run validate:i4:0",
+    "bun run validate:i4:a",
+    "bun run validate:i4:b",
+    "bun run validate:i4:c",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/validate-full-suite.mjs",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}
