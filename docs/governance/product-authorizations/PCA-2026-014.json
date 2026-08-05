@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-014",
+  "title": "OMXDS V1 · I4-B Workflow, RBAC & Publication Authority",
+  "status": "Approved",
+  "branch": "feature/omxds-i4-b-workflow-publication-authority-v1",
+  "blueprint": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+  "founder_authority": "Founder Directive and addendum 2026-08-04 · Ejecutar I4-B sobre main@bb1b17ffcbed0594d1433957e8f2b5d864e1a5a8 con migración PostgreSQL aditiva mínima: snapshot/hash aprobado, autor y aprobador separados, invalidación atómica tras edición, publicación y programación sólo del snapshot exacto aprobado, aislamiento por entidad y auditoría; compatible con registros existentes, reversible, sin datos reales, tabla nueva, dependencia, producción ni flag activo; continuar I4-C/I4-D sólo después de PR, merge y Governance Integrity posterior en SUCCESS.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260804233000_omxds_i4b_workflow_publication_authority.sql"
+    },
+    { "operation": "modify", "path": "src/lib/experience-builder/studio.functions.ts" },
+    { "operation": "modify", "path": "src/integrations/supabase/types.ts" },
+    { "operation": "modify", "path": "src/components/experience-builder/VisualStudio.tsx" },
+    { "operation": "modify", "path": "package.json" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run lint",
+    "bun run validate:i1",
+    "bun run validate:i2a",
+    "bun run validate:i2b",
+    "bun run validate:i2c",
+    "bun run validate:i3:0",
+    "bun run validate:i3:a",
+    "bun run validate:i3:b",
+    "bun run validate:i3:c",
+    "bun run validate:i3:d",
+    "bun run validate:i4:0",
+    "bun run validate:i4:a",
+    "bun run validate:i4:b",
+    "bun run typecheck",
+    "bun run build",
+    "bun run governance:check",
+    "bun run governance:product-check"
+  ]
+}

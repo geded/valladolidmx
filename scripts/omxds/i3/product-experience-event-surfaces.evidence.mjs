@@ -157,6 +157,17 @@ const authorizedRouteConsumers = new Set(
     )
     .map((permission) => permission.path),
 );
+const authorizedChangedPaths = new Set(
+  authorizations
+    .filter(
+      (authorization) =>
+        authorization.status === "Approved" &&
+        authorization.required_feature_flags?.includes("omxds_visual_v1_contracts_enabled=false"),
+    )
+    .flatMap((authorization) => authorization.permissions ?? [])
+    .filter((permission) => ["create", "modify"].includes(permission.operation))
+    .map((permission) => permission.path),
+);
 for (const file of flagConsumers)
   assert.ok(authorizedRouteConsumers.has(file), `unauthorized SSR flag consumer: ${file}`);
 
@@ -184,13 +195,15 @@ for (const forbiddenPath of [
     }),
     "",
   );
-for (const forbiddenRoot of ["supabase", "src/integrations/supabase"])
-  assert.equal(
-    execFileSync("git", ["diff", "--name-only", base, "--", forbiddenRoot], {
-      encoding: "utf8",
-    }),
-    "",
-  );
+for (const file of gitLines([
+  "diff",
+  "--name-only",
+  base,
+  "--",
+  "supabase",
+  "src/integrations/supabase",
+]))
+  assert.ok(authorizedChangedPaths.has(file), `post-I3-C data change lacks Approved PCA: ${file}`);
 
 const tests = readFileSync(
   "scripts/omxds/i3/product-experience-event-surfaces.contract.test.ts",

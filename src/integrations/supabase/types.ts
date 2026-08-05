@@ -4296,11 +4296,16 @@ export type Database = {
       page_compositions: {
         Row: {
           active_revision_id: string | null
+          approved_at: string | null
+          approved_by: string | null
+          approved_revision_id: string | null
+          approved_snapshot_hash: string | null
           canonical_override: string | null
           created_at: string
           created_by: string | null
           current_draft: Json
           description: string | null
+          draft_author_id: string | null
           editing_lock: Json | null
           id: string
           is_template: boolean
@@ -4313,6 +4318,8 @@ export type Database = {
           scheduled_publish_at: string | null
           scheduled_publish_by: string | null
           scheduled_publish_notes: string | null
+          scheduled_revision_id: string | null
+          scheduled_snapshot_hash: string | null
           sitemap_changefreq: string | null
           sitemap_priority: number | null
           slug: string
@@ -4329,11 +4336,16 @@ export type Database = {
         }
         Insert: {
           active_revision_id?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          approved_revision_id?: string | null
+          approved_snapshot_hash?: string | null
           canonical_override?: string | null
           created_at?: string
           created_by?: string | null
           current_draft?: Json
           description?: string | null
+          draft_author_id?: string | null
           editing_lock?: Json | null
           id?: string
           is_template?: boolean
@@ -4346,6 +4358,8 @@ export type Database = {
           scheduled_publish_at?: string | null
           scheduled_publish_by?: string | null
           scheduled_publish_notes?: string | null
+          scheduled_revision_id?: string | null
+          scheduled_snapshot_hash?: string | null
           sitemap_changefreq?: string | null
           sitemap_priority?: number | null
           slug: string
@@ -4362,11 +4376,16 @@ export type Database = {
         }
         Update: {
           active_revision_id?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          approved_revision_id?: string | null
+          approved_snapshot_hash?: string | null
           canonical_override?: string | null
           created_at?: string
           created_by?: string | null
           current_draft?: Json
           description?: string | null
+          draft_author_id?: string | null
           editing_lock?: Json | null
           id?: string
           is_template?: boolean
@@ -4379,6 +4398,8 @@ export type Database = {
           scheduled_publish_at?: string | null
           scheduled_publish_by?: string | null
           scheduled_publish_notes?: string | null
+          scheduled_revision_id?: string | null
+          scheduled_snapshot_hash?: string | null
           sitemap_changefreq?: string | null
           sitemap_priority?: number | null
           slug?: string
@@ -4462,6 +4483,7 @@ export type Database = {
           notes: string | null
           revision_number: number
           snapshot: Json
+          snapshot_hash: string | null
         }
         Insert: {
           composition_id: string
@@ -4471,6 +4493,7 @@ export type Database = {
           notes?: string | null
           revision_number: number
           snapshot: Json
+          snapshot_hash?: string | null
         }
         Update: {
           composition_id?: string
@@ -4480,6 +4503,7 @@ export type Database = {
           notes?: string | null
           revision_number?: number
           snapshot?: Json
+          snapshot_hash?: string | null
         }
         Relationships: [
           {

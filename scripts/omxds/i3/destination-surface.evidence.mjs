@@ -1,6 +1,7 @@
 import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 
 const base = "6ca2ebc61dbea827a28c80f5d8254096a9123e7b";
 const i3aHead = "d47a41fe6f96edf4dad95f273a95fc2a8ebb63d5";
@@ -97,12 +98,27 @@ assert.equal(
   "",
   "SEO helper must remain untouched because no reproducible gap was found",
 );
-assert.equal(
-  execFileSync("git", ["diff", "--name-only", base, "--", "supabase"], {
-    encoding: "utf8",
-  }),
-  "",
+const authorizations = readdirSync("docs/governance/product-authorizations")
+  .filter((file) => file.endsWith(".json"))
+  .map((file) =>
+    JSON.parse(readFileSync(join("docs/governance/product-authorizations", file), "utf8")),
+  );
+const authorizedChangedPaths = new Set(
+  authorizations
+    .filter((authorization) => authorization.status === "Approved")
+    .flatMap((authorization) => authorization.permissions ?? [])
+    .filter((permission) => ["create", "modify"].includes(permission.operation))
+    .map((permission) => permission.path),
 );
+for (const file of gitLines([
+  "diff",
+  "--name-only",
+  base,
+  "--",
+  "supabase",
+  "src/integrations/supabase",
+]))
+  assert.ok(authorizedChangedPaths.has(file), `post-I3-A data change lacks Approved PCA: ${file}`);
 
 console.log(
   "I3-A evidence: PASS (historical scope preserved; Destination contract intact; exact OFF legacy branch).",
