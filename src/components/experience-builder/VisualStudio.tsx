@@ -3705,7 +3705,7 @@ function WorkflowChip({
   canApprove,
   onChange,
 }: {
-  state: "draft" | "in_review" | "approved";
+  state: CompositionDetail["workflow_state"];
   busy: boolean;
   canApprove: boolean;
   onChange: (next: "draft" | "in_review" | "approved") => void | Promise<void>;
@@ -3714,11 +3714,15 @@ function WorkflowChip({
     draft: "border-border bg-muted text-foreground",
     in_review: "border-amber-300 bg-amber-50 text-amber-900",
     approved: "border-emerald-300 bg-emerald-50 text-emerald-800",
+    scheduled: "border-sky-300 bg-sky-50 text-sky-800",
+    published: "border-blue-300 bg-blue-50 text-blue-800",
   };
   const labels: Record<string, string> = {
     draft: "Borrador",
     in_review: "En revisión",
     approved: "Aprobado",
+    scheduled: "Programado",
+    published: "Publicado",
   };
   const [open, setOpen] = useState(false);
   return (

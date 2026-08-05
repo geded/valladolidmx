@@ -58,9 +58,16 @@ export interface CompositionDetail extends CompositionSummary {
    * US-02 · Estado del flujo editorial independiente del ciclo de
    * publicación. Valores: `draft`, `in_review`, `approved`.
    */
-  workflow_state: "draft" | "in_review" | "approved";
+  workflow_state: "draft" | "in_review" | "approved" | "scheduled" | "published";
   workflow_updated_at: string | null;
   workflow_notes: string | null;
+  draft_author_id: string | null;
+  approved_revision_id: string | null;
+  approved_snapshot_hash: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  scheduled_revision_id: string | null;
+  scheduled_snapshot_hash: string | null;
 }
 
 export interface CompositionRevisionSummary {
@@ -191,7 +198,7 @@ export const getComposition = createServerFn({ method: "GET" })
     const { data: row, error } = await context.supabase
       .from("page_compositions")
       .select(
-        "id, slug, title, description, status, page_type, active_revision_id, updated_at, current_draft, published_at, scheduled_publish_at, workflow_state, workflow_updated_at, workflow_notes",
+        "id, slug, title, description, status, page_type, active_revision_id, updated_at, current_draft, published_at, scheduled_publish_at, workflow_state, workflow_updated_at, workflow_notes, draft_author_id, approved_revision_id, approved_snapshot_hash, approved_by, approved_at, scheduled_revision_id, scheduled_snapshot_hash",
       )
       .eq("id", data.id)
       .maybeSingle();
@@ -424,8 +431,8 @@ export const restoreCompositionRevision = createServerFn({ method: "POST" })
 /* ------------------------------------------------------------------ *
  * Etapa 15.10.3 · Publicación pública
  *
- * Las RPCs validan internamente que el actor tenga el rol `admin`
- * (los editores solo pueden crear borradores y revisiones).
+ * Las RPCs I4-B son la única autoridad de escritura: validan RBAC, identidad
+ * autor/aprobador y el revision/hash exacto antes de publicar o programar.
  * ------------------------------------------------------------------ */
 
 export const publishComposition = createServerFn({ method: "POST" })
@@ -454,7 +461,8 @@ export const unpublishComposition = createServerFn({ method: "POST" })
 
 /**
  * US-D · Programa una publicación futura. La ejecuta el sistema (cron)
- * cuando llega la fecha; el estado queda en 'draft' hasta ese momento.
+ * cuando llega la fecha; la RPC congela la revisión/hash aprobada y el
+ * procesador service-role rechaza cualquier programación legacy o incoherente.
  */
 export const schedulePublishComposition = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string; scheduled_at: string; notes?: string }) => data)
@@ -609,7 +617,7 @@ export const resolveCompositionPreview = createServerFn({ method: "GET" })
  * US-02 · Cambia el estado del flujo editorial.
  * - draft → in_review: cualquier editor autenticado.
  * - in_review → approved: sólo admin / super_admin (validado en RPC).
- * - approved → draft: cualquier editor (para reabrir el ciclo).
+ * - approved/scheduled/published → draft: reabre el ciclo e invalida aprobación.
  */
 export const setCompositionWorkflowState = createServerFn({ method: "POST" })
   .inputValidator(

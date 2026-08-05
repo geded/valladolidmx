@@ -125,6 +125,19 @@ assert.match(eligibility, /review_state === "approved"/);
 assert.match(eligibility, /createSignedUrl/);
 assert.doesNotMatch(eligibility, /plan_tier|\.verified\b/);
 
+const i4bAuthorization = JSON.parse(
+  readFileSync("docs/governance/product-authorizations/PCA-2026-014.json", "utf8"),
+);
+assert.equal(i4bAuthorization.status, "Approved");
+assert.deepEqual(i4bAuthorization.required_feature_flags, [
+  "omxds_visual_v1_contracts_enabled=false",
+]);
+const authorizedI4bPaths = new Set(
+  (i4bAuthorization.permissions ?? [])
+    .filter((permission) => ["create", "modify"].includes(permission.operation))
+    .map((permission) => permission.path),
+);
+
 const flagConsumers = gitLines([
   "grep",
   "-l",
@@ -167,13 +180,15 @@ for (const forbiddenPath of [
     }),
     "",
   );
-for (const forbiddenRoot of ["supabase", "src/integrations/supabase"])
-  assert.equal(
-    execFileSync("git", ["diff", "--name-only", base, "--", forbiddenRoot], {
-      encoding: "utf8",
-    }),
-    "",
-  );
+for (const file of gitLines([
+  "diff",
+  "--name-only",
+  base,
+  "--",
+  "supabase",
+  "src/integrations/supabase",
+]))
+  assert.ok(authorizedI4bPaths.has(file), `post-I3-D data change lacks PCA-2026-014: ${file}`);
 
 const tests = readFileSync("scripts/omxds/i3/business-premium-surface.contract.test.ts", "utf8");
 assert.match(tests, /fictional/i);

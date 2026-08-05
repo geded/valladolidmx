@@ -167,13 +167,15 @@ for (const forbiddenPath of [
     "",
   );
 
-for (const forbiddenRoot of ["supabase", "src/integrations/supabase"])
-  assert.equal(
-    execFileSync("git", ["diff", "--name-only", base, "--", forbiddenRoot], {
-      encoding: "utf8",
-    }),
-    "",
-  );
+for (const file of execFileSync(
+  "git",
+  ["diff", "--name-only", base, "--", "supabase", "src/integrations/supabase"],
+  { encoding: "utf8" },
+)
+  .trim()
+  .split("\n")
+  .filter(Boolean))
+  assert.ok(authorizedChangedPaths.has(file), `post-I3-B data change lacks Approved PCA: ${file}`);
 
 console.log(
   "I3-B evidence: PASS (Business owner; Hotel/Restaurant adapters; PCA-authorized SSR; exact OFF legacy branch).",

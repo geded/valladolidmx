@@ -2,7 +2,7 @@
 
 **Estado:** Approved
 
-**Versión:** 0.33
+**Versión:** 0.34
 
 **Última actualización:** 2026-08-04
 
@@ -16,30 +16,30 @@ Este documento contiene el catálogo canónico del universo documental bajo `doc
 
 Esta sección se reemitió el 2026-07-22 conforme al mandato Founder de revisión RV0.2. El alcance del índice sigue siendo registrar autoridad documental adjudicada; no acredita por sí mismo implementación, despliegue, tráfico real ni cierre de dependencias. El orden de ejecución continúa determinado por el [roadmap oficial v2.1](../blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md).
 
-El universo total del árbol `docs/blueprint/` es actualmente de **504 archivos** verificados. El índice registra **504 filas** adjudicadas y admite `18.48` como Authorization Pack aprobado de I4-A bajo `PCA-2026-013` y el addendum Founder de dieciséis rutas. El árbol y la tabla quedan reconciliados sin brecha operativa. Las cifras anteriores se conservan únicamente como historia de versiones.
+El universo total del árbol `docs/blueprint/` es actualmente de **505 archivos** verificados. El índice registra **505 filas** adjudicadas y admite `18.49` como Authorization Pack aprobado de I4-B bajo `PCA-2026-014` y el addendum Founder de migración aditiva mínima. El árbol y la tabla quedan reconciliados sin brecha operativa. Las cifras anteriores se conservan únicamente como historia de versiones.
 
 Las asociaciones técnicas de las filas adjudicadas fueron validadas localmente contra el árbol actual del repositorio: se conservan sólo rutas resolubles, se normalizan expresiones truncadas y se eliminan autorreferencias. La evidencia documental autocontenida se distingue expresamente de una prueba operativa externa.
 
 ## 2.1 Universo documental verificable
 
-El universo total bajo `docs/blueprint/` es de **504 archivos únicos** (medición 2026-08-04 posterior a la admisión de `18.48`):
+El universo total bajo `docs/blueprint/` es de **505 archivos únicos** (medición 2026-08-04 posterior a la admisión de `18.49`):
 
-- **489** archivos en la raíz de `docs/blueprint/`.
+- **490** archivos en la raíz de `docs/blueprint/`.
 - **15** archivos en 5 subdirectorios: `artifacts/`, `audits/`, `project-constitution/`, `roadmap/`, `templates/`.
-- **489 + 15 = 504**.
+- **490 + 15 = 505**.
 
-El índice registra actualmente **504 filas** en `§4`. La brecha se mantiene en `0`; v0.33 registra `18.48`, `PCA-2026-013` y la implementación I4-A con exactamente cuatro consumidores y dieciséis rutas. Los 119 hallazgos congelados y el contenido sustantivo anterior no fueron reabiertos.
+El índice registra actualmente **505 filas** en `§4`. La brecha se mantiene en `0`; v0.34 registra `18.49`, `PCA-2026-014` y la implementación I4-B en exactamente dieciocho rutas, con migración aditiva, autoridad atómica, representación tipada compatible en VisualStudio y cuatro gates I3 reconciliados sin debilitar su alcance histórico. Los 119 hallazgos congelados y el contenido sustantivo anterior no fueron reabiertos.
 
 Los conteos previos (`429`, `432`, `439`, `442`, `444`, `447`, `453`) reflejan medidas históricas del árbol o del índice; ninguno representa el universo actual y no deben citarse fuera del `§6 Control de versiones`.
 
 ## 2.2 Metodología reproducible
 
 ```text
-find docs/blueprint -type f | wc -l                    # 504 archivos únicos (2026-08-04)
-find docs/blueprint -maxdepth 1 -type f | wc -l        # 489 raíz
+find docs/blueprint -type f | wc -l                    # 505 archivos únicos (2026-08-04)
+find docs/blueprint -maxdepth 1 -type f | wc -l        # 490 raíz
 find docs/blueprint -mindepth 2 -type f | wc -l        # 15 en subdirectorios
 find docs/blueprint -mindepth 1 -type d                # 5 subdirectorios (artifacts, audits, project-constitution, roadmap, templates)
-grep -c '^| \[`docs/blueprint/' docs/governance/06-BLUEPRINT-MASTER-INDEX.md   # 504 filas adjudicadas
+grep -c '^| \[`docs/blueprint/' docs/governance/06-BLUEPRINT-MASTER-INDEX.md   # 505 filas adjudicadas
 ```
 
 Delta reproducible tabla ↔ árbol:
@@ -75,31 +75,31 @@ Semántica obligatoria:
 
 ## 3.1 Resumen de adjudicación
 
-Recomputado sobre las 504 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $5 }' | sort | uniq -c`, 2026-08-04):
+Recomputado sobre las 505 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $5 }' | sort | uniq -c`, 2026-08-04):
 
 | Estado               | Documentos |
 | -------------------- | ---------: |
-| `Approved`           |        212 |
+| `Approved`           |        213 |
 | `Draft`              |        288 |
 | `Superseded`         |          3 |
 | `Historical`         |          1 |
 | `Deprecated`         |          0 |
-| **Total adjudicado** |    **504** |
+| **Total adjudicado** |    **505** |
 | No adjudicado        |          0 |
-| **Total del árbol**  |    **504** |
+| **Total del árbol**  |    **505** |
 
 Los conteos previos (`155 / 285`, `442`) se conservan sólo para el `§6 Control de versiones`; no representan el estado actual. La cobertura declarada en versiones anteriores (274 implementaciones, 14 migraciones, 251 pruebas/evidencia) queda como métrica histórica de la versión v0.5 y se recomputará cuando la brecha de 11 filas se adjudique.
 
 ## 3.2 Resumen por dominio primario
 
-Recomputado sobre las 504 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $7 }' | sort | uniq -c`, 2026-08-04):
+Recomputado sobre las 505 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ { print $7 }' | sort | uniq -c`, 2026-08-04):
 
 | ID    | Dominio                    | Documentos |
 | ----- | -------------------------- | ---------: |
 | `D01` | `product-governance`       |         36 |
 | `D02` | `platform-foundation`      |         22 |
 | `D03` | `identity-security`        |         45 |
-| `D04` | `content-experience`       |        123 |
+| `D04` | `content-experience`       |        124 |
 | `D05` | `destination-discovery`    |         37 |
 | `D06` | `marketplace-commerce`     |         25 |
 | `D07` | `provider-operations`      |         24 |
@@ -110,9 +110,9 @@ Recomputado sobre las 504 filas actualmente adjudicadas (`awk -F '|' '/^\| \[/ {
 | `D12` | `engagement-notifications` |         14 |
 | `D13` | `media-delivery`           |         30 |
 | `D14` | `growth-reliability`       |         21 |
-|       | **Total adjudicado**       |    **504** |
+|       | **Total adjudicado**       |    **505** |
 
-Verificación aritmética: `36+22+45+123+37+25+24+54+29+16+28+14+30+21 = 504`. `20.01` y `18.44` permanecen adjudicados en D01; `18.15`–`18.47` conservan sus adjudicaciones anteriores; y `18.48` queda adjudicado en D04 como Authorization Pack `Approved` de I4-A. No autoriza merge, activación de flags, producción ni I4-B/C/D, P0, P1, L1 o S1.
+Verificación aritmética: `36+22+45+124+37+25+24+54+29+16+28+14+30+21 = 505`. `20.01` y `18.44` permanecen adjudicados en D01; `18.15`–`18.48` conservan sus adjudicaciones anteriores; y `18.49` queda adjudicado en D04 como Authorization Pack `Approved` de I4-B. No autoriza producción, activación de flags ni fases posteriores a I4.
 
 La asignación primaria expresa accountability documental. Las dependencias e impactos transversales se modelarán como aristas en `07`; no crean owners múltiples en este índice.
 
@@ -627,22 +627,23 @@ La asignación primaria expresa accountability documental. Las dependencias e im
 | [`docs/blueprint/18.46-OMXDS-V1-I4-0-SHARED-EDITORIAL-BUILDER-CONTRACT-AUTHORIZATION-PACK-v1.0.md`](../blueprint/18.46-OMXDS-V1-I4-0-SHARED-EDITORIAL-BUILDER-CONTRACT-AUTHORIZATION-PACK-v1.0.md) | 18.46 · OMXDS V1 · I4-0 Shared Editorial Builder Contract · Authorization Pack v1.0 | `1.0`|`Approved`| Blueprint · 18.46-omxds-v1-i4-0-shared-editorial-builder-contract-authorization-pack-v1.0 |`D04 · content-experience`|`docs/blueprint/18.45-OMXDS-V1-I4-EDITORIAL-BUILDER-ENABLEMENT-SCOPE-REPORT-v1.0.md`| — |`src/lib/experience-builder/editorial-builder-policy.ts; src/lib/experience-builder/block-contract.ts; scripts/omxds/i4/editorial-builder.contract.test.ts; scripts/omxds/i4/editorial-builder.evidence.mjs; package.json; scripts/governance/validate-full-suite.mjs; docs/governance/product-authorizations/PCA-2026-012.json`| — |`bun run test:i4:0`; `bun run validate:i4:0`; `bun scripts/governance/validate-full-suite.mjs`; `bun run governance:check`; `bun run governance:product-check`| — | Founder approval recorded 2026-08-03 · Autoriza exclusivamente I4-0 sobre`main@69f4767e`: contrato interno puro, allowlists cerradas, `vmx.custom.html` legacy-only y harness positivo/negativo; exactamente 12 rutas, flag vigente OFF y PR borrador sólo con PASS total. Sin consumidores, Studio, Library, renderer, rutas, RPC, schema, migraciones, producción, merge ni I4-A/B/C/D. | 2026-08-03 |
 | [`docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md`](../blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md) | 18.47 · OMXDS V1 · I4-A Contract Reconciliation Addendum v1.0 | `1.0`|`Approved`| Addendum · 18.47-omxds-v1-i4-a-contract-reconciliation-addendum-v1.0 |`D04 · content-experience`|`docs/blueprint/18.45-OMXDS-V1-I4-EDITORIAL-BUILDER-ENABLEMENT-SCOPE-REPORT-v1.0.md; docs/blueprint/18.46-OMXDS-V1-I4-0-SHARED-EDITORIAL-BUILDER-CONTRACT-AUTHORIZATION-PACK-v1.0.md`| — |`Not established`| — |`Self-contained documentary evidence; external operational artifact not established`| — | Founder approval recorded 2026-08-03 · Aprueba formalmente la reconciliación entre policy y catálogo activo sobre`main@aea7f589`: familias runtime, blocks, fields, variantes, superficies, roles, enlaces externos, confinamiento histórico, quince rutas candidatas y definición futura de PCA-2026-013. No autoriza preparar `18.48`, crear la PCA, implementar I4-A, modificar código, migraciones, flags, producción, rama, commit o PR. | 2026-08-03 |
 | [`docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md`](../blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md) | 18.48 · OMXDS V1 · I4-A Authoring Allowlist & Legacy Confinement · Authorization Pack v1.0 | `1.0`|`Approved`| Blueprint · 18.48-omxds-v1-i4-a-authoring-allowlist-legacy-confinement-authorization-pack-v1.0 |`D04 · content-experience`|`docs/blueprint/18.46-OMXDS-V1-I4-0-SHARED-EDITORIAL-BUILDER-CONTRACT-AUTHORIZATION-PACK-v1.0.md; docs/blueprint/18.47-OMXDS-V1-I4-A-CONTRACT-RECONCILIATION-ADDENDUM-v1.0.md`| — |`src/lib/experience-builder/editorial-builder-policy.ts; src/lib/experience-builder/block-registry.ts; src/lib/experience-builder/block-library.ts; src/components/experience-builder/VisualStudio.tsx; src/lib/experience-builder/studio.functions.ts; scripts/omxds/i4/editorial-builder-authoring.test.ts; scripts/omxds/i4/editorial-builder-authoring.evidence.mjs; scripts/omxds/i4/editorial-builder.evidence.mjs; package.json; scripts/governance/validate-full-suite.mjs; docs/governance/product-authorizations/PCA-2026-013.json`| — |`bun run validate:i4:0`; `bun run validate:i4:a`; `bun scripts/governance/validate-full-suite.mjs`; `bun run governance:check`; `bun run governance:product-check`| — | Founder approval and addendum recorded 2026-08-04 · Autoriza exclusivamente I4-A sobre`main@1fe83c8b`: policy reconciliada, cuatro consumidores cerrados, doble validación server-side, Media Registry, enlaces internos y confinamiento histórico; exactamente 16 rutas, flag OFF/fail-closed, un commit y PR borrador sólo con PASS total. Sin renderer, rutas, RPC, schema, migraciones, dependencias, lockfile, merge, producción ni I4-B/C/D, P0, P1, L1 o S1. | 2026-08-04 |
+| [`docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md`](../blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md) | 18.49 · OMXDS V1 · I4-B Workflow & Publication Authority · Authorization Pack v1.0 | `1.0`|`Approved`| Blueprint · 18.49-omxds-v1-i4-b-workflow-publication-authority-pack-v1.0 |`D04 · content-experience`|`docs/blueprint/18.45-OMXDS-V1-I4-EDITORIAL-BUILDER-ENABLEMENT-SCOPE-REPORT-v1.0.md; docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md`| — |`supabase/migrations/20260804233000_omxds_i4b_workflow_publication_authority.sql; src/lib/experience-builder/studio.functions.ts; src/integrations/supabase/types.ts; src/components/experience-builder/VisualStudio.tsx; scripts/omxds/i4/editorial-builder-workflow.test.ts; scripts/omxds/i4/editorial-builder-workflow.evidence.mjs; scripts/omxds/i3/destination-surface.evidence.mjs; scripts/omxds/i3/business-vertical-surfaces.evidence.mjs; scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs; scripts/omxds/i3/business-premium-surface.evidence.mjs; package.json; scripts/governance/validate-full-suite.mjs; docs/governance/product-authorizations/PCA-2026-014.json`|`supabase/migrations/20260804233000_omxds_i4b_workflow_publication_authority.sql`|`bun run validate:i4:b`; `bun scripts/governance/validate-full-suite.mjs`; `bun run governance:check`; `bun run governance:product-check`| — | Founder approval and addendum recorded 2026-08-04 · Autoriza exclusivamente I4-B sobre`main@bb1b17ff`: migración PostgreSQL aditiva mínima, revisión/hash aprobado, separación autor-aprobador, invalidación atómica, publicación/programación exactas, aislamiento y auditoría; exactamente 18 rutas, flag OFF/fail-closed y sin tabla, backfill, datos reales, producción ni fases posteriores a I4. | 2026-08-04 |
 
 ## 5. Criterios objetivos para salir de Draft
 
 | Gate                                  | Estado 2026-07-24                     | Evidencia o pendiente                                                                                                              |
 | ------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Filas adjudicadas                     | 504 sobre 504 del árbol               | Cerrado por v0.33 (autorización e implementación de `18.48`).                                                                      |
+| Filas adjudicadas                     | 505 sobre 505 del árbol               | Cerrado por v0.34 (autorización e implementación de `18.49`).                                                                      |
 | Rutas y artefactos existentes         | Cumplido para referencias conservadas | Las rutas técnicas retenidas resuelven contra el árbol local. La evidencia autocontenida no se presenta como prueba externa.       |
 | Superseded-pass cerrado               | Cumplido                              | 3 `Superseded` con relaciones aprobadas; 0 derivas inesperadas.                                                                    |
 | ADR de dominios aprobado              | Cumplido                              | `ADR-GOV-0001` formaliza los 14 dominios aprobados por el Founder.                                                                 |
-| Dominios primarios asignados          | Cumplido                              | Las 504 filas contienen exactamente un dominio `D01`–`D14`.                                                                        |
+| Dominios primarios asignados          | Cumplido                              | Las 505 filas contienen exactamente un dominio `D01`–`D14`.                                                                        |
 | Base de derivación para `07` definida | Cumplido                              | `07` deberá derivarse desde la última versión de `06` aprobada por el Founder.                                                     |
 | Evidencia reproducible del PR #12     | Cumplido                              | PR #12, head `a832c568…`, merge `2e50745e…`, blob `0d047f02…`; ADR publicada mediante PR #13, merge `497d08e3…`, blob `8153c886…`. |
 | Aprobación Founder de v0.5            | Cumplido                              | El Founder aprobó la propuesta local v0.5; PR #13 fue fusionado en `main`.                                                         |
-| Reconciliación tabla ↔ árbol          | Cumplido                              | Universo reconciliado a **504 = 504** en v0.33; sin brecha operativa.                                                              |
+| Reconciliación tabla ↔ árbol          | Cumplido                              | Universo reconciliado a **505 = 505** en v0.34; sin brecha operativa.                                                              |
 
-El documento permanece **operativamente Approved** para las 504 filas adjudicadas. RV0.2 está `Approved · Closed`; la cohorte 1 de RV0.3 queda definida sólo documentalmente; el gate `20.01` permanece autorizado como control de gobernanza; `18.17`–`18.47` conservan su admisión y `18.48` autoriza exclusivamente I4-A bajo `PCA-2026-013`. Merge, flags activos, producción e I4-B/C/D requieren autorización separada.
+El documento permanece **operativamente Approved** para las 505 filas adjudicadas. RV0.2 está `Approved · Closed`; la cohorte 1 de RV0.3 queda definida sólo documentalmente; el gate `20.01` permanece autorizado como control de gobernanza; `18.17`–`18.48` conservan su admisión y `18.49` autoriza exclusivamente I4-B bajo `PCA-2026-014`. Flags activos, producción y fases posteriores a I4 requieren autorización separada.
 
 ## 6. Control de versiones
 
@@ -682,3 +683,4 @@ El documento permanece **operativamente Approved** para las 504 filas adjudicada
 | v0.31   | 2026-08-03 | Founder | Admite `18.47` en D04 como Draft documental de reconciliación para I4-A sobre `main@aea7f589`: vincula los conceptos I4-0 con familias runtime oficiales, define fields, variantes, fuentes, superficies, roles, enlaces externos, confinamiento histórico, quince rutas candidatas y PCA-2026-013 futura. Universo reconciliado: **503 = 503**. No autoriza código, implementación I4-A, migraciones, dependencias, flags, producción, rama, commit ni PR.                                                                                                                                                                                         |
 | v0.32   | 2026-08-03 | Founder | Promueve `18.47` a `Approved — Founder` exclusivamente como reconciliación contractual para I4-A. Conserva las quince rutas candidatas y la definición futura de PCA-2026-013, pero no autoriza preparar `18.48`, crear la PCA, modificar código, implementar I4-A, migraciones, flags, producción, rama, commit o PR. Universo reconciliado: **503 = 503**.                                                                                                                                                                                                                                                                                        |
 | v0.33   | 2026-08-04 | Founder | Admite `18.48` y `PCA-2026-013` para ejecutar exclusivamente I4-A sobre `main@1fe83c8b`: reconcilia identidades runtime, conecta exactamente Block Registry, Block Library, VisualStudio y `studio.functions.ts`, aplica doble validación server-side, Media Registry, rutas internas y confinamiento histórico. El addendum sustituye 15 por exactamente 16 rutas agregando sólo la evidencia I4-0. Universo reconciliado: **504 = 504**; flag OFF, sin merge, producción ni I4-B/C/D, P0, P1, L1 o S1.                                                                                                                                            |
+| v0.34   | 2026-08-04 | Founder | Admite `18.49` y `PCA-2026-014` para ejecutar exclusivamente I4-B sobre `main@bb1b17ff`: migración PostgreSQL aditiva mínima, autoridad atómica de revisión/hash aprobado, identidad autor-aprobador separada, invalidación tras edición, publicación/programación exactas, aislamiento y auditoría; reconcilia la representación tipada en VisualStudio y cuatro gates históricos I3 sólo para rutas con PCA aprobada. Universo reconciliado: **505 = 505**; exactamente 18 rutas, flag OFF/fail-closed, sin tabla nueva, backfill, datos reales, producción ni fases posteriores a I4. |

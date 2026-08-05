@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.33",
+    "version": "0.34",
     "state": "Approved",
-    "source_sha256": "d37341852b09a7c00219c5b43040a253c9c75e9fb15ec6ee3f28aaf0314730a9",
+    "source_sha256": "1138126a6b42e0cd4ef97f354c5cdfa0e74b8d98871531b3681ba9706d0430c5",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -7222,6 +7222,34 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-013.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-013.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:supabase/migrations/20260804233000_omxds_i4b_workflow_publication_authority.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260804233000_omxds_i4b_workflow_publication_authority.sql"
+    },
+    {
+      "id": "ART:scripts/omxds/i4/editorial-builder-workflow.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/i4/editorial-builder-workflow.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i4/editorial-builder-workflow.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/i4/editorial-builder-workflow.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-014.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-014.json"
     }
   ],
   "edges": [
@@ -18527,6 +18555,123 @@
       "destination": "DOC:docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
       "evidence": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/18.48-OMXDS-V1-I4-A-AUTHORING-ALLOWLIST-LEGACY-CONFINEMENT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:supabase/migrations/20260804233000_omxds_i4b_workflow_publication_authority.sql:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "origin": "ART:supabase/migrations/20260804233000_omxds_i4b_workflow_publication_authority.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/studio.functions.ts:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/studio.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/integrations/supabase/types.ts:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "origin": "ART:src/integrations/supabase/types.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-workflow.test.ts:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-workflow.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-workflow.evidence.mjs:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-workflow.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/validate-full-suite.mjs:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/validate-full-suite.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-014.json:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-014.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/business-vertical-surfaces.evidence.mjs:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-vertical-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/business-premium-surface.evidence.mjs:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-premium-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/experience-builder/VisualStudio.tsx:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "origin": "ART:src/components/experience-builder/VisualStudio.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "verified_at": "2026-08-04"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/destination-surface.evidence.mjs:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/destination-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.49-OMXDS-V1-I4-B-WORKFLOW-PUBLICATION-AUTHORITY-PACK-v1.0.md",
       "verified_at": "2026-08-04"
     }
   ],
