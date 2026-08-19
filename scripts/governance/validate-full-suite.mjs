@@ -21,6 +21,7 @@ const checks = [
   ["I4-B", ["run", "validate:i4:b"]],
   ["I4-C", ["run", "validate:i4:c"]],
   ["I4-R", ["run", "validate:i4:r"]],
+  ["I4-D", ["run", "validate:i4:d"]],
   ["typecheck", ["run", "typecheck"]],
   ["build", ["run", "build"]],
   ["governance projections", ["scripts/governance/sync-governance.mjs", "--check"]],

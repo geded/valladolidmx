@@ -2,14 +2,14 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.36",
+    "version": "0.37",
     "state": "Approved",
-    "source_sha256": "0ab0a006bdbea6d85a68a488becbdbc0e3d25511a615ddbc469112b0e9fc9dee",
+    "source_sha256": "ca65338ac62c9d0ef71fbfa83947bbab822e0383758e54a7f044737795557a21",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-08-06T00:00:00.000Z",
+  "generated_at": "2026-08-19T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -7316,6 +7316,39 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-016.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-016.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:scripts/omxds/i4/editorial-builder-g3.integration.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/i4/editorial-builder-g3.integration.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i4/editorial-builder-g3.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/i4/editorial-builder-g3.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/governance/evidence/omxds-i4-d-g3-integration-closure.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/omxds-i4-d-g3-integration-closure.json"
+    },
+    {
+      "id": "ART:docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md",
+      "type": "artifact",
+      "path": "docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-017.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-017.json"
     }
   ],
   "edges": [
@@ -18964,6 +18997,69 @@
       "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
       "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-g3.integration.test.ts:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-g3.integration.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-g3.evidence.mjs:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-g3.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/validate-full-suite.mjs:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/validate-full-suite.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/omxds-i4-d-g3-integration-closure.json:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/evidence/omxds-i4-d-g3-integration-closure.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-017.json:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-017.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19"
     }
   ],
   "critical_chain_coverage": [

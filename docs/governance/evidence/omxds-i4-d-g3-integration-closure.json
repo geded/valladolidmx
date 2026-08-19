@@ -1,0 +1,10 @@
+{
+  "initiative": "I4-D · G3 Integration & Evidence Closure",
+  "gate": "G3",
+  "status": "BLOCKED",
+  "base": "d02942d07b9fc96e9a39f1faf4bbafb28ec7a5c2",
+  "branch": "feature/omxds-i4-d-g3-integration-evidence-closure-v1",
+  "acceptance_report": "docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md",
+  "reason": "Human acceptance scenarios G3-H01..G3-H12 are pending. validate:i4:d must remain fail-closed until Verdict PASS with Open P0/P1 = 0.",
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"]
+}
