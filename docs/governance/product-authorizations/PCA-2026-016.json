@@ -1,0 +1,43 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-016",
+  "title": "OMXDS V1 · I4-A/B/C Governed Source Reconciliation (Remediation)",
+  "status": "Approved",
+  "branch": "fix/omxds-i4-abc-governed-source-reconciliation-v1",
+  "blueprint": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-06 · Ejecutar exclusivamente la remediación mínima I4-A/B/C sobre main@a987181a51dcfb36f026e96f784c1bd158c7629c: autoría nueva de vmx.experience.info-grid sólo con el binding canónico geography.location, legacy congelado como render histórico, reutilización de getMarketplaceBusinessBySlug/primary_location/BusinessSurfaceProvider, procedencia published obligatoria, preview server-side por page_type y slug persistidos con fail-closed, rollback revalidado antes de eb_restore_revision y publicación/programación sin guardado implícito. Sin migraciones, RPC nuevas, readers nuevos, dependencias, rutas públicas nuevas, flags activos, producción ni despliegue. Addendum Founder 2026-08-18 · incorporar exclusivamente scripts/omxds/i3/destination-surface.evidence.mjs como ruta 23 para sustituir la prohibición histórica absoluta sobre src/lib/experience-builder/preview-registry.tsx por una validación fail-closed que sólo admita esa modificación cuando exista una PCA Approved que la autorice explícitamente. Segundo addendum Founder 2026-08-18 · incorporar exclusivamente scripts/omxds/i3/business-vertical-surfaces.evidence.mjs, scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs y scripts/omxds/i3/business-premium-surface.evidence.mjs como rutas 24-26; sustituir sólo sus prohibiciones históricas absolutas que bloquean src/lib/experience-builder/preview-registry.tsx y, donde aplique, src/lib/catalog/marketplace-reads.functions.ts por validaciones fail-closed de autorización exacta mediante PCA Approved; todas las demás prohibiciones permanecen intactas. Sin ruta 27 ni ampliación de alcance.",
+  "permissions": [
+    { "operation": "modify", "path": "src/lib/catalog/marketplace-reads.functions.ts" },
+    { "operation": "modify", "path": "src/lib/experience-builder/preview-registry.tsx" },
+    { "operation": "modify", "path": "src/lib/experience-builder/editorial-builder-policy.ts" },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/blocks/experience-info-grid/contract.ts"
+    },
+    { "operation": "modify", "path": "src/lib/experience-builder/block-library.ts" },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGridBlock.tsx"
+    },
+    { "operation": "modify", "path": "src/lib/experience-builder/studio.functions.ts" },
+    { "operation": "modify", "path": "src/routes/preview/composition.$token.tsx" },
+    { "operation": "modify", "path": "src/components/experience-builder/VisualStudio.tsx" },
+    { "operation": "modify", "path": "package.json" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:i4:a",
+    "bun run validate:i4:b",
+    "bun run validate:i4:c",
+    "bun run validate:i4:r",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/validate-full-suite.mjs --base=a987181a51dcfb36f026e96f784c1bd158c7629c",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

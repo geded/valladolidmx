@@ -1911,19 +1911,13 @@ const experienceInfoGridBlock: BlockContract = {
   version: "1.0.0",
   display_name: "Experience Info Grid",
   description:
-    "Rejilla de datos clave (horario, ubicación, teléfono, categoría, aforo…) reutilizable.",
+    "Rejilla de datos clave enlazada exclusivamente a la fuente gobernada geography.location (18.51).",
   schema: {
     source: {
       type: "select",
-      label: "Fuente",
-      default: "manual",
-      options: [
-        { value: "manual", label: "Manual" },
-        { value: "business", label: "Ficha empresa (auto)" },
-        { value: "product", label: "Ficha producto (reservado)" },
-        { value: "destination", label: "Destino (reservado)" },
-        { value: "event", label: "Evento (reservado)" },
-      ],
+      label: "Fuente gobernada",
+      default: "geography.location",
+      options: [{ value: "geography.location", label: "Ubicación gobernada (geography.location)" }],
     },
     variant: {
       type: "select",
@@ -1943,31 +1937,6 @@ const experienceInfoGridBlock: BlockContract = {
       default: "Información clave",
       translatable: true,
     },
-    items: {
-      type: "list",
-      label: "Datos",
-      item: {
-        type: "object",
-        label: "Dato",
-        fields: {
-          iconKey: { type: "text", label: "Icono (Lucide key)" },
-          label: { type: "text", label: "Etiqueta", translatable: true },
-          value: { type: "text", label: "Valor", translatable: true },
-          href: { type: "url", label: "Enlace" },
-          tone: {
-            type: "select",
-            label: "Tono",
-            default: "default",
-            options: [
-              { value: "default", label: "Neutro" },
-              { value: "primary", label: "Primario" },
-              { value: "accent", label: "Acentuado" },
-              { value: "warning", label: "Aviso" },
-            ],
-          },
-        },
-      },
-    },
   },
   capabilities: {
     soporta_i18n: true,
@@ -1980,7 +1949,7 @@ const experienceInfoGridBlock: BlockContract = {
     breakpoints: ["desktop", "tablet", "mobile"],
     overridable_fields: ["variant", "columns"],
   },
-  i18n: { translatable_fields: ["heading", "ariaLabel", "items"] },
+  i18n: { translatable_fields: ["heading", "ariaLabel"] },
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 

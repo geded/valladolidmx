@@ -171,8 +171,8 @@ describe("I4-A authoring allowlist and legacy confinement", () => {
     }
   });
 
-  test("keeps governed values frozen while allowing presentation-only edits", () => {
-    const governed = {
+  test("freezes legacy info-grid and admits only the canonical geography.location binding", () => {
+    const legacyGoverned = {
       id: "info-fictitious",
       type: "vmx.experience.info-grid",
       version: "1.0.0",
@@ -183,27 +183,24 @@ describe("I4-A authoring allowlist and legacy confinement", () => {
         items: [{ label: "Horario", value: "Registro ficticio" }],
       },
     };
-    const previous = { root: { children: [governed] } };
+    const previous = { root: { children: [legacyGoverned] } };
+    // 18.51 · El render histórico se conserva sólo byte a byte.
     expect(
       validateEditorialCompositionTree({
-        tree: {
-          root: { children: [{ ...governed, config: { ...governed.config, variant: "list" } }] },
-        },
+        tree: previous,
         previous_tree: previous,
         surface: "business",
         actor: "territorial_editor",
         registered_media_paths: media,
       }).valid,
     ).toBe(true);
+    // Toda edición sobre legacy queda prohibida, incluso presentacional.
     expect(
       validateEditorialCompositionTree({
         tree: {
           root: {
             children: [
-              {
-                ...governed,
-                config: { ...governed.config, items: [{ label: "Horario", value: "Manual" }] },
-              },
+              { ...legacyGoverned, config: { ...legacyGoverned.config, variant: "list" } },
             ],
           },
         },
@@ -213,5 +210,51 @@ describe("I4-A authoring allowlist and legacy confinement", () => {
         registered_media_paths: media,
       }).valid,
     ).toBe(false);
+    // Legacy no se duplica ni se convierte en plantilla.
+    for (const operation of ["duplicate", "template_new"] as const)
+      expect(
+        validateEditorialCompositionTree({
+          tree: previous,
+          previous_tree: previous,
+          surface: "business",
+          actor: "territorial_editor",
+          operation,
+          registered_media_paths: media,
+        }).valid,
+      ).toBe(false);
+  });
+
+  test("admits new info-grid authoring only through geography.location without client items", () => {
+    const governedNew = {
+      id: "info-governed",
+      type: "vmx.experience.info-grid",
+      version: "1.0.0",
+      config: {
+        variant: "cards",
+        heading: "Información clave",
+        source: "geography.location",
+        items: [],
+      },
+    };
+    expect(
+      validateEditorialCompositionTree({
+        tree: { root: { children: [governedNew] } },
+        surface: "business",
+        actor: "territorial_editor",
+        registered_media_paths: media,
+      }).valid,
+    ).toBe(true);
+    for (const forbidden of [
+      { ...governedNew.config, source: "manual" },
+      { ...governedNew.config, items: [{ label: "Horario", value: "Escrito por el cliente" }] },
+    ])
+      expect(
+        validateEditorialCompositionTree({
+          tree: { root: { children: [{ ...governedNew, config: forbidden }] } },
+          surface: "business",
+          actor: "territorial_editor",
+          registered_media_paths: media,
+        }).valid,
+      ).toBe(false);
   });
 });

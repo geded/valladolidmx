@@ -1,14 +1,22 @@
 /**
  * H-03 · Ola I1.c — `vmx.experience.info-grid` (Capa 3: Comportamiento).
+ *
+ * I4-A/B/C · Governed Source Reconciliation (18.51): la autoría nueva
+ * consume exclusivamente el binding canónico `geography.location`
+ * resuelto desde `BusinessSurfaceProvider` con procedencia `published`.
+ * Las configuraciones legacy se renderizan congeladas tal cual fueron
+ * persistidas. Sin fuente gobernada válida se muestra un estado
+ * explícito fail-closed; nunca un fallback ficticio.
  */
 import { useContext, useMemo } from "react";
 import { ExperienceInfoGrid } from "./ExperienceInfoGrid";
 import {
   buildExperienceInfoGridPreviewDTO,
+  buildGovernedLocationItems,
   experienceInfoGridConfigSchema,
+  isLegacyExperienceInfoGridConfig,
   type ExperienceInfoGridConfig,
   type ExperienceInfoGridDTO,
-  type ExperienceInfoItem,
 } from "@/lib/experience-builder/blocks/experience-info-grid/contract";
 import { BusinessSurfaceContext } from "@/components/surfaces/BusinessSurface";
 
@@ -17,31 +25,11 @@ function safeParse(raw: unknown): ExperienceInfoGridConfig {
   return r.success ? r.data : experienceInfoGridConfigSchema.parse({});
 }
 
-function humanize(s?: string | null) {
-  return (s ?? "")
-    .split("-")
-    .filter(Boolean)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-}
-
-function buildDTO(cfg: ExperienceInfoGridConfig, business: React.ContextType<typeof BusinessSurfaceContext>): ExperienceInfoGridDTO {
-  let items: ExperienceInfoItem[] = cfg.items;
-  if (cfg.source === "business" && business && items.length === 0) {
-    const derived: ExperienceInfoItem[] = [];
-    if (business.destination_slug)
-      derived.push({ iconKey: "map-pin", label: "Destino", value: humanize(business.destination_slug), tone: "default" });
-    if (business.category_slug)
-      derived.push({ iconKey: "tag", label: "Categoría", value: humanize(business.category_slug), tone: "default" });
-    if (business.verified)
-      derived.push({ iconKey: "star", label: "Estatus", value: "Verificado", tone: "primary" });
-    items = derived;
-  }
+function baseDTO(cfg: ExperienceInfoGridConfig): Omit<ExperienceInfoGridDTO, "items" | "provenance"> {
   return {
     variant: cfg.variant,
     heading: cfg.heading?.trim() || null,
     columns: cfg.columns,
-    items,
     ariaLabel: cfg.ariaLabel,
     capabilities: {
       copyable: cfg.capabilities.copyable ?? false,
@@ -51,14 +39,46 @@ function buildDTO(cfg: ExperienceInfoGridConfig, business: React.ContextType<typ
   };
 }
 
-export interface ExperienceInfoGridBlockProps { config?: unknown }
+function GovernedSourceUnavailable({ reason }: { reason: string }) {
+  return (
+    <section
+      data-eb-block="experience-info-grid"
+      data-eb-state="governed-source-unavailable"
+      aria-label="Información clave no disponible"
+      className="w-full rounded-lg border border-dashed border-border bg-muted/40 p-4"
+    >
+      <p className="text-sm font-medium text-foreground">Información clave no disponible</p>
+      <p className="mt-1 text-xs text-muted-foreground">{reason}</p>
+    </section>
+  );
+}
+
+export interface ExperienceInfoGridBlockProps {
+  config?: unknown;
+}
 
 export function ExperienceInfoGridBlock({ config }: ExperienceInfoGridBlockProps) {
   const cfg = safeParse(config);
+  const legacy = isLegacyExperienceInfoGridConfig(config ?? {});
   const business = useContext(BusinessSurfaceContext);
-  const dto = useMemo(() => buildDTO(cfg, business), [cfg, business]);
-  if (dto.items.length === 0) return <ExperienceInfoGrid dto={buildExperienceInfoGridPreviewDTO()} />;
-  return <ExperienceInfoGrid dto={dto} />;
+  const governedItems = useMemo(() => buildGovernedLocationItems(business), [business]);
+
+  if (legacy) {
+    if (cfg.items.length === 0) {
+      return (
+        <GovernedSourceUnavailable reason="Configuración histórica sin datos persistidos. Render congelado, sin nueva autoría." />
+      );
+    }
+    return <ExperienceInfoGrid dto={{ ...baseDTO(cfg), items: cfg.items, provenance: "legacy_frozen" }} />;
+  }
+
+  if (!governedItems) {
+    return (
+      <GovernedSourceUnavailable reason="La fuente gobernada geography.location no resolvió una ubicación publicada con coordenadas reales." />
+    );
+  }
+
+  return <ExperienceInfoGrid dto={{ ...baseDTO(cfg), items: governedItems, provenance: "published" }} />;
 }
 
 export function ExperienceInfoGridPreview() {

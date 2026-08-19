@@ -20,6 +20,13 @@ import type { CompositionNode, CompositionTree } from "./composition-tree";
 import { EMPTY_TREE } from "./composition-tree";
 import { translateTreeBestEffort } from "./translate.functions";
 import {
+  getMarketplaceBusinessBySlug,
+  type MarketplaceBusinessDetail,
+} from "@/lib/catalog/marketplace-reads.functions";
+import { buildGovernedLocationItems } from "./blocks/experience-info-grid/contract";
+import {
+  INFO_GRID_TYPE,
+  isLegacyInfoGridConfig,
   collectEditorialMediaPaths,
   resolveEditorialActor,
   resolveEditorialSurface,
@@ -155,6 +162,75 @@ async function loadRegisteredMediaPaths(
     .is("deleted_at", null);
   if (error) throw new Error(`i4_media_registry_failed: ${error.message}`);
   return new Set<string>((data ?? []).map((row: { storage_path: string }) => row.storage_path));
+}
+
+/* ------------------------------------------------------------------ *
+ * I4-A/B/C · Governed Source Reconciliation (18.51)
+ *
+ * El binding gobernado `geography.location` se resuelve SIEMPRE en el
+ * servidor a partir de `page_type` y `slug` persistidos. El cliente no
+ * puede aportar identidad ni valores gobernados, y sin fuente válida
+ * el flujo falla en cerrado, nunca con datos ficticios.
+ * ------------------------------------------------------------------ */
+
+function walkNodes(nodes: readonly CompositionNode[] | undefined): CompositionNode[] {
+  const output: CompositionNode[] = [];
+  for (const node of nodes ?? []) {
+    output.push(node);
+    output.push(...walkNodes((node as { children?: CompositionNode[] }).children));
+  }
+  return output;
+}
+
+/** `true` si el árbol contiene autoría gobernada nueva de info-grid. */
+export function treeRequiresGovernedLocation(tree: CompositionTree | null | undefined): boolean {
+  return walkNodes(tree?.root?.children).some(
+    (node) =>
+      node.type === INFO_GRID_TYPE &&
+      !isLegacyInfoGridConfig((node.config ?? {}) as Record<string, unknown>),
+  );
+}
+
+export interface GovernedLocationResolution {
+  ok: boolean;
+  reason: string | null;
+  business: MarketplaceBusinessDetail | null;
+}
+
+/**
+ * Resuelve `geography.location` desde la fuente publicada oficial.
+ * Reutiliza `getMarketplaceBusinessBySlug`; no crea readers nuevos.
+ */
+export async function resolveGovernedLocationSource(input: {
+  pageType: string;
+  slug: string;
+}): Promise<GovernedLocationResolution> {
+  const surface = resolveEditorialSurface(input.pageType);
+  if (surface !== "business")
+    return {
+      ok: false,
+      reason: `governed_source_unavailable: page_type "${input.pageType}" has no governed geography.location surface`,
+      business: null,
+    };
+  let business: MarketplaceBusinessDetail | null = null;
+  try {
+    business = await getMarketplaceBusinessBySlug({ data: { slug: input.slug } });
+  } catch {
+    business = null;
+  }
+  if (!business || business.provenance !== "published")
+    return {
+      ok: false,
+      reason: `governed_source_unavailable: no published business resolves slug "${input.slug}"`,
+      business: null,
+    };
+  if (!buildGovernedLocationItems(business))
+    return {
+      ok: false,
+      reason: `governed_source_unavailable: published business "${input.slug}" has no governed location`,
+      business: null,
+    };
+  return { ok: true, reason: null, business };
 }
 
 async function assertI4AuthoringTree(input: {
@@ -305,7 +381,7 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
     async ({ data, context }): Promise<{ ok: true; draft_hash: string; draft_version: number }> => {
       const { data: existingRow } = await context.supabase
         .from("page_compositions")
-        .select("current_draft, page_type, draft_hash")
+        .select("current_draft, page_type, slug, draft_hash")
         .eq("id", data.id)
         .maybeSingle();
       if (!existingRow) throw new Error("i4_authoring_rejected: composition not found");
@@ -449,7 +525,7 @@ export const restoreCompositionRevision = createServerFn({ method: "POST" })
       if (!rev?.snapshot) throw new Error("revision not found for composition");
       const { data: existingRow } = await context.supabase
         .from("page_compositions")
-        .select("current_draft, page_type, draft_hash")
+        .select("current_draft, page_type, slug, draft_hash")
         .eq("id", data.id)
         .maybeSingle();
       if (!existingRow) throw new Error("i4_authoring_rejected: composition not found");
@@ -463,12 +539,23 @@ export const restoreCompositionRevision = createServerFn({ method: "POST" })
           "draft_conflict: El borrador cambió desde que lo abriste. Recarga antes de restaurar.",
         );
       }
+      const snapshotTree = rev.snapshot as unknown as CompositionTree;
       await assertI4AuthoringTree({
         context,
-        tree: rev.snapshot as unknown as CompositionTree,
+        tree: snapshotTree,
         previousTree,
         pageType: String(existingRow.page_type),
       });
+      // 18.51 · El rollback revalida `geography.location` ANTES de la RPC.
+      // Si la fuente gobernada no resuelve, se rechaza sin tocar la base.
+      if (treeRequiresGovernedLocation(snapshotTree)) {
+        const governed = await resolveGovernedLocationSource({
+          pageType: String(existingRow.page_type),
+          slug: String((existingRow as { slug: string }).slug),
+        });
+        if (!governed.ok)
+          throw new Error(`i4_rollback_rejected: ${governed.reason ?? "governed_source_unavailable"}`);
+      }
       const { data: result, error } = await context.supabase.rpc("eb_restore_revision", {
         _id: data.id,
         _revision_id: data.revision_id,
@@ -653,6 +740,21 @@ export interface CompositionPreviewPayload {
   slug: string;
   expires_at: string;
   snapshot_hash: string;
+  /**
+   * 18.51 · Fuente gobernada resuelta server-side a partir de
+   * `page_type` y `slug` persistidos. `null` cuando no resuelve: la
+   * vista previa debe fallar en cerrado, jamás inventar datos.
+   */
+  governed_source: {
+    kind: "business";
+    slug: string;
+    provenance: "published";
+    business: MarketplaceBusinessDetail;
+  } | null;
+  /** Motivo explícito cuando el binding gobernado no resuelve. */
+  governed_source_error: string | null;
+  /** `true` si el árbol contiene autoría gobernada que exige fuente. */
+  requires_governed_source: boolean;
 }
 
 /**
@@ -685,13 +787,35 @@ export const resolveCompositionPreview = createServerFn({ method: "GET" })
     if (compErr) throw new Error(compErr.message);
     if (!comp) return null;
 
+    const previewTree = (tok.snapshot as unknown as CompositionTree) ?? EMPTY_TREE;
+    const requiresGoverned = treeRequiresGovernedLocation(previewTree);
+    let governed: CompositionPreviewPayload["governed_source"] = null;
+    let governedError: string | null = null;
+    if (requiresGoverned) {
+      const resolution = await resolveGovernedLocationSource({
+        pageType: String(comp.page_type),
+        slug: String(comp.slug),
+      });
+      if (resolution.ok && resolution.business)
+        governed = {
+          kind: "business",
+          slug: String(comp.slug),
+          provenance: "published",
+          business: resolution.business,
+        };
+      else governedError = resolution.reason ?? "governed_source_unavailable";
+    }
+
     return {
-      tree: (tok.snapshot as unknown as CompositionTree) ?? EMPTY_TREE,
+      tree: previewTree,
       title: comp.title,
       page_type: comp.page_type,
       slug: comp.slug,
       expires_at: tok.expires_at,
       snapshot_hash: tok.snapshot_hash,
+      governed_source: governed,
+      governed_source_error: governedError,
+      requires_governed_source: requiresGoverned,
     };
   });
 /**

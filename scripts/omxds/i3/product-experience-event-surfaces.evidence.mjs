@@ -180,12 +180,26 @@ assert.match(i3bEvidence, /I3-B regression/);
 assert.match(i3bEvidence, /authorizedRouteConsumers/);
 assert.doesNotMatch(i3bEvidence, /deepEqual\(flagConsumers/);
 
+for (const pcaGovernedPath of [
+  "src/lib/experience-builder/preview-registry.tsx",
+  "src/lib/catalog/marketplace-reads.functions.ts",
+]) {
+  const pcaGovernedChange = execFileSync(
+    "git",
+    ["diff", "--name-only", base, "--", pcaGovernedPath],
+    { encoding: "utf8" },
+  );
+  if (pcaGovernedChange)
+    assert.ok(
+      authorizedChangedPaths.has(pcaGovernedPath),
+      `post-I3-C change lacks Approved PCA: ${pcaGovernedPath}`,
+    );
+}
+
 for (const forbiddenPath of [
   "src/lib/discovery/seo.ts",
   "src/lib/experience-builder/page-kind-registry.ts",
-  "src/lib/experience-builder/preview-registry.tsx",
   "src/lib/experience-builder/composition-renderer.tsx",
-  "src/lib/catalog/marketplace-reads.functions.ts",
   "src/lib/catalog/product-related.functions.ts",
   "src/lib/events/public-reads.functions.ts",
 ])

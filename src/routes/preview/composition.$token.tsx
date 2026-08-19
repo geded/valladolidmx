@@ -13,6 +13,7 @@ import {
   type CompositionPreviewPayload,
 } from "@/lib/experience-builder/studio.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import { BusinessSurfaceProvider } from "@/components/surfaces/BusinessSurface";
 import { buildDemoContext } from "@/lib/experience-builder/dynamic-variables";
 import { buildPublicHead } from "@/lib/discovery/seo";
 
@@ -63,13 +64,41 @@ function PreviewCompositionView() {
     timeZone: "America/Merida",
     timeZoneName: "short",
   }).format(new Date(payload.expires_at));
+  // 18.51 · La identidad y los valores gobernados los resuelve el
+  // servidor desde `page_type` y `slug` persistidos. Sin fuente válida
+  // la vista previa falla en cerrado, nunca con datos ficticios.
+  if (payload.requires_governed_source && !payload.governed_source) {
+    return (
+      <div className="mx-auto max-w-xl p-8 text-center">
+        <h1 className="text-xl font-semibold">Fuente gobernada no disponible</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Esta composición usa el binding gobernado <code>geography.location</code> y no resolvió
+          una fuente publicada para <code>{payload.slug}</code>.
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {payload.governed_source_error ?? "governed_source_unavailable"}
+        </p>
+      </div>
+    );
+  }
+
+  const rendered = (
+    <CompositionRenderer tree={payload.tree} variableContext={buildDemoContext()} />
+  );
   return (
     <div className="min-h-screen">
       <div className="border-b border-amber-300/60 bg-amber-50 px-4 py-2 text-center text-xs text-amber-900">
         Vista previa del borrador · {payload.title} — enlace caduca el {expiresLabel}{" "}
         (America/Merida). Snapshot {payload.snapshot_hash.slice(0, 12)}…. No indexable.
+        {payload.governed_source ? " Fuente gobernada: publicada." : ""}
       </div>
-      <CompositionRenderer tree={payload.tree} variableContext={buildDemoContext()} />
+      {payload.governed_source ? (
+        <BusinessSurfaceProvider business={payload.governed_source.business}>
+          {rendered}
+        </BusinessSurfaceProvider>
+      ) : (
+        rendered
+      )}
     </div>
   );
 }

@@ -394,12 +394,7 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       mode: "governed_read_only",
       family: "operations",
       variants: ["cards", "list", "inline"],
-      allowed_sources: [
-        "operations.schedule",
-        "geography.location",
-        "commerce.price",
-        "commerce.availability",
-      ],
+      allowed_sources: ["geography.location"],
       surfaces: ["destination", "business", "product"],
       authoring_roles: ["founder_admin", "territorial_editor"],
       fields: [
@@ -408,7 +403,7 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           field: "items",
           class: "governed",
           type: "reference",
-          source_id: "operations.schedule",
+          source_id: "geography.location",
           writable_by: [],
         },
         {
@@ -980,6 +975,31 @@ export function collectEditorialMediaPaths(tree: EditorialCompositionTree): stri
   return [...paths].sort();
 }
 
+/**
+ * I4-A/B/C · Governed Source Reconciliation (18.51).
+ * `vmx.experience.info-grid` sólo admite autoría nueva mediante el
+ * binding canónico `geography.location`; `source: "manual"` y los
+ * `items` escritos por el cliente quedan confinados a render histórico.
+ */
+export const INFO_GRID_TYPE = "vmx.experience.info-grid";
+export const INFO_GRID_CANONICAL_SOURCE: GovernedSourceId = "geography.location";
+
+export function isLegacyInfoGridConfig(config: Record<string, unknown>): boolean {
+  const items = config.items;
+  if (Array.isArray(items) && items.length > 0) return true;
+  return config.source !== INFO_GRID_CANONICAL_SOURCE;
+}
+
+function isCanonicalInfoGridBinding(
+  type: string,
+  key: string,
+  config: Record<string, unknown>,
+): boolean {
+  if (type !== INFO_GRID_TYPE) return false;
+  if (key === "source") return config.source === INFO_GRID_CANONICAL_SOURCE;
+  return Array.isArray(config.items) && config.items.length === 0;
+}
+
 export function validateEditorialCompositionTree(
   input: EditorialTreeValidationInput,
 ): EditorialPolicyValidation {
@@ -1047,6 +1067,7 @@ export function validateEditorialCompositionTree(
     if (block.mode === "governed_read_only") {
       for (const key of ["items", "source"]) {
         if (!(key in node.config)) continue;
+        if (isCanonicalInfoGridBinding(node.type, key, node.config)) continue;
         if (
           !old ||
           canonicalizePolicyValue(old.node.config[key]) !==
@@ -1054,6 +1075,19 @@ export function validateEditorialCompositionTree(
         )
           errors.push(`${node.type}.${key}: governed value cannot be authored manually`);
       }
+    }
+    if (node.type === INFO_GRID_TYPE && isLegacyInfoGridConfig(node.config)) {
+      const frozenInPlace =
+        Boolean(old) &&
+        old!.path === path &&
+        canonicalizePolicyValue(withoutChildren(old!.node)) ===
+          canonicalizePolicyValue(withoutChildren(node));
+      if (!frozenInPlace)
+        errors.push(
+          `${node.type}: legacy configuration is frozen render-only; new authoring requires the ${INFO_GRID_CANONICAL_SOURCE} binding`,
+        );
+      if (operation === "duplicate" || operation === "template_new")
+        errors.push(`${node.type}: legacy configuration cannot be duplicated, reused or templated`);
     }
     visitStrings(node.config, (value, key) => {
       if (unsafeMarkup.test(value) || externalUrl.test(value))
