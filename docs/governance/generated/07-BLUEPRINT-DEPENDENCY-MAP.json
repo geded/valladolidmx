@@ -2,14 +2,14 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.35",
+    "version": "0.36",
     "state": "Approved",
-    "source_sha256": "9b545b41949b1a7da1f41c67b40191d9cfd83c6953d9068cc36c207686ee1e71",
+    "source_sha256": "0ab0a006bdbea6d85a68a488becbdbc0e3d25511a615ddbc469112b0e9fc9dee",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-08-05T00:00:00.000Z",
+  "generated_at": "2026-08-06T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -7278,6 +7278,44 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-015.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-015.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/catalog/marketplace-reads.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/catalog/marketplace-reads.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/experience-builder/blocks/experience-info-grid/contract.ts",
+      "type": "artifact",
+      "path": "src/lib/experience-builder/blocks/experience-info-grid/contract.ts"
+    },
+    {
+      "id": "ART:src/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGridBlock.tsx",
+      "type": "artifact",
+      "path": "src/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGridBlock.tsx"
+    },
+    {
+      "id": "ART:scripts/omxds/i4/editorial-builder-reconciliation.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/i4/editorial-builder-reconciliation.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i4/editorial-builder-reconciliation.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/i4/editorial-builder-reconciliation.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-016.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-016.json"
     }
   ],
   "edges": [
@@ -18800,6 +18838,132 @@
       "evidence": "docs/blueprint/18.50-OMXDS-V1-I4-C-PREVIEW-CONCURRENCY-AUDIT-ROLLBACK-AUTHORIZATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/18.50-OMXDS-V1-I4-C-PREVIEW-CONCURRENCY-AUDIT-ROLLBACK-AUTHORIZATION-PACK-v1.0.md",
       "verified_at": "2026-08-05"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/catalog/marketplace-reads.functions.ts:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/catalog/marketplace-reads.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/preview-registry.tsx:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/preview-registry.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/editorial-builder-policy.ts:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/editorial-builder-policy.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/blocks/experience-info-grid/contract.ts:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/blocks/experience-info-grid/contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/block-library.ts:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/block-library.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGridBlock.tsx:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGridBlock.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/studio.functions.ts:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/studio.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/preview/composition.$token.tsx:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/routes/preview/composition.$token.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/experience-builder/VisualStudio.tsx:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/components/experience-builder/VisualStudio.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-reconciliation.test.ts:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-reconciliation.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-reconciliation.evidence.mjs:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-reconciliation.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/governance/validate-full-suite.mjs:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/validate-full-suite.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-016.json:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-016.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-06"
     }
   ],
   "critical_chain_coverage": [

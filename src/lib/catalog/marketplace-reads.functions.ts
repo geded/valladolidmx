@@ -99,6 +99,12 @@ export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
     latitude: number | null;
     longitude: number | null;
   } | null;
+  /**
+   * I4-A/B/C · Governed Source Reconciliation (18.51). Distingue el
+   * dato publicado real del dato demo del Studio. Sólo `published`
+   * puede alimentar el binding gobernado `geography.location`.
+   */
+  provenance?: "published" | "demo";
 }
 
 export interface MarketplaceSearchHit {
@@ -173,11 +179,7 @@ export interface ProductReviewItem {
   language: string | null;
   visit_type: string | null;
   verified_source:
-    | "verified_purchase"
-    | "managed_visit"
-    | "verified_visit"
-    | "declared_visitor"
-    | null;
+    "verified_purchase" | "managed_visit" | "verified_visit" | "declared_visitor" | null;
   business_response: string | null;
   business_response_at: string | null;
 }
@@ -305,7 +307,9 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         .limit(1),
       supabase
         .from("promotions")
-        .select("id, slug, title, description, discount_percent, starts_at, ends_at, status, deleted_at")
+        .select(
+          "id, slug, title, description, discount_percent, starts_at, ends_at, status, deleted_at",
+        )
         .eq("business_id", businessId)
         .eq("status", "published")
         .is("deleted_at", null)
@@ -313,7 +317,9 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         .limit(6),
       supabase
         .from("reviews")
-        .select("id, author_display_name, rating, title, body, published_at, language, visit_type, verified_source, business_response, business_response_at, status, deleted_at, subject_kind, subject_id")
+        .select(
+          "id, author_display_name, rating, title, body, published_at, language, visit_type, verified_source, business_response, business_response_at, status, deleted_at, subject_kind, subject_id",
+        )
         .eq("subject_kind", "product")
         .eq("subject_id", prod.id)
         .eq("status", "published")
@@ -322,7 +328,9 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         .limit(20),
       supabase
         .from("faqs")
-        .select("id, question, answer, position, status, deleted_at, entity_kind, entity_id, locale")
+        .select(
+          "id, question, answer, position, status, deleted_at, entity_kind, entity_id, locale",
+        )
         .eq("entity_kind", "product")
         .eq("entity_id", prod.id)
         .eq("status", "published")
@@ -448,13 +456,15 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         }
       : null;
 
-    const locRow = ((locations ?? []) as Array<{
-      label: string | null;
-      address_line1: string | null;
-      address_line2: string | null;
-      latitude: number | string | null;
-      longitude: number | string | null;
-    }>)[0];
+    const locRow = (
+      (locations ?? []) as Array<{
+        label: string | null;
+        address_line1: string | null;
+        address_line2: string | null;
+        latitude: number | string | null;
+        longitude: number | string | null;
+      }>
+    )[0];
     const primaryLocation = locRow
       ? {
           label: locRow.label,
@@ -465,26 +475,27 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         }
       : null;
 
-    const related: MarketplaceProductCard[] = ((relatedRows ?? []) as Array<Record<string, unknown>>).map(
-      (p) => ({
-        id: String(p.id),
-        slug: String(p.slug),
-        name: String(p.name),
-        tagline: (p.tagline as string) ?? "",
-        product_type: String(p.product_type),
-        price_amount: p.price_amount !== null && p.price_amount !== undefined ? Number(p.price_amount) : null,
-        price_currency: String(p.price_currency ?? "MXN"),
-        business_slug: biz.slug,
-        business_name: biz.display_name,
-        conversion_mode: String(p.conversion_mode ?? "informacion"),
-        primary_action_label: (p.primary_action_label as string | null) ?? null,
-        secondary_action_mode: (p.secondary_action_mode as string | null) ?? null,
-        secondary_action_label: (p.secondary_action_label as string | null) ?? null,
-        accepts_online_payment: Boolean(p.accepts_online_payment),
-        requires_availability: Boolean(p.requires_availability),
-        visibility_level: String(p.visibility_level ?? "standard"),
-      }),
-    );
+    const related: MarketplaceProductCard[] = (
+      (relatedRows ?? []) as Array<Record<string, unknown>>
+    ).map((p) => ({
+      id: String(p.id),
+      slug: String(p.slug),
+      name: String(p.name),
+      tagline: (p.tagline as string) ?? "",
+      product_type: String(p.product_type),
+      price_amount:
+        p.price_amount !== null && p.price_amount !== undefined ? Number(p.price_amount) : null,
+      price_currency: String(p.price_currency ?? "MXN"),
+      business_slug: biz.slug,
+      business_name: biz.display_name,
+      conversion_mode: String(p.conversion_mode ?? "informacion"),
+      primary_action_label: (p.primary_action_label as string | null) ?? null,
+      secondary_action_mode: (p.secondary_action_mode as string | null) ?? null,
+      secondary_action_label: (p.secondary_action_label as string | null) ?? null,
+      accepts_online_payment: Boolean(p.accepts_online_payment),
+      requires_availability: Boolean(p.requires_availability),
+      visibility_level: String(p.visibility_level ?? "standard"),
+    }));
 
     return {
       id: prod.id,
@@ -496,9 +507,12 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
       price_amount: prod.price_amount !== null ? Number(prod.price_amount) : null,
       price_currency: String(prod.price_currency ?? "MXN"),
       conversion_mode: String((prod as Record<string, unknown>).conversion_mode ?? "informacion"),
-      primary_action_label: ((prod as Record<string, unknown>).primary_action_label as string | null) ?? null,
-      secondary_action_mode: ((prod as Record<string, unknown>).secondary_action_mode as string | null) ?? null,
-      secondary_action_label: ((prod as Record<string, unknown>).secondary_action_label as string | null) ?? null,
+      primary_action_label:
+        ((prod as Record<string, unknown>).primary_action_label as string | null) ?? null,
+      secondary_action_mode:
+        ((prod as Record<string, unknown>).secondary_action_mode as string | null) ?? null,
+      secondary_action_label:
+        ((prod as Record<string, unknown>).secondary_action_label as string | null) ?? null,
       accepts_online_payment: Boolean((prod as Record<string, unknown>).accepts_online_payment),
       requires_availability: Boolean((prod as Record<string, unknown>).requires_availability),
       visibility_level: String((prod as Record<string, unknown>).visibility_level ?? "standard"),
@@ -539,8 +553,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
           published_at: (row.published_at as string | null) ?? null,
           language: (row.language as string | null) ?? null,
           visit_type: (row.visit_type as string | null) ?? null,
-          verified_source:
-            (row.verified_source as ProductReviewItem["verified_source"]) ?? null,
+          verified_source: (row.verified_source as ProductReviewItem["verified_source"]) ?? null,
           business_response: (row.business_response as string | null) ?? null,
           business_response_at: (row.business_response_at as string | null) ?? null,
         } satisfies ProductReviewItem;
@@ -604,8 +617,10 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
     const rows: MarketplaceBusinessCard[] = (data ?? []).map((row) => {
       const dest = (row.destinations as { slug?: unknown } | null)?.slug;
       const cat = (row.business_categories as { slug?: unknown } | null)?.slug;
-      const locs = ((row as { business_locations?: Array<Record<string, unknown>> | null }).business_locations ?? [])
-        .filter((l) => (l as { deleted_at?: unknown }).deleted_at == null);
+      const locs = (
+        (row as { business_locations?: Array<Record<string, unknown>> | null })
+          .business_locations ?? []
+      ).filter((l) => (l as { deleted_at?: unknown }).deleted_at == null);
       const primary =
         locs.find((l) => (l as { is_primary?: unknown }).is_primary === true) ?? locs[0] ?? null;
       const rawLat = primary ? (primary as { latitude?: unknown }).latitude : null;
@@ -630,7 +645,9 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
       const ids = rows.map((r) => r.id);
       const { data: viz } = await supabase
         .from("business_effective_visibility")
-        .select("business_id, plan_slug, plan_name, badge_variant, levers, base_price_mxn, is_default")
+        .select(
+          "business_id, plan_slug, plan_name, badge_variant, levers, base_price_mxn, is_default",
+        )
         .in("business_id", ids);
       const byId = new Map<string, Record<string, unknown>>();
       for (const r of viz ?? []) {
@@ -697,7 +714,12 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
  */
 export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
   .inputValidator((input: { slug: string }) => {
-    if (!input || typeof input.slug !== "string" || input.slug.length === 0 || input.slug.length > 200) {
+    if (
+      !input ||
+      typeof input.slug !== "string" ||
+      input.slug.length === 0 ||
+      input.slug.length > 200
+    ) {
       throw new Error("invalid_slug");
     }
     return { slug: input.slug };
@@ -716,24 +738,38 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
     if (error) throw new Error(`marketplace_business_failed: ${error.message}`);
     if (!biz) return null;
 
-    const [{ data: products, error: pErr }, { data: promos, error: prErr }] = await Promise.all([
-      supabase
-        .from("products")
-        .select("id, slug, name, tagline, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level")
-        .eq("business_id", biz.id)
-        .eq("status", "published")
-        .is("deleted_at", null)
-        .order("name", { ascending: true })
-        .limit(48),
-      supabase
-        .from("promotions")
-        .select("id, slug, title, description, discount_percent, starts_at, ends_at, status, deleted_at")
-        .eq("business_id", biz.id)
-        .eq("status", "published")
-        .is("deleted_at", null)
-        .order("ends_at", { ascending: true, nullsFirst: false })
-        .limit(24),
-    ]);
+    const [{ data: products, error: pErr }, { data: promos, error: prErr }, { data: locations }] =
+      await Promise.all([
+        supabase
+          .from("products")
+          .select(
+            "id, slug, name, tagline, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level",
+          )
+          .eq("business_id", biz.id)
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .order("name", { ascending: true })
+          .limit(48),
+        supabase
+          .from("promotions")
+          .select(
+            "id, slug, title, description, discount_percent, starts_at, ends_at, status, deleted_at",
+          )
+          .eq("business_id", biz.id)
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .order("ends_at", { ascending: true, nullsFirst: false })
+          .limit(24),
+        supabase
+          .from("business_locations")
+          .select(
+            "label, address_line1, address_line2, latitude, longitude, is_primary, deleted_at",
+          )
+          .eq("business_id", biz.id)
+          .is("deleted_at", null)
+          .order("is_primary", { ascending: false })
+          .limit(1),
+      ]);
     if (pErr) throw new Error(`marketplace_products_failed: ${pErr.message}`);
     if (prErr) throw new Error(`marketplace_promos_failed: ${prErr.message}`);
 
@@ -743,12 +779,34 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       (biz as { metadata?: Record<string, unknown> | null }).metadata ?? null,
     );
 
+    const detailLocationRow = (
+      (locations ?? []) as Array<{
+        label: string | null;
+        address_line1: string | null;
+        address_line2: string | null;
+        latitude: number | string | null;
+        longitude: number | string | null;
+      }>
+    )[0];
+    const detailPrimaryLocation = detailLocationRow
+      ? {
+          label: detailLocationRow.label,
+          address_line1: detailLocationRow.address_line1,
+          address_line2: detailLocationRow.address_line2,
+          latitude: detailLocationRow.latitude !== null ? Number(detailLocationRow.latitude) : null,
+          longitude:
+            detailLocationRow.longitude !== null ? Number(detailLocationRow.longitude) : null,
+        }
+      : null;
+
     return {
       id: biz.id,
       slug: biz.slug,
       display_name: biz.display_name,
       tagline: biz.tagline ?? "",
       description: biz.description ?? "",
+      primary_location: detailPrimaryLocation,
+      provenance: "published",
       verified: Boolean(biz.verified),
       destination_slug: typeof destSlug === "string" ? destSlug : "",
       category_slug: typeof catSlug === "string" ? catSlug : "",
@@ -801,7 +859,8 @@ export const searchMarketplace = createServerFn({ method: "GET" })
       typeof s === "string" && s.length > 0 && s.length <= max ? s : null;
     const clampNum = (n: unknown) =>
       typeof n === "number" && Number.isFinite(n) && n >= 0 && n <= 1_000_000_000 ? n : null;
-    const limit = typeof v.limit === "number" && v.limit > 0 ? Math.min(100, Math.floor(v.limit)) : 24;
+    const limit =
+      typeof v.limit === "number" && v.limit > 0 ? Math.min(100, Math.floor(v.limit)) : 24;
     const offset = typeof v.offset === "number" && v.offset >= 0 ? Math.floor(v.offset) : 0;
     return {
       q: clampStr(v.q, 200),
@@ -818,34 +877,38 @@ export const searchMarketplace = createServerFn({ method: "GET" })
     const startedAt = Date.now();
     // El tipo generado puede no haberse regenerado tras la migración;
     // se llama vía cast acotado y se valida la forma del resultado.
-    const { data: rows, error } = await (supabase.rpc as unknown as (
-      fn: string,
-      args: Record<string, unknown>,
-    ) => Promise<{ data: unknown; error: { message: string } | null }>)(
-      "search_marketplace",
-      {
-        p_q: data.q,
-        p_destination_slug: data.destination_slug,
-        p_category_slug: data.category_slug,
-        p_price_min: data.price_min,
-        p_price_max: data.price_max,
-        p_limit: data.limit,
-        p_offset: data.offset,
-      },
-    );
+    const { data: rows, error } = await (
+      supabase.rpc as unknown as (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: unknown; error: { message: string } | null }>
+    )("search_marketplace", {
+      p_q: data.q,
+      p_destination_slug: data.destination_slug,
+      p_category_slug: data.category_slug,
+      p_price_min: data.price_min,
+      p_price_max: data.price_max,
+      p_limit: data.limit,
+      p_offset: data.offset,
+    });
     if (error) {
       // 14.40.7 — alerta funcional: error crítico en API pública.
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        await (supabaseAdmin.rpc as unknown as (
-          fn: string, args: Record<string, unknown>,
-        ) => Promise<unknown>)("raise_system_alert", {
+        await (
+          supabaseAdmin.rpc as unknown as (
+            fn: string,
+            args: Record<string, unknown>,
+          ) => Promise<unknown>
+        )("raise_system_alert", {
           p_kind: "api.search_marketplace.error",
           p_severity: "critical",
           p_message: `search_marketplace falló: ${error.message}`,
           p_payload: { q: data.q ?? null },
         });
-      } catch { /* la observabilidad nunca rompe el flujo */ }
+      } catch {
+        /* la observabilidad nunca rompe el flujo */
+      }
       throw new Error(`marketplace_search_failed: ${error.message}`);
     }
     const list = (Array.isArray(rows) ? rows : []) as Array<Record<string, unknown>>;
@@ -856,7 +919,8 @@ export const searchMarketplace = createServerFn({ method: "GET" })
       product_name: String(r.product_name ?? ""),
       product_tagline: r.product_tagline ? String(r.product_tagline) : "",
       product_type: String(r.product_type ?? ""),
-      price_amount: r.price_amount !== null && r.price_amount !== undefined ? Number(r.price_amount) : null,
+      price_amount:
+        r.price_amount !== null && r.price_amount !== undefined ? Number(r.price_amount) : null,
       price_currency: String(r.price_currency ?? "MXN"),
       business_id: String(r.business_id),
       business_slug: String(r.business_slug),
@@ -868,9 +932,12 @@ export const searchMarketplace = createServerFn({ method: "GET" })
     try {
       const duration = Date.now() - startedAt;
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await (supabaseAdmin.rpc as unknown as (
-        fn: string, args: Record<string, unknown>,
-      ) => Promise<unknown>)("record_search_metric", {
+      await (
+        supabaseAdmin.rpc as unknown as (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<unknown>
+      )("record_search_metric", {
         p_q: data.q,
         p_destination_slug: data.destination_slug,
         p_category_slug: data.category_slug,
@@ -878,6 +945,8 @@ export const searchMarketplace = createServerFn({ method: "GET" })
         p_duration_ms: duration,
         p_user_id: null,
       });
-    } catch { /* la observabilidad nunca rompe el flujo */ }
+    } catch {
+      /* la observabilidad nunca rompe el flujo */
+    }
     return { items, total, limit: data.limit, offset: data.offset };
   });

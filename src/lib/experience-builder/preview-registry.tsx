@@ -192,11 +192,19 @@ function demoProduct(): MarketplaceProductDetail {
   };
 }
 
-/** Empresa demo estable — evita "Empresa no disponible" en Studio. */
+/**
+ * Empresa demo estable — evita "Empresa no disponible" en Studio.
+ *
+ * I4-A/B/C · Governed Source Reconciliation (18.51): se marca con
+ * `provenance: "demo"` y sin `primary_location`, de modo que jamás
+ * pueda alimentar el binding gobernado `geography.location`.
+ */
 function demoBusiness(): MarketplaceBusinessDetail {
   return {
     id: "demo-business",
     slug: "empresa-demo",
+    provenance: "demo",
+    primary_location: null,
     display_name: "Empresa demo · Valladolid.mx",
     tagline: "Ficha de ejemplo para editar la Plantilla Madre.",
     description:

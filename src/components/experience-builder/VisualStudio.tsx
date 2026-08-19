@@ -1308,19 +1308,36 @@ function PageVisualEditor({
     return selectedNode?.config as Record<string, unknown> | null;
   }, [selectedChrome, selectedNode, tree]);
 
+  /**
+   * 18.51 · Publicar/programar NUNCA guarda de forma implícita. Sólo se
+   * invocan las RPC existentes cuando no hay cambios locales pendientes,
+   * `workflow_state` es `approved` y `draft_hash` coincide exactamente
+   * con `approved_snapshot_hash`.
+   */
+  const releaseBlocker = (): string | null => {
+    if (!page || !tree) return "No hay composición cargada.";
+    if (saveStatus === "saving")
+      return "Hay cambios locales sin guardar. Espera a que termine el guardado.";
+    if (saveStatus === "error") return "El último guardado falló. Resuélvelo antes de publicar.";
+    if (!draftHash || !page.draft_hash || draftHash !== page.draft_hash)
+      return "Hay cambios locales sin guardar. Guarda antes de publicar o programar.";
+    if (page.workflow_state !== "approved")
+      return "La composición debe estar en estado aprobado antes de publicar o programar.";
+    if (!page.approved_snapshot_hash || page.draft_hash !== page.approved_snapshot_hash)
+      return "El borrador no coincide con el snapshot aprobado. Solicita una nueva aprobación.";
+    return null;
+  };
+
   const onPublish = async () => {
     if (!page || !tree) return;
+    const blocker = releaseBlocker();
+    if (blocker) {
+      setMessage(`No se pudo publicar: ${blocker}`);
+      return;
+    }
     setPublishing(true);
     setMessage(null);
     try {
-      const saveResult = await save({
-        data: { id: page.id, tree, expected_hash: page.draft_hash ?? draftHash ?? "" },
-      });
-      setPage((p) =>
-        p
-          ? { ...p, draft_hash: saveResult.draft_hash, draft_version: saveResult.draft_version }
-          : p,
-      );
       await publish({ data: { id: page.id, notes: "Publicado desde Modo Visual" } });
       if (pageDef.page_type === "home") {
         await queryClient.invalidateQueries({ queryKey: ["eb", "published-home", "default"] });
@@ -1433,6 +1450,11 @@ function PageVisualEditor({
 
   const onSchedule = async () => {
     if (!page || !tree) return;
+    const scheduleBlocker = releaseBlocker();
+    if (scheduleBlocker) {
+      setScheduleError(scheduleBlocker);
+      return;
+    }
     setScheduling(true);
     setScheduleError(null);
     try {
@@ -1442,14 +1464,6 @@ function PageVisualEditor({
         setScheduling(false);
         return;
       }
-      const saveResult = await save({
-        data: { id: page.id, tree, expected_hash: page.draft_hash ?? draftHash ?? "" },
-      });
-      setPage((p) =>
-        p
-          ? { ...p, draft_hash: saveResult.draft_hash, draft_version: saveResult.draft_version }
-          : p,
-      );
       await schedulePublish({
         data: {
           id: page.id,

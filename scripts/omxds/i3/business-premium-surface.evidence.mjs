@@ -180,11 +180,25 @@ assert.match(seo, /export function localBusinessJsonLd/);
 assert.match(seo, /if \(input\.image\) jsonLd\.image = input\.image/);
 assert.match(seo, /if \(input\.latitude != null && input\.longitude != null\)/);
 
-for (const forbiddenPath of [
+for (const pcaGovernedPath of [
   "src/lib/catalog/marketplace-reads.functions.ts",
+  "src/lib/experience-builder/preview-registry.tsx",
+]) {
+  const pcaGovernedChange = execFileSync(
+    "git",
+    ["diff", "--name-only", base, "--", pcaGovernedPath],
+    { encoding: "utf8" },
+  );
+  if (pcaGovernedChange)
+    assert.ok(
+      approvedPcaAuthorizedPaths.has(pcaGovernedPath),
+      `post-I3-D change lacks Approved PCA: ${pcaGovernedPath}`,
+    );
+}
+
+for (const forbiddenPath of [
   "src/lib/experience-builder/composition-renderer.tsx",
   "src/lib/experience-builder/page-kind-registry.ts",
-  "src/lib/experience-builder/preview-registry.tsx",
   "src/lib/omxds/surfaces/surface-actions.ts",
   "src/lib/omxds/surfaces/surface-contract.ts",
   "src/lib/omxds/surfaces/surface-contracts-flag.server.ts",

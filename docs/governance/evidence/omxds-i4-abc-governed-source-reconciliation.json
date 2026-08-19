@@ -1,0 +1,129 @@
+{
+  "initiative": "I4-A/B/C · R · Governed Source Reconciliation",
+  "blueprint": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+  "authorization": "docs/governance/product-authorizations/PCA-2026-016.json",
+  "branch": "fix/omxds-i4-abc-governed-source-reconciliation-v1",
+  "base": "a987181a51dcfb36f026e96f784c1bd158c7629c",
+  "status": "PASS",
+  "canonical_governed_source": "geography.location",
+  "legacy_policy": "frozen historical render only — no edit, duplicate, reuse, template or authoring",
+  "provenance_rule": "only published provenance may feed the governed binding; demo is rejected",
+  "preview_rule": "server-side resolution from persisted page_type and slug; fail-closed without fictitious fallback",
+  "rollback_rule": "geography.location revalidated before eb_restore_revision; rollback stays a draft",
+  "release_rule": "publish and schedule require a clean local tree, approved workflow_state and draft_hash === approved_snapshot_hash",
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "exact_route_count": 22,
+  "exact_routes": [
+    "src/lib/catalog/marketplace-reads.functions.ts",
+    "src/lib/experience-builder/preview-registry.tsx",
+    "src/lib/experience-builder/editorial-builder-policy.ts",
+    "src/lib/experience-builder/blocks/experience-info-grid/contract.ts",
+    "src/lib/experience-builder/block-library.ts",
+    "src/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGridBlock.tsx",
+    "src/lib/experience-builder/studio.functions.ts",
+    "src/routes/preview/composition.$token.tsx",
+    "src/components/experience-builder/VisualStudio.tsx",
+    "scripts/omxds/i4/editorial-builder-authoring.test.ts",
+    "scripts/omxds/i4/editorial-builder-reconciliation.test.ts",
+    "scripts/omxds/i4/editorial-builder-reconciliation.evidence.mjs",
+    "package.json",
+    "scripts/governance/validate-full-suite.mjs",
+    "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+    "docs/governance/product-authorizations/PCA-2026-016.json",
+    "docs/governance/evidence/omxds-i4-abc-governed-source-reconciliation.json",
+    "docs/governance/evidence/omxds-i4-c-preview-concurrency-audit-rollback.json",
+    "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+    "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
+    "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
+    "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json"
+  ],
+  "artifacts": [
+    {
+      "path": "src/lib/catalog/marketplace-reads.functions.ts",
+      "sha256": "5dcd11e4705688f0a6d04c1cc7f51b704d709ef3bcaf2e38a9d4e920480f5ddb"
+    },
+    {
+      "path": "src/lib/experience-builder/preview-registry.tsx",
+      "sha256": "6fe7c48828b0eb7ee25e085a0054fff3810a2ef38834d45b8e346d7f716adcf5"
+    },
+    {
+      "path": "src/lib/experience-builder/editorial-builder-policy.ts",
+      "sha256": "862168864f91bcac0a6c375e462ab0e3f5073a3c468a14e845b40e7ef0f52295"
+    },
+    {
+      "path": "src/lib/experience-builder/blocks/experience-info-grid/contract.ts",
+      "sha256": "bc0ab4256af88db07bd86712a82e9ed91b54673cce715e37bf2a65cb9bacb2c3"
+    },
+    {
+      "path": "src/lib/experience-builder/block-library.ts",
+      "sha256": "2b4da6aaabf6dfaada40128cede30453da5f899065e10ceca658386956f9b7bc"
+    },
+    {
+      "path": "src/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGridBlock.tsx",
+      "sha256": "4171a6b1817bab1b97e6aa2062a2b467ffe48ef6b7a619dc7709d8862f525d7f"
+    },
+    {
+      "path": "src/lib/experience-builder/studio.functions.ts",
+      "sha256": "501f327ad9a8560931102ddc805e14cfa57c104353a2bc822f08ee5370acdbff"
+    },
+    {
+      "path": "src/routes/preview/composition.$token.tsx",
+      "sha256": "4c771dc279fc63abc6e79956f25989bbf9e87eff54134e70a89ec8f9558246ef"
+    },
+    {
+      "path": "src/components/experience-builder/VisualStudio.tsx",
+      "sha256": "492c5e5cce2b5630e8803d8daaedc2db3131e617ab4967abfb04c1b83232e120"
+    },
+    {
+      "path": "scripts/omxds/i4/editorial-builder-authoring.test.ts",
+      "sha256": "5485710696bfb9651929a5205920240a4e64466b27da9cac2cf1ae3b0c059b04"
+    },
+    {
+      "path": "scripts/omxds/i4/editorial-builder-reconciliation.test.ts",
+      "sha256": "4a80df7772419e69c7979f6b7dacac62e6575698d05e23f48d0d7ba56cc2a4e9"
+    },
+    {
+      "path": "scripts/omxds/i4/editorial-builder-reconciliation.evidence.mjs",
+      "sha256": "c912d70ae61ec9d44deae92047675466cebc683b82e2ca2f501b3f72c2257c78"
+    },
+    {
+      "path": "package.json",
+      "sha256": "c5f21e1522e0283d02cbf4f946f1f99ace279e058146758508c807032e21309c"
+    },
+    {
+      "path": "scripts/governance/validate-full-suite.mjs",
+      "sha256": "106aedfa906017aef31be19fffc8a763391582684505eafab7438c96e6b03c8a"
+    },
+    {
+      "path": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+      "sha256": "174d71aef56d1b2aa3776603f1e207335367f54a8c594a6cc7f7b20d88132dc8"
+    },
+    {
+      "path": "docs/governance/product-authorizations/PCA-2026-016.json",
+      "sha256": "45118d246970ccc9e671854f67d798b1b57c09a219c9e4ec8558e2f73235e0f7"
+    },
+    {
+      "path": "docs/governance/evidence/omxds-i4-c-preview-concurrency-audit-rollback.json",
+      "sha256": "351fa0140b08c3414219725e979339870f07ec8483aec62a1ce9dd27c0a0471d"
+    },
+    {
+      "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "sha256": "0ab0a006bdbea6d85a68a488becbdbc0e3d25511a615ddbc469112b0e9fc9dee"
+    },
+    {
+      "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
+      "sha256": "a2ef674380ea7e2456c5fe430873f91633d4e5b54050907968657e3fbe641d03"
+    },
+    {
+      "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
+      "sha256": "a71546f6d78c35bf057f5966b975f9540654e9b1cb0974041e288224ac17a95b"
+    },
+    {
+      "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
+      "sha256": "14b3bf2c84cbefdedab1033804f884360fedf2677cba6657c36127cf6ed84103"
+    }
+  ]
+}

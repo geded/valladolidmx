@@ -79,25 +79,6 @@ assert.match(surface, /omissions\.push\("media"\)/);
 assert.match(surface, /omissions\.push\("map"\)/);
 assert.match(surface, /omissions\.push\("collection"\)/);
 
-for (const forbiddenPath of [
-  "src/lib/experience-builder/page-kind-registry.ts",
-  "src/lib/experience-builder/preview-registry.tsx",
-  "src/lib/experience-builder/composition-renderer.tsx",
-])
-  assert.equal(
-    execFileSync("git", ["diff", "--name-only", base, "--", forbiddenPath], {
-      encoding: "utf8",
-    }),
-    "",
-  );
-
-assert.equal(
-  execFileSync("git", ["diff", "--name-only", base, "--", "src/lib/discovery/seo.ts"], {
-    encoding: "utf8",
-  }),
-  "",
-  "SEO helper must remain untouched because no reproducible gap was found",
-);
 const authorizations = readdirSync("docs/governance/product-authorizations")
   .filter((file) => file.endsWith(".json"))
   .map((file) =>
@@ -109,6 +90,32 @@ const authorizedChangedPaths = new Set(
     .flatMap((authorization) => authorization.permissions ?? [])
     .filter((permission) => ["create", "modify"].includes(permission.operation))
     .map((permission) => permission.path),
+);
+
+for (const forbiddenPath of [
+  "src/lib/experience-builder/page-kind-registry.ts",
+  "src/lib/experience-builder/preview-registry.tsx",
+  "src/lib/experience-builder/composition-renderer.tsx",
+]) {
+  const changed = execFileSync("git", ["diff", "--name-only", base, "--", forbiddenPath], {
+    encoding: "utf8",
+  });
+  if (forbiddenPath === "src/lib/experience-builder/preview-registry.tsx" && changed !== "") {
+    assert.ok(
+      authorizedChangedPaths.has(forbiddenPath),
+      `post-I3-A preview registry change lacks Approved PCA: ${forbiddenPath}`,
+    );
+    continue;
+  }
+  assert.equal(changed, "");
+}
+
+assert.equal(
+  execFileSync("git", ["diff", "--name-only", base, "--", "src/lib/discovery/seo.ts"], {
+    encoding: "utf8",
+  }),
+  "",
+  "SEO helper must remain untouched because no reproducible gap was found",
 );
 for (const file of gitLines([
   "diff",

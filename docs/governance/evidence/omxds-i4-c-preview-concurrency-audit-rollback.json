@@ -1,5 +1,5 @@
 {
-  "initiative": "I4-C · Preview, Concurrency, Audit & Rollback",
+  "initiative": "I4-C \u00b7 Preview, Concurrency, Audit & Rollback",
   "status": "PASS",
   "closed_requirements": [
     "EBG-10",
@@ -62,7 +62,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "9f4f2a747018c77d6dfa6534b71e9f94b7d8288113e5680fc1ec10cb31ebdd0a"
+      "sha256": "2c093f060430b891edf1b8469770f53044a4ee14ee771df26ae5a9ad06ecf1f8"
     },
     {
       "path": "scripts/governance/validate-full-suite.mjs",
@@ -100,5 +100,12 @@
       "path": "supabase/migrations/20260805090000_omxds_i4c_preview_concurrency_audit_rollback.sql",
       "sha256": "0b1c021f6f518786b2de850c7c3c2ed875473f95ffc6e42d70d6eff9aa9ceb08"
     }
-  ]
+  ],
+  "subsequent_reconciliation": {
+    "initiative": "I4-A/B/C \u00b7 R \u00b7 Governed Source Reconciliation",
+    "blueprint": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
+    "authorization": "docs/governance/product-authorizations/PCA-2026-016.json",
+    "evidence": "docs/governance/evidence/omxds-i4-abc-governed-source-reconciliation.json",
+    "note": "El cierre hist\u00f3rico de I4-C se conserva \u00edntegro; esta reconciliaci\u00f3n posterior corrige la fuente gobernada de vmx.experience.info-grid, la resoluci\u00f3n server-side de la vista previa, la revalidaci\u00f3n del rollback y la publicaci\u00f3n sin guardado impl\u00edcito."
+  }
 }

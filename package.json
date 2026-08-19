@@ -45,7 +45,9 @@
     "governance:product-check": "bun scripts/governance/validate-product-authorization.mjs",
     "governance:product-test": "bun scripts/governance/test-product-authorization.mjs",
     "test:i4:c": "bun test scripts/omxds/i4/editorial-builder-preview-concurrency.test.ts",
-    "validate:i4:c": "bun run test:i4:c && bun scripts/omxds/i4/editorial-builder-preview-concurrency.evidence.mjs"
+    "validate:i4:c": "bun run test:i4:c && bun scripts/omxds/i4/editorial-builder-preview-concurrency.evidence.mjs",
+    "test:i4:r": "bun test scripts/omxds/i4/editorial-builder-reconciliation.test.ts",
+    "validate:i4:r": "bun run test:i4:r && bun scripts/omxds/i4/editorial-builder-reconciliation.evidence.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.1",

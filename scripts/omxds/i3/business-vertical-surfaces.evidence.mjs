@@ -154,10 +154,21 @@ const destinationEvidence = readFileSync(
 assert.match(destinationEvidence, /historical I3-A scope violation/);
 assert.match(destinationEvidence, /I3-A regression/);
 
+const pcaGovernedPath = "src/lib/experience-builder/preview-registry.tsx";
+const pcaGovernedChange = execFileSync(
+  "git",
+  ["diff", "--name-only", base, "--", pcaGovernedPath],
+  { encoding: "utf8" },
+);
+if (pcaGovernedChange)
+  assert.ok(
+    authorizedChangedPaths.has(pcaGovernedPath),
+    `post-I3-B change lacks Approved PCA: ${pcaGovernedPath}`,
+  );
+
 for (const forbiddenPath of [
   "src/lib/discovery/seo.ts",
   "src/lib/experience-builder/page-kind-registry.ts",
-  "src/lib/experience-builder/preview-registry.tsx",
   "src/lib/experience-builder/composition-renderer.tsx",
 ])
   assert.equal(
