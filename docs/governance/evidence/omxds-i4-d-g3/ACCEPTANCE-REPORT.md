@@ -96,21 +96,27 @@ Completar con datos ficticios:
 
 Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contrario.
 
-### Defectos corregidos (no convierten ningún escenario en PASS)
+### Defectos abiertos
 
 - **DEF-G3-001 · Canvas del Experience Builder sin encabezado y con desbordamiento horizontal en vista previa Móvil.**
-  Detectado como `FAIL` real durante la preparación de G3 (escenario móvil).
+  **REOPENED** tras validación humana real en iPad Safari: el encabezado volvía
+  a desaparecer después del scroll y el botón circular del buscador quedaba
+  recortado en el borde derecho.
   Causa raíz A: el header `overlay` observaba `window.scrollY` del documento del
   editor y el `transform: scale` del canvas rompía `sticky`. Causa raíz B: las
   media queries se resolvían contra el viewport real del navegador y no contra
   el ancho simulado del marco.
-  Remediación canónica: viewport aislado con `<iframe>` de anchos reales
-  (390/768/1280) más observación del scroll sobre la ventana propietaria del
-  header. Autorización `PCA-2026-020`, blueprint `18.54`.
-  Evidencia automática: `docs/governance/evidence/omxds-i4-d-g3/canvas-viewport/`
-  (`canvas-viewport-metrics.json`, capturas por dispositivo): overflow horizontal
-  `0 px` y encabezado visible y `sticky` en Móvil, Tablet y Desktop, con paridad
-  medida frente al sitio público a 390 px.
+  Causa raíz confirmada al reabrir: el `SiteHeader` estaba contenido por el
+  wrapper editorial `InertChrome`, cuya altura terminaba junto con el header;
+  `position: sticky` no puede desplazarse fuera de los límites de ese ancestro.
+  El buscador, aunque el documento medía 390 px, conservaba mínimos intrínsecos
+  en sus hijos flex y desplazaba el botón 6 px fuera de su caja.
+  Remediación dentro de 18.54/PCA-2026-020: el wrapper del encabezado participa
+  como sticky y el documento aislado normaliza `min-width: 0`/`max-width: 100%`
+  exclusivamente para el buscador canónico, sin duplicarlo ni sustituirlo.
+  La evidencia automática previa queda invalidada como prueba de aceptación
+  humana y debe regenerarse con capturas reales antes/después del scroll en
+  390, 768 y 1280 px.
   Estado de aceptación: **G3 permanece `BLOCKED`**; la validación humana debe
   repetirse sobre el canvas remediado.
 

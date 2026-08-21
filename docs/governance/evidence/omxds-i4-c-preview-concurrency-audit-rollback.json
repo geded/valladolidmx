@@ -82,7 +82,7 @@
     },
     {
       "path": "src/components/experience-builder/VisualStudio.tsx",
-      "sha256": "2c60cbe98b7e58e5fd53dab69dd7eb64b643a8e8832e63f934d9033a063269b2"
+      "sha256": "257ace4966176cbd4cd8fec5be30198cbb2751201928570bc52a5118984d6a1d"
     },
     {
       "path": "src/integrations/supabase/types.ts",
