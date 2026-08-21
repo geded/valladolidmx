@@ -2621,7 +2621,10 @@ function HomeCanvas({
   const frameHeight = Math.max(360, available.height / scale);
 
   return (
-    <div ref={outerRef} className="flex min-h-0 flex-1 overflow-hidden bg-muted/20 p-3">
+    <div
+      ref={outerRef}
+      className="flex min-h-[70vh] min-w-0 flex-1 overflow-hidden bg-muted/20 p-3"
+    >
       <CanvasViewport
         device={deviceViewport}
         width={frameWidth}
