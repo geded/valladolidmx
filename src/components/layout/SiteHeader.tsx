@@ -324,27 +324,30 @@ export function SiteHeader({ variant = "solid", config }: Props) {
             className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-24 bg-[linear-gradient(180deg,rgba(0,0,0,0.45)_0%,rgba(0,0,0,0.18)_55%,rgba(0,0,0,0)_100%)]"
           />
         )}
-        <SiteTopBar hidden={isOverlay} />
-        <Container className="grid h-16 grid-cols-[auto_1fr_auto] items-center gap-6">
-          <Link to="/" aria-label="Inicio" className="flex items-center">
-            <BrandLogo tone={isOverlay ? "light" : "dark"} size="md" />
-          </Link>
+        <div className="@container">
+          <SiteTopBar hidden={isOverlay} />
+          <Container className="grid h-16 grid-cols-[auto_1fr_auto] items-center gap-6">
+            <Link to="/" aria-label="Inicio" className="flex items-center">
+              <BrandLogo tone={isOverlay ? "light" : "dark"} size="md" />
+            </Link>
 
-          <div className="flex min-w-0 items-center justify-center">
-            <PrimaryMegaMenu variant="desktop" isOverlay={isOverlay} />
-          </div>
+            <div className="flex min-w-0 items-center justify-center">
+              <PrimaryMegaMenu variant="desktop" isOverlay={isOverlay} />
+            </div>
 
-          <div className="flex items-center gap-2">
-            <MiViajeChip isOverlay={isOverlay} />
-            {visibleButtons.map((btn, idx) => renderHeaderButton(btn, idx, {
-              isOverlay,
-              open,
-              setOpen,
-              menuButtonRef,
-              ctaFallback: { label: ctaLabel, href: ctaHref },
-            }))}
-          </div>
-        </Container>
+            <div className="flex min-w-0 items-center gap-2">
+              <MiViajeChip isOverlay={isOverlay} />
+              {visibleButtons.map((btn, idx) => renderHeaderButton(btn, idx, {
+                isOverlay,
+                open,
+                setOpen,
+                menuButtonRef,
+                ctaFallback: { label: ctaLabel, href: ctaHref },
+              }))}
+            </div>
+          </Container>
+        </div>
+
       </header>
       {mobileDrawer}
     </>
