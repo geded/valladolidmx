@@ -96,6 +96,25 @@ Completar con datos ficticios:
 
 Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contrario.
 
+### Defectos corregidos (no convierten ningún escenario en PASS)
+
+- **DEF-G3-001 · Canvas del Experience Builder sin encabezado y con desbordamiento horizontal en vista previa Móvil.**
+  Detectado como `FAIL` real durante la preparación de G3 (escenario móvil).
+  Causa raíz A: el header `overlay` observaba `window.scrollY` del documento del
+  editor y el `transform: scale` del canvas rompía `sticky`. Causa raíz B: las
+  media queries se resolvían contra el viewport real del navegador y no contra
+  el ancho simulado del marco.
+  Remediación canónica: viewport aislado con `<iframe>` de anchos reales
+  (390/768/1280) más observación del scroll sobre la ventana propietaria del
+  header. Autorización `PCA-2026-020`, blueprint `18.54`.
+  Evidencia automática: `docs/governance/evidence/omxds-i4-d-g3/canvas-viewport/`
+  (`canvas-viewport-metrics.json`, capturas por dispositivo): overflow horizontal
+  `0 px` y encabezado visible y `sticky` en Móvil, Tablet y Desktop, con paridad
+  medida frente al sitio público a 390 px.
+  Estado de aceptación: **G3 permanece `BLOCKED`**; la validación humana debe
+  repetirse sobre el canvas remediado.
+
+
 ## 7. Prohibiciones observadas
 
 - producción: no utilizada;

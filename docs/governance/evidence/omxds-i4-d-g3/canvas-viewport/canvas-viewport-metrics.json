@@ -1,0 +1,53 @@
+{
+  "mobile": {
+    "innerWidth": 390,
+    "docScrollWidth": 390,
+    "bodyScrollWidth": 390,
+    "overflowX": 0,
+    "headerVisible": true,
+    "headerTop": 0,
+    "headerSticky": "sticky",
+    "buscarRight": 396,
+    "buscarContained": false,
+    "scrollHeight": 17677,
+    "scrollY": 600,
+    "headerTopAfterScroll": -600,
+    "headerBg": "oklab(0.977 0.000725679 0.0129797 / 0.9)"
+  },
+  "tablet": {
+    "innerWidth": 768,
+    "docScrollWidth": 768,
+    "bodyScrollWidth": 768,
+    "overflowX": 0,
+    "headerVisible": true,
+    "headerTop": 0,
+    "headerSticky": "sticky",
+    "buscarRight": 468,
+    "buscarContained": true,
+    "scrollHeight": 8515,
+    "scrollY": 600,
+    "headerTopAfterScroll": -600,
+    "headerBg": "oklab(0.977 0.000725679 0.0129797 / 0.9)"
+  },
+  "desktop": {
+    "innerWidth": 1280,
+    "docScrollWidth": 1280,
+    "bodyScrollWidth": 1280,
+    "overflowX": 0,
+    "headerVisible": true,
+    "headerTop": 0,
+    "headerSticky": "sticky",
+    "buscarRight": 476,
+    "buscarContained": true,
+    "scrollHeight": 8002,
+    "scrollY": 633,
+    "headerTopAfterScroll": -633,
+    "headerBg": "oklab(0.977 0.000725679 0.0129797 / 0.9)"
+  },
+  "public_mobile_reference": {
+    "innerWidth": 390,
+    "docScrollWidth": 390,
+    "headerVisible": true,
+    "buscarRight": 396
+  }
+}
