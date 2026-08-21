@@ -2,14 +2,14 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.37",
+    "version": "0.38",
     "state": "Approved",
-    "source_sha256": "ca65338ac62c9d0ef71fbfa83947bbab822e0383758e54a7f044737795557a21",
+    "source_sha256": "6f57046c4f1d94a6b2ae770f793772353f43050d7700d131fce6b67b5128fe4f",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-08-19T00:00:00.000Z",
+  "generated_at": "2026-08-21T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -7349,6 +7349,29 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-017.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-017.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:scripts/omxds/lib/platform-dependency-baseline.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/lib/platform-dependency-baseline.mjs"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-019.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-019.json"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-018.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-018.json"
     }
   ],
   "edges": [
@@ -19060,6 +19083,96 @@
       "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
       "verified_at": "2026-08-19"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/lib/platform-dependency-baseline.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/lib/platform-dependency-baseline.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/shared-surface.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/shared-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/destination-surface.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/destination-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/business-vertical-surfaces.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-vertical-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/business-premium-surface.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-premium-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-authoring.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-authoring.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-workflow.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-workflow.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-019.json:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-019.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-018.json:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-018.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21"
     }
   ],
   "critical_chain_coverage": [
