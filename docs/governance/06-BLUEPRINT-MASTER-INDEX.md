@@ -22,13 +22,13 @@ Las asociaciones técnicas de las filas adjudicadas fueron validadas localmente 
 
 ## 2.1 Universo documental verificable
 
-El universo total bajo `docs/blueprint/` es de **509 archivos únicos** (medición 2026-08-21 posterior a la admisión de `18.53`):
+El universo total bajo `docs/blueprint/` es de **510 archivos únicos** (medición 2026-08-22 posterior a la admisión de `18.54`):
 
-- **494** archivos en la raíz de `docs/blueprint/`.
+- **495** archivos en la raíz de `docs/blueprint/`.
 - **15** archivos en 5 subdirectorios: `artifacts/`, `audits/`, `project-constitution/`, `roadmap/`, `templates/`.
-- **494 + 15 = 509**.
+- **495 + 15 = 510**.
 
-El índice registra actualmente **509 filas** en `§4`. La brecha se mantiene en `0`; v0.38 registra `18.53`, `PCA-2026-019` y la excepción gobernada del bump de plataforma `@lovable.dev/vite-tanstack-config` 2.7.7 → 2.13.1 en los validadores I3-0/A/B/C/D e I4-A/B, sin cambiar la base canónica `a987181a` ni la aceptación humana G3; v0.36 registra `18.51`, `PCA-2026-016` y la remediación I4-A/B/C de fuente gobernada en 22 rutas sin rutas públicas nuevas; v0.35 registra `18.50`, `PCA-2026-015` y la implementación I4-C en 17 rutas y la ruta pública canónica `/preview/composition/$token`, con migración aditiva, CAS real, preview snapshot-bound, auditoría y rollback seguro. Los 119 hallazgos congelados y el contenido sustantivo anterior no fueron reabiertos.
+El índice registra actualmente **510 filas** en `§4`. La brecha se mantiene en `0`; v0.39 registra `18.54`, `PCA-2026-020` y la remediación canónica del defecto responsive del canvas del Experience Builder mediante viewport aislado con iframe, sin cambiar la base canónica `a987181a` ni convertir la aceptación humana G3 en `PASS`; v0.38 registra `18.53`, `PCA-2026-019` y la excepción gobernada del bump de plataforma `@lovable.dev/vite-tanstack-config` 2.7.7 → 2.13.1 en los validadores I3-0/A/B/C/D e I4-A/B; v0.36 registra `18.51`, `PCA-2026-016` y la remediación I4-A/B/C de fuente gobernada en 22 rutas sin rutas públicas nuevas; v0.35 registra `18.50`, `PCA-2026-015` y la implementación I4-C en 17 rutas y la ruta pública canónica `/preview/composition/$token`, con migración aditiva, CAS real, preview snapshot-bound, auditoría y rollback seguro. Los 119 hallazgos congelados y el contenido sustantivo anterior no fueron reabiertos.
 
 Los conteos previos (`429`, `432`, `439`, `442`, `444`, `447`, `453`) reflejan medidas históricas del árbol o del índice; ninguno representa el universo actual y no deben citarse fuera del `§6 Control de versiones`.
 
