@@ -65,8 +65,8 @@ Completar únicamente en entorno no público con datos ficticios. Para cada fila
 | G3-H08 | Touch: controles principales operables y sin dependencia de hover                                                                        | BLOCKED | pendiente                 |
 | G3-H09 | Tema Sol conserva contenido, orden, CTA y estado                                                                                         | BLOCKED | pendiente                 |
 | G3-H10 | Tema Luna conserva contenido, orden, CTA y estado                                                                                        | BLOCKED | pendiente                 |
-| G3-H11 | Slice vertical completo: authorable + binding + preview + Draft→Published + autor/aprobador distintos + conflicto + auditoría + rollback | BLOCKED | pendiente                 |
-| G3-H12 | Seguridad: operaciones sensibles con actor autorizado, preview sin PII/secrets y fallo gobernado fail-closed                             | BLOCKED | pendiente                 |
+| G3-H11 | Slice vertical completo: authorable + binding + preview + Draft→Published + autor/aprobador distintos + conflicto + auditoría + rollback | PARTIAL | Sesión humana 2026-08-21 (entorno no público): el administrador abrió Experience Builder y cargaron las composiciones Inicio y Hoteles. Faltan Draft→Published, separación autor/aprobador, conflicto, auditoría y rollback. |
+| G3-H12 | Seguridad: operaciones sensibles con actor autorizado, preview sin PII/secrets y fallo gobernado fail-closed                             | PARTIAL | Sesión humana 2026-08-21 (entorno no público, flag OFF): «Añadir sección» no ofreció Info Grid y la búsqueda «Info» tampoco lo mostró. Falta verificar actor autorizado en operaciones sensibles, ausencia de PII/secrets en preview y fallo gobernado fail-closed. |
 
 ## 5. Registro del escenario G3-H11
 
