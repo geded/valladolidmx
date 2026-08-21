@@ -43,7 +43,7 @@
   "artifacts": [
     {
       "path": "src/lib/catalog/marketplace-reads.functions.ts",
-      "sha256": "5dcd11e4705688f0a6d04c1cc7f51b704d709ef3bcaf2e38a9d4e920480f5ddb"
+      "sha256": "a0f1162aa5a41daab7a67d8dc98d9c1a76652b2ac466a86b35c061176aa7e581"
     },
     {
       "path": "src/lib/experience-builder/preview-registry.tsx",
@@ -51,7 +51,7 @@
     },
     {
       "path": "src/lib/experience-builder/editorial-builder-policy.ts",
-      "sha256": "862168864f91bcac0a6c375e462ab0e3f5073a3c468a14e845b40e7ef0f52295"
+      "sha256": "4541a64c6cc9b3b486f6c7502e96245d4f00de57072ccabfb2ca6e53ecd9df71"
     },
     {
       "path": "src/lib/experience-builder/blocks/experience-info-grid/contract.ts",
@@ -83,19 +83,19 @@
     },
     {
       "path": "scripts/omxds/i4/editorial-builder-reconciliation.test.ts",
-      "sha256": "4a80df7772419e69c7979f6b7dacac62e6575698d05e23f48d0d7ba56cc2a4e9"
+      "sha256": "60716a0c50ef278ef47a0114ae99fce19fa60356da4c1064edd35155107ed857"
     },
     {
       "path": "scripts/omxds/i4/editorial-builder-reconciliation.evidence.mjs",
-      "sha256": "c912d70ae61ec9d44deae92047675466cebc683b82e2ca2f501b3f72c2257c78"
+      "sha256": "e1f50a07e76fafd131c5e87543212e75f5763c85acfc76a63ad2cd181896fba2"
     },
     {
       "path": "package.json",
-      "sha256": "c5f21e1522e0283d02cbf4f946f1f99ace279e058146758508c807032e21309c"
+      "sha256": "046738d7e006193e594c35327ed1f3dc0f98cc13033cc3b1f636ba1d65d27024"
     },
     {
       "path": "scripts/governance/validate-full-suite.mjs",
-      "sha256": "106aedfa906017aef31be19fffc8a763391582684505eafab7438c96e6b03c8a"
+      "sha256": "41c76e34f21968d8bd159cc191214464365ef7701bab2e3e81e971a3ed62c413"
     },
     {
       "path": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
@@ -103,27 +103,27 @@
     },
     {
       "path": "docs/governance/product-authorizations/PCA-2026-016.json",
-      "sha256": "45118d246970ccc9e671854f67d798b1b57c09a219c9e4ec8558e2f73235e0f7"
+      "sha256": "1c18349831802f61c68546788198e11f1fba9e05788b98f41add2fe1c6be16ec"
     },
     {
       "path": "docs/governance/evidence/omxds-i4-c-preview-concurrency-audit-rollback.json",
-      "sha256": "351fa0140b08c3414219725e979339870f07ec8483aec62a1ce9dd27c0a0471d"
+      "sha256": "9dfbc8dd16dfdc3b9f701692b171e486789a0e96982bbf816a348c301b0c5f0c"
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "sha256": "0ab0a006bdbea6d85a68a488becbdbc0e3d25511a615ddbc469112b0e9fc9dee"
+      "sha256": "ca65338ac62c9d0ef71fbfa83947bbab822e0383758e54a7f044737795557a21"
     },
     {
       "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
-      "sha256": "a2ef674380ea7e2456c5fe430873f91633d4e5b54050907968657e3fbe641d03"
+      "sha256": "e2902d924af1a5d9a189f5b19460e8d0a2857238c8a11586ec6130e8505e8be7"
     },
     {
       "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
-      "sha256": "a71546f6d78c35bf057f5966b975f9540654e9b1cb0974041e288224ac17a95b"
+      "sha256": "4398529d66153cc7a0fb11fffe57e70e447f864b22f719672938af995f14fa12"
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "14b3bf2c84cbefdedab1033804f884360fedf2677cba6657c36127cf6ed84103"
+      "sha256": "fc6e877fce49c74e11b62c80f3531e86ed4299942c02ff5ba4b9831a1cf93e15"
     }
   ]
 }
