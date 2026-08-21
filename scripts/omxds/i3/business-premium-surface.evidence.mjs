@@ -1,6 +1,10 @@
 import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
+import {
+  assertGovernedDependencyBaseline,
+  assertGovernedLockBaseline,
+} from "../lib/platform-dependency-baseline.mjs";
 
 const base = "ec9ae951412e8cb5223ba9fbf60d51d6814b0552";
 const i3DHead = "43c8ca6de4c10cf2430285aa8261adeda82dbf10";
@@ -54,14 +58,8 @@ const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
 );
 const currentPackage = JSON.parse(readFileSync("package.json", "utf8"));
-assert.deepEqual(currentPackage.dependencies, basePackage.dependencies);
-assert.deepEqual(currentPackage.devDependencies, basePackage.devDependencies);
-assert.equal(
-  execFileSync("git", ["diff", "--name-only", base, "--", "bun.lock"], {
-    encoding: "utf8",
-  }),
-  "",
-);
+assertGovernedDependencyBaseline(currentPackage, basePackage, "I3-D");
+assertGovernedLockBaseline(base, "I3-D");
 
 const route = readFileSync(routePath, "utf8");
 assert.match(route, /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/);

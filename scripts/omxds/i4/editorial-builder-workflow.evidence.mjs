@@ -1,6 +1,10 @@
 import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+import {
+  assertGovernedDependencyBaseline,
+  assertGovernedLockBaseline,
+} from "../lib/platform-dependency-baseline.mjs";
 
 const base = "bb1b17ffcbed0594d1433957e8f2b5d864e1a5a8";
 const branch = "feature/omxds-i4-b-workflow-publication-authority-v1";
@@ -117,9 +121,8 @@ if (mode !== "base_worktree") {
 
 const basePackage = JSON.parse(git(["show", `${base}:package.json`]));
 const currentPackage = JSON.parse(readFileSync("package.json", "utf8"));
-assert.deepEqual(currentPackage.dependencies, basePackage.dependencies);
-assert.deepEqual(currentPackage.devDependencies, basePackage.devDependencies);
-assert.equal(git(["diff", "--name-only", base, "--", "bun.lock"]), "");
+assertGovernedDependencyBaseline(currentPackage, basePackage, "I4-B");
+assertGovernedLockBaseline(base, "I4-B");
 assert.equal(
   currentPackage.scripts["validate:i4:b"],
   "bun run test:i4:b && bun scripts/omxds/i4/editorial-builder-workflow.evidence.mjs",

@@ -2,6 +2,10 @@ import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import {
+  assertGovernedDependencyBaseline,
+  assertGovernedLockBaseline,
+} from "../lib/platform-dependency-baseline.mjs";
 
 const base = "c3d663e5c74bcd5c0f1c96f01da2974c992d1dc6";
 const i3CHead = "1b67c610af4643f115a4901a2865f766c609018f";
@@ -69,14 +73,8 @@ const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
 );
 const currentPackage = JSON.parse(readFileSync("package.json", "utf8"));
-assert.deepEqual(currentPackage.dependencies, basePackage.dependencies);
-assert.deepEqual(currentPackage.devDependencies, basePackage.devDependencies);
-assert.equal(
-  execFileSync("git", ["diff", "--name-only", base, "--", "bun.lock"], {
-    encoding: "utf8",
-  }),
-  "",
-);
+assertGovernedDependencyBaseline(currentPackage, basePackage, "I3-C");
+assertGovernedLockBaseline(base, "I3-C");
 
 for (const routePath of newConsumers) {
   const route = readFileSync(routePath, "utf8");
