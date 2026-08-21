@@ -1640,39 +1640,21 @@ export type Database = {
           created_at: string
           created_by: string | null
           expires_at: string
-          revoke_reason: string | null
-          revoked_at: string | null
-          revoked_by: string | null
-          snapshot: Json | null
-          snapshot_hash: string | null
           token: string
-          token_digest: string | null
         }
         Insert: {
           composition_id: string
           created_at?: string
           created_by?: string | null
           expires_at: string
-          revoke_reason: string | null
-          revoked_at: string | null
-          revoked_by: string | null
-          snapshot: Json | null
-          snapshot_hash: string | null
           token: string
-          token_digest: string | null
         }
         Update: {
           composition_id?: string
           created_at?: string
           created_by?: string | null
           expires_at?: string
-          revoke_reason?: string | null
-          revoked_at?: string | null
-          revoked_by?: string | null
-          snapshot?: Json | null
-          snapshot_hash?: string | null
           token?: string
-          token_digest?: string | null
         }
         Relationships: [
           {
@@ -4314,18 +4296,11 @@ export type Database = {
       page_compositions: {
         Row: {
           active_revision_id: string | null
-          approved_at: string | null
-          approved_by: string | null
-          approved_revision_id: string | null
-          approved_snapshot_hash: string | null
           canonical_override: string | null
           created_at: string
           created_by: string | null
           current_draft: Json
-          draft_hash: string | null
-          draft_version: number
           description: string | null
-          draft_author_id: string | null
           editing_lock: Json | null
           id: string
           is_template: boolean
@@ -4338,8 +4313,6 @@ export type Database = {
           scheduled_publish_at: string | null
           scheduled_publish_by: string | null
           scheduled_publish_notes: string | null
-          scheduled_revision_id: string | null
-          scheduled_snapshot_hash: string | null
           sitemap_changefreq: string | null
           sitemap_priority: number | null
           slug: string
@@ -4356,18 +4329,11 @@ export type Database = {
         }
         Insert: {
           active_revision_id?: string | null
-          approved_at?: string | null
-          approved_by?: string | null
-          approved_revision_id?: string | null
-          approved_snapshot_hash?: string | null
           canonical_override?: string | null
           created_at?: string
           created_by?: string | null
           current_draft?: Json
-          draft_hash?: string | null
-          draft_version?: number
           description?: string | null
-          draft_author_id?: string | null
           editing_lock?: Json | null
           id?: string
           is_template?: boolean
@@ -4380,8 +4346,6 @@ export type Database = {
           scheduled_publish_at?: string | null
           scheduled_publish_by?: string | null
           scheduled_publish_notes?: string | null
-          scheduled_revision_id?: string | null
-          scheduled_snapshot_hash?: string | null
           sitemap_changefreq?: string | null
           sitemap_priority?: number | null
           slug: string
@@ -4398,18 +4362,11 @@ export type Database = {
         }
         Update: {
           active_revision_id?: string | null
-          approved_at?: string | null
-          approved_by?: string | null
-          approved_revision_id?: string | null
-          approved_snapshot_hash?: string | null
           canonical_override?: string | null
           created_at?: string
           created_by?: string | null
           current_draft?: Json
-          draft_hash?: string | null
-          draft_version?: number
           description?: string | null
-          draft_author_id?: string | null
           editing_lock?: Json | null
           id?: string
           is_template?: boolean
@@ -4422,8 +4379,6 @@ export type Database = {
           scheduled_publish_at?: string | null
           scheduled_publish_by?: string | null
           scheduled_publish_notes?: string | null
-          scheduled_revision_id?: string | null
-          scheduled_snapshot_hash?: string | null
           sitemap_changefreq?: string | null
           sitemap_priority?: number | null
           slug?: string
@@ -4507,7 +4462,6 @@ export type Database = {
           notes: string | null
           revision_number: number
           snapshot: Json
-          snapshot_hash: string | null
         }
         Insert: {
           composition_id: string
@@ -4517,7 +4471,6 @@ export type Database = {
           notes?: string | null
           revision_number: number
           snapshot: Json
-          snapshot_hash?: string | null
         }
         Update: {
           composition_id?: string
@@ -4527,7 +4480,6 @@ export type Database = {
           notes?: string | null
           revision_number?: number
           snapshot?: Json
-          snapshot_hash?: string | null
         }
         Relationships: [
           {
@@ -7154,25 +7106,13 @@ export type Database = {
           target_path: string
         }[]
       }
-      eb_resolve_composition_preview: {
-        Args: { _token: string }
-        Returns: Json
-      }
       eb_restore_revision: {
-        Args: { _expected_hash: string; _id: string; _revision_id: string }
-        Returns: Json
-      }
-      eb_revoke_composition_preview: {
-        Args: { _reason?: string; _token_digest: string }
-        Returns: Json
+        Args: { _id: string; _revision_id: string }
+        Returns: undefined
       }
       eb_save_composition_draft: {
-        Args: { _expected_hash: string; _id: string; _tree: Json }
-        Returns: Json
-      }
-      eb_issue_composition_preview: {
-        Args: { _composition_id: string; _token_digest: string; _ttl_minutes: number }
-        Returns: Json
+        Args: { _id: string; _tree: Json }
+        Returns: undefined
       }
       eb_schedule_publish_composition: {
         Args: { _id: string; _notes?: string; _when: string }
