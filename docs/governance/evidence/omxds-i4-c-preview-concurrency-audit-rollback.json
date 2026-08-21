@@ -1,5 +1,5 @@
 {
-  "initiative": "I4-C \u00b7 Preview, Concurrency, Audit & Rollback",
+  "initiative": "I4-C · Preview, Concurrency, Audit & Rollback",
   "status": "PASS",
   "closed_requirements": [
     "EBG-10",
@@ -42,19 +42,19 @@
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "sha256": "9b545b41949b1a7da1f41c67b40191d9cfd83c6953d9068cc36c207686ee1e71"
+      "sha256": "ca65338ac62c9d0ef71fbfa83947bbab822e0383758e54a7f044737795557a21"
     },
     {
       "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
-      "sha256": "f2277a2d1374578bcc65a3cb19610f2412f8aea4d295745fede99c6fc13eda74"
+      "sha256": "e2902d924af1a5d9a189f5b19460e8d0a2857238c8a11586ec6130e8505e8be7"
     },
     {
       "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
-      "sha256": "0b4e1f8401f2421c35b1168bddf88790754c85c81e2bc462f677e8c71ad3291b"
+      "sha256": "4398529d66153cc7a0fb11fffe57e70e447f864b22f719672938af995f14fa12"
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "07d6a40500fc9e87944d1299dc40c72e5b6b661602a83fa9eb4f10c7030fb82e"
+      "sha256": "fc6e877fce49c74e11b62c80f3531e86ed4299942c02ff5ba4b9831a1cf93e15"
     },
     {
       "path": "docs/governance/product-authorizations/PCA-2026-015.json",
@@ -62,15 +62,15 @@
     },
     {
       "path": "package.json",
-      "sha256": "2c093f060430b891edf1b8469770f53044a4ee14ee771df26ae5a9ad06ecf1f8"
+      "sha256": "046738d7e006193e594c35327ed1f3dc0f98cc13033cc3b1f636ba1d65d27024"
     },
     {
       "path": "scripts/governance/validate-full-suite.mjs",
-      "sha256": "88ca57090b176926802124330b2e4aae7717489f02f09b3fd57eb82278d957c0"
+      "sha256": "41c76e34f21968d8bd159cc191214464365ef7701bab2e3e81e971a3ed62c413"
     },
     {
       "path": "scripts/omxds/i3/business-premium-surface.evidence.mjs",
-      "sha256": "a0cabe46b95c67c0c4ce5525c10226fbb57ce3ea0e82d2456e312de5d1458446"
+      "sha256": "1a1e121d5b3ca7c14b52e3cacc44e964ce34a76d7ab8b58a7107555fc866f0a8"
     },
     {
       "path": "scripts/omxds/i4/editorial-builder-preview-concurrency.evidence.mjs",
@@ -82,30 +82,23 @@
     },
     {
       "path": "src/components/experience-builder/VisualStudio.tsx",
-      "sha256": "275bca80c53a980baee8cc8418fd31be1553c74f830d215a4f53a5054b3aeaf4"
+      "sha256": "492c5e5cce2b5630e8803d8daaedc2db3131e617ab4967abfb04c1b83232e120"
     },
     {
       "path": "src/integrations/supabase/types.ts",
-      "sha256": "44493f93f238bf9653e3d4d2e23e66d1b4acf2052a2fd097204583a67ee611a9"
+      "sha256": "7c5c9d7762956c9493cc6776ab1ca830773b34a369268b097a1789d5eca0fa2e"
     },
     {
       "path": "src/lib/experience-builder/studio.functions.ts",
-      "sha256": "20ce6ce3ab881bd025324b2151f4b16818e33cde093a3d6319b4de3a1e406844"
+      "sha256": "501f327ad9a8560931102ddc805e14cfa57c104353a2bc822f08ee5370acdbff"
     },
     {
       "path": "src/routes/preview/composition.$token.tsx",
-      "sha256": "8a9bc27aca61e9639b7cc8cc3b50fd63acb0b9bdbde1ef20ac76fddf7eba062b"
+      "sha256": "4c771dc279fc63abc6e79956f25989bbf9e87eff54134e70a89ec8f9558246ef"
     },
     {
       "path": "supabase/migrations/20260805090000_omxds_i4c_preview_concurrency_audit_rollback.sql",
       "sha256": "0b1c021f6f518786b2de850c7c3c2ed875473f95ffc6e42d70d6eff9aa9ceb08"
     }
-  ],
-  "subsequent_reconciliation": {
-    "initiative": "I4-A/B/C \u00b7 R \u00b7 Governed Source Reconciliation",
-    "blueprint": "docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md",
-    "authorization": "docs/governance/product-authorizations/PCA-2026-016.json",
-    "evidence": "docs/governance/evidence/omxds-i4-abc-governed-source-reconciliation.json",
-    "note": "El cierre hist\u00f3rico de I4-C se conserva \u00edntegro; esta reconciliaci\u00f3n posterior corrige la fuente gobernada de vmx.experience.info-grid, la resoluci\u00f3n server-side de la vista previa, la revalidaci\u00f3n del rollback y la publicaci\u00f3n sin guardado impl\u00edcito."
-  }
+  ]
 }
