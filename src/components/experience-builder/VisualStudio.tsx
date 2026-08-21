@@ -2701,15 +2701,14 @@ function CanvasViewport({
   device,
   width,
   height,
-  scale,
   children,
 }: {
   device: DeviceViewport;
   width: number;
   height: number;
-  scale: number;
   children: React.ReactNode;
 }) {
+
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [mount, setMount] = useState<HTMLElement | null>(null);
 
