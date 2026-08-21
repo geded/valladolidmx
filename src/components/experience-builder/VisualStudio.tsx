@@ -2635,6 +2635,7 @@ function HomeCanvas({
           label="Encabezado"
           selected={selectedId === HEADER_CHROME_ID}
           onSelect={() => onSelectChrome("header")}
+          sticky
         >
           <PublicHeader variant="overlay" config={getChromeConfig(tree, "header")} />
         </InertChrome>
@@ -2722,6 +2723,21 @@ function CanvasViewport({
     doc.body.style.margin = "0";
     doc.body.style.background = "";
 
+    // El componente canónico conserva sus contratos. Esta normalización sólo
+    // actúa dentro del viewport aislado: Safari respeta el ancho útil de 390 px
+    // aunque los controles flex tengan contenido intrínseco más largo.
+    const viewportStyle = doc.createElement("style");
+    viewportStyle.setAttribute("data-eb-canvas-viewport-style", "");
+    viewportStyle.textContent = `
+      form[role="search"],
+      form[role="search"] > div,
+      form[role="search"] > div > button {
+        min-width: 0;
+        max-width: 100%;
+      }
+    `;
+    doc.head.appendChild(viewportStyle);
+
     let frame = 0;
     const syncStyles = () => {
       cancelAnimationFrame(frame);
@@ -2759,6 +2775,7 @@ function CanvasViewport({
       observer.disconnect();
       doc.removeEventListener("click", blockNavigation, true);
       doc.removeEventListener("submit", blockNavigation, true);
+      viewportStyle.remove();
     };
   }, []);
 
@@ -2793,11 +2810,13 @@ function InertChrome({
   label,
   selected,
   onSelect,
+  sticky = false,
   children,
 }: {
   label: string;
   selected: boolean;
   onSelect: () => void;
+  sticky?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -2814,7 +2833,7 @@ function InertChrome({
           onSelect();
         }
       }}
-      className={`group relative cursor-pointer outline-none ring-inset ${selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"}`}
+      className={`group cursor-pointer outline-none ring-inset ${sticky ? "sticky top-0 z-30" : "relative"} ${selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"}`}
       aria-label={`Editar ${label}`}
     >
       <div className="pointer-events-none select-none" aria-hidden>
