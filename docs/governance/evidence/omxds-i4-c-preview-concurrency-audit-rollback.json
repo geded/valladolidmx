@@ -42,19 +42,19 @@
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "sha256": "6f57046c4f1d94a6b2ae770f793772353f43050d7700d131fce6b67b5128fe4f"
+      "sha256": "32d81521f997eedf7cdab3a526ec184f16b2fe76bbfd12d152b895928b8b232d"
     },
     {
       "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
-      "sha256": "1cae3f1dcb7f5de92d537ec8cc77afcfc2782e502e21b9c52a45f34c3c6eaf21"
+      "sha256": "2a4a84a145427a696b4db07d0b2cc5fe16ed43b2328232ce1dda579e7c37d2e3"
     },
     {
       "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
-      "sha256": "c81843cae698c595437a37126e6f84fdcb83ecf7be2e6623af24d88d5aecd4d4"
+      "sha256": "c565d937fcc891ffad38c24ad1daba3684fca830e816eada8d1b10c65aefd459"
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "984712233ebd957fd5c4d18e101e3a5a649cd4befcdc34d2e45ed59259c89b6b"
+      "sha256": "4a033fbce6dc2b78fc796c79bbf9d9771ac5c6a9696d85ee9a2be0e171746ccf"
     },
     {
       "path": "docs/governance/product-authorizations/PCA-2026-015.json",
@@ -82,7 +82,7 @@
     },
     {
       "path": "src/components/experience-builder/VisualStudio.tsx",
-      "sha256": "492c5e5cce2b5630e8803d8daaedc2db3131e617ab4967abfb04c1b83232e120"
+      "sha256": "2c60cbe98b7e58e5fd53dab69dd7eb64b643a8e8832e63f934d9033a063269b2"
     },
     {
       "path": "src/integrations/supabase/types.ts",
