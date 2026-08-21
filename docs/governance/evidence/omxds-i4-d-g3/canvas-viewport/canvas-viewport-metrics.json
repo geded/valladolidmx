@@ -43,5 +43,11 @@
     "scrollY": 633,
     "headerTopAfterScroll": -633,
     "headerBg": "oklab(0.977 0.000725679 0.0129797 / 0.9)"
+  },
+  "public_mobile_reference": {
+    "innerWidth": 390,
+    "docScrollWidth": 390,
+    "headerVisible": true,
+    "buscarRight": 396
   }
 }
