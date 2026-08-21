@@ -133,16 +133,23 @@ export function SiteHeader({ variant = "solid", config }: Props) {
   const [mounted, setMounted] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
   const drawerRef = useRef<HTMLElement | null>(null);
+  const headerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (variant !== "overlay") return;
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    // 18.54 · El scroll se observa sobre la ventana propietaria del header.
+    // En el sitio público es `window`; dentro del viewport aislado del
+    // Experience Builder es la ventana del iframe. Paridad 1:1 sin
+    // duplicar el componente canónico.
+    const view = headerRef.current?.ownerDocument?.defaultView ?? window;
+    const onScroll = () => setScrolled(view.scrollY > 24);
     onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [variant]);
+    view.addEventListener("scroll", onScroll, { passive: true });
+    return () => view.removeEventListener("scroll", onScroll);
+  }, [variant, mounted]);
+
 
   // Bloqueo de scroll del documento + cierre con Escape + focus trap.
   // El drawer se porta al body para escapar del stacking context del Header:
@@ -292,6 +299,8 @@ export function SiteHeader({ variant = "solid", config }: Props) {
   return (
     <>
       <header
+        ref={headerRef}
+
         className={cn(
           "@container sticky top-0 z-30 transition-colors duration-300",
           isOverlay
