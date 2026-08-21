@@ -299,6 +299,8 @@ export function SiteHeader({ variant = "solid", config }: Props) {
   return (
     <>
       <header
+        ref={headerRef}
+
         className={cn(
           "@container sticky top-0 z-30 transition-colors duration-300",
           isOverlay
