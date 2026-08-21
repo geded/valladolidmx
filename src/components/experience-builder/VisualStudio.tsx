@@ -2613,24 +2613,23 @@ function HomeCanvas({
     };
   }, [deviceViewport]);
 
-  // El viewport aislado se muestra 1:1 siempre que quepa; si el editor es más
-  // angosto (p. ej. desktop 1280 en pantalla pequeña) se escala visualmente,
-  // pero el viewport interno sigue midiendo el ancho real del dispositivo,
-  // por lo que las media queries se resuelven como en el sitio público.
-  const scale = Math.min(1, Math.max(0.35, available.width / frameWidth));
-  const frameHeight = Math.max(360, available.height / scale);
+  // 18.54 · Viewport aislado SIN zoom: el iframe usa siempre el ancho real del
+  // dispositivo (390/768/1280). Si el editor es más angosto, el contenedor
+  // desplaza horizontalmente en lugar de escalar, porque `transform: scale`
+  // rompe `position: sticky` y provoca recortes por redondeo en Safari/iPad.
+  const frameHeight = Math.max(360, available.height);
 
   return (
     <div
       ref={outerRef}
-      className="flex min-h-[70vh] min-w-0 flex-1 overflow-hidden bg-muted/20 p-3"
+      className="flex min-h-[70vh] min-w-0 flex-1 overflow-auto bg-muted/20 p-3"
     >
       <CanvasViewport
         device={deviceViewport}
         width={frameWidth}
         height={frameHeight}
-        scale={scale}
       >
+
         <InertChrome
           label="Encabezado"
           selected={selectedId === HEADER_CHROME_ID}
@@ -2702,15 +2701,14 @@ function CanvasViewport({
   device,
   width,
   height,
-  scale,
   children,
 }: {
   device: DeviceViewport;
   width: number;
   height: number;
-  scale: number;
   children: React.ReactNode;
 }) {
+
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [mount, setMount] = useState<HTMLElement | null>(null);
 
@@ -2781,8 +2779,8 @@ function CanvasViewport({
 
   return (
     <div
-      className="mx-auto overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
-      style={{ width: width * scale, height: height * scale }}
+      className="mx-auto shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
+      style={{ width, height }}
     >
       <iframe
         ref={iframeRef}
@@ -2790,17 +2788,13 @@ function CanvasViewport({
         data-eb-canvas-device={device}
         data-eb-canvas-width={width}
         className="block border-0 bg-background"
-        style={{
-          width,
-          height,
-          transform: `scale(${scale})`,
-          transformOrigin: "top left",
-        }}
+        style={{ width, height }}
       />
       {mount ? createPortal(children, mount) : null}
     </div>
   );
 }
+
 
 
 
