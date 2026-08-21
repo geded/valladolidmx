@@ -86,7 +86,7 @@
     },
     {
       "path": "src/integrations/supabase/types.ts",
-      "sha256": "44493f93f238bf9653e3d4d2e23e66d1b4acf2052a2fd097204583a67ee611a9"
+      "sha256": "7c5c9d7762956c9493cc6776ab1ca830773b34a369268b097a1789d5eca0fa2e"
     },
     {
       "path": "src/lib/experience-builder/studio.functions.ts",
