@@ -16,6 +16,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { SeoPreview } from "./SeoPreview";
@@ -2782,59 +2783,6 @@ function CanvasViewport({
 }
 
 
-/**
- * Fallback exclusivo del Studio: el canvas simula 390/768/1280px dentro de
- * una ventana desktop. Si algún breakpoint de viewport o container-query no
- * alcanza a recalcularse dentro del editor, estas reglas fuerzan las mismas
- * columnas que ve el sitio público para cada dispositivo seleccionado.
- */
-function StudioDeviceCss() {
-  return (
-    <style>{`
-      [data-eb-canvas-device="mobile"] [data-home-grid] {
-        grid-template-columns: minmax(0, 1fr) !important;
-      }
-      [data-eb-canvas-device="mobile"] [data-home-layout="consejo-alux"] {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-      }
-
-      [data-eb-canvas-device="tablet"] [data-home-grid="destinos"],
-      [data-eb-canvas-device="tablet"] [data-home-grid="categorias"],
-      [data-eb-canvas-device="tablet"] [data-home-grid="empresas"] {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="tablet"] [data-home-grid="rutas"],
-      [data-eb-canvas-device="tablet"] [data-home-grid="resenas"],
-      [data-eb-canvas-device="tablet"] [data-home-grid="en-vivo"] {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="tablet"] [data-home-grid="arma-tu-viaje"] {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="tablet"] [data-home-layout="consejo-alux"] {
-        flex-direction: row !important;
-        align-items: center !important;
-      }
-
-      [data-eb-canvas-device="desktop"] [data-home-grid="destinos"],
-      [data-eb-canvas-device="desktop"] [data-home-grid="rutas"],
-      [data-eb-canvas-device="desktop"] [data-home-grid="resenas"] {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="desktop"] [data-home-grid="categorias"],
-      [data-eb-canvas-device="desktop"] [data-home-grid="empresas"] {
-        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="desktop"] [data-home-grid="en-vivo"] {
-        grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="desktop"] [data-home-grid="arma-tu-viaje"] {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      }
-    `}</style>
-  );
-}
 
 /* --------------------------------------------------------------------- */
 
@@ -2866,7 +2814,7 @@ function InertChrome({
       className={`group relative cursor-pointer outline-none ring-inset ${selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"}`}
       aria-label={`Editar ${label}`}
     >
-      <div className="pointer-events-none select-none opacity-90" aria-hidden>
+      <div className="pointer-events-none select-none" aria-hidden>
         {children}
       </div>
       <span
