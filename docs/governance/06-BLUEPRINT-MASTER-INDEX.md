@@ -2,9 +2,9 @@
 
 **Estado:** Approved
 
-**Versión:** 0.38
+**Versión:** 0.39
 
-**Última actualización:** 2026-08-21
+**Última actualización:** 2026-08-22
 
 **Owner:** Founder (documental) · Núcleo de Gobernanza (mantenimiento)
 
