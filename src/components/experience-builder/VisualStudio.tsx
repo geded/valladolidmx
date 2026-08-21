@@ -2779,8 +2779,8 @@ function CanvasViewport({
 
   return (
     <div
-      className="mx-auto overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
-      style={{ width: width * scale, height: height * scale }}
+      className="mx-auto shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
+      style={{ width, height }}
     >
       <iframe
         ref={iframeRef}
@@ -2788,17 +2788,13 @@ function CanvasViewport({
         data-eb-canvas-device={device}
         data-eb-canvas-width={width}
         className="block border-0 bg-background"
-        style={{
-          width,
-          height,
-          transform: `scale(${scale})`,
-          transformOrigin: "top left",
-        }}
+        style={{ width, height }}
       />
       {mount ? createPortal(children, mount) : null}
     </div>
   );
 }
+
 
 
 
