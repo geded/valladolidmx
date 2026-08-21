@@ -302,11 +302,16 @@ export function SiteHeader({ variant = "solid", config }: Props) {
         ref={headerRef}
 
         className={cn(
-          "@container sticky top-0 z-30 transition-colors duration-300",
+          // 18.54 · `@container` se separa del elemento sticky: en Safari (iPad)
+          // la contención del contenedor invalida `position: sticky` dentro del
+          // scrollport del iframe. El contexto de contenedor vive ahora en el
+          // wrapper interno, sin cambiar la maquetación ni la paridad visual.
+          "sticky top-0 z-30 transition-colors duration-300",
           isOverlay
             ? "border-b border-transparent bg-transparent"
             : "border-b border-border/70 bg-background/90 backdrop-blur shadow-[0_1px_0_color-mix(in_oklab,var(--color-foreground)_4%,transparent)]",
         )}
+
       >
         {/*
           Scrim editorial superior (12C.0/12C.1): garantiza que el logotipo
