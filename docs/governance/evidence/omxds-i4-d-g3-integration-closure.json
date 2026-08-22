@@ -5,6 +5,20 @@
   "base": "d02942d07b9fc96e9a39f1faf4bbafb28ec7a5c2",
   "branch": "feature/omxds-i4-d-g3-integration-evidence-closure-v1",
   "acceptance_report": "docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md",
-  "reason": "Human acceptance scenarios G3-H01..G3-H12 are pending. validate:i4:d must remain fail-closed until Verdict PASS with Open P0/P1 = 0.",
-  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"]
+  "reason": "Functional acceptance PASS (H01-H06, H08-H10). H07 pendiente de VoiceOver; H11/H12 DEFERRED por dependencia de segunda identidad editorial real. validate:i4:d permanece fail-closed.",
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "functional_acceptance": "PASS",
+  "operational_multi_actor_acceptance": "DEFERRED",
+  "deferred_scenarios": {
+    "G3-H11": "segunda identidad editorial real y sesión operativa de aprobación",
+    "G3-H12": "segunda identidad editorial real y sesión operativa de aprobación"
+  },
+  "pending_human_scenarios": {
+    "G3-H07": "percepción asistida real (VoiceOver)"
+  },
+  "founder_decision": "2026-08-22 · no se autoriza sandbox adicional ni cuenta editorial artificial; H11/H12 DEFERRED; sin fabricación de PASS",
+  "open_p0": 0,
+  "open_p1": 0
 }
