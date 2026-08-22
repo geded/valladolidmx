@@ -1,7 +1,7 @@
 # 15 · Asset Rights Register v1.0
 
 **Fecha:** 2026-08-22 · **Ola:** V1-P1.a · **Blueprint:** `docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md`
-**Manifiesto:** `docs/governance/product-authorizations/PCA-2026-021.json` (Approved)
+**Manifiesto:** ninguno. Paquete documental puro; no requiere Product Change Authorization porque no modifica rutas sensibles de producto.
 **FLAG:** OFF · **PRODUCCIÓN:** NO TOCADA · **Sin cambios en binarios, Storage ni `media_assets`.**
 
 Registro canónico de derechos, licencia y atribución de los **11 assets canónicos** de `media_assets`, más los objetos de Storage fuera del universo canónico. Documento puramente declarativo: no modifica ningún binario ni URL pública (Founder Immutable Original Principle, Founder Stable Public Asset Contract).
