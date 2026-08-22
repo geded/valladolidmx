@@ -137,8 +137,12 @@ Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contr
   | Móvil       | 390        | 0 px       | 0            | Sí             | `sticky`   | Sí (right 166.5)         |
   | Tablet      | 768        | 0 px       | 0            | Sí             | `sticky`   | Sí (right 191.5)         |
   | Desktop     | 1280       | 0 px       | 0            | Sí             | `sticky`   | Sí (right 199.5)         |
-  Estado de aceptación: **G3 permanece `BLOCKED`**; la validación humana debe
-  repetirse sobre el canvas remediado en iPad Safari.
+  Estado del defecto: **CLOSED** (validación humana repetida 2026-08-22, iPad
+  Safari, Móvil/Tablet/Desktop PASS).
+  Estado de aceptación del gate: **G3 permanece `BLOCKED`** por escenarios
+  humanos aún no ejecutados (G3-H03, G3-H04, G3-H05 a G3-H10) y por G3-H11/G3-H12
+  en `PARTIAL`. El cierre de DEF-G3-001 no cubre esos escenarios y la regla de
+  cierre de la sección 1 exige los doce en `PASS` con evidencia verificable.
 
 
 
