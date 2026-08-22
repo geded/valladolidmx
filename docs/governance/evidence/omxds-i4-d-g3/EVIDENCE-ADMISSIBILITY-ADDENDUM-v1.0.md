@@ -55,7 +55,7 @@ Aplicación única vigente: **`G3-H05`** (zoom nativo de Safari 200 %). Evidenci
 
 ## 4. Escenarios que siguen exigiendo humano
 
-`G3-H05` (zoom nativo de Safari 200 % / reflow 320 px), `G3-H07` (VoiceOver),
+`G3-H07` (VoiceOver),
 `G3-H11` (flujo Draft→Published con dos cuentas reales, conflicto, auditoría y
 rollback) y `G3-H12` (autorización y seguridad). `G3-H01`, `G3-H02` y `G3-H08` ya
 están acreditados humanamente.
