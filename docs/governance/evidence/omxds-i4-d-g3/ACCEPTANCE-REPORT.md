@@ -13,13 +13,15 @@
 
 Este reporte es la autoridad humana de aceptación para G3. La automatización puede demostrar contratos y regresión, pero **no puede convertir el gate a PASS por sí sola**. G3 sólo puede quedar en `PASS` cuando:
 
-1. todos los escenarios `G3-H01` a `G3-H12` estén en `PASS`;
-2. exista evidencia verificable para cada escenario;
+1. todos los escenarios `G3-H01` a `G3-H12` estén en `PASS` (humano u objetivo admisible según `EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md`);
+2. exista evidencia verificable y archivada para cada escenario;
 3. `Open P0: 0` y `Open P1: 0`;
 4. la suite automatizada I4-D y la validación canónica completa estén en PASS;
 5. no se utilicen producción, despliegue, datos reales, flag ON, Premium ni Commerce.
 
-`PASS WITH CONDITIONS` no cierra G3.
+`PASS WITH CONDITIONS` no cierra G3. La adenda no sustituye la validación humana de
+G3-H05, G3-H07, G3-H11 ni G3-H12.
+
 
 ## 2. Slice vertical canónico
 
