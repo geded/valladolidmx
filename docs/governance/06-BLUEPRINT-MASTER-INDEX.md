@@ -2,7 +2,7 @@
 
 **Estado:** Approved
 
-**Versión:** 0.40
+**Versión:** 0.41
 
 **Última actualización:** 2026-08-22
 
