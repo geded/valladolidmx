@@ -18,7 +18,7 @@
 
 ## Estado consolidado
 
-- **PASS humano:** H01, H02, H08.
-- **PASS objetiva:** H03, H04, H06, H09, H10.
+- **PASS humano:** H01, H02, H03, H04, H08.
+- **PASS objetiva:** H06, H09, H10 (H03 y H04 refuerzan con evidencia objetiva combinada).
 - **BLOCKED, requiere humano:** H05, H07.
 - **PARTIAL, requiere humano:** H11, H12.
