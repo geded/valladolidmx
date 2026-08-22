@@ -13,13 +13,15 @@
 
 Este reporte es la autoridad humana de aceptación para G3. La automatización puede demostrar contratos y regresión, pero **no puede convertir el gate a PASS por sí sola**. G3 sólo puede quedar en `PASS` cuando:
 
-1. todos los escenarios `G3-H01` a `G3-H12` estén en `PASS`;
-2. exista evidencia verificable para cada escenario;
+1. todos los escenarios `G3-H01` a `G3-H12` estén en `PASS` (humano u objetivo admisible según `EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md`);
+2. exista evidencia verificable y archivada para cada escenario;
 3. `Open P0: 0` y `Open P1: 0`;
 4. la suite automatizada I4-D y la validación canónica completa estén en PASS;
 5. no se utilicen producción, despliegue, datos reales, flag ON, Premium ni Commerce.
 
-`PASS WITH CONDITIONS` no cierra G3.
+`PASS WITH CONDITIONS` no cierra G3. La adenda no sustituye la validación humana de
+G3-H05, G3-H07, G3-H11 ni G3-H12.
+
 
 ## 2. Slice vertical canónico
 
@@ -49,22 +51,26 @@ No se autoriza crear arquitectura paralela ni corregir producto dentro de I4-D.
 | Harness I4-D                            | BLOCKED | pendiente ejecutar `bun run test:i4:d` sobre el paquete final                           |
 | Governance Integrity                    | BLOCKED | pendiente paquete final y validación completa                                           |
 
-## 4. Validación humana obligatoria
+## 4. Validación de escenarios G3-H01…G3-H12
 
 Completar únicamente en entorno no público con datos ficticios. Para cada fila, registrar referencia de captura/video/log y observaciones. No cambiar a PASS sin ejecutar el escenario.
+
+Desde 2026-08-22 rige `EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md` (Founder Directive «MODO CIERRE I4-D»): los escenarios deterministas y mecánicos no ejecutables humanamente en la superficie disponible pueden acreditarse con evidencia objetiva reproducible, declarada como `PASS (objetiva)` y nunca como humana. Percepción asistida, interacción nativa del sistema, autorización entre cuentas y seguridad siguen exigiendo humano.
+
 
 | ID     | Escenario                                                                                                                                | Estado  | Evidencia / observaciones |
 | ------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------- |
 | G3-H01 | Responsive 390 px: sin overflow ni pérdida de función                                                                                    | PASS | Validación humana iPad Safari 2026-08-22 sobre `/cms/experience-builder?mode=visual&page=home`, modo Móvil: scroll vertical real dentro del canvas, encabezado visible y `sticky`, sin recorte derecho, buscador y botón completos. Evidencia automática de apoyo: `canvas-viewport/canvas-noscale-metrics.json` (390: overflowX 0). |
 | G3-H02 | Responsive 768 px: sin overflow ni pérdida de función                                                                                    | PASS | Validación humana iPad Safari 2026-08-22, modo Tablet: scroll vertical real, encabezado visible y `sticky`, sin overflow interno, buscador completo. Evidencia automática: `canvas-viewport/canvas-noscale-metrics.json` (768: overflowX 0). |
-| G3-H03 | Responsive 1024 px: sin overflow ni pérdida de función                                                                                   | BLOCKED | evidencia técnica automatizada 2026-08-22 (`objective-2026-08-22-h03h04/`): innerWidth 1024, overflowX 0, header `sticky` visible tras scroll real, 0 errores de consola. Los botones del Studio (Móvil/Tablet/Desktop = 390/768/1280) no producen 1024 px, por lo que **no hay validación humana posible desde iPad**; permanece BLOCKED. |
-| G3-H04 | Responsive 1440 px: sin overflow ni pérdida de función                                                                                   | BLOCKED | evidencia técnica automatizada 2026-08-22 (`objective-2026-08-22-h03h04/`): innerWidth 1440, overflowX 0, header `sticky` visible tras scroll real, 0 errores de consola. Ningún botón del Studio equivale a 1440 px; permanece BLOCKED. |
-| G3-H05 | Zoom 200 % y reflow 320 CSS px utilizables                                                                                               | BLOCKED | pendiente                 |
-| G3-H06 | Flujo completo por teclado, foco visible, orden lógico y sin trampa                                                                      | BLOCKED | pendiente                 |
-| G3-H07 | Lector real: VoiceOver/Safari, NVDA o TalkBack según dispositivo disponible                                                              | BLOCKED | pendiente                 |
+| G3-H03 | Responsive 1024 px: sin overflow ni pérdida de función                                                                                   | PASS (objetiva) | Acreditado por `EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md` §3. Evidencia: `objective-2026-08-22-h03h04/canvas-exact-widths.json` — innerWidth 1024, overflowX 0, header `sticky` visible tras scroll real (scrollY 933), 0 errores de consola. No ejecutable humanamente: el Studio sólo ofrece 390/768/1280. |
+| G3-H04 | Responsive 1440 px: sin overflow ni pérdida de función                                                                                   | PASS (objetiva) | Acreditado por la adenda §3. Evidencia: `objective-2026-08-22-h03h04/canvas-exact-widths.json` — innerWidth 1440, overflowX 0, header `sticky` visible tras scroll real, 0 errores de consola. No ejecutable humanamente. |
+| G3-H05 | Zoom 200 % y reflow 320 CSS px utilizables                                                                                               | BLOCKED | **Requiere humano** (zoom nativo de Safari). Apoyo objetivo no suficiente: `objective-2026-08-22/objective.json` (reflow 320 overflowX 0; equivalente 200 % a 720 px de layout overflowX 0). Bloque 1 del `FINAL-HUMAN-SESSION-RUNBOOK.md`. |
+| G3-H06 | Flujo completo por teclado, foco visible, orden lógico y sin trampa                                                                      | PASS (objetiva) | Acreditado por la adenda §3. Evidencia: `objective-2026-08-22/security_a11y.json` — 25 tabulaciones, 17 paradas únicas, 0 paradas sin indicador de foco, sin trampa de foco. |
+| G3-H07 | Lector real: VoiceOver/Safari, NVDA o TalkBack según dispositivo disponible                                                              | BLOCKED | **Requiere humano** (VoiceOver). Bloque 2 del `FINAL-HUMAN-SESSION-RUNBOOK.md`. |
 | G3-H08 | Touch: controles principales operables y sin dependencia de hover                                                                        | PASS | Grabación humana iPad Safari 2026-08-21 (`human-session-2026-08-21/G3-H08-ipad-safari-2026-08-21.mp4`, sha256 `30e01a4b…65ea3`, 22.7 s): operación táctil real sobre `/cms/experience-builder?mode=visual&page=home` sin dependencia de hover. Evidencia complementaria en la misma grabación: cambio entre Móvil, Tablet y Desktop con scroll real dentro del canvas y encabezado `sticky` visible. No aplicable a G3-H05, G3-H07, G3-H11 ni G3-H12. |
-| G3-H09 | Tema Sol conserva contenido, orden, CTA y estado                                                                                         | BLOCKED | pendiente                 |
-| G3-H10 | Tema Luna conserva contenido, orden, CTA y estado                                                                                        | BLOCKED | pendiente                 |
+| G3-H09 | Tema Sol conserva contenido, orden, CTA y estado                                                                                         | PASS (objetiva) | Acreditado por la adenda §3. Evidencia: `objective-2026-08-22/themes.json` — 1024 y 1440: mismos 7 encabezados, mismo conteo/hash de CTAs (58 / 745) que Luna, overflowX 0. |
+| G3-H10 | Tema Luna conserva contenido, orden, CTA y estado                                                                                        | PASS (objetiva) | Acreditado por la adenda §3. Evidencia: `objective-2026-08-22/themes.json` — paridad estructural exacta con Sol en 1024 y 1440, overflowX 0, contraste de fondo `oklch(0.329 0.048 129.7)`. |
+
 | G3-H11 | Slice vertical completo: authorable + binding + preview + Draft→Published + autor/aprobador distintos + conflicto + auditoría + rollback | PARTIAL | Sesión humana 2026-08-21 (entorno no público): el administrador abrió Experience Builder y cargaron las composiciones Inicio y Hoteles. Faltan Draft→Published, separación autor/aprobador, conflicto, auditoría y rollback. |
 | G3-H12 | Seguridad: operaciones sensibles con actor autorizado, preview sin PII/secrets y fallo gobernado fail-closed                             | PARTIAL | Sesión humana 2026-08-21 (entorno no público, flag OFF): «Añadir sección» no ofreció Info Grid y la búsqueda «Info» tampoco lo mostró. Falta verificar actor autorizado en operaciones sensibles, ausencia de PII/secrets en preview y fallo gobernado fail-closed. |
 
@@ -139,11 +145,13 @@ Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contr
   | Desktop     | 1280       | 0 px       | 0            | Sí             | `sticky`   | Sí (right 199.5)         |
   Estado del defecto: **CLOSED** (validación humana repetida 2026-08-22, iPad
   Safari, Móvil/Tablet/Desktop PASS).
-  Estado de aceptación del gate: **G3 permanece `BLOCKED`** por escenarios
-  humanos aún no ejecutados (G3-H03, G3-H04, G3-H05, G3-H06, G3-H07, G3-H09,
-  G3-H10) y por G3-H11/G3-H12 en `PARTIAL`. El cierre de DEF-G3-001 no cubre
-  esos escenarios y la regla de cierre de la sección 1 exige los doce en `PASS`
-  con evidencia verificable.
+  Estado de aceptación del gate: **G3 permanece `BLOCKED`** exclusivamente por los
+  escenarios que exigen humano y aún no se han ejecutado: G3-H05 (zoom nativo),
+  G3-H07 (VoiceOver), G3-H11 (dos cuentas) y G3-H12 (autorización y seguridad).
+  G3-H03, G3-H04, G3-H06, G3-H09 y G3-H10 quedan acreditados como
+  `PASS (objetiva)` bajo `EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md`. El cierre de
+  DEF-G3-001 no cubre los escenarios humanos restantes.
+
 
 ### 6.1 Registro de grabación humana (G3-H08)
 
