@@ -57,8 +57,7 @@ const SAFE_COLUMNS =
 
 function serverPublicClient() {
   const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
-  const key =
-    process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) {
     throw new Error("Supabase public env vars missing (SUPABASE_URL/SUPABASE_PUBLISHABLE_KEY)");
   }
@@ -125,7 +124,10 @@ export async function fetchPublicReviews(data: {
       break;
   }
 
-  if (data.cursor && (data.sort === "recent" || data.sort === "highest" || data.sort === "lowest")) {
+  if (
+    data.cursor &&
+    (data.sort === "recent" || data.sort === "highest" || data.sort === "lowest")
+  ) {
     q = q.lt("published_at", data.cursor);
   }
 
