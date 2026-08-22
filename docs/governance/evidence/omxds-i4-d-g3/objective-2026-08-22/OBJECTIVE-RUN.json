@@ -1,0 +1,71 @@
+{
+  "run": "I4-D · G3 · Objective (non-human) verification run",
+  "date": "2026-08-22",
+  "environment": "entorno local no público · datos ficticios",
+  "flag": "omxds_visual_v1_contracts_enabled=false",
+  "production": "no tocada",
+  "authority": "NO constituye validación humana de aceptación; es evidencia técnica de apoyo. G3 permanece BLOCKED.",
+  "tooling": "Chromium headless (Playwright) · viewports reales sin transform/scale",
+  "surface": "http://localhost:8080/ (documento canónico que el canvas del Studio renderiza en viewport aislado)",
+  "checks": {
+    "viewport_1024": {
+      "innerWidth": 1024,
+      "overflowX": 0,
+      "headerPosition": "sticky",
+      "headerVisibleAfterScroll": true,
+      "consoleErrors": 0
+    },
+    "viewport_1440": {
+      "innerWidth": 1440,
+      "overflowX": 0,
+      "headerPosition": "sticky",
+      "headerVisibleAfterScroll": true,
+      "consoleErrors": 0
+    },
+    "reflow_320": { "innerWidth": 320, "overflowX": 0, "headerVisibleAfterScroll": true },
+    "zoom_200_equivalent": {
+      "layoutWidth": 720,
+      "note": "1440 CSS px @200% ≡ 720 px de layout con dpr 2",
+      "overflowX": 0,
+      "headerVisibleAfterScroll": true
+    },
+    "themes": {
+      "method": "aplicación directa del contrato applyOmxdsTheme (clase dark + data-theme)",
+      "sol_vs_luna_1024": { "sameHeadings": true, "sameCtaCount": true, "overflowX": 0 },
+      "sol_vs_luna_1440": { "sameHeadings": true, "sameCtaCount": true, "overflowX": 0 },
+      "bodyBgSol": "oklch(0.977 0.013 86.8)",
+      "bodyBgLuna": "oklch(0.329 0.048 129.7)"
+    },
+    "keyboard_sweep": {
+      "tabSteps": 25,
+      "uniqueStops": 17,
+      "stopsWithoutFocusIndicator": 0,
+      "trapDetected": false,
+      "note": "barrido mecánico; no sustituye G3-H06 ni G3-H07"
+    },
+    "preview_security": {
+      "route": "/preview/composition/token-invalido-ficticio",
+      "robotsMeta": "noindex, nofollow",
+      "failClosedMessage": "Vista previa no disponible · Este enlace no es válido o ya caducó.",
+      "secretsOrPiiInHtml": false,
+      "scannedPatterns": ["service_role", "sb_secret", "SUPABASE_SERVICE", "password", "correo"]
+    }
+  },
+  "artifacts": [
+    "objective.json",
+    "themes.json",
+    "security_a11y.json",
+    "screenshots/1024_sol.png",
+    "screenshots/1440_sol.png",
+    "screenshots/1024_luna.png",
+    "screenshots/1440_luna.png",
+    "screenshots/reflow_320.png",
+    "screenshots/zoom200_1440.png",
+    "screenshots/theme_sol_1024.png",
+    "screenshots/theme_luna_1024.png",
+    "screenshots/theme_sol_1440.png",
+    "screenshots/theme_luna_1440.png",
+    "screenshots/preview_invalid.png"
+  ],
+  "g3": "BLOCKED"
+}
