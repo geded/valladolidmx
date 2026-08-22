@@ -1,0 +1,74 @@
+{
+  "sol_1024": {
+    "theme": "sol",
+    "dark": false,
+    "bodyBg": "oklch(0.977 0.013 86.8)",
+    "h1": "Despierta en Valladolid y descubre el Oriente Maya de Yucat\u00e1n.",
+    "ctaCount": 58,
+    "ctaHash": 745,
+    "overflowX": 0,
+    "headings": [
+      "Destinos del Oriente Maya",
+      "Qu\u00e9 te mueve",
+      "Rutas sugeridas",
+      "Arma tu Viaje",
+      "Oriente Maya en vivo",
+      "Empresas recomendadas",
+      "Lo que cuentan quienes ya vinieron"
+    ]
+  },
+  "luna_1024": {
+    "theme": "luna",
+    "dark": true,
+    "bodyBg": "oklch(0.329 0.048 129.7)",
+    "h1": "Despierta en Valladolid y descubre el Oriente Maya de Yucat\u00e1n.",
+    "ctaCount": 58,
+    "ctaHash": 745,
+    "overflowX": 0,
+    "headings": [
+      "Destinos del Oriente Maya",
+      "Qu\u00e9 te mueve",
+      "Rutas sugeridas",
+      "Arma tu Viaje",
+      "Oriente Maya en vivo",
+      "Empresas recomendadas",
+      "Lo que cuentan quienes ya vinieron"
+    ]
+  },
+  "sol_1440": {
+    "theme": "sol",
+    "dark": false,
+    "bodyBg": "oklch(0.977 0.013 86.8)",
+    "h1": "Despierta en Valladolid y descubre el Oriente Maya de Yucat\u00e1n.",
+    "ctaCount": 58,
+    "ctaHash": 745,
+    "overflowX": 0,
+    "headings": [
+      "Destinos del Oriente Maya",
+      "Qu\u00e9 te mueve",
+      "Rutas sugeridas",
+      "Arma tu Viaje",
+      "Oriente Maya en vivo",
+      "Empresas recomendadas",
+      "Lo que cuentan quienes ya vinieron"
+    ]
+  },
+  "luna_1440": {
+    "theme": "luna",
+    "dark": true,
+    "bodyBg": "oklch(0.329 0.048 129.7)",
+    "h1": "Despierta en Valladolid y descubre el Oriente Maya de Yucat\u00e1n.",
+    "ctaCount": 58,
+    "ctaHash": 745,
+    "overflowX": 0,
+    "headings": [
+      "Destinos del Oriente Maya",
+      "Qu\u00e9 te mueve",
+      "Rutas sugeridas",
+      "Arma tu Viaje",
+      "Oriente Maya en vivo",
+      "Empresas recomendadas",
+      "Lo que cuentan quienes ya vinieron"
+    ]
+  }
+}
