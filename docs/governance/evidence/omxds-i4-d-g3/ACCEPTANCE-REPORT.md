@@ -148,8 +148,9 @@ Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contr
   Estado del defecto: **CLOSED** (validación humana repetida 2026-08-22, iPad
   Safari, Móvil/Tablet/Desktop PASS).
   Estado de aceptación del gate: **G3 permanece `BLOCKED`** exclusivamente por los
-  escenarios que exigen humano y aún no se han ejecutado: G3-H05 (zoom nativo),
-  G3-H07 (VoiceOver), G3-H11 (dos cuentas) y G3-H12 (autorización y seguridad).
+  escenarios que exigen humano y aún no se han ejecutado: G3-H07 (VoiceOver),
+  G3-H11 (dos cuentas) y G3-H12 (autorización y seguridad). G3-H05 queda acreditado
+  por evidencia objetiva admisible ante limitación verificable del dispositivo.
   G3-H03 y G3-H04 quedan acreditados como `PASS (humana + objetiva)` con la
   grabación iPad Safari 2026-08-21 20:31:45 (sha256 `f469ace5…b34f4`) combinada con
   `objective-2026-08-22-h03h04/`. G3-H06, G3-H09 y G3-H10 permanecen
