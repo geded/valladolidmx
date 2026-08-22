@@ -1,4 +1,11 @@
-# I4-D · G3 · Runbook final de sesión humana única (H05 · H07 · H11 · H12)
+# I4-D · G3 · Runbook final de sesión humana única (H07 · H11 · H12)
+
+> **Actualización 2026-08-22 (autoridad Founder):** el Bloque 1 (H05, zoom nativo de
+> Safari) queda **retirado**. El iPad de validación no expone ese control (limitación
+> verificable con captura del Founder) y los botones 1024/1440 no son equivalentes.
+> H05 se acredita con evidencia objetiva admisible (§2 bis de la adenda). H07 se
+> ejecuta con `H07-VOICEOVER-MINIMAL-RUNBOOK.md`. H11/H12 quedan en espera hasta
+> confirmar sandbox y dos cuentas con roles reales.
 
 **Duración estimada:** 35–45 min · **Dispositivo:** iPad Safari · **Entorno:** no público, datos ficticios
 **FLAG:** `omxds_visual_v1_contracts_enabled=false` · **Producción:** no tocada · **G3:** BLOCKED
