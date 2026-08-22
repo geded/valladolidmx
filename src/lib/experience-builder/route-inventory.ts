@@ -254,6 +254,11 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     maturity: "L3",
     migrationStatus: "planned",
   },
+  "src/routes/eventos.index.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "planned",
+  },
   "src/routes/hoteles.tsx": {
     businessPriority: "high",
     maturity: "L3",
