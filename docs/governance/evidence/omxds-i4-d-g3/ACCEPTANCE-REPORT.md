@@ -169,6 +169,24 @@ Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contr
 
 El binario original se conserva íntegro (inmutable) mediante puntero CDN; no se altera ni recodifica.
 
+### 6.2 Registro de grabación humana (G3-H03 · G3-H04)
+
+| Campo | Valor |
+| ----- | ----- |
+| Nombre original | `ScreenRecording_08-21-2026_20-31-44_1.mp4` |
+| Nombre archivado | `G3-H03-H04-ipad-safari-2026-08-21.mp4` |
+| Ruta de evidencia | `docs/governance/evidence/omxds-i4-d-g3/human-session-2026-08-21/` (puntero `.asset.json` + `HUMAN-RECORDING-MANIFEST-H03-H04.json`) |
+| Fecha de captura | 2026-08-21 20:31:45 (UTC-6) · archivado 2026-08-22 |
+| SHA-256 | `f469ace5e387fb180ce62e7fcbed8cea16b649808897ac484fde1dc068fb34f4` |
+| Tamaño / duración | 23 555 409 bytes · 15.96 s · HEVC 2420×1668 |
+| Dispositivo / superficie | iPad Safari · `/cms/experience-builder?mode=visual&page=home` |
+| Alcance probatorio | G3-H03 `PASS` y G3-H04 `PASS`, combinada con `objective-2026-08-22-h03h04/`. |
+| No válido para | G3-H05, G3-H06, G3-H07, G3-H08, G3-H09, G3-H10, G3-H11, G3-H12 |
+
+El binario original se conserva íntegro (inmutable) mediante puntero CDN; no se altera ni recodifica.
+
+
+
 
 
 ## 7. Prohibiciones observadas
