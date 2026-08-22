@@ -49,9 +49,12 @@ No se autoriza crear arquitectura paralela ni corregir producto dentro de I4-D.
 | Harness I4-D                            | BLOCKED | pendiente ejecutar `bun run test:i4:d` sobre el paquete final                           |
 | Governance Integrity                    | BLOCKED | pendiente paquete final y validación completa                                           |
 
-## 4. Validación humana obligatoria
+## 4. Validación de escenarios G3-H01…G3-H12
 
 Completar únicamente en entorno no público con datos ficticios. Para cada fila, registrar referencia de captura/video/log y observaciones. No cambiar a PASS sin ejecutar el escenario.
+
+Desde 2026-08-22 rige `EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md` (Founder Directive «MODO CIERRE I4-D»): los escenarios deterministas y mecánicos no ejecutables humanamente en la superficie disponible pueden acreditarse con evidencia objetiva reproducible, declarada como `PASS (objetiva)` y nunca como humana. Percepción asistida, interacción nativa del sistema, autorización entre cuentas y seguridad siguen exigiendo humano.
+
 
 | ID     | Escenario                                                                                                                                | Estado  | Evidencia / observaciones |
 | ------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------- |
