@@ -62,7 +62,7 @@ Completar únicamente en entorno no público con datos ficticios. Para cada fila
 | G3-H05 | Zoom 200 % y reflow 320 CSS px utilizables                                                                                               | BLOCKED | pendiente                 |
 | G3-H06 | Flujo completo por teclado, foco visible, orden lógico y sin trampa                                                                      | BLOCKED | pendiente                 |
 | G3-H07 | Lector real: VoiceOver/Safari, NVDA o TalkBack según dispositivo disponible                                                              | BLOCKED | pendiente                 |
-| G3-H08 | Touch: controles principales operables y sin dependencia de hover                                                                        | BLOCKED | pendiente                 |
+| G3-H08 | Touch: controles principales operables y sin dependencia de hover                                                                        | PASS | Grabación humana iPad Safari 2026-08-21 (`human-session-2026-08-21/G3-H08-ipad-safari-2026-08-21.mp4`, sha256 `30e01a4b…65ea3`, 22.7 s): operación táctil real sobre `/cms/experience-builder?mode=visual&page=home` sin dependencia de hover. Evidencia complementaria en la misma grabación: cambio entre Móvil, Tablet y Desktop con scroll real dentro del canvas y encabezado `sticky` visible. No aplicable a G3-H05, G3-H07, G3-H11 ni G3-H12. |
 | G3-H09 | Tema Sol conserva contenido, orden, CTA y estado                                                                                         | BLOCKED | pendiente                 |
 | G3-H10 | Tema Luna conserva contenido, orden, CTA y estado                                                                                        | BLOCKED | pendiente                 |
 | G3-H11 | Slice vertical completo: authorable + binding + preview + Draft→Published + autor/aprobador distintos + conflicto + auditoría + rollback | PARTIAL | Sesión humana 2026-08-21 (entorno no público): el administrador abrió Experience Builder y cargaron las composiciones Inicio y Hoteles. Faltan Draft→Published, separación autor/aprobador, conflicto, auditoría y rollback. |
@@ -140,9 +140,26 @@ Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contr
   Estado del defecto: **CLOSED** (validación humana repetida 2026-08-22, iPad
   Safari, Móvil/Tablet/Desktop PASS).
   Estado de aceptación del gate: **G3 permanece `BLOCKED`** por escenarios
-  humanos aún no ejecutados (G3-H03, G3-H04, G3-H05 a G3-H10) y por G3-H11/G3-H12
-  en `PARTIAL`. El cierre de DEF-G3-001 no cubre esos escenarios y la regla de
-  cierre de la sección 1 exige los doce en `PASS` con evidencia verificable.
+  humanos aún no ejecutados (G3-H03, G3-H04, G3-H05, G3-H06, G3-H07, G3-H09,
+  G3-H10) y por G3-H11/G3-H12 en `PARTIAL`. El cierre de DEF-G3-001 no cubre
+  esos escenarios y la regla de cierre de la sección 1 exige los doce en `PASS`
+  con evidencia verificable.
+
+### 6.1 Registro de grabación humana (G3-H08)
+
+| Campo | Valor |
+| ----- | ----- |
+| Nombre original | `ScreenRecording_08-21-2026_19-29-52_1.mp4` |
+| Nombre archivado | `G3-H08-ipad-safari-2026-08-21.mp4` |
+| Ruta de evidencia | `docs/governance/evidence/omxds-i4-d-g3/human-session-2026-08-21/` (puntero `.asset.json` + `HUMAN-RECORDING-MANIFEST.json`) |
+| Fecha de captura | 2026-08-21 19:29:52 (UTC-6) · archivado 2026-08-22 |
+| SHA-256 | `30e01a4bd2578e10fae78a91421bc8a31f8ff6dd7d40a8b72be63a8ba8565ea3` |
+| Tamaño / duración | 37 429 385 bytes · 22.71 s · HEVC 2420×1668 |
+| Dispositivo / superficie | iPad Safari · `/cms/experience-builder?mode=visual&page=home` |
+| Alcance probatorio | G3-H08 `PASS`; evidencia complementaria de Móvil/Tablet/Desktop con scroll real y encabezado `sticky`. |
+| No válido para | G3-H05, G3-H07, G3-H11, G3-H12 |
+
+El binario original se conserva íntegro (inmutable) mediante puntero CDN; no se altera ni recodifica.
 
 
 
