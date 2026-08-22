@@ -1,0 +1,13 @@
+{
+  "remediation": "18.54 · DEF-G3-001 · viewport real sin transform",
+  "iframeTransform": "none",
+  "stickyScrollport": "documento del iframe (scrollingElement)",
+  "results": {
+    "mobile": { "innerWidth": 390, "scrollY": 700, "overflowX": 0, "headerTop": 0, "headerVisible": true, "headerPosition": "sticky", "searchButtonRight": 166.5, "buttonContained": true },
+    "tablet": { "innerWidth": 768, "scrollY": 700, "overflowX": 0, "headerTop": 0, "headerVisible": true, "headerPosition": "sticky", "searchButtonRight": 191.5, "buttonContained": true },
+    "desktop": { "innerWidth": 1280, "scrollY": 733, "overflowX": 0, "headerTop": 0, "headerVisible": true, "headerPosition": "sticky", "searchButtonRight": 199.5, "buttonContained": true }
+  },
+  "flag": "omxds_visual_v1_contracts_enabled=false",
+  "production": "no tocada",
+  "g3": "BLOCKED"
+}
