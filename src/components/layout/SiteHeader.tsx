@@ -150,7 +150,6 @@ export function SiteHeader({ variant = "solid", config }: Props) {
     return () => view.removeEventListener("scroll", onScroll);
   }, [variant, mounted]);
 
-
   // Bloqueo de scroll del documento + cierre con Escape + focus trap.
   // El drawer se porta al body para escapar del stacking context del Header:
   // así el Hero nunca atraviesa el panel móvil (12C.1).
@@ -242,65 +241,74 @@ export function SiteHeader({ variant = "solid", config }: Props) {
       visible: true,
     },
     { kind: "language", label: "", href: "", icon: "", variant: "ghost", visible: showLanguage },
-    { kind: "user_menu", label: "Iniciar sesión", href: "", icon: "User", variant: "primary", visible: showUserMenu },
+    {
+      kind: "user_menu",
+      label: "Iniciar sesión",
+      href: "",
+      icon: "User",
+      variant: "primary",
+      visible: showUserMenu,
+    },
     { kind: "menu_toggle", label: "", href: "", icon: "Menu", variant: "ghost", visible: true },
   ];
   const visibleButtons = buttons.filter((b) => b.visible);
 
-  const mobileDrawer = mounted && open
-    ? createPortal(
-        <>
-          <div
-            aria-hidden
-            className="fixed inset-0 z-[998] bg-foreground/58 backdrop-blur-sm lg:hidden"
-            onClick={() => setOpen(false)}
-          />
-          <aside
-            ref={drawerRef}
-            id="mobile-drawer"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navegación principal"
-            tabIndex={-1}
-            style={{ backgroundColor: "var(--background)" }}
-            className="fixed right-3 top-3 z-[999] flex max-h-[calc(100dvh-1.5rem)] w-[min(76vw,21rem)] flex-col overflow-y-auto rounded-2xl border border-border/70 shadow-2xl outline-none lg:hidden"
-          >
-            <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 px-4">
-              <BrandLogo tone="dark" size="sm" />
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                aria-label="Cerrar menú"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-foreground transition-all active:scale-[0.98]"
-              >
-                <X className="size-4" />
-              </button>
-            </div>
-            <nav aria-label="Menú móvil" className="flex flex-col gap-0.5 px-4 py-5">
-              <PrimaryMegaMenu variant="mobile" onNavigate={() => setOpen(false)} />
-              <a
-                href={ctaHref}
-                onClick={() => setOpen(false)}
-                className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
-              >
-                <Compass className="size-4" aria-hidden />
-                {ctaLabel}
-              </a>
-              {showUserMenu ? <div className="mt-4 border-t border-border/70 pt-4 sm:hidden">
-                <UserMenu />
-              </div> : null}
-            </nav>
-          </aside>
-        </>,
-        document.body,
-      )
-    : null;
+  const mobileDrawer =
+    mounted && open
+      ? createPortal(
+          <>
+            <div
+              aria-hidden
+              className="fixed inset-0 z-[998] bg-foreground/58 backdrop-blur-sm lg:hidden"
+              onClick={() => setOpen(false)}
+            />
+            <aside
+              ref={drawerRef}
+              id="mobile-drawer"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navegación principal"
+              tabIndex={-1}
+              style={{ backgroundColor: "var(--background)" }}
+              className="fixed right-3 top-3 z-[999] flex max-h-[calc(100dvh-1.5rem)] w-[min(76vw,21rem)] flex-col overflow-y-auto rounded-2xl border border-border/70 shadow-2xl outline-none lg:hidden"
+            >
+              <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 px-4">
+                <BrandLogo tone="dark" size="sm" />
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label="Cerrar menú"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-foreground transition-all active:scale-[0.98]"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+              <nav aria-label="Menú móvil" className="flex flex-col gap-0.5 px-4 py-5">
+                <PrimaryMegaMenu variant="mobile" onNavigate={() => setOpen(false)} />
+                <a
+                  href={ctaHref}
+                  onClick={() => setOpen(false)}
+                  className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
+                >
+                  <Compass className="size-4" aria-hidden />
+                  {ctaLabel}
+                </a>
+                {showUserMenu ? (
+                  <div className="mt-4 border-t border-border/70 pt-4 sm:hidden">
+                    <UserMenu />
+                  </div>
+                ) : null}
+              </nav>
+            </aside>
+          </>,
+          document.body,
+        )
+      : null;
 
   return (
     <>
       <header
         ref={headerRef}
-
         className={cn(
           // 18.54 · `@container` se separa del elemento sticky: en Safari (iPad)
           // la contención del contenedor invalida `position: sticky` dentro del
@@ -311,7 +319,6 @@ export function SiteHeader({ variant = "solid", config }: Props) {
             ? "border-b border-transparent bg-transparent"
             : "border-b border-border/70 bg-background/90 backdrop-blur shadow-[0_1px_0_color-mix(in_oklab,var(--color-foreground)_4%,transparent)]",
         )}
-
       >
         {/*
           Scrim editorial superior (12C.0/12C.1): garantiza que el logotipo
@@ -337,17 +344,18 @@ export function SiteHeader({ variant = "solid", config }: Props) {
 
             <div className="flex min-w-0 items-center gap-2">
               <MiViajeChip isOverlay={isOverlay} />
-              {visibleButtons.map((btn, idx) => renderHeaderButton(btn, idx, {
-                isOverlay,
-                open,
-                setOpen,
-                menuButtonRef,
-                ctaFallback: { label: ctaLabel, href: ctaHref },
-              }))}
+              {visibleButtons.map((btn, idx) =>
+                renderHeaderButton(btn, idx, {
+                  isOverlay,
+                  open,
+                  setOpen,
+                  menuButtonRef,
+                  ctaFallback: { label: ctaLabel, href: ctaHref },
+                }),
+              )}
             </div>
           </Container>
         </div>
-
       </header>
       {mobileDrawer}
     </>
@@ -449,9 +457,7 @@ function getVariantClass(variant: HeaderButton["variant"], isOverlay: boolean): 
         ? "border border-white/50 text-white hover:bg-white/10"
         : "border border-border text-foreground hover:bg-accent";
     case "ghost":
-      return isOverlay
-        ? "text-white/90 hover:bg-white/10"
-        : "text-foreground hover:bg-accent";
+      return isOverlay ? "text-white/90 hover:bg-white/10" : "text-foreground hover:bg-accent";
     case "light":
       return isOverlay
         ? "border border-white/40 bg-white/10 text-white backdrop-blur hover:bg-white/20"
