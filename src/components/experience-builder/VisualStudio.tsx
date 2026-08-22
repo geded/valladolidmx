@@ -2807,9 +2807,52 @@ function CanvasViewport({
     };
   }, []);
 
+  // HUD de medición (sólo entornos no productivos): innerWidth real del
+  // iframe, overflow horizontal y posición efectiva del encabezado.
+  const [hud, setHud] = useState(false);
+  const [metrics, setMetrics] = useState<{
+    innerWidth: number;
+    overflowX: number;
+    scrollY: number;
+    headerPosition: string;
+    headerTop: number;
+    headerVisible: boolean;
+  } | null>(null);
+
+  useEffect(() => setHud(auditWidthsEnabled()), []);
+
+  useEffect(() => {
+    if (!hud || !mount) return;
+    const win = mount.ownerDocument.defaultView;
+    const doc = mount.ownerDocument;
+    if (!win) return;
+    const read = () => {
+      const scroller = doc.scrollingElement ?? doc.documentElement;
+      const header = doc.querySelector("header");
+      const rect = header?.getBoundingClientRect();
+      setMetrics({
+        innerWidth: win.innerWidth,
+        overflowX: Math.max(0, Math.round(scroller.scrollWidth - scroller.clientWidth)),
+        scrollY: Math.round(win.scrollY),
+        headerPosition: header ? win.getComputedStyle(header).position : "n/a",
+        headerTop: rect ? Math.round(rect.top) : -1,
+        headerVisible: !!rect && rect.bottom > 0 && rect.top < win.innerHeight,
+      });
+    };
+    read();
+    const id = win.setInterval(read, 250);
+    win.addEventListener("scroll", read, true);
+    win.addEventListener("resize", read);
+    return () => {
+      win.clearInterval(id);
+      win.removeEventListener("scroll", read, true);
+      win.removeEventListener("resize", read);
+    };
+  }, [hud, mount, width]);
+
   return (
     <div
-      className="mx-auto shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
+      className="relative mx-auto shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
       style={{ width, height }}
     >
       <iframe
@@ -2821,6 +2864,16 @@ function CanvasViewport({
         style={{ width, height }}
       />
       {mount ? createPortal(children, mount) : null}
+      {hud && metrics ? (
+        <div
+          data-eb-canvas-hud=""
+          className="pointer-events-none absolute bottom-2 left-1/2 z-50 -translate-x-1/2 rounded-md bg-foreground/90 px-3 py-1.5 font-mono text-[11px] leading-tight text-background shadow-lg"
+        >
+          innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
+          {metrics.headerPosition} top {metrics.headerTop}px ·{" "}
+          {metrics.headerVisible ? "visible" : "OCULTO"} · scrollY {metrics.scrollY}px
+        </div>
+      ) : null}
     </div>
   );
 }
