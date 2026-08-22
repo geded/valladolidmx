@@ -96,10 +96,16 @@ Completar con datos ficticios:
 
 Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contrario.
 
-### Defectos abiertos
+### Defectos cerrados
 
 - **DEF-G3-001 · Canvas del Experience Builder sin encabezado y con desbordamiento horizontal en vista previa Móvil.**
-  **REOPENED** tras validación humana real en iPad Safari: el encabezado volvía
+  **CLOSED (2026-08-22)** por validación humana repetida en iPad Safari sobre
+  `/cms/experience-builder?mode=visual&page=home`: Móvil PASS, Tablet PASS y
+  Desktop PASS, con scroll vertical real dentro del canvas, encabezado visible y
+  `sticky`, sin recorte del buscador y sin desbordamiento interno del sitio. En
+  Desktop el ancho excedente se gestiona con desplazamiento horizontal del
+  contenedor del editor, sin escalar el iframe.
+  Historial: **REOPENED** tras validación humana real en iPad Safari: el encabezado volvía
   a desaparecer después del scroll y el botón circular del buscador quedaba
   recortado en el borde derecho.
   Causa raíz A: el header `overlay` observaba `window.scrollY` del documento del
