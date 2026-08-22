@@ -1,7 +1,7 @@
 # V1-P1.a · Reporte de Brechas de ALT y Dimensiones v1.0
 
 **Fecha:** 2026-08-22 · **Blueprint:** `19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md`
-**Manifiesto:** `PCA-2026-021` (Approved) · **FLAG:** OFF · **PRODUCCIÓN:** NO TOCADA
+**Manifiesto:** ninguno (paquete documental puro) · **FLAG:** OFF · **PRODUCCIÓN:** NO TOCADA
 **Fuentes de verdad:** consulta a `media_assets` (2026-08-22), `docs/evidence/omxds-visual/v0-baseline/media/media_assets_inventory.csv`, `docs/evidence/omxds-visual/v0-baseline/media/storage_objects_inventory.csv`.
 
 ---
