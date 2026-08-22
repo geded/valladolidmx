@@ -2209,7 +2209,7 @@ function PageVisualEditor({
               onChange={(next) => updateSelectedConfig(next)}
               simple={!advanced}
               activeBreakpoint={
-                deviceViewport === "desktop" ? "lg" : deviceViewport === "tablet" ? "md" : "base"
+                deviceViewport === "tablet" ? "md" : deviceViewport === "mobile" ? "base" : "lg"
               }
             />
 
