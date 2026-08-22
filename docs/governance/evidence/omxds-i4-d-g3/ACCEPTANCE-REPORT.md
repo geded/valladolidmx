@@ -20,7 +20,9 @@ Este reporte es la autoridad humana de aceptación para G3. La automatización p
 5. no se utilicen producción, despliegue, datos reales, flag ON, Premium ni Commerce.
 
 `PASS WITH CONDITIONS` no cierra G3. La adenda no sustituye la validación humana de
-G3-H05, G3-H07, G3-H11 ni G3-H12.
+G3-H07, G3-H11 ni G3-H12. `G3-H05` queda acreditado por evidencia objetiva admisible
+ante limitación verificable del dispositivo (sin control de zoom nativo al 200 %),
+conforme a la autoridad Founder 2026-08-22 y a la §2 bis de la adenda.
 
 
 ## 2. Slice vertical canónico
@@ -64,7 +66,7 @@ Desde 2026-08-22 rige `EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md` (Founder Directi
 | G3-H02 | Responsive 768 px: sin overflow ni pérdida de función                                                                                    | PASS | Validación humana iPad Safari 2026-08-22, modo Tablet: scroll vertical real, encabezado visible y `sticky`, sin overflow interno, buscador completo. Evidencia automática: `canvas-viewport/canvas-noscale-metrics.json` (768: overflowX 0). |
 | G3-H03 | Responsive 1024 px: sin overflow ni pérdida de función                                                                                   | PASS (humana + objetiva) | Grabación humana iPad Safari 2026-08-21 20:31:45 (UTC-6) (`human-session-2026-08-21/G3-H03-H04-ipad-safari-2026-08-21.mp4`, sha256 `f469ace5…b34f4`, 15.96 s): selección humana del control **1024** y scroll real dentro del canvas con encabezado visible. Combinada con evidencia técnica `objective-2026-08-22-h03h04/canvas-exact-widths.json` — innerWidth 1024, overflowX 0, header `sticky` visible tras scroll (scrollY 933), 0 errores de consola. |
 | G3-H04 | Responsive 1440 px: sin overflow ni pérdida de función                                                                                   | PASS (humana + objetiva) | Misma grabación humana (`sha256 f469ace5…b34f4`): selección humana del control **1440** y scroll real dentro del canvas con encabezado visible. Combinada con `objective-2026-08-22-h03h04/canvas-exact-widths.json` — innerWidth 1440, overflowX 0, header `sticky` visible tras scroll, 0 errores de consola. |
-| G3-H05 | Zoom 200 % y reflow 320 CSS px utilizables                                                                                               | BLOCKED | **Requiere humano** (zoom nativo de Safari). Apoyo objetivo no suficiente: `objective-2026-08-22/objective.json` (reflow 320 overflowX 0; equivalente 200 % a 720 px de layout overflowX 0). Bloque 1 del `FINAL-HUMAN-SESSION-RUNBOOK.md`. |
+| G3-H05 | Zoom 200 % y reflow 320 CSS px utilizables                                                                                               | PASS (objetiva admisible · limitación verificable del dispositivo) | Autoridad Founder 2026-08-22: la interfaz disponible en el iPad de validación no expone control de zoom nativo al 200 % (captura de limitación aportada por el Founder). Los botones 1024/1440 no son equivalentes (cambian viewport, no escala). Evidencia objetiva admisible bajo `EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md` §2: `objective-2026-08-22/objective.json` → `reflow_320` (innerWidth 320, overflowX 0, header `sticky` visible tras scroll) y `zoom200_1440` (1440 CSS px @200 % ≡ 720 px de layout con dpr 2, overflowX 0, header visible), 0 errores de consola. No se declara evidencia humana. |
 | G3-H06 | Flujo completo por teclado, foco visible, orden lógico y sin trampa                                                                      | PASS (objetiva) | Acreditado por la adenda §3. Evidencia: `objective-2026-08-22/security_a11y.json` — 25 tabulaciones, 17 paradas únicas, 0 paradas sin indicador de foco, sin trampa de foco. |
 | G3-H07 | Lector real: VoiceOver/Safari, NVDA o TalkBack según dispositivo disponible                                                              | BLOCKED | **Requiere humano** (VoiceOver). Bloque 2 del `FINAL-HUMAN-SESSION-RUNBOOK.md`. |
 | G3-H08 | Touch: controles principales operables y sin dependencia de hover                                                                        | PASS | Grabación humana iPad Safari 2026-08-21 (`human-session-2026-08-21/G3-H08-ipad-safari-2026-08-21.mp4`, sha256 `30e01a4b…65ea3`, 22.7 s): operación táctil real sobre `/cms/experience-builder?mode=visual&page=home` sin dependencia de hover. Evidencia complementaria en la misma grabación: cambio entre Móvil, Tablet y Desktop con scroll real dentro del canvas y encabezado `sticky` visible. No aplicable a G3-H05, G3-H07, G3-H11 ni G3-H12. |
@@ -146,8 +148,9 @@ Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contr
   Estado del defecto: **CLOSED** (validación humana repetida 2026-08-22, iPad
   Safari, Móvil/Tablet/Desktop PASS).
   Estado de aceptación del gate: **G3 permanece `BLOCKED`** exclusivamente por los
-  escenarios que exigen humano y aún no se han ejecutado: G3-H05 (zoom nativo),
-  G3-H07 (VoiceOver), G3-H11 (dos cuentas) y G3-H12 (autorización y seguridad).
+  escenarios que exigen humano y aún no se han ejecutado: G3-H07 (VoiceOver),
+  G3-H11 (dos cuentas) y G3-H12 (autorización y seguridad). G3-H05 queda acreditado
+  por evidencia objetiva admisible ante limitación verificable del dispositivo.
   G3-H03 y G3-H04 quedan acreditados como `PASS (humana + objetiva)` con la
   grabación iPad Safari 2026-08-21 20:31:45 (sha256 `f469ace5…b34f4`) combinada con
   `objective-2026-08-22-h03h04/`. G3-H06, G3-H09 y G3-H10 permanecen

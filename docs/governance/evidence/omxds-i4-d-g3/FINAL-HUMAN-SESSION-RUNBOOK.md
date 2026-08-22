@@ -1,4 +1,11 @@
-# I4-D · G3 · Runbook final de sesión humana única (H05 · H07 · H11 · H12)
+# I4-D · G3 · Runbook final de sesión humana única (H07 · H11 · H12)
+
+> **Actualización 2026-08-22 (autoridad Founder):** el Bloque 1 (H05, zoom nativo de
+> Safari) queda **retirado**. El iPad de validación no expone ese control (limitación
+> verificable con captura del Founder) y los botones 1024/1440 no son equivalentes.
+> H05 se acredita con evidencia objetiva admisible (§2 bis de la adenda). H07 se
+> ejecuta con `H07-VOICEOVER-MINIMAL-RUNBOOK.md`. H11/H12 quedan en espera hasta
+> confirmar sandbox y dos cuentas con roles reales.
 
 **Duración estimada:** 35–45 min · **Dispositivo:** iPad Safari · **Entorno:** no público, datos ficticios
 **FLAG:** `omxds_visual_v1_contracts_enabled=false` · **Producción:** no tocada · **G3:** BLOCKED
@@ -11,14 +18,11 @@
 2. Cuenta **A (Autor)**: cuenta editorial de prueba. Cuenta **B (Aprobador)**: cuenta distinta con permiso de aprobación (puede abrirse en ventana privada de Safari).
 3. Crea la composición sandbox **`G3 Sandbox · Oriente Maya`**, slug `g3-sandbox-oriente-maya`. No enlazada, no publicada en producción. Nunca tocar `home`.
 
-## Bloque 1 · H05 · Zoom nativo (5 min)
+## Bloque 1 · H05 · RETIRADO
 
-1. Con la composición abierta, aplica zoom nativo de Safari al 200 % (pellizco o Aa → zoom).
-2. Recorre toda la superficie; verifica que no aparezca desplazamiento horizontal y que todo control siga alcanzable.
-3. Reduce el ancho efectivo al mínimo (Split View estrecho ≈ 320 px CSS) y repite el recorrido.
-4. Vuelve al 100 %.
-
-**Esperado:** sin scroll horizontal, sin pérdida de función.
+No ejecutar. Acreditado por evidencia objetiva admisible (§2 bis de
+`EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md`): `objective-2026-08-22/objective.json`
+(`reflow_320`, `zoom200_1440`). No solicitar zoom nativo al usuario.
 
 ## Bloque 2 · H07 · VoiceOver (10 min)
 

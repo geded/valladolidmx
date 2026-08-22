@@ -28,8 +28,20 @@ cumple, de forma simultánea, las cinco condiciones siguientes:
 5. **Declarada como objetiva**, nunca como humana, en la propia fila del reporte.
 
 Quedan **excluidos** de esta regla y siguen exigiendo humano: percepción asistida
-(lector de pantalla), interacción nativa del sistema operativo (zoom de Safari),
-autorización real entre dos cuentas distintas y verificación de seguridad/permiso.
+(lector de pantalla), autorización real entre dos cuentas distintas y verificación
+de seguridad/permiso.
+
+## 2 bis. Limitación verificable del dispositivo (Founder 2026-08-22)
+
+Cuando la superficie de validación disponible **no expone** el control del sistema
+operativo requerido por un escenario, y esa limitación queda acreditada con captura
+aportada por el Founder, el escenario se acredita con evidencia objetiva reproducible
+equivalente, declarando explícitamente la limitación y sin atribuir evidencia humana.
+No se admiten sustitutos que cambien la semántica del criterio (por ejemplo, cambiar
+el ancho del viewport del canvas **no** es equivalente a aplicar zoom).
+
+Aplicación única vigente: **`G3-H05`** (zoom nativo de Safari 200 %). Evidencia:
+`objective-2026-08-22/objective.json` → `reflow_320` y `zoom200_1440`.
 
 ## 3. Escenarios acreditados por esta adenda
 
@@ -43,13 +55,13 @@ autorización real entre dos cuentas distintas y verificación de seguridad/perm
 
 ## 4. Escenarios que siguen exigiendo humano
 
-`G3-H05` (zoom nativo de Safari 200 % / reflow 320 px), `G3-H07` (VoiceOver),
+`G3-H07` (VoiceOver),
 `G3-H11` (flujo Draft→Published con dos cuentas reales, conflicto, auditoría y
 rollback) y `G3-H12` (autorización y seguridad). `G3-H01`, `G3-H02` y `G3-H08` ya
 están acreditados humanamente.
 
 ## 5. Efecto
 
-Esta adenda **no cierra G3**. G3 pasa a `PASS` únicamente cuando `G3-H05`, `G3-H07`,
-`G3-H11` y `G3-H12` estén en `PASS` con evidencia humana legítima, con `Open P0: 0`
-y `Open P1: 0`.
+Esta adenda **no cierra G3**. G3 pasa a `PASS` únicamente cuando `G3-H07`, `G3-H11`
+y `G3-H12` estén en `PASS` con evidencia humana legítima, con `Open P0: 0`
+y `Open P1: 0`. `G3-H05` ya está acreditado por la §2 bis.
