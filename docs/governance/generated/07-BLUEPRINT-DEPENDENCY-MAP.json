@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.39",
+    "version": "0.40",
     "state": "Approved",
-    "source_sha256": "32d81521f997eedf7cdab3a526ec184f16b2fe76bbfd12d152b895928b8b232d",
+    "source_sha256": "a2816b678b37dd2502e899a4d6d52cc8bf2c53c8f70d3fc0fb3e5265ac78d844",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -7390,6 +7390,52 @@
       "id": "ART:docs/governance/evidence/omxds-i4-d-g3/canvas-viewport/canvas-viewport-metrics.json",
       "type": "artifact",
       "path": "docs/governance/evidence/omxds-i4-d-g3/canvas-viewport/canvas-viewport-metrics.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-visual/v0-baseline/media/media_assets_inventory.csv",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-visual/v0-baseline/media/media_assets_inventory.csv"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-visual/v0-baseline/media/storage_objects_inventory.csv",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-visual/v0-baseline/media/storage_objects_inventory.csv"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-021.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-021.json"
+    },
+    {
+      "id": "ART:docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md",
+      "type": "artifact",
+      "path": "docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1-a/asset-governance-matrix.csv",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1-a/asset-governance-matrix.csv"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1-a/alt-and-dimensions-gap-report.md",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1-a/alt-and-dimensions-gap-report.md"
     }
   ],
   "edges": [
@@ -19235,6 +19281,60 @@
       "destination": "DOC:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
       "evidence": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/evidence/omxds-visual/v0-baseline/media/media_assets_inventory.csv:docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-visual/v0-baseline/media/media_assets_inventory.csv",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "evidence": "docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "verified_at": "2026-08-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/evidence/omxds-visual/v0-baseline/media/storage_objects_inventory.csv:docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-visual/v0-baseline/media/storage_objects_inventory.csv",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "evidence": "docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "verified_at": "2026-08-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-021.json:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-021.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1-a/asset-governance-matrix.csv:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1-a/asset-governance-matrix.csv",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1-a/alt-and-dimensions-gap-report.md:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1-a/alt-and-dimensions-gap-report.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
       "verified_at": "2026-08-22"
     }
   ],
