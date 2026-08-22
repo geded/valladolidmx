@@ -2,10 +2,10 @@
   "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
   "id": "PCA-2026-021",
   "title": "V1-P1.a · Gobernanza de Derechos, Atribucion, ALT Real y Dimensiones de Assets Existentes",
-  "status": "Draft",
+  "status": "Approved",
   "branch": "edit/edt-088b34fa-7cd8-4cb6-93ac-0f58c19ec356",
   "blueprint": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
-  "founder_authority": "Founder Directive 2026-08-22 · AUTORIZADO emitir el Blueprint canonico 19.16 y el manifiesto PCA-2026-021 para V1-P1 (el numero 19.01 ya estaba ocupado por 19.01-RV0.1-REFERENCE-SAMPLE-v1.0.md; sin alias). Alcance inmediato exclusivo: V1-P1.a — derechos, licencias/atribucion, ALT real y dimensiones de los assets existentes. Condiciones vinculantes: I4-D permanece cerrado; no reabrir H07, H11 ni H12; no generar, sustituir, publicar ni borrar imagenes; no crear componentes, rutas, migraciones, RPC ni dependencias; flags OFF; produccion no tocada; separacion explicita entre assets reales gobernados, demo y faltantes; criterios verificables de aceptacion y rollback definidos; paquete exacto de rutas registrado; no iniciar V1-P1.b, c, d ni e; no activar ni ejecutar la remediacion hasta presentar Blueprint y manifiesto en estado propuesto para revision.",
+  "founder_authority": "Founder Directive 2026-08-22 · AUTORIZADO emitir el Blueprint canonico 19.16 y el manifiesto PCA-2026-021 para V1-P1 (el numero 19.01 ya estaba ocupado por 19.01-RV0.1-REFERENCE-SAMPLE-v1.0.md; sin alias). Alcance inmediato exclusivo: V1-P1.a — derechos, licencias/atribucion, ALT real y dimensiones de los assets existentes. Condiciones vinculantes: I4-D permanece cerrado; no reabrir H07, H11 ni H12; no generar, sustituir, publicar ni borrar imagenes; no crear componentes, rutas, migraciones, RPC ni dependencias; flags OFF; produccion no tocada; separacion explicita entre assets reales gobernados, demo y faltantes; criterios verificables de aceptacion y rollback definidos; paquete exacto de rutas registrado; no iniciar V1-P1.b, c, d ni e; Founder Directive 2026-08-22 (segunda) · APROBADA la ejecucion de V1-P1.a con el paquete exacto definitivo de 9 rutas reconciliado; sin ampliar el paquete, sin alias 19.01, sin indices ni carpetas alternativas; no iniciar V1-P1.b.",
   "permissions": [
     {
       "operation": "create",
