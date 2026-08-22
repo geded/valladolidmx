@@ -143,11 +143,13 @@ Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contr
   | Desktop     | 1280       | 0 px       | 0            | Sí             | `sticky`   | Sí (right 199.5)         |
   Estado del defecto: **CLOSED** (validación humana repetida 2026-08-22, iPad
   Safari, Móvil/Tablet/Desktop PASS).
-  Estado de aceptación del gate: **G3 permanece `BLOCKED`** por escenarios
-  humanos aún no ejecutados (G3-H03, G3-H04, G3-H05, G3-H06, G3-H07, G3-H09,
-  G3-H10) y por G3-H11/G3-H12 en `PARTIAL`. El cierre de DEF-G3-001 no cubre
-  esos escenarios y la regla de cierre de la sección 1 exige los doce en `PASS`
-  con evidencia verificable.
+  Estado de aceptación del gate: **G3 permanece `BLOCKED`** exclusivamente por los
+  escenarios que exigen humano y aún no se han ejecutado: G3-H05 (zoom nativo),
+  G3-H07 (VoiceOver), G3-H11 (dos cuentas) y G3-H12 (autorización y seguridad).
+  G3-H03, G3-H04, G3-H06, G3-H09 y G3-H10 quedan acreditados como
+  `PASS (objetiva)` bajo `EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md`. El cierre de
+  DEF-G3-001 no cubre los escenarios humanos restantes.
+
 
 ### 6.1 Registro de grabación humana (G3-H08)
 
