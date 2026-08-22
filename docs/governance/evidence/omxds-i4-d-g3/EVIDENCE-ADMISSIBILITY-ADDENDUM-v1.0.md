@@ -28,8 +28,20 @@ cumple, de forma simultánea, las cinco condiciones siguientes:
 5. **Declarada como objetiva**, nunca como humana, en la propia fila del reporte.
 
 Quedan **excluidos** de esta regla y siguen exigiendo humano: percepción asistida
-(lector de pantalla), interacción nativa del sistema operativo (zoom de Safari),
-autorización real entre dos cuentas distintas y verificación de seguridad/permiso.
+(lector de pantalla), autorización real entre dos cuentas distintas y verificación
+de seguridad/permiso.
+
+## 2 bis. Limitación verificable del dispositivo (Founder 2026-08-22)
+
+Cuando la superficie de validación disponible **no expone** el control del sistema
+operativo requerido por un escenario, y esa limitación queda acreditada con captura
+aportada por el Founder, el escenario se acredita con evidencia objetiva reproducible
+equivalente, declarando explícitamente la limitación y sin atribuir evidencia humana.
+No se admiten sustitutos que cambien la semántica del criterio (por ejemplo, cambiar
+el ancho del viewport del canvas **no** es equivalente a aplicar zoom).
+
+Aplicación única vigente: **`G3-H05`** (zoom nativo de Safari 200 %). Evidencia:
+`objective-2026-08-22/objective.json` → `reflow_320` y `zoom200_1440`.
 
 ## 3. Escenarios acreditados por esta adenda
 
