@@ -1,0 +1,17 @@
+{
+  "run": "I4-D · G3-H03/H04 · validación técnica automatizada con anchos exactos",
+  "date": "2026-08-22",
+  "authority": "Evidencia técnica objetiva. NO constituye validación humana de aceptación. G3-H03 y G3-H04 permanecen BLOCKED.",
+  "reason": "Los botones del Studio en iPad Safari son Móvil/Tablet/Desktop y equivalen a 390/768/1280 px; ninguno equivale a 1024 ni 1440 px.",
+  "deviceButtonEquivalence": { "Móvil": 390, "Tablet": 768, "Desktop": 1280 },
+  "auditButtons1024_1440": "sólo visibles en entornos no productivos (preview/local); no disponibles en el Studio abierto por el Founder",
+  "mechanism": "iframe same-origin de ancho exacto (mismo mecanismo de viewport aislado del canvas) sobre http://localhost:8080/",
+  "results": {
+    "1024": { "innerWidth": 1024, "overflowX": 0, "headerPosition": "sticky", "headerTopAfterScroll": 0, "headerVisibleAfterScroll": true, "scrollY": 933, "consoleErrors": 0 },
+    "1440": { "innerWidth": 1440, "overflowX": 0, "headerPosition": "sticky", "headerTopAfterScroll": 0, "headerVisibleAfterScroll": true, "scrollY": 933, "consoleErrors": 0 }
+  },
+  "artifacts": ["canvas-exact-widths.json", "screenshots/canvas_1024.png", "screenshots/canvas_1440.png"],
+  "flag": "omxds_visual_v1_contracts_enabled=false",
+  "production": "no tocada",
+  "g3": "BLOCKED"
+}
