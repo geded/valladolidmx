@@ -55,10 +55,10 @@ Completar únicamente en entorno no público con datos ficticios. Para cada fila
 
 | ID     | Escenario                                                                                                                                | Estado  | Evidencia / observaciones |
 | ------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------- |
-| G3-H01 | Responsive 390 px: sin overflow ni pérdida de función                                                                                    | BLOCKED | pendiente                 |
-| G3-H02 | Responsive 768 px: sin overflow ni pérdida de función                                                                                    | BLOCKED | pendiente                 |
-| G3-H03 | Responsive 1024 px: sin overflow ni pérdida de función                                                                                   | BLOCKED | pendiente                 |
-| G3-H04 | Responsive 1440 px: sin overflow ni pérdida de función                                                                                   | BLOCKED | pendiente                 |
+| G3-H01 | Responsive 390 px: sin overflow ni pérdida de función                                                                                    | PASS | Validación humana iPad Safari 2026-08-22 sobre `/cms/experience-builder?mode=visual&page=home`, modo Móvil: scroll vertical real dentro del canvas, encabezado visible y `sticky`, sin recorte derecho, buscador y botón completos. Evidencia automática de apoyo: `canvas-viewport/canvas-noscale-metrics.json` (390: overflowX 0). |
+| G3-H02 | Responsive 768 px: sin overflow ni pérdida de función                                                                                    | PASS | Validación humana iPad Safari 2026-08-22, modo Tablet: scroll vertical real, encabezado visible y `sticky`, sin overflow interno, buscador completo. Evidencia automática: `canvas-viewport/canvas-noscale-metrics.json` (768: overflowX 0). |
+| G3-H03 | Responsive 1024 px: sin overflow ni pérdida de función                                                                                   | BLOCKED | pendiente: la sesión 2026-08-22 validó 390/768/1280; falta ejecutar 1024 px. |
+| G3-H04 | Responsive 1440 px: sin overflow ni pérdida de función                                                                                   | BLOCKED | pendiente: la sesión 2026-08-22 validó Desktop a 1280 px (encabezado `sticky`, sin desbordamiento interno del sitio, ancho excedente gestionado por desplazamiento horizontal del contenedor del editor, sin escalado del iframe); falta ejecutar 1440 px. |
 | G3-H05 | Zoom 200 % y reflow 320 CSS px utilizables                                                                                               | BLOCKED | pendiente                 |
 | G3-H06 | Flujo completo por teclado, foco visible, orden lógico y sin trampa                                                                      | BLOCKED | pendiente                 |
 | G3-H07 | Lector real: VoiceOver/Safari, NVDA o TalkBack según dispositivo disponible                                                              | BLOCKED | pendiente                 |
@@ -96,10 +96,16 @@ Completar con datos ficticios:
 
 Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contrario.
 
-### Defectos abiertos
+### Defectos cerrados
 
 - **DEF-G3-001 · Canvas del Experience Builder sin encabezado y con desbordamiento horizontal en vista previa Móvil.**
-  **REOPENED** tras validación humana real en iPad Safari: el encabezado volvía
+  **CLOSED (2026-08-22)** por validación humana repetida en iPad Safari sobre
+  `/cms/experience-builder?mode=visual&page=home`: Móvil PASS, Tablet PASS y
+  Desktop PASS, con scroll vertical real dentro del canvas, encabezado visible y
+  `sticky`, sin recorte del buscador y sin desbordamiento interno del sitio. En
+  Desktop el ancho excedente se gestiona con desplazamiento horizontal del
+  contenedor del editor, sin escalar el iframe.
+  Historial: **REOPENED** tras validación humana real en iPad Safari: el encabezado volvía
   a desaparecer después del scroll y el botón circular del buscador quedaba
   recortado en el borde derecho.
   Causa raíz A: el header `overlay` observaba `window.scrollY` del documento del
@@ -131,8 +137,12 @@ Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contr
   | Móvil       | 390        | 0 px       | 0            | Sí             | `sticky`   | Sí (right 166.5)         |
   | Tablet      | 768        | 0 px       | 0            | Sí             | `sticky`   | Sí (right 191.5)         |
   | Desktop     | 1280       | 0 px       | 0            | Sí             | `sticky`   | Sí (right 199.5)         |
-  Estado de aceptación: **G3 permanece `BLOCKED`**; la validación humana debe
-  repetirse sobre el canvas remediado en iPad Safari.
+  Estado del defecto: **CLOSED** (validación humana repetida 2026-08-22, iPad
+  Safari, Móvil/Tablet/Desktop PASS).
+  Estado de aceptación del gate: **G3 permanece `BLOCKED`** por escenarios
+  humanos aún no ejecutados (G3-H03, G3-H04, G3-H05 a G3-H10) y por G3-H11/G3-H12
+  en `PARTIAL`. El cierre de DEF-G3-001 no cubre esos escenarios y la regla de
+  cierre de la sección 1 exige los doce en `PASS` con evidencia verificable.
 
 
 
