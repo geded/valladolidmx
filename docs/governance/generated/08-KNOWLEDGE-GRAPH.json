@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "5da52d58c57713428e7248ef8ce155b5787cf1375423ccb140513c198507ed5b"
+      "source_sha256": "ad9a623a33ca704a097385da40ede62f3610015963b270d6a919e1890c8add5f"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",

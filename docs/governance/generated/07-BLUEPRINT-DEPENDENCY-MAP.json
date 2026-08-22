@@ -4,7 +4,7 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.40",
     "state": "Approved",
-    "source_sha256": "a2816b678b37dd2502e899a4d6d52cc8bf2c53c8f70d3fc0fb3e5265ac78d844",
+    "source_sha256": "4b27e1ce867f51bf00d335f91571c905f4abf2991a580d4eb10fc6995fdc5d91",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
