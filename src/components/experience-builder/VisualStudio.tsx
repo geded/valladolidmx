@@ -1188,7 +1188,7 @@ function PageVisualEditor({
   const [deviceViewport, setDeviceViewport] = useState<DeviceViewport>(() => {
     if (typeof window === "undefined") return "mobile";
     const stored = window.localStorage.getItem("eb.canvas.device");
-    return stored === "tablet" || stored === "desktop" ? stored : "mobile";
+    return isDeviceViewport(stored) ? stored : "mobile";
   });
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -2209,7 +2209,7 @@ function PageVisualEditor({
               onChange={(next) => updateSelectedConfig(next)}
               simple={!advanced}
               activeBreakpoint={
-                deviceViewport === "desktop" ? "lg" : deviceViewport === "tablet" ? "md" : "base"
+                deviceViewport === "tablet" ? "md" : deviceViewport === "mobile" ? "base" : "lg"
               }
             />
 
@@ -2498,12 +2498,34 @@ function SharePreviewModal({
 const HOME_CANVAS_WIDTH = 1280;
 
 /** Anchos de canvas por dispositivo (px CSS reales, no escalados). */
-export type DeviceViewport = "mobile" | "tablet" | "desktop";
+export type DeviceViewport = "mobile" | "tablet" | "desktop" | "w1024" | "w1440";
 const DEVICE_WIDTHS: Record<DeviceViewport, number> = {
   mobile: 390,
   tablet: 768,
   desktop: 1280,
+  w1024: 1024,
+  w1440: 1440,
 };
+
+function isDeviceViewport(value: unknown): value is DeviceViewport {
+  return typeof value === "string" && value in DEVICE_WIDTHS;
+}
+
+/**
+ * Anchos exactos de auditoría (G3-H03 = 1024 px, G3-H04 = 1440 px).
+ * Sólo disponibles en entornos NO productivos (preview / local). No añaden
+ * rutas, no activan flags y no alteran el comportamiento del canvas.
+ */
+const AUDIT_HOSTNAMES_BLOCKED = new Set([
+  "valladolidmx.lovable.app",
+  "quehacerenvalladolid.com",
+  "www.quehacerenvalladolid.com",
+]);
+
+function auditWidthsEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  return !AUDIT_HOSTNAMES_BLOCKED.has(window.location.hostname);
+}
 
 /**
  * Toggle segmentado Móvil / Tablet / Desktop para el canvas.
@@ -2517,10 +2539,18 @@ function DeviceToggle({
   value: DeviceViewport;
   onChange: (v: DeviceViewport) => void;
 }) {
+  const [audit, setAudit] = useState(false);
+  useEffect(() => setAudit(auditWidthsEnabled()), []);
   const items: Array<{ id: DeviceViewport; label: string; short: string }> = [
     { id: "mobile", label: "Vista móvil (390 px)", short: "Móvil" },
     { id: "tablet", label: "Vista tablet (768 px)", short: "Tablet" },
     { id: "desktop", label: "Vista desktop (1280 px)", short: "Desktop" },
+    ...(audit
+      ? ([
+          { id: "w1024", label: "Auditoría G3-H03 · ancho exacto 1024 px", short: "1024" },
+          { id: "w1440", label: "Auditoría G3-H04 · ancho exacto 1440 px", short: "1440" },
+        ] as Array<{ id: DeviceViewport; label: string; short: string }>)
+      : []),
   ];
   return (
     <div
@@ -2777,9 +2807,52 @@ function CanvasViewport({
     };
   }, []);
 
+  // HUD de medición (sólo entornos no productivos): innerWidth real del
+  // iframe, overflow horizontal y posición efectiva del encabezado.
+  const [hud, setHud] = useState(false);
+  const [metrics, setMetrics] = useState<{
+    innerWidth: number;
+    overflowX: number;
+    scrollY: number;
+    headerPosition: string;
+    headerTop: number;
+    headerVisible: boolean;
+  } | null>(null);
+
+  useEffect(() => setHud(auditWidthsEnabled()), []);
+
+  useEffect(() => {
+    if (!hud || !mount) return;
+    const win = mount.ownerDocument.defaultView;
+    const doc = mount.ownerDocument;
+    if (!win) return;
+    const read = () => {
+      const scroller = doc.scrollingElement ?? doc.documentElement;
+      const header = doc.querySelector("header");
+      const rect = header?.getBoundingClientRect();
+      setMetrics({
+        innerWidth: win.innerWidth,
+        overflowX: Math.max(0, Math.round(scroller.scrollWidth - scroller.clientWidth)),
+        scrollY: Math.round(win.scrollY),
+        headerPosition: header ? win.getComputedStyle(header).position : "n/a",
+        headerTop: rect ? Math.round(rect.top) : -1,
+        headerVisible: !!rect && rect.bottom > 0 && rect.top < win.innerHeight,
+      });
+    };
+    read();
+    const id = win.setInterval(read, 250);
+    win.addEventListener("scroll", read, true);
+    win.addEventListener("resize", read);
+    return () => {
+      win.clearInterval(id);
+      win.removeEventListener("scroll", read, true);
+      win.removeEventListener("resize", read);
+    };
+  }, [hud, mount, width]);
+
   return (
     <div
-      className="mx-auto shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
+      className="relative mx-auto shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
       style={{ width, height }}
     >
       <iframe
@@ -2791,6 +2864,16 @@ function CanvasViewport({
         style={{ width, height }}
       />
       {mount ? createPortal(children, mount) : null}
+      {hud && metrics ? (
+        <div
+          data-eb-canvas-hud=""
+          className="pointer-events-none absolute bottom-2 left-1/2 z-50 -translate-x-1/2 rounded-md bg-foreground/90 px-3 py-1.5 font-mono text-[11px] leading-tight text-background shadow-lg"
+        >
+          innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
+          {metrics.headerPosition} top {metrics.headerTop}px ·{" "}
+          {metrics.headerVisible ? "visible" : "OCULTO"} · scrollY {metrics.scrollY}px
+        </div>
+      ) : null}
     </div>
   );
 }
