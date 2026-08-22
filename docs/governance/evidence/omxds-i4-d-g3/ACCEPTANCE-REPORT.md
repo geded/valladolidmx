@@ -62,8 +62,8 @@ Desde 2026-08-22 rige `EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md` (Founder Directi
 | ------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------- |
 | G3-H01 | Responsive 390 px: sin overflow ni pérdida de función                                                                                    | PASS | Validación humana iPad Safari 2026-08-22 sobre `/cms/experience-builder?mode=visual&page=home`, modo Móvil: scroll vertical real dentro del canvas, encabezado visible y `sticky`, sin recorte derecho, buscador y botón completos. Evidencia automática de apoyo: `canvas-viewport/canvas-noscale-metrics.json` (390: overflowX 0). |
 | G3-H02 | Responsive 768 px: sin overflow ni pérdida de función                                                                                    | PASS | Validación humana iPad Safari 2026-08-22, modo Tablet: scroll vertical real, encabezado visible y `sticky`, sin overflow interno, buscador completo. Evidencia automática: `canvas-viewport/canvas-noscale-metrics.json` (768: overflowX 0). |
-| G3-H03 | Responsive 1024 px: sin overflow ni pérdida de función                                                                                   | PASS (objetiva) | Acreditado por `EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md` §3. Evidencia: `objective-2026-08-22-h03h04/canvas-exact-widths.json` — innerWidth 1024, overflowX 0, header `sticky` visible tras scroll real (scrollY 933), 0 errores de consola. No ejecutable humanamente: el Studio sólo ofrece 390/768/1280. |
-| G3-H04 | Responsive 1440 px: sin overflow ni pérdida de función                                                                                   | PASS (objetiva) | Acreditado por la adenda §3. Evidencia: `objective-2026-08-22-h03h04/canvas-exact-widths.json` — innerWidth 1440, overflowX 0, header `sticky` visible tras scroll real, 0 errores de consola. No ejecutable humanamente. |
+| G3-H03 | Responsive 1024 px: sin overflow ni pérdida de función                                                                                   | PASS (humana + objetiva) | Grabación humana iPad Safari 2026-08-21 20:31:45 (UTC-6) (`human-session-2026-08-21/G3-H03-H04-ipad-safari-2026-08-21.mp4`, sha256 `f469ace5…b34f4`, 15.96 s): selección humana del control **1024** y scroll real dentro del canvas con encabezado visible. Combinada con evidencia técnica `objective-2026-08-22-h03h04/canvas-exact-widths.json` — innerWidth 1024, overflowX 0, header `sticky` visible tras scroll (scrollY 933), 0 errores de consola. |
+| G3-H04 | Responsive 1440 px: sin overflow ni pérdida de función                                                                                   | PASS (humana + objetiva) | Misma grabación humana (`sha256 f469ace5…b34f4`): selección humana del control **1440** y scroll real dentro del canvas con encabezado visible. Combinada con `objective-2026-08-22-h03h04/canvas-exact-widths.json` — innerWidth 1440, overflowX 0, header `sticky` visible tras scroll, 0 errores de consola. |
 | G3-H05 | Zoom 200 % y reflow 320 CSS px utilizables                                                                                               | BLOCKED | **Requiere humano** (zoom nativo de Safari). Apoyo objetivo no suficiente: `objective-2026-08-22/objective.json` (reflow 320 overflowX 0; equivalente 200 % a 720 px de layout overflowX 0). Bloque 1 del `FINAL-HUMAN-SESSION-RUNBOOK.md`. |
 | G3-H06 | Flujo completo por teclado, foco visible, orden lógico y sin trampa                                                                      | PASS (objetiva) | Acreditado por la adenda §3. Evidencia: `objective-2026-08-22/security_a11y.json` — 25 tabulaciones, 17 paradas únicas, 0 paradas sin indicador de foco, sin trampa de foco. |
 | G3-H07 | Lector real: VoiceOver/Safari, NVDA o TalkBack según dispositivo disponible                                                              | BLOCKED | **Requiere humano** (VoiceOver). Bloque 2 del `FINAL-HUMAN-SESSION-RUNBOOK.md`. |
@@ -148,7 +148,9 @@ Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contr
   Estado de aceptación del gate: **G3 permanece `BLOCKED`** exclusivamente por los
   escenarios que exigen humano y aún no se han ejecutado: G3-H05 (zoom nativo),
   G3-H07 (VoiceOver), G3-H11 (dos cuentas) y G3-H12 (autorización y seguridad).
-  G3-H03, G3-H04, G3-H06, G3-H09 y G3-H10 quedan acreditados como
+  G3-H03 y G3-H04 quedan acreditados como `PASS (humana + objetiva)` con la
+  grabación iPad Safari 2026-08-21 20:31:45 (sha256 `f469ace5…b34f4`) combinada con
+  `objective-2026-08-22-h03h04/`. G3-H06, G3-H09 y G3-H10 permanecen
   `PASS (objetiva)` bajo `EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md`. El cierre de
   DEF-G3-001 no cubre los escenarios humanos restantes.
 
@@ -168,6 +170,24 @@ Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contr
 | No válido para | G3-H05, G3-H07, G3-H11, G3-H12 |
 
 El binario original se conserva íntegro (inmutable) mediante puntero CDN; no se altera ni recodifica.
+
+### 6.2 Registro de grabación humana (G3-H03 · G3-H04)
+
+| Campo | Valor |
+| ----- | ----- |
+| Nombre original | `ScreenRecording_08-21-2026_20-31-44_1.mp4` |
+| Nombre archivado | `G3-H03-H04-ipad-safari-2026-08-21.mp4` |
+| Ruta de evidencia | `docs/governance/evidence/omxds-i4-d-g3/human-session-2026-08-21/` (puntero `.asset.json` + `HUMAN-RECORDING-MANIFEST-H03-H04.json`) |
+| Fecha de captura | 2026-08-21 20:31:45 (UTC-6) · archivado 2026-08-22 |
+| SHA-256 | `f469ace5e387fb180ce62e7fcbed8cea16b649808897ac484fde1dc068fb34f4` |
+| Tamaño / duración | 23 555 409 bytes · 15.96 s · HEVC 2420×1668 |
+| Dispositivo / superficie | iPad Safari · `/cms/experience-builder?mode=visual&page=home` |
+| Alcance probatorio | G3-H03 `PASS` y G3-H04 `PASS`, combinada con `objective-2026-08-22-h03h04/`. |
+| No válido para | G3-H05, G3-H06, G3-H07, G3-H08, G3-H09, G3-H10, G3-H11, G3-H12 |
+
+El binario original se conserva íntegro (inmutable) mediante puntero CDN; no se altera ni recodifica.
+
+
 
 
 
