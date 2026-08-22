@@ -20,7 +20,9 @@ Este reporte es la autoridad humana de aceptación para G3. La automatización p
 5. no se utilicen producción, despliegue, datos reales, flag ON, Premium ni Commerce.
 
 `PASS WITH CONDITIONS` no cierra G3. La adenda no sustituye la validación humana de
-G3-H05, G3-H07, G3-H11 ni G3-H12.
+G3-H07, G3-H11 ni G3-H12. `G3-H05` queda acreditado por evidencia objetiva admisible
+ante limitación verificable del dispositivo (sin control de zoom nativo al 200 %),
+conforme a la autoridad Founder 2026-08-22 y a la §2 bis de la adenda.
 
 
 ## 2. Slice vertical canónico
