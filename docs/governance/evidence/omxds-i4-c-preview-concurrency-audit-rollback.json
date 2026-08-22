@@ -54,7 +54,7 @@
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "4a033fbce6dc2b78fc796c79bbf9d9771ac5c6a9696d85ee9a2be0e171746ccf"
+      "sha256": "90533a970171223c3891b9cbe80f1aa4aeabb528c9136eb739ced03f4edf658c"
     },
     {
       "path": "docs/governance/product-authorizations/PCA-2026-015.json",
@@ -82,7 +82,7 @@
     },
     {
       "path": "src/components/experience-builder/VisualStudio.tsx",
-      "sha256": "257ace4966176cbd4cd8fec5be30198cbb2751201928570bc52a5118984d6a1d"
+      "sha256": "22e93d4efe64947bfe249032d2b8268f2ab1fb2c9b996baae15f434dba606f4a"
     },
     {
       "path": "src/integrations/supabase/types.ts",

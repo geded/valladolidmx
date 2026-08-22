@@ -117,8 +117,23 @@ Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contr
   La evidencia automática previa queda invalidada como prueba de aceptación
   humana y debe regenerarse con capturas reales antes/después del scroll en
   390, 768 y 1280 px.
+  Remediación final aplicada (2026-08-22): se elimina por completo
+  `transform: scale` del iframe y todo dimensionado compensatorio; el canvas usa
+  viewports reales de 390/768/1280 px y el contenedor del editor desplaza
+  horizontalmente cuando el editor es más angosto. Además, `@container` se
+  separa del elemento `sticky` de `SiteHeader` y se traslada a un wrapper
+  interno, porque la contención de contenedor invalida `position: sticky` en
+  Safari (iPad) dentro del scrollport del iframe.
+  Scrollport utilizado por `sticky`: documento del propio iframe.
+  Medición automática tras scroll real (`canvas-noscale-metrics.json`):
+  | Dispositivo | innerWidth | Overflow X | Header `top` | Header visible | `position` | Botón buscador contenido |
+  | ----------- | ---------- | ---------- | ------------ | -------------- | ---------- | ------------------------ |
+  | Móvil       | 390        | 0 px       | 0            | Sí             | `sticky`   | Sí (right 166.5)         |
+  | Tablet      | 768        | 0 px       | 0            | Sí             | `sticky`   | Sí (right 191.5)         |
+  | Desktop     | 1280       | 0 px       | 0            | Sí             | `sticky`   | Sí (right 199.5)         |
   Estado de aceptación: **G3 permanece `BLOCKED`**; la validación humana debe
-  repetirse sobre el canvas remediado.
+  repetirse sobre el canvas remediado en iPad Safari.
+
 
 
 ## 7. Prohibiciones observadas
