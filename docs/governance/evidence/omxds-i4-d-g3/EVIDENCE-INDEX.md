@@ -1,6 +1,6 @@
 # I4-D · G3 · Índice consolidado de evidencia
 
-**FLAG:** `omxds_visual_v1_contracts_enabled=false` · **Producción:** no tocada · **G3:** BLOCKED
+**FLAG:** `omxds_visual_v1_contracts_enabled=false` · **Producción:** no tocada · **G3:** BLOCKED (funcional PASS · multi-actor DEFERRED)
 
 | Artefacto | Contenido | Escenarios que acredita |
 | --------- | --------- | ----------------------- |
@@ -21,5 +21,8 @@
 
 - **PASS humano:** H01, H02, H03, H04, H08.
 - **PASS objetiva:** H05 (§2 bis), H06, H09, H10 (H03 y H04 refuerzan con evidencia objetiva combinada).
-- **BLOCKED, requiere humano:** H07.
-- **PARTIAL, requiere humano:** H11, H12.
+- **BLOCKED, requiere humano:** H07 (VoiceOver).
+- **DEFERRED (Founder 2026-08-22):** H11, H12 — dependencia: segunda identidad editorial real y sesión operativa de aprobación.
+
+**Cierre I4-D:** FUNCTIONAL ACCEPTANCE `PASS` · OPERATIONAL MULTI-ACTOR ACCEPTANCE `DEFERRED`.
+`validate:i4:d` permanece fail-closed por diseño; no se fabrica evidencia humana.

@@ -5,9 +5,16 @@
 **Base exacta:** `main@d02942d07b9fc96e9a39f1faf4bbafb28ec7a5c2`  
 **Rama:** `feature/omxds-i4-d-g3-integration-evidence-closure-v1`  
 **Entorno permitido:** no público, datos totalmente ficticios  
-**Verdict:** BLOCKED  
-**Open P0:** UNASSESSED  
-**Open P1:** UNASSESSED
+**Verdict:** FUNCTIONAL ACCEPTANCE: PASS · OPERATIONAL MULTI-ACTOR ACCEPTANCE: DEFERRED  
+**Open P0:** 0  
+**Open P1:** 0
+
+> **Decisión Founder 2026-08-22 (MODO CIERRE I4-D):** no se autoriza crear composición
+> sandbox adicional ni cuenta editorial artificial. `G3-H11` y `G3-H12` quedan
+> registrados como **DEFERRED** con dependencia explícita: *segunda identidad editorial
+> real y sesión operativa de aprobación*. No bloquean el avance funcional y visual de
+> Valladolid.mx. `G3-H07` continúa pendiente de percepción asistida real (VoiceOver);
+> no se fabrica evidencia humana. `validate:i4:d` permanece fail-closed por diseño.
 
 ## 1. Regla de cierre
 
@@ -73,8 +80,8 @@ Desde 2026-08-22 rige `EVIDENCE-ADMISSIBILITY-ADDENDUM-v1.0.md` (Founder Directi
 | G3-H09 | Tema Sol conserva contenido, orden, CTA y estado                                                                                         | PASS (objetiva) | Acreditado por la adenda §3. Evidencia: `objective-2026-08-22/themes.json` — 1024 y 1440: mismos 7 encabezados, mismo conteo/hash de CTAs (58 / 745) que Luna, overflowX 0. |
 | G3-H10 | Tema Luna conserva contenido, orden, CTA y estado                                                                                        | PASS (objetiva) | Acreditado por la adenda §3. Evidencia: `objective-2026-08-22/themes.json` — paridad estructural exacta con Sol en 1024 y 1440, overflowX 0, contraste de fondo `oklch(0.329 0.048 129.7)`. |
 
-| G3-H11 | Slice vertical completo: authorable + binding + preview + Draft→Published + autor/aprobador distintos + conflicto + auditoría + rollback | PARTIAL | Sesión humana 2026-08-21 (entorno no público): el administrador abrió Experience Builder y cargaron las composiciones Inicio y Hoteles. Faltan Draft→Published, separación autor/aprobador, conflicto, auditoría y rollback. |
-| G3-H12 | Seguridad: operaciones sensibles con actor autorizado, preview sin PII/secrets y fallo gobernado fail-closed                             | PARTIAL | Sesión humana 2026-08-21 (entorno no público, flag OFF): «Añadir sección» no ofreció Info Grid y la búsqueda «Info» tampoco lo mostró. Falta verificar actor autorizado en operaciones sensibles, ausencia de PII/secrets en preview y fallo gobernado fail-closed. |
+| G3-H11 | Slice vertical completo: authorable + binding + preview + Draft→Published + autor/aprobador distintos + conflicto + auditoría + rollback | DEFERRED (dependencia: segunda identidad editorial real y sesión operativa de aprobación) | Sesión humana 2026-08-21 (entorno no público): el administrador abrió Experience Builder y cargaron las composiciones Inicio y Hoteles. Faltan Draft→Published, separación autor/aprobador, conflicto, auditoría y rollback. |
+| G3-H12 | Seguridad: operaciones sensibles con actor autorizado, preview sin PII/secrets y fallo gobernado fail-closed                             | DEFERRED (dependencia: segunda identidad editorial real y sesión operativa de aprobación) | Sesión humana 2026-08-21 (entorno no público, flag OFF): «Añadir sección» no ofreció Info Grid y la búsqueda «Info» tampoco lo mostró. Falta verificar actor autorizado en operaciones sensibles, ausencia de PII/secrets en preview y fallo gobernado fail-closed. |
 
 ## 5. Registro del escenario G3-H11
 
@@ -206,4 +213,22 @@ El binario original se conserva íntegro (inmutable) mediante puntero CDN; no se
 
 ## 8. Cierre
 
-Mientras cualquier escenario permanezca `BLOCKED`, o P0/P1 no sean exactamente cero, el veredicto de este documento debe permanecer `BLOCKED` y `validate:i4:d` debe fallar en cerrado.
+**FUNCTIONAL ACCEPTANCE: PASS.** Contratos, workflow heredado (I4-A/B/C/R), responsive
+390/768/1024/1440, reflow, teclado, touch y paridad de temas están acreditados con
+evidencia humana u objetiva admisible archivada: `G3-H01`, `G3-H02`, `G3-H03`, `G3-H04`,
+`G3-H05`, `G3-H06`, `G3-H08`, `G3-H09`, `G3-H10`. Open P0: 0 · Open P1: 0.
+
+**OPERATIONAL MULTI-ACTOR ACCEPTANCE: DEFERRED.** `G3-H11` y `G3-H12` quedan diferidos
+por decisión Founder 2026-08-22, con dependencia explícita **«segunda identidad
+editorial real y sesión operativa de aprobación»**. No se crea sandbox, ni usuarios, ni
+permisos, ni migraciones, ni RPC. `G3-H07` (VoiceOver) permanece pendiente de percepción
+asistida real y se ejecutará con `H07-VOICEOVER-MINIMAL-RUNBOOK.md` cuando el Founder lo
+disponga.
+
+**Efecto sobre la automatización.** `validate:i4:d` continúa **fail-closed** de forma
+intencional: `scripts/omxds/i4/editorial-builder-g3.evidence.mjs` exige `PASS` en los
+doce escenarios y no se fabrica ningún `PASS`. El cierre de I4-D es documental y no
+convierte G3 en `PASS` automatizado.
+
+**Invariantes mantenidos:** `omxds_visual_v1_contracts_enabled=false`; producción no
+tocada; sin despliegue; toda la evidencia previa conservada íntegra.
