@@ -254,6 +254,11 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     maturity: "L3",
     migrationStatus: "planned",
   },
+  "src/routes/eventos.index.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "planned",
+  },
   "src/routes/hoteles.tsx": {
     businessPriority: "high",
     maturity: "L3",
@@ -444,6 +449,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/email/unsubscribe.ts",
   "src/routes/empresas.tsx",
   "src/routes/eventos.$slug.tsx",
+  "src/routes/eventos.index.tsx",
   "src/routes/eventos.tsx",
   "src/routes/experiencias.tsx",
   "src/routes/hoteles.tsx",
