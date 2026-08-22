@@ -62,6 +62,6 @@ están acreditados humanamente.
 
 ## 5. Efecto
 
-Esta adenda **no cierra G3**. G3 pasa a `PASS` únicamente cuando `G3-H05`, `G3-H07`,
-`G3-H11` y `G3-H12` estén en `PASS` con evidencia humana legítima, con `Open P0: 0`
-y `Open P1: 0`.
+Esta adenda **no cierra G3**. G3 pasa a `PASS` únicamente cuando `G3-H07`, `G3-H11`
+y `G3-H12` estén en `PASS` con evidencia humana legítima, con `Open P0: 0`
+y `Open P1: 0`. `G3-H05` ya está acreditado por la §2 bis.
