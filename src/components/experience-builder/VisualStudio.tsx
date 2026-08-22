@@ -2498,12 +2498,34 @@ function SharePreviewModal({
 const HOME_CANVAS_WIDTH = 1280;
 
 /** Anchos de canvas por dispositivo (px CSS reales, no escalados). */
-export type DeviceViewport = "mobile" | "tablet" | "desktop";
+export type DeviceViewport = "mobile" | "tablet" | "desktop" | "w1024" | "w1440";
 const DEVICE_WIDTHS: Record<DeviceViewport, number> = {
   mobile: 390,
   tablet: 768,
   desktop: 1280,
+  w1024: 1024,
+  w1440: 1440,
 };
+
+function isDeviceViewport(value: unknown): value is DeviceViewport {
+  return typeof value === "string" && value in DEVICE_WIDTHS;
+}
+
+/**
+ * Anchos exactos de auditoría (G3-H03 = 1024 px, G3-H04 = 1440 px).
+ * Sólo disponibles en entornos NO productivos (preview / local). No añaden
+ * rutas, no activan flags y no alteran el comportamiento del canvas.
+ */
+const AUDIT_HOSTNAMES_BLOCKED = new Set([
+  "valladolidmx.lovable.app",
+  "quehacerenvalladolid.com",
+  "www.quehacerenvalladolid.com",
+]);
+
+function auditWidthsEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  return !AUDIT_HOSTNAMES_BLOCKED.has(window.location.hostname);
+}
 
 /**
  * Toggle segmentado Móvil / Tablet / Desktop para el canvas.
