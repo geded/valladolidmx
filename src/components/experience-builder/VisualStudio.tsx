@@ -2539,10 +2539,18 @@ function DeviceToggle({
   value: DeviceViewport;
   onChange: (v: DeviceViewport) => void;
 }) {
+  const [audit, setAudit] = useState(false);
+  useEffect(() => setAudit(auditWidthsEnabled()), []);
   const items: Array<{ id: DeviceViewport; label: string; short: string }> = [
     { id: "mobile", label: "Vista móvil (390 px)", short: "Móvil" },
     { id: "tablet", label: "Vista tablet (768 px)", short: "Tablet" },
     { id: "desktop", label: "Vista desktop (1280 px)", short: "Desktop" },
+    ...(audit
+      ? ([
+          { id: "w1024", label: "Auditoría G3-H03 · ancho exacto 1024 px", short: "1024" },
+          { id: "w1440", label: "Auditoría G3-H04 · ancho exacto 1440 px", short: "1440" },
+        ] as Array<{ id: DeviceViewport; label: string; short: string }>)
+      : []),
   ];
   return (
     <div
