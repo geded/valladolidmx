@@ -1188,7 +1188,7 @@ function PageVisualEditor({
   const [deviceViewport, setDeviceViewport] = useState<DeviceViewport>(() => {
     if (typeof window === "undefined") return "mobile";
     const stored = window.localStorage.getItem("eb.canvas.device");
-    return stored === "tablet" || stored === "desktop" ? stored : "mobile";
+    return isDeviceViewport(stored) ? stored : "mobile";
   });
   useEffect(() => {
     if (typeof window === "undefined") return;
