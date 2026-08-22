@@ -1,0 +1,48 @@
+vertical,order,block,requirement,surface,adapter_or_contract,kit_pieces,fail_closed_rule
+hotel,1,experience-hero,required,Business,hotel-surface.adapter,Hero;Gallery,portada con ALT real o no publica
+hotel,2,experience-institutional-badges,conditional,Business,hotel-surface.adapter,Badges,omitir bloque si no hay badges vigentes
+hotel,3,experience-subnav,required-if-3-anchors,Business,hotel-surface.adapter,Shell,omitir si menos de 3 anclas
+hotel,4,experience-info-grid,required,Business,hotel-surface.adapter,InfoTable,no publica sin datos esenciales
+hotel,5,experience-features,conditional,Business,hotel-surface.adapter,Badges,omitir bloque
+hotel,6,experience-section,required,Business,hotel-surface.adapter,RichText,no publica sin descripcion completa
+hotel,7,experience-gallery,required-if-2-images,Business,hotel-surface.adapter,Gallery,degradar a no-premium si menos de 2 imagenes elegibles
+hotel,8,experience-map,required,Business,hotel-surface.adapter,Location,no publica sin lat/lng reales
+hotel,9,experience-promotions,conditional,Business,hotel-surface.adapter,Promos,omitir bloque
+hotel,10,experience-reviews,conditional,Business,hotel-surface.adapter,Reviews,omitir bloque
+hotel,11,experience-related-collection,conditional,Business,hotel-surface.adapter,CardGrid,omitir bloque
+hotel,12,experience-cta-bar,required,Business,hotel-surface.adapter,PriceCta;Contact,una sola accion dominante
+restaurant,1,experience-hero,required,Business,restaurant-surface.adapter,Hero;Gallery,portada con ALT real o no publica
+restaurant,2,experience-institutional-badges,conditional,Business,restaurant-surface.adapter,Badges,omitir bloque
+restaurant,3,experience-subnav,required-if-3-anchors,Business,restaurant-surface.adapter,Shell,omitir si menos de 3 anclas
+restaurant,4,experience-info-grid,required,Business,restaurant-surface.adapter,InfoTable,no publica sin cocina/precio/horario
+restaurant,5,experience-features,conditional,Business,restaurant-surface.adapter,Badges,omitir bloque
+restaurant,6,experience-section,required,Business,restaurant-surface.adapter,RichText,no publica sin propuesta gastronomica
+restaurant,7,experience-gallery,required-if-2-images,Business,restaurant-surface.adapter,Gallery,degradar a no-premium
+restaurant,8,experience-map,required,Business,restaurant-surface.adapter,Location,no publica sin lat/lng reales
+restaurant,9,experience-promotions,conditional,Business,restaurant-surface.adapter,Promos,omitir bloque
+restaurant,10,experience-reviews,conditional,Business,restaurant-surface.adapter,Reviews,omitir bloque
+restaurant,11,experience-related-collection,conditional,Business,restaurant-surface.adapter,CardGrid,omitir bloque
+restaurant,12,experience-cta-bar,required,Business,restaurant-surface.adapter,Contact,una sola accion dominante
+experience,1,experience-hero,required,Product,experience-surface.adapter,Hero;Gallery,portada con ALT real o no publica
+experience,2,experience-institutional-badges,conditional,Product,experience-surface.adapter,Badges,omitir bloque
+experience,3,experience-subnav,required-if-3-anchors,Product,experience-surface.adapter,Shell,omitir si menos de 3 anclas
+experience,4,experience-info-grid,required,Product,product-surface.contract,InfoTable,no publica sin duracion/encuentro/idioma
+experience,5,experience-features,required,Product,product-surface.contract,Badges,no publica sin incluye/no incluye
+experience,6,experience-section,required,Product,product-surface.contract,RichText,no publica sin itinerario
+experience,7,experience-gallery,required-if-2-images,Product,experience-surface.adapter,Gallery,degradar a no-premium
+experience,8,experience-map,required,Product,experience-surface.adapter,Location,no publica sin punto de encuentro real
+experience,9,experience-products,conditional,Product,product-surface.contract,CardGrid,omitir bloque
+experience,10,experience-promotions,conditional,Product,product-surface.contract,Promos,omitir bloque
+experience,11,experience-reviews,conditional,Product,product-surface.contract,Reviews,omitir bloque
+experience,12,experience-related-collection,conditional,Product,product-surface.contract,CardGrid,omitir bloque
+experience,13,experience-cta-bar,required,Product,product-surface.contract,PriceCta,una sola accion dominante
+destination,1,experience-hero,required,Destination,destination-surface,Hero,portada con ALT real o no publica
+destination,2,experience-institutional-badges,conditional,Destination,destination-surface,Badges,solo si pertenece al registry Pueblos Magicos
+destination,3,experience-subnav,required-if-3-anchors,Destination,destination-surface,Shell,omitir si menos de 3 anclas
+destination,4,experience-section,required,Destination,destination-surface,RichText,no publica sin identidad del destino
+destination,5,experience-info-grid,required,Destination,destination-surface,InfoTable,no publica sin como llegar/mejor epoca
+destination,6,experience-map,required,Destination,destination-surface,Location,no publica sin coordenadas territoriales
+destination,7,experience-products,required,Destination,destination-surface,CardGrid,no publica sin oferta que hacer
+destination,8,experience-gallery,conditional,Destination,destination-surface,Gallery,omitir bloque
+destination,9,experience-related-collection,conditional,Destination,destination-surface,CardGrid,omitir bloque
+destination,10,experience-cta-bar,required,Destination,destination-surface,Contact,una sola accion dominante

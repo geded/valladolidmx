@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.40",
+    "version": "0.41",
     "state": "Approved",
-    "source_sha256": "4b27e1ce867f51bf00d335f91571c905f4abf2991a580d4eb10fc6995fdc5d91",
+    "source_sha256": "14e243df9bf3aa19418721671ef725fb5ec42fd7fc91bac2b6898b421b50f6e8",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -7436,6 +7436,37 @@
       "id": "ART:docs/governance/evidence/v1-p1-a/alt-and-dimensions-gap-report.md",
       "type": "artifact",
       "path": "docs/governance/evidence/v1-p1-a/alt-and-dimensions-gap-report.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "type": "artifact",
+      "path": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1-b/template-block-coverage-matrix.csv",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1-b/template-block-coverage-matrix.csv"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md"
     }
   ],
   "edges": [
@@ -19335,6 +19366,33 @@
       "destination": "DOC:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
       "evidence": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md:docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md",
+      "origin": "ART:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md",
+      "evidence": "docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md",
+      "verified_at": "2026-08-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1-b/template-block-coverage-matrix.csv:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1-b/template-block-coverage-matrix.csv",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "evidence": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "verified_at": "2026-08-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "evidence": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
       "verified_at": "2026-08-22"
     }
   ],
