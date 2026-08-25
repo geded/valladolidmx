@@ -10,6 +10,7 @@ const sourceCommit = "7084b2a7c15a05029cdbc7e62a483f49b47e05cb";
 const excludedPaths = [
   "docs/evidence/omxds-visual/v0-baseline/accessibility/axe.min.js",
   "src/integrations/supabase/types.ts",
+  "src/integrations/supabase/previewAuthStorage.ts",
 ];
 const i3ExactPaths = new Set([
   "src/components/surfaces/DestinationSurface.tsx",
