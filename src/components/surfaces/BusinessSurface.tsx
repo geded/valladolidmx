@@ -236,7 +236,6 @@ export function BusinessSurfaceContractBoundary({
       />
     );
 
-
   const premiumResolution = premiumEligibility
     ? createBusinessPremiumSurfaceContract(input, premiumEligibility)
     : null;

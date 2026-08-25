@@ -43,9 +43,7 @@ export function isSignedMediaUrl(url: string | null | undefined): boolean {
  * Filtro fail-closed para metadatos indexables: devuelve la URL sólo si
  * es estable. Ante cualquier duda (URL firmada o vacía) omite la imagen.
  */
-export function stableIndexableImageUrl(
-  url: string | null | undefined,
-): string | undefined {
+export function stableIndexableImageUrl(url: string | null | undefined): string | undefined {
   if (typeof url !== "string") return undefined;
   const value = url.trim();
   if (!value) return undefined;

@@ -142,8 +142,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
           ogType: "article",
           // 19.24 — Sólo ruta pública estable. Sin asset elegible se omite
           // la imagen; prohibido caer a una URL firmada temporal.
-          ogImage:
-            loaderData.stableCoverUrl ?? stableIndexableImageUrl(loaderData.db?.hero_url),
+          ogImage: loaderData.stableCoverUrl ?? stableIndexableImageUrl(loaderData.db?.hero_url),
           breadcrumbs: [
             { label: "Inicio", path: "/" },
             { label: ORIENTE_MAYA.name, path: "/oriente-maya" },
@@ -157,8 +156,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
                 loaderData.dest.tagline ||
                 loaderData.dest.name,
               path: `/oriente-maya/${params.destino}`,
-              image:
-                loaderData.stableCoverUrl ?? stableIndexableImageUrl(loaderData.db?.hero_url),
+              image: loaderData.stableCoverUrl ?? stableIndexableImageUrl(loaderData.db?.hero_url),
               latitude: loaderData.db?.latitude ?? null,
               longitude: loaderData.db?.longitude ?? null,
               containedInId: ORIENTE_MAYA_PLACE_ID,
