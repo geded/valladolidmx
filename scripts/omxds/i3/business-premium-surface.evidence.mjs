@@ -59,14 +59,14 @@ const acknowledgedRevisions = new Map([
     contractPath,
     {
       sha256: "d52aab428b9cf58fbca14257497cc2bf93e0482c9a731139af8125ea285869c1",
-      authorizations: ["PCA-2026-023"],
+      authorizations: ["PCA-2026-026"],
     },
   ],
   [
     eligibilityPath,
     {
       sha256: "93ddeac96c3f74cef90f691a4bf5f64e2bb02aede26f5aa502e35ee65a47e477",
-      authorizations: ["PCA-2026-023"],
+      authorizations: ["PCA-2026-026"],
     },
   ],
 ]);
