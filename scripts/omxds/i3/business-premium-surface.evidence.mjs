@@ -91,7 +91,10 @@ for (const protectedPath of [
   );
   for (const authorizationId of acknowledged.authorizations) {
     const authorization = JSON.parse(
-      readFileSync(join("docs/governance/product-authorizations", `${authorizationId}.json`), "utf8"),
+      readFileSync(
+        join("docs/governance/product-authorizations", `${authorizationId}.json`),
+        "utf8",
+      ),
     );
     assert.equal(
       authorization.status,
