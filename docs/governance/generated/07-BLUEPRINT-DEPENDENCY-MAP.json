@@ -4,7 +4,7 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.43",
     "state": "Approved",
-    "source_sha256": "651692c6bf0c705c93e036d4e1e55b68b05e72ab61770e58fad1d1c6fe664250",
+    "source_sha256": "2f51dd7dc4fa97744d318a02d4bd8ae3e52acf504937759e5ccd1eed0f98cca6",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -7488,6 +7488,19 @@
       "id": "ART:supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql",
       "type": "artifact",
       "path": "supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1-d/per-listing-premium-enablement.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1-d/per-listing-premium-enablement.json"
     }
   ],
   "edges": [
@@ -19432,6 +19445,24 @@
       "destination": "DOC:docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
       "evidence": "docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx:docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "origin": "ART:src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "evidence": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "verified_at": "2026-08-25"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1-d/per-listing-premium-enablement.json:docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1-d/per-listing-premium-enablement.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "evidence": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
       "verified_at": "2026-08-25"
     }
   ],
