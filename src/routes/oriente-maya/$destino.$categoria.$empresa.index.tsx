@@ -91,10 +91,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
     const b = loaderData.business;
-    const premium =
-      loaderData.surfaceContractsEnabled && loaderData.premiumEligibility?.eligible
-        ? loaderData.premiumEligibility
-        : null;
+    const premium = loaderData.premiumEligibility?.eligible ? loaderData.premiumEligibility : null;
     const destName = loaderData.resolution.destination?.label ?? params.destino;
     const catName = loaderData.resolution.category?.label ?? params.categoria;
     const path = `/oriente-maya/${params.destino}/${params.categoria}/${params.empresa}`;
