@@ -49,6 +49,14 @@ for (const file of allowed) assert.ok(changed.has(file), `I3-D authorized file m
 // Cualquier otro contenido, ruta o digest vuelve a fallar el gate.
 const acknowledgedRevisions = new Map([
   [
+    surfacePath,
+    {
+      sha256: "3bf20d30f1f7bcc03b83669053baa0d4d6ffebd677a8aa0379d8d02feda757f0",
+      authorizationAddendum: "PCA-2026-023-ADDENDUM-A",
+      baseAuthorization: "PCA-2026-023",
+    },
+  ],
+  [
     routePath,
     {
       sha256: "a615c0a480b5d9881e47629b895f20413531561ab9b7c92332cb82dbdb1d5549",
@@ -89,6 +97,48 @@ for (const protectedPath of [
     acknowledged && acknowledged.sha256 === digest,
     `I3-D protected artifact regressed after its authorized batch: ${protectedPath} (digest ${digest} is not an acknowledged PCA revision)`,
   );
+  if (acknowledged.authorizationAddendum) {
+    const addendumPath = join(
+      "docs/governance/addenda",
+      `${acknowledged.authorizationAddendum}.json`,
+    );
+    const addendum = JSON.parse(readFileSync(addendumPath, "utf8"));
+    assert.equal(
+      addendum.status,
+      "Approved",
+      `acknowledged I3-D revision requires an Approved ${acknowledged.authorizationAddendum}`,
+    );
+    assert.equal(addendum.addendum_to, acknowledged.baseAuthorization);
+    assert.ok(
+      (addendum.acknowledged_paths ?? []).some(
+        (entry) =>
+          entry.operation === "modify" && entry.path === protectedPath && entry.sha256 === digest,
+      ),
+      `${acknowledged.authorizationAddendum} does not acknowledge modifying ${protectedPath} at digest ${digest}`,
+    );
+    assert.ok(
+      (addendum.required_feature_flags ?? []).includes("omxds_visual_v1_contracts_enabled=false"),
+      `${acknowledged.authorizationAddendum} must preserve the OFF flag invariant`,
+    );
+    const baseAuthorization = JSON.parse(
+      readFileSync(
+        join("docs/governance/product-authorizations", `${acknowledged.baseAuthorization}.json`),
+        "utf8",
+      ),
+    );
+    assert.equal(
+      baseAuthorization.status,
+      "Approved",
+      `acknowledged I3-D revision requires an Approved ${acknowledged.baseAuthorization}`,
+    );
+    assert.ok(
+      (baseAuthorization.required_feature_flags ?? []).includes(
+        "omxds_visual_v1_contracts_enabled=false",
+      ),
+      `${acknowledged.baseAuthorization} must preserve the OFF flag invariant`,
+    );
+    continue;
+  }
   for (const authorizationId of acknowledged.authorizations) {
     const authorization = JSON.parse(
       readFileSync(
@@ -125,13 +175,13 @@ assertGovernedLockBaseline(base, "I3-D");
 
 const route = readFileSync(routePath, "utf8");
 assert.match(route, /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/);
-assert.match(route, /surfaceContractsEnabled\s*\?\s*await getBusinessPremiumEligibility/);
-assert.ok(
-  route.indexOf("getOmxdsSurfaceContractsFlag().catch(() => false)") <
-    route.indexOf("await getBusinessPremiumEligibility"),
-  "Premium eligibility must run only after the fail-closed flag read",
-);
-assert.match(route, /premiumEligibility=\{premiumEligibility\}/);
+// 19.21 · La elegibilidad Premium se evalúa siempre por ficha y falla cerrado;
+// el flag global OFF continúa gobernando los demás contratos de superficie.
+assert.match(route, /const premiumEligibility = await getBusinessPremiumEligibility\(\{/);
+assert.match(route, /\}\)\.catch\(\(\) => null\)/);
+assert.match(route, /const premiumEnabled = premiumEligibility\?\.eligible === true/);
+assert.match(route, /enabled=\{surfaceContractsEnabled \|\| premiumEnabled\}/);
+assert.match(route, /premiumEligibility=\{premiumEnabled \? premiumEligibility : null\}/);
 assert.match(route, /CompositionRenderer tree=\{composition\.snapshot\}/);
 assert.match(route, /legacy=/);
 

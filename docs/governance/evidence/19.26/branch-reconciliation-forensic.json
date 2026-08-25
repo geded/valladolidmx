@@ -1,0 +1,80 @@
+{
+  "package": "19.26",
+  "report": "PCA-2026-029 branch reconciliation forensic audit",
+  "mode": "READ-ONLY",
+  "base_commit": "4c213820ce81bc6b7416481197e9efd06ee978dc",
+  "branch": "feature/omxds-i4-d-g3-integration-evidence-closure-v1",
+  "recorded_at": "2026-08-25",
+  "result": "PASS",
+  "files_modified_by_audit": false,
+  "secret_scan": {
+    "result": "PASS",
+    "embedded_credentials": 0,
+    "notes": "No JWT, service-role key, sb_secret value, password, access token or private key is embedded. The literal sb_secret_ appears only in a key-format detector. Supabase configuration uses publishable/public environment values."
+  },
+  "artifacts": [
+    {
+      "path": "src/integrations/supabase/client.ts",
+      "operation": "modify",
+      "sha256": "fd07c64d4e312b11ff629b520abb36c613cbfa688db4096b36c53f5832dee741",
+      "lineage": [
+        "5a4adfb3d3cf030cd181c08bba755699bc051bff",
+        "c8af30a64d35990550bc659fcff6332eca169595"
+      ],
+      "purpose": "Creates the browser Supabase client and delegates preview authentication persistence to the platform broker while retaining localStorage fallback.",
+      "documentary_authority": [
+        "docs/blueprint/13.A-I4-B-LOVABLE-CLOUD-MIGRATION-COMPLETION-REPORT-v1.0.md",
+        "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md"
+      ],
+      "security_auth_data_product_effect": "No privileged credential or service-role access. Authentication storage transport changes only inside validated framed Lovable previews; production/browser fallback behavior remains the existing publishable-key client."
+    },
+    {
+      "path": "src/integrations/supabase/previewAuthStorage.ts",
+      "operation": "create",
+      "sha256": "634c0f279327b7c79f6e38b54b7ab4ae3737f0d6c3a660d8ac02a9659be48a0f",
+      "lineage": ["c8af30a64d35990550bc659fcff6332eca169595"],
+      "purpose": "Auto-generated Lovable preview-session storage broker with exact origin, request-id and timeout checks plus localStorage fallback.",
+      "documentary_authority": [
+        "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md"
+      ],
+      "security_auth_data_product_effect": "Fail-closed to approved Lovable/gptengineer preview origins and exact targetOrigin; no credential is embedded, persisted as product data or exposed to an unvalidated origin."
+    },
+    {
+      "path": "src/lib/experience-builder/route-inventory.ts",
+      "operation": "modify",
+      "sha256": "132b19a85be3cdd368091e4d9e34e4e4ebafc119cb50b62c2296d93088e59948",
+      "lineage": [
+        "023a2250ea7322242079f1939b3c7f6102f002bb",
+        "6db7c7b51a50072636350f172905d7cdfec15a00"
+      ],
+      "purpose": "Adds the already restored eventos index route to the Experience Builder route inventory and classifies its governance level.",
+      "documentary_authority": [
+        "docs/blueprint/RT-1-EVENT-DETAIL-ROUTE-RESTORATION-CLOSURE-REPORT-v1.0.md",
+        "docs/blueprint/18.07-EXPERIENCE-BUILDER-V1-I4-A-IMPLEMENTATION-AUTHORIZATION-PACK-v1.0.md"
+      ],
+      "security_auth_data_product_effect": "Inventory metadata only; no authentication, secret, database write or public runtime behavior is introduced."
+    },
+    {
+      "path": "src/lib/reviews/public-reads.functions.ts",
+      "operation": "modify",
+      "sha256": "7d978f092e933d2d3877e33b3d2760401a835d096fd1cf5923cb2e987bddc9e7",
+      "lineage": ["dc8cda62119fb21e41ebe2b1928a4d5fef74c582"],
+      "purpose": "Retains the public review read API as a thin server-function wrapper after extracting runtime-only implementation.",
+      "documentary_authority": ["docs/blueprint/16.21-EG-TRUST-ENGINE-V1-CLOSURE-REPORT-v1.0.md"],
+      "security_auth_data_product_effect": "No write path or elevated client. Existing input validation and public-safe response contract are preserved."
+    },
+    {
+      "path": "src/lib/reviews/public-reads.server.ts",
+      "operation": "create",
+      "sha256": "e8eac542cfa2071baca6d8297d6c58df38024cdbe072a4d1b5af0a4993974712",
+      "lineage": [
+        "2a4d4de5a57e603c4414c624487b7396cf64a22e",
+        "e93bce064cb76e19efe9d6feeaa2d73ec702a794"
+      ],
+      "purpose": "Moves public review query implementation into a server-only module so the TanStack function splitter preserves runtime dependencies.",
+      "documentary_authority": ["docs/blueprint/16.21-EG-TRUST-ENGINE-V1-CLOSURE-REPORT-v1.0.md"],
+      "security_auth_data_product_effect": "Published and non-deleted filters, safe-column selection, validation and stats RPC semantics are preserved; only publishable environment configuration is used."
+    }
+  ],
+  "conclusion": "All five artifacts predate the authorized base, are byte-identical to that base, have reconstructable Git lineage and documented product purpose, contain no embedded secrets, and introduce no unexplained functional deviation. They are eligible for exact branch recognition without editing their content."
+}

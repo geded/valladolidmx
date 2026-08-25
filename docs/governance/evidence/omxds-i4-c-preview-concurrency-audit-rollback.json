@@ -42,19 +42,19 @@
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "sha256": "23a204661d91547f591ad02d9bad45e9c4d80efcff126aa0611d6a91fefccc57"
+      "sha256": "03f27b611c10a8b43af9bd1c6f762dc0b1bc22f87caa71cbdac91a2739140aff"
     },
     {
       "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
-      "sha256": "b124c8ac1224a17b224a44e0ccb9fcc154f2e5d9e0bc9a634b8e366a067aeaf6"
+      "sha256": "eca39b77bce31978cbc66a5ca6f714cd3dd5dd9ffb9824c1989cf793e6b8cb0f"
     },
     {
       "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
-      "sha256": "28ca70e0039af0abad9d5f17971a67ecda1d9667d4ef3ccfeaead122d55d3346"
+      "sha256": "e93b75f4537ce168f09b04c83eb02b44dd2e9e9e043417e1ed476f9a18c52a5f"
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "0450a09462088eace2e3fc6ba6105518c11d66693c8a78fe794d13b66c4d7a3e"
+      "sha256": "8beef06a0311cad3a1c6720c048e7124f059588736c3cf4d1376649b15815a66"
     },
     {
       "path": "docs/governance/product-authorizations/PCA-2026-015.json",
@@ -70,7 +70,7 @@
     },
     {
       "path": "scripts/omxds/i3/business-premium-surface.evidence.mjs",
-      "sha256": "bc5f5bbfd5af62bc18e203d38eec8abc1ccea8e595f487d10570fd01b8c05e78"
+      "sha256": "b61fc1f4afc225c37cd0173514928f725d4f41690579a89a9168d5e58e5c1793"
     },
     {
       "path": "scripts/omxds/i4/editorial-builder-preview-concurrency.evidence.mjs",
