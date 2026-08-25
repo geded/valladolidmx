@@ -50,10 +50,26 @@
     }
   ],
   "negative_barriers": [
-    { "case": "sin grant activo", "expected": "standard", "enforced_by": "evaluateBusinessPremiumEligibility · plan/grant vigente" },
-    { "case": "is_demo_seed = true", "expected": "standard", "enforced_by": "business-premium-eligibility.server.ts · exclusión explícita" },
-    { "case": "no publicada", "expected": "standard", "enforced_by": "isPublished === false → verification/publication fail-closed" },
-    { "case": "revocación de grant", "expected": "standard", "verified_by": "simulación de contrato en scripts/omxds/i3/business-premium-surface.contract.test.ts; datos reales no modificados" }
+    {
+      "case": "sin grant activo",
+      "expected": "standard",
+      "enforced_by": "evaluateBusinessPremiumEligibility · plan/grant vigente"
+    },
+    {
+      "case": "is_demo_seed = true",
+      "expected": "standard",
+      "enforced_by": "business-premium-eligibility.server.ts · exclusión explícita"
+    },
+    {
+      "case": "no publicada",
+      "expected": "standard",
+      "enforced_by": "isPublished === false → verification/publication fail-closed"
+    },
+    {
+      "case": "revocación de grant",
+      "expected": "standard",
+      "verified_by": "simulación de contrato en scripts/omxds/i3/business-premium-surface.contract.test.ts; datos reales no modificados"
+    }
   ],
   "asset_reconciliation": {
     "masters_v1p1c": 12,
