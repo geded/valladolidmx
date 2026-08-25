@@ -1,5 +1,6 @@
 import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import {
   assertGovernedDependencyBaseline,
@@ -208,6 +209,36 @@ for (const forbiddenPath of [
     }),
     "",
   );
+// 19.26 · Reconocimiento fail-closed y NO genérico de dos artefactos generados por
+// la plataforma (broker de sesión de preview), presentes desde 66c4386c, sin
+// secretos embebidos y no editables por el proyecto. Sólo estas dos rutas exactas
+// con estos digest exactos; cualquier cambio de contenido, ausencia o ruta
+// adicional bajo src/integrations/supabase vuelve a fallar el gate.
+const generatedPlatformArtifacts = new Map([
+  [
+    "src/integrations/supabase/client.ts",
+    "fd07c64d4e312b11ff629b520abb36c613cbfa688db4096b36c53f5832dee741",
+  ],
+  [
+    "src/integrations/supabase/previewAuthStorage.ts",
+    "634c0f279327b7c79f6e38b54b7ab4ae3737f0d6c3a660d8ac02a9659be48a0f",
+  ],
+]);
+
+for (const [artifactPath, expectedDigest] of generatedPlatformArtifacts) {
+  let contents;
+  try {
+    contents = readFileSync(artifactPath);
+  } catch {
+    assert.fail(`acknowledged generated artifact is missing: ${artifactPath}`);
+  }
+  assert.equal(
+    createHash("sha256").update(contents).digest("hex"),
+    expectedDigest,
+    `acknowledged generated artifact changed without Approved PCA: ${artifactPath}`,
+  );
+}
+
 for (const file of gitLines([
   "diff",
   "--name-only",
@@ -217,7 +248,7 @@ for (const file of gitLines([
   "src/integrations/supabase",
 ]))
   assert.ok(
-    approvedPcaAuthorizedPaths.has(file),
+    approvedPcaAuthorizedPaths.has(file) || generatedPlatformArtifacts.has(file),
     `post-I3-D data change lacks an Approved PCA exact-path authorization: ${file}`,
   );
 
