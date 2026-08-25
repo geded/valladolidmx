@@ -43,7 +43,6 @@ assert.ok(
 );
 
 for (const file of [
-  routePath,
   "src/components/surfaces/DestinationSurface.tsx",
   "scripts/omxds/i3/destination-surface.contract.test.ts",
 ])
@@ -54,6 +53,55 @@ for (const file of [
     "",
     `I3-A regression: ${file}`,
   );
+
+// 19.26 · Reconciliación fail-closed del gate I3-A.
+// El baseline histórico (base…i3aHead) se conserva intacto. La única evolución
+// tolerada de la ruta canónica de destino es el contenido EXACTO acreditado por
+// PCA-2026-025 (19.23) y PCA-2026-026 (19.24), fijado por digest SHA-256.
+// Cualquier otra modificación —presente o futura— vuelve a fallar el gate.
+const acknowledgedRouteRevisions = [
+  {
+    package: "19.23+19.24",
+    sha256: "9de7f1c8476780d719127c3bd4df3968db82116ab7ef8658269be2ff2d4e9f88",
+    authorizations: ["PCA-2026-025", "PCA-2026-026"],
+  },
+];
+
+const routeDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", routePath], {
+  encoding: "utf8",
+});
+if (routeDrift !== "") {
+  const digest = createHash("sha256").update(readFileSync(routePath)).digest("hex");
+  const acknowledged = acknowledgedRouteRevisions.find((revision) => revision.sha256 === digest);
+  assert.ok(
+    acknowledged,
+    `I3-A regression: ${routePath} (digest ${digest} is not an acknowledged PCA revision)`,
+  );
+  for (const authorizationId of acknowledged.authorizations) {
+    const authorizationPath = join(
+      "docs/governance/product-authorizations",
+      `${authorizationId}.json`,
+    );
+    const authorization = JSON.parse(readFileSync(authorizationPath, "utf8"));
+    assert.equal(
+      authorization.status,
+      "Approved",
+      `acknowledged route revision requires an Approved ${authorizationId}`,
+    );
+    assert.ok(
+      (authorization.permissions ?? []).some(
+        (permission) => permission.operation === "modify" && permission.path === routePath,
+      ),
+      `${authorizationId} does not authorize modifying ${routePath}`,
+    );
+    assert.ok(
+      (authorization.required_feature_flags ?? []).includes(
+        "omxds_visual_v1_contracts_enabled=false",
+      ),
+      `${authorizationId} must preserve the OFF flag invariant`,
+    );
+  }
+}
 
 const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
