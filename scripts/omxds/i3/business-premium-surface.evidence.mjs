@@ -2,6 +2,7 @@ import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import {
   assertGovernedDependencyBaseline,
   assertGovernedLockBaseline,
@@ -40,20 +41,77 @@ assert.equal(changed.size, 15, "I3-D must contain exactly 15 files");
 for (const file of changed) assert.ok(allowed.has(file), `I3-D scope violation: ${file}`);
 for (const file of allowed) assert.ok(changed.has(file), `I3-D authorized file missing: ${file}`);
 
+// 19.26 · Reconciliación fail-closed del gate I3-D.
+// El baseline histórico (base…i3DHead) se conserva intacto. La única evolución
+// tolerada de los artefactos protegidos es el contenido EXACTO acreditado por
+// PCA-2026-023 (19.21) y/o PCA-2026-026 (19.24), fijado por digest SHA-256 y
+// verificado contra un PCA Approved con permiso `modify` sobre la ruta exacta.
+// Cualquier otro contenido, ruta o digest vuelve a fallar el gate.
+const acknowledgedRevisions = new Map([
+  [
+    routePath,
+    {
+      sha256: "a615c0a480b5d9881e47629b895f20413531561ab9b7c92332cb82dbdb1d5549",
+      authorizations: ["PCA-2026-023", "PCA-2026-026"],
+    },
+  ],
+  [
+    contractPath,
+    {
+      sha256: "d52aab428b9cf58fbca14257497cc2bf93e0482c9a731139af8125ea285869c1",
+      authorizations: ["PCA-2026-023"],
+    },
+  ],
+  [
+    eligibilityPath,
+    {
+      sha256: "93ddeac96c3f74cef90f691a4bf5f64e2bb02aede26f5aa502e35ee65a47e477",
+      authorizations: ["PCA-2026-023"],
+    },
+  ],
+]);
+
 for (const protectedPath of [
   routePath,
   surfacePath,
   contractPath,
   eligibilityPath,
   "scripts/omxds/i3/business-premium-surface.contract.test.ts",
-])
-  assert.equal(
-    execFileSync("git", ["diff", "--name-only", i3DHead, "--", protectedPath], {
-      encoding: "utf8",
-    }),
-    "",
-    `I3-D protected artifact regressed after its authorized batch: ${protectedPath}`,
+]) {
+  const drift = execFileSync("git", ["diff", "--name-only", i3DHead, "--", protectedPath], {
+    encoding: "utf8",
+  });
+  if (drift === "") continue;
+
+  const acknowledged = acknowledgedRevisions.get(protectedPath);
+  const digest = createHash("sha256").update(readFileSync(protectedPath)).digest("hex");
+  assert.ok(
+    acknowledged && acknowledged.sha256 === digest,
+    `I3-D protected artifact regressed after its authorized batch: ${protectedPath} (digest ${digest} is not an acknowledged PCA revision)`,
   );
+  for (const authorizationId of acknowledged.authorizations) {
+    const authorization = JSON.parse(
+      readFileSync(join("docs/governance/product-authorizations", `${authorizationId}.json`), "utf8"),
+    );
+    assert.equal(
+      authorization.status,
+      "Approved",
+      `acknowledged I3-D revision requires an Approved ${authorizationId}`,
+    );
+    assert.ok(
+      (authorization.permissions ?? []).some(
+        (permission) => permission.operation === "modify" && permission.path === protectedPath,
+      ),
+      `${authorizationId} does not authorize modifying ${protectedPath}`,
+    );
+    assert.ok(
+      (authorization.required_feature_flags ?? []).includes(
+        "omxds_visual_v1_contracts_enabled=false",
+      ),
+      `${authorizationId} must preserve the OFF flag invariant`,
+    );
+  }
+}
 
 const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
