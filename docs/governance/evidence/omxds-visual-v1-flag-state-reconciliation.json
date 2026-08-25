@@ -1,0 +1,31 @@
+{
+  "initiative": "19.20 · OMXDS Visual V1 · Flag State Reconciliation",
+  "authorization": "docs/governance/product-authorizations/PCA-2026-022.json",
+  "blueprint": "docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+  "flag": "omxds_visual_v1_contracts_enabled",
+  "divergence_detected_at": "2026-08-25",
+  "observed_initial_state": {
+    "value": true,
+    "updated_at": "2026-08-25T06:57:54.807278+00:00",
+    "source": "public.platform_settings persisted row"
+  },
+  "governed_required_state": false,
+  "postcondition_verified": {
+    "value": false,
+    "updated_at": "2026-08-25T16:35:31.028075+00:00",
+    "read_method": "direct psql SELECT on public.platform_settings",
+    "read_at": "2026-08-25T16:35:31Z"
+  },
+  "migration": "supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql",
+  "migration_idempotent": true,
+  "rows_scope": 1,
+  "other_settings_changed": 0,
+  "blocking_dependency": "V1-P1.d permanece bloqueada y NO iniciada",
+  "invariants": {
+    "i4_d_functional_acceptance": "PASS",
+    "operational_multi_actor_acceptance": "DEFERRED",
+    "deferred_scenarios": ["G3-H07", "G3-H11", "G3-H12"],
+    "validate_i4_d": "FAIL-CLOSED (por diseño, no alterado)"
+  },
+  "status": "RECONCILED · FLAG OFF"
+}

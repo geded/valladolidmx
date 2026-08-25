@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.42",
+    "version": "0.43",
     "state": "Approved",
-    "source_sha256": "598a88a7987513914cb8a126e1d82999191922ee237166acd0800f152874bccc",
+    "source_sha256": "651692c6bf0c705c93e036d4e1e55b68b05e72ab61770e58fad1d1c6fe664250",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -7475,6 +7475,19 @@
       "owner": "D04 · content-experience",
       "state": "Approved",
       "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+      "owner": "D02 · platform-foundation",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql"
     }
   ],
   "edges": [
@@ -19410,6 +19423,15 @@
       "destination": "DOC:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
       "evidence": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-25"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql:docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
       "verified_at": "2026-08-25"
     }
   ],
