@@ -22,7 +22,7 @@ Las asociaciones técnicas de las filas adjudicadas fueron validadas localmente 
 
 ## 2.1 Universo documental verificable
 
-El universo total bajo `docs/blueprint/` es de **516 archivos únicos** (medición 2026-08-25 posterior a la admisión de `19.20`):
+El universo total bajo `docs/blueprint/` es de **517 archivos únicos** (medición 2026-08-25 posterior a la admisión de `19.21`):
 
 - **499** archivos en la raíz de `docs/blueprint/`.
 - **15** archivos en 5 subdirectorios: `artifacts/`, `audits/`, `project-constitution/`, `roadmap/`, `templates/`.
