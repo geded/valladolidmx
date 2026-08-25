@@ -9,7 +9,7 @@
   "permissions": [
     {
       "operation": "create",
-      "path": "supabase/migrations/20260825170000_omxds_visual_v1_flag_state_reconciliation.sql"
+      "path": "supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql"
     }
   ],
   "public_routes": [],
