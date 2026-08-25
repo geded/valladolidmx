@@ -1,0 +1,986 @@
+{
+  "package": "19.22.a · V1-P1 · Governed Asset Lineage & Checksum Reconciliation",
+  "blueprint": "docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md",
+  "product_change_authorization": "PCA-2026-024",
+  "governed_base_commit": "3b24138c158a1441ea785d5dc3a09fa46f13b639",
+  "branch": "edit/edt-a7b4111c-4fa0-4062-bc36-78ca1dbff7b7",
+  "generated_at": "2026-08-25T19:35:39.920946+00:00",
+  "migration": "supabase/migrations/20260825193309_61f9e8e4-608e-46a8-b4ac-4d8930c4eb78.sql",
+  "checksum_method": {
+    "algorithm": "SHA-256",
+    "procedure": "GET storage/v1/object/studio-media/<storage_path> con credencial de servicio; sha256sum sobre los bytes descargados sin transformacion; tamano contrastado contra storage.objects.metadata.size",
+    "derivation_from_names_or_metadata": "prohibido y no utilizado",
+    "uuid_policy": "UUID completos, sin truncar"
+  },
+  "counts": {
+    "masters": 12,
+    "per_listing_copies": 9,
+    "rows_affected": 21
+  },
+  "flag_state": {
+    "omxds_visual_v1_contracts_enabled_before": false,
+    "omxds_visual_v1_contracts_enabled_after": false
+  },
+  "before_state": {
+    "original_checksum": "NULL en los 21 registros",
+    "metadata_lineage": "ausente en las 9 copias"
+  },
+  "verified_objects": [
+    {
+      "storage_path": "7d1d0001-1111-4111-8111-000000000001/cover.jpg",
+      "sha256": "816737965a3226fdec3696cd1a1ce9825effb67fb1e3228250e740b1094f42f8",
+      "bytes": 347858
+    },
+    {
+      "storage_path": "7d1d0001-1111-4111-8111-000000000001/gallery-1.jpg",
+      "sha256": "1d4a926f61a16b66d12b304806dbc62ba8f8f8b2b85c85e8226ede341489c390",
+      "bytes": 202522
+    },
+    {
+      "storage_path": "7d1d0001-1111-4111-8111-000000000001/gallery-2.jpg",
+      "sha256": "7327cd40abe8ec21e5b853bd8e567a57951ca39cba877d889da43ffd085bd72c",
+      "bytes": 225152
+    },
+    {
+      "storage_path": "7d1d0002-1111-4111-8111-000000000002/cover.jpg",
+      "sha256": "68b6f784a2b2f058748af298560c51ae7c3c7b4991899744456d50d8211a4937",
+      "bytes": 246533
+    },
+    {
+      "storage_path": "7d1d0002-1111-4111-8111-000000000002/gallery-1.jpg",
+      "sha256": "a9bdd76802ee1d14b0ffb032582a1ea2f9539ad42b56cbf46d1d4a0407b41b4c",
+      "bytes": 309813
+    },
+    {
+      "storage_path": "7d1d0002-1111-4111-8111-000000000002/gallery-2.jpg",
+      "sha256": "c27cecf2879b41d6cb97d418eba5c03fc6a6746bcc05670356d30bda392ea68f",
+      "bytes": 360011
+    },
+    {
+      "storage_path": "7d1d0003-1111-4111-8111-000000000003/cover.jpg",
+      "sha256": "1f13bc0cde46f407d9a616d8c350d9719509830f86313488e3bf92453d9fd904",
+      "bytes": 359336
+    },
+    {
+      "storage_path": "7d1d0003-1111-4111-8111-000000000003/gallery-1.jpg",
+      "sha256": "db797455033f4b387465ff4aa52ec2d772678a86308501e8cae03416f8d7da2c",
+      "bytes": 317988
+    },
+    {
+      "storage_path": "7d1d0003-1111-4111-8111-000000000003/gallery-2.jpg",
+      "sha256": "e04614d9ccceac79b9f8a22fc5c53595f762fff9ca525aef3a30b904043f5edb",
+      "bytes": 294527
+    },
+    {
+      "storage_path": "governed/v1p1c/destination-cover.jpg",
+      "sha256": "5bb19d90a602874c49f354dd81a28c051602ae60d7f27c8af82f724fd04b3488",
+      "bytes": 273714
+    },
+    {
+      "storage_path": "governed/v1p1c/destination-gallery-1.jpg",
+      "sha256": "6246da339f87cced4b9c25e800f1cf6690e718512710d5fd364f38ea6b260b0d",
+      "bytes": 352446
+    },
+    {
+      "storage_path": "governed/v1p1c/destination-gallery-2.jpg",
+      "sha256": "ef3d7604309c92bc9eb06a3b8dbdfef0ab65a886d828381118674cea1e94db5e",
+      "bytes": 341866
+    },
+    {
+      "storage_path": "governed/v1p1c/experience-cover.jpg",
+      "sha256": "1f13bc0cde46f407d9a616d8c350d9719509830f86313488e3bf92453d9fd904",
+      "bytes": 359336
+    },
+    {
+      "storage_path": "governed/v1p1c/experience-gallery-1.jpg",
+      "sha256": "db797455033f4b387465ff4aa52ec2d772678a86308501e8cae03416f8d7da2c",
+      "bytes": 317988
+    },
+    {
+      "storage_path": "governed/v1p1c/experience-gallery-2.jpg",
+      "sha256": "e04614d9ccceac79b9f8a22fc5c53595f762fff9ca525aef3a30b904043f5edb",
+      "bytes": 294527
+    },
+    {
+      "storage_path": "governed/v1p1c/hotel-cover.jpg",
+      "sha256": "816737965a3226fdec3696cd1a1ce9825effb67fb1e3228250e740b1094f42f8",
+      "bytes": 347858
+    },
+    {
+      "storage_path": "governed/v1p1c/hotel-gallery-1.jpg",
+      "sha256": "1d4a926f61a16b66d12b304806dbc62ba8f8f8b2b85c85e8226ede341489c390",
+      "bytes": 202522
+    },
+    {
+      "storage_path": "governed/v1p1c/hotel-gallery-2.jpg",
+      "sha256": "7327cd40abe8ec21e5b853bd8e567a57951ca39cba877d889da43ffd085bd72c",
+      "bytes": 225152
+    },
+    {
+      "storage_path": "governed/v1p1c/restaurant-cover.jpg",
+      "sha256": "68b6f784a2b2f058748af298560c51ae7c3c7b4991899744456d50d8211a4937",
+      "bytes": 246533
+    },
+    {
+      "storage_path": "governed/v1p1c/restaurant-gallery-1.jpg",
+      "sha256": "a9bdd76802ee1d14b0ffb032582a1ea2f9539ad42b56cbf46d1d4a0407b41b4c",
+      "bytes": 309813
+    },
+    {
+      "storage_path": "governed/v1p1c/restaurant-gallery-2.jpg",
+      "sha256": "c27cecf2879b41d6cb97d418eba5c03fc6a6746bcc05670356d30bda392ea68f",
+      "bytes": 360011
+    }
+  ],
+  "masters_after": [
+    {
+      "id": "453dd8fd-7d1e-419e-95ea-9afa365f363c",
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/destination-cover.jpg",
+      "original_checksum": "5bb19d90a602874c49f354dd81a28c051602ae60d7f27c8af82f724fd04b3488",
+      "metadata": {
+        "role": "cover",
+        "v1p1c": true,
+        "source": "own_production",
+        "license": "own_production",
+        "vertical": "destination",
+        "provenance": {
+          "kind": "governed_source",
+          "origin": "v1p1c"
+        },
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "48bdb6fd-91ec-40b4-8262-070cffdbdaf3",
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/destination-gallery-1.jpg",
+      "original_checksum": "6246da339f87cced4b9c25e800f1cf6690e718512710d5fd364f38ea6b260b0d",
+      "metadata": {
+        "role": "gallery",
+        "v1p1c": true,
+        "source": "own_production",
+        "license": "own_production",
+        "vertical": "destination",
+        "provenance": {
+          "kind": "governed_source",
+          "origin": "v1p1c"
+        },
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "4c1ffec3-c57f-44e5-99f3-b8c9ffb0b93b",
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/destination-gallery-2.jpg",
+      "original_checksum": "ef3d7604309c92bc9eb06a3b8dbdfef0ab65a886d828381118674cea1e94db5e",
+      "metadata": {
+        "role": "gallery",
+        "v1p1c": true,
+        "source": "own_production",
+        "license": "own_production",
+        "vertical": "destination",
+        "provenance": {
+          "kind": "governed_source",
+          "origin": "v1p1c"
+        },
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "0603dbfb-762d-496a-a3f2-507d5b892d00",
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/experience-cover.jpg",
+      "original_checksum": "1f13bc0cde46f407d9a616d8c350d9719509830f86313488e3bf92453d9fd904",
+      "metadata": {
+        "role": "cover",
+        "v1p1c": true,
+        "source": "own_production",
+        "license": "own_production",
+        "vertical": "experience",
+        "provenance": {
+          "kind": "governed_source",
+          "origin": "v1p1c"
+        },
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "054505b4-07c7-482e-be02-29a950fc3967",
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/experience-gallery-1.jpg",
+      "original_checksum": "db797455033f4b387465ff4aa52ec2d772678a86308501e8cae03416f8d7da2c",
+      "metadata": {
+        "role": "gallery",
+        "v1p1c": true,
+        "source": "own_production",
+        "license": "own_production",
+        "vertical": "experience",
+        "provenance": {
+          "kind": "governed_source",
+          "origin": "v1p1c"
+        },
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "5d14e132-1e05-449e-9cbf-4962c4fc55b6",
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/experience-gallery-2.jpg",
+      "original_checksum": "e04614d9ccceac79b9f8a22fc5c53595f762fff9ca525aef3a30b904043f5edb",
+      "metadata": {
+        "role": "gallery",
+        "v1p1c": true,
+        "source": "own_production",
+        "license": "own_production",
+        "vertical": "experience",
+        "provenance": {
+          "kind": "governed_source",
+          "origin": "v1p1c"
+        },
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "809b7e1b-22e6-4a15-af65-06bc46b9d8e5",
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/hotel-cover.jpg",
+      "original_checksum": "816737965a3226fdec3696cd1a1ce9825effb67fb1e3228250e740b1094f42f8",
+      "metadata": {
+        "role": "cover",
+        "v1p1c": true,
+        "source": "own_production",
+        "license": "own_production",
+        "vertical": "hotel",
+        "provenance": {
+          "kind": "governed_source",
+          "origin": "v1p1c"
+        },
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "995e5a74-d10a-48ee-b968-315b754def41",
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/hotel-gallery-1.jpg",
+      "original_checksum": "1d4a926f61a16b66d12b304806dbc62ba8f8f8b2b85c85e8226ede341489c390",
+      "metadata": {
+        "role": "gallery",
+        "v1p1c": true,
+        "source": "own_production",
+        "license": "own_production",
+        "vertical": "hotel",
+        "provenance": {
+          "kind": "governed_source",
+          "origin": "v1p1c"
+        },
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "c43d33b6-f67a-486d-81ce-c979e509dfd0",
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/hotel-gallery-2.jpg",
+      "original_checksum": "7327cd40abe8ec21e5b853bd8e567a57951ca39cba877d889da43ffd085bd72c",
+      "metadata": {
+        "role": "gallery",
+        "v1p1c": true,
+        "source": "own_production",
+        "license": "own_production",
+        "vertical": "hotel",
+        "provenance": {
+          "kind": "governed_source",
+          "origin": "v1p1c"
+        },
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "0b4978d0-3a15-4f07-ac60-fe93b94c4071",
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/restaurant-cover.jpg",
+      "original_checksum": "68b6f784a2b2f058748af298560c51ae7c3c7b4991899744456d50d8211a4937",
+      "metadata": {
+        "role": "cover",
+        "v1p1c": true,
+        "source": "own_production",
+        "license": "own_production",
+        "vertical": "restaurant",
+        "provenance": {
+          "kind": "governed_source",
+          "origin": "v1p1c"
+        },
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "b9f33bef-54e6-49fe-9767-fb99748369b5",
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/restaurant-gallery-1.jpg",
+      "original_checksum": "a9bdd76802ee1d14b0ffb032582a1ea2f9539ad42b56cbf46d1d4a0407b41b4c",
+      "metadata": {
+        "role": "gallery",
+        "v1p1c": true,
+        "source": "own_production",
+        "license": "own_production",
+        "vertical": "restaurant",
+        "provenance": {
+          "kind": "governed_source",
+          "origin": "v1p1c"
+        },
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "8702e5bd-8834-4ff5-beaa-e52ea84b2dbd",
+      "storage_bucket": "studio-media",
+      "storage_path": "governed/v1p1c/restaurant-gallery-2.jpg",
+      "original_checksum": "c27cecf2879b41d6cb97d418eba5c03fc6a6746bcc05670356d30bda392ea68f",
+      "metadata": {
+        "role": "gallery",
+        "v1p1c": true,
+        "source": "own_production",
+        "license": "own_production",
+        "vertical": "restaurant",
+        "provenance": {
+          "kind": "governed_source",
+          "origin": "v1p1c"
+        },
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    }
+  ],
+  "copies_after": [
+    {
+      "id": "b95017a9-72cb-4b19-aa4d-24d96b5feb50",
+      "storage_bucket": "studio-media",
+      "storage_path": "7d1d0001-1111-4111-8111-000000000001/cover.jpg",
+      "original_checksum": "816737965a3226fdec3696cd1a1ce9825effb67fb1e3228250e740b1094f42f8",
+      "metadata": {
+        "role": "cover",
+        "source": "portal",
+        "license": "own_production",
+        "lineage": {
+          "kind": "governed_copy",
+          "origin": "v1p1c",
+          "sha256": "816737965a3226fdec3696cd1a1ce9825effb67fb1e3228250e740b1094f42f8",
+          "verified_by": "19.22.a",
+          "master_asset_id": "809b7e1b-22e6-4a15-af65-06bc46b9d8e5",
+          "master_storage_path": "governed/v1p1c/hotel-cover.jpg",
+          "verification_method": "sha256 over stored object bytes",
+          "master_storage_bucket": "studio-media"
+        },
+        "demo_pack": "v1p1d",
+        "business_id": "7d1d0001-1111-4111-8111-000000000001",
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "731b8e81-fd93-479d-9181-abcf618d6ab5",
+      "storage_bucket": "studio-media",
+      "storage_path": "7d1d0001-1111-4111-8111-000000000001/gallery-1.jpg",
+      "original_checksum": "1d4a926f61a16b66d12b304806dbc62ba8f8f8b2b85c85e8226ede341489c390",
+      "metadata": {
+        "role": "gallery",
+        "source": "portal",
+        "license": "own_production",
+        "lineage": {
+          "kind": "governed_copy",
+          "origin": "v1p1c",
+          "sha256": "1d4a926f61a16b66d12b304806dbc62ba8f8f8b2b85c85e8226ede341489c390",
+          "verified_by": "19.22.a",
+          "master_asset_id": "995e5a74-d10a-48ee-b968-315b754def41",
+          "master_storage_path": "governed/v1p1c/hotel-gallery-1.jpg",
+          "verification_method": "sha256 over stored object bytes",
+          "master_storage_bucket": "studio-media"
+        },
+        "demo_pack": "v1p1d",
+        "business_id": "7d1d0001-1111-4111-8111-000000000001",
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "aa6aecdc-4f6e-4227-8c7d-761ba56a24f0",
+      "storage_bucket": "studio-media",
+      "storage_path": "7d1d0001-1111-4111-8111-000000000001/gallery-2.jpg",
+      "original_checksum": "7327cd40abe8ec21e5b853bd8e567a57951ca39cba877d889da43ffd085bd72c",
+      "metadata": {
+        "role": "gallery",
+        "source": "portal",
+        "license": "own_production",
+        "lineage": {
+          "kind": "governed_copy",
+          "origin": "v1p1c",
+          "sha256": "7327cd40abe8ec21e5b853bd8e567a57951ca39cba877d889da43ffd085bd72c",
+          "verified_by": "19.22.a",
+          "master_asset_id": "c43d33b6-f67a-486d-81ce-c979e509dfd0",
+          "master_storage_path": "governed/v1p1c/hotel-gallery-2.jpg",
+          "verification_method": "sha256 over stored object bytes",
+          "master_storage_bucket": "studio-media"
+        },
+        "demo_pack": "v1p1d",
+        "business_id": "7d1d0001-1111-4111-8111-000000000001",
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "61cea08a-9436-45ec-9e1c-9f0eca42fd6d",
+      "storage_bucket": "studio-media",
+      "storage_path": "7d1d0002-1111-4111-8111-000000000002/cover.jpg",
+      "original_checksum": "68b6f784a2b2f058748af298560c51ae7c3c7b4991899744456d50d8211a4937",
+      "metadata": {
+        "role": "cover",
+        "source": "portal",
+        "license": "own_production",
+        "lineage": {
+          "kind": "governed_copy",
+          "origin": "v1p1c",
+          "sha256": "68b6f784a2b2f058748af298560c51ae7c3c7b4991899744456d50d8211a4937",
+          "verified_by": "19.22.a",
+          "master_asset_id": "0b4978d0-3a15-4f07-ac60-fe93b94c4071",
+          "master_storage_path": "governed/v1p1c/restaurant-cover.jpg",
+          "verification_method": "sha256 over stored object bytes",
+          "master_storage_bucket": "studio-media"
+        },
+        "demo_pack": "v1p1d",
+        "business_id": "7d1d0002-1111-4111-8111-000000000002",
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "d0e73e69-e387-445a-a91a-73101ad5dd59",
+      "storage_bucket": "studio-media",
+      "storage_path": "7d1d0002-1111-4111-8111-000000000002/gallery-1.jpg",
+      "original_checksum": "a9bdd76802ee1d14b0ffb032582a1ea2f9539ad42b56cbf46d1d4a0407b41b4c",
+      "metadata": {
+        "role": "gallery",
+        "source": "portal",
+        "license": "own_production",
+        "lineage": {
+          "kind": "governed_copy",
+          "origin": "v1p1c",
+          "sha256": "a9bdd76802ee1d14b0ffb032582a1ea2f9539ad42b56cbf46d1d4a0407b41b4c",
+          "verified_by": "19.22.a",
+          "master_asset_id": "b9f33bef-54e6-49fe-9767-fb99748369b5",
+          "master_storage_path": "governed/v1p1c/restaurant-gallery-1.jpg",
+          "verification_method": "sha256 over stored object bytes",
+          "master_storage_bucket": "studio-media"
+        },
+        "demo_pack": "v1p1d",
+        "business_id": "7d1d0002-1111-4111-8111-000000000002",
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "523fce33-316e-4d8e-8e1e-a3f9239decc6",
+      "storage_bucket": "studio-media",
+      "storage_path": "7d1d0002-1111-4111-8111-000000000002/gallery-2.jpg",
+      "original_checksum": "c27cecf2879b41d6cb97d418eba5c03fc6a6746bcc05670356d30bda392ea68f",
+      "metadata": {
+        "role": "gallery",
+        "source": "portal",
+        "license": "own_production",
+        "lineage": {
+          "kind": "governed_copy",
+          "origin": "v1p1c",
+          "sha256": "c27cecf2879b41d6cb97d418eba5c03fc6a6746bcc05670356d30bda392ea68f",
+          "verified_by": "19.22.a",
+          "master_asset_id": "8702e5bd-8834-4ff5-beaa-e52ea84b2dbd",
+          "master_storage_path": "governed/v1p1c/restaurant-gallery-2.jpg",
+          "verification_method": "sha256 over stored object bytes",
+          "master_storage_bucket": "studio-media"
+        },
+        "demo_pack": "v1p1d",
+        "business_id": "7d1d0002-1111-4111-8111-000000000002",
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "8376763c-253b-428f-8122-6c30a12d32cb",
+      "storage_bucket": "studio-media",
+      "storage_path": "7d1d0003-1111-4111-8111-000000000003/cover.jpg",
+      "original_checksum": "1f13bc0cde46f407d9a616d8c350d9719509830f86313488e3bf92453d9fd904",
+      "metadata": {
+        "role": "cover",
+        "source": "portal",
+        "license": "own_production",
+        "lineage": {
+          "kind": "governed_copy",
+          "origin": "v1p1c",
+          "sha256": "1f13bc0cde46f407d9a616d8c350d9719509830f86313488e3bf92453d9fd904",
+          "verified_by": "19.22.a",
+          "master_asset_id": "0603dbfb-762d-496a-a3f2-507d5b892d00",
+          "master_storage_path": "governed/v1p1c/experience-cover.jpg",
+          "verification_method": "sha256 over stored object bytes",
+          "master_storage_bucket": "studio-media"
+        },
+        "demo_pack": "v1p1d",
+        "business_id": "7d1d0003-1111-4111-8111-000000000003",
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "453830c0-3001-476b-a218-6a908e60b440",
+      "storage_bucket": "studio-media",
+      "storage_path": "7d1d0003-1111-4111-8111-000000000003/gallery-1.jpg",
+      "original_checksum": "db797455033f4b387465ff4aa52ec2d772678a86308501e8cae03416f8d7da2c",
+      "metadata": {
+        "role": "gallery",
+        "source": "portal",
+        "license": "own_production",
+        "lineage": {
+          "kind": "governed_copy",
+          "origin": "v1p1c",
+          "sha256": "db797455033f4b387465ff4aa52ec2d772678a86308501e8cae03416f8d7da2c",
+          "verified_by": "19.22.a",
+          "master_asset_id": "054505b4-07c7-482e-be02-29a950fc3967",
+          "master_storage_path": "governed/v1p1c/experience-gallery-1.jpg",
+          "verification_method": "sha256 over stored object bytes",
+          "master_storage_bucket": "studio-media"
+        },
+        "demo_pack": "v1p1d",
+        "business_id": "7d1d0003-1111-4111-8111-000000000003",
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    },
+    {
+      "id": "4da29132-ea3e-458c-b365-b5ab063d7a0e",
+      "storage_bucket": "studio-media",
+      "storage_path": "7d1d0003-1111-4111-8111-000000000003/gallery-2.jpg",
+      "original_checksum": "e04614d9ccceac79b9f8a22fc5c53595f762fff9ca525aef3a30b904043f5edb",
+      "metadata": {
+        "role": "gallery",
+        "source": "portal",
+        "license": "own_production",
+        "lineage": {
+          "kind": "governed_copy",
+          "origin": "v1p1c",
+          "sha256": "e04614d9ccceac79b9f8a22fc5c53595f762fff9ca525aef3a30b904043f5edb",
+          "verified_by": "19.22.a",
+          "master_asset_id": "5d14e132-1e05-449e-9cbf-4962c4fc55b6",
+          "master_storage_path": "governed/v1p1c/experience-gallery-2.jpg",
+          "verification_method": "sha256 over stored object bytes",
+          "master_storage_bucket": "studio-media"
+        },
+        "demo_pack": "v1p1d",
+        "business_id": "7d1d0003-1111-4111-8111-000000000003",
+        "rights_holder": "Valladolid.mx",
+        "rights_status": "declared"
+      }
+    }
+  ],
+  "rollback_manifest": [
+    {
+      "id": "b95017a9-72cb-4b19-aa4d-24d96b5feb50",
+      "storage_path": "7d1d0001-1111-4111-8111-000000000001/cover.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "cover",
+          "source": "portal",
+          "license": "own_production",
+          "demo_pack": "v1p1d",
+          "business_id": "7d1d0001-1111-4111-8111-000000000001",
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "731b8e81-fd93-479d-9181-abcf618d6ab5",
+      "storage_path": "7d1d0001-1111-4111-8111-000000000001/gallery-1.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "source": "portal",
+          "license": "own_production",
+          "demo_pack": "v1p1d",
+          "business_id": "7d1d0001-1111-4111-8111-000000000001",
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "aa6aecdc-4f6e-4227-8c7d-761ba56a24f0",
+      "storage_path": "7d1d0001-1111-4111-8111-000000000001/gallery-2.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "source": "portal",
+          "license": "own_production",
+          "demo_pack": "v1p1d",
+          "business_id": "7d1d0001-1111-4111-8111-000000000001",
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "61cea08a-9436-45ec-9e1c-9f0eca42fd6d",
+      "storage_path": "7d1d0002-1111-4111-8111-000000000002/cover.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "cover",
+          "source": "portal",
+          "license": "own_production",
+          "demo_pack": "v1p1d",
+          "business_id": "7d1d0002-1111-4111-8111-000000000002",
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "d0e73e69-e387-445a-a91a-73101ad5dd59",
+      "storage_path": "7d1d0002-1111-4111-8111-000000000002/gallery-1.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "source": "portal",
+          "license": "own_production",
+          "demo_pack": "v1p1d",
+          "business_id": "7d1d0002-1111-4111-8111-000000000002",
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "523fce33-316e-4d8e-8e1e-a3f9239decc6",
+      "storage_path": "7d1d0002-1111-4111-8111-000000000002/gallery-2.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "source": "portal",
+          "license": "own_production",
+          "demo_pack": "v1p1d",
+          "business_id": "7d1d0002-1111-4111-8111-000000000002",
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "8376763c-253b-428f-8122-6c30a12d32cb",
+      "storage_path": "7d1d0003-1111-4111-8111-000000000003/cover.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "cover",
+          "source": "portal",
+          "license": "own_production",
+          "demo_pack": "v1p1d",
+          "business_id": "7d1d0003-1111-4111-8111-000000000003",
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "453830c0-3001-476b-a218-6a908e60b440",
+      "storage_path": "7d1d0003-1111-4111-8111-000000000003/gallery-1.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "source": "portal",
+          "license": "own_production",
+          "demo_pack": "v1p1d",
+          "business_id": "7d1d0003-1111-4111-8111-000000000003",
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "4da29132-ea3e-458c-b365-b5ab063d7a0e",
+      "storage_path": "7d1d0003-1111-4111-8111-000000000003/gallery-2.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "source": "portal",
+          "license": "own_production",
+          "demo_pack": "v1p1d",
+          "business_id": "7d1d0003-1111-4111-8111-000000000003",
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "453dd8fd-7d1e-419e-95ea-9afa365f363c",
+      "storage_path": "governed/v1p1c/destination-cover.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "cover",
+          "v1p1c": true,
+          "source": "own_production",
+          "license": "own_production",
+          "vertical": "destination",
+          "provenance": {
+            "kind": "governed_source",
+            "origin": "v1p1c"
+          },
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "48bdb6fd-91ec-40b4-8262-070cffdbdaf3",
+      "storage_path": "governed/v1p1c/destination-gallery-1.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "v1p1c": true,
+          "source": "own_production",
+          "license": "own_production",
+          "vertical": "destination",
+          "provenance": {
+            "kind": "governed_source",
+            "origin": "v1p1c"
+          },
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "4c1ffec3-c57f-44e5-99f3-b8c9ffb0b93b",
+      "storage_path": "governed/v1p1c/destination-gallery-2.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "v1p1c": true,
+          "source": "own_production",
+          "license": "own_production",
+          "vertical": "destination",
+          "provenance": {
+            "kind": "governed_source",
+            "origin": "v1p1c"
+          },
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "0603dbfb-762d-496a-a3f2-507d5b892d00",
+      "storage_path": "governed/v1p1c/experience-cover.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "cover",
+          "v1p1c": true,
+          "source": "own_production",
+          "license": "own_production",
+          "vertical": "experience",
+          "provenance": {
+            "kind": "governed_source",
+            "origin": "v1p1c"
+          },
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "054505b4-07c7-482e-be02-29a950fc3967",
+      "storage_path": "governed/v1p1c/experience-gallery-1.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "v1p1c": true,
+          "source": "own_production",
+          "license": "own_production",
+          "vertical": "experience",
+          "provenance": {
+            "kind": "governed_source",
+            "origin": "v1p1c"
+          },
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "5d14e132-1e05-449e-9cbf-4962c4fc55b6",
+      "storage_path": "governed/v1p1c/experience-gallery-2.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "v1p1c": true,
+          "source": "own_production",
+          "license": "own_production",
+          "vertical": "experience",
+          "provenance": {
+            "kind": "governed_source",
+            "origin": "v1p1c"
+          },
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "809b7e1b-22e6-4a15-af65-06bc46b9d8e5",
+      "storage_path": "governed/v1p1c/hotel-cover.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "cover",
+          "v1p1c": true,
+          "source": "own_production",
+          "license": "own_production",
+          "vertical": "hotel",
+          "provenance": {
+            "kind": "governed_source",
+            "origin": "v1p1c"
+          },
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "995e5a74-d10a-48ee-b968-315b754def41",
+      "storage_path": "governed/v1p1c/hotel-gallery-1.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "v1p1c": true,
+          "source": "own_production",
+          "license": "own_production",
+          "vertical": "hotel",
+          "provenance": {
+            "kind": "governed_source",
+            "origin": "v1p1c"
+          },
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "c43d33b6-f67a-486d-81ce-c979e509dfd0",
+      "storage_path": "governed/v1p1c/hotel-gallery-2.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "v1p1c": true,
+          "source": "own_production",
+          "license": "own_production",
+          "vertical": "hotel",
+          "provenance": {
+            "kind": "governed_source",
+            "origin": "v1p1c"
+          },
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "0b4978d0-3a15-4f07-ac60-fe93b94c4071",
+      "storage_path": "governed/v1p1c/restaurant-cover.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "cover",
+          "v1p1c": true,
+          "source": "own_production",
+          "license": "own_production",
+          "vertical": "restaurant",
+          "provenance": {
+            "kind": "governed_source",
+            "origin": "v1p1c"
+          },
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "b9f33bef-54e6-49fe-9767-fb99748369b5",
+      "storage_path": "governed/v1p1c/restaurant-gallery-1.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "v1p1c": true,
+          "source": "own_production",
+          "license": "own_production",
+          "vertical": "restaurant",
+          "provenance": {
+            "kind": "governed_source",
+            "origin": "v1p1c"
+          },
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    },
+    {
+      "id": "8702e5bd-8834-4ff5-beaa-e52ea84b2dbd",
+      "storage_path": "governed/v1p1c/restaurant-gallery-2.jpg",
+      "restore": {
+        "original_checksum": null,
+        "metadata": {
+          "role": "gallery",
+          "v1p1c": true,
+          "source": "own_production",
+          "license": "own_production",
+          "vertical": "restaurant",
+          "provenance": {
+            "kind": "governed_source",
+            "origin": "v1p1c"
+          },
+          "rights_holder": "Valladolid.mx",
+          "rights_status": "declared"
+        }
+      }
+    }
+  ],
+  "invariants": [
+    "binarios, rutas y ALT sin cambios",
+    "businesses / business_media / business_visibility_grants / platform_settings sin cambios",
+    "sin cambios de esquema, RPC, funciones, dependencias, rutas, componentes, contratos ni readers",
+    "sin publicacion ni despliegue",
+    "validate:i4:d permanece FAIL-CLOSED por H07/H11/H12",
+    "19.22.b y 19.22.c no iniciados"
+  ]
+}
