@@ -282,9 +282,12 @@ export function BusinessSurface({
       ? surfaceContract
       : null;
   const activePremium =
-    activeContract?.family === "business" && premiumEligibility?.eligible
+    activeContract &&
+    ["business", "hotel", "restaurant"].includes(activeContract.family) &&
+    premiumEligibility?.eligible
       ? premiumEligibility
       : null;
+
   const b: MarketplaceBusinessDetail = activePremium
     ? {
         ...sourceBusiness,
