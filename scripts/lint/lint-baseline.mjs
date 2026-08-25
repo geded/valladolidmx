@@ -52,9 +52,11 @@ function runEslint() {
 }
 
 function aggregate(results) {
+  const excluded = new Set(excludedPaths);
   const entries = new Map();
   for (const result of results) {
     const file = normalizePath(result.filePath);
+    if (excluded.has(file)) continue;
     for (const message of result.messages) {
       const severity = message.severity === 2 ? "error" : "warning";
       const rule = message.ruleId || "<parser>";
