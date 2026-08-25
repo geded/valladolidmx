@@ -4,7 +4,7 @@
   "authorization": "PCA-2026-025",
   "blueprint": "docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
   "base_commit": "92911980041c2c381f5bdffa8814b1ef5c12b1ac",
-  "branch": "edit/edt-798e4bd3-3c3b-4837-9f98-48052de98b32",
+  "branch": "edit/edt-42417d62-69b1-4c49-97b6-ae3c761f4f68",
   "executed_at": "2026-08-25T20:10:00Z",
   "flag": {
     "key": "omxds_visual_v1_contracts_enabled",
