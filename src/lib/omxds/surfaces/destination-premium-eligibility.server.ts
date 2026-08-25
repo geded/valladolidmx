@@ -142,7 +142,8 @@ export const getDestinationPremiumEligibility = createServerFn({ method: "GET" }
         .select("id, status, is_demo_seed, latitude, longitude")
         .eq("slug", data.slug)
         .maybeSingle();
-      if (destinationError) return createIneligibleDestinationPremiumResult(["eligibility_read_failed"]);
+      if (destinationError)
+        return createIneligibleDestinationPremiumResult(["eligibility_read_failed"]);
       if (!destination) return createIneligibleDestinationPremiumResult(["destination_not_found"]);
 
       const reasons: string[] = [];
@@ -184,7 +185,9 @@ export const getDestinationPremiumEligibility = createServerFn({ method: "GET" }
       if (gallery.length < 2) reasons.push("governed_gallery_insufficient");
 
       const audits = auditResult.data ?? [];
-      const hasReclassificationAudit = audits.some((row) => row.action === "destination.reclassify");
+      const hasReclassificationAudit = audits.some(
+        (row) => row.action === "destination.reclassify",
+      );
       const linkedAssetIds = new Set(
         audits
           .filter((row) => row.action === "media.link")
