@@ -3,7 +3,7 @@
   "title": "V1-P1 · Stable Public Asset Contract Enforcement",
   "authorization": "PCA-2026-026",
   "blueprint": "docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md",
-  "branch": "edit/edt-19655307-be20-4997-bd51-a467593b3827",
+  "branch": "edit/edt-c6bc0ec6-d02d-4e72-b419-7f7ae04c6bd0",
   "flag": { "omxds_visual_v1_contracts_enabled": false },
   "changes": {
     "created": [
