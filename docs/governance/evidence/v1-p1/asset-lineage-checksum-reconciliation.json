@@ -3,7 +3,7 @@
   "blueprint": "docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md",
   "product_change_authorization": "PCA-2026-024",
   "governed_base_commit": "3b24138c158a1441ea785d5dc3a09fa46f13b639",
-  "branch": "edit/edt-71d43fa7-1f90-4998-8272-10e174f846bd",
+  "branch": "edit/edt-a7b4111c-4fa0-4062-bc36-78ca1dbff7b7",
   "generated_at": "2026-08-25T19:35:39.920946+00:00",
   "migration": "supabase/migrations/20260825193309_61f9e8e4-608e-46a8-b4ac-4d8930c4eb78.sql",
   "checksum_method": {
