@@ -238,19 +238,30 @@ for (const [artifactPath, expectedDigest] of generatedPlatformArtifacts) {
   );
 }
 
-// 19.26 · Reconocimiento nominal y fail-closed de UNA transicion historica documentada:
-// la migracion de reconciliacion del flag autorizada por PCA-2026-022 (19.20), cuyo
-// required_feature_flags quedo vacio porque `false` era su POSTCONDICION y no su
-// precondicion. Se reconoce mediante un addendum append-only, por ruta EXACTA y digest
-// SHA-256 EXACTO, con addendum y PCA base en estado Approved. La precondicion global del
-// flag OFF permanece intacta para cualquier otra ruta.
+// 19.26 · Reconocimiento nominal y fail-closed de transiciones historicas documentadas:
+// migraciones ya autorizadas por una PCA Approved con la ruta EXACTA, cuyo campo
+// required_feature_flags quedo vacio porque el flag OFF era postcondicion (PCA-2026-022)
+// o porque el paquete era data-only (PCA-2026-024), y que por ello quedan fuera del filtro
+// del gate. Cada caso se reconoce por ruta EXACTA y digest SHA-256 EXACTO, mediante un
+// addendum append-only Approved ligado nominalmente a su PCA base. La precondicion global
+// del flag OFF permanece intacta para cualquier otra ruta.
 const acknowledgedHistoricalMigrations = new Map([
   [
     "supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql",
     {
       addendum: "docs/governance/addenda/PCA-2026-022-ADDENDUM-A.json",
       basePca: "docs/governance/product-authorizations/PCA-2026-022.json",
+      basePcaId: "PCA-2026-022",
       sha256: "cf0c31ab1eeb8b051154697b6d26c671b5e2105dba9770c0aa8e6e5b46dba252",
+    },
+  ],
+  [
+    "supabase/migrations/20260825193309_61f9e8e4-608e-46a8-b4ac-4d8930c4eb78.sql",
+    {
+      addendum: "docs/governance/addenda/PCA-2026-024-ADDENDUM-A.json",
+      basePca: "docs/governance/product-authorizations/PCA-2026-024.json",
+      basePcaId: "PCA-2026-024",
+      sha256: "e103b39b9178834dcedd74ad2c0bedfd1a912e021ea5280e1ae61b0452026b34",
     },
   ],
 ]);
@@ -265,18 +276,23 @@ function isAcknowledgedHistoricalMigration(file) {
     "Approved",
     `historical migration acknowledgement requires an Approved addendum: ${acknowledged.addendum}`,
   );
-  assert.equal(addendum.addendum_to, "PCA-2026-022");
+  assert.equal(
+    addendum.addendum_to,
+    acknowledged.basePcaId,
+    `addendum is not bound to ${acknowledged.basePcaId}: ${acknowledged.addendum}`,
+  );
   const basePca = JSON.parse(readFileSync(acknowledged.basePca, "utf8"));
+  assert.equal(basePca.id, acknowledged.basePcaId);
   assert.equal(
     basePca.status,
     "Approved",
-    `historical migration acknowledgement requires an Approved ${basePca.id}`,
+    `historical migration acknowledgement requires an Approved ${acknowledged.basePcaId}`,
   );
   assert.ok(
     (basePca.permissions ?? []).some(
       (permission) => permission.operation === "create" && permission.path === file,
     ),
-    `PCA-2026-022 does not authorize creating ${file}`,
+    `${acknowledged.basePcaId} does not authorize creating ${file}`,
   );
   const declared = (addendum.acknowledged_paths ?? []).find((entry) => entry.path === file);
   assert.ok(declared, `addendum does not acknowledge ${file}`);
