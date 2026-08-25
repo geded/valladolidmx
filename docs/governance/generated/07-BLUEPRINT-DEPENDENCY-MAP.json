@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.47",
+    "version": "0.48",
     "state": "Approved",
-    "source_sha256": "430c04ee1888757c03b609d92104a5715e139819b2bc669bac9100635ff8cf62",
+    "source_sha256": "23a204661d91547f591ad02d9bad45e9c4d80efcff126aa0611d6a91fefccc57",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -7540,6 +7540,19 @@
       "id": "ART:docs/governance/evidence/v1-p1-19-24/stable-public-asset-contract.json",
       "type": "artifact",
       "path": "docs/governance/evidence/v1-p1-19-24/stable-public-asset-contract.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:docs/governance/evidence/p0-19-25/data-readiness.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/p0-19-25/data-readiness.json"
     }
   ],
   "edges": [
@@ -19529,6 +19542,15 @@
       "destination": "DOC:docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md",
       "evidence": "docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md",
+      "verified_at": "2026-08-25"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/p0-19-25/data-readiness.json:docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "origin": "ART:docs/governance/evidence/p0-19-25/data-readiness.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "evidence": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
       "verified_at": "2026-08-25"
     }
   ],

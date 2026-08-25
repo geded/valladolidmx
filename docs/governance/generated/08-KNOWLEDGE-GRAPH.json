@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "8e9618c3dfa561a12a5ae40ed2e426c321534c1e20a53a058e36cec5b2dfaf41"
+      "source_sha256": "b124c8ac1224a17b224a44e0ccb9fcc154f2e5d9e0bc9a634b8e366a067aeaf6"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -10668,6 +10668,23 @@
       "path": "docs/governance/evidence/v1-p1-19-24/stable-public-asset-contract.json",
       "source": "docs/governance/evidence/v1-p1-19-24/stable-public-asset-contract.json",
       "evidence": "docs/governance/evidence/v1-p1-19-24/stable-public-asset-contract.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "evidence": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/evidence/p0-19-25/data-readiness.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/p0-19-25/data-readiness.json",
+      "source": "docs/governance/evidence/p0-19-25/data-readiness.json",
+      "evidence": "docs/governance/evidence/p0-19-25/data-readiness.json"
     }
   ],
   "edges": [
@@ -29300,6 +29317,25 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.47 · docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/p0-19-25/data-readiness.json:docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "origin": "ART:docs/governance/evidence/p0-19-25/data-readiness.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "evidence": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "verified_at": "2026-08-25",
+      "origin": "DOC:docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.48 · docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {

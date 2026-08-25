@@ -1,0 +1,28 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-027",
+  "title": "19.25 · P0 · Data Readiness for G4/G5 (despublicacion fail-closed de fichas incompletas, desvinculacion de asset legacy y siembra de seo_metadata en entidades acreditadas)",
+  "status": "Approved",
+  "branch": "edit/edt-33399ff5-b95e-4525-a6fd-9b1cddcf24eb",
+  "blueprint": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-25 · AUTORIZACION FOUNDER · EJECUTAR P0 · DATA READINESS como paquete minimo 19.25 bajo PCA-2026-027 sobre base gobernada descendiente de 546d371a. Autoriza exclusivamente cambios de datos gobernados mediante migracion idempotente con allowlist por UUID exacto: (1) pasar a draft las fichas publicadas que no cumplen portada gobernada estable, geolocalizacion y contacto publico (4 businesses y el destino chichen-itza), con auditoria de causa literal y sin eliminar registros; (2) desvincular de cocina-de-dona-elsa el asset legacy cb8ccb0d-60de-4d37-b178-7802f6d39b24 conservando media_asset y binario; (3) sembrar seo_metadata en locale es para las cuatro entidades acreditadas (destino Valladolid y las tres fichas Golden) usando exclusivamente rutas publicas estables /api/public/studio-media, sin URLs firmadas. Invariantes: omxds_visual_v1_contracts_enabled permanece false antes y despues; sin cambios de codigo de producto; sin rutas publicas nuevas; sin cambios de politicas de Storage ni exposicion de buckets privados; sin despliegue ni publicacion; validate:i4:d permanece FAIL-CLOSED por H07/H11/H12; G4 y G5 no se inician.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260825213014_4bd966c5-8384-4c14-bba4-1b4d52a3bfe1.sql"
+    }
+  ],
+  "public_routes": [
+    "/oriente-maya/valladolid",
+    "/oriente-maya/valladolid/hoteles/hacienda-san-servacio-boutique",
+    "/oriente-maya/valladolid/restaurantes/cocina-del-frailes",
+    "/oriente-maya/valladolid/experiencias/ruta-cenotes-y-selva"
+  ],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}
