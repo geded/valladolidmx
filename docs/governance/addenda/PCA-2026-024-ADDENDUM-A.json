@@ -1,0 +1,24 @@
+{
+  "id": "PCA-2026-024-ADDENDUM-A",
+  "type": "append-only-addendum",
+  "addendum_to": "PCA-2026-024",
+  "status": "Approved",
+  "package": "19.26",
+  "founder_authority": "Founder Directive 2026-08-25 · ADDENDUM LIMITADO · 19.26 · I3-C autorizado: crear addendum append-only asociado a PCA-2026-024, sin modificar la PCA original, para documentar el desfase temporal y reconocer exclusivamente la migracion 20260825193309 por digest SHA-256 exacto. El gate I3-C debe exigir PCA-2026-024 Approved, permiso exacto sobre la ruta, digest exacto, reconocimiento nominal y preservacion de la regla global del flag OFF. No autoriza editar, recrear ni ejecutar la migracion.",
+  "temporal_offset_rationale": "PCA-2026-024 (19.22.a · Governed Asset Lineage & Checksum Reconciliation) fue emitida como paquete data-only idempotente y su campo required_feature_flags quedo vacio. El gate I3-C construye su conjunto de rutas autorizadas filtrando unicamente autorizaciones Approved cuyo required_feature_flags incluye 'omxds_visual_v1_contracts_enabled=false', de modo que la migracion legitimamente autorizada por PCA-2026-024 (que declara la ruta exacta con operacion create) queda fuera del conjunto. Este addendum documenta el desfase temporal y lo reconoce de forma nominal y fail-closed, sin relajar la precondicion del flag OFF para ninguna otra ruta.",
+  "acknowledged_paths": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260825193309_61f9e8e4-608e-46a8-b4ac-4d8930c4eb78.sql",
+      "sha256": "e103b39b9178834dcedd74ad2c0bedfd1a912e021ea5280e1ae61b0452026b34",
+      "state": "applied",
+      "note": "Migracion data-only idempotente ya aplicada en el backend. No se edita, no se recrea, no se reejecuta."
+    }
+  ],
+  "does_not_authorize": [
+    "editar, recrear o reejecutar la migracion reconocida",
+    "reconocer cualquier otra migracion, ruta o digest",
+    "eliminar o debilitar globalmente la precondicion del flag OFF en I3-C",
+    "cambios funcionales, datos, produccion, merge, G4 o G5"
+  ]
+}
