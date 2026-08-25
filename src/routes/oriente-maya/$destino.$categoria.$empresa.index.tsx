@@ -174,14 +174,19 @@ function EmpresaTerritorialPage() {
     currentLabel: business.display_name,
   });
 
+  // 19.21 · V1-P1.d — la presentación Premium depende exclusivamente de la
+  // elegibilidad efectiva por ficha. El flag global sigue gobernando el resto
+  // de contratos: con el flag OFF y ficha no elegible, el render es el legado.
+  const premiumEnabled = premiumEligibility?.eligible === true;
+
   return (
     <ContextEngineProvider declaration={declaration}>
       <BusinessSurfaceProvider business={business} related={related}>
         <BusinessSurfaceContractBoundary
-          enabled={surfaceContractsEnabled}
+          enabled={surfaceContractsEnabled || premiumEnabled}
           business={business}
           related={related}
-          premiumEligibility={premiumEligibility}
+          premiumEligibility={premiumEnabled ? premiumEligibility : null}
           legacy={
             composition ? <CompositionRenderer tree={composition.snapshot} /> : <BusinessSurface />
           }
