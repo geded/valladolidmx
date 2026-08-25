@@ -238,6 +238,57 @@ for (const [artifactPath, expectedDigest] of generatedPlatformArtifacts) {
   );
 }
 
+// 19.26 · Reconocimiento nominal y fail-closed de UNA transicion historica documentada:
+// la migracion de reconciliacion del flag autorizada por PCA-2026-022 (19.20), cuyo
+// required_feature_flags quedo vacio porque `false` era su POSTCONDICION y no su
+// precondicion. Se reconoce mediante un addendum append-only, por ruta EXACTA y digest
+// SHA-256 EXACTO, con addendum y PCA base en estado Approved. La precondicion global del
+// flag OFF permanece intacta para cualquier otra ruta.
+const acknowledgedHistoricalMigrations = new Map([
+  [
+    "supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql",
+    {
+      addendum: "docs/governance/addenda/PCA-2026-022-ADDENDUM-A.json",
+      basePca: "docs/governance/product-authorizations/PCA-2026-022.json",
+      sha256: "cf0c31ab1eeb8b051154697b6d26c671b5e2105dba9770c0aa8e6e5b46dba252",
+    },
+  ],
+]);
+
+function isAcknowledgedHistoricalMigration(file) {
+  const acknowledged = acknowledgedHistoricalMigrations.get(file);
+  if (!acknowledged) return false;
+
+  const addendum = JSON.parse(readFileSync(acknowledged.addendum, "utf8"));
+  assert.equal(
+    addendum.status,
+    "Approved",
+    `historical migration acknowledgement requires an Approved addendum: ${acknowledged.addendum}`,
+  );
+  assert.equal(addendum.addendum_to, "PCA-2026-022");
+  const basePca = JSON.parse(readFileSync(acknowledged.basePca, "utf8"));
+  assert.equal(
+    basePca.status,
+    "Approved",
+    `historical migration acknowledgement requires an Approved ${basePca.id}`,
+  );
+  assert.ok(
+    (basePca.permissions ?? []).some(
+      (permission) => permission.operation === "create" && permission.path === file,
+    ),
+    `PCA-2026-022 does not authorize creating ${file}`,
+  );
+  const declared = (addendum.acknowledged_paths ?? []).find((entry) => entry.path === file);
+  assert.ok(declared, `addendum does not acknowledge ${file}`);
+  assert.equal(
+    createHash("sha256").update(readFileSync(file)).digest("hex"),
+    declared.sha256,
+    `acknowledged historical migration changed after its addendum: ${file}`,
+  );
+  assert.equal(declared.sha256, acknowledged.sha256);
+  return true;
+}
+
 for (const file of gitLines([
   "diff",
   "--name-only",
@@ -247,7 +298,9 @@ for (const file of gitLines([
   "src/integrations/supabase",
 ]))
   assert.ok(
-    authorizedChangedPaths.has(file) || generatedPlatformArtifacts.has(file),
+    authorizedChangedPaths.has(file) ||
+      generatedPlatformArtifacts.has(file) ||
+      isAcknowledgedHistoricalMigration(file),
     `post-I3-C data change lacks Approved PCA: ${file}`,
   );
 
