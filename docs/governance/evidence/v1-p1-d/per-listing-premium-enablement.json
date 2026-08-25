@@ -80,5 +80,49 @@
   "data_mutations": "none",
   "production_touched": false,
   "deployed_or_published": false,
-  "validate_i4_d": "FAIL-CLOSED (sin cambios)"
+  "validate_i4_d": "FAIL-CLOSED (sin cambios)",
+  "runtime_verification": {
+    "verified_at": "2026-08-25T17:20:00Z",
+    "method": "SSR HTML inspection on localhost:8080",
+    "flag_at_verification": false,
+    "premium_rendered": [
+      {
+        "route": "/oriente-maya/valladolid/hoteles/hacienda-san-servacio-boutique",
+        "governed_signed_media": 3
+      },
+      {
+        "route": "/oriente-maya/valladolid/restaurantes/cocina-del-frailes",
+        "governed_signed_media": 3
+      },
+      {
+        "route": "/oriente-maya/valladolid/experiencias/ruta-cenotes-y-selva",
+        "governed_signed_media": 3
+      }
+    ],
+    "standard_preserved": [
+      {
+        "route": "/oriente-maya/valladolid/hoteles/hacienda-selva-maya",
+        "reason": "sin grant activo",
+        "governed_signed_media": 0
+      },
+      {
+        "route": "/oriente-maya/valladolid/hoteles/casa-hipil-boutique",
+        "reason": "is_demo_seed = true",
+        "governed_signed_media": 0
+      }
+    ]
+  },
+  "gates": {
+    "typecheck": "PASS",
+    "build": "PASS",
+    "test:i3 (5 files)": "PASS 25/25",
+    "validate:i4:a": "PASS",
+    "validate:i4:b": "PASS",
+    "validate:i4:c": "PASS",
+    "validate:i4:r": "PASS",
+    "governance:check": "PASS",
+    "governance:product-check --base=f71cd866": "PASS (1 sensitive change authorized by PCA-2026-023)",
+    "lint": "7978 errors / 69 warnings — idéntico a la base; único hallazgo I3_NOT_CLEAN BusinessSurface.tsx:239 preexistente",
+    "validate:i4:d": "FAIL-CLOSED (sin cambios)"
+  }
 }
