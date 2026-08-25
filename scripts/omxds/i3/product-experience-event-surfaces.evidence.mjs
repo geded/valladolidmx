@@ -248,7 +248,7 @@ const acknowledgedHistoricalMigrations = new Map([
   [
     "supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql",
     {
-      addendum: "docs/governance/product-authorizations/PCA-2026-022-ADDENDUM-A.json",
+      addendum: "docs/governance/addenda/PCA-2026-022-ADDENDUM-A.json",
       basePca: "docs/governance/product-authorizations/PCA-2026-022.json",
       sha256: "cf0c31ab1eeb8b051154697b6d26c671b5e2105dba9770c0aa8e6e5b46dba252",
     },
