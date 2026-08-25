@@ -55,11 +55,15 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       getOmxdsSurfaceContractsFlag().catch(() => false),
     ]);
     if (!business) throw notFound();
-    // I3-D · lectura Premium estrictamente posterior al flag. OFF conserva
-    // incluso el mismo conjunto de consultas heredadas.
-    const premiumEligibility = surfaceContractsEnabled
-      ? await getBusinessPremiumEligibility({ data: { businessId: business.id } }).catch(() => null)
-      : null;
+    // 19.21 · V1-P1.d — la elegibilidad Premium se evalúa SIEMPRE por ficha
+    // (fail-closed dentro del evaluador: published, is_demo_seed=false, grant
+    // activo, plan efectivo, procedencia portal, auditoría, ubicación,
+    // contacto, SEO y media aprobada). La presentación Premium depende
+    // exclusivamente de `premiumEligibility.eligible === true`; el flag global
+    // conserva su función para el resto de contratos gobernados.
+    const premiumEligibility = await getBusinessPremiumEligibility({
+      data: { businessId: business.id },
+    }).catch(() => null);
     // E2 · US-E2.1 — Related Collection contextual del negocio.
     // Fallback silencioso: si falla no rompe el render de la ficha.
     let related = null as Awaited<ReturnType<typeof getBusinessRelated>> | null;
