@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.45",
+    "version": "0.46",
     "state": "Approved",
-    "source_sha256": "b121136b3e5fea11401f797e5dc994a3b4b464bca8f43680aaad68f6878ab1fa",
+    "source_sha256": "725c2e2b758af7e552af5cfcb22244ebba90f29954e918761cc1719d7561f0ee",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -7514,6 +7514,19 @@
       "id": "ART:docs/governance/evidence/v1-p1/asset-lineage-checksum-reconciliation.json",
       "type": "artifact",
       "path": "docs/governance/evidence/v1-p1/asset-lineage-checksum-reconciliation.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1/destination-governed-assets-enablement.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1/destination-governed-assets-enablement.json"
     }
   ],
   "edges": [
@@ -19485,6 +19498,15 @@
       "destination": "DOC:docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md",
       "evidence": "docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1/destination-governed-assets-enablement.json:docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1/destination-governed-assets-enablement.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+      "evidence": "docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
       "verified_at": "2026-08-25"
     }
   ],
