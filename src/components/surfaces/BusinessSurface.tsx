@@ -228,7 +228,14 @@ export function BusinessSurfaceContractBoundary({
   const verticalContract =
     adaptHotelSurfaceContract(input) ?? adaptRestaurantSurfaceContract(input);
   if (verticalContract)
-    return <BusinessSurface business={business} surfaceContract={verticalContract} />;
+    return (
+      <BusinessSurface
+        business={business}
+        surfaceContract={verticalContract}
+        premiumEligibility={premiumEligibility}
+      />
+    );
+
 
   const premiumResolution = premiumEligibility
     ? createBusinessPremiumSurfaceContract(input, premiumEligibility)
@@ -275,9 +282,12 @@ export function BusinessSurface({
       ? surfaceContract
       : null;
   const activePremium =
-    activeContract?.family === "business" && premiumEligibility?.eligible
+    activeContract &&
+    ["business", "hotel", "restaurant"].includes(activeContract.family) &&
+    premiumEligibility?.eligible
       ? premiumEligibility
       : null;
+
   const b: MarketplaceBusinessDetail = activePremium
     ? {
         ...sourceBusiness,
