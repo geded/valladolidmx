@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "status": "Approved",
-  "generated_at": "2026-08-22T00:00:00.000Z",
+  "generated_at": "2026-08-25T00:00:00.000Z",
   "derived_from": {
     "glossary": {
       "document": "docs/governance/01-GLOSSARY.md",
@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "a2a72a09f7ca0de2df606ee6b1ddde49c0fe85fda1cacdc1f69d651a3c1b2c6e"
+      "source_sha256": "cc24e8cbf30b4dfec92328b9d90379c4b34ad7329829e395b8ded7f616221ec2"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -10573,6 +10573,16 @@
       "path": "docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md",
       "source": "docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md",
       "evidence": "docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md"
     }
   ],
   "edges": [
@@ -29081,6 +29091,25 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.40 · docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-25",
+      "origin": "DOC:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.41 · docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {

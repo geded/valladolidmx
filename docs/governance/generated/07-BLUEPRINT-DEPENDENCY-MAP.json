@@ -4,12 +4,12 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.41",
     "state": "Approved",
-    "source_sha256": "14e243df9bf3aa19418721671ef725fb5ec42fd7fc91bac2b6898b421b50f6e8",
+    "source_sha256": "e53e66ec70a7b8c870304959967d10995db3cca5cd3dcb7fa7410227efe87193",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-08-22T00:00:00.000Z",
+  "generated_at": "2026-08-25T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -7467,6 +7467,14 @@
       "id": "ART:docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md",
       "type": "artifact",
       "path": "docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
     }
   ],
   "edges": [
@@ -19394,6 +19402,15 @@
       "evidence": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
       "verified_at": "2026-08-22"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-25"
     }
   ],
   "critical_chain_coverage": [
