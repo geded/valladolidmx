@@ -111,19 +111,19 @@
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "sha256": "b121136b3e5fea11401f797e5dc994a3b4b464bca8f43680aaad68f6878ab1fa"
+      "sha256": "725c2e2b758af7e552af5cfcb22244ebba90f29954e918761cc1719d7561f0ee"
     },
     {
       "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
-      "sha256": "f698270e684879b3bd1737693f25c22c731e3f83bc658d256eedc07173a96691"
+      "sha256": "bbb12dd7e6de3b653e35bbf8453eddd5bbcfa473870c35eb491062c21fce6f5f"
     },
     {
       "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
-      "sha256": "c771fea6d69b25011f146e845015c1dfe2fb9c9e44eba872120eccfe5224294e"
+      "sha256": "7a9789698c35c876c20a79e210a8c4a15a1e03196cf85822ad0fbefdb0ac2937"
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "a699de313f644dee1b20d62351549cb4fbf90cb327f205db30ccc49212527a50"
+      "sha256": "ffbd2c0a51fe8d8b52a7c5751522bc907ccbf942d1e6b893b05d5c1d2a05bfc4"
     }
   ]
 }
