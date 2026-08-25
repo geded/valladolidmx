@@ -28,6 +28,12 @@ export interface BusinessPremiumMediaItem {
   id: string;
   role: "cover" | "gallery";
   url: string;
+  /**
+   * 19.24 — Ruta pública estable canónica (`/api/public/studio-media/...`)
+   * cuando el asset vive en el bucket gobernado. Única fuente admitida
+   * para metadatos indexables (OG / JSON-LD). `null` = omitir imagen.
+   */
+  stableUrl?: string | null;
   alt: string;
   caption: string | null;
   width: number;

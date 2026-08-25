@@ -17,6 +17,7 @@ import {
 import { DESTINOS_MOCK } from "@/mocks/destinos";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { SITE } from "@/config/site";
+import { stableIndexableImageUrl } from "@/lib/media/stable-public-url";
 import {
   DestinationSurface,
   DestinationSurfaceContractBoundary,
@@ -139,7 +140,10 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
             `${loaderData.dest.name}, destino turístico del ${ORIENTE_MAYA.name} de Yucatán.`,
           path: `/oriente-maya/${params.destino}`,
           ogType: "article",
-          ogImage: loaderData.stableCoverUrl ?? loaderData.db?.hero_url ?? undefined,
+          // 19.24 — Sólo ruta pública estable. Sin asset elegible se omite
+          // la imagen; prohibido caer a una URL firmada temporal.
+          ogImage:
+            loaderData.stableCoverUrl ?? stableIndexableImageUrl(loaderData.db?.hero_url),
           breadcrumbs: [
             { label: "Inicio", path: "/" },
             { label: ORIENTE_MAYA.name, path: "/oriente-maya" },
@@ -153,7 +157,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
                 loaderData.dest.tagline ||
                 loaderData.dest.name,
               path: `/oriente-maya/${params.destino}`,
-              image: loaderData.stableCoverUrl ?? loaderData.db?.hero_url ?? undefined,
+              image:
+                loaderData.stableCoverUrl ?? stableIndexableImageUrl(loaderData.db?.hero_url),
               latitude: loaderData.db?.latitude ?? null,
               longitude: loaderData.db?.longitude ?? null,
               containedInId: ORIENTE_MAYA_PLACE_ID,

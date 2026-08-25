@@ -1,0 +1,45 @@
+{
+  "package": "19.24",
+  "title": "V1-P1 · Stable Public Asset Contract Enforcement",
+  "authorization": "PCA-2026-026",
+  "blueprint": "docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md",
+  "branch": "edit/edt-c6bc0ec6-d02d-4e72-b419-7f7ae04c6bd0",
+  "flag": { "omxds_visual_v1_contracts_enabled": false },
+  "changes": {
+    "created": [
+      "src/lib/media/stable-public-url.ts",
+      "supabase/migrations/20260825210054_e131147b-aaba-445b-b447-7fcf7add86be.sql"
+    ],
+    "modified": [
+      "src/lib/omxds/surfaces/business-premium-eligibility.server.ts",
+      "src/lib/omxds/surfaces/business-premium-surface.contract.ts",
+      "src/routes/oriente-maya/$destino.index.tsx",
+      "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
+    ]
+  },
+  "enforcement": {
+    "indexable_metadata_sources": ["stableCoverUrl", "BusinessPremiumMediaItem.stableUrl"],
+    "stable_prefix": "/api/public/studio-media/",
+    "signed_url_markers_rejected": ["/object/sign/", "token=", "X-Amz-Signature", "Expires="],
+    "fallback_policy": "fail-closed · omit og:image and JSON-LD image when no stable asset exists"
+  },
+  "data": {
+    "destination_id": "11111111-aaaa-4aaa-8aaa-000000000001",
+    "legacy_asset_unlinked": "57a401dc-68d3-456f-87ba-f5196070376b",
+    "media_assets_deleted": 0,
+    "binaries_deleted": 0,
+    "audit_action": "media.unlink"
+  },
+  "invariants": {
+    "new_public_routes": 0,
+    "private_buckets_exposed": 0,
+    "storage_policies_changed": 0,
+    "production_deployed": false,
+    "validate_i4_d": "FAIL-CLOSED (H07/H11/H12, esperado)"
+  },
+  "verification": {
+    "typecheck": "PASS",
+    "governance:check": "PASS",
+    "governance:product-check": "PASS"
+  }
+}
