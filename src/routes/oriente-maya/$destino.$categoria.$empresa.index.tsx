@@ -11,6 +11,7 @@ import { PublicShell } from "@/components/discovery";
 import { buildPublicHead, localBusinessJsonLd, placeId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getMarketplaceBusinessBySlug } from "@/lib/catalog/marketplace-reads.functions";
+import { stableIndexableImageUrl } from "@/lib/media/stable-public-url";
 import { getBusinessRelated } from "@/lib/catalog/business-related.functions";
 import {
   resolveTerritorialPath,
@@ -104,7 +105,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       description,
       path,
       ogType: "profile",
-      ogImage: premium?.cover?.url ?? b.cover_url ?? undefined,
+      // 19.24 — Sólo ruta pública estable en metadatos indexables.
+      ogImage: stableIndexableImageUrl(premium?.cover?.stableUrl ?? b.cover_url),
       breadcrumbs: [
         { label: "Inicio", path: "/" },
         { label: "Oriente Maya", path: "/oriente-maya" },
@@ -117,7 +119,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
           name: b.display_name,
           description,
           path,
-          image: premium?.cover?.url ?? b.cover_url ?? undefined,
+          image: stableIndexableImageUrl(premium?.cover?.stableUrl ?? b.cover_url),
           telephone:
             (premium?.contact ?? b.primary_contact)?.type === "phone" ||
             (premium?.contact ?? b.primary_contact)?.type === "whatsapp"
