@@ -16,6 +16,13 @@
 > Valladolid.mx. `G3-H07` continúa pendiente de percepción asistida real (VoiceOver);
 > no se fabrica evidencia humana. `validate:i4:d` permanece fail-closed por diseño.
 
+> **Cierre humano 2026-08-25 (I4-D/G3):** el Founder acepta el canvas remediado en
+> Móvil, Tablet y Desktop (encabezado sticky PASS, overflow horizontal 0, buscador
+> completo, paridad visual con la superficie pública PASS) y declara **DEF-G3-001
+> CLOSED/PASS**. Alcance limitado al defecto y a la paridad visual: no cubre G3-H07,
+> G3-H11 ni G3-H12. FLAG `omxds_visual_v1_contracts_enabled` permanece OFF y
+> producción no fue tocada. No se inicia P0.
+
 ## 1. Regla de cierre
 
 Este reporte es la autoridad humana de aceptación para G3. La automatización puede demostrar contratos y regresión, pero **no puede convertir el gate a PASS por sí sola**. G3 sólo puede quedar en `PASS` cuando:
@@ -57,8 +64,8 @@ No se autoriza crear arquitectura paralela ni corregir producto dentro de I4-D.
 | SEC-04/08/09                            | PASS    | evidencia I4-C vigente                                                                  |
 | Preview noindex/fail-closed             | PASS    | ruta canónica `/preview/composition/$token` + I4-R                                      |
 | Sol/Luna y 390/768/1024/1440 declarados | PASS    | policy I4-0 vigente                                                                     |
-| Harness I4-D                            | BLOCKED | pendiente ejecutar `bun run test:i4:d` sobre el paquete final                           |
-| Governance Integrity                    | BLOCKED | pendiente paquete final y validación completa                                           |
+| Harness I4-D                            | PASS    | `bun run test:i4:d` 2026-08-25: 5 pass / 0 fail (54 aserciones)                          |
+| Governance Integrity                    | PASS    | `bun run governance:sync` + `governance:validate` 2026-08-25: sin fingerprints stale     |
 
 ## 4. Validación de escenarios G3-H01…G3-H12
 
@@ -152,8 +159,10 @@ Registrar aquí sin bloquear G3 salvo que el criterio canónico indique lo contr
   | Móvil       | 390        | 0 px       | 0            | Sí             | `sticky`   | Sí (right 166.5)         |
   | Tablet      | 768        | 0 px       | 0            | Sí             | `sticky`   | Sí (right 191.5)         |
   | Desktop     | 1280       | 0 px       | 0            | Sí             | `sticky`   | Sí (right 199.5)         |
-  Estado del defecto: **CLOSED** (validación humana repetida 2026-08-22, iPad
-  Safari, Móvil/Tablet/Desktop PASS).
+  Estado del defecto: **CLOSED/PASS** — validación humana Founder 2026-08-25
+  (`canvas-viewport/human-validation-2026-08-25.json`): Móvil, Tablet y Desktop con
+  encabezado `sticky` PASS, overflow horizontal 0 y buscador completo; paridad visual
+  con la superficie pública PASS. Ratifica la validación humana previa 2026-08-22.
   Estado de aceptación del gate: **G3 permanece `BLOCKED`** exclusivamente por los
   escenarios que exigen humano y aún no se han ejecutado: G3-H07 (VoiceOver),
   G3-H11 (dos cuentas) y G3-H12 (autorización y seguridad). G3-H05 queda acreditado
