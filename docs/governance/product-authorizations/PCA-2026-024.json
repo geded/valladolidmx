@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-024",
+  "title": "19.22.a · V1-P1 · Governed Asset Lineage & Checksum Reconciliation (migracion de datos idempotente, allowlist de 21 UUID)",
+  "status": "Approved",
+  "branch": "edit/edt-71d43fa7-1f90-4998-8272-10e174f846bd",
+  "blueprint": "docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-25 · Ejecuta exclusivamente 19.22.a · V1-P1 · Governed Asset Lineage & Checksum Reconciliation, sobre la base gobernada exacta 3b24138c158a1441ea785d5dc3a09fa46f13b639. Objeto unico: completar original_checksum de los 12 assets maestros gobernados de V1-P1.c cuando es NULL y agregar por merge no destructivo el linaje explicito de las 9 copias por ficha de las tres fichas control de 19.21, con SHA-256 calculado leyendo los bytes reales de cada objeto almacenado. Migracion de datos unica, idempotente, limitada por allowlist de UUID completos, con verificacion de precondiciones, afirmacion exacta de 21 filas, rechazo de filas adicionales y fallo cerrado ante discrepancia. Prohibido modificar binarios, rutas de almacenamiento, ALT, derechos, businesses, business_media, business_visibility_grants, platform_settings, esquema, tablas, RPC, funciones, dependencias, rutas, componentes, contratos, readers, produccion o despliegue. omxds_visual_v1_contracts_enabled permanece false antes y despues. validate:i4:d permanece FAIL-CLOSED por H07/H11/H12. No se inicia 19.22.b, 19.22.c, G4 ni G5. Paquete documental asociado no sensible: docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md, docs/governance/evidence/v1-p1/asset-lineage-checksum-reconciliation.json, docs/governance/06-BLUEPRINT-MASTER-INDEX.md y las proyecciones 07, 08 e inventario regeneradas exclusivamente por el sincronizador canonico. 15-ASSET-RIGHTS-REGISTER-v1.0.md no se modifica en este paquete por no requerir registro adicional de derechos.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260825193309_61f9e8e4-608e-46a8-b4ac-4d8930c4eb78.sql"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run build",
+    "bun run test:i3",
+    "bun run validate:i4:a",
+    "bun run validate:i4:b",
+    "bun run validate:i4:c",
+    "bun run validate:i4:r",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}
