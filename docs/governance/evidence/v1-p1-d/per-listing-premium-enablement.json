@@ -1,0 +1,68 @@
+{
+  "package": "19.21 · V1-P1.d · Demo Pack y habilitación Premium por ficha",
+  "authorization": "PCA-2026-023",
+  "base_commit": "f71cd866",
+  "recorded_at": "2026-08-25T17:05:00Z",
+  "flag": {
+    "key": "omxds_visual_v1_contracts_enabled",
+    "value_before": false,
+    "value_after": false,
+    "updated_at": "2026-08-25T16:35:31.028075+00:00",
+    "modified_by_this_package": false
+  },
+  "architecture": {
+    "code_files_modified": ["src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"],
+    "premium_gate": "premiumEligibility.eligible === true",
+    "global_flag_role": "conserva su función para el resto de contratos gobernados",
+    "hardcoded_slugs_or_ids": false,
+    "migrations_or_rpc_or_routes_added": false
+  },
+  "control_listings": [
+    {
+      "vertical": "hotel",
+      "business_id": "7d1d0001-1111-4111-8111-000000000001",
+      "slug": "hacienda-san-servacio-boutique",
+      "route": "/oriente-maya/valladolid/hoteles/hacienda-san-servacio-boutique",
+      "status": "published",
+      "is_demo_seed": false,
+      "cover": 1,
+      "gallery": 2
+    },
+    {
+      "vertical": "restaurante",
+      "business_id": "7d1d0002-1111-4111-8111-000000000002",
+      "slug": "cocina-del-frailes",
+      "route": "/oriente-maya/valladolid/restaurantes/cocina-del-frailes",
+      "status": "published",
+      "is_demo_seed": false,
+      "cover": 1,
+      "gallery": 2
+    },
+    {
+      "vertical": "experiencia",
+      "business_id": "7d1d0003-1111-4111-8111-000000000003",
+      "slug": "ruta-cenotes-y-selva",
+      "route": "/oriente-maya/valladolid/experiencias/ruta-cenotes-y-selva",
+      "status": "published",
+      "is_demo_seed": false,
+      "cover": 1,
+      "gallery": 2
+    }
+  ],
+  "negative_barriers": [
+    { "case": "sin grant activo", "expected": "standard", "enforced_by": "evaluateBusinessPremiumEligibility · plan/grant vigente" },
+    { "case": "is_demo_seed = true", "expected": "standard", "enforced_by": "business-premium-eligibility.server.ts · exclusión explícita" },
+    { "case": "no publicada", "expected": "standard", "enforced_by": "isPublished === false → verification/publication fail-closed" },
+    { "case": "revocación de grant", "expected": "standard", "verified_by": "simulación de contrato en scripts/omxds/i3/business-premium-surface.contract.test.ts; datos reales no modificados" }
+  ],
+  "asset_reconciliation": {
+    "masters_v1p1c": 12,
+    "consumed_by_listings": 9,
+    "reserved_destination_assets": 3,
+    "reserved_not_consumed": true
+  },
+  "data_mutations": "none",
+  "production_touched": false,
+  "deployed_or_published": false,
+  "validate_i4_d": "FAIL-CLOSED (sin cambios)"
+}
