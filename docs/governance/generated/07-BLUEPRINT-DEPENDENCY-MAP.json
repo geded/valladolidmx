@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.43",
+    "version": "0.44",
     "state": "Approved",
-    "source_sha256": "2f51dd7dc4fa97744d318a02d4bd8ae3e52acf504937759e5ccd1eed0f98cca6",
+    "source_sha256": "5a6269baa079ac9a523f5d32fc4ef7941b2f26032c321d5a369a717b6d5a2d5a",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
