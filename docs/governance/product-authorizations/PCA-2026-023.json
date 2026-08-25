@@ -3,7 +3,7 @@
   "id": "PCA-2026-023",
   "title": "V1-P1.d · Demo Pack y habilitacion Premium por ficha (elegibilidad efectiva, sin activar el flag global)",
   "status": "Approved",
-  "branch": "edit/edt-de2d4cb9-9a63-4724-86a3-56ac75ea579a",
+  "branch": "edit/edt-06eae197-160d-4063-842a-d90e7e40e30b",
   "blueprint": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
   "founder_authority": "Founder Directive 2026-08-25 · AUTORIZACION DE PREPARACION Y EJECUCION CONTROLADA 19.21 / PCA-2026-023. Base exacta main@f71cd866, ancestro verificado de HEAD, arbol limpio. Objeto unico: habilitar presentacion Premium exclusivamente mediante elegibilidad efectiva por ficha y business_visibility_grants. Invariantes: omxds_visual_v1_contracts_enabled permanece false antes y despues y no se activa ni modifica; sin migraciones, readers, RPC, tablas, dependencias ni rutas; sin modificar datos de las tres fichas, grants ni assets persistidos; is_demo_seed=true siempre excluido; sin ampliar ni reinterpretar otros contratos gobernados por el flag global; validate:i4:d permanece FAIL-CLOSED; prohibido habilitar Premium por slug hardcodeado o por lista de IDs; sin desplegar ni publicar.",
   "permissions": [
