@@ -42,7 +42,8 @@ export function OfflineBanner() {
     >
       <WifiOff className="h-3.5 w-3.5" aria-hidden />
       <span>
-        Sin conexión — el contenido puede estar desactualizado hasta que recuperes conexión.
+        Sin conexión — el contenido puede estar desactualizado hasta que
+        recuperes conexión.
       </span>
     </div>
   );
