@@ -28,7 +28,6 @@ import {
   Phone,
   Shield,
   SlidersHorizontal,
-  Sparkles,
   UtensilsCrossed,
   Wallet,
 } from "lucide-react";
@@ -928,5 +927,3 @@ function Toggle({
     </button>
   );
 }
-
-export { Sparkles as _unusedSparkles };
