@@ -1,7 +1,7 @@
 /**
  * I4-D · G3 Integration & Evidence Closure.
  *
- * Integra evidencia ya cerrada por I4-A/B/C/R y exige validación humana real.
+ * Integra evidencia ya cerrada por I4-A/B/C/R y la aceptación operativa single-actor.
  * No publica, no despliega y no toca datos reales.
  */
 import { createHash } from "node:crypto";
@@ -66,10 +66,16 @@ const verdict = report.match(/\*\*Verdict:\*\*\s*([^\n]+)/)?.[1]?.trim();
 const openP0 = report.match(/\*\*Open P0:\*\*\s*([^\n]+)/)?.[1]?.trim();
 const openP1 = report.match(/\*\*Open P1:\*\*\s*([^\n]+)/)?.[1]?.trim();
 
-if (verdict !== "PASS")
-  throw new Error(`G3 human acceptance is not PASS; found ${verdict ?? "missing"}`);
+if (verdict !== "SINGLE-ACTOR OPERATIONAL ACCEPTANCE: PASS")
+  throw new Error(`G3 single-actor acceptance is not PASS; found ${verdict ?? "missing"}`);
 if (openP0 !== "0") throw new Error(`G3 requires Open P0: 0; found ${openP0 ?? "missing"}`);
 if (openP1 !== "0") throw new Error(`G3 requires Open P1: 0; found ${openP1 ?? "missing"}`);
+
+const deferredScenarios = new Map([
+  ["G3-H07", "DEFERRED — accesibilidad asistida no bloqueante"],
+  ["G3-H11", "DEFERRED — segunda identidad no habilitada"],
+  ["G3-H12", "DEFERRED — segunda identidad no habilitada"],
+]);
 
 for (const id of humanScenarios) {
   const line = report.split("\n").find((candidate) => candidate.startsWith(`| ${id} |`));
@@ -77,10 +83,21 @@ for (const id of humanScenarios) {
   const cells = line.split("|").map((cell) => cell.trim());
   const status = cells[3];
   const evidence = cells[4];
-  if (status !== "PASS") throw new Error(`${id} must be PASS; found ${status || "missing"}`);
+  const deferredStatus = deferredScenarios.get(id);
+  if (deferredStatus) {
+    if (status !== deferredStatus)
+      throw new Error(`${id} must remain ${deferredStatus}; found ${status || "missing"}`);
+  } else if (!status.startsWith("PASS")) {
+    throw new Error(`${id} must be PASS; found ${status || "missing"}`);
+  }
   if (!evidence || /^(pendiente|n\/a)$/i.test(evidence))
     throw new Error(`${id} requires a concrete evidence reference`);
 }
+
+if (!report.includes("antes de habilitar una segunda identidad editorial"))
+  throw new Error("G3 must preserve multi-actor validation before a second identity");
+if (!report.includes("La separación técnica autor–aprobador no se elimina ni relaja"))
+  throw new Error("G3 must preserve fail-closed author-approver separation");
 
 const i4c = JSON.parse(
   readFileSync(
@@ -125,6 +142,8 @@ const evidence = {
   },
   inherited_closure: ["I4-A", "I4-B", "I4-C", "I4-R"],
   human_scenarios: humanScenarios,
+  operational_model: "single-actor",
+  deferred_non_blocking: [...deferredScenarios.keys()],
   open_p0: 0,
   open_p1: 0,
   required_feature_flags: ["omxds_visual_v1_contracts_enabled=false"],
