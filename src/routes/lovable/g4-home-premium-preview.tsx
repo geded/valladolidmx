@@ -30,7 +30,6 @@ import { toHomePremiumVM, type PremiumEntitySource } from "@/lib/omxds/presentat
 import type { PremiumPresentation } from "@/lib/omxds/presentation/premium-presentation";
 import { cn } from "@/lib/utils";
 
-
 export const Route = createFileRoute("/lovable/g4-home-premium-preview")({
   head: () => ({
     meta: [
@@ -569,7 +568,6 @@ function HomeHero({ presentation }: { presentation: PremiumPresentation }) {
     />
   );
 }
-
 
 function SectionHead({
   kicker,
