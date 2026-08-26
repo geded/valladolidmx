@@ -584,7 +584,7 @@ function HeroCopy({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function HeroMosaico() {
+function HeroEditorial() {
   return (
     <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-center">
       <HeroCopy />
