@@ -354,6 +354,8 @@ function G4HomePremiumPreview() {
     layout: "asimetrica",
     sections: {
       destinos: true,
+      pueblosMagicos: true,
+      rutas: true,
       experiencias: true,
       servicios: true,
       eventos: true,
@@ -365,10 +367,30 @@ function G4HomePremiumPreview() {
   const [selectedRoute, setSelectedRoute] = useState<RouteId>("essential");
   const [selectedPrompt, setSelectedPrompt] = useState("Tengo medio día");
   const [added, setAdded] = useState(false);
+  const [openedMicrosite, setOpenedMicrosite] = useState<string | null>(null);
 
   const renderSection = (key: SectionKey) => {
     if (!tuning.sections[key]) return null;
-    if (key === "destinos") return <DestinationsSection key={key} layout={tuning.layout} />;
+    if (key === "destinos")
+      return (
+        <DestinationsSection
+          key={key}
+          layout={tuning.layout}
+          opened={openedMicrosite}
+          onOpen={setOpenedMicrosite}
+        />
+      );
+    if (key === "pueblosMagicos")
+      return <PueblosMagicosSection key={key} onCreateRoute={() => setSelectedRoute("pueblos")} />;
+    if (key === "rutas")
+      return (
+        <RoutesSection
+          key={key}
+          selectedRoute={selectedRoute}
+          onSelectRoute={setSelectedRoute}
+          onAdd={() => setAdded(true)}
+        />
+      );
     if (key === "experiencias") return <ExperiencesSection key={key} layout={tuning.layout} />;
     if (key === "servicios") return <ServicesSection key={key} />;
     if (key === "eventos") return <EventsSection key={key} />;
@@ -396,19 +418,14 @@ function G4HomePremiumPreview() {
           />
         </Container>
 
-        <Container className="mt-10 sm:mt-12">
-          <RoutesSection
-            selectedRoute={selectedRoute}
-            onSelectRoute={setSelectedRoute}
-            onAdd={() => setAdded(true)}
-          />
-        </Container>
+        {tuning.order.map((key) =>
+          tuning.sections[key] ? (
+            <Container key={key} className="mt-10 sm:mt-12">
+              {renderSection(key)}
+            </Container>
+          ) : null,
+        )}
 
-        {tuning.order.map((key) => (
-          <Container key={key} className="mt-10 sm:mt-12">
-            {renderSection(key)}
-          </Container>
-        ))}
 
         <Container className="mt-10 sm:mt-12">
           <TravelPlanClose
