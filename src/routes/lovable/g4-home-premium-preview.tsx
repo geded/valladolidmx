@@ -107,8 +107,7 @@ const DESTINOS = [
     slug: "valladolid",
     name: "Valladolid",
     role: "Capital Turística del Oriente Maya",
-    tagline:
-      "Ciudad colonial de piedra caliza, cenotes urbanos y cocina yucateca de fuego lento.",
+    tagline: "Ciudad colonial de piedra caliza, cenotes urbanos y cocina yucateca de fuego lento.",
     media: MEDIA.centro,
     puebloMagico: true,
     demo: false,
@@ -366,12 +365,7 @@ interface TuningState {
   order: SectionKey[];
 }
 
-type SectionKey =
-  | "experiencias"
-  | "hospedaje"
-  | "gastronomia"
-  | "eventos"
-  | "queHacer";
+type SectionKey = "experiencias" | "hospedaje" | "gastronomia" | "eventos" | "queHacer";
 
 const SECTION_LABEL: Record<SectionKey, string> = {
   experiencias: "Experiencias",
@@ -421,11 +415,7 @@ function G4HomePremiumPreview() {
       <PreviewHeader />
 
       <Container className="pt-6">
-        {tuning.heroVariant === "cinematografica" ? (
-          <HeroCinematografico />
-        ) : (
-          <HeroEditorial />
-        )}
+        {tuning.heroVariant === "cinematografica" ? <HeroCinematografico /> : <HeroEditorial />}
       </Container>
 
       {tuning.showDestinos ? (
@@ -470,7 +460,6 @@ function G4HomePremiumPreview() {
         <PreviewFooter />
       </Container>
 
-      {tuning.role === "administracion" ? null : null}
       <TuningPanel value={tuning} onChange={setTuning} />
     </div>
   );
