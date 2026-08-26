@@ -560,17 +560,14 @@ function Descripcion() {
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">El hotel</p>
           <DemoTag>Contenido de demostración</DemoTag>
         </div>
-        <h2
-          id="descripcion-hotel"
-          className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl"
-        >
+        <h2 id="descripcion-hotel" className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
           Historia y propuesta de valor
         </h2>
         <div className="mt-4 space-y-4 text-base leading-relaxed text-foreground/80">
           <p>
-            Texto de demostración del preview, no dato publicado. La casona se organiza alrededor
-            de un patio de arcos de piedra, con una alberca inspirada en los cenotes de la región y
-            una terraza abierta a la torre de San Servacio.
+            Texto de demostración del preview, no dato publicado. La casona se organiza alrededor de
+            un patio de arcos de piedra, con una alberca inspirada en los cenotes de la región y una
+            terraza abierta a la torre de San Servacio.
           </p>
           <p>
             La propuesta combina hospitalidad yucateca, cocina de recado y un servicio de concierge
@@ -596,10 +593,7 @@ function Habitaciones() {
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Hospedaje</p>
         <DemoTag>Datos demo · sin precios ni disponibilidad</DemoTag>
       </div>
-      <h2
-        id="habitaciones-hotel"
-        className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl"
-      >
+      <h2 id="habitaciones-hotel" className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
         Habitaciones
       </h2>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -840,8 +834,7 @@ function PermissionMatrix({ role }: { role: Exclude<RoleView, "visitante"> }) {
       <div className="flex flex-wrap items-center gap-2">
         <SlidersHorizontal className="size-4 text-primary" aria-hidden />
         <p className="text-sm font-medium">
-          Vista simulada:{" "}
-          {isOwner ? "Propietario del hotel" : "Administración Valladolid.mx"}
+          Vista simulada: {isOwner ? "Propietario del hotel" : "Administración Valladolid.mx"}
         </p>
         <DemoTag>Sólo informativo · sin efectos</DemoTag>
       </div>
@@ -863,16 +856,14 @@ function PermissionMatrix({ role }: { role: Exclude<RoleView, "visitante"> }) {
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-2 text-sm">
-        {["Propietario edita", "Administración revisa", "Administración publica"].map(
-          (step, i) => (
-            <span key={step} className="inline-flex items-center gap-2">
-              {i > 0 ? <ChevronRight className="size-4 text-muted-foreground" aria-hidden /> : null}
-              <span className="rounded-pill border border-border bg-background px-3 py-1.5">
-                {step}
-              </span>
+        {["Propietario edita", "Administración revisa", "Administración publica"].map((step, i) => (
+          <span key={step} className="inline-flex items-center gap-2">
+            {i > 0 ? <ChevronRight className="size-4 text-muted-foreground" aria-hidden /> : null}
+            <span className="rounded-pill border border-border bg-background px-3 py-1.5">
+              {step}
             </span>
-          ),
-        )}
+          </span>
+        ))}
       </div>
     </section>
   );
