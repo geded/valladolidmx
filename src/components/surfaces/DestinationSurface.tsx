@@ -316,30 +316,31 @@ export function DestinationSurface({
         ) : null}
 
         {premiumEnabled && activeContract ? (
-          <PremiumHero
-            className={showGalleryMosaic ? "mt-6" : undefined}
-            vm={{
-              presentation: DEFAULT_PREMIUM_PRESENTATION,
-              crumbs: [
-                { label: "Inicio", href: "/" },
-                { label: "Oriente Maya de Yucatán", href: "/oriente-maya" },
-                { label: input.name },
-              ],
-              eyebrow: "Destino · Oriente Maya de Yucatán",
-              title: input.name,
-              description: input.tagline || input.description || undefined,
-              media:
-                (input.galleryUrls[0] ?? input.heroUrl)
-                  ? {
-                      url: input.galleryUrls[0] ?? input.heroUrl ?? "",
-                      alt: `Vista de ${input.name}, Oriente Maya de Yucatán`,
-                    }
-                  : null,
-              primaryAction: dominantAction?.href
-                ? { label: dominantAction.label, href: dominantAction.href }
-                : undefined,
-            }}
-          />
+          <div className={showGalleryMosaic ? "mt-6" : undefined}>
+            <PremiumHero
+              vm={{
+                presentation: DEFAULT_PREMIUM_PRESENTATION,
+                crumbs: [
+                  { label: "Inicio", href: "/" },
+                  { label: "Oriente Maya de Yucatán", href: "/oriente-maya" },
+                  { label: input.name },
+                ],
+                eyebrow: "Destino · Oriente Maya de Yucatán",
+                title: input.name,
+                description: input.tagline || input.description || undefined,
+                media:
+                  (input.galleryUrls[0] ?? input.heroUrl)
+                    ? {
+                        url: input.galleryUrls[0] ?? input.heroUrl ?? "",
+                        alt: `Vista de ${input.name}, Oriente Maya de Yucatán`,
+                      }
+                    : null,
+                primaryAction: dominantAction?.href
+                  ? { label: dominantAction.label, href: dominantAction.href }
+                  : undefined,
+              }}
+            />
+          </div>
         ) : (
           <ExperienceHero
             dto={heroDto}

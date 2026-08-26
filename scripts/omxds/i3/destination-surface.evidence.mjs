@@ -84,6 +84,12 @@ const acknowledgedSurfaceRevisions = [
     sha256: "f2107c0abb8c55b62cbb737123eba415b5333e884bf15e4fb9d7f8ad4ea6d328",
     authorizations: ["PCA-2026-032"],
   },
+  {
+    // D-01 · PremiumHero contract remediation (sin `className` en el contrato del primitivo).
+    package: "19.28-g5-destination-d01",
+    sha256: "6a98bbd9942dde9aa794929694f245578bf108dec9df2a5f0de5b04bdc5c1e45",
+    authorizations: ["PCA-2026-032"],
+  },
 ];
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",
