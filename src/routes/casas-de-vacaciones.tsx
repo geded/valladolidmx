@@ -16,10 +16,7 @@ import {
 } from "@/lib/catalog/marketplace-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
-import {
-  defineRouteContext,
-  type RouteContextDeclaration,
-} from "@/lib/context-engine";
+import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import {
   TourismListingSurface,
   buildDestinationFacet,
@@ -43,8 +40,18 @@ function destinationLabel(slug: string): string {
 function buildCasasContext(destino: string | undefined): RouteContextDeclaration {
   const explicitAncestors = destino
     ? [
-        { kind: "region" as const, slug: ORIENTE_MAYA.slug, label: ORIENTE_MAYA.name, href: "/oriente-maya" },
-        { kind: "destination" as const, slug: destino, label: destinationLabel(destino), href: `/oriente-maya/${destino}` },
+        {
+          kind: "region" as const,
+          slug: ORIENTE_MAYA.slug,
+          label: ORIENTE_MAYA.name,
+          href: "/oriente-maya",
+        },
+        {
+          kind: "destination" as const,
+          slug: destino,
+          label: destinationLabel(destino),
+          href: `/oriente-maya/${destino}`,
+        },
       ]
     : [];
   return defineRouteContext({
@@ -70,16 +77,18 @@ export const Route = createFileRoute("/casas-de-vacaciones")({
     // Comparamos normalizado sin renombrar datos ni URLs canónicas.
     return {
       businesses: all.filter((b) =>
-        CATEGORY_SLUGS.has(String(b.category_slug ?? "").trim().toLowerCase()),
+        CATEGORY_SLUGS.has(
+          String(b.category_slug ?? "")
+            .trim()
+            .toLowerCase(),
+        ),
       ),
     };
-
   },
   head: () =>
     buildPublicHead({
       title: `Casas de vacaciones · ${SITE.name}`,
-      description:
-        "Casas, villas y rentas vacacionales para explorar el Oriente Maya a tu ritmo.",
+      description: "Casas, villas y rentas vacacionales para explorar el Oriente Maya a tu ritmo.",
       path: "/casas-de-vacaciones",
     }),
   component: CasasRoute,
@@ -105,19 +114,14 @@ function CasasRoute() {
   );
   const destinoFacet = buildDestinationFacet(cards);
   return (
-    <PublicShell
-      crumbs={legacyCrumbs}
-      contextDeclaration={contextDeclaration}
-      useContextCrumbs
-    >
+    <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs>
       <TourismListingSurface
         hero={{
           eyebrow: "Tu casa en el Oriente Maya",
           title: destino
             ? `Casas de vacaciones en ${destinationLabel(destino)}`
             : "Casas de vacaciones",
-          subtitle:
-            "Casas, villas y rentas vacacionales para explorar el Oriente Maya a tu ritmo.",
+          subtitle: "Casas, villas y rentas vacacionales para explorar el Oriente Maya a tu ritmo.",
           metaLabel: destino ? destinationLabel(destino) : ORIENTE_MAYA.name,
         }}
         items={cards}

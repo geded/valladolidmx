@@ -30,8 +30,7 @@ export const Route = createFileRoute("/lovable/g5-listing-readiness-preview")({
       { title: "G5-S1 · Vista previa interna de Listing Readiness" },
       {
         name: "description",
-        content:
-          "Vista previa interna de listados turísticos con fixtures locales. No indexable.",
+        content: "Vista previa interna de listados turísticos con fixtures locales. No indexable.",
       },
       { name: "robots", content: "noindex,nofollow,noarchive" },
     ],
@@ -41,12 +40,7 @@ export const Route = createFileRoute("/lovable/g5-listing-readiness-preview")({
 
 const GOVERNED = "/api/public/studio-media/governed/v1p1c";
 
-type FamilyId =
-  | "hoteles"
-  | "restaurantes"
-  | "experiencias"
-  | "eventos"
-  | "casas-de-vacaciones";
+type FamilyId = "hoteles" | "restaurantes" | "experiencias" | "eventos" | "casas-de-vacaciones";
 
 interface FamilyFixture {
   id: FamilyId;
@@ -271,9 +265,7 @@ function G5ListingReadinessPreview() {
           ))}
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-            Layout
-          </span>
+          <span className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Layout</span>
           {([1, 2, 3] as const).map((c) => (
             <Button
               key={c}

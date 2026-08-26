@@ -14,9 +14,7 @@ export function PremiumHero({ vm }: { vm: PremiumHeroVM }) {
         "relative isolate overflow-hidden text-white",
         // D-05 · sin medio gobernado no se muestra un rectángulo negro:
         // degradado cálido piedra/caliza que conserva contraste AA.
-        hasMedia
-          ? "bg-stone-950"
-          : "bg-gradient-to-br from-stone-800 via-stone-700 to-amber-900",
+        hasMedia ? "bg-stone-950" : "bg-gradient-to-br from-stone-800 via-stone-700 to-amber-900",
         cinematic ? "min-h-[78svh]" : "min-h-[34rem] lg:min-h-[42rem]",
       )}
     >
