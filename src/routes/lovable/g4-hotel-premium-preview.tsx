@@ -58,7 +58,6 @@ import {
 } from "@/lib/omxds/presentation/vm";
 import { cn } from "@/lib/utils";
 
-
 export const Route = createFileRoute("/lovable/g4-hotel-premium-preview")({
   head: () => ({
     meta: [
@@ -352,7 +351,6 @@ function G4HotelPremiumPreview() {
         <GallerySection layout={tuning.gallery} />
       </Container>
 
-
       {tuning.showDescription ? (
         <Container className="mt-14">
           <Descripcion />
@@ -436,9 +434,21 @@ const HOTEL_SOURCE = {
     { label: "Ficha en preparación", tone: "neutral" as const },
   ],
   facts: [
-    { label: "Ubicación", value: HOTEL.location, icon: <Compass className="size-3.5" aria-hidden /> },
-    { label: "Habitaciones", value: "12 llaves", icon: <BedDouble className="size-3.5" aria-hidden /> },
-    { label: "Capacidad", value: "2 a 4 personas", icon: <Users className="size-3.5" aria-hidden /> },
+    {
+      label: "Ubicación",
+      value: HOTEL.location,
+      icon: <Compass className="size-3.5" aria-hidden />,
+    },
+    {
+      label: "Habitaciones",
+      value: "12 llaves",
+      icon: <BedDouble className="size-3.5" aria-hidden />,
+    },
+    {
+      label: "Capacidad",
+      value: "2 a 4 personas",
+      icon: <Users className="size-3.5" aria-hidden />,
+    },
   ],
 } satisfies PremiumEntitySource;
 
@@ -480,7 +490,6 @@ function GallerySection({ layout }: { layout: GalleryLayout }) {
     </PremiumSection>
   );
 }
-
 
 function Descripcion() {
   return (
