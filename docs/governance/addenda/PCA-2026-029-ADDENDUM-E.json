@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-E",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-28 · FASE G5-S1 · Listing Readiness Local. Autoriza registrar la nueva ruta interna no indexable src/routes/lovable/g5-listing-readiness-preview.tsx en el Route Inventory conforme a la Route Inventory Rule (DOS · SSC-01 · P2) y, en consecuencia, sustituir de forma append-only el digest acreditado de src/lib/experience-builder/route-inventory.ts en PCA-2026-029. No autoriza ninguna otra variación: cualquier cambio adicional falla cerrado.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "0d9ee377b54f2b93577feb321eee56981d272267c5ead3c59f2304c4132fd6f1",
+    "current_sha256": "0b7b92b731fdeaa7415595a945b6a96c2b6e1ceb368953846d96133113e711e4",
+    "semantic_change": "Alta aditiva de la entrada src/routes/lovable/g5-listing-readiness-preview.tsx en SCANNED_ROUTE_FILES. Sin cambios de lógica, heurística, overrides ni API del inventario.",
+    "authority": "PCA-2026-036"
+  },
+  "invariants": ["omxds_visual_v1_contracts_enabled=false"],
+  "recorded_at": "2026-08-28"
+}
