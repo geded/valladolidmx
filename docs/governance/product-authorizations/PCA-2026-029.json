@@ -94,8 +94,8 @@
     {
       "operation": "modify",
       "path": "src/lib/experience-builder/route-inventory.ts",
-      "sha256": "0b7b92b731fdeaa7415595a945b6a96c2b6e1ceb368953846d96133113e711e4",
-      "authority": "docs/governance/evidence/19.26/branch-reconciliation-forensic.json; docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json; docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json"
+      "sha256": "0d9ee377b54f2b93577feb321eee56981d272267c5ead3c59f2304c4132fd6f1",
+      "authority": "docs/governance/evidence/19.26/branch-reconciliation-forensic.json; docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json"
     },
     {
       "operation": "create",
