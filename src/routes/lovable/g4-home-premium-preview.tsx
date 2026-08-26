@@ -1,36 +1,24 @@
 /**
- * G4-F · Visual North Star de la página principal de Valladolid.mx.
- *
- * Vista INTERNA, no indexable y sin persistencia. No sustituye ni edita
- * la Home pública (`src/routes/index.tsx`).
- *
- * Reglas aplicadas:
- *  - Sólo medios gobernados existentes vía el proxy público estable
- *    `/api/public/studio-media/governed/v1p1c/*`. Sin URLs firmadas.
- *  - DIRECCIÓN VISUAL (Editorial | Cinematográfica) y DISPOSICIÓN de
- *    destinos/tarjetas (Asimétrica | Cuadrícula | Carrusel) son ejes
- *    independientes.
- *  - Mapa exclusivamente con el bloque oficial `ExperienceMapBlock`.
- *  - "Experiencias" es la única categoría; no se duplica como "Tours".
- *  - Travel Plan / Alux se referencian como entidades canónicas; no se
- *    crea ningún modelo de viaje paralelo.
- *  - Sin precios, reseñas, premios, disponibilidad ni distintivos no
- *    acreditados: estados vacíos honestos.
- *  - El panel "Afinar página principal" es local (useState), sólo
- *    visible en rol Administración y no persiste.
+ * G4-F · Home Premium Visual North Star.
+ * Preview interna, no indexable, sin persistencia y sin impacto en la Home pública.
  */
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   CalendarDays,
+  Check,
   ChevronRight,
+  Clock3,
   Compass,
+  Hotel,
   Landmark,
   Map as MapIcon,
   MapPin,
-  Sparkles,
+  MessageCircle,
+  Route as RouteIcon,
   SlidersHorizontal,
+  Sparkles,
   UtensilsCrossed,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -48,237 +36,237 @@ export const Route = createFileRoute("/lovable/g4-home-premium-preview")({
         content:
           "Vista previa interna de la página principal premium de Valladolid.mx. No indexable, sin persistencia.",
       },
+      { property: "og:title", content: "G4-F · Vista previa Home Premium (interna)" },
+      {
+        property: "og:description",
+        content: "Vista previa interna y no indexable de la Home Premium de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex,nofollow,noarchive" },
     ],
   }),
   component: G4HomePremiumPreview,
 });
 
-/* ------------------------------------------------------------------ *
- * Medios gobernados (ruta pública estable, nunca firmada).
- * ------------------------------------------------------------------ */
 const GOVERNED = "/api/public/studio-media/governed/v1p1c";
-
 const MEDIA = {
   plaza: {
     url: `${GOVERNED}/destination-gallery-1.jpg`,
-    alt: "Plaza principal de Valladolid con kiosco, bancas, palmeras y arcadas coloniales en tonos ocre y crema",
+    alt: "Plaza principal de Valladolid con kiosco, palmeras y arcadas coloniales",
   },
   calle: {
     url: `${GOVERNED}/destination-gallery-2.jpg`,
-    alt: "Calle colonial de Valladolid con fachadas pastel en terracota y ocre, puertas de madera y buganvilia",
+    alt: "Calle colonial de Valladolid con fachadas pastel y puertas de madera",
   },
   centro: {
     url: `${GOVERNED}/destination-cover.jpg`,
-    alt: "Centro histórico de Valladolid, Yucatán, con arquitectura colonial en piedra caliza y luz cálida de tarde",
+    alt: "Centro histórico de Valladolid con arquitectura colonial bajo la luz cálida de la tarde",
   },
   cocina: {
     url: `${GOVERNED}/restaurant-cover.jpg`,
-    alt: "Terraza de restaurante colonial con arcos de piedra y mesas iluminadas con velas en Valladolid, Yucatán",
+    alt: "Terraza de restaurante colonial con arcos de piedra y mesas iluminadas",
   },
   patio: {
     url: `${GOVERNED}/hotel-cover.jpg`,
-    alt: "Patio central con piscina estilo cenote y arcos de piedra en un hotel boutique colonial de Valladolid, Yucatán",
+    alt: "Patio de hotel boutique con piscina y arcos de piedra caliza",
   },
   cenote: {
     url: `${GOVERNED}/experience-cover.jpg`,
-    alt: "Cenote abierto de aguas turquesa en una caverna de piedra caliza cerca de Valladolid, Yucatán",
+    alt: "Cenote de aguas turquesa dentro de una caverna de piedra caliza",
   },
 } as const;
 
 type Media = (typeof MEDIA)[keyof typeof MEDIA];
+type VisualDirection = "editorial" | "cinematografica";
+type CardLayout = "asimetrica" | "cuadricula" | "carrusel";
+type SectionKey = "destinos" | "experiencias" | "servicios" | "eventos" | "queHacer" | "mapa";
+
+type TuningState = {
+  direction: VisualDirection;
+  heroVariant: VisualDirection;
+  layout: CardLayout;
+  sections: Record<SectionKey, boolean>;
+  order: SectionKey[];
+};
 
 const HERO_SLIDES = [
+  { media: MEDIA.centro, caption: "Centro histórico al atardecer" },
+  { media: MEDIA.cenote, caption: "Cenotes del Oriente Maya" },
+] as const;
+
+const ROUTES = [
   {
+    id: "essential",
+    title: "Valladolid esencial",
+    duration: "Medio día",
+    stops: 4,
+    vibe: "Historia, paseo y sabor",
+    description: "Una primera lectura de la ciudad, del centro a una cocina tradicional.",
+    sequence: ["Plaza principal", "San Servacio", "Calzada de los Frailes", "Cocina local"],
     media: MEDIA.centro,
-    caption: "Centro histórico al atardecer",
   },
   {
+    id: "cenotes",
+    title: "Cenotes y comunidades",
+    duration: "Un día",
+    stops: 4,
+    vibe: "Naturaleza y cultura viva",
+    description: "Una propuesta visual para ordenar agua, territorio y comunidades sin prisas.",
+    sequence: ["Valladolid", "Cenote de la región", "Comunidad maya", "Regreso al centro"],
     media: MEDIA.cenote,
-    caption: "Cenotes del Oriente Maya",
+  },
+  {
+    id: "pueblos",
+    title: "Pueblos Mágicos del Oriente Maya",
+    duration: "Dos días",
+    stops: 3,
+    vibe: "Patrimonio y vida local",
+    description: "Tres escalas para comprender la identidad compartida y los matices del oriente.",
+    sequence: ["Valladolid", "Espita", "Izamal"],
+    media: MEDIA.calle,
   },
 ] as const;
 
-/* ------------------------------------------------------------------ *
- * Datos DEMO VISUAL (ninguno consulta backend).
- * ------------------------------------------------------------------ */
-const DESTINOS = [
+type RouteId = (typeof ROUTES)[number]["id"];
+
+const DESTINATIONS = [
   {
-    slug: "valladolid",
     name: "Valladolid",
-    role: "Capital Turística del Oriente Maya",
-    tagline: "Ciudad colonial de piedra caliza, cenotes urbanos y cocina yucateca de fuego lento.",
+    note: "Capital turística · punto de partida",
     media: MEDIA.centro,
     puebloMagico: true,
     demo: false,
   },
   {
-    slug: "izamal",
     name: "Izamal",
-    role: "La ciudad amarilla",
-    tagline: "Conventos, basamentos mayas y calles ocre bajo el sol del oriente.",
+    note: "Ciudad amarilla · patrimonio vivo",
     media: MEDIA.calle,
     puebloMagico: true,
     demo: true,
   },
   {
-    slug: "espita",
     name: "Espita",
-    role: "Pueblo de la Sultana del Oriente",
-    tagline: "Vida tranquila, arquitectura tradicional y camino a la selva baja.",
+    note: "Arquitectura y ritmo de pueblo",
     media: MEDIA.plaza,
     puebloMagico: true,
     demo: true,
   },
   {
-    slug: "temozon",
     name: "Temozón",
-    role: "Territorio de artesanía y sabor",
-    tagline: "Talleres, mercados y ruta hacia las haciendas del oriente (demo visual).",
+    note: "Artesanía y sabor del oriente",
     media: MEDIA.cocina,
-    puebloMagico: false,
-    demo: true,
-  },
-  {
-    slug: "tinum",
-    name: "Tinum",
-    role: "Puerta a la zona arqueológica",
-    tagline: "Comunidades mayas y cenotes en el corredor hacia Chichén Itzá (demo visual).",
-    media: MEDIA.cenote,
-    puebloMagico: false,
-    demo: true,
-  },
-  {
-    slug: "uayma",
-    name: "Uayma",
-    role: "Templo barroco del oriente",
-    tagline: "Fachada policromada y ritmo de pueblo a minutos de Valladolid (demo visual).",
-    media: MEDIA.patio,
     puebloMagico: false,
     demo: true,
   },
 ] as const;
 
-type SectionCard = {
-  id: string;
-  title: string;
-  tagline: string;
-  meta: string;
-  media: Media;
-  tone: "editorial" | "cinematografico";
-};
-
-const EXPERIENCIAS: SectionCard[] = [
+const EXPERIENCES = [
   {
-    id: "exp-1",
     title: "Inframundo Maya",
-    tagline: "Descenso guiado a un cenote de caverna con lectura del paisaje kárstico.",
-    meta: "Experiencia · Valladolid (demo visual)",
+    category: "Cenote · Valladolid",
+    summary: "Lectura del paisaje kárstico y descenso guiado a una caverna.",
     media: MEDIA.cenote,
-    tone: "cinematografico",
   },
   {
-    id: "exp-2",
-    title: "Caminata por la Calzada de los Frailes",
-    tagline: "Recorrido documental por fachadas restauradas y oficios del centro.",
-    meta: "Experiencia · Valladolid (demo visual)",
+    title: "Calzada de los Frailes",
+    category: "Caminata cultural",
+    summary: "Fachadas restauradas, oficios y memoria urbana.",
     media: MEDIA.calle,
-    tone: "editorial",
   },
   {
-    id: "exp-3",
     title: "Amanecer en la plaza",
-    tagline: "Ruta temprana entre arcadas, mercado y cocina de humo.",
-    meta: "Experiencia · Valladolid (demo visual)",
+    category: "Vida local",
+    summary: "Arcadas, mercado y cocina de humo antes del mediodía.",
     media: MEDIA.plaza,
-    tone: "editorial",
   },
-];
-
-const HOSPEDAJE: SectionCard[] = [
   {
-    id: "hos-1",
-    title: "Hacienda San Servacio",
-    tagline: "Casona colonial con patio de arcos y piscina estilo cenote.",
-    meta: "Hospedaje · Centro histórico (demo visual)",
+    title: "Patios de piedra",
+    category: "Arquitectura",
+    summary: "Una mirada íntima a los espacios frescos de la ciudad.",
     media: MEDIA.patio,
-    tone: "cinematografico",
+  },
+] as const;
+
+const STAYS = [
+  {
+    title: "Hacienda San Servacio",
+    destination: "Valladolid",
+    category: "Hotel boutique · demo visual",
+    summary: "Casona colonial con patio de arcos y piscina estilo cenote.",
+    media: MEDIA.patio,
   },
   {
-    id: "hos-2",
     title: "Casa de piedra en el centro",
-    tagline: "Habitaciones frescas de muros gruesos a dos cuadras de la plaza.",
-    meta: "Hospedaje · Valladolid (demo visual)",
+    destination: "Valladolid",
+    category: "Hospedaje · demo visual",
+    summary: "Muros gruesos y una ubicación pensada para recorrer la ciudad a pie.",
     media: MEDIA.centro,
-    tone: "editorial",
   },
-];
+] as const;
 
-const GASTRONOMIA: SectionCard[] = [
+const FOOD = [
   {
-    id: "gas-1",
     title: "Cocina de Zací",
-    tagline: "Recetario yucateco de fuego lento en una terraza de arcos.",
-    meta: "Gastronomía · Valladolid (demo visual)",
+    destination: "Valladolid",
+    category: "Cocina yucateca · demo visual",
+    summary: "Recetario de fuego lento servido en una terraza de arcos.",
     media: MEDIA.cocina,
-    tone: "editorial",
   },
   {
-    id: "gas-2",
     title: "Mercado y cocinas de barrio",
-    tagline: "Desayunos tradicionales, recado negro y sopa de lima.",
-    meta: "Gastronomía · Valladolid (demo visual)",
+    destination: "Valladolid",
+    category: "Cocina local · demo visual",
+    summary: "Una selección editorial para comprender sabores, horarios y rituales cotidianos.",
     media: MEDIA.plaza,
-    tone: "cinematografico",
   },
-];
+] as const;
 
-const EVENTOS: SectionCard[] = [
+const EVENTS = [
   {
-    id: "eve-1",
+    day: "Fecha por confirmar",
     title: "Noche de Valladolid",
-    tagline: "Velada de trova y memoria del centro histórico. Fecha por confirmar.",
-    meta: "Evento cultural · programado (demo visual)",
-    media: MEDIA.plaza,
-    tone: "cinematografico",
+    type: "Música y memoria",
+    detail: "Velada cultural en el centro histórico · demo visual, sin disponibilidad afirmada.",
   },
   {
-    id: "eve-2",
+    day: "Sin fecha acreditada",
     title: "Oficios de la Calzada",
-    tagline: "Muestra de talleres frente a las fachadas restauradas.",
-    meta: "Evento cultural · sin fecha acreditada (demo visual)",
-    media: MEDIA.calle,
-    tone: "editorial",
+    type: "Talleres y comunidad",
+    detail: "Encuentro editorial con artesanos locales · demo visual.",
   },
-];
-
-const QUE_HACER = [
   {
-    id: "qh-1",
-    kicker: "Ensayo visual",
+    day: "Agenda en preparación",
+    title: "Sabores del oriente",
+    type: "Gastronomía",
+    detail: "Relato visual de productores y cocinas · demo visual.",
+  },
+] as const;
+
+const EDITORIAL = [
+  {
+    kicker: "Patrimonio",
     title: "Leer una ciudad de piedra caliza",
-    body: "Cómo mirar una fachada colonial, qué cuenta un dintel y por qué el centro de Valladolid conserva su trazado original.",
+    body: "Claves para mirar fachadas, dinteles y el trazado original del centro.",
     media: MEDIA.centro,
   },
   {
-    id: "qh-2",
-    kicker: "Guía editorial",
-    title: "Tres días en el Oriente Maya",
-    body: "Un itinerario pausado entre cenotes, pueblos y cocina tradicional, pensado para viajar sin prisa.",
-    media: MEDIA.calle,
-  },
-  {
-    id: "qh-3",
     kicker: "Territorio",
     title: "El agua bajo el suelo",
-    body: "Qué es un cenote, cómo se formó la red subterránea de Yucatán y qué significó para la vida maya.",
+    body: "Una introducción a los cenotes y su relación con la vida del Oriente Maya.",
     media: MEDIA.cenote,
+  },
+  {
+    kicker: "Cuaderno de viaje",
+    title: "Viajar sin prisa",
+    body: "Cómo combinar pueblos, cocina y naturaleza en una ruta de varios días.",
+    media: MEDIA.calle,
   },
 ] as const;
 
 const MAP_DTO: ExperienceMapDTO = {
   variant: "multi",
-  heading: "Visión territorial del Oriente Maya de Yucatán",
+  heading: "Paradas de la ruta en el territorio",
   center: { lat: 20.72, lng: -88.3, zoom: 10 },
   points: [
     {
@@ -287,19 +275,7 @@ const MAP_DTO: ExperienceMapDTO = {
       lat: 20.6892,
       lng: -88.2018,
       title: "Valladolid",
-      subtitle: "Capital Turística del Oriente Maya",
-      href: null,
-      thumbUrl: null,
-      badge: null,
-      priceLabel: null,
-    },
-    {
-      id: "izamal",
-      kind: "destination",
-      lat: 20.9308,
-      lng: -89.0175,
-      title: "Izamal",
-      subtitle: "Pueblo Mágico (demo visual)",
+      subtitle: "Inicio sugerido · Capital Turística del Oriente Maya",
       href: null,
       thumbUrl: null,
       badge: null,
@@ -311,19 +287,19 @@ const MAP_DTO: ExperienceMapDTO = {
       lat: 21.0117,
       lng: -88.3061,
       title: "Espita",
-      subtitle: "Pueblo Mágico (demo visual)",
+      subtitle: "Segunda parada · demo visual",
       href: null,
       thumbUrl: null,
       badge: null,
       priceLabel: null,
     },
     {
-      id: "temozon",
+      id: "izamal",
       kind: "destination",
-      lat: 20.8047,
-      lng: -88.2003,
-      title: "Temozón",
-      subtitle: "Destino del oriente (demo visual)",
+      lat: 20.9308,
+      lng: -89.0175,
+      title: "Izamal",
+      subtitle: "Tercera parada · demo visual",
       href: null,
       thumbUrl: null,
       badge: null,
@@ -331,7 +307,7 @@ const MAP_DTO: ExperienceMapDTO = {
     },
   ],
   capabilities: {
-    showDistance: true,
+    showDistance: false,
     showDirections: false,
     clustering: false,
     syncList: false,
@@ -341,171 +317,138 @@ const MAP_DTO: ExperienceMapDTO = {
   emptyMessage: null,
 };
 
-/* ------------------------------------------------------------------ */
-
-type VisualDirection = "editorial" | "cinematografica";
-type CardLayout = "asimetrica" | "cuadricula" | "carrusel";
-type RoleView = "visitante" | "administracion";
-
-interface TuningState {
-  role: RoleView;
-  direction: VisualDirection;
-  heroVariant: VisualDirection;
-  layout: CardLayout;
-  showDestinos: boolean;
-  showValladolid: boolean;
-  showExperiencias: boolean;
-  showHospedaje: boolean;
-  showGastronomia: boolean;
-  showEventos: boolean;
-  showQueHacer: boolean;
-  showAlux: boolean;
-  showMapa: boolean;
-  /** Orden visual simulado de las secciones premium. */
-  order: SectionKey[];
-}
-
-type SectionKey = "experiencias" | "hospedaje" | "gastronomia" | "eventos" | "queHacer";
-
-const SECTION_LABEL: Record<SectionKey, string> = {
+const SECTION_LABELS: Record<SectionKey, string> = {
+  destinos: "Destinos",
   experiencias: "Experiencias",
-  hospedaje: "Hospedaje",
-  gastronomia: "Gastronomía",
+  servicios: "Hospedaje y gastronomía",
   eventos: "Eventos",
   queHacer: "Qué hacer",
+  mapa: "Mapa",
 };
 
 const DEFAULT_ORDER: SectionKey[] = [
+  "destinos",
   "experiencias",
-  "hospedaje",
-  "gastronomia",
+  "servicios",
   "eventos",
   "queHacer",
+  "mapa",
 ];
 
 function G4HomePremiumPreview() {
   const [tuning, setTuning] = useState<TuningState>({
-    role: "visitante",
     direction: "editorial",
-    heroVariant: "cinematografica",
+    heroVariant: "editorial",
     layout: "asimetrica",
-    showDestinos: true,
-    showValladolid: true,
-    showExperiencias: true,
-    showHospedaje: true,
-    showGastronomia: true,
-    showEventos: true,
-    showQueHacer: true,
-    showAlux: true,
-    showMapa: true,
+    sections: {
+      destinos: true,
+      experiencias: true,
+      servicios: true,
+      eventos: true,
+      queHacer: true,
+      mapa: true,
+    },
     order: DEFAULT_ORDER,
   });
+  const [selectedRoute, setSelectedRoute] = useState<RouteId>("essential");
+  const [selectedPrompt, setSelectedPrompt] = useState("Tengo medio día");
+  const [added, setAdded] = useState(false);
 
-  const sectionEnabled: Record<SectionKey, boolean> = {
-    experiencias: tuning.showExperiencias,
-    hospedaje: tuning.showHospedaje,
-    gastronomia: tuning.showGastronomia,
-    eventos: tuning.showEventos,
-    queHacer: tuning.showQueHacer,
+  const renderSection = (key: SectionKey) => {
+    if (!tuning.sections[key]) return null;
+    if (key === "destinos") return <DestinationsSection key={key} layout={tuning.layout} />;
+    if (key === "experiencias") return <ExperiencesSection key={key} layout={tuning.layout} />;
+    if (key === "servicios") return <ServicesSection key={key} />;
+    if (key === "eventos") return <EventsSection key={key} />;
+    if (key === "queHacer") return <EditorialSection key={key} />;
+    return <MapSection key={key} selectedRoute={selectedRoute} />;
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen overflow-x-clip bg-background pb-20">
       <PreviewRibbon />
       <PreviewHeader />
-
-      <Container className="pt-6">
-        {tuning.heroVariant === "cinematografica" ? <HeroCinematografico /> : <HeroEditorial />}
-      </Container>
-
-      {tuning.showDestinos ? (
-        <Container className="mt-16">
-          <DestinosSection layout={tuning.layout} direction={tuning.direction} />
+      <main>
+        <Container className="pt-4 sm:pt-6">
+          {tuning.heroVariant === "editorial" ? <HeroEditorial /> : <HeroCinematic />}
         </Container>
-      ) : null}
 
-      {tuning.showValladolid ? (
-        <Container className="mt-16">
-          <ValladolidEditorial />
+        <Container className="mt-6 sm:mt-8">
+          <AluxPlanner
+            selectedPrompt={selectedPrompt}
+            onSelectPrompt={setSelectedPrompt}
+            selectedRoute={selectedRoute}
+            onSelectRoute={setSelectedRoute}
+            added={added}
+            onAdd={() => setAdded(true)}
+          />
         </Container>
-      ) : null}
 
-      {tuning.order.map((key) =>
-        sectionEnabled[key] ? (
-          <Container key={key} className="mt-16">
-            <PremiumSection sectionKey={key} layout={tuning.layout} />
+        <Container className="mt-10 sm:mt-12">
+          <RoutesSection
+            selectedRoute={selectedRoute}
+            onSelectRoute={setSelectedRoute}
+            onAdd={() => setAdded(true)}
+          />
+        </Container>
+
+        {tuning.order.map((key) => (
+          <Container key={key} className="mt-10 sm:mt-12">
+            {renderSection(key)}
           </Container>
-        ) : null,
-      )}
+        ))}
 
-      {tuning.showAlux ? (
-        <Container className="mt-16">
-          <AluxBand />
+        <Container className="mt-10 sm:mt-12">
+          <TravelPlanClose
+            selectedRoute={selectedRoute}
+            added={added}
+            onAdd={() => setAdded(true)}
+          />
         </Container>
-      ) : null}
-
-      {tuning.showMapa ? (
-        <Container className="mt-16">
-          <section id="mapa-territorial">
-            <ExperienceMapBlock dto={MAP_DTO} />
-          </section>
-        </Container>
-      ) : null}
-
-      <Container className="mt-16">
-        <EstadosVacios />
-      </Container>
-
-      <Container className="mt-16">
+      </main>
+      <Container className="mt-8">
         <PreviewFooter />
       </Container>
-
       <TuningPanel value={tuning} onChange={setTuning} />
     </div>
   );
 }
 
-/* ------------------------------------------------------------------ *
- * Shell
- * ------------------------------------------------------------------ */
-
 function PreviewRibbon() {
   return (
-    <div className="border-b border-amber-300/60 bg-amber-50 px-4 py-2 text-center text-xs text-amber-900">
-      Vista previa interna G4-F · Página principal premium — no indexable, sin persistencia. El
-      contenido marcado DEMO VISUAL no representa datos publicados.
+    <div className="border-b border-warning/40 bg-warning/15 px-4 py-2 text-center text-xs text-warning-foreground">
+      Vista interna G4-F · DEMO VISUAL · no indexable · sin persistencia · producción intacta
     </div>
   );
 }
 
 function PreviewHeader() {
   return (
-    <header className="border-b border-border bg-background/90 backdrop-blur">
-      <Container className="flex h-16 items-center justify-between gap-6">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="font-serif text-lg font-semibold tracking-tight">Valladolid.mx</span>
-          <span className="hidden text-[10px] uppercase tracking-[0.18em] text-muted-foreground sm:inline">
+    <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
+      <Container className="flex min-h-16 items-center justify-between gap-4 py-2">
+        <Link to="/" className="flex min-w-0 items-center gap-2">
+          <span className="truncate font-display text-lg font-semibold">Valladolid.mx</span>
+          <span className="hidden text-[10px] uppercase text-muted-foreground sm:inline">
             Oriente Maya
           </span>
         </Link>
-        <nav aria-label="Navegación de la vista previa" className="hidden gap-1 md:flex">
-          {(
-            [
-              ["/oriente-maya", "Oriente Maya"],
-              ["/experiencias", "Experiencias"],
-              ["/hoteles", "Hospedaje"],
-              ["/restaurantes", "Gastronomía"],
-              ["/eventos", "Eventos"],
-              ["/que-hacer", "Qué hacer"],
-            ] as const
-          ).map(([to, label]) => (
-            <Link
-              key={to}
-              to={to}
-              className="rounded-pill px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+        <nav
+          aria-label="Navegación de la vista previa"
+          className="hidden items-center gap-1 lg:flex"
+        >
+          {[
+            ["#rutas", "Rutas"],
+            ["#destinos", "Destinos"],
+            ["#experiencias", "Experiencias"],
+            ["#mapa", "Mapa"],
+          ].map(([href, label]) => (
+            <a
+              key={href}
+              href={href}
+              className="rounded-pill px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             >
               {label}
-            </Link>
+            </a>
           ))}
         </nav>
         <Button asChild size="sm" className="rounded-pill">
@@ -516,83 +459,37 @@ function PreviewHeader() {
   );
 }
 
-/* ------------------------------------------------------------------ *
- * Hero
- * ------------------------------------------------------------------ */
-
-function HeroTexts({ inverted }: { inverted?: boolean }) {
-  return (
-    <div className={cn("max-w-2xl", inverted && "text-primary-foreground")}>
-      <p
-        className={cn(
-          "text-[11px] font-medium uppercase tracking-[0.2em]",
-          inverted ? "text-primary-foreground/80" : "text-primary",
-        )}
-      >
-        Destination Operating System
-      </p>
-      <h1 className="mt-3 text-balance font-serif text-4xl leading-[1.05] md:text-5xl lg:text-6xl">
-        Valladolid, Capital Turística del Oriente Maya de Yucatán
-      </h1>
-      <p
-        className={cn(
-          "mt-5 max-w-xl text-base leading-relaxed md:text-lg",
-          inverted ? "text-primary-foreground/85" : "text-muted-foreground",
-        )}
-      >
-        Descubre el territorio con criterio: destinos, experiencias, hospedaje y cocina verificados
-        por la plataforma, y una planeación que se arma contigo, no con anuncios.
-      </p>
-      <div className="mt-7 flex flex-wrap gap-3">
-        <Button asChild size="lg" className="rounded-pill">
-          <Link to="/oriente-maya">
-            Explorar Oriente Maya
-            <ArrowRight className="ml-2 size-4" aria-hidden />
-          </Link>
-        </Button>
-        <Button
-          asChild
-          size="lg"
-          variant={inverted ? "secondary" : "outline"}
-          className="rounded-pill"
-        >
-          <Link to="/arma-tu-viaje">Arma tu viaje</Link>
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function HeroSlideSwitcher({
+function HeroSlideControl({
   index,
   onChange,
-  inverted,
+  inverted = false,
 }: {
   index: number;
-  onChange: (i: number) => void;
+  onChange: (value: number) => void;
   inverted?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-2">
-      {HERO_SLIDES.map((slide, i) => (
-        <button
+    <div className="flex flex-wrap items-center gap-2" aria-label="Seleccionar imagen del hero">
+      {HERO_SLIDES.map((slide, itemIndex) => (
+        <Button
           key={slide.caption}
           type="button"
-          onClick={() => onChange(i)}
-          aria-label={`Mostrar imagen: ${slide.caption}`}
-          aria-pressed={i === index}
+          size="sm"
+          variant={itemIndex === index ? "default" : "outline"}
+          onClick={() => onChange(itemIndex)}
+          aria-pressed={itemIndex === index}
           className={cn(
-            "h-1.5 rounded-pill transition-all",
-            i === index ? "w-8" : "w-4 opacity-50",
-            inverted ? "bg-primary-foreground" : "bg-foreground",
+            "min-h-11 rounded-pill px-4",
+            inverted &&
+              itemIndex !== index &&
+              "border-primary-foreground/50 bg-foreground/40 text-primary-foreground hover:bg-foreground/60",
           )}
-        />
+        >
+          {itemIndex + 1} de {HERO_SLIDES.length}
+        </Button>
       ))}
       <span
-        className={cn(
-          "ml-2 text-[11px]",
-          inverted ? "text-primary-foreground/80" : "text-muted-foreground",
-        )}
+        className={cn("text-xs", inverted ? "text-primary-foreground/85" : "text-muted-foreground")}
       >
         {HERO_SLIDES[index].caption}
       </span>
@@ -600,28 +497,18 @@ function HeroSlideSwitcher({
   );
 }
 
-function HeroCinematografico() {
-  const [index, setIndex] = useState(0);
-  const slide = HERO_SLIDES[index];
+function HeroActions() {
   return (
-    <section className="relative overflow-hidden rounded-3xl">
-      <img
-        src={slide.media.url}
-        alt={slide.media.alt}
-        loading="eager"
-        className="h-[68vh] min-h-[420px] w-full object-cover"
-      />
-      <div
-        className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/45 to-foreground/10"
-        aria-hidden
-      />
-      <div className="absolute inset-x-0 bottom-0 p-6 md:p-12">
-        <HeroTexts inverted />
-        <div className="mt-8">
-          <HeroSlideSwitcher index={index} onChange={setIndex} inverted />
-        </div>
-      </div>
-    </section>
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <Button asChild size="lg" className="min-h-12 rounded-pill">
+        <Link to="/oriente-maya">
+          Explorar Oriente Maya <ArrowRight className="ml-2 size-4" aria-hidden />
+        </Link>
+      </Button>
+      <Button asChild size="lg" variant="outline" className="min-h-12 rounded-pill">
+        <Link to="/arma-tu-viaje">Arma tu viaje</Link>
+      </Button>
+    </div>
   );
 }
 
@@ -629,55 +516,104 @@ function HeroEditorial() {
   const [index, setIndex] = useState(0);
   const slide = HERO_SLIDES[index];
   return (
-    <section className="grid gap-8 lg:grid-cols-[1.05fr_1fr] lg:items-center">
-      <div>
-        <HeroTexts />
-        <div className="mt-8">
-          <HeroSlideSwitcher index={index} onChange={setIndex} />
+    <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
+      <div className="grid lg:grid-cols-[minmax(0,42%)_minmax(0,58%)]">
+        <div className="flex flex-col justify-center bg-card p-6 sm:p-9 lg:p-12">
+          <p className="text-xs font-semibold uppercase text-primary">
+            Revista territorial · Oriente Maya
+          </p>
+          <h1 className="mt-3 text-balance font-display text-4xl leading-tight sm:text-5xl lg:text-6xl">
+            Valladolid, Capital Turística del Oriente Maya de Yucatán
+          </h1>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
+            Historias, rutas y lugares reunidos con una mirada editorial para inspirar el viaje y
+            convertirlo, paso a paso, en un itinerario con Alux.
+          </p>
+          <div className="mt-7">
+            <HeroActions />
+          </div>
+          <div className="mt-7 border-t border-border pt-5">
+            <HeroSlideControl index={index} onChange={setIndex} />
+          </div>
         </div>
+        <figure className="relative min-h-[22rem] overflow-hidden lg:min-h-[38rem]">
+          <img
+            src={slide.media.url}
+            alt={slide.media.alt}
+            loading="eager"
+            className="absolute inset-0 size-full object-cover"
+          />
+          <figcaption className="absolute bottom-4 left-4 rounded-md bg-foreground/85 px-3 py-2 text-xs text-background">
+            {slide.caption}
+          </figcaption>
+        </figure>
       </div>
-      <figure className="overflow-hidden rounded-3xl border border-border">
-        <img
-          src={slide.media.url}
-          alt={slide.media.alt}
-          loading="eager"
-          className="h-[52vh] min-h-[340px] w-full object-cover"
-        />
-        <figcaption className="border-t border-border bg-card px-4 py-3 text-xs text-muted-foreground">
-          {slide.caption} · fotografía gobernada de la plataforma
-        </figcaption>
-      </figure>
     </section>
   );
 }
 
-/* ------------------------------------------------------------------ *
- * Piezas comunes
- * ------------------------------------------------------------------ */
+function HeroCinematic() {
+  const [index, setIndex] = useState(0);
+  const slide = HERO_SLIDES[index];
+  return (
+    <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
+      <div className="relative min-h-[28rem] sm:min-h-[36rem]">
+        <img
+          src={slide.media.url}
+          alt={slide.media.alt}
+          loading="eager"
+          className="absolute inset-0 size-full object-cover"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/55 to-foreground/10"
+          aria-hidden
+        />
+        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
+          <p className="text-xs font-semibold uppercase text-primary">Oriente Maya · Yucatán</p>
+          <h1 className="mt-3 max-w-4xl text-balance font-display text-4xl leading-tight text-primary-foreground sm:text-6xl">
+            Valladolid, Capital Turística del Oriente Maya de Yucatán
+          </h1>
+          <div className="mt-5">
+            <HeroSlideControl index={index} onChange={setIndex} inverted />
+          </div>
+        </div>
+      </div>
+      <div className="grid gap-5 bg-card p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center">
+        <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
+          Del asombro a una ruta posible: descubre el territorio y organiza cada parada con Alux
+          dentro del Travel Plan canónico.
+        </p>
+        <HeroActions />
+      </div>
+    </section>
+  );
+}
 
 function SectionHead({
-  eyebrow,
+  kicker,
   title,
   description,
   action,
 }: {
-  eyebrow: string;
+  kicker: string;
   title: string;
   description?: string;
-  action?: { to: string; label: string };
+  action?: string;
 }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-      <div className="max-w-2xl">
-        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary">{eyebrow}</p>
-        <h2 className="mt-2 text-balance font-serif text-2xl md:text-3xl">{title}</h2>
+    <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="max-w-3xl">
+        <p className="text-xs font-semibold uppercase text-primary">{kicker}</p>
+        <h2 className="mt-2 text-balance font-display text-3xl sm:text-4xl">{title}</h2>
         {description ? (
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            {description}
+          </p>
         ) : null}
       </div>
       {action ? (
-        <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
-          {action.label}
+        <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground">
+          {action}
           <ChevronRight className="size-4" aria-hidden />
         </span>
       ) : null}
@@ -687,712 +623,731 @@ function SectionHead({
 
 function DemoTag() {
   return (
-    <span className="inline-flex items-center rounded-pill border border-border bg-background/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+    <span className="inline-flex rounded-pill border border-border bg-card px-2.5 py-1 text-[10px] font-semibold uppercase text-muted-foreground">
       Demo visual
     </span>
   );
 }
 
-function PuebloMagicoBadge() {
+function AluxPlanner({
+  selectedPrompt,
+  onSelectPrompt,
+  selectedRoute,
+  onSelectRoute,
+  added,
+  onAdd,
+}: {
+  selectedPrompt: string;
+  onSelectPrompt: (value: string) => void;
+  selectedRoute: RouteId;
+  onSelectRoute: (value: RouteId) => void;
+  added: boolean;
+  onAdd: () => void;
+}) {
+  const prompts = [
+    "Tengo medio día",
+    "Viajo en pareja",
+    "Quiero cenotes y gastronomía",
+    "Busco cultura viva",
+  ];
+  const suggested = ROUTES.find((route) => route.id === selectedRoute) ?? ROUTES[0];
   return (
-    <span className="inline-flex items-center gap-1 rounded-pill border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-primary">
-      <Landmark className="size-3" aria-hidden />
-      Pueblo Mágico
-    </span>
+    <section
+      aria-labelledby="alux-title"
+      className="overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-soft"
+    >
+      <div className="grid lg:grid-cols-[minmax(0,42%)_minmax(0,58%)]">
+        <div className="bg-selva p-6 text-selva-foreground sm:p-8">
+          <div className="flex items-center gap-2">
+            <Sparkles className="size-5 text-primary" aria-hidden />
+            <p className="text-xs font-semibold uppercase">Planea con Alux</p>
+          </div>
+          <h2 id="alux-title" className="mt-3 font-display text-3xl">
+            ¿Qué quieres descubrir?
+          </h2>
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-selva-foreground/80">
+            Elige una pista. Alux propone un orden comprensible y lo conecta con el Travel Plan
+            canónico; esta preview sólo simula la interacción local.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {prompts.map((prompt) => (
+              <Button
+                key={prompt}
+                type="button"
+                size="sm"
+                variant={selectedPrompt === prompt ? "default" : "secondary"}
+                onClick={() => onSelectPrompt(prompt)}
+                className="min-h-11 rounded-pill whitespace-normal text-left"
+              >
+                {prompt}
+              </Button>
+            ))}
+          </div>
+        </div>
+        <div className="p-6 sm:p-8" aria-live="polite">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <DemoTag />
+            <span className="text-xs text-muted-foreground">Respuesta contextual simulada</span>
+          </div>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Para “{selectedPrompt}”, empezaría por:
+          </p>
+          <h3 className="mt-1 font-display text-2xl">{suggested.title}</h3>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            <Stat icon={<Clock3 />} label={suggested.duration} />
+            <Stat icon={<MapPin />} label={`${suggested.stops} paradas`} />
+            <Stat icon={<RouteIcon />} label="Orden sugerido" />
+          </div>
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+            Propongo iniciar en el centro, continuar por la parada que requiere más luz de día y
+            cerrar cerca de opciones de comida. La distancia y tiempos reales se confirmarían con
+            datos acreditados.
+          </p>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Button
+              type="button"
+              onClick={() => onSelectRoute(suggested.id)}
+              className="min-h-11 rounded-pill"
+            >
+              <MessageCircle className="mr-2 size-4" aria-hidden />
+              Personalizar con Alux
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onAdd}
+              className="min-h-11 rounded-pill"
+            >
+              {added ? (
+                <Check className="mr-2 size-4" aria-hidden />
+              ) : (
+                <Compass className="mr-2 size-4" aria-hidden />
+              )}
+              {added ? "Ruta agregada" : "Agregar ruta a mi viaje"}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
-function layoutClasses(layout: CardLayout) {
-  if (layout === "carrusel") {
-    return "flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2";
-  }
-  if (layout === "cuadricula") {
-    return "grid gap-5 sm:grid-cols-2 lg:grid-cols-3";
-  }
-  return "grid gap-5 sm:grid-cols-2 lg:grid-cols-3";
-}
-
-function itemClasses(layout: CardLayout, index: number) {
-  if (layout === "carrusel") return "w-[78%] shrink-0 snap-start sm:w-[46%] lg:w-[32%]";
-  if (layout === "asimetrica" && index === 0) return "sm:col-span-2 lg:row-span-2";
-  return "";
-}
-
-function MediaCard({
-  media,
-  title,
-  meta,
-  tagline,
-  tone,
-  tall,
-  badges,
-}: {
-  media: Media;
-  title: string;
-  meta: string;
-  tagline: string;
-  tone: VisualDirection;
-  tall?: boolean;
-  badges?: React.ReactNode;
-}) {
-  if (tone === "cinematografica") {
-    return (
-      <article className="group relative overflow-hidden rounded-3xl border border-border">
-        <img
-          src={media.url}
-          alt={media.alt}
-          loading="lazy"
-          className={cn("w-full object-cover", tall ? "h-[26rem]" : "h-64")}
-        />
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/30 to-transparent"
-          aria-hidden
-        />
-        <div className="absolute inset-x-0 bottom-0 p-5 text-primary-foreground">
-          {badges ? <div className="mb-2 flex flex-wrap gap-2">{badges}</div> : null}
-          <h3 className="font-serif text-xl">{title}</h3>
-          <p className="mt-1 text-xs uppercase tracking-[0.14em] text-primary-foreground/75">
-            {meta}
-          </p>
-          <p className="mt-2 text-sm leading-relaxed text-primary-foreground/90">{tagline}</p>
-        </div>
-      </article>
-    );
-  }
+function Stat({ icon, label }: { icon: ReactNode; label: string }) {
   return (
-    <article className="group overflow-hidden rounded-3xl border border-border bg-card">
-      <img
-        src={media.url}
-        alt={media.alt}
-        loading="lazy"
-        className={cn("w-full object-cover", tall ? "h-72" : "h-52")}
+    <div className="min-w-0 rounded-xl bg-muted p-3 text-center text-xs font-medium text-foreground [&_svg]:mx-auto [&_svg]:mb-1 [&_svg]:size-4 [&_svg]:text-primary">
+      <span aria-hidden>{icon}</span>
+      <span className="block break-words">{label}</span>
+    </div>
+  );
+}
+
+function RoutesSection({
+  selectedRoute,
+  onSelectRoute,
+  onAdd,
+}: {
+  selectedRoute: RouteId;
+  onSelectRoute: (value: RouteId) => void;
+  onAdd: () => void;
+}) {
+  return (
+    <section id="rutas" aria-labelledby="routes-title">
+      <SectionHead
+        kicker="Elige un ritmo"
+        title="Explora por rutas"
+        description="Tres relatos compactos que convierten inspiración en una secuencia de paradas. Duraciones y contenidos son demostrativos; no afirman distancia, precio ni disponibilidad."
+        action="3 propuestas"
       />
-      <div className="p-5">
-        {badges ? <div className="mb-2 flex flex-wrap gap-2">{badges}</div> : null}
-        <h3 className="font-serif text-xl">{title}</h3>
-        <p className="mt-1 text-xs uppercase tracking-[0.14em] text-muted-foreground">{meta}</p>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{tagline}</p>
+      <div className="grid gap-4 lg:grid-cols-3">
+        {ROUTES.map((route) => {
+          const active = route.id === selectedRoute;
+          return (
+            <article
+              key={route.id}
+              className={cn(
+                "overflow-hidden rounded-2xl border bg-card",
+                active ? "border-primary shadow-elevated" : "border-border",
+              )}
+            >
+              <div className="grid grid-cols-[7rem_1fr] border-b border-border">
+                <img
+                  src={route.media.url}
+                  alt={route.media.alt}
+                  loading="lazy"
+                  className="h-full min-h-32 w-full object-cover"
+                />
+                <div className="p-4">
+                  <div className="flex flex-wrap gap-2">
+                    <DemoTag />
+                    {active ? (
+                      <span className="rounded-pill bg-primary/15 px-2 py-1 text-[10px] font-semibold text-foreground">
+                        Seleccionada
+                      </span>
+                    ) : null}
+                  </div>
+                  <h3 className="mt-3 font-display text-xl">{route.title}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {route.duration} · {route.stops} paradas · {route.vibe}
+                  </p>
+                </div>
+              </div>
+              <div className="p-4">
+                <p className="text-sm leading-relaxed text-muted-foreground">{route.description}</p>
+                <ol className="mt-4 space-y-2" aria-label={`Paradas de ${route.title}`}>
+                  {route.sequence.map((stop, index) => (
+                    <li key={stop} className="flex items-center gap-3 text-sm">
+                      <span className="grid size-7 shrink-0 place-items-center rounded-full bg-secondary font-semibold">
+                        {index + 1}
+                      </span>
+                      <span className="min-w-0 flex-1">{stop}</span>
+                      {index < route.sequence.length - 1 ? (
+                        <span className="h-px w-5 bg-primary" aria-hidden />
+                      ) : null}
+                    </li>
+                  ))}
+                </ol>
+                <div className="mt-5 grid grid-cols-2 gap-2">
+                  <Button
+                    type="button"
+                    variant={active ? "default" : "outline"}
+                    onClick={() => onSelectRoute(route.id)}
+                    className="min-h-11 rounded-pill"
+                  >
+                    Ver ruta
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      onSelectRoute(route.id);
+                      onAdd();
+                    }}
+                    className="min-h-11 rounded-pill whitespace-normal"
+                  >
+                    Personalizar con Alux
+                  </Button>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function DestinationsSection({ layout }: { layout: CardLayout }) {
+  return (
+    <section id="destinos" aria-labelledby="destinations-title">
+      <SectionHead
+        kicker="Territorio"
+        title="Tres Pueblos Mágicos, muchos caminos"
+        description="Un mosaico editorial para comprender dónde empieza cada relato y cómo se conecta con Valladolid."
+        action="Explorar territorio"
+      />
+      <div
+        className={cn(
+          "grid gap-3",
+          layout === "cuadricula"
+            ? "sm:grid-cols-2"
+            : layout === "carrusel"
+              ? "grid-flow-col auto-cols-[85%] overflow-x-auto pb-2 sm:auto-cols-[45%] lg:auto-cols-[30%]"
+              : "sm:grid-cols-2 lg:grid-cols-4",
+        )}
+      >
+        {DESTINATIONS.map((destination, index) => (
+          <article
+            key={destination.name}
+            className={cn(
+              "group relative min-h-64 overflow-hidden rounded-2xl border border-border",
+              layout === "asimetrica" && index === 0 && "sm:col-span-2 lg:col-span-2",
+            )}
+          >
+            <img
+              src={destination.media.url}
+              alt={destination.media.alt}
+              loading="lazy"
+              className="absolute inset-0 size-full object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.02]"
+            />
+            <div
+              className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/25 to-transparent"
+              aria-hidden
+            />
+            <div className="absolute inset-x-0 bottom-0 p-4 text-primary-foreground">
+              <div className="flex flex-wrap gap-2">
+                {destination.puebloMagico ? (
+                  <span className="rounded-pill bg-card px-2.5 py-1 text-[10px] font-semibold uppercase text-card-foreground">
+                    Pueblo Mágico
+                  </span>
+                ) : null}
+                {destination.demo ? (
+                  <span className="rounded-pill bg-foreground/80 px-2.5 py-1 text-[10px] font-semibold uppercase">
+                    Demo visual
+                  </span>
+                ) : null}
+              </div>
+              <h3 className="mt-3 font-display text-2xl">{destination.name}</h3>
+              <p className="mt-1 text-sm text-primary-foreground/85">{destination.note}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+      <p className="mt-3 rounded-xl border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
+        El badge es exclusivamente textual. El distintivo gráfico oficial espera un asset acreditado
+        y no se fabrica ni se recrea en esta preview. Entidades distintas de Valladolid se presentan
+        sólo como DEMO VISUAL.
+      </p>
+    </section>
+  );
+}
+
+function ExperiencesSection({ layout }: { layout: CardLayout }) {
+  const featured = EXPERIENCES[0];
+  return (
+    <section id="experiencias" aria-labelledby="experiences-title">
+      <SectionHead
+        kicker="Experiencias"
+        title="Vive lo que da forma al territorio"
+        description="Una selección densa: un relato protagonista y tres maneras de continuar."
+        action="Ver experiencias"
+      />
+      <div
+        className={cn(
+          "grid gap-4",
+          layout === "carrusel"
+            ? "grid-flow-col auto-cols-[86%] overflow-x-auto pb-2 sm:auto-cols-[48%]"
+            : "lg:grid-cols-[1.2fr_1fr]",
+        )}
+      >
+        <article className="overflow-hidden rounded-2xl border border-border bg-card">
+          <img
+            src={featured.media.url}
+            alt={featured.media.alt}
+            loading="lazy"
+            className="aspect-[16/9] w-full object-cover"
+          />
+          <div className="p-5">
+            <div className="flex flex-wrap gap-2">
+              <DemoTag />
+              <span className="text-xs text-muted-foreground">{featured.category}</span>
+            </div>
+            <h3 className="mt-3 font-display text-3xl">{featured.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{featured.summary}</p>
+            <Button type="button" variant="outline" className="mt-4 min-h-11 rounded-pill">
+              Explorar experiencia
+            </Button>
+          </div>
+        </article>
+        <div className="grid gap-3">
+          {EXPERIENCES.slice(1).map((item) => (
+            <CompactMediaRow key={item.title} item={item} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CompactMediaRow({
+  item,
+}: {
+  item: { title: string; category: string; summary: string; media: Media };
+}) {
+  return (
+    <article className="grid min-h-36 grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[10rem_1fr]">
+      <img
+        src={item.media.url}
+        alt={item.media.alt}
+        loading="lazy"
+        className="h-full w-full object-cover"
+      />
+      <div className="flex min-w-0 flex-col justify-center p-4">
+        <p className="text-[10px] font-semibold uppercase text-primary">{item.category}</p>
+        <h3 className="mt-1 font-display text-xl">{item.title}</h3>
+        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+          {item.summary}
+        </p>
+        <span className="mt-2 inline-flex items-center text-xs font-semibold">
+          Ver detalle <ChevronRight className="size-3" aria-hidden />
+        </span>
       </div>
     </article>
   );
 }
 
-/* ------------------------------------------------------------------ *
- * Entrada territorial
- * ------------------------------------------------------------------ */
-
-function DestinosSection({
-  layout,
-  direction,
-}: {
-  layout: CardLayout;
-  direction: VisualDirection;
-}) {
+function ServicesSection() {
   return (
-    <section aria-labelledby="destinos-title">
+    <section aria-labelledby="services-title">
       <SectionHead
-        eyebrow="Territorio"
-        title="Descubre el Oriente Maya de Yucatán"
-        description="Un corredor de pueblos, cenotes y ciudades coloniales con Valladolid como capital turística. Cada destino abre su propio micrositio."
-        action={{ to: "/oriente-maya", label: "Ver todos los destinos" }}
+        kicker="Servicios para continuar"
+        title="Descansa bien, come con contexto"
+        description="Tarjetas compactas con lo necesario para decidir qué explorar después; sin precios ni disponibilidad simulados."
       />
-      <div className={layoutClasses(layout)}>
-        {DESTINOS.map((d, i) => (
-          <div key={d.slug} className={itemClasses(layout, i)}>
-            <MediaCard
-              media={d.media}
-              title={d.name}
-              meta={d.role}
-              tagline={d.tagline}
-              tone={i === 0 && layout === "asimetrica" ? "cinematografica" : direction}
-              tall={i === 0 && layout === "asimetrica"}
-              badges={
-                <>
-                  {d.puebloMagico ? <PuebloMagicoBadge /> : null}
-                  {d.demo ? <DemoTag /> : null}
-                </>
-              }
-            />
-          </div>
-        ))}
-      </div>
-      <p className="mt-4 rounded-2xl border border-dashed border-border px-4 py-3 text-xs text-muted-foreground">
-        Valladolid, Izamal y Espita son Pueblos Mágicos. Aquí se muestra únicamente un distintivo
-        textual sobrio: el logotipo oficial del programa requiere un asset acreditado con derechos
-        verificados y no se recrea ni se aproxima gráficamente. Los demás destinos aparecen como
-        demo visual y no afirman acreditación alguna.
-      </p>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Bloque editorial de Valladolid
- * ------------------------------------------------------------------ */
-
-function ValladolidEditorial() {
-  return (
-    <section
-      aria-labelledby="valladolid-title"
-      className="grid gap-8 rounded-3xl border border-border bg-card p-6 md:p-10 lg:grid-cols-[1fr_1.1fr] lg:items-center"
-    >
-      <figure className="overflow-hidden rounded-3xl">
-        <img
-          src={MEDIA.calle.url}
-          alt={MEDIA.calle.alt}
-          loading="lazy"
-          className="h-80 w-full object-cover"
-        />
-      </figure>
-      <div>
-        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary">
-          Capital turística
-        </p>
-        <h2 id="valladolid-title" className="mt-2 text-balance font-serif text-3xl">
-          Valladolid, punto de partida del oriente
-        </h2>
-        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-          Fundada sobre la antigua Zací, Valladolid conserva un trazado colonial legible a pie:
-          arcadas, conventos y casas de muros gruesos que enfrían el mediodía. Desde aquí se
-          alcanzan los cenotes del corredor, los pueblos del oriente y las cocinas donde el recado
-          se sigue moliendo en casa.
-        </p>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          El micrositio de la ciudad reúne su relato, sus empresas verificadas y su mapa
-          territorial, y conecta con el resto del Oriente Maya sin perder el contexto.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Button asChild className="rounded-pill">
-            <Link to="/oriente-maya/$destino" params={{ destino: "valladolid" }}>
-              Abrir micrositio de Valladolid
-              <ArrowRight className="ml-2 size-4" aria-hidden />
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="rounded-pill">
-            <Link to="/oriente-maya">Continuar por el territorio</Link>
-          </Button>
-        </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ServiceColumn icon={<Hotel />} title="Hospedaje" items={STAYS} />
+        <ServiceColumn icon={<UtensilsCrossed />} title="Gastronomía" items={FOOD} />
       </div>
     </section>
   );
 }
 
-/* ------------------------------------------------------------------ *
- * Secciones premium
- * ------------------------------------------------------------------ */
-
-const SECTION_META: Record<
-  SectionKey,
-  { eyebrow: string; title: string; description: string; icon: typeof Compass }
-> = {
-  experiencias: {
-    eyebrow: "Experiencias",
-    title: "Vive el territorio con quien lo conoce",
-    description:
-      "Cenotes, caminatas documentales y recorridos de oficio. Una sola categoría: Experiencias.",
-    icon: Compass,
-  },
-  hospedaje: {
-    eyebrow: "Hospedaje",
-    title: "Dormir dentro de la ciudad colonial",
-    description: "Casonas, patios y habitaciones de muros gruesos en el centro histórico.",
-    icon: MapPin,
-  },
-  gastronomia: {
-    eyebrow: "Gastronomía",
-    title: "Cocina yucateca de fuego lento",
-    description: "Recetarios de casa, mercados y terrazas de arcos.",
-    icon: UtensilsCrossed,
-  },
-  eventos: {
-    eyebrow: "Eventos",
-    title: "Agenda cultural del oriente",
-    description: "Programas culturales del destino. Sin boletos ni disponibilidad simulada.",
-    icon: CalendarDays,
-  },
-  queHacer: {
-    eyebrow: "Qué hacer",
-    title: "Inspiración editorial para leer el destino",
-    description:
-      "Ensayos y guías del equipo editorial. No duplica Experiencias: aquí se contextualiza, allá se reserva.",
-    icon: Sparkles,
-  },
-};
-
-function PremiumSection({ sectionKey, layout }: { sectionKey: SectionKey; layout: CardLayout }) {
-  const meta = SECTION_META[sectionKey];
-
-  if (sectionKey === "queHacer") {
-    return (
-      <section aria-label={meta.eyebrow}>
-        <SectionHead
-          eyebrow={meta.eyebrow}
-          title={meta.title}
-          description={meta.description}
-          action={{ to: "/que-hacer", label: "Ver inspiración" }}
-        />
-        <div className="grid gap-5 lg:grid-cols-3">
-          {QUE_HACER.map((item) => (
-            <article
-              key={item.id}
-              className="overflow-hidden rounded-3xl border border-border bg-card"
-            >
-              <img
-                src={item.media.url}
-                alt={item.media.alt}
-                loading="lazy"
-                className="h-44 w-full object-cover"
-              />
-              <div className="p-5">
-                <p className="text-[10px] uppercase tracking-[0.18em] text-primary">
-                  {item.kicker}
-                </p>
-                <h3 className="mt-2 font-serif text-xl">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
-                <p className="mt-3 text-[11px] text-muted-foreground">Contenido demo visual.</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-    );
-  }
-
-  const items =
-    sectionKey === "experiencias"
-      ? EXPERIENCIAS
-      : sectionKey === "hospedaje"
-        ? HOSPEDAJE
-        : sectionKey === "gastronomia"
-          ? GASTRONOMIA
-          : EVENTOS;
-
-  const action =
-    sectionKey === "experiencias"
-      ? { to: "/experiencias", label: "Ver experiencias" }
-      : sectionKey === "hospedaje"
-        ? { to: "/hoteles", label: "Ver hospedaje" }
-        : sectionKey === "gastronomia"
-          ? { to: "/restaurantes", label: "Ver gastronomía" }
-          : { to: "/eventos", label: "Ver agenda" };
-
-  return (
-    <section aria-label={meta.eyebrow}>
-      <SectionHead
-        eyebrow={meta.eyebrow}
-        title={meta.title}
-        description={meta.description}
-        action={action}
-      />
-      <div className={layoutClasses(layout)}>
-        {items.map((item, i) => (
-          <div key={item.id} className={itemClasses(layout, i)}>
-            <MediaCard
-              media={item.media}
-              title={item.title}
-              meta={item.meta}
-              tagline={item.tagline}
-              tone={item.tone === "cinematografico" ? "cinematografica" : "editorial"}
-              tall={layout === "asimetrica" && i === 0}
-              badges={<DemoTag />}
-            />
-          </div>
-        ))}
-      </div>
-      <p className="mt-3 text-xs text-muted-foreground">
-        Sin precios, calificaciones ni disponibilidad: esta preview no consulta datos publicados.
-      </p>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Alux + Travel Plan
- * ------------------------------------------------------------------ */
-
-function AluxBand() {
-  return (
-    <section className="overflow-hidden rounded-3xl border border-border bg-muted/40">
-      <div className="grid gap-8 p-6 md:p-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
-        <div>
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary">
-            Planea con Alux
-          </p>
-          <h2 className="mt-2 text-balance font-serif text-3xl">
-            Tu copiloto de viaje del Oriente Maya
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            Alux acompaña primero y pregunta después: sugiere qué ver según dónde estás y cuánto
-            tiempo tienes, y guarda todo en tu Travel Plan, la única entidad de viaje de la
-            plataforma. No se crea ningún itinerario paralelo.
-          </p>
-          <ul className="mt-5 space-y-2 text-sm text-foreground/85">
-            <li className="flex items-start gap-2">
-              <Sparkles className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
-              Recomendaciones con contexto territorial y explicación del porqué.
-            </li>
-            <li className="flex items-start gap-2">
-              <MapIcon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
-              Todo lo que guardas se ordena en tu Travel Plan por día y por destino.
-            </li>
-          </ul>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Button asChild className="rounded-pill">
-              <Link to="/arma-tu-viaje">Arma tu viaje</Link>
-            </Button>
-            <Button asChild variant="outline" className="rounded-pill">
-              <Link to="/alux">Hablar con Alux</Link>
-            </Button>
-          </div>
-        </div>
-        <figure className="overflow-hidden rounded-3xl">
-          <img
-            src={MEDIA.cenote.url}
-            alt={MEDIA.cenote.alt}
-            loading="lazy"
-            className="h-72 w-full object-cover"
-          />
-        </figure>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Estados vacíos honestos
- * ------------------------------------------------------------------ */
-
-const EMPTY_STATES = [
-  {
-    title: "Precios",
-    body: "No se muestran tarifas: ninguna ficha de esta preview tiene precio publicado y verificado.",
-  },
-  {
-    title: "Reseñas",
-    body: "Sin reseñas: la plataforma sólo publica opiniones con origen verificable.",
-  },
-  {
-    title: "Disponibilidad",
-    body: "Sin calendario ni cupo: la disponibilidad requiere conexión con el proveedor.",
-  },
-  {
-    title: "Premios y distintivos",
-    body: "Sólo se declara el distintivo textual de Pueblo Mágico donde corresponde. Cualquier otro reconocimiento requiere acreditación documental.",
-  },
-] as const;
-
-function EstadosVacios() {
-  return (
-    <section aria-label="Estados vacíos">
-      <SectionHead
-        eyebrow="Transparencia"
-        title="Lo que aún no podemos afirmar"
-        description="La Home premium no inventa señales de confianza. Cada bloque sin acreditación se muestra vacío y explicado."
-      />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {EMPTY_STATES.map((e) => (
-          <div
-            key={e.title}
-            className="rounded-2xl border border-dashed border-border bg-muted/30 p-4"
-          >
-            <p className="text-sm font-medium">{e.title}</p>
-            <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{e.body}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Footer
- * ------------------------------------------------------------------ */
-
-function PreviewFooter() {
-  return (
-    <footer className="rounded-3xl border border-border bg-card p-6 md:p-10">
-      <div className="grid gap-8 md:grid-cols-4">
-        <div>
-          <p className="font-serif text-lg">Valladolid.mx</p>
-          <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-            Sistema operativo turístico del Oriente Maya de Yucatán. Vista previa interna: ningún
-            enlace de esta página publica ni modifica contenido.
-          </p>
-        </div>
-        <FooterColumn
-          title="Territorio"
-          links={[
-            ["/oriente-maya", "Oriente Maya"],
-            ["/mapa", "Mapa territorial"],
-          ]}
-        />
-        <FooterColumn
-          title="Descubrir"
-          links={[
-            ["/experiencias", "Experiencias"],
-            ["/hoteles", "Hospedaje"],
-            ["/restaurantes", "Gastronomía"],
-            ["/eventos", "Eventos"],
-          ]}
-        />
-        <FooterColumn
-          title="Planear"
-          links={[
-            ["/arma-tu-viaje", "Arma tu viaje"],
-            ["/alux", "Alux"],
-            ["/empresas", "Empresas del destino"],
-          ]}
-        />
-      </div>
-    </footer>
-  );
-}
-
-function FooterColumn({
+function ServiceColumn({
+  icon,
   title,
-  links,
+  items,
 }: {
+  icon: ReactNode;
   title: string;
-  links: readonly (readonly [string, string])[];
+  items: readonly {
+    title: string;
+    destination: string;
+    category: string;
+    summary: string;
+    media: Media;
+  }[];
 }) {
   return (
     <div>
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</p>
-      <ul className="mt-2 space-y-1.5 text-sm">
-        {links.map(([to, label]) => (
-          <li key={to}>
-            <Link to={to} className="text-foreground/80 hover:text-foreground">
-              {label}
-            </Link>
-          </li>
+      <div className="mb-3 flex items-center gap-2 text-sm font-semibold [&_svg]:size-4 [&_svg]:text-primary">
+        <span aria-hidden>{icon}</span>
+        <h3>{title}</h3>
+      </div>
+      <div className="grid gap-3">
+        {items.map((item) => (
+          <article
+            key={item.title}
+            className="grid grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[11rem_1fr]"
+          >
+            <img
+              src={item.media.url}
+              alt={item.media.alt}
+              loading="lazy"
+              className="h-full min-h-40 w-full object-cover"
+            />
+            <div className="min-w-0 p-4">
+              <p className="text-[10px] font-semibold uppercase text-primary">
+                {item.destination} · {item.category}
+              </p>
+              <h4 className="mt-1 font-display text-xl">{item.title}</h4>
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{item.summary}</p>
+              <Button type="button" variant="link" className="mt-2 h-auto min-h-11 p-0">
+                Ver ficha <ArrowRight className="ml-1 size-3" aria-hidden />
+              </Button>
+            </div>
+          </article>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
 
-/* ------------------------------------------------------------------ *
- * Panel local "Afinar página principal" (sin persistencia).
- * ------------------------------------------------------------------ */
+function EventsSection() {
+  return (
+    <section
+      aria-labelledby="events-title"
+      className="rounded-3xl border border-border bg-card p-5 sm:p-8"
+    >
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,34%)_1fr]">
+        <div>
+          <p className="text-xs font-semibold uppercase text-primary">Agenda editorial</p>
+          <h2 id="events-title" className="mt-2 font-display text-3xl">
+            El territorio también ocurre hoy
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Agenda compacta, sin imágenes ornamentales aisladas ni datos de disponibilidad no
+            acreditados.
+          </p>
+          <img
+            src={MEDIA.plaza.url}
+            alt={MEDIA.plaza.alt}
+            loading="lazy"
+            className="mt-5 aspect-[16/10] w-full rounded-2xl object-cover"
+          />
+        </div>
+        <ol className="divide-y divide-border border-y border-border">
+          {EVENTS.map((event, index) => (
+            <li
+              key={event.title}
+              className="grid gap-3 py-5 sm:grid-cols-[3rem_1fr_auto] sm:items-center"
+            >
+              <span className="grid size-10 place-items-center rounded-full bg-secondary font-display text-lg">
+                {index + 1}
+              </span>
+              <div>
+                <p className="text-[10px] font-semibold uppercase text-primary">
+                  {event.day} · {event.type}
+                </p>
+                <h3 className="mt-1 font-display text-xl">{event.title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{event.detail}</p>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="min-h-11 justify-self-start rounded-pill sm:justify-self-end"
+              >
+                Ver agenda
+              </Button>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+function EditorialSection() {
+  return (
+    <section aria-labelledby="editorial-title">
+      <SectionHead
+        kicker="Qué hacer · inspiración"
+        title="Historias para mirar mejor"
+        description="Contenido transversal que prepara el viaje y contextualiza el territorio; no duplica experiencias ni tours."
+        action="Abrir cuaderno editorial"
+      />
+      <div className="grid gap-4 md:grid-cols-3">
+        {EDITORIAL.map((item) => (
+          <article
+            key={item.title}
+            className="grid grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card md:block"
+          >
+            <img
+              src={item.media.url}
+              alt={item.media.alt}
+              loading="lazy"
+              className="h-full min-h-40 w-full object-cover md:aspect-[4/3] md:h-auto"
+            />
+            <div className="p-4">
+              <p className="text-[10px] font-semibold uppercase text-primary">{item.kicker}</p>
+              <h3 className="mt-1 font-display text-xl">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function MapSection({ selectedRoute }: { selectedRoute: RouteId }) {
+  const route = ROUTES.find((item) => item.id === selectedRoute) ?? ROUTES[0];
+  return (
+    <section
+      id="mapa"
+      aria-labelledby="map-title"
+      className="rounded-3xl border border-border bg-card p-4 sm:p-7"
+    >
+      <div className="mb-5 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div>
+          <p className="text-xs font-semibold uppercase text-primary">Del relato al territorio</p>
+          <h2 id="map-title" className="mt-2 font-display text-3xl sm:text-4xl">
+            Mira la ruta y sus paradas
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            El mapa oficial se acompaña de la lista de puntos del bloque y del contexto de la ruta
+            elegida. En móvil, el orden sigue siendo mapa → paradas.
+          </p>
+        </div>
+        <div className="rounded-xl bg-muted p-4">
+          <p className="text-[10px] font-semibold uppercase text-primary">Ruta activa · demo</p>
+          <p className="mt-1 font-display text-lg">{route.title}</p>
+          <p className="text-xs text-muted-foreground">
+            {route.duration} · {route.stops} paradas
+          </p>
+        </div>
+      </div>
+      <ExperienceMapBlock dto={MAP_DTO} />
+    </section>
+  );
+}
+
+function TravelPlanClose({
+  selectedRoute,
+  added,
+  onAdd,
+}: {
+  selectedRoute: RouteId;
+  added: boolean;
+  onAdd: () => void;
+}) {
+  const route = ROUTES.find((item) => item.id === selectedRoute) ?? ROUTES[0];
+  return (
+    <section className="overflow-hidden rounded-3xl bg-selva text-selva-foreground">
+      <div className="grid gap-6 p-6 sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div>
+          <div className="flex items-center gap-2 text-primary">
+            <Sparkles className="size-5" aria-hidden />
+            <p className="text-xs font-semibold uppercase">Tu Travel Plan canónico</p>
+          </div>
+          <h2 className="mt-3 font-display text-3xl sm:text-4xl">Tu ruta empieza a tomar forma</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-selva-foreground/80">
+            {route.title} · {route.duration} · {route.stops} paradas. Alux puede ajustar el orden
+            según tus intereses sin crear otro modelo de itinerario.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+          <Button type="button" size="lg" onClick={onAdd} className="min-h-12 rounded-pill">
+            {added ? (
+              <Check className="mr-2 size-4" aria-hidden />
+            ) : (
+              <Compass className="mr-2 size-4" aria-hidden />
+            )}
+            {added ? "Guardada en mi viaje" : "Agregar a mi viaje"}
+          </Button>
+          <Button asChild size="lg" variant="secondary" className="min-h-12 rounded-pill">
+            <Link to="/alux">Personalizar con Alux</Link>
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PreviewFooter() {
+  return (
+    <footer className="border-t border-border py-7">
+      <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-center">
+        <div>
+          <p className="font-display text-xl">Valladolid.mx</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Continuidad territorial: Valladolid · Espita · Izamal · Oriente Maya de Yucatán.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+          <Link to="/oriente-maya">Territorio</Link>
+          <Link to="/experiencias">Experiencias</Link>
+          <Link to="/arma-tu-viaje">Travel Plan</Link>
+          <Link to="/alux">Alux</Link>
+        </div>
+      </div>
+    </footer>
+  );
+}
 
 function TuningPanel({
   value,
   onChange,
 }: {
   value: TuningState;
-  onChange: (v: TuningState) => void;
+  onChange: (next: TuningState) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const set = <K extends keyof TuningState>(k: K, v: TuningState[K]) =>
-    onChange({ ...value, [k]: v });
-
+  const set = <K extends keyof TuningState>(key: K, next: TuningState[K]) =>
+    onChange({ ...value, [key]: next });
   const move = (key: SectionKey, delta: number) => {
     const order = [...value.order];
-    const i = order.indexOf(key);
-    const j = i + delta;
-    if (i < 0 || j < 0 || j >= order.length) return;
-    [order[i], order[j]] = [order[j], order[i]];
+    const index = order.indexOf(key);
+    const target = index + delta;
+    if (index < 0 || target < 0 || target >= order.length) return;
+    [order[index], order[target]] = [order[target], order[index]];
     set("order", order);
   };
-
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-[min(22rem,calc(100vw-2rem))]">
+    <aside
+      className="fixed bottom-4 right-4 z-50 w-[min(23rem,calc(100vw-2rem))]"
+      aria-label="Configuración interna de la preview"
+    >
       {open ? (
-        <div className="max-h-[80vh] overflow-y-auto rounded-3xl border border-border bg-card/95 p-4 shadow-floating backdrop-blur">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium">Afinar página principal · vista interna</p>
-            <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
+        <div className="max-h-[82vh] overflow-y-auto rounded-3xl border border-border bg-card/95 p-4 shadow-floating backdrop-blur">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold">Afinar página principal · vista interna</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Rol local: Administración · useState local · sin persistencia.
+              </p>
+            </div>
+            <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
               Cerrar
             </Button>
           </div>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            Simulación local: no persiste, no escribe en el CMS ni en la base de datos y no altera
-            la Home pública.
+          <p className="mt-3 rounded-xl border border-primary/30 bg-primary/10 p-3 text-xs leading-relaxed text-foreground">
+            <strong>Editorial</strong> prioriza siempre texto sobre superficies sólidas de alto
+            contraste; las fotografías acompañan, nunca sostienen párrafos.
           </p>
-
           <div className="mt-4 space-y-4">
+            <OptionGroup
+              title="Dirección visual"
+              options={[
+                ["editorial", "Editorial"],
+                ["cinematografica", "Cinematográfica"],
+              ]}
+              active={value.direction}
+              onSelect={(next) => set("direction", next as VisualDirection)}
+            />
+            <OptionGroup
+              title="Hero"
+              options={[
+                ["editorial", "Split editorial"],
+                ["cinematografica", "Inmersivo + banda"],
+              ]}
+              active={value.heroVariant}
+              onSelect={(next) => set("heroVariant", next as VisualDirection)}
+            />
+            <OptionGroup
+              title="Layout"
+              options={[
+                ["asimetrica", "Asimétrica"],
+                ["cuadricula", "Cuadrícula"],
+                ["carrusel", "Tira"],
+              ]}
+              active={value.layout}
+              onSelect={(next) => set("layout", next as CardLayout)}
+            />
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Vista simulada
+              <p className="text-xs font-semibold uppercase text-muted-foreground">
+                Secciones y orden
               </p>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                {(
-                  [
-                    ["visitante", "Visitante"],
-                    ["administracion", "Administración"],
-                  ] as const
-                ).map(([key, label]) => (
-                  <OptionButton
-                    key={key}
-                    label={label}
-                    active={value.role === key}
-                    onClick={() => set("role", key)}
-                  />
+              <ul className="mt-2 space-y-2">
+                {value.order.map((key, index) => (
+                  <li key={key} className="rounded-xl border border-border bg-background p-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <Toggle
+                        label={SECTION_LABELS[key]}
+                        checked={value.sections[key]}
+                        onChange={(checked) =>
+                          set("sections", { ...value.sections, [key]: checked })
+                        }
+                      />
+                      <span className="flex">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          aria-label={`Subir ${SECTION_LABELS[key]}`}
+                          disabled={index === 0}
+                          onClick={() => move(key, -1)}
+                        >
+                          ↑
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          aria-label={`Bajar ${SECTION_LABELS[key]}`}
+                          disabled={index === value.order.length - 1}
+                          onClick={() => move(key, 1)}
+                        >
+                          ↓
+                        </Button>
+                      </span>
+                    </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
-
-            {value.role === "visitante" ? (
-              <p className="rounded-2xl border border-dashed border-border px-3 py-2 text-[11px] text-muted-foreground">
-                El visitante sólo ve la variante publicada. Cambia a Administración para simular
-                dirección visual, disposición, secciones y orden.
-              </p>
-            ) : (
-              <>
-                <OptionGroup
-                  title="Dirección visual global"
-                  options={[
-                    ["editorial", "Editorial documental"],
-                    ["cinematografica", "Cinematográfica"],
-                  ]}
-                  active={value.direction}
-                  onSelect={(v) => set("direction", v as VisualDirection)}
-                />
-
-                <OptionGroup
-                  title="Variante del hero"
-                  options={[
-                    ["editorial", "Editorial"],
-                    ["cinematografica", "Cinematográfica"],
-                  ]}
-                  active={value.heroVariant}
-                  onSelect={(v) => set("heroVariant", v as VisualDirection)}
-                />
-
-                <OptionGroup
-                  title="Disposición de destinos y tarjetas"
-                  options={[
-                    ["asimetrica", "Asimétrica editorial"],
-                    ["cuadricula", "Cuadrícula"],
-                    ["carrusel", "Carrusel / tira"],
-                  ]}
-                  active={value.layout}
-                  onSelect={(v) => set("layout", v as CardLayout)}
-                />
-
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    Orden visual simulado
-                  </p>
-                  <ul className="mt-2 space-y-1.5">
-                    {value.order.map((key, i) => (
-                      <li
-                        key={key}
-                        className="flex items-center justify-between rounded-2xl border border-border bg-background px-3 py-2 text-xs"
-                      >
-                        <span>{SECTION_LABEL[key]}</span>
-                        <span className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            aria-label={`Subir ${SECTION_LABEL[key]}`}
-                            disabled={i === 0}
-                            onClick={() => move(key, -1)}
-                          >
-                            ↑
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            aria-label={`Bajar ${SECTION_LABEL[key]}`}
-                            disabled={i === value.order.length - 1}
-                            onClick={() => move(key, 1)}
-                          >
-                            ↓
-                          </Button>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    Secciones de la preview
-                  </p>
-                  <Toggle
-                    label="Entrada territorial"
-                    checked={value.showDestinos}
-                    onChange={(v) => set("showDestinos", v)}
-                  />
-                  <Toggle
-                    label="Bloque editorial Valladolid"
-                    checked={value.showValladolid}
-                    onChange={(v) => set("showValladolid", v)}
-                  />
-                  <Toggle
-                    label="Experiencias"
-                    checked={value.showExperiencias}
-                    onChange={(v) => set("showExperiencias", v)}
-                  />
-                  <Toggle
-                    label="Hospedaje"
-                    checked={value.showHospedaje}
-                    onChange={(v) => set("showHospedaje", v)}
-                  />
-                  <Toggle
-                    label="Gastronomía"
-                    checked={value.showGastronomia}
-                    onChange={(v) => set("showGastronomia", v)}
-                  />
-                  <Toggle
-                    label="Eventos"
-                    checked={value.showEventos}
-                    onChange={(v) => set("showEventos", v)}
-                  />
-                  <Toggle
-                    label="Qué hacer"
-                    checked={value.showQueHacer}
-                    onChange={(v) => set("showQueHacer", v)}
-                  />
-                  <Toggle
-                    label="Planea con Alux"
-                    checked={value.showAlux}
-                    onChange={(v) => set("showAlux", v)}
-                  />
-                  <Toggle
-                    label="Mapa territorial"
-                    checked={value.showMapa}
-                    onChange={(v) => set("showMapa", v)}
-                  />
-                </div>
-              </>
-            )}
           </div>
         </div>
       ) : (
-        <Button className="rounded-pill shadow-floating" onClick={() => setOpen(true)}>
+        <Button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="min-h-12 rounded-pill shadow-floating"
+        >
           <SlidersHorizontal className="mr-2 size-4" aria-hidden />
           Afinar página principal
         </Button>
       )}
-    </div>
-  );
-}
-
-function OptionButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={cn(
-        "rounded-2xl border px-3 py-2 text-xs transition-colors",
-        active
-          ? "border-primary bg-primary text-primary-foreground"
-          : "border-border bg-background hover:bg-accent",
-      )}
-    >
-      {label}
-    </button>
+    </aside>
   );
 }
 
@@ -1409,15 +1364,20 @@ function OptionGroup({
 }) {
   return (
     <div>
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</p>
+      <p className="text-xs font-semibold uppercase text-muted-foreground">{title}</p>
       <div className="mt-2 grid grid-cols-2 gap-2">
         {options.map(([key, label]) => (
-          <OptionButton
+          <Button
             key={key}
-            label={label}
-            active={active === key}
+            type="button"
+            size="sm"
+            variant={active === key ? "default" : "outline"}
+            aria-pressed={active === key}
             onClick={() => onSelect(key)}
-          />
+            className="min-h-11 rounded-xl whitespace-normal"
+          >
+            {label}
+          </Button>
         ))}
       </div>
     </div>
@@ -1431,30 +1391,28 @@ function Toggle({
 }: {
   label: string;
   checked: boolean;
-  onChange: (v: boolean) => void;
+  onChange: (checked: boolean) => void;
 }) {
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="flex w-full items-center justify-between rounded-2xl border border-border bg-background px-3 py-2 text-xs hover:bg-accent"
+      className="min-h-11 flex-1 justify-start rounded-lg px-2"
     >
-      <span>{label}</span>
       <span
         className={cn(
-          "inline-flex h-5 w-9 items-center rounded-pill p-0.5 transition-colors",
-          checked ? "bg-primary" : "bg-muted",
+          "mr-2 grid size-5 place-items-center rounded border",
+          checked
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-border bg-background",
         )}
       >
-        <span
-          className={cn(
-            "size-4 rounded-pill bg-background transition-transform",
-            checked ? "translate-x-4" : "translate-x-0",
-          )}
-        />
+        {checked ? <Check className="size-3" aria-hidden /> : null}
       </span>
-    </button>
+      {label}
+    </Button>
   );
 }
