@@ -783,7 +783,7 @@ function RoutesSection({
     <section id="rutas" aria-labelledby="routes-title">
       <SectionHead
         kicker="Elige un ritmo"
-        title="Explora por rutas"
+        title="Rutas recomendadas por Alux"
         description="Tres relatos compactos que convierten inspiración en una secuencia de paradas. Duraciones y contenidos son demostrativos; no afirman distancia, precio ni disponibilidad."
         action="3 propuestas"
       />
