@@ -2,14 +2,14 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.51",
+    "version": "0.52",
     "state": "Approved",
-    "source_sha256": "91ee33d0ecb554de5a301a6229f22de21e75b5f363e878807c3236958997343c",
+    "source_sha256": "a4f3460c23b2ad8a533a3a2823a229f0a31367352062122db6967ff47b95074d",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-08-26T00:00:00.000Z",
+  "generated_at": "2026-08-27T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -7659,6 +7659,79 @@
       "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json",
       "type": "artifact",
       "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/premium-presentation.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/premium-presentation.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/premium-view-models.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/premium-view-models.ts"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumHero.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumHero.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumGallery.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumGallery.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumCard.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumCard.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumSection.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumSection.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumBadges.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumBadges.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumBreadcrumb.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumBreadcrumb.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumPresentationSelector.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumPresentationSelector.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/index.ts",
+      "type": "artifact",
+      "path": "src/components/premium/index.ts"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-system-runtime-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-system-runtime-preview.tsx"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-031.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-031.json"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json"
     }
   ],
   "edges": [
@@ -19901,6 +19974,132 @@
       "evidence": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
       "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/presentation/premium-presentation.ts:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/premium-presentation.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/presentation/premium-view-models.ts:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/premium-view-models.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumHero.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumHero.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumGallery.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumGallery.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumCard.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumCard.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumSection.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumSection.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumBadges.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumBadges.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumBreadcrumb.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumBreadcrumb.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumPresentationSelector.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumPresentationSelector.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/index.ts:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/index.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/lovable/g4-system-runtime-preview.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-system-runtime-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/route-inventory.ts:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/route-inventory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-031.json:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-031.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27"
     }
   ],
   "critical_chain_coverage": [

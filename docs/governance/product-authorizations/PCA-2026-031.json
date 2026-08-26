@@ -1,0 +1,70 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-031",
+  "title": "G4-SYSTEM-01 · Runtime visual premium compartido (Editorial | Cinematografica)",
+  "status": "Approved",
+  "branch": "edit/edt-448bc934-579b-4119-bff3-af773ff703f5",
+  "blueprint": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-27 · Ejecutar G4-SYSTEM-01: consolidar los previews G4 aprobados en un runtime visual compartido con Editorial y Cinematografica como variantes de presentacion sobre los mismos view-models, selector no publico, breadcrumb Inicio → Oriente Maya de Yucatan → Destino, Pueblos Magicos con distintivo solo desde asset acreditado, medios gobernados estables y pruebas contractuales. Prohibe datos, migraciones, status/is_demo_seed, produccion, secretos, merge, deploy, G5 y activar omxds_visual_v1_contracts_enabled.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/presentation/premium-presentation.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/presentation/premium-view-models.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/premium/PremiumBadges.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/premium/PremiumBreadcrumb.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/premium/PremiumCard.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/premium/PremiumGallery.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/premium/PremiumHero.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/premium/PremiumPresentationSelector.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/premium/PremiumSection.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/premium/index.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g4-system-runtime-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun test scripts/omxds/g4/premium-runtime.contract.test.ts",
+    "bun run scripts/route-inventory-coverage.ts"
+  ]
+}
