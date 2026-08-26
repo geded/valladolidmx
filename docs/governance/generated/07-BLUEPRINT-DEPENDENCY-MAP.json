@@ -4,7 +4,7 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.55",
     "state": "Approved",
-    "source_sha256": "0db4447e5ea93225a6d15a7c56ae38b64a12437d84d179ca248021a77eeb1714",
+    "source_sha256": "c14e0cfa7f476e7108227eb0f495b13de2ddbd6347c39d59bda13d298f7d65f3",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -7798,6 +7798,49 @@
       "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json",
       "type": "artifact",
       "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/omxds/category-icon-registry.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/category-icon-registry.ts"
+    },
+    {
+      "id": "ART:src/components/omxds/TourismCategoryIcon.tsx",
+      "type": "artifact",
+      "path": "src/components/omxds/TourismCategoryIcon.tsx"
+    },
+    {
+      "id": "ART:src/components/omxds/CategoryNavGrid.tsx",
+      "type": "artifact",
+      "path": "src/components/omxds/CategoryNavGrid.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g6-category-icon-catalog.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g6-category-icon-catalog.tsx"
+    },
+    {
+      "id": "ART:scripts/omxds/g6/category-icon-system.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/g6/category-icon-system.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/g6/category-icon-system.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/g6/category-icon-system.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-037.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-037.json"
     }
   ],
   "edges": [
@@ -20408,6 +20451,69 @@
       "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
       "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/category-icon-registry.ts:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "origin": "ART:src/lib/omxds/category-icon-registry.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "evidence": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/omxds/TourismCategoryIcon.tsx:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "origin": "ART:src/components/omxds/TourismCategoryIcon.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "evidence": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/omxds/CategoryNavGrid.tsx:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "origin": "ART:src/components/omxds/CategoryNavGrid.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "evidence": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/lovable/g6-category-icon-catalog.tsx:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "origin": "ART:src/routes/lovable/g6-category-icon-catalog.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "evidence": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/g6/category-icon-system.contract.test.ts:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "origin": "ART:scripts/omxds/g6/category-icon-system.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "evidence": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/g6/category-icon-system.evidence.mjs:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "origin": "ART:scripts/omxds/g6/category-icon-system.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "evidence": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-037.json:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-037.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "evidence": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
       "verified_at": "2026-08-26"
     }
   ],
