@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
+import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { cn } from "@/lib/utils";
@@ -618,31 +619,18 @@ function HeroCinematografico() {
 }
 
 function ServiciosStrip({ active, onSelect }: { active: string; onSelect: (key: string) => void }) {
+  // G6-S1 · autoridad única: CategoryNavGrid + TourismCategoryIcon (fail-closed).
   return (
     <section aria-label="Servicios del micrositio">
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {SERVICIOS.map((s) => {
-          const Icon = s.icon;
-          const on = s.key === active;
-          return (
-            <button
-              key={s.key}
-              type="button"
-              onClick={() => onSelect(s.key)}
-              aria-pressed={on}
-              className={cn(
-                "inline-flex shrink-0 items-center gap-2 rounded-pill border px-4 py-2.5 text-sm transition-colors",
-                on
-                  ? "border-primary bg-primary text-primary-foreground shadow-soft"
-                  : "border-border bg-card text-foreground hover:bg-accent",
-              )}
-            >
-              <Icon className="size-4" aria-hidden />
-              {s.label}
-            </button>
-          );
-        })}
-      </div>
+      <CategoryNavGrid
+        items={SERVICIOS.map((s) => ({ slug: s.key, label: s.label, countLabel: s.hint }))}
+        mode="select"
+        activeSlug={active}
+        onSelect={onSelect}
+        showCounts={false}
+        variant="standard"
+        desktopColumnsClassName="lg:grid-cols-6"
+      />
       <p className="mt-2 text-xs text-muted-foreground">
         Tours forma parte de Experiencias (subtipo interno); no es una categoría pública
         independiente.

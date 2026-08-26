@@ -14,7 +14,15 @@
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { MapPin, ExternalLink, Loader2, BadgeCheck, Navigation, Phone, MessageCircle } from "lucide-react";
+import {
+  MapPin,
+  ExternalLink,
+  Loader2,
+  BadgeCheck,
+  Navigation,
+  Phone,
+  MessageCircle,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -42,7 +50,11 @@ export function BusinessQuickViewDialog({
 }: BusinessQuickViewDialogProps) {
   const fetchBiz = useServerFn(getMarketplaceBusinessBySlug);
   const open = Boolean(slug);
-  const { data: biz, isLoading, isError } = useQuery({
+  const {
+    data: biz,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["marketplace", "business", slug],
     queryFn: () => fetchBiz({ data: { slug: slug as string } }),
     enabled: open,
@@ -174,9 +186,7 @@ export function BusinessQuickViewDialog({
                     {biz.products.slice(0, 4).map((p) => (
                       <li key={p.id} className="flex items-center justify-between gap-3 p-3">
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-foreground">
-                            {p.name}
-                          </p>
+                          <p className="truncate text-sm font-medium text-foreground">{p.name}</p>
                           {p.tagline ? (
                             <p className="mt-0.5 truncate text-xs text-muted-foreground">
                               {p.tagline}

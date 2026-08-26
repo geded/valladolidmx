@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-F",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-26 · FASE G6-S1 · OMXDS Category Navigation Icon System v1.0. Autoriza registrar la nueva ruta interna no indexable src/routes/lovable/g6-category-icon-catalog.tsx en el Route Inventory conforme a la Route Inventory Rule (DOS · SSC-01 · P2) y, en consecuencia, sustituir de forma append-only el digest acreditado de src/lib/experience-builder/route-inventory.ts en PCA-2026-029. No autoriza ninguna otra variación: cualquier cambio adicional falla cerrado.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "0b7b92b731fdeaa7415595a945b6a96c2b6e1ceb368953846d96133113e711e4",
+    "current_sha256": "c1bf1b30b1bfccfd8364baced98b83e85be5a9fad898b5cab73147217af5f59d",
+    "semantic_change": "Alta aditiva de la entrada src/routes/lovable/g6-category-icon-catalog.tsx en SCANNED_ROUTE_FILES. Sin cambios de lógica, heurística, overrides ni API del inventario.",
+    "authority": "PCA-2026-037"
+  },
+  "invariants": ["omxds_visual_v1_contracts_enabled=false"],
+  "recorded_at": "2026-08-26"
+}

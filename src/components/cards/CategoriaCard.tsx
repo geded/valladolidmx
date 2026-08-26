@@ -8,6 +8,7 @@
  */
 import type { Category } from "@/types/entities";
 import { useTranslation } from "@/i18n/context";
+import { TourismCategoryIcon } from "@/components/omxds/TourismCategoryIcon";
 import {
   TourismCard,
   type TourismCardVM,
@@ -20,10 +21,7 @@ const ROUTE_BY_SLUG: Partial<Record<string, string>> = {
   eventos: "/eventos",
 };
 
-function toVM(
-  category: Category,
-  labels: { explore: string; comingSoon: string },
-): TourismCardVM {
+function toVM(category: Category, labels: { explore: string; comingSoon: string }): TourismCardVM {
   const href = ROUTE_BY_SLUG[category.slug] ?? null;
   return {
     id: `category:${category.id}`,
@@ -58,19 +56,25 @@ export function CategoriaCard({ category }: { category: Category }) {
     comingSoon: t("common.coming_soon"),
   });
   return (
-    <TourismCard
-      vm={vm}
-      capabilities={{
-        showRating: false,
-        showPrice: false,
-        showDate: false,
-        showAvailability: !ROUTE_BY_SLUG[category.slug],
-        showDistance: false,
-        showBusiness: false,
-        showLocation: false,
-        showHighlights: false,
-        showFavorite: false,
-      }}
-    />
+    <div className="relative min-w-0">
+      <span className="pointer-events-none absolute left-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-card/90 shadow-soft ring-1 ring-border/60">
+        {/* G6-S1 · autoridad única de iconografía (fail-closed) */}
+        <TourismCategoryIcon slug={category.slug} variant="compact" size={32} />
+      </span>
+      <TourismCard
+        vm={vm}
+        capabilities={{
+          showRating: false,
+          showPrice: false,
+          showDate: false,
+          showAvailability: !ROUTE_BY_SLUG[category.slug],
+          showDistance: false,
+          showBusiness: false,
+          showLocation: false,
+          showHighlights: false,
+          showFavorite: false,
+        }}
+      />
+    </div>
   );
 }

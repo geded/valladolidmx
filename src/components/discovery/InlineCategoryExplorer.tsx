@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/sheet";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
+import { TourismCategoryIcon } from "@/components/omxds/TourismCategoryIcon";
 import { toast } from "@/lib/toast";
 import {
   inlineExplorerQueryOptions,
@@ -32,9 +33,7 @@ function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: num
   const dLng = ((b.lng - a.lng) * Math.PI) / 180;
   const lat1 = (a.lat * Math.PI) / 180;
   const lat2 = (b.lat * Math.PI) / 180;
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
@@ -72,7 +71,11 @@ async function nativeShareItem(item: InlineExplorerItem) {
   const data = { title: item.display_name, text: item.tagline || item.display_name, url };
   try {
     const nav = typeof navigator !== "undefined" ? (navigator as Navigator) : null;
-    if (nav && "share" in nav && typeof (nav as { share?: (d: ShareData) => Promise<void> }).share === "function") {
+    if (
+      nav &&
+      "share" in nav &&
+      typeof (nav as { share?: (d: ShareData) => Promise<void> }).share === "function"
+    ) {
       await (nav as { share: (d: ShareData) => Promise<void> }).share(data);
       return;
     }
@@ -166,25 +169,24 @@ export function InlineCategoryExplorer({
       data-inline-explorer
     >
       <header className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Explorando en {destinationName ?? "este destino"}
-          </p>
-          <h3 className="truncate text-lg font-semibold">{label}</h3>
-          {!isLoading ? (
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {totalCount} {totalCount === 1 ? "opción publicada" : "opciones publicadas"}
-              {location ? " · ordenadas por cercanía a ti" : ""}
+        <div className="flex min-w-0 items-center gap-3">
+          {/* G6-S1 · autoridad única de iconografía (fail-closed) */}
+          <TourismCategoryIcon slug={categorySlug} variant="compact" size={32} />
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Explorando en {destinationName ?? "este destino"}
             </p>
-          ) : null}
+            <h3 className="truncate text-lg font-semibold">{label}</h3>
+            {!isLoading ? (
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {totalCount} {totalCount === 1 ? "opción publicada" : "opciones publicadas"}
+                {location ? " · ordenadas por cercanía a ti" : ""}
+              </p>
+            ) : null}
+          </div>
         </div>
         {onClose ? (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="shrink-0"
-            onClick={onClose}
-          >
+          <Button variant="ghost" size="sm" className="shrink-0" onClick={onClose}>
             <X className="h-4 w-4" aria-hidden />
             <span className="ml-1 hidden sm:inline">Ver todo el destino</span>
           </Button>
@@ -258,7 +260,11 @@ export function InlineCategoryExplorer({
             </p>
             <div className="flex gap-2">
               {page > 1 ? (
-                <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                >
                   ← Anterior
                 </Button>
               ) : null}
@@ -310,16 +316,11 @@ function InlineExplorerCard({
           <div className="flex min-w-0 items-center gap-1.5">
             <span className="truncate text-sm font-semibold">{item.display_name}</span>
             {item.verified ? (
-              <BadgeCheck
-                className="h-3.5 w-3.5 shrink-0 text-primary"
-                aria-label="Verificado"
-              />
+              <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-primary" aria-label="Verificado" />
             ) : null}
           </div>
           {item.tagline ? (
-            <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
-              {item.tagline}
-            </p>
+            <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{item.tagline}</p>
           ) : null}
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
             {km != null ? (
@@ -328,9 +329,7 @@ function InlineExplorerCard({
                 {formatKm(km)}
               </Badge>
             ) : item.address ? (
-              <span className="truncate text-[10px] text-muted-foreground">
-                {item.address}
-              </span>
+              <span className="truncate text-[10px] text-muted-foreground">{item.address}</span>
             ) : null}
           </div>
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -399,7 +398,11 @@ function ExplorerActionSheet({
           <div className="mx-auto w-full max-w-2xl">
             <SheetHeader className="pr-8 text-left">
               <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                {panel?.type === "directions" ? "Cómo llegar" : panel?.type === "share" ? "Compartir" : "Detalles"}
+                {panel?.type === "directions"
+                  ? "Cómo llegar"
+                  : panel?.type === "share"
+                    ? "Compartir"
+                    : "Detalles"}
               </p>
               <SheetTitle className="font-serif text-2xl font-semibold leading-tight sm:text-3xl">
                 {item.display_name}
@@ -413,7 +416,9 @@ function ExplorerActionSheet({
               <div className="mt-5 space-y-4">
                 {item.address ? (
                   <div className="rounded-xl border border-border bg-muted/30 p-4">
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Ubicación</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      Ubicación
+                    </p>
                     <p className="mt-1 text-sm text-foreground">{item.address}</p>
                   </div>
                 ) : null}
@@ -428,7 +433,11 @@ function ExplorerActionSheet({
                 ) : null}
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                   {hasCoords ? (
-                    <Button type="button" variant="outline" onClick={() => copyText(directionsUrl, "Ruta copiada")}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => copyText(directionsUrl, "Ruta copiada")}
+                    >
                       <Navigation className="mr-2 h-4 w-4" aria-hidden />
                       Copiar ruta
                     </Button>
@@ -457,10 +466,18 @@ function ExplorerActionSheet({
                       className="h-[340px] w-full rounded-2xl border border-border sm:h-[440px]"
                     />
                     <div className="rounded-xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-                      <p className="font-medium text-foreground">{item.address ?? "Punto marcado en el mapa"}</p>
-                      <p className="mt-1">Copia la ruta para abrirla cuando quieras, sin abandonar este micrositio.</p>
+                      <p className="font-medium text-foreground">
+                        {item.address ?? "Punto marcado en el mapa"}
+                      </p>
+                      <p className="mt-1">
+                        Copia la ruta para abrirla cuando quieras, sin abandonar este micrositio.
+                      </p>
                     </div>
-                    <Button type="button" className="w-full" onClick={() => copyText(directionsUrl, "Ruta copiada")}>
+                    <Button
+                      type="button"
+                      className="w-full"
+                      onClick={() => copyText(directionsUrl, "Ruta copiada")}
+                    >
                       <Navigation className="mr-2 h-4 w-4" aria-hidden />
                       Copiar ruta de Google Maps
                     </Button>
@@ -496,7 +513,11 @@ function ExplorerActionSheet({
                     Copiar texto
                   </Button>
                   {hasCoords ? (
-                    <Button type="button" variant="outline" onClick={() => copyText(directionsUrl, "Ruta copiada")}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => copyText(directionsUrl, "Ruta copiada")}
+                    >
                       <Navigation className="mr-2 h-4 w-4" aria-hidden />
                       Copiar ruta
                     </Button>

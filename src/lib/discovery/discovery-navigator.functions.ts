@@ -17,8 +17,12 @@ export interface DiscoveryCategoryItem {
   slug: string;
   /** Nombre visible en el idioma base (fallback: slug). */
   label: string;
-  /** Icono Lucide recomendado — sólo referencia; el UI decide. */
-  iconKey: string;
+  /**
+   * @deprecated G6-S1 — la iconografía es autoridad exclusiva de
+   * `@/lib/omxds/category-icon-registry`. Este campo ya no se emite ni se
+   * consume; se conserva opcional sólo para compatibilidad de tipos.
+   */
+  iconKey?: never;
   /** Número de negocios publicados de esta categoría en el scope. */
   count: number;
   /** Href canónico ya resuelto (mantiene el destino activo). */
@@ -37,7 +41,10 @@ export interface DiscoveryNavigatorDTO {
    * promociones, eventos, experiencias destacadas, rutas, Alux, campañas.
    * Vacío en esta ola. Los items serán objetos JSON serializables.
    */
-  extensions: Array<{ kind: string; items: Array<Record<string, string | number | boolean | null>> }>;
+  extensions: Array<{
+    kind: string;
+    items: Array<Record<string, string | number | boolean | null>>;
+  }>;
 }
 
 /** Slugs de categoría que tienen ruta pública propia. */
@@ -51,19 +58,6 @@ const CATEGORY_ROUTE_MAP: Record<string, string> = {
   tours: "/experiencias",
   "casas-de-vacaciones": "/casas-de-vacaciones",
   "que-hacer": "/que-hacer",
-};
-
-const CATEGORY_ICON_MAP: Record<string, string> = {
-  hoteles: "bed-double",
-  hospedaje: "bed-double",
-  restaurantes: "utensils",
-  gastronomia: "utensils",
-  experiencias: "compass",
-  "experiencias-tours": "compass",
-  tours: "compass",
-  "casas-de-vacaciones": "home",
-  "que-hacer": "binoculars",
-  eventos: "calendar-days",
 };
 
 function categoryHref(slug: string, destinationSlug: string | null): string {
@@ -92,11 +86,9 @@ export const getDiscoveryNavigator = createServerFn({ method: "GET" })
   })
   .handler(async ({ data }): Promise<DiscoveryNavigatorDTO> => {
     const { createClient } = await import("@supabase/supabase-js");
-    const sb = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { persistSession: false, autoRefreshToken: false } },
-    );
+    const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
     // Resolver scope
     let scopeKind: DiscoveryNavigatorDTO["scope"]["kind"] = "global";
@@ -134,9 +126,7 @@ export const getDiscoveryNavigator = createServerFn({ method: "GET" })
     // Pull published businesses in scope with their primary category.
     let query = sb
       .from("businesses")
-      .select(
-        "id, business_categories!businesses_primary_category_id_fkey ( slug, name )",
-      )
+      .select("id, business_categories!businesses_primary_category_id_fkey ( slug, name )")
       .eq("status", "published")
       .is("deleted_at", null)
       .limit(2000);
@@ -145,13 +135,14 @@ export const getDiscoveryNavigator = createServerFn({ method: "GET" })
       query = query.eq("destination_id", destinationId);
     } else if (regionId) {
       // Los destinos exponen region_id (Fase 4.1b). Filtramos vía subquery lite.
-      const { data: dests } = await sb
-        .from("destinations")
-        .select("id")
-        .eq("region_id", regionId);
+      const { data: dests } = await sb.from("destinations").select("id").eq("region_id", regionId);
       const ids = (dests ?? []).map((d) => d.id as string);
       if (ids.length === 0) {
-        return { scope: { kind: scopeKind, slug: scopeSlug, label: scopeLabel }, categories: [], extensions: [] };
+        return {
+          scope: { kind: scopeKind, slug: scopeSlug, label: scopeLabel },
+          categories: [],
+          extensions: [],
+        };
       }
       query = query.in("destination_id", ids);
     }
@@ -159,7 +150,11 @@ export const getDiscoveryNavigator = createServerFn({ method: "GET" })
     const { data: rows, error } = await query;
     if (error) {
       console.error("[getDiscoveryNavigator] read error", error);
-      return { scope: { kind: scopeKind, slug: scopeSlug, label: scopeLabel }, categories: [], extensions: [] };
+      return {
+        scope: { kind: scopeKind, slug: scopeSlug, label: scopeLabel },
+        categories: [],
+        extensions: [],
+      };
     }
 
     // Aggregate by category slug (fallback: 'sin-categoria').
@@ -179,7 +174,6 @@ export const getDiscoveryNavigator = createServerFn({ method: "GET" })
       .map((c) => ({
         slug: c.slug,
         label: c.label,
-        iconKey: CATEGORY_ICON_MAP[c.slug] ?? "layers",
         count: c.count,
         href: categoryHref(c.slug, scopeKind === "destination" ? scopeSlug : null),
       }))

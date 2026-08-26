@@ -1,36 +1,15 @@
 /**
  * H-02 · Iniciativa 2 — Discovery Navigator (presentational).
  *
- * Componente puro reutilizable en Destinos, Regiones, Micrositios,
- * Landings territoriales, Marketplace contextual y futuras superficies
- * públicas. Recibe items ya resueltos (server) y los presenta con
- * iconografía Lucide estándar.
- *
- * Contrato pensado para evolucionar: acepta `slots` opcional para
- * secciones futuras (promociones, eventos, Alux) sin romper API.
+ * G6-S1: la iconografía y el grid responsive dejan de vivir aquí.
+ * Este componente sólo aporta encabezado, CTA y slots; delega en
+ * `CategoryNavGrid` (autoridad única responsive) y en
+ * `TourismCategoryIcon` (autoridad única de iconografía).
+ * Prohibido reintroducir mapas locales de íconos o fallback `Layers`.
  */
 import type { ReactNode } from "react";
-import {
-  BedDouble,
-  Binoculars,
-  CalendarDays,
-  Compass,
-  Home as HomeIcon,
-  Layers,
-  Utensils,
-  type LucideIcon,
-} from "lucide-react";
+import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import type { DiscoveryCategoryItem } from "@/lib/discovery/discovery-navigator.functions";
-
-const ICONS: Record<string, LucideIcon> = {
-  "bed-double": BedDouble,
-  utensils: Utensils,
-  compass: Compass,
-  home: HomeIcon,
-  binoculars: Binoculars,
-  "calendar-days": CalendarDays,
-  layers: Layers,
-};
 
 export interface DiscoveryNavigatorProps {
   title?: string;
@@ -68,12 +47,12 @@ export function DiscoveryNavigator({
 }: DiscoveryNavigatorProps) {
   if (categories.length === 0 && emptyLabel === null && !slots) return null;
 
-  const layout =
-    variant === "grid"
-      ? "grid grid-cols-2 gap-3"
-      : variant === "list"
-        ? "flex flex-col divide-y divide-border"
-        : "flex flex-col gap-2";
+  const desktopColumns =
+    variant === "list"
+      ? "lg:grid-cols-2"
+      : variant === "grid"
+        ? "lg:grid-cols-4"
+        : "lg:grid-cols-3";
 
   return (
     <section
@@ -90,71 +69,22 @@ export function DiscoveryNavigator({
         ) : null}
       </header>
 
-      {categories.length === 0 ? (
-        emptyLabel ? (
-          <p className="text-sm text-muted-foreground">{emptyLabel}</p>
-        ) : null
-      ) : (
-        <ul className={layout}>
-          {categories.map((c) => {
-            const Icon = ICONS[c.iconKey] ?? Layers;
-            const isActive = mode === "inline" && activeCategory === c.slug;
-            const commonInner = (
-              <>
-                <span
-                  className={
-                    "flex h-9 w-9 items-center justify-center rounded-full " +
-                    (isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-primary/10 text-primary")
-                  }
-                >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <span className="flex-1 min-w-0 text-left">
-                  <span className="block truncate text-sm font-medium leading-tight">
-                    {c.label}
-                  </span>
-                  {showCounts ? (
-                    <span className="block text-xs text-muted-foreground">
-                      {c.count} {c.count === 1 ? "opción" : "opciones"}
-                    </span>
-                  ) : null}
-                </span>
-                <span
-                  aria-hidden="true"
-                  className="text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground"
-                >
-                  {isActive ? "•" : "→"}
-                </span>
-              </>
-            );
-            const chipClass =
-              "group flex w-full items-center gap-3 rounded-xl border px-3 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary " +
-              (isActive
-                ? "border-primary/50 bg-primary/5"
-                : "border-transparent hover:border-border hover:bg-muted/40");
-            return (
-              <li key={c.slug}>
-                {mode === "inline" ? (
-                  <button
-                    type="button"
-                    aria-pressed={isActive}
-                    onClick={() => onSelect?.(c.slug)}
-                    className={chipClass}
-                  >
-                    {commonInner}
-                  </button>
-                ) : (
-                  <a href={c.href} className={chipClass}>
-                    {commonInner}
-                  </a>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      <CategoryNavGrid
+        items={categories.map((c) => ({
+          slug: c.slug,
+          label: c.label,
+          href: c.href,
+          count: c.count,
+        }))}
+        mode={mode === "inline" ? "select" : "navigate"}
+        activeSlug={activeCategory}
+        onSelect={onSelect}
+        showCounts={showCounts}
+        desktopColumnsClassName={desktopColumns}
+        emptySlot={
+          emptyLabel ? <p className="text-sm text-muted-foreground">{emptyLabel}</p> : null
+        }
+      />
 
       {ctaHref && ctaLabel ? (
         <div className="mt-4 border-t border-border pt-4">
