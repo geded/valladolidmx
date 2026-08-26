@@ -326,7 +326,9 @@ const MAP_DTO: ExperienceMapDTO = {
 };
 
 const SECTION_LABELS: Record<SectionKey, string> = {
-  destinos: "Destinos",
+  destinos: "Destinos del Oriente Maya",
+  pueblosMagicos: "Pueblos Mágicos",
+  rutas: "Rutas recomendadas por Alux",
   experiencias: "Experiencias",
   servicios: "Hospedaje y gastronomía",
   eventos: "Eventos",
@@ -336,6 +338,8 @@ const SECTION_LABELS: Record<SectionKey, string> = {
 
 const DEFAULT_ORDER: SectionKey[] = [
   "destinos",
+  "pueblosMagicos",
+  "rutas",
   "experiencias",
   "servicios",
   "eventos",
