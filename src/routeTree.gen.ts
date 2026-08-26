@@ -50,6 +50,7 @@ import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/wo
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
 import { Route as LovableTourismCardPreviewRouteImport } from './routes/lovable/tourism-card-preview'
 import { Route as LovableProtectedActionsPreviewRouteImport } from './routes/lovable/protected-actions-preview'
+import { Route as LovableG4DestinationMicrositePreviewRouteImport } from './routes/lovable/g4-destination-microsite-preview'
 import { Route as LovableExperienceSubnavCtabarPreviewRouteImport } from './routes/lovable/experience-subnav-ctabar-preview'
 import { Route as LovableExperienceReviewsPreviewRouteImport } from './routes/lovable/experience-reviews-preview'
 import { Route as LovableExperienceRelatedCollectionPreviewRouteImport } from './routes/lovable/experience-related-collection-preview'
@@ -406,6 +407,12 @@ const LovableProtectedActionsPreviewRoute =
   LovableProtectedActionsPreviewRouteImport.update({
     id: '/lovable/protected-actions-preview',
     path: '/lovable/protected-actions-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG4DestinationMicrositePreviewRoute =
+  LovableG4DestinationMicrositePreviewRouteImport.update({
+    id: '/lovable/g4-destination-microsite-preview',
+    path: '/lovable/g4-destination-microsite-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableExperienceSubnavCtabarPreviewRoute =
@@ -1333,6 +1340,7 @@ export interface FileRoutesByFullPath {
   '/lovable/experience-related-collection-preview': typeof LovableExperienceRelatedCollectionPreviewRoute
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
+  '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1519,6 +1527,7 @@ export interface FileRoutesByTo {
   '/lovable/experience-related-collection-preview': typeof LovableExperienceRelatedCollectionPreviewRoute
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
+  '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1709,6 +1718,7 @@ export interface FileRoutesById {
   '/lovable/experience-related-collection-preview': typeof LovableExperienceRelatedCollectionPreviewRoute
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
+  '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1903,6 +1913,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-related-collection-preview'
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
+    | '/lovable/g4-destination-microsite-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2089,6 +2100,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-related-collection-preview'
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
+    | '/lovable/g4-destination-microsite-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2278,6 +2290,7 @@ export interface FileRouteTypes {
     | '/lovable/experience-related-collection-preview'
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
+    | '/lovable/g4-destination-microsite-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2463,6 +2476,7 @@ export interface RootRouteChildren {
   LovableExperienceRelatedCollectionPreviewRoute: typeof LovableExperienceRelatedCollectionPreviewRoute
   LovableExperienceReviewsPreviewRoute: typeof LovableExperienceReviewsPreviewRoute
   LovableExperienceSubnavCtabarPreviewRoute: typeof LovableExperienceSubnavCtabarPreviewRoute
+  LovableG4DestinationMicrositePreviewRoute: typeof LovableG4DestinationMicrositePreviewRoute
   LovableProtectedActionsPreviewRoute: typeof LovableProtectedActionsPreviewRoute
   LovableTourismCardPreviewRoute: typeof LovableTourismCardPreviewRoute
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
@@ -2786,6 +2800,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/protected-actions-preview'
       fullPath: '/lovable/protected-actions-preview'
       preLoaderRoute: typeof LovableProtectedActionsPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g4-destination-microsite-preview': {
+      id: '/lovable/g4-destination-microsite-preview'
+      path: '/lovable/g4-destination-microsite-preview'
+      fullPath: '/lovable/g4-destination-microsite-preview'
+      preLoaderRoute: typeof LovableG4DestinationMicrositePreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/experience-subnav-ctabar-preview': {
@@ -4364,6 +4385,8 @@ const rootRouteChildren: RootRouteChildren = {
   LovableExperienceReviewsPreviewRoute: LovableExperienceReviewsPreviewRoute,
   LovableExperienceSubnavCtabarPreviewRoute:
     LovableExperienceSubnavCtabarPreviewRoute,
+  LovableG4DestinationMicrositePreviewRoute:
+    LovableG4DestinationMicrositePreviewRoute,
   LovableProtectedActionsPreviewRoute: LovableProtectedActionsPreviewRoute,
   LovableTourismCardPreviewRoute: LovableTourismCardPreviewRoute,
   LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,
