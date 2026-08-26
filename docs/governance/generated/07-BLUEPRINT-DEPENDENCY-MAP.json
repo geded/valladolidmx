@@ -2,14 +2,14 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.50",
+    "version": "0.51",
     "state": "Approved",
-    "source_sha256": "03f27b611c10a8b43af9bd1c6f762dc0b1bc22f87caa71cbdac91a2739140aff",
+    "source_sha256": "91ee33d0ecb554de5a301a6229f22de21e75b5f363e878807c3236958997343c",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-08-25T00:00:00.000Z",
+  "generated_at": "2026-08-26T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -7636,6 +7636,29 @@
       "id": "ART:supabase/migrations/20260825213014_4bd966c5-8384-4c14-bba4-1b4d52a3bfe1.sql",
       "type": "artifact",
       "path": "supabase/migrations/20260825213014_4bd966c5-8384-4c14-bba4-1b4d52a3bfe1.sql"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-destination-microsite-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-destination-microsite-preview.tsx"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-030.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-030.json"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json"
     }
   ],
   "edges": [
@@ -19833,6 +19856,51 @@
       "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
       "verified_at": "2026-08-25"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/lovable/g4-destination-microsite-preview.tsx:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-destination-microsite-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "evidence": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/route-inventory.ts:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/route-inventory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "evidence": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/experience-builder/blocks/experience-map/ExperienceMapBlock.tsx:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "origin": "ART:src/components/experience-builder/blocks/experience-map/ExperienceMapBlock.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "evidence": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-030.json:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-030.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "evidence": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "evidence": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "verified_at": "2026-08-26"
     }
   ],
   "critical_chain_coverage": [
