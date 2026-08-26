@@ -292,21 +292,46 @@ const MAP_DTO: ExperienceMapDTO = {
 
 /* ------------------------------------------------------------------ */
 
-type HeroVariant = "mosaico" | "cinematografico";
+/**
+ * Corrección conceptual vinculante:
+ *  - DIRECCIÓN VISUAL (Editorial | Cinematográfico) define la dirección
+ *    de arte del hero/superficie.
+ *  - GALERÍA (Mosaico | Carrusel | Cuadrícula | Tira) es configuración
+ *    independiente de la galería. "Mosaico" NO es sinónimo de Editorial.
+ */
+type VisualDirection = "editorial" | "cinematografico";
+type GalleryLayout = "mosaico" | "carrusel" | "cuadricula" | "tira";
+/** Destino/Inicio/Región sólo son administrables por Administración. */
+type RoleView = "visitante" | "administracion";
 
 interface TuningState {
-  hero: HeroVariant;
+  direction: VisualDirection;
+  gallery: GalleryLayout;
   showDescription: boolean;
+  showGallery: boolean;
   showMap: boolean;
   showNearby: boolean;
+  role: RoleView;
 }
+
+const DESTINATION_GALLERY = [
+  MEDIA.cover,
+  MEDIA.plaza,
+  MEDIA.calle,
+  MEDIA.cenote,
+  MEDIA.piramide,
+  MEDIA.comedor,
+] as const;
 
 function G4DestinationMicrositePreview() {
   const [tuning, setTuning] = useState<TuningState>({
-    hero: "mosaico",
+    direction: "editorial",
+    gallery: "mosaico",
     showDescription: true,
+    showGallery: true,
     showMap: true,
     showNearby: true,
+    role: "visitante",
   });
   const [activeService, setActiveService] = useState<string>("hoteles");
 
@@ -324,8 +349,14 @@ function G4DestinationMicrositePreview() {
       </Container>
 
       <Container className="mt-5">
-        {tuning.hero === "mosaico" ? <HeroMosaico /> : <HeroCinematografico />}
+        {tuning.direction === "editorial" ? <HeroEditorial /> : <HeroCinematografico />}
       </Container>
+
+      {tuning.role === "administracion" ? (
+        <Container className="mt-10">
+          <GovernanceNote />
+        </Container>
+      ) : null}
 
       <Container className="mt-12">
         <ServiciosStrip active={activeService} onSelect={setActiveService} />
@@ -334,6 +365,12 @@ function G4DestinationMicrositePreview() {
       {tuning.showDescription ? (
         <Container className="mt-14">
           <DescubreValladolid />
+        </Container>
+      ) : null}
+
+      {tuning.showGallery ? (
+        <Container className="mt-14">
+          <GaleriaEditorial layout={tuning.gallery} />
         </Container>
       ) : null}
 
@@ -355,6 +392,114 @@ function G4DestinationMicrositePreview() {
 
       <TuningPanel value={tuning} onChange={setTuning} />
     </div>
+  );
+}
+
+/** Gobernanza editorial del destino (sólo vista Administración). */
+function GovernanceNote() {
+  return (
+    <section className="rounded-3xl border border-border bg-card p-5 shadow-soft">
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+        Permisos editoriales
+      </p>
+      <h2 className="mt-1 font-serif text-xl tracking-tight">
+        Destino, Inicio y Región: administrables sólo por Administración
+      </h2>
+      <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+        <li>· La dirección visual y la galería del destino las define Administración.</li>
+        <li>· El propietario de una ficha no edita superficies territoriales.</li>
+        <li>· Nada se publica automáticamente: requiere revisión y aprobación.</li>
+      </ul>
+      <p className="mt-3 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+        DEMO VISUAL · vista interna sin persistencia
+      </p>
+    </section>
+  );
+}
+
+/**
+ * Galería configurable de forma independiente a la dirección visual.
+ */
+function GaleriaEditorial({ layout }: { layout: GalleryLayout }) {
+  const items = DESTINATION_GALLERY;
+  return (
+    <section aria-labelledby="galeria-destino">
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Galería</p>
+          <h2 id="galeria-destino" className="mt-1 font-serif text-2xl tracking-tight sm:text-3xl">
+            Valladolid en imágenes
+          </h2>
+        </div>
+        <span className="hidden text-[11px] uppercase tracking-[0.16em] text-muted-foreground sm:inline">
+          {layout}
+        </span>
+      </div>
+
+      {layout === "mosaico" ? (
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {items.map((m, i) => (
+            <img
+              key={m.url + i}
+              src={m.url}
+              alt={m.alt}
+              loading="lazy"
+              className={cn(
+                "w-full rounded-3xl object-cover shadow-soft",
+                i === 0 ? "col-span-2 row-span-2 h-64 sm:h-[21rem]" : "h-32 sm:h-40",
+              )}
+            />
+          ))}
+        </div>
+      ) : null}
+
+      {layout === "carrusel" ? (
+        <ul className="mt-5 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2">
+          {items.map((m, i) => (
+            <li key={m.url + i} className="w-[78%] shrink-0 snap-center sm:w-[42%]">
+              <img
+                src={m.url}
+                alt={m.alt}
+                loading="lazy"
+                className="h-60 w-full rounded-3xl object-cover shadow-soft"
+              />
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      {layout === "cuadricula" ? (
+        <div className="mt-5 grid gap-4 sm:grid-cols-3">
+          {items.map((m, i) => (
+            <img
+              key={m.url + i}
+              src={m.url}
+              alt={m.alt}
+              loading="lazy"
+              className="h-48 w-full rounded-3xl object-cover shadow-soft"
+            />
+          ))}
+        </div>
+      ) : null}
+
+      {layout === "tira" ? (
+        <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-6">
+          {items.map((m, i) => (
+            <img
+              key={m.url + i}
+              src={m.url}
+              alt={m.alt}
+              loading="lazy"
+              className="h-24 w-full rounded-2xl object-cover shadow-soft sm:h-28"
+            />
+          ))}
+        </div>
+      ) : null}
+
+      <p className="mt-2 text-xs text-muted-foreground">
+        Fotografías gobernadas existentes servidas por ruta pública estable. Sin URLs firmadas.
+      </p>
+    </section>
   );
 }
 
@@ -439,7 +584,7 @@ function HeroCopy({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function HeroMosaico() {
+function HeroEditorial() {
   return (
     <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-center">
       <HeroCopy />
@@ -696,23 +841,23 @@ function TuningPanel({
           <div className="mt-4 space-y-4">
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Hero
+                Vista simulada
               </p>
-              <div className="mt-2 grid grid-cols-2 gap-2">
+              <div className="mt-2 grid gap-2">
                 {(
                   [
-                    ["mosaico", "Mosaico editorial"],
-                    ["cinematografico", "Cinematográfico"],
+                    ["visitante", "Visitante"],
+                    ["administracion", "Administración Valladolid.mx"],
                   ] as const
                 ).map(([key, label]) => (
                   <button
                     key={key}
                     type="button"
-                    onClick={() => set("hero", key)}
-                    aria-pressed={value.hero === key}
+                    onClick={() => set("role", key)}
+                    aria-pressed={value.role === key}
                     className={cn(
                       "rounded-2xl border px-3 py-2 text-xs transition-colors",
-                      value.hero === key
+                      value.role === key
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border bg-background hover:bg-accent",
                     )}
@@ -723,10 +868,84 @@ function TuningPanel({
               </div>
             </div>
 
+            {value.role === "visitante" ? (
+              <p className="rounded-2xl border border-dashed border-border px-3 py-2 text-[11px] text-muted-foreground">
+                La vista Visitante muestra únicamente el resultado limpio. Los controles de
+                dirección visual y galería sólo están disponibles para Administración.
+              </p>
+            ) : (
+              <>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Dirección visual
+                  </p>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {(
+                      [
+                        ["editorial", "Editorial"],
+                        ["cinematografico", "Cinematográfico"],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => set("direction", key)}
+                        aria-pressed={value.direction === key}
+                        className={cn(
+                          "rounded-2xl border px-3 py-2 text-xs transition-colors",
+                          value.direction === key
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background hover:bg-accent",
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Galería
+                  </p>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {(
+                      [
+                        ["mosaico", "Mosaico"],
+                        ["carrusel", "Carrusel"],
+                        ["cuadricula", "Cuadrícula"],
+                        ["tira", "Tira"],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => set("gallery", key)}
+                        aria-pressed={value.gallery === key}
+                        className={cn(
+                          "rounded-2xl border px-3 py-2 text-xs transition-colors",
+                          value.gallery === key
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background hover:bg-accent",
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
             <Toggle
               label="Descripción del destino"
               checked={value.showDescription}
               onChange={(v) => set("showDescription", v)}
+            />
+            <Toggle
+              label="Galería"
+              checked={value.showGallery}
+              onChange={(v) => set("showGallery", v)}
             />
             <Toggle label="Mapa" checked={value.showMap} onChange={(v) => set("showMap", v)} />
             <Toggle
