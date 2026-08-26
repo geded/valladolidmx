@@ -997,34 +997,80 @@ function TuningPanel({
           </p>
 
           <div className="mt-4 space-y-4">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Hero
+            {value.role === "visitante" ? (
+              <p className="rounded-2xl border border-dashed border-border px-3 py-2 text-[11px] text-muted-foreground">
+                La vista Visitante muestra únicamente el resultado limpio. Los controles de
+                dirección visual y galería sólo aparecen para Propietario y Administración.
               </p>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                {(
-                  [
-                    ["mosaico", "Mosaico editorial"],
-                    ["cinematografico", "Cinematográfico"],
-                  ] as const
-                ).map(([key, label]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => set("hero", key)}
-                    aria-pressed={value.hero === key}
-                    className={cn(
-                      "rounded-2xl border px-3 py-2 text-xs transition-colors",
-                      value.hero === key
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-background hover:bg-accent",
-                    )}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            ) : (
+              <>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Dirección visual
+                  </p>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {(
+                      [
+                        ["editorial", "Editorial"],
+                        ["cinematografico", "Cinematográfico"],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => set("direction", key)}
+                        aria-pressed={value.direction === key}
+                        className={cn(
+                          "rounded-2xl border px-3 py-2 text-xs transition-colors",
+                          value.direction === key
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background hover:bg-accent",
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  {value.role === "propietario" ? (
+                    <p className="mt-2 text-[11px] text-muted-foreground">
+                      El propietario propone la variante; Administración revisa, aprueba y publica.
+                      Nada se publica automáticamente.
+                    </p>
+                  ) : null}
+                </div>
+
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Galería
+                  </p>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {(
+                      [
+                        ["mosaico", "Mosaico"],
+                        ["carrusel", "Carrusel"],
+                        ["cuadricula", "Cuadrícula"],
+                        ["tira", "Tira"],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => set("gallery", key)}
+                        aria-pressed={value.gallery === key}
+                        className={cn(
+                          "rounded-2xl border px-3 py-2 text-xs transition-colors",
+                          value.gallery === key
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background hover:bg-accent",
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
 
             <Toggle
               label="Descripción"
