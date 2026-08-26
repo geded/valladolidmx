@@ -404,7 +404,7 @@ function G4HomePremiumPreview() {
       <PreviewHeader />
       <main>
         <Container className="pt-4 sm:pt-6">
-          {tuning.heroVariant === "editorial" ? <HeroEditorial /> : <HeroCinematic />}
+          <HomeHero presentation={tuning.heroVariant === "editorial" ? "editorial" : "cinematic"} />
         </Container>
 
         <Container className="mt-6 sm:mt-8">
