@@ -2,14 +2,14 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.52",
+    "version": "0.53",
     "state": "Approved",
-    "source_sha256": "a4f3460c23b2ad8a533a3a2823a229f0a31367352062122db6967ff47b95074d",
+    "source_sha256": "375775ce492461e877df8e879c49daba394a5744416002399e70f752c2bb56ac",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-08-27T00:00:00.000Z",
+  "generated_at": "2026-08-28T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -7732,6 +7732,64 @@
       "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json",
       "type": "artifact",
       "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/vm/common.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/vm/common.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/vm/families.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/vm/families.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/vm/index.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/vm/index.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/g5/premium-presentation.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/g5/premium-presentation.contract.test.ts"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-home-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-home-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-hotel-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-hotel-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-restaurant-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-restaurant-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-experience-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-experience-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-event-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-event-premium-preview.tsx"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-032.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-032.json"
     }
   ],
   "edges": [
@@ -20100,6 +20158,114 @@
       "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
       "verified_at": "2026-08-27"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/presentation/vm/common.ts:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/vm/common.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/presentation/vm/families.ts:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/vm/families.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/presentation/vm/index.ts:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/vm/index.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/g5/premium-presentation.contract.test.ts:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:scripts/omxds/g5/premium-presentation.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumHero.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumHero.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/lovable/g4-home-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-home-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/lovable/g4-destination-microsite-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-destination-microsite-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/lovable/g4-hotel-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-hotel-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/lovable/g4-restaurant-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-restaurant-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/lovable/g4-experience-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-experience-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/lovable/g4-event-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-event-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-032.json:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-032.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28"
     }
   ],
   "critical_chain_coverage": [
