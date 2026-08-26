@@ -80,7 +80,15 @@ const MEDIA = {
 type Media = (typeof MEDIA)[keyof typeof MEDIA];
 type VisualDirection = "editorial" | "cinematografica";
 type CardLayout = "asimetrica" | "cuadricula" | "carrusel";
-type SectionKey = "destinos" | "experiencias" | "servicios" | "eventos" | "queHacer" | "mapa";
+type SectionKey =
+  | "destinos"
+  | "pueblosMagicos"
+  | "rutas"
+  | "experiencias"
+  | "servicios"
+  | "eventos"
+  | "queHacer"
+  | "mapa";
 
 type TuningState = {
   direction: VisualDirection;
