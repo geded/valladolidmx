@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-030",
+  "title": "19.27 · G4-A · Vista previa visual interna del micrositio de destino (Valladolid)",
+  "status": "Approved",
+  "branch": "edit/edt-16d3036a-f62f-43d8-bd85-bbcb0eb0bf88",
+  "blueprint": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-26 · CONTINUIDAD ESTRICTA — G4-A · Vista previa visual del micrositio de destino. Autoriza exclusivamente crear la ruta interna no indexable /lovable/g4-destination-microsite-preview y registrarla en el Route Inventory. Prohibe modificar rutas publicas, datos, Supabase, migraciones, produccion, despliegue o merge; prohibe activar omxds_visual_v1_contracts_enabled e iniciar G5. Medios exclusivamente gobernados via /api/public/studio-media/governed/v1p1c.",
+  "permissions": [
+    { "operation": "create", "path": "src/routes/lovable/g4-destination-microsite-preview.tsx" },
+    { "operation": "modify", "path": "src/lib/experience-builder/route-inventory.ts" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun scripts/governance/validate-full-suite.mjs",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}
