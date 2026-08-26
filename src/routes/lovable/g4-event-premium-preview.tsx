@@ -38,6 +38,17 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
+import {
+  PremiumBreadcrumb,
+  PremiumGallery,
+  PremiumHero,
+  PremiumSection,
+} from "@/components/premium";
+import {
+  toEventPremiumVM,
+  toPremiumSectionVM,
+  type PremiumEntitySource,
+} from "@/lib/omxds/presentation/vm";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/lovable/g4-event-premium-preview")({
@@ -284,20 +295,22 @@ function G4EventPremiumPreview() {
     role: "visitante",
   });
 
+  const presentation = tuning.direction === "editorial" ? "editorial" : "cinematic";
+  const vm = toEventPremiumVM(
+    { ...buildEventSource(tuning.status), actions: <HeroActions status={tuning.status} /> },
+    { crumbTail: [{ label: "Eventos" }, { label: EVENT.name }] },
+  );
+
   return (
     <div className="min-h-screen bg-background pb-24">
       <PreviewRibbon />
 
       <Container className="pt-6">
-        <TerritorialPath />
+        <PremiumBreadcrumb crumbs={vm.crumbs} />
       </Container>
 
       <Container className="mt-5">
-        {tuning.direction === "editorial" ? (
-          <HeroEditorial status={tuning.status} />
-        ) : (
-          <HeroCinematografico status={tuning.status} />
-        )}
+        <PremiumHero vm={vm.hero} presentation={presentation} />
       </Container>
 
       {tuning.role !== "visitante" ? (
@@ -370,97 +383,65 @@ function PreviewRibbon() {
   );
 }
 
-function TerritorialPath() {
-  return (
-    <nav aria-label="Ruta territorial" className="text-sm">
-      <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
-        <li>
-          <Link
-            to="/"
-            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            Inicio
-          </Link>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>
-          <Link
-            to="/oriente-maya"
-            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            Oriente Maya
-          </Link>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>Valladolid</li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>Eventos</li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li aria-current="page" className="font-medium text-foreground">
-          {EVENT.name}
-        </li>
-      </ol>
-    </nav>
-  );
+/**
+ * Fuente plana del caso DEMO por estado del evento. Hero, galería y
+ * breadcrumb los construye el runtime premium compartido.
+ */
+function buildEventSource(status: EventStatus): PremiumEntitySource {
+  const meta = STATUS_META[status];
+  return {
+    title: EVENT.name,
+    eyebrow: EVENT.eyebrow,
+    subtitle: EVENT.claim,
+    cover: MEDIA.cover,
+    gallery: GALLERY,
+    destination: { slug: "valladolid", label: "Valladolid" },
+    badges: [
+      { label: meta.label, tone: "primary" as const },
+      { label: EVENT.category, tone: "neutral" as const },
+      { label: "Demo visual", tone: "neutral" as const },
+    ],
+    facts: [
+      {
+        label: "Fecha",
+        value: EVENT.dateLabel,
+        icon: <CalendarDays className="size-3.5 text-primary" aria-hidden />,
+      },
+      {
+        label: "Hora y duración",
+        value: `${EVENT.timeLabel} · ${EVENT.duration}`,
+        icon: <Clock className="size-3.5 text-primary" aria-hidden />,
+      },
+      {
+        label: "Sede",
+        value: EVENT.venue,
+        icon: <MapPin className="size-3.5 text-primary" aria-hidden />,
+      },
+      {
+        label: "Dirección",
+        value: EVENT.address,
+        icon: <Building2 className="size-3.5 text-primary" aria-hidden />,
+      },
+      {
+        label: "Accesibilidad",
+        value: EVENT.accessibility,
+        icon: <Accessibility className="size-3.5 text-primary" aria-hidden />,
+      },
+      {
+        label: "Organizador",
+        value: EVENT.organizer,
+        icon: <Users className="size-3.5 text-primary" aria-hidden />,
+      },
+    ],
+  };
 }
 
-function DemoTag() {
-  return (
-    <span className="inline-flex items-center rounded-pill border border-border bg-background/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-      Demo visual
-    </span>
-  );
-}
-
-function StatusBadge({ status }: { status: EventStatus }) {
+/** Acciones del hero, condicionadas por el estado del evento. */
+function HeroActions({ status }: { status: EventStatus }) {
   const meta = STATUS_META[status];
   return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-pill border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em]",
-        meta.className,
-      )}
-    >
-      {meta.label}
-    </span>
-  );
-}
-
-/** Panel editorial: eyebrow, nombre, estado, propuesta de valor, datos prácticos y acciones. */
-function HeroPanel({ status, compact = false }: { status: EventStatus; compact?: boolean }) {
-  const meta = STATUS_META[status];
-  return (
-    <div className={compact ? "" : "max-w-xl"}>
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-pill border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-primary">
-          {EVENT.eyebrow}
-        </span>
-        <StatusBadge status={status} />
-        <DemoTag />
-      </div>
-
-      <h1 className="mt-4 font-serif text-4xl leading-[1.06] tracking-tight text-foreground sm:text-5xl">
-        {EVENT.name}
-      </h1>
-      <p className="mt-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-        {EVENT.category}
-      </p>
-      <p className="mt-3 text-lg text-foreground/80">{EVENT.claim}</p>
-
-      <dl className="mt-6 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
-        <Fact icon={CalendarDays} label="Fecha" value={EVENT.dateLabel} />
-        <Fact
-          icon={Clock}
-          label="Hora y duración"
-          value={`${EVENT.timeLabel} · ${EVENT.duration}`}
-        />
-        <Fact icon={MapPin} label="Sede" value={EVENT.venue} />
-        <Fact icon={Building2} label="Dirección" value={EVENT.address} />
-        <Fact icon={Accessibility} label="Accesibilidad" value={EVENT.accessibility} />
-        <Fact icon={Users} label="Organizador" value={EVENT.organizer} />
-      </dl>
-
-      <div className="mt-7 flex flex-wrap items-center gap-3">
+    <div>
+      <div className="flex flex-wrap items-center gap-3">
         {meta.primaryCta ? (
           <Button size="lg" className="rounded-pill px-7">
             {meta.primaryCta}
@@ -477,74 +458,6 @@ function HeroPanel({ status, compact = false }: { status: EventStatus; compact?:
         {meta.note} Esta vista no muestra boletos, precios, cupo ni compra.
       </p>
     </div>
-  );
-}
-
-function Fact({ icon: Icon, label, value }: { icon: typeof Clock; label: string; value: string }) {
-  return (
-    <div className="flex items-start gap-2.5">
-      <Icon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
-      <div>
-        <dt className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{label}</dt>
-        <dd className="text-foreground/90">{value}</dd>
-      </div>
-    </div>
-  );
-}
-
-/** Fotografía documental + relato, con composición asimétrica. */
-function HeroEditorial({ status }: { status: EventStatus }) {
-  return (
-    <section className="grid gap-8 lg:grid-cols-3 lg:items-center">
-      <div className="lg:col-span-2">
-        <img
-          src={MEDIA.cover.url}
-          alt={MEDIA.cover.alt}
-          loading="eager"
-          className="h-[300px] w-full rounded-3xl object-cover shadow-elevated sm:h-[440px] lg:h-[580px]"
-        />
-      </div>
-      <div className="lg:col-span-1">
-        <HeroPanel status={status} />
-      </div>
-    </section>
-  );
-}
-
-/** Imagen monumental con overlay contenido + banda práctica inmediatamente debajo. */
-function HeroCinematografico({ status }: { status: EventStatus }) {
-  return (
-    <section>
-      <div className="relative overflow-hidden rounded-3xl shadow-floating">
-        <img
-          src={MEDIA.cover.url}
-          alt={MEDIA.cover.alt}
-          loading="eager"
-          className="h-[440px] w-full object-cover sm:h-[600px]"
-        />
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/5"
-          aria-hidden
-        />
-        <div className="absolute inset-x-0 bottom-0 p-5 sm:p-10">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-pill bg-background/85 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-foreground backdrop-blur">
-              {EVENT.eyebrow}
-            </span>
-            <span className="rounded-pill bg-background/85 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-foreground backdrop-blur">
-              {STATUS_META[status].label}
-            </span>
-          </div>
-          <h2 className="mt-3 font-serif text-4xl leading-tight tracking-tight text-white sm:text-5xl">
-            {EVENT.name}
-          </h2>
-        </div>
-      </div>
-
-      <div className="mt-5 rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
-        <HeroPanel status={status} compact />
-      </div>
-    </section>
   );
 }
 
@@ -629,80 +542,17 @@ function Programa() {
 }
 
 function Galeria({ layout }: { layout: GalleryLayout }) {
+  const vm = toEventPremiumVM(buildEventSource("programado"), { galleryLayout: layout });
   return (
-    <section id="galeria" aria-labelledby="galeria-evento">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Galería</p>
-          <h2 id="galeria-evento" className="mt-1 font-serif text-2xl tracking-tight sm:text-3xl">
-            La plaza, la piedra y la tarde
-          </h2>
-        </div>
-        <span className="hidden text-[11px] uppercase tracking-[0.16em] text-muted-foreground sm:inline">
-          {layout}
-        </span>
-      </div>
-
-      {layout === "mosaico" ? (
-        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {GALLERY.map((m, i) => (
-            <img
-              key={m.url}
-              src={m.url}
-              alt={m.alt}
-              loading="lazy"
-              className={cn(
-                "w-full rounded-3xl object-cover shadow-soft",
-                i === 0 ? "col-span-2 row-span-2 h-64 sm:h-[21rem]" : "h-32 sm:h-40",
-              )}
-            />
-          ))}
-        </div>
-      ) : null}
-
-      {layout === "carrusel" ? (
-        <ul className="-mx-4 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2">
-          {GALLERY.map((m) => (
-            <li key={m.url} className="w-[78%] shrink-0 snap-center sm:w-[46%] lg:w-[32%]">
-              <img
-                src={m.url}
-                alt={m.alt}
-                loading="lazy"
-                className="h-64 w-full rounded-3xl object-cover shadow-soft sm:h-72"
-              />
-            </li>
-          ))}
-        </ul>
-      ) : null}
-
-      {layout === "cuadricula" ? (
-        <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-3">
-          {GALLERY.map((m) => (
-            <img
-              key={m.url}
-              src={m.url}
-              alt={m.alt}
-              loading="lazy"
-              className="h-40 w-full rounded-3xl object-cover shadow-soft sm:h-52"
-            />
-          ))}
-        </div>
-      ) : null}
-
-      {layout === "tira" ? (
-        <div className="mt-5 grid grid-cols-5 gap-2">
-          {GALLERY.map((m) => (
-            <img
-              key={m.url}
-              src={m.url}
-              alt={m.alt}
-              loading="lazy"
-              className="h-20 w-full rounded-2xl object-cover shadow-soft sm:h-28"
-            />
-          ))}
-        </div>
-      ) : null}
-    </section>
+    <PremiumSection
+      vm={toPremiumSectionVM({
+        id: "galeria",
+        eyebrow: "Galería",
+        title: "La plaza, la piedra y la tarde",
+      })}
+    >
+      <PremiumGallery vm={vm.gallery} />
+    </PremiumSection>
   );
 }
 

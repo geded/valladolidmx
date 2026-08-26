@@ -35,6 +35,17 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
+import {
+  PremiumBreadcrumb,
+  PremiumGallery,
+  PremiumHero,
+  PremiumSection,
+} from "@/components/premium";
+import {
+  toPremiumSectionVM,
+  toRestaurantPremiumVM,
+  type PremiumEntitySource,
+} from "@/lib/omxds/presentation/vm";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/lovable/g4-restaurant-premium-preview")({
@@ -218,16 +229,22 @@ function G4RestaurantPremiumPreview() {
     role: "visitante",
   });
 
+  const presentation = tuning.direction === "editorial" ? "editorial" : "cinematic";
+  const vm = toRestaurantPremiumVM(
+    { ...RESTAURANT_SOURCE, actions: <HeroActions /> },
+    { crumbTail: [{ label: "Restaurantes" }, { label: RESTAURANT.name }] },
+  );
+
   return (
     <div className="min-h-screen bg-background pb-24">
       <PreviewRibbon />
 
       <Container className="pt-6">
-        <TerritorialPath />
+        <PremiumBreadcrumb crumbs={vm.crumbs} />
       </Container>
 
       <Container className="mt-5">
-        {tuning.direction === "editorial" ? <HeroEditorial /> : <HeroCinematografico />}
+        <PremiumHero vm={vm.hero} presentation={presentation} />
       </Container>
 
       {tuning.role !== "visitante" ? (
@@ -290,135 +307,49 @@ function PreviewRibbon() {
   );
 }
 
-function TerritorialPath() {
+/**
+ * Fuente plana del caso DEMO. Hero, galería y breadcrumb los construye
+ * el runtime premium compartido (`toRestaurantPremiumVM`).
+ */
+const RESTAURANT_SOURCE = {
+  title: RESTAURANT.name,
+  eyebrow: RESTAURANT.eyebrow,
+  subtitle: RESTAURANT.claim,
+  cover: MEDIA.cover,
+  gallery: GALLERY,
+  destination: { slug: "valladolid", label: "Valladolid" },
+  badges: [{ label: "Demo visual", tone: "neutral" as const }],
+  facts: [
+    {
+      label: "Cocina",
+      value: RESTAURANT.cuisine,
+      icon: <UtensilsCrossed className="size-3.5 text-primary" aria-hidden />,
+    },
+    {
+      label: "Horario",
+      value: RESTAURANT.schedule,
+      icon: <Clock className="size-3.5 text-primary" aria-hidden />,
+    },
+    {
+      label: "Rango de precio",
+      value: RESTAURANT.priceRange,
+      icon: <Wallet className="size-3.5 text-primary" aria-hidden />,
+    },
+    {
+      label: "Ubicación",
+      value: RESTAURANT.location,
+      icon: <MapPin className="size-3.5 text-primary" aria-hidden />,
+    },
+  ],
+} satisfies PremiumEntitySource;
+
+/** Acción dominante única de la ficha. */
+function HeroActions() {
   return (
-    <nav aria-label="Ruta territorial" className="text-sm">
-      <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
-        <li>
-          <Link
-            to="/"
-            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            Inicio
-          </Link>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>
-          <Link
-            to="/oriente-maya"
-            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            Oriente Maya
-          </Link>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>Valladolid</li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>Restaurantes</li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li aria-current="page" className="font-medium text-foreground">
-          {RESTAURANT.name}
-        </li>
-      </ol>
-    </nav>
-  );
-}
-
-function DemoTag() {
-  return (
-    <span className="inline-flex items-center rounded-pill border border-border bg-background/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-      Demo visual
-    </span>
-  );
-}
-
-/** Panel editorial: eyebrow, nombre, propuesta, datos prácticos y una sola acción dominante. */
-function HeroPanel({ compact = false }: { compact?: boolean }) {
-  return (
-    <div className={compact ? "" : "max-w-xl"}>
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-pill border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-primary">
-          {RESTAURANT.eyebrow}
-        </span>
-        <DemoTag />
-      </div>
-
-      <h1 className="mt-4 font-serif text-4xl leading-[1.06] tracking-tight text-foreground sm:text-5xl">
-        {RESTAURANT.name}
-      </h1>
-      <p className="mt-3 text-lg text-foreground/80">{RESTAURANT.claim}</p>
-
-      <dl className="mt-6 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
-        <Fact icon={UtensilsCrossed} label="Cocina" value={RESTAURANT.cuisine} />
-        <Fact icon={Clock} label="Horario" value={RESTAURANT.schedule} />
-        <Fact icon={Wallet} label="Rango de precio" value={RESTAURANT.priceRange} />
-        <Fact icon={MapPin} label="Ubicación" value={RESTAURANT.location} />
-      </dl>
-
-      <div className="mt-7">
-        <Button size="lg" className="rounded-pill px-7">
-          Cómo llegar
-          <ArrowRight className="ml-2 size-4" aria-hidden />
-        </Button>
-        <p className="mt-2 text-[11px] text-muted-foreground">
-          Acción dominante única. Sin reservas ni disponibilidad en esta vista.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function Fact({ icon: Icon, label, value }: { icon: typeof Clock; label: string; value: string }) {
-  return (
-    <div className="flex items-start gap-2.5">
-      <Icon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
-      <div>
-        <dt className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{label}</dt>
-        <dd className="text-foreground/90">{value}</dd>
-      </div>
-    </div>
-  );
-}
-
-/** Above the fold asimétrico: 2/3 fotografía + 1/3 panel editorial. */
-function HeroEditorial() {
-  return (
-    <section className="grid gap-8 lg:grid-cols-3 lg:items-center">
-      <div className="lg:col-span-2">
-        <img
-          src={MEDIA.cover.url}
-          alt={MEDIA.cover.alt}
-          loading="eager"
-          className="h-[300px] w-full rounded-3xl object-cover shadow-elevated sm:h-[440px] lg:h-[560px]"
-        />
-      </div>
-      <div className="lg:col-span-1">
-        <HeroPanel />
-      </div>
-    </section>
-  );
-}
-
-/** Variante cinematográfica equivalente dentro de la misma plantilla. */
-function HeroCinematografico() {
-  return (
-    <section className="relative overflow-hidden rounded-3xl shadow-floating">
-      <img
-        src={MEDIA.cover.url}
-        alt={MEDIA.cover.alt}
-        loading="eager"
-        className="h-[440px] w-full object-cover sm:h-[560px]"
-      />
-      <div
-        className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/5"
-        aria-hidden
-      />
-      <div className="absolute inset-x-0 bottom-0 p-5 sm:p-10">
-        <div className="rounded-3xl bg-background/88 p-6 backdrop-blur-md sm:max-w-lg sm:p-8">
-          <HeroPanel compact />
-        </div>
-      </div>
-    </section>
+    <Button size="lg" className="rounded-pill px-7">
+      Cómo llegar
+      <ArrowRight className="ml-2 size-4" aria-hidden />
+    </Button>
   );
 }
 
@@ -478,90 +409,20 @@ function Relato() {
 }
 
 function Galeria({ layout }: { layout: GalleryLayout }) {
+  const vm = toRestaurantPremiumVM(RESTAURANT_SOURCE, { galleryLayout: layout });
   return (
-    <section id="galeria" aria-labelledby="galeria-restaurante">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Galería</p>
-          <h2
-            id="galeria-restaurante"
-            className="mt-1 font-serif text-2xl tracking-tight sm:text-3xl"
-          >
-            La casa, la mesa y el barrio
-          </h2>
-        </div>
-        <span className="hidden text-[11px] uppercase tracking-[0.16em] text-muted-foreground sm:inline">
-          {layout}
-        </span>
-      </div>
-
-      {layout === "mosaico" ? (
-        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {GALLERY.map((m, i) => (
-            <img
-              key={m.url}
-              src={m.url}
-              alt={m.alt}
-              loading="lazy"
-              className={cn(
-                "w-full rounded-3xl object-cover shadow-soft",
-                i === 0 ? "col-span-2 row-span-2 h-64 sm:h-[21rem]" : "h-32 sm:h-40",
-              )}
-            />
-          ))}
-        </div>
-      ) : null}
-
-      {layout === "carrusel" ? (
-        <ul className="-mx-4 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2">
-          {GALLERY.map((m, i) => (
-            <li key={m.url} className="w-[78%] shrink-0 snap-center sm:w-[42%]">
-              <img
-                src={m.url}
-                alt={m.alt}
-                loading="lazy"
-                className="h-60 w-full rounded-3xl object-cover shadow-soft"
-              />
-              <p className="mt-1.5 text-[11px] text-muted-foreground">
-                {i + 1} / {GALLERY.length}
-              </p>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-
-      {layout === "cuadricula" ? (
-        <div className="mt-5 grid gap-4 sm:grid-cols-3">
-          {GALLERY.map((m) => (
-            <img
-              key={m.url}
-              src={m.url}
-              alt={m.alt}
-              loading="lazy"
-              className="h-52 w-full rounded-3xl object-cover shadow-soft"
-            />
-          ))}
-        </div>
-      ) : null}
-
-      {layout === "tira" ? (
-        <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-6">
-          {GALLERY.map((m) => (
-            <img
-              key={m.url}
-              src={m.url}
-              alt={m.alt}
-              loading="lazy"
-              className="h-24 w-full rounded-2xl object-cover shadow-soft sm:h-28"
-            />
-          ))}
-        </div>
-      ) : null}
-
+    <PremiumSection
+      vm={toPremiumSectionVM({
+        id: "galeria",
+        eyebrow: "Galería",
+        title: "La casa, la mesa y el barrio",
+      })}
+    >
+      <PremiumGallery vm={vm.gallery} />
       <p className="mt-2 text-xs text-muted-foreground">
         Fotografías gobernadas existentes servidas por ruta pública estable. Sin URLs firmadas.
       </p>
-    </section>
+    </PremiumSection>
   );
 }
 

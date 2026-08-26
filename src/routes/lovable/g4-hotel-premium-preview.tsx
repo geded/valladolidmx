@@ -45,6 +45,17 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
+import {
+  PremiumBreadcrumb,
+  PremiumGallery,
+  PremiumHero,
+  PremiumSection,
+} from "@/components/premium";
+import {
+  toHotelPremiumVM,
+  toPremiumSectionVM,
+  type PremiumEntitySource,
+} from "@/lib/omxds/presentation/vm";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/lovable/g4-hotel-premium-preview")({
@@ -312,16 +323,22 @@ function G4HotelPremiumPreview() {
     role: "visitante",
   });
 
+  const presentation = tuning.direction === "editorial" ? "editorial" : "cinematic";
+  const vm = toHotelPremiumVM(
+    { ...HOTEL_SOURCE, actions: <HeroActions /> },
+    { crumbTail: [{ label: "Hoteles" }, { label: HOTEL.name }] },
+  );
+
   return (
     <div className="min-h-screen bg-background pb-24">
       <PreviewRibbon />
 
       <Container className="pt-6">
-        <TerritorialPath />
+        <PremiumBreadcrumb crumbs={vm.crumbs} />
       </Container>
 
       <Container className="mt-5">
-        {tuning.direction === "editorial" ? <HeroEditorial /> : <HeroCinematografico />}
+        <PremiumHero vm={vm.hero} presentation={presentation} />
       </Container>
 
       {tuning.role !== "visitante" ? (
@@ -331,7 +348,7 @@ function G4HotelPremiumPreview() {
       ) : null}
 
       <Container className="mt-12">
-        <Gallery layout={tuning.gallery} />
+        <GallerySection layout={tuning.gallery} />
       </Container>
 
       {tuning.showDescription ? (
@@ -400,215 +417,77 @@ function DemoTag({ children = "Demo visual" }: { children?: string }) {
   );
 }
 
-function TerritorialPath() {
+/**
+ * Fuente plana del caso DEMO. El runtime premium compartido
+ * (`toHotelPremiumVM`) construye hero, galería y breadcrumb: este
+ * preview ya no reimplementa ninguna de esas piezas.
+ */
+const HOTEL_SOURCE = {
+  title: HOTEL.name,
+  eyebrow: HOTEL.type,
+  subtitle: "Una casona del siglo XVIII a dos calles de la catedral de San Servacio.",
+  cover: MEDIA.cover,
+  gallery: GALLERY,
+  destination: { slug: "valladolid", label: "Valladolid" },
+  badges: [
+    { label: HOTEL.location, tone: "neutral" as const },
+    { label: "Ficha en preparación", tone: "neutral" as const },
+  ],
+  facts: [
+    {
+      label: "Ubicación",
+      value: HOTEL.location,
+      icon: <Compass className="size-3.5" aria-hidden />,
+    },
+    {
+      label: "Habitaciones",
+      value: "12 llaves",
+      icon: <BedDouble className="size-3.5" aria-hidden />,
+    },
+    {
+      label: "Capacidad",
+      value: "2 a 4 personas",
+      icon: <Users className="size-3.5" aria-hidden />,
+    },
+  ],
+} satisfies PremiumEntitySource;
+
+function HeroActions() {
   return (
-    <nav aria-label="Ruta territorial" className="text-sm">
-      <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
-        <li>
-          <Link
-            to="/"
-            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            Inicio
-          </Link>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>
-          <Link
-            to="/oriente-maya"
-            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            Oriente Maya
-          </Link>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>
-          <Link
-            to="/lovable/g4-destination-microsite-preview"
-            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            Valladolid
-          </Link>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>
-          <span className="px-1.5 py-0.5">Hoteles</span>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li aria-current="page" className="font-medium text-foreground">
-          {HOTEL.name}
-        </li>
-      </ol>
-    </nav>
+    <>
+      <Button size="lg" className="rounded-pill px-6">
+        Solicitar disponibilidad
+        <ArrowRight className="ml-2 size-4" aria-hidden />
+      </Button>
+      <Button size="lg" variant="outline" className="rounded-pill px-6">
+        <Heart className="mr-2 size-4" aria-hidden />
+        Agregar a mi viaje
+      </Button>
+    </>
   );
 }
 
-function HeroCopy({ compact = false }: { compact?: boolean }) {
+function GallerySection({ layout }: { layout: GalleryLayout }) {
+  const vm = toHotelPremiumVM(HOTEL_SOURCE, { galleryLayout: layout });
   return (
-    <div className={compact ? "" : "max-w-2xl"}>
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-pill border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-primary">
-          {HOTEL.type}
-        </span>
-        <span className="rounded-pill border border-border bg-background/70 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-          {HOTEL.location}
-        </span>
-        <DemoTag>Ficha en preparación</DemoTag>
-      </div>
-      <h1 className="mt-4 font-serif text-4xl leading-[1.05] tracking-tight text-foreground sm:text-5xl">
-        {HOTEL.name}
-      </h1>
-      <p className="mt-3 text-lg text-foreground/80">
-        Una casona del siglo XVIII a dos calles de la catedral de San Servacio.
-      </p>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Indicadores editoriales provisionales. Sin certificaciones ni distintivos acreditados.
-      </p>
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <Button size="lg" className="rounded-pill px-6">
-          Solicitar disponibilidad
-          <ArrowRight className="ml-2 size-4" aria-hidden />
-        </Button>
-        <Button size="lg" variant="outline" className="rounded-pill px-6">
-          <Heart className="mr-2 size-4" aria-hidden />
-          Agregar a mi viaje
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function HeroEditorial() {
-  return (
-    <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-center">
-      <HeroCopy />
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        <img
-          src={MEDIA.cover.url}
-          alt={MEDIA.cover.alt}
-          loading="eager"
-          className="col-span-2 h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72"
-        />
-        <img
-          src={MEDIA.habitacion.url}
-          alt={MEDIA.habitacion.alt}
-          loading="lazy"
-          className="h-36 w-full rounded-2xl object-cover shadow-soft sm:h-44"
-        />
-        <img
-          src={MEDIA.terraza.url}
-          alt={MEDIA.terraza.alt}
-          loading="lazy"
-          className="h-36 w-full rounded-2xl object-cover shadow-soft sm:h-44"
-        />
-      </div>
-    </section>
-  );
-}
-
-function HeroCinematografico() {
-  return (
-    <section className="relative overflow-hidden rounded-3xl shadow-floating">
-      <img
-        src={MEDIA.cover.url}
-        alt={MEDIA.cover.alt}
-        loading="eager"
-        className="h-[420px] w-full object-cover sm:h-[520px]"
-      />
-      <div
-        className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/5"
-        aria-hidden
-      />
-      <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
-        <div className="rounded-3xl bg-background/85 p-6 backdrop-blur-md sm:max-w-xl sm:p-8">
-          <HeroCopy compact />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Gallery({ layout }: { layout: GalleryLayout }) {
-  return (
-    <section aria-labelledby="galeria-hotel">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Galería</p>
-          <h2 id="galeria-hotel" className="mt-1 font-serif text-2xl tracking-tight sm:text-3xl">
-            Espacios del hotel
-          </h2>
-        </div>
-        <Button variant="ghost" className="rounded-pill">
-          <Images className="mr-2 size-4" aria-hidden />
-          Ver todas
-        </Button>
-      </div>
-      {layout === "mosaico" ? (
-        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {GALLERY.map((m, i) => (
-            <img
-              key={m.url}
-              src={m.url}
-              alt={m.alt}
-              loading="lazy"
-              className={cn(
-                "w-full rounded-3xl object-cover shadow-soft",
-                i === 0 ? "col-span-2 row-span-2 h-64 sm:h-[21rem]" : "h-32 sm:h-40",
-              )}
-            />
-          ))}
-        </div>
-      ) : null}
-
-      {layout === "carrusel" ? (
-        <ul className="mt-5 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2">
-          {GALLERY.map((m, i) => (
-            <li key={m.url} className="w-[78%] shrink-0 snap-center sm:w-[42%]">
-              <img
-                src={m.url}
-                alt={m.alt}
-                loading="lazy"
-                className="h-60 w-full rounded-3xl object-cover shadow-soft"
-              />
-              <p className="mt-1.5 text-[11px] text-muted-foreground">
-                {i + 1} / {GALLERY.length}
-              </p>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-
-      {layout === "cuadricula" ? (
-        <div className="mt-5 grid gap-4 sm:grid-cols-3">
-          {GALLERY.map((m) => (
-            <img
-              key={m.url}
-              src={m.url}
-              alt={m.alt}
-              loading="lazy"
-              className="h-52 w-full rounded-3xl object-cover shadow-soft"
-            />
-          ))}
-        </div>
-      ) : null}
-
-      {layout === "tira" ? (
-        <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-6">
-          {GALLERY.map((m) => (
-            <img
-              key={m.url}
-              src={m.url}
-              alt={m.alt}
-              loading="lazy"
-              className="h-24 w-full rounded-2xl object-cover shadow-soft sm:h-28"
-            />
-          ))}
-        </div>
-      ) : null}
+    <PremiumSection
+      vm={toPremiumSectionVM({
+        id: "galeria-hotel",
+        eyebrow: "Galería",
+        title: "Espacios del hotel",
+        action: (
+          <Button variant="ghost" className="rounded-pill">
+            <Images className="mr-2 size-4" aria-hidden />
+            Ver todas
+          </Button>
+        ),
+      })}
+    >
+      <PremiumGallery vm={vm.gallery} />
       <p className="mt-2 text-xs text-muted-foreground">
         Fotografías gobernadas existentes servidas por ruta pública estable. Sin URLs firmadas.
       </p>
-    </section>
+    </PremiumSection>
   );
 }
 

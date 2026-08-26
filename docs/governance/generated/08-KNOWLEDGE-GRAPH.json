@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "status": "Approved",
-  "generated_at": "2026-08-27T00:00:00.000Z",
+  "generated_at": "2026-08-28T00:00:00.000Z",
   "derived_from": {
     "glossary": {
       "document": "docs/governance/01-GLOSSARY.md",
@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "2f7784110fedd6e06602cc57ace5aa3e7d3eac4503563039e3544b3420a57ad2"
+      "source_sha256": "fc3020ebb570463040a1229f0971c7078e7761919f36859a8f5dc9a0220a8b19"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -10932,6 +10932,86 @@
       "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json",
       "source": "docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json",
       "evidence": "docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/vm/common.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/vm/common.ts",
+      "source": "src/lib/omxds/presentation/vm/common.ts",
+      "evidence": "src/lib/omxds/presentation/vm/common.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/vm/families.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/vm/families.ts",
+      "source": "src/lib/omxds/presentation/vm/families.ts",
+      "evidence": "src/lib/omxds/presentation/vm/families.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/vm/index.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/vm/index.ts",
+      "source": "src/lib/omxds/presentation/vm/index.ts",
+      "evidence": "src/lib/omxds/presentation/vm/index.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/g5/premium-presentation.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/g5/premium-presentation.contract.test.ts",
+      "source": "scripts/omxds/g5/premium-presentation.contract.test.ts",
+      "evidence": "scripts/omxds/g5/premium-presentation.contract.test.ts"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-home-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-home-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-home-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-home-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-hotel-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-hotel-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-hotel-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-hotel-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-restaurant-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-restaurant-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-restaurant-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-restaurant-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-experience-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-experience-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-experience-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-experience-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-event-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-event-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-event-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-event-premium-preview.tsx"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-032.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-032.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-032.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-032.json"
     }
   ],
   "edges": [
@@ -30020,6 +30100,135 @@
       "destination": "DOMAIN:D01",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.52 · docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md → D01 · product-governance"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/omxds/presentation/vm/common.ts:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/vm/common.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/omxds/presentation/vm/families.ts:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/vm/families.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/omxds/presentation/vm/index.ts:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/vm/index.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/g5/premium-presentation.contract.test.ts:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:scripts/omxds/g5/premium-presentation.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/premium/PremiumHero.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumHero.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-home-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-home-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-destination-microsite-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-destination-microsite-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-hotel-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-hotel-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-restaurant-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-restaurant-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-experience-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-experience-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-event-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-event-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-032.json:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-032.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "origin": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D01",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.53 · docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md → D01 · product-governance"
     }
   ],
   "views": {
