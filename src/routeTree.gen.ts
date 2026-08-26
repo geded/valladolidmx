@@ -52,6 +52,7 @@ import { Route as LovableTourismCardPreviewRouteImport } from './routes/lovable/
 import { Route as LovableProtectedActionsPreviewRouteImport } from './routes/lovable/protected-actions-preview'
 import { Route as LovableG4RestaurantPremiumPreviewRouteImport } from './routes/lovable/g4-restaurant-premium-preview'
 import { Route as LovableG4HotelPremiumPreviewRouteImport } from './routes/lovable/g4-hotel-premium-preview'
+import { Route as LovableG4HomePremiumPreviewRouteImport } from './routes/lovable/g4-home-premium-preview'
 import { Route as LovableG4ExperiencePremiumPreviewRouteImport } from './routes/lovable/g4-experience-premium-preview'
 import { Route as LovableG4EventPremiumPreviewRouteImport } from './routes/lovable/g4-event-premium-preview'
 import { Route as LovableG4DestinationMicrositePreviewRouteImport } from './routes/lovable/g4-destination-microsite-preview'
@@ -423,6 +424,12 @@ const LovableG4HotelPremiumPreviewRoute =
   LovableG4HotelPremiumPreviewRouteImport.update({
     id: '/lovable/g4-hotel-premium-preview',
     path: '/lovable/g4-hotel-premium-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG4HomePremiumPreviewRoute =
+  LovableG4HomePremiumPreviewRouteImport.update({
+    id: '/lovable/g4-home-premium-preview',
+    path: '/lovable/g4-home-premium-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableG4ExperiencePremiumPreviewRoute =
@@ -1371,6 +1378,7 @@ export interface FileRoutesByFullPath {
   '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
   '/lovable/g4-event-premium-preview': typeof LovableG4EventPremiumPreviewRoute
   '/lovable/g4-experience-premium-preview': typeof LovableG4ExperiencePremiumPreviewRoute
+  '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
   '/lovable/g4-hotel-premium-preview': typeof LovableG4HotelPremiumPreviewRoute
   '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
@@ -1562,6 +1570,7 @@ export interface FileRoutesByTo {
   '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
   '/lovable/g4-event-premium-preview': typeof LovableG4EventPremiumPreviewRoute
   '/lovable/g4-experience-premium-preview': typeof LovableG4ExperiencePremiumPreviewRoute
+  '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
   '/lovable/g4-hotel-premium-preview': typeof LovableG4HotelPremiumPreviewRoute
   '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
@@ -1757,6 +1766,7 @@ export interface FileRoutesById {
   '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
   '/lovable/g4-event-premium-preview': typeof LovableG4EventPremiumPreviewRoute
   '/lovable/g4-experience-premium-preview': typeof LovableG4ExperiencePremiumPreviewRoute
+  '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
   '/lovable/g4-hotel-premium-preview': typeof LovableG4HotelPremiumPreviewRoute
   '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
@@ -1956,6 +1966,7 @@ export interface FileRouteTypes {
     | '/lovable/g4-destination-microsite-preview'
     | '/lovable/g4-event-premium-preview'
     | '/lovable/g4-experience-premium-preview'
+    | '/lovable/g4-home-premium-preview'
     | '/lovable/g4-hotel-premium-preview'
     | '/lovable/g4-restaurant-premium-preview'
     | '/lovable/protected-actions-preview'
@@ -2147,6 +2158,7 @@ export interface FileRouteTypes {
     | '/lovable/g4-destination-microsite-preview'
     | '/lovable/g4-event-premium-preview'
     | '/lovable/g4-experience-premium-preview'
+    | '/lovable/g4-home-premium-preview'
     | '/lovable/g4-hotel-premium-preview'
     | '/lovable/g4-restaurant-premium-preview'
     | '/lovable/protected-actions-preview'
@@ -2341,6 +2353,7 @@ export interface FileRouteTypes {
     | '/lovable/g4-destination-microsite-preview'
     | '/lovable/g4-event-premium-preview'
     | '/lovable/g4-experience-premium-preview'
+    | '/lovable/g4-home-premium-preview'
     | '/lovable/g4-hotel-premium-preview'
     | '/lovable/g4-restaurant-premium-preview'
     | '/lovable/protected-actions-preview'
@@ -2531,6 +2544,7 @@ export interface RootRouteChildren {
   LovableG4DestinationMicrositePreviewRoute: typeof LovableG4DestinationMicrositePreviewRoute
   LovableG4EventPremiumPreviewRoute: typeof LovableG4EventPremiumPreviewRoute
   LovableG4ExperiencePremiumPreviewRoute: typeof LovableG4ExperiencePremiumPreviewRoute
+  LovableG4HomePremiumPreviewRoute: typeof LovableG4HomePremiumPreviewRoute
   LovableG4HotelPremiumPreviewRoute: typeof LovableG4HotelPremiumPreviewRoute
   LovableG4RestaurantPremiumPreviewRoute: typeof LovableG4RestaurantPremiumPreviewRoute
   LovableProtectedActionsPreviewRoute: typeof LovableProtectedActionsPreviewRoute
@@ -2870,6 +2884,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/g4-hotel-premium-preview'
       fullPath: '/lovable/g4-hotel-premium-preview'
       preLoaderRoute: typeof LovableG4HotelPremiumPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g4-home-premium-preview': {
+      id: '/lovable/g4-home-premium-preview'
+      path: '/lovable/g4-home-premium-preview'
+      fullPath: '/lovable/g4-home-premium-preview'
+      preLoaderRoute: typeof LovableG4HomePremiumPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/g4-experience-premium-preview': {
@@ -4474,6 +4495,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableG4EventPremiumPreviewRoute: LovableG4EventPremiumPreviewRoute,
   LovableG4ExperiencePremiumPreviewRoute:
     LovableG4ExperiencePremiumPreviewRoute,
+  LovableG4HomePremiumPreviewRoute: LovableG4HomePremiumPreviewRoute,
   LovableG4HotelPremiumPreviewRoute: LovableG4HotelPremiumPreviewRoute,
   LovableG4RestaurantPremiumPreviewRoute:
     LovableG4RestaurantPremiumPreviewRoute,
