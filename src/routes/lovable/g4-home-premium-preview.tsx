@@ -540,82 +540,32 @@ function HeroActions() {
   );
 }
 
-function HeroEditorial() {
-  const [index, setIndex] = useState(0);
+/** Fuente plana de la portada; el hero lo construye el runtime compartido. */
+function buildHomeSource(index: number): PremiumEntitySource {
   const slide = HERO_SLIDES[index];
+  return {
+    title: "Valladolid, Capital Turística del Oriente Maya de Yucatán",
+    eyebrow: "Revista territorial · Oriente Maya",
+    subtitle:
+      "Historias, rutas y lugares reunidos con una mirada editorial para inspirar el viaje y convertirlo, paso a paso, en un itinerario con Alux.",
+    cover: slide.media,
+    gallery: HERO_SLIDES.map((s) => s.media),
+    destination: { slug: "valladolid", label: "Valladolid" },
+  };
+}
+
+function HomeHero({ presentation }: { presentation: PremiumPresentation }) {
+  const [index, setIndex] = useState(0);
+  const vm = toHomePremiumVM({ ...buildHomeSource(index), actions: <HeroActions /> });
   return (
-    <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-      <div className="grid lg:grid-cols-[minmax(0,42%)_minmax(0,58%)]">
-        <div className="flex flex-col justify-center bg-card p-6 sm:p-9 lg:p-12">
-          <p className="text-xs font-semibold uppercase text-primary">
-            Revista territorial · Oriente Maya
-          </p>
-          <h1 className="mt-3 text-balance font-display text-4xl leading-tight sm:text-5xl lg:text-6xl">
-            Valladolid, Capital Turística del Oriente Maya de Yucatán
-          </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
-            Historias, rutas y lugares reunidos con una mirada editorial para inspirar el viaje y
-            convertirlo, paso a paso, en un itinerario con Alux.
-          </p>
-          <div className="mt-7">
-            <HeroActions />
-          </div>
-          <div className="mt-7 border-t border-border pt-5">
-            <HeroSlideControl index={index} onChange={setIndex} />
-          </div>
-        </div>
-        <figure className="relative min-h-[22rem] overflow-hidden lg:min-h-[38rem]">
-          <img
-            src={slide.media.url}
-            alt={slide.media.alt}
-            loading="eager"
-            className="absolute inset-0 size-full object-cover"
-          />
-          <figcaption className="absolute bottom-4 left-4 rounded-md bg-foreground/85 px-3 py-2 text-xs text-background">
-            {slide.caption}
-          </figcaption>
-        </figure>
-      </div>
-    </section>
+    <PremiumHero
+      vm={vm.hero}
+      presentation={presentation}
+      extras={<HeroSlideControl index={index} onChange={setIndex} />}
+    />
   );
 }
 
-function HeroCinematic() {
-  const [index, setIndex] = useState(0);
-  const slide = HERO_SLIDES[index];
-  return (
-    <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-      <div className="relative min-h-[28rem] sm:min-h-[36rem]">
-        <img
-          src={slide.media.url}
-          alt={slide.media.alt}
-          loading="eager"
-          className="absolute inset-0 size-full object-cover"
-        />
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/55 to-foreground/10"
-          aria-hidden
-        />
-        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
-          <p className="text-xs font-semibold uppercase text-primary">Oriente Maya · Yucatán</p>
-          <h1 className="mt-3 max-w-4xl text-balance font-display text-4xl leading-tight text-primary-foreground sm:text-6xl">
-            Valladolid, Capital Turística del Oriente Maya de Yucatán
-          </h1>
-          <div className="mt-5">
-            <HeroSlideControl index={index} onChange={setIndex} inverted />
-          </div>
-        </div>
-      </div>
-      <div className="grid gap-5 bg-card p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center">
-        <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
-          Del asombro a una ruta posible: descubre el territorio y organiza cada parada con Alux
-          dentro del Travel Plan canónico.
-        </p>
-        <HeroActions />
-      </div>
-    </section>
-  );
-}
 
 function SectionHead({
   kicker,

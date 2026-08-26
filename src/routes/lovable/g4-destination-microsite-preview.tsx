@@ -38,6 +38,17 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
+import {
+  PremiumBreadcrumb,
+  PremiumGallery,
+  PremiumHero,
+  PremiumSection,
+} from "@/components/premium";
+import {
+  toDestinationPremiumVM,
+  toPremiumSectionVM,
+  type PremiumEntitySource,
+} from "@/lib/omxds/presentation/vm";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/lovable/g4-destination-microsite-preview")({
@@ -340,16 +351,19 @@ function G4DestinationMicrositePreview() {
     [activeService],
   );
 
+  const presentation = tuning.direction === "editorial" ? "editorial" : "cinematic";
+  const vm = toDestinationPremiumVM({ ...DESTINATION_SOURCE, actions: <HeroActions /> });
+
   return (
     <div className="min-h-screen bg-background pb-24">
       <PreviewRibbon />
 
       <Container className="pt-6">
-        <TerritorialPath />
+        <PremiumBreadcrumb crumbs={vm.crumbs} />
       </Container>
 
       <Container className="mt-5">
-        {tuning.direction === "editorial" ? <HeroEditorial /> : <HeroCinematografico />}
+        <PremiumHero vm={vm.hero} presentation={presentation} />
       </Container>
 
       {tuning.role === "administracion" ? (
@@ -421,85 +435,20 @@ function GovernanceNote() {
  * Galería configurable de forma independiente a la dirección visual.
  */
 function GaleriaEditorial({ layout }: { layout: GalleryLayout }) {
-  const items = DESTINATION_GALLERY;
+  const vm = toDestinationPremiumVM(DESTINATION_SOURCE, { galleryLayout: layout });
   return (
-    <section aria-labelledby="galeria-destino">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Galería</p>
-          <h2 id="galeria-destino" className="mt-1 font-serif text-2xl tracking-tight sm:text-3xl">
-            Valladolid en imágenes
-          </h2>
-        </div>
-        <span className="hidden text-[11px] uppercase tracking-[0.16em] text-muted-foreground sm:inline">
-          {layout}
-        </span>
-      </div>
-
-      {layout === "mosaico" ? (
-        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {items.map((m, i) => (
-            <img
-              key={m.url + i}
-              src={m.url}
-              alt={m.alt}
-              loading="lazy"
-              className={cn(
-                "w-full rounded-3xl object-cover shadow-soft",
-                i === 0 ? "col-span-2 row-span-2 h-64 sm:h-[21rem]" : "h-32 sm:h-40",
-              )}
-            />
-          ))}
-        </div>
-      ) : null}
-
-      {layout === "carrusel" ? (
-        <ul className="mt-5 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2">
-          {items.map((m, i) => (
-            <li key={m.url + i} className="w-[78%] shrink-0 snap-center sm:w-[42%]">
-              <img
-                src={m.url}
-                alt={m.alt}
-                loading="lazy"
-                className="h-60 w-full rounded-3xl object-cover shadow-soft"
-              />
-            </li>
-          ))}
-        </ul>
-      ) : null}
-
-      {layout === "cuadricula" ? (
-        <div className="mt-5 grid gap-4 sm:grid-cols-3">
-          {items.map((m, i) => (
-            <img
-              key={m.url + i}
-              src={m.url}
-              alt={m.alt}
-              loading="lazy"
-              className="h-48 w-full rounded-3xl object-cover shadow-soft"
-            />
-          ))}
-        </div>
-      ) : null}
-
-      {layout === "tira" ? (
-        <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-6">
-          {items.map((m, i) => (
-            <img
-              key={m.url + i}
-              src={m.url}
-              alt={m.alt}
-              loading="lazy"
-              className="h-24 w-full rounded-2xl object-cover shadow-soft sm:h-28"
-            />
-          ))}
-        </div>
-      ) : null}
-
+    <PremiumSection
+      vm={toPremiumSectionVM({
+        id: "galeria",
+        eyebrow: "Galería",
+        title: "Valladolid en imágenes",
+      })}
+    >
+      <PremiumGallery vm={vm.gallery} />
       <p className="mt-2 text-xs text-muted-foreground">
         Fotografías gobernadas existentes servidas por ruta pública estable. Sin URLs firmadas.
       </p>
-    </section>
+    </PremiumSection>
   );
 }
 
@@ -512,62 +461,24 @@ function PreviewRibbon() {
   );
 }
 
-function TerritorialPath() {
-  return (
-    <nav aria-label="Ruta territorial" className="text-sm">
-      <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
-        <li>
-          <Link
-            to="/"
-            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            Inicio
-          </Link>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>
-          <Link
-            to="/oriente-maya"
-            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            Oriente Maya
-          </Link>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li aria-current="page" className="font-medium text-foreground">
-          Valladolid
-        </li>
-      </ol>
-    </nav>
-  );
-}
+/**
+ * Fuente plana del destino DEMO. El breadcrumb territorial y el distintivo
+ * Pueblo Mágico los resuelve el runtime premium compartido.
+ */
+const DESTINATION_SOURCE = {
+  title: "Valladolid",
+  eyebrow: "Oriente Maya · Yucatán",
+  subtitle: "Capital Turística del Oriente Maya de Yucatán",
+  cover: MEDIA.cover,
+  gallery: DESTINATION_GALLERY,
+  destination: { slug: "valladolid", label: "Valladolid" },
+} satisfies PremiumEntitySource;
 
-function EditorialStatus() {
-  if (!isPuebloMagico("valladolid")) return null;
+/** Acciones del hero del micrositio. */
+function HeroActions() {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-primary">
-      Pueblo Mágico
-      <span className="sr-only">(estado editorial provisional en texto; sin logotipo oficial)</span>
-    </span>
-  );
-}
-
-function HeroCopy({ compact = false }: { compact?: boolean }) {
-  return (
-    <div className={compact ? "" : "max-w-2xl"}>
-      <div className="flex flex-wrap items-center gap-2">
-        <EditorialStatus />
-        <span className="rounded-pill border border-border bg-background/70 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-          Oriente Maya · Yucatán
-        </span>
-      </div>
-      <h1 className="mt-4 font-serif text-4xl leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-        Valladolid
-      </h1>
-      <p className="mt-3 text-lg text-foreground/80 sm:text-xl">
-        Capital Turística del Oriente Maya de Yucatán
-      </p>
-      <p className="mt-4 max-w-xl text-base text-muted-foreground">
+    <div>
+      <p className="max-w-xl text-base text-muted-foreground">
         Despierta aquí. Descubre desde Valladolid todo el Oriente Maya.
       </p>
       <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -581,56 +492,6 @@ function HeroCopy({ compact = false }: { compact?: boolean }) {
         </Button>
       </div>
     </div>
-  );
-}
-
-function HeroEditorial() {
-  return (
-    <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-center">
-      <HeroCopy />
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        <img
-          src={MEDIA.cover.url}
-          alt={MEDIA.cover.alt}
-          loading="eager"
-          className="col-span-2 h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72"
-        />
-        <img
-          src={MEDIA.plaza.url}
-          alt={MEDIA.plaza.alt}
-          loading="lazy"
-          className="h-36 w-full rounded-2xl object-cover shadow-soft sm:h-44"
-        />
-        <img
-          src={MEDIA.calle.url}
-          alt={MEDIA.calle.alt}
-          loading="lazy"
-          className="h-36 w-full rounded-2xl object-cover shadow-soft sm:h-44"
-        />
-      </div>
-    </section>
-  );
-}
-
-function HeroCinematografico() {
-  return (
-    <section className="relative overflow-hidden rounded-3xl shadow-floating">
-      <img
-        src={MEDIA.cover.url}
-        alt={MEDIA.cover.alt}
-        loading="eager"
-        className="h-[420px] w-full object-cover sm:h-[520px]"
-      />
-      <div
-        className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/5"
-        aria-hidden
-      />
-      <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
-        <div className="rounded-3xl bg-background/85 p-6 backdrop-blur-md sm:max-w-xl sm:p-8">
-          <HeroCopy compact />
-        </div>
-      </div>
-    </section>
   );
 }
 

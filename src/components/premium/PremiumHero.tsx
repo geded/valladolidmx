@@ -8,6 +8,7 @@
  *  - `cinematic`: media inmersiva con scrim sólido inferior y contraste
  *    reforzado; sin párrafos largos sobre la foto.
  */
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { PremiumBadges } from "./PremiumBadges";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/premium-presentation";
@@ -66,10 +67,13 @@ export function PremiumHero({
   vm,
   presentation,
   className,
+  extras,
 }: {
   vm: PremiumHeroVM;
   presentation: PremiumPresentation;
   className?: string;
+  /** Complemento opcional del panel (p. ej. control de slides de portada). */
+  extras?: ReactNode;
 }) {
   const cover = vm.cover;
 
@@ -91,6 +95,7 @@ export function PremiumHero({
         <div className="relative -mt-16 px-5 pb-6 sm:-mt-20 sm:px-8 sm:pb-8">
           <div className="rounded-2xl bg-card/95 p-5 shadow-soft backdrop-blur sm:p-7">
             <Copy vm={vm} />
+            {extras ? <div className="mt-6 border-t border-border pt-5">{extras}</div> : null}
           </div>
         </div>
       </section>
@@ -102,6 +107,7 @@ export function PremiumHero({
       <div className="grid gap-0 lg:grid-cols-5">
         <div className="order-2 p-5 sm:p-8 lg:order-1 lg:col-span-2 lg:self-center">
           <Copy vm={vm} compact />
+          {extras ? <div className="mt-6 border-t border-border pt-5">{extras}</div> : null}
         </div>
         <div className="order-1 lg:order-2 lg:col-span-3">
           {cover ? (
