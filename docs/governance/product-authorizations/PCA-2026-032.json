@@ -1,0 +1,65 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-032",
+  "title": "G4-SYSTEM-02 · Adopcion del runtime visual premium en los previews G4",
+  "status": "Approved",
+  "branch": "edit/edt-3952bbcb-64f1-4fe4-af84-ac827cbee50b",
+  "blueprint": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-28 · Ejecutar P1 y P2 del plan aprobado en .lovable/plan.md: eje de presentacion compartido, tipos, gate contractual, primitivas premium y mappers ViewModel, migrando las seis vistas previas internas G4 al runtime compartido. Prohibe conectar superficies publicas, datos, migraciones, status/is_demo_seed, produccion, secretos, merge, deploy y activar omxds_visual_v1_contracts_enabled.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/presentation/vm/common.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/presentation/vm/families.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/presentation/vm/index.ts"
+    },
+    {
+      "operation": "create",
+      "path": "scripts/omxds/g5/premium-presentation.contract.test.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/premium/PremiumHero.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-home-premium-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-destination-microsite-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-hotel-premium-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-restaurant-premium-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-experience-premium-preview.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-event-premium-preview.tsx"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bunx vitest run scripts/omxds/g5/premium-presentation.contract.test.ts"
+  ]
+}
