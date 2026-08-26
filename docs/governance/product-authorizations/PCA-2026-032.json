@@ -20,10 +20,6 @@
       "path": "src/lib/omxds/presentation/vm/index.ts"
     },
     {
-      "operation": "create",
-      "path": "scripts/omxds/g5/premium-presentation.contract.test.ts"
-    },
-    {
       "operation": "modify",
       "path": "src/components/premium/PremiumHero.tsx"
     },
