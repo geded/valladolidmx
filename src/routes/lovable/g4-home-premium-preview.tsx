@@ -426,7 +426,6 @@ function G4HomePremiumPreview() {
           ) : null,
         )}
 
-
         <Container className="mt-10 sm:mt-12">
           <TravelPlanClose
             selectedRoute={selectedRoute}
@@ -990,8 +989,8 @@ function PueblosMagicosSection({ onCreateRoute }: { onCreateRoute: () => void })
       </div>
       <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Badge exclusivamente textual: el distintivo gráfico oficial espera un asset acreditado y no
-          se fabrica ni se imita en esta preview.
+          Badge exclusivamente textual: el distintivo gráfico oficial espera un asset acreditado y
+          no se fabrica ni se imita en esta preview.
         </p>
         <Button type="button" onClick={onCreateRoute} className="min-h-11 rounded-pill">
           <RouteIcon className="mr-2 size-4" aria-hidden />
