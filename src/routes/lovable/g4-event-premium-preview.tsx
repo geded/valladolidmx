@@ -449,7 +449,11 @@ function HeroPanel({ status, compact = false }: { status: EventStatus; compact?:
 
       <dl className="mt-6 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
         <Fact icon={CalendarDays} label="Fecha" value={EVENT.dateLabel} />
-        <Fact icon={Clock} label="Hora y duración" value={`${EVENT.timeLabel} · ${EVENT.duration}`} />
+        <Fact
+          icon={Clock}
+          label="Hora y duración"
+          value={`${EVENT.timeLabel} · ${EVENT.duration}`}
+        />
         <Fact icon={MapPin} label="Sede" value={EVENT.venue} />
         <Fact icon={Building2} label="Dirección" value={EVENT.address} />
         <Fact icon={Accessibility} label="Accesibilidad" value={EVENT.accessibility} />
@@ -476,15 +480,7 @@ function HeroPanel({ status, compact = false }: { status: EventStatus; compact?:
   );
 }
 
-function Fact({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Clock;
-  label: string;
-  value: string;
-}) {
+function Fact({ icon: Icon, label, value }: { icon: typeof Clock; label: string; value: string }) {
   return (
     <div className="flex items-start gap-2.5">
       <Icon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
@@ -1072,7 +1068,11 @@ function TuningPanel({
               checked={value.showGallery}
               onChange={(v) => set("showGallery", v)}
             />
-            <Toggle label="Mapa de sede" checked={value.showMap} onChange={(v) => set("showMap", v)} />
+            <Toggle
+              label="Mapa de sede"
+              checked={value.showMap}
+              onChange={(v) => set("showMap", v)}
+            />
             <Toggle
               label="Información práctica"
               checked={value.showPractical}
