@@ -30,7 +30,9 @@ export function ListingMapHeader({ heading, points }: ListingMapHeaderProps) {
 
   return (
     <section className="space-y-3">
-      {heading ? <h2 className="text-lg font-semibold text-foreground">{heading}</h2> : null}
+      {heading ? (
+        <h2 className="text-lg font-semibold text-foreground">{heading}</h2>
+      ) : null}
       <Suspense
         fallback={
           <div className="h-[320px] w-full animate-pulse rounded-2xl bg-muted md:h-[420px]" />
