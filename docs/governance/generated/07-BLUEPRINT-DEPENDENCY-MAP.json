@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.51",
+    "version": "0.52",
     "state": "Approved",
-    "source_sha256": "91ee33d0ecb554de5a301a6229f22de21e75b5f363e878807c3236958997343c",
+    "source_sha256": "cc5817a97c3b121c36ed3cc27c9850162c28a6e0aef29e09d29612b5604a727b",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -7659,6 +7659,99 @@
       "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json",
       "type": "artifact",
       "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumHero.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumHero.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumPresentationControl.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumPresentationControl.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumTerritorialBreadcrumb.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumTerritorialBreadcrumb.tsx"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/presentation.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/presentation.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/g5/premium-presentation.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/g5/premium-presentation.contract.test.ts"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-031.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-031.json"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumAction.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumAction.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumCard.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumCard.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumSection.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumSection.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/index.ts",
+      "type": "artifact",
+      "path": "src/components/premium/index.ts"
+    },
+    {
+      "id": "ART:src/components/premium/types.ts",
+      "type": "artifact",
+      "path": "src/components/premium/types.ts"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-032.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-032.json"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-033.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-033.json"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-034.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-034.json"
+    },
+    {
+      "id": "ART:scripts/omxds/g5/publication-readiness.audit.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/g5/publication-readiness.audit.mjs"
+    },
+    {
+      "id": "ART:docs/governance/evidence/19.28/publication-readiness.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/19.28/publication-readiness.json"
     }
   ],
   "edges": [
@@ -19900,6 +19993,240 @@
       "destination": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
       "evidence": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumHero.tsx:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumHero.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumPresentationControl.tsx:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumPresentationControl.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumTerritorialBreadcrumb.tsx:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumTerritorialBreadcrumb.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/surfaces/BusinessSurface.tsx:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/surfaces/BusinessSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/presentation/presentation.ts:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/presentation.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/g5/premium-presentation.contract.test.ts:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:scripts/omxds/g5/premium-presentation.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/business-premium-surface.evidence.mjs:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-premium-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-031.json:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-031.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumAction.tsx:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumAction.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumCard.tsx:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumCard.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumSection.tsx:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumSection.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/index.ts:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/index.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/types.ts:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/types.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/surfaces/DestinationSurface.tsx:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/surfaces/DestinationSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/oriente-maya/$destino.index.tsx:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/routes/oriente-maya/$destino.index.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/destination-surface.evidence.mjs:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/destination-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-032.json:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-032.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/surfaces/TourismListingSurface.tsx:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/surfaces/TourismListingSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-033.json:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-033.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/surfaces/EventSurface.tsx:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/surfaces/EventSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/surfaces/ProductSurface.tsx:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/surfaces/ProductSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-034.json:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-034.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/g5/publication-readiness.audit.mjs:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:scripts/omxds/g5/publication-readiness.audit.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/19.28/publication-readiness.json:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "origin": "ART:docs/governance/evidence/19.28/publication-readiness.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
       "verified_at": "2026-08-26"
     }
   ],

@@ -1,0 +1,31 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-032",
+  "title": "19.28 · G5 · Integración Premium fail-closed del micrositio de destino",
+  "status": "Approved",
+  "branch": "feature/omxds-g5-premium-system-v1",
+  "blueprint": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-26 · Continuar la construcción del sistema completo con el estilo aprobado. Este incremento integra el runtime Premium en el micrositio de destino exclusivamente bajo elegibilidad individual vigente; no autoriza datos, migraciones, producción, merge, despliegue, activación del flag ni publicación de demos.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/DestinationSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.index.tsx"
+    }
+  ],
+  "public_routes": ["/oriente-maya/:destino"],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:i3:a",
+    "bun scripts/omxds/g5/premium-presentation.contract.test.ts",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

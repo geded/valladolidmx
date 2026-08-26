@@ -43,10 +43,7 @@ assert.ok(
   "DestinationSurface must consume the shared contract",
 );
 
-for (const file of [
-  "src/components/surfaces/DestinationSurface.tsx",
-  "scripts/omxds/i3/destination-surface.contract.test.ts",
-])
+for (const file of ["scripts/omxds/i3/destination-surface.contract.test.ts"])
   assert.equal(
     execFileSync("git", ["diff", "--name-only", i3aHead, "--", file], {
       encoding: "utf8",
@@ -55,6 +52,54 @@ for (const file of [
     `I3-A regression: ${file}`,
   );
 
+function assertApprovedExactModification(authorizationId, protectedPath) {
+  const authorizationPath = join(
+    "docs/governance/product-authorizations",
+    `${authorizationId}.json`,
+  );
+  const authorization = JSON.parse(readFileSync(authorizationPath, "utf8"));
+  assert.equal(
+    authorization.status,
+    "Approved",
+    `acknowledged revision requires an Approved ${authorizationId}`,
+  );
+  assert.ok(
+    (authorization.permissions ?? []).some(
+      (permission) => permission.operation === "modify" && permission.path === protectedPath,
+    ),
+    `${authorizationId} does not authorize modifying ${protectedPath}`,
+  );
+  assert.ok(
+    (authorization.required_feature_flags ?? []).includes(
+      "omxds_visual_v1_contracts_enabled=false",
+    ),
+    `${authorizationId} must preserve the OFF flag invariant`,
+  );
+}
+
+const surfacePath = "src/components/surfaces/DestinationSurface.tsx";
+const acknowledgedSurfaceRevisions = [
+  {
+    package: "19.28-g5-destination",
+    sha256: "f2107c0abb8c55b62cbb737123eba415b5333e884bf15e4fb9d7f8ad4ea6d328",
+    authorizations: ["PCA-2026-032"],
+  },
+];
+const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
+  encoding: "utf8",
+});
+if (surfaceDrift !== "") {
+  const digest = createHash("sha256").update(readFileSync(surfacePath)).digest("hex");
+  const acknowledged = acknowledgedSurfaceRevisions.find((revision) => revision.sha256 === digest);
+  assert.ok(
+    acknowledged,
+    `I3-A regression: ${surfacePath} (digest ${digest} is not an acknowledged PCA revision)`,
+  );
+  for (const authorizationId of acknowledged.authorizations) {
+    assertApprovedExactModification(authorizationId, surfacePath);
+  }
+}
+
 // 19.26 · Reconciliación fail-closed del gate I3-A.
 // El baseline histórico (base…i3aHead) se conserva intacto. La única evolución
 // tolerada de la ruta canónica de destino es el contenido EXACTO acreditado por
@@ -62,9 +107,9 @@ for (const file of [
 // Cualquier otra modificación —presente o futura— vuelve a fallar el gate.
 const acknowledgedRouteRevisions = [
   {
-    package: "19.23+19.24",
-    sha256: "9de7f1c8476780d719127c3bd4df3968db82116ab7ef8658269be2ff2d4e9f88",
-    authorizations: ["PCA-2026-025", "PCA-2026-026"],
+    package: "19.23+19.24+19.28-g5-destination",
+    sha256: "757b76081ec68a96d5df0c204d0662907800275ea2b8b90d52c6d3fa0534244e",
+    authorizations: ["PCA-2026-025", "PCA-2026-026", "PCA-2026-032"],
   },
 ];
 
@@ -79,28 +124,7 @@ if (routeDrift !== "") {
     `I3-A regression: ${routePath} (digest ${digest} is not an acknowledged PCA revision)`,
   );
   for (const authorizationId of acknowledged.authorizations) {
-    const authorizationPath = join(
-      "docs/governance/product-authorizations",
-      `${authorizationId}.json`,
-    );
-    const authorization = JSON.parse(readFileSync(authorizationPath, "utf8"));
-    assert.equal(
-      authorization.status,
-      "Approved",
-      `acknowledged route revision requires an Approved ${authorizationId}`,
-    );
-    assert.ok(
-      (authorization.permissions ?? []).some(
-        (permission) => permission.operation === "modify" && permission.path === routePath,
-      ),
-      `${authorizationId} does not authorize modifying ${routePath}`,
-    );
-    assert.ok(
-      (authorization.required_feature_flags ?? []).includes(
-        "omxds_visual_v1_contracts_enabled=false",
-      ),
-      `${authorizationId} must preserve the OFF flag invariant`,
-    );
+    assertApprovedExactModification(authorizationId, routePath);
   }
 }
 

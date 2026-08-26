@@ -19,14 +19,13 @@
  *    base de datos ni modifica el CMS.
  */
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
   Building2,
   CalendarDays,
   Compass,
   Home,
-  ChevronRight,
   Hotel,
   Images,
   Map as MapIcon,
@@ -39,6 +38,8 @@ import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { cn } from "@/lib/utils";
+import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
+import { PremiumPresentationControl, PremiumTerritorialBreadcrumb } from "@/components/premium";
 
 export const Route = createFileRoute("/lovable/g4-destination-microsite-preview")({
   head: () => ({
@@ -299,7 +300,7 @@ const MAP_DTO: ExperienceMapDTO = {
  *  - GALERÍA (Mosaico | Carrusel | Cuadrícula | Tira) es configuración
  *    independiente de la galería. "Mosaico" NO es sinónimo de Editorial.
  */
-type VisualDirection = "editorial" | "cinematografico";
+type VisualDirection = PremiumPresentation;
 type GalleryLayout = "mosaico" | "carrusel" | "cuadricula" | "tira";
 /** Destino/Inicio/Región sólo son administrables por Administración. */
 type RoleView = "visitante" | "administracion";
@@ -514,31 +515,13 @@ function PreviewRibbon() {
 
 function TerritorialPath() {
   return (
-    <nav aria-label="Ruta territorial" className="text-sm">
-      <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
-        <li>
-          <Link
-            to="/"
-            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            Inicio
-          </Link>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>
-          <Link
-            to="/oriente-maya"
-            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            Oriente Maya
-          </Link>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li aria-current="page" className="font-medium text-foreground">
-          Valladolid
-        </li>
-      </ol>
-    </nav>
+    <PremiumTerritorialBreadcrumb
+      crumbs={[
+        { label: "Inicio", href: "/" },
+        { label: "Oriente Maya de Yucatán", href: "/oriente-maya" },
+        { label: "Valladolid" },
+      ]}
+    />
   );
 }
 
@@ -558,7 +541,7 @@ function HeroCopy({ compact = false }: { compact?: boolean }) {
       <div className="flex flex-wrap items-center gap-2">
         <EditorialStatus />
         <span className="rounded-pill border border-border bg-background/70 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-          Oriente Maya · Yucatán
+          Oriente Maya de Yucatán
         </span>
       </div>
       <h1 className="mt-4 font-serif text-4xl leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
@@ -568,7 +551,7 @@ function HeroCopy({ compact = false }: { compact?: boolean }) {
         Capital Turística del Oriente Maya de Yucatán
       </p>
       <p className="mt-4 max-w-xl text-base text-muted-foreground">
-        Despierta aquí. Descubre desde Valladolid todo el Oriente Maya.
+        Despierta aquí. Descubre desde Valladolid todo el Oriente Maya de Yucatán.
       </p>
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <Button size="lg" className="rounded-pill px-6">
@@ -693,8 +676,9 @@ function DescubreValladolid() {
             de bordado, comunidades mayas vivas y haciendas henequeneras.
           </p>
           <p>
-            Por su ubicación, Valladolid es la base natural para recorrer el Oriente Maya: Chichén
-            Itzá, Ek' Balam, Izamal, Río Lagartos y Las Coloradas están al alcance de una jornada.
+            Por su ubicación, Valladolid es la base natural para recorrer el Oriente Maya de
+            Yucatán: Chichén Itzá, Ek' Balam, Izamal, Río Lagartos y Las Coloradas están al alcance
+            de una jornada.
           </p>
         </div>
       </div>
@@ -772,7 +756,9 @@ function ServicioPreview({ service }: { service: (typeof SERVICIOS)[number] }) {
 function CercaDeValladolid() {
   return (
     <section aria-labelledby="cerca-de-valladolid">
-      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Oriente Maya</p>
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+        Oriente Maya de Yucatán
+      </p>
       <h2 id="cerca-de-valladolid" className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
         Cerca de Valladolid
       </h2>
@@ -875,34 +861,10 @@ function TuningPanel({
               </p>
             ) : (
               <>
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    Dirección visual
-                  </p>
-                  <div className="mt-2 grid grid-cols-2 gap-2">
-                    {(
-                      [
-                        ["editorial", "Editorial"],
-                        ["cinematografico", "Cinematográfico"],
-                      ] as const
-                    ).map(([key, label]) => (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => set("direction", key)}
-                        aria-pressed={value.direction === key}
-                        className={cn(
-                          "rounded-2xl border px-3 py-2 text-xs transition-colors",
-                          value.direction === key
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border bg-background hover:bg-accent",
-                        )}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                <PremiumPresentationControl
+                  value={value.direction}
+                  onChange={(next) => set("direction", next)}
+                />
 
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">

@@ -41,6 +41,8 @@ import { ExperienceRelatedCollectionBlock } from "@/components/experience-builde
 import { InstitutionalBadgesBlock } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
 import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
 import { AluxNearbySuggestionBanner } from "@/components/alux/AluxNearbySuggestionBanner";
+import { PremiumHero } from "@/components/premium";
+import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 import type { ExperienceMapPoint } from "@/lib/experience-builder/blocks/experience-map/contract";
 import {
   toDestinationBlockInput,
@@ -109,6 +111,8 @@ export interface DestinationSurfaceProps {
   galleryUrls?: string[];
   /** I3-A · contrato validado; ausente conserva exactamente el renderer vigente. */
   surfaceContract?: OmxdsSurfaceContract;
+  /** G5 · sólo true cuando la ficha superó la elegibilidad Premium individual. */
+  premiumEnabled?: boolean;
 }
 
 function destinationRelatedCounts(related?: DestinationRelatedDTO | null) {
@@ -177,6 +181,7 @@ export function DestinationSurfaceContractBoundary({
   related,
   mapPoints,
   galleryUrls,
+  premiumEnabled,
 }: DestinationSurfaceContractBoundaryProps) {
   if (!enabled || !destinationSlug) return legacy;
 
@@ -205,6 +210,7 @@ export function DestinationSurfaceContractBoundary({
       mapPoints={mapPoints}
       galleryUrls={galleryUrls}
       surfaceContract={surfaceContract}
+      premiumEnabled={premiumEnabled}
     />
   );
 }
@@ -216,6 +222,7 @@ export function DestinationSurface({
   mapPoints,
   galleryUrls,
   surfaceContract,
+  premiumEnabled = false,
 }: DestinationSurfaceProps = {}) {
   const params = useParams({ strict: false }) as { destino?: string };
   const routeSearch = useSearch({ strict: false }) as { explora?: string };
@@ -308,11 +315,38 @@ export function DestinationSurface({
           </section>
         ) : null}
 
-        <ExperienceHero
-          dto={heroDto}
-          headingLevel="h1"
-          className={showGalleryMosaic ? "mt-6" : undefined}
-        />
+        {premiumEnabled && activeContract ? (
+          <PremiumHero
+            className={showGalleryMosaic ? "mt-6" : undefined}
+            vm={{
+              presentation: DEFAULT_PREMIUM_PRESENTATION,
+              crumbs: [
+                { label: "Inicio", href: "/" },
+                { label: "Oriente Maya de Yucatán", href: "/oriente-maya" },
+                { label: input.name },
+              ],
+              eyebrow: "Destino · Oriente Maya de Yucatán",
+              title: input.name,
+              description: input.tagline || input.description || undefined,
+              media:
+                (input.galleryUrls[0] ?? input.heroUrl)
+                  ? {
+                      url: input.galleryUrls[0] ?? input.heroUrl ?? "",
+                      alt: `Vista de ${input.name}, Oriente Maya de Yucatán`,
+                    }
+                  : null,
+              primaryAction: dominantAction?.href
+                ? { label: dominantAction.label, href: dominantAction.href }
+                : undefined,
+            }}
+          />
+        ) : (
+          <ExperienceHero
+            dto={heroDto}
+            headingLevel="h1"
+            className={showGalleryMosaic ? "mt-6" : undefined}
+          />
+        )}
 
         {nearbyPoints.length >= 3 ? (
           <AluxNearbySuggestionBanner destinationLabel={input.name} points={nearbyPoints} />

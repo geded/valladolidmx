@@ -63,6 +63,8 @@ import {
   createBusinessPremiumSurfaceContract,
   type BusinessPremiumEligibilityResult,
 } from "@/lib/omxds/surfaces/business-premium-surface.contract";
+import { PremiumHero } from "@/components/premium";
+import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 
 /* ------------------------------------------------------------------ *
  * Contexto — poblado por la ruta pública (SSR-safe).
@@ -406,17 +408,54 @@ export function BusinessSurface({
       crumbs={[{ label: "Catálogo", to: "/oriente-maya" }, { label: b.display_name }]}
       useContextCrumbs
     >
-      <ExperienceHero
-        dto={heroDto}
-        headingLevel="h1"
-        headerActionsSlot={
-          <>
+      {activePremium ? (
+        <>
+          <PremiumHero
+            vm={{
+              presentation: DEFAULT_PREMIUM_PRESENTATION,
+              crumbs: [
+                { label: "Inicio", href: "/" },
+                { label: "Oriente Maya de Yucatán", href: "/oriente-maya" },
+                ...(b.destination_slug
+                  ? [
+                      {
+                        label: b.destination_slug,
+                        href: `/oriente-maya/${encodeURIComponent(b.destination_slug)}`,
+                      },
+                    ]
+                  : []),
+                { label: b.display_name },
+              ],
+              eyebrow: variant.eyebrow,
+              title: b.display_name,
+              description: b.tagline || undefined,
+              media: activePremium.cover
+                ? {
+                    url: activePremium.cover.url,
+                    alt: activePremium.cover.alt,
+                  }
+                : null,
+              badges: b.verified ? [{ label: "Empresa verificada", tone: "success" }] : [],
+            }}
+          />
+          <div className="mx-auto mt-4 flex w-full max-w-7xl justify-end gap-2 px-5 sm:px-8 lg:px-12">
             <ShareButton title={b.display_name} />
             <FavoriteButton entityKind="business" entityId={b.id} />
-          </>
-        }
-        extensionsSlot={null}
-      />
+          </div>
+        </>
+      ) : (
+        <ExperienceHero
+          dto={heroDto}
+          headingLevel="h1"
+          headerActionsSlot={
+            <>
+              <ShareButton title={b.display_name} />
+              <FavoriteButton entityKind="business" entityId={b.id} />
+            </>
+          }
+          extensionsSlot={null}
+        />
+      )}
 
       <AluxContextChip
         businessId={b.id}

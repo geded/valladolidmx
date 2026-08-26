@@ -26,6 +26,8 @@ import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { cn } from "@/lib/utils";
+import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
+import { PremiumPresentationControl } from "@/components/premium";
 
 export const Route = createFileRoute("/lovable/g4-home-premium-preview")({
   head: () => ({
@@ -78,7 +80,7 @@ const MEDIA = {
 } as const;
 
 type Media = (typeof MEDIA)[keyof typeof MEDIA];
-type VisualDirection = "editorial" | "cinematografica";
+type VisualDirection = PremiumPresentation;
 type CardLayout = "asimetrica" | "cuadricula" | "carrusel";
 type SectionKey =
   | "destinos"
@@ -100,7 +102,7 @@ type TuningState = {
 
 const HERO_SLIDES = [
   { media: MEDIA.centro, caption: "Centro histórico al atardecer" },
-  { media: MEDIA.cenote, caption: "Cenotes del Oriente Maya" },
+  { media: MEDIA.cenote, caption: "Cenotes del Oriente Maya de Yucatán" },
 ] as const;
 
 const ROUTES = [
@@ -126,7 +128,7 @@ const ROUTES = [
   },
   {
     id: "pueblos",
-    title: "Pueblos Mágicos del Oriente Maya",
+    title: "Pueblos Mágicos del Oriente Maya de Yucatán",
     duration: "Dos días",
     stops: 3,
     vibe: "Patrimonio y vida local",
@@ -261,7 +263,7 @@ const EDITORIAL = [
   {
     kicker: "Territorio",
     title: "El agua bajo el suelo",
-    body: "Una introducción a los cenotes y su relación con la vida del Oriente Maya.",
+    body: "Una introducción a los cenotes y su relación con la vida del Oriente Maya de Yucatán.",
     media: MEDIA.cenote,
   },
   {
@@ -283,7 +285,7 @@ const MAP_DTO: ExperienceMapDTO = {
       lat: 20.6892,
       lng: -88.2018,
       title: "Valladolid",
-      subtitle: "Inicio sugerido · Capital Turística del Oriente Maya",
+      subtitle: "Inicio sugerido · Capital Turística del Oriente Maya de Yucatán",
       href: null,
       thumbUrl: null,
       badge: null,
@@ -326,7 +328,7 @@ const MAP_DTO: ExperienceMapDTO = {
 };
 
 const SECTION_LABELS: Record<SectionKey, string> = {
-  destinos: "Destinos del Oriente Maya",
+  destinos: "Destinos del Oriente Maya de Yucatán",
   pueblosMagicos: "Pueblos Mágicos",
   rutas: "Rutas recomendadas por Alux",
   experiencias: "Experiencias",
@@ -457,7 +459,7 @@ function PreviewHeader() {
         <Link to="/" className="flex min-w-0 items-center gap-2">
           <span className="truncate font-display text-lg font-semibold">Valladolid.mx</span>
           <span className="hidden text-[10px] uppercase text-muted-foreground sm:inline">
-            Oriente Maya
+            Oriente Maya de Yucatán
           </span>
         </Link>
         <nav
@@ -530,7 +532,7 @@ function HeroActions() {
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
       <Button asChild size="lg" className="min-h-12 rounded-pill">
         <Link to="/oriente-maya">
-          Explorar Oriente Maya <ArrowRight className="ml-2 size-4" aria-hidden />
+          Explorar Oriente Maya de Yucatán <ArrowRight className="ml-2 size-4" aria-hidden />
         </Link>
       </Button>
       <Button asChild size="lg" variant="outline" className="min-h-12 rounded-pill">
@@ -548,7 +550,7 @@ function HeroEditorial() {
       <div className="grid lg:grid-cols-[minmax(0,42%)_minmax(0,58%)]">
         <div className="flex flex-col justify-center bg-card p-6 sm:p-9 lg:p-12">
           <p className="text-xs font-semibold uppercase text-primary">
-            Revista territorial · Oriente Maya
+            Revista territorial · Oriente Maya de Yucatán
           </p>
           <h1 className="mt-3 text-balance font-display text-4xl leading-tight sm:text-5xl lg:text-6xl">
             Valladolid, Capital Turística del Oriente Maya de Yucatán
@@ -597,7 +599,7 @@ function HeroCinematic() {
           aria-hidden
         />
         <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
-          <p className="text-xs font-semibold uppercase text-primary">Oriente Maya · Yucatán</p>
+          <p className="text-xs font-semibold uppercase text-primary">Oriente Maya de Yucatán</p>
           <h1 className="mt-3 max-w-4xl text-balance font-display text-4xl leading-tight text-primary-foreground sm:text-6xl">
             Valladolid, Capital Turística del Oriente Maya de Yucatán
           </h1>
@@ -959,7 +961,7 @@ function PueblosMagicosSection({ onCreateRoute }: { onCreateRoute: () => void })
     <section id="pueblos-magicos" aria-labelledby="pueblos-title">
       <SectionHead
         kicker="Distintivo territorial"
-        title="Pueblos Mágicos del Oriente Maya"
+        title="Pueblos Mágicos del Oriente Maya de Yucatán"
         description="Valladolid, Izamal y Espita comparten un distintivo y tres formas distintas de vivir el oriente de Yucatán."
         action="Descubre los tres"
       />
@@ -1365,20 +1367,15 @@ function TuningPanel({
             contraste; las fotografías acompañan, nunca sostienen párrafos.
           </p>
           <div className="mt-4 space-y-4">
-            <OptionGroup
-              title="Dirección visual"
-              options={[
-                ["editorial", "Editorial"],
-                ["cinematografica", "Cinematográfica"],
-              ]}
-              active={value.direction}
-              onSelect={(next) => set("direction", next as VisualDirection)}
+            <PremiumPresentationControl
+              value={value.direction}
+              onChange={(next) => set("direction", next)}
             />
             <OptionGroup
               title="Hero"
               options={[
                 ["editorial", "Split editorial"],
-                ["cinematografica", "Inmersivo + banda"],
+                ["cinematic", "Inmersivo + banda"],
               ]}
               active={value.heroVariant}
               onSelect={(next) => set("heroVariant", next as VisualDirection)}

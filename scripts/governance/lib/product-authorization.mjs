@@ -116,8 +116,33 @@ export function loadAuthorizations(root = process.cwd()) {
     });
 }
 
+function loadAcknowledgedRevisionOverrides(root = process.cwd()) {
+  const directory = path.join(root, "docs/governance/addenda");
+  const overrides = new Map();
+  if (!fs.existsSync(directory)) return overrides;
+  const addenda = fs
+    .readdirSync(directory)
+    .filter((file) => file.endsWith(".json"))
+    .sort()
+    .map((file) => JSON.parse(fs.readFileSync(path.join(directory, file), "utf8")))
+    .filter(
+      (addendum) =>
+        addendum.status === ACTIVE_STATUS && addendum.supersedes_acknowledged_revision,
+    );
+  for (const addendum of addenda) {
+    const revision = addendum.supersedes_acknowledged_revision;
+    const key = `${addendum.parent}:${revision.operation}:${normalizeRepositoryPath(revision.path)}`;
+    const existing = overrides.get(key);
+    const expectedPrevious = existing?.current_sha256;
+    if (expectedPrevious && revision.previous_sha256 !== expectedPrevious) continue;
+    overrides.set(key, revision);
+  }
+  return overrides;
+}
+
 export function validateAuthorizations(authorizations, masterIndex) {
   const errors = [];
+  const acknowledgedRevisionOverrides = loadAcknowledgedRevisionOverrides();
   const ids = new Set();
   const approvedBlueprints = new Set(
     masterIndex.rows.filter((row) => row.state === "Approved").map((row) => row.path),
@@ -195,7 +220,9 @@ export function validateAuthorizations(authorizations, masterIndex) {
               .createHash("sha256")
               .update(fs.readFileSync(absolutePath))
               .digest("hex");
-            if (actual !== revision.sha256)
+            const overrideKey = `${authorization.id}:${revision.operation}:${normalizeRepositoryPath(revision.path)}`;
+            const expected = acknowledgedRevisionOverrides.get(overrideKey)?.current_sha256 ?? revision.sha256;
+            if (actual !== expected)
               errors.push(`${prefix}: acknowledged revision changed: ${revision.path}`);
           }
         }

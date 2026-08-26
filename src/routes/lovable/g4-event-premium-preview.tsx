@@ -17,14 +17,13 @@
  *  - El panel "Afinar plantilla" es local (useState) y no persiste.
  */
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   Accessibility,
   ArrowRight,
   Building2,
   CalendarDays,
   Check,
-  ChevronRight,
   Clock,
   Lock,
   Map as MapIcon,
@@ -39,6 +38,8 @@ import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { cn } from "@/lib/utils";
+import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
+import { PremiumPresentationControl, PremiumTerritorialBreadcrumb } from "@/components/premium";
 
 export const Route = createFileRoute("/lovable/g4-event-premium-preview")({
   head: () => ({
@@ -148,7 +149,7 @@ const PRACTICO = [
 const COMO_LLEGAR = [
   "A pie desde el centro histórico: acceso directo por las arcadas de la plaza.",
   "En coche: calles del cuadro central con sentido único y estacionamiento fuera de la plaza.",
-  "Desde otros destinos del Oriente Maya: llegada por la carretera federal y entrada al centro.",
+  "Desde otros destinos del Oriente Maya de Yucatán: llegada por la carretera federal y entrada al centro.",
 ] as const;
 
 const CERCANOS = [
@@ -228,7 +229,7 @@ const ADMIN_CAN = [
 
 /* ------------------------------------------------------------------ */
 
-type VisualDirection = "editorial" | "cinematografico";
+type VisualDirection = PremiumPresentation;
 type GalleryLayout = "mosaico" | "carrusel" | "cuadricula" | "tira";
 type RoleView = "visitante" | "organizador" | "administracion";
 type EventStatus = "programado" | "finalizado" | "cancelado";
@@ -372,35 +373,15 @@ function PreviewRibbon() {
 
 function TerritorialPath() {
   return (
-    <nav aria-label="Ruta territorial" className="text-sm">
-      <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
-        <li>
-          <Link
-            to="/"
-            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            Inicio
-          </Link>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>
-          <Link
-            to="/oriente-maya"
-            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            Oriente Maya
-          </Link>
-        </li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>Valladolid</li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li>Eventos</li>
-        <ChevronRight className="size-3.5 opacity-50" aria-hidden />
-        <li aria-current="page" className="font-medium text-foreground">
-          {EVENT.name}
-        </li>
-      </ol>
-    </nav>
+    <PremiumTerritorialBreadcrumb
+      crumbs={[
+        { label: "Inicio", href: "/" },
+        { label: "Oriente Maya de Yucatán", href: "/oriente-maya" },
+        { label: "Valladolid" },
+        { label: "Eventos" },
+        { label: EVENT.name },
+      ]}
+    />
   );
 }
 
@@ -951,40 +932,15 @@ function TuningPanel({
               </p>
             ) : (
               <>
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    Dirección visual
-                  </p>
-                  <div className="mt-2 grid grid-cols-2 gap-2">
-                    {(
-                      [
-                        ["editorial", "Editorial"],
-                        ["cinematografico", "Cinematográfico"],
-                      ] as const
-                    ).map(([key, label]) => (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => set("direction", key)}
-                        aria-pressed={value.direction === key}
-                        className={cn(
-                          "rounded-2xl border px-3 py-2 text-xs transition-colors",
-                          value.direction === key
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border bg-background hover:bg-accent",
-                        )}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                  {value.role === "organizador" ? (
-                    <p className="mt-2 text-[11px] text-muted-foreground">
-                      El organizador propone la variante; Administración revisa, aprueba y publica.
-                      Nada se publica automáticamente.
-                    </p>
-                  ) : null}
-                </div>
+                <PremiumPresentationControl
+                  value={value.direction}
+                  onChange={(next) => set("direction", next)}
+                  note={
+                    value.role === "organizador"
+                      ? "El organizador propone la variante; Administración revisa, aprueba y publica. Nada se publica automáticamente."
+                      : undefined
+                  }
+                />
 
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">

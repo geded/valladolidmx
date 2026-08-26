@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-034",
+  "title": "19.28 · G5 · Fichas Premium de producto, experiencia y evento",
+  "status": "Approved",
+  "branch": "feature/omxds-g5-premium-system-v1",
+  "blueprint": "docs/blueprint/19.28-G5-PREMIUM-PRESENTATION-RUNTIME-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-26 · Continuar las fichas restantes con el estilo aprobado y las conexiones existentes de Alux y Travel Plan. Autoriza sólo presentación en las superficies compartidas de producto/experiencia y evento; no autoriza datos, lógica comercial, migraciones, producción, merge, despliegue ni flag.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/ProductSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/EventSurface.tsx"
+    }
+  ],
+  "public_routes": [
+    "/producto/:slug",
+    "/oriente-maya/:destino/:categoria/:empresa/:producto",
+    "/eventos/:slug"
+  ],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:i3:c",
+    "bun scripts/omxds/g5/premium-presentation.contract.test.ts",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

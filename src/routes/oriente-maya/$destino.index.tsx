@@ -205,6 +205,7 @@ function DestinoPage() {
           related={related ?? undefined}
           mapPoints={mapPoints ?? []}
           galleryUrls={galleryUrls ?? []}
+          premiumEnabled={premiumEnabled}
           legacy={
             composition ? (
               <CompositionRenderer tree={composition.snapshot} />
@@ -214,6 +215,7 @@ function DestinoPage() {
                 related={related ?? undefined}
                 mapPoints={mapPoints ?? []}
                 galleryUrls={galleryUrls ?? []}
+                premiumEnabled={premiumEnabled}
               />
             )
           }

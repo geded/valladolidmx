@@ -55,8 +55,6 @@ for (const file of [
   productRoutePath,
   territorialProductRoutePath,
   eventRoutePath,
-  "src/components/surfaces/ProductSurface.tsx",
-  "src/components/surfaces/EventSurface.tsx",
   "src/lib/omxds/surfaces/product-surface.contract.ts",
   "src/lib/omxds/surfaces/experience-surface.adapter.ts",
   "src/lib/omxds/surfaces/event-surface.contract.ts",
@@ -69,6 +67,41 @@ for (const file of [
     "",
     `I3-C regression: ${file}`,
   );
+
+const acknowledgedSurfaceRevisions = new Map([
+  [
+    "src/components/surfaces/ProductSurface.tsx",
+    "f9f70fae41023133c79bcce5bcf750f6b79c666e296eb8f84b5f1d4f0147e55a",
+  ],
+  [
+    "src/components/surfaces/EventSurface.tsx",
+    "964fd6a43f656be98dd92e0af2adfe56677a280f46a07657d0cddb6b05a8131f",
+  ],
+]);
+const g5Authorization = JSON.parse(
+  readFileSync("docs/governance/product-authorizations/PCA-2026-034.json", "utf8"),
+);
+assert.equal(g5Authorization.status, "Approved", "I3-C G5 requires Approved PCA-2026-034");
+assert.ok(
+  (g5Authorization.required_feature_flags ?? []).includes(
+    "omxds_visual_v1_contracts_enabled=false",
+  ),
+  "PCA-2026-034 must preserve the OFF flag invariant",
+);
+for (const [surfacePath, expectedDigest] of acknowledgedSurfaceRevisions) {
+  const digest = createHash("sha256").update(readFileSync(surfacePath)).digest("hex");
+  assert.equal(
+    digest,
+    expectedDigest,
+    `I3-C regression: ${surfacePath} changed after PCA-2026-034`,
+  );
+  assert.ok(
+    (g5Authorization.permissions ?? []).some(
+      (permission) => permission.operation === "modify" && permission.path === surfacePath,
+    ),
+    `PCA-2026-034 does not authorize modifying ${surfacePath}`,
+  );
+}
 
 const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),

@@ -1,0 +1,48 @@
+{
+  "package": "19.28",
+  "mode": "READ_ONLY_EVIDENCE_SNAPSHOT",
+  "source": "docs/governance/evidence/p0-19-25/data-readiness.json",
+  "source_sha256": "1fddc8f2af22bf7d6f60330e2b47c126a4e5e4110bd5c8ef8efaefb95b2b9dc4",
+  "cutoff": "2026-08-25",
+  "live_backend_verified": false,
+  "feature_flag": false,
+  "summary": {
+    "ready_accredited": 4,
+    "blocked_incomplete": 5,
+    "blocked_no_media": 9
+  },
+  "ready_accredited": [
+    "destination:valladolid",
+    "business:hacienda-san-servacio-boutique",
+    "business:cocina-del-frailes",
+    "business:ruta-cenotes-y-selva"
+  ],
+  "blocked_incomplete": [
+    "business:hacienda-selva-maya",
+    "business:cocina-de-dona-elsa",
+    "business:manglar-expediciones",
+    "business:taller-de-bordado-uayma",
+    "destination:chichen-itza"
+  ],
+  "blocked_no_media": [
+    "product:bici-nocturna-frailes-ticket-demo",
+    "product:cena-romantica-en-cenote",
+    "product:ceremonia-maya",
+    "product:menu-cochinita-tradicional-demo",
+    "product:nado-en-cenote",
+    "product:recorrido-cenote-museo",
+    "product:suite-selva-maya-demo",
+    "product:tour-cenote-suytun-guiado-demo",
+    "product:tour-manglar-amanecer-demo"
+  ],
+  "remaining_debt": {
+    "seo_metadata_locales_missing": ["en", "fr", "de", "it", "pt"]
+  },
+  "exclusions": [
+    "no database writes",
+    "no publication",
+    "no demo promotion",
+    "no migration",
+    "no feature flag change"
+  ]
+}

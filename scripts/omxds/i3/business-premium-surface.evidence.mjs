@@ -51,9 +51,8 @@ const acknowledgedRevisions = new Map([
   [
     surfacePath,
     {
-      sha256: "3bf20d30f1f7bcc03b83669053baa0d4d6ffebd677a8aa0379d8d02feda757f0",
-      authorizationAddendum: "PCA-2026-023-ADDENDUM-A",
-      baseAuthorization: "PCA-2026-023",
+      sha256: "3a15378594de08c7d1b199fe81f061ccd4895a9ff9bde892635659728316ca57",
+      authorizations: ["PCA-2026-031"],
     },
   ],
   [
