@@ -368,15 +368,7 @@ function HeroPanel({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function Fact({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Clock;
-  label: string;
-  value: string;
-}) {
+function Fact({ icon: Icon, label, value }: { icon: typeof Clock; label: string; value: string }) {
   return (
     <div className="flex items-start gap-2.5">
       <Icon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
