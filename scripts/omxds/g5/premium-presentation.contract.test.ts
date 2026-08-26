@@ -9,7 +9,7 @@
  *  - Cero duplicación de primitivas (`-v2`, `-pro`, `-next`, `-lite`).
  *  - Los previews G4 consumen el runtime compartido.
  */
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
 
 import {
