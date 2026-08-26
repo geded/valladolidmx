@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "status": "Approved",
-  "generated_at": "2026-08-28T00:00:00.000Z",
+  "generated_at": "2026-08-26T00:00:00.000Z",
   "derived_from": {
     "glossary": {
       "document": "docs/governance/01-GLOSSARY.md",
@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "873085c397ca799831f0a5b3013810fceca3992bc12b67964bf7fd3b86351c45"
+      "source_sha256": "c097b7d83badad8d1990a0bcaf8d2d0764c4a8e6124981fac7b4d50ffff8acd4"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -30238,7 +30238,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
@@ -30248,7 +30248,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
@@ -30258,7 +30258,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
@@ -30268,7 +30268,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
@@ -30278,7 +30278,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
@@ -30288,7 +30288,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
@@ -30298,7 +30298,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
@@ -30308,7 +30308,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
@@ -30318,17 +30318,8 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
-    },
-    {
-      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27",
-      "origin": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "relation": "governed_by",
-      "destination": "DOMAIN:D04",
-      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "evidence": "06 v0.53 · docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md → D04 · content-experience"
     },
     {
       "id": "DEP:AUTO:IMPLEMENTS:src/components/premium/PremiumHero.tsx:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
@@ -30337,7 +30328,7 @@
       "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
       "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
-      "verified_at": "2026-08-28",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
@@ -30347,7 +30338,7 @@
       "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
       "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
-      "verified_at": "2026-08-28",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
@@ -30357,7 +30348,7 @@
       "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
       "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
-      "verified_at": "2026-08-28",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
@@ -30367,7 +30358,7 @@
       "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
       "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
-      "verified_at": "2026-08-28",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
@@ -30377,7 +30368,7 @@
       "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
       "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
-      "verified_at": "2026-08-28",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
@@ -30387,17 +30378,26 @@
       "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
       "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
-      "verified_at": "2026-08-28",
+      "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
     },
     {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
+      "verified_at": "2026-08-26",
+      "origin": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.55 · docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md → D04 · content-experience"
+    },
+    {
       "id": "AUTO:GOVERNED_BY:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
-      "verified_at": "2026-08-28",
+      "verified_at": "2026-08-26",
       "origin": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
       "relation": "governed_by",
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "evidence": "06 v0.54 · docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md → D04 · content-experience"
+      "evidence": "06 v0.55 · docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {

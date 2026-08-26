@@ -5,7 +5,7 @@
   "status": "Approved",
   "branch": "fix/omxds-g5-responsive-visual-remediation-v1",
   "blueprint": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
-  "founder_authority": "Founder Directive 2026-08-28 · Autorización limitada FASE G5-S1 sobre la base efectiva 0c25d4603682273fd373c38c7bab51508304f2f5. Autoriza exclusivamente D-06 (comparación normalizada del slug de categoría en /casas-de-vacaciones sin renombrar datos ni URLs canónicas), D-05 (fallback visual cálido piedra/caliza en PremiumHero cuando no hay medio gobernado, con contraste AA) y la creación de la vista previa interna no indexable /lovable/g5-listing-readiness-preview con fixtures locales. No autoriza datos, migraciones, backend, producción, merge, despliegue, activación del flag ni publicación de demos.",
+  "founder_authority": "Founder Directive 2026-08-26 · Autorización limitada FASE G5-S1 sobre la base efectiva 0c25d4603682273fd373c38c7bab51508304f2f5. Autoriza exclusivamente D-06 (comparación normalizada del slug de categoría en /casas-de-vacaciones sin renombrar datos ni URLs canónicas), D-05 (fallback visual cálido piedra/caliza en PremiumHero cuando no hay medio gobernado, con contraste AA) y la creación de la vista previa interna no indexable /lovable/g5-listing-readiness-preview con fixtures locales. No autoriza datos, migraciones, backend, producción, merge, despliegue, activación del flag ni publicación de demos.",
   "permissions": [
     {
       "operation": "modify",
