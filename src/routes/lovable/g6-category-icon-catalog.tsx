@@ -10,10 +10,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Container } from "@/components/layout/Container";
 import { TourismCategoryIcon } from "@/components/omxds/TourismCategoryIcon";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
-import {
-  CATEGORY_ICON_REGISTRY,
-  CATEGORY_ICON_SLUGS,
-} from "@/lib/omxds/category-icon-registry";
+import { CATEGORY_ICON_REGISTRY, CATEGORY_ICON_SLUGS } from "@/lib/omxds/category-icon-registry";
 
 export const Route = createFileRoute("/lovable/g6-category-icon-catalog")({
   head: () => ({
@@ -50,8 +47,8 @@ function G6CategoryIconCatalog() {
           Iconografía Turística Universal con Acento Textil Yucateco v1.0
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Autoridad única e inmutable. {entries.length} categorías registradas. Cualquier slug
-          fuera del registry no renderiza símbolo (fail-closed) y conserva su etiqueta de texto.
+          Autoridad única e inmutable. {entries.length} categorías registradas. Cualquier slug fuera
+          del registry no renderiza símbolo (fail-closed) y conserva su etiqueta de texto.
         </p>
       </Container>
 
