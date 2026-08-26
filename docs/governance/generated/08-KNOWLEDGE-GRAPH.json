@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "status": "Approved",
-  "generated_at": "2026-08-27T00:00:00.000Z",
+  "generated_at": "2026-08-28T00:00:00.000Z",
   "derived_from": {
     "glossary": {
       "document": "docs/governance/01-GLOSSARY.md",
@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "80a8957fbbd9915d93763539e280786d55d49754a8ee50c59a37bbd017f8f6c8"
+      "source_sha256": "873085c397ca799831f0a5b3013810fceca3992bc12b67964bf7fd3b86351c45"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -10991,6 +10991,37 @@
       "path": "docs/governance/product-authorizations/PCA-2026-035.json",
       "source": "docs/governance/product-authorizations/PCA-2026-035.json",
       "evidence": "docs/governance/product-authorizations/PCA-2026-035.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md"
+    },
+    {
+      "id": "ART:src/routes/lovable/g5-listing-readiness-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g5-listing-readiness-preview.tsx",
+      "source": "src/routes/lovable/g5-listing-readiness-preview.tsx",
+      "evidence": "src/routes/lovable/g5-listing-readiness-preview.tsx"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-036.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-036.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-036.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-036.json"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json",
+      "source": "docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json",
+      "evidence": "docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json"
     }
   ],
   "edges": [
@@ -30298,6 +30329,75 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.53 · docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/premium/PremiumHero.tsx:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumHero.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/casas-de-vacaciones.tsx:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "origin": "ART:src/routes/casas-de-vacaciones.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g5-listing-readiness-preview.tsx:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "origin": "ART:src/routes/lovable/g5-listing-readiness-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/route-inventory.ts:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/route-inventory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-036.json:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-036.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-28",
+      "origin": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.54 · docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {
