@@ -356,47 +356,52 @@ export function TourismCard({
           ) : (
             <MediaPlaceholder kind={vm.entityKind} />
           )}
-          {(eyebrow || vm.mapLabel) ? (
-            <div className="absolute left-3 top-3 flex items-center gap-2">
-              {vm.mapLabel ? (
-                <span
-                  aria-label={`Ubicación ${vm.mapLabel} en el mapa`}
-                  className="grid h-6 w-6 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground shadow-soft"
-                >
-                  {vm.mapLabel}
-                </span>
+          {eyebrow || vm.mapLabel || institutional.length + badges.length > 0 ? (
+            <div
+              data-tourism-card-badges="top"
+              className="absolute inset-x-3 top-3 flex flex-wrap items-start justify-between gap-x-2 gap-y-1"
+            >
+              <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                {vm.mapLabel ? (
+                  <span
+                    aria-label={`Ubicación ${vm.mapLabel} en el mapa`}
+                    className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground shadow-soft"
+                  >
+                    {vm.mapLabel}
+                  </span>
+                ) : null}
+                {eyebrow ? (
+                  <span className="max-w-full truncate rounded-pill bg-background/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-foreground shadow-soft backdrop-blur">
+                    {eyebrow}
+                  </span>
+                ) : null}
+              </div>
+              {institutional.length + badges.length > 0 ? (
+                <div className="flex min-w-0 flex-wrap justify-end gap-1">
+                  {institutional.map((b, i) => (
+                    <span
+                      key={`inst-${i}`}
+                      className={cn(
+                        "max-w-full truncate rounded-pill px-2 py-0.5 text-[10px] font-semibold shadow-soft backdrop-blur",
+                        badgeToneClass(b.tone),
+                      )}
+                    >
+                      {b.label}
+                    </span>
+                  ))}
+                  {badges.map((b, i) => (
+                    <span
+                      key={`b-${i}`}
+                      className={cn(
+                        "max-w-full truncate rounded-pill px-2 py-0.5 text-[10px] font-semibold shadow-soft backdrop-blur",
+                        badgeToneClass(b.tone),
+                      )}
+                    >
+                      {b.label}
+                    </span>
+                  ))}
+                </div>
               ) : null}
-              {eyebrow ? (
-                <span className="rounded-pill bg-background/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-foreground shadow-soft backdrop-blur">
-                  {eyebrow}
-                </span>
-              ) : null}
-            </div>
-          ) : null}
-          {institutional.length + badges.length > 0 ? (
-            <div className="absolute right-3 top-3 flex flex-wrap justify-end gap-1">
-              {institutional.map((b, i) => (
-                <span
-                  key={`inst-${i}`}
-                  className={cn(
-                    "rounded-pill px-2 py-0.5 text-[10px] font-semibold shadow-soft backdrop-blur",
-                    badgeToneClass(b.tone),
-                  )}
-                >
-                  {b.label}
-                </span>
-              ))}
-              {badges.map((b, i) => (
-                <span
-                  key={`b-${i}`}
-                  className={cn(
-                    "rounded-pill px-2 py-0.5 text-[10px] font-semibold shadow-soft backdrop-blur",
-                    badgeToneClass(b.tone),
-                  )}
-                >
-                  {b.label}
-                </span>
-              ))}
             </div>
           ) : null}
           {caps.showDate && vm.dateLabel ? (
@@ -521,11 +526,11 @@ function PrimaryCta({
 }) {
   if (!primary && !secondary) return null;
   return (
-    <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+    <div className="mt-3 flex min-w-0 flex-col flex-wrap gap-2 sm:flex-row">
       {primary ? (
         <a
           href={primary.href ?? "#"}
-          className="inline-flex flex-1 items-center justify-center rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+          className="inline-flex min-h-11 min-w-0 flex-1 basis-full items-center justify-center rounded-pill bg-primary px-4 py-2 text-center text-sm font-semibold sm:basis-0 text-primary-foreground shadow-soft transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
         >
           {primary.label}
         </a>
@@ -533,7 +538,7 @@ function PrimaryCta({
       {secondary ? (
         <a
           href={secondary.href ?? "#"}
-          className="inline-flex items-center justify-center rounded-pill border border-border px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+          className="inline-flex min-h-11 min-w-0 items-center justify-center rounded-pill border border-border px-4 py-2 text-center text-sm font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
         >
           {secondary.label}
         </a>
@@ -569,7 +574,7 @@ export function TourismCardRow({
       data-eb-entity={vm.entityKind ?? undefined}
       data-tourism-card="row"
       className={cn(
-        "flex gap-4 rounded-2xl border border-border bg-card p-4 shadow-soft transition-shadow hover:shadow-elevated",
+        "flex min-w-0 gap-4 rounded-2xl border border-border bg-card p-4 shadow-soft transition-shadow hover:shadow-elevated",
         caps.compact ? "p-3" : "",
         className,
       )}
@@ -650,7 +655,7 @@ export function TourismCardRow({
               </p>
             ) : null}
           </div>
-          <div className="flex shrink-0 flex-col items-end gap-1 text-right">
+          <div className="flex min-w-0 shrink flex-col items-end gap-1 text-right">
             {institutional.length > 0 ? (
               <div className="flex flex-wrap justify-end gap-1">
                 {institutional.map((b, i) => (
@@ -716,8 +721,8 @@ export function FeaturedTourismLayout({
   const [featured, ...rest] = items;
   if (!featured) return null;
   return (
-    <div className="grid gap-4 lg:grid-cols-3">
-      <div className="lg:col-span-2">
+    <div className="grid min-w-0 gap-4 lg:grid-cols-3">
+      <div className="min-w-0 lg:col-span-2">
         <TourismCard
           vm={featured}
           capabilities={capabilities}
@@ -725,9 +730,9 @@ export function FeaturedTourismLayout({
         />
       </div>
       {rest.length > 0 ? (
-        <ul role="list" className="flex flex-col gap-3">
+        <ul role="list" className="flex min-w-0 flex-col gap-3">
           {rest.slice(0, 3).map((it) => (
-            <li key={it.id}>
+            <li key={it.id} className="min-w-0">
               <TourismCardRow
                 vm={it}
                 capabilities={capabilities}

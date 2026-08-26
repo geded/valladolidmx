@@ -320,11 +320,8 @@ export function DestinationSurface({
             <PremiumHero
               vm={{
                 presentation: DEFAULT_PREMIUM_PRESENTATION,
-                crumbs: [
-                  { label: "Inicio", href: "/" },
-                  { label: "Oriente Maya de Yucatán", href: "/oriente-maya" },
-                  { label: input.name },
-                ],
+                // D-03 · La ruta territorial navegable la emite PublicShell.
+                // El Hero no repite el breadcrumb decorativo.
                 eyebrow: "Destino · Oriente Maya de Yucatán",
                 title: input.name,
                 description: input.tagline || input.description || undefined,

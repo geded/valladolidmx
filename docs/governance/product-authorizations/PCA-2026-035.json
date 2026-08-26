@@ -1,0 +1,51 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-035",
+  "title": "19.29 · G5 · Remediación visual responsive (D-02, D-03, D-04, D-09, D-10)",
+  "status": "Approved",
+  "branch": "fix/omxds-g5-responsive-visual-remediation-v1",
+  "blueprint": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-27 · Autorización limitada de remediación visual G5 sobre la base exacta fix/omxds-g5-d01-premium-hero-contract-v1@99d116b0. Autoriza exclusivamente D-02 (clúster único de badges), D-03 (eliminar breadcrumb decorativo del Hero), D-04 (buscador en dos filas bajo 640 px), D-09 (área táctil mínima 44x44 px) y D-10 (contracción min-w-0 en variante list y grilla destacada). No autoriza datos, migraciones, producción, merge, despliegue, activación del flag ni publicación de demos.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/tourism-card/TourismCard.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home/HeroSearchPill.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/premium/PremiumPresentationControl.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/premium/PremiumTerritorialBreadcrumb.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/BusinessSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/DestinationSurface.tsx"
+    }
+  ],
+  "public_routes": ["/", "/oriente-maya/:destino", "/oriente-maya/:destino/:categoria/:empresa"],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:i2a",
+    "bun run validate:i2c",
+    "bun run validate:i3:a",
+    "bun run validate:i3:c",
+    "bun run validate:i3:d",
+    "bun scripts/omxds/g5/premium-presentation.contract.test.ts",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

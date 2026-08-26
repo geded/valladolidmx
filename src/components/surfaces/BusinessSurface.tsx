@@ -413,19 +413,8 @@ export function BusinessSurface({
           <PremiumHero
             vm={{
               presentation: DEFAULT_PREMIUM_PRESENTATION,
-              crumbs: [
-                { label: "Inicio", href: "/" },
-                { label: "Oriente Maya de Yucatán", href: "/oriente-maya" },
-                ...(b.destination_slug
-                  ? [
-                      {
-                        label: b.destination_slug,
-                        href: `/oriente-maya/${encodeURIComponent(b.destination_slug)}`,
-                      },
-                    ]
-                  : []),
-                { label: b.display_name },
-              ],
+              // D-03 · La ruta territorial navegable la emite PublicShell.
+              // El Hero no repite el breadcrumb decorativo.
               eyebrow: variant.eyebrow,
               title: b.display_name,
               description: b.tagline || undefined,

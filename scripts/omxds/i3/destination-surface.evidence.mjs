@@ -90,6 +90,13 @@ const acknowledgedSurfaceRevisions = [
     sha256: "6a98bbd9942dde9aa794929694f245578bf108dec9df2a5f0de5b04bdc5c1e45",
     authorizations: ["PCA-2026-032"],
   },
+  {
+    // 19.29 · D-03 · El breadcrumb territorial navegable lo emite PublicShell;
+    // la superficie deja de emitir crumbs decorativos al Hero.
+    package: "19.29-g5-responsive-visual-remediation",
+    sha256: "e0073c58b623b32c871f54f95c00becd39de5750b77f73c2423d72f6ce465b05",
+    authorizations: ["PCA-2026-035"],
+  },
 ];
 const surfaceDrift = execFileSync("git", ["diff", "--name-only", i3aHead, "--", surfacePath], {
   encoding: "utf8",

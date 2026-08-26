@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import type { CrumbVM } from "@/components/surfaces/kit/types";
+import { cn } from "@/lib/utils";
 
 export function PremiumTerritorialBreadcrumb({ crumbs }: { crumbs: readonly CrumbVM[] }) {
   return (
@@ -14,14 +15,17 @@ export function PremiumTerritorialBreadcrumb({ crumbs }: { crumbs: readonly Crum
               {crumb.href && !current ? (
                 <Link
                   to={crumb.href}
-                  className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
+                  className="inline-flex min-h-11 items-center rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
                 >
                   {crumb.label}
                 </Link>
               ) : (
                 <span
                   aria-current={current ? "page" : undefined}
-                  className={current ? "font-medium text-foreground" : undefined}
+                  className={cn(
+                    "inline-flex min-h-11 items-center",
+                    current ? "font-medium text-foreground" : undefined,
+                  )}
                 >
                   {crumb.label}
                 </span>

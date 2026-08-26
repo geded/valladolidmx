@@ -28,7 +28,7 @@ export function PremiumPresentationControl({
             onClick={() => onChange(key)}
             aria-pressed={value === key}
             className={cn(
-              "rounded-2xl border px-3 py-2 text-xs transition-colors",
+              "inline-flex min-h-11 items-center justify-center rounded-2xl border px-3 py-2 text-xs transition-colors",
               value === key
                 ? "border-primary bg-primary text-primary-foreground"
                 : "border-border bg-background hover:bg-accent",
