@@ -710,7 +710,10 @@ function Variantes() {
       </h2>
       <div className="mt-5 grid gap-4 sm:grid-cols-3">
         {VARIANTES.map((v) => (
-          <article key={v.name} className="rounded-3xl border border-border bg-card p-5 shadow-soft">
+          <article
+            key={v.name}
+            className="rounded-3xl border border-border bg-card p-5 shadow-soft"
+          >
             <div className="flex items-center gap-2 text-primary">
               <Sparkles className="size-4" aria-hidden />
               <h3 className="font-medium text-foreground">{v.name}</h3>
