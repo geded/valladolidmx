@@ -112,8 +112,7 @@ const MEDIA = {
 
 /** Destinos con estado editorial Pueblo Mágico reconocido. */
 const PUEBLOS_MAGICOS = ["valladolid", "izamal", "espita"] as const;
-const isPuebloMagico = (slug: string) =>
-  (PUEBLOS_MAGICOS as readonly string[]).includes(slug);
+const isPuebloMagico = (slug: string) => (PUEBLOS_MAGICOS as readonly string[]).includes(slug);
 
 /* ------------------------------------------------------------------ *
  * Servicios del micrositio. Tours NO aparece: subtipo de Experiencias.
@@ -127,7 +126,13 @@ const SERVICIOS = [
     icon: UtensilsCrossed,
     media: MEDIA.restaurante,
   },
-  { key: "que-hacer", label: "Qué hacer", hint: "Planes del día", icon: Compass, media: MEDIA.plaza },
+  {
+    key: "que-hacer",
+    label: "Qué hacer",
+    hint: "Planes del día",
+    icon: Compass,
+    media: MEDIA.plaza,
+  },
   {
     key: "casas-de-vacaciones",
     label: "Casas de vacaciones",
@@ -367,7 +372,10 @@ function TerritorialPath() {
     <nav aria-label="Ruta territorial" className="text-sm">
       <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
         <li>
-          <Link to="/" className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground">
+          <Link
+            to="/"
+            className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
+          >
             Inicio
           </Link>
         </li>
@@ -394,9 +402,7 @@ function EditorialStatus() {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-primary">
       Pueblo Mágico
-      <span className="sr-only">
-        (estado editorial provisional en texto; sin logotipo oficial)
-      </span>
+      <span className="sr-only">(estado editorial provisional en texto; sin logotipo oficial)</span>
     </span>
   );
 }
@@ -483,13 +489,7 @@ function HeroCinematografico() {
   );
 }
 
-function ServiciosStrip({
-  active,
-  onSelect,
-}: {
-  active: string;
-  onSelect: (key: string) => void;
-}) {
+function ServiciosStrip({ active, onSelect }: { active: string; onSelect: (key: string) => void }) {
   return (
     <section aria-label="Servicios del micrositio">
       <div className="flex gap-2 overflow-x-auto pb-2">
@@ -528,7 +528,10 @@ function DescubreValladolid() {
     <section aria-labelledby="descubre-valladolid" className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
       <div>
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">El destino</p>
-        <h2 id="descubre-valladolid" className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
+        <h2
+          id="descubre-valladolid"
+          className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl"
+        >
           Descubre Valladolid
         </h2>
         <div className="mt-4 space-y-4 text-base leading-relaxed text-foreground/80">
