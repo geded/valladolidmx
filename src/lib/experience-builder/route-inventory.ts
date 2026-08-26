@@ -470,6 +470,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/lovable/g4-restaurant-premium-preview.tsx",
   "src/routes/lovable/g4-experience-premium-preview.tsx",
   "src/routes/lovable/g4-event-premium-preview.tsx",
+  "src/routes/lovable/g4-home-premium-preview.tsx",
   "src/routes/lovable/experience-hero-preview.tsx",
   "src/routes/lovable/experience-i1c-preview.tsx",
   "src/routes/lovable/experience-products-preview.tsx",
