@@ -25,7 +25,11 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
+import { PremiumHero } from "@/components/premium";
+import { toHomePremiumVM, type PremiumEntitySource } from "@/lib/omxds/presentation/vm";
+import type { PremiumPresentation } from "@/lib/omxds/presentation/premium-presentation";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/lovable/g4-home-premium-preview")({
   head: () => ({
