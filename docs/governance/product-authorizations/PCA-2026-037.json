@@ -1,0 +1,43 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-037",
+  "title": "19.31 · G6-S1 · OMXDS Category Navigation Icon System v1.0",
+  "status": "Approved",
+  "branch": "feature/omxds-g5-s1-listing-readiness-local-v1",
+  "blueprint": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-26 · Autoriza ejecutar exclusivamente G6-S1 sobre la base requerida 4d1742406eca7da31869d762d6347a0b7cca508b conforme al preflight read-only cerrado y al manifiesto exacto de rutas: sistema canónico e inmutable Universal Tourism Iconography with Yucatecan Textile Accent v1.0 con 22 símbolos React .tsx, registry congelado como autoridad única fail-closed, wrapper único TourismCategoryIcon, rejilla única CategoryNavGrid, adopción en las superficies de categoría existentes, eliminación de mapas paralelos, slugs PascalCase y fallbacks genéricos, catálogo interno no indexable /lovable/g6-category-icon-catalog y gates de contrato y evidencia. No autoriza datos, migraciones, backend, storage, dependencias nuevas, producción, merge, despliegue, activación del flag ni publicación.",
+  "permissions": [
+    { "operation": "create", "path": "src/lib/omxds/category-icon-registry.ts" },
+    { "operation": "create", "path": "src/components/omxds/TourismCategoryIcon.tsx" },
+    { "operation": "create", "path": "src/components/omxds/CategoryNavGrid.tsx" },
+    { "operation": "create", "path": "src/components/omxds/icons" },
+    { "operation": "create", "path": "src/routes/lovable/g6-category-icon-catalog.tsx" },
+    { "operation": "create", "path": "scripts/omxds/g6/category-icon-system.contract.test.ts" },
+    { "operation": "create", "path": "scripts/omxds/g6/category-icon-system.evidence.mjs" },
+    { "operation": "modify", "path": "src/components/discovery/DiscoveryNavigator.tsx" },
+    { "operation": "modify", "path": "src/components/discovery/InlineCategoryExplorer.tsx" },
+    { "operation": "modify", "path": "src/components/cards/CategoriaCard.tsx" },
+    { "operation": "modify", "path": "src/lib/discovery/discovery-navigator.functions.ts" },
+    { "operation": "modify", "path": "src/mocks/categorias.ts" },
+    { "operation": "modify", "path": "src/routes/lovable/g4-home-premium-preview.tsx" },
+    { "operation": "modify", "path": "src/routes/lovable/g4-destination-microsite-preview.tsx" },
+    { "operation": "modify", "path": "src/lib/experience-builder/route-inventory.ts" },
+    { "operation": "modify", "path": "package.json" },
+    {
+      "operation": "create",
+      "path": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md"
+    },
+    { "operation": "modify", "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md" }
+  ],
+  "public_routes": ["/", "/valladolid", "/hoteles", "/restaurantes", "/experiencias", "/eventos"],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:g6:s1",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

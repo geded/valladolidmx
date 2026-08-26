@@ -4,6 +4,7 @@
  */
 import { useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import {
   ArrowRight,
   CalendarDays,
@@ -349,6 +350,21 @@ const DEFAULT_ORDER: SectionKey[] = [
   "mapa",
 ];
 
+const G6_HOME_CATEGORIES = [
+  { slug: "destinos", label: "Destinos", href: "#" },
+  { slug: "hoteles", label: "Hoteles", href: "#" },
+  { slug: "restaurantes", label: "Restaurantes", href: "#" },
+  { slug: "experiencias", label: "Experiencias", href: "#" },
+  { slug: "cenotes", label: "Cenotes", href: "#" },
+  { slug: "zonas-arqueologicas", label: "Zonas arqueológicas", href: "#" },
+  { slug: "eventos", label: "Eventos", href: "#" },
+  { slug: "gastronomia", label: "Gastronomía", href: "#" },
+  { slug: "pueblos", label: "Pueblos", href: "#" },
+  { slug: "rutas", label: "Rutas", href: "#" },
+  { slug: "artesanias", label: "Artesanías", href: "#" },
+  { slug: "mapas", label: "Mapas", href: "#" },
+] as const;
+
 function G4HomePremiumPreview() {
   const [tuning, setTuning] = useState<TuningState>({
     direction: "editorial",
@@ -407,6 +423,23 @@ function G4HomePremiumPreview() {
       <main>
         <Container className="pt-4 sm:pt-6">
           {tuning.heroVariant === "editorial" ? <HeroEditorial /> : <HeroCinematic />}
+        </Container>
+
+        <Container className="mt-6 sm:mt-8">
+          {/* G6-S1 · adopción de la autoridad única de iconografía turística */}
+          <section
+            aria-label="Explora por categoría"
+            className="rounded-2xl border border-border bg-card p-4 sm:p-5"
+          >
+            <h2 className="mb-4 text-base font-semibold">Explora por categoría</h2>
+            <CategoryNavGrid
+              items={G6_HOME_CATEGORIES}
+              variant="standard"
+              mode="navigate"
+              showCounts={false}
+              desktopColumnsClassName="lg:grid-cols-6"
+            />
+          </section>
         </Container>
 
         <Container className="mt-6 sm:mt-8">
