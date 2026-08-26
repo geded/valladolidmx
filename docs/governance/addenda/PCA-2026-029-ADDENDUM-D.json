@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-D",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-26 · AUTORIZACIÓN B · Base efectiva G5-S1. Acepta como base efectiva 0c25d4603682273fd373c38c7bab51508304f2f5 sobre la merge-base gobernada d34ec1e39e2893bf033f9dc1dc3356a38640a7c9 y autoriza conservar exclusivamente la divergencia automática de una línea en src/integrations/supabase/types.ts. No acredita ni autoriza cambios de tablas, columnas, enums, vistas, RPC, datos, migraciones, backend ni flags. Autoridad de paquete: PCA-2026-035 (19.29 · G5). El addendum se registra bajo PCA-2026-029 porque es la única autorización Approved que contiene el permiso modify y la acknowledged revision de esta ruta.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/integrations/supabase/types.ts",
+    "previous_sha256": "7c5c9d7762956c9493cc6776ab1ca830773b34a369268b097a1789d5eca0fa2e",
+    "current_sha256": "6a6adee2c50bc212a89e5e68a230ca82352d47baab979aeb8658c70b52ca831e",
+    "semantic_change": "Divergencia automática de una sola línea introducida por los commits f2a65bf9f41eb380334524a565fbd9569840bebf ('Work in progress') y 0c25d4603682273fd373c38c7bab51508304f2f5 ('Lovable update'): __InternalSupabase.PostgrestVersion \"14.5\" → \"14.17\". Causa: actualización gestionada del servidor PostgREST 14.5 → 14.17 y regeneración automática del archivo de tipos. Sin cambio de esquema: no altera tablas, columnas, enums, vistas, funciones ni RPC. No originada por ninguna migración del repositorio.",
+    "authority": "PCA-2026-035"
+  },
+  "invariants": ["omxds_visual_v1_contracts_enabled=false"],
+  "recorded_at": "2026-08-26"
+}
