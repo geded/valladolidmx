@@ -50,6 +50,7 @@ import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/wo
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
 import { Route as LovableTourismCardPreviewRouteImport } from './routes/lovable/tourism-card-preview'
 import { Route as LovableProtectedActionsPreviewRouteImport } from './routes/lovable/protected-actions-preview'
+import { Route as LovableG5ListingReadinessPreviewRouteImport } from './routes/lovable/g5-listing-readiness-preview'
 import { Route as LovableG4RestaurantPremiumPreviewRouteImport } from './routes/lovable/g4-restaurant-premium-preview'
 import { Route as LovableG4HotelPremiumPreviewRouteImport } from './routes/lovable/g4-hotel-premium-preview'
 import { Route as LovableG4HomePremiumPreviewRouteImport } from './routes/lovable/g4-home-premium-preview'
@@ -412,6 +413,12 @@ const LovableProtectedActionsPreviewRoute =
   LovableProtectedActionsPreviewRouteImport.update({
     id: '/lovable/protected-actions-preview',
     path: '/lovable/protected-actions-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG5ListingReadinessPreviewRoute =
+  LovableG5ListingReadinessPreviewRouteImport.update({
+    id: '/lovable/g5-listing-readiness-preview',
+    path: '/lovable/g5-listing-readiness-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableG4RestaurantPremiumPreviewRoute =
@@ -1381,6 +1388,7 @@ export interface FileRoutesByFullPath {
   '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
   '/lovable/g4-hotel-premium-preview': typeof LovableG4HotelPremiumPreviewRoute
   '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
+  '/lovable/g5-listing-readiness-preview': typeof LovableG5ListingReadinessPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1573,6 +1581,7 @@ export interface FileRoutesByTo {
   '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
   '/lovable/g4-hotel-premium-preview': typeof LovableG4HotelPremiumPreviewRoute
   '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
+  '/lovable/g5-listing-readiness-preview': typeof LovableG5ListingReadinessPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1769,6 +1778,7 @@ export interface FileRoutesById {
   '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
   '/lovable/g4-hotel-premium-preview': typeof LovableG4HotelPremiumPreviewRoute
   '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
+  '/lovable/g5-listing-readiness-preview': typeof LovableG5ListingReadinessPreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1969,6 +1979,7 @@ export interface FileRouteTypes {
     | '/lovable/g4-home-premium-preview'
     | '/lovable/g4-hotel-premium-preview'
     | '/lovable/g4-restaurant-premium-preview'
+    | '/lovable/g5-listing-readiness-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2161,6 +2172,7 @@ export interface FileRouteTypes {
     | '/lovable/g4-home-premium-preview'
     | '/lovable/g4-hotel-premium-preview'
     | '/lovable/g4-restaurant-premium-preview'
+    | '/lovable/g5-listing-readiness-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2356,6 +2368,7 @@ export interface FileRouteTypes {
     | '/lovable/g4-home-premium-preview'
     | '/lovable/g4-hotel-premium-preview'
     | '/lovable/g4-restaurant-premium-preview'
+    | '/lovable/g5-listing-readiness-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2547,6 +2560,7 @@ export interface RootRouteChildren {
   LovableG4HomePremiumPreviewRoute: typeof LovableG4HomePremiumPreviewRoute
   LovableG4HotelPremiumPreviewRoute: typeof LovableG4HotelPremiumPreviewRoute
   LovableG4RestaurantPremiumPreviewRoute: typeof LovableG4RestaurantPremiumPreviewRoute
+  LovableG5ListingReadinessPreviewRoute: typeof LovableG5ListingReadinessPreviewRoute
   LovableProtectedActionsPreviewRoute: typeof LovableProtectedActionsPreviewRoute
   LovableTourismCardPreviewRoute: typeof LovableTourismCardPreviewRoute
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
@@ -2870,6 +2884,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/protected-actions-preview'
       fullPath: '/lovable/protected-actions-preview'
       preLoaderRoute: typeof LovableProtectedActionsPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g5-listing-readiness-preview': {
+      id: '/lovable/g5-listing-readiness-preview'
+      path: '/lovable/g5-listing-readiness-preview'
+      fullPath: '/lovable/g5-listing-readiness-preview'
+      preLoaderRoute: typeof LovableG5ListingReadinessPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/g4-restaurant-premium-preview': {
@@ -4499,6 +4520,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableG4HotelPremiumPreviewRoute: LovableG4HotelPremiumPreviewRoute,
   LovableG4RestaurantPremiumPreviewRoute:
     LovableG4RestaurantPremiumPreviewRoute,
+  LovableG5ListingReadinessPreviewRoute: LovableG5ListingReadinessPreviewRoute,
   LovableProtectedActionsPreviewRoute: LovableProtectedActionsPreviewRoute,
   LovableTourismCardPreviewRoute: LovableTourismCardPreviewRoute,
   LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,

@@ -66,7 +66,14 @@ export const Route = createFileRoute("/casas-de-vacaciones")({
   }),
   loader: async () => {
     const all = await listMarketplaceBusinesses();
-    return { businesses: all.filter((b) => CATEGORY_SLUGS.has(b.category_slug)) };
+    // D-06 · el slug persistido puede venir capitalizado ("Casas-de-vacaciones").
+    // Comparamos normalizado sin renombrar datos ni URLs canónicas.
+    return {
+      businesses: all.filter((b) =>
+        CATEGORY_SLUGS.has(String(b.category_slug ?? "").trim().toLowerCase()),
+      ),
+    };
+
   },
   head: () =>
     buildPublicHead({
