@@ -1,0 +1,23 @@
+slug	label	symbol	primary_token	hex_light	min_ratio_light	hex_dark	min_ratio_dark	secondary_token	role	result
+hoteles	Hoteles	cama	cenoteTeal	#0F6E72	5.62	#5FD1D6	9.74	-	trazo significativo	PASS
+restaurantes	Restaurantes	tenedor y cuchillo	terracotta	#A8442A	5.57	#E9906F	7.31	-	trazo significativo	PASS
+destinos	Destinos	pin	valladolidMagenta	#9B2247	7.24	#F07AA0	6.73	-	trazo significativo	PASS
+casas-de-vacaciones	Casas de vacaciones	casa	turquoise	#0E7490	5.01	#67D3E8	10.15	-	trazo significativo	PASS
+eventos	Eventos	calendario	indigo	#2B3A8F	9.34	#93A4F5	7.47	mutedPink	trazo + acento textil	PASS
+experiencias	Experiencias	brújula	antiqueGoldOperativo	#8A6A12	4.73	#E2BE63	9.91	antiqueGold	trazo + acento textil	PASS
+que-hacer	¿Qué hacer?	lista con pin	cenoteTeal	#0F6E72	5.62	#5FD1D6	9.74	valladolidMagenta	trazo + acento textil	PASS
+tours	Tours	señal direccional	mustard	#96700E	4.25	#E0BC5A	9.69	-	trazo significativo	PASS
+promociones	Promociones	etiqueta	valladolidMagenta	#9B2247	7.24	#F07AA0	6.73	-	trazo significativo	PASS
+zonas-arqueologicas	Zonas arqueológicas	templo maya simplificado	limestoneGoldOperativo	#8A7434	4.25	#DCC489	10.35	limestoneGold	trazo + acento textil	PASS
+comunidades	Comunidades	dos figuras humanas simplificadas	deepTurquoise	#0B5E63	7.03	#4FC3C9	8.40	-	trazo significativo	PASS
+cenotes	Cenotes	abertura circular con ondas	cenoteBlue	#1560A8	6.01	#79B9F0	8.43	-	trazo significativo	PASS
+rutas	Rutas	recorrido entre dos puntos	valladolidMagenta	#9B2247	7.24	#F07AA0	6.73	-	trazo significativo	PASS
+artesanias	Artesanías	mano con pieza tejida	terracotta	#A8442A	5.57	#E9906F	7.31	-	trazo significativo	PASS
+naturaleza	Naturaleza	ceiba maya / ya’axché	ceibaGreen	#2F6B3A	5.98	#86C98F	9.06	-	trazo significativo	PASS
+gastronomia	Gastronomía	plato y cuchara	terracotta	#A8442A	5.57	#E9906F	7.31	-	trazo significativo	PASS
+cultura	Cultura	libro con motivo maya	indigo	#2B3A8F	9.34	#93A4F5	7.47	-	trazo significativo	PASS
+compras	Compras	bolsa	valladolidMagenta	#9B2247	7.24	#F07AA0	6.73	-	trazo significativo	PASS
+pueblos	Pueblos	casa y torre	colonialGold	#8A6A12	4.73	#E2BE63	9.91	-	trazo significativo	PASS
+bienestar	Bienestar	hoja y ondas	ceibaGreen	#2F6B3A	5.98	#86C98F	9.06	waterTurquoise	trazo + acento textil	PASS
+vida-nocturna	Vida nocturna	luna	deepIndigo	#22265E	13.04	#8F96E8	6.48	-	trazo significativo	PASS
+mapas	Mapas	mapa plegado	turquoise	#0E7490	5.01	#67D3E8	10.15	-	trazo significativo	PASS
