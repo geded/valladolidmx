@@ -1,0 +1,37 @@
+{
+  "record": "I4-D · G3 · Grabación de sesión humana H03/H04 (iPad Safari)",
+  "original_filename": "ScreenRecording_08-21-2026_20-31-44_1.mp4",
+  "archived_filename": "G3-H03-H04-ipad-safari-2026-08-21.mp4",
+  "pointer": "docs/governance/evidence/omxds-i4-d-g3/human-session-2026-08-21/G3-H03-H04-ipad-safari-2026-08-21.mp4.asset.json",
+  "cdn_url": "/__l5e/assets-v1/79fb2c90-1835-4ee1-8f4d-5e8ee4e02dd0/G3-H03-H04-ipad-safari-2026-08-21.mp4",
+  "sha256": "f469ace5e387fb180ce62e7fcbed8cea16b649808897ac484fde1dc068fb34f4",
+  "size_bytes": 23555409,
+  "duration_seconds": 15.96,
+  "video": { "codec": "hevc", "width": 2420, "height": 1668 },
+  "recoded": false,
+  "captured_at": "2026-08-21T20:31:45-06:00",
+  "archived_at": "2026-08-22T02:48:46Z",
+  "device": "iPad · Safari",
+  "surface": "/cms/experience-builder?mode=visual&page=home",
+  "environment": "entorno no público · datos ficticios",
+  "flag": "omxds_visual_v1_contracts_enabled=false",
+  "production": "no tocada",
+  "demonstrates": [
+    "selección humana del control 1024 y scroll real dentro del canvas",
+    "selección humana del control 1440 y scroll real dentro del canvas",
+    "encabezado visible durante ambos desplazamientos"
+  ],
+  "combined_with": "docs/governance/evidence/omxds-i4-d-g3/objective-2026-08-22-h03h04/",
+  "scenarios_closed": ["G3-H03", "G3-H04"],
+  "explicitly_not_valid_for": [
+    "G3-H05",
+    "G3-H06",
+    "G3-H07",
+    "G3-H08",
+    "G3-H09",
+    "G3-H10",
+    "G3-H11",
+    "G3-H12"
+  ],
+  "g3": "BLOCKED"
+}

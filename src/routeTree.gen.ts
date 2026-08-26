@@ -50,6 +50,13 @@ import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/wo
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
 import { Route as LovableTourismCardPreviewRouteImport } from './routes/lovable/tourism-card-preview'
 import { Route as LovableProtectedActionsPreviewRouteImport } from './routes/lovable/protected-actions-preview'
+import { Route as LovableG4SystemRuntimePreviewRouteImport } from './routes/lovable/g4-system-runtime-preview'
+import { Route as LovableG4RestaurantPremiumPreviewRouteImport } from './routes/lovable/g4-restaurant-premium-preview'
+import { Route as LovableG4HotelPremiumPreviewRouteImport } from './routes/lovable/g4-hotel-premium-preview'
+import { Route as LovableG4HomePremiumPreviewRouteImport } from './routes/lovable/g4-home-premium-preview'
+import { Route as LovableG4ExperiencePremiumPreviewRouteImport } from './routes/lovable/g4-experience-premium-preview'
+import { Route as LovableG4EventPremiumPreviewRouteImport } from './routes/lovable/g4-event-premium-preview'
+import { Route as LovableG4DestinationMicrositePreviewRouteImport } from './routes/lovable/g4-destination-microsite-preview'
 import { Route as LovableExperienceSubnavCtabarPreviewRouteImport } from './routes/lovable/experience-subnav-ctabar-preview'
 import { Route as LovableExperienceReviewsPreviewRouteImport } from './routes/lovable/experience-reviews-preview'
 import { Route as LovableExperienceRelatedCollectionPreviewRouteImport } from './routes/lovable/experience-related-collection-preview'
@@ -406,6 +413,48 @@ const LovableProtectedActionsPreviewRoute =
   LovableProtectedActionsPreviewRouteImport.update({
     id: '/lovable/protected-actions-preview',
     path: '/lovable/protected-actions-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG4SystemRuntimePreviewRoute =
+  LovableG4SystemRuntimePreviewRouteImport.update({
+    id: '/lovable/g4-system-runtime-preview',
+    path: '/lovable/g4-system-runtime-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG4RestaurantPremiumPreviewRoute =
+  LovableG4RestaurantPremiumPreviewRouteImport.update({
+    id: '/lovable/g4-restaurant-premium-preview',
+    path: '/lovable/g4-restaurant-premium-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG4HotelPremiumPreviewRoute =
+  LovableG4HotelPremiumPreviewRouteImport.update({
+    id: '/lovable/g4-hotel-premium-preview',
+    path: '/lovable/g4-hotel-premium-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG4HomePremiumPreviewRoute =
+  LovableG4HomePremiumPreviewRouteImport.update({
+    id: '/lovable/g4-home-premium-preview',
+    path: '/lovable/g4-home-premium-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG4ExperiencePremiumPreviewRoute =
+  LovableG4ExperiencePremiumPreviewRouteImport.update({
+    id: '/lovable/g4-experience-premium-preview',
+    path: '/lovable/g4-experience-premium-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG4EventPremiumPreviewRoute =
+  LovableG4EventPremiumPreviewRouteImport.update({
+    id: '/lovable/g4-event-premium-preview',
+    path: '/lovable/g4-event-premium-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG4DestinationMicrositePreviewRoute =
+  LovableG4DestinationMicrositePreviewRouteImport.update({
+    id: '/lovable/g4-destination-microsite-preview',
+    path: '/lovable/g4-destination-microsite-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableExperienceSubnavCtabarPreviewRoute =
@@ -1333,6 +1382,13 @@ export interface FileRoutesByFullPath {
   '/lovable/experience-related-collection-preview': typeof LovableExperienceRelatedCollectionPreviewRoute
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
+  '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
+  '/lovable/g4-event-premium-preview': typeof LovableG4EventPremiumPreviewRoute
+  '/lovable/g4-experience-premium-preview': typeof LovableG4ExperiencePremiumPreviewRoute
+  '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
+  '/lovable/g4-hotel-premium-preview': typeof LovableG4HotelPremiumPreviewRoute
+  '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
+  '/lovable/g4-system-runtime-preview': typeof LovableG4SystemRuntimePreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1519,6 +1575,13 @@ export interface FileRoutesByTo {
   '/lovable/experience-related-collection-preview': typeof LovableExperienceRelatedCollectionPreviewRoute
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
+  '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
+  '/lovable/g4-event-premium-preview': typeof LovableG4EventPremiumPreviewRoute
+  '/lovable/g4-experience-premium-preview': typeof LovableG4ExperiencePremiumPreviewRoute
+  '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
+  '/lovable/g4-hotel-premium-preview': typeof LovableG4HotelPremiumPreviewRoute
+  '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
+  '/lovable/g4-system-runtime-preview': typeof LovableG4SystemRuntimePreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1709,6 +1772,13 @@ export interface FileRoutesById {
   '/lovable/experience-related-collection-preview': typeof LovableExperienceRelatedCollectionPreviewRoute
   '/lovable/experience-reviews-preview': typeof LovableExperienceReviewsPreviewRoute
   '/lovable/experience-subnav-ctabar-preview': typeof LovableExperienceSubnavCtabarPreviewRoute
+  '/lovable/g4-destination-microsite-preview': typeof LovableG4DestinationMicrositePreviewRoute
+  '/lovable/g4-event-premium-preview': typeof LovableG4EventPremiumPreviewRoute
+  '/lovable/g4-experience-premium-preview': typeof LovableG4ExperiencePremiumPreviewRoute
+  '/lovable/g4-home-premium-preview': typeof LovableG4HomePremiumPreviewRoute
+  '/lovable/g4-hotel-premium-preview': typeof LovableG4HotelPremiumPreviewRoute
+  '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
+  '/lovable/g4-system-runtime-preview': typeof LovableG4SystemRuntimePreviewRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1903,6 +1973,13 @@ export interface FileRouteTypes {
     | '/lovable/experience-related-collection-preview'
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
+    | '/lovable/g4-destination-microsite-preview'
+    | '/lovable/g4-event-premium-preview'
+    | '/lovable/g4-experience-premium-preview'
+    | '/lovable/g4-home-premium-preview'
+    | '/lovable/g4-hotel-premium-preview'
+    | '/lovable/g4-restaurant-premium-preview'
+    | '/lovable/g4-system-runtime-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2089,6 +2166,13 @@ export interface FileRouteTypes {
     | '/lovable/experience-related-collection-preview'
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
+    | '/lovable/g4-destination-microsite-preview'
+    | '/lovable/g4-event-premium-preview'
+    | '/lovable/g4-experience-premium-preview'
+    | '/lovable/g4-home-premium-preview'
+    | '/lovable/g4-hotel-premium-preview'
+    | '/lovable/g4-restaurant-premium-preview'
+    | '/lovable/g4-system-runtime-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2278,6 +2362,13 @@ export interface FileRouteTypes {
     | '/lovable/experience-related-collection-preview'
     | '/lovable/experience-reviews-preview'
     | '/lovable/experience-subnav-ctabar-preview'
+    | '/lovable/g4-destination-microsite-preview'
+    | '/lovable/g4-event-premium-preview'
+    | '/lovable/g4-experience-premium-preview'
+    | '/lovable/g4-home-premium-preview'
+    | '/lovable/g4-hotel-premium-preview'
+    | '/lovable/g4-restaurant-premium-preview'
+    | '/lovable/g4-system-runtime-preview'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2463,6 +2554,13 @@ export interface RootRouteChildren {
   LovableExperienceRelatedCollectionPreviewRoute: typeof LovableExperienceRelatedCollectionPreviewRoute
   LovableExperienceReviewsPreviewRoute: typeof LovableExperienceReviewsPreviewRoute
   LovableExperienceSubnavCtabarPreviewRoute: typeof LovableExperienceSubnavCtabarPreviewRoute
+  LovableG4DestinationMicrositePreviewRoute: typeof LovableG4DestinationMicrositePreviewRoute
+  LovableG4EventPremiumPreviewRoute: typeof LovableG4EventPremiumPreviewRoute
+  LovableG4ExperiencePremiumPreviewRoute: typeof LovableG4ExperiencePremiumPreviewRoute
+  LovableG4HomePremiumPreviewRoute: typeof LovableG4HomePremiumPreviewRoute
+  LovableG4HotelPremiumPreviewRoute: typeof LovableG4HotelPremiumPreviewRoute
+  LovableG4RestaurantPremiumPreviewRoute: typeof LovableG4RestaurantPremiumPreviewRoute
+  LovableG4SystemRuntimePreviewRoute: typeof LovableG4SystemRuntimePreviewRoute
   LovableProtectedActionsPreviewRoute: typeof LovableProtectedActionsPreviewRoute
   LovableTourismCardPreviewRoute: typeof LovableTourismCardPreviewRoute
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
@@ -2786,6 +2884,55 @@ declare module '@tanstack/react-router' {
       path: '/lovable/protected-actions-preview'
       fullPath: '/lovable/protected-actions-preview'
       preLoaderRoute: typeof LovableProtectedActionsPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g4-system-runtime-preview': {
+      id: '/lovable/g4-system-runtime-preview'
+      path: '/lovable/g4-system-runtime-preview'
+      fullPath: '/lovable/g4-system-runtime-preview'
+      preLoaderRoute: typeof LovableG4SystemRuntimePreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g4-restaurant-premium-preview': {
+      id: '/lovable/g4-restaurant-premium-preview'
+      path: '/lovable/g4-restaurant-premium-preview'
+      fullPath: '/lovable/g4-restaurant-premium-preview'
+      preLoaderRoute: typeof LovableG4RestaurantPremiumPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g4-hotel-premium-preview': {
+      id: '/lovable/g4-hotel-premium-preview'
+      path: '/lovable/g4-hotel-premium-preview'
+      fullPath: '/lovable/g4-hotel-premium-preview'
+      preLoaderRoute: typeof LovableG4HotelPremiumPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g4-home-premium-preview': {
+      id: '/lovable/g4-home-premium-preview'
+      path: '/lovable/g4-home-premium-preview'
+      fullPath: '/lovable/g4-home-premium-preview'
+      preLoaderRoute: typeof LovableG4HomePremiumPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g4-experience-premium-preview': {
+      id: '/lovable/g4-experience-premium-preview'
+      path: '/lovable/g4-experience-premium-preview'
+      fullPath: '/lovable/g4-experience-premium-preview'
+      preLoaderRoute: typeof LovableG4ExperiencePremiumPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g4-event-premium-preview': {
+      id: '/lovable/g4-event-premium-preview'
+      path: '/lovable/g4-event-premium-preview'
+      fullPath: '/lovable/g4-event-premium-preview'
+      preLoaderRoute: typeof LovableG4EventPremiumPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g4-destination-microsite-preview': {
+      id: '/lovable/g4-destination-microsite-preview'
+      path: '/lovable/g4-destination-microsite-preview'
+      fullPath: '/lovable/g4-destination-microsite-preview'
+      preLoaderRoute: typeof LovableG4DestinationMicrositePreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/experience-subnav-ctabar-preview': {
@@ -4364,6 +4511,16 @@ const rootRouteChildren: RootRouteChildren = {
   LovableExperienceReviewsPreviewRoute: LovableExperienceReviewsPreviewRoute,
   LovableExperienceSubnavCtabarPreviewRoute:
     LovableExperienceSubnavCtabarPreviewRoute,
+  LovableG4DestinationMicrositePreviewRoute:
+    LovableG4DestinationMicrositePreviewRoute,
+  LovableG4EventPremiumPreviewRoute: LovableG4EventPremiumPreviewRoute,
+  LovableG4ExperiencePremiumPreviewRoute:
+    LovableG4ExperiencePremiumPreviewRoute,
+  LovableG4HomePremiumPreviewRoute: LovableG4HomePremiumPreviewRoute,
+  LovableG4HotelPremiumPreviewRoute: LovableG4HotelPremiumPreviewRoute,
+  LovableG4RestaurantPremiumPreviewRoute:
+    LovableG4RestaurantPremiumPreviewRoute,
+  LovableG4SystemRuntimePreviewRoute: LovableG4SystemRuntimePreviewRoute,
   LovableProtectedActionsPreviewRoute: LovableProtectedActionsPreviewRoute,
   LovableTourismCardPreviewRoute: LovableTourismCardPreviewRoute,
   LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,

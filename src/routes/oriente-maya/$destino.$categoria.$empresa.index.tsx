@@ -11,6 +11,7 @@ import { PublicShell } from "@/components/discovery";
 import { buildPublicHead, localBusinessJsonLd, placeId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
 import { getMarketplaceBusinessBySlug } from "@/lib/catalog/marketplace-reads.functions";
+import { stableIndexableImageUrl } from "@/lib/media/stable-public-url";
 import { getBusinessRelated } from "@/lib/catalog/business-related.functions";
 import {
   resolveTerritorialPath,
@@ -55,11 +56,15 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       getOmxdsSurfaceContractsFlag().catch(() => false),
     ]);
     if (!business) throw notFound();
-    // I3-D · lectura Premium estrictamente posterior al flag. OFF conserva
-    // incluso el mismo conjunto de consultas heredadas.
-    const premiumEligibility = surfaceContractsEnabled
-      ? await getBusinessPremiumEligibility({ data: { businessId: business.id } }).catch(() => null)
-      : null;
+    // 19.21 · V1-P1.d — la elegibilidad Premium se evalúa SIEMPRE por ficha
+    // (fail-closed dentro del evaluador: published, is_demo_seed=false, grant
+    // activo, plan efectivo, procedencia portal, auditoría, ubicación,
+    // contacto, SEO y media aprobada). La presentación Premium depende
+    // exclusivamente de `premiumEligibility.eligible === true`; el flag global
+    // conserva su función para el resto de contratos gobernados.
+    const premiumEligibility = await getBusinessPremiumEligibility({
+      data: { businessId: business.id },
+    }).catch(() => null);
     // E2 · US-E2.1 — Related Collection contextual del negocio.
     // Fallback silencioso: si falla no rompe el render de la ficha.
     let related = null as Awaited<ReturnType<typeof getBusinessRelated>> | null;
@@ -87,10 +92,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };
     const b = loaderData.business;
-    const premium =
-      loaderData.surfaceContractsEnabled && loaderData.premiumEligibility?.eligible
-        ? loaderData.premiumEligibility
-        : null;
+    const premium = loaderData.premiumEligibility?.eligible ? loaderData.premiumEligibility : null;
     const destName = loaderData.resolution.destination?.label ?? params.destino;
     const catName = loaderData.resolution.category?.label ?? params.categoria;
     const path = `/oriente-maya/${params.destino}/${params.categoria}/${params.empresa}`;
@@ -103,7 +105,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       description,
       path,
       ogType: "profile",
-      ogImage: premium?.cover?.url ?? b.cover_url ?? undefined,
+      // 19.24 — Sólo ruta pública estable en metadatos indexables.
+      ogImage: stableIndexableImageUrl(premium?.cover?.stableUrl ?? b.cover_url),
       breadcrumbs: [
         { label: "Inicio", path: "/" },
         { label: "Oriente Maya", path: "/oriente-maya" },
@@ -116,7 +119,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
           name: b.display_name,
           description,
           path,
-          image: premium?.cover?.url ?? b.cover_url ?? undefined,
+          image: stableIndexableImageUrl(premium?.cover?.stableUrl ?? b.cover_url),
           telephone:
             (premium?.contact ?? b.primary_contact)?.type === "phone" ||
             (premium?.contact ?? b.primary_contact)?.type === "whatsapp"
@@ -173,14 +176,19 @@ function EmpresaTerritorialPage() {
     currentLabel: business.display_name,
   });
 
+  // 19.21 · V1-P1.d — la presentación Premium depende exclusivamente de la
+  // elegibilidad efectiva por ficha. El flag global sigue gobernando el resto
+  // de contratos: con el flag OFF y ficha no elegible, el render es el legado.
+  const premiumEnabled = premiumEligibility?.eligible === true;
+
   return (
     <ContextEngineProvider declaration={declaration}>
       <BusinessSurfaceProvider business={business} related={related}>
         <BusinessSurfaceContractBoundary
-          enabled={surfaceContractsEnabled}
+          enabled={surfaceContractsEnabled || premiumEnabled}
           business={business}
           related={related}
-          premiumEligibility={premiumEligibility}
+          premiumEligibility={premiumEnabled ? premiumEligibility : null}
           legacy={
             composition ? <CompositionRenderer tree={composition.snapshot} /> : <BusinessSurface />
           }

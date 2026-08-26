@@ -1,0 +1,48 @@
+{
+  "package": "19.26",
+  "title": "Governance Gate Reconciliation",
+  "base_commit": "4c213820ce81bc6b7416481197e9efd06ee978dc",
+  "branch": "feature/omxds-i4-d-g3-integration-evidence-closure-v1",
+  "recorded_at": "2026-08-25",
+  "business_surface_reconciliation": {
+    "path": "src/components/surfaces/BusinessSurface.tsx",
+    "functional_commits": [
+      "b70d29b27f7cd5ed4ae88d91ead7a74b4045ecfb",
+      "5b1bf93f02aaeca8793716dcbce4761acabd20cb"
+    ],
+    "format_only_commit": "0f190484bea435a84c17da3a56eb0306199b796a",
+    "sha256": "3bf20d30f1f7bcc03b83669053baa0d4d6ffebd677a8aa0379d8d02feda757f0",
+    "authorization": "PCA-2026-023-ADDENDUM-A",
+    "file_modified_by_closure": false
+  },
+  "branch_reconciliation": {
+    "authorization": "PCA-2026-029",
+    "acknowledged_sensitive_revisions": 19,
+    "forensic_report": "docs/governance/evidence/19.26/branch-reconciliation-forensic.json",
+    "forensic_routes": 5,
+    "forensic_result": "PASS",
+    "digest_enforcement": "PASS — Product Authorization validates every acknowledged revision against its exact SHA-256"
+  },
+  "invariants": {
+    "omxds_visual_v1_contracts_enabled": false,
+    "data_changed": false,
+    "migrations_changed_or_executed": false,
+    "production_changed": false,
+    "i4_d_operational_multi_actor_acceptance": "DEFERRED",
+    "g4_g5_started": false
+  },
+  "verification": {
+    "lint": "PASS",
+    "i1_through_i4_r": "PASS",
+    "i3_d": "PASS",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "forensic_secret_scan": "PASS — 0 embedded credentials",
+    "governance_integrity": "PASS",
+    "product_authorization": "PASS — 22/22 sensitive changes uniquely authorized",
+    "product_authorization_tests": "PASS",
+    "canonical_sync_check": "PASS",
+    "i4_d_contract_tests": "5/5 PASS",
+    "i4_d_evidence_gate": "EXPECTED FAIL-CLOSED — OPERATIONAL MULTI-ACTOR ACCEPTANCE: DEFERRED"
+  }
+}

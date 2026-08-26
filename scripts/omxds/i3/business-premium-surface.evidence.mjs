@@ -1,6 +1,12 @@
 import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import {
+  assertGovernedDependencyBaseline,
+  assertGovernedLockBaseline,
+} from "../lib/platform-dependency-baseline.mjs";
 
 const base = "ec9ae951412e8cb5223ba9fbf60d51d6814b0552";
 const i3DHead = "43c8ca6de4c10cf2430285aa8261adeda82dbf10";
@@ -35,43 +41,147 @@ assert.equal(changed.size, 15, "I3-D must contain exactly 15 files");
 for (const file of changed) assert.ok(allowed.has(file), `I3-D scope violation: ${file}`);
 for (const file of allowed) assert.ok(changed.has(file), `I3-D authorized file missing: ${file}`);
 
+// 19.26 · Reconciliación fail-closed del gate I3-D.
+// El baseline histórico (base…i3DHead) se conserva intacto. La única evolución
+// tolerada de los artefactos protegidos es el contenido EXACTO acreditado por
+// PCA-2026-023 (19.21) y/o PCA-2026-026 (19.24), fijado por digest SHA-256 y
+// verificado contra un PCA Approved con permiso `modify` sobre la ruta exacta.
+// Cualquier otro contenido, ruta o digest vuelve a fallar el gate.
+const acknowledgedRevisions = new Map([
+  [
+    surfacePath,
+    {
+      sha256: "3bf20d30f1f7bcc03b83669053baa0d4d6ffebd677a8aa0379d8d02feda757f0",
+      authorizationAddendum: "PCA-2026-023-ADDENDUM-A",
+      baseAuthorization: "PCA-2026-023",
+    },
+  ],
+  [
+    routePath,
+    {
+      sha256: "a615c0a480b5d9881e47629b895f20413531561ab9b7c92332cb82dbdb1d5549",
+      authorizations: ["PCA-2026-023", "PCA-2026-026"],
+    },
+  ],
+  [
+    contractPath,
+    {
+      sha256: "d52aab428b9cf58fbca14257497cc2bf93e0482c9a731139af8125ea285869c1",
+      authorizations: ["PCA-2026-026"],
+    },
+  ],
+  [
+    eligibilityPath,
+    {
+      sha256: "93ddeac96c3f74cef90f691a4bf5f64e2bb02aede26f5aa502e35ee65a47e477",
+      authorizations: ["PCA-2026-026"],
+    },
+  ],
+]);
+
 for (const protectedPath of [
   routePath,
   surfacePath,
   contractPath,
   eligibilityPath,
   "scripts/omxds/i3/business-premium-surface.contract.test.ts",
-])
-  assert.equal(
-    execFileSync("git", ["diff", "--name-only", i3DHead, "--", protectedPath], {
-      encoding: "utf8",
-    }),
-    "",
-    `I3-D protected artifact regressed after its authorized batch: ${protectedPath}`,
+]) {
+  const drift = execFileSync("git", ["diff", "--name-only", i3DHead, "--", protectedPath], {
+    encoding: "utf8",
+  });
+  if (drift === "") continue;
+
+  const acknowledged = acknowledgedRevisions.get(protectedPath);
+  const digest = createHash("sha256").update(readFileSync(protectedPath)).digest("hex");
+  assert.ok(
+    acknowledged && acknowledged.sha256 === digest,
+    `I3-D protected artifact regressed after its authorized batch: ${protectedPath} (digest ${digest} is not an acknowledged PCA revision)`,
   );
+  if (acknowledged.authorizationAddendum) {
+    const addendumPath = join(
+      "docs/governance/addenda",
+      `${acknowledged.authorizationAddendum}.json`,
+    );
+    const addendum = JSON.parse(readFileSync(addendumPath, "utf8"));
+    assert.equal(
+      addendum.status,
+      "Approved",
+      `acknowledged I3-D revision requires an Approved ${acknowledged.authorizationAddendum}`,
+    );
+    assert.equal(addendum.addendum_to, acknowledged.baseAuthorization);
+    assert.ok(
+      (addendum.acknowledged_paths ?? []).some(
+        (entry) =>
+          entry.operation === "modify" && entry.path === protectedPath && entry.sha256 === digest,
+      ),
+      `${acknowledged.authorizationAddendum} does not acknowledge modifying ${protectedPath} at digest ${digest}`,
+    );
+    assert.ok(
+      (addendum.required_feature_flags ?? []).includes("omxds_visual_v1_contracts_enabled=false"),
+      `${acknowledged.authorizationAddendum} must preserve the OFF flag invariant`,
+    );
+    const baseAuthorization = JSON.parse(
+      readFileSync(
+        join("docs/governance/product-authorizations", `${acknowledged.baseAuthorization}.json`),
+        "utf8",
+      ),
+    );
+    assert.equal(
+      baseAuthorization.status,
+      "Approved",
+      `acknowledged I3-D revision requires an Approved ${acknowledged.baseAuthorization}`,
+    );
+    assert.ok(
+      (baseAuthorization.required_feature_flags ?? []).includes(
+        "omxds_visual_v1_contracts_enabled=false",
+      ),
+      `${acknowledged.baseAuthorization} must preserve the OFF flag invariant`,
+    );
+    continue;
+  }
+  for (const authorizationId of acknowledged.authorizations) {
+    const authorization = JSON.parse(
+      readFileSync(
+        join("docs/governance/product-authorizations", `${authorizationId}.json`),
+        "utf8",
+      ),
+    );
+    assert.equal(
+      authorization.status,
+      "Approved",
+      `acknowledged I3-D revision requires an Approved ${authorizationId}`,
+    );
+    assert.ok(
+      (authorization.permissions ?? []).some(
+        (permission) => permission.operation === "modify" && permission.path === protectedPath,
+      ),
+      `${authorizationId} does not authorize modifying ${protectedPath}`,
+    );
+    assert.ok(
+      (authorization.required_feature_flags ?? []).includes(
+        "omxds_visual_v1_contracts_enabled=false",
+      ),
+      `${authorizationId} must preserve the OFF flag invariant`,
+    );
+  }
+}
 
 const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
 );
 const currentPackage = JSON.parse(readFileSync("package.json", "utf8"));
-assert.deepEqual(currentPackage.dependencies, basePackage.dependencies);
-assert.deepEqual(currentPackage.devDependencies, basePackage.devDependencies);
-assert.equal(
-  execFileSync("git", ["diff", "--name-only", base, "--", "bun.lock"], {
-    encoding: "utf8",
-  }),
-  "",
-);
+assertGovernedDependencyBaseline(currentPackage, basePackage, "I3-D");
+assertGovernedLockBaseline(base, "I3-D");
 
 const route = readFileSync(routePath, "utf8");
 assert.match(route, /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/);
-assert.match(route, /surfaceContractsEnabled\s*\?\s*await getBusinessPremiumEligibility/);
-assert.ok(
-  route.indexOf("getOmxdsSurfaceContractsFlag().catch(() => false)") <
-    route.indexOf("await getBusinessPremiumEligibility"),
-  "Premium eligibility must run only after the fail-closed flag read",
-);
-assert.match(route, /premiumEligibility=\{premiumEligibility\}/);
+// 19.21 · La elegibilidad Premium se evalúa siempre por ficha y falla cerrado;
+// el flag global OFF continúa gobernando los demás contratos de superficie.
+assert.match(route, /const premiumEligibility = await getBusinessPremiumEligibility\(\{/);
+assert.match(route, /\}\)\.catch\(\(\) => null\)/);
+assert.match(route, /const premiumEnabled = premiumEligibility\?\.eligible === true/);
+assert.match(route, /enabled=\{surfaceContractsEnabled \|\| premiumEnabled\}/);
+assert.match(route, /premiumEligibility=\{premiumEnabled \? premiumEligibility : null\}/);
 assert.match(route, /CompositionRenderer tree=\{composition\.snapshot\}/);
 assert.match(route, /legacy=/);
 
@@ -210,6 +320,36 @@ for (const forbiddenPath of [
     }),
     "",
   );
+// 19.26 · Reconocimiento fail-closed y NO genérico de dos artefactos generados por
+// la plataforma (broker de sesión de preview), presentes desde 66c4386c, sin
+// secretos embebidos y no editables por el proyecto. Sólo estas dos rutas exactas
+// con estos digest exactos; cualquier cambio de contenido, ausencia o ruta
+// adicional bajo src/integrations/supabase vuelve a fallar el gate.
+const generatedPlatformArtifacts = new Map([
+  [
+    "src/integrations/supabase/client.ts",
+    "fd07c64d4e312b11ff629b520abb36c613cbfa688db4096b36c53f5832dee741",
+  ],
+  [
+    "src/integrations/supabase/previewAuthStorage.ts",
+    "634c0f279327b7c79f6e38b54b7ab4ae3737f0d6c3a660d8ac02a9659be48a0f",
+  ],
+]);
+
+for (const [artifactPath, expectedDigest] of generatedPlatformArtifacts) {
+  let contents;
+  try {
+    contents = readFileSync(artifactPath);
+  } catch {
+    assert.fail(`acknowledged generated artifact is missing: ${artifactPath}`);
+  }
+  assert.equal(
+    createHash("sha256").update(contents).digest("hex"),
+    expectedDigest,
+    `acknowledged generated artifact changed without Approved PCA: ${artifactPath}`,
+  );
+}
+
 for (const file of gitLines([
   "diff",
   "--name-only",
@@ -219,7 +359,7 @@ for (const file of gitLines([
   "src/integrations/supabase",
 ]))
   assert.ok(
-    approvedPcaAuthorizedPaths.has(file),
+    approvedPcaAuthorizedPaths.has(file) || generatedPlatformArtifacts.has(file),
     `post-I3-D data change lacks an Approved PCA exact-path authorization: ${file}`,
   );
 

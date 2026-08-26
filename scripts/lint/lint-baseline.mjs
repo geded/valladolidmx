@@ -10,6 +10,7 @@ const sourceCommit = "7084b2a7c15a05029cdbc7e62a483f49b47e05cb";
 const excludedPaths = [
   "docs/evidence/omxds-visual/v0-baseline/accessibility/axe.min.js",
   "src/integrations/supabase/types.ts",
+  "src/integrations/supabase/previewAuthStorage.ts",
 ];
 const i3ExactPaths = new Set([
   "src/components/surfaces/DestinationSurface.tsx",
@@ -51,9 +52,11 @@ function runEslint() {
 }
 
 function aggregate(results) {
+  const excluded = new Set(excludedPaths);
   const entries = new Map();
   for (const result of results) {
     const file = normalizePath(result.filePath);
+    if (excluded.has(file)) continue;
     for (const message of result.messages) {
       const severity = message.severity === 2 ? "error" : "warning";
       const rule = message.ruleId || "<parser>";

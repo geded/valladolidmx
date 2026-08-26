@@ -1,0 +1,30 @@
+{
+  "id": "PCA-2026-023-ADDENDUM-A",
+  "type": "append-only-addendum",
+  "addendum_to": "PCA-2026-023",
+  "status": "Approved",
+  "package": "19.26",
+  "founder_authority": "Founder Directive 2026-08-25 · Autoriza continuar exclusivamente desde este chat la remediacion y cierre tecnico de 19.26 sobre 4c213820ce81bc6b7416481197e9efd06ee978dc; crear un addendum append-only que reconozca el cambio funcional preexistente de BusinessSurface.tsx introducido por b70d29b2 y 5b1bf93f bajo el objetivo aprobado de 19.21, limitado al contenido exacto acreditado y al digest posterior de formato 3bf20d30f1f7bcc03b83669053baa0d4d6ffebd677a8aa0379d8d02feda757f0. Sin modificar BusinessSurface.tsx, logica funcional, datos, migraciones, produccion, merge, flag ni G4/G5; I4-D permanece DEFERRED.",
+  "historical_scope_rationale": "PCA-2026-023 aprobo el objetivo de Premium por ficha con flag global OFF, pero su lista original de permisos omitio BusinessSurface.tsx aunque los commits b70d29b2 y 5b1bf93f propagaron premiumEligibility y extendieron activePremium a las familias business, hotel y restaurant para materializar ese mismo objetivo. Este addendum reconoce de forma nominal y fail-closed ese contenido preexistente; no autoriza una nueva modificacion funcional.",
+  "source_commits": [
+    "b70d29b27f7cd5ed4ae88d91ead7a74b4045ecfb",
+    "5b1bf93f02aaeca8793716dcbce4761acabd20cb"
+  ],
+  "format_only_commit": "0f190484bea435a84c17da3a56eb0306199b796a",
+  "acknowledged_paths": [
+    {
+      "operation": "modify",
+      "path": "src/components/surfaces/BusinessSurface.tsx",
+      "sha256": "3bf20d30f1f7bcc03b83669053baa0d4d6ffebd677a8aa0379d8d02feda757f0",
+      "state": "preexisting-functional-change-plus-format-only-normalization"
+    }
+  ],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "does_not_authorize": [
+    "editar nuevamente src/components/surfaces/BusinessSurface.tsx",
+    "reconocer otra ruta, digest o cambio funcional",
+    "modificar datos, migraciones, produccion o el flag",
+    "merge, despliegue, G4 o G5",
+    "cambiar I4-D de DEFERRED sin aceptacion humana multi-actor real"
+  ]
+}

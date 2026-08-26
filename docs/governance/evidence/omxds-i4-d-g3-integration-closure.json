@@ -1,0 +1,109 @@
+{
+  "initiative": "I4-D · G3 Integration & Evidence Closure",
+  "gate": "G3",
+  "status": "PASS",
+  "base": "d02942d07b9fc96e9a39f1faf4bbafb28ec7a5c2",
+  "branch": "feature/omxds-i4-d-g3-integration-evidence-closure-v1",
+  "blueprint": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+  "authorization": "docs/governance/product-authorizations/PCA-2026-017.json",
+  "acceptance_report": "docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md",
+  "vertical_slice": {
+    "authorable_block": "vmx.experience.section",
+    "governed_read_only_block": "vmx.experience.info-grid",
+    "governed_source": "geography.location",
+    "preview_route": "/preview/composition/$token",
+    "public_routes_added": []
+  },
+  "inherited_closure": [
+    "I4-A",
+    "I4-B",
+    "I4-C",
+    "I4-R"
+  ],
+  "human_scenarios": [
+    "G3-H01",
+    "G3-H02",
+    "G3-H03",
+    "G3-H04",
+    "G3-H05",
+    "G3-H06",
+    "G3-H07",
+    "G3-H08",
+    "G3-H09",
+    "G3-H10",
+    "G3-H11",
+    "G3-H12"
+  ],
+  "operational_model": "single-actor",
+  "deferred_non_blocking": [
+    "G3-H07",
+    "G3-H11",
+    "G3-H12"
+  ],
+  "open_p0": 0,
+  "open_p1": 0,
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "exact_route_count": 12,
+  "exact_routes": [
+    "scripts/omxds/i4/editorial-builder-g3.integration.test.ts",
+    "scripts/omxds/i4/editorial-builder-g3.evidence.mjs",
+    "package.json",
+    "scripts/governance/validate-full-suite.mjs",
+    "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+    "docs/governance/product-authorizations/PCA-2026-017.json",
+    "docs/governance/evidence/omxds-i4-d-g3-integration-closure.json",
+    "docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md",
+    "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+    "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
+    "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
+    "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json"
+  ],
+  "artifacts": [
+    {
+      "path": "scripts/omxds/i4/editorial-builder-g3.integration.test.ts",
+      "sha256": "6557991c531f7412f43d3178bd1ba1fd2a9108edfa06e4c26343bfa686e83b83"
+    },
+    {
+      "path": "scripts/omxds/i4/editorial-builder-g3.evidence.mjs",
+      "sha256": "9322023cd22a80d0e497af67ca69c9c38c29dfff4125862996fdfea241cde9de"
+    },
+    {
+      "path": "package.json",
+      "sha256": "046738d7e006193e594c35327ed1f3dc0f98cc13033cc3b1f636ba1d65d27024"
+    },
+    {
+      "path": "scripts/governance/validate-full-suite.mjs",
+      "sha256": "41c76e34f21968d8bd159cc191214464365ef7701bab2e3e81e971a3ed62c413"
+    },
+    {
+      "path": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "sha256": "a609e4a9aa085952b24718eb3a64faf660017739ac692bd0666cdb1a1bdd0fd5"
+    },
+    {
+      "path": "docs/governance/product-authorizations/PCA-2026-017.json",
+      "sha256": "6583f332899d19638e3f56875345705f2026dc7518a34f213ab10a63d0c6f717"
+    },
+    {
+      "path": "docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md",
+      "sha256": "422e00eaec438db7d266e73997e075dca3fd55b8f42a37e31393809ce63d33fa"
+    },
+    {
+      "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "sha256": "a4f3460c23b2ad8a533a3a2823a229f0a31367352062122db6967ff47b95074d"
+    },
+    {
+      "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
+      "sha256": "2f7784110fedd6e06602cc57ace5aa3e7d3eac4503563039e3544b3420a57ad2"
+    },
+    {
+      "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
+      "sha256": "977530ebf6034c0dcb69aa85a2a7452f93e712cbd045a85cc5a51b6a8f41f1e6"
+    },
+    {
+      "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
+      "sha256": "2e037571d58bf071ba1ae077e64953f4994861225891744f0540f3bcbd6bd918"
+    }
+  ]
+}

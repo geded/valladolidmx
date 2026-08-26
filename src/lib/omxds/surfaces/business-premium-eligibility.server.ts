@@ -8,6 +8,7 @@ import {
   type BusinessPremiumLocation,
   type BusinessPremiumMediaItem,
 } from "./business-premium-surface.contract";
+import { toStablePublicMediaUrl } from "@/lib/media/stable-public-url";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -211,6 +212,8 @@ export const getBusinessPremiumEligibility = createServerFn({ method: "GET" })
             id: asset.id,
             role: row.role,
             url: signed.signedUrl,
+            // 19.24 — Ruta pública estable para metadatos indexables.
+            stableUrl: toStablePublicMediaUrl(asset.storage_bucket, asset.storage_path),
             alt: nonEmpty(asset.alt_text) ? asset.alt_text : (asset.alt_text_ai ?? ""),
             caption: asset.caption,
             width: asset.width ?? 0,

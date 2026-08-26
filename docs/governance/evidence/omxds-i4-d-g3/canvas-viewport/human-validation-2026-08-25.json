@@ -1,0 +1,38 @@
+{
+  "defect": "DEF-G3-001",
+  "status": "CLOSED/PASS",
+  "date": "2026-08-25",
+  "authority": "Founder · VALIDACIÓN HUMANA I4-D / G3 AUTORIZADA",
+  "environment": "entorno no público · datos ficticios",
+  "surface": "/cms/experience-builder?mode=visual&page=home",
+  "flag": "omxds_visual_v1_contracts_enabled=false",
+  "production": "no tocada",
+  "results": {
+    "mobile": {
+      "verdict": "PASS",
+      "header": "sticky",
+      "horizontalOverflow": 0,
+      "searchPill": "completo"
+    },
+    "tablet": {
+      "verdict": "PASS",
+      "header": "sticky",
+      "horizontalOverflow": 0,
+      "searchPill": "completo"
+    },
+    "desktop": {
+      "verdict": "PASS",
+      "header": "sticky",
+      "horizontalOverflow": 0,
+      "searchPill": "completo"
+    },
+    "publicParity": "PASS"
+  },
+  "acceptance_scenarios_closed": ["G3-H01", "G3-H02", "G3-H03", "G3-H04", "G3-H08"],
+  "acceptance_scenarios_objective": ["G3-H05", "G3-H06", "G3-H09", "G3-H10"],
+  "acceptance_scenarios_blocked_human": ["G3-H07"],
+  "acceptance_scenarios_deferred": ["G3-H11", "G3-H12"],
+  "defect_verdict": "CLOSED/PASS",
+  "g3": "FUNCTIONAL ACCEPTANCE: PASS · OPERATIONAL MULTI-ACTOR ACCEPTANCE: DEFERRED",
+  "notes": "El cierre humano cubre exclusivamente DEF-G3-001 y la paridad visual canvas/superficie pública. No sustituye G3-H07 (VoiceOver) ni la sesión multi-actor H11/H12. `validate:i4:d` permanece fail-closed por diseño."
+}

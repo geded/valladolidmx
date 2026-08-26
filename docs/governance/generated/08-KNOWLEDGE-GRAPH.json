@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "status": "Approved",
-  "generated_at": "2026-08-06T00:00:00.000Z",
+  "generated_at": "2026-08-28T00:00:00.000Z",
   "derived_from": {
     "glossary": {
       "document": "docs/governance/01-GLOSSARY.md",
@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "a2ef674380ea7e2456c5fe430873f91633d4e5b54050907968657e3fbe641d03"
+      "source_sha256": "fc3020ebb570463040a1229f0971c7078e7761919f36859a8f5dc9a0220a8b19"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -10370,6 +10370,648 @@
       "path": "docs/governance/product-authorizations/PCA-2026-016.json",
       "source": "docs/governance/product-authorizations/PCA-2026-016.json",
       "evidence": "docs/governance/product-authorizations/PCA-2026-016.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md"
+    },
+    {
+      "id": "ART:scripts/omxds/i4/editorial-builder-g3.integration.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/i4/editorial-builder-g3.integration.test.ts",
+      "source": "scripts/omxds/i4/editorial-builder-g3.integration.test.ts",
+      "evidence": "scripts/omxds/i4/editorial-builder-g3.integration.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/i4/editorial-builder-g3.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/i4/editorial-builder-g3.evidence.mjs",
+      "source": "scripts/omxds/i4/editorial-builder-g3.evidence.mjs",
+      "evidence": "scripts/omxds/i4/editorial-builder-g3.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/governance/evidence/omxds-i4-d-g3-integration-closure.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/omxds-i4-d-g3-integration-closure.json",
+      "source": "docs/governance/evidence/omxds-i4-d-g3-integration-closure.json",
+      "evidence": "docs/governance/evidence/omxds-i4-d-g3-integration-closure.json"
+    },
+    {
+      "id": "ART:docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md",
+      "type": "artifact",
+      "path": "docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md",
+      "source": "docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md",
+      "evidence": "docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-017.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-017.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-017.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-017.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md"
+    },
+    {
+      "id": "ART:scripts/omxds/lib/platform-dependency-baseline.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/lib/platform-dependency-baseline.mjs",
+      "source": "scripts/omxds/lib/platform-dependency-baseline.mjs",
+      "evidence": "scripts/omxds/lib/platform-dependency-baseline.mjs"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-019.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-019.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-019.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-019.json"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-018.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-018.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-018.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-018.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-020.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-020.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-020.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-020.json"
+    },
+    {
+      "id": "ART:docs/governance/evidence/omxds-i4-d-g3/canvas-viewport/canvas-viewport-metrics.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/omxds-i4-d-g3/canvas-viewport/canvas-viewport-metrics.json",
+      "source": "docs/governance/evidence/omxds-i4-d-g3/canvas-viewport/canvas-viewport-metrics.json",
+      "evidence": "docs/governance/evidence/omxds-i4-d-g3/canvas-viewport/canvas-viewport-metrics.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "evidence": "docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-visual/v0-baseline/media/media_assets_inventory.csv",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-visual/v0-baseline/media/media_assets_inventory.csv",
+      "source": "docs/evidence/omxds-visual/v0-baseline/media/media_assets_inventory.csv",
+      "evidence": "docs/evidence/omxds-visual/v0-baseline/media/media_assets_inventory.csv"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-visual/v0-baseline/media/storage_objects_inventory.csv",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-visual/v0-baseline/media/storage_objects_inventory.csv",
+      "source": "docs/evidence/omxds-visual/v0-baseline/media/storage_objects_inventory.csv",
+      "evidence": "docs/evidence/omxds-visual/v0-baseline/media/storage_objects_inventory.csv"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-021.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-021.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-021.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-021.json"
+    },
+    {
+      "id": "ART:docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md",
+      "type": "artifact",
+      "path": "docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md",
+      "source": "docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md",
+      "evidence": "docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1-a/asset-governance-matrix.csv",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1-a/asset-governance-matrix.csv",
+      "source": "docs/governance/evidence/v1-p1-a/asset-governance-matrix.csv",
+      "evidence": "docs/governance/evidence/v1-p1-a/asset-governance-matrix.csv"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1-a/alt-and-dimensions-gap-report.md",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1-a/alt-and-dimensions-gap-report.md",
+      "source": "docs/governance/evidence/v1-p1-a/alt-and-dimensions-gap-report.md",
+      "evidence": "docs/governance/evidence/v1-p1-a/alt-and-dimensions-gap-report.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md",
+      "evidence": "docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "evidence": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md"
+    },
+    {
+      "id": "ART:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "type": "artifact",
+      "path": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "source": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "evidence": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1-b/template-block-coverage-matrix.csv",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1-b/template-block-coverage-matrix.csv",
+      "source": "docs/governance/evidence/v1-p1-b/template-block-coverage-matrix.csv",
+      "evidence": "docs/governance/evidence/v1-p1-b/template-block-coverage-matrix.csv"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md",
+      "source": "docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md",
+      "evidence": "docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+      "owner": "D02 · platform-foundation",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md"
+    },
+    {
+      "id": "ART:supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql",
+      "source": "supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql",
+      "evidence": "supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "evidence": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1-d/per-listing-premium-enablement.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1-d/per-listing-premium-enablement.json",
+      "source": "docs/governance/evidence/v1-p1-d/per-listing-premium-enablement.json",
+      "evidence": "docs/governance/evidence/v1-p1-d/per-listing-premium-enablement.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1/asset-lineage-checksum-reconciliation.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1/asset-lineage-checksum-reconciliation.json",
+      "source": "docs/governance/evidence/v1-p1/asset-lineage-checksum-reconciliation.json",
+      "evidence": "docs/governance/evidence/v1-p1/asset-lineage-checksum-reconciliation.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+      "evidence": "docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1/destination-governed-assets-enablement.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1/destination-governed-assets-enablement.json",
+      "source": "docs/governance/evidence/v1-p1/destination-governed-assets-enablement.json",
+      "evidence": "docs/governance/evidence/v1-p1/destination-governed-assets-enablement.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md",
+      "evidence": "docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/evidence/v1-p1-19-24/stable-public-asset-contract.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/v1-p1-19-24/stable-public-asset-contract.json",
+      "source": "docs/governance/evidence/v1-p1-19-24/stable-public-asset-contract.json",
+      "evidence": "docs/governance/evidence/v1-p1-19-24/stable-public-asset-contract.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "evidence": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/evidence/p0-19-25/data-readiness.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/p0-19-25/data-readiness.json",
+      "source": "docs/governance/evidence/p0-19-25/data-readiness.json",
+      "evidence": "docs/governance/evidence/p0-19-25/data-readiness.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-022-ADDENDUM-A.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-022-ADDENDUM-A.json",
+      "source": "docs/governance/addenda/PCA-2026-022-ADDENDUM-A.json",
+      "evidence": "docs/governance/addenda/PCA-2026-022-ADDENDUM-A.json"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-023-ADDENDUM-A.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-023-ADDENDUM-A.json",
+      "source": "docs/governance/addenda/PCA-2026-023-ADDENDUM-A.json",
+      "evidence": "docs/governance/addenda/PCA-2026-023-ADDENDUM-A.json"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-024-ADDENDUM-A.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-024-ADDENDUM-A.json",
+      "source": "docs/governance/addenda/PCA-2026-024-ADDENDUM-A.json",
+      "evidence": "docs/governance/addenda/PCA-2026-024-ADDENDUM-A.json"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-028.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-028.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-028.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-028.json"
+    },
+    {
+      "id": "ART:docs/governance/evidence/19.26/governance-gate-reconciliation.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/19.26/governance-gate-reconciliation.json",
+      "source": "docs/governance/evidence/19.26/governance-gate-reconciliation.json",
+      "evidence": "docs/governance/evidence/19.26/governance-gate-reconciliation.json"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-029.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-029.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-029.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-029.json"
+    },
+    {
+      "id": "ART:docs/governance/evidence/19.26/branch-reconciliation-forensic.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/19.26/branch-reconciliation-forensic.json",
+      "source": "docs/governance/evidence/19.26/branch-reconciliation-forensic.json",
+      "evidence": "docs/governance/evidence/19.26/branch-reconciliation-forensic.json"
+    },
+    {
+      "id": "ART:src/integrations/supabase/previewAuthStorage.ts",
+      "type": "artifact",
+      "path": "src/integrations/supabase/previewAuthStorage.ts",
+      "source": "src/integrations/supabase/previewAuthStorage.ts",
+      "evidence": "src/integrations/supabase/previewAuthStorage.ts"
+    },
+    {
+      "id": "ART:src/lib/media/stable-public-url.ts",
+      "type": "artifact",
+      "path": "src/lib/media/stable-public-url.ts",
+      "source": "src/lib/media/stable-public-url.ts",
+      "evidence": "src/lib/media/stable-public-url.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/surfaces/destination-premium-eligibility.server.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/surfaces/destination-premium-eligibility.server.ts",
+      "source": "src/lib/omxds/surfaces/destination-premium-eligibility.server.ts",
+      "evidence": "src/lib/omxds/surfaces/destination-premium-eligibility.server.ts"
+    },
+    {
+      "id": "ART:src/lib/reviews/public-reads.server.ts",
+      "type": "artifact",
+      "path": "src/lib/reviews/public-reads.server.ts",
+      "source": "src/lib/reviews/public-reads.server.ts",
+      "evidence": "src/lib/reviews/public-reads.server.ts"
+    },
+    {
+      "id": "ART:supabase/migrations/20260825193309_61f9e8e4-608e-46a8-b4ac-4d8930c4eb78.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260825193309_61f9e8e4-608e-46a8-b4ac-4d8930c4eb78.sql",
+      "source": "supabase/migrations/20260825193309_61f9e8e4-608e-46a8-b4ac-4d8930c4eb78.sql",
+      "evidence": "supabase/migrations/20260825193309_61f9e8e4-608e-46a8-b4ac-4d8930c4eb78.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260825200658_91f01898-2d1c-4e08-966f-162553fa40a6.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260825200658_91f01898-2d1c-4e08-966f-162553fa40a6.sql",
+      "source": "supabase/migrations/20260825200658_91f01898-2d1c-4e08-966f-162553fa40a6.sql",
+      "evidence": "supabase/migrations/20260825200658_91f01898-2d1c-4e08-966f-162553fa40a6.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260825210054_e131147b-aaba-445b-b447-7fcf7add86be.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260825210054_e131147b-aaba-445b-b447-7fcf7add86be.sql",
+      "source": "supabase/migrations/20260825210054_e131147b-aaba-445b-b447-7fcf7add86be.sql",
+      "evidence": "supabase/migrations/20260825210054_e131147b-aaba-445b-b447-7fcf7add86be.sql"
+    },
+    {
+      "id": "ART:supabase/migrations/20260825213014_4bd966c5-8384-4c14-bba4-1b4d52a3bfe1.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260825213014_4bd966c5-8384-4c14-bba4-1b4d52a3bfe1.sql",
+      "source": "supabase/migrations/20260825213014_4bd966c5-8384-4c14-bba4-1b4d52a3bfe1.sql",
+      "evidence": "supabase/migrations/20260825213014_4bd966c5-8384-4c14-bba4-1b4d52a3bfe1.sql"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "evidence": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-destination-microsite-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-destination-microsite-preview.tsx",
+      "source": "src/routes/lovable/g4-destination-microsite-preview.tsx",
+      "evidence": "src/routes/lovable/g4-destination-microsite-preview.tsx"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-030.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-030.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-030.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-030.json"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json",
+      "source": "docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json",
+      "evidence": "docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/premium-presentation.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/premium-presentation.ts",
+      "source": "src/lib/omxds/presentation/premium-presentation.ts",
+      "evidence": "src/lib/omxds/presentation/premium-presentation.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/premium-view-models.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/premium-view-models.ts",
+      "source": "src/lib/omxds/presentation/premium-view-models.ts",
+      "evidence": "src/lib/omxds/presentation/premium-view-models.ts"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumHero.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumHero.tsx",
+      "source": "src/components/premium/PremiumHero.tsx",
+      "evidence": "src/components/premium/PremiumHero.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumGallery.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumGallery.tsx",
+      "source": "src/components/premium/PremiumGallery.tsx",
+      "evidence": "src/components/premium/PremiumGallery.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumCard.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumCard.tsx",
+      "source": "src/components/premium/PremiumCard.tsx",
+      "evidence": "src/components/premium/PremiumCard.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumSection.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumSection.tsx",
+      "source": "src/components/premium/PremiumSection.tsx",
+      "evidence": "src/components/premium/PremiumSection.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumBadges.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumBadges.tsx",
+      "source": "src/components/premium/PremiumBadges.tsx",
+      "evidence": "src/components/premium/PremiumBadges.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumBreadcrumb.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumBreadcrumb.tsx",
+      "source": "src/components/premium/PremiumBreadcrumb.tsx",
+      "evidence": "src/components/premium/PremiumBreadcrumb.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/PremiumPresentationSelector.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PremiumPresentationSelector.tsx",
+      "source": "src/components/premium/PremiumPresentationSelector.tsx",
+      "evidence": "src/components/premium/PremiumPresentationSelector.tsx"
+    },
+    {
+      "id": "ART:src/components/premium/index.ts",
+      "type": "artifact",
+      "path": "src/components/premium/index.ts",
+      "source": "src/components/premium/index.ts",
+      "evidence": "src/components/premium/index.ts"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-system-runtime-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-system-runtime-preview.tsx",
+      "source": "src/routes/lovable/g4-system-runtime-preview.tsx",
+      "evidence": "src/routes/lovable/g4-system-runtime-preview.tsx"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-031.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-031.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-031.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-031.json"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json",
+      "source": "docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json",
+      "evidence": "docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "owner": "D01 · product-governance",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/vm/common.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/vm/common.ts",
+      "source": "src/lib/omxds/presentation/vm/common.ts",
+      "evidence": "src/lib/omxds/presentation/vm/common.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/vm/families.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/vm/families.ts",
+      "source": "src/lib/omxds/presentation/vm/families.ts",
+      "evidence": "src/lib/omxds/presentation/vm/families.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/vm/index.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/vm/index.ts",
+      "source": "src/lib/omxds/presentation/vm/index.ts",
+      "evidence": "src/lib/omxds/presentation/vm/index.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/g5/premium-presentation.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/g5/premium-presentation.contract.test.ts",
+      "source": "scripts/omxds/g5/premium-presentation.contract.test.ts",
+      "evidence": "scripts/omxds/g5/premium-presentation.contract.test.ts"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-home-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-home-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-home-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-home-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-hotel-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-hotel-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-hotel-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-hotel-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-restaurant-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-restaurant-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-restaurant-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-restaurant-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-experience-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-experience-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-experience-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-experience-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g4-event-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g4-event-premium-preview.tsx",
+      "source": "src/routes/lovable/g4-event-premium-preview.tsx",
+      "evidence": "src/routes/lovable/g4-event-premium-preview.tsx"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-032.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-032.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-032.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-032.json"
     }
   ],
   "edges": [
@@ -28505,6 +29147,1088 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.35 · docs/blueprint/18.51-OMXDS-V1-I4-ABC-GOVERNED-SOURCE-RECONCILIATION-REMEDIATION-AUTHORIZATION-PACK-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-g3.integration.test.ts:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-g3.integration.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-g3.evidence.mjs:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-g3.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:package.json:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/governance/validate-full-suite.mjs:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/governance/validate-full-suite.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/omxds-i4-d-g3-integration-closure.json:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/evidence/omxds-i4-d-g3-integration-closure.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-017.json:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-017.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-19",
+      "origin": "DOC:docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.37 · docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/lib/platform-dependency-baseline.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/lib/platform-dependency-baseline.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i3/shared-surface.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/shared-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i3/destination-surface.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/destination-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i3/business-vertical-surfaces.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-vertical-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i3/business-premium-surface.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-premium-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-authoring.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-authoring.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-workflow.evidence.mjs:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-workflow.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-019.json:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-019.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-018.json:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-018.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-21",
+      "origin": "DOC:docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.38 · docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/experience-builder/VisualStudio.tsx:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/components/experience-builder/VisualStudio.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/layout/SiteHeader.tsx:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:src/components/layout/SiteHeader.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-020.json:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-020.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/evidence/omxds-i4-d-g3/ACCEPTANCE-REPORT.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/omxds-i4-d-g3/canvas-viewport/canvas-viewport-metrics.json:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/evidence/omxds-i4-d-g3/canvas-viewport/canvas-viewport-metrics.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22",
+      "origin": "DOC:docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.39 · docs/blueprint/18.54-OMXDS-V1-I4-D-EXPERIENCE-BUILDER-CANVAS-ISOLATED-VIEWPORT-AUTHORIZATION-PACK-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/evidence/omxds-visual/v0-baseline/media/media_assets_inventory.csv:docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-visual/v0-baseline/media/media_assets_inventory.csv",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "evidence": "docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/evidence/omxds-visual/v0-baseline/media/storage_objects_inventory.csv:docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-visual/v0-baseline/media/storage_objects_inventory.csv",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "evidence": "docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-021.json:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-021.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1-a/asset-governance-matrix.csv:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1-a/asset-governance-matrix.csv",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1-a/alt-and-dimensions-gap-report.md:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1-a/alt-and-dimensions-gap-report.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "evidence": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "verified_at": "2026-08-22",
+      "origin": "DOC:docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.40 · docs/blueprint/19.00-V1-P1-PREMIUM-TEMPLATES-AND-IMAGERY-READONLY-AUDIT-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "verified_at": "2026-08-22",
+      "origin": "DOC:docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.40 · docs/blueprint/19.16-V1-P1a-ASSET-RIGHTS-ALT-DIMENSIONS-GOVERNANCE-AUTHORIZATION-PACK-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md:docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md",
+      "origin": "ART:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md",
+      "evidence": "docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1-b/template-block-coverage-matrix.csv:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1-b/template-block-coverage-matrix.csv",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "evidence": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1-b/premium-eligibility-gap-report.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "evidence": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "verified_at": "2026-08-22",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md",
+      "verified_at": "2026-08-22",
+      "origin": "DOC:docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.40 · docs/blueprint/19.17-V1-P1b-PREMIUM-VERTICAL-TEMPLATES-CANONICAL-PROPOSAL-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "verified_at": "2026-08-22",
+      "origin": "DOC:docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.40 · docs/blueprint/19.18-V1-P1b-TEMPLATE-COMPOSITION-SPEC-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-25",
+      "origin": "DOC:docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.41 · docs/blueprint/19.19-V1-P1c-GOVERNED-SOURCE-IMAGE-LIBRARY-COMPLETION-REPORT-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql:docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "origin": "DOC:docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D02",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.43 · docs/blueprint/19.20-OMXDS-VISUAL-V1-FLAG-STATE-RECONCILIATION-v1.0.md → D02 · platform-foundation"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx:docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "origin": "ART:src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "evidence": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1-d/per-listing-premium-enablement.json:docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1-d/per-listing-premium-enablement.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "evidence": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "verified_at": "2026-08-25",
+      "origin": "DOC:docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.43 · docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1/asset-lineage-checksum-reconciliation.json:docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1/asset-lineage-checksum-reconciliation.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "origin": "DOC:docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.45 · docs/blueprint/19.22-V1-P1-GOVERNED-ASSET-LINEAGE-AND-CHECKSUM-RECONCILIATION-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1/destination-governed-assets-enablement.json:docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1/destination-governed-assets-enablement.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+      "evidence": "docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+      "verified_at": "2026-08-25",
+      "origin": "DOC:docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.46 · docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/v1-p1-19-24/stable-public-asset-contract.json:docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md",
+      "origin": "ART:docs/governance/evidence/v1-p1-19-24/stable-public-asset-contract.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md",
+      "evidence": "docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md",
+      "verified_at": "2026-08-25",
+      "origin": "DOC:docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.47 · docs/blueprint/19.24-V1-P1-STABLE-PUBLIC-ASSET-CONTRACT-ENFORCEMENT-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/p0-19-25/data-readiness.json:docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "origin": "ART:docs/governance/evidence/p0-19-25/data-readiness.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "evidence": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "verified_at": "2026-08-25",
+      "origin": "DOC:docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.48 · docs/blueprint/19.25-P0-DATA-READINESS-FOR-G4-G5-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i3/destination-surface.evidence.mjs:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/destination-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i3/business-vertical-surfaces.evidence.mjs:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-vertical-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/product-experience-event-surfaces.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i3/business-premium-surface.evidence.mjs:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:scripts/omxds/i3/business-premium-surface.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder.evidence.mjs:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-022-ADDENDUM-A.json:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-022-ADDENDUM-A.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-023-ADDENDUM-A.json:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-023-ADDENDUM-A.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-024-ADDENDUM-A.json:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-024-ADDENDUM-A.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-028.json:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-028.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/19.26/governance-gate-reconciliation.json:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:docs/governance/evidence/19.26/governance-gate-reconciliation.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "origin": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D01",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.49 · docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md → D01 · product-governance"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/governance/lib/product-authorization.mjs:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:scripts/governance/lib/product-authorization.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/governance/schemas/product-authorization.schema.json:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:scripts/governance/schemas/product-authorization.schema.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-029.json:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-029.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/evidence/19.26/branch-reconciliation-forensic.json:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:docs/governance/evidence/19.26/branch-reconciliation-forensic.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/integrations/supabase/previewAuthStorage.ts:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:src/integrations/supabase/previewAuthStorage.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/media/stable-public-url.ts:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:src/lib/media/stable-public-url.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/omxds/surfaces/destination-premium-eligibility.server.ts:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:src/lib/omxds/surfaces/destination-premium-eligibility.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/reviews/public-reads.server.ts:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:src/lib/reviews/public-reads.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260825193309_61f9e8e4-608e-46a8-b4ac-4d8930c4eb78.sql:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:supabase/migrations/20260825193309_61f9e8e4-608e-46a8-b4ac-4d8930c4eb78.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260825200658_91f01898-2d1c-4e08-966f-162553fa40a6.sql:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:supabase/migrations/20260825200658_91f01898-2d1c-4e08-966f-162553fa40a6.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260825210054_e131147b-aaba-445b-b447-7fcf7add86be.sql:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:supabase/migrations/20260825210054_e131147b-aaba-445b-b447-7fcf7add86be.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:supabase/migrations/20260825213014_4bd966c5-8384-4c14-bba4-1b4d52a3bfe1.sql:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "origin": "ART:supabase/migrations/20260825213014_4bd966c5-8384-4c14-bba4-1b4d52a3bfe1.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
+      "verified_at": "2026-08-25",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-destination-microsite-preview.tsx:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-destination-microsite-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "evidence": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "verified_at": "2026-08-26",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/route-inventory.ts:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/route-inventory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "evidence": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "verified_at": "2026-08-26",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/experience-builder/blocks/experience-map/ExperienceMapBlock.tsx:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "origin": "ART:src/components/experience-builder/blocks/experience-map/ExperienceMapBlock.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "evidence": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "verified_at": "2026-08-26",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-030.json:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-030.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "evidence": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "verified_at": "2026-08-26",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-B.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "evidence": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "verified_at": "2026-08-26",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "verified_at": "2026-08-26",
+      "origin": "DOC:docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D01",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.51 · docs/blueprint/19.27-G4-A-DESTINATION-MICROSITE-VISUAL-PREVIEW-v1.0.md → D01 · product-governance"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/omxds/presentation/premium-presentation.ts:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/premium-presentation.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/omxds/presentation/premium-view-models.ts:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/premium-view-models.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/premium/PremiumHero.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumHero.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/premium/PremiumGallery.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumGallery.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/premium/PremiumCard.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumCard.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/premium/PremiumSection.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumSection.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/premium/PremiumBadges.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumBadges.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/premium/PremiumBreadcrumb.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumBreadcrumb.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/premium/PremiumPresentationSelector.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumPresentationSelector.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/premium/index.ts:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/components/premium/index.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-system-runtime-preview.tsx:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-system-runtime-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/route-inventory.ts:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/route-inventory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-031.json:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-031.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-C.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "evidence": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "verified_at": "2026-08-27",
+      "origin": "DOC:docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D01",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.52 · docs/blueprint/19.28-G4-SYSTEM-01-PREMIUM-VISUAL-RUNTIME-v1.0.md → D01 · product-governance"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/omxds/presentation/vm/common.ts:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/vm/common.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/omxds/presentation/vm/families.ts:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/vm/families.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/omxds/presentation/vm/index.ts:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/vm/index.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/g5/premium-presentation.contract.test.ts:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:scripts/omxds/g5/premium-presentation.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/premium/PremiumHero.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumHero.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-home-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-home-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-destination-microsite-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-destination-microsite-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-hotel-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-hotel-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-restaurant-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-restaurant-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-experience-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-experience-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g4-event-premium-preview.tsx:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g4-event-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-032.json:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-032.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "evidence": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "origin": "DOC:docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D01",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.53 · docs/blueprint/19.29-G4-SYSTEM-02-PREMIUM-VISUAL-ADOPTION-v1.0.md → D01 · product-governance"
     }
   ],
   "views": {

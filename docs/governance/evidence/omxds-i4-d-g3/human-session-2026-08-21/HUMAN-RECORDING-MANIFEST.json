@@ -1,0 +1,22 @@
+{
+  "record": "I4-D · G3 · Grabación de sesión humana (iPad Safari)",
+  "original_filename": "ScreenRecording_08-21-2026_19-29-52_1.mp4",
+  "archived_filename": "G3-H08-ipad-safari-2026-08-21.mp4",
+  "pointer": "docs/governance/evidence/omxds-i4-d-g3/human-session-2026-08-21/G3-H08-ipad-safari-2026-08-21.mp4.asset.json",
+  "cdn_url": "/__l5e/assets-v1/d058e13b-1462-4153-a97e-c991c95f8b9b/G3-H08-ipad-safari-2026-08-21.mp4",
+  "sha256": "30e01a4bd2578e10fae78a91421bc8a31f8ff6dd7d40a8b72be63a8ba8565ea3",
+  "size_bytes": 37429385,
+  "duration_seconds": 22.7066,
+  "video": { "codec": "hevc", "width": 2420, "height": 1668 },
+  "captured_at": "2026-08-21T19:29:52-06:00",
+  "archived_at": "2026-08-22T01:46:51Z",
+  "device": "iPad · Safari",
+  "surface": "/cms/experience-builder?mode=visual&page=home",
+  "environment": "entorno no público · datos ficticios",
+  "flag": "omxds_visual_v1_contracts_enabled=false",
+  "production": "no tocada",
+  "scenarios_closed": ["G3-H08"],
+  "complementary_evidence": "Cambio entre modos Móvil, Tablet y Desktop con scroll real dentro del canvas y encabezado sticky visible.",
+  "explicitly_not_valid_for": ["G3-H05", "G3-H07", "G3-H11", "G3-H12"],
+  "g3": "BLOCKED"
+}

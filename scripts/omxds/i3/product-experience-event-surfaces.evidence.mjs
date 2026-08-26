@@ -1,7 +1,12 @@
 import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import {
+  assertGovernedDependencyBaseline,
+  assertGovernedLockBaseline,
+} from "../lib/platform-dependency-baseline.mjs";
 
 const base = "c3d663e5c74bcd5c0f1c96f01da2974c992d1dc6";
 const i3CHead = "1b67c610af4643f115a4901a2865f766c609018f";
@@ -69,14 +74,8 @@ const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
 );
 const currentPackage = JSON.parse(readFileSync("package.json", "utf8"));
-assert.deepEqual(currentPackage.dependencies, basePackage.dependencies);
-assert.deepEqual(currentPackage.devDependencies, basePackage.devDependencies);
-assert.equal(
-  execFileSync("git", ["diff", "--name-only", base, "--", "bun.lock"], {
-    encoding: "utf8",
-  }),
-  "",
-);
+assertGovernedDependencyBaseline(currentPackage, basePackage, "I3-C");
+assertGovernedLockBaseline(base, "I3-C");
 
 for (const routePath of newConsumers) {
   const route = readFileSync(routePath, "utf8");
@@ -209,6 +208,103 @@ for (const forbiddenPath of [
     }),
     "",
   );
+// 19.26 · Reconocimiento fail-closed y NO genérico de dos artefactos generados por
+// la plataforma (broker de sesión de preview), presentes desde 66c4386c, sin
+// secretos embebidos y no editables por el proyecto. Sólo estas dos rutas exactas
+// con estos digest exactos; cualquier cambio de contenido, ausencia o ruta
+// adicional bajo src/integrations/supabase vuelve a fallar el gate.
+const generatedPlatformArtifacts = new Map([
+  [
+    "src/integrations/supabase/client.ts",
+    "fd07c64d4e312b11ff629b520abb36c613cbfa688db4096b36c53f5832dee741",
+  ],
+  [
+    "src/integrations/supabase/previewAuthStorage.ts",
+    "634c0f279327b7c79f6e38b54b7ab4ae3737f0d6c3a660d8ac02a9659be48a0f",
+  ],
+]);
+
+for (const [artifactPath, expectedDigest] of generatedPlatformArtifacts) {
+  let contents;
+  try {
+    contents = readFileSync(artifactPath);
+  } catch {
+    assert.fail(`acknowledged generated artifact is missing: ${artifactPath}`);
+  }
+  assert.equal(
+    createHash("sha256").update(contents).digest("hex"),
+    expectedDigest,
+    `acknowledged generated artifact changed without Approved PCA: ${artifactPath}`,
+  );
+}
+
+// 19.26 · Reconocimiento nominal y fail-closed de transiciones historicas documentadas:
+// migraciones ya autorizadas por una PCA Approved con la ruta EXACTA, cuyo campo
+// required_feature_flags quedo vacio porque el flag OFF era postcondicion (PCA-2026-022)
+// o porque el paquete era data-only (PCA-2026-024), y que por ello quedan fuera del filtro
+// del gate. Cada caso se reconoce por ruta EXACTA y digest SHA-256 EXACTO, mediante un
+// addendum append-only Approved ligado nominalmente a su PCA base. La precondicion global
+// del flag OFF permanece intacta para cualquier otra ruta.
+const acknowledgedHistoricalMigrations = new Map([
+  [
+    "supabase/migrations/20260825163531_3ed38299-f9a2-488c-9686-8d2373075753.sql",
+    {
+      addendum: "docs/governance/addenda/PCA-2026-022-ADDENDUM-A.json",
+      basePca: "docs/governance/product-authorizations/PCA-2026-022.json",
+      basePcaId: "PCA-2026-022",
+      sha256: "cf0c31ab1eeb8b051154697b6d26c671b5e2105dba9770c0aa8e6e5b46dba252",
+    },
+  ],
+  [
+    "supabase/migrations/20260825193309_61f9e8e4-608e-46a8-b4ac-4d8930c4eb78.sql",
+    {
+      addendum: "docs/governance/addenda/PCA-2026-024-ADDENDUM-A.json",
+      basePca: "docs/governance/product-authorizations/PCA-2026-024.json",
+      basePcaId: "PCA-2026-024",
+      sha256: "e103b39b9178834dcedd74ad2c0bedfd1a912e021ea5280e1ae61b0452026b34",
+    },
+  ],
+]);
+
+function isAcknowledgedHistoricalMigration(file) {
+  const acknowledged = acknowledgedHistoricalMigrations.get(file);
+  if (!acknowledged) return false;
+
+  const addendum = JSON.parse(readFileSync(acknowledged.addendum, "utf8"));
+  assert.equal(
+    addendum.status,
+    "Approved",
+    `historical migration acknowledgement requires an Approved addendum: ${acknowledged.addendum}`,
+  );
+  assert.equal(
+    addendum.addendum_to,
+    acknowledged.basePcaId,
+    `addendum is not bound to ${acknowledged.basePcaId}: ${acknowledged.addendum}`,
+  );
+  const basePca = JSON.parse(readFileSync(acknowledged.basePca, "utf8"));
+  assert.equal(basePca.id, acknowledged.basePcaId);
+  assert.equal(
+    basePca.status,
+    "Approved",
+    `historical migration acknowledgement requires an Approved ${acknowledged.basePcaId}`,
+  );
+  assert.ok(
+    (basePca.permissions ?? []).some(
+      (permission) => permission.operation === "create" && permission.path === file,
+    ),
+    `${acknowledged.basePcaId} does not authorize creating ${file}`,
+  );
+  const declared = (addendum.acknowledged_paths ?? []).find((entry) => entry.path === file);
+  assert.ok(declared, `addendum does not acknowledge ${file}`);
+  assert.equal(
+    createHash("sha256").update(readFileSync(file)).digest("hex"),
+    declared.sha256,
+    `acknowledged historical migration changed after its addendum: ${file}`,
+  );
+  assert.equal(declared.sha256, acknowledged.sha256);
+  return true;
+}
+
 for (const file of gitLines([
   "diff",
   "--name-only",
@@ -217,7 +313,12 @@ for (const file of gitLines([
   "supabase",
   "src/integrations/supabase",
 ]))
-  assert.ok(authorizedChangedPaths.has(file), `post-I3-C data change lacks Approved PCA: ${file}`);
+  assert.ok(
+    authorizedChangedPaths.has(file) ||
+      generatedPlatformArtifacts.has(file) ||
+      isAcknowledgedHistoricalMigration(file),
+    `post-I3-C data change lacks Approved PCA: ${file}`,
+  );
 
 const tests = readFileSync(
   "scripts/omxds/i3/product-experience-event-surfaces.contract.test.ts",

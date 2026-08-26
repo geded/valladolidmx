@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-025",
+  "title": "19.23 · V1-P1 · Destination Governed Assets Enablement (reclasificacion allowlist, enlaces gobernados y elegibilidad Premium por destino)",
+  "status": "Approved",
+  "branch": "edit/edt-42417d62-69b1-4c49-97b6-ae3c761f4f68",
+  "blueprint": "docs/blueprint/19.23-V1-P1-DESTINATION-GOVERNED-ASSETS-ENABLEMENT-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-25 · AUTORIZACION FOUNDER · EJECUTAR 19.22.b COMO BLUEPRINT 19.23 con PCA-2026-025, sobre base gobernada descendiente de 92911980041c2c381f5bdffa8814b1ef5c12b1ac. Autoriza: (1) reclasificar exclusivamente el destino canonico Valladolid 11111111-aaaa-4aaa-8aaa-000000000001 de is_demo_seed true a false, verificando status published y registrando auditoria con causa literal, mediante migracion idempotente con allowlist por UUID que aborta ante precondicion incumplida y no modifica ningun otro destino; (2) vincular directamente los tres assets maestros gobernados 453dd8fd-7d1e-419e-95ea-9afa365f363c, 48bdb6fd-91ec-40b4-8262-070cffdbdaf3 y 4c1ffec3-c57f-44e5-99f3-b8c9ffb0b93b en destination_media con roles cover y gallery y auditoria correspondiente, sin duplicar binarios ni crear media_assets; (3) elegibilidad Premium por destino fail-closed e independiente del flag global, sin slug ni UUID hardcodeados en runtime; (4) crear src/lib/omxds/surfaces/destination-premium-eligibility.server.ts y modificar src/routes/oriente-maya/$destino.index.tsx; (5) OG, SEO y JSON-LD con fuente estable por el mecanismo canonico existente, prohibido publicar buckets privados, debilitar politicas de Storage, persistir URLs firmadas como canonicas o crear una solucion paralela de medios. Invariantes: omxds_visual_v1_contracts_enabled permanece false antes y despues y conserva su funcion en los demas contratos; ningun destino demo puede ascender; sin rutas publicas nuevas; sin despliegue ni publicacion en produccion; validate:i4:d permanece FAIL-CLOSED por H07/H11/H12; 19.22.c, G4 y G5 no se inician.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260825200658_91f01898-2d1c-4e08-966f-162553fa40a6.sql"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/surfaces/destination-premium-eligibility.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.index.tsx"
+    }
+  ],
+  "public_routes": ["/oriente-maya/valladolid"],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run build",
+    "bun run test:i3:0",
+    "bun run test:i3:a",
+    "bun run test:i3:b",
+    "bun run test:i3:c",
+    "bun run test:i3:d",
+    "bun run validate:i4:a",
+    "bun run validate:i4:b",
+    "bun run validate:i4:c",
+    "bun run validate:i4:r",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

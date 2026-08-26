@@ -1,7 +1,12 @@
 import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import {
+  assertGovernedDependencyBaseline,
+  assertGovernedLockBaseline,
+} from "../lib/platform-dependency-baseline.mjs";
 
 const base = "bc04fc43008c506c967ee2034a724533f254e7d6";
 const i3BHead = "0f740b84cd72f7cb07672ff7e350e998f0f4bc45";
@@ -55,14 +60,8 @@ const basePackage = JSON.parse(
   execFileSync("git", ["show", `${base}:package.json`], { encoding: "utf8" }),
 );
 const currentPackage = JSON.parse(readFileSync("package.json", "utf8"));
-assert.deepEqual(currentPackage.dependencies, basePackage.dependencies);
-assert.deepEqual(currentPackage.devDependencies, basePackage.devDependencies);
-assert.equal(
-  execFileSync("git", ["diff", "--name-only", base, "--", "bun.lock"], {
-    encoding: "utf8",
-  }),
-  "",
-);
+assertGovernedDependencyBaseline(currentPackage, basePackage, "I3-B");
+assertGovernedLockBaseline(base, "I3-B");
 
 const route = readFileSync(routePath, "utf8");
 assert.match(route, /getOmxdsSurfaceContractsFlag\(\)\.catch\(\(\) => false\)/);
@@ -141,6 +140,36 @@ for (const file of [routePath, "src/components/surfaces/BusinessSurface.tsx"]) {
   if (changedAfterI3B)
     assert.ok(authorizedChangedPaths.has(file), `post-I3-B change lacks Approved PCA: ${file}`);
 }
+// 19.26 · Reconocimiento fail-closed y NO genérico de dos artefactos generados por
+// la plataforma (broker de sesión de preview), presentes desde 66c4386c, sin
+// secretos embebidos y no editables por el proyecto. Sólo estas dos rutas exactas
+// con estos digest exactos; cualquier cambio de contenido, ausencia o ruta
+// adicional bajo src/integrations/supabase vuelve a fallar el gate.
+const generatedPlatformArtifacts = new Map([
+  [
+    "src/integrations/supabase/client.ts",
+    "fd07c64d4e312b11ff629b520abb36c613cbfa688db4096b36c53f5832dee741",
+  ],
+  [
+    "src/integrations/supabase/previewAuthStorage.ts",
+    "634c0f279327b7c79f6e38b54b7ab4ae3737f0d6c3a660d8ac02a9659be48a0f",
+  ],
+]);
+
+for (const [artifactPath, expectedDigest] of generatedPlatformArtifacts) {
+  let contents;
+  try {
+    contents = readFileSync(artifactPath);
+  } catch {
+    assert.fail(`acknowledged generated artifact is missing: ${artifactPath}`);
+  }
+  assert.equal(
+    createHash("sha256").update(contents).digest("hex"),
+    expectedDigest,
+    `acknowledged generated artifact changed without Approved PCA: ${artifactPath}`,
+  );
+}
+
 for (const file of flagConsumers)
   assert.ok(authorizedRouteConsumers.has(file), `unauthorized SSR flag consumer: ${file}`);
 
@@ -186,7 +215,10 @@ for (const file of execFileSync(
   .trim()
   .split("\n")
   .filter(Boolean))
-  assert.ok(authorizedChangedPaths.has(file), `post-I3-B data change lacks Approved PCA: ${file}`);
+  assert.ok(
+    authorizedChangedPaths.has(file) || generatedPlatformArtifacts.has(file),
+    `post-I3-B data change lacks Approved PCA: ${file}`,
+  );
 
 console.log(
   "I3-B evidence: PASS (Business owner; Hotel/Restaurant adapters; PCA-authorized SSR; exact OFF legacy branch).",

@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-017",
+  "title": "OMXDS V1 · I4-D G3 Integration & Evidence Closure",
+  "status": "Approved",
+  "branch": "feature/omxds-i4-d-g3-integration-evidence-closure-v1",
+  "blueprint": "docs/blueprint/18.52-OMXDS-V1-I4-D-G3-INTEGRATION-EVIDENCE-CLOSURE-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-19 · Autoriza iniciar exclusivamente I4-D · G3 Integration & Evidence Closure sobre main@d02942d07b9fc96e9a39f1faf4bbafb28ec7a5c2, comenzando por preflight read-only y continuando sólo dentro del alcance canónico si no existe ampliación. Preflight PASS: I4-D queda limitado a integración, pruebas, aceptación humana y evidencia; no se autorizan cambios de producto, producción, despliegue, datos reales, flag ON, Premium, Commerce ni ruta 13. Cualquier necesidad adicional regresa a Founder Review.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "package.json"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run lint",
+    "bun run test:i4:d",
+    "bun run validate:i4:d",
+    "bun run typecheck",
+    "bun run build",
+    "bun scripts/governance/sync-governance.mjs --check",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/validate-full-suite.mjs --base=d02942d07b9fc96e9a39f1faf4bbafb28ec7a5c2"
+  ]
+}

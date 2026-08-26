@@ -16,6 +16,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { SeoPreview } from "./SeoPreview";
@@ -1187,7 +1188,7 @@ function PageVisualEditor({
   const [deviceViewport, setDeviceViewport] = useState<DeviceViewport>(() => {
     if (typeof window === "undefined") return "mobile";
     const stored = window.localStorage.getItem("eb.canvas.device");
-    return stored === "tablet" || stored === "desktop" ? stored : "mobile";
+    return isDeviceViewport(stored) ? stored : "mobile";
   });
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -2208,7 +2209,7 @@ function PageVisualEditor({
               onChange={(next) => updateSelectedConfig(next)}
               simple={!advanced}
               activeBreakpoint={
-                deviceViewport === "desktop" ? "lg" : deviceViewport === "tablet" ? "md" : "base"
+                deviceViewport === "tablet" ? "md" : deviceViewport === "mobile" ? "base" : "lg"
               }
             />
 
@@ -2497,12 +2498,34 @@ function SharePreviewModal({
 const HOME_CANVAS_WIDTH = 1280;
 
 /** Anchos de canvas por dispositivo (px CSS reales, no escalados). */
-export type DeviceViewport = "mobile" | "tablet" | "desktop";
+export type DeviceViewport = "mobile" | "tablet" | "desktop" | "w1024" | "w1440";
 const DEVICE_WIDTHS: Record<DeviceViewport, number> = {
   mobile: 390,
   tablet: 768,
   desktop: 1280,
+  w1024: 1024,
+  w1440: 1440,
 };
+
+function isDeviceViewport(value: unknown): value is DeviceViewport {
+  return typeof value === "string" && value in DEVICE_WIDTHS;
+}
+
+/**
+ * Anchos exactos de auditoría (G3-H03 = 1024 px, G3-H04 = 1440 px).
+ * Sólo disponibles en entornos NO productivos (preview / local). No añaden
+ * rutas, no activan flags y no alteran el comportamiento del canvas.
+ */
+const AUDIT_HOSTNAMES_BLOCKED = new Set([
+  "valladolidmx.lovable.app",
+  "quehacerenvalladolid.com",
+  "www.quehacerenvalladolid.com",
+]);
+
+function auditWidthsEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  return !AUDIT_HOSTNAMES_BLOCKED.has(window.location.hostname);
+}
 
 /**
  * Toggle segmentado Móvil / Tablet / Desktop para el canvas.
@@ -2516,10 +2539,18 @@ function DeviceToggle({
   value: DeviceViewport;
   onChange: (v: DeviceViewport) => void;
 }) {
+  const [audit, setAudit] = useState(false);
+  useEffect(() => setAudit(auditWidthsEnabled()), []);
   const items: Array<{ id: DeviceViewport; label: string; short: string }> = [
     { id: "mobile", label: "Vista móvil (390 px)", short: "Móvil" },
     { id: "tablet", label: "Vista tablet (768 px)", short: "Tablet" },
     { id: "desktop", label: "Vista desktop (1280 px)", short: "Desktop" },
+    ...(audit
+      ? ([
+          { id: "w1024", label: "Auditoría G3-H03 · ancho exacto 1024 px", short: "1024" },
+          { id: "w1440", label: "Auditoría G3-H04 · ancho exacto 1440 px", short: "1440" },
+        ] as Array<{ id: DeviceViewport; label: string; short: string }>)
+      : []),
   ];
   return (
     <div
@@ -2576,9 +2607,8 @@ function HomeCanvas({
   commentCounts?: Record<string, number>;
 }) {
   const outerRef = useRef<HTMLDivElement | null>(null);
-  const frameRef = useRef<HTMLDivElement | null>(null);
   const frameWidth = DEVICE_WIDTHS[deviceViewport];
-  const [metrics, setMetrics] = useState({ width: frameWidth, height: 900 });
+  const [available, setAvailable] = useState({ width: frameWidth, height: 900 });
   const rootIds = tree.root.children.map((n) => n.id);
   const rootIdSet = new Set(rootIds);
   const canvasSensors = useSensors(
@@ -2592,158 +2622,264 @@ function HomeCanvas({
 
   useEffect(() => {
     const measure = () => {
-      const width = outerRef.current?.clientWidth ?? HOME_CANVAS_WIDTH;
-      const height = frameRef.current?.scrollHeight ?? 900;
-      setMetrics((current) =>
+      const el = outerRef.current;
+      if (!el) return;
+      const width = el.clientWidth - 24;
+      const height = el.clientHeight - 24;
+      setAvailable((current) =>
         Math.abs(current.width - width) > 1 || Math.abs(current.height - height) > 1
           ? { width, height }
           : current,
       );
     };
-
     measure();
-    const frame = frameRef.current;
     const outer = outerRef.current;
     const observer = new ResizeObserver(measure);
-    if (frame) observer.observe(frame);
     if (outer) observer.observe(outer);
     window.addEventListener("resize", measure);
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [tree, previewMode, selectedId, deviceViewport]);
+  }, [deviceViewport]);
 
-  // Móvil y tablet caben casi siempre a 1:1; desktop se auto-escala si el
-  // contenedor del editor es más angosto que 1280.
-  const scale = Math.min(1, Math.max(0.45, metrics.width / frameWidth));
+  // 18.54 · Viewport aislado SIN zoom: el iframe usa siempre el ancho real del
+  // dispositivo (390/768/1280). Si el editor es más angosto, el contenedor
+  // desplaza horizontalmente en lugar de escalar, porque `transform: scale`
+  // rompe `position: sticky` y provoca recortes por redondeo en Safari/iPad.
+  const frameHeight = Math.max(360, available.height);
 
   return (
-    <div ref={outerRef} className="flex-1 overflow-y-auto bg-muted/20 px-3 py-3">
-      <div
-        className="relative mx-auto overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
-        style={{
-          width: frameWidth * scale,
-          height: metrics.height * scale,
-        }}
+    <div
+      ref={outerRef}
+      className="flex min-h-[70vh] min-w-0 flex-1 overflow-auto bg-muted/20 p-3"
+    >
+      <CanvasViewport
+        device={deviceViewport}
+        width={frameWidth}
+        height={frameHeight}
       >
-        <div
-          ref={frameRef}
-          data-eb-canvas-device={deviceViewport}
-          className="absolute left-0 top-0 bg-background"
-          style={{
-            width: frameWidth,
-            transform: `scale(${scale})`,
-            transformOrigin: "top left",
-          }}
+
+        <InertChrome
+          label="Encabezado"
+          selected={selectedId === HEADER_CHROME_ID}
+          onSelect={() => onSelectChrome("header")}
+          sticky
         >
-          <StudioDeviceCss />
-          <InertChrome
-            label="Encabezado"
-            selected={selectedId === HEADER_CHROME_ID}
-            onSelect={() => onSelectChrome("header")}
-          >
-            <PublicHeader variant="overlay" config={getChromeConfig(tree, "header")} />
-          </InertChrome>
-          <DndContext
-            sensors={canvasSensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleCanvasDragEnd}
-          >
-            <SortableContext items={rootIds} strategy={verticalListSortingStrategy}>
-              <CompositionRenderer
-                tree={tree}
-                pageType="home"
-                wrap={
-                  previewMode
-                    ? undefined
-                    : (node, content) => (
-                        <BlockOverlay
-                          key={node.id}
-                          node={node}
-                          selected={selectedId === node.id}
-                          onSelect={() => onSelect(node.id)}
-                          onDelete={() => onDelete(node.id)}
-                          onDuplicate={() => onDuplicate(node.id)}
-                          onToggleHidden={() => onToggleHidden(node.id)}
-                          onMoveUp={() => onMove(node.id, -1)}
-                          onMoveDown={() => onMove(node.id, 1)}
-                          sortable={rootIdSet.has(node.id)}
-                          commentCount={commentCounts?.[node.id] ?? 0}
-                        >
-                          {content}
-                        </BlockOverlay>
-                      )
-                }
-              />
-            </SortableContext>
-          </DndContext>
-          <InertChrome
-            label="Pie de página"
-            selected={selectedId === FOOTER_CHROME_ID}
-            onSelect={() => onSelectChrome("footer")}
-          >
-            <PublicFooter config={getChromeConfig(tree, "footer")} />
-          </InertChrome>
-        </div>
-      </div>
+          <PublicHeader variant="overlay" config={getChromeConfig(tree, "header")} />
+        </InertChrome>
+        <DndContext
+          sensors={canvasSensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleCanvasDragEnd}
+        >
+          <SortableContext items={rootIds} strategy={verticalListSortingStrategy}>
+            <CompositionRenderer
+              tree={tree}
+              pageType="home"
+              wrap={
+                previewMode
+                  ? undefined
+                  : (node, content) => (
+                      <BlockOverlay
+                        key={node.id}
+                        node={node}
+                        selected={selectedId === node.id}
+                        onSelect={() => onSelect(node.id)}
+                        onDelete={() => onDelete(node.id)}
+                        onDuplicate={() => onDuplicate(node.id)}
+                        onToggleHidden={() => onToggleHidden(node.id)}
+                        onMoveUp={() => onMove(node.id, -1)}
+                        onMoveDown={() => onMove(node.id, 1)}
+                        sortable={rootIdSet.has(node.id)}
+                        commentCount={commentCounts?.[node.id] ?? 0}
+                      >
+                        {content}
+                      </BlockOverlay>
+                    )
+              }
+            />
+          </SortableContext>
+        </DndContext>
+        <InertChrome
+          label="Pie de página"
+          selected={selectedId === FOOTER_CHROME_ID}
+          onSelect={() => onSelectChrome("footer")}
+        >
+          <PublicFooter config={getChromeConfig(tree, "footer")} />
+        </InertChrome>
+      </CanvasViewport>
     </div>
   );
 }
 
 /**
- * Fallback exclusivo del Studio: el canvas simula 390/768/1280px dentro de
- * una ventana desktop. Si algún breakpoint de viewport o container-query no
- * alcanza a recalcularse dentro del editor, estas reglas fuerzan las mismas
- * columnas que ve el sitio público para cada dispositivo seleccionado.
+ * CanvasViewport — viewport aislado del Studio (18.54).
+ *
+ * Renderiza el árbol del canvas dentro de un `<iframe>` same-origin con el
+ * ancho real del dispositivo seleccionado. Al ser un documento propio:
+ *  - las media queries (`sm:`, `md:`, `lg:`) se resuelven contra 390/768/1280
+ *    y no contra la ventana del editor;
+ *  - el scroll y el `sticky` del encabezado se comportan como en producción;
+ *  - el overflow horizontal aparece (o no) exactamente igual que en público.
+ *
+ * No duplica componentes: el árbol React se porta al documento del iframe,
+ * conservando providers, contextos y los componentes canónicos.
+ * El canvas permanece inerte: se cancelan navegaciones y envíos de formulario.
  */
-function StudioDeviceCss() {
+function CanvasViewport({
+  device,
+  width,
+  height,
+  children,
+}: {
+  device: DeviceViewport;
+  width: number;
+  height: number;
+  children: React.ReactNode;
+}) {
+
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [mount, setMount] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    const doc = iframe?.contentDocument;
+    if (!doc) return;
+
+    doc.documentElement.lang = document.documentElement.lang || "es";
+    doc.body.style.margin = "0";
+    doc.body.style.background = "";
+
+    // El componente canónico conserva sus contratos. Esta normalización sólo
+    // actúa dentro del viewport aislado: Safari respeta el ancho útil de 390 px
+    // aunque los controles flex tengan contenido intrínseco más largo.
+    const viewportStyle = doc.createElement("style");
+    viewportStyle.setAttribute("data-eb-canvas-viewport-style", "");
+    viewportStyle.textContent = `
+      form[role="search"],
+      form[role="search"] > div,
+      form[role="search"] > div > button {
+        min-width: 0;
+        max-width: 100%;
+      }
+    `;
+    doc.head.appendChild(viewportStyle);
+
+    let frame = 0;
+    const syncStyles = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        doc.documentElement.className = document.documentElement.className;
+        doc.head.querySelectorAll("[data-eb-canvas-style]").forEach((n) => n.remove());
+        document
+          .querySelectorAll('style, link[rel="stylesheet"]')
+          .forEach((node) => {
+            const clone = node.cloneNode(true) as HTMLElement;
+            clone.setAttribute("data-eb-canvas-style", "");
+            doc.head.appendChild(clone);
+          });
+      });
+    };
+    syncStyles();
+
+    const observer = new MutationObserver(syncStyles);
+    observer.observe(document.head, { childList: true, subtree: true });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+    // Inercia del canvas: ninguna navegación ni envío desde la vista previa.
+    const blockNavigation = (event: Event) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest?.("a[href], button[type='submit'], form")) {
+        event.preventDefault();
+      }
+    };
+    doc.addEventListener("click", blockNavigation, true);
+    doc.addEventListener("submit", blockNavigation, true);
+
+    setMount(doc.body);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      doc.removeEventListener("click", blockNavigation, true);
+      doc.removeEventListener("submit", blockNavigation, true);
+      viewportStyle.remove();
+    };
+  }, []);
+
+  // HUD de medición (sólo entornos no productivos): innerWidth real del
+  // iframe, overflow horizontal y posición efectiva del encabezado.
+  const [hud, setHud] = useState(false);
+  const [metrics, setMetrics] = useState<{
+    innerWidth: number;
+    overflowX: number;
+    scrollY: number;
+    headerPosition: string;
+    headerTop: number;
+    headerVisible: boolean;
+  } | null>(null);
+
+  useEffect(() => setHud(auditWidthsEnabled()), []);
+
+  useEffect(() => {
+    if (!hud || !mount) return;
+    const win = mount.ownerDocument.defaultView;
+    const doc = mount.ownerDocument;
+    if (!win) return;
+    const read = () => {
+      const scroller = doc.scrollingElement ?? doc.documentElement;
+      const header = doc.querySelector("header");
+      const rect = header?.getBoundingClientRect();
+      setMetrics({
+        innerWidth: win.innerWidth,
+        overflowX: Math.max(0, Math.round(scroller.scrollWidth - scroller.clientWidth)),
+        scrollY: Math.round(win.scrollY),
+        headerPosition: header ? win.getComputedStyle(header).position : "n/a",
+        headerTop: rect ? Math.round(rect.top) : -1,
+        headerVisible: !!rect && rect.bottom > 0 && rect.top < win.innerHeight,
+      });
+    };
+    read();
+    const id = win.setInterval(read, 250);
+    win.addEventListener("scroll", read, true);
+    win.addEventListener("resize", read);
+    return () => {
+      win.clearInterval(id);
+      win.removeEventListener("scroll", read, true);
+      win.removeEventListener("resize", read);
+    };
+  }, [hud, mount, width]);
+
   return (
-    <style>{`
-      [data-eb-canvas-device="mobile"] [data-home-grid] {
-        grid-template-columns: minmax(0, 1fr) !important;
-      }
-      [data-eb-canvas-device="mobile"] [data-home-layout="consejo-alux"] {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-      }
-
-      [data-eb-canvas-device="tablet"] [data-home-grid="destinos"],
-      [data-eb-canvas-device="tablet"] [data-home-grid="categorias"],
-      [data-eb-canvas-device="tablet"] [data-home-grid="empresas"] {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="tablet"] [data-home-grid="rutas"],
-      [data-eb-canvas-device="tablet"] [data-home-grid="resenas"],
-      [data-eb-canvas-device="tablet"] [data-home-grid="en-vivo"] {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="tablet"] [data-home-grid="arma-tu-viaje"] {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="tablet"] [data-home-layout="consejo-alux"] {
-        flex-direction: row !important;
-        align-items: center !important;
-      }
-
-      [data-eb-canvas-device="desktop"] [data-home-grid="destinos"],
-      [data-eb-canvas-device="desktop"] [data-home-grid="rutas"],
-      [data-eb-canvas-device="desktop"] [data-home-grid="resenas"] {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="desktop"] [data-home-grid="categorias"],
-      [data-eb-canvas-device="desktop"] [data-home-grid="empresas"] {
-        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="desktop"] [data-home-grid="en-vivo"] {
-        grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-      }
-      [data-eb-canvas-device="desktop"] [data-home-grid="arma-tu-viaje"] {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      }
-    `}</style>
+    <div
+      className="relative mx-auto shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
+      style={{ width, height }}
+    >
+      <iframe
+        ref={iframeRef}
+        title="Vista previa del canvas"
+        data-eb-canvas-device={device}
+        data-eb-canvas-width={width}
+        className="block border-0 bg-background"
+        style={{ width, height }}
+      />
+      {mount ? createPortal(children, mount) : null}
+      {hud && metrics ? (
+        <div
+          data-eb-canvas-hud=""
+          className="pointer-events-none absolute bottom-2 left-1/2 z-50 -translate-x-1/2 rounded-md bg-foreground/90 px-3 py-1.5 font-mono text-[11px] leading-tight text-background shadow-lg"
+        >
+          innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
+          {metrics.headerPosition} top {metrics.headerTop}px ·{" "}
+          {metrics.headerVisible ? "visible" : "OCULTO"} · scrollY {metrics.scrollY}px
+        </div>
+      ) : null}
+    </div>
   );
 }
+
+
+
 
 /* --------------------------------------------------------------------- */
 
@@ -2751,11 +2887,13 @@ function InertChrome({
   label,
   selected,
   onSelect,
+  sticky = false,
   children,
 }: {
   label: string;
   selected: boolean;
   onSelect: () => void;
+  sticky?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -2772,10 +2910,10 @@ function InertChrome({
           onSelect();
         }
       }}
-      className={`group relative cursor-pointer outline-none ring-inset ${selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"}`}
+      className={`group cursor-pointer outline-none ring-inset ${sticky ? "sticky top-0 z-30" : "relative"} ${selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"}`}
       aria-label={`Editar ${label}`}
     >
-      <div className="pointer-events-none select-none opacity-90" aria-hidden>
+      <div className="pointer-events-none select-none" aria-hidden>
         {children}
       </div>
       <span

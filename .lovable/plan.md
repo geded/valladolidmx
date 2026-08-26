@@ -1,217 +1,77 @@
-# Plan operativo vigente · Reconciliación → Soft Launch
+# G4-SYSTEM · De previews a runtime premium adoptado (plan incremental)
 
-**Estado:** Activo
-**Última actualización:** 2026-07-21
-**Roadmap rector:** `docs/blueprint/16.00-PRODUCT-EVOLUTION-ROADMAP-v2.1.md`
-**Rama activa:** preparación documental OMXDS Visual Experience · ninguna etapa técnica autorizada.
-**Base integrada:** `main` · merge `234a8c5f` (PR #6)
-**Canal de publicación:** conexión directa de GitHub como vía principal; `gh` sólo como alternativa y nunca como requisito para el Founder.
+Base: HEAD `caeacf99`. Todo lo afirmado abajo fue verificado leyendo el repositorio en esta sesión.
 
-Este archivo es una instrucción de ejecución subordinada a `docs/governance/00–08` y al roadmap oficial. No crea prioridades nuevas ni sustituye Completion Reports.
+## 1. Implementado vs faltante (verificado)
 
-## 1. Punto de partida recuperado
+Implementado:
+- Runtime premium compartido ya existe: `src/lib/omxds/presentation/premium-presentation.ts`, `premium-view-models.ts` y primitivas `src/components/premium/{PremiumHero,PremiumGallery,PremiumCard,PremiumSection,PremiumBadges,PremiumBreadcrumb,PremiumPresentationSelector,index}.tsx`.
+- Preview integral del runtime: `src/routes/lovable/g4-system-runtime-preview.tsx` (419 líneas, 9 familias).
+- Autorización `PCA-2026-031` aprobada, con `omxds_visual_v1_contracts_enabled=false` como flag requerido.
+- Superficies públicas existentes: `DestinationSurface`, `BusinessSurface`, `EventSurface`, `ProductSurface`, `CategorySurface`, `RegionSurface`, `TourismListingSurface` + Surface Kit ViewModel-only.
+- Listados públicos ya ruteados: `hoteles.tsx`, `restaurantes.tsx`, `experiencias.tsx`, `eventos.index.tsx`, `casas-de-vacaciones.tsx`, `que-hacer.tsx`, `empresas.tsx`.
+- Micrositio territorial: `src/routes/oriente-maya/*` (índice, `$destino`, categoría, empresa, producto) con SSR y JSON-LD.
+- Travel Plan canónico y Alux: `src/lib/traveler/travel-plans.functions.ts`, `alux-traveler.functions.ts`, `on-trip-concierge.ts`; CMS en `_authenticated/cms/travel-plans.tsx` y `cms/alux*`.
+- Gates I1–I4, Governance Integrity, Product Authorization y sync en `package.json` + `scripts/governance/validate-full-suite.mjs`.
 
-- [x] Integración no destructiva de `main` con el trabajo benchmark H2.
-- [x] Numeración canónica de `docs/governance/00–08` y auditoría de reconciliación.
-- [x] Bun restaurado como gestor canónico; `bun.lock` recuperado y `package-lock.json` retirado.
-- [x] Instalación congelada reproducible con Bun 1.3.14.
-- [x] Typecheck sin errores.
-- [x] Suite de 143 tests aprobada.
-- [x] Build de producción aprobado y repetido.
-- [x] Deuda de lint heredada documentada; no se mezcla con esta reconciliación.
-- [x] Roadmap canónico rebaselined a v2.1 con estados respaldados por evidencia.
-- [x] Plan Lovable reescrito para reflejar el estado real.
+Faltante (verificado por ausencia):
+- Los 6 previews G4 siguen con implementación local: 6.824 líneas en `g4-{home,destination-microsite,hotel,restaurant,experience,event}-*.tsx`, sin importar `src/components/premium/*`.
+- Ninguna superficie de `src/components/surfaces/*.tsx` importa el runtime premium (`rg` sobre `PremiumHero|premium-presentation` no arroja coincidencias; sólo existe `premiumEligibility` en `BusinessSurface`).
+- No existe ruta ni superficie de **rutas/itinerarios**: no hay `/rutas` en `src/routes` ni en `route-inventory.ts` (sólo `src/mocks/rutas.ts`).
+- No hay selector Editorial/Cinematográfico expuesto por rol en CMS (el selector sólo vive en el preview interno).
+- No hay reporte READY/BLOCKED de entidades ni script que lo genere.
+- No hay QA responsive ni accesibilidad automatizada: `playwright`/`axe` no están en `package.json` (Playwright sí está en el sandbox).
 
-## 2. Gate R4 · Reconciliación cerrada
+## 2. Rutas mínimas
 
-- [x] Draft PR #1 revisado e integrado sin reescribir historia publicada.
-- [x] `main` alineado con el árbol validado en `47065f81`.
-- [x] Bun 1.3.14, lockfile congelado, typecheck, 143 pruebas base y build reproducibles.
-- [x] Orden de migraciones revisado y migración correctiva autorizada aplicada.
+Sin rutas públicas nuevas salvo una:
+- Nueva (opcional en P6): `src/routes/rutas.index.tsx` + `rutas.$slug.tsx` para itinerarios; obliga a alta en `src/lib/experience-builder/route-inventory.ts` y a un permiso explícito en el PCA.
+- Modificadas: listados y fichas ya existentes (`hoteles`, `restaurantes`, `experiencias`, `eventos`, `casas-de-vacaciones`, `oriente-maya/*`) sólo a través de sus superficies, no de sus archivos de ruta cuando sea evitable.
+- CMS: selector de presentación dentro de superficies ya existentes bajo `src/routes/_authenticated/cms/*`, jamás público.
 
-**DoD R4:** cumplido.
+## 3. Estrategia sin duplicación
 
-## 3. Próxima épica única · CV8.9
+1. Una sola familia por patrón en `src/components/premium/*`; evolución por `presentation` / `variant` / `capabilities` / `config`. Prohibido `-v2`, `-pro`, `-next`.
+2. Cada preview G4 conserva sólo: constantes DEMO, su mapper `toPremiumVM()` y el panel de afinación; el resto se borra al adoptar primitivas. Meta medible: de 6.824 a <3.400 líneas.
+3. Los mappers viven en `src/lib/omxds/presentation/vm/*.ts` y sólo leen contratos existentes de `src/lib/omxds/surfaces/*`; ninguna regla de negocio nueva.
+4. Las superficies públicas consumen los mismos mappers, de modo que el dato es uno y las presentaciones dos.
+5. Mapas: se preserva `ExperienceMapBlock` (`vmx.experience.map`) como único mapa; el gate G5 verifica que no aparezca ningún mapa alterno.
+6. Travel Plan/Alux/Concierge: las primitivas sólo emiten acciones; la escritura pasa exclusivamente por el contrato Travel Plan (`addPlanItem`, `attachAluxSuggestion`, `promotePlanToCase` como única puerta al Concierge, con consentimiento explícito).
 
-**Blueprint:** `docs/blueprint/16.CV8.9-ACTION-QUEUE-DECISION-WORKFLOW-v1.0.md`
-**Objetivo:** convertir recomendaciones prescriptivas de Visitor Intelligence en decisiones humanas trazables y ejecutables.
-**Inicio permitido:** después del DoD R4 y con GO Founder.
+## 4. Paquetes (secuenciales, cada uno revertible por separado)
 
-### Secuencia propuesta
+- **P1 — Mappers VM + gate.** `src/lib/omxds/presentation/vm/*` por familia y `validate:g5` (un solo eje de presentación, sin mapas alternos, sin URLs firmadas, sin primitivas duplicadas). Cero cambio visual.
+- **P2 — Migración de los 6 previews G4** a primitivas, con capturas antes/después por preview.
+- **P3 — Listados y fichas**: hoteles, restaurantes, experiencias, eventos y casas de vacaciones renderizan Tourism Card/listing sobre las primitivas, respetando `TourismListingSurface` y el Founder Discovery Standard.
+- **P4 — Micrositios de destino** (`oriente-maya/$destino*`) sobre el runtime, con breadcrumb Inicio → Oriente Maya de Yucatán → Destino, sólo cuando `destination-premium-eligibility.server.ts` lo permita; ruta actual intacta en caso contrario.
+- **P5 — Travel Plan / Alux / handoff**: acciones "Agregar al viaje" y "Hablar con Alux" en hero y cards; handoff a concierge humano sólo tras consentimiento explícito.
+- **P6 — Rutas/itinerarios**: superficie de ruta con paradas, mapa preservado y alta en route inventory (única ruta pública nueva).
+- **P7 — CMS por rol**: selector Editorial/Cinematográfico en CMS, visible para admin/super_admin/editor según rol, fail-closed a `editorial`.
+- **P8 — QA responsive + accesibilidad automatizada** con evidencias.
+- **P9 — Reporte READY/BLOCKED read-only** + cierre documental y `governance:sync`.
 
-1. [x] **CV8.9.1 · Contratos y proyección**
-   - contrato `Action Queue` v1.0.0 congelado;
-   - oportunidades y prioridades CV8.5–CV8.8 reutilizadas por adaptadores puros;
-   - proyección pura, sin snapshots paralelos;
-   - Completion Report aprobado por el Founder el 2026-07-20.
-2. [x] **CV8.9.2 · Persistencia, roles y auditoría**
-   - [x] estados y transiciones autorizadas;
-   - [x] `has_role`, lectura assigned-only y escritura service-only;
-   - [x] traza de responsable, decisión, motivo y timestamps;
-   - [x] append atómico sin tablas ni snapshots nuevos;
-   - [x] aplicar migración y ejecutar smoke DB con autorización Founder;
-   - [x] aplicar migración correctiva de orden autoritativo y supersesión única;
-   - [x] publicar la rama y su corrección en el PR #2;
-   - [x] Completion Report aprobado por el Founder y PR #2 autorizado para integración;
-   - [x] integrar PR #2 y desplegar el merge `b3a43282`;
-   - [x] verificar que producción sirve exactamente el merge autorizado;
-   - [x] ejecutar smoke humano Founder/Admin después de desplegar CV8.9.3;
-   - [ ] ejecutar smoke assigned-only cuando existan operadores Concierge Lead/Editor reales.
-3. [x] **CV8.9.3 · Superficie operativa — cierre técnico**
-   - [x] cola filtrable, buckets, detalle e historial explicable;
-   - [x] propuesta desde CV8.7/CV8.8 y propuesta manual;
-   - [x] aceptación, owner, KPI, dirección, magnitud, ventana y fecha objetivo;
-   - [x] acciones humanas por rol, evidencia, corrección y estados de error/vacío;
-   - [x] cero auto-ejecución y cero datos de visitantes.
-4. [x] **CV8.9.4 · Feedback, métricas y cierre técnico**
-   - [x] `validated/rejected/dismissed` alimentan `family_confidence` CV8.6;
-   - [x] aceptación 7d/30d, p50 a aceptar/implementar, validación, sesgo y SLA;
-   - [x] proyección pura, cero tablas, snapshots o migraciones;
-   - [x] pruebas focalizadas, typecheck, lint acotado y build;
-   - [x] publicar la rama y abrir el Draft PR #3;
-   - [x] revisar, integrar, desplegar, ejecutar smoke Founder/Admin y aprobar Completion Report;
-   - [ ] ejecutar smoke assigned-only cuando existan operadores Concierge Lead/Editor reales.
+## 5. Pruebas
 
-**DoD CV8.9:** contrato versionado, persistencia segura, UI operable, decisiones auditables, pruebas verdes y Completion Report aprobado.
+- Técnicas: `bun run lint`, `bun run typecheck`, `bun run build`, `bun run scripts/route-inventory-coverage.ts`.
+- Gates: `validate:i1`, `i2a/b/c`, `i3:0/a/b/c/d`, `i4:0/a/b/c/…`, `governance:sync --check`, dependency map, knowledge graph, Governance Integrity y Product Authorization (+ `governance:product-test`), todo vía `bun scripts/governance/validate-full-suite.mjs`.
+- Contractual G5: `scripts/omxds/g5/premium-presentation.contract.test.ts` + `.evidence.mjs`, `validate:g5`.
+- Responsive: 390/768/1024/1280/1440 en previews G4, listados, fichas y micrositio; assert `scrollWidth <= clientWidth` y ausencia de huecos > 1 viewport.
+- Accesibilidad: axe-core en Playwright (sandbox, no dependencia de build); cero violaciones críticas o serias; contraste de scrims con `scripts/omxds/i1/contrast.mjs`.
+- Funcionales: Alux → Travel Plan → handoff consentido; breadcrumb territorial; mapa único presente; selector nunca visible en público.
 
-## 4. Épica cerrada después de CV8.9 · AC1.4–AC1.5
+## 6. Reporte de preparación (read-only)
 
-**Contrato rector:** `docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md`
+`scripts/omxds/g5/entity-readiness.mjs` ejecuta sólo `SELECT`, reutiliza los criterios de `destination-premium-eligibility.server.ts` y `business-premium-eligibility.server.ts`, y escribe `docs/evidence/omxds-visual/g5/ENTITY-READINESS.{md,csv}` con familia, id, slug, `is_demo_seed`, `status`, presentación resuelta y READY/BLOCKED con razones. Los demos siempre BLOCKED por origen demo. Ninguna escritura, ningún `UPDATE`, ninguna migración.
 
-Implementar registro progresivo sólo en los momentos de valor oficiales:
+## 7. Riesgos y bloqueos reales
 
-- guardar de forma permanente;
-- continuar en otro dispositivo;
-- compartir;
-- recibir recordatorios.
+- **I3-D** ya registra divergencia por propagación de `premiumEligibility` en `BusinessSurface.tsx`; P3/P4 deben reconciliar evidencia en el mismo paquete o quedarán fail-closed.
+- **Route inventory** es fail-closed: P6 no puede cerrarse sin metadatos completos de la ruta nueva.
+- **PCA-2026-031** no incluye permisos para superficies públicas ni CMS: P3–P7 requieren un PCA nuevo (`PCA-2026-032`) con rutas exactas, sin globs.
+- **Regresión visual** al unificar hero/galería: mitigada con capturas obligatorias antes/después.
+- **Playwright/axe** fuera de `package.json`: el QA corre como verificación local, nunca como dependencia de build.
+- Riesgo de segunda fuente de verdad si un mapper replica lógica de contrato: prohibido; los mappers sólo leen `src/lib/omxds/surfaces/*`.
 
-La continuidad anónima debe preservarse y `SignInPromptSheet` no puede actuar como gate genérico de identidad. El cierre requiere medición del paso anónimo → identificado sin pérdida de planes, favoritos o contexto.
+## Invariantes
 
-Decisión Founder del 2026-07-20: GO explícito al modelo local-first. Invariantes vinculantes:
-
-- `AnonymousTravelDraft` es la única fuente local durante la etapa anónima;
-- cero cuenta, fila DB o escritura remota por interacción anónima;
-- `guest-queue` se retira como contrato activo y sólo se lee una vez para compatibilidad;
-- `importAnonymousDraft` se ejecuta exclusivamente con sesión autenticada, es idempotente y borra lo local sólo tras éxito;
-- la validación incluye 1,000 sesiones con 20 interacciones y cero llamadas de red.
-
-Evidencia de cierre:
-
-- [x] PR #5 integrado y desplegado;
-- [x] continuidad anónimo → autenticado confirmada con Río Lagartos;
-- [x] PR #6 integrado en `main` mediante `234a8c5f`;
-- [x] Lovable sincronizado y deployment `bbcf898c-f4db-43d2-9f67-79547c8000f9` completado;
-- [x] dock “Tu viaje (1)” y registro progresivo verificados en producción sin cuentas ni datos artificiales.
-
-## 5. Trabajo operativo paralelo permitido
-
-Este trabajo puede prepararse sin abrir otra épica técnica:
-
-- checklist de verificación de negocio, ubicación, horarios, fotos y catálogo;
-- lista de 15–25 empresas fundadoras de Valladolid;
-- responsable y canal de onboarding;
-- runbooks iniciales de soporte e incidentes;
-- definición de cobertura Concierge y escalación;
-- checklist de GSC, analítica, monitoreo, privacidad, términos y CFDI.
-
-No registrar como empresa onboarded a un mock, seed o registro sin validación humana.
-
-## 6. Secuencia de lanzamiento
-
-1. Reconciliación integrada.
-2. CV8.9 cerrado.
-3. AC1.4 cerrado.
-4. Quince empresas reales verificadas como mínimo; objetivo 25.
-5. Operación mínima lista: soporte, runbooks, notificaciones, monitoreo, medición y proceso comercial/fiscal.
-6. Soft launch por invitación.
-7. Lectura de datos reales y Launch Readiness Report actualizado.
-8. Decisión GO/NO-GO para apertura comercial y para CV7.
-
-## 7. No abrir ahora
-
-- MCP M1.1–M1.3; M1.0 ya está cerrado y no es el siguiente paso.
-- CV7 antes de cerrar la base operativa, salvo nueva decisión basada en evidencia.
-- Header/Navigation Builder, Hero Vivo o Navigation Intelligence.
-- nuevas superficies de CMS o capacidades de Alux sin dolor real observado.
-- simulación `full`, PWA offline total o expansión territorial automática.
-- refactor masivo de lint o performance mezclado con épicas de producto.
-
-## 8. Deuda de evidencia que no debe propagarse
-
-- No afirmar que H2 P1+P2 redujo 15% el entry: el benchmark aislado registra ~−0.1% gzip.
-- No afirmar que P1 corrigió TTFB de producción hasta medirlo en un preview o despliegue comparable.
-- No presentar datos CV8.S como usuarios, ventas o tracción reales.
-- Mantener visibles las aprobaciones Founder y outcome validations pendientes de CV8 y SEO.
-
-## 9. Commerce, Experiences & Settlement · plan preparado
-
-**Blueprint aprobado:** `docs/governance/13-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-BLUEPRINT-v1.0.md`  
-**PRD:** `docs/blueprint/18.01-OMXDS-COMMERCE-EXPERIENCES-SETTLEMENT-PRD-SUITE-v1.0.md`  
-**Plan de etapas:** `docs/blueprint/18.02-OMXDS-COMMERCE-LOVABLE-PLAN-C0-C8-v1.0.md`
-
-Decisión Founder del 2026-07-21:
-
-- Administración autoriza exclusivamente venta y comisión;
-- Valladolid.mx usa checkout central;
-- aprobación editorial y comercial permanecen separadas;
-- existirán paneles Admin y Empresa;
-- se autoriza preparar C0–C8;
-- todos los flags permanecen OFF;
-- Gate B2 permanece cerrado;
-- no hay GO de implementación para C0.
-
-Secuencia preparada:
-
-- [ ] C0 · Contención y baseline.
-- [ ] C1 · Autoridad comercial.
-- [ ] C2 · Panel Admin de Experiencias.
-- [ ] C3 · Inventario y reservas.
-- [ ] C4 · Checkout sandbox y órdenes.
-- [ ] C5 · Ledger.
-- [ ] C6 · Conciliación, reembolsos y disputas.
-- [ ] C7 · Liquidaciones Admin.
-- [ ] C8 · Portal Empresa de ventas y pagos.
-
-No iniciar una etapa por inferencia. Cada una requiere Scope Report, GO, pruebas, flags OFF, Completion Report y autorización para continuar.
-
-## 10. OMXDS Visual Experience & Surface Architecture · prioridad documental
-
-**Blueprint propuesto:** `docs/governance/14-OMXDS-VISUAL-EXPERIENCE-SURFACE-ARCHITECTURE-v1.0.md`  
-**Auditoría:** `docs/blueprint/18.03-OMXDS-VISUAL-RECONCILIATION-AUDIT-v1.0.md`  
-**PRD Suite:** `docs/blueprint/18.04-OMXDS-VISUAL-SURFACES-PRD-SUITE-v1.0.md`  
-**Plan Lovable:** `docs/blueprint/18.05-OMXDS-VISUAL-LOVABLE-PLAN-V0-V8-v1.0.md`
-
-Decisión Founder del 2026-07-21:
-
-- preparar la arquitectura visual antes de Commerce, reservaciones y monitoreo;
-- reconciliar Home, territorios, Empresa Estándar y Empresa Premium;
-- canonizar ocho familias visuales y jerarquías H1–H4;
-- integrar SEO, medios, accesibilidad, rendimiento y gobernanza;
-- mantener todos los flags OFF;
-- no iniciar V0 ni modificar código, rutas públicas o producción.
-
-Secuencia preparada:
-
-- [ ] V0 · Baseline y reconciliación técnica.
-- [ ] V1 · Visual Masterboard.
-- [ ] V2 · Contratos, tokens y tarjetas.
-- [ ] V3 · Home.
-- [ ] V4 · Territorio y Landmark.
-- [ ] V5 · Empresa Estándar.
-- [ ] V6 · Empresa Premium.
-- [ ] V7 · Experiencia, producto, evento, editorial y journey.
-- [ ] V8 · Certificación y recomendación GO/NO-GO.
-
-Commerce C0–C8 permanece documentado y pausado. Ninguna etapa visual puede iniciarse por inferencia.
-
-## 11. Regla para actualizar este plan
-
-Al cerrar una ola:
-
-1. crear su Completion Report;
-2. actualizar el roadmap v2.1;
-3. registrar dependencias o contradicciones;
-4. reemplazar aquí sólo el próximo paso operativo;
-5. no mantener instrucciones ya ejecutadas como si siguieran pendientes.
-
-**Siguiente acción:** revisar y aprobar la documentación OMXDS Visual Experience. Después de integrarla en `main`, el único gate técnico elegible será V0 · Baseline y reconciliación técnica, que requiere GO Founder independiente y no modifica superficies públicas. Commerce C0–C8, Programa Fundadores, Gate B1, Gate B2, reservaciones y monitoreo continúan cerrados.
+`omxds_visual_v1_contracts_enabled` permanece **false**. Sin datos, sin migraciones, sin cambios de `status` ni `is_demo_seed`, sin producción, sin merge, sin deploy. Sólo medios gobernados por el proxy estable. Distintivo Pueblo Mágico únicamente textual mientras no exista asset acreditado.

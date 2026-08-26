@@ -1,0 +1,33 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-023",
+  "title": "V1-P1.d · Demo Pack y habilitacion Premium por ficha (elegibilidad efectiva, sin activar el flag global)",
+  "status": "Approved",
+  "branch": "edit/edt-d36fbbdf-ddfb-43ed-9f58-5154b831a2ed",
+  "blueprint": "docs/blueprint/19.21-V1-P1d-DEMO-PACK-AND-PER-LISTING-PREMIUM-ENABLEMENT-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-25 · AUTORIZACION DE PREPARACION Y EJECUCION CONTROLADA 19.21 / PCA-2026-023. Base exacta main@f71cd866, ancestro verificado de HEAD, arbol limpio. Objeto unico: habilitar presentacion Premium exclusivamente mediante elegibilidad efectiva por ficha y business_visibility_grants. Invariantes: omxds_visual_v1_contracts_enabled permanece false antes y despues y no se activa ni modifica; sin migraciones, readers, RPC, tablas, dependencias ni rutas; sin modificar datos de las tres fichas, grants ni assets persistidos; is_demo_seed=true siempre excluido; sin ampliar ni reinterpretar otros contratos gobernados por el flag global; validate:i4:d permanece FAIL-CLOSED; prohibido habilitar Premium por slug hardcodeado o por lista de IDs; sin desplegar ni publicar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
+    }
+  ],
+  "public_routes": [
+    "/oriente-maya/valladolid/hoteles/hacienda-san-servacio-boutique",
+    "/oriente-maya/valladolid/restaurantes/cocina-del-frailes",
+    "/oriente-maya/valladolid/experiencias/ruta-cenotes-y-selva"
+  ],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run build",
+    "bun run test:i3",
+    "bun run validate:i4:a",
+    "bun run validate:i4:b",
+    "bun run validate:i4:c",
+    "bun run validate:i4:r",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

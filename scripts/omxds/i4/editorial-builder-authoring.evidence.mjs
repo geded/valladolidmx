@@ -2,6 +2,10 @@ import { strict as assert } from "node:assert";
 import { execFileSync } from "node:child_process";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
+import {
+  assertGovernedDependencyBaseline,
+  assertGovernedLockBaseline,
+} from "../lib/platform-dependency-baseline.mjs";
 
 const base = "1fe83c8bfb8874468560c9c3c7d89ded0073a252";
 const authorizedCommit = "3c8e138ae768380f6656fad40b84515615002d7d";
@@ -155,9 +159,8 @@ if (currentBranch && ["base_worktree", "single_commit", "github_authoring_pr_mer
 
 const basePackage = JSON.parse(git(["show", `${base}:package.json`]));
 const currentPackage = JSON.parse(readFileSync("package.json", "utf8"));
-assert.deepEqual(currentPackage.dependencies, basePackage.dependencies);
-assert.deepEqual(currentPackage.devDependencies, basePackage.devDependencies);
-assert.equal(git(["diff", "--name-only", base, "--", "bun.lock"]), "");
+assertGovernedDependencyBaseline(currentPackage, basePackage, "I4-A");
+assertGovernedLockBaseline(base, "I4-A");
 assert.equal(
   currentPackage.scripts["test:i4:a"],
   "bun test scripts/omxds/i4/editorial-builder-authoring.test.ts",

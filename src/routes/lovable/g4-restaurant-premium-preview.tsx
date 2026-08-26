@@ -1,0 +1,782 @@
+/**
+ * G4-C · Vista previa visual de la Plantilla Premium de Restaurante.
+ *
+ * Vista INTERNA, no indexable y sin persistencia. Caso visual
+ * DEMO VISUAL: "Cocina de Zací".
+ *
+ * Reglas aplicadas:
+ *  - Sólo medios gobernados existentes vía el proxy público estable
+ *    `/api/public/studio-media/governed/v1p1c/*`. Sin URLs firmadas.
+ *  - Mapa exclusivamente con el bloque oficial `ExperienceMapBlock`.
+ *  - Todo texto/dato es DEMO VISUAL. Sin rating, premios, reseñas,
+ *    disponibilidad, reservas ni distintivos oficiales inventados.
+ *  - DIRECCIÓN VISUAL (Editorial | Cinematográfico) y GALERÍA
+ *    (Mosaico | Carrusel | Cuadrícula | Tira) son ejes independientes.
+ *  - El panel "Afinar plantilla" es local (useState) y no persiste.
+ */
+import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  ArrowRight,
+  Check,
+  ChevronRight,
+  Clock,
+  Lock,
+  Mail,
+  Map as MapIcon,
+  MapPin,
+  Phone,
+  Shield,
+  SlidersHorizontal,
+  UtensilsCrossed,
+  Wallet,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Container } from "@/components/layout/Container";
+import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
+import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
+import {
+  PremiumBreadcrumb,
+  PremiumGallery,
+  PremiumHero,
+  PremiumSection,
+} from "@/components/premium";
+import {
+  toPremiumSectionVM,
+  toRestaurantPremiumVM,
+  type PremiumEntitySource,
+} from "@/lib/omxds/presentation/vm";
+import { cn } from "@/lib/utils";
+
+export const Route = createFileRoute("/lovable/g4-restaurant-premium-preview")({
+  head: () => ({
+    meta: [
+      { title: "G4-C · Vista previa plantilla Premium de Restaurante (interna)" },
+      {
+        name: "description",
+        content:
+          "Vista previa interna de la plantilla premium de restaurante de Valladolid.mx. No indexable.",
+      },
+      { name: "robots", content: "noindex,nofollow,noarchive" },
+    ],
+  }),
+  component: G4RestaurantPremiumPreview,
+});
+
+/* ------------------------------------------------------------------ *
+ * Medios gobernados (ruta pública estable, nunca firmada).
+ * ------------------------------------------------------------------ */
+const GOVERNED = "/api/public/studio-media/governed/v1p1c";
+
+const MEDIA = {
+  cover: {
+    url: `${GOVERNED}/restaurant-cover.jpg`,
+    alt: "Terraza de restaurante colonial con arcos de piedra y cenas iluminadas con velas frente a un cenote en Valladolid, Yucatán",
+  },
+  cochinita: {
+    url: `${GOVERNED}/restaurant-gallery-1.jpg`,
+    alt: "Cochinita pibil tradicional yucateca servida en plato de cerámica artesanal con cebolla morada, habanero y tortillas",
+  },
+  comedor: {
+    url: `${GOVERNED}/restaurant-gallery-2.jpg`,
+    alt: "Comedor interior colonial con patio central, columnas de piedra, mesas de madera y lámparas tejidas en Valladolid, Yucatán",
+  },
+  calle: {
+    url: `${GOVERNED}/destination-gallery-2.jpg`,
+    alt: "Calle colonial colorida de Valladolid con fachadas pastel en terracota, ocre y amarillo, puertas de madera y buganvilia",
+  },
+  plaza: {
+    url: `${GOVERNED}/destination-gallery-1.jpg`,
+    alt: "Plaza principal de Valladolid con kiosco, bancas, palmeras y arcadas coloniales de herradura en tonos ocre y crema",
+  },
+  cenote: {
+    url: `${GOVERNED}/experience-cover.jpg`,
+    alt: "Cenote abierto de aguas turquesa en una caverna de piedra caliza con raíces colgantes y plataforma de madera cerca de Valladolid, Yucatán",
+  },
+  hotel: {
+    url: `${GOVERNED}/hotel-cover.jpg`,
+    alt: "Patio central con piscina estilo cenote y arcos de piedra en un hotel boutique colonial de Valladolid, Yucatán",
+  },
+} as const;
+
+const RESTAURANT = {
+  name: "Cocina de Zací",
+  eyebrow: "Oriente Maya · Valladolid, Yucatán",
+  claim: "Cocina yucateca de fuego lento en una casona del Centro Histórico",
+  cuisine: "Yucateca contemporánea",
+  schedule: "Mar a Dom · 13:00 – 22:30",
+  priceRange: "$$ · rango orientativo",
+  location: "Calle 41 · Centro Histórico de Valladolid",
+  lat: 20.6893,
+  lng: -88.2018,
+} as const;
+
+const GALLERY = [MEDIA.cover, MEDIA.cochinita, MEDIA.comedor, MEDIA.calle, MEDIA.plaza] as const;
+
+const SUBNAV = [
+  { key: "relato", label: "El relato" },
+  { key: "galeria", label: "Galería" },
+  { key: "mapa", label: "Ubicación" },
+  { key: "servicios", label: "Servicios" },
+  { key: "cerca", label: "Cerca de aquí" },
+] as const;
+
+const SERVICIOS = [
+  "Terraza al aire libre",
+  "Cocina de horno de tierra",
+  "Opciones vegetarianas",
+  "Accesible en planta baja",
+  "Grupos pequeños",
+  "Wi-Fi para huéspedes",
+] as const;
+
+const CERCANOS = [
+  {
+    name: "Cenote Zací",
+    distance: "600 m · 8 min a pie",
+    tagline: "Cenote urbano en pleno centro.",
+    media: MEDIA.cenote,
+  },
+  {
+    name: "Calzada de los Frailes",
+    distance: "1.1 km · 14 min a pie",
+    tagline: "Paseo colonial de fachadas restauradas.",
+    media: MEDIA.calle,
+  },
+  {
+    name: "Hospedaje boutique del centro",
+    distance: "450 m · 6 min a pie",
+    tagline: "Estancias coloniales a unas cuadras.",
+    media: MEDIA.hotel,
+  },
+] as const;
+
+const MAP_DTO: ExperienceMapDTO = {
+  variant: "single",
+  heading: "Dónde encontrarnos",
+  center: { lat: RESTAURANT.lat, lng: RESTAURANT.lng, zoom: 16 },
+  points: [
+    {
+      id: "restaurante-demo",
+      kind: "business",
+      lat: RESTAURANT.lat,
+      lng: RESTAURANT.lng,
+      title: RESTAURANT.name,
+      subtitle: RESTAURANT.location,
+      href: null,
+      thumbUrl: null,
+      badge: null,
+      priceLabel: null,
+    },
+  ],
+  capabilities: {
+    showDistance: true,
+    showDirections: true,
+    clustering: false,
+    syncList: false,
+    staticFallback: true,
+    allowInteractiveToggle: true,
+  },
+  emptyMessage: null,
+};
+
+const OWNER_CAN = [
+  "Proponer dirección visual y configuración de galería",
+  "Editar relato gastronómico, servicios y datos de contacto",
+  "Cargar fotografía propia para revisión",
+  "Enviar cambios a revisión editorial",
+] as const;
+
+const OWNER_CANNOT = [
+  "Publicar sin aprobación de Administración",
+  "Editar destino, inicio o superficies regionales",
+  "Añadir distintivos institucionales u oficiales",
+] as const;
+
+const ADMIN_CAN = [
+  "Revisar, aprobar, rechazar o devolver con notas",
+  "Publicar o despublicar la ficha",
+  "Definir plantilla, dirección visual y galería finales",
+  "Gestionar distintivos institucionales acreditados",
+] as const;
+
+/* ------------------------------------------------------------------ */
+
+type VisualDirection = "editorial" | "cinematografico";
+type GalleryLayout = "mosaico" | "carrusel" | "cuadricula" | "tira";
+type RoleView = "visitante" | "propietario" | "administracion";
+
+interface TuningState {
+  direction: VisualDirection;
+  gallery: GalleryLayout;
+  showStory: boolean;
+  showGallery: boolean;
+  showMap: boolean;
+  showServices: boolean;
+  showNearby: boolean;
+  role: RoleView;
+}
+
+function G4RestaurantPremiumPreview() {
+  const [tuning, setTuning] = useState<TuningState>({
+    direction: "editorial",
+    gallery: "mosaico",
+    showStory: true,
+    showGallery: true,
+    showMap: true,
+    showServices: true,
+    showNearby: true,
+    role: "visitante",
+  });
+
+  const presentation = tuning.direction === "editorial" ? "editorial" : "cinematic";
+  const vm = toRestaurantPremiumVM(
+    { ...RESTAURANT_SOURCE, actions: <HeroActions /> },
+    { crumbTail: [{ label: "Restaurantes" }, { label: RESTAURANT.name }] },
+  );
+
+  return (
+    <div className="min-h-screen bg-background pb-24">
+      <PreviewRibbon />
+
+      <Container className="pt-6">
+        <PremiumBreadcrumb crumbs={vm.crumbs} />
+      </Container>
+
+      <Container className="mt-5">
+        <PremiumHero vm={vm.hero} presentation={presentation} />
+      </Container>
+
+      {tuning.role !== "visitante" ? (
+        <Container className="mt-10">
+          <PermissionMatrix role={tuning.role} />
+        </Container>
+      ) : null}
+
+      <Container className="mt-10">
+        <SubNav />
+      </Container>
+
+      {tuning.showStory ? (
+        <Container className="mt-14">
+          <Relato />
+        </Container>
+      ) : null}
+
+      {tuning.showGallery ? (
+        <Container className="mt-16">
+          <Galeria layout={tuning.gallery} />
+        </Container>
+      ) : null}
+
+      {tuning.showMap ? (
+        <Container className="mt-16">
+          <section id="mapa">
+            <ExperienceMapBlock dto={MAP_DTO} />
+          </section>
+        </Container>
+      ) : null}
+
+      {tuning.showServices ? (
+        <Container className="mt-16">
+          <Servicios />
+        </Container>
+      ) : null}
+
+      {tuning.showNearby ? (
+        <Container className="mt-16">
+          <Cercanias />
+        </Container>
+      ) : null}
+
+      <Container className="mt-16">
+        <DemoNotice />
+      </Container>
+
+      <TuningPanel value={tuning} onChange={setTuning} />
+    </div>
+  );
+}
+
+function PreviewRibbon() {
+  return (
+    <div className="border-b border-amber-300/60 bg-amber-50 px-4 py-2 text-center text-xs text-amber-900">
+      Vista previa interna G4-C · Plantilla Premium de Restaurante — no indexable, sin persistencia.
+      Contenido DEMO VISUAL: no representa datos publicados.
+    </div>
+  );
+}
+
+/**
+ * Fuente plana del caso DEMO. Hero, galería y breadcrumb los construye
+ * el runtime premium compartido (`toRestaurantPremiumVM`).
+ */
+const RESTAURANT_SOURCE = {
+  title: RESTAURANT.name,
+  eyebrow: RESTAURANT.eyebrow,
+  subtitle: RESTAURANT.claim,
+  cover: MEDIA.cover,
+  gallery: GALLERY,
+  destination: { slug: "valladolid", label: "Valladolid" },
+  badges: [{ label: "Demo visual", tone: "neutral" as const }],
+  facts: [
+    {
+      label: "Cocina",
+      value: RESTAURANT.cuisine,
+      icon: <UtensilsCrossed className="size-3.5 text-primary" aria-hidden />,
+    },
+    {
+      label: "Horario",
+      value: RESTAURANT.schedule,
+      icon: <Clock className="size-3.5 text-primary" aria-hidden />,
+    },
+    {
+      label: "Rango de precio",
+      value: RESTAURANT.priceRange,
+      icon: <Wallet className="size-3.5 text-primary" aria-hidden />,
+    },
+    {
+      label: "Ubicación",
+      value: RESTAURANT.location,
+      icon: <MapPin className="size-3.5 text-primary" aria-hidden />,
+    },
+  ],
+} satisfies PremiumEntitySource;
+
+/** Acción dominante única de la ficha. */
+function HeroActions() {
+  return (
+    <Button size="lg" className="rounded-pill px-7">
+      Cómo llegar
+      <ArrowRight className="ml-2 size-4" aria-hidden />
+    </Button>
+  );
+}
+
+function SubNav() {
+  return (
+    <nav
+      aria-label="Secciones de la ficha"
+      className="flex gap-2 overflow-x-auto border-y border-border py-3"
+    >
+      {SUBNAV.map((s) => (
+        <a
+          key={s.key}
+          href={`#${s.key}`}
+          className="shrink-0 rounded-pill px-4 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+        >
+          {s.label}
+        </a>
+      ))}
+    </nav>
+  );
+}
+
+function Relato() {
+  return (
+    <section id="relato" className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
+      <div>
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+          Propuesta gastronómica
+        </p>
+        <h2 className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
+          Fuego lento, recado rojo y huerto propio
+        </h2>
+        <div className="mt-4 space-y-4 text-base leading-relaxed text-foreground/80">
+          <p>
+            La casona conserva su patio original, sus columnas de piedra y un horno de tierra que se
+            enciende de madrugada. La carta cambia con la temporada y con lo que llega del mercado
+            municipal, a cinco cuadras de la mesa.
+          </p>
+          <p>
+            El recado rojo se muele en casa, la tortilla se hace a mano y el habanero se sirve
+            aparte. Es cocina yucateca sin adornos: pocas piezas, tiempos largos y producto de la
+            región.
+          </p>
+        </div>
+        <p className="mt-4 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+          DEMO VISUAL · texto ilustrativo, no publicado
+        </p>
+      </div>
+      <img
+        src={MEDIA.cochinita.url}
+        alt={MEDIA.cochinita.alt}
+        loading="lazy"
+        className="h-72 w-full rounded-3xl object-cover shadow-soft lg:h-full"
+      />
+    </section>
+  );
+}
+
+function Galeria({ layout }: { layout: GalleryLayout }) {
+  const vm = toRestaurantPremiumVM(RESTAURANT_SOURCE, { galleryLayout: layout });
+  return (
+    <PremiumSection
+      vm={toPremiumSectionVM({
+        id: "galeria",
+        eyebrow: "Galería",
+        title: "La casa, la mesa y el barrio",
+      })}
+    >
+      <PremiumGallery vm={vm.gallery} />
+      <p className="mt-2 text-xs text-muted-foreground">
+        Fotografías gobernadas existentes servidas por ruta pública estable. Sin URLs firmadas.
+      </p>
+    </PremiumSection>
+  );
+}
+
+function Servicios() {
+  return (
+    <section id="servicios" className="grid gap-8 lg:grid-cols-[1fr_1fr]">
+      <div>
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Servicios</p>
+        <h2 className="mt-2 font-serif text-3xl tracking-tight">Lo que encuentras en la casa</h2>
+        <ul className="mt-5 grid gap-2.5 sm:grid-cols-2">
+          {SERVICIOS.map((s) => (
+            <li key={s} className="flex items-start gap-2 text-sm text-foreground/85">
+              <Check className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+              {s}
+            </li>
+          ))}
+        </ul>
+        <p className="mt-4 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+          DEMO VISUAL · listado ilustrativo
+        </p>
+      </div>
+      <div className="rounded-3xl border border-border bg-card p-6 shadow-soft">
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Contacto</p>
+        <h3 className="mt-1 font-serif text-2xl tracking-tight">Habla con la casa</h3>
+        <ul className="mt-4 space-y-3 text-sm text-foreground/85">
+          <li className="flex items-center gap-2.5">
+            <Phone className="size-4 text-primary" aria-hidden /> Teléfono de contacto (demo)
+          </li>
+          <li className="flex items-center gap-2.5">
+            <Mail className="size-4 text-primary" aria-hidden /> Correo de contacto (demo)
+          </li>
+          <li className="flex items-center gap-2.5">
+            <MapIcon className="size-4 text-primary" aria-hidden /> {RESTAURANT.location}
+          </li>
+        </ul>
+        <Button variant="outline" className="mt-5 w-full rounded-pill">
+          Contactar
+        </Button>
+      </div>
+    </section>
+  );
+}
+
+function Cercanias() {
+  return (
+    <section id="cerca">
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Cerca de aquí</p>
+      <h2 className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">A pie desde la mesa</h2>
+      <div className="mt-5 grid gap-4 sm:grid-cols-3">
+        {CERCANOS.map((c) => (
+          <article
+            key={c.name}
+            className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
+          >
+            <img
+              src={c.media.url}
+              alt={c.media.alt}
+              loading="lazy"
+              className="h-40 w-full object-cover"
+            />
+            <div className="p-4">
+              <h3 className="font-medium">{c.name}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{c.tagline}</p>
+              <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+                <MapIcon className="size-3.5" aria-hidden />
+                {c.distance}
+              </p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function DemoNotice() {
+  return (
+    <p className="rounded-3xl border border-dashed border-border p-5 text-xs text-muted-foreground">
+      Todo el contenido de esta vista es DEMO VISUAL para evaluación de plantilla. No hay rating,
+      premios, reseñas, disponibilidad, reservas ni distintivos oficiales. No se escribe ni se lee
+      información de negocio real, y nada de lo mostrado está publicado.
+    </p>
+  );
+}
+
+function PermissionMatrix({ role }: { role: Exclude<RoleView, "visitante"> }) {
+  const isOwner = role === "propietario";
+  return (
+    <section className="rounded-3xl border border-border bg-card p-5 shadow-soft">
+      <div className="flex items-center gap-2">
+        <Shield className="size-4 text-primary" aria-hidden />
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+          Matriz de permisos · {isOwner ? "Propietario" : "Administración"}
+        </p>
+      </div>
+      <h2 className="mt-1 font-serif text-xl tracking-tight">
+        {isOwner
+          ? "El propietario propone; Administración aprueba y publica"
+          : "Administración revisa, aprueba y publica"}
+      </h2>
+      <div className="mt-4 grid gap-6 sm:grid-cols-2">
+        <PermissionList
+          title={isOwner ? "Puede hacer" : "Puede hacer"}
+          items={isOwner ? OWNER_CAN : ADMIN_CAN}
+          tone="ok"
+        />
+        {isOwner ? (
+          <PermissionList title="No puede hacer" items={OWNER_CANNOT} tone="blocked" />
+        ) : (
+          <PermissionList
+            title="Flujo editorial"
+            items={[
+              "Borrador del propietario",
+              "Envío a revisión",
+              "Revisión editorial de Administración",
+              "Publicación manual: nunca automática",
+            ]}
+            tone="ok"
+          />
+        )}
+      </div>
+    </section>
+  );
+}
+
+function PermissionList({
+  title,
+  items,
+  tone,
+}: {
+  title: string;
+  items: readonly string[];
+  tone: "ok" | "blocked";
+}) {
+  const Icon = tone === "ok" ? Check : Lock;
+  return (
+    <div>
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</p>
+      <ul className="mt-2 space-y-2 text-sm text-foreground/85">
+        {items.map((item) => (
+          <li key={item} className="flex items-start gap-2">
+            <Icon
+              className={cn(
+                "mt-0.5 size-4 shrink-0",
+                tone === "ok" ? "text-primary" : "text-muted-foreground",
+              )}
+              aria-hidden
+            />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Panel local "Afinar plantilla" (sin persistencia).
+ * ------------------------------------------------------------------ */
+function TuningPanel({
+  value,
+  onChange,
+}: {
+  value: TuningState;
+  onChange: (v: TuningState) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const set = <K extends keyof TuningState>(k: K, v: TuningState[K]) =>
+    onChange({ ...value, [k]: v });
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50 w-[min(21rem,calc(100vw-2rem))]">
+      {open ? (
+        <div className="max-h-[80vh] overflow-y-auto rounded-3xl border border-border bg-card/95 p-4 shadow-floating backdrop-blur">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">Afinar plantilla</p>
+            <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
+              Cerrar
+            </Button>
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            Sólo evaluación visual. No guarda nada en base de datos ni en el CMS.
+          </p>
+
+          <div className="mt-4 space-y-4">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Vista simulada
+              </p>
+              <div className="mt-2 grid gap-2">
+                {(
+                  [
+                    ["visitante", "Visitante"],
+                    ["propietario", "Propietario del restaurante"],
+                    ["administracion", "Administración Valladolid.mx"],
+                  ] as const
+                ).map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => set("role", key)}
+                    aria-pressed={value.role === key}
+                    className={cn(
+                      "rounded-2xl border px-3 py-2 text-xs transition-colors",
+                      value.role === key
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background hover:bg-accent",
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {value.role === "visitante" ? (
+              <p className="rounded-2xl border border-dashed border-border px-3 py-2 text-[11px] text-muted-foreground">
+                La vista Visitante muestra únicamente el resultado limpio. Los controles de
+                dirección visual y galería sólo aparecen para Propietario y Administración.
+              </p>
+            ) : (
+              <>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Dirección visual
+                  </p>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {(
+                      [
+                        ["editorial", "Editorial"],
+                        ["cinematografico", "Cinematográfico"],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => set("direction", key)}
+                        aria-pressed={value.direction === key}
+                        className={cn(
+                          "rounded-2xl border px-3 py-2 text-xs transition-colors",
+                          value.direction === key
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background hover:bg-accent",
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  {value.role === "propietario" ? (
+                    <p className="mt-2 text-[11px] text-muted-foreground">
+                      El propietario propone la variante; Administración revisa, aprueba y publica.
+                      Nada se publica automáticamente.
+                    </p>
+                  ) : null}
+                </div>
+
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Galería
+                  </p>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {(
+                      [
+                        ["mosaico", "Mosaico"],
+                        ["carrusel", "Carrusel"],
+                        ["cuadricula", "Cuadrícula"],
+                        ["tira", "Tira"],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => set("gallery", key)}
+                        aria-pressed={value.gallery === key}
+                        className={cn(
+                          "rounded-2xl border px-3 py-2 text-xs transition-colors",
+                          value.gallery === key
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background hover:bg-accent",
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            <Toggle
+              label="Relato gastronómico"
+              checked={value.showStory}
+              onChange={(v) => set("showStory", v)}
+            />
+            <Toggle
+              label="Galería"
+              checked={value.showGallery}
+              onChange={(v) => set("showGallery", v)}
+            />
+            <Toggle label="Mapa" checked={value.showMap} onChange={(v) => set("showMap", v)} />
+            <Toggle
+              label="Servicios y contacto"
+              checked={value.showServices}
+              onChange={(v) => set("showServices", v)}
+            />
+            <Toggle
+              label="Cerca de aquí"
+              checked={value.showNearby}
+              onChange={(v) => set("showNearby", v)}
+            />
+          </div>
+        </div>
+      ) : (
+        <Button className="rounded-pill shadow-floating" onClick={() => setOpen(true)}>
+          <SlidersHorizontal className="mr-2 size-4" aria-hidden />
+          Afinar plantilla
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function Toggle({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className="flex w-full items-center justify-between rounded-2xl border border-border bg-background px-3 py-2 text-xs hover:bg-accent"
+    >
+      <span>{label}</span>
+      <span
+        className={cn(
+          "inline-flex h-5 w-9 items-center rounded-pill p-0.5 transition-colors",
+          checked ? "bg-primary" : "bg-muted",
+        )}
+      >
+        <span
+          className={cn(
+            "size-4 rounded-pill bg-background transition-transform",
+            checked ? "translate-x-4" : "translate-x-0",
+          )}
+        />
+      </span>
+    </button>
+  );
+}

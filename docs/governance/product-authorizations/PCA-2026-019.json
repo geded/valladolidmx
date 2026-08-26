@@ -1,0 +1,42 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-019",
+  "title": "OMXDS V1 · I4-D · Platform Dependency Baseline Reconciliation",
+  "status": "Approved",
+  "branch": "fix/omxds-i4-abc-governed-source-reconciliation-v1",
+  "blueprint": "docs/blueprint/18.53-OMXDS-V1-I4-D-PLATFORM-DEPENDENCY-BASELINE-RECONCILIATION-AUTHORIZATION-PACK-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-21 · Autorización Controlada de Reconciliación de Baseline de Plataforma para el cierre I4-D. Se autoriza exclusivamente el cambio automático de plataforma @lovable.dev/vite-tanstack-config 2.7.7 -> 2.13.1 en devDependencies y su reescritura de bun.lock (entrada del paquete y eliminación de las transitivas @lovable.dev/vite-plugin-dev-server-bridge y @lovable.dev/vite-plugin-hmr-gate). La base canónica funcional y de alcance sigue siendo a987181a51dcfb36f026e96f784c1bd158c7629c. Los validadores I3-0/A/B/C/D e I4-A/B aceptan únicamente esa excepción mediante el módulo compartido scripts/omxds/lib/platform-dependency-baseline.mjs y continúan comparando estrictamente todas las demás dependencias y líneas de lockfile contra su base; prohibidos skip, comodines y allowlists abiertas. No se autorizan dependencias adicionales, migraciones, RPC, readers nuevos, rutas públicas nuevas, activación de flags, producción ni despliegue. No se autoriza modificar el Acceptance Report G3 ni convertir BLOCKED o PARTIAL en PASS. Este manifiesto supersede a PCA-2026-018 para package.json y bun.lock, que queda Consumed para evitar autorización ambigua.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "package.json"
+    },
+    {
+      "operation": "modify",
+      "path": "bun.lock"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun install --frozen-lockfile",
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:i3:0",
+    "bun run validate:i3:a",
+    "bun run validate:i3:b",
+    "bun run validate:i3:c",
+    "bun run validate:i3:d",
+    "bun run validate:i4:a",
+    "bun run validate:i4:b",
+    "bun run validate:i4:c",
+    "bun run validate:i4:r",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/validate-full-suite.mjs --base=a987181a51dcfb36f026e96f784c1bd158c7629c",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}
