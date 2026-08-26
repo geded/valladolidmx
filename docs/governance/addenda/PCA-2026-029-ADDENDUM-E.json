@@ -3,7 +3,7 @@
   "status": "Approved",
   "parent": "PCA-2026-029",
   "blueprint": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
-  "founder_authority": "Founder Directive 2026-08-28 · FASE G5-S1 · Listing Readiness Local. Autoriza registrar la nueva ruta interna no indexable src/routes/lovable/g5-listing-readiness-preview.tsx en el Route Inventory conforme a la Route Inventory Rule (DOS · SSC-01 · P2) y, en consecuencia, sustituir de forma append-only el digest acreditado de src/lib/experience-builder/route-inventory.ts en PCA-2026-029. No autoriza ninguna otra variación: cualquier cambio adicional falla cerrado.",
+  "founder_authority": "Founder Directive 2026-08-26 · FASE G5-S1 · Listing Readiness Local. Autoriza registrar la nueva ruta interna no indexable src/routes/lovable/g5-listing-readiness-preview.tsx en el Route Inventory conforme a la Route Inventory Rule (DOS · SSC-01 · P2) y, en consecuencia, sustituir de forma append-only el digest acreditado de src/lib/experience-builder/route-inventory.ts en PCA-2026-029. No autoriza ninguna otra variación: cualquier cambio adicional falla cerrado.",
   "supersedes_acknowledged_revision": {
     "operation": "modify",
     "path": "src/lib/experience-builder/route-inventory.ts",
@@ -13,5 +13,5 @@
     "authority": "PCA-2026-036"
   },
   "invariants": ["omxds_visual_v1_contracts_enabled=false"],
-  "recorded_at": "2026-08-28"
+  "recorded_at": "2026-08-26"
 }
