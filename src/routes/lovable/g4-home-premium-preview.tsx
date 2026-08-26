@@ -80,7 +80,15 @@ const MEDIA = {
 type Media = (typeof MEDIA)[keyof typeof MEDIA];
 type VisualDirection = "editorial" | "cinematografica";
 type CardLayout = "asimetrica" | "cuadricula" | "carrusel";
-type SectionKey = "destinos" | "experiencias" | "servicios" | "eventos" | "queHacer" | "mapa";
+type SectionKey =
+  | "destinos"
+  | "pueblosMagicos"
+  | "rutas"
+  | "experiencias"
+  | "servicios"
+  | "eventos"
+  | "queHacer"
+  | "mapa";
 
 type TuningState = {
   direction: VisualDirection;
@@ -318,7 +326,9 @@ const MAP_DTO: ExperienceMapDTO = {
 };
 
 const SECTION_LABELS: Record<SectionKey, string> = {
-  destinos: "Destinos",
+  destinos: "Destinos del Oriente Maya",
+  pueblosMagicos: "Pueblos Mágicos",
+  rutas: "Rutas recomendadas por Alux",
   experiencias: "Experiencias",
   servicios: "Hospedaje y gastronomía",
   eventos: "Eventos",
@@ -328,6 +338,8 @@ const SECTION_LABELS: Record<SectionKey, string> = {
 
 const DEFAULT_ORDER: SectionKey[] = [
   "destinos",
+  "pueblosMagicos",
+  "rutas",
   "experiencias",
   "servicios",
   "eventos",
@@ -342,6 +354,8 @@ function G4HomePremiumPreview() {
     layout: "asimetrica",
     sections: {
       destinos: true,
+      pueblosMagicos: true,
+      rutas: true,
       experiencias: true,
       servicios: true,
       eventos: true,
@@ -353,10 +367,30 @@ function G4HomePremiumPreview() {
   const [selectedRoute, setSelectedRoute] = useState<RouteId>("essential");
   const [selectedPrompt, setSelectedPrompt] = useState("Tengo medio día");
   const [added, setAdded] = useState(false);
+  const [openedMicrosite, setOpenedMicrosite] = useState<string | null>(null);
 
   const renderSection = (key: SectionKey) => {
     if (!tuning.sections[key]) return null;
-    if (key === "destinos") return <DestinationsSection key={key} layout={tuning.layout} />;
+    if (key === "destinos")
+      return (
+        <DestinationsSection
+          key={key}
+          layout={tuning.layout}
+          opened={openedMicrosite}
+          onOpen={setOpenedMicrosite}
+        />
+      );
+    if (key === "pueblosMagicos")
+      return <PueblosMagicosSection key={key} onCreateRoute={() => setSelectedRoute("pueblos")} />;
+    if (key === "rutas")
+      return (
+        <RoutesSection
+          key={key}
+          selectedRoute={selectedRoute}
+          onSelectRoute={setSelectedRoute}
+          onAdd={() => setAdded(true)}
+        />
+      );
     if (key === "experiencias") return <ExperiencesSection key={key} layout={tuning.layout} />;
     if (key === "servicios") return <ServicesSection key={key} />;
     if (key === "eventos") return <EventsSection key={key} />;
@@ -384,19 +418,13 @@ function G4HomePremiumPreview() {
           />
         </Container>
 
-        <Container className="mt-10 sm:mt-12">
-          <RoutesSection
-            selectedRoute={selectedRoute}
-            onSelectRoute={setSelectedRoute}
-            onAdd={() => setAdded(true)}
-          />
-        </Container>
-
-        {tuning.order.map((key) => (
-          <Container key={key} className="mt-10 sm:mt-12">
-            {renderSection(key)}
-          </Container>
-        ))}
+        {tuning.order.map((key) =>
+          tuning.sections[key] ? (
+            <Container key={key} className="mt-10 sm:mt-12">
+              {renderSection(key)}
+            </Container>
+          ) : null,
+        )}
 
         <Container className="mt-10 sm:mt-12">
           <TravelPlanClose
@@ -754,7 +782,7 @@ function RoutesSection({
     <section id="rutas" aria-labelledby="routes-title">
       <SectionHead
         kicker="Elige un ritmo"
-        title="Explora por rutas"
+        title="Rutas recomendadas por Alux"
         description="Tres relatos compactos que convierten inspiración en una secuencia de paradas. Duraciones y contenidos son demostrativos; no afirman distancia, precio ni disponibilidad."
         action="3 propuestas"
       />
@@ -836,14 +864,22 @@ function RoutesSection({
   );
 }
 
-function DestinationsSection({ layout }: { layout: CardLayout }) {
+function DestinationsSection({
+  layout,
+  opened,
+  onOpen,
+}: {
+  layout: CardLayout;
+  opened: string | null;
+  onOpen: (value: string) => void;
+}) {
   return (
     <section id="destinos" aria-labelledby="destinations-title">
       <SectionHead
         kicker="Territorio"
-        title="Tres Pueblos Mágicos, muchos caminos"
-        description="Un mosaico editorial para comprender dónde empieza cada relato y cómo se conecta con Valladolid."
-        action="Explorar territorio"
+        title="Explora los destinos del Oriente Maya de Yucatán"
+        description="Cada tarjeta es la entrada a su micrositio. Valladolid es la capital turística y el punto de partida sugerido; el resto se presenta como demo visual en esta preview."
+        action="Todos los destinos"
       />
       <div
         className={cn(
@@ -851,52 +887,116 @@ function DestinationsSection({ layout }: { layout: CardLayout }) {
           layout === "cuadricula"
             ? "sm:grid-cols-2"
             : layout === "carrusel"
-              ? "grid-flow-col auto-cols-[85%] overflow-x-auto pb-2 sm:auto-cols-[45%] lg:auto-cols-[30%]"
+              ? "grid-flow-col auto-cols-[85%] overflow-x-auto pb-2 sm:auto-cols-[45%] lg:auto-cols-[32%]"
               : "sm:grid-cols-2 lg:grid-cols-4",
         )}
       >
-        {DESTINATIONS.map((destination, index) => (
+        {DESTINATIONS.map((destination, index) => {
+          const wide = layout === "asimetrica" && index === 0;
+          return (
+            <article
+              key={destination.name}
+              className={cn(
+                "group flex flex-col overflow-hidden rounded-2xl border border-border bg-card",
+                wide && "sm:col-span-2 lg:col-span-2",
+              )}
+            >
+              <div className="relative">
+                <img
+                  src={destination.media.url}
+                  alt={destination.media.alt}
+                  loading="lazy"
+                  className={cn(
+                    "w-full object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.02]",
+                    wide ? "aspect-[16/9]" : "aspect-[4/3]",
+                  )}
+                />
+                <span className="absolute left-3 top-3 rounded-pill bg-card px-2.5 py-1 text-[10px] font-semibold uppercase text-card-foreground shadow-soft">
+                  {destination.demo ? "Demo visual" : "Capital turística"}
+                </span>
+              </div>
+              <div className="flex flex-1 flex-col p-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="font-display text-2xl">{destination.name}</h3>
+                  {destination.puebloMagico ? (
+                    <span className="rounded-pill border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
+                      Pueblo Mágico
+                    </span>
+                  ) : null}
+                </div>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                  {destination.note}
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpen(destination.name)}
+                  className="mt-4 min-h-11 rounded-pill"
+                >
+                  {opened === destination.name ? (
+                    <Check className="mr-2 size-4" aria-hidden />
+                  ) : (
+                    <Landmark className="mr-2 size-4" aria-hidden />
+                  )}
+                  {opened === destination.name ? "Micrositio abierto (demo)" : "Ver micrositio"}
+                </Button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+      <p className="mt-3 rounded-xl border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
+        Listado demostrativo de los destinos disponibles en esta preview. No se afirma cobertura,
+        disponibilidad ni datos operativos; la apertura del micrositio es una acción local simulada.
+      </p>
+    </section>
+  );
+}
+
+function PueblosMagicosSection({ onCreateRoute }: { onCreateRoute: () => void }) {
+  const pueblos = DESTINATIONS.filter((destination) => destination.puebloMagico);
+  return (
+    <section id="pueblos-magicos" aria-labelledby="pueblos-title">
+      <SectionHead
+        kicker="Distintivo territorial"
+        title="Pueblos Mágicos del Oriente Maya"
+        description="Valladolid, Izamal y Espita comparten un distintivo y tres formas distintas de vivir el oriente de Yucatán."
+        action="Descubre los tres"
+      />
+      <div className="grid gap-3 sm:grid-cols-3">
+        {pueblos.map((pueblo) => (
           <article
-            key={destination.name}
-            className={cn(
-              "group relative min-h-64 overflow-hidden rounded-2xl border border-border",
-              layout === "asimetrica" && index === 0 && "sm:col-span-2 lg:col-span-2",
-            )}
+            key={pueblo.name}
+            className="flex items-center gap-3 overflow-hidden rounded-2xl border border-border bg-card p-3"
           >
             <img
-              src={destination.media.url}
-              alt={destination.media.alt}
+              src={pueblo.media.url}
+              alt={pueblo.media.alt}
               loading="lazy"
-              className="absolute inset-0 size-full object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.02]"
+              className="size-20 shrink-0 rounded-xl object-cover"
             />
-            <div
-              className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/25 to-transparent"
-              aria-hidden
-            />
-            <div className="absolute inset-x-0 bottom-0 p-4 text-primary-foreground">
-              <div className="flex flex-wrap gap-2">
-                {destination.puebloMagico ? (
-                  <span className="rounded-pill bg-card px-2.5 py-1 text-[10px] font-semibold uppercase text-card-foreground">
-                    Pueblo Mágico
-                  </span>
-                ) : null}
-                {destination.demo ? (
-                  <span className="rounded-pill bg-foreground/80 px-2.5 py-1 text-[10px] font-semibold uppercase">
-                    Demo visual
-                  </span>
-                ) : null}
-              </div>
-              <h3 className="mt-3 font-display text-2xl">{destination.name}</h3>
-              <p className="mt-1 text-sm text-primary-foreground/85">{destination.note}</p>
+            <div className="min-w-0">
+              <span className="rounded-pill border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
+                Pueblo Mágico
+              </span>
+              <h3 className="mt-1 font-display text-xl">{pueblo.name}</h3>
+              <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                {pueblo.note}
+              </p>
             </div>
           </article>
         ))}
       </div>
-      <p className="mt-3 rounded-xl border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
-        El badge es exclusivamente textual. El distintivo gráfico oficial espera un asset acreditado
-        y no se fabrica ni se recrea en esta preview. Entidades distintas de Valladolid se presentan
-        sólo como DEMO VISUAL.
-      </p>
+      <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Badge exclusivamente textual: el distintivo gráfico oficial espera un asset acreditado y
+          no se fabrica ni se imita en esta preview.
+        </p>
+        <Button type="button" onClick={onCreateRoute} className="min-h-11 rounded-pill">
+          <RouteIcon className="mr-2 size-4" aria-hidden />
+          Crear ruta con Alux
+        </Button>
+      </div>
     </section>
   );
 }
