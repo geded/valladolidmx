@@ -277,11 +277,19 @@ const PROTECTED_CAPS = [
 
 /* ------------------------------------------------------------------ */
 
-type HeroVariant = "mosaico" | "cinematografico";
+/**
+ * Corrección conceptual vinculante:
+ *  - DIRECCIÓN VISUAL (Editorial | Cinematográfico) = dirección de arte.
+ *  - GALERÍA (Mosaico | Carrusel | Cuadrícula | Tira) = configuración
+ *    independiente de la galería. "Mosaico" NO es sinónimo de Editorial.
+ */
+type VisualDirection = "editorial" | "cinematografico";
+type GalleryLayout = "mosaico" | "carrusel" | "cuadricula" | "tira";
 type RoleView = "visitante" | "propietario" | "administracion";
 
 interface TuningState {
-  hero: HeroVariant;
+  direction: VisualDirection;
+  gallery: GalleryLayout;
   showDescription: boolean;
   showRooms: boolean;
   showAmenities: boolean;
@@ -293,7 +301,8 @@ interface TuningState {
 
 function G4HotelPremiumPreview() {
   const [tuning, setTuning] = useState<TuningState>({
-    hero: "mosaico",
+    direction: "editorial",
+    gallery: "mosaico",
     showDescription: true,
     showRooms: true,
     showAmenities: true,
@@ -312,7 +321,7 @@ function G4HotelPremiumPreview() {
       </Container>
 
       <Container className="mt-5">
-        {tuning.hero === "mosaico" ? <HeroMosaico /> : <HeroCinematografico />}
+        {tuning.direction === "editorial" ? <HeroEditorial /> : <HeroCinematografico />}
       </Container>
 
       {tuning.role !== "visitante" ? (
@@ -322,7 +331,7 @@ function G4HotelPremiumPreview() {
       ) : null}
 
       <Container className="mt-12">
-        <Gallery />
+        <Gallery layout={tuning.gallery} />
       </Container>
 
       {tuning.showDescription ? (
@@ -469,7 +478,7 @@ function HeroCopy({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function HeroMosaico() {
+function HeroEditorial() {
   return (
     <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-center">
       <HeroCopy />
@@ -519,7 +528,7 @@ function HeroCinematografico() {
   );
 }
 
-function Gallery() {
+function Gallery({ layout }: { layout: GalleryLayout }) {
   return (
     <section aria-labelledby="galeria-hotel">
       <div className="flex items-end justify-between gap-4">
@@ -534,17 +543,68 @@ function Gallery() {
           Ver todas
         </Button>
       </div>
-      <div className="mt-5 grid gap-4 sm:grid-cols-3">
-        {GALLERY.map((m) => (
-          <img
-            key={m.url}
-            src={m.url}
-            alt={m.alt}
-            loading="lazy"
-            className="h-52 w-full rounded-3xl object-cover shadow-soft"
-          />
-        ))}
-      </div>
+      {layout === "mosaico" ? (
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {GALLERY.map((m, i) => (
+            <img
+              key={m.url}
+              src={m.url}
+              alt={m.alt}
+              loading="lazy"
+              className={cn(
+                "w-full rounded-3xl object-cover shadow-soft",
+                i === 0 ? "col-span-2 row-span-2 h-64 sm:h-[21rem]" : "h-32 sm:h-40",
+              )}
+            />
+          ))}
+        </div>
+      ) : null}
+
+      {layout === "carrusel" ? (
+        <ul className="mt-5 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2">
+          {GALLERY.map((m, i) => (
+            <li key={m.url} className="w-[78%] shrink-0 snap-center sm:w-[42%]">
+              <img
+                src={m.url}
+                alt={m.alt}
+                loading="lazy"
+                className="h-60 w-full rounded-3xl object-cover shadow-soft"
+              />
+              <p className="mt-1.5 text-[11px] text-muted-foreground">
+                {i + 1} / {GALLERY.length}
+              </p>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      {layout === "cuadricula" ? (
+        <div className="mt-5 grid gap-4 sm:grid-cols-3">
+          {GALLERY.map((m) => (
+            <img
+              key={m.url}
+              src={m.url}
+              alt={m.alt}
+              loading="lazy"
+              className="h-52 w-full rounded-3xl object-cover shadow-soft"
+            />
+          ))}
+        </div>
+      ) : null}
+
+      {layout === "tira" ? (
+        <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-6">
+          {GALLERY.map((m) => (
+            <img
+              key={m.url}
+              src={m.url}
+              alt={m.alt}
+              loading="lazy"
+              className="h-24 w-full rounded-2xl object-cover shadow-soft sm:h-28"
+            />
+          ))}
+        </div>
+      ) : null}
       <p className="mt-2 text-xs text-muted-foreground">
         Fotografías gobernadas existentes servidas por ruta pública estable. Sin URLs firmadas.
       </p>
