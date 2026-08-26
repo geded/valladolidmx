@@ -2,14 +2,14 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.53",
+    "version": "0.55",
     "state": "Approved",
-    "source_sha256": "2f3c6b2ffad7382828a1b8281e831ae9400027152ef37de2c9be89801e349ff0",
+    "source_sha256": "0db4447e5ea93225a6d15a7c56ae38b64a12437d84d179ca248021a77eeb1714",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-08-27T00:00:00.000Z",
+  "generated_at": "2026-08-26T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -7775,6 +7775,29 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-035.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-035.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/routes/lovable/g5-listing-readiness-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g5-listing-readiness-preview.tsx"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-036.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-036.json"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json"
     }
   ],
   "edges": [
@@ -20259,7 +20282,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27"
+      "verified_at": "2026-08-26"
     },
     {
       "id": "AUTO:IMPLEMENTS:src/components/home/HeroSearchPill.tsx:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
@@ -20268,7 +20291,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27"
+      "verified_at": "2026-08-26"
     },
     {
       "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumPresentationControl.tsx:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
@@ -20277,7 +20300,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27"
+      "verified_at": "2026-08-26"
     },
     {
       "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumTerritorialBreadcrumb.tsx:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
@@ -20286,7 +20309,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27"
+      "verified_at": "2026-08-26"
     },
     {
       "id": "AUTO:IMPLEMENTS:src/components/surfaces/BusinessSurface.tsx:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
@@ -20295,7 +20318,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27"
+      "verified_at": "2026-08-26"
     },
     {
       "id": "AUTO:IMPLEMENTS:src/components/surfaces/DestinationSurface.tsx:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
@@ -20304,7 +20327,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27"
+      "verified_at": "2026-08-26"
     },
     {
       "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/business-premium-surface.evidence.mjs:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
@@ -20313,7 +20336,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27"
+      "verified_at": "2026-08-26"
     },
     {
       "id": "AUTO:IMPLEMENTS:scripts/omxds/i3/destination-surface.evidence.mjs:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
@@ -20322,7 +20345,7 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27"
+      "verified_at": "2026-08-26"
     },
     {
       "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-035.json:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
@@ -20331,7 +20354,61 @@
       "destination": "DOC:docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.29-G5-RESPONSIVE-VISUAL-REMEDIATION-v1.0.md",
-      "verified_at": "2026-08-27"
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PremiumHero.tsx:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "origin": "ART:src/components/premium/PremiumHero.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/casas-de-vacaciones.tsx:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "origin": "ART:src/routes/casas-de-vacaciones.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/lovable/g5-listing-readiness-preview.tsx:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "origin": "ART:src/routes/lovable/g5-listing-readiness-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/route-inventory.ts:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/route-inventory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-036.json:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-036.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-E.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "evidence": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.30-G5-S1-LISTING-READINESS-LOCAL-v1.0.md",
+      "verified_at": "2026-08-26"
     }
   ],
   "critical_chain_coverage": [
