@@ -50,23 +50,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
+  // Identidad (perfil + roles) en vuelo: evita redirecciones por rol con
+  // `roles = []` justo después de SIGNED_IN (founder caía en /mi-viaje).
+  const [identityLoading, setIdentityLoading] = useState(false);
 
   const loadIdentity = useCallback(async (uid: string | null) => {
     if (!uid) {
       setProfile(null);
       setRoles([]);
+      setIdentityLoading(false);
       return;
     }
-    const [{ data: prof }, { data: r }] = await Promise.all([
-      supabase
-        .from("profiles")
-        .select("user_id, display_name, avatar_url, email")
-        .eq("user_id", uid)
-        .maybeSingle(),
-      supabase.from("user_roles").select("role").eq("user_id", uid),
-    ]);
-    setProfile((prof as ProfileRow | null) ?? null);
-    setRoles(((r ?? []) as { role: AppRole }[]).map((x) => x.role));
+    setIdentityLoading(true);
+    try {
+      const [{ data: prof }, { data: r }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("user_id, display_name, avatar_url, email")
+          .eq("user_id", uid)
+          .maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", uid),
+      ]);
+      setProfile((prof as ProfileRow | null) ?? null);
+      setRoles(((r ?? []) as { role: AppRole }[]).map((x) => x.role));
+    } finally {
+      setIdentityLoading(false);
+    }
   }, []);
 
   useEffect(() => {
