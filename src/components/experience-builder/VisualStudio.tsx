@@ -2532,7 +2532,7 @@ const DEVICE_PRESET_BY_ID = new Map<DeviceViewport, DevicePreset>(
   DEVICE_PRESETS.map((preset) => [preset.id, preset]),
 );
 
-const DEVICE_WIDTHS: Record<DeviceViewport, number> = Object.fromEntries(
+export const DEVICE_WIDTHS: Record<DeviceViewport, number> = Object.fromEntries(
   DEVICE_PRESETS.map((preset) => [preset.id, preset.width]),
 ) as Record<DeviceViewport, number>;
 
