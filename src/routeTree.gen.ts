@@ -50,6 +50,7 @@ import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/wo
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
 import { Route as LovableTourismCardPreviewRouteImport } from './routes/lovable/tourism-card-preview'
 import { Route as LovableProtectedActionsPreviewRouteImport } from './routes/lovable/protected-actions-preview'
+import { Route as LovableG8dPremiumParityRouteImport } from './routes/lovable/g8d-premium-parity'
 import { Route as LovableG6CategoryIconCatalogRouteImport } from './routes/lovable/g6-category-icon-catalog'
 import { Route as LovableG5ListingReadinessPreviewRouteImport } from './routes/lovable/g5-listing-readiness-preview'
 import { Route as LovableG4RestaurantPremiumPreviewRouteImport } from './routes/lovable/g4-restaurant-premium-preview'
@@ -416,6 +417,11 @@ const LovableProtectedActionsPreviewRoute =
     path: '/lovable/protected-actions-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LovableG8dPremiumParityRoute = LovableG8dPremiumParityRouteImport.update({
+  id: '/lovable/g8d-premium-parity',
+  path: '/lovable/g8d-premium-parity',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableG6CategoryIconCatalogRoute =
   LovableG6CategoryIconCatalogRouteImport.update({
     id: '/lovable/g6-category-icon-catalog',
@@ -1397,6 +1403,7 @@ export interface FileRoutesByFullPath {
   '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
   '/lovable/g5-listing-readiness-preview': typeof LovableG5ListingReadinessPreviewRoute
   '/lovable/g6-category-icon-catalog': typeof LovableG6CategoryIconCatalogRoute
+  '/lovable/g8d-premium-parity': typeof LovableG8dPremiumParityRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1591,6 +1598,7 @@ export interface FileRoutesByTo {
   '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
   '/lovable/g5-listing-readiness-preview': typeof LovableG5ListingReadinessPreviewRoute
   '/lovable/g6-category-icon-catalog': typeof LovableG6CategoryIconCatalogRoute
+  '/lovable/g8d-premium-parity': typeof LovableG8dPremiumParityRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1789,6 +1797,7 @@ export interface FileRoutesById {
   '/lovable/g4-restaurant-premium-preview': typeof LovableG4RestaurantPremiumPreviewRoute
   '/lovable/g5-listing-readiness-preview': typeof LovableG5ListingReadinessPreviewRoute
   '/lovable/g6-category-icon-catalog': typeof LovableG6CategoryIconCatalogRoute
+  '/lovable/g8d-premium-parity': typeof LovableG8dPremiumParityRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1991,6 +2000,7 @@ export interface FileRouteTypes {
     | '/lovable/g4-restaurant-premium-preview'
     | '/lovable/g5-listing-readiness-preview'
     | '/lovable/g6-category-icon-catalog'
+    | '/lovable/g8d-premium-parity'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2185,6 +2195,7 @@ export interface FileRouteTypes {
     | '/lovable/g4-restaurant-premium-preview'
     | '/lovable/g5-listing-readiness-preview'
     | '/lovable/g6-category-icon-catalog'
+    | '/lovable/g8d-premium-parity'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2382,6 +2393,7 @@ export interface FileRouteTypes {
     | '/lovable/g4-restaurant-premium-preview'
     | '/lovable/g5-listing-readiness-preview'
     | '/lovable/g6-category-icon-catalog'
+    | '/lovable/g8d-premium-parity'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2575,6 +2587,7 @@ export interface RootRouteChildren {
   LovableG4RestaurantPremiumPreviewRoute: typeof LovableG4RestaurantPremiumPreviewRoute
   LovableG5ListingReadinessPreviewRoute: typeof LovableG5ListingReadinessPreviewRoute
   LovableG6CategoryIconCatalogRoute: typeof LovableG6CategoryIconCatalogRoute
+  LovableG8dPremiumParityRoute: typeof LovableG8dPremiumParityRoute
   LovableProtectedActionsPreviewRoute: typeof LovableProtectedActionsPreviewRoute
   LovableTourismCardPreviewRoute: typeof LovableTourismCardPreviewRoute
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
@@ -2898,6 +2911,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/protected-actions-preview'
       fullPath: '/lovable/protected-actions-preview'
       preLoaderRoute: typeof LovableProtectedActionsPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g8d-premium-parity': {
+      id: '/lovable/g8d-premium-parity'
+      path: '/lovable/g8d-premium-parity'
+      fullPath: '/lovable/g8d-premium-parity'
+      preLoaderRoute: typeof LovableG8dPremiumParityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/g6-category-icon-catalog': {
@@ -4543,6 +4563,7 @@ const rootRouteChildren: RootRouteChildren = {
     LovableG4RestaurantPremiumPreviewRoute,
   LovableG5ListingReadinessPreviewRoute: LovableG5ListingReadinessPreviewRoute,
   LovableG6CategoryIconCatalogRoute: LovableG6CategoryIconCatalogRoute,
+  LovableG8dPremiumParityRoute: LovableG8dPremiumParityRoute,
   LovableProtectedActionsPreviewRoute: LovableProtectedActionsPreviewRoute,
   LovableTourismCardPreviewRoute: LovableTourismCardPreviewRoute,
   LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,

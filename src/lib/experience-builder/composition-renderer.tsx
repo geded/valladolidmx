@@ -30,6 +30,8 @@ import { DestinosSection } from "@/components/home/DestinosSection";
 import { CategoriasSection } from "@/components/home/CategoriasSection";
 import { RutasSection } from "@/components/home/RutasSection";
 import { AluxPlannerBlock } from "@/components/experience-builder/blocks/alux-planner/AluxPlannerBlock";
+import { HomePremiumSurface } from "@/components/home-premium/HomePremiumSurface";
+import { resolveHomePremiumG4 } from "@/components/home-premium/home-premium-config";
 import { ConsejoAluxSection } from "@/components/home/ConsejoAluxSection";
 import { ArmaTuViajeSection } from "@/components/home/ArmaTuViajeSection";
 import { EnVivoSection } from "@/components/home/EnVivoSection";
@@ -397,6 +399,23 @@ function GenericBlockPreview({ displayName, renderChildren }: BlockPreviewProps)
   );
 }
 
+/**
+ * G8-D · `vmx.home.premium-g4` — render único (Studio, preview y producción).
+ * Autoridad visual: `HomePremiumSurface`. No renderiza chrome global.
+ */
+function HomePremiumG4Render({ node }: BlockPreviewProps): ReactNode {
+  const resolved = resolveHomePremiumG4(node.config as Record<string, unknown>);
+  return (
+    <HomePremiumSurface
+      content={resolved.content}
+      heroVariant={resolved.heroVariant}
+      layout={resolved.layout}
+      sections={resolved.sections}
+      order={resolved.order}
+    />
+  );
+}
+
 function StudioErrorBlock({ title, detail }: { title: string; detail: string }): ReactNode {
   return (
     <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm">
@@ -416,6 +435,8 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.section.categorias": NamedSectionPreview,
   "vmx.section.rutas": NamedSectionPreview,
   "vmx.alux.planner": NamedSectionPreview,
+  // G8-D · la preview de Studio usa el MISMO componente que producción.
+  "vmx.home.premium-g4": HomePremiumG4Render,
   "vmx.section.consejo-alux": NamedSectionPreview,
   "vmx.section.arma-tu-viaje": NamedSectionPreview,
   "vmx.section.en-vivo": NamedSectionPreview,
@@ -596,6 +617,9 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.section.rutas": wrap(RutasSection),
   // G7 · Planificador Alux visual (render-only, sin IA ni persistencia).
   "vmx.alux.planner": wrap(AluxPlannerBlock),
+  // G8-D · Home Premium G4: cuerpo premium únicamente. El chrome global
+  // (ribbon/header/footer) lo aporta el shell público o el canvas.
+  "vmx.home.premium-g4": HomePremiumG4Render,
   "vmx.section.consejo-alux": wrap(ConsejoAluxSection),
   "vmx.section.arma-tu-viaje": wrap(ArmaTuViajeSection),
   "vmx.section.en-vivo": wrap(EnVivoSection),
