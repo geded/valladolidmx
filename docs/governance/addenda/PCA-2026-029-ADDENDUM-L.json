@@ -1,0 +1,30 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-L",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORSHIP-PARITY-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-27 · AUTORIZACIÓN FOUNDER · G8-E2 · REMEDIACIÓN VISUAL MÍNIMA DE TRES OBSERVACIONES. Autoriza exclusivamente: (OBS-G8E1-01) elevar el control de cierre del borrador local a un área táctil real de 44x44 px conservando tamaño visual, foco, nombre accesible, posición y comportamiento; (OBS-G8E1-02) montar el chrome público real (Header/Footer) en modo inerte dentro del borrador local con control de preview Pagina completa / Solo contenido y default Pagina completa, sin convertirlo en bloques, sin duplicarlo y sin mezclarlo con el chrome de Studio; (OBS-G8E1-03) fijar el tamaño responsive del glifo bordado standard (40 px movil, 44 px tablet, 44-48 px escritorio, object-contain) en la rejilla unica CategoryNavGrid. No autoriza rediseñar plantillas, cambiar contenido, datos, presets, imagenes demo, fallbacks, los 22 PNG oficiales, publicacion, token, PR, merge, despliegue ni activacion de flags.",
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/PremiumPresetGallery.tsx",
+      "current_sha256": "8e5398e91e5983c48cd3db40fb339543759916e3844a8e0ef8c2d764b63b4f00",
+      "semantic_change": "G8-E2 · OBS-G8E1-01 y OBS-G8E1-02: control de cierre con area tactil min-h-11/min-w-11 y anillo de foco visible; chrome publico canonico (PublicHeader/PublicFooter) renderizado en contenedores inert dentro del borrador local, con control de preview Pagina completa / Solo contenido (default Pagina completa). Cero escrituras, cero publicacion, cero cambios de contenido o presets.",
+      "authority": "PCA-2026-029/PCA-2026-039"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/omxds/CategoryNavGrid.tsx",
+      "current_sha256": "2dcaf60cc485a0fa745a60dc8a024d329c8c7686394f03e5fbb6c854a5cfe087",
+      "semantic_change": "G8-E2 · OBS-G8E1-03: la rejilla unica aplica al glifo standard un tamaño responsive gobernado (size-10 movil, size-11 tablet, size-12 escritorio) con object-contain y shrink-0. La variante compact permanece intacta para chips y espacios reducidos. Sin cambios en los 22 PNG oficiales, en el registry ni en TourismCategoryIcon.",
+      "authority": "PCA-2026-037"
+    }
+  ],
+  "generated_projection_refresh": {
+    "artifact": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
+    "reason": "Reconciliacion append-only de la proyeccion generada tras G8-E2 y tras las correcciones autorizadas previas de sesion (src/hooks/useAuth.tsx y migraciones de correccion de concierge_case_file_v1).",
+    "generator": "scripts/governance/generate-artifact-inventory.mjs"
+  },
+  "invariants": ["omxds_visual_v1_contracts_enabled=false"],
+  "recorded_at": "2026-08-27"
+}
