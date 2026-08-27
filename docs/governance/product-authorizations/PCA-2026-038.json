@@ -16,14 +16,6 @@
       "path": "src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx"
     },
     {
-      "operation": "create",
-      "path": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md"
-    },
-    {
-      "operation": "create",
-      "path": "docs/governance/product-authorizations/PCA-2026-038.json"
-    },
-    {
       "operation": "modify",
       "path": "src/components/home/Hero.tsx"
     },
@@ -38,14 +30,14 @@
     {
       "operation": "modify",
       "path": "src/lib/experience-builder/composition-renderer.tsx"
-    },
-    {
-      "operation": "modify",
-      "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md"
     }
   ],
-  "public_routes": ["/"],
-  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "public_routes": [
+    "/"
+  ],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
   "required_tests": [
     "bun run lint",
     "bun run typecheck",
