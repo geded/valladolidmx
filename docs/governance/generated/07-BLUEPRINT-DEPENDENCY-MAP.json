@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.55",
+    "version": "0.57",
     "state": "Approved",
-    "source_sha256": "c14e0cfa7f476e7108227eb0f495b13de2ddbd6347c39d59bda13d298f7d65f3",
+    "source_sha256": "3736606a02733f0482767b76ad8bf4be742798fa5e999bb663e68a76ea199bbc",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -7841,6 +7841,21 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-037.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-037.json"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-037-ADDENDUM-A.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-037-ADDENDUM-A.json"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-g6/category-icons/catalog-viewports.md",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-g6/category-icons/catalog-viewports.md"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-g6/category-icons/contrast.tsv",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-g6/category-icons/contrast.tsv"
     }
   ],
   "edges": [
@@ -20510,6 +20525,33 @@
     {
       "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-037.json:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
       "origin": "ART:docs/governance/product-authorizations/PCA-2026-037.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "evidence": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-037-ADDENDUM-A.json:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-037-ADDENDUM-A.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "evidence": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/evidence/omxds-g6/category-icons/catalog-viewports.md:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-g6/category-icons/catalog-viewports.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "evidence": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "verified_at": "2026-08-26"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/evidence/omxds-g6/category-icons/contrast.tsv:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-g6/category-icons/contrast.tsv",
       "relation": "implements",
       "destination": "DOC:docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
       "evidence": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md § Implementación",
