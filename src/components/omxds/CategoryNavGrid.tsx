@@ -95,9 +95,11 @@ export function CategoryNavGrid({
           </>
         );
 
+        // G6-S1-A · D-G6-02: el control real (enlace o botón) garantiza
+        // 44×44 px reales, foco visible y activación por teclado nativa.
         const cls = [
-          "flex min-h-[44px] w-full min-w-0 flex-col items-center gap-2 rounded-2xl border px-3 py-3",
-          "transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "flex min-h-[44px] min-w-[44px] w-full min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border px-3 py-3",
+          "transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
           isActive
             ? "border-primary/50 bg-primary/5"
             : "border-border/70 bg-card hover:border-border hover:bg-muted/40",
@@ -109,13 +111,19 @@ export function CategoryNavGrid({
         return (
           <li key={item.slug} className="min-w-0">
             {mode === "navigate" && item.href ? (
-              <a href={item.href} className={cls} aria-current={isActive ? "page" : undefined}>
+              <a
+                href={item.href}
+                className={cls}
+                data-omxds-touch-target="44"
+                aria-current={isActive ? "page" : undefined}
+              >
                 {inner}
               </a>
             ) : (
               <button
                 type="button"
                 className={cls}
+                data-omxds-touch-target="44"
                 aria-pressed={isActive}
                 disabled={item.disabled}
                 onClick={() => onSelect?.(item.slug)}
@@ -129,4 +137,5 @@ export function CategoryNavGrid({
     </ul>
   );
 }
+
 
