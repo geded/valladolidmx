@@ -157,6 +157,32 @@ export interface EditorialBuilderPolicy {
 
 const AUTHORING_ROLES = ["founder_admin", "territorial_editor", "business_author"] as const;
 
+/** G8 · Campos editoriales comunes de los bloques `vmx.smart.*`. */
+const SMART_GRID_FIELDS: readonly EditorialFieldPolicy[] = [
+  {
+    field: "title",
+    class: "editorial",
+    type: "text",
+    max_length: 160,
+    translatable: true,
+    writable_by: ["founder_admin", "territorial_editor"],
+  },
+  {
+    field: "limit",
+    class: "editorial",
+    type: "number",
+    writable_by: ["founder_admin", "territorial_editor"],
+  },
+  {
+    field: "only_featured",
+    class: "editorial",
+    type: "boolean",
+    writable_by: ["founder_admin", "territorial_editor"],
+  },
+];
+
+
+
 export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
   contract_version: EDITORIAL_BUILDER_CONTRACT_VERSION,
   blocks: [
@@ -665,6 +691,360 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
         },
       ],
     },
+    /* ------------------------------------------------------------------ *
+     * G8 · Paridad de autoría para la Home premium aprobada (19.33).
+     *
+     * Registra como authorable, sobre la superficie `home`, los bloques
+     * que la Home premium G4 ya emplea en producción. No crea bloques
+     * nuevos, no altera contratos canónicos y no habilita superficies
+     * fuera de las que declara cada contrato en `block-library.ts`.
+     * ------------------------------------------------------------------ */
+    {
+      type: "vmx.hero",
+      mode: "authorable",
+      family: "identity",
+      variants: ["cinematic", "editorial-split"],
+      allowed_sources: ["media.registry", "routing.canonical"],
+      surfaces: ["home", "landing"],
+      authoring_roles: ["founder_admin", "territorial_editor"],
+      fields: [
+        {
+          field: "variant",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "media_side",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "mobile_order",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "text_safe_zone",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "eyebrow",
+          class: "editorial",
+          type: "text",
+          max_length: 120,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "title",
+          class: "editorial",
+          type: "text",
+          required: true,
+          max_length: 160,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "subtitle",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "background_images",
+          class: "media",
+          type: "media",
+          source_id: "media.registry",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "background_position",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "slide_interval_seconds",
+          class: "editorial",
+          type: "number",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "ctas",
+          class: "reference",
+          type: "reference",
+          source_id: "routing.canonical",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "show_ctas",
+          class: "editorial",
+          type: "boolean",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "cta_alignment",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "show_search",
+          class: "editorial",
+          type: "boolean",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "search_placeholder",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "search_helper",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "search_size",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "search_max_width",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "text_alignment",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "search_alignment",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+      ],
+    },
+    {
+      type: "vmx.smart.destinations-grid",
+      mode: "authorable",
+      family: "discovery",
+      variants: ["grid"],
+      allowed_sources: [],
+      surfaces: ["home", "landing", "institutional", "destination"],
+      authoring_roles: ["founder_admin", "territorial_editor"],
+      fields: SMART_GRID_FIELDS,
+    },
+    {
+      type: "vmx.smart.businesses-grid",
+      mode: "authorable",
+      family: "discovery",
+      variants: ["grid"],
+      allowed_sources: [],
+      surfaces: ["home", "landing", "destination", "business"],
+      authoring_roles: ["founder_admin", "territorial_editor"],
+      fields: SMART_GRID_FIELDS,
+    },
+    {
+      type: "vmx.smart.products-grid",
+      mode: "authorable",
+      family: "discovery",
+      variants: ["grid"],
+      allowed_sources: [],
+      surfaces: ["home", "landing", "destination", "business", "product"],
+      authoring_roles: ["founder_admin", "territorial_editor"],
+      fields: SMART_GRID_FIELDS,
+    },
+    {
+      type: "vmx.smart.events-list",
+      mode: "authorable",
+      family: "discovery",
+      variants: ["list"],
+      allowed_sources: [],
+      surfaces: ["home", "landing", "destination"],
+      authoring_roles: ["founder_admin", "territorial_editor"],
+      fields: SMART_GRID_FIELDS,
+    },
+    {
+      type: "vmx.section.rutas",
+      mode: "authorable",
+      family: "narrative",
+      variants: ["default"],
+      allowed_sources: ["routing.canonical"],
+      surfaces: ["home", "landing"],
+      authoring_roles: ["founder_admin", "territorial_editor"],
+      fields: [
+        {
+          field: "heading",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "subheading",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "source",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "route_slugs",
+          class: "reference",
+          type: "reference",
+          source_id: "routing.canonical",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "max_items",
+          class: "editorial",
+          type: "number",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "columns",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "show_stops",
+          class: "editorial",
+          type: "boolean",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+      ],
+    },
+    {
+      type: "vmx.section.arma-tu-viaje",
+      mode: "authorable",
+      family: "conversion",
+      variants: ["default"],
+      allowed_sources: ["routing.canonical"],
+      surfaces: ["home", "landing", "institutional"],
+      authoring_roles: ["founder_admin", "territorial_editor"],
+      fields: [
+        {
+          field: "heading",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "body",
+          class: "editorial",
+          type: "rich_text",
+          max_length: 800,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "cta_label",
+          class: "editorial",
+          type: "text",
+          max_length: 80,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+      ],
+    },
+    {
+      type: "vmx.experience.map",
+      mode: "authorable",
+      family: "geography",
+      variants: ["single", "multi", "list-sync", "cluster"],
+      allowed_sources: ["geography.location"],
+      surfaces: ["home", "landing", "destination", "business", "product"],
+      authoring_roles: ["founder_admin", "territorial_editor"],
+      fields: [
+        {
+          field: "variant",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "heading",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "emptyMessage",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "showDistance",
+          class: "editorial",
+          type: "boolean",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "showDirections",
+          class: "editorial",
+          type: "boolean",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "clustering",
+          class: "editorial",
+          type: "boolean",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "syncList",
+          class: "editorial",
+          type: "boolean",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "staticFallback",
+          class: "editorial",
+          type: "boolean",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "allowInteractiveToggle",
+          class: "editorial",
+          type: "boolean",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+      ],
+    },
     {
       type: "vmx.custom.html",
       mode: "legacy_read_only",
@@ -850,8 +1230,9 @@ export interface EditorialAuthoringRequest {
 }
 
 // I4-0's immutable contract harness exercises the conceptual vocabulary that
-// preceded 18.47. It remains valid only at this pure request boundary; tree
-// validation below resolves runtime types first and therefore rejects aliases.
+// preceded 18.47. It remains valid only at this pure request boundary and, since
+// G8 registers the runtime `vmx.hero` contract, it takes precedence there. Tree
+// validation resolves runtime types exclusively (see RUNTIME_TREE_POLICY).
 const I4_ZERO_REQUEST_COMPATIBILITY: readonly EditorialBlockPolicy[] = [
   {
     type: "vmx.hero",
@@ -930,16 +1311,24 @@ const I4_ZERO_REQUEST_COMPATIBILITY: readonly EditorialBlockPolicy[] = [
   },
 ];
 
+/**
+ * G8 · Política de árbol: copia no idéntica de la política canónica que
+ * desactiva por construcción el arnés de compatibilidad I4-0. Garantiza que
+ * la validación de composiciones resuelva únicamente contratos productivos.
+ */
+const RUNTIME_TREE_POLICY: EditorialBuilderPolicy = { ...EDITORIAL_BUILDER_POLICY };
+
+
+
 export function validateEditorialAuthoringRequest(
   request: EditorialAuthoringRequest,
   policy: EditorialBuilderPolicy = EDITORIAL_BUILDER_POLICY,
 ): EditorialPolicyValidation {
   const errors: string[] = [];
   const block =
-    policy.blocks.find((candidate) => candidate.type === request.block_type) ??
     (policy === EDITORIAL_BUILDER_POLICY
       ? I4_ZERO_REQUEST_COMPATIBILITY.find((candidate) => candidate.type === request.block_type)
-      : undefined);
+      : undefined) ?? policy.blocks.find((candidate) => candidate.type === request.block_type);
   if (!block) return { valid: false, errors: [`unknown block "${request.block_type}"`] };
   if (!OPERATIONS_BY_MODE[block.mode].includes(request.operation))
     errors.push(`operation "${request.operation}" is forbidden for mode "${block.mode}"`);
@@ -1104,6 +1493,20 @@ function validateClosedValue(type: string, key: string, value: unknown, errors: 
     "vmx.experience.institutional-badges:variant": ["filled", "soft", "outline", "icon-only"],
     "vmx.experience.institutional-badges:size": ["sm", "md", "lg"],
     "vmx.experience.institutional-badges:layout": ["strip", "stack"],
+    // G8 · Enums cerrados de los contratos productivos de la Home premium.
+    "vmx.hero:variant": ["cinematic", "editorial-split"],
+    "vmx.hero:media_side": ["right", "left"],
+    "vmx.hero:mobile_order": ["media-first", "text-first"],
+    "vmx.hero:text_safe_zone": ["sm", "md", "lg"],
+    "vmx.hero:background_position": ["center", "top", "bottom", "left", "right"],
+    "vmx.hero:cta_alignment": ["left", "center", "right"],
+    "vmx.hero:text_alignment": ["left", "center", "right"],
+    "vmx.hero:search_alignment": ["left", "center", "right"],
+    "vmx.hero:search_size": ["sm", "md", "lg", "xl"],
+    "vmx.hero:search_max_width": ["sm", "md", "lg", "xl", "full"],
+    "vmx.section.rutas:source": ["auto", "manual"],
+    "vmx.section.rutas:columns": ["2", "3", "4"],
+    "vmx.experience.map:variant": ["single", "multi", "list-sync", "cluster"],
   };
   const allowed = enumValues[`${type}:${key}`];
   if (allowed && !allowed.includes(value)) errors.push(`${type}.${key}: value is outside the enum`);
@@ -1231,15 +1634,18 @@ export function validateEditorialCompositionTree(
         return !field || field.writable_by.includes(input.actor);
       }),
     );
-    const request = validateEditorialAuthoringRequest({
-      block_type: node.type,
-      operation: requestOperation,
-      surface: input.surface,
-      actor: input.actor,
-      variant,
-      fields: requestFields,
-      source_bindings: block.mode === "governed_read_only" ? block.allowed_sources : [],
-    });
+    const request = validateEditorialAuthoringRequest(
+      {
+        block_type: node.type,
+        operation: requestOperation,
+        surface: input.surface,
+        actor: input.actor,
+        variant,
+        fields: requestFields,
+        source_bindings: block.mode === "governed_read_only" ? block.allowed_sources : [],
+      },
+      RUNTIME_TREE_POLICY,
+    );
     errors.push(...request.errors.map((error) => `${node.type}: ${error}`));
     if (!/^\d+\.\d+\.\d+$/.test(node.version))
       errors.push(`${node.type}: invalid contract version`);

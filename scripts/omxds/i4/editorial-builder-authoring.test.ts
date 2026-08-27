@@ -22,7 +22,7 @@ const hero = (overrides: Record<string, unknown> = {}) => ({
 const tree = (...children: ReturnType<typeof hero>[]) => ({ root: { children } });
 
 describe("I4-A authoring allowlist and legacy confinement", () => {
-  test("reconciles the six concepts to the five runtime families plus legacy HTML", () => {
+  test("reconciles the six concepts to the runtime families plus legacy HTML", () => {
     expect(EDITORIAL_BUILDER_POLICY.blocks.map((block) => block.type)).toEqual([
       "vmx.experience.hero",
       "vmx.experience.section",
@@ -31,11 +31,21 @@ describe("I4-A authoring allowlist and legacy confinement", () => {
       "vmx.experience.institutional-badges",
       "vmx.discovery.navigator",
       "vmx.alux.planner",
+      // G8 · paridad de autoría de la Home premium aprobada.
+      "vmx.hero",
+      "vmx.smart.destinations-grid",
+      "vmx.smart.businesses-grid",
+      "vmx.smart.products-grid",
+      "vmx.smart.events-list",
+      "vmx.section.rutas",
+      "vmx.section.arma-tu-viaje",
+      "vmx.experience.map",
       "vmx.custom.html",
     ]);
     expect(getBlock("vmx.experience.hero")?.editorial?.mode).toBe("authorable");
     expect(getBlock("vmx.custom.html")?.editorial?.mode).toBe("legacy_read_only");
   });
+
 
   test("normalizes page kinds and RBAC without trusting client aliases", () => {
     expect(resolveEditorialSurface("hotel")).toBe("business");
@@ -74,14 +84,26 @@ describe("I4-A authoring allowlist and legacy confinement", () => {
   });
 
   test("fails closed for aliases, unknown fields, variants, HTML and external URLs", () => {
+    // G8 · `vmx.hero` ya es un contrato productivo; el alias inexistente
+    // sigue congelado como nodo histórico (fail-closed).
     const aliases = validateEditorialCompositionTree({
-      tree: tree({ ...hero(), type: "vmx.hero" }),
+      tree: tree({ ...hero(), type: "vmx.hero.alias" }),
       surface: "destination",
       actor: "territorial_editor",
       registered_media_paths: media,
     });
     expect(aliases.valid).toBe(false);
     expect(aliases.errors.join(" ")).toContain("historical node");
+
+    // El contrato productivo `vmx.hero` sólo autoriza home y landing.
+    const outOfSurface = validateEditorialCompositionTree({
+      tree: tree({ ...hero(), type: "vmx.hero", config: { variant: "cinematic", title: "X" } }),
+      surface: "destination",
+      actor: "territorial_editor",
+      registered_media_paths: media,
+    });
+    expect(outOfSurface.valid).toBe(false);
+    expect(outOfSurface.errors.join(" ")).toContain('surface "destination" is not allowed');
 
     const malicious = validateEditorialCompositionTree({
       tree: tree(

@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "b355e8947b94a0e696eee4417c22c972dc48486c7c7032b8e04462345f746842"
+      "source_sha256": "12f9ef9df01b5f96af0d00464f0c30cb71358553aed9b7ac44064963ab2cda7b"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -11133,6 +11133,30 @@
       "path": "docs/governance/product-authorizations/PCA-2026-038.json",
       "source": "docs/governance/product-authorizations/PCA-2026-038.json",
       "evidence": "docs/governance/product-authorizations/PCA-2026-038.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md"
+    },
+    {
+      "id": "ART:scripts/omxds/g8/home-premium-authoring-parity.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/g8/home-premium-authoring-parity.contract.test.ts",
+      "source": "scripts/omxds/g8/home-premium-authoring-parity.contract.test.ts",
+      "evidence": "scripts/omxds/g8/home-premium-authoring-parity.contract.test.ts"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-039.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-039.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-039.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-039.json"
     }
   ],
   "edges": [
@@ -30697,6 +30721,65 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.57 · docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/editorial-builder-policy.ts:docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/editorial-builder-policy.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/i4/editorial-builder-authoring.test.ts:docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "origin": "ART:scripts/omxds/i4/editorial-builder-authoring.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/g8/home-premium-authoring-parity.contract.test.ts:docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "origin": "ART:scripts/omxds/g8/home-premium-authoring-parity.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:package.json:docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-039.json:docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-039.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "verified_at": "2026-08-27",
+      "origin": "DOC:docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.60 · docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {
