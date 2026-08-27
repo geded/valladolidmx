@@ -14,6 +14,7 @@
  * aquí (Block Marketplace Readiness).
  */
 
+import { ALUX_PLANNER_DEFAULTS } from "@/lib/experience-builder/blocks/alux-planner/contract";
 import { registerBlock } from "./block-registry";
 import type { BlockContract } from "./block-contract";
 import { KIT_BLOCK_CONTRACTS } from "./kit-blocks";
@@ -2720,6 +2721,113 @@ const experienceMapBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+/**
+ * G7 · `vmx.alux.planner` — Bloque visual del Planificador Alux.
+ * Render-only: no invoca modelos, no persiste estado, no crea planes.
+ */
+const aluxPlannerBlock: BlockContract = {
+  type: "vmx.alux.planner",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Planificador Alux (visual)",
+  description:
+    "Entrada visual al copiloto de viaje. No ejecuta IA ni guarda datos: la conversación real ocurre en Arma tu viaje.",
+  schema: {
+    variant: {
+      type: "select",
+      label: "Variante",
+      default: "editorial",
+      options: [
+        { value: "compact", label: "Compacta" },
+        { value: "editorial", label: "Editorial (por defecto)" },
+        { value: "panel", label: "Panel amplio" },
+      ],
+    },
+    eyebrow: {
+      type: "text",
+      label: "Frase superior",
+      translatable: true,
+      default: ALUX_PLANNER_DEFAULTS.eyebrow ?? "",
+    },
+    heading: {
+      type: "text",
+      label: "Encabezado",
+      required: true,
+      translatable: true,
+      default: ALUX_PLANNER_DEFAULTS.heading,
+    },
+    subheading: {
+      type: "text",
+      label: "Subtítulo",
+      translatable: true,
+      default: ALUX_PLANNER_DEFAULTS.subheading ?? "",
+    },
+    placeholder: {
+      type: "text",
+      label: "Texto de ejemplo del campo",
+      translatable: true,
+      default: ALUX_PLANNER_DEFAULTS.placeholder,
+    },
+    cta_label: {
+      type: "text",
+      label: "Texto del botón",
+      translatable: true,
+      default: ALUX_PLANNER_DEFAULTS.cta_label,
+    },
+    cta_href: {
+      type: "text",
+      label: "Destino del botón",
+      default: ALUX_PLANNER_DEFAULTS.cta_href,
+    },
+    show_prompts: {
+      type: "boolean",
+      label: "Mostrar sugerencias",
+      default: true,
+    },
+    prompts: {
+      type: "list",
+      label: "Sugerencias",
+      default: ALUX_PLANNER_DEFAULTS.prompts.map((p) => ({ label: p.label })),
+      item: {
+        type: "object",
+        label: "Sugerencia",
+        fields: {
+          label: { type: "text", label: "Texto", translatable: true },
+        },
+      },
+    },
+    show_disclaimer: {
+      type: "boolean",
+      label: "Mostrar aviso de vista previa",
+      default: true,
+    },
+    disclaimer: {
+      type: "text",
+      label: "Aviso",
+      translatable: true,
+      default: ALUX_PLANNER_DEFAULTS.disclaimer,
+    },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["home", "landing", "destination"] },
+  i18n: {
+    translatable_fields: [
+      "eyebrow",
+      "heading",
+      "subheading",
+      "placeholder",
+      "cta_label",
+      "disclaimer",
+    ],
+  },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 const INITIAL_BLOCK_LIBRARY_SOURCE: BlockContract[] = [
   // NOTE: `experienceMapBlock` is appended near the end of this array.
   containerBlock,
@@ -2805,6 +2913,8 @@ const INITIAL_BLOCK_LIBRARY_SOURCE: BlockContract[] = [
   experienceRelatedCollectionBlock,
   // U-VISUAL · V4 — Experience Map (Founder Discovery Map Principle).
   experienceMapBlock,
+  // G7 · Capacidades premium del constructor — Planificador Alux (visual).
+  aluxPlannerBlock,
 ];
 
 /** I4-A: proyecta metadata de la única policy sobre los contratos runtime. */
