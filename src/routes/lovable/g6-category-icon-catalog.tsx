@@ -5,11 +5,22 @@
  * Ruta interna de verificación (no pública, no indexable). Renderiza las 22
  * categorías canónicas del `CATEGORY_ICON_REGISTRY` en sus dos variantes,
  * ambos esquemas cromáticos y en monocromo, además de la prueba fail-closed.
+ *
+ * G6-S1-A · D-G6-03 — Añade fixtures locales deterministas (`#fixture-s1`,
+ * `#fixture-s2`, `#fixture-s3`) que montan los componentes REALES con datos
+ * literales locales: sin backend, sin sesión, sin datos reales y sin
+ * duplicar la implementación visual.
  */
 import { createFileRoute } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
 import { TourismCategoryIcon } from "@/components/omxds/TourismCategoryIcon";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
+import { DiscoveryNavigator } from "@/components/discovery/DiscoveryNavigator";
+import { DiscoveryNavigatorBlock } from "@/components/experience-builder/blocks/DiscoveryNavigatorBlock";
+import { CategoriaCard } from "@/components/cards/CategoriaCard";
+import { CATEGORIAS_MOCK } from "@/mocks/categorias";
+import type { DiscoveryCategoryItem } from "@/lib/discovery/discovery-navigator.functions";
 import { CATEGORY_ICON_REGISTRY, CATEGORY_ICON_SLUGS } from "@/lib/omxds/category-icon-registry";
 
 export const Route = createFileRoute("/lovable/g6-category-icon-catalog")({
@@ -32,6 +43,23 @@ export const Route = createFileRoute("/lovable/g6-category-icon-catalog")({
     ],
   }),
   component: G6CategoryIconCatalog,
+});
+
+/** Datos literales locales — ficticios, deterministas, sin backend. */
+const FIXTURE_CATEGORIES: readonly DiscoveryCategoryItem[] = [
+  { slug: "hoteles", label: "Hoteles", count: 4, href: "/hoteles" },
+  { slug: "restaurantes", label: "Restaurantes", count: 6, href: "/restaurantes" },
+  { slug: "experiencias", label: "Experiencias", count: 3, href: "/experiencias" },
+  { slug: "cenotes", label: "Cenotes", count: 5, href: "#fixture-s1" },
+  { slug: "naturaleza", label: "Naturaleza", count: 2, href: "#fixture-s1" },
+  { slug: "zonas-arqueologicas", label: "Zonas arqueológicas", count: 2, href: "#fixture-s1" },
+] as unknown as readonly DiscoveryCategoryItem[];
+
+/** QueryClient aislado: `staleTime: Infinity` evita cualquier fetch real. */
+const fixtureQueryClient = new QueryClient({
+  defaultOptions: {
+    queries: { staleTime: Number.POSITIVE_INFINITY, retry: false, refetchOnMount: false },
+  },
 });
 
 function G6CategoryIconCatalog() {
@@ -91,6 +119,92 @@ function G6CategoryIconCatalog() {
           ))}
         </div>
       </Container>
+
+      <Container className="mt-12">
+        <h2 className="mb-2 text-lg font-semibold">Ceiba / ya’axché · primeros planos</h2>
+        <p className="mb-4 max-w-2xl text-sm text-muted-foreground">
+          D-G6-01 · Alternativa B: copa escalonada en tres niveles (16 / 12 / 7 u), tronco central
+          dominante y tres raíces tabulares.
+        </p>
+        <div
+          className="flex flex-wrap items-end gap-6 rounded-2xl border border-border bg-card p-4"
+          data-testid="g6-ceiba-closeups"
+        >
+          <span className="flex flex-col items-center gap-2">
+            <TourismCategoryIcon slug="naturaleza" variant="compact" size={32} />
+            <span className="text-[11px] text-muted-foreground">compact 32 · light</span>
+          </span>
+          <span className="flex flex-col items-center gap-2">
+            <TourismCategoryIcon slug="naturaleza" variant="compact" size={36} />
+            <span className="text-[11px] text-muted-foreground">compact 36 · light</span>
+          </span>
+          <span className="flex flex-col items-center gap-2">
+            <TourismCategoryIcon slug="naturaleza" variant="standard" size={44} />
+            <span className="text-[11px] text-muted-foreground">standard 44 · light</span>
+          </span>
+          <span className="flex flex-col items-center gap-2 rounded-xl bg-foreground p-3">
+            <TourismCategoryIcon slug="naturaleza" variant="compact" size={36} scheme="dark" />
+            <TourismCategoryIcon slug="naturaleza" variant="standard" size={44} scheme="dark" />
+          </span>
+          <span className="flex items-center">
+            <TourismCategoryIcon slug="naturaleza" variant="standard" size={44} />
+          </span>
+        </div>
+      </Container>
+
+      <QueryClientProvider client={fixtureQueryClient}>
+        <Container className="mt-12">
+          <h2 className="mb-2 text-lg font-semibold">Fixture S1 · DiscoveryNavigator real</h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Componente real de descubrimiento con categorías literales locales.
+          </p>
+          <div id="fixture-s1" data-omxds-fixture="s1">
+            <DiscoveryNavigator
+              title="Explora el destino (fixture)"
+              categories={[...FIXTURE_CATEGORIES]}
+              variant="grid"
+            />
+          </div>
+        </Container>
+
+        <Container className="mt-12">
+          <h2 className="mb-2 text-lg font-semibold">
+            Fixture S2 · preview real de <code>vmx.discovery.navigator</code>
+          </h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Bloque real del Experience Builder alimentado con <code>previewData</code> literal.
+          </p>
+          <div id="fixture-s2" data-omxds-fixture="s2">
+            <DiscoveryNavigatorBlock
+              config={{ scope: "destination", manualDestinationSlug: "fixture", mode: "navigate" }}
+              previewData={{
+                scope: { kind: "destination", slug: "fixture", label: "Destino fixture" },
+                categories: [...FIXTURE_CATEGORIES],
+                slots: [],
+              }}
+            />
+          </div>
+        </Container>
+
+        <Container className="mt-12">
+          <h2 className="mb-2 text-lg font-semibold">
+            Fixture S3 · CategoriaCard con <code>CATEGORIAS_MOCK</code>
+          </h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Mismo flujo de composición que <code>CategoriasSection</code>, con datos mock locales.
+          </p>
+          <div
+            id="fixture-s3"
+            data-omxds-fixture="s3"
+            data-home-grid="categorias"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            {CATEGORIAS_MOCK.map((c) => (
+              <CategoriaCard key={c.id} category={c} />
+            ))}
+          </div>
+        </Container>
+      </QueryClientProvider>
 
       <Container className="mt-12">
         <h2 className="mb-2 text-lg font-semibold">Prueba fail-closed</h2>

@@ -56,7 +56,12 @@ export function CategoriaCard({ category }: { category: Category }) {
     comingSoon: t("common.coming_soon"),
   });
   return (
-    <div className="relative min-w-0">
+    // G6-S1-A · D-G6-02: los controles reales de la tarjeta (enlace de
+    // título y CTA) quedan garantizados en 44×44 px con foco visible.
+    <div
+      className="relative min-w-0 [&_a]:inline-flex [&_a]:min-h-[44px] [&_a]:min-w-[44px] [&_a]:items-center [&_a]:focus-visible:outline-none [&_a]:focus-visible:ring-2 [&_a]:focus-visible:ring-ring [&_button]:min-h-[44px] [&_button]:min-w-[44px]"
+      data-omxds-touch-target="44"
+    >
       <span className="pointer-events-none absolute left-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-card/90 shadow-soft ring-1 ring-border/60">
         {/* G6-S1 · autoridad única de iconografía (fail-closed) */}
         <TourismCategoryIcon slug={category.slug} variant="compact" size={32} />
@@ -78,3 +83,4 @@ export function CategoriaCard({ category }: { category: Category }) {
     </div>
   );
 }
+
