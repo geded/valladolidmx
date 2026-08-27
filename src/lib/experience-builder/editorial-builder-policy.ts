@@ -181,8 +181,6 @@ const SMART_GRID_FIELDS: readonly EditorialFieldPolicy[] = [
   },
 ];
 
-
-
 export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
   contract_version: EDITORIAL_BUILDER_CONTRACT_VERSION,
   blocks: [
@@ -2294,8 +2292,6 @@ const I4_ZERO_REQUEST_COMPATIBILITY: readonly EditorialBlockPolicy[] = [
  * la validación de composiciones resuelva únicamente contratos productivos.
  */
 const RUNTIME_TREE_POLICY: EditorialBuilderPolicy = { ...EDITORIAL_BUILDER_POLICY };
-
-
 
 export function validateEditorialAuthoringRequest(
   request: EditorialAuthoringRequest,

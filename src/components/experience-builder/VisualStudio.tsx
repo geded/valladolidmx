@@ -1788,7 +1788,6 @@ function PageVisualEditor({
     };
   }, [page, tree]);
 
-
   if (loadError)
     return (
       <FullScreenState title="No se pudo abrir el editor" detail={loadError} onExit={onExit} />
@@ -1810,7 +1809,6 @@ function PageVisualEditor({
       style={shellHeight ? { height: shellHeight } : undefined}
       className="flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-background"
     >
-
       <div className="sticky top-0 z-40 flex flex-wrap items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
         <button
           type="button"
@@ -2246,7 +2244,6 @@ function PageVisualEditor({
                   : deviceViewport === "mobile" || deviceViewport === "mobile430"
                     ? "base"
                     : "lg"
-
               }
             />
 
@@ -2540,15 +2537,9 @@ const HOME_CANVAS_WIDTH = 1280;
  * menos espacio se aplica una escala visual externa que NO altera container
  * queries, breakpoints ni medidas internas del documento aislado.
  */
-export type DeviceViewport =
-  | "mobile"
-  | "mobile430"
-  | "tablet"
-  | "w1024"
-  | "desktop"
-  | "w1440";
+type DeviceViewport = "mobile" | "mobile430" | "tablet" | "w1024" | "desktop" | "w1440";
 
-export interface DevicePreset {
+interface DevicePreset {
   id: DeviceViewport;
   width: number;
   height: number;
@@ -2569,7 +2560,7 @@ const DEVICE_PRESET_BY_ID = new Map<DeviceViewport, DevicePreset>(
   DEVICE_PRESETS.map((preset) => [preset.id, preset]),
 );
 
-export const DEVICE_WIDTHS: Record<DeviceViewport, number> = Object.fromEntries(
+const DEVICE_WIDTHS: Record<DeviceViewport, number> = Object.fromEntries(
   DEVICE_PRESETS.map((preset) => [preset.id, preset.width]),
 ) as Record<DeviceViewport, number>;
 
@@ -2589,7 +2580,7 @@ function isDeviceViewport(value: unknown): value is DeviceViewport {
  * solid    → Hero editorial dividido, Hero sin medio, primer bloque no Hero
  *            o estado desconocido (fail-closed).
  */
-export function resolveCanvasHeaderVariant(tree: CompositionTree | null | undefined): "overlay" | "solid" {
+function resolveCanvasHeaderVariant(tree: CompositionTree | null | undefined): "overlay" | "solid" {
   const first = tree?.root?.children?.find((node) => !node.hidden);
   if (!first || first.type !== "vmx.hero") return "solid";
   const config = (first.config ?? {}) as Record<string, unknown>;
@@ -2602,7 +2593,6 @@ export function resolveCanvasHeaderVariant(tree: CompositionTree | null | undefi
   });
   return hasMedia ? "overlay" : "solid";
 }
-
 
 /**
  * Anchos exactos de auditoría (G3-H03 = 1024 px, G3-H04 = 1440 px).
@@ -2747,7 +2737,6 @@ function HomeCanvas({
         scale={scale}
         presetLabel={preset.label}
       >
-
         <InertChrome
           label="Encabezado"
           selected={selectedId === HEADER_CHROME_ID}
@@ -2830,7 +2819,6 @@ function CanvasViewport({
   presetLabel: string;
   children: React.ReactNode;
 }) {
-
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [mount, setMount] = useState<HTMLElement | null>(null);
 
@@ -2867,13 +2855,11 @@ function CanvasViewport({
       frame = requestAnimationFrame(() => {
         doc.documentElement.className = document.documentElement.className;
         doc.head.querySelectorAll("[data-eb-canvas-style]").forEach((n) => n.remove());
-        document
-          .querySelectorAll('style, link[rel="stylesheet"]')
-          .forEach((node) => {
-            const clone = node.cloneNode(true) as HTMLElement;
-            clone.setAttribute("data-eb-canvas-style", "");
-            doc.head.appendChild(clone);
-          });
+        document.querySelectorAll('style, link[rel="stylesheet"]').forEach((node) => {
+          const clone = node.cloneNode(true) as HTMLElement;
+          clone.setAttribute("data-eb-canvas-style", "");
+          doc.head.appendChild(clone);
+        });
       });
     };
     syncStyles();
@@ -2987,9 +2973,6 @@ function CanvasViewport({
     </div>
   );
 }
-
-
-
 
 /* --------------------------------------------------------------------- */
 

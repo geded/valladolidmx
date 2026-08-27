@@ -56,15 +56,56 @@ const adopted = [
   "src/routes/lovable/g6-category-icon-catalog.tsx",
 ];
 
+// G8-E1 · Cadena real de autoridad tras extraer las superficies compartidas:
+//   preview → superficie premium compartida → CompositionRenderer → preset
+//   registrado → TourismCategoryIcon → PNG aprobado.
+// La delegación es un allowlist cerrado: sólo estas superficies compartidas
+// pueden acreditar la autoridad por delegación, y el delegado debe contener
+// la autoridad real. Cualquier otro caso sigue fallando (fail-closed).
+const DELEGATED_AUTHORITY: Record<string, string> = {
+  "src/routes/lovable/g4-destination-microsite-preview.tsx":
+    "src/components/destination-premium/DestinationPremiumSurface.tsx",
+  "src/routes/lovable/g4-home-premium-preview.tsx":
+    "src/components/home-premium/HomePremiumSurface.tsx",
+};
+
+const AUTHORITY = /TourismCategoryIcon|CategoryNavGrid/;
+
 for (const file of adopted) {
   const source = readFileSync(resolve(file), "utf8");
-  assert.match(
-    source,
-    /TourismCategoryIcon|CategoryNavGrid/,
-    `superficie sin autoridad de iconografía: ${file}`,
-  );
+  if (!AUTHORITY.test(source)) {
+    const delegate = DELEGATED_AUTHORITY[file];
+    assert.ok(delegate, `superficie sin autoridad de iconografía: ${file}`);
+    assert.ok(
+      source.includes(delegate!.replace(/^src\//, "@/").replace(/\.tsx$/, "")),
+      `la superficie ${file} no importa su delegado acreditado ${delegate}`,
+    );
+    const delegateSource = readFileSync(resolve(delegate!), "utf8");
+    assert.match(
+      delegateSource,
+      AUTHORITY,
+      `el delegado no ejerce la autoridad de iconografía: ${delegate}`,
+    );
+    assert.doesNotMatch(delegateSource, /CATEGORY_ICON_MAP/, `mapa paralelo en ${delegate}`);
+  }
   assert.doesNotMatch(source, /CATEGORY_ICON_MAP/, `mapa paralelo detectado en ${file}`);
 }
+
+// 4-bis · La cadena de render premium consume las superficies compartidas y el
+// preset registrado consume la misma autoridad visual (sin duplicar bloques).
+const renderer = readFileSync(
+  resolve("src/lib/experience-builder/composition-renderer.tsx"),
+  "utf8",
+);
+for (const surface of ["HomePremiumSurface", "DestinationPremiumSurface"]) {
+  assert.ok(renderer.includes(surface), `el CompositionRenderer no consume ${surface}`);
+}
+const iconWrapper = readFileSync(resolve("src/components/omxds/TourismCategoryIcon.tsx"), "utf8");
+assert.match(
+  iconWrapper,
+  /\/brand\/category-icons\/\$\{entry\.slug\}\.png/,
+  "el wrapper debe resolver el PNG aprobado por slug",
+);
 
 // 5 · Sin fallback genérico ni mapas paralelos en el motor de descubrimiento
 const navigator = readFileSync(

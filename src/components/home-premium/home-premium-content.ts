@@ -380,8 +380,7 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
         duration: "Un día",
         stops: 4,
         vibe: "Naturaleza y cultura viva",
-        description:
-          "Una propuesta visual para ordenar agua, territorio y comunidades sin prisas.",
+        description: "Una propuesta visual para ordenar agua, territorio y comunidades sin prisas.",
         sequence: ["Valladolid", "Cenote de la región", "Comunidad maya", "Regreso al centro"],
         media: HOME_PREMIUM_MEDIA.cenote,
       },
@@ -465,8 +464,7 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
         title: "Mercado y cocinas de barrio",
         destination: "Valladolid",
         category: "Cocina local · demo visual",
-        summary:
-          "Una selección editorial para comprender sabores, horarios y rituales cotidianos.",
+        summary: "Una selección editorial para comprender sabores, horarios y rituales cotidianos.",
         media: HOME_PREMIUM_MEDIA.plaza,
       },
     ],
@@ -482,7 +480,8 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
         day: "Fecha por confirmar",
         title: "Noche de Valladolid",
         type: "Música y memoria",
-        detail: "Velada cultural en el centro histórico · demo visual, sin disponibilidad afirmada.",
+        detail:
+          "Velada cultural en el centro histórico · demo visual, sin disponibilidad afirmada.",
       },
       {
         day: "Sin fecha acreditada",

@@ -13,7 +13,9 @@
  *  - Este módulo es puro: sin red, sin base de datos, sin flags.
  */
 import { homePremiumG4DefaultConfig } from "@/components/home-premium/home-premium-config";
+import { listingPremiumG5DefaultConfig } from "@/components/listing-premium/listing-premium-config";
 import type { EditorialSurface } from "./editorial-builder-policy";
+import type { PageKind } from "./page-kind-registry";
 
 export const PREMIUM_TEMPLATE_REGISTRY_VERSION = "1.0.0" as const;
 export const PREMIUM_TEMPLATE_EFFECTIVE_DATE = "2026-08-26" as const;
@@ -39,9 +41,23 @@ export interface PremiumTemplatePreset {
   visualAuthorityRoute: string;
   /** Versión del contrato compuesto. */
   contractVersion: string;
+  /** Estado editorial del preset dentro del Fast Track. */
+  status: "aprobada";
+  /**
+   * Tipos de página compatibles (fail-closed): un preset sólo puede
+   * seleccionarse cuando el `pageKind` destino está declarado aquí.
+   */
+  pageKinds: readonly PageKind[];
   /** Configuración inicial del bloque al crear la composición. */
   defaultConfig: () => Record<string, unknown>;
 }
+
+/** Tipos de página compatibles por familia de plantilla premium. */
+const PAGE_KINDS_BY_FAMILY: Record<"home" | "destination" | "listing", readonly PageKind[]> = {
+  home: ["home"],
+  destination: ["destination"],
+  listing: ["landing", "campaign"],
+};
 
 export const PREMIUM_TEMPLATE_PRESETS: PremiumTemplatePreset[] = [
   {
@@ -56,6 +72,8 @@ export const PREMIUM_TEMPLATE_PRESETS: PremiumTemplatePreset[] = [
     targetRoute: "/",
     visualAuthorityRoute: "/lovable/g4-home-premium-preview",
     contractVersion: "1.0.0",
+    status: "aprobada",
+    pageKinds: PAGE_KINDS_BY_FAMILY.home,
     defaultConfig: () => homePremiumG4DefaultConfig(),
   },
   {
@@ -70,6 +88,8 @@ export const PREMIUM_TEMPLATE_PRESETS: PremiumTemplatePreset[] = [
     targetRoute: "/oriente-maya/valladolid",
     visualAuthorityRoute: "/lovable/g4-destination-microsite-preview",
     contractVersion: "1.0.0",
+    status: "aprobada",
+    pageKinds: PAGE_KINDS_BY_FAMILY.destination,
     defaultConfig: () => ({}),
   },
   ...(
@@ -92,9 +112,44 @@ export const PREMIUM_TEMPLATE_PRESETS: PremiumTemplatePreset[] = [
     targetRoute: route,
     visualAuthorityRoute: "/lovable/g5-listing-readiness-preview",
     contractVersion: "1.0.0",
-    defaultConfig: () => ({ family }),
+    status: "aprobada" as const,
+    pageKinds: PAGE_KINDS_BY_FAMILY.listing,
+    defaultConfig: () => listingPremiumG5DefaultConfig(family) as Record<string, unknown>,
   })),
 ];
+
+/**
+ * Tipos de página compatibles (fail-closed). Un preset no declarado para el
+ * `pageKind` destino NUNCA es seleccionable.
+ */
+export function isPremiumPresetCompatible(presetId: string, pageKind: string): boolean {
+  const preset = getPremiumTemplatePreset(presetId);
+  if (!preset) return false;
+  return preset.pageKinds.some((k) => k === pageKind);
+}
+
+/** Presets seleccionables para un tipo de página. Desconocido → lista vacía. */
+export function listPremiumTemplatePresetsForKind(pageKind: string): PremiumTemplatePreset[] {
+  return PREMIUM_TEMPLATE_PRESETS.filter((p) => p.pageKinds.some((k) => k === pageKind));
+}
+
+/**
+ * Miniatura del preset derivada de su propia configuración aprobada
+ * (portada del hero). Sin construcción de URLs ni derivaciones locales.
+ */
+export function resolvePremiumPresetThumbnail(preset: PremiumTemplatePreset): string | null {
+  const cfg = preset.defaultConfig() as Record<string, unknown>;
+  const direct = cfg.hero_media_url;
+  if (typeof direct === "string" && direct.trim()) return direct;
+  const slides = cfg.hero_slides;
+  if (Array.isArray(slides)) {
+    for (const slide of slides) {
+      const url = (slide as Record<string, unknown> | null)?.media_url;
+      if (typeof url === "string" && url.trim()) return url;
+    }
+  }
+  return null;
+}
 
 export function getPremiumTemplatePreset(id: string): PremiumTemplatePreset | null {
   return PREMIUM_TEMPLATE_PRESETS.find((p) => p.id === id) ?? null;

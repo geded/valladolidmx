@@ -30,8 +30,7 @@ export const Route = createFileRoute("/lovable/g5-listing-readiness-preview")({
       { title: "G5-S1 · Vista previa interna de Listing Readiness" },
       {
         name: "description",
-        content:
-          "Vista previa interna de listados turísticos con fixtures locales. No indexable.",
+        content: "Vista previa interna de listados turísticos con fixtures locales. No indexable.",
       },
       { name: "robots", content: "noindex,nofollow,noarchive" },
     ],

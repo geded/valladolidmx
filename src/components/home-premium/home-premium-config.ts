@@ -53,9 +53,7 @@ function mapRows<T>(
 ): T[] {
   const list = rows(value);
   if (list.length === 0) return defaults.slice(0, limit);
-  return list
-    .slice(0, limit)
-    .map((row, index) => map(row, defaults[index % defaults.length] as T));
+  return list.slice(0, limit).map((row, index) => map(row, defaults[index % defaults.length] as T));
 }
 
 export interface HomePremiumG4Resolved {

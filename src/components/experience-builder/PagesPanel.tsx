@@ -18,6 +18,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { PremiumPresetGallery } from "@/components/experience-builder/PremiumPresetGallery";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/lib/toast";
 import {
@@ -93,9 +94,7 @@ function publicPathFromKind(def: PageKindDefinition | undefined, slug: string): 
  */
 function publicUrlPattern(def: PageKindDefinition | undefined): string {
   const origin =
-    typeof window !== "undefined" && window.location?.origin
-      ? window.location.origin
-      : "";
+    typeof window !== "undefined" && window.location?.origin ? window.location.origin : "";
   const pattern = def?.publicRoutePattern ?? "/p/{slug}";
   return `${origin}${pattern}`;
 }
@@ -217,11 +216,13 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
   const [ownershipFilter, setOwnershipFilter] = useState<OwnershipFilter>("all");
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const [showCreate, setShowCreate] = useState(false);
+  const [showPremium, setShowPremium] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
-  const [inlineEdit, setInlineEdit] = useState<
-    | null
-    | { mode: "rename" | "slug"; row: StudioPageRow; value: string }
-  >(null);
+  const [inlineEdit, setInlineEdit] = useState<null | {
+    mode: "rename" | "slug";
+    row: StudioPageRow;
+    value: string;
+  }>(null);
   const [confirmDelete, setConfirmDelete] = useState<StudioPageRow | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -321,11 +322,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
   const onArchive = (r: StudioPageRow) =>
     void doAction(r.id, () => archive({ data: { id: r.id } }), "Página archivada.");
   const onUnarchive = (r: StudioPageRow) =>
-    void doAction(
-      r.id,
-      () => unarchive({ data: { id: r.id } }),
-      "Página restaurada al borrador.",
-    );
+    void doAction(r.id, () => unarchive({ data: { id: r.id } }), "Página restaurada al borrador.");
   const onMarkTemplate = (r: StudioPageRow) =>
     void doAction(
       r.id,
@@ -348,9 +345,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
         const clean = slugify(value);
         if (!clean) throw new Error("La dirección web no puede quedar vacía.");
         await updSlug({ data: { id: row.id, new_slug: clean } });
-        toast.success(
-          "Dirección web actualizada. El redirect editorial se aplicará en US-R3.",
-        );
+        toast.success("Dirección web actualizada. El redirect editorial se aplicará en US-R3.");
       }
       setInlineEdit(null);
       await reload();
@@ -386,8 +381,8 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           </p>
           <h2 className="mt-1 text-lg font-semibold sm:text-xl">Mis páginas</h2>
           <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-            Todas las páginas del sitio, agrupadas por tipo. Selecciona una para
-            editarla dentro del Studio, sin salir del canvas.
+            Todas las páginas del sitio, agrupadas por tipo. Selecciona una para editarla dentro del
+            Studio, sin salir del canvas.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -400,6 +395,14 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           </button>
           <button
             type="button"
+            onClick={() => setShowPremium((v) => !v)}
+            aria-pressed={showPremium}
+            className="rounded-md border border-primary/40 bg-primary/5 px-3 py-1.5 text-[11px] font-semibold text-primary hover:bg-primary/10"
+          >
+            Plantillas premium
+          </button>
+          <button
+            type="button"
             onClick={() => setShowCreate(true)}
             className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:opacity-95"
           >
@@ -407,6 +410,13 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           </button>
         </div>
       </header>
+
+      {showPremium ? (
+        <PremiumPresetGallery
+          pageKind={kindFilter === "all" ? undefined : kindFilter}
+          onClose={() => setShowPremium(false)}
+        />
+      ) : null}
 
       {/* Filtros y búsqueda */}
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-2">
@@ -586,9 +596,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           title={inlineEdit.mode === "rename" ? "Renombrar página" : "Cambiar dirección web"}
           label={inlineEdit.mode === "rename" ? "Nuevo nombre" : "Nueva dirección"}
           value={inlineEdit.value}
-          onChange={(v) =>
-            setInlineEdit((prev) => (prev ? { ...prev, value: v } : prev))
-          }
+          onChange={(v) => setInlineEdit((prev) => (prev ? { ...prev, value: v } : prev))}
           hint={
             inlineEdit.mode === "slug"
               ? "Sólo minúsculas, números y guiones. En US-R3 se activarán redirects 301 y actualización de canonical/sitemap."
@@ -843,11 +851,7 @@ function PageRow({
                 shortcut="⌘D"
                 onClick={() => onAction("duplicate", row)}
               />
-              <MenuItem
-                icon={Pencil}
-                label="Renombrar"
-                onClick={() => onAction("rename", row)}
-              />
+              <MenuItem icon={Pencil} label="Renombrar" onClick={() => onAction("rename", row)} />
               <MenuItem
                 icon={ExternalLink}
                 label="Cambiar dirección web"
@@ -915,9 +919,7 @@ function MenuItem({
     >
       <Icon className="size-3.5" aria-hidden />
       <span className="flex-1">{label}</span>
-      {shortcut ? (
-        <span className="text-[10px] text-muted-foreground">{shortcut}</span>
-      ) : null}
+      {shortcut ? <span className="text-[10px] text-muted-foreground">{shortcut}</span> : null}
     </button>
   );
 }
@@ -1186,9 +1188,7 @@ function SimpleTextDialog({
               <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                 URL pública
               </p>
-              <p className="mt-0.5 break-all font-mono text-xs text-foreground">
-                {previewUrl}
-              </p>
+              <p className="mt-0.5 break-all font-mono text-xs text-foreground">{previewUrl}</p>
             </div>
           ) : null}
           {hint ? <p className="text-[10px] text-muted-foreground">{hint}</p> : null}
@@ -1242,8 +1242,8 @@ function ConfirmDeleteDialog({
           </button>
         </div>
         <p className="text-xs text-muted-foreground">
-          Vas a eliminar <strong>{row.title}</strong> ({row.slug}) y todas sus revisiones.
-          Esta acción es irreversible.
+          Vas a eliminar <strong>{row.title}</strong> ({row.slug}) y todas sus revisiones. Esta
+          acción es irreversible.
         </p>
         <label className="mt-2 block text-xs font-medium">
           Escribe <code className="font-mono">{required}</code> para confirmar:
@@ -1269,7 +1269,9 @@ function ConfirmDeleteDialog({
             disabled={text !== required || busy}
             className="inline-flex items-center gap-1 rounded-md bg-destructive px-3 py-1.5 text-xs font-semibold text-destructive-foreground hover:opacity-95 disabled:opacity-40"
           >
-            {busy ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : (
+            {busy ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden />
+            ) : (
               <Trash2 className="size-3.5" aria-hidden />
             )}
             Eliminar definitivamente
