@@ -30,6 +30,8 @@ import { DestinosSection } from "@/components/home/DestinosSection";
 import { CategoriasSection } from "@/components/home/CategoriasSection";
 import { RutasSection } from "@/components/home/RutasSection";
 import { AluxPlannerBlock } from "@/components/experience-builder/blocks/alux-planner/AluxPlannerBlock";
+import { HomePremiumSurface } from "@/components/home-premium/HomePremiumSurface";
+import { resolveHomePremiumG4 } from "@/components/home-premium/home-premium-config";
 import { ConsejoAluxSection } from "@/components/home/ConsejoAluxSection";
 import { ArmaTuViajeSection } from "@/components/home/ArmaTuViajeSection";
 import { EnVivoSection } from "@/components/home/EnVivoSection";
