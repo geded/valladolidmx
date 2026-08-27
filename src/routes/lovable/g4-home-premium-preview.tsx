@@ -29,6 +29,11 @@ import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experienc
 import { cn } from "@/lib/utils";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { PremiumPresentationControl } from "@/components/premium";
+import { Hero } from "@/components/home/Hero";
+import { RutasSection } from "@/components/home/RutasSection";
+import { AluxPlannerBlock } from "@/components/experience-builder/blocks/alux-planner/AluxPlannerBlock";
+import { DiscoveryNavigatorBlock } from "@/components/experience-builder/blocks/DiscoveryNavigatorBlock";
+import type { DiscoveryNavigatorDTO } from "@/lib/discovery/discovery-navigator.functions";
 
 export const Route = createFileRoute("/lovable/g4-home-premium-preview")({
   head: () => ({
@@ -420,6 +425,7 @@ function G4HomePremiumPreview() {
     <div className="min-h-screen overflow-x-clip bg-background pb-20">
       <PreviewRibbon />
       <PreviewHeader />
+      <G7IntegratedFixture />
       <main>
         <Container className="pt-4 sm:pt-6">
           {tuning.heroVariant === "editorial" ? <HeroEditorial /> : <HeroCinematic />}
@@ -1544,5 +1550,154 @@ function Toggle({
       </span>
       {label}
     </Button>
+  );
+}
+
+
+/* ------------------------------------------------------------------ *
+ * G7-A · Fixture integrado (PEND-G7-F01)
+ *
+ * Monta los COMPONENTES PRODUCTIVOS reales — sin imitaciones, sin
+ * persistencia, sin funciones de escritura y sin duplicar componentes —
+ * para acreditar juntos `vmx.hero` (editorial-split),
+ * `vmx.discovery.navigator` (bordados aprobados con curaduría manual),
+ * `vmx.alux.planner` y `vmx.section.rutas`.
+ * Los datos son literales locales usados exclusivamente como props.
+ * ------------------------------------------------------------------ */
+
+const G7_NAVIGATOR_DATA: DiscoveryNavigatorDTO = {
+  scope: { kind: "destination", slug: "valladolid", label: "Valladolid" },
+  categories: [
+    { slug: "hoteles", label: "Hoteles", count: 39, href: "/hoteles?destino=valladolid" },
+    { slug: "cenotes", label: "Cenotes", count: 14, href: "/cenotes?destino=valladolid" },
+    {
+      slug: "restaurantes",
+      label: "Restaurantes",
+      count: 30,
+      href: "/restaurantes?destino=valladolid",
+    },
+    {
+      slug: "experiencias",
+      label: "Experiencias",
+      count: 10,
+      href: "/experiencias?destino=valladolid",
+    },
+    {
+      slug: "zonas-arqueologicas",
+      label: "Zonas arqueológicas",
+      count: 4,
+      href: "/zonas-arqueologicas?destino=valladolid",
+    },
+    {
+      slug: "gastronomia",
+      label: "Gastronomía",
+      count: 18,
+      href: "/gastronomia?destino=valladolid",
+    },
+    { slug: "cultura", label: "Cultura", count: 9, href: "/cultura?destino=valladolid" },
+    { slug: "artesanias", label: "Artesanías", count: 12, href: "/artesanias?destino=valladolid" },
+    { slug: "eventos", label: "Eventos", count: 6, href: "/eventos?destino=valladolid" },
+    {
+      slug: "vida-nocturna",
+      label: "Vida nocturna",
+      count: 5,
+      href: "/vida-nocturna?destino=valladolid",
+    },
+  ],
+  extensions: [],
+};
+
+/** Orden manual gobernado (incluye un slug inexistente: fail-closed). */
+const G7_NAVIGATOR_ORDER = [
+  { slug: "cenotes" },
+  { slug: "hoteles" },
+  { slug: "gastronomia" },
+  { slug: "zonas-arqueologicas" },
+  { slug: "experiencias" },
+  { slug: "artesanias" },
+  { slug: "cultura" },
+  { slug: "restaurantes" },
+  { slug: "categoria-inexistente" },
+];
+
+function G7IntegratedFixture() {
+  return (
+    <section data-g7-fixture="integrated" className="overflow-x-clip border-b border-border">
+      <div className="border-y border-border bg-muted/40 px-4 py-2 text-center text-xs text-muted-foreground">
+        G7-A · Fixture integrado de capacidades premium — componentes productivos, sin persistencia.
+      </div>
+
+      <Hero
+        config={{
+          variant: "editorial-split",
+          media_side: "right",
+          mobile_order: "media-first",
+          text_safe_zone: "lg",
+          eyebrow: "Despierta en Valladolid",
+          title: "El Oriente Maya, contado como una historia editorial.",
+          subtitle:
+            "Cenotes, haciendas y cocina de humo a media hora del centro histórico de Valladolid.",
+          background_images: [MEDIA.centro.url, MEDIA.calle.url],
+          cta_label: "Arma tu viaje",
+          cta_href: "/arma-tu-viaje",
+          cta_secondary_label: "Explorar Valladolid",
+          cta_secondary_href: "/oriente-maya/valladolid",
+          show_search: false,
+        }}
+      />
+
+      <Container className="py-10">
+        <DiscoveryNavigatorBlock
+          config={{
+            title: "Explora Valladolid",
+            variant: "grid",
+            scope: "destination",
+            manualDestinationSlug: "valladolid",
+            categorySlugs: G7_NAVIGATOR_ORDER,
+            hiddenSlugs: [{ slug: "restaurantes" }],
+            maxItems: 8,
+            ctaLabel: "Ver todo lo que ofrece Valladolid",
+            ctaHref: "/oriente-maya/valladolid",
+          }}
+          previewData={G7_NAVIGATOR_DATA}
+        />
+      </Container>
+
+      <AluxPlannerBlock
+        config={{
+          variant: "editorial",
+          eyebrow: "Alux · copiloto de viaje",
+          heading: "Cuéntame tu viaje y lo armamos juntos.",
+          subheading:
+            "Vista previa visual: la conversación real ocurre en Arma tu viaje, sin guardar nada aquí.",
+          cta_label: "Arma tu viaje",
+          cta_href: "/arma-tu-viaje",
+          show_prompts: true,
+          prompts: [
+            { label: "Tengo medio día" },
+            { label: "Viajo con niños" },
+            { label: "Quiero cenotes tranquilos" },
+            { label: "Cocina yucateca auténtica" },
+          ],
+        }}
+      />
+
+      <RutasSection
+        config={{
+          heading: "Rutas sugeridas",
+          subheading: "Curaduría manual gobernada desde el constructor.",
+          source: "manual",
+          route_slugs: [
+            { slug: "valladolid-ek-balam" },
+            { slug: "pueblos-coloniales" },
+            { slug: "costa-rosada" },
+            { slug: "ruta-inexistente" },
+          ],
+          max_items: 3,
+          columns: "3",
+          show_stops: true,
+        }}
+      />
+    </section>
   );
 }
