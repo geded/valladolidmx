@@ -1499,7 +1499,7 @@ const productRelatedBlock = productBlock(
 const discoveryNavigatorBlock: BlockContract = {
   type: "vmx.discovery.navigator",
   category: "static",
-  version: "1.0.0",
+  version: "1.1.0",
   display_name: "Discovery Navigator",
   description:
     "Centro de descubrimiento territorial. Muestra las categorías disponibles del destino con conteos dinámicos y las conecta con las superficies del portal.",
@@ -1558,6 +1558,37 @@ const discoveryNavigatorBlock: BlockContract = {
     manualRegionSlug: {
       type: "text",
       label: "Slug de región (manual)",
+    },
+    categorySlugs: {
+      type: "list",
+      label: "Categorías seleccionadas (en orden)",
+      description:
+        "Curaduría manual opcional. Si la dejas vacía se conserva la derivación automática del destino. Un slug desconocido se descarta (fail-closed).",
+      default: [],
+      item: {
+        type: "object",
+        label: "Categoría",
+        fields: {
+          slug: { type: "text", label: "Slug de la categoría" },
+        },
+      },
+    },
+    hiddenSlugs: {
+      type: "list",
+      label: "Categorías ocultas",
+      description: "Se ocultan tanto en modo automático como en curaduría manual.",
+      default: [],
+      item: {
+        type: "object",
+        label: "Categoría",
+        fields: {
+          slug: { type: "text", label: "Slug de la categoría" },
+        },
+      },
+    },
+    maxItems: {
+      type: "number",
+      label: "Máximo de categorías visibles",
     },
   },
   capabilities: {
