@@ -27,12 +27,13 @@ export function NaturalezaGlyph({ primary, secondary, textile }: CategoryGlyphPr
       <path d="M12 19.6 8.2 21.4M12 19.6v1.9M12 19.6l3.8 1.8" strokeWidth="1.6" />
       {textile ? (
         <g data-layer="textile" opacity="0.75">
-          {/* Acento textil subordinado bajo la copa */}
+          {/* Acento textil subordinado bajo la copa, flanqueando el tronco */}
           <path
-            d="M8.2 12.6h1.5l.8-1.1.8 1.1h1.5l.8-1.1.8 1.1h1.4"
+            d="M7.8 12.9h1.2l.8-1.1.8 1.1h.4M13 12.9h.4l.8-1.1.8 1.1h1.2"
             stroke={secondary}
             strokeWidth="1"
           />
+
         </g>
       ) : null}
     </g>
