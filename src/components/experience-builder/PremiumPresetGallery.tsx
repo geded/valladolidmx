@@ -194,12 +194,13 @@ function PresetDraftModal({
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-background">
       <header className="flex items-center gap-3 border-b border-border px-4 py-2">
-        <div className="min-w-0">
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
+        <div className="min-w-0 flex-1">
+          <p className="hidden truncate text-[10px] font-medium uppercase tracking-[0.18em] text-primary sm:block">
             Borrador local · no publicado
           </p>
           <h3 className="truncate text-sm font-semibold">{preset.name}</h3>
         </div>
+
         {/* G8-E2 · OBS-G8E1-02 — control de preview del chrome público. */}
         <div
           role="group"
