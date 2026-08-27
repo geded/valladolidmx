@@ -76,3 +76,42 @@ assert.match(wrapper, /fail-closed/);
 assert.match(wrapper, /spaceCredited/);
 
 console.log("G6-S1 category icon system contract: PASS");
+
+// 7 · G6-S1-A · D-G6-01 — Ceiba/ya’axché alternativa B (copa escalonada)
+const ceiba = readFileSync(resolve("src/components/omxds/icons/naturaleza.tsx"), "utf8");
+assert.match(ceiba, /M8\.5 5\.4h7/, "falta el nivel superior de copa (7 u)");
+assert.match(ceiba, /M6 7\.6h12/, "falta el nivel medio de copa (12 u)");
+assert.match(ceiba, /M4 9\.8h16/, "falta el nivel inferior de copa (16 u)");
+assert.doesNotMatch(ceiba, /<(ellipse|circle)/, "la copa no puede ser ovalada ni circular");
+assert.match(ceiba, /M12 10\.2v9\.4/, "falta el tronco central continuo");
+assert.match(ceiba, /M12 19\.6 8\.2 21\.4M12 19\.6v1\.9M12 19\.6l3\.8 1\.8/, "faltan 3 raíces");
+
+// 8 · G6-S1-A · D-G6-02 — Área táctil real ≥ 44×44 px en los controles reales
+const touchSurfaces = [
+  "src/components/omxds/CategoryNavGrid.tsx",
+  "src/components/cards/CategoriaCard.tsx",
+  "src/components/discovery/InlineCategoryExplorer.tsx",
+];
+for (const file of touchSurfaces) {
+  const source = readFileSync(resolve(file), "utf8");
+  assert.match(source, /min-h-\[44px\]/, `sin garantía de alto táctil real: ${file}`);
+  assert.match(source, /min-w-\[44px\]/, `sin garantía de ancho táctil real: ${file}`);
+  assert.match(source, /data-omxds-touch-target="44"/, `sin instrumentación táctil: ${file}`);
+}
+// El wrapper de iconografía no introduce interactividad anidada.
+assert.doesNotMatch(wrapper, /<button|<a\s|role="button"|tabIndex/, "wrapper con interactividad");
+assert.match(wrapper, /data-omxds-icon-size/, "wrapper sin instrumentación de tamaño");
+
+// 9 · G6-S1-A · D-G6-03 — Fixtures locales que montan componentes reales
+const catalog = readFileSync(resolve("src/routes/lovable/g6-category-icon-catalog.tsx"), "utf8");
+for (const id of ["fixture-s1", "fixture-s2", "fixture-s3"]) {
+  assert.match(catalog, new RegExp(`id="${id}"`), `falta el fixture #${id}`);
+}
+assert.match(catalog, /<DiscoveryNavigator\b/, "S1 debe montar DiscoveryNavigator real");
+assert.match(catalog, /<DiscoveryNavigatorBlock\b/, "S2 debe montar el bloque real");
+assert.match(catalog, /previewData=\{/, "S2 debe usar previewData literal");
+assert.match(catalog, /<CategoriaCard\b/, "S3 debe montar CategoriaCard real");
+assert.match(catalog, /CATEGORIAS_MOCK/, "S3 debe usar CATEGORIAS_MOCK");
+assert.doesNotMatch(catalog, /supabase/i, "los fixtures no pueden usar backend");
+
+console.log("G6-S1-A remediation contract: PASS");

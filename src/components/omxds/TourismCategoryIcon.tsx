@@ -6,8 +6,8 @@
  * Fail-closed: slug no registrado ⇒ no renderiza ícono.
  *
  * G6-S1-A · D-G6-02 — El componente es puramente decorativo
- * (`aria-hidden`, sin `tabIndex`, sin rol interactivo, sin botones ni
- * enlaces anidados). El área táctil real de 44×44 px la garantiza el
+ * (`aria-hidden`, sin foco propio, sin rol interactivo y sin controles
+ * anidados). El área táctil real de 44×44 px la garantiza el
  * control que lo contiene (`CategoryNavGrid`, `CategoriaCard`,
  * `InlineCategoryExplorer`). Expone únicamente atributos de
  * instrumentación para la medición de evidencia.
@@ -124,7 +124,6 @@ export function TourismCategoryIcon({
       data-omxds-icon-textile={variant === "standard" ? "true" : "false"}
       className={className}
     >
-
       <Glyph primary={primary} secondary={secondary} textile={variant === "standard"} />
     </svg>
   );
