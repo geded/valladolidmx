@@ -1,0 +1,17 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-K",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORSHIP-PARITY-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-27 · AUTORIZACIÓN FOUNDER · FAST TRACK DE PLANTILLAS PREMIUM APROBADAS (G8-E) y su cierre técnico G8-E1. Autoriza exclusivamente reconciliar de forma append-only el digest acreditado de src/lib/experience-builder/route-inventory.ts derivado del alta de la ruta interna no indexable de catálogo de presets premium. No autoriza cambios en rutas públicas, publicación, datos, migraciones ni flags.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "8997ddc18516787736a61ea4e823ae3d143ca03e9839bf8aa6c0b62651687177",
+    "current_sha256": "344f93723e8d2385448892797fe9c6d7c54e1cd5c5b35c41075fee3636dfe95c",
+    "semantic_change": "G8-E · Alta en SCANNED_ROUTE_FILES de la ruta interna no indexable src/routes/lovable/g8e-premium-template-catalog.tsx, catálogo de evidencia de los 8 presets premium renderizados por el CompositionRenderer. Cobertura verificada: 202 rutas. Cero cambio en rutas públicas, backend, datos, storage, migraciones, publicación y flags; omxds_visual_v1_contracts_enabled permanece en false.",
+    "authority": "PCA-2026-029/PCA-2026-039"
+  },
+  "invariants": ["omxds_visual_v1_contracts_enabled=false"],
+  "recorded_at": "2026-08-27"
+}
