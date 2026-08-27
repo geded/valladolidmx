@@ -80,6 +80,13 @@ export function CategoryNavGrid({
                 variant={variant}
                 spaceCredited={spaceCredited}
                 scheme={scheme}
+                /* G8-E2 · OBS-G8E1-03 — glifo bordado 40 px en móvil,
+                   44 px en tablet y 48 px en escritorio, sin deformar. */
+                className={
+                  variant === "standard"
+                    ? "size-10 shrink-0 object-contain md:size-11 lg:size-12"
+                    : undefined
+                }
               />
             ) : null}
             <span className="min-w-0 text-center">

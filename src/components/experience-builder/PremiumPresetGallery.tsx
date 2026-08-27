@@ -15,6 +15,7 @@
  */
 import { useMemo, useState } from "react";
 import { ExternalLink, Image as ImageIcon, X } from "lucide-react";
+import { PublicHeader, PublicFooter } from "@/components/discovery";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import type { CompositionTree } from "@/lib/experience-builder/composition-tree";
 import { getBlock } from "@/lib/experience-builder/block-registry";
@@ -184,6 +185,7 @@ function PresetDraftModal({
   onClose: () => void;
 }) {
   const [config, setConfig] = useState<Cfg>(() => preset.defaultConfig());
+  const [previewMode, setPreviewMode] = useState<"full" | "content">("full");
   const fields = useMemo(() => editableFields(preset.blockType), [preset.blockType]);
   const tree = useMemo(() => buildTree(preset, config), [preset, config]);
   const setField = (key: string, value: unknown) =>
@@ -192,25 +194,75 @@ function PresetDraftModal({
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-background">
       <header className="flex items-center gap-3 border-b border-border px-4 py-2">
-        <div className="min-w-0">
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
+        <div className="min-w-0 flex-1">
+          <p className="hidden truncate text-[10px] font-medium uppercase tracking-[0.18em] text-primary sm:block">
             Borrador local · no publicado
           </p>
           <h3 className="truncate text-sm font-semibold">{preset.name}</h3>
+        </div>
+
+        {/* G8-E2 · OBS-G8E1-02 — control de preview del chrome público. */}
+        <div
+          role="group"
+          aria-label="Modo de vista previa"
+          className="ml-auto flex shrink-0 items-center gap-1 rounded-pill border border-border p-1"
+        >
+          {(
+            [
+              ["full", "Página completa"],
+              ["content", "Sólo contenido"],
+            ] as const
+          ).map(([mode, label]) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setPreviewMode(mode)}
+              aria-pressed={previewMode === mode}
+              className={[
+                "inline-flex min-h-11 items-center rounded-pill px-3 text-[11px] font-medium",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                previewMode === mode
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-accent",
+              ].join(" ")}
+            >
+              {label}
+            </button>
+          ))}
         </div>
         <button
           type="button"
           onClick={onClose}
           aria-label="Cerrar borrador"
-          className="ml-auto rounded-full p-2 text-muted-foreground hover:bg-accent hover:text-foreground"
+          /* G8-E2 · OBS-G8E1-01 — área táctil real de 44×44 px. */
+          className="inline-grid min-h-11 min-w-11 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <X className="size-4" aria-hidden />
         </button>
       </header>
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <div className="min-h-0 flex-1 overflow-auto bg-muted/40">
-          <CompositionRenderer tree={tree} />
+          {previewMode === "full" ? (
+            /*
+             * G8-E2 · OBS-G8E1-02 — chrome público real (Header/Footer) en modo
+             * inerte: se ve la página completa, pero sus enlaces y acciones no
+             * navegan ni tocan el borrador local. No son bloques ni se duplican;
+             * el chrome de Studio vive fuera de este contenedor.
+             */
+            <div data-studio-draft-chrome="public-inert">
+              <div inert>
+                <PublicHeader variant="solid" />
+              </div>
+              <CompositionRenderer tree={tree} />
+              <div inert>
+                <PublicFooter />
+              </div>
+            </div>
+          ) : (
+            <CompositionRenderer tree={tree} />
+          )}
         </div>
+
         <aside className="max-h-[45vh] w-full shrink-0 overflow-auto border-t border-border bg-card p-4 lg:max-h-none lg:w-80 lg:border-l lg:border-t-0">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Contenido editable
