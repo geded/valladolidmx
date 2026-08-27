@@ -31,6 +31,10 @@ import { CategoriasSection } from "@/components/home/CategoriasSection";
 import { RutasSection } from "@/components/home/RutasSection";
 import { AluxPlannerBlock } from "@/components/experience-builder/blocks/alux-planner/AluxPlannerBlock";
 import { HomePremiumSurface } from "@/components/home-premium/HomePremiumSurface";
+import { DestinationPremiumSurface } from "@/components/destination-premium/DestinationPremiumSurface";
+import { resolveDestinationPremiumG4 } from "@/components/destination-premium/destination-premium-config";
+import { ListingPremiumSurface } from "@/components/listing-premium/ListingPremiumSurface";
+import { resolveListingPremiumG5 } from "@/components/listing-premium/listing-premium-config";
 import { resolveHomePremiumG4 } from "@/components/home-premium/home-premium-config";
 import { ConsejoAluxSection } from "@/components/home/ConsejoAluxSection";
 import { ArmaTuViajeSection } from "@/components/home/ArmaTuViajeSection";
@@ -416,6 +420,42 @@ function HomePremiumG4Render({ node }: BlockPreviewProps): ReactNode {
   );
 }
 
+/**
+ * G8-E · `vmx.destination.premium-g4` — render único (Studio, preview y
+ * producción). Autoridad visual: `DestinationPremiumSurface`.
+ */
+function DestinationPremiumG4Render({ node }: BlockPreviewProps): ReactNode {
+  const resolved = resolveDestinationPremiumG4(node.config as Record<string, unknown>);
+  return (
+    <DestinationPremiumSurface
+      content={resolved.content}
+      heroVariant={resolved.heroVariant}
+      galleryLayout={resolved.galleryLayout}
+      sections={resolved.sections}
+    />
+  );
+}
+
+/**
+ * G8-E · `vmx.listing.premium-g5` — render único de los 6 listados
+ * turísticos. Autoridad visual: `TourismListingSurface`.
+ */
+function ListingPremiumG5Render({ node }: BlockPreviewProps): ReactNode {
+  const resolved = resolveListingPremiumG5(node.config as Record<string, unknown>);
+  return (
+    <ListingPremiumSurface
+      hero={resolved.hero}
+      items={resolved.items}
+      columns={resolved.columns}
+      destinationSlug={resolved.destinationSlug}
+      destinationLabel={resolved.destinationLabel}
+      emptyMessage={resolved.emptyMessage}
+      showAddToTrip={resolved.showAddToTrip}
+      showFavorite={resolved.showFavorite}
+    />
+  );
+}
+
 function StudioErrorBlock({ title, detail }: { title: string; detail: string }): ReactNode {
   return (
     <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm">
@@ -437,6 +477,8 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.alux.planner": NamedSectionPreview,
   // G8-D · la preview de Studio usa el MISMO componente que producción.
   "vmx.home.premium-g4": HomePremiumG4Render,
+  "vmx.destination.premium-g4": DestinationPremiumG4Render,
+  "vmx.listing.premium-g5": ListingPremiumG5Render,
   "vmx.section.consejo-alux": NamedSectionPreview,
   "vmx.section.arma-tu-viaje": NamedSectionPreview,
   "vmx.section.en-vivo": NamedSectionPreview,
@@ -620,6 +662,8 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   // G8-D · Home Premium G4: cuerpo premium únicamente. El chrome global
   // (ribbon/header/footer) lo aporta el shell público o el canvas.
   "vmx.home.premium-g4": HomePremiumG4Render,
+  "vmx.destination.premium-g4": DestinationPremiumG4Render,
+  "vmx.listing.premium-g5": ListingPremiumG5Render,
   "vmx.section.consejo-alux": wrap(ConsejoAluxSection),
   "vmx.section.arma-tu-viaje": wrap(ArmaTuViajeSection),
   "vmx.section.en-vivo": wrap(EnVivoSection),

@@ -16,6 +16,8 @@
 
 import { ALUX_PLANNER_DEFAULTS } from "@/lib/experience-builder/blocks/alux-planner/contract";
 import { homePremiumG4Block } from "@/lib/experience-builder/blocks/home-premium-g4/contract";
+import { destinationPremiumG4Block } from "@/lib/experience-builder/blocks/destination-premium-g4/contract";
+import { listingPremiumG5Block } from "@/lib/experience-builder/blocks/listing-premium-g5/contract";
 import { registerBlock } from "./block-registry";
 import type { BlockContract } from "./block-contract";
 import { KIT_BLOCK_CONTRACTS } from "./kit-blocks";
@@ -2947,6 +2949,9 @@ const INITIAL_BLOCK_LIBRARY_SOURCE: BlockContract[] = [
   aluxPlannerBlock,
   // G8-D · Plantilla compuesta oficial de la Home Premium G4.
   homePremiumG4Block,
+  // G8-E · Fast Track de plantillas premium aprobadas.
+  destinationPremiumG4Block,
+  listingPremiumG5Block,
 ];
 
 /** I4-A: proyecta metadata de la única policy sobre los contratos runtime. */
