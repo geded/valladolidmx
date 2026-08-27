@@ -44,10 +44,6 @@ export const Route = createFileRoute("/lovable/g8d-premium-parity")({
 
 const TREE: CompositionTree = {
   root: {
-    id: "root",
-    type: "vmx.layout.container",
-    version: "1.0.0",
-    config: {},
     children: [
       {
         id: "home-premium-g4",
