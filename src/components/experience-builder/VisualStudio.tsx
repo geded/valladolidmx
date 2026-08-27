@@ -2709,7 +2709,8 @@ function HomeCanvas({
       const el = outerRef.current;
       if (!el) return;
       const width = Math.max(120, el.clientWidth - 24);
-      const height = Math.max(240, el.clientHeight - 24);
+      // 24px de padding + 32px reservados para la barra indicadora del canvas.
+      const height = Math.max(240, el.clientHeight - 24 - 32);
       setAvailable((current) =>
         Math.abs(current.width - width) > 1 || Math.abs(current.height - height) > 1
           ? { width, height }
