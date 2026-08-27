@@ -2904,30 +2904,45 @@ function CanvasViewport({
     };
   }, [hud, mount, width]);
 
+  const scaled = Math.min(1, Math.max(0.2, scale));
   return (
-    <div
-      className="relative mx-auto shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
-      style={{ width, height }}
-    >
-      <iframe
-        ref={iframeRef}
-        title="Vista previa del canvas"
-        data-eb-canvas-device={device}
-        data-eb-canvas-width={width}
-        className="block border-0 bg-background"
-        style={{ width, height }}
-      />
-      {mount ? createPortal(children, mount) : null}
-      {hud && metrics ? (
-        <div
-          data-eb-canvas-hud=""
-          className="pointer-events-none absolute bottom-2 left-1/2 z-50 -translate-x-1/2 rounded-md bg-foreground/90 px-3 py-1.5 font-mono text-[11px] leading-tight text-background shadow-lg"
-        >
-          innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
-          {metrics.headerPosition} top {metrics.headerTop}px ·{" "}
-          {metrics.headerVisible ? "visible" : "OCULTO"} · scrollY {metrics.scrollY}px
-        </div>
-      ) : null}
+    <div className="flex min-h-0 min-w-0 flex-col items-center gap-1.5">
+      <div
+        data-eb-canvas-indicator=""
+        className="flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-0.5 rounded-md bg-foreground/85 px-2 py-0.5 font-mono text-[10px] leading-tight text-background"
+      >
+        <span>{presetLabel}</span>
+        <span>{scaled < 1 ? `escala ${Math.round(scaled * 100)}%` : "escala 100%"}</span>
+        {hud && metrics ? (
+          <span data-eb-canvas-hud="">
+            innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
+            {metrics.headerPosition} top {metrics.headerTop}px ·{" "}
+            {metrics.headerVisible ? "visible" : "OCULTO"} · scrollY {metrics.scrollY}px
+          </span>
+        ) : null}
+      </div>
+      <div
+        data-eb-canvas-frame=""
+        className="relative shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
+        style={{ width: Math.round(width * scaled), height: Math.round(height * scaled) }}
+      >
+        <iframe
+          ref={iframeRef}
+          title="Vista previa del canvas"
+          data-eb-canvas-device={device}
+          data-eb-canvas-width={width}
+          data-eb-canvas-height={height}
+          data-eb-canvas-scale={scaled}
+          className="block border-0 bg-background"
+          style={{
+            width,
+            height,
+            transform: `scale(${scaled})`,
+            transformOrigin: "top left",
+          }}
+        />
+        {mount ? createPortal(children, mount) : null}
+      </div>
     </div>
   );
 }
