@@ -26,6 +26,12 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
+import {
+  HomePremiumFooter,
+  HomePremiumHeader,
+  HomePremiumRibbon,
+  HomePremiumSurface,
+} from "@/components/home-premium/HomePremiumSurface";
 import { cn } from "@/lib/utils";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { PremiumPresentationControl } from "@/components/premium";
