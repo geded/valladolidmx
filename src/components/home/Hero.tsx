@@ -73,6 +73,19 @@ export interface HeroConfig {
   search_size?: string;
   /** "sm" | "md" | "lg" | "xl" | "full" */
   search_max_width?: string;
+  /**
+   * G7 · Variante gobernada del Hero. `undefined` o `"cinematic"` conservan
+   * exactamente el comportamiento histórico (fondo a sangre + overlay).
+   * `"editorial-split"` activa la composición editorial en dos columnas.
+   * La familia `vmx.hero` NUNCA se duplica: crece sólo por variante.
+   */
+  variant?: string;
+  /** editorial-split · orden en móvil: "media-first" (default) o "text-first". */
+  mobile_order?: string;
+  /** editorial-split · zona segura del texto: "sm" | "md" | "lg". */
+  text_safe_zone?: string;
+  /** editorial-split · lado del panel de medios en escritorio: "left" | "right". */
+  media_side?: string;
   /** Overrides tipográficos por campo, guardados por el Experience Builder. */
   __typography?: Record<string, FieldTypography>;
 }
