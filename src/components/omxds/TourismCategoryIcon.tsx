@@ -119,8 +119,12 @@ export function TourismCategoryIcon({
       focusable="false"
       data-omxds-category-icon={entry.slug}
       data-variant={variant}
+      data-omxds-icon-size={px}
+      data-omxds-icon-scheme={monochrome ? "monochrome" : scheme}
+      data-omxds-icon-textile={variant === "standard" ? "true" : "false"}
       className={className}
     >
+
       <Glyph primary={primary} secondary={secondary} textile={variant === "standard"} />
     </svg>
   );
