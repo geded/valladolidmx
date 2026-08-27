@@ -96,6 +96,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       )
         return;
       setSession(s);
+      // Marca identidad en vuelo de inmediato: los consumidores no deben
+      // decidir rol/destino con los roles del estado anterior.
+      if (s?.user) setIdentityLoading(true);
       // No await: defer to microtask to avoid deadlocks
       setTimeout(() => {
         void loadIdentity(s?.user.id ?? null);
