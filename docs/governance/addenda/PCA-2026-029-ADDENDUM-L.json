@@ -8,7 +8,7 @@
     {
       "operation": "modify",
       "path": "src/components/experience-builder/PremiumPresetGallery.tsx",
-      "current_sha256": "8e5398e91e5983c48cd3db40fb339543759916e3844a8e0ef8c2d764b63b4f00",
+      "current_sha256": "d46ff12d3665a2490f9b21bd356266c572d5dd3e76013d2c4113ed1a7ef47ef3",
       "semantic_change": "G8-E2 · OBS-G8E1-01 y OBS-G8E1-02: control de cierre con area tactil min-h-11/min-w-11 y anillo de foco visible; chrome publico canonico (PublicHeader/PublicFooter) renderizado en contenedores inert dentro del borrador local, con control de preview Pagina completa / Solo contenido (default Pagina completa). Cero escrituras, cero publicacion, cero cambios de contenido o presets.",
       "authority": "PCA-2026-029/PCA-2026-039"
     },
@@ -25,6 +25,8 @@
     "reason": "Reconciliacion append-only de la proyeccion generada tras G8-E2 y tras las correcciones autorizadas previas de sesion (src/hooks/useAuth.tsx y migraciones de correccion de concierge_case_file_v1).",
     "generator": "scripts/governance/generate-artifact-inventory.mjs"
   },
-  "invariants": ["omxds_visual_v1_contracts_enabled=false"],
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
   "recorded_at": "2026-08-27"
 }
