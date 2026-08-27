@@ -2497,19 +2497,75 @@ function SharePreviewModal({
 
 const HOME_CANVAS_WIDTH = 1280;
 
-/** Anchos de canvas por dispositivo (px CSS reales, no escalados). */
-export type DeviceViewport = "mobile" | "tablet" | "desktop" | "w1024" | "w1440";
-const DEVICE_WIDTHS: Record<DeviceViewport, number> = {
-  mobile: 390,
-  tablet: 768,
-  desktop: 1280,
-  w1024: 1024,
-  w1440: 1440,
-};
+/**
+ * G7-C · Presets exactos del canvas (ancho y alto lógicos del dispositivo).
+ * El iframe siempre recibe estas medidas lógicas; cuando el editor dispone de
+ * menos espacio se aplica una escala visual externa que NO altera container
+ * queries, breakpoints ni medidas internas del documento aislado.
+ */
+export type DeviceViewport =
+  | "mobile"
+  | "mobile430"
+  | "tablet"
+  | "w1024"
+  | "desktop"
+  | "w1440";
+
+export interface DevicePreset {
+  id: DeviceViewport;
+  width: number;
+  height: number;
+  short: string;
+  label: string;
+}
+
+const DEVICE_PRESETS: readonly DevicePreset[] = [
+  { id: "mobile", width: 390, height: 844, short: "390", label: "Móvil · 390 × 844" },
+  { id: "mobile430", width: 430, height: 932, short: "430", label: "Móvil grande · 430 × 932" },
+  { id: "tablet", width: 768, height: 1024, short: "768", label: "Tablet · 768 × 1024" },
+  { id: "w1024", width: 1024, height: 1366, short: "1024", label: "iPad Pro · 1024 × 1366" },
+  { id: "desktop", width: 1280, height: 800, short: "1280", label: "Escritorio · 1280 × 800" },
+  { id: "w1440", width: 1440, height: 900, short: "1440", label: "Escritorio amplio · 1440 × 900" },
+] as const;
+
+const DEVICE_PRESET_BY_ID = new Map<DeviceViewport, DevicePreset>(
+  DEVICE_PRESETS.map((preset) => [preset.id, preset]),
+);
+
+const DEVICE_WIDTHS: Record<DeviceViewport, number> = Object.fromEntries(
+  DEVICE_PRESETS.map((preset) => [preset.id, preset.width]),
+) as Record<DeviceViewport, number>;
+
+function getDevicePreset(id: DeviceViewport): DevicePreset {
+  return DEVICE_PRESET_BY_ID.get(id) ?? DEVICE_PRESETS[0];
+}
 
 function isDeviceViewport(value: unknown): value is DeviceViewport {
-  return typeof value === "string" && value in DEVICE_WIDTHS;
+  return typeof value === "string" && DEVICE_PRESET_BY_ID.has(value as DeviceViewport);
 }
+
+/**
+ * G7-C · Variante determinista del encabezado dentro del canvas.
+ *
+ * overlay  → el primer bloque visible es un Hero cinematográfico (full-bleed)
+ *            con al menos un medio válido.
+ * solid    → Hero editorial dividido, Hero sin medio, primer bloque no Hero
+ *            o estado desconocido (fail-closed).
+ */
+export function resolveCanvasHeaderVariant(tree: CompositionTree | null | undefined): "overlay" | "solid" {
+  const first = tree?.root?.children?.find((node) => !node.hidden);
+  if (!first || first.type !== "vmx.hero") return "solid";
+  const config = (first.config ?? {}) as Record<string, unknown>;
+  const variant = typeof config.variant === "string" ? config.variant : "cinematic";
+  if (variant !== "cinematic") return "solid";
+  const media = Array.isArray(config.background_images) ? config.background_images : [];
+  const hasMedia = media.some((item) => {
+    const src = (item as { src?: unknown } | null)?.src;
+    return typeof src === "string" && src.trim() !== "";
+  });
+  return hasMedia ? "overlay" : "solid";
+}
+
 
 /**
  * Anchos exactos de auditoría (G3-H03 = 1024 px, G3-H04 = 1440 px).
