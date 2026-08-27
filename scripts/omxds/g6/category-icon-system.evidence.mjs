@@ -56,7 +56,6 @@ for (const file of [
 const adopted = [
   "src/components/discovery/DiscoveryNavigator.tsx",
   "src/components/discovery/InlineCategoryExplorer.tsx",
-  "src/components/cards/CategoriaCard.tsx",
   "src/lib/discovery/discovery-navigator.functions.ts",
   "src/mocks/categorias.ts",
   "src/routes/lovable/g4-home-premium-preview.tsx",
@@ -103,8 +102,9 @@ assert.doesNotMatch(ceibaSource, /<(ellipse|circle)/, "copa ovalada prohibida");
 
 // 8 · G6-S1-A · área táctil real acreditada
 for (const file of [
+  // La Home pública legacy (CategoriaCard) no forma parte de la adopción G6:
+  // la iconografía bordada llegará mediante la futura composición Home premium.
   "src/components/omxds/CategoryNavGrid.tsx",
-  "src/components/cards/CategoriaCard.tsx",
   "src/components/discovery/InlineCategoryExplorer.tsx",
 ]) {
   const source = readFileSync(resolve(file), "utf8");

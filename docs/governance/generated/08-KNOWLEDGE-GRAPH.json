@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "status": "Approved",
-  "generated_at": "2026-08-26T00:00:00.000Z",
+  "generated_at": "2026-08-27T00:00:00.000Z",
   "derived_from": {
     "glossary": {
       "document": "docs/governance/01-GLOSSARY.md",
@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "8795402662e6471a826dc7b7be9834039de9052ffa64a503be9aa0703295b207"
+      "source_sha256": "3310a2b620895dd2cff75f27c1ba1b038183c8607d6470a94dd292255d33032a"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -11102,6 +11102,37 @@
       "path": "docs/evidence/omxds-g6/category-icons/contrast.tsv",
       "source": "docs/evidence/omxds-g6/category-icons/contrast.tsv",
       "evidence": "docs/evidence/omxds-g6/category-icons/contrast.tsv"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "evidence": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md"
+    },
+    {
+      "id": "ART:src/lib/experience-builder/blocks/alux-planner/contract.ts",
+      "type": "artifact",
+      "path": "src/lib/experience-builder/blocks/alux-planner/contract.ts",
+      "source": "src/lib/experience-builder/blocks/alux-planner/contract.ts",
+      "evidence": "src/lib/experience-builder/blocks/alux-planner/contract.ts"
+    },
+    {
+      "id": "ART:src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx",
+      "type": "artifact",
+      "path": "src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx",
+      "source": "src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx",
+      "evidence": "src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-038.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-038.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-038.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-038.json"
     }
   ],
   "edges": [
@@ -30587,6 +30618,85 @@
       "source_row": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
       "verified_at": "2026-08-26",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/blocks/alux-planner/contract.ts:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/blocks/alux-planner/contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "evidence": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "origin": "ART:src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "evidence": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/home/Hero.tsx:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "origin": "ART:src/components/home/Hero.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "evidence": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/home/RutasSection.tsx:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "origin": "ART:src/components/home/RutasSection.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "evidence": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/block-library.ts:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/block-library.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "evidence": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/composition-renderer.tsx:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/composition-renderer.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "evidence": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-038.json:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-038.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "evidence": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "verified_at": "2026-08-27",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "verified_at": "2026-08-27",
+      "origin": "DOC:docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.57 · docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {

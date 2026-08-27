@@ -1,0 +1,50 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-038",
+  "title": "19.32 · G7 · Premium Builder Capabilities v1.0",
+  "status": "Approved",
+  "branch": "fix/omxds-g6-founder-approved-embroidered-icons-v1",
+  "blueprint": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-27 · Autorización encadenada · Fase B: ampliar el Experience Builder con las tres capacidades premium faltantes identificadas en la matriz de paridad G4: (CAP-03) variante editorial-split de la familia única vmx.hero, (CAP-01) bloque visual vmx.alux.planner sin IA ni persistencia, y (CAP-04) mejora de vmx.section.rutas con selección manual ordenada, límite, columnas y visibilidad de paradas. No autoriza modificar CategoriaCard.tsx, los 22 PNG bordados aprobados ni los glifos lineales huérfanos. No autoriza datos, migraciones, backend, storage, dependencias nuevas, producción, merge, despliegue, activación del flag ni publicación.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/blocks/alux-planner/contract.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home/Hero.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home/RutasSection.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/block-library.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/composition-renderer.tsx"
+    }
+  ],
+  "public_routes": [
+    "/"
+  ],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:g6:s1",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

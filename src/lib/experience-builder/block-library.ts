@@ -14,6 +14,7 @@
  * aquí (Block Marketplace Readiness).
  */
 
+import { ALUX_PLANNER_DEFAULTS } from "@/lib/experience-builder/blocks/alux-planner/contract";
 import { registerBlock } from "./block-registry";
 import type { BlockContract } from "./block-contract";
 import { KIT_BLOCK_CONTRACTS } from "./kit-blocks";
@@ -158,10 +159,49 @@ const dividerBlock: BlockContract = {
 const heroBlock: BlockContract = {
   type: "vmx.hero",
   category: "static",
-  version: "1.2.0",
+  version: "1.3.0",
   display_name: "Hero",
   description: "Bloque hero principal de la Home y de Landing Pages.",
   schema: {
+    variant: {
+      type: "select",
+      label: "Variante del hero",
+      description:
+        "Cinematográfico conserva el hero clásico a sangre. Editorial dividido muestra medios y texto en dos columnas.",
+      default: "cinematic",
+      options: [
+        { value: "cinematic", label: "Cinematográfico (por defecto)" },
+        { value: "editorial-split", label: "Editorial dividido" },
+      ],
+    },
+    media_side: {
+      type: "select",
+      label: "Lado de la imagen (editorial dividido)",
+      default: "right",
+      options: [
+        { value: "right", label: "Derecha (por defecto)" },
+        { value: "left", label: "Izquierda" },
+      ],
+    },
+    mobile_order: {
+      type: "select",
+      label: "Orden en móvil (editorial dividido)",
+      default: "media-first",
+      options: [
+        { value: "media-first", label: "Imagen primero (por defecto)" },
+        { value: "text-first", label: "Texto primero" },
+      ],
+    },
+    text_safe_zone: {
+      type: "select",
+      label: "Zona segura del texto (editorial dividido)",
+      default: "md",
+      options: [
+        { value: "sm", label: "Compacta" },
+        { value: "md", label: "Media (por defecto)" },
+        { value: "lg", label: "Amplia" },
+      ],
+    },
     eyebrow: {
       type: "text",
       label: "Frase superior",
@@ -412,10 +452,59 @@ const categoriasBlock: BlockContract = {
 const rutasBlock: BlockContract = {
   type: "vmx.section.rutas",
   category: "static",
-  version: "1.0.0",
+  version: "1.1.0",
   display_name: "Sección Rutas",
+  description: "Rutas sugeridas. Permite curaduría manual, orden, límite y visibilidad de paradas.",
   schema: {
     heading: { type: "text", label: "Encabezado", translatable: true, default: "Rutas sugeridas" },
+    subheading: {
+      type: "text",
+      label: "Subtítulo",
+      translatable: true,
+      default: "",
+    },
+    source: {
+      type: "select",
+      label: "Origen de las rutas",
+      default: "auto",
+      options: [
+        { value: "auto", label: "Automático (rutas publicadas)" },
+        { value: "manual", label: "Selección manual" },
+      ],
+    },
+    route_slugs: {
+      type: "list",
+      label: "Rutas seleccionadas (en orden)",
+      description: "Sólo aplica cuando el origen es Selección manual.",
+      default: [],
+      item: {
+        type: "object",
+        label: "Ruta",
+        fields: {
+          slug: { type: "text", label: "Slug de la ruta" },
+        },
+      },
+    },
+    max_items: {
+      type: "number",
+      label: "Máximo de rutas",
+      default: 3,
+    },
+    columns: {
+      type: "select",
+      label: "Columnas en escritorio",
+      default: "3",
+      options: [
+        { value: "2", label: "2 columnas" },
+        { value: "3", label: "3 columnas (por defecto)" },
+        { value: "4", label: "4 columnas" },
+      ],
+    },
+    show_stops: {
+      type: "boolean",
+      label: "Mostrar paradas de cada ruta",
+      default: false,
+    },
   },
   capabilities: {
     soporta_i18n: true,
@@ -424,7 +513,8 @@ const rutasBlock: BlockContract = {
     soporta_cache: true,
   },
   constraints: { surfaces: ["home", "landing"] },
-  i18n: { translatable_fields: ["heading"] },
+  i18n: { translatable_fields: ["heading", "subheading"] },
+
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
@@ -2629,6 +2719,113 @@ const experienceMapBlock: BlockContract = {
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
+/**
+ * G7 · `vmx.alux.planner` — Bloque visual del Planificador Alux.
+ * Render-only: no invoca modelos, no persiste estado, no crea planes.
+ */
+const aluxPlannerBlock: BlockContract = {
+  type: "vmx.alux.planner",
+  category: "static",
+  version: "1.0.0",
+  display_name: "Planificador Alux (visual)",
+  description:
+    "Entrada visual al copiloto de viaje. No ejecuta IA ni guarda datos: la conversación real ocurre en Arma tu viaje.",
+  schema: {
+    variant: {
+      type: "select",
+      label: "Variante",
+      default: "editorial",
+      options: [
+        { value: "compact", label: "Compacta" },
+        { value: "editorial", label: "Editorial (por defecto)" },
+        { value: "panel", label: "Panel amplio" },
+      ],
+    },
+    eyebrow: {
+      type: "text",
+      label: "Frase superior",
+      translatable: true,
+      default: ALUX_PLANNER_DEFAULTS.eyebrow ?? "",
+    },
+    heading: {
+      type: "text",
+      label: "Encabezado",
+      required: true,
+      translatable: true,
+      default: ALUX_PLANNER_DEFAULTS.heading,
+    },
+    subheading: {
+      type: "text",
+      label: "Subtítulo",
+      translatable: true,
+      default: ALUX_PLANNER_DEFAULTS.subheading ?? "",
+    },
+    placeholder: {
+      type: "text",
+      label: "Texto de ejemplo del campo",
+      translatable: true,
+      default: ALUX_PLANNER_DEFAULTS.placeholder,
+    },
+    cta_label: {
+      type: "text",
+      label: "Texto del botón",
+      translatable: true,
+      default: ALUX_PLANNER_DEFAULTS.cta_label,
+    },
+    cta_href: {
+      type: "text",
+      label: "Destino del botón",
+      default: ALUX_PLANNER_DEFAULTS.cta_href,
+    },
+    show_prompts: {
+      type: "boolean",
+      label: "Mostrar sugerencias",
+      default: true,
+    },
+    prompts: {
+      type: "list",
+      label: "Sugerencias",
+      default: ALUX_PLANNER_DEFAULTS.prompts.map((p) => ({ label: p.label })),
+      item: {
+        type: "object",
+        label: "Sugerencia",
+        fields: {
+          label: { type: "text", label: "Texto", translatable: true },
+        },
+      },
+    },
+    show_disclaimer: {
+      type: "boolean",
+      label: "Mostrar aviso de vista previa",
+      default: true,
+    },
+    disclaimer: {
+      type: "text",
+      label: "Aviso",
+      translatable: true,
+      default: ALUX_PLANNER_DEFAULTS.disclaimer,
+    },
+  },
+  capabilities: {
+    soporta_i18n: true,
+    soporta_preview: true,
+    soporta_responsive: true,
+    soporta_cache: true,
+  },
+  constraints: { surfaces: ["home", "landing", "destination"] },
+  i18n: {
+    translatable_fields: [
+      "eyebrow",
+      "heading",
+      "subheading",
+      "placeholder",
+      "cta_label",
+      "disclaimer",
+    ],
+  },
+  audit: ["Block.Registered", "Block.VersionPublished"],
+};
+
 const INITIAL_BLOCK_LIBRARY_SOURCE: BlockContract[] = [
   // NOTE: `experienceMapBlock` is appended near the end of this array.
   containerBlock,
@@ -2714,6 +2911,8 @@ const INITIAL_BLOCK_LIBRARY_SOURCE: BlockContract[] = [
   experienceRelatedCollectionBlock,
   // U-VISUAL · V4 — Experience Map (Founder Discovery Map Principle).
   experienceMapBlock,
+  // G7 · Capacidades premium del constructor — Planificador Alux (visual).
+  aluxPlannerBlock,
 ];
 
 /** I4-A: proyecta metadata de la única policy sobre los contratos runtime. */

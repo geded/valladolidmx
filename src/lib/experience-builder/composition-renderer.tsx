@@ -20,10 +20,7 @@ import { getBlock } from "./block-registry";
 import { isContainerBlock } from "./layout-engine";
 import type { CompositionNode, CompositionTree } from "./composition-tree";
 import { bootstrapBlockLibrary } from "./block-library";
-import {
-  resolveVariables,
-  type VariableContext,
-} from "./dynamic-variables";
+import { resolveVariables, type VariableContext } from "./dynamic-variables";
 import { appearanceToStyle, hasAppearance, readAppearance } from "./appearance";
 import { buildScopedTypographyCss, type FieldTypography } from "./typography";
 import { applyI18nToNode } from "./i18n-overlay";
@@ -32,6 +29,7 @@ import { Hero } from "@/components/home/Hero";
 import { DestinosSection } from "@/components/home/DestinosSection";
 import { CategoriasSection } from "@/components/home/CategoriasSection";
 import { RutasSection } from "@/components/home/RutasSection";
+import { AluxPlannerBlock } from "@/components/experience-builder/blocks/alux-planner/AluxPlannerBlock";
 import { ConsejoAluxSection } from "@/components/home/ConsejoAluxSection";
 import { ArmaTuViajeSection } from "@/components/home/ArmaTuViajeSection";
 import { EnVivoSection } from "@/components/home/EnVivoSection";
@@ -217,7 +215,10 @@ function RenderNode({ node, studio, wrap, variableContext }: RenderNodeProps): R
     !studio && locale !== defaultLocale ? applyI18nToNode(node, locale) : node;
   // 2) Resolución de variables dinámicas.
   const resolved: CompositionNode = variableContext
-    ? { ...localized, config: resolveVariables(localized.config, variableContext) as CompositionNode["config"] }
+    ? {
+        ...localized,
+        config: resolveVariables(localized.config, variableContext) as CompositionNode["config"],
+      }
     : localized;
   const content = (
     <Comp
@@ -247,10 +248,9 @@ function RenderNode({ node, studio, wrap, variableContext }: RenderNodeProps): R
   // Aplica overrides visuales (tipografía, tamaño, colores) definidos en el
   // Inspector → `config.__appearance`. Sin overrides no se envuelve nada.
   const appearance = readAppearance(resolved.config);
-  const typoOverrides =
-    (resolved.config as Record<string, unknown>).__typography as
-      | Record<string, FieldTypography>
-      | undefined;
+  const typoOverrides = (resolved.config as Record<string, unknown>).__typography as
+    | Record<string, FieldTypography>
+    | undefined;
   const scopeId = resolved.id;
   const scopedCss = typoOverrides
     ? buildScopedTypographyCss(scopeId, resolved.type, typoOverrides)
@@ -310,8 +310,7 @@ type BlockPreview = (props: BlockPreviewProps) => ReactNode;
 
 function ContainerPreview({ node, renderChildren }: BlockPreviewProps): ReactNode {
   const padding = (node.config.padding as string) ?? "normal";
-  const padClass =
-    padding === "tight" ? "p-3" : padding === "spacious" ? "p-10" : "p-6";
+  const padClass = padding === "tight" ? "p-3" : padding === "spacious" ? "p-10" : "p-6";
   return (
     <div className={`rounded-lg border border-dashed border-border ${padClass}`}>
       {renderChildren ? renderChildren() : null}
@@ -324,19 +323,13 @@ function SectionPreview({ node, renderChildren }: BlockPreviewProps): ReactNode 
   const subheading = (node.config.subheading as string) ?? "";
   const tone = (node.config.tone as string) ?? "default";
   const toneClass =
-    tone === "muted"
-      ? "bg-muted/40"
-      : tone === "accent"
-        ? "bg-primary/5"
-        : "bg-background";
+    tone === "muted" ? "bg-muted/40" : tone === "accent" ? "bg-primary/5" : "bg-background";
   return (
     <section className={`rounded-lg ${toneClass} p-6`}>
       {heading ? (
         <header className="mb-4">
           <h2 className="text-2xl font-semibold">{heading}</h2>
-          {subheading ? (
-            <p className="mt-1 text-sm text-muted-foreground">{subheading}</p>
-          ) : null}
+          {subheading ? <p className="mt-1 text-sm text-muted-foreground">{subheading}</p> : null}
         </header>
       ) : null}
       {renderChildren ? renderChildren() : null}
@@ -359,23 +352,16 @@ function HeroPreview({ node }: BlockPreviewProps): ReactNode {
   const subtitle = (node.config.subtitle as string) ?? "";
   return (
     <div className="rounded-xl bg-primary/10 px-8 py-16 text-center">
-      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-        Hero
-      </p>
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Hero</p>
       <h1 className="mt-3 text-3xl font-semibold">{title}</h1>
       {subtitle ? (
-        <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
-          {subtitle}
-        </p>
+        <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">{subtitle}</p>
       ) : null}
     </div>
   );
 }
 
-function NamedSectionPreview({
-  node,
-  displayName,
-}: BlockPreviewProps): ReactNode {
+function NamedSectionPreview({ node, displayName }: BlockPreviewProps): ReactNode {
   const heading = (node.config.heading as string) ?? displayName;
   return (
     <div className="rounded-lg border border-border bg-card/50 p-6">
@@ -402,27 +388,16 @@ function CardPreview({ node, displayName }: BlockPreviewProps): ReactNode {
   );
 }
 
-function GenericBlockPreview({
-  displayName,
-  renderChildren,
-}: BlockPreviewProps): ReactNode {
+function GenericBlockPreview({ displayName, renderChildren }: BlockPreviewProps): ReactNode {
   return (
     <div className="rounded-md border border-border/60 bg-card/30 p-4 text-sm">
-      <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-        {displayName}
-      </p>
+      <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{displayName}</p>
       {renderChildren ? <div className="mt-3">{renderChildren()}</div> : null}
     </div>
   );
 }
 
-function StudioErrorBlock({
-  title,
-  detail,
-}: {
-  title: string;
-  detail: string;
-}): ReactNode {
+function StudioErrorBlock({ title, detail }: { title: string; detail: string }): ReactNode {
   return (
     <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm">
       <p className="font-semibold text-destructive">{title}</p>
@@ -440,6 +415,7 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.section.destinos": NamedSectionPreview,
   "vmx.section.categorias": NamedSectionPreview,
   "vmx.section.rutas": NamedSectionPreview,
+  "vmx.alux.planner": NamedSectionPreview,
   "vmx.section.consejo-alux": NamedSectionPreview,
   "vmx.section.arma-tu-viaje": NamedSectionPreview,
   "vmx.section.en-vivo": NamedSectionPreview,
@@ -500,25 +476,17 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
 
 // H-02 · Iniciativa 2 — Discovery Navigator (Studio preview neutral).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(STUDIO_PREVIEW_MAP as any)["vmx.discovery.navigator"] = () => (
-  <DiscoveryNavigatorPreview />
-);
+(STUDIO_PREVIEW_MAP as any)["vmx.discovery.navigator"] = () => <DiscoveryNavigatorPreview />;
 
 // H-03 · Ola I1.a — Experience Hero (Studio preview neutral).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(STUDIO_PREVIEW_MAP as any)["vmx.experience.hero"] = () => (
-  <ExperienceHeroPreview />
-);
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.hero"] = () => <ExperienceHeroPreview />;
 
 // H-03 · Ola I1.b — Experience Subnav + CTA Bar (Studio preview neutral).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(STUDIO_PREVIEW_MAP as any)["vmx.experience.subnav"] = () => (
-  <ExperienceSubnavPreview />
-);
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.subnav"] = () => <ExperienceSubnavPreview />;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(STUDIO_PREVIEW_MAP as any)["vmx.experience.cta-bar"] = () => (
-  <ExperienceCtaBarPreview />
-);
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.cta-bar"] = () => <ExperienceCtaBarPreview />;
 
 // H-03 · Ola I1.c — Gallery / Info-Grid / Section / Features (Studio).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -540,10 +508,14 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
 (STUDIO_PREVIEW_MAP as any)["vmx.experience.reviews"] = () => <ExperienceReviewsPreview />;
 // H-03 · Ola I3.b — Experience Related Collection (Studio).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(STUDIO_PREVIEW_MAP as any)["vmx.experience.related-collection"] = () => <ExperienceRelatedCollectionPreview />;
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.related-collection"] = () => (
+  <ExperienceRelatedCollectionPreview />
+);
 // H-03 · Ola I3.c — Institutional Badges (Studio).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(STUDIO_PREVIEW_MAP as any)["vmx.experience.institutional-badges"] = () => <InstitutionalBadgesPreview />;
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.institutional-badges"] = () => (
+  <InstitutionalBadgesPreview />
+);
 
 /* ------------------------------------------------------------------ *
  * Mapa de producción (Etapa 15.10.3)
@@ -555,9 +527,9 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
  * todavía no migrados caen al preview neutral.
  * ------------------------------------------------------------------ */
 
-const wrap = (Component: (props?: { config?: Record<string, unknown> }) => ReactNode): BlockPreview => ({ node }) => (
-  <Component config={node.config as Record<string, unknown>} />
-);
+const wrap =
+  (Component: (props?: { config?: Record<string, unknown> }) => ReactNode): BlockPreview =>
+  ({ node }) => <Component config={node.config as Record<string, unknown>} />;
 
 const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.hero": ({ node }) => {
@@ -622,6 +594,8 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.section.destinos": wrap(DestinosSection),
   "vmx.section.categorias": wrap(CategoriasSection),
   "vmx.section.rutas": wrap(RutasSection),
+  // G7 · Planificador Alux visual (render-only, sin IA ni persistencia).
+  "vmx.alux.planner": wrap(AluxPlannerBlock),
   "vmx.section.consejo-alux": wrap(ConsejoAluxSection),
   "vmx.section.arma-tu-viaje": wrap(ArmaTuViajeSection),
   "vmx.section.en-vivo": wrap(EnVivoSection),
@@ -821,7 +795,12 @@ PRODUCTION_COMPONENT_MAP["vmx.experience.institutional-badges"] = ({ node }) => 
 // (Los renderers de `vmx.product.*` se inyectan también en PRODUCTION_COMPONENT_MAP
 //  arriba, reutilizando los mismos componentes de Studio.)
 
-interface FormFieldCfg { key: string; label: string; type: string; required?: boolean }
+interface FormFieldCfg {
+  key: string;
+  label: string;
+  type: string;
+  required?: boolean;
+}
 
 function CustomFormBlock({ config }: { config: Record<string, unknown> }) {
   const heading = (config.heading as string) ?? "Contáctanos";
@@ -890,7 +869,9 @@ function CustomFormBlock({ config }: { config: Record<string, unknown> }) {
         >
           {submitLabel}
         </button>
-        <p data-form-success className="hidden text-sm text-emerald-600">{successMessage}</p>
+        <p data-form-success className="hidden text-sm text-emerald-600">
+          {successMessage}
+        </p>
       </form>
     </section>
   );
