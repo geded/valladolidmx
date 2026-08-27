@@ -222,6 +222,105 @@ export function Hero({ config }: HeroProps = {}) {
   const titleStyle = typographyToStyle(readFieldTypography(cfgRecord, "title"));
   const subtitleStyle = typographyToStyle(readFieldTypography(cfgRecord, "subtitle"));
 
+  // G7 · Variante editorial-split. Cualquier otro valor (incluido undefined)
+  // conserva intacta la variante cinematográfica por defecto.
+  if ((config?.variant ?? "cinematic").trim() === "editorial-split") {
+    const mediaFirst = (config?.mobile_order ?? "media-first").trim() !== "text-first";
+    const safeZone = (config?.text_safe_zone ?? "md").trim();
+    const safeZoneClass =
+      safeZone === "sm" ? "px-5 py-10" : safeZone === "lg" ? "px-8 py-16" : "px-6 py-12";
+    const mediaRight = (config?.media_side ?? "right").trim() !== "left";
+    return (
+      <section
+        data-hero-variant="editorial-split"
+        className="@container relative isolate overflow-hidden bg-background text-foreground"
+      >
+        <div
+          className={`flex flex-col ${mediaFirst ? "" : "flex-col-reverse"} @3xl:grid @3xl:min-h-[70svh] @3xl:grid-cols-2 @3xl:items-stretch`}
+        >
+          <div
+            data-hero-media
+            className={`relative min-h-[42svh] w-full overflow-hidden bg-foreground @3xl:min-h-[70svh] ${mediaRight ? "@3xl:order-2" : "@3xl:order-1"}`}
+          >
+            {slides.map((src, i) => (
+              <img
+                key={`${src}-${i}`}
+                src={src}
+                alt=""
+                aria-hidden
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
+                  slides.length === 1 || i === index % slides.length
+                    ? "opacity-100"
+                    : "opacity-0"
+                }`}
+                style={{ objectPosition: backgroundPosition }}
+                loading={i === 0 ? "eager" : "lazy"}
+                decoding="async"
+              />
+            ))}
+          </div>
+          <div
+            data-hero-safe-zone={safeZone}
+            className={`flex w-full min-w-0 flex-col justify-center gap-4 ${safeZoneClass} ${mediaRight ? "@3xl:order-1" : "@3xl:order-2"} ${textAlignClass}`}
+          >
+            {eyebrow ? (
+              <p
+                data-eb-field="eyebrow"
+                suppressHydrationWarning
+                className={`font-script text-[1.375rem] leading-tight text-primary @3xl:text-[1.75rem] ${textSelfClass}`}
+                style={eyebrowStyle}
+              >
+                {eyebrow}
+              </p>
+            ) : null}
+            {title ? (
+              <h1
+                data-eb-field="title"
+                suppressHydrationWarning
+                className={`max-w-2xl text-balance font-display text-[1.75rem] leading-[1.12] text-foreground @2xl:text-[2.25rem] @3xl:text-[2.75rem] ${textSelfClass}`}
+                style={titleStyle}
+              >
+                {title}
+              </h1>
+            ) : null}
+            {subtitle ? (
+              <p
+                data-eb-field="subtitle"
+                suppressHydrationWarning
+                className={`max-w-xl text-pretty text-base text-muted-foreground @3xl:text-lg ${textSelfClass}`}
+                style={subtitleStyle}
+              >
+                {subtitle}
+              </p>
+            ) : null}
+            {showCtas && ctas.length > 0 ? (
+              <div
+                className={`flex w-full flex-wrap items-center gap-3 ${ctaAlignmentClass}`}
+              >
+                {ctas.map((cta, i) => (
+                  <HeroButton key={i} cta={cta} isPrimary={i === 0} onLight />
+                ))}
+              </div>
+            ) : null}
+            {showSearch ? (
+              <div className={`mt-2 flex w-full min-w-0 ${searchJustifyClass}`}>
+                <div className={`w-full min-w-0 ${searchMaxWidthClass}`}>
+                  <HeroSearchPill
+                    align={searchAlignment as "left" | "center" | "right"}
+                    maxWidth={
+                      (searchMaxWidth as "sm" | "md" | "lg" | "xl" | "full") ?? "xl"
+                    }
+                    submitLabel={t("hero.search_button")}
+                  />
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section
       className="@container relative isolate overflow-hidden text-white"
