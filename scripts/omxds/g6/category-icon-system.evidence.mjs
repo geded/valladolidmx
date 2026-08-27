@@ -80,3 +80,32 @@ const masterIndex = readFileSync(resolve("docs/governance/06-BLUEPRINT-MASTER-IN
 assert.match(masterIndex, /19\.31/, "Master Index sin el blueprint 19.31");
 
 console.log("G6-S1 category icon system evidence: PASS");
+
+// 6 · G6-S1-A · fixtures deterministas montando componentes reales
+const catalogSource = readFileSync(resolve("src/routes/lovable/g6-category-icon-catalog.tsx"), "utf8");
+for (const id of ["fixture-s1", "fixture-s2", "fixture-s3"]) {
+  assert.match(catalogSource, new RegExp(`id="${id}"`), `falta el fixture #${id}`);
+}
+for (const real of ["<DiscoveryNavigator", "<DiscoveryNavigatorBlock", "<CategoriaCard"]) {
+  assert.ok(catalogSource.includes(real), `fixture sin componente real: ${real}`);
+}
+
+// 7 · G6-S1-A · ceiba alternativa B y símbolos fuera de alcance intactos
+const ceibaSource = readFileSync(resolve("src/components/omxds/icons/naturaleza.tsx"), "utf8");
+assert.ok(
+  ["M8.5 5.4h7", "M6 7.6h12", "M4 9.8h16"].every((d) => ceibaSource.includes(d)),
+  "la ceiba debe declarar copa escalonada de tres niveles",
+);
+assert.doesNotMatch(ceibaSource, /<(ellipse|circle)/, "copa ovalada prohibida");
+
+// 8 · G6-S1-A · área táctil real acreditada
+for (const file of [
+  "src/components/omxds/CategoryNavGrid.tsx",
+  "src/components/cards/CategoriaCard.tsx",
+  "src/components/discovery/InlineCategoryExplorer.tsx",
+]) {
+  const source = readFileSync(resolve(file), "utf8");
+  assert.ok(source.includes('data-omxds-touch-target="44"'), `sin área táctil real: ${file}`);
+}
+
+console.log("G6-S1-A category icon remediation evidence: PASS");
