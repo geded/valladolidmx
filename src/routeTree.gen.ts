@@ -50,6 +50,7 @@ import { Route as LovableWorkspacePreviewRouteImport } from './routes/lovable/wo
 import { Route as LovableWorkspaceFoundationsRouteImport } from './routes/lovable/workspace-foundations'
 import { Route as LovableTourismCardPreviewRouteImport } from './routes/lovable/tourism-card-preview'
 import { Route as LovableProtectedActionsPreviewRouteImport } from './routes/lovable/protected-actions-preview'
+import { Route as LovableG8ePremiumTemplateCatalogRouteImport } from './routes/lovable/g8e-premium-template-catalog'
 import { Route as LovableG8dPremiumParityRouteImport } from './routes/lovable/g8d-premium-parity'
 import { Route as LovableG6CategoryIconCatalogRouteImport } from './routes/lovable/g6-category-icon-catalog'
 import { Route as LovableG5ListingReadinessPreviewRouteImport } from './routes/lovable/g5-listing-readiness-preview'
@@ -415,6 +416,12 @@ const LovableProtectedActionsPreviewRoute =
   LovableProtectedActionsPreviewRouteImport.update({
     id: '/lovable/protected-actions-preview',
     path: '/lovable/protected-actions-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG8ePremiumTemplateCatalogRoute =
+  LovableG8ePremiumTemplateCatalogRouteImport.update({
+    id: '/lovable/g8e-premium-template-catalog',
+    path: '/lovable/g8e-premium-template-catalog',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableG8dPremiumParityRoute = LovableG8dPremiumParityRouteImport.update({
@@ -1404,6 +1411,7 @@ export interface FileRoutesByFullPath {
   '/lovable/g5-listing-readiness-preview': typeof LovableG5ListingReadinessPreviewRoute
   '/lovable/g6-category-icon-catalog': typeof LovableG6CategoryIconCatalogRoute
   '/lovable/g8d-premium-parity': typeof LovableG8dPremiumParityRoute
+  '/lovable/g8e-premium-template-catalog': typeof LovableG8ePremiumTemplateCatalogRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1599,6 +1607,7 @@ export interface FileRoutesByTo {
   '/lovable/g5-listing-readiness-preview': typeof LovableG5ListingReadinessPreviewRoute
   '/lovable/g6-category-icon-catalog': typeof LovableG6CategoryIconCatalogRoute
   '/lovable/g8d-premium-parity': typeof LovableG8dPremiumParityRoute
+  '/lovable/g8e-premium-template-catalog': typeof LovableG8ePremiumTemplateCatalogRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -1798,6 +1807,7 @@ export interface FileRoutesById {
   '/lovable/g5-listing-readiness-preview': typeof LovableG5ListingReadinessPreviewRoute
   '/lovable/g6-category-icon-catalog': typeof LovableG6CategoryIconCatalogRoute
   '/lovable/g8d-premium-parity': typeof LovableG8dPremiumParityRoute
+  '/lovable/g8e-premium-template-catalog': typeof LovableG8ePremiumTemplateCatalogRoute
   '/lovable/protected-actions-preview': typeof LovableProtectedActionsPreviewRoute
   '/lovable/tourism-card-preview': typeof LovableTourismCardPreviewRoute
   '/lovable/workspace-foundations': typeof LovableWorkspaceFoundationsRoute
@@ -2001,6 +2011,7 @@ export interface FileRouteTypes {
     | '/lovable/g5-listing-readiness-preview'
     | '/lovable/g6-category-icon-catalog'
     | '/lovable/g8d-premium-parity'
+    | '/lovable/g8e-premium-template-catalog'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2196,6 +2207,7 @@ export interface FileRouteTypes {
     | '/lovable/g5-listing-readiness-preview'
     | '/lovable/g6-category-icon-catalog'
     | '/lovable/g8d-premium-parity'
+    | '/lovable/g8e-premium-template-catalog'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2394,6 +2406,7 @@ export interface FileRouteTypes {
     | '/lovable/g5-listing-readiness-preview'
     | '/lovable/g6-category-icon-catalog'
     | '/lovable/g8d-premium-parity'
+    | '/lovable/g8e-premium-template-catalog'
     | '/lovable/protected-actions-preview'
     | '/lovable/tourism-card-preview'
     | '/lovable/workspace-foundations'
@@ -2588,6 +2601,7 @@ export interface RootRouteChildren {
   LovableG5ListingReadinessPreviewRoute: typeof LovableG5ListingReadinessPreviewRoute
   LovableG6CategoryIconCatalogRoute: typeof LovableG6CategoryIconCatalogRoute
   LovableG8dPremiumParityRoute: typeof LovableG8dPremiumParityRoute
+  LovableG8ePremiumTemplateCatalogRoute: typeof LovableG8ePremiumTemplateCatalogRoute
   LovableProtectedActionsPreviewRoute: typeof LovableProtectedActionsPreviewRoute
   LovableTourismCardPreviewRoute: typeof LovableTourismCardPreviewRoute
   LovableWorkspaceFoundationsRoute: typeof LovableWorkspaceFoundationsRoute
@@ -2911,6 +2925,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/protected-actions-preview'
       fullPath: '/lovable/protected-actions-preview'
       preLoaderRoute: typeof LovableProtectedActionsPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g8e-premium-template-catalog': {
+      id: '/lovable/g8e-premium-template-catalog'
+      path: '/lovable/g8e-premium-template-catalog'
+      fullPath: '/lovable/g8e-premium-template-catalog'
+      preLoaderRoute: typeof LovableG8ePremiumTemplateCatalogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/g8d-premium-parity': {
@@ -4564,6 +4585,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableG5ListingReadinessPreviewRoute: LovableG5ListingReadinessPreviewRoute,
   LovableG6CategoryIconCatalogRoute: LovableG6CategoryIconCatalogRoute,
   LovableG8dPremiumParityRoute: LovableG8dPremiumParityRoute,
+  LovableG8ePremiumTemplateCatalogRoute: LovableG8ePremiumTemplateCatalogRoute,
   LovableProtectedActionsPreviewRoute: LovableProtectedActionsPreviewRoute,
   LovableTourismCardPreviewRoute: LovableTourismCardPreviewRoute,
   LovableWorkspaceFoundationsRoute: LovableWorkspaceFoundationsRoute,
