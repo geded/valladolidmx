@@ -1763,6 +1763,32 @@ function PageVisualEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tree]);
 
+  // G7-C · Altura acotada real del editor: el shell del Studio se mide contra
+  // la ventana (sin alturas mágicas) para que el canvas nunca sobresalga del
+  // área visible y exista un único scrollport.
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const [shellHeight, setShellHeight] = useState<number | null>(null);
+  useEffect(() => {
+    const measure = () => {
+      const el = shellRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const height = Math.max(360, Math.round(window.innerHeight - top));
+      setShellHeight((current) =>
+        current === null || Math.abs(current - height) > 1 ? height : current,
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (shellRef.current) observer.observe(shellRef.current);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [page, tree]);
+
+
   if (loadError)
     return (
       <FullScreenState title="No se pudo abrir el editor" detail={loadError} onExit={onExit} />
