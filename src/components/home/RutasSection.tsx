@@ -54,9 +54,13 @@ export function RutasSection({ config }: { config?: Record<string, unknown> } = 
   const routes = maxItems ? ordered.slice(0, maxItems) : ordered;
 
   const showStops = config?.show_stops === true;
-  const columns = typeof config?.columns === "number" ? config.columns : 3;
+  const columns = String(config?.columns ?? "3");
   const gridCols =
-    columns === 2 ? "@3xl:grid-cols-2" : columns === 4 ? "@3xl:grid-cols-4" : "@3xl:grid-cols-3";
+    columns === "2"
+      ? "@3xl:grid-cols-2"
+      : columns === "4"
+        ? "@3xl:grid-cols-4"
+        : "@3xl:grid-cols-3";
 
   const title =
     typeof config?.heading === "string" && config.heading.trim()

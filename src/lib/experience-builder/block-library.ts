@@ -494,11 +494,11 @@ const rutasBlock: BlockContract = {
     columns: {
       type: "select",
       label: "Columnas en escritorio",
-      default: 3,
+      default: "3",
       options: [
-        { value: 2, label: "2 columnas" },
-        { value: 3, label: "3 columnas (por defecto)" },
-        { value: 4, label: "4 columnas" },
+        { value: "2", label: "2 columnas" },
+        { value: "3", label: "3 columnas (por defecto)" },
+        { value: "4", label: "4 columnas" },
       ],
     },
     show_stops: {
