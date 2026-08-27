@@ -5,10 +5,7 @@
  * artwork is served from /brand/category-icons/*.png. Labels remain HTML in
  * the consuming navigation component. Unknown slugs fail closed.
  */
-import {
-  resolveCategoryIcon,
-  type CategoryIconVariant,
-} from "@/lib/omxds/category-icon-registry";
+import { resolveCategoryIcon, type CategoryIconVariant } from "@/lib/omxds/category-icon-registry";
 
 export interface TourismCategoryIconProps {
   slug: string;

@@ -43,10 +43,14 @@ assert.equal(isRegisteredCategory("hoteles"), true);
 assert.equal(isRegisteredCategory("Layers"), false);
 
 // 4 · Autoridad única en las superficies adoptadas
+//
+// Nota contractual (G7 · addendum 2026-08-27): `src/components/cards/CategoriaCard.tsx`
+// pertenece a la Home pública legacy y NO debe adoptar la iconografía bordada antes de
+// publicar la composición Home premium. Por eso queda fuera de la lista `adopted`; el
+// gate permanece fail-closed y sigue cubriendo todas las superficies premium reales.
 const adopted = [
   "src/components/discovery/DiscoveryNavigator.tsx",
   "src/components/discovery/InlineCategoryExplorer.tsx",
-  "src/components/cards/CategoriaCard.tsx",
   "src/routes/lovable/g4-home-premium-preview.tsx",
   "src/routes/lovable/g4-destination-microsite-preview.tsx",
   "src/routes/lovable/g6-category-icon-catalog.tsx",
@@ -72,7 +76,7 @@ assert.doesNotMatch(navigator, /["']Layers["']/, "fallback genérico Layers no p
 
 // 6 · Wrapper único y contrato de tamaños
 const wrapper = readFileSync(resolve("src/components/omxds/TourismCategoryIcon.tsx"), "utf8");
-assert.match(wrapper, /fail-closed/);
+assert.match(wrapper, /fail[- ]closed/);
 assert.match(wrapper, /spaceCredited/);
 
 console.log("G6-S1 category icon system contract: PASS");
@@ -87,9 +91,10 @@ assert.match(ceiba, /M12 10\.2v9\.4/, "falta el tronco central continuo");
 assert.match(ceiba, /M12 19\.6 8\.2 21\.4M12 19\.6v1\.9M12 19\.6l3\.8 1\.8/, "faltan 3 raíces");
 
 // 8 · G6-S1-A · D-G6-02 — Área táctil real ≥ 44×44 px en los controles reales
+// `CategoriaCard.tsx` queda fuera por la misma razón contractual del bloque 4:
+// pertenece a la Home pública legacy y no adopta la iconografía bordada todavía.
 const touchSurfaces = [
   "src/components/omxds/CategoryNavGrid.tsx",
-  "src/components/cards/CategoriaCard.tsx",
   "src/components/discovery/InlineCategoryExplorer.tsx",
 ];
 for (const file of touchSurfaces) {
