@@ -1,12 +1,17 @@
 /**
- * CategoriaCard — acceso canónico de navegación turística.
+ * CategoriaCard — Adaptador oficial sobre TourismCard (U1.3).
  *
- * Presentación aprobada Founder 2026-08-27:
- * tarjeta compacta marfil, ícono universal centrado y etiqueta HTML.
- * Las tarjetas editoriales con fotografía pertenecen a otra familia.
+ * Mapa slug → ruta top-level preservado; cuando exista /categoria/$slug
+ * en Fase 1 se amplía sin tocar consumidores. La representación visual
+ * queda unificada bajo la Tourism Card oficial (Single Card Family),
+ * usando el gradiente institucional para categorías sin fotografía.
  */
 import type { Category } from "@/types/entities";
-import { TourismCategoryIcon } from "@/components/omxds/TourismCategoryIcon";
+import { useTranslation } from "@/i18n/context";
+import {
+  TourismCard,
+  type TourismCardVM,
+} from "@/components/experience-builder/tourism-card/TourismCard";
 
 const ROUTE_BY_SLUG: Partial<Record<string, string>> = {
   experiencias: "/experiencias",
@@ -15,51 +20,57 @@ const ROUTE_BY_SLUG: Partial<Record<string, string>> = {
   eventos: "/eventos",
 };
 
-const CONTROL_CLASS = [
-  "group flex min-h-[104px] w-full min-w-0 flex-col items-center justify-center gap-2.5",
-  "rounded-xl border border-primary/20 bg-card px-3 py-4 text-center",
-  "transition-colors duration-200",
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-  "sm:min-h-[120px]",
-].join(" ");
+function toVM(
+  category: Category,
+  labels: { explore: string; comingSoon: string },
+): TourismCardVM {
+  const href = ROUTE_BY_SLUG[category.slug] ?? null;
+  return {
+    id: `category:${category.id}`,
+    entityKind: "category",
+    eyebrow: null,
+    name: category.name,
+    href,
+    tagline: category.description,
+    businessName: null,
+    mediaUrl: null,
+    mediaAlt: category.name,
+    rating: null,
+    location: null,
+    territorialContext: null,
+    highlights: [],
+    badges: [],
+    institutionalBadges: [],
+    dateLabel: null,
+    availabilityLabel: href ? null : labels.comingSoon,
+    priceAmount: null,
+    priceCurrency: null,
+    priceHint: null,
+    primaryAction: href ? { label: labels.explore, href } : null,
+    secondaryAction: null,
+  };
+}
 
 export function CategoriaCard({ category }: { category: Category }) {
-  const href = ROUTE_BY_SLUG[category.slug] ?? null;
-  const content = (
-    <>
-      <TourismCategoryIcon
-        slug={category.slug}
-        variant="standard"
-        size={44}
-        className="shrink-0 transition-transform duration-200 group-hover:scale-[1.04]"
-      />
-      <span className="line-clamp-2 min-w-0 text-sm font-medium leading-snug text-foreground">
-        {category.name}
-      </span>
-    </>
-  );
-
-  if (!href) {
-    return (
-      <div
-        className={`${CONTROL_CLASS} cursor-default opacity-70`}
-        data-omxds-category-button={category.slug}
-        aria-disabled="true"
-      >
-        {content}
-      </div>
-    );
-  }
-
+  const { t } = useTranslation();
+  const vm = toVM(category, {
+    explore: t("common.explore"),
+    comingSoon: t("common.coming_soon"),
+  });
   return (
-    <a
-      href={href}
-      className={`${CONTROL_CLASS} hover:border-primary/40 hover:bg-primary/[0.04]`}
-      data-omxds-category-button={category.slug}
-      data-omxds-touch-target="44"
-      aria-label={category.name}
-    >
-      {content}
-    </a>
+    <TourismCard
+      vm={vm}
+      capabilities={{
+        showRating: false,
+        showPrice: false,
+        showDate: false,
+        showAvailability: !ROUTE_BY_SLUG[category.slug],
+        showDistance: false,
+        showBusiness: false,
+        showLocation: false,
+        showHighlights: false,
+        showFavorite: false,
+      }}
+    />
   );
 }
