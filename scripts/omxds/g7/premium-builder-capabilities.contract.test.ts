@@ -90,12 +90,8 @@ assert.ok(hero.includes("media_side"), "Hero editorial debe gobernar el lado de 
 // 6 · Alux es render-only y apunta a /arma-tu-viaje
 assert.ok(aluxContract.includes("/arma-tu-viaje"), "el default del CTA de Alux debe ser productivo");
 assert.ok(alux.includes("readOnly"), "el campo de Alux debe ser no interactivo");
-for (const forbidden = ["useMutation", "supabase", "createServerFn", "localStorage"], f of [
-  forbidden,
-]) {
-  for (const token of f) {
-    assert.ok(!alux.includes(token), `Alux no debe persistir ni escribir (${token})`);
-  }
+for (const token of ["useMutation", "supabase", "createServerFn", "localStorage"]) {
+  assert.ok(!alux.includes(token), `Alux no debe persistir ni escribir (${token})`);
 }
 assert.ok(alux.includes("min-h-[44px]"), "los chips de Alux deben medir al menos 44 px");
 
