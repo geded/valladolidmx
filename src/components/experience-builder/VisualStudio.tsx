@@ -1778,7 +1778,7 @@ function PageVisualEditor({
     );
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex h-screen min-h-0 flex-col overflow-hidden bg-background">
       <div className="sticky top-0 z-40 flex flex-wrap items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
         <button
           type="button"
