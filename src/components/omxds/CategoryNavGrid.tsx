@@ -137,5 +137,3 @@ export function CategoryNavGrid({
     </ul>
   );
 }
-
-
