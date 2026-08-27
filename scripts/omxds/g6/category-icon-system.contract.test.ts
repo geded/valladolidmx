@@ -43,10 +43,14 @@ assert.equal(isRegisteredCategory("hoteles"), true);
 assert.equal(isRegisteredCategory("Layers"), false);
 
 // 4 · Autoridad única en las superficies adoptadas
+//
+// Nota contractual (G7 · addendum 2026-08-27): `src/components/cards/CategoriaCard.tsx`
+// pertenece a la Home pública legacy y NO debe adoptar la iconografía bordada antes de
+// publicar la composición Home premium. Por eso queda fuera de la lista `adopted`; el
+// gate permanece fail-closed y sigue cubriendo todas las superficies premium reales.
 const adopted = [
   "src/components/discovery/DiscoveryNavigator.tsx",
   "src/components/discovery/InlineCategoryExplorer.tsx",
-  "src/components/cards/CategoriaCard.tsx",
   "src/routes/lovable/g4-home-premium-preview.tsx",
   "src/routes/lovable/g4-destination-microsite-preview.tsx",
   "src/routes/lovable/g6-category-icon-catalog.tsx",
