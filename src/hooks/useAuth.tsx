@@ -134,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       : null;
     return {
-      loading,
+      loading: loading || identityLoading,
       session,
       user,
       profile,
