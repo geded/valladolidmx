@@ -2008,7 +2008,7 @@ function PageVisualEditor({
         </div>
       ) : null}
 
-      <div className="relative flex flex-1">
+      <div className="relative flex min-h-0 flex-1 overflow-hidden">
         {!previewMode ? (
           <aside
             className="hidden w-72 shrink-0 border-r border-border bg-card/40 md:flex md:flex-col"
