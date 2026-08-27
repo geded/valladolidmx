@@ -2652,8 +2652,8 @@ function HomeCanvas({
   commentCounts?: Record<string, number>;
 }) {
   const outerRef = useRef<HTMLDivElement | null>(null);
-  const frameWidth = DEVICE_WIDTHS[deviceViewport];
-  const [available, setAvailable] = useState({ width: frameWidth, height: 900 });
+  const preset = getDevicePreset(deviceViewport);
+  const [available, setAvailable] = useState({ width: preset.width, height: preset.height });
   const rootIds = tree.root.children.map((n) => n.id);
   const rootIdSet = new Set(rootIds);
   const canvasSensors = useSensors(
@@ -2665,12 +2665,14 @@ function HomeCanvas({
     onReorderRoot(String(e.active.id), String(e.over.id));
   };
 
+  // G7-C · La altura del canvas se deriva SIEMPRE del contenedor acotado del
+  // editor (medición + ResizeObserver), nunca de una altura mágica.
   useEffect(() => {
     const measure = () => {
       const el = outerRef.current;
       if (!el) return;
-      const width = el.clientWidth - 24;
-      const height = el.clientHeight - 24;
+      const width = Math.max(120, el.clientWidth - 24);
+      const height = Math.max(240, el.clientHeight - 24);
       setAvailable((current) =>
         Math.abs(current.width - width) > 1 || Math.abs(current.height - height) > 1
           ? { width, height }
@@ -2688,21 +2690,24 @@ function HomeCanvas({
     };
   }, [deviceViewport]);
 
-  // 18.54 · Viewport aislado SIN zoom: el iframe usa siempre el ancho real del
-  // dispositivo (390/768/1280). Si el editor es más angosto, el contenedor
-  // desplaza horizontalmente en lugar de escalar, porque `transform: scale`
-  // rompe `position: sticky` y provoca recortes por redondeo en Safari/iPad.
-  const frameHeight = Math.max(360, available.height);
+  // G7-C · Escala proporcional sólo cuando el espacio visible es menor que el
+  // preset. El iframe conserva SIEMPRE el ancho y alto lógicos del dispositivo,
+  // por lo que container queries y breakpoints no se ven alterados.
+  const scale = Math.min(1, available.width / preset.width, available.height / preset.height);
+  const headerVariant = resolveCanvasHeaderVariant(tree);
 
   return (
     <div
       ref={outerRef}
-      className="flex min-h-[70vh] min-w-0 flex-1 overflow-auto bg-muted/20 p-3"
+      data-eb-canvas-scrollport="editor"
+      className="flex min-h-0 min-w-0 flex-1 items-start justify-center overflow-hidden bg-muted/20 p-3"
     >
       <CanvasViewport
         device={deviceViewport}
-        width={frameWidth}
-        height={frameHeight}
+        width={preset.width}
+        height={preset.height}
+        scale={scale}
+        presetLabel={preset.label}
       >
 
         <InertChrome
@@ -2711,7 +2716,7 @@ function HomeCanvas({
           onSelect={() => onSelectChrome("header")}
           sticky
         >
-          <PublicHeader variant="overlay" config={getChromeConfig(tree, "header")} />
+          <PublicHeader variant={headerVariant} config={getChromeConfig(tree, "header")} />
         </InertChrome>
         <DndContext
           sensors={canvasSensors}
