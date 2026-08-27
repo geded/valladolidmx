@@ -33,6 +33,26 @@ export interface DiscoveryNavigatorBlockConfig {
   mode?: "navigate" | "inline";
   /** Tarjetas por página en el explorador embebido. */
   pageSize?: number;
+  /**
+   * G7-A · Curaduría manual opcional. Lista estable de slugs en el orden
+   * deseado. Si está vacía o ausente, se conserva la derivación automática.
+   * Fail-closed: un slug desconocido se descarta (no se inventa etiqueta ni
+   * ícono) porque la única fuente válida es el DTO del Context Engine.
+   */
+  categorySlugs?: Array<string | { slug?: string }>;
+  /** G7-A · Categorías ocultas (se aplican también en modo automático). */
+  hiddenSlugs?: Array<string | { slug?: string }>;
+  /** G7-A · Límite máximo de categorías visibles. */
+  maxItems?: number;
+}
+
+/** Normaliza listas del Experience Builder (`["x"]` o `[{ slug: "x" }]`). */
+function readSlugList(raw: DiscoveryNavigatorBlockConfig["categorySlugs"]): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((it) => (typeof it === "string" ? it : (it?.slug ?? "")))
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 export function DiscoveryNavigatorBlock({
@@ -57,7 +77,23 @@ export function DiscoveryNavigatorBlock({
   const query = useQuery({ ...options, initialData: previewData });
 
   const dto = query.data;
-  const categories = dto?.categories ?? [];
+  const derived = dto?.categories ?? [];
+
+  // G7-A · Curaduría manual gobernada (orden, ocultamiento y límite).
+  const manualOrder = readSlugList(config.categorySlugs);
+  const hidden = new Set(readSlugList(config.hiddenSlugs));
+  const curated =
+    manualOrder.length > 0
+      ? manualOrder
+          .map((slug) => derived.find((c) => c.slug === slug))
+          .filter((c): c is (typeof derived)[number] => Boolean(c))
+      : derived;
+  const visible = curated.filter((c) => !hidden.has(c.slug));
+  const limit =
+    typeof config.maxItems === "number" && config.maxItems > 0
+      ? Math.floor(config.maxItems)
+      : undefined;
+  const categories = limit ? visible.slice(0, limit) : visible;
   const scopeLabel = dto?.scope.label ?? null;
   const defaultTitle = scopeLabel ? `Explora ${scopeLabel}` : "Explora el destino";
   const defaultCtaLabel = scopeLabel
