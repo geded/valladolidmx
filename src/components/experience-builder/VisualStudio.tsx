@@ -2781,11 +2781,15 @@ function CanvasViewport({
   device,
   width,
   height,
+  scale,
+  presetLabel,
   children,
 }: {
   device: DeviceViewport;
   width: number;
   height: number;
+  scale: number;
+  presetLabel: string;
   children: React.ReactNode;
 }) {
 
