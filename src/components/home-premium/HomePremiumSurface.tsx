@@ -77,7 +77,10 @@ export function HomePremiumSurface({
       );
     if (key === "pueblosMagicos")
       return (
-        <PueblosMagicosSection content={content} onCreateRoute={() => setSelectedRoute("pueblos")} />
+        <PueblosMagicosSection
+          content={content}
+          onCreateRoute={() => setSelectedRoute("pueblos")}
+        />
       );
     if (key === "rutas")
       return (
@@ -488,7 +491,12 @@ function AluxPlanner({
               <MessageCircle className="mr-2 size-4" aria-hidden />
               Personalizar con Alux
             </Button>
-            <Button type="button" variant="outline" onClick={onAdd} className="min-h-11 rounded-pill">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onAdd}
+              className="min-h-11 rounded-pill"
+            >
               {added ? (
                 <Check className="mr-2 size-4" aria-hidden />
               ) : (
@@ -987,7 +995,8 @@ function MapSection({
   content: HomePremiumContent;
   selectedRoute: string;
 }) {
-  const route = content.rutas.items.find((item) => item.id === selectedRoute) ?? content.rutas.items[0];
+  const route =
+    content.rutas.items.find((item) => item.id === selectedRoute) ?? content.rutas.items[0];
   return (
     <section
       id="mapa"
@@ -1028,7 +1037,8 @@ function TravelPlanClose({
   added: boolean;
   onAdd: () => void;
 }) {
-  const route = content.rutas.items.find((item) => item.id === selectedRoute) ?? content.rutas.items[0];
+  const route =
+    content.rutas.items.find((item) => item.id === selectedRoute) ?? content.rutas.items[0];
   return (
     <section className="overflow-hidden rounded-3xl bg-selva text-selva-foreground">
       <div className="grid gap-6 p-6 sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center">

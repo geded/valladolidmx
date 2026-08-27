@@ -54,8 +54,7 @@ export function ListingPremiumSurface({
       showAddToTrip={showAddToTrip}
       capabilities={{ showFavorite }}
       emptyMessage={
-        emptyMessage ??
-        "Aún no hay resultados publicados. Explora otros destinos del Oriente Maya."
+        emptyMessage ?? "Aún no hay resultados publicados. Explora otros destinos del Oriente Maya."
       }
       className={className}
     />

@@ -76,7 +76,9 @@ assert.equal(okTree.valid, true, `árbol premium rechazado: ${okTree.errors.join
 
 // 4 · Fail-closed: variantes fuera del enum, superficies y alias históricos
 const badVariant = validateEditorialCompositionTree({
-  tree: { root: { children: [{ type: "vmx.hero", version: "1.3.0", config: { variant: "media_left" } }] } },
+  tree: {
+    root: { children: [{ type: "vmx.hero", version: "1.3.0", config: { variant: "media_left" } }] },
+  },
   surface: "home",
   actor: "founder_admin",
   registered_media_paths: [],
@@ -84,7 +86,9 @@ const badVariant = validateEditorialCompositionTree({
 assert.equal(badVariant.valid, false, "la variante histórica media_left debe rechazarse");
 
 const badSurface = validateEditorialCompositionTree({
-  tree: { root: { children: [{ type: "vmx.hero", version: "1.3.0", config: { variant: "cinematic" } }] } },
+  tree: {
+    root: { children: [{ type: "vmx.hero", version: "1.3.0", config: { variant: "cinematic" } }] },
+  },
   surface: "business",
   actor: "founder_admin",
   registered_media_paths: [],

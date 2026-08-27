@@ -25,7 +25,6 @@ const str = (value: unknown, fallback: string): string =>
 const strOrNull = (value: unknown, fallback: string | null | undefined): string | null =>
   typeof value === "string" && value.trim().length > 0 ? value : (fallback ?? null);
 
-
 const bool = (value: unknown, fallback: boolean): boolean =>
   typeof value === "boolean" ? value : fallback;
 

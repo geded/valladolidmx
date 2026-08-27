@@ -30,6 +30,8 @@ describe("I4-A authoring allowlist and legacy confinement", () => {
       "vmx.experience.info-grid",
       "vmx.experience.institutional-badges",
       "vmx.discovery.navigator",
+      // G8-E · plantillas compuestas premium aprobadas (schema cerrado).
+      "vmx.home.premium-g4",
       "vmx.alux.planner",
       // G8 · paridad de autoría de la Home premium aprobada.
       "vmx.hero",
@@ -40,12 +42,13 @@ describe("I4-A authoring allowlist and legacy confinement", () => {
       "vmx.section.rutas",
       "vmx.section.arma-tu-viaje",
       "vmx.experience.map",
+      "vmx.destination.premium-g4",
+      "vmx.listing.premium-g5",
       "vmx.custom.html",
     ]);
     expect(getBlock("vmx.experience.hero")?.editorial?.mode).toBe("authorable");
     expect(getBlock("vmx.custom.html")?.editorial?.mode).toBe("legacy_read_only");
   });
-
 
   test("normalizes page kinds and RBAC without trusting client aliases", () => {
     expect(resolveEditorialSurface("hotel")).toBe("business");
