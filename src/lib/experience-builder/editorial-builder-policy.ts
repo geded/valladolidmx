@@ -657,7 +657,7 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
         },
         {
           field: "disclaimer",
-          class: "legal",
+          class: "editorial",
           type: "text",
           max_length: 240,
           translatable: true,

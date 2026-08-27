@@ -29,6 +29,8 @@ describe("I4-A authoring allowlist and legacy confinement", () => {
       "vmx.experience.gallery",
       "vmx.experience.info-grid",
       "vmx.experience.institutional-badges",
+      "vmx.discovery.navigator",
+      "vmx.alux.planner",
       "vmx.custom.html",
     ]);
     expect(getBlock("vmx.experience.hero")?.editorial?.mode).toBe("authorable");
