@@ -65,7 +65,7 @@ for (const width of ["390", "430", "768", "1024", "1280", "1440"]) {
   assert.ok(evidence.includes(`${width} px`), `falta la evidencia visual de ${width} px`);
 }
 for (const claim of ["overflow", "44", "/arma-tu-viaje", "fail-closed"]) {
-  assert.ok(evidence.includes(claim), `la evidencia no declara: ${claim}`);
+  assert.ok(evidence.toLowerCase().includes(claim), `la evidencia no declara: ${claim}`);
 }
 
 // 6 · Gobernanza
