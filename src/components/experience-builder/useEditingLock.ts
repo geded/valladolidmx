@@ -1,10 +1,21 @@
 import { useEffect, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   acquireEditLock,
   heartbeatEditLock,
   releaseEditLock,
   type EditingLock,
 } from "@/lib/experience-builder/studio.functions";
+
+/** These server fns require auth; skip them entirely when signed out. */
+async function hasSession(): Promise<boolean> {
+  try {
+    const { data } = await supabase.auth.getSession();
+    return Boolean(data.session?.access_token);
+  } catch {
+    return false;
+  }
+}
 
 export interface UseEditingLockState {
   /** Lock currently held by someone else — read-only mode. */
