@@ -20,9 +20,7 @@ const VARIANT_PADDING: Record<AluxPlannerDTO["variant"], string> = {
   panel: "p-6 @3xl:p-12",
 };
 
-export function AluxPlannerBlock({
-  config,
-}: { config?: Record<string, unknown> } = {}) {
+export function AluxPlannerBlock({ config }: { config?: Record<string, unknown> } = {}) {
   const dto = applyAluxPlannerDefaults(config);
 
   return (

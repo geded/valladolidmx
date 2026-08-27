@@ -15,7 +15,11 @@ import { ArrowRight, Compass } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { useTranslation } from "@/i18n/context";
 import { HeroSearchPill } from "@/components/home/HeroSearchPill";
-import { readFieldTypography, typographyToStyle, type FieldTypography } from "@/lib/experience-builder/typography";
+import {
+  readFieldTypography,
+  typographyToStyle,
+  type FieldTypography,
+} from "@/lib/experience-builder/typography";
 import heroBg01 from "@/assets/brand/hero/bg01.webp";
 import heroBg02 from "@/assets/brand/hero/bg02.webp";
 
@@ -104,11 +108,7 @@ export function Hero({ config }: HeroProps = {}) {
     : null;
   const legacyBg = config?.background_image?.trim();
   const slides: readonly string[] =
-    configSlides && configSlides.length > 0
-      ? configSlides
-      : legacyBg
-        ? [legacyBg]
-        : DEFAULT_SLIDES;
+    configSlides && configSlides.length > 0 ? configSlides : legacyBg ? [legacyBg] : DEFAULT_SLIDES;
 
   const intervalMs = Math.max(
     2000,
@@ -119,10 +119,7 @@ export function Hero({ config }: HeroProps = {}) {
     if (slides.length < 2) return;
     const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (prefersReduced) return;
-    const id = window.setInterval(
-      () => setIndex((i) => (i + 1) % slides.length),
-      intervalMs,
-    );
+    const id = window.setInterval(() => setIndex((i) => (i + 1) % slides.length), intervalMs);
     return () => window.clearInterval(id);
   }, [slides.length, intervalMs]);
 
@@ -249,9 +246,7 @@ export function Hero({ config }: HeroProps = {}) {
                 alt=""
                 aria-hidden
                 className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
-                  slides.length === 1 || i === index % slides.length
-                    ? "opacity-100"
-                    : "opacity-0"
+                  slides.length === 1 || i === index % slides.length ? "opacity-100" : "opacity-0"
                 }`}
                 style={{ objectPosition: backgroundPosition }}
                 loading={i === 0 ? "eager" : "lazy"}
@@ -294,9 +289,7 @@ export function Hero({ config }: HeroProps = {}) {
               </p>
             ) : null}
             {showCtas && ctas.length > 0 ? (
-              <div
-                className={`flex w-full flex-wrap items-center gap-3 ${ctaAlignmentClass}`}
-              >
+              <div className={`flex w-full flex-wrap items-center gap-3 ${ctaAlignmentClass}`}>
                 {ctas.map((cta, i) => (
                   <HeroButton key={i} cta={cta} isPrimary={i === 0} onLight />
                 ))}
@@ -307,9 +300,7 @@ export function Hero({ config }: HeroProps = {}) {
                 <div className={`w-full min-w-0 ${searchMaxWidthClass}`}>
                   <HeroSearchPill
                     align={searchAlignment as "left" | "center" | "right"}
-                    maxWidth={
-                      (searchMaxWidth as "sm" | "md" | "lg" | "xl" | "full") ?? "xl"
-                    }
+                    maxWidth={(searchMaxWidth as "sm" | "md" | "lg" | "xl" | "full") ?? "xl"}
                     submitLabel={t("hero.search_button")}
                   />
                 </div>
@@ -328,7 +319,11 @@ export function Hero({ config }: HeroProps = {}) {
       style={{ marginTop: "-4rem" }}
     >
       {/* Carrusel cinematográfico con las fotografías oficiales del Hero. */}
-      <div data-hero-media aria-hidden className="absolute inset-0 -z-20 h-full w-full overflow-hidden bg-foreground">
+      <div
+        data-hero-media
+        aria-hidden
+        className="absolute inset-0 -z-20 h-full w-full overflow-hidden bg-foreground"
+      >
         {slides.map((src, i) => (
           <img
             key={`${src}-${i}`}
@@ -395,7 +390,9 @@ export function Hero({ config }: HeroProps = {}) {
         ) : null}
 
         {showCtas && ctas.length > 0 ? (
-          <div className={`flex w-full flex-wrap items-center gap-3 @3xl:mt-8 ${ctaAlignmentClass}`}>
+          <div
+            className={`flex w-full flex-wrap items-center gap-3 @3xl:mt-8 ${ctaAlignmentClass}`}
+          >
             {ctas.map((cta, i) => (
               <HeroButton key={i} cta={cta} isPrimary={i === 0} />
             ))}
@@ -408,9 +405,7 @@ export function Hero({ config }: HeroProps = {}) {
             <div className={`w-full ${searchMaxWidthClass}`}>
               <HeroSearchPill
                 align={searchAlignment as "left" | "center" | "right"}
-                maxWidth={
-                  (searchMaxWidth as "sm" | "md" | "lg" | "xl" | "full") ?? "xl"
-                }
+                maxWidth={(searchMaxWidth as "sm" | "md" | "lg" | "xl" | "full") ?? "xl"}
                 submitLabel={t("hero.search_button")}
               />
             </div>
@@ -452,14 +447,12 @@ function HeroButton({
   }`;
   let icon: ReactNode = null;
   if (variant === "primary") {
-    cls +=
-      " bg-primary text-primary-foreground shadow-md hover:opacity-95";
+    cls += " bg-primary text-primary-foreground shadow-md hover:opacity-95";
     icon = <ArrowRight className="size-4" aria-hidden />;
   } else if (variant === "secondary") {
-    cls +=
-      onLight
-        ? " border border-border bg-background text-foreground hover:bg-muted"
-        : " border border-white/20 bg-white/5 text-white/95 backdrop-blur-md hover:bg-white/15";
+    cls += onLight
+      ? " border border-border bg-background text-foreground hover:bg-muted"
+      : " border border-white/20 bg-white/5 text-white/95 backdrop-blur-md hover:bg-white/15";
     icon = <Compass className="size-4" aria-hidden />;
   } else {
     cls += onLight

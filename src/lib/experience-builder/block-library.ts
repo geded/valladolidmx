@@ -203,7 +203,6 @@ const heroBlock: BlockContract = {
       ],
     },
     eyebrow: {
-
       type: "text",
       label: "Frase superior",
       translatable: true,
@@ -455,8 +454,7 @@ const rutasBlock: BlockContract = {
   category: "static",
   version: "1.1.0",
   display_name: "Sección Rutas",
-  description:
-    "Rutas sugeridas. Permite curaduría manual, orden, límite y visibilidad de paradas.",
+  description: "Rutas sugeridas. Permite curaduría manual, orden, límite y visibilidad de paradas.",
   schema: {
     heading: { type: "text", label: "Encabezado", translatable: true, default: "Rutas sugeridas" },
     subheading: {

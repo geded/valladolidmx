@@ -19,9 +19,7 @@ import type { SuggestedRoute } from "@/types/entities";
 function readSlugList(raw: unknown): string[] {
   if (!Array.isArray(raw)) return [];
   return raw
-    .map((it) =>
-      typeof it === "string" ? it : ((it as { slug?: string } | null)?.slug ?? ""),
-    )
+    .map((it) => (typeof it === "string" ? it : ((it as { slug?: string } | null)?.slug ?? "")))
     .map((s) => s.trim())
     .filter(Boolean);
 }
@@ -35,8 +33,7 @@ export function RutasSection({ config }: { config?: Record<string, unknown> } = 
     initialData: RUTAS_MOCK as readonly SuggestedRoute[],
     staleTime: 5 * 60 * 1000,
   });
-  const available: readonly SuggestedRoute[] =
-    data && data.length > 0 ? data : RUTAS_MOCK;
+  const available: readonly SuggestedRoute[] = data && data.length > 0 ? data : RUTAS_MOCK;
 
   const source = typeof config?.source === "string" ? config.source : "auto";
   const selected = readSlugList(config?.route_slugs);
