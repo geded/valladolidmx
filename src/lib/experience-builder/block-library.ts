@@ -158,11 +158,51 @@ const dividerBlock: BlockContract = {
 const heroBlock: BlockContract = {
   type: "vmx.hero",
   category: "static",
-  version: "1.2.0",
+  version: "1.3.0",
   display_name: "Hero",
   description: "Bloque hero principal de la Home y de Landing Pages.",
   schema: {
+    variant: {
+      type: "select",
+      label: "Variante del hero",
+      description:
+        "Cinematográfico conserva el hero clásico a sangre. Editorial dividido muestra medios y texto en dos columnas.",
+      default: "cinematic",
+      options: [
+        { value: "cinematic", label: "Cinematográfico (por defecto)" },
+        { value: "editorial-split", label: "Editorial dividido" },
+      ],
+    },
+    media_side: {
+      type: "select",
+      label: "Lado de la imagen (editorial dividido)",
+      default: "right",
+      options: [
+        { value: "right", label: "Derecha (por defecto)" },
+        { value: "left", label: "Izquierda" },
+      ],
+    },
+    mobile_order: {
+      type: "select",
+      label: "Orden en móvil (editorial dividido)",
+      default: "media-first",
+      options: [
+        { value: "media-first", label: "Imagen primero (por defecto)" },
+        { value: "text-first", label: "Texto primero" },
+      ],
+    },
+    text_safe_zone: {
+      type: "select",
+      label: "Zona segura del texto (editorial dividido)",
+      default: "md",
+      options: [
+        { value: "sm", label: "Compacta" },
+        { value: "md", label: "Media (por defecto)" },
+        { value: "lg", label: "Amplia" },
+      ],
+    },
     eyebrow: {
+
       type: "text",
       label: "Frase superior",
       translatable: true,
