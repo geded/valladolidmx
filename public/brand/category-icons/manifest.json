@@ -1,0 +1,21 @@
+{
+  "contract": "OMXDS Founder-Approved Embroidered Category Artwork v1.0",
+  "approved_at": "2026-08-27",
+  "authority": "Founder visual acceptance in Codex",
+  "source": "authority-sheet-v1.jpg",
+  "rendering": {
+    "master_px": 256,
+    "mobile_px": 36,
+    "tablet_px": 48,
+    "desktop_px": 56,
+    "labels": "HTML only",
+    "fit": "contain",
+    "upscale": false
+  },
+  "immutable_slugs": [
+    "hoteles", "restaurantes", "destinos", "casas-de-vacaciones", "eventos",
+    "experiencias", "que-hacer", "tours", "promociones", "zonas-arqueologicas",
+    "comunidades", "cenotes", "rutas", "artesanias", "naturaleza", "gastronomia",
+    "cultura", "compras", "pueblos", "bienestar", "vida-nocturna", "mapas"
+  ]
+}
