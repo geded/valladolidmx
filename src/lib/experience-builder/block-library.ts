@@ -452,10 +452,60 @@ const categoriasBlock: BlockContract = {
 const rutasBlock: BlockContract = {
   type: "vmx.section.rutas",
   category: "static",
-  version: "1.0.0",
+  version: "1.1.0",
   display_name: "Sección Rutas",
+  description:
+    "Rutas sugeridas. Permite curaduría manual, orden, límite y visibilidad de paradas.",
   schema: {
     heading: { type: "text", label: "Encabezado", translatable: true, default: "Rutas sugeridas" },
+    subheading: {
+      type: "text",
+      label: "Subtítulo",
+      translatable: true,
+      default: "",
+    },
+    source: {
+      type: "select",
+      label: "Origen de las rutas",
+      default: "auto",
+      options: [
+        { value: "auto", label: "Automático (rutas publicadas)" },
+        { value: "manual", label: "Selección manual" },
+      ],
+    },
+    route_slugs: {
+      type: "list",
+      label: "Rutas seleccionadas (en orden)",
+      description: "Sólo aplica cuando el origen es Selección manual.",
+      default: [],
+      item: {
+        type: "object",
+        label: "Ruta",
+        fields: {
+          slug: { type: "text", label: "Slug de la ruta" },
+        },
+      },
+    },
+    max_items: {
+      type: "number",
+      label: "Máximo de rutas",
+      default: 3,
+    },
+    columns: {
+      type: "select",
+      label: "Columnas en escritorio",
+      default: 3,
+      options: [
+        { value: 2, label: "2 columnas" },
+        { value: 3, label: "3 columnas (por defecto)" },
+        { value: 4, label: "4 columnas" },
+      ],
+    },
+    show_stops: {
+      type: "boolean",
+      label: "Mostrar paradas de cada ruta",
+      default: false,
+    },
   },
   capabilities: {
     soporta_i18n: true,
@@ -464,7 +514,8 @@ const rutasBlock: BlockContract = {
     soporta_cache: true,
   },
   constraints: { surfaces: ["home", "landing"] },
-  i18n: { translatable_fields: ["heading"] },
+  i18n: { translatable_fields: ["heading", "subheading"] },
+
   audit: ["Block.Registered", "Block.VersionPublished"],
 };
 
