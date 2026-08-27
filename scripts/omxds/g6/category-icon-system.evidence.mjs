@@ -82,7 +82,10 @@ assert.match(masterIndex, /19\.31/, "Master Index sin el blueprint 19.31");
 console.log("G6-S1 category icon system evidence: PASS");
 
 // 6 · G6-S1-A · fixtures deterministas montando componentes reales
-const catalogSource = readFileSync(resolve("src/routes/lovable/g6-category-icon-catalog.tsx"), "utf8");
+const catalogSource = readFileSync(
+  resolve("src/routes/lovable/g6-category-icon-catalog.tsx"),
+  "utf8",
+);
 for (const id of ["fixture-s1", "fixture-s2", "fixture-s3"]) {
   assert.match(catalogSource, new RegExp(`id="${id}"`), `falta el fixture #${id}`);
 }

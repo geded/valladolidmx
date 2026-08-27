@@ -33,7 +33,6 @@ export function NaturalezaGlyph({ primary, secondary, textile }: CategoryGlyphPr
             stroke={secondary}
             strokeWidth="1"
           />
-
         </g>
       ) : null}
     </g>
