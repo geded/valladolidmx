@@ -15,6 +15,7 @@
  */
 import { useMemo, useState } from "react";
 import { ExternalLink, Image as ImageIcon, X } from "lucide-react";
+import { PublicHeader, PublicFooter } from "@/components/discovery";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import type { CompositionTree } from "@/lib/experience-builder/composition-tree";
 import { getBlock } from "@/lib/experience-builder/block-registry";
