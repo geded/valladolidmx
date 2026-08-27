@@ -184,6 +184,7 @@ function PresetDraftModal({
   onClose: () => void;
 }) {
   const [config, setConfig] = useState<Cfg>(() => preset.defaultConfig());
+  const [previewMode, setPreviewMode] = useState<"full" | "content">("full");
   const fields = useMemo(() => editableFields(preset.blockType), [preset.blockType]);
   const tree = useMemo(() => buildTree(preset, config), [preset, config]);
   const setField = (key: string, value: unknown) =>
