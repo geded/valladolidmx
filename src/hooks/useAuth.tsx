@@ -50,23 +50,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
+  // Identidad (perfil + roles) en vuelo: evita redirecciones por rol con
+  // `roles = []` justo después de SIGNED_IN (founder caía en /mi-viaje).
+  const [identityLoading, setIdentityLoading] = useState(false);
 
   const loadIdentity = useCallback(async (uid: string | null) => {
     if (!uid) {
       setProfile(null);
       setRoles([]);
+      setIdentityLoading(false);
       return;
     }
-    const [{ data: prof }, { data: r }] = await Promise.all([
-      supabase
-        .from("profiles")
-        .select("user_id, display_name, avatar_url, email")
-        .eq("user_id", uid)
-        .maybeSingle(),
-      supabase.from("user_roles").select("role").eq("user_id", uid),
-    ]);
-    setProfile((prof as ProfileRow | null) ?? null);
-    setRoles(((r ?? []) as { role: AppRole }[]).map((x) => x.role));
+    setIdentityLoading(true);
+    try {
+      const [{ data: prof }, { data: r }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("user_id, display_name, avatar_url, email")
+          .eq("user_id", uid)
+          .maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", uid),
+      ]);
+      setProfile((prof as ProfileRow | null) ?? null);
+      setRoles(((r ?? []) as { role: AppRole }[]).map((x) => x.role));
+    } finally {
+      setIdentityLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -87,6 +96,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       )
         return;
       setSession(s);
+      // Marca identidad en vuelo de inmediato: los consumidores no deben
+      // decidir rol/destino con los roles del estado anterior.
+      if (s?.user) setIdentityLoading(true);
       // No await: defer to microtask to avoid deadlocks
       setTimeout(() => {
         void loadIdentity(s?.user.id ?? null);
@@ -122,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       : null;
     return {
-      loading,
+      loading: loading || identityLoading,
       session,
       user,
       profile,
@@ -132,7 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       refresh,
     };
-  }, [loading, session, profile, roles, signOut, refresh]);
+  }, [loading, identityLoading, session, profile, roles, signOut, refresh]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
