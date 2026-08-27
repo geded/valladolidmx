@@ -67,7 +67,6 @@ Copa escalonada en tres masas horizontales (16/12/7 u), separación negativa 2.2
 
 Medición sobre los controles reales (`a[href]`, `button`) que contienen o presentan iconografía de categoría. Mínimo observado 59×44 px (S3) y 137×115 px (S1/S2) en 360 px. Ningún control por debajo de 44×44 px. `TourismCategoryIcon` permanece decorativo (`aria-hidden`, sin foco ni rol interactivo).
 
-## Reservas atendidas
+## Reservas revisadas (sin cambio de símbolo)
 
-- Cenotes: mayor separación entre ondas para conservar lectura a 36 px.
-- Zonas arqueológicas: escalinata engrosada, sin cambio de geometría ni de token cromático.
+- Cenotes y Zonas arqueológicas fueron revisados en las capturas de 360–1440 px: se confirman legibles y se mantienen **inmutables** (G6-S1-A no autoriza modificar geometría distinta de Naturaleza). La reserva de detalle a 36 px se mitiga usando `variant="standard"` (≥40 px) en superficies con espacio acreditado.

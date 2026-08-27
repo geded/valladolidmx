@@ -1,0 +1,66 @@
+{
+  "id": "PCA-2026-037-ADDENDUM-A",
+  "status": "Approved",
+  "parent": "PCA-2026-037",
+  "blueprint": "docs/blueprint/19.31-G6-S1-CATEGORY-NAVIGATION-ICON-SYSTEM-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-27 · Autoriza exclusivamente G6-S1-A · Remediación visual y táctil final sobre la base 4d1742406eca7da31869d762d6347a0b7cca508b: (1) sustituir el símbolo fallido de Naturaleza por una ceiba/ya'axché reconocible conforme a la Alternativa B (copa escalonada en tres masas horizontales 16/12/7 u, separación negativa 2.2 u, tronco dominante y raíces tabulares); (2) garantizar área táctil real mínima de 44x44 px en CategoryNavGrid, CategoriaCard, InlineCategoryExplorer y catálogo interno, sin introducir interactividad en TourismCategoryIcon; (3) acreditar S1, S2 y S3 mediante fixtures locales deterministas que monten los componentes verdaderos con datos locales y sin backend; (4) regenerar la evidencia visual y la gobernanza estrictamente asociadas. No autoriza datos, migraciones, backend, storage, dependencias nuevas, nuevos símbolos, producción, merge, despliegue, activación del flag ni publicación.",
+  "defects": [
+    {
+      "id": "D-G6-01",
+      "title": "Ceiba no reconocible",
+      "resolution": "Alternativa B implementada en src/components/omxds/icons/naturaleza.tsx. Copa escalonada de tres niveles, sin elipses ni círculos; se elimina la lectura de hongo o globo."
+    },
+    {
+      "id": "D-G6-02",
+      "title": "Área táctil compact incumple 44x44 px",
+      "resolution": "Garantía real sobre los controles (a[href]/button) de CategoryNavGrid, CategoriaCard e InlineCategoryExplorer con min-h-[44px], min-w-[44px] y data-omxds-touch-target=\"44\". TourismCategoryIcon permanece decorativo (aria-hidden, sin foco ni rol interactivo) y sólo expone instrumentación de medición."
+    },
+    {
+      "id": "D-G6-03",
+      "title": "QA sin componente montado",
+      "resolution": "Fixtures deterministas #fixture-s1 (DiscoveryNavigator), #fixture-s2 (DiscoveryNavigatorBlock con previewData) y #fixture-s3 (CategoriaCard con CATEGORIAS_MOCK) en /lovable/g6-category-icon-catalog. iconCount observado 6/6/8 en los seis viewports."
+    }
+  ],
+  "scope": {
+    "type": "visual-tactil-documental",
+    "modified_paths": [
+      "src/components/omxds/icons/naturaleza.tsx",
+      "src/components/omxds/TourismCategoryIcon.tsx",
+      "src/components/omxds/CategoryNavGrid.tsx",
+      "src/components/cards/CategoriaCard.tsx",
+      "src/components/discovery/InlineCategoryExplorer.tsx",
+      "src/routes/lovable/g6-category-icon-catalog.tsx",
+      "scripts/omxds/g6/category-icon-system.contract.test.ts",
+      "scripts/omxds/g6/category-icon-system.evidence.mjs",
+      "docs/evidence/omxds-g6/category-icons/catalog-viewports.md",
+      "docs/governance/06-BLUEPRINT-MASTER-INDEX.md"
+    ],
+    "created_paths": ["docs/governance/addenda/PCA-2026-037-ADDENDUM-A.json"],
+    "regenerated_paths": [
+      "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
+      "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
+      "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json"
+    ]
+  },
+  "evidence": {
+    "captures": "42 capturas locales en /tmp/omxds-g6/ (7 superficies x 6 viewports) con SHA-256 en /tmp/omxds-g6/metrics.json",
+    "closeups": "/tmp/omxds-g6/ceiba-closeups.png",
+    "matrix": "docs/evidence/omxds-g6/category-icons/catalog-viewports.md",
+    "contrast": "docs/evidence/omxds-g6/category-icons/contrast.tsv (22/22 PASS, tokens sin cambio)",
+    "overflow_px": 0,
+    "min_touch_target_px": "59x44",
+    "icon_count_fixtures": { "fixture-s1": 6, "fixture-s2": 6, "fixture-s3": 8 }
+  },
+  "no_changes": {
+    "data": true,
+    "backend": true,
+    "storage": true,
+    "migrations": true,
+    "dependencies": true,
+    "new_symbols": true,
+    "feature_flags": true,
+    "production": true
+  },
+  "invariants": ["omxds_visual_v1_contracts_enabled=false"],
+  "recorded_at": "2026-08-27"
+}
