@@ -180,7 +180,7 @@ function G6CategoryIconCatalog() {
               previewData={{
                 scope: { kind: "destination", slug: "fixture", label: "Destino fixture" },
                 categories: [...FIXTURE_CATEGORIES],
-                slots: [],
+                extensions: [],
               }}
             />
           </div>
