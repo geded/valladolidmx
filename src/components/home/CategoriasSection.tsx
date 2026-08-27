@@ -1,5 +1,9 @@
 /**
  * CategoriasSection — Sección 3 de Home.
+ *
+ * Navegación responsive aprobada: 2 columnas en celular, 4 en tablet
+ * y hasta 8 en escritorio. Las categorías usan CategoriaCard como
+ * botón compacto; no se renderizan tarjetas editoriales sin fotografía.
  */
 import { Container } from "@/components/layout/Container";
 import { SectionHeader } from "@/components/common/SectionHeader";
@@ -21,14 +25,21 @@ export function CategoriasSection({ config }: { config?: Record<string, unknown>
     staleTime: 5 * 60 * 1000,
   });
   const categories = data && data.length > 0 ? data : CATEGORIAS_MOCK;
-  const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.categories_title");
+  const title =
+    typeof config?.heading === "string" && config.heading.trim()
+      ? config.heading
+      : t("sections.categories_title");
+
   return (
-    <section id="categorias" className="@container bg-secondary/40 py-20 @3xl:py-28">
+    <section id="categorias" className="@container bg-secondary/40 py-14 @3xl:py-20">
       <Container>
         <SectionHeader title={title} subtitle={t("sections.categories_sub")} />
-        <div data-home-grid="categorias" className="grid grid-cols-1 gap-4 @2xl:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4">
-          {categories.map((c) => (
-            <CategoriaCard key={c.id} category={c} />
+        <div
+          data-home-grid="categorias"
+          className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8"
+        >
+          {categories.map((category) => (
+            <CategoriaCard key={category.id} category={category} />
           ))}
         </div>
       </Container>
