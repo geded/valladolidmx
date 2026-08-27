@@ -163,11 +163,15 @@ export function InlineCategoryExplorer({
   );
 
   return (
+    // G6-S1-A · D-G6-02: todos los controles reales del explorador
+    // (botones y enlaces accionables) garantizan 44×44 px y foco visible.
     <section
       aria-label={`Explorando ${label}${destinationName ? ` en ${destinationName}` : ""}`}
-      className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm"
+      className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5 [&_a[href]]:min-h-[44px] [&_button]:min-h-[44px] [&_button]:min-w-[44px] [&_button]:focus-visible:ring-2 [&_button]:focus-visible:ring-ring"
       data-inline-explorer
+      data-omxds-touch-target="44"
     >
+
       <header className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
           {/* G6-S1 · autoridad única de iconografía (fail-closed) */}
