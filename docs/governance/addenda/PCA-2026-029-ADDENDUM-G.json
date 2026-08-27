@@ -1,0 +1,18 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-G",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-27 · AUTORIZACIÓN G8-A · FASE A. Autoriza exclusivamente reconciliar de forma append-only el digest acreditado de src/components/experience-builder/VisualStudio.tsx en PCA-2026-029, como consecuencia del cambio ya ejecutado y autorizado bajo G7-C (canvas editorial completo). No autoriza ninguna otra variación: cualquier cambio adicional falla cerrado.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/experience-builder/VisualStudio.tsx",
+    "previous_sha256": "e2295bf154284f599c31a028228bcc4b341531abeb44745207eeb3f36d79fcf5",
+    "current_sha256": "37624843649eb06f90c8e3fb1fe350b5592d9b15286b45ec42352bc8bb4c840b",
+    "semantic_change": "G7-C · Canvas editorial completo del Experience Builder: se acota el scrollport del canvas a un único contenedor, se añaden seis presets responsive con altura real de dispositivo, se garantiza el render completo de Header y Footer dentro del canvas y se selecciona automáticamente la variante de Header solid/overlay según la composición. Alcance exclusivamente de canvas editorial (preview/autoría). Cero cambio en backend, datos, storage, migraciones, publicación y flags; omxds_visual_v1_contracts_enabled permanece en false.",
+    "introduced_by_commit": "86a2ffb6",
+    "authority": "PCA-2026-029/PCA-2026-039"
+  },
+  "invariants": ["omxds_visual_v1_contracts_enabled=false"],
+  "recorded_at": "2026-08-27"
+}
