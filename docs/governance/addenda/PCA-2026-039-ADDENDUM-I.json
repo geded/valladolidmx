@@ -1,0 +1,52 @@
+{
+  "id": "PCA-2026-039-ADDENDUM-I",
+  "status": "Approved",
+  "parent": "PCA-2026-039",
+  "blueprint": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORSHIP-PARITY-v1.0.md",
+  "effective_date": "2026-08-26",
+  "founder_authority": "Founder Directive · AUTORIZACIÓN FOUNDER · FAST TRACK DE PLANTILLAS PREMIUM APROBADAS (G8-E). Autoriza exclusivamente: (a) extraer las autoridades visuales del micrositio de destino G4 y de los listados G5 a superficies compartidas (DestinationPremiumSurface, ListingPremiumSurface); (b) registrar los contratos compuestos vmx.destination.premium-g4 v1.0.0 y vmx.listing.premium-g5 v1.0.0 con su política editorial; (c) crear el registro único PREMIUM_TEMPLATE_PRESETS con los 8 presets productivos (1 Home, 1 Destino, 6 Listados); (d) refactorizar las previews internas para consumir la superficie compartida; (e) incorporar la ruta interna no indexable de catálogo al Route Inventory. No autoriza publicar, aprobar, programar, generar token, modificar la Home pública 50d2f632-70bc-4c79-b569-a8a2885d8030, ni activar flags.",
+  "scope": {
+    "created": [
+      "src/components/destination-premium/destination-premium-content.ts",
+      "src/components/destination-premium/DestinationPremiumSurface.tsx",
+      "src/components/destination-premium/destination-premium-config.ts",
+      "src/components/listing-premium/listing-premium-content.ts",
+      "src/components/listing-premium/ListingPremiumSurface.tsx",
+      "src/components/listing-premium/listing-premium-config.ts",
+      "src/lib/experience-builder/blocks/destination-premium-g4/contract.ts",
+      "src/lib/experience-builder/blocks/listing-premium-g5/contract.ts",
+      "src/lib/experience-builder/premium-template-registry.ts",
+      "src/routes/lovable/g8e-premium-template-catalog.tsx"
+    ],
+    "modified": [
+      "src/lib/experience-builder/block-library.ts",
+      "src/lib/experience-builder/composition-renderer.tsx",
+      "src/lib/experience-builder/editorial-builder-policy.ts",
+      "src/lib/experience-builder/route-inventory.ts",
+      "src/routes/lovable/g4-destination-microsite-preview.tsx",
+      "src/routes/lovable/g5-listing-readiness-preview.tsx"
+    ]
+  },
+  "route_inventory": {
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "current_sha256": "344f93723e8d2385448892797fe9c6d7c54e1cd5c5b35c41075fee3636dfe95c",
+    "semantic_change": "G8-E · Alta en SCANNED_ROUTE_FILES de la ruta interna no indexable src/routes/lovable/g8e-premium-template-catalog.tsx, usada exclusivamente como catálogo de evidencia de los 8 presets premium renderizados por el CompositionRenderer. Cobertura verificada: 202 rutas.",
+    "authority": "PCA-2026-039"
+  },
+  "verification": {
+    "typecheck": "PASS (tsgo --noEmit)",
+    "route_inventory_coverage": "PASS · 202 rutas",
+    "visual_evidence": [
+      "/lovable/g8e-premium-template-catalog · overflow-x 0 · 0 errores de consola",
+      "/lovable/g4-destination-microsite-preview · overflow-x 0 · 0 errores de consola",
+      "/lovable/g5-listing-readiness-preview · overflow-x 0 · 0 errores de consola"
+    ]
+  },
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "CategoriaCard.tsx sin cambios",
+    "22 PNG bordados sin cambios",
+    "Sin publicación, datos, migraciones, backend, storage ni despliegue"
+  ],
+  "recorded_at": "2026-08-26"
+}
