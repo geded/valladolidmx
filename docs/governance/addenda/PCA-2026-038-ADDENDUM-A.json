@@ -1,0 +1,55 @@
+{
+  "id": "PCA-2026-038-ADDENDUM-A",
+  "parent_authorization": "PCA-2026-038",
+  "title": "Addendum G7-A · Fixture integrado, evidencia y curación de categorías",
+  "effective_date": "2026-08-27",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "base_head": "183e79b6d9e773a46c95cd7017437da1a49fafc8",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "scope": [
+    "PEND-G7-F01 · fixture integrado inexistente",
+    "Ausencia de pruebas y evidencia G7",
+    "GAP-G7-N01 · selección y orden manual de categorías desde Studio"
+  ],
+  "authorized_routes": [
+    "src/routes/lovable/g4-home-premium-preview.tsx",
+    "src/lib/experience-builder/block-library.ts",
+    "src/components/experience-builder/blocks/DiscoveryNavigatorBlock.tsx",
+    "scripts/omxds/g7/premium-builder-capabilities.contract.test.ts",
+    "scripts/omxds/g7/premium-builder-capabilities.evidence.mjs",
+    "docs/evidence/omxds-g7/premium-builder-capabilities.md",
+    "docs/governance/addenda/PCA-2026-038-ADDENDUM-A.json",
+    "docs/blueprint/19.32-G7-PREMIUM-BUILDER-CAPABILITIES-v1.0.md",
+    "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+    "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
+    "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
+    "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
+    "package.json"
+  ],
+  "prohibitions": [
+    "22 PNG bordados, lámina de autoridad y manifiesto inmutables",
+    "TourismCategoryIcon.tsx y CategoriaCard.tsx intactos",
+    "Sin cambios en los seis listados, SEO, datos, backend, storage, migraciones ni flags",
+    "Sin publicación de composiciones, tokens, PR, merge ni despliegue"
+  ],
+  "gates": [
+    "test:g7",
+    "validate:g7",
+    "validate:g6:s1",
+    "typecheck",
+    "lint",
+    "build",
+    "governance:check",
+    "governance:product-check",
+    "route-inventory-coverage",
+    "sync-governance --check"
+  ],
+  "contract_versions": {
+    "vmx.hero": "1.3.0",
+    "vmx.alux.planner": "1.0.0",
+    "vmx.section.rutas": "1.1.0",
+    "vmx.discovery.navigator": "1.1.0"
+  },
+  "status": "executed"
+}

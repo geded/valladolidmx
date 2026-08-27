@@ -36,6 +36,8 @@
     "validate:i4:b": "bun run test:i4:b && bun scripts/omxds/i4/editorial-builder-workflow.evidence.mjs",
     "test:g6:s1": "bun test scripts/omxds/g6/category-icon-system.contract.test.ts",
     "validate:g6:s1": "bun run test:g6:s1 && bun scripts/omxds/g6/category-icon-system.evidence.mjs",
+    "test:g7": "bun test scripts/omxds/g7/premium-builder-capabilities.contract.test.ts",
+    "validate:g7": "bun run test:g7 && bun scripts/omxds/g7/premium-builder-capabilities.evidence.mjs",
     "lint": "bun scripts/lint/lint-baseline.mjs",
     "lint:full": "eslint .",
     "lint:baseline:check": "bun scripts/lint/lint-baseline.mjs",
