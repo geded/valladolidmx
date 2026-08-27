@@ -1,0 +1,54 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-039",
+  "title": "19.33 · G8 · Home Premium Authoring Parity v1.0",
+  "status": "Approved",
+  "branch": "fix/omxds-g6-founder-approved-embroidered-icons-v1",
+  "blueprint": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-27 · Autorización G8 · Paridad de autoría para la Home premium aprobada sobre HEAD 75ecdb7793b684e116d48793129e8266a22925d8. Autoriza exclusivamente registrar como authorable en la superficie home los contratos que la Home premium G4 ya emplea (vmx.hero con variante editorial-split, vmx.smart.destinations-grid, vmx.smart.businesses-grid, vmx.smart.products-grid, vmx.smart.events-list, vmx.section.rutas, vmx.section.arma-tu-viaje y vmx.experience.map), aislar el arnés histórico I4-0 de la validación de árboles, actualizar las pruebas fail-closed de autoría I4 y contratos G7, crear el contrato G8 de paridad y la gobernanza asociada, y guardar una única composición en estado draft. No autoriza publicar, modificar la preview G4, componentes visuales, PNG bordados, CategoriaCard.tsx, datos de producción, backend, migraciones, storage, dependencias nuevas, merge, despliegue ni activación del flag; omxds_visual_v1_contracts_enabled permanece false.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/editorial-builder-policy.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "scripts/omxds/i4/editorial-builder-authoring.test.ts"
+    },
+    {
+      "operation": "create",
+      "path": "scripts/omxds/g8/home-premium-authoring-parity.contract.test.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    },
+    {
+      "operation": "create",
+      "path": "docs/blueprint/19.33-G8-HOME-PREMIUM-AUTHORING-PARITY-v1.0.md"
+    },
+    {
+      "operation": "create",
+      "path": "docs/governance/product-authorizations/PCA-2026-039.json"
+    },
+    {
+      "operation": "modify",
+      "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:g8",
+    "bun run validate:g7",
+    "bun run validate:g6:s1",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}
