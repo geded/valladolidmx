@@ -32,6 +32,7 @@ import { Hero } from "@/components/home/Hero";
 import { DestinosSection } from "@/components/home/DestinosSection";
 import { CategoriasSection } from "@/components/home/CategoriasSection";
 import { RutasSection } from "@/components/home/RutasSection";
+import { AluxPlannerBlock } from "@/components/experience-builder/blocks/alux-planner/AluxPlannerBlock";
 import { ConsejoAluxSection } from "@/components/home/ConsejoAluxSection";
 import { ArmaTuViajeSection } from "@/components/home/ArmaTuViajeSection";
 import { EnVivoSection } from "@/components/home/EnVivoSection";
@@ -440,6 +441,7 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.section.destinos": NamedSectionPreview,
   "vmx.section.categorias": NamedSectionPreview,
   "vmx.section.rutas": NamedSectionPreview,
+  "vmx.alux.planner": NamedSectionPreview,
   "vmx.section.consejo-alux": NamedSectionPreview,
   "vmx.section.arma-tu-viaje": NamedSectionPreview,
   "vmx.section.en-vivo": NamedSectionPreview,
@@ -622,6 +624,8 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.section.destinos": wrap(DestinosSection),
   "vmx.section.categorias": wrap(CategoriasSection),
   "vmx.section.rutas": wrap(RutasSection),
+  // G7 · Planificador Alux visual (render-only, sin IA ni persistencia).
+  "vmx.alux.planner": wrap(AluxPlannerBlock),
   "vmx.section.consejo-alux": wrap(ConsejoAluxSection),
   "vmx.section.arma-tu-viaje": wrap(ArmaTuViajeSection),
   "vmx.section.en-vivo": wrap(EnVivoSection),
