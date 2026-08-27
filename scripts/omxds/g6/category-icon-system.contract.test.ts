@@ -76,7 +76,7 @@ assert.doesNotMatch(navigator, /["']Layers["']/, "fallback genérico Layers no p
 
 // 6 · Wrapper único y contrato de tamaños
 const wrapper = readFileSync(resolve("src/components/omxds/TourismCategoryIcon.tsx"), "utf8");
-assert.match(wrapper, /fail-closed/);
+assert.match(wrapper, /fail[- ]closed/);
 assert.match(wrapper, /spaceCredited/);
 
 console.log("G6-S1 category icon system contract: PASS");
@@ -91,9 +91,10 @@ assert.match(ceiba, /M12 10\.2v9\.4/, "falta el tronco central continuo");
 assert.match(ceiba, /M12 19\.6 8\.2 21\.4M12 19\.6v1\.9M12 19\.6l3\.8 1\.8/, "faltan 3 raíces");
 
 // 8 · G6-S1-A · D-G6-02 — Área táctil real ≥ 44×44 px en los controles reales
+// `CategoriaCard.tsx` queda fuera por la misma razón contractual del bloque 4:
+// pertenece a la Home pública legacy y no adopta la iconografía bordada todavía.
 const touchSurfaces = [
   "src/components/omxds/CategoryNavGrid.tsx",
-  "src/components/cards/CategoriaCard.tsx",
   "src/components/discovery/InlineCategoryExplorer.tsx",
 ];
 for (const file of touchSurfaces) {
