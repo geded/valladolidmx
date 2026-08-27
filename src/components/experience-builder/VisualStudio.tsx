@@ -2584,7 +2584,7 @@ function auditWidthsEnabled(): boolean {
 }
 
 /**
- * Toggle segmentado Móvil / Tablet / Desktop para el canvas.
+ * G7-C · Selector de presets del canvas (seis dispositivos exactos).
  * Default móvil — el turismo se consume mayormente en celular y así el
  * empresario ve la verdad del turista sin publicar.
  */
@@ -2595,39 +2595,28 @@ function DeviceToggle({
   value: DeviceViewport;
   onChange: (v: DeviceViewport) => void;
 }) {
-  const [audit, setAudit] = useState(false);
-  useEffect(() => setAudit(auditWidthsEnabled()), []);
-  const items: Array<{ id: DeviceViewport; label: string; short: string }> = [
-    { id: "mobile", label: "Vista móvil (390 px)", short: "Móvil" },
-    { id: "tablet", label: "Vista tablet (768 px)", short: "Tablet" },
-    { id: "desktop", label: "Vista desktop (1280 px)", short: "Desktop" },
-    ...(audit
-      ? ([
-          { id: "w1024", label: "Auditoría G3-H03 · ancho exacto 1024 px", short: "1024" },
-          { id: "w1440", label: "Auditoría G3-H04 · ancho exacto 1440 px", short: "1440" },
-        ] as Array<{ id: DeviceViewport; label: string; short: string }>)
-      : []),
-  ];
   return (
     <div
       role="group"
       aria-label="Vista previa por dispositivo"
+      data-eb-device-presets={DEVICE_PRESETS.length}
       className="inline-flex items-center overflow-hidden rounded-md border border-border bg-background"
     >
-      {items.map((it) => {
-        const active = it.id === value;
+      {DEVICE_PRESETS.map((preset) => {
+        const active = preset.id === value;
         return (
           <button
-            key={it.id}
+            key={preset.id}
             type="button"
-            onClick={() => onChange(it.id)}
+            onClick={() => onChange(preset.id)}
             aria-pressed={active}
-            title={it.label}
+            title={preset.label}
+            data-eb-device-preset={preset.id}
             className={`px-2.5 py-1.5 text-[11px] font-medium transition ${
               active ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-accent"
             }`}
           >
-            {it.short}
+            {preset.short}
           </button>
         );
       })}
