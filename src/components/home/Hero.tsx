@@ -462,7 +462,9 @@ function HeroButton({
         : " border border-white/20 bg-white/5 text-white/95 backdrop-blur-md hover:bg-white/15";
     icon = <Compass className="size-4" aria-hidden />;
   } else {
-    cls += " bg-transparent font-medium text-white/95 hover:text-white";
+    cls += onLight
+      ? " bg-transparent font-medium text-foreground hover:text-primary"
+      : " bg-transparent font-medium text-white/95 hover:text-white";
   }
   return (
     <a href={href} className={cls}>
