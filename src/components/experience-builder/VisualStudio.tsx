@@ -2816,12 +2816,15 @@ function CanvasViewport({
     const viewportStyle = doc.createElement("style");
     viewportStyle.setAttribute("data-eb-canvas-viewport-style", "");
     viewportStyle.textContent = `
+      html, body { overflow-x: hidden; }
       form[role="search"],
       form[role="search"] > div,
       form[role="search"] > div > button {
         min-width: 0;
         max-width: 100%;
       }
+      /* G7-C · El pie de página respeta la safe area inferior del móvil. */
+      footer { padding-bottom: max(0px, env(safe-area-inset-bottom)); }
     `;
     doc.head.appendChild(viewportStyle);
 
