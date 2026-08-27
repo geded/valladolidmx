@@ -19,9 +19,7 @@ const hero = read("src/components/home/Hero.tsx");
 const rutas = read("src/components/home/RutasSection.tsx");
 const alux = read("src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx");
 const aluxContract = read("src/lib/experience-builder/blocks/alux-planner/contract.ts");
-const navigatorBlock = read(
-  "src/components/experience-builder/blocks/DiscoveryNavigatorBlock.tsx",
-);
+const navigatorBlock = read("src/components/experience-builder/blocks/DiscoveryNavigatorBlock.tsx");
 
 // 1 · Registro en la Biblioteca Oficial
 for (const type of [
@@ -88,7 +86,10 @@ assert.ok(hero.includes("mobile_order"), "Hero editorial debe gobernar el orden 
 assert.ok(hero.includes("media_side"), "Hero editorial debe gobernar el lado de los medios");
 
 // 6 · Alux es render-only y apunta a /arma-tu-viaje
-assert.ok(aluxContract.includes("/arma-tu-viaje"), "el default del CTA de Alux debe ser productivo");
+assert.ok(
+  aluxContract.includes("/arma-tu-viaje"),
+  "el default del CTA de Alux debe ser productivo",
+);
 assert.ok(alux.includes("readOnly"), "el campo de Alux debe ser no interactivo");
 for (const token of ["useMutation", "supabase", "createServerFn", "localStorage"]) {
   assert.ok(!alux.includes(token), `Alux no debe persistir ni escribir (${token})`);
