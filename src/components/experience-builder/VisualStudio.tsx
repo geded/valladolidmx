@@ -1763,6 +1763,32 @@ function PageVisualEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tree]);
 
+  // G7-C · Altura acotada real del editor: el shell del Studio se mide contra
+  // la ventana (sin alturas mágicas) para que el canvas nunca sobresalga del
+  // área visible y exista un único scrollport.
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const [shellHeight, setShellHeight] = useState<number | null>(null);
+  useEffect(() => {
+    const measure = () => {
+      const el = shellRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const height = Math.max(360, Math.round(window.innerHeight - top));
+      setShellHeight((current) =>
+        current === null || Math.abs(current - height) > 1 ? height : current,
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (shellRef.current) observer.observe(shellRef.current);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [page, tree]);
+
+
   if (loadError)
     return (
       <FullScreenState title="No se pudo abrir el editor" detail={loadError} onExit={onExit} />
@@ -1778,7 +1804,13 @@ function PageVisualEditor({
     );
 
   return (
-    <div className="flex h-screen min-h-0 flex-col overflow-hidden bg-background">
+    <div
+      ref={shellRef}
+      data-eb-studio-shell=""
+      style={shellHeight ? { height: shellHeight } : undefined}
+      className="flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-background"
+    >
+
       <div className="sticky top-0 z-40 flex flex-wrap items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
         <button
           type="button"
@@ -2677,7 +2709,8 @@ function HomeCanvas({
       const el = outerRef.current;
       if (!el) return;
       const width = Math.max(120, el.clientWidth - 24);
-      const height = Math.max(240, el.clientHeight - 24);
+      // 24px de padding + 32px reservados para la barra indicadora del canvas.
+      const height = Math.max(240, el.clientHeight - 24 - 32);
       setAvailable((current) =>
         Math.abs(current.width - width) > 1 || Math.abs(current.height - height) > 1
           ? { width, height }
