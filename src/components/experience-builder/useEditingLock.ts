@@ -42,6 +42,10 @@ export function useEditingLock(compositionId: string | null | undefined): UseEdi
 
   const tryAcquire = async (force = false) => {
     if (!compositionId) return;
+    if (!(await hasSession())) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await acquireEditLock({ data: { id: compositionId, force } });
       if (res.acquired) {
@@ -70,12 +74,18 @@ export function useEditingLock(compositionId: string | null | undefined): UseEdi
   useEffect(() => {
     if (!compositionId || !owned) return;
     const id = window.setInterval(() => {
-      void heartbeatEditLock({ data: { id: compositionId } }).then((r) => {
-        if (!r.ok) {
-          setOwned(false);
-          setBlockedBy(r.lock);
+      void (async () => {
+        try {
+          if (!(await hasSession())) return;
+          const r = await heartbeatEditLock({ data: { id: compositionId } });
+          if (!r.ok) {
+            setOwned(false);
+            setBlockedBy(r.lock);
+          }
+        } catch {
+          /* silent — transient/auth errors must not break the editor */
         }
-      }).catch(() => undefined);
+      })();
     }, 30_000);
     return () => window.clearInterval(id);
   }, [compositionId, owned]);
@@ -87,8 +97,11 @@ export function useEditingLock(compositionId: string | null | undefined): UseEdi
       if (releasedRef.current || !owned) return;
       releasedRef.current = true;
       try {
-        // Fire-and-forget; server function handles auth.
-        void releaseEditLock({ data: { id: compositionId } }).catch(() => undefined);
+        // Fire-and-forget; skip when signed out.
+        void (async () => {
+          if (!(await hasSession())) return;
+          await releaseEditLock({ data: { id: compositionId } });
+        })().catch(() => undefined);
       } catch {
         /* noop */
       }
