@@ -421,7 +421,16 @@ export function Hero({ config }: HeroProps = {}) {
   );
 }
 
-function HeroButton({ cta, isPrimary }: { cta: HeroCta; isPrimary: boolean }) {
+function HeroButton({
+  cta,
+  isPrimary,
+  onLight = false,
+}: {
+  cta: HeroCta;
+  isPrimary: boolean;
+  /** G7 · true en superficies claras (variante editorial-split). */
+  onLight?: boolean;
+}) {
   const label = cta.label ?? "";
   const href = cta.href || "#";
   const variant = cta.variant ?? (isPrimary ? "primary" : "secondary");
@@ -448,7 +457,9 @@ function HeroButton({ cta, isPrimary }: { cta: HeroCta; isPrimary: boolean }) {
     icon = <ArrowRight className="size-4" aria-hidden />;
   } else if (variant === "secondary") {
     cls +=
-      " border border-white/20 bg-white/5 text-white/95 backdrop-blur-md hover:bg-white/15";
+      onLight
+        ? " border border-border bg-background text-foreground hover:bg-muted"
+        : " border border-white/20 bg-white/5 text-white/95 backdrop-blur-md hover:bg-white/15";
     icon = <Compass className="size-4" aria-hidden />;
   } else {
     cls += " bg-transparent font-medium text-white/95 hover:text-white";
