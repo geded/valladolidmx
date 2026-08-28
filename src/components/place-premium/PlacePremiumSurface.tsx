@@ -73,25 +73,40 @@ export function PlacePremiumSurface({
   );
 
   return (
-    <div data-place-presentation={presentation} className={cn("pb-24", className)}>
+    <div
+      data-place-presentation={presentation}
+      /* Founder Review G8-Q2D-0 · zona segura inferior para que el dock de
+         Alux nunca cubra contenido en ninguna dirección visual. */
+      data-alux-safe-zone="true"
+      className={cn("pb-24", className)}
+    >
       <Container className="pt-6">
         <DemoNotice text={content.demoNotice} />
       </Container>
 
       {cinematic ? (
         <>
-          <div className="mt-5">
+          {/* Breadcrumb territorial permanente: visible ANTES del hero y
+              persistente al hacer scroll, igual que en Editorial. */}
+          <div className="sticky top-0 z-20 mt-4 border-y border-border bg-background/90 backdrop-blur">
+            <Container className="py-1.5">
+              <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
+            </Container>
+          </div>
+          <div className="mt-4">
             <PremiumHero
               vm={{
                 presentation: "cinematic",
                 eyebrow: content.identity.eyebrow,
                 title: content.identity.title,
                 description: content.identity.subtitle,
-                media: {
-                  url: content.hero.cover.url,
-                  alt: content.hero.cover.alt,
-                  credit: content.hero.cover.credit,
-                },
+                media: content.hero.cover.url
+                  ? {
+                      url: content.hero.cover.url,
+                      alt: content.hero.cover.alt,
+                      credit: content.hero.cover.credit,
+                    }
+                  : null,
                 badges: content.identity.badges.map((label) => ({ label })),
                 primaryAction: { label: content.hero.primaryCta.label },
                 secondaryAction: {
@@ -101,12 +116,11 @@ export function PlacePremiumSurface({
               }}
             />
           </div>
-          {/* Breadcrumb territorial permanente, aquí como barra fija bajo el hero. */}
-          <div className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur">
-            <Container className="py-1">
-              <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
+          {content.hero.cover.url ? null : (
+            <Container className="mt-3">
+              <p className="text-xs text-muted-foreground">{content.hero.cover.credit}</p>
             </Container>
-          </div>
+          )}
           <Container className="mt-8">
             <IdentityStrip content={content} dense />
           </Container>
@@ -120,6 +134,7 @@ export function PlacePremiumSurface({
             <IntroCentered content={content} />
           </Container>
         </>
+
       ) : (
         <>
           <Container className="mt-4">
