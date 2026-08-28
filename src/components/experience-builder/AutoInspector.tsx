@@ -663,171 +663,170 @@ function FieldControl({
   }
 }
 
+/**
+ * MediaControl · G8-M1 · Safe Media Replacement MVP
+ *
+ * Flujo único: un botón primario `Seleccionar o subir imagen` abre la
+ * Biblioteca. Cero `FileReader`, cero `data:` URI, cero base64 en la
+ * composición. ALT, crédito, naturaleza, estado de revisión y punto focal
+ * viajan con la referencia del slot y nunca se descartan en silencio.
+ */
 function MediaControl({
-  baseClass, def, value, onChange,
+  def, value, onChange,
 }: { baseClass: string; def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void }) {
-  const v = (value as string) ?? "";
-  const reactId = useId();
-  const inputId = `media-${reactId.replace(/:/g, "")}`;
+  const raw = (value as string) ?? "";
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [importing, setImporting] = useState(false);
-  const importFn = useServerFn(importUrlToStudioMedia);
-  // El botón "Guardar en Biblioteca" SÓLO aparece cuando la imagen viene
-  // desde el código del sitio (assets del bundle: /assets/…, /__l5e/…,
-  // /src/assets/…). No aparece para URLs externas pegadas por el usuario,
-  // para `data:` URIs recién subidas, ni para archivos que ya viven en el
-  // bucket studio-media (biblioteca).
-  const isBundleAssetPath = (raw: string): boolean => {
-    let path = raw;
-    if (/^https?:\/\//i.test(raw)) {
-      try {
-        const u = new URL(raw);
-        if (typeof window !== "undefined" && u.origin !== window.location.origin) {
-          return false;
-        }
-        path = u.pathname;
-      } catch {
-        return false;
-      }
-    }
-    return /^\/(assets|__l5e|src\/assets)\//i.test(path);
-  };
-  const isImportable =
-    !!v &&
-    !v.includes("/api/public/studio-media/") &&
-    isBundleAssetPath(v);
-  // Sugerencia: cuando el campo está vacío pero el bloque tiene una imagen
-  // por defecto declarada en código (ruta del bundle), la ofrecemos con un
-  // botón "Usar imagen sugerida" para que el editor no tenga que copiarla a
-  // mano. Al aceptar, el valor se materializa en el campo y aparece el
-  // botón "Guardar en Biblioteca" para importarla al bucket.
-  const suggested =
-    !v && typeof def.default === "string" && isBundleAssetPath(def.default)
-      ? (def.default as string)
-      : "";
-  const handleImport = async () => {
-    if (!v || importing) return;
-    setImporting(true);
-    try {
-      // Si es una ruta relativa del sitio, la convertimos a absoluta para
-      // que el server pueda descargarla desde el propio origen.
-      let url = v;
-      if (url.startsWith("/") && typeof window !== "undefined") {
-        url = `${window.location.origin}${url}`;
-      }
-      const res = await importFn({ data: { url } });
-      onChange(res.url);
-      toast.success("Imagen guardada en la Biblioteca");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Error desconocido";
-      toast.error(`No se pudo importar: ${msg}`);
-    } finally {
-      setImporting(false);
-    }
-  };
+  const [showAltOverride, setShowAltOverride] = useState(false);
+  const media = decodeSlotMedia(raw);
+  const hasImage = Boolean(media.src);
+  const natureLabel =
+    media.nature === "ai_generated"
+      ? "Generada con IA"
+      : media.nature === "documentary"
+        ? "Fotografía documental"
+        : media.nature === "conceptual"
+          ? "Imagen conceptual"
+          : "Naturaleza no declarada";
+
+  const applyFocal = (x: number, y: number) =>
+    onChange(encodeSlotMedia({ ...media, src: media.src, focalX: x, focalY: y, reviewState: media.reviewState }));
+
   return (
     <div className="space-y-2">
-      {v ? (
-        <div className="overflow-hidden rounded-md border border-border bg-muted/30">
-          <img src={v} alt="Vista previa" className="max-h-36 w-full object-cover" />
-        </div>
-      ) : null}
-      {!v && suggested ? (
-        <div className="space-y-1 rounded-md border border-dashed border-amber-300 bg-amber-50/60 p-2 dark:border-amber-700/50 dark:bg-amber-950/30">
-          <div className="overflow-hidden rounded">
-            <img src={suggested} alt="Sugerida" className="max-h-28 w-full object-cover" />
+      {hasImage ? (
+        <div className="space-y-2 rounded-lg border border-border bg-muted/20 p-2">
+          <div className="overflow-hidden rounded-md border border-border bg-muted/30">
+            <img
+              src={media.src}
+              alt={media.alt ?? "Vista previa"}
+              className="max-h-36 w-full object-cover"
+              style={{ objectPosition: focalObjectPosition(media) }}
+            />
           </div>
-          <button
-            type="button"
-            onClick={() => onChange(suggested)}
-            className="inline-flex w-full items-center justify-center gap-1 rounded-md border border-amber-300 bg-amber-100 px-2 py-1 text-[11px] font-medium text-amber-900 hover:bg-amber-200 dark:border-amber-700/50 dark:bg-amber-900/40 dark:text-amber-100"
-            title="Usa la imagen que el bloque trae por defecto en el código"
-          >
-            Usar imagen sugerida
-          </button>
+          <dl className="space-y-0.5 text-[10px] text-muted-foreground">
+            <div><span className="font-medium text-foreground">ALT:</span> {media.alt ?? "(sin ALT)"}</div>
+            <div><span className="font-medium text-foreground">Crédito:</span> {media.credit ?? "(sin crédito)"}</div>
+            <div><span className="font-medium text-foreground">Naturaleza:</span> {natureLabel}</div>
+            <div>
+              <span className="font-medium text-foreground">Revisión:</span>{" "}
+              {media.reviewState === "approved" ? "Aprobada" : media.reviewState ?? "sin dato"}
+            </div>
+            <div>
+              <span className="font-medium text-foreground">Punto focal:</span>{" "}
+              {media.focalX.toFixed(2)} · {media.focalY.toFixed(2)}
+            </div>
+          </dl>
+          <div className="flex flex-wrap gap-1">
+            <button
+              type="button"
+              onClick={() => setPickerOpen(true)}
+              className="inline-flex h-9 items-center gap-1 rounded-md border border-primary/40 bg-primary/5 px-3 text-xs font-medium text-primary hover:bg-primary/10"
+            >
+              <ImageIcon className="size-3.5" aria-hidden /> Cambiar imagen
+            </button>
+            <button
+              type="button"
+              onClick={() => onChange("")}
+              className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+              title="Quita la referencia de este slot. El activo permanece intacto en la Biblioteca."
+            >
+              Quitar de este slot
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowAltOverride((v) => !v)}
+              className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+              title="Override de ALT sólo para este slot; el ALT original se conserva en la Biblioteca."
+            >
+              ALT de este slot
+            </button>
+          </div>
+          {showAltOverride ? (
+            <input
+              type="text"
+              className="h-9 w-full rounded-md border border-border bg-background px-2 text-xs"
+              placeholder="ALT específico para este contexto"
+              value={media.alt ?? ""}
+              onChange={(e) =>
+                onChange(encodeSlotMedia({ ...media, alt: e.target.value || null }))
+              }
+            />
+          ) : null}
+          <SlotFocalPicker media={media} onChange={applyFocal} />
         </div>
-      ) : null}
-      <div className="flex flex-wrap items-center gap-1">
+      ) : (
         <button
           type="button"
           onClick={() => setPickerOpen(true)}
-          className="inline-flex h-7 items-center gap-1 rounded-md border border-primary/40 bg-primary/5 px-2 text-xs font-medium text-primary hover:bg-primary/10"
-          title="Elegir de la biblioteca de imágenes"
+          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground hover:opacity-90"
         >
-          <ImageIcon className="size-3.5" aria-hidden />
-          Biblioteca
+          <ImageIcon className="size-4" aria-hidden /> Seleccionar o subir imagen
         </button>
-        <span className="text-[10px] text-muted-foreground">o</span>
-      </div>
-      <div className="flex items-center gap-1">
-        <input
-          className={baseClass}
-          type="url"
-          placeholder="Pega la URL de una imagen"
-          value={v}
-          onChange={(e) => onChange(e.target.value)}
-        />
-        <label
-          htmlFor={inputId}
-          className="inline-flex h-7 cursor-pointer items-center justify-center rounded-md border border-border bg-background px-2 text-xs font-medium hover:bg-accent"
-          title="Subir imagen"
-        >
-          <Upload className="size-3.5" aria-hidden />
-        </label>
-      </div>
-      <input
-        id={inputId}
-        type="file"
-        accept={def.accepts?.join(",") ?? "image/*"}
-        className="sr-only"
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-          if (!file) return;
-          if (!file.type.startsWith("image/")) return;
-          if (file.size > 1_800_000) {
-            window.alert("La imagen es demasiado pesada. Usa una imagen menor a 1.8 MB.");
-            return;
-          }
-          const reader = new FileReader();
-          reader.onload = () => onChange(String(reader.result ?? ""));
-          reader.readAsDataURL(file);
-          event.target.value = "";
-        }}
-      />
-      {v ? (
-        <button
-          type="button"
-          onClick={() => onChange("")}
-          className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-destructive"
-        >
-          <Trash2 className="size-3" aria-hidden /> Quitar imagen
-        </button>
-      ) : null}
-      {isImportable ? (
-        <button
-          type="button"
-          onClick={handleImport}
-          disabled={importing}
-          className="inline-flex w-full items-center justify-center gap-1 rounded-md border border-amber-300 bg-amber-50 px-2 py-1.5 text-[11px] font-medium text-amber-900 hover:bg-amber-100 disabled:opacity-60 dark:border-amber-700/50 dark:bg-amber-950/40 dark:text-amber-200"
-          title="Descarga esta URL y la guarda en la Biblioteca del Studio"
-        >
-          {importing ? (
-            <Loader2 className="size-3.5 animate-spin" aria-hidden />
-          ) : (
-            <CloudUpload className="size-3.5" aria-hidden />
-          )}
-          {importing ? "Importando…" : "Guardar en Biblioteca"}
-        </button>
-      ) : null}
+      )}
+      {def.description ? null : null}
       <MediaPickerDialog
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
-        onPick={(url) => onChange(url)}
+        onPick={(picked) =>
+          onChange(
+            encodeSlotMedia({
+              src: picked.url,
+              alt: picked.alt,
+              credit: picked.credit,
+              nature: picked.nature,
+              reviewState: picked.reviewState,
+              focalX: picked.focalX,
+              focalY: picked.focalY,
+            }),
+          )
+        }
         role="gallery"
       />
     </div>
   );
 }
+
+function SlotFocalPicker({
+  media,
+  onChange,
+}: {
+  media: ReturnType<typeof decodeSlotMedia>;
+  onChange: (x: number, y: number) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  if (!media.src) return null;
+  return (
+    <div className="space-y-1">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="text-[11px] font-medium text-primary hover:underline"
+      >
+        {open ? "Ocultar punto focal" : "Ajustar punto focal"}
+      </button>
+      {open ? (
+        <button
+          type="button"
+          className="relative block w-full overflow-hidden rounded-md border border-border"
+          onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+            const y = Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
+            onChange(Math.round(x * 100) / 100, Math.round(y * 100) / 100);
+          }}
+        >
+          <img src={media.src} alt="" className="max-h-40 w-full object-contain" />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary bg-primary/30"
+            style={{ left: `${media.focalX * 100}%`, top: `${media.focalY * 100}%` }}
+          />
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 
 function StructuredListControl({
   def, value, onChange, simple,
