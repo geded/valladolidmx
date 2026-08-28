@@ -108,6 +108,20 @@ export function toDestinationBlockInput(
   };
 }
 
+/**
+ * G8-F1D — Índice URL → atribución acreditada. Las URLs firmadas son
+ * únicas por lectura, por lo que el índice se construye por petición.
+ */
+function attributionIndex(
+  list: PublicMediaAttribution[] | undefined,
+): Map<string, PublicMediaAttribution> {
+  const map = new Map<string, PublicMediaAttribution>();
+  for (const item of list ?? []) {
+    if (item?.url) map.set(item.url, item);
+  }
+  return map;
+}
+
 /* ------------------------------------------------------------------ *
  * Hero
  * ------------------------------------------------------------------ */
