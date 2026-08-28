@@ -38,28 +38,32 @@ export const DEFAULT_CONFIDENCE_WHEN_UNKNOWN = 0.5;
 export interface PriorityFactor {
   key: keyof typeof PRIORITIZATION_WEIGHTS;
   weight: number;
-  value: number;         // ∈ [0,1]
-  contribution: number;  // weight * value
+  value: number; // ∈ [0,1]
+  contribution: number; // weight * value
   explanation: string;
 }
 
 export interface PrioritizedOpportunity {
   rank: number;
   opportunity: Opportunity;
-  score: number;                 // ∈ [0,1]
+  score: number; // ∈ [0,1]
   factors: PriorityFactor[];
   learned_confidence: number;
   confidence_reliability: FamilyLearningSignal["reliability"] | "unknown";
-  rationale: string;             // por qué ocupa esta posición
-  expected_effect: string;       // qué esperamos si actuamos ahora
+  rationale: string; // por qué ocupa esta posición
+  expected_effect: string; // qué esperamos si actuamos ahora
 }
 
 function severityUrgency(s: Opportunity["severity"]): number {
   switch (s) {
-    case "critical": return 1.0;
-    case "attention": return 0.7;
-    case "opportunity": return 0.5;
-    case "informative": return 0.15;
+    case "critical":
+      return 1.0;
+    case "attention":
+      return 0.7;
+    case "opportunity":
+      return 0.5;
+    case "informative":
+      return 0.15;
   }
 }
 
@@ -116,9 +120,7 @@ export interface PrioritizationResult {
 }
 
 /** Priorización pura — CV8.7. */
-export function prioritizeOpportunities(
-  input: PrioritizationInput,
-): PrioritizationResult {
+export function prioritizeOpportunities(input: PrioritizationInput): PrioritizationResult {
   const opps = input.opportunities;
   const confidenceByMetric = new Map<string, FamilyLearningSignal>();
   if (input.validation) {
@@ -126,10 +128,7 @@ export function prioritizeOpportunities(
       confidenceByMetric.set(f.metric_id, f);
     }
   }
-  const maxSample = opps.reduce(
-    (m, o) => Math.max(m, o.evidence.sample_size),
-    0,
-  );
+  const maxSample = opps.reduce((m, o) => Math.max(m, o.evidence.sample_size), 0);
 
   const scored = opps.map((o): PrioritizedOpportunity => {
     const fam = confidenceByMetric.get(o.metric_id);
@@ -148,9 +147,7 @@ export function prioritizeOpportunities(
         key: "confidence",
         weight: PRIORITIZATION_WEIGHTS.confidence,
         value: Number(learned.toFixed(4)),
-        contribution: Number(
-          (PRIORITIZATION_WEIGHTS.confidence * learned).toFixed(4),
-        ),
+        contribution: Number((PRIORITIZATION_WEIGHTS.confidence * learned).toFixed(4)),
         explanation:
           reliability === "unknown"
             ? "Sin evidencia histórica para esta familia — se usa 0.5 por defecto."
@@ -169,9 +166,7 @@ export function prioritizeOpportunities(
         key: "urgency",
         weight: PRIORITIZATION_WEIGHTS.urgency,
         value: urgency,
-        contribution: Number(
-          (PRIORITIZATION_WEIGHTS.urgency * urgency).toFixed(4),
-        ),
+        contribution: Number((PRIORITIZATION_WEIGHTS.urgency * urgency).toFixed(4)),
         explanation: `Severidad ${o.severity}.`,
       },
       {
@@ -185,25 +180,19 @@ export function prioritizeOpportunities(
         key: "journey",
         weight: PRIORITIZATION_WEIGHTS.journey,
         value: jw.value,
-        contribution: Number(
-          (PRIORITIZATION_WEIGHTS.journey * jw.value).toFixed(4),
-        ),
+        contribution: Number((PRIORITIZATION_WEIGHTS.journey * jw.value).toFixed(4)),
         explanation: `Etapa Journey: ${jw.label} — amplifica aguas abajo.`,
       },
       {
         key: "ecosystem",
         weight: PRIORITIZATION_WEIGHTS.ecosystem,
         value: eco.value,
-        contribution: Number(
-          (PRIORITIZATION_WEIGHTS.ecosystem * eco.value).toFixed(4),
-        ),
+        contribution: Number((PRIORITIZATION_WEIGHTS.ecosystem * eco.value).toFixed(4)),
         explanation: `Beneficio ecosistema: ${eco.label}.`,
       },
     ];
 
-    const score = Number(
-      factors.reduce((s, f) => s + f.contribution, 0).toFixed(4),
-    );
+    const score = Number(factors.reduce((s, f) => s + f.contribution, 0).toFixed(4));
 
     const topFactors = [...factors]
       .sort((a, b) => b.contribution - a.contribution)

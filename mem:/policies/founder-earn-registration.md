@@ -3,6 +3,7 @@ name: Founder Earn The Registration Principle
 description: El registro nunca se solicita sólo porque el viajero realizó una acción. Se solicita cuando Alux ya demostró valor suficiente para que el propio viajero perciba beneficio evidente al crear cuenta.
 type: constraint
 ---
+
 Vinculante desde AC1.4. Sólo afecta estrategia de experiencia/conversión — no altera arquitectura local-first, `AnonymousTravelDraft`, `TravelPlan`, ni contratos aprobados.
 
 Reglas:

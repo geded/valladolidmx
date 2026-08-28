@@ -63,10 +63,12 @@ export async function translateTreeBestEffort(
     .select("code, is_default, is_active")
     .eq("is_active", true);
   const locales = (rows ?? []) as Array<{ code: string; is_default: boolean }>;
-  if (locales.length === 0) return { tree: treeInput, translated: 0, skipped: true, reason: "no-locales" };
+  if (locales.length === 0)
+    return { tree: treeInput, translated: 0, skipped: true, reason: "no-locales" };
   const base = locales.find((l) => l.is_default)?.code ?? "es";
   const targets = locales.map((l) => l.code).filter((c) => c !== base);
-  if (targets.length === 0) return { tree: treeInput, translated: 0, skipped: true, reason: "no-targets" };
+  if (targets.length === 0)
+    return { tree: treeInput, translated: 0, skipped: true, reason: "no-targets" };
 
   // Clon profundo (mutamos i18n directamente sobre el clon).
   const tree: CompositionTree = JSON.parse(JSON.stringify(treeInput));
@@ -107,7 +109,7 @@ export async function translateTreeBestEffort(
   }));
 
   const system =
-    "Eres un traductor profesional para una plataforma turística mexicana. Traduce cada campo del idioma base al idioma destino conservando estrictamente: mayúsculas iniciales, puntuación final, saltos de línea, emojis y nombres propios sin traducir (Valladolid, Oriente Maya, Yucatán, Alux, México, Chichén Itzá, Cenote). Longitud similar al original (±20%). Sin comentarios ni comillas adicionales. Devuelve exclusivamente JSON válido con la forma: {\"results\":[{\"id\":<n>,\"translations\":{\"<locale>\":{\"<path>\":\"<texto>\"}}}]}.";
+    'Eres un traductor profesional para una plataforma turística mexicana. Traduce cada campo del idioma base al idioma destino conservando estrictamente: mayúsculas iniciales, puntuación final, saltos de línea, emojis y nombres propios sin traducir (Valladolid, Oriente Maya, Yucatán, Alux, México, Chichén Itzá, Cenote). Longitud similar al original (±20%). Sin comentarios ni comillas adicionales. Devuelve exclusivamente JSON válido con la forma: {"results":[{"id":<n>,"translations":{"<locale>":{"<path>":"<texto>"}}}]}.';
   const prompt =
     `Idioma base: ${base}. Idiomas destino: ${localeUnion.join(", ")}.\n\n` +
     `Entradas (id → fields por dot.path):\n\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\``;
@@ -118,7 +120,12 @@ export async function translateTreeBestEffort(
     const res = await generateText({ model: provider(MODEL), system, prompt });
     raw = res.text ?? "";
   } catch (e) {
-    return { tree: treeInput, translated: 0, skipped: true, reason: `ai-error:${(e as Error).message}` };
+    return {
+      tree: treeInput,
+      translated: 0,
+      skipped: true,
+      reason: `ai-error:${(e as Error).message}`,
+    };
   }
 
   const match = raw.match(/\{[\s\S]*\}/);

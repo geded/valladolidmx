@@ -18,11 +18,11 @@ OMXDS no sustituye a Valladolid.mx. Define el ecosistema superior sobre el cual 
 
 La jerarquía oficial es:
 
-| Nivel | Elemento | Función |
-|---|---|---|
-| Ecosistema regional | **OMXDS** | Arquitectura común, capacidades compartidas, reglas, datos e inteligencia turística regional. |
-| Producto principal | **Valladolid.mx** | Plataforma pública y operativa para descubrir, planear, reservar, vivir y recordar el Oriente Maya de Yucatán. |
-| Capa de inteligencia | **Alux** | Compañero inteligente transversal que interpreta contexto y acompaña al viajero. |
+| Nivel                   | Elemento                                        | Función                                                                                                                            |
+| ----------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Ecosistema regional     | **OMXDS**                                       | Arquitectura común, capacidades compartidas, reglas, datos e inteligencia turística regional.                                      |
+| Producto principal      | **Valladolid.mx**                               | Plataforma pública y operativa para descubrir, planear, reservar, vivir y recordar el Oriente Maya de Yucatán.                     |
+| Capa de inteligencia    | **Alux**                                        | Compañero inteligente transversal que interpreta contexto y acompaña al viajero.                                                   |
 | Sistemas especializados | **Videomapping Valladolid** y futuros productos | Soluciones verticales que reutilizan identidad, inventario, pagos, viajeros, notificaciones, analítica y operación del ecosistema. |
 
 Esta decisión evita dos errores: reducir Valladolid.mx a un portal aislado y convertir OMXDS en una segunda plataforma duplicada.
@@ -86,16 +86,16 @@ Esta métrica conecta el comportamiento digital con el resultado turístico que 
 
 ### Métricas secundarias V1
 
-| Dimensión | Métrica |
-|---|---|
-| Permanencia | Promedio de noches planeadas y confirmadas desde Valladolid como base regional. |
-| Descubrimiento | Destinos y categorías relevantes explorados por sesión o viaje. |
-| Continuidad | Porcentaje de viajeros que retoma un plan, favorito o conversación previa. |
-| Conversión útil | Viajes que pasan de inspiración a acción verificable sin deteriorar confianza. |
-| Economía local | Empresas locales incluidas, contactadas o reservadas por viaje. |
-| Distribución | Porcentaje de derrama estimada fuera de los atractivos de mayor concentración. |
-| Calidad | Satisfacción, NPS y resolución efectiva por Alux/Concierge. |
-| Ecosistema | Empresas activas con información completa y actualizada. |
+| Dimensión       | Métrica                                                                         |
+| --------------- | ------------------------------------------------------------------------------- |
+| Permanencia     | Promedio de noches planeadas y confirmadas desde Valladolid como base regional. |
+| Descubrimiento  | Destinos y categorías relevantes explorados por sesión o viaje.                 |
+| Continuidad     | Porcentaje de viajeros que retoma un plan, favorito o conversación previa.      |
+| Conversión útil | Viajes que pasan de inspiración a acción verificable sin deteriorar confianza.  |
+| Economía local  | Empresas locales incluidas, contactadas o reservadas por viaje.                 |
+| Distribución    | Porcentaje de derrama estimada fuera de los atractivos de mayor concentración.  |
+| Calidad         | Satisfacción, NPS y resolución efectiva por Alux/Concierge.                     |
+| Ecosistema      | Empresas activas con información completa y actualizada.                        |
 
 Una reserva no cuenta como éxito si degrada confianza, utilidad, continuidad o beneficio territorial.
 
@@ -103,17 +103,17 @@ Una reserva no cuenta como éxito si degrada confianza, utilidad, continuidad o 
 
 ## 6. Actores del sistema
 
-| Actor | Necesidad principal | Valor que recibe |
-|---|---|---|
-| Viajero anónimo | Descubrir sin fricción | Inspiración útil, continuidad local y registro sólo cuando aporta valor. |
-| Viajero registrado | Organizar y vivir su viaje | Plan persistente, personalización, reservas, asistencia y memoria. |
-| Empresa turística | Vender y operar mejor | Presencia, demanda directa, herramientas, datos y relación con clientes. |
-| Concierge | Resolver decisiones complejas | Contexto unificado, casos, propuestas, SLA y seguimiento. |
-| Operador/transportista | Coordinar servicios | Demanda, horarios, manifiestos, rutas y notificaciones. |
-| Hotel anfitrión | Extender la estancia | Recomendaciones, venta cruzada, logística y atención a huéspedes. |
-| Comunidad/custodio | Proteger y compartir patrimonio | Visibilidad responsable, participación y beneficio local. |
-| Institución/DMO | Gestionar el destino | Inteligencia agregada, flujos, alertas y evidencia para decidir. |
-| Founder/Admin | Gobernar el ecosistema | Políticas, configuración, calidad, métricas y trazabilidad. |
+| Actor                  | Necesidad principal             | Valor que recibe                                                         |
+| ---------------------- | ------------------------------- | ------------------------------------------------------------------------ |
+| Viajero anónimo        | Descubrir sin fricción          | Inspiración útil, continuidad local y registro sólo cuando aporta valor. |
+| Viajero registrado     | Organizar y vivir su viaje      | Plan persistente, personalización, reservas, asistencia y memoria.       |
+| Empresa turística      | Vender y operar mejor           | Presencia, demanda directa, herramientas, datos y relación con clientes. |
+| Concierge              | Resolver decisiones complejas   | Contexto unificado, casos, propuestas, SLA y seguimiento.                |
+| Operador/transportista | Coordinar servicios             | Demanda, horarios, manifiestos, rutas y notificaciones.                  |
+| Hotel anfitrión        | Extender la estancia            | Recomendaciones, venta cruzada, logística y atención a huéspedes.        |
+| Comunidad/custodio     | Proteger y compartir patrimonio | Visibilidad responsable, participación y beneficio local.                |
+| Institución/DMO        | Gestionar el destino            | Inteligencia agregada, flujos, alertas y evidencia para decidir.         |
+| Founder/Admin          | Gobernar el ecosistema          | Políticas, configuración, calidad, métricas y trazabilidad.              |
 
 ---
 
@@ -121,18 +121,18 @@ Una reserva no cuenta como éxito si degrada confianza, utilidad, continuidad o 
 
 OMXDS se organiza por capacidades compartidas, no por sitios independientes.
 
-| Capa | Capacidades V1 |
-|---|---|
-| Identidad y confianza | Identidad progresiva, roles, permisos, consentimiento, reputación y trazabilidad. |
-| Knowledge & Content | Entidades territoriales, CMS, Experience Builder, contenido multilingüe y conocimiento verificable. |
-| Discovery | SEO territorial, búsqueda, colecciones, mapas, rutas y superficies de destino. |
-| Traveler Journey | Favoritos, Arma tu Viaje, etapas del viaje, continuidad anónima y memoria post-viaje. |
-| Commerce | Productos, disponibilidad, promociones, cotización, reserva, pago y pases especializados. |
-| Operations | Portal de empresas, Concierge, transporte, hoteles, incidencias y SLA. |
-| Intelligence | Alux, perfil contextual, recomendación explicable y Motor de Contexto. |
-| Engagement | PWA, notificaciones, mensajería transaccional y comunicación por etapa. |
-| Destination Intelligence | Eventos conductuales, embudos, permanencia, flujos, calidad y paneles. |
-| Platform Foundation | APIs, integraciones, observabilidad, seguridad, performance, offline y feature flags. |
+| Capa                     | Capacidades V1                                                                                      |
+| ------------------------ | --------------------------------------------------------------------------------------------------- |
+| Identidad y confianza    | Identidad progresiva, roles, permisos, consentimiento, reputación y trazabilidad.                   |
+| Knowledge & Content      | Entidades territoriales, CMS, Experience Builder, contenido multilingüe y conocimiento verificable. |
+| Discovery                | SEO territorial, búsqueda, colecciones, mapas, rutas y superficies de destino.                      |
+| Traveler Journey         | Favoritos, Arma tu Viaje, etapas del viaje, continuidad anónima y memoria post-viaje.               |
+| Commerce                 | Productos, disponibilidad, promociones, cotización, reserva, pago y pases especializados.           |
+| Operations               | Portal de empresas, Concierge, transporte, hoteles, incidencias y SLA.                              |
+| Intelligence             | Alux, perfil contextual, recomendación explicable y Motor de Contexto.                              |
+| Engagement               | PWA, notificaciones, mensajería transaccional y comunicación por etapa.                             |
+| Destination Intelligence | Eventos conductuales, embudos, permanencia, flujos, calidad y paneles.                              |
+| Platform Foundation      | APIs, integraciones, observabilidad, seguridad, performance, offline y feature flags.               |
 
 ### Regla de reutilización
 
@@ -252,6 +252,6 @@ El primer vertical operativo no queda predeterminado. Se decidirá después del 
 
 ## 13. Control de versión
 
-| Versión | Fecha | Estado | Descripción |
-|---|---|---|---|
-| 1.0 | 2026-07-21 | Approved | Definición fundacional de OMXDS aprobada por el Founder; el primer vertical queda sujeto al inventario de capacidades y a la velocidad de lanzamiento de Valladolid.mx. |
+| Versión | Fecha      | Estado   | Descripción                                                                                                                                                             |
+| ------- | ---------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-07-21 | Approved | Definición fundacional de OMXDS aprobada por el Founder; el primer vertical queda sujeto al inventario de capacidades y a la velocidad de lanzamiento de Valladolid.mx. |

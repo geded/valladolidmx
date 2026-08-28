@@ -24,22 +24,10 @@ import { AluxSourcesFooter } from "./AluxSourcesFooter";
 import { AluxFeedbackButtons } from "./AluxFeedbackButtons";
 import type { TravelItemKind } from "@/lib/traveler/travel-plans.functions";
 
-const ADDABLE_KINDS: TravelItemKind[] = [
-  "destination",
-  "business",
-  "product",
-  "event",
-  "note",
-];
+const ADDABLE_KINDS: TravelItemKind[] = ["destination", "business", "product", "event", "note"];
 
-function isAddable(
-  s: AluxTravelerSource,
-): s is AluxTravelerSource & { target_id: string } {
-  return (
-    !!s.target_id &&
-    (ADDABLE_KINDS as string[]).includes(s.kind) &&
-    s.kind !== "note"
-  );
+function isAddable(s: AluxTravelerSource): s is AluxTravelerSource & { target_id: string } {
+  return !!s.target_id && (ADDABLE_KINDS as string[]).includes(s.kind) && s.kind !== "note";
 }
 
 export interface AluxSuggestionCardProps {
@@ -47,10 +35,7 @@ export interface AluxSuggestionCardProps {
   suggestion: AluxTravelerSuggestion;
 }
 
-export function AluxSuggestionCard({
-  capabilityLabel,
-  suggestion,
-}: AluxSuggestionCardProps) {
+export function AluxSuggestionCard({ capabilityLabel, suggestion }: AluxSuggestionCardProps) {
   const addable = suggestion.sources.filter(isAddable).slice(0, 4);
 
   return (

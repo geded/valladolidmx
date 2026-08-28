@@ -168,7 +168,9 @@ export function toSurfaceMedia(
 }
 
 /** Portada gobernada: sólo un activo del propio lugar, aprobado y con URL. */
-export function findApprovedCover(media: readonly PublicPlaceMediaDTO[]): PublicPlaceMediaDTO | null {
+export function findApprovedCover(
+  media: readonly PublicPlaceMediaDTO[],
+): PublicPlaceMediaDTO | null {
   const covers = media.filter((m) => m.approved && Boolean(m.url));
   if (covers.length === 0) return null;
   return covers.find((m) => m.role === "cover") ?? covers[0];
@@ -189,10 +191,7 @@ export function buildPlaceBreadcrumbs(dto: PublicPlaceDTO) {
   return crumbs;
 }
 
-export function placeCanonicalPath(dto: {
-  destination: { slug: string };
-  slug: string;
-}): string {
+export function placeCanonicalPath(dto: { destination: { slug: string }; slug: string }): string {
   return `/oriente-maya/${dto.destination.slug}/lugares/${dto.slug}`;
 }
 
@@ -288,18 +287,19 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
   for (const line of formatPlaceHours(dto.hours)) {
     facts.push({ key: `hours-${line}`, label: "Horario", value: line });
   }
-  if (dto.addressLine)
-    facts.push({ key: "address", label: "Dirección", value: dto.addressLine });
+  if (dto.addressLine) facts.push({ key: "address", label: "Dirección", value: dto.addressLine });
   if (dto.contact.website)
     facts.push({ key: "website", label: "Sitio web", value: dto.contact.website });
-  if (dto.contact.phone)
-    facts.push({ key: "phone", label: "Teléfono", value: dto.contact.phone });
+  if (dto.contact.phone) facts.push({ key: "phone", label: "Teléfono", value: dto.contact.phone });
   if (dto.contact.whatsapp)
     facts.push({ key: "whatsapp", label: "WhatsApp", value: dto.contact.whatsapp });
-  if (dto.contact.email)
-    facts.push({ key: "email", label: "Correo", value: dto.contact.email });
+  if (dto.contact.email) facts.push({ key: "email", label: "Correo", value: dto.contact.email });
   for (const authority of dto.authorities) {
-    facts.push({ key: `authority-${authority.name}`, label: authority.kind, value: authority.name });
+    facts.push({
+      key: `authority-${authority.name}`,
+      label: authority.kind,
+      value: authority.name,
+    });
   }
 
   const paragraphs = [dto.description?.trim(), dto.shortDescription?.trim()].filter(

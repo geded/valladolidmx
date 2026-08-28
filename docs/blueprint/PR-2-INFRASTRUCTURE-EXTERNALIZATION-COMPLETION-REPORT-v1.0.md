@@ -19,15 +19,15 @@ comportamiento visible.
 
 ## 2. Archivos modificados / creados / eliminados
 
-| Acción | Archivo | Nota |
-|---|---|---|
-| Modificado | `src/routes/sitemap[.]xml.ts` | Elimina `const BASE_URL = "https://…"`; consume `absoluteUrl()` de `@/config/site`. |
-| Creado | `src/routes/robots[.]txt.ts` | `/robots.txt` dinámico; `Sitemap:` derivado de `absoluteUrl("/sitemap.xml")`. |
-| Creado | `src/routes/llms[.]txt.ts` | `/llms.txt` dinámico; todos los enlaces absolutos vía `absoluteUrl()`; título y sitio canónico desde `SITE.name`, `SITE.tagline`, `SITE.url`. |
-| Creado | `src/routes/manifest[.]webmanifest.ts` | `/manifest.webmanifest` dinámico; `name`, `short_name`, `theme_color` desde `SITE`. |
-| Eliminado | `public/robots.txt` | Sustituido por server route. |
-| Eliminado | `public/llms.txt` | Sustituido por server route. |
-| Eliminado | `public/manifest.webmanifest` | Sustituido por server route. |
+| Acción     | Archivo                                | Nota                                                                                                                                          |
+| ---------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Modificado | `src/routes/sitemap[.]xml.ts`          | Elimina `const BASE_URL = "https://…"`; consume `absoluteUrl()` de `@/config/site`.                                                           |
+| Creado     | `src/routes/robots[.]txt.ts`           | `/robots.txt` dinámico; `Sitemap:` derivado de `absoluteUrl("/sitemap.xml")`.                                                                 |
+| Creado     | `src/routes/llms[.]txt.ts`             | `/llms.txt` dinámico; todos los enlaces absolutos vía `absoluteUrl()`; título y sitio canónico desde `SITE.name`, `SITE.tagline`, `SITE.url`. |
+| Creado     | `src/routes/manifest[.]webmanifest.ts` | `/manifest.webmanifest` dinámico; `name`, `short_name`, `theme_color` desde `SITE`.                                                           |
+| Eliminado  | `public/robots.txt`                    | Sustituido por server route.                                                                                                                  |
+| Eliminado  | `public/llms.txt`                      | Sustituido por server route.                                                                                                                  |
+| Eliminado  | `public/manifest.webmanifest`          | Sustituido por server route.                                                                                                                  |
 
 Sin cambios en: `src/routes/__root.tsx` (ya consumía `SITE.theme_color`
 y referenciaba `/manifest.webmanifest`, `/favicon.ico`, `/logo.png` con
@@ -44,12 +44,12 @@ sobre el scope de PR-2 (`public/`, `src/routes/{sitemap,robots,llms,manifest}*.t
 
 ## 4. Dependencias eliminadas
 
-| Antes | Después |
-|---|---|
-| `const BASE_URL = "https://quehacerenvalladolid.com"` (sitemap) | `absoluteUrl(e.path)` desde `@/config/site` |
+| Antes                                                                     | Después                                                  |
+| ------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `const BASE_URL = "https://quehacerenvalladolid.com"` (sitemap)           | `absoluteUrl(e.path)` desde `@/config/site`              |
 | `Sitemap: https://quehacerenvalladolid.com/sitemap.xml` (robots estático) | `Sitemap: ${absoluteUrl("/sitemap.xml")}` (server route) |
-| 20 URLs absolutas hardcodeadas (llms estático) | `absoluteUrl(path)` por entrada (server route) |
-| `manifest.webmanifest` estático con literales | server route con `SITE.name` / `SITE.theme_color` |
+| 20 URLs absolutas hardcodeadas (llms estático)                            | `absoluteUrl(path)` por entrada (server route)           |
+| `manifest.webmanifest` estático con literales                             | server route con `SITE.name` / `SITE.theme_color`        |
 
 ## 5. Arquitectura antes / después
 

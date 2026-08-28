@@ -25,35 +25,35 @@ toque), campos de formulario y campos sin etiqueta accesible.
 Pantalla `/cms/lugares` (listado, 4 campos de filtro, 0 sin etiqueta):
 
 | Ancho | Overflow | Controles | <44 px (propios) | <44 px (chrome compartido) |
-| --- | --- | --- | --- | --- |
-| 390 | 0 | 10 | 0 | 4 |
-| 430 | 0 | 10 | 0 | 4 |
-| 768 | 0 | 10 | 0 | 5 |
-| 1024 | 0 | 11 | 0 | 6 |
-| 1280 | 0 | 11 | 0 | 6 |
-| 1440 | 0 | 11 | 0 | 6 |
+| ----- | -------- | --------- | ---------------- | -------------------------- |
+| 390   | 0        | 10        | 0                | 4                          |
+| 430   | 0        | 10        | 0                | 4                          |
+| 768   | 0        | 10        | 0                | 5                          |
+| 1024  | 0        | 11        | 0                | 6                          |
+| 1280  | 0        | 11        | 0                | 6                          |
+| 1440  | 0        | 11        | 0                | 6                          |
 
 Pantalla `/cms/lugares/nuevo` (alta, 6 campos, 0 sin etiqueta):
 
 | Ancho | Overflow | Controles | <44 px (propios) | <44 px (chrome compartido) |
-| --- | --- | --- | --- | --- |
-| 390 | 0 | 14 | 0 | 4 |
-| 430 | 0 | 14 | 0 | 4 |
-| 768 | 0 | 14 | 0 | 5 |
-| 1024 | 0 | 15 | 0 | 6 |
-| 1280 | 0 | 15 | 0 | 6 |
-| 1440 | 0 | 15 | 0 | 6 |
+| ----- | -------- | --------- | ---------------- | -------------------------- |
+| 390   | 0        | 14        | 0                | 4                          |
+| 430   | 0        | 14        | 0                | 4                          |
+| 768   | 0        | 14        | 0                | 5                          |
+| 1024  | 0        | 15        | 0                | 6                          |
+| 1280  | 0        | 15        | 0                | 6                          |
+| 1440  | 0        | 15        | 0                | 6                          |
 
 Pantalla `/cms/lugares/{placeId}/editar` (52 campos, 0 sin etiqueta):
 
 | Ancho | Overflow | Controles | <44 px (propios) | <44 px (chrome compartido) |
-| --- | --- | --- | --- | --- |
-| 390 | 0 | 72 | 0 | 4 |
-| 430 | 0 | 72 | 0 | 4 |
-| 768 | 0 | 72 | 0 | 5 |
-| 1024 | 0 | 73 | 0 | 6 |
-| 1280 | 0 | 73 | 0 | 6 |
-| 1440 | 0 | 73 | 0 | 6 |
+| ----- | -------- | --------- | ---------------- | -------------------------- |
+| 390   | 0        | 72        | 0                | 4                          |
+| 430   | 0        | 72        | 0                | 4                          |
+| 768   | 0        | 72        | 0                | 5                          |
+| 1024  | 0        | 73        | 0                | 6                          |
+| 1280  | 0        | 73        | 0                | 6                          |
+| 1440  | 0        | 73        | 0                | 6                          |
 
 Estados verificados: carga (skeleton), vacío (listado sin coincidencias con
 filtros) y error (identificador inexistente → mensaje accesible, sin pantalla
@@ -110,17 +110,17 @@ La escritura es best-effort por la limitación declarada en el Blueprint 19.40 �
 
 ## 5. Matriz de permisos
 
-| Sujeto | Escritura en el CMS de Lugares | Fuente de la decisión |
-| --- | --- | --- |
-| traveler | Denegada | `assertPlacesStaff` fail-closed |
-| business_owner | Denegada; sin administración automática | `assertPlacesStaff` |
-| concierge | Denegada | `assertPlacesStaff` |
-| editor | Permitida | `is_editor_or_admin` |
-| admin | Permitida | `is_editor_or_admin` |
-| super_admin | Permitida | `is_editor_or_admin` |
-| usuario con `poi.write` | Permitida | `has_permission('poi.write')` |
-| usuario sin autoridad | Denegada | fail-closed |
-| producto/evento/autoridad relacionados | Nunca conceden administración | `grantsPlaceAdministration: false` |
+| Sujeto                                 | Escritura en el CMS de Lugares          | Fuente de la decisión              |
+| -------------------------------------- | --------------------------------------- | ---------------------------------- |
+| traveler                               | Denegada                                | `assertPlacesStaff` fail-closed    |
+| business_owner                         | Denegada; sin administración automática | `assertPlacesStaff`                |
+| concierge                              | Denegada                                | `assertPlacesStaff`                |
+| editor                                 | Permitida                               | `is_editor_or_admin`               |
+| admin                                  | Permitida                               | `is_editor_or_admin`               |
+| super_admin                            | Permitida                               | `is_editor_or_admin`               |
+| usuario con `poi.write`                | Permitida                               | `has_permission('poi.write')`      |
+| usuario sin autoridad                  | Denegada                                | fail-closed                        |
+| producto/evento/autoridad relacionados | Nunca conceden administración           | `grantsPlaceAdministration: false` |
 
 Probada con harness efímero en memoria (`scripts/omxds/q2b/places-permissions.contract.test.ts`),
 sin crear usuarios reales ni tocar datos compartidos.

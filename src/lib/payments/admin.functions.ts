@@ -118,9 +118,7 @@ export const listRecentPaymentEvents = createServerFn({ method: "GET" })
     const { supabase } = context;
     const { data, error } = await supabase
       .from("payment_events")
-      .select(
-        "id, provider, provider_event_id, event_type, order_id, received_at, processed_at",
-      )
+      .select("id, provider, provider_event_id, event_type, order_id, received_at, processed_at")
       .order("received_at", { ascending: false })
       .limit(50);
     if (error) throw new Error(`payment_events_read_failed: ${error.message}`);
@@ -165,11 +163,7 @@ export const getPaymentsSummary = createServerFn({ method: "GET" })
     for (const r of rows) {
       const s = (r.payment_status ?? "unpaid") as keyof typeof totals;
       if (s in totals) totals[s] += 1;
-      if (
-        r.payment_status === "paid" &&
-        r.paid_at &&
-        new Date(r.paid_at).getTime() >= cutoff
-      ) {
+      if (r.payment_status === "paid" && r.paid_at && new Date(r.paid_at).getTime() >= cutoff) {
         paidLast30dAmount += Number(r.total_amount ?? 0);
         if (!currency) currency = r.currency;
       }

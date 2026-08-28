@@ -11,8 +11,8 @@ export function EmptyInspector() {
       </span>
       <h3 className="font-display text-base">Selecciona un elemento</h3>
       <p className="max-w-[260px] text-sm text-muted-foreground">
-        El Inspector mostrará aquí los detalles, acciones rápidas y
-        recomendaciones de Alux para el elemento enfocado.
+        El Inspector mostrará aquí los detalles, acciones rápidas y recomendaciones de Alux para el
+        elemento enfocado.
       </p>
     </section>
   );

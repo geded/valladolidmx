@@ -8,11 +8,11 @@ conjunto representativo de imágenes reales, sin tocar producción.
 Colocar en `scripts/media-benchmark/samples/` (git-ignored):
 
 1. `hero-horizontal.jpg` — hero de alta resolución (≥3000px)
-2. `portrait.jpg`         — fotografía vertical
-3. `card.jpg`             — tarjeta de empresa (~1200px)
-4. `gallery.jpg`          — imagen de galería típica
-5. `thumbnail.jpg`        — pequeña (<400px)
-6. `transparent.png`      — con canal alfa (opcional)
+2. `portrait.jpg` — fotografía vertical
+3. `card.jpg` — tarjeta de empresa (~1200px)
+4. `gallery.jpg` — imagen de galería típica
+5. `thumbnail.jpg` — pequeña (<400px)
+6. `transparent.png` — con canal alfa (opcional)
 
 ## Ejecución
 
@@ -34,11 +34,11 @@ bun run scripts/media-benchmark/upload.ts <run.json>
 ## Métricas capturadas por (motor × formato × ancho × muestra)
 
 - `output_bytes`
-- `processing_ms`     (worker local o edge)
-- `delivery_ms`       (TTFB percibido, sólo cache miss)
-- `psnr` / `ssim`     (calidad reconstruida vs original)
-- `cache_status`      (`MISS`, `HIT`, `EXPIRED`)
-- `visual_notes`      (revisión humana en texto, obligatoria para hero/portrait)
+- `processing_ms` (worker local o edge)
+- `delivery_ms` (TTFB percibido, sólo cache miss)
+- `psnr` / `ssim` (calidad reconstruida vs original)
+- `cache_status` (`MISS`, `HIT`, `EXPIRED`)
+- `visual_notes` (revisión humana en texto, obligatoria para hero/portrait)
 
 ## Reglas
 

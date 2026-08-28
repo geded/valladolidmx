@@ -68,11 +68,19 @@ export function CockpitKpiGrid({
 
 function KpiCards({ data }: { data: FounderKpis }) {
   const cards: Array<{ label: string; value: string | number; sub?: string }> = [
-    { label: "Empresas activas", value: data.businesses.active, sub: `${data.businesses.total} totales` },
+    {
+      label: "Empresas activas",
+      value: data.businesses.active,
+      sub: `${data.businesses.total} totales`,
+    },
     { label: "Viajeros", value: data.travelers.total },
     { label: "Concierges activos", value: data.concierges.active },
     { label: "Casos abiertos", value: data.cases.open, sub: `${data.cases.overdue} vencidos` },
-    { label: "Propuestas enviadas", value: data.proposals.sent, sub: `${data.proposals.accepted} aceptadas` },
+    {
+      label: "Propuestas enviadas",
+      value: data.proposals.sent,
+      sub: `${data.proposals.accepted} aceptadas`,
+    },
     { label: "Cotizaciones", value: data.quotes.submitted },
     { label: "Reservas pagadas", value: data.orders.paid },
     {
@@ -138,20 +146,14 @@ export function CockpitAlerts({ title, limit }: { title: string; limit: number }
   );
 }
 
-export function CockpitActivityStream({
-  title,
-  limit,
-}: {
-  title: string;
-  limit: number;
-}) {
+export function CockpitActivityStream({ title, limit }: { title: string; limit: number }) {
   // Lectura placeholder; los readers existentes de observability se conectarán
   // en una iteración menor sin tocar el contrato del bloque.
   return (
     <CockpitCard title={title} meta={`últimos ${limit}`}>
       <p className="text-sm text-muted-foreground">
-        Flujo de actividad operativa — pendiente de conectarse a los readers de
-        observabilidad sin modificar el contrato del bloque.
+        Flujo de actividad operativa — pendiente de conectarse a los readers de observabilidad sin
+        modificar el contrato del bloque.
       </p>
     </CockpitCard>
   );

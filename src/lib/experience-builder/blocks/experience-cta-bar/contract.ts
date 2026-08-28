@@ -13,9 +13,9 @@ import { z } from "zod";
 export const EXPERIENCE_CTA_BAR_CONTRACT_VERSION = "1.0.0";
 
 export const experienceCtaBarVariantSchema = z.enum([
-  "floating",  // Píldora flotante (mobile bottom, desktop bottom-right).
-  "bar",       // Barra full-width sticky (mobile bottom, desktop bottom).
-  "inline",    // Bar inline (no sticky) — para colocar dentro de secciones.
+  "floating", // Píldora flotante (mobile bottom, desktop bottom-right).
+  "bar", // Barra full-width sticky (mobile bottom, desktop bottom).
+  "inline", // Bar inline (no sticky) — para colocar dentro de secciones.
 ]);
 export type ExperienceCtaBarVariant = z.infer<typeof experienceCtaBarVariantSchema>;
 
@@ -97,7 +97,13 @@ export function buildExperienceCtaBarPreviewDTO(): ExperienceCtaBarDTO {
     meta: "Desde $2,400 MXN · noche",
     actions: [
       { label: "Reservar", action: "book", href: "#", emphasis: "primary", iconKey: "calendar" },
-      { label: "Contactar", action: "contact", href: "#", emphasis: "secondary", iconKey: "message-circle" },
+      {
+        label: "Contactar",
+        action: "contact",
+        href: "#",
+        emphasis: "secondary",
+        iconKey: "message-circle",
+      },
       { label: "Guardar", action: "favorite", href: "#", emphasis: "ghost", iconKey: "heart" },
     ],
     revealAfterScroll: 0,

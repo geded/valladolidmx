@@ -171,12 +171,10 @@ export function WelcomeOnboardingModal({
   });
   const mission = getDailyMission(previewStage);
 
-  const canFinish = useMemo(() => Boolean(firstName.trim() && lang && travelWindow && party), [
-    firstName,
-    lang,
-    travelWindow,
-    party,
-  ]);
+  const canFinish = useMemo(
+    () => Boolean(firstName.trim() && lang && travelWindow && party),
+    [firstName, lang, travelWindow, party],
+  );
 
   function dismiss() {
     try {
@@ -188,8 +186,7 @@ export function WelcomeOnboardingModal({
   async function finish() {
     if (!canFinish || !party || !travelWindow) return;
     const partyOpt = PARTY_OPTIONS.find((p) => p.value === party)!;
-    const winLabel =
-      WINDOW_OPTIONS.find((w) => w.value === travelWindow)?.label ?? "";
+    const winLabel = WINDOW_OPTIONS.find((w) => w.value === travelWindow)?.label ?? "";
     await mutation.mutateAsync({
       data: {
         preferred_language: lang,
@@ -216,8 +213,8 @@ export function WelcomeOnboardingModal({
               : "Bienvenido al Oriente Maya de Yucatán"}
           </DialogTitle>
           <DialogDescription>
-            3 preguntas rápidas para que Alux te recomiende mejor. Puedes
-            editarlas después en tu perfil.
+            3 preguntas rápidas para que Alux te recomiende mejor. Puedes editarlas después en tu
+            perfil.
           </DialogDescription>
         </DialogHeader>
 
@@ -230,9 +227,7 @@ export function WelcomeOnboardingModal({
               {Array.from({ length: totalSteps }, (_, i) => i + firstStep).map((n) => (
                 <span
                   key={n}
-                  className={`h-1.5 w-6 rounded-full ${
-                    n <= step ? "bg-primary" : "bg-muted"
-                  }`}
+                  className={`h-1.5 w-6 rounded-full ${n <= step ? "bg-primary" : "bg-muted"}`}
                 />
               ))}
             </div>
@@ -265,11 +260,7 @@ export function WelcomeOnboardingModal({
               <p className="text-sm font-medium">¿En qué idioma prefieres viajar?</p>
               <div className="grid grid-cols-2 gap-2">
                 {LANG_OPTIONS.map((o) => (
-                  <Chip
-                    key={o.value}
-                    active={lang === o.value}
-                    onClick={() => setLang(o.value)}
-                  >
+                  <Chip key={o.value} active={lang === o.value} onClick={() => setLang(o.value)}>
                     {o.label}
                   </Chip>
                 ))}
@@ -299,11 +290,7 @@ export function WelcomeOnboardingModal({
               <p className="text-sm font-medium">¿Con quién vas a viajar?</p>
               <div className="grid grid-cols-2 gap-2">
                 {PARTY_OPTIONS.map((o) => (
-                  <Chip
-                    key={o.value}
-                    active={party === o.value}
-                    onClick={() => setParty(o.value)}
-                  >
+                  <Chip key={o.value} active={party === o.value} onClick={() => setParty(o.value)}>
                     {o.label}
                   </Chip>
                 ))}
@@ -316,13 +303,10 @@ export function WelcomeOnboardingModal({
               <p className="text-sm font-medium">Alux te acompaña todo el viaje</p>
               <div className="rounded-2xl border border-border/70 bg-muted/30 p-4">
                 <p className="text-base font-semibold">{mission.headline}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {mission.subline}
-                </p>
+                <p className="mt-1 text-sm text-muted-foreground">{mission.subline}</p>
               </div>
               <p className="text-xs text-muted-foreground">
-                Antes, durante y después. Sin pedirte permisos hasta que valga la
-                pena.
+                Antes, durante y después. Sin pedirte permisos hasta que valga la pena.
               </p>
             </div>
           )}
@@ -353,11 +337,7 @@ export function WelcomeOnboardingModal({
               </Button>
             )}
             {step === FINAL_STEP && (
-              <Button
-                size="sm"
-                onClick={finish}
-                disabled={!canFinish || mutation.isPending}
-              >
+              <Button size="sm" onClick={finish} disabled={!canFinish || mutation.isPending}>
                 {mutation.isPending ? "Guardando…" : mission.ctaLabel}
               </Button>
             )}

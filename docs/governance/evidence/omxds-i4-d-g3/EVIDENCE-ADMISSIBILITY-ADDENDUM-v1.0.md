@@ -45,13 +45,13 @@ Aplicación única vigente: **`G3-H05`** (zoom nativo de Safari 200 %). Evidenci
 
 ## 3. Escenarios acreditados por esta adenda
 
-| ID     | Criterio                        | Evidencia objetiva                                                        | Por qué no humano |
-| ------ | ------------------------------- | ------------------------------------------------------------------------- | ----------------- |
-| G3-H03 | Responsive 1024 px              | `objective-2026-08-22-h03h04/canvas-exact-widths.json` + capturas          | El Studio no ofrece 1024 px |
-| G3-H04 | Responsive 1440 px              | `objective-2026-08-22-h03h04/canvas-exact-widths.json` + capturas          | El Studio no ofrece 1440 px |
-| G3-H06 | Teclado: foco, orden, sin trampa| `objective-2026-08-22/security_a11y.json` (25 tabs, 17 paradas, 0 sin indicador, sin trampa) | iPad Safari sin teclado físico en la sesión; criterio mecánico |
-| G3-H09 | Tema Sol conserva contenido     | `objective-2026-08-22/themes.json` (1024/1440: mismos headings, mismo CTA count/hash, overflowX 0) | Comparación estructural exacta |
-| G3-H10 | Tema Luna conserva contenido    | `objective-2026-08-22/themes.json`                                        | Comparación estructural exacta |
+| ID     | Criterio                         | Evidencia objetiva                                                                                 | Por qué no humano                                              |
+| ------ | -------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| G3-H03 | Responsive 1024 px               | `objective-2026-08-22-h03h04/canvas-exact-widths.json` + capturas                                  | El Studio no ofrece 1024 px                                    |
+| G3-H04 | Responsive 1440 px               | `objective-2026-08-22-h03h04/canvas-exact-widths.json` + capturas                                  | El Studio no ofrece 1440 px                                    |
+| G3-H06 | Teclado: foco, orden, sin trampa | `objective-2026-08-22/security_a11y.json` (25 tabs, 17 paradas, 0 sin indicador, sin trampa)       | iPad Safari sin teclado físico en la sesión; criterio mecánico |
+| G3-H09 | Tema Sol conserva contenido      | `objective-2026-08-22/themes.json` (1024/1440: mismos headings, mismo CTA count/hash, overflowX 0) | Comparación estructural exacta                                 |
+| G3-H10 | Tema Luna conserva contenido     | `objective-2026-08-22/themes.json`                                                                 | Comparación estructural exacta                                 |
 
 ## 4. Escenarios que siguen exigiendo humano
 

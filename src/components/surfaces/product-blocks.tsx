@@ -54,21 +54,14 @@ import {
 /* ------------------------------------------------------------------ *
  * 1) Shell — KitShell + breadcrumbs canónicos.
  * ------------------------------------------------------------------ */
-export function ProductShellBlock({
-  renderChildren,
-}: {
-  renderChildren?: () => ReactNode;
-}) {
+export function ProductShellBlock({ renderChildren }: { renderChildren?: () => ReactNode }) {
   const p = useProduct();
   if (!p) {
     return (
       <KitShell
         vm={{
           title: "Producto (previsualiza con datos reales o demo)",
-          crumbs: [
-            { label: "Catálogo", href: "/oriente-maya" },
-            { label: "—" },
-          ],
+          crumbs: [{ label: "Catálogo", href: "/oriente-maya" }, { label: "—" }],
         }}
       >
         {renderChildren?.()}
@@ -169,15 +162,10 @@ export function ProductBusinessContextBlock() {
       </p>
       <div className="mt-1 flex flex-wrap items-baseline justify-between gap-3">
         <div>
-          <Link
-            to={businessHref}
-            className="text-lg font-semibold text-foreground hover:underline"
-          >
+          <Link to={businessHref} className="text-lg font-semibold text-foreground hover:underline">
             {b.display_name}
           </Link>
-          {b.tagline ? (
-            <p className="mt-1 text-sm text-muted-foreground">{b.tagline}</p>
-          ) : null}
+          {b.tagline ? <p className="mt-1 text-sm text-muted-foreground">{b.tagline}</p> : null}
         </div>
         {b.verified ? (
           <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
@@ -195,7 +183,10 @@ export function ProductBusinessContextBlock() {
               </dt>
               <dd className="mt-1 text-foreground">
                 {b.primary_location.label ? (
-                  <span className="font-medium">{b.primary_location.label}<br /></span>
+                  <span className="font-medium">
+                    {b.primary_location.label}
+                    <br />
+                  </span>
                 ) : null}
                 {b.primary_location.address_line1}
                 {b.primary_location.address_line2 ? `, ${b.primary_location.address_line2}` : ""}
@@ -237,11 +228,7 @@ export function ProductReviewsBlock() {
   return (
     <section>
       <div className="mb-3 flex items-center justify-end">
-        <ReviewComposer
-          subjectKind="product"
-          subjectId={p.id}
-          subjectName={p.name}
-        />
+        <ReviewComposer subjectKind="product" subjectId={p.id} subjectName={p.name} />
       </div>
       <KitReviews
         reviews={productToReviewVMs(p)}
@@ -270,9 +257,7 @@ export function ProductRelatedBlock() {
   if (p.related.length === 0) return null;
   return (
     <section className="mt-10">
-      <h2 className="text-xl font-semibold">
-        Otros productos de {p.business.display_name}
-      </h2>
+      <h2 className="text-xl font-semibold">Otros productos de {p.business.display_name}</h2>
       <KitCardGrid vm={{ items: productToRelatedCardVMs(p), columns: 3 }} />
     </section>
   );

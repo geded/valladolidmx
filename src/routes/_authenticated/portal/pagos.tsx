@@ -55,8 +55,7 @@ function PortalPaymentsPage() {
 
   const statusQuery = useQuery<AdminBusinessCommercialStatus>({
     queryKey: ["portal", "admin-commercial-status", activeBusinessId],
-    queryFn: () =>
-      fetchCommercialStatus({ data: { businessId: activeBusinessId as string } }),
+    queryFn: () => fetchCommercialStatus({ data: { businessId: activeBusinessId as string } }),
     enabled: Boolean(activeBusinessId && activeBusiness?.role === "admin"),
     staleTime: 30_000,
   });
@@ -87,11 +86,7 @@ function PortalPaymentsPage() {
     return (
       <EmptyState
         title="No pudimos cargar pagos y visibilidad"
-        body={
-          statusQuery.error instanceof Error
-            ? statusQuery.error.message
-            : "Error desconocido."
-        }
+        body={statusQuery.error instanceof Error ? statusQuery.error.message : "Error desconocido."}
       />
     );
   }
@@ -145,8 +140,14 @@ function CommercialStatusView({ data }: { data: AdminBusinessCommercialStatus })
           </h2>
           <dl className="mt-4 grid gap-3 text-sm">
             <InfoRow label="Productos" value={`${data.configuration.products_total}`} />
-            <InfoRow label="Productos publicados" value={`${data.configuration.products_published}`} />
-            <InfoRow label="Aceptan pago en línea" value={`${data.configuration.accepts_online_payment}`} />
+            <InfoRow
+              label="Productos publicados"
+              value={`${data.configuration.products_published}`}
+            />
+            <InfoRow
+              label="Aceptan pago en línea"
+              value={`${data.configuration.accepts_online_payment}`}
+            />
             <InfoRow
               label="Elegibles para campañas"
               value={`${data.configuration.eligible_for_visibility_campaigns}`}
@@ -222,7 +223,15 @@ function CommercialStatusView({ data }: { data: AdminBusinessCommercialStatus })
   );
 }
 
-function MetricCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
+function MetricCard({
+  label,
+  value,
+  sub,
+}: {
+  label: string;
+  value: string | number;
+  sub?: string;
+}) {
   return (
     <article className="rounded-lg border border-border bg-card p-4">
       <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
@@ -253,7 +262,9 @@ function StatusPill({ status }: { status: string }) {
           ? "bg-destructive/10 text-destructive"
           : "bg-muted text-muted-foreground";
   return (
-    <span className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium uppercase ${cls}`}>
+    <span
+      className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium uppercase ${cls}`}
+    >
       {status || "unpaid"}
     </span>
   );

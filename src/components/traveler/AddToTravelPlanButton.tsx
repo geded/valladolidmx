@@ -256,9 +256,7 @@ export function AddToTravelPlanButton({
       ) : (
         <Plus className="size-3.5" aria-hidden />
       )}
-      <span>
-        {done ? "Ya está en Mi Viaje" : busy ? "Agregando…" : "Agregar a Mi Viaje"}
-      </span>
+      <span>{done ? "Ya está en Mi Viaje" : busy ? "Agregando…" : "Agregar a Mi Viaje"}</span>
     </button>
   );
 }

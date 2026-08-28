@@ -45,16 +45,14 @@ export const getDestinationLocation = createServerFn({ method: "GET" })
 
 export const upsertDestinationLocation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { destinationId: string; latitude: number; longitude: number }) => {
-      if (!input?.destinationId || typeof input.destinationId !== "string") {
-        throw new Error("destinationId requerido");
-      }
-      const lat = coerceCoord(input.latitude, -90, 90);
-      const lng = coerceCoord(input.longitude, -180, 180);
-      return { destinationId: input.destinationId, latitude: lat, longitude: lng };
-    },
-  )
+  .inputValidator((input: { destinationId: string; latitude: number; longitude: number }) => {
+    if (!input?.destinationId || typeof input.destinationId !== "string") {
+      throw new Error("destinationId requerido");
+    }
+    const lat = coerceCoord(input.latitude, -90, 90);
+    const lng = coerceCoord(input.longitude, -180, 180);
+    return { destinationId: input.destinationId, latitude: lat, longitude: lng };
+  })
   .handler(async ({ data, context }): Promise<DestinationLocationDTO> => {
     const { supabase, userId } = context;
     const { data: updated, error } = await supabase

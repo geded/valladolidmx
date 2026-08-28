@@ -16,10 +16,5 @@
   "html_lang": "es",
   "h1": "Zazil Tunich",
   "hreflang_count": 0,
-  "jsonld_types": [
-    "WebSite",
-    "Organization",
-    "BreadcrumbList",
-    "TouristAttraction"
-  ]
+  "jsonld_types": ["WebSite", "Organization", "BreadcrumbList", "TouristAttraction"]
 }

@@ -6,12 +6,7 @@
  * rutas de cliente.
  */
 import Stripe from "stripe";
-import type {
-  CreateIntentInput,
-  IntentResult,
-  NormalizedEvent,
-  PaymentProvider,
-} from "./provider";
+import type { CreateIntentInput, IntentResult, NormalizedEvent, PaymentProvider } from "./provider";
 
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -73,10 +68,7 @@ export const stripeProvider: PaymentProvider = {
     };
   },
 
-  async verifyWebhook(
-    headers: Headers,
-    rawBody: string,
-  ): Promise<NormalizedEvent> {
+  async verifyWebhook(headers: Headers, rawBody: string): Promise<NormalizedEvent> {
     const stripe = getStripe();
     const secret = process.env.STRIPE_WEBHOOK_SECRET;
     if (!secret) throw new Error("stripe_webhook_secret_missing");
@@ -103,10 +95,7 @@ export const stripeProvider: PaymentProvider = {
         return {
           ...base,
           type: "payment_succeeded",
-          orderId:
-            s.client_reference_id ??
-            (s.metadata?.order_id as string | undefined) ??
-            null,
+          orderId: s.client_reference_id ?? (s.metadata?.order_id as string | undefined) ?? null,
           providerIntentId: s.id,
           reason: null,
         };
@@ -117,10 +106,7 @@ export const stripeProvider: PaymentProvider = {
         return {
           ...base,
           type: "payment_failed",
-          orderId:
-            s.client_reference_id ??
-            (s.metadata?.order_id as string | undefined) ??
-            null,
+          orderId: s.client_reference_id ?? (s.metadata?.order_id as string | undefined) ?? null,
           providerIntentId: s.id,
           reason: event.type,
         };

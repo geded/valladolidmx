@@ -56,16 +56,11 @@ function PortalIndex() {
         </h2>
         <ul className="mt-3 grid gap-3">
           {businesses.map((b) => (
-            <li
-              key={b.business_id}
-              className="rounded-lg border border-border bg-card p-4"
-            >
+            <li key={b.business_id} className="rounded-lg border border-border bg-card p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="font-semibold">{b.display_name}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    /{b.slug}
-                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">/{b.slug}</p>
                 </div>
                 <div className="text-right text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                   <p>{b.role}</p>
@@ -94,7 +89,9 @@ function PortalIndex() {
                 className="flex items-center justify-between rounded-md border border-border bg-background px-3 py-2 text-sm transition-colors hover:bg-accent"
               >
                 <span>{s.label}</span>
-                <span aria-hidden className="text-muted-foreground">→</span>
+                <span aria-hidden className="text-muted-foreground">
+                  →
+                </span>
               </Link>
             </li>
           ))}

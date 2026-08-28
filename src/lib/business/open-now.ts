@@ -61,10 +61,7 @@ function formatMinutes(total: number): string {
  * "Now" en la timezone dada como { dow (0..6), minutes (0..1439) }.
  * Usa Intl.DateTimeFormat con hourCycle h23 y weekday numérico via en-US.
  */
-function nowInTz(
-  now: Date,
-  tz: string,
-): { dow: number; minutes: number } {
+function nowInTz(now: Date, tz: string): { dow: number; minutes: number } {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: tz,
     weekday: "short",
@@ -148,8 +145,7 @@ export function computeOpenNow(
     for (const slot of slots) {
       if (offset === 0 && slot.start <= minutes) continue;
       const opensAt = formatMinutes(slot.start);
-      const opensDayLabel =
-        offset === 0 ? "hoy" : offset === 1 ? "mañana" : WEEKDAY_LABEL_ES[d];
+      const opensDayLabel = offset === 0 ? "hoy" : offset === 1 ? "mañana" : WEEKDAY_LABEL_ES[d];
       return {
         state: "closed",
         label: `Cerrado · abre ${opensDayLabel} ${opensAt}`,

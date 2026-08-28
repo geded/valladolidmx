@@ -10,13 +10,13 @@
 import type { CSSProperties } from "react";
 
 export interface FieldTypography {
-  font_family?: string;    // "display" | "body" | "script" | "system" | ""
-  font_size?: number;      // px (0/undefined = por defecto)
-  font_weight?: number;    // 300..900
-  line_height?: number;    // multiplicador (1.1, 1.4…)
+  font_family?: string; // "display" | "body" | "script" | "system" | ""
+  font_size?: number; // px (0/undefined = por defecto)
+  font_weight?: number; // 300..900
+  line_height?: number; // multiplicador (1.1, 1.4…)
   letter_spacing?: number; // px (puede ser negativo)
-  color?: string;          // hex
-  align?: string;          // left|center|right|justify
+  color?: string; // hex
+  align?: string; // left|center|right|justify
   italic?: boolean;
   uppercase?: boolean;
   /**
@@ -53,7 +53,8 @@ export function getBreakpointTypography(
   if (bp === "base") {
     // Copia superficial excluyendo md/lg.
     const { md: _m, lg: _l, ...base } = t;
-    void _m; void _l;
+    void _m;
+    void _l;
     return base;
   }
   return (t[bp] as FieldTypography | undefined) ?? {};
@@ -171,50 +172,155 @@ export const BLOCK_FIELD_TYPOGRAPHY_DEFAULTS: Record<string, Record<string, Fiel
   // Sección genérica (layout.section) y todas las secciones vmx.section.*
   // usan SectionHeader (h2 36px desktop, subtitle 18px).
   "vmx.layout.section": {
-    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
-    subheading: { font_family: "body", font_size: 18, font_weight: 400, line_height: 1.5, color: "#4B5563", align: "left" },
+    heading: {
+      font_family: "display",
+      font_size: 36,
+      font_weight: 600,
+      line_height: 1.15,
+      color: "#0A0A0A",
+      align: "left",
+    },
+    subheading: {
+      font_family: "body",
+      font_size: 18,
+      font_weight: 400,
+      line_height: 1.5,
+      color: "#4B5563",
+      align: "left",
+    },
   },
   "vmx.section.destinos": {
-    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+    heading: {
+      font_family: "display",
+      font_size: 36,
+      font_weight: 600,
+      line_height: 1.15,
+      color: "#0A0A0A",
+      align: "left",
+    },
   },
   "vmx.section.categorias": {
-    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+    heading: {
+      font_family: "display",
+      font_size: 36,
+      font_weight: 600,
+      line_height: 1.15,
+      color: "#0A0A0A",
+      align: "left",
+    },
   },
   "vmx.section.rutas": {
-    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+    heading: {
+      font_family: "display",
+      font_size: 36,
+      font_weight: 600,
+      line_height: 1.15,
+      color: "#0A0A0A",
+      align: "left",
+    },
   },
   "vmx.section.consejo-alux": {
-    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+    heading: {
+      font_family: "display",
+      font_size: 36,
+      font_weight: 600,
+      line_height: 1.15,
+      color: "#0A0A0A",
+      align: "left",
+    },
   },
   "vmx.section.en-vivo": {
-    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+    heading: {
+      font_family: "display",
+      font_size: 36,
+      font_weight: 600,
+      line_height: 1.15,
+      color: "#0A0A0A",
+      align: "left",
+    },
   },
   "vmx.section.empresas": {
-    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+    heading: {
+      font_family: "display",
+      font_size: 36,
+      font_weight: 600,
+      line_height: 1.15,
+      color: "#0A0A0A",
+      align: "left",
+    },
   },
   "vmx.section.resenas": {
-    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#0A0A0A", align: "left" },
+    heading: {
+      font_family: "display",
+      font_size: 36,
+      font_weight: 600,
+      line_height: 1.15,
+      color: "#0A0A0A",
+      align: "left",
+    },
   },
   "vmx.section.arma-tu-viaje": {
-    heading: { font_family: "display", font_size: 36, font_weight: 600, line_height: 1.15, color: "#FFFFFF", align: "left" },
-    body: { font_family: "body", font_size: 18, font_weight: 400, line_height: 1.6, color: "#F5F5F5", align: "left" },
+    heading: {
+      font_family: "display",
+      font_size: 36,
+      font_weight: 600,
+      line_height: 1.15,
+      color: "#FFFFFF",
+      align: "left",
+    },
+    body: {
+      font_family: "body",
+      font_size: 18,
+      font_weight: 400,
+      line_height: 1.6,
+      color: "#F5F5F5",
+      align: "left",
+    },
     cta_label: { font_family: "body", font_size: 14, font_weight: 600, color: "#FFFFFF" },
   },
 
   // Cockpit (títulos de KPI grid, alerts y activity stream)
   "vmx.cockpit.kpi-grid": {
-    title: { font_family: "display", font_size: 22, font_weight: 600, line_height: 1.25, color: "#0A0A0A", align: "left" },
+    title: {
+      font_family: "display",
+      font_size: 22,
+      font_weight: 600,
+      line_height: 1.25,
+      color: "#0A0A0A",
+      align: "left",
+    },
   },
   "vmx.cockpit.alerts": {
-    title: { font_family: "display", font_size: 22, font_weight: 600, line_height: 1.25, color: "#0A0A0A", align: "left" },
+    title: {
+      font_family: "display",
+      font_size: 22,
+      font_weight: 600,
+      line_height: 1.25,
+      color: "#0A0A0A",
+      align: "left",
+    },
   },
   "vmx.cockpit.activity-stream": {
-    title: { font_family: "display", font_size: 22, font_weight: 600, line_height: 1.25, color: "#0A0A0A", align: "left" },
+    title: {
+      font_family: "display",
+      font_size: 22,
+      font_weight: 600,
+      line_height: 1.25,
+      color: "#0A0A0A",
+      align: "left",
+    },
   },
 
   // Bloque genérico de botones — label del botón
   "vmx.actions.buttons": {
-    heading: { font_family: "display", font_size: 24, font_weight: 600, line_height: 1.2, color: "#0A0A0A", align: "left" },
+    heading: {
+      font_family: "display",
+      font_size: 24,
+      font_weight: 600,
+      line_height: 1.2,
+      color: "#0A0A0A",
+      align: "left",
+    },
   },
 
   // Chrome global (header / footer)
@@ -222,7 +328,14 @@ export const BLOCK_FIELD_TYPOGRAPHY_DEFAULTS: Record<string, Record<string, Fiel
     cta_label: { font_family: "body", font_size: 14, font_weight: 600, color: "#FFFFFF" },
   },
   "vmx.chrome.footer": {
-    tagline: { font_family: "body", font_size: 14, font_weight: 400, line_height: 1.5, color: "#9CA3AF", align: "left" },
+    tagline: {
+      font_family: "body",
+      font_size: 14,
+      font_weight: 400,
+      line_height: 1.5,
+      color: "#9CA3AF",
+      align: "left",
+    },
     legal_label: { font_family: "body", font_size: 12, font_weight: 400, color: "#9CA3AF" },
     privacy_label: { font_family: "body", font_size: 12, font_weight: 400, color: "#9CA3AF" },
   },
@@ -259,20 +372,24 @@ export const BLOCK_FIELD_SELECTORS: Record<string, Record<string, string>> = {
     heading: "h2",
     subheading: "header p",
   },
-  "vmx.section.destinos":       { heading: "h2" },
-  "vmx.section.categorias":     { heading: "h2" },
-  "vmx.section.rutas":          { heading: "h2" },
-  "vmx.section.consejo-alux":   { heading: "h2" },
-  "vmx.section.en-vivo":        { heading: "h2" },
-  "vmx.section.empresas":       { heading: "h2" },
-  "vmx.section.resenas":        { heading: "h2" },
-  "vmx.section.arma-tu-viaje":  { heading: "h2", body: "p", cta_label: "a" },
-  "vmx.cockpit.kpi-grid":       { title: "h2, h3" },
-  "vmx.cockpit.alerts":         { title: "h2, h3" },
-  "vmx.cockpit.activity-stream":{ title: "h2, h3" },
-  "vmx.actions.buttons":        { heading: "h2, h3" },
-  "vmx.chrome.header":          { cta_label: "a" },
-  "vmx.chrome.footer":          { tagline: "p:first-of-type", legal_label: "small, .legal", privacy_label: ".privacy" },
+  "vmx.section.destinos": { heading: "h2" },
+  "vmx.section.categorias": { heading: "h2" },
+  "vmx.section.rutas": { heading: "h2" },
+  "vmx.section.consejo-alux": { heading: "h2" },
+  "vmx.section.en-vivo": { heading: "h2" },
+  "vmx.section.empresas": { heading: "h2" },
+  "vmx.section.resenas": { heading: "h2" },
+  "vmx.section.arma-tu-viaje": { heading: "h2", body: "p", cta_label: "a" },
+  "vmx.cockpit.kpi-grid": { title: "h2, h3" },
+  "vmx.cockpit.alerts": { title: "h2, h3" },
+  "vmx.cockpit.activity-stream": { title: "h2, h3" },
+  "vmx.actions.buttons": { heading: "h2, h3" },
+  "vmx.chrome.header": { cta_label: "a" },
+  "vmx.chrome.footer": {
+    tagline: "p:first-of-type",
+    legal_label: "small, .legal",
+    privacy_label: ".privacy",
+  },
 };
 
 function cssProps(t: Partial<FieldTypography>): string {
@@ -304,7 +421,11 @@ export function buildScopedTypographyCss(
   if (!map) return "";
 
   const bang = (decls: string): string =>
-    decls.replace(/;$/g, "").split(";").map((d) => (d ? `${d} !important` : d)).join(";") + ";";
+    decls
+      .replace(/;$/g, "")
+      .split(";")
+      .map((d) => (d ? `${d} !important` : d))
+      .join(";") + ";";
 
   const baseRules: string[] = [];
   const mdRules: string[] = [];

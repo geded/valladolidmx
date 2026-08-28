@@ -25,13 +25,7 @@ function formatPrice(price?: number | null, currency?: string | null): string | 
   }
 }
 
-export function SmartProductsGrid({
-  items,
-  title,
-}: {
-  items: SmartProductItem[];
-  title?: string;
-}) {
+export function SmartProductsGrid({ items, title }: { items: SmartProductItem[]; title?: string }) {
   if (!items?.length) return <SmartEmpty message="Aún no hay productos para mostrar." />;
   return (
     <section className="space-y-4">

@@ -104,8 +104,18 @@
       "stable_proxy_http_status": 302
     },
     "negative_barrier": [
-      { "route": "/oriente-maya/ek-balam", "http_status": 200, "html_bytes": 69289, "premium": false },
-      { "route": "/oriente-maya/chichen-itza", "http_status": 200, "html_bytes": 67484, "premium": false }
+      {
+        "route": "/oriente-maya/ek-balam",
+        "http_status": 200,
+        "html_bytes": 69289,
+        "premium": false
+      },
+      {
+        "route": "/oriente-maya/chichen-itza",
+        "http_status": 200,
+        "html_bytes": 67484,
+        "premium": false
+      }
     ]
   },
   "storage_policy_changes": "none",

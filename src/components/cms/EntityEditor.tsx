@@ -20,12 +20,7 @@ import {
 import type { ReactNode } from "react";
 import { StatusBadge } from "@/components/cms/EntityListView";
 
-export type FieldType =
-  | "text"
-  | "textarea"
-  | "number"
-  | "select"
-  | "tags";
+export type FieldType = "text" | "textarea" | "number" | "select" | "tags";
 
 export interface EditorField {
   name: string;
@@ -47,15 +42,14 @@ interface Props {
   listQueryKey: string;
   fields: EditorField[];
   /** Slot para paneles extra (imágenes, galería...) que reciben el id. */
-  renderExtras?: (args: { id?: string; entity: Record<string, unknown> | undefined; refresh: () => void }) => ReactNode;
+  renderExtras?: (args: {
+    id?: string;
+    entity: Record<string, unknown> | undefined;
+    refresh: () => void;
+  }) => ReactNode;
 }
 
-type ContentStatus =
-  | "draft"
-  | "in_review"
-  | "approved"
-  | "published"
-  | "archived";
+type ContentStatus = "draft" | "in_review" | "approved" | "published" | "archived";
 
 const NEXT_ACTIONS: Record<ContentStatus, { to: ContentStatus; label: string }[]> = {
   draft: [{ to: "in_review", label: "Enviar a revisión" }],
@@ -124,8 +118,7 @@ export function EntityEditor(props: Props) {
     }
   }, [detail.data, fields, initialValues]);
 
-  const status =
-    ((detail.data?.status as unknown) as ContentStatus | undefined) ?? "draft";
+  const status = (detail.data?.status as unknown as ContentStatus | undefined) ?? "draft";
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -162,15 +155,13 @@ export function EntityEditor(props: Props) {
   });
 
   const transitionMutation = useMutation({
-    mutationFn: (to: ContentStatus) =>
-      transition({ data: { table, id: id!, to } }),
+    mutationFn: (to: ContentStatus) => transition({ data: { table, id: id!, to } }),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["cms", listQueryKey] });
       await detail.refetch();
       await history.refetch();
     },
-    onError: (e) =>
-      setError(e instanceof Error ? e.message : "Error en transición."),
+    onError: (e) => setError(e instanceof Error ? e.message : "Error en transición."),
   });
 
   return (
@@ -184,9 +175,7 @@ export function EntityEditor(props: Props) {
             {isEdit ? title : `Nuevo · ${title}`}
           </h1>
           {description && (
-            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              {description}
-            </p>
+            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p>
           )}
         </div>
         {isEdit && (
@@ -229,11 +218,7 @@ export function EntityEditor(props: Props) {
             disabled={saveMutation.isPending}
             className="h-9 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
           >
-            {saveMutation.isPending
-              ? "Guardando…"
-              : isEdit
-                ? "Guardar cambios"
-                : "Crear borrador"}
+            {saveMutation.isPending ? "Guardando…" : isEdit ? "Guardar cambios" : "Crear borrador"}
           </button>
           <button
             type="button"
@@ -264,13 +249,10 @@ export function EntityEditor(props: Props) {
 
       {isEdit && (
         <section className="mt-8 rounded-xl border border-border bg-card p-5">
-          <h2 className="text-sm font-semibold tracking-tight">
-            Workflow editorial
-          </h2>
+          <h2 className="text-sm font-semibold tracking-tight">Workflow editorial</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            draft → in_review → approved → published → archived. Cada
-            transición se valida server-side y queda asociada al usuario actual
-            como insumo de auditoría futura.
+            draft → in_review → approved → published → archived. Cada transición se valida
+            server-side y queda asociada al usuario actual como insumo de auditoría futura.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {NEXT_ACTIONS[status].map((action) => (
@@ -299,25 +281,19 @@ export function EntityEditor(props: Props) {
       {isEdit && (
         <section className="mt-6 rounded-xl border border-border bg-card p-5">
           <header className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold tracking-tight">
-              Historial editorial
-            </h2>
+            <h2 className="text-sm font-semibold tracking-tight">Historial editorial</h2>
             <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
               content_audit_log
             </span>
           </header>
           <p className="mt-1 text-xs text-muted-foreground">
-            Bitácora append-only de creaciones, ediciones y transiciones de
-            estado. Insumo oficial de auditoría (Serie 13.4).
+            Bitácora append-only de creaciones, ediciones y transiciones de estado. Insumo oficial
+            de auditoría (Serie 13.4).
           </p>
           <div className="mt-4 divide-y divide-border text-xs">
-            {history.isLoading && (
-              <p className="py-2 text-muted-foreground">Cargando historial…</p>
-            )}
+            {history.isLoading && <p className="py-2 text-muted-foreground">Cargando historial…</p>}
             {history.data && history.data.length === 0 && (
-              <p className="py-2 text-muted-foreground">
-                Sin eventos registrados aún.
-              </p>
+              <p className="py-2 text-muted-foreground">Sin eventos registrados aún.</p>
             )}
             {history.data?.map((h) => (
               <div
@@ -351,11 +327,7 @@ export function EntityEditor(props: Props) {
   );
 }
 
-function FieldInput(props: {
-  field: EditorField;
-  value: string;
-  onChange: (v: string) => void;
-}) {
+function FieldInput(props: { field: EditorField; value: string; onChange: (v: string) => void }) {
   const { field, value, onChange } = props;
   const common =
     "w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary";
@@ -407,9 +379,7 @@ function FieldInput(props: {
           className={common}
         />
       )}
-      {field.helpText && (
-        <p className="text-[11px] text-muted-foreground">{field.helpText}</p>
-      )}
+      {field.helpText && <p className="text-[11px] text-muted-foreground">{field.helpText}</p>}
     </div>
   );
 }

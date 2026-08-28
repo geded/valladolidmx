@@ -3,6 +3,7 @@ name: Founder First Five Seconds Principle
 description: Los primeros cinco segundos tras regresar a Alux deben responder sin búsqueda tres preguntas — dónde nos quedamos, qué es lo más importante ahora, cuál es el siguiente paso recomendado.
 type: constraint
 ---
+
 Vinculante desde AC1.3. Sólo afecta UX/jerarquía de superficies.
 
 Reglas:

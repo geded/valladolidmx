@@ -80,11 +80,20 @@ export interface AluxKnowledgeMatch {
 
 type SbFrom = {
   from: (t: string) => {
-    select: (s: string, o?: { count?: string; head?: boolean }) => {
-      order?: (c: string, o?: { ascending?: boolean }) => {
+    select: (
+      s: string,
+      o?: { count?: string; head?: boolean },
+    ) => {
+      order?: (
+        c: string,
+        o?: { ascending?: boolean },
+      ) => {
         limit?: (n: number) => Promise<{ data: unknown; error: { message: string } | null }>;
       };
-      eq?: (a: string, b: unknown) => {
+      eq?: (
+        a: string,
+        b: unknown,
+      ) => {
         maybeSingle: () => Promise<{ data: unknown; error: { message: string } | null }>;
       };
     };
@@ -192,9 +201,7 @@ export const listAluxKnowledge = createServerFn({ method: "GET" })
       .from("alux_knowledge_entries")
       .select(
         "id, slug, title, summary, body, category, tags, source_url, priority, status, embedded_at, embedding_model, updated_at",
-      )
-      .order!("updated_at", { ascending: false })
-      .limit!(500);
+      ).order!("updated_at", { ascending: false }).limit!(500);
     if (res.error) throw new Error(res.error.message);
     return ((res.data as Record<string, unknown>[]) ?? []).map(normalizeEntry);
   });
@@ -261,11 +268,7 @@ export const upsertAluxKnowledge = createServerFn({ method: "POST" })
       finalSlug = slug;
     } else {
       rec.created_by = context.userId;
-      const ins = await c
-        .from("alux_knowledge_entries")
-        .insert(rec)
-        .select("id, slug")
-        .single();
+      const ins = await c.from("alux_knowledge_entries").insert(rec).select("id, slug").single();
       if (ins.error) throw new Error(ins.error.message);
       const row = ins.data as { id: string; slug: string };
       entryId = row.id;
@@ -417,12 +420,21 @@ export interface AluxKnowledgeLocaleCoverage {
 type SbTrClient = {
   from: (t: string) => {
     select: (s: string) => {
-      order?: (c: string, o?: { ascending?: boolean }) => Promise<{
+      order?: (
+        c: string,
+        o?: { ascending?: boolean },
+      ) => Promise<{
         data: unknown;
         error: { message: string } | null;
       }>;
-      eq?: (a: string, b: unknown) => {
-        eq?: (a: string, b: unknown) => {
+      eq?: (
+        a: string,
+        b: unknown,
+      ) => {
+        eq?: (
+          a: string,
+          b: unknown,
+        ) => {
           maybeSingle: () => Promise<{ data: unknown; error: { message: string } | null }>;
         };
       };
@@ -441,8 +453,10 @@ export const listAluxKnowledgeLocaleCoverage = createServerFn({ method: "GET" })
     const c = context.supabase as unknown as SbTrClient;
     const res = await c
       .from("alux_knowledge_translations")
-      .select("entry_id, locale, source, embedded_at, reviewed_at, updated_at")
-      .order!("updated_at", { ascending: false });
+      .select("entry_id, locale, source, embedded_at, reviewed_at, updated_at").order!(
+      "updated_at",
+      { ascending: false },
+    );
     if (res.error) throw new Error(res.error.message);
     return ((res.data as Record<string, unknown>[]) ?? []).map((r) => ({
       entry_id: String(r.entry_id),
@@ -467,7 +481,8 @@ async function translateWithAi(input: {
     "Traduces con naturalidad, tono cercano y profesional. " +
     "Mantén nombres propios (personas, cenotes, calles, hoteles, platillos), direcciones, precios y URLs sin cambios. " +
     "No añadas contenido nuevo. Devuelve estrictamente JSON válido con las llaves title, summary, body, tags.";
-  const userPrompt = `Traduce este contenido al ${localeName} (código ${input.targetLocale}). Responde SOLO con JSON.\n\n` +
+  const userPrompt =
+    `Traduce este contenido al ${localeName} (código ${input.targetLocale}). Responde SOLO con JSON.\n\n` +
     JSON.stringify({
       title: input.title,
       summary: input.summary,
@@ -526,16 +541,16 @@ export const translateAluxKnowledgeEntry = createServerFn({ method: "POST" })
     const c = context.supabase as unknown as SbTrClient;
 
     // 1) Cargar fila canónica ES
-    const sourceRes = await c
-      .from("alux_knowledge_translations")
-      .select!("title, summary, body, tags")
-      .eq!("entry_id", data.entryId)
-      .eq!("locale", "es")
-      .maybeSingle();
+    const sourceRes = await c.from("alux_knowledge_translations").select!(
+      "title, summary, body, tags",
+    ).eq!("entry_id", data.entryId).eq!("locale", "es").maybeSingle();
     if (sourceRes.error) throw new Error(sourceRes.error.message);
-    const source = sourceRes.data as
-      | { title: string; summary: string | null; body: string; tags: string[] }
-      | null;
+    const source = sourceRes.data as {
+      title: string;
+      summary: string | null;
+      body: string;
+      tags: string[];
+    } | null;
     if (!source) throw new Error("Entrada sin versión ES canónica");
 
     const results: Array<{ locale: string; ok: boolean; error?: string }> = [];
@@ -547,12 +562,10 @@ export const translateAluxKnowledgeEntry = createServerFn({ method: "POST" })
       try {
         // Skip si ya existe y no se pidió overwrite
         if (!data.overwrite) {
-          const existing = await c
-            .from("alux_knowledge_translations")
-            .select!("id")
-            .eq!("entry_id", data.entryId)
-            .eq!("locale", locale)
-            .maybeSingle();
+          const existing = await c.from("alux_knowledge_translations").select!("id").eq!(
+            "entry_id",
+            data.entryId,
+          ).eq!("locale", locale).maybeSingle();
           if (!existing.error && existing.data) {
             results.push({ locale, ok: false, error: "ya existe" });
             continue;
@@ -574,25 +587,23 @@ export const translateAluxKnowledgeEntry = createServerFn({ method: "POST" })
           .filter(Boolean)
           .join("\n\n");
         const embedding = await embedText(composed);
-        const up = await c
-          .from("alux_knowledge_translations")
-          .upsert(
-            {
-              entry_id: data.entryId,
-              locale,
-              title: translated.title,
-              summary: translated.summary,
-              body: translated.body,
-              tags: translated.tags,
-              embedding: pgvectorLiteral(embedding),
-              embedding_model: EMBEDDING_MODEL,
-              embedded_at: new Date().toISOString(),
-              source: "ai_generated",
-              reviewed_at: null,
-              updated_at: new Date().toISOString(),
-            },
-            { onConflict: "entry_id,locale" },
-          );
+        const up = await c.from("alux_knowledge_translations").upsert(
+          {
+            entry_id: data.entryId,
+            locale,
+            title: translated.title,
+            summary: translated.summary,
+            body: translated.body,
+            tags: translated.tags,
+            embedding: pgvectorLiteral(embedding),
+            embedding_model: EMBEDDING_MODEL,
+            embedded_at: new Date().toISOString(),
+            source: "ai_generated",
+            reviewed_at: null,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "entry_id,locale" },
+        );
         if (up.error) throw new Error(up.error.message);
         results.push({ locale, ok: true });
       } catch (e) {

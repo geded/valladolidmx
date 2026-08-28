@@ -21,9 +21,7 @@ export const Route = createFileRoute("/api/public/studio-media/$")({
         if (splat.includes("..")) return new Response("Bad path", { status: 400 });
 
         try {
-          const { supabaseAdmin } = await import(
-            "@/integrations/supabase/client.server"
-          );
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const storage = (supabaseAdmin as any).storage;
           const { data, error } = await storage

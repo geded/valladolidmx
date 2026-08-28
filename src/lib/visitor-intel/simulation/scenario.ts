@@ -143,9 +143,5 @@ export function simulatedSubjectId(runId: string, n: number): string {
 }
 
 /** Selector de modo de consulta (Capa 4: Visualización). */
-export const IntelligenceQueryModeSchema = z.enum([
-  "real",
-  "simulation",
-  "combined",
-]);
+export const IntelligenceQueryModeSchema = z.enum(["real", "simulation", "combined"]);
 export type IntelligenceQueryMode = z.infer<typeof IntelligenceQueryModeSchema>;

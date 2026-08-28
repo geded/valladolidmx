@@ -52,9 +52,7 @@ export function PublicProfileBenefitsCard({
             Perfil público
           </p>
           <h2 className="mt-1 text-lg font-semibold">
-            {isPublic
-              ? "Tu perfil público está activo"
-              : "Completar tu perfil público"}
+            {isPublic ? "Tu perfil público está activo" : "Completar tu perfil público"}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {isPublic

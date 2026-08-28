@@ -7,7 +7,17 @@
  * (no hay memoria persistente para prospectos).
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Send, Sparkles, Loader2, MapPin, MapPinOff, BrainCircuit, RotateCcw, Plus, Check } from "lucide-react";
+import {
+  Send,
+  Sparkles,
+  Loader2,
+  MapPin,
+  MapPinOff,
+  BrainCircuit,
+  RotateCcw,
+  Plus,
+  Check,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@tanstack/react-router";
@@ -258,8 +268,8 @@ export function PublicAluxChat() {
         {messages.length === 0 && (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Pregúntame lo que quieras sobre Valladolid, Izamal, Espita, los cenotes, Chichén
-              Itzá o cómo armar tu viaje al Oriente Maya.
+              Pregúntame lo que quieras sobre Valladolid, Izamal, Espita, los cenotes, Chichén Itzá
+              o cómo armar tu viaje al Oriente Maya.
             </p>
             <div className="flex flex-wrap gap-2">
               {SUGGESTIONS.map((s) => (
@@ -343,8 +353,12 @@ export function PublicAluxChat() {
       </form>
 
       <p className="px-5 pb-4 pt-2 text-[11px] text-muted-foreground bg-muted/30">
-        Alux es una guía inspiracional. Nunca reserva ni cotiza sin tu confirmación. Para armar
-        tu viaje completo, <Link to="/auth" className="underline">crea tu cuenta gratuita</Link>.
+        Alux es una guía inspiracional. Nunca reserva ni cotiza sin tu confirmación. Para armar tu
+        viaje completo,{" "}
+        <Link to="/auth" className="underline">
+          crea tu cuenta gratuita
+        </Link>
+        .
       </p>
     </section>
   );
@@ -397,14 +411,16 @@ function AluxProposals({ items }: { items: Proposal[] }) {
           >
             {added ? <Check className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
             <span className="truncate max-w-[180px]">{p.title}</span>
-            {p.subtitle && (
-              <span className="text-[10px] text-primary/70">· {p.subtitle}</span>
-            )}
+            {p.subtitle && <span className="text-[10px] text-primary/70">· {p.subtitle}</span>}
           </button>
         );
       })}
       <p className="basis-full text-[10px] text-muted-foreground">
-        Alux propone · tú confirmas en <Link to="/cuenta/mi-viaje" className="underline">Mi Viaje</Link>.
+        Alux propone · tú confirmas en{" "}
+        <Link to="/cuenta/mi-viaje" className="underline">
+          Mi Viaje
+        </Link>
+        .
       </p>
     </div>
   );

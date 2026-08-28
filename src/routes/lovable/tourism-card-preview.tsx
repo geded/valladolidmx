@@ -42,11 +42,10 @@ function TourismCardPreviewRoute() {
           Tourism Card — familia oficial
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Un único componente <code>ExperienceProducts</code> renderiza seis
-          tipos de entidad turística (Empresa, Producto, Hotel, Restaurante,
-          Experiencia, Evento) variando <code>entityKind</code>,{" "}
-          <code>variant</code> y <code>capabilities</code>. Cada card responde
-          visualmente a las cinco preguntas fundacionales.
+          Un único componente <code>ExperienceProducts</code> renderiza seis tipos de entidad
+          turística (Empresa, Producto, Hotel, Restaurante, Experiencia, Evento) variando{" "}
+          <code>entityKind</code>, <code>variant</code> y <code>capabilities</code>. Cada card
+          responde visualmente a las cinco preguntas fundacionales.
         </p>
       </header>
 

@@ -69,17 +69,15 @@ function AluxQualityPage() {
         >
           <ArrowLeft className="size-3" aria-hidden /> Volver a la consola
         </Link>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">
-          CMS · Inteligencia
-        </p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">CMS · Inteligencia</p>
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-serif">Calidad de respuestas de Alux</h1>
           <Badge variant="secondary">Ola A20</Badge>
         </div>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          Instrumentación heurística (no censura): riesgo de alucinación,
-          low-context, latencia y coincidencias con la base de conocimiento
-          por capacidad. Complementa el 👍/👎 explícito del viajero.
+          Instrumentación heurística (no censura): riesgo de alucinación, low-context, latencia y
+          coincidencias con la base de conocimiento por capacidad. Complementa el 👍/👎 explícito
+          del viajero.
         </p>
 
         <div className="pt-2 flex flex-wrap gap-2">
@@ -88,9 +86,7 @@ function AluxQualityPage() {
               key={n}
               onClick={() => setDays(n as 7 | 30 | 90)}
               className={`rounded-full border px-3 py-1 text-xs ${
-                days === n
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "hover:bg-muted"
+                days === n ? "bg-primary text-primary-foreground border-primary" : "hover:bg-muted"
               }`}
             >
               Últimos {n} días
@@ -99,9 +95,7 @@ function AluxQualityPage() {
         </div>
       </header>
 
-      {isLoading && (
-        <p className="text-sm text-muted-foreground">Cargando métricas…</p>
-      )}
+      {isLoading && <p className="text-sm text-muted-foreground">Cargando métricas…</p>}
       {error && (
         <p className="text-sm text-destructive">
           {(error as Error).message || "No se pudo cargar la calidad."}
@@ -204,9 +198,7 @@ function AluxQualityPage() {
           </section>
 
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
-            <h2 className="font-serif text-lg mb-4">
-              Respuestas de alto riesgo (últimas 15)
-            </h2>
+            <h2 className="font-serif text-lg mb-4">Respuestas de alto riesgo (últimas 15)</h2>
             {data.recent_high_risk.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 Ninguna respuesta reciente superó el umbral heurístico (riesgo &gt; 50%).
@@ -216,9 +208,7 @@ function AluxQualityPage() {
                 {data.recent_high_risk.map((r) => (
                   <li key={r.id} className="rounded-lg border p-3 space-y-1">
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <Badge variant="destructive">
-                        Riesgo {pct(r.hallucination_risk)}
-                      </Badge>
+                      <Badge variant="destructive">Riesgo {pct(r.hallucination_risk)}</Badge>
                       <span className="font-medium text-foreground">
                         {CAP_LABELS[r.capability] ?? r.capability}
                       </span>
@@ -305,11 +295,7 @@ function DailySparkline({
           const h = Math.max(4, (p.total / maxTotal) * 140);
           const risk = p.avg_hallucination_risk;
           const bg =
-            risk >= 0.35
-              ? "bg-destructive/70"
-              : risk >= 0.15
-                ? "bg-warning/70"
-                : "bg-primary/70";
+            risk >= 0.35 ? "bg-destructive/70" : risk >= 0.15 ? "bg-warning/70" : "bg-primary/70";
           return (
             <div
               key={p.day}
@@ -325,7 +311,8 @@ function DailySparkline({
         })}
       </div>
       <p className="mt-6 text-[11px] text-muted-foreground">
-        Altura = volumen diario · color = riesgo promedio (verde &lt; 15%, ámbar 15–35%, rojo ≥ 35%).
+        Altura = volumen diario · color = riesgo promedio (verde &lt; 15%, ámbar 15–35%, rojo ≥
+        35%).
       </p>
     </div>
   );

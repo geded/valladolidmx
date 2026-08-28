@@ -50,8 +50,16 @@ async function computeMetrics(referencePngBuffer, candidateBuffer, width) {
   mse /= counted;
   const psnr = mse === 0 ? Infinity : 10 * Math.log10((255 * 255) / mse);
 
-  const refImg = { data: new Uint8ClampedArray(ref.data), width: ref.info.width, height: ref.info.height };
-  const candImg = { data: new Uint8ClampedArray(cand.data), width: cand.info.width, height: cand.info.height };
+  const refImg = {
+    data: new Uint8ClampedArray(ref.data),
+    width: ref.info.width,
+    height: ref.info.height,
+  };
+  const candImg = {
+    data: new Uint8ClampedArray(cand.data),
+    width: cand.info.width,
+    height: cand.info.height,
+  };
   let ssimScore = null;
   try {
     const s = ssim(refImg, candImg, { downsample: false });
@@ -59,7 +67,10 @@ async function computeMetrics(referencePngBuffer, candidateBuffer, width) {
   } catch (err) {
     ssimScore = null;
   }
-  return { psnr: Number.isFinite(psnr) ? +psnr.toFixed(2) : null, ssim: ssimScore == null ? null : +ssimScore.toFixed(4) };
+  return {
+    psnr: Number.isFinite(psnr) ? +psnr.toFixed(2) : null,
+    ssim: ssimScore == null ? null : +ssimScore.toFixed(4),
+  };
 }
 
 async function main() {
@@ -95,18 +106,28 @@ async function main() {
         let out;
         try {
           const pipeline = sharp(buf).resize({ width, withoutEnlargement: true });
-          if (format === "avif") out = await pipeline.avif({ quality: QUALITY.avif, effort: 4 }).toBuffer();
-          else if (format === "webp") out = await pipeline.webp({ quality: QUALITY.webp }).toBuffer();
+          if (format === "avif")
+            out = await pipeline.avif({ quality: QUALITY.avif, effort: 4 }).toBuffer();
+          else if (format === "webp")
+            out = await pipeline.webp({ quality: QUALITY.webp }).toBuffer();
           else out = await pipeline.jpeg({ quality: QUALITY.jpeg, mozjpeg: true }).toBuffer();
         } catch (err) {
           results.push({
-            run_id: runId, sample: label, engine: "sharp", format, target_width: width,
+            run_id: runId,
+            sample: label,
+            engine: "sharp",
+            format,
+            target_width: width,
             error: String(err?.message ?? err),
           });
           continue;
         }
         const dt = performance.now() - t0;
-        const metrics = await computeMetrics(refPng, out, width).catch((e) => ({ psnr: null, ssim: null, note: String(e?.message ?? e) }));
+        const metrics = await computeMetrics(refPng, out, width).catch((e) => ({
+          psnr: null,
+          ssim: null,
+          note: String(e?.message ?? e),
+        }));
         results.push({
           run_id: runId,
           sample: label,
@@ -124,13 +145,25 @@ async function main() {
           ssim: metrics.ssim,
           reduction_pct: st.size ? +(100 - (out.length * 100) / st.size).toFixed(1) : null,
         });
-        console.log(`  ${format.padEnd(4)} @ ${String(width).padStart(4)}w  ${String(out.length).padStart(7)} B  ${dt.toFixed(0).padStart(4)} ms  PSNR=${metrics.psnr}  SSIM=${metrics.ssim}`);
+        console.log(
+          `  ${format.padEnd(4)} @ ${String(width).padStart(4)}w  ${String(out.length).padStart(7)} B  ${dt.toFixed(0).padStart(4)} ms  PSNR=${metrics.psnr}  SSIM=${metrics.ssim}`,
+        );
       }
     }
   }
   const outPath = join(OUT_DIR, `${runId}.json`);
-  await writeFile(outPath, JSON.stringify({ runId, generatedAt: new Date().toISOString(), engine: "sharp@local", results }, null, 2));
+  await writeFile(
+    outPath,
+    JSON.stringify(
+      { runId, generatedAt: new Date().toISOString(), engine: "sharp@local", results },
+      null,
+      2,
+    ),
+  );
   console.log(`\nWrote ${results.length} rows → ${outPath}`);
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

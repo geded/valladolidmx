@@ -30,9 +30,7 @@ import {
 } from "./composition-tree";
 
 /** Set de tipos permitidos (derivado del contrato Kit, no hardcoded). */
-const KIT_TYPES: ReadonlySet<string> = new Set(
-  KIT_BLOCK_CONTRACTS.map((c) => c.type),
-);
+const KIT_TYPES: ReadonlySet<string> = new Set(KIT_BLOCK_CONTRACTS.map((c) => c.type));
 
 /** Devuelve la versión declarada por el contrato, o "1.0.0" como fallback. */
 function versionFor(type: string): string {
@@ -118,9 +116,7 @@ export class SurfaceComposer {
  */
 export function isKitOnlyTree(tree: CompositionTree): boolean {
   const walk = (nodes?: CompositionNode[]): boolean =>
-    (nodes ?? []).every(
-      (n) => KIT_TYPES.has(n.type) && walk(n.children),
-    );
+    (nodes ?? []).every((n) => KIT_TYPES.has(n.type) && walk(n.children));
   return walk(tree.root.children);
 }
 

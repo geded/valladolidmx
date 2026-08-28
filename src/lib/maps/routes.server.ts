@@ -60,8 +60,7 @@ export async function computeRouteInternal(
       headers: {
         ...gatewayHeaders(),
         "Content-Type": "application/json",
-        "X-Goog-FieldMask":
-          "routes.distanceMeters,routes.duration,routes.staticDuration",
+        "X-Goog-FieldMask": "routes.distanceMeters,routes.duration,routes.staticDuration",
       },
       body: JSON.stringify({
         origin: {
@@ -100,17 +99,14 @@ export async function computeRouteInternal(
       };
     }
     const r = body.routes[0];
-    const toSec = (s?: string) =>
-      s ? Number(s.replace(/s$/, "")) : null;
+    const toSec = (s?: string) => (s ? Number(s.replace(/s$/, "")) : null);
     const duration = toSec(r.duration);
     const staticDuration = toSec(r.staticDuration);
     return {
       ok: true,
       distanceMeters: r.distanceMeters ?? null,
       durationSeconds: Number.isFinite(duration) ? duration : null,
-      staticDurationSeconds: Number.isFinite(staticDuration)
-        ? staticDuration
-        : null,
+      staticDurationSeconds: Number.isFinite(staticDuration) ? staticDuration : null,
     };
   } catch (err) {
     return {

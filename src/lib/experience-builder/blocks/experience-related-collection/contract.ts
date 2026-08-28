@@ -53,35 +53,29 @@ export const experienceRelatedEntityKindSchema = z.enum([
   "category",
   "mixed",
 ]);
-export type ExperienceRelatedEntityKind = z.infer<
-  typeof experienceRelatedEntityKindSchema
->;
+export type ExperienceRelatedEntityKind = z.infer<typeof experienceRelatedEntityKindSchema>;
 
 export const experienceRelatedVariantSchema = z.enum([
-  "grid",       // Grid responsivo (default).
-  "list",       // Lista vertical.
-  "carousel",   // Scroll horizontal con snap.
-  "masonry",    // Mosaico denso.
-  "featured",   // Uno destacado + secundarios.
-  "compact",    // Fila mini (widget lateral).
+  "grid", // Grid responsivo (default).
+  "list", // Lista vertical.
+  "carousel", // Scroll horizontal con snap.
+  "masonry", // Mosaico denso.
+  "featured", // Uno destacado + secundarios.
+  "compact", // Fila mini (widget lateral).
 ]);
-export type ExperienceRelatedVariant = z.infer<
-  typeof experienceRelatedVariantSchema
->;
+export type ExperienceRelatedVariant = z.infer<typeof experienceRelatedVariantSchema>;
 
 export const experienceRelatedSourceSchema = z.enum([
-  "manual",       // Items provistos por el editor.
-  "destination",  // Hidrata desde DestinationSurfaceContext.
-  "region",       // Reservado — RegionSurfaceContext.
-  "category",     // Reservado — CategorySurfaceContext.
-  "business",     // Reservado — BusinessSurfaceContext.
-  "product",      // Reservado — ProductSurfaceContext.
-  "context",      // Reservado — Context Engine (herencia).
-  "alux",         // Reservado — Motor Alux (recomendaciones).
+  "manual", // Items provistos por el editor.
+  "destination", // Hidrata desde DestinationSurfaceContext.
+  "region", // Reservado — RegionSurfaceContext.
+  "category", // Reservado — CategorySurfaceContext.
+  "business", // Reservado — BusinessSurfaceContext.
+  "product", // Reservado — ProductSurfaceContext.
+  "context", // Reservado — Context Engine (herencia).
+  "alux", // Reservado — Motor Alux (recomendaciones).
 ]);
-export type ExperienceRelatedSource = z.infer<
-  typeof experienceRelatedSourceSchema
->;
+export type ExperienceRelatedSource = z.infer<typeof experienceRelatedSourceSchema>;
 
 export const experienceRelatedSortSchema = z.enum([
   "manual",
@@ -107,18 +101,14 @@ export const experienceRelatedContextRefsSchema = z
   })
   .partial()
   .default({});
-export type ExperienceRelatedContextRefs = z.infer<
-  typeof experienceRelatedContextRefsSchema
->;
+export type ExperienceRelatedContextRefs = z.infer<typeof experienceRelatedContextRefsSchema>;
 
 /* ------------------------------------------------------------------ *
  * Item shape — universal (todas las entidades caben aquí).
  * ------------------------------------------------------------------ */
 export const experienceRelatedBadgeSchema = z.object({
   label: z.string().min(1),
-  tone: z
-    .enum(["default", "primary", "success", "warning", "info"])
-    .default("default"),
+  tone: z.enum(["default", "primary", "success", "warning", "info"]).default("default"),
 });
 export type ExperienceRelatedBadge = z.infer<typeof experienceRelatedBadgeSchema>;
 
@@ -228,9 +218,7 @@ export type ExperienceRelatedGroup = z.infer<typeof experienceRelatedGroupSchema
  * Config (Studio) & DTO (runtime)
  * ------------------------------------------------------------------ */
 export const experienceRelatedCollectionConfigSchema = z.object({
-  contractVersion: z
-    .string()
-    .default(EXPERIENCE_RELATED_COLLECTION_CONTRACT_VERSION),
+  contractVersion: z.string().default(EXPERIENCE_RELATED_COLLECTION_CONTRACT_VERSION),
   source: experienceRelatedSourceSchema.default("manual"),
   entityKind: experienceRelatedEntityKindSchema.default("mixed"),
   variant: experienceRelatedVariantSchema.default("grid"),
@@ -248,9 +236,7 @@ export const experienceRelatedCollectionConfigSchema = z.object({
   /** v1.1.0 — densidad visual (Founder: no clonar SaaS genérico). */
   density: z.enum(["comfortable", "compact"]).default("comfortable"),
   /** v1.1.0 — cómo agrupar internamente cuando la fuente lo permita. */
-  groupBy: z
-    .enum(["none", "destination", "category", "type"])
-    .default("none"),
+  groupBy: z.enum(["none", "destination", "category", "type"]).default("none"),
   capabilities: z
     .object({
       showImage: z.boolean().default(true),
@@ -351,33 +337,41 @@ export const experienceRelatedCollectionDtoSchema = z.object({
   }),
   contextRefs: experienceRelatedContextRefsSchema,
 });
-export type ExperienceRelatedCollectionDTO = z.infer<
-  typeof experienceRelatedCollectionDtoSchema
->;
+export type ExperienceRelatedCollectionDTO = z.infer<typeof experienceRelatedCollectionDtoSchema>;
 
 /* ------------------------------------------------------------------ *
  * Helpers puros
  * ------------------------------------------------------------------ */
 export function kindLabel(kind: ExperienceRelatedEntityKind): string {
   switch (kind) {
-    case "business": return "Empresa";
-    case "product": return "Producto";
-    case "experience": return "Experiencia";
-    case "hotel": return "Hotel";
-    case "restaurant": return "Restaurante";
-    case "event": return "Evento";
-    case "promotion": return "Promoción";
-    case "route": return "Ruta";
-    case "destination": return "Destino";
-    case "region": return "Región";
-    case "category": return "Categoría";
-    case "mixed": return "Descubrir";
+    case "business":
+      return "Empresa";
+    case "product":
+      return "Producto";
+    case "experience":
+      return "Experiencia";
+    case "hotel":
+      return "Hotel";
+    case "restaurant":
+      return "Restaurante";
+    case "event":
+      return "Evento";
+    case "promotion":
+      return "Promoción";
+    case "route":
+      return "Ruta";
+    case "destination":
+      return "Destino";
+    case "region":
+      return "Región";
+    case "category":
+      return "Categoría";
+    case "mixed":
+      return "Descubrir";
   }
 }
 
-export function dedupeItems(
-  items: ExperienceRelatedItem[],
-): ExperienceRelatedItem[] {
+export function dedupeItems(items: ExperienceRelatedItem[]): ExperienceRelatedItem[] {
   const seen = new Set<string>();
   const out: ExperienceRelatedItem[] = [];
   for (const it of items) {
@@ -409,10 +403,7 @@ export const EXPERIENCE_RELATED_ITEM_V11_DEFAULTS = {
 
 /** Ayuda a construir un ExperienceRelatedItem completo desde un parcial. */
 export function createRelatedItem(
-  partial: Omit<
-    ExperienceRelatedItem,
-    keyof typeof EXPERIENCE_RELATED_ITEM_V11_DEFAULTS
-  > &
+  partial: Omit<ExperienceRelatedItem, keyof typeof EXPERIENCE_RELATED_ITEM_V11_DEFAULTS> &
     Partial<Pick<ExperienceRelatedItem, keyof typeof EXPERIENCE_RELATED_ITEM_V11_DEFAULTS>>,
 ): ExperienceRelatedItem {
   return {
@@ -505,8 +496,7 @@ export function buildExperienceRelatedCollectionPreviewDTO(): ExperienceRelatedC
     density: "comfortable",
     groupBy: "none",
     heading: "Sigue descubriendo",
-    subheading:
-      "Empresas, eventos y experiencias para continuar construyendo tu viaje.",
+    subheading: "Empresas, eventos y experiencias para continuar construyendo tu viaje.",
     emptyMessage: "Aún no hay contenido para descubrir aquí.",
     ariaLabel: "Sigue descubriendo",
     groups: [

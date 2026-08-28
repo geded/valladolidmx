@@ -76,9 +76,7 @@ function InventoryTable({ entries }: { entries: readonly RouteInventoryEntry[] }
                   {e.routeId.replace("src/routes/", "")}
                 </div>
                 {e.notes && (
-                  <div className="mt-1 text-[11px] italic text-muted-foreground">
-                    {e.notes}
-                  </div>
+                  <div className="mt-1 text-[11px] italic text-muted-foreground">{e.notes}</div>
                 )}
               </td>
               <td className="px-3 py-2">
@@ -93,13 +91,9 @@ function InventoryTable({ entries }: { entries: readonly RouteInventoryEntry[] }
                   {e.businessPriority}
                 </span>
               </td>
-              <td className="px-3 py-2 text-[11px]">
-                {STATUS_LABEL[e.migrationStatus]}
-              </td>
+              <td className="px-3 py-2 text-[11px]">{STATUS_LABEL[e.migrationStatus]}</td>
               <td className="px-3 py-2 text-[11px]">{e.functionalOwner}</td>
-              <td className="px-3 py-2 text-[11px] text-muted-foreground">
-                {e.lastReviewed}
-              </td>
+              <td className="px-3 py-2 text-[11px] text-muted-foreground">{e.lastReviewed}</td>
               <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">
                 {e.productVersion}
               </td>
@@ -158,10 +152,10 @@ export function RouteInventoryPanel() {
       <header className="space-y-1">
         <h2 className="text-lg font-semibold">Inventario de Rutas · Destination OS</h2>
         <p className="text-xs text-muted-foreground">
-          Fuente única del producto Valladolid.mx. {inventory.length} rutas
-          registradas · {totals.studio} en Studio · {totals["dynamic-template"]}{" "}
-          plantillas · {totals["pending-migration"]} pendientes ·{" "}
-          {totals.technical + totals.system} técnicas/sistema.
+          Fuente única del producto Valladolid.mx. {inventory.length} rutas registradas ·{" "}
+          {totals.studio} en Studio · {totals["dynamic-template"]} plantillas ·{" "}
+          {totals["pending-migration"]} pendientes · {totals.technical + totals.system}{" "}
+          técnicas/sistema.
         </p>
       </header>
 
@@ -169,9 +163,7 @@ export function RouteInventoryPanel() {
         {TABS.map((t) => {
           const active = tab === t.id;
           const count =
-            t.id === "roadmap"
-              ? inventory.length
-              : byCategory[t.id as RouteCategory].length;
+            t.id === "roadmap" ? inventory.length : byCategory[t.id as RouteCategory].length;
           return (
             <button
               key={t.id}
@@ -183,9 +175,7 @@ export function RouteInventoryPanel() {
               }`}
             >
               {t.label}
-              <span className="ml-1.5 rounded bg-muted px-1 py-0.5 text-[10px]">
-                {count}
-              </span>
+              <span className="ml-1.5 rounded bg-muted px-1 py-0.5 text-[10px]">{count}</span>
             </button>
           );
         })}

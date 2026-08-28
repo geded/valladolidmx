@@ -3,6 +3,7 @@ name: Founder Reproducible Simulation Principle
 description: CV8.S · Toda simulación del Visitor Intelligence Center debe ser reproducible, determinística, configurable, aislada (is_simulation=true), reversible y jamás confundible con datos reales.
 type: constraint
 ---
+
 **Founder Reproducible Simulation Principle** (vinculante, CV8.S+).
 
 La simulación del Visitor Intelligence Center no es una carga única de datos.

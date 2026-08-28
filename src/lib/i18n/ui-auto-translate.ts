@@ -81,10 +81,7 @@ function loadCache(locale: string): CacheState {
 function saveCache(state: CacheState) {
   if (!state.dirty) return;
   try {
-    window.localStorage.setItem(
-      CACHE_KEY_PREFIX + state.locale,
-      JSON.stringify(state.map),
-    );
+    window.localStorage.setItem(CACHE_KEY_PREFIX + state.locale, JSON.stringify(state.map));
     state.dirty = false;
   } catch {
     /* quota */
@@ -116,7 +113,8 @@ function collectTextNodes(root: Node, pending: Map<Text, string>) {
 
 function collectAttrs(root: Node, pendingAttrs: Map<HTMLElement, Map<string, string>>) {
   if (root.nodeType !== Node.ELEMENT_NODE && root.nodeType !== Node.DOCUMENT_NODE) return;
-  const scope = root.nodeType === Node.DOCUMENT_NODE ? (root as Document).body : (root as HTMLElement);
+  const scope =
+    root.nodeType === Node.DOCUMENT_NODE ? (root as Document).body : (root as HTMLElement);
   if (!scope) return;
   if (isSkippableAncestor(scope)) return;
   const selector = TRANSLATABLE_ATTRS.map((a) => `[${a}]`).join(",");
@@ -325,7 +323,10 @@ async function sha20(input: string): Promise<string> {
   const enc = new TextEncoder().encode(input);
   const buf = await crypto.subtle.digest("SHA-256", enc);
   const arr = Array.from(new Uint8Array(buf));
-  return arr.map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 20);
+  return arr
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("")
+    .slice(0, 20);
 }
 
 async function mapByHash(

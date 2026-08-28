@@ -65,8 +65,7 @@ function FichaPage() {
 
   const auditQuery = useQuery<BusinessAuditEntry[]>({
     queryKey: ["portal", "business-audit", businessId, user?.id],
-    queryFn: () =>
-      fetchAudit({ data: { businessId: businessId as string, limit: 25 } }),
+    queryFn: () => fetchAudit({ data: { businessId: businessId as string, limit: 25 } }),
     enabled: Boolean(businessId && user?.id),
   });
 
@@ -93,7 +92,12 @@ function FichaPage() {
   }, [cardQuery.data?.id, cardQuery.data?.updated_at]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const status = cardQuery.data?.status;
-  const isEditable = status === "draft" || status === "in_review" || status === "published" || status === "approved" || status === "archived";
+  const isEditable =
+    status === "draft" ||
+    status === "in_review" ||
+    status === "published" ||
+    status === "approved" ||
+    status === "archived";
 
   const saveMutation = useMutation({
     mutationFn: () =>
@@ -123,8 +127,7 @@ function FichaPage() {
   });
 
   const reviewMutation = useMutation({
-    mutationFn: () =>
-      requestReview({ data: { businessId: businessId as string } }),
+    mutationFn: () => requestReview({ data: { businessId: businessId as string } }),
     onSuccess: async () => {
       setFeedback("Ficha enviada a revisión editorial.");
       setErrorMessage(null);
@@ -140,8 +143,7 @@ function FichaPage() {
   });
 
   const withdrawMutation = useMutation({
-    mutationFn: () =>
-      withdrawReview({ data: { businessId: businessId as string } }),
+    mutationFn: () => withdrawReview({ data: { businessId: businessId as string } }),
     onSuccess: async () => {
       setFeedback("Solicitud de revisión retirada.");
       setErrorMessage(null);
@@ -173,11 +175,7 @@ function FichaPage() {
     return (
       <EmptyState
         title="No pudimos cargar la ficha"
-        body={
-          cardQuery.error instanceof Error
-            ? cardQuery.error.message
-            : "Error desconocido."
-        }
+        body={cardQuery.error instanceof Error ? cardQuery.error.message : "Error desconocido."}
       />
     );
   }
@@ -260,8 +258,7 @@ function FichaPage() {
             type="button"
             onClick={() => saveMutation.mutate()}
             disabled={
-              !isEditable || !dirty || saveMutation.isPending ||
-              form.display_name.trim().length < 2
+              !isEditable || !dirty || saveMutation.isPending || form.display_name.trim().length < 2
             }
             className="inline-flex rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50"
           >
@@ -293,16 +290,12 @@ function FichaPage() {
         </div>
 
         <p className="mt-4 text-[11px] text-muted-foreground">
-          La aprobación y publicación las realiza el equipo editorial desde el
-          CMS. Los campos slug, destino, categorías, verificación y fecha de
-          publicación están reservados.
+          La aprobación y publicación las realiza el equipo editorial desde el CMS. Los campos slug,
+          destino, categorías, verificación y fecha de publicación están reservados.
         </p>
       </section>
 
-      <AuditSection
-        loading={auditQuery.isLoading}
-        entries={auditQuery.data ?? []}
-      />
+      <AuditSection loading={auditQuery.isLoading} entries={auditQuery.data ?? []} />
     </div>
   );
 }
@@ -368,13 +361,7 @@ function StatusBadge({ status }: { status: PortalBusinessCard["status"] }) {
   return <Badge tone={tone}>{labels[status]}</Badge>;
 }
 
-function Badge({
-  children,
-  tone,
-}: {
-  children: React.ReactNode;
-  tone: "ok" | "warn" | "neutral";
-}) {
+function Badge({ children, tone }: { children: React.ReactNode; tone: "ok" | "warn" | "neutral" }) {
   const cls =
     tone === "ok"
       ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
@@ -390,25 +377,15 @@ function Badge({
   );
 }
 
-function AuditSection({
-  loading,
-  entries,
-}: {
-  loading: boolean;
-  entries: BusinessAuditEntry[];
-}) {
+function AuditSection({ loading, entries }: { loading: boolean; entries: BusinessAuditEntry[] }) {
   return (
     <section className="rounded-lg border border-border bg-card p-5">
       <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
         Historial editorial
       </h2>
-      {loading && (
-        <p className="mt-3 text-xs text-muted-foreground">Cargando historial…</p>
-      )}
+      {loading && <p className="mt-3 text-xs text-muted-foreground">Cargando historial…</p>}
       {!loading && entries.length === 0 && (
-        <p className="mt-3 text-xs text-muted-foreground">
-          Aún no hay transiciones registradas.
-        </p>
+        <p className="mt-3 text-xs text-muted-foreground">Aún no hay transiciones registradas.</p>
       )}
       {entries.length > 0 && (
         <ul className="mt-4 divide-y divide-border">
@@ -422,9 +399,7 @@ function AuditSection({
                   {new Date(e.created_at).toLocaleString("es-MX")}
                 </span>
               </div>
-              {e.notes && (
-                <p className="mt-1 text-xs text-muted-foreground">{e.notes}</p>
-              )}
+              {e.notes && <p className="mt-1 text-xs text-muted-foreground">{e.notes}</p>}
             </li>
           ))}
         </ul>

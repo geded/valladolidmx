@@ -35,7 +35,10 @@ export function VariablePicker({ onPick }: { onPick: (token: string) => void }) 
                     <li key={f.field}>
                       <button
                         type="button"
-                        onClick={() => { onPick(token); setOpen(false); }}
+                        onClick={() => {
+                          onPick(token);
+                          setOpen(false);
+                        }}
                         className="w-full rounded px-1 py-1 text-left hover:bg-accent"
                       >
                         <span className="font-mono text-[10px]">{token}</span>

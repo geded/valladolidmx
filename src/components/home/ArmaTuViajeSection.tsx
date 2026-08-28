@@ -8,13 +8,23 @@ import { useTranslation } from "@/i18n/context";
 
 export function ArmaTuViajeSection({ config }: { config?: Record<string, unknown> } = {}) {
   const { t } = useTranslation();
-  const heading = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.ayv_title");
-  const body = typeof config?.body === "string" && config.body.trim() ? config.body : t("sections.ayv_sub");
-  const ctaLabel = typeof config?.cta_label === "string" && config.cta_label.trim() ? config.cta_label : t("hero.cta_secondary");
+  const heading =
+    typeof config?.heading === "string" && config.heading.trim()
+      ? config.heading
+      : t("sections.ayv_title");
+  const body =
+    typeof config?.body === "string" && config.body.trim() ? config.body : t("sections.ayv_sub");
+  const ctaLabel =
+    typeof config?.cta_label === "string" && config.cta_label.trim()
+      ? config.cta_label
+      : t("hero.cta_secondary");
   return (
     <section id="arma-tu-viaje" className="@container py-20 @3xl:py-28">
       <Container>
-        <div data-home-grid="arma-tu-viaje" className="grid grid-cols-1 gap-8 @3xl:grid-cols-2 @3xl:items-center">
+        <div
+          data-home-grid="arma-tu-viaje"
+          className="grid grid-cols-1 gap-8 @3xl:grid-cols-2 @3xl:items-center"
+        >
           <div>
             <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">
               {t("nav.plan_trip")}
@@ -31,11 +41,26 @@ export function ArmaTuViajeSection({ config }: { config?: Record<string, unknown
           </div>
           <ul className="grid gap-3">
             {[
-              { Icon: Compass, title: "Guarda destinos", body: "Reúne lo que te llama de cada lugar." },
-              { Icon: FileText, title: "Anota lo importante", body: "Fechas, intereses, viajeros, presupuesto." },
-              { Icon: MessageCircle, title: "Tu concierge humano", body: "Lo recibe cuando estés listo. Nunca antes." },
+              {
+                Icon: Compass,
+                title: "Guarda destinos",
+                body: "Reúne lo que te llama de cada lugar.",
+              },
+              {
+                Icon: FileText,
+                title: "Anota lo importante",
+                body: "Fechas, intereses, viajeros, presupuesto.",
+              },
+              {
+                Icon: MessageCircle,
+                title: "Tu concierge humano",
+                body: "Lo recibe cuando estés listo. Nunca antes.",
+              },
             ].map(({ Icon, title, body }) => (
-              <li key={title} className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5">
+              <li
+                key={title}
+                className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5"
+              >
                 <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
                   <Icon className="size-5" aria-hidden />
                 </span>

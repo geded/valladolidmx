@@ -95,8 +95,14 @@ export const getAluxQualityStats = createServerFn({ method: "POST" })
     const sb = context.supabase as unknown as {
       from: (t: string) => {
         select: (s: string) => {
-          gte: (a: string, b: string) => {
-            order: (a: string, o: { ascending: boolean }) => {
+          gte: (
+            a: string,
+            b: string,
+          ) => {
+            order: (
+              a: string,
+              o: { ascending: boolean },
+            ) => {
               limit: (n: number) => Promise<{
                 data: Array<{
                   id: string;
@@ -146,7 +152,14 @@ export const getAluxQualityStats = createServerFn({ method: "POST" })
     >();
     const perDay = new Map<
       string,
-      { total: number; sumRisk: number; riskCount: number; low: number; sumLat: number; latCount: number }
+      {
+        total: number;
+        sumRisk: number;
+        riskCount: number;
+        low: number;
+        sumLat: number;
+        latCount: number;
+      }
     >();
 
     const highRiskItems: AluxQualityStats["recent_high_risk"] = [];

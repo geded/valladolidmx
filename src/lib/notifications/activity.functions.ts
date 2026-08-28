@@ -23,7 +23,9 @@ export const getAdminActivity = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { limit?: number } | undefined) => ({ limit: clampLimit(input?.limit) }))
   .handler(async ({ data, context }) => {
-    const { data: rows, error } = await context.supabase.rpc("unc_activity_admin", { _limit: data.limit });
+    const { data: rows, error } = await context.supabase.rpc("unc_activity_admin", {
+      _limit: data.limit,
+    });
     if (error) throw error;
     return { items: (rows ?? []) as ActivityItem[] };
   });
@@ -47,7 +49,9 @@ export const getTravelerActivity = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { limit?: number } | undefined) => ({ limit: clampLimit(input?.limit) }))
   .handler(async ({ data, context }) => {
-    const { data: rows, error } = await context.supabase.rpc("unc_activity_traveler", { _limit: data.limit });
+    const { data: rows, error } = await context.supabase.rpc("unc_activity_traveler", {
+      _limit: data.limit,
+    });
     if (error) throw error;
     return { items: (rows ?? []) as ActivityItem[] };
   });

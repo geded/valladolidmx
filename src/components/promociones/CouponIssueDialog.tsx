@@ -19,10 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  issueCoupon,
-  type TravelerCoupon,
-} from "@/lib/promotions/coupons.functions";
+import { issueCoupon, type TravelerCoupon } from "@/lib/promotions/coupons.functions";
 import { CouponQR } from "./CouponQR";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,18 +54,18 @@ export function CouponIssueDialog({
         // Email de confirmación (idempotente por coupon.id — no duplica en reintentos).
         void (async () => {
           try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const {
+              data: { user },
+            } = await supabase.auth.getUser();
             if (!user?.email) return;
-            const origin =
-              typeof window !== "undefined" ? window.location.origin : "";
+            const origin = typeof window !== "undefined" ? window.location.origin : "";
             await sendTransactionalEmail({
               templateName: "coupon-issued",
               recipientEmail: user.email,
               idempotencyKey: `coupon-issued-${c.id}`,
               templateData: {
                 travelerName:
-                  (user.user_metadata as { first_name?: string } | null)
-                    ?.first_name ?? null,
+                  (user.user_metadata as { first_name?: string } | null)?.first_name ?? null,
                 title: c.title,
                 code: c.code,
                 discountPercent: c.discount_percent,
@@ -164,10 +161,7 @@ export function CouponIssueDialog({
             </div>
             {coupon.discount_percent ? (
               <p className="text-sm">
-                Descuento:{" "}
-                <strong>
-                  {Math.round(Number(coupon.discount_percent))}%
-                </strong>
+                Descuento: <strong>{Math.round(Number(coupon.discount_percent))}%</strong>
               </p>
             ) : null}
             <p className="text-xs text-muted-foreground">
@@ -179,18 +173,13 @@ export function CouponIssueDialog({
               })}
             </p>
             <p className="text-center text-xs text-muted-foreground">
-              Presenta este QR o dicta el código en el negocio para aplicar
-              tu descuento.
+              Presenta este QR o dicta el código en el negocio para aplicar tu descuento.
             </p>
           </div>
         )}
 
         <DialogFooter className="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cerrar
           </Button>
           <Button asChild>

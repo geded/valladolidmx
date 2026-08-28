@@ -20,10 +20,7 @@ const ROUTE_BY_SLUG: Partial<Record<string, string>> = {
   eventos: "/eventos",
 };
 
-function toVM(
-  category: Category,
-  labels: { explore: string; comingSoon: string },
-): TourismCardVM {
+function toVM(category: Category, labels: { explore: string; comingSoon: string }): TourismCardVM {
   const href = ROUTE_BY_SLUG[category.slug] ?? null;
   return {
     id: `category:${category.id}`,

@@ -75,7 +75,11 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
       : cn(
           "fixed left-0 right-0 z-40 transition-transform duration-300",
           desktopPosition === "top" ? "top-0" : "bottom-0",
-          visible ? "translate-y-0 opacity-100" : desktopPosition === "top" ? "-translate-y-full opacity-0" : "translate-y-full opacity-0",
+          visible
+            ? "translate-y-0 opacity-100"
+            : desktopPosition === "top"
+              ? "-translate-y-full opacity-0"
+              : "translate-y-full opacity-0",
         );
 
   const inner = (
@@ -97,12 +101,8 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
     >
       {(label || meta) && (
         <div className="min-w-0 flex-1">
-          {label ? (
-            <p className="truncate text-sm font-semibold text-foreground">{label}</p>
-          ) : null}
-          {meta ? (
-            <p className="truncate text-xs text-muted-foreground">{meta}</p>
-          ) : null}
+          {label ? <p className="truncate text-sm font-semibold text-foreground">{label}</p> : null}
+          {meta ? <p className="truncate text-xs text-muted-foreground">{meta}</p> : null}
         </div>
       )}
       <div className="ml-auto flex items-center gap-2">

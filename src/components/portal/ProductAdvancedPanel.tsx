@@ -37,11 +37,7 @@ type Props = {
   onStatusChanged: () => void;
 };
 
-export function ProductAdvancedPanel({
-  productId,
-  productStatus,
-  onStatusChanged,
-}: Props) {
+export function ProductAdvancedPanel({ productId, productStatus, onStatusChanged }: Props) {
   const [open, setOpen] = useState(false);
   return (
     <div className="mt-3 border-t border-border/60 pt-3">
@@ -80,8 +76,7 @@ function MediaSection({ productId }: { productId: string }) {
     queryKey: ["portal", "product-media", productId],
     queryFn: () => listFn({ data: { productId } }),
   });
-  const refresh = () =>
-    qc.invalidateQueries({ queryKey: ["portal", "product-media", productId] });
+  const refresh = () => qc.invalidateQueries({ queryKey: ["portal", "product-media", productId] });
 
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -95,12 +90,10 @@ function MediaSection({ productId }: { productId: string }) {
       });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const st = supabase.storage as any;
-      const { error: upErr } = await st
-        .from(bucket)
-        .uploadToSignedUrl(path, token, file, {
-          contentType: file.type,
-          upsert: false,
-        });
+      const { error: upErr } = await st.from(bucket).uploadToSignedUrl(path, token, file, {
+        contentType: file.type,
+        upsert: false,
+      });
       if (upErr) throw upErr;
       await registerFn({
         data: {
@@ -184,9 +177,7 @@ function MediaSection({ productId }: { productId: string }) {
                 <span className="uppercase">{m.role}</span>
                 <button
                   type="button"
-                  onClick={() =>
-                    removeFn({ data: { productMediaId: m.id } }).then(refresh)
-                  }
+                  onClick={() => removeFn({ data: { productMediaId: m.id } }).then(refresh)}
                   className="opacity-0 transition-opacity group-hover:opacity-100"
                   aria-label="Eliminar"
                 >
@@ -213,8 +204,7 @@ function FaqSection({ productId }: { productId: string }) {
     queryKey: ["portal", "product-faqs", productId],
     queryFn: () => listFn({ data: { productId } }),
   });
-  const refresh = () =>
-    qc.invalidateQueries({ queryKey: ["portal", "product-faqs", productId] });
+  const refresh = () => qc.invalidateQueries({ queryKey: ["portal", "product-faqs", productId] });
 
   const [q, setQ] = useState("");
   const [a, setA] = useState("");
@@ -238,10 +228,7 @@ function FaqSection({ productId }: { productId: string }) {
       <h4 className="mb-2 text-sm font-semibold">Preguntas frecuentes</h4>
       <ul className="mb-3 grid gap-2">
         {faqs.map((f) => (
-          <li
-            key={f.id}
-            className="rounded border border-border/60 bg-card/30 p-2 text-xs"
-          >
+          <li key={f.id} className="rounded border border-border/60 bg-card/30 p-2 text-xs">
             <div className="mb-1 flex items-start justify-between gap-2">
               <strong className="text-foreground">{f.question}</strong>
               <div className="flex gap-2">
@@ -261,9 +248,7 @@ function FaqSection({ productId }: { productId: string }) {
                 </button>
                 <button
                   type="button"
-                  onClick={() =>
-                    deleteFn({ data: { faqId: f.id } }).then(refresh)
-                  }
+                  onClick={() => deleteFn({ data: { faqId: f.id } }).then(refresh)}
                   className="text-[10px] uppercase text-destructive hover:underline"
                 >
                   Borrar
@@ -348,9 +333,7 @@ function PublishSection({
     onSuccess: (r) => {
       if (r.published) setFeedback("✅ Producto publicado.");
       else if (r.reason === "not_authorized_to_self_publish")
-        setFeedback(
-          "⚠️ Empresa no autorizada para autopublicar. Solicita revisión Founder.",
-        );
+        setFeedback("⚠️ Empresa no autorizada para autopublicar. Solicita revisión Founder.");
       else if (r.reason === "validation_failed")
         setFeedback(`⚠️ Faltan requisitos: ${(r.errors ?? []).join(", ")}`);
       else setFeedback(r.message ?? r.reason ?? "No se pudo publicar.");
@@ -398,23 +381,16 @@ function PublishSection({
                     : "text-muted-foreground"
               }
             >
-              {i.severity === "block" ? "✕" : i.severity === "warn" ? "!" : "·"}{" "}
-              {i.message}
-              {i.fixHint && (
-                <span className="ml-1 opacity-70">— {i.fixHint}</span>
-              )}
+              {i.severity === "block" ? "✕" : i.severity === "warn" ? "!" : "·"} {i.message}
+              {i.fixHint && <span className="ml-1 opacity-70">— {i.fixHint}</span>}
             </li>
           ))}
           {check.ok && check.warnings.length === 0 && (
-            <li className="text-emerald-600 dark:text-emerald-400">
-              ✓ Listo para publicar.
-            </li>
+            <li className="text-emerald-600 dark:text-emerald-400">✓ Listo para publicar.</li>
           )}
         </ul>
       ) : null}
-      {feedback && (
-        <p className="mb-2 text-xs text-muted-foreground">{feedback}</p>
-      )}
+      {feedback && <p className="mb-2 text-xs text-muted-foreground">{feedback}</p>}
       <div className="flex flex-wrap gap-2">
         <button
           type="button"

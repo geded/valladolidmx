@@ -55,7 +55,10 @@ export interface AuthUserShape {
  *
  * Destino del panel principal por rol (`/auth` redirige aquí tras SIGNED_IN).
  */
-export const ROLE_HOME: Record<AppRole, "/admin" | "/empresa" | "/concierge" | "/cms" | "/mi-viaje"> = {
+export const ROLE_HOME: Record<
+  AppRole,
+  "/admin" | "/empresa" | "/concierge" | "/cms" | "/mi-viaje"
+> = {
   super_admin: "/admin",
   admin: "/admin",
   editor: "/cms",
@@ -65,10 +68,18 @@ export const ROLE_HOME: Record<AppRole, "/admin" | "/empresa" | "/concierge" | "
   traveler: "/mi-viaje",
 };
 
-export function resolveRoleHome(roles: AppRole[]): "/admin" | "/empresa" | "/concierge" | "/cms" | "/mi-viaje" {
+export function resolveRoleHome(
+  roles: AppRole[],
+): "/admin" | "/empresa" | "/concierge" | "/cms" | "/mi-viaje" {
   // Orden de prioridad operativa (no jerárquico): founder/admin > business > concierge > editor > traveler.
   const order: AppRole[] = [
-    "super_admin", "admin", "business_owner", "concierge_lead", "concierge", "editor", "traveler",
+    "super_admin",
+    "admin",
+    "business_owner",
+    "concierge_lead",
+    "concierge",
+    "editor",
+    "traveler",
   ];
   for (const r of order) if (roles.includes(r)) return ROLE_HOME[r];
   return "/mi-viaje";

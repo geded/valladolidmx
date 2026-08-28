@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.71",
+    "version": "0.73",
     "state": "Approved",
-    "source_sha256": "79d5c73389d5bcb88a5c027ead40599e2c3c5a558827fc7b25bbfc3e74fd76d0",
+    "source_sha256": "d5c5819d57604253c8e8f4da83b45ea76d9758d726503f8f6f06284f9f8b3424",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -8252,6 +8252,64 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-047.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-047.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/places/place-public-contract.ts",
+      "type": "artifact",
+      "path": "src/lib/places/place-public-contract.ts"
+    },
+    {
+      "id": "ART:src/lib/places/place-public-reads.server.ts",
+      "type": "artifact",
+      "path": "src/lib/places/place-public-reads.server.ts"
+    },
+    {
+      "id": "ART:src/lib/places/place-public-reads.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/places/place-public-reads.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/places/place-presentation.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/places/place-presentation.functions.ts"
+    },
+    {
+      "id": "ART:src/components/cms/places/PlacePresentationPanel.tsx",
+      "type": "artifact",
+      "path": "src/components/cms/places/PlacePresentationPanel.tsx"
+    },
+    {
+      "id": "ART:src/routes/oriente-maya/$destino.lugares.$slug.tsx",
+      "type": "artifact",
+      "path": "src/routes/oriente-maya/$destino.lugares.$slug.tsx"
+    },
+    {
+      "id": "ART:scripts/omxds/q2d-b/place-public-connection.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/q2d-b/place-public-connection.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/q2d-b/place-public-connection.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/q2d-b/place-public-connection.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-q2d-b/EVIDENCE-MANIFEST.md",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-q2d-b/EVIDENCE-MANIFEST.md"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-048.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-048.json"
     }
   ],
   "edges": [
@@ -21726,6 +21784,123 @@
       "destination": "DOC:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
       "evidence": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/places/place-public-contract.ts:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/lib/places/place-public-contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/places/place-public-reads.server.ts:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/lib/places/place-public-reads.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/places/place-public-reads.functions.ts:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/lib/places/place-public-reads.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/places/place-presentation.functions.ts:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/lib/places/place-presentation.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/cms/places/PlacePresentationPanel.tsx:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/components/cms/places/PlacePresentationPanel.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/cms/places/PlaceEditor.tsx:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/components/cms/places/PlaceEditor.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/oriente-maya/$destino.lugares.$slug.tsx:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/routes/oriente-maya/$destino.lugares.$slug.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/route-inventory.ts:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/route-inventory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2d-b/place-public-connection.contract.test.ts:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:scripts/omxds/q2d-b/place-public-connection.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2d-b/place-public-connection.evidence.mjs:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:scripts/omxds/q2d-b/place-public-connection.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/evidence/omxds-q2d-b/EVIDENCE-MANIFEST.md:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-q2d-b/EVIDENCE-MANIFEST.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-048.json:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-048.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
       "verified_at": "2026-08-28"
     }
   ],

@@ -13,10 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { resolveSmartBlock } from "@/lib/experience-builder/smart-blocks.functions";
 import { getBlock } from "@/lib/experience-builder/block-registry";
-import type {
-  SmartBlockFilter,
-  SmartBlockQuery,
-} from "@/lib/experience-builder/block-contract";
+import type { SmartBlockFilter, SmartBlockQuery } from "@/lib/experience-builder/block-contract";
 import type { CompositionNode } from "@/lib/experience-builder/composition-tree";
 import {
   SmartDestinationsGrid,
@@ -41,7 +38,7 @@ export function SmartBlockRuntime({ node }: { node: CompositionNode }) {
   const limit =
     typeof cfg.limit === "number" && cfg.limit > 0 && cfg.limit <= 24
       ? Math.floor(cfg.limit)
-      : baseQuery?.limit ?? 6;
+      : (baseQuery?.limit ?? 6);
   const onlyFeatured = cfg.only_featured === true;
 
   const query: SmartBlockQuery | null = baseQuery

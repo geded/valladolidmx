@@ -79,15 +79,36 @@ function PreviewPage() {
       "Descubre cenotes escondidos, cocina yucateca de autor y experiencias curadas por Alux.",
     alignment: "left",
     mediaSlides: [
-      { url: "https://images.unsplash.com/photo-1518638150340-f706e86654de?auto=format&fit=crop&w=1920&q=80", alt: "Valladolid colonial" },
-      { url: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1920&q=80", alt: "Cenote Zací" },
-      { url: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1920&q=80", alt: "Hacienda al atardecer" },
+      {
+        url: "https://images.unsplash.com/photo-1518638150340-f706e86654de?auto=format&fit=crop&w=1920&q=80",
+        alt: "Valladolid colonial",
+      },
+      {
+        url: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1920&q=80",
+        alt: "Cenote Zací",
+      },
+      {
+        url: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1920&q=80",
+        alt: "Hacienda al atardecer",
+      },
     ],
     slideIntervalMs: 6000,
     overlapHeader: false,
     ctas: [
-      { label: "Explorar Oriente Maya", action: "navigate", href: "#", emphasis: "primary", iconKey: "arrow-right" },
-      { label: "Arma tu viaje", action: "navigate", href: "#", emphasis: "secondary", iconKey: "compass" },
+      {
+        label: "Explorar Oriente Maya",
+        action: "navigate",
+        href: "#",
+        emphasis: "primary",
+        iconKey: "arrow-right",
+      },
+      {
+        label: "Arma tu viaje",
+        action: "navigate",
+        href: "#",
+        emphasis: "secondary",
+        iconKey: "compass",
+      },
     ],
     ctaPrimary: null,
     ctaSecondary: null,
@@ -123,15 +144,16 @@ function PreviewPage() {
         </p>
         <h1 className="text-3xl font-semibold font-serif">Tourist Hero — matriz oficial</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          Cuatro variantes oficiales del bloque <code>vmx.experience.hero</code>{" "}
-          renderizadas desde el mismo componente presentacional. Sin bloques
-          paralelos: la Home cinematic vive en el mismo contrato v1.1.0.
+          Cuatro variantes oficiales del bloque <code>vmx.experience.hero</code> renderizadas desde
+          el mismo componente presentacional. Sin bloques paralelos: la Home cinematic vive en el
+          mismo contrato v1.1.0.
         </p>
       </header>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold text-muted-foreground">
-          Variante 4 · <span className="font-mono">cinematic</span> (Home + destinos institucionales)
+          Variante 4 · <span className="font-mono">cinematic</span> (Home + destinos
+          institucionales)
         </h2>
         <ExperienceHero dto={cinematicHome} extensionsSlot={searchSlot} />
       </section>
@@ -166,19 +188,16 @@ function PreviewPage() {
 
       <section className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold text-muted-foreground">
-          Variante 3 · <span className="font-mono">editorial</span> (sin media, tipografía protagonista)
+          Variante 3 · <span className="font-mono">editorial</span> (sin media, tipografía
+          protagonista)
         </h2>
-        <ExperienceHero
-          dto={{ ...base, variant: "editorial", media: null }}
-          headingLevel="h2"
-        />
+        <ExperienceHero dto={{ ...base, variant: "editorial", media: null }} headingLevel="h2" />
       </section>
 
       <footer className="rounded-2xl border border-border bg-muted/30 p-5 text-xs text-muted-foreground">
         <p>
-          Contrato v1.1.0 retrocompatible. Cero regresiones en Business /
-          Destination surfaces (Experience Hero) ni Home Hero cinematic
-          (adapter documentado en la auditoría U1.4).
+          Contrato v1.1.0 retrocompatible. Cero regresiones en Business / Destination surfaces
+          (Experience Hero) ni Home Hero cinematic (adapter documentado en la auditoría U1.4).
         </p>
       </footer>
     </main>

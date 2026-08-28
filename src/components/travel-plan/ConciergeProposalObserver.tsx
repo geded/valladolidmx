@@ -66,8 +66,7 @@ export function ConciergeProposalObserver() {
       if (row.status === "paid" || row.status === "fulfilled") {
         toast.success("Tu viaje está confirmado", {
           description:
-            row.editorial_title ??
-            "Reservamos tu experiencia. Tu concierge sigue contigo.",
+            row.editorial_title ?? "Reservamos tu experiencia. Tu concierge sigue contigo.",
           action: {
             label: "Ver",
             onClick: () => {

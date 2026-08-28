@@ -9,12 +9,7 @@ import { useWorkspace } from "./WorkspaceProvider";
 import { useWorkspaceBreakpoint, isTouchBreakpoint } from "./hooks/useWorkspaceBreakpoint";
 import { BottomSheet } from "./BottomSheet";
 import { AluxCopilotPanel } from "./AluxCopilotPanel";
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetHeader,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 export interface WorkspaceInspectorProps {
@@ -67,10 +62,7 @@ export function WorkspaceInspector({
   // lg+: panel acoplado
   return (
     <aside
-      className={cn(
-        "hidden h-full w-[360px] shrink-0 lg:flex xl:w-[420px]",
-        className,
-      )}
+      className={cn("hidden h-full w-[360px] shrink-0 lg:flex xl:w-[420px]", className)}
       aria-label="Inspector"
     >
       {content}

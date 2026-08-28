@@ -126,8 +126,7 @@ function loadAcknowledgedRevisionOverrides(root = process.cwd()) {
     .sort()
     .map((file) => JSON.parse(fs.readFileSync(path.join(directory, file), "utf8")))
     .filter(
-      (addendum) =>
-        addendum.status === ACTIVE_STATUS && addendum.supersedes_acknowledged_revision,
+      (addendum) => addendum.status === ACTIVE_STATUS && addendum.supersedes_acknowledged_revision,
     );
   for (const addendum of addenda) {
     const revision = addendum.supersedes_acknowledged_revision;
@@ -221,7 +220,8 @@ export function validateAuthorizations(authorizations, masterIndex) {
               .update(fs.readFileSync(absolutePath))
               .digest("hex");
             const overrideKey = `${authorization.id}:${revision.operation}:${normalizeRepositoryPath(revision.path)}`;
-            const expected = acknowledgedRevisionOverrides.get(overrideKey)?.current_sha256 ?? revision.sha256;
+            const expected =
+              acknowledgedRevisionOverrides.get(overrideKey)?.current_sha256 ?? revision.sha256;
             if (actual !== expected)
               errors.push(`${prefix}: acknowledged revision changed: ${revision.path}`);
           }

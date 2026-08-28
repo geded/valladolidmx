@@ -118,11 +118,10 @@ export const runDemoEvaluations = createServerFn({ method: "POST" })
     const results: Array<{ id: string; ok: boolean; score: number }> = [];
 
     for (const ev of evals) {
-      const matches = await retrieveAluxKnowledgeServer(
-        context.supabase,
-        ev.question,
-        { matchCount: 4, locale: ev.locale },
-      );
+      const matches = await retrieveAluxKnowledgeServer(context.supabase, ev.question, {
+        matchCount: 4,
+        locale: ev.locale,
+      });
       const kbBlock = knowledgeToPromptBlock(matches, { locale: ev.locale });
       const t0 = Date.now();
       let text = "";
@@ -141,9 +140,7 @@ export const runDemoEvaluations = createServerFn({ method: "POST" })
       const scored = scoreAnswer(text, ev.expected_entities ?? [], ev.forbidden_terms ?? []);
       const risk = hallucinationRisk(text, kbBlock);
       const ok =
-        scored.score >= 0.5 &&
-        scored.forbiddenHits.length === 0 &&
-        !text.startsWith("ERROR");
+        scored.score >= 0.5 && scored.forbiddenHits.length === 0 && !text.startsWith("ERROR");
 
       await admin
         .from("alux_evaluations")

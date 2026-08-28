@@ -31,9 +31,10 @@ function toVM(business: BusinessTeaser): TourismCardVM {
     mediaUrl: null,
     mediaAlt: business.name,
     rating: null,
-    location: (contract?.territory ?? business.destination_slug)
-      ? { label: contract?.territory ?? business.destination_slug, distanceKm: null }
-      : null,
+    location:
+      (contract?.territory ?? business.destination_slug)
+        ? { label: contract?.territory ?? business.destination_slug, distanceKm: null }
+        : null,
     territorialContext: null,
     highlights: [],
     badges: [],
@@ -61,9 +62,7 @@ export function EmpresaCard({ business }: { business: BusinessTeaser }) {
         showDistance: false,
         showFavorite: true,
       }}
-      renderActions={() => (
-        <TrustBadge subjectKind="business" subjectId={business.id} />
-      )}
+      renderActions={() => <TrustBadge subjectKind="business" subjectId={business.id} />}
     />
   );
 }

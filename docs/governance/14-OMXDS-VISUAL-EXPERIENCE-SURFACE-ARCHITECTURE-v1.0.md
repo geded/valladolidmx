@@ -4,7 +4,7 @@
 **Fecha:** 2026-07-21  
 **Autoridad:** Founder  
 **Naturaleza:** Blueprint rector visual y de superficies públicas  
-**Implementación:** No autorizada  
+**Implementación:** No autorizada
 
 ## 1. Decisión Founder
 
@@ -83,12 +83,12 @@ La experiencia combinará patrimonio, luz cálida, piedra caliza, selva, agua de
 
 ## 6. Jerarquía visual canónica
 
-| Nivel | Nombre | Función | Densidad |
-|---|---|---|---|
-| H1 | Hero cinematográfico | Identidad, promesa y entrada | 1 por superficie elegible |
-| H2 | Destacado editorial | Priorizar una historia, lugar o experiencia | 1–3 por página |
-| H3 | Tarjeta principal | Explorar entidades comparables | Colecciones acotadas |
-| H4 | Resultado compacto | Buscar, filtrar, planear y operar | Alta densidad controlada |
+| Nivel | Nombre               | Función                                     | Densidad                  |
+| ----- | -------------------- | ------------------------------------------- | ------------------------- |
+| H1    | Hero cinematográfico | Identidad, promesa y entrada                | 1 por superficie elegible |
+| H2    | Destacado editorial  | Priorizar una historia, lugar o experiencia | 1–3 por página            |
+| H3    | Tarjeta principal    | Explorar entidades comparables              | Colecciones acotadas      |
+| H4    | Resultado compacto   | Buscar, filtrar, planear y operar           | Alta densidad controlada  |
 
 Ninguna página podrá resolver toda su composición con H3. Debe existir ritmo entre inmersión, contexto, elección y detalle.
 
@@ -96,16 +96,16 @@ Ninguna página podrá resolver toda su composición con H3. Debe existir ritmo 
 
 Las familias no crean ocho Design Systems; definen ocho gramáticas de composición sobre tokens, bloques y datos compartidos.
 
-| Familia | Promesa | Superficies principales | Rasgo dominante |
-|---|---|---|---|
-| Territory | Comprender y recorrer un lugar | región, destino, municipio | panorama, identidad y conexiones |
-| Landmark | Entender un icono patrimonial o natural | cenote, zona arqueológica, convento | presencia monumental y contexto |
-| Business | Confiar en un anfitrión | Empresa Estándar | identidad, evidencia y oferta |
-| Premium | Sumergirse en una marca anfitriona | Empresa Premium | narrativa cinematográfica modular |
-| Editorial | Aprender e inspirarse | artículo, guía, historia | lectura, fotografía y autoridad |
-| Collection | Elegir dentro de una curaduría | listas temáticas y destacados | comparación con intención |
-| Event | Decidir con contexto temporal | evento, agenda, festival | fecha, estado, lugar y acceso |
-| Journey | Conectar varios momentos | ruta, itinerario, Arma tu Viaje | secuencia, mapa y continuidad |
+| Familia    | Promesa                                 | Superficies principales             | Rasgo dominante                   |
+| ---------- | --------------------------------------- | ----------------------------------- | --------------------------------- |
+| Territory  | Comprender y recorrer un lugar          | región, destino, municipio          | panorama, identidad y conexiones  |
+| Landmark   | Entender un icono patrimonial o natural | cenote, zona arqueológica, convento | presencia monumental y contexto   |
+| Business   | Confiar en un anfitrión                 | Empresa Estándar                    | identidad, evidencia y oferta     |
+| Premium    | Sumergirse en una marca anfitriona      | Empresa Premium                     | narrativa cinematográfica modular |
+| Editorial  | Aprender e inspirarse                   | artículo, guía, historia            | lectura, fotografía y autoridad   |
+| Collection | Elegir dentro de una curaduría          | listas temáticas y destacados       | comparación con intención         |
+| Event      | Decidir con contexto temporal           | evento, agenda, festival            | fecha, estado, lugar y acceso     |
+| Journey    | Conectar varios momentos                | ruta, itinerario, Arma tu Viaje     | secuencia, mapa y continuidad     |
 
 ## 8. Arquitectura de superficies
 
@@ -372,19 +372,19 @@ Alux no modifica recomendaciones neutrales por plan comercial. Las campañas pat
 
 ## 14. Reconciliación de autoridad existente
 
-| Documento/capacidad | Decisión V1.0 |
-|---|---|
-| 09 UX/UI Design System | Se conserva como base; este documento completa jerarquías y familias |
-| 12 Home Master Experience | Se conserva; el contrato Home de §8.1 define la composición canónica futura |
-| 12A v2 Dirección de Arte | Se ratifica y operacionaliza |
-| 12D Visual Governance | Se conserva; “cumple técnicamente” no equivale a aprobación visual Founder |
-| Valladolid Colonial Design System | Se adopta como base de tokens, sujeto a QA con medios reales |
-| Surface Kit | Se conserva como infraestructura compartida |
-| Experience Builder | Se conserva como único compositor y renderer |
-| Plantilla Madre BusinessSurface | Se conserva como orquestador; se separan Estándar y Premium por composición/capabilities |
-| Micrositios territoriales | Se conservan; se completa jerarquía editorial y media |
-| Parity reports | Prueban compatibilidad, no aceptación estética final |
-| Commerce V1.0 | Permanece aprobado pero pausado; no cambia por el plan visual |
+| Documento/capacidad               | Decisión V1.0                                                                            |
+| --------------------------------- | ---------------------------------------------------------------------------------------- |
+| 09 UX/UI Design System            | Se conserva como base; este documento completa jerarquías y familias                     |
+| 12 Home Master Experience         | Se conserva; el contrato Home de §8.1 define la composición canónica futura              |
+| 12A v2 Dirección de Arte          | Se ratifica y operacionaliza                                                             |
+| 12D Visual Governance             | Se conserva; “cumple técnicamente” no equivale a aprobación visual Founder               |
+| Valladolid Colonial Design System | Se adopta como base de tokens, sujeto a QA con medios reales                             |
+| Surface Kit                       | Se conserva como infraestructura compartida                                              |
+| Experience Builder                | Se conserva como único compositor y renderer                                             |
+| Plantilla Madre BusinessSurface   | Se conserva como orquestador; se separan Estándar y Premium por composición/capabilities |
+| Micrositios territoriales         | Se conservan; se completa jerarquía editorial y media                                    |
+| Parity reports                    | Prueban compatibilidad, no aceptación estética final                                     |
+| Commerce V1.0                     | Permanece aprobado pero pausado; no cambia por el plan visual                            |
 
 En caso de conflicto visual entre Blueprints del mismo nivel, este V1.0 prevalece por fecha y especialidad, siempre subordinado a CANON y gobernanza superior.
 
@@ -444,7 +444,6 @@ Antes de autorizar V0 deberá existir:
 
 Este documento queda **Proposed** hasta aprobación explícita posterior del Founder. Su preparación no equivale a autorización de implementación.
 
-
 ---
 
 # Anexo A · Auditoría de reconciliación visual
@@ -457,18 +456,18 @@ La brecha principal es de **sistema de composición**, no de librería UI.
 
 ## 2. Evidencia recuperada
 
-| Fuente | Aporte vigente | Limitación detectada |
-|---|---|---|
-| `09-UX-UI-DESIGN-SYSTEM` | Componentes y filosofía base | Define “Cards” genéricas sin taxonomía visual completa |
-| `12-HOME-MASTER-EXPERIENCE` | Secciones funcionales del Home | No resuelve ritmo editorial integral en todas las superficies |
-| `12A-v2` | Dirección de arte “evolucionar, no rediseñar” | Aspiracional; faltan contratos ejecutables por entidad |
-| `12D.00/12D.01` | Gobernanza, accesibilidad y gates | Auditoría anterior confundió cumplimiento de infraestructura con cierre visual |
-| Colonial Design System | Tokens y lenguaje territorial | No basta para diferenciar entidades ni composiciones |
-| Surface Kit | Primitives y adapters reutilizables | La reutilización actual puede producir monotonía |
-| Experience Builder | Fuente única de composición | Carece de familias visuales canónicas y restricciones completas |
-| BusinessSurface | Orquestador puro | No formaliza Estándar versus Premium |
-| Destination parity | Hero y badges | “Parity” no prueba riqueza editorial ni calidad de toda la página |
-| Discovery Navigator | Conexión territorial | Resuelve orientación, no jerarquía completa del contenido |
+| Fuente                      | Aporte vigente                                | Limitación detectada                                                           |
+| --------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------ |
+| `09-UX-UI-DESIGN-SYSTEM`    | Componentes y filosofía base                  | Define “Cards” genéricas sin taxonomía visual completa                         |
+| `12-HOME-MASTER-EXPERIENCE` | Secciones funcionales del Home                | No resuelve ritmo editorial integral en todas las superficies                  |
+| `12A-v2`                    | Dirección de arte “evolucionar, no rediseñar” | Aspiracional; faltan contratos ejecutables por entidad                         |
+| `12D.00/12D.01`             | Gobernanza, accesibilidad y gates             | Auditoría anterior confundió cumplimiento de infraestructura con cierre visual |
+| Colonial Design System      | Tokens y lenguaje territorial                 | No basta para diferenciar entidades ni composiciones                           |
+| Surface Kit                 | Primitives y adapters reutilizables           | La reutilización actual puede producir monotonía                               |
+| Experience Builder          | Fuente única de composición                   | Carece de familias visuales canónicas y restricciones completas                |
+| BusinessSurface             | Orquestador puro                              | No formaliza Estándar versus Premium                                           |
+| Destination parity          | Hero y badges                                 | “Parity” no prueba riqueza editorial ni calidad de toda la página              |
+| Discovery Navigator         | Conexión territorial                          | Resuelve orientación, no jerarquía completa del contenido                      |
 
 ## 3. Hallazgos
 
@@ -506,21 +505,21 @@ Existen políticas SEO avanzadas, pero no una matriz única que vincule familia 
 
 ## 4. Matriz conservar / extender / retirar
 
-| Elemento | Decisión | Razón |
-|---|---|---|
-| Tokens oficiales | Conservar | Coherencia y bajo riesgo |
-| Fraunces + Inter | Conservar | Editorial + legibilidad |
-| Tangerine | Restringir | Sólo acentos breves |
-| PublicHeader/Footer | Conservar | Navegación única |
-| BreadcrumbTerritorial | Conservar | Contexto y SEO |
-| Surface Kit | Extender | Variantes por familia, no duplicados |
-| Experience Builder | Extender | Único compositor |
-| `page_compositions` | Conservar | Single Source of Truth |
-| Hero oficial | Extender | Variantes por familia sobre el mismo contrato |
-| Tarjeta genérica única | Retirar como patrón público | Sustituir por contratos especializados |
-| Placeholders grises repetidos | Retirar | Fallbacks editoriales por categoría |
-| Premium como “más bloques” | Retirar | Debe ser narrativa y capacidades gobernadas |
-| Recomendación pagada de Alux | Prohibir | Confianza y neutralidad |
+| Elemento                      | Decisión                    | Razón                                         |
+| ----------------------------- | --------------------------- | --------------------------------------------- |
+| Tokens oficiales              | Conservar                   | Coherencia y bajo riesgo                      |
+| Fraunces + Inter              | Conservar                   | Editorial + legibilidad                       |
+| Tangerine                     | Restringir                  | Sólo acentos breves                           |
+| PublicHeader/Footer           | Conservar                   | Navegación única                              |
+| BreadcrumbTerritorial         | Conservar                   | Contexto y SEO                                |
+| Surface Kit                   | Extender                    | Variantes por familia, no duplicados          |
+| Experience Builder            | Extender                    | Único compositor                              |
+| `page_compositions`           | Conservar                   | Single Source of Truth                        |
+| Hero oficial                  | Extender                    | Variantes por familia sobre el mismo contrato |
+| Tarjeta genérica única        | Retirar como patrón público | Sustituir por contratos especializados        |
+| Placeholders grises repetidos | Retirar                     | Fallbacks editoriales por categoría           |
+| Premium como “más bloques”    | Retirar                     | Debe ser narrativa y capacidades gobernadas   |
+| Recomendación pagada de Alux  | Prohibir                    | Confianza y neutralidad                       |
 
 ## 5. Superficies prioritarias para Masterboard
 
@@ -552,7 +551,6 @@ Existen políticas SEO avanzadas, pero no una matriz única que vincule familia 
 
 Aprobar primero el Blueprint `14`, el PRD `18.04` y el plan `18.05`. Implementar después por gates V0–V8, comenzando con baseline y Masterboard, sin tocar rutas públicas hasta obtener aprobación visual Founder.
 
-
 # Anexo B · PRD Suite y Visual Masterboard
 
 ## 1. Objetivo
@@ -561,15 +559,15 @@ Definir con precisión las superficies, jerarquías, tarjetas, medios, SEO y est
 
 ## 2. Personas y necesidades
 
-| Persona | Necesidad visual |
-|---|---|
-| Visitante inspiracional | Entender rápidamente por qué quedarse y qué vivir |
-| Visitante planificador | Comparar sin perder contexto territorial |
-| Visitante onsite | Encontrar información decisiva con poca fricción |
-| Anfitrión estándar | Presencia digna, clara y confiable |
-| Anfitrión Premium | Narrativa diferenciada sin romper el sistema |
-| Editor/Admin | Componer con reglas y previsualizar estados |
-| SEO/Contenido | Mantener entidad, URL, schema y medios consistentes |
+| Persona                 | Necesidad visual                                    |
+| ----------------------- | --------------------------------------------------- |
+| Visitante inspiracional | Entender rápidamente por qué quedarse y qué vivir   |
+| Visitante planificador  | Comparar sin perder contexto territorial            |
+| Visitante onsite        | Encontrar información decisiva con poca fricción    |
+| Anfitrión estándar      | Presencia digna, clara y confiable                  |
+| Anfitrión Premium       | Narrativa diferenciada sin romper el sistema        |
+| Editor/Admin            | Componer con reglas y previsualizar estados         |
+| SEO/Contenido           | Mantener entidad, URL, schema y medios consistentes |
 
 ## 3. Requisitos transversales
 
@@ -671,47 +669,47 @@ Objetivo: pasar de inspiración a plan. Utiliza H4 compacto, días/secuencia, ma
 
 ## 5. Contratos de tarjetas
 
-| Contrato | Ratio | Campos obligatorios | CTA |
-|---|---:|---|---|
-| TerritoryCard | 16:9 | nombre, identidad, territorio, distancia/tiempo | Descubrir |
-| BusinessCard | 4:3 | nombre, categoría, ubicación, promesa, media | Ver perfil/acción autorizada |
-| ExperienceCard | 3:2 o 4:5 | promesa, anfitrión, duración, modalidad | Vivir/Agregar/Cotizar/Reservar |
-| ProductCard | 1:1 o 4:3 | producto, empresa, unidad/variante | Ver/Agregar/Comprar autorizado |
-| EventCard | 4:5 | fecha, estado, lugar, título | Ver evento |
-| JourneyCard | 16:9 | tema, paradas, duración | Explorar/Agregar |
-| CompactResult | 1:1 miniatura | nombre, tipo, metadato decisivo | Acción contextual |
+| Contrato       |         Ratio | Campos obligatorios                             | CTA                            |
+| -------------- | ------------: | ----------------------------------------------- | ------------------------------ |
+| TerritoryCard  |          16:9 | nombre, identidad, territorio, distancia/tiempo | Descubrir                      |
+| BusinessCard   |           4:3 | nombre, categoría, ubicación, promesa, media    | Ver perfil/acción autorizada   |
+| ExperienceCard |     3:2 o 4:5 | promesa, anfitrión, duración, modalidad         | Vivir/Agregar/Cotizar/Reservar |
+| ProductCard    |     1:1 o 4:3 | producto, empresa, unidad/variante              | Ver/Agregar/Comprar autorizado |
+| EventCard      |           4:5 | fecha, estado, lugar, título                    | Ver evento                     |
+| JourneyCard    |          16:9 | tema, paradas, duración                         | Explorar/Agregar               |
+| CompactResult  | 1:1 miniatura | nombre, tipo, metadato decisivo                 | Acción contextual              |
 
 Reglas comunes: título máximo controlado, fallback específico, badges limitados, acción completa accesible, sin nested links, foco visible y tracking futuro sin PII.
 
 ## 6. Empresa Estándar vs Premium
 
-| Capacidad | Estándar | Premium |
-|---|---|---|
-| URL/entidad | Canónica | La misma canónica |
-| Hero | Fotográfico/editorial contenido | Cinematográfico foto/video |
-| Historia | Resumen + descripción | Narrativa modular extensa |
-| Galería | Estándar | Secuencial y ampliada |
-| Productos | Lista completa | Curaduría + lista completa |
-| Itinerarios | Relacionados automáticos | Bloques editoriales autorizados |
-| Bloques personalizados | No | Whitelist Premium |
-| Analítica futura | Base | Avanzada con consentimiento |
-| Posición orgánica | Sin privilegio | Sin privilegio |
-| Alux neutral | Sí | Sí, sin sesgo pagado |
-| Venta online | Sólo autorización Commerce | Sólo autorización Commerce |
+| Capacidad              | Estándar                        | Premium                         |
+| ---------------------- | ------------------------------- | ------------------------------- |
+| URL/entidad            | Canónica                        | La misma canónica               |
+| Hero                   | Fotográfico/editorial contenido | Cinematográfico foto/video      |
+| Historia               | Resumen + descripción           | Narrativa modular extensa       |
+| Galería                | Estándar                        | Secuencial y ampliada           |
+| Productos              | Lista completa                  | Curaduría + lista completa      |
+| Itinerarios            | Relacionados automáticos        | Bloques editoriales autorizados |
+| Bloques personalizados | No                              | Whitelist Premium               |
+| Analítica futura       | Base                            | Avanzada con consentimiento     |
+| Posición orgánica      | Sin privilegio                  | Sin privilegio                  |
+| Alux neutral           | Sí                              | Sí, sin sesgo pagado            |
+| Venta online           | Sólo autorización Commerce      | Sólo autorización Commerce      |
 
 ## 7. Matriz SEO
 
-| Superficie | Schema principal | Breadcrumb | Riesgo a evitar |
-|---|---|---|---|
-| Home | WebSite/Organization | No obligatorio | saturar H1 |
-| Región/Destino | TouristDestination | Sí | páginas territoriales duplicadas |
-| Landmark | TouristAttraction | Sí | datos culturales imprecisos |
-| Empresa | LocalBusiness/subtipo | Sí | Premium duplicado |
-| Experiencia | Product + Offer sólo autorizado | Sí | precio falso o stale |
-| Producto | Product | Sí | confundir empresa y producto |
-| Evento | Event | Sí | estado/fecha caducos |
-| Ruta | Trip/ItemList | Sí | orden no indexable |
-| Editorial | Article | Sí contextual | contenido delgado |
+| Superficie     | Schema principal                | Breadcrumb     | Riesgo a evitar                  |
+| -------------- | ------------------------------- | -------------- | -------------------------------- |
+| Home           | WebSite/Organization            | No obligatorio | saturar H1                       |
+| Región/Destino | TouristDestination              | Sí             | páginas territoriales duplicadas |
+| Landmark       | TouristAttraction               | Sí             | datos culturales imprecisos      |
+| Empresa        | LocalBusiness/subtipo           | Sí             | Premium duplicado                |
+| Experiencia    | Product + Offer sólo autorizado | Sí             | precio falso o stale             |
+| Producto       | Product                         | Sí             | confundir empresa y producto     |
+| Evento         | Event                           | Sí             | estado/fecha caducos             |
+| Ruta           | Trip/ItemList                   | Sí             | orden no indexable               |
+| Editorial      | Article                         | Sí contextual  | contenido delgado                |
 
 Todos deberán definir canonical, title, H1, meta description, OG, social media, alternates y seis locales sólo cuando la traducción exista.
 
@@ -745,7 +743,6 @@ Cuando el monitor reciba autorización separada, sólo se medirán eventos defin
 ## 11. Fuera de alcance
 
 Commerce C0–C8, inventario, checkout, pagos, reservaciones reales, liquidaciones, Visitor Intelligence, tracking, producción, contacto con empresas y creación definitiva del banco de medios.
-
 
 # Anexo C · Plan Lovable V0–V8
 
@@ -909,5 +906,3 @@ Puede dividirse una etapa; no puede saltarse el Masterboard ni la certificación
 ## 16. Próxima autorización posible
 
 Después de aprobar e integrar la documentación, la única autorización técnica elegible será **V0 · Baseline y reconciliación técnica**. V0 no cambia UI pública.
-
-

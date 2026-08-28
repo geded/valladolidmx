@@ -15,10 +15,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { VisitorEventSchema, type VisitorEvent } from "./events";
-import {
-  JOURNEY_TRANSITIONS,
-  type JourneyTransitionId,
-} from "./journey";
+import { JOURNEY_TRANSITIONS, type JourneyTransitionId } from "./journey";
 import { KPI_CATALOG } from "./kpis";
 
 export const OPPORTUNITY_SNAPSHOT_CONTRACT_VERSION = "1.0.0" as const;
@@ -30,10 +27,10 @@ export const MIN_SAMPLE_FOR_OPPORTUNITY = 30 as const;
 const SIGNIFICANCE_THRESHOLD = 0.1;
 
 export type OpportunitySeverity =
-  | "opportunity"   // upside claro; recomendación de amplificar
-  | "attention"     // caída moderada; revisar
-  | "critical"      // caída severa sostenida; intervención inmediata
-  | "informative";  // sin acción operativa; sólo contexto
+  | "opportunity" // upside claro; recomendación de amplificar
+  | "attention" // caída moderada; revisar
+  | "critical" // caída severa sostenida; intervención inmediata
+  | "informative"; // sin acción operativa; sólo contexto
 
 export type OpportunityStatus = "ok" | "insufficient_data";
 
@@ -200,8 +197,7 @@ export const detectJourneyOpportunities = createServerFn({ method: "POST" })
 
     // ── JPR global (North Star) ──────────────────────────────────────
     if (current.active_subjects.size >= MIN_SAMPLE_FOR_OPPORTUNITY) {
-      const deltaRel =
-        jprPrevious === 0 ? 0 : (jprCurrent - jprPrevious) / jprPrevious;
+      const deltaRel = jprPrevious === 0 ? 0 : (jprCurrent - jprPrevious) / jprPrevious;
       const sev = classify(deltaRel, current.active_subjects.size);
       const kpi = kpiById.get("JPR_30D");
       opportunities.push({
@@ -248,8 +244,7 @@ export const detectJourneyOpportunities = createServerFn({ method: "POST" })
       if (sample < MIN_SAMPLE_FOR_OPPORTUNITY) continue;
 
       const deltaAbs = curSubjects - prevSubjects;
-      const deltaRel =
-        prevSubjects === 0 ? (curSubjects > 0 ? 1 : 0) : deltaAbs / prevSubjects;
+      const deltaRel = prevSubjects === 0 ? (curSubjects > 0 ? 1 : 0) : deltaAbs / prevSubjects;
       const sev = classify(deltaRel, sample);
       if (sev === "informative") continue;
 
@@ -307,9 +302,7 @@ export const detectJourneyOpportunities = createServerFn({ method: "POST" })
     });
 
     const status: OpportunityStatus =
-      current.active_subjects.size < MIN_SAMPLE_FOR_OPPORTUNITY
-        ? "insufficient_data"
-        : "ok";
+      current.active_subjects.size < MIN_SAMPLE_FOR_OPPORTUNITY ? "insufficient_data" : "ok";
 
     return {
       window_days: data.window_days,

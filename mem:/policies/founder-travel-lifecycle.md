@@ -3,6 +3,7 @@ name: Founder Travel Lifecycle Principle
 description: El viaje nunca termina. Ciclo oficial del viajero — Inspiración → Exploración → Planeación → Pre-viaje → En destino → Post-viaje → Inspiración. El Post-viaje inicia el siguiente viaje. Vinculante para toda evolución de producto.
 type: constraint
 ---
+
 Principio Founder vinculante (2026-07-13). Reglas:
 
 1. Toda superficie, capacidad, notificación, email, contenido, propuesta de Alux, sección del Workspace y evento del CRM debe declarar en qué etapa del Journey opera y cómo empuja al viajero hacia la siguiente etapa (incluida la vuelta a Inspiración).

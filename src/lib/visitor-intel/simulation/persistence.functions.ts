@@ -15,10 +15,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-import {
-  SimulationScaleSchema,
-  type SimulationScale,
-} from "./scenario";
+import { SimulationScaleSchema, type SimulationScale } from "./scenario";
 import { runScenario } from "./engine";
 import {
   buildOrienteMayaScenario,
@@ -42,12 +39,7 @@ async function requireAdmin(context: { supabase: any; userId: string }): Promise
 }
 
 // ── Contratos ──────────────────────────────────────────────────────────
-export type SimulationRunStatus =
-  | "pending"
-  | "running"
-  | "completed"
-  | "failed"
-  | "wiped";
+export type SimulationRunStatus = "pending" | "running" | "completed" | "failed" | "wiped";
 
 export interface SimulationRunSummary {
   run_id: string;
@@ -84,8 +76,7 @@ export const previewSimulationRun = createServerFn({ method: "POST" })
       scale: scenario.scale,
       calendar: scenario.calendar,
       volume,
-      allow_full:
-        (process.env.SIMULATION_ALLOW_FULL ?? "").toLowerCase() === "true",
+      allow_full: (process.env.SIMULATION_ALLOW_FULL ?? "").toLowerCase() === "true",
     };
   });
 
@@ -211,8 +202,7 @@ export const executeSimulationRun = createServerFn({ method: "POST" })
         stats: result.stats,
       };
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Error desconocido durante la ejecución";
+      const message = err instanceof Error ? err.message : "Error desconocido durante la ejecución";
       await admin
         .schema("visitor_intel")
         .from("simulation_runs")
@@ -301,7 +291,6 @@ export const getDefaultScenarioInfo = createServerFn({ method: "POST" })
         medium: estimateVolume("medium"),
         full: estimateVolume("full"),
       },
-      allow_full:
-        (process.env.SIMULATION_ALLOW_FULL ?? "").toLowerCase() === "true",
+      allow_full: (process.env.SIMULATION_ALLOW_FULL ?? "").toLowerCase() === "true",
     };
   });

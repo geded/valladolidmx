@@ -26,11 +26,31 @@ import {
 } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 
 const TEMAS = [
-  { slug: "cultura", label: "Cultura", description: "Museos, cenotes sagrados, comunidades mayas y rituales vivos." },
-  { slug: "naturaleza", label: "Naturaleza", description: "Reservas, flamingos, selva baja y cielos estrellados." },
-  { slug: "aventura", label: "Aventura", description: "Cenotes profundos, ciclismo entre pueblos y rutas menos transitadas." },
-  { slug: "gastronomia", label: "Gastronomía", description: "Cocineras tradicionales, panuchos, recados y mercados." },
-  { slug: "mercados", label: "Mercados", description: "Plazas, tianguis y ferias del calendario yucateco." },
+  {
+    slug: "cultura",
+    label: "Cultura",
+    description: "Museos, cenotes sagrados, comunidades mayas y rituales vivos.",
+  },
+  {
+    slug: "naturaleza",
+    label: "Naturaleza",
+    description: "Reservas, flamingos, selva baja y cielos estrellados.",
+  },
+  {
+    slug: "aventura",
+    label: "Aventura",
+    description: "Cenotes profundos, ciclismo entre pueblos y rutas menos transitadas.",
+  },
+  {
+    slug: "gastronomia",
+    label: "Gastronomía",
+    description: "Cocineras tradicionales, panuchos, recados y mercados.",
+  },
+  {
+    slug: "mercados",
+    label: "Mercados",
+    description: "Plazas, tianguis y ferias del calendario yucateco.",
+  },
 ];
 
 export const Route = createFileRoute("/que-hacer")({
@@ -72,9 +92,7 @@ function QueHacerRoute() {
       <TourismListingSurface
         hero={{
           eyebrow: "Editorial",
-          title: activo
-            ? `¿Qué hacer? · ${activo.label}`
-            : "¿Qué hacer en el Oriente Maya?",
+          title: activo ? `¿Qué hacer? · ${activo.label}` : "¿Qué hacer en el Oriente Maya?",
           subtitle:
             activo?.description ??
             "Cultura, naturaleza, aventura, gastronomía y eventos para inspirar tu viaje.",

@@ -12,11 +12,7 @@ import { PROFILE_CATALOG } from "./profiles";
 import { sampleSessionMoment } from "./calendar";
 import { createPrng } from "./prng";
 import { simulateVisitor, type VisitorTrace, type SimulatedEvent } from "./behavior";
-import {
-  SCALE_VISITORS,
-  SimulationScenarioSchema,
-  type SimulationScenario,
-} from "./scenario";
+import { SCALE_VISITORS, SimulationScenarioSchema, type SimulationScenario } from "./scenario";
 
 export interface RunScenarioResult {
   run_id_placeholder: string; // real UUID lo crea S.4 al persistir
@@ -34,14 +30,20 @@ export interface RunScenarioResult {
     territorial_touches: Record<string, number>;
     // CV8.S.3 · Sub-motores.
     alux_totals: {
-      asks: number; recommendations: number; accepted: number; rejected: number;
-      itinerary_optimizations: number; onsite_queries: number;
+      asks: number;
+      recommendations: number;
+      accepted: number;
+      rejected: number;
+      itinerary_optimizations: number;
+      onsite_queries: number;
     };
     concierge_status_histogram: Record<string, number>;
     commerce_status_histogram: Record<string, number>;
     commerce_revenue_usd: number;
     reviews_summary: {
-      requested: number; published: number; business_responded: number;
+      requested: number;
+      published: number;
+      business_responded: number;
       average_rating: number | null;
     };
   };
@@ -67,8 +69,12 @@ export function runScenario(params: {
   const final_stage_histogram: Record<string, number> = {};
   const territorial_touches: Record<string, number> = {};
   const alux_totals = {
-    asks: 0, recommendations: 0, accepted: 0, rejected: 0,
-    itinerary_optimizations: 0, onsite_queries: 0,
+    asks: 0,
+    recommendations: 0,
+    accepted: 0,
+    rejected: 0,
+    itinerary_optimizations: 0,
+    onsite_queries: 0,
   };
   const concierge_status_histogram: Record<string, number> = {};
   const commerce_status_histogram: Record<string, number> = {};
@@ -106,8 +112,7 @@ export function runScenario(params: {
         events_by_transition[t] = (events_by_transition[t] ?? 0) + 1;
       }
     }
-    final_stage_histogram[trace.final_stage] =
-      (final_stage_histogram[trace.final_stage] ?? 0) + 1;
+    final_stage_histogram[trace.final_stage] = (final_stage_histogram[trace.final_stage] ?? 0) + 1;
     for (const d of trace.path) {
       territorial_touches[d] = (territorial_touches[d] ?? 0) + 1;
     }
@@ -138,10 +143,7 @@ export function runScenario(params: {
       ratings_count += 1;
     }
     // Toda traza que alcanzó T8 recibió una solicitud de reseña.
-    if (
-      trace.final_stage === "traveler" ||
-      trace.final_stage === "ambassador"
-    ) {
+    if (trace.final_stage === "traveler" || trace.final_stage === "ambassador") {
       reviews_requested += 1;
     }
   }

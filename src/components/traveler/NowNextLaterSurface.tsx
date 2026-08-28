@@ -35,10 +35,7 @@ import {
 import { CV6_5_DESTINATION_CONTRIBUTORS } from "@/lib/traveler/decision-center-destination";
 import { resolveTravelerDestinationContext } from "@/lib/traveler/destination-context.functions";
 import type { TripPhase } from "@/lib/traveler/trip-phase";
-import {
-  deriveAluxSpatialProposals,
-  type AluxSpatialProposal,
-} from "@/lib/traveler/alux-spatial";
+import { deriveAluxSpatialProposals, type AluxSpatialProposal } from "@/lib/traveler/alux-spatial";
 import { useRef } from "react";
 import { deriveOnTripConciergeState } from "@/lib/traveler/on-trip-concierge";
 import { OnTripConciergePriorityBanner } from "@/components/traveler/OnTripConciergePriorityBanner";
@@ -86,7 +83,15 @@ const SLOT_LABEL = {
   later: "Más tarde",
 } as const;
 
-function ActionIcon({ intent }: { intent: DecisionCard["primaryAction"] extends infer A ? A extends { intent: infer I } ? I : never : never }) {
+function ActionIcon({
+  intent,
+}: {
+  intent: DecisionCard["primaryAction"] extends infer A
+    ? A extends { intent: infer I }
+      ? I
+      : never
+    : never;
+}) {
   switch (intent) {
     case "navigate":
       return <Navigation2 className="size-4" aria-hidden />;
@@ -205,12 +210,9 @@ export function NowNextLaterSurface({
       else if (idx === liveDay.nextIndex) role = "next";
       out.push({ id, type, role });
     });
-    const nextItem =
-      liveDay.nextIndex != null ? liveDay.items[liveDay.nextIndex] : null;
+    const nextItem = liveDay.nextIndex != null ? liveDay.items[liveDay.nextIndex] : null;
     const trafficReq =
-      nextItem && nextItem.starts_at
-        ? { arriveBy: nextItem.starts_at }
-        : undefined;
+      nextItem && nextItem.starts_at ? { arriveBy: nextItem.starts_at } : undefined;
     return { todayEntities: out, traffic: trafficReq };
   }, [plan]);
 
@@ -356,35 +358,35 @@ export function NowNextLaterSurface({
       {!center.empty ? (
         <>
           <header className="mb-3 flex items-center gap-2">
-        <span className="grid size-7 place-items-center rounded-full bg-primary/15 text-primary">
-          <Sparkles className="size-4" aria-hidden />
-        </span>
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
-            Centro de decisiones
-          </p>
-          <h2 className="text-sm font-semibold text-foreground">
-            Qué hacer ahora, después y más tarde
-          </h2>
-        </div>
-      </header>
-
-      <div className="grid gap-4 md:grid-cols-3">
-        {(["now", "next", "later"] as const).map((slot) => {
-          const cards = center[slot];
-          if (cards.length === 0) return null;
-          return (
-            <div key={slot} className="space-y-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                {SLOT_LABEL[slot]}
+            <span className="grid size-7 place-items-center rounded-full bg-primary/15 text-primary">
+              <Sparkles className="size-4" aria-hidden />
+            </span>
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+                Centro de decisiones
               </p>
-              {cards.map((c) => (
-                <CardView key={c.id} card={c} />
-              ))}
+              <h2 className="text-sm font-semibold text-foreground">
+                Qué hacer ahora, después y más tarde
+              </h2>
             </div>
-          );
-        })}
-      </div>
+          </header>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {(["now", "next", "later"] as const).map((slot) => {
+              const cards = center[slot];
+              if (cards.length === 0) return null;
+              return (
+                <div key={slot} className="space-y-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                    {SLOT_LABEL[slot]}
+                  </p>
+                  {cards.map((c) => (
+                    <CardView key={c.id} card={c} />
+                  ))}
+                </div>
+              );
+            })}
+          </div>
         </>
       ) : null}
 
@@ -401,9 +403,7 @@ export function NowNextLaterSurface({
                 className="flex flex-col gap-2 rounded-2xl border border-primary/20 bg-primary/[0.04] p-4 shadow-soft"
                 aria-label={p.headline}
               >
-                <p className="text-sm font-semibold text-foreground">
-                  {p.headline}
-                </p>
+                <p className="text-sm font-semibold text-foreground">{p.headline}</p>
                 <dl className="grid gap-1.5 text-xs">
                   <div>
                     <dt className="font-medium text-foreground">Qué hacer</dt>

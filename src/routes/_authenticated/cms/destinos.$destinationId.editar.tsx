@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DestinationEditor } from "@/components/cms/DestinationEditor";
 
-export const Route = createFileRoute(
-  "/_authenticated/cms/destinos/$destinationId/editar",
-)({
+export const Route = createFileRoute("/_authenticated/cms/destinos/$destinationId/editar")({
   head: () => ({
     meta: [
       { title: "Editar destino · CMS Studio" },

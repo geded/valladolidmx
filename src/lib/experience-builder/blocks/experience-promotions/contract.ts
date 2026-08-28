@@ -29,23 +29,23 @@ export const EXPERIENCE_PROMOTIONS_CONTRACT_VERSION = "1.0.0";
  * Enums
  * ------------------------------------------------------------------ */
 export const experiencePromotionsVariantSchema = z.enum([
-  "strip",     // Franja compacta (mobile-first).
-  "grid",      // Grid de tarjetas — default.
-  "list",      // Lista vertical densa.
-  "carousel",  // Scroll horizontal con snap.
-  "featured",  // Una destacada + secundarias.
-  "banner",    // Franja hero-like (una única oportunidad).
+  "strip", // Franja compacta (mobile-first).
+  "grid", // Grid de tarjetas — default.
+  "list", // Lista vertical densa.
+  "carousel", // Scroll horizontal con snap.
+  "featured", // Una destacada + secundarias.
+  "banner", // Franja hero-like (una única oportunidad).
 ]);
 export type ExperiencePromotionsVariant = z.infer<typeof experiencePromotionsVariantSchema>;
 
 export const experiencePromotionsSourceSchema = z.enum([
-  "manual",       // Items provistos por el editor.
-  "business",     // Hidrata desde `BusinessSurfaceContext` (I2.b).
-  "destination",  // Reservado (Ola I2.d+).
-  "region",       // Reservado.
-  "category",     // Reservado.
-  "context",      // Reservado — Context Engine + Alux.
-  "campaign",     // Reservado — campañas activas (Marketing Ops).
+  "manual", // Items provistos por el editor.
+  "business", // Hidrata desde `BusinessSurfaceContext` (I2.b).
+  "destination", // Reservado (Ola I2.d+).
+  "region", // Reservado.
+  "category", // Reservado.
+  "context", // Reservado — Context Engine + Alux.
+  "campaign", // Reservado — campañas activas (Marketing Ops).
 ]);
 export type ExperiencePromotionsSource = z.infer<typeof experiencePromotionsSourceSchema>;
 
@@ -112,7 +112,9 @@ export const experiencePromotionItemSchema = z.object({
   primaryAction: z
     .object({
       label: z.string().min(1),
-      action: z.enum(["redeem", "book", "buy", "contact", "external", "internal"]).default("internal"),
+      action: z
+        .enum(["redeem", "book", "buy", "contact", "external", "internal"])
+        .default("internal"),
       href: z.string().nullable().default(null),
     })
     .nullable()

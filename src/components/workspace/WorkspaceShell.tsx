@@ -45,7 +45,12 @@ export function WorkspaceShell({
             <main
               id="main"
               className="min-h-0 flex-1 overflow-y-auto"
-              style={{ paddingBottom: bp === "xs" || bp === "sm" ? "calc(56px + env(safe-area-inset-bottom))" : undefined }}
+              style={{
+                paddingBottom:
+                  bp === "xs" || bp === "sm"
+                    ? "calc(56px + env(safe-area-inset-bottom))"
+                    : undefined,
+              }}
             >
               <div className="mx-auto w-full max-w-[1400px] p-4 md:p-6">{children}</div>
             </main>

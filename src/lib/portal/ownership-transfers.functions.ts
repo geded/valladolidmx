@@ -8,12 +8,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type OwnershipTransferStatus =
-  | "pending"
-  | "accepted"
-  | "rejected"
-  | "cancelled"
-  | "expired";
+export type OwnershipTransferStatus = "pending" | "accepted" | "rejected" | "cancelled" | "expired";
 
 export interface OwnershipTransfer {
   id: string;
@@ -55,11 +50,7 @@ export const listBusinessOwnershipTransfers = createServerFn({ method: "POST" })
 export const listIncomingOwnershipTransfers = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(
-    async ({
-      context,
-    }): Promise<
-      Array<OwnershipTransfer & { business_name: string | null }>
-    > => {
+    async ({ context }): Promise<Array<OwnershipTransfer & { business_name: string | null }>> => {
       const { supabase, userId } = context;
       const { data: rows, error } = await supabase
         .from("business_ownership_transfers")
@@ -68,8 +59,7 @@ export const listIncomingOwnershipTransfers = createServerFn({ method: "POST" })
         )
         .eq("to_user_id", userId)
         .order("created_at", { ascending: false });
-      if (error)
-        throw new Error(`list_incoming_transfers_failed: ${error.message}`);
+      if (error) throw new Error(`list_incoming_transfers_failed: ${error.message}`);
       return (rows ?? []).map((r: Record<string, unknown>) => {
         const biz = r.businesses as { display_name?: string } | null;
         const { businesses: _b, ...rest } = r as Record<string, unknown>;
@@ -83,29 +73,22 @@ export const listIncomingOwnershipTransfers = createServerFn({ method: "POST" })
 
 export const requestOwnershipTransfer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { businessId: string; toUserId: string; notes?: string }) => {
-      if (!input || typeof input.businessId !== "string")
-        throw new Error("invalid_business");
-      if (typeof input.toUserId !== "string" || !input.toUserId)
-        throw new Error("invalid_recipient");
-      return {
-        businessId: input.businessId,
-        toUserId: input.toUserId,
-        notes: typeof input.notes === "string" ? input.notes : undefined,
-      };
-    },
-  )
+  .inputValidator((input: { businessId: string; toUserId: string; notes?: string }) => {
+    if (!input || typeof input.businessId !== "string") throw new Error("invalid_business");
+    if (typeof input.toUserId !== "string" || !input.toUserId) throw new Error("invalid_recipient");
+    return {
+      businessId: input.businessId,
+      toUserId: input.toUserId,
+      notes: typeof input.notes === "string" ? input.notes : undefined,
+    };
+  })
   .handler(async ({ data, context }): Promise<{ transferId: string }> => {
     const { supabase } = context;
-    const { data: id, error } = await supabase.rpc(
-      "request_business_ownership_transfer",
-      {
-        _business_id: data.businessId,
-        _to_user_id: data.toUserId,
-        _notes: data.notes ?? undefined,
-      },
-    );
+    const { data: id, error } = await supabase.rpc("request_business_ownership_transfer", {
+      _business_id: data.businessId,
+      _to_user_id: data.toUserId,
+      _notes: data.notes ?? undefined,
+    });
     if (error) throw new Error(error.message);
     return { transferId: id as string };
   });
@@ -113,16 +96,14 @@ export const requestOwnershipTransfer = createServerFn({ method: "POST" })
 export const acceptOwnershipTransfer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { transferId: string }) => {
-    if (!input || typeof input.transferId !== "string")
-      throw new Error("invalid_transfer");
+    if (!input || typeof input.transferId !== "string") throw new Error("invalid_transfer");
     return { transferId: input.transferId };
   })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const { data: result, error } = await supabase.rpc(
-      "accept_business_ownership_transfer",
-      { _transfer_id: data.transferId },
-    );
+    const { data: result, error } = await supabase.rpc("accept_business_ownership_transfer", {
+      _transfer_id: data.transferId,
+    });
     if (error) throw new Error(error.message);
     return result as {
       transfer_id: string;
@@ -135,8 +116,7 @@ export const acceptOwnershipTransfer = createServerFn({ method: "POST" })
 export const rejectOwnershipTransfer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { transferId: string; notes?: string }) => {
-    if (!input || typeof input.transferId !== "string")
-      throw new Error("invalid_transfer");
+    if (!input || typeof input.transferId !== "string") throw new Error("invalid_transfer");
     return {
       transferId: input.transferId,
       notes: typeof input.notes === "string" ? input.notes : undefined,
@@ -144,10 +124,10 @@ export const rejectOwnershipTransfer = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const { error } = await supabase.rpc(
-      "reject_business_ownership_transfer",
-      { _transfer_id: data.transferId, _notes: data.notes ?? undefined },
-    );
+    const { error } = await supabase.rpc("reject_business_ownership_transfer", {
+      _transfer_id: data.transferId,
+      _notes: data.notes ?? undefined,
+    });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -155,16 +135,14 @@ export const rejectOwnershipTransfer = createServerFn({ method: "POST" })
 export const cancelOwnershipTransfer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { transferId: string }) => {
-    if (!input || typeof input.transferId !== "string")
-      throw new Error("invalid_transfer");
+    if (!input || typeof input.transferId !== "string") throw new Error("invalid_transfer");
     return { transferId: input.transferId };
   })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const { error } = await supabase.rpc(
-      "cancel_business_ownership_transfer",
-      { _transfer_id: data.transferId },
-    );
+    const { error } = await supabase.rpc("cancel_business_ownership_transfer", {
+      _transfer_id: data.transferId,
+    });
     if (error) throw new Error(error.message);
     return { ok: true };
   });

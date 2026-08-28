@@ -31,36 +31,28 @@ const MONDAY = "2026-07-13";
 
 describe("evaluateHoursStatus", () => {
   test("1. abierta ahora", () => {
-    const rows: BusinessHourRow[] = [
-      { day_of_week: 1, opens_at: "09:00", closes_at: "18:00" },
-    ];
+    const rows: BusinessHourRow[] = [{ day_of_week: 1, opens_at: "09:00", closes_at: "18:00" }];
     const r = evaluateHoursStatus(rows, { timezone: TZ, now: atLocal(MONDAY, 12) });
     expect(r.status).toBe("open_now");
     expect(r.closesAt).toBe("18:00");
   });
 
   test("2. cerrada (fuera de horario, reabre hoy)", () => {
-    const rows: BusinessHourRow[] = [
-      { day_of_week: 1, opens_at: "09:00", closes_at: "18:00" },
-    ];
+    const rows: BusinessHourRow[] = [{ day_of_week: 1, opens_at: "09:00", closes_at: "18:00" }];
     const r = evaluateHoursStatus(rows, { timezone: TZ, now: atLocal(MONDAY, 7) });
     expect(r.status).toBe("closed_now");
     expect(r.opensAt).toBe("09:00");
   });
 
   test("3. abre dentro de 60 min → opening_soon", () => {
-    const rows: BusinessHourRow[] = [
-      { day_of_week: 1, opens_at: "09:00", closes_at: "18:00" },
-    ];
+    const rows: BusinessHourRow[] = [{ day_of_week: 1, opens_at: "09:00", closes_at: "18:00" }];
     const r = evaluateHoursStatus(rows, { timezone: TZ, now: atLocal(MONDAY, 8, 30) });
     expect(r.status).toBe("opening_soon");
     expect(r.minutesToOpen).toBe(30);
   });
 
   test("4. cierra dentro de 60 min → closing_soon", () => {
-    const rows: BusinessHourRow[] = [
-      { day_of_week: 1, opens_at: "09:00", closes_at: "18:00" },
-    ];
+    const rows: BusinessHourRow[] = [{ day_of_week: 1, opens_at: "09:00", closes_at: "18:00" }];
     const r = evaluateHoursStatus(rows, { timezone: TZ, now: atLocal(MONDAY, 17, 30) });
     expect(r.status).toBe("closing_soon");
     expect(r.minutesToClose).toBe(30);
@@ -68,9 +60,7 @@ describe("evaluateHoursStatus", () => {
 
   test("5. día sin servicio → closed_today", () => {
     // Sólo abre martes.
-    const rows: BusinessHourRow[] = [
-      { day_of_week: 2, opens_at: "09:00", closes_at: "18:00" },
-    ];
+    const rows: BusinessHourRow[] = [{ day_of_week: 2, opens_at: "09:00", closes_at: "18:00" }];
     const r = evaluateHoursStatus(rows, { timezone: TZ, now: atLocal(MONDAY, 12) });
     expect(r.status).toBe("closed_today");
     expect(r.opensDayLabel).toBe("mañana");
@@ -91,9 +81,7 @@ describe("evaluateHoursStatus", () => {
 
   test("7. overnight (bar 20:00→02:00) — abierto pasada la medianoche", () => {
     // domingo 20:00 → lunes 02:00. A las 00:30 quedan 90 min → open_now.
-    const rows: BusinessHourRow[] = [
-      { day_of_week: 0, opens_at: "20:00", closes_at: "02:00" },
-    ];
+    const rows: BusinessHourRow[] = [{ day_of_week: 0, opens_at: "20:00", closes_at: "02:00" }];
     const r = evaluateHoursStatus(rows, { timezone: TZ, now: atLocal(MONDAY, 0, 30) });
     expect(r.status).toBe("open_now");
     expect(r.closesAt).toBe("02:00");
@@ -118,9 +106,7 @@ describe("evaluateHoursStatus", () => {
   test("10. diferencia de timezone viajero vs destino", () => {
     // Instante equivalente a Merida 12:00 lunes. Aunque el reloj del
     // viajero esté en otra TZ, la evaluación usa la TZ del destino.
-    const rows: BusinessHourRow[] = [
-      { day_of_week: 1, opens_at: "09:00", closes_at: "18:00" },
-    ];
+    const rows: BusinessHourRow[] = [{ day_of_week: 1, opens_at: "09:00", closes_at: "18:00" }];
     const instant = atLocal(MONDAY, 12); // 12:00 Merida = 18:00 UTC
     const rMerida = evaluateHoursStatus(rows, { timezone: "America/Merida", now: instant });
     const rMadrid = evaluateHoursStatus(rows, { timezone: "Europe/Madrid", now: instant });

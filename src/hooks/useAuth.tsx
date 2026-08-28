@@ -40,9 +40,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 function primaryRole(roles: AppRole[]): AppRole | null {
   if (!roles.length) return null;
-  return [...roles].sort(
-    (a, b) => ROLE_PRIORITY.indexOf(b) - ROLE_PRIORITY.indexOf(a),
-  )[0];
+  return [...roles].sort((a, b) => ROLE_PRIORITY.indexOf(b) - ROLE_PRIORITY.indexOf(a))[0];
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -89,12 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })();
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
-      if (
-        event !== "SIGNED_IN" &&
-        event !== "SIGNED_OUT" &&
-        event !== "USER_UPDATED"
-      )
-        return;
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       setSession(s);
       // Marca identidad en vuelo de inmediato: los consumidores no deben
       // decidir rol/destino con los roles del estado anterior.

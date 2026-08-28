@@ -6,13 +6,7 @@ export function SkeletonLine({ className }: { className?: string }) {
 
 export function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div
-      className={cn(
-        "rounded-2xl border border-border bg-surface p-5",
-        className,
-      )}
-      aria-hidden
-    >
+    <div className={cn("rounded-2xl border border-border bg-surface p-5", className)} aria-hidden>
       <SkeletonLine className="w-2/3" />
       <SkeletonLine className="mt-3 w-full" />
       <SkeletonLine className="mt-2 w-5/6" />
@@ -28,7 +22,10 @@ export function SkeletonList({ rows = 5 }: { rows?: number }) {
   return (
     <div className="space-y-2" aria-hidden>
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3">
+        <div
+          key={i}
+          className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3"
+        >
           <div className="ws-shimmer h-9 w-9 rounded-full" />
           <div className="flex-1 space-y-2">
             <SkeletonLine className="w-1/3" />

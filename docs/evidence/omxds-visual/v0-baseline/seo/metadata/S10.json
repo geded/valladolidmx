@@ -16,8 +16,5 @@
   "html_lang": "es",
   "h1": "Eventos",
   "hreflang_count": 0,
-  "jsonld_types": [
-    "WebSite",
-    "Organization"
-  ]
+  "jsonld_types": ["WebSite", "Organization"]
 }

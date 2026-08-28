@@ -1,6 +1,7 @@
 # 10-GLOSSARY.md
 
 # Glosario Oficial
+
 Versión 1.0
 
 ## Objetivo
@@ -38,6 +39,7 @@ Actividad o producto turístico que el visitante puede vivir.
 ## Categoría
 
 Clasificación funcional:
+
 - Hotel
 - Restaurante
 - Cenote

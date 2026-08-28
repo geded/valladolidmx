@@ -3,6 +3,7 @@ name: Founder Continuity Recognition Principle
 description: Cuando un viajero regresa a Alux, la experiencia centra el mensaje en la CONTINUIDAD del viaje — no en la recuperación técnica de datos. Persistencia es medio; continuidad es percepción.
 type: constraint
 ---
+
 Vinculante desde AC1.3 (Delight Moment de Continuidad). Sólo afecta UX/copy.
 
 Reglas:

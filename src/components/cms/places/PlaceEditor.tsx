@@ -43,6 +43,7 @@ import {
 } from "./PlaceSection";
 import { PlaceHoursPanel, type HoursRow } from "./PlaceHoursPanel";
 import { PlaceMediaPanel, type PlaceMediaAsset, type PlaceMediaRow } from "./PlaceMediaPanel";
+import { PlacePresentationPanel } from "./PlacePresentationPanel";
 import {
   PlaceRelationsPanel,
   type AuthorityRelation,
@@ -955,6 +956,32 @@ export function PlaceEditor({ placeId }: Props) {
         placeId={placeId!}
         media={(det.media ?? []) as PlaceMediaRow[]}
         assets={(det.assets ?? []) as PlaceMediaAsset[]}
+        onChanged={() => void detail.refetch()}
+      />
+
+      <PlacePresentationPanel
+        placeId={placeId!}
+        typeSlug={
+          ((opts.placeTypes ?? []) as Array<{ id: string; slug?: string }>).find(
+            (t) => t.id === (place?.place_type_id as string | undefined),
+          )?.slug ?? null
+        }
+        value={
+          (((place?.metadata as Record<string, unknown> | null)?.presentation_mode as
+            | "editorial"
+            | "cinematic"
+            | undefined) ?? null) as "editorial" | "cinematic" | null
+        }
+        hasApprovedCover={(() => {
+          const rows = (det.media ?? []) as PlaceMediaRow[];
+          const assetsById = new Map(
+            ((det.assets ?? []) as PlaceMediaAsset[]).map((a) => [a.id, a]),
+          );
+          const cover = rows.find((m) => m.role === "cover");
+          return Boolean(
+            cover && assetsById.get(cover.media_asset_id)?.review_state === "approved",
+          );
+        })()}
         onChanged={() => void detail.refetch()}
       />
 

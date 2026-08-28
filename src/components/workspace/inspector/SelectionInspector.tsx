@@ -56,9 +56,7 @@ export function SelectionInspector() {
               size="sm"
               className="w-full justify-start"
               variant="outline"
-              onClick={() =>
-                void a.run({ workspaceId, selection, focused })
-              }
+              onClick={() => void a.run({ workspaceId, selection, focused })}
             >
               {a.label}
             </Button>

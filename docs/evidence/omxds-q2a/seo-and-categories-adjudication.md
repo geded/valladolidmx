@@ -21,15 +21,15 @@ Contenido real verificado de `business_categories` (15 filas): Artesanías, Casa
 Vacaciones, Cenotes, Cultura, Eventos (×2), Experiencias, Experiencias y tours,
 Gastronomía, Hoteles, Naturaleza, Restaurantes, Servicios turísticos, Tours, Transporte.
 
-| Categoría requerida | ¿Existe en `business_categories`? |
-|---|---|
-| museo | **No** |
-| cenote | Sí (`cenotes`, con semántica comercial de oferta) |
-| zona arqueológica | **No** |
-| cultura | Sí |
-| naturaleza | Sí |
-| patrimonio | **No** |
-| mercado / artesanal | Parcial (`artesanias`, orientada a comercio) |
+| Categoría requerida | ¿Existe en `business_categories`?                 |
+| ------------------- | ------------------------------------------------- |
+| museo               | **No**                                            |
+| cenote              | Sí (`cenotes`, con semántica comercial de oferta) |
+| zona arqueológica   | **No**                                            |
+| cultura             | Sí                                                |
+| naturaleza          | Sí                                                |
+| patrimonio          | **No**                                            |
+| mercado / artesanal | Parcial (`artesanias`, orientada a comercio)      |
 
 La tabla es una taxonomía **comercial** de oferta empresarial (Hoteles, Restaurantes,
 Transporte, Casas de Vacaciones, Servicios turísticos) y no cubre patrimonio, museos ni

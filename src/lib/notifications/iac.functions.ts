@@ -39,8 +39,7 @@ export interface SubjectGroup {
   last_summary: string | null;
 }
 
-const clampLimit = (n: number | undefined, max = 500) =>
-  Math.min(Math.max(n ?? 100, 1), max);
+const clampLimit = (n: number | undefined, max = 500) => Math.min(Math.max(n ?? 100, 1), max);
 
 const normalizeScope = (s: string | undefined): Scope => {
   const v = (s ?? "traveler").toLowerCase();
@@ -51,7 +50,11 @@ const normalizeScope = (s: string | undefined): Scope => {
 export const getAluxActivityFeed = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (input: { scope?: Scope; businessId?: string | null; sinceISO?: string | null; limit?: number } | undefined) => ({
+    (
+      input:
+        | { scope?: Scope; businessId?: string | null; sinceISO?: string | null; limit?: number }
+        | undefined,
+    ) => ({
       scope: normalizeScope(input?.scope),
       businessId: input?.businessId ?? null,
       sinceISO: input?.sinceISO ?? null,
@@ -72,7 +75,16 @@ export const getAluxActivityFeed = createServerFn({ method: "GET" })
 export const getActivitySummaryByPeriod = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (input: { scope?: Scope; businessId?: string | null; sinceISO?: string | null; bucket?: "day" | "week" } | undefined) => ({
+    (
+      input:
+        | {
+            scope?: Scope;
+            businessId?: string | null;
+            sinceISO?: string | null;
+            bucket?: "day" | "week";
+          }
+        | undefined,
+    ) => ({
       scope: normalizeScope(input?.scope),
       businessId: input?.businessId ?? null,
       sinceISO: input?.sinceISO ?? null,
@@ -93,7 +105,11 @@ export const getActivitySummaryByPeriod = createServerFn({ method: "GET" })
 export const getActivityGroupBySubject = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (input: { scope?: Scope; businessId?: string | null; sinceISO?: string | null; limit?: number } | undefined) => ({
+    (
+      input:
+        | { scope?: Scope; businessId?: string | null; sinceISO?: string | null; limit?: number }
+        | undefined,
+    ) => ({
       scope: normalizeScope(input?.scope),
       businessId: input?.businessId ?? null,
       sinceISO: input?.sinceISO ?? null,

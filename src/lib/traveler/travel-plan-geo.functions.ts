@@ -13,8 +13,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface PlanItemGeo {
   item_id: string;
@@ -39,9 +38,7 @@ export const getPlanItemsGeo = createServerFn({ method: "POST" })
       const id = typeof r.id === "string" && UUID_RE.test(r.id) ? r.id : null;
       const kind = typeof r.kind === "string" ? r.kind : null;
       const target =
-        typeof r.target_id === "string" && UUID_RE.test(r.target_id)
-          ? r.target_id
-          : null;
+        typeof r.target_id === "string" && UUID_RE.test(r.target_id) ? r.target_id : null;
       if (!id || !kind) continue;
       items.push({ id, kind, target_id: target });
     }
@@ -60,14 +57,10 @@ export const getPlanItemsGeo = createServerFn({ method: "POST" })
       if (!it.target_id) continue;
       if (it.kind === "business") {
         bizIds.add(it.target_id);
-        (byBiz.get(it.target_id) ?? byBiz.set(it.target_id, []).get(it.target_id)!).push(
-          it.id,
-        );
+        (byBiz.get(it.target_id) ?? byBiz.set(it.target_id, []).get(it.target_id)!).push(it.id);
       } else if (it.kind === "destination") {
         destIds.add(it.target_id);
-        (byDest.get(it.target_id) ?? byDest.set(it.target_id, []).get(it.target_id)!).push(
-          it.id,
-        );
+        (byDest.get(it.target_id) ?? byDest.set(it.target_id, []).get(it.target_id)!).push(it.id);
       }
     }
 

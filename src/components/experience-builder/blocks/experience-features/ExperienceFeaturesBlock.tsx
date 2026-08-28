@@ -31,12 +31,15 @@ function buildDTO(cfg: ExperienceFeaturesConfig): ExperienceFeaturesDTO {
   };
 }
 
-export interface ExperienceFeaturesBlockProps { config?: unknown }
+export interface ExperienceFeaturesBlockProps {
+  config?: unknown;
+}
 
 export function ExperienceFeaturesBlock({ config }: ExperienceFeaturesBlockProps) {
   const cfg = safeParse(config);
   const dto = useMemo(() => buildDTO(cfg), [cfg]);
-  if (dto.items.length === 0) return <ExperienceFeatures dto={buildExperienceFeaturesPreviewDTO()} />;
+  if (dto.items.length === 0)
+    return <ExperienceFeatures dto={buildExperienceFeaturesPreviewDTO()} />;
   return <ExperienceFeatures dto={dto} />;
 }
 

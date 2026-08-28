@@ -47,7 +47,11 @@ export default defineTool({
         .order("updated_at", { ascending: false })
         .limit(25);
       if (error) {
-        return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true, resultCount: 0 };
+        return {
+          content: [{ type: "text", text: `Error: ${error.message}` }],
+          isError: true,
+          resultCount: 0,
+        };
       }
       const rows = (data ?? []) as z.infer<typeof PlanSchema>[];
       const output = OutputSchema.parse({

@@ -127,20 +127,30 @@ export function ActiveTravelPlansTable({
                       <p className="text-xs text-muted-foreground truncate max-w-[280px]">
                         {r.title ?? "Sin título"} · {r.items_count} ítem
                         {r.items_count === 1 ? "" : "s"}
-                        {r.pending_alux_count > 0
-                          ? ` · ${r.pending_alux_count} Alux`
-                          : ""}
+                        {r.pending_alux_count > 0 ? ` · ${r.pending_alux_count} Alux` : ""}
                       </p>
                     </td>
                     <td className="p-3">
                       <ReservationCell reservation={r.reservation} daysToTrip={r.days_to_trip} />
                     </td>
-                    <td className="p-3"><PlanStatusBadge status={r.plan_status} /></td>
-                    <td className="p-3"><IntentBadge level={r.intent_level} /></td>
-                    <td className="p-3"><ConciergeStatusBadge status={r.concierge.status} /></td>
-                    <td className="p-3"><ProposalStatusBadge status={r.proposal.status} /></td>
-                    <td className="p-3"><SlaBadge risk={r.sla_risk} /></td>
-                    <td className="p-3"><PriorityBadge level={r.priority} /></td>
+                    <td className="p-3">
+                      <PlanStatusBadge status={r.plan_status} />
+                    </td>
+                    <td className="p-3">
+                      <IntentBadge level={r.intent_level} />
+                    </td>
+                    <td className="p-3">
+                      <ConciergeStatusBadge status={r.concierge.status} />
+                    </td>
+                    <td className="p-3">
+                      <ProposalStatusBadge status={r.proposal.status} />
+                    </td>
+                    <td className="p-3">
+                      <SlaBadge risk={r.sla_risk} />
+                    </td>
+                    <td className="p-3">
+                      <PriorityBadge level={r.priority} />
+                    </td>
                     <td className="p-3 whitespace-nowrap text-xs text-muted-foreground">
                       {fmtDate(r.start_date)}
                       {r.days_to_trip != null ? (

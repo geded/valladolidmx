@@ -24,8 +24,8 @@ export const EXPERIENCE_INFO_GRID_CANONICAL_SOURCE = "geography.location" as con
 export type ExperienceInfoGridCanonicalSource = typeof EXPERIENCE_INFO_GRID_CANONICAL_SOURCE;
 
 export const experienceInfoGridVariantSchema = z.enum([
-  "cards",  // Cada dato en una tarjeta (default).
-  "list",   // Lista compacta con separadores.
+  "cards", // Cada dato en una tarjeta (default).
+  "list", // Lista compacta con separadores.
   "inline", // Fila horizontal (chips).
 ]);
 
@@ -155,7 +155,12 @@ export function buildGovernedLocationItems(
   const address = [location.address_line1, location.address_line2].filter(Boolean).join(", ");
   if (!address) return null;
   const items: ExperienceInfoItem[] = [
-    { iconKey: "map-pin", label: location.label?.trim() || "Ubicación", value: address, tone: "default" },
+    {
+      iconKey: "map-pin",
+      label: location.label?.trim() || "Ubicación",
+      value: address,
+      tone: "default",
+    },
   ];
   items.push({
     iconKey: "map-pin",

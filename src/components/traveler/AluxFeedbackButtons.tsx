@@ -43,9 +43,7 @@ export function AluxFeedbackButtons({ suggestion }: AluxFeedbackButtonsProps) {
       setSent(rating);
       setShowReason(false);
       toast.success(
-        rating === 1
-          ? "Gracias, me ayuda a recomendarte mejor."
-          : "Gracias, aprenderé de esto.",
+        rating === 1 ? "Gracias, me ayuda a recomendarte mejor." : "Gracias, aprenderé de esto.",
       );
     },
     onError: (e: Error) => toast.error(e.message || "No se pudo enviar"),
@@ -55,9 +53,7 @@ export function AluxFeedbackButtons({ suggestion }: AluxFeedbackButtonsProps) {
     return (
       <div className="mt-3 flex items-center gap-1.5 text-[11px] text-muted-foreground">
         <Check className="size-3 text-success" aria-hidden />
-        <span>
-          Feedback registrado ({sent === 1 ? "útil" : "poco útil"}).
-        </span>
+        <span>Feedback registrado ({sent === 1 ? "útil" : "poco útil"}).</span>
       </div>
     );
   }
@@ -112,11 +108,7 @@ export function AluxFeedbackButtons({ suggestion }: AluxFeedbackButtonsProps) {
             >
               Cancelar
             </Button>
-            <Button
-              size="sm"
-              onClick={() => mutation.mutate(-1)}
-              disabled={mutation.isPending}
-            >
+            <Button size="sm" onClick={() => mutation.mutate(-1)} disabled={mutation.isPending}>
               {mutation.isPending ? "Enviando…" : "Enviar feedback"}
             </Button>
           </div>

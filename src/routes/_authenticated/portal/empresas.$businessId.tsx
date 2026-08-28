@@ -93,7 +93,10 @@ function BusinessDetailPage() {
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
           <InfoRow label="Productos" value={`${data.configuration.products_total}`} />
           <InfoRow label="Publicados" value={`${data.configuration.products_published}`} />
-          <InfoRow label="Aceptan pago en línea" value={`${data.configuration.accepts_online_payment}`} />
+          <InfoRow
+            label="Aceptan pago en línea"
+            value={`${data.configuration.accepts_online_payment}`}
+          />
           <InfoRow
             label="Elegibles para campañas"
             value={`${data.configuration.eligible_for_visibility_campaigns}`}
@@ -104,7 +107,11 @@ function BusinessDetailPage() {
           />
           <InfoRow
             label="Publicada"
-            value={data.business.published_at ? new Date(data.business.published_at).toLocaleDateString("es-MX") : "No publicada"}
+            value={
+              data.business.published_at
+                ? new Date(data.business.published_at).toLocaleDateString("es-MX")
+                : "No publicada"
+            }
           />
         </dl>
       </section>
@@ -198,7 +205,15 @@ function BusinessDetailPage() {
   );
 }
 
-function MetricCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
+function MetricCard({
+  label,
+  value,
+  sub,
+}: {
+  label: string;
+  value: string | number;
+  sub?: string;
+}) {
   return (
     <article className="rounded-lg border border-border bg-card p-4">
       <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
@@ -229,7 +244,9 @@ function StatusPill({ status }: { status: string }) {
           ? "bg-destructive/10 text-destructive"
           : "bg-muted text-muted-foreground";
   return (
-    <span className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium uppercase ${cls}`}>
+    <span
+      className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium uppercase ${cls}`}
+    >
       {status || "unpaid"}
     </span>
   );

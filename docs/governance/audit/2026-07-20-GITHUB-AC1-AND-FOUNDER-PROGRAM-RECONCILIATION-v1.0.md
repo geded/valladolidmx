@@ -12,16 +12,16 @@ Los PR #1–#7 dejaron una única base en `main`, cerraron CV8.9, unificaron AC1
 
 ## 2. Hallazgos y resolución
 
-| ID | Antes | Riesgo | Resolución | Evidencia final |
-| --- | --- | --- | --- | --- |
-| A-01 | Trabajo dividido entre `main` y ramas de benchmark/producto. | Historia, paquetes y roadmap podían divergir. | Reconciliación no destructiva y una base única. | PR #1. |
-| A-02 | Gobernanza duplicada y dos lockfiles incompatibles. | Fuentes de autoridad y builds no reproducibles. | Serie `00–08`, Bun 1.3.14 y `bun.lock` único. | PR #1. |
-| A-03 | CV8 producía inteligencia, pero faltaba una cola humana gobernada. | Recomendaciones sin decisión ni trazabilidad. | Action Queue, roles, auditoría, UI y feedback. | PR #2–#4. |
-| A-04 | Botones anónimos escribían `AnonymousTravelDraft`, mientras otras superficies leían `guest-queue`. | Pérdida aparente, duplicidad o discontinuidad al autenticarse. | Contrato local único, migración local legacy e importación idempotente poslogin. | PR #5. |
-| A-05 | El dock flotante conservaba una regla heredada “sólo autenticado”. | El viaje existía localmente, pero el anónimo no tenía acceso persistente ni CTA de guardado. | Dock `Tu viaje`, resumen y registro progresivo opt-in. | PR #6 y smoke público. |
-| A-06 | El flujo de publicación se detenía si `gh` no estaba instalado. | El Founder podía creer que los cambios estaban guardados cuando sólo existían localmente. | Conexión directa de GitHub como vía principal; `gh` queda como alternativa. | PR #7 y `.lovable/plan.md`. |
-| A-07 | Roadmap y Completion Report seguían diciendo que AC1 estaba pendiente. | El siguiente equipo podía repetir trabajo ya desplegado. | Cierre documental con SHAs, deployment y smokes reales. | PR #7. |
-| A-08 | “Programa Fundadores” existía como hito, pero sin un plan operativo canónico. | Confundir capacidad técnica con empresas reales incorporadas. | Plan operativo y checklist verificable separados del runtime. | `17.1-PROGRAMA-FUNDADORES-VALLADOLID-OPERATING-PLAN-v1.0.md`. |
+| ID   | Antes                                                                                              | Riesgo                                                                                       | Resolución                                                                       | Evidencia final                                               |
+| ---- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| A-01 | Trabajo dividido entre `main` y ramas de benchmark/producto.                                       | Historia, paquetes y roadmap podían divergir.                                                | Reconciliación no destructiva y una base única.                                  | PR #1.                                                        |
+| A-02 | Gobernanza duplicada y dos lockfiles incompatibles.                                                | Fuentes de autoridad y builds no reproducibles.                                              | Serie `00–08`, Bun 1.3.14 y `bun.lock` único.                                    | PR #1.                                                        |
+| A-03 | CV8 producía inteligencia, pero faltaba una cola humana gobernada.                                 | Recomendaciones sin decisión ni trazabilidad.                                                | Action Queue, roles, auditoría, UI y feedback.                                   | PR #2–#4.                                                     |
+| A-04 | Botones anónimos escribían `AnonymousTravelDraft`, mientras otras superficies leían `guest-queue`. | Pérdida aparente, duplicidad o discontinuidad al autenticarse.                               | Contrato local único, migración local legacy e importación idempotente poslogin. | PR #5.                                                        |
+| A-05 | El dock flotante conservaba una regla heredada “sólo autenticado”.                                 | El viaje existía localmente, pero el anónimo no tenía acceso persistente ni CTA de guardado. | Dock `Tu viaje`, resumen y registro progresivo opt-in.                           | PR #6 y smoke público.                                        |
+| A-06 | El flujo de publicación se detenía si `gh` no estaba instalado.                                    | El Founder podía creer que los cambios estaban guardados cuando sólo existían localmente.    | Conexión directa de GitHub como vía principal; `gh` queda como alternativa.      | PR #7 y `.lovable/plan.md`.                                   |
+| A-07 | Roadmap y Completion Report seguían diciendo que AC1 estaba pendiente.                             | El siguiente equipo podía repetir trabajo ya desplegado.                                     | Cierre documental con SHAs, deployment y smokes reales.                          | PR #7.                                                        |
+| A-08 | “Programa Fundadores” existía como hito, pero sin un plan operativo canónico.                      | Confundir capacidad técnica con empresas reales incorporadas.                                | Plan operativo y checklist verificable separados del runtime.                    | `17.1-PROGRAMA-FUNDADORES-VALLADOLID-OPERATING-PLAN-v1.0.md`. |
 
 ## 3. Estado final verificado
 
@@ -36,12 +36,12 @@ Los PR #1–#7 dejaron una única base en `main`, cerraron CV8.9, unificaron AC1
 
 ## 4. Documentos que quedaron completados
 
-| Documento | Situación anterior | Estado actual |
-| --- | --- | --- |
-| Completion Report AC1.4–AC1.5 | Integración y dock aparecían pendientes. | Cerrado con evidencia de PR #5, PR #6, deployment y smoke. |
-| Roadmap v2.1 | AC1 figuraba como cierre técnico en rama. | AC1 figura cerrado; Programa Fundadores es el siguiente hito. |
-| `.lovable/plan.md` | Conservaba una rama/base antigua y dependía del siguiente PR de AC1. | Registra `main`, el cierre y la política de publicación directa. |
-| Programa Fundadores | Sólo aparecía como recomendación y meta de 15–25. | Cuenta con alcance, checklist, estados, métricas y gates operativos. |
+| Documento                     | Situación anterior                                                   | Estado actual                                                        |
+| ----------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Completion Report AC1.4–AC1.5 | Integración y dock aparecían pendientes.                             | Cerrado con evidencia de PR #5, PR #6, deployment y smoke.           |
+| Roadmap v2.1                  | AC1 figuraba como cierre técnico en rama.                            | AC1 figura cerrado; Programa Fundadores es el siguiente hito.        |
+| `.lovable/plan.md`            | Conservaba una rama/base antigua y dependía del siguiente PR de AC1. | Registra `main`, el cierre y la política de publicación directa.     |
+| Programa Fundadores           | Sólo aparecía como recomendación y meta de 15–25.                    | Cuenta con alcance, checklist, estados, métricas y gates operativos. |
 
 ## 5. Pendientes legítimos, no defectos del repositorio
 

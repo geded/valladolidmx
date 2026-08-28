@@ -20,31 +20,29 @@ import {
   type ProfileMode,
 } from "@/lib/profile-mode/mode.functions";
 
-const MODE_META: Record<
-  ProfileMode,
-  { label: string; description: string; Icon: typeof Compass }
-> = {
-  traveler: {
-    label: "Viajero",
-    description: "Explora, guarda favoritos y arma tu viaje.",
-    Icon: Compass,
-  },
-  business: {
-    label: "Empresa",
-    description: "Administra tu(s) negocio(s) y publicaciones.",
-    Icon: Briefcase,
-  },
-  concierge: {
-    label: "Concierge",
-    description: "Atiende solicitudes de viajeros.",
-    Icon: Headphones,
-  },
-  staff: {
-    label: "Staff",
-    description: "Panel editorial e interno.",
-    Icon: Shield,
-  },
-};
+const MODE_META: Record<ProfileMode, { label: string; description: string; Icon: typeof Compass }> =
+  {
+    traveler: {
+      label: "Viajero",
+      description: "Explora, guarda favoritos y arma tu viaje.",
+      Icon: Compass,
+    },
+    business: {
+      label: "Empresa",
+      description: "Administra tu(s) negocio(s) y publicaciones.",
+      Icon: Briefcase,
+    },
+    concierge: {
+      label: "Concierge",
+      description: "Atiende solicitudes de viajeros.",
+      Icon: Headphones,
+    },
+    staff: {
+      label: "Staff",
+      description: "Panel editorial e interno.",
+      Icon: Shield,
+    },
+  };
 
 // US-EPS.4 — Landing canónico por modo. Home pública permanece fija (/);
 // tras el switch enviamos al usuario al espacio de trabajo del modo elegido,
@@ -79,9 +77,7 @@ export function ProfileModeSwitcher({ onSwitched }: { onSwitched?: () => void })
   });
 
   if (state.isLoading || !state.data) {
-    return (
-      <div className="px-3 py-2 text-xs text-muted-foreground">Cargando modos…</div>
-    );
+    return <div className="px-3 py-2 text-xs text-muted-foreground">Cargando modos…</div>;
   }
 
   const { active, available } = state.data;
@@ -136,17 +132,13 @@ export function ProfileModeSwitcher({ onSwitched }: { onSwitched?: () => void })
                 {label}
                 {isActive && <Check className="size-3.5 text-primary" aria-hidden />}
               </span>
-              <span className="block text-[11px] text-muted-foreground">
-                {description}
-              </span>
+              <span className="block text-[11px] text-muted-foreground">{description}</span>
             </span>
           </button>
         );
       })}
       {mutate.error instanceof Error && (
-        <div className="px-3 pb-1 text-[11px] text-destructive">
-          {mutate.error.message}
-        </div>
+        <div className="px-3 pb-1 text-[11px] text-destructive">{mutate.error.message}</div>
       )}
     </div>
   );

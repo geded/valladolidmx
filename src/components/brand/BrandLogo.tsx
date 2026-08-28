@@ -28,7 +28,12 @@ const SIZE_MAP = {
   lg: "h-12",
 } as const;
 
-export function BrandLogo({ tone = "dark", showWordmark: _showWordmark = true, size = "md", className }: Props) {
+export function BrandLogo({
+  tone = "dark",
+  showWordmark: _showWordmark = true,
+  size = "md",
+  className,
+}: Props) {
   return (
     <img
       src={logoUrl}

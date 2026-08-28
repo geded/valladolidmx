@@ -8,14 +8,21 @@ import {
   preloadShadowAssetBundles,
   type PreloadedBundle,
 } from "../src/lib/media/shadow-preloader.server";
-import { evaluateMediaSourceShadow, SHADOW_ALLOWLIST } from "../src/lib/media/shadow-evaluator.server";
+import {
+  evaluateMediaSourceShadow,
+  SHADOW_ALLOWLIST,
+} from "../src/lib/media/shadow-evaluator.server";
 
 const ALLOWED = Array.from(SHADOW_ALLOWLIST)[0]!;
 const OUTSIDE = "00000000-0000-0000-0000-000000000000";
 const SECRET = "unit-test-secret-value-do-not-use-in-prod";
 
-beforeEach(() => { process.env.MEDIA_SHADOW_INTERNAL_SECRET = SECRET; });
-afterEach(() => { delete process.env.MEDIA_SHADOW_INTERNAL_SECRET; });
+beforeEach(() => {
+  process.env.MEDIA_SHADOW_INTERNAL_SECRET = SECRET;
+});
+afterEach(() => {
+  delete process.env.MEDIA_SHADOW_INTERNAL_SECRET;
+});
 
 /** Mock del cliente Supabase con contadores de queries. */
 function makeMockClient(spec: {
@@ -39,9 +46,17 @@ function makeMockClient(spec: {
     } = {
       _table: table,
       _eq: [],
-      select() { return q; },
-      in(col, ids) { q._in = { col, ids }; return q; },
-      eq(col, val) { q._eq.push({ col, val }); return q; },
+      select() {
+        return q;
+      },
+      in(col, ids) {
+        q._in = { col, ids };
+        return q;
+      },
+      eq(col, val) {
+        q._eq.push({ col, val });
+        return q;
+      },
       then(onOk) {
         if (table === "media_assets") {
           if (spec.assetsFail === "timeout") {
@@ -75,16 +90,46 @@ function makeMockClient(spec: {
 }
 
 const ASSET_READY = {
-  id: ALLOWED, original_width: 1600, original_height: 2400,
-  pipeline_status: "ready", original_checksum: "abc123",
+  id: ALLOWED,
+  original_width: 1600,
+  original_height: 2400,
+  pipeline_status: "ready",
+  original_checksum: "abc123",
 };
 const ASSET_NO_CHECKSUM = { ...ASSET_READY, original_checksum: null };
 const ASSET_DASH_CHECKSUM = { ...ASSET_READY, original_checksum: "-" };
 
 const VARIANTS_READY = [
-  { asset_id: ALLOWED, format: "avif", width: 800, height: 1200, bucket: "media-derived", path: "p/a.avif", variant_key: "vk-avif-800", usage_context: "generic" },
-  { asset_id: ALLOWED, format: "webp", width: 800, height: 1200, bucket: "media-derived", path: "p/w.webp", variant_key: "vk-webp-800", usage_context: "generic" },
-  { asset_id: ALLOWED, format: "jpeg", width: 800, height: 1200, bucket: "media-derived", path: "p/j.jpg", variant_key: "vk-jpeg-800", usage_context: "generic" },
+  {
+    asset_id: ALLOWED,
+    format: "avif",
+    width: 800,
+    height: 1200,
+    bucket: "media-derived",
+    path: "p/a.avif",
+    variant_key: "vk-avif-800",
+    usage_context: "generic",
+  },
+  {
+    asset_id: ALLOWED,
+    format: "webp",
+    width: 800,
+    height: 1200,
+    bucket: "media-derived",
+    path: "p/w.webp",
+    variant_key: "vk-webp-800",
+    usage_context: "generic",
+  },
+  {
+    asset_id: ALLOWED,
+    format: "jpeg",
+    width: 800,
+    height: 1200,
+    bucket: "media-derived",
+    path: "p/j.jpg",
+    variant_key: "vk-jpeg-800",
+    usage_context: "generic",
+  },
 ];
 
 const goodCtx = { headerToken: SECRET, host: "id-preview--foo.lovable.app" };
@@ -106,7 +151,12 @@ describe("V1. Asset permitido con variantes ready", () => {
     const { bundle, result } = await preloadShadowAssetBundle(ALLOWED, { supabase: client });
     const d = await evaluateMediaSourceShadow(
       { id: ALLOWED, original_width: 1600 },
-      { _silent: true, preloaded: bundle, preloadTelemetry: { latencyMs: result.latencyMs, queryCount: result.queryCount }, _signer: async () => ({ ok: true, latencyMs: 10 }) },
+      {
+        _silent: true,
+        preloaded: bundle,
+        preloadTelemetry: { latencyMs: result.latencyMs, queryCount: result.queryCount },
+        _signer: async () => ({ ok: true, latencyMs: 10 }),
+      },
       goodCtx,
     );
     expect(d.decision).toBe("would_use_pipeline");
@@ -126,7 +176,9 @@ describe("V2. Asset fuera de allowlist", () => {
 
   test("evaluador → authorized=false, reason='asset_not_allowlisted'", async () => {
     const d = await evaluateMediaSourceShadow(
-      { id: OUTSIDE, original_width: 100 }, { _silent: true }, goodCtx,
+      { id: OUTSIDE, original_width: 100 },
+      { _silent: true },
+      goodCtx,
     );
     expect(d.authorized).toBe(false);
     expect(d.reason).toBe("asset_not_allowlisted");
@@ -184,7 +236,11 @@ describe("V6. Error y timeout de base de datos", () => {
     expect(result.error).toBe("db_timeout");
   }, 5000);
   test("error en variants → error='db_error'", async () => {
-    const { client } = makeMockClient({ assets: [ASSET_READY], variants: [], variantsFail: "error" });
+    const { client } = makeMockClient({
+      assets: [ASSET_READY],
+      variants: [],
+      variantsFail: "error",
+    });
     const { bundle, result } = await preloadShadowAssetBundle(ALLOWED, { supabase: client });
     expect(bundle).toBeNull();
     expect(result.error).toBe("db_error");
@@ -192,12 +248,22 @@ describe("V6. Error y timeout de base de datos", () => {
   test("evaluador con preloadTelemetry.error → storage_unreachable", async () => {
     // Aunque el bundle esté presente por casualidad, un error propagado debe caer a legacy.
     const bogus: PreloadedBundle = {
-      asset: { id: ALLOWED, original_width: 1600, original_height: 2400, pipeline_status: "ready", has_original_checksum: true },
+      asset: {
+        id: ALLOWED,
+        original_width: 1600,
+        original_height: 2400,
+        pipeline_status: "ready",
+        has_original_checksum: true,
+      },
       variants: [],
     };
     const d = await evaluateMediaSourceShadow(
       { id: ALLOWED, original_width: 1600 },
-      { _silent: true, preloaded: bogus, preloadTelemetry: { latencyMs: 1500, queryCount: 1, error: "db_timeout" } },
+      {
+        _silent: true,
+        preloaded: bogus,
+        preloadTelemetry: { latencyMs: 1500, queryCount: 1, error: "db_timeout" },
+      },
       goodCtx,
     );
     expect(d.fallbackReason).toBe("storage_unreachable");
@@ -207,12 +273,32 @@ describe("V6. Error y timeout de base de datos", () => {
 describe("V7. Error de firma", () => {
   test("signer devuelve reason='signed_url_error' → decisión legacy", async () => {
     const bundle: PreloadedBundle = {
-      asset: { id: ALLOWED, original_width: 1600, original_height: 2400, pipeline_status: "ready", has_original_checksum: true },
-      variants: [{ format: "avif", width: 800, height: 1200, bucket: "b", path: "p", variant_key: "vk", usage_context: "generic" }],
+      asset: {
+        id: ALLOWED,
+        original_width: 1600,
+        original_height: 2400,
+        pipeline_status: "ready",
+        has_original_checksum: true,
+      },
+      variants: [
+        {
+          format: "avif",
+          width: 800,
+          height: 1200,
+          bucket: "b",
+          path: "p",
+          variant_key: "vk",
+          usage_context: "generic",
+        },
+      ],
     };
     const d = await evaluateMediaSourceShadow(
       { id: ALLOWED, original_width: 1600 },
-      { _silent: true, preloaded: bundle, _signer: async () => ({ ok: false, latencyMs: 5, reason: "signed_url_error" }) },
+      {
+        _silent: true,
+        preloaded: bundle,
+        _signer: async () => ({ ok: false, latencyMs: 5, reason: "signed_url_error" }),
+      },
       goodCtx,
     );
     expect(d.decision).toBe("would_use_legacy");
@@ -224,7 +310,8 @@ describe("V8. Host o secreto inválido", () => {
   test("host productivo → not authorized", async () => {
     const d = await evaluateMediaSourceShadow(
       { id: ALLOWED, original_width: 1600 },
-      { _silent: true }, { headerToken: SECRET, host: "valladolidmx.lovable.app" },
+      { _silent: true },
+      { headerToken: SECRET, host: "valladolidmx.lovable.app" },
     );
     expect(d.authorized).toBe(false);
     expect(d.reason).toBe("production_host");
@@ -232,7 +319,8 @@ describe("V8. Host o secreto inválido", () => {
   test("header inválido → not authorized", async () => {
     const d = await evaluateMediaSourceShadow(
       { id: ALLOWED, original_width: 1600 },
-      { _silent: true }, { headerToken: "xxx", host: goodCtx.host },
+      { _silent: true },
+      { headerToken: "xxx", host: goodCtx.host },
     );
     expect(d.reason).toBe("bad_header");
   });
@@ -243,7 +331,9 @@ describe("V9. Query count estable · sin N+1", () => {
     // Simular allowlist ampliada de forma controlada: repetimos el mismo id.
     // El preloader dedup por Set, así sigue haciendo 2 queries.
     const { client, counts } = makeMockClient({ assets: [ASSET_READY], variants: VARIANTS_READY });
-    const result = await preloadShadowAssetBundles([ALLOWED, ALLOWED, ALLOWED, ALLOWED], { supabase: client });
+    const result = await preloadShadowAssetBundles([ALLOWED, ALLOWED, ALLOWED, ALLOWED], {
+      supabase: client,
+    });
     expect(result.queryCount).toBe(2);
     expect(counts.asset_selects).toBe(1);
     expect(counts.variant_selects).toBe(1);
@@ -262,8 +352,8 @@ describe("V10/V11. Contract: preloader NO expone URLs firmadas ni columnas prohi
     const { client } = makeMockClient({ assets: [ASSET_READY], variants: VARIANTS_READY });
     const { bundle } = await preloadShadowAssetBundle(ALLOWED, { supabase: client });
     const serialized = JSON.stringify(bundle);
-    expect(serialized).not.toContain("abc123");      // checksum real
-    expect(serialized).not.toContain("\"original_checksum\""); // sólo se expone has_original_checksum:boolean
+    expect(serialized).not.toContain("abc123"); // checksum real
+    expect(serialized).not.toContain('"original_checksum"'); // sólo se expone has_original_checksum:boolean
     expect(serialized).not.toContain("http:");
     expect(serialized).not.toContain("https:");
     expect(serialized).not.toContain("signedUrl");
@@ -282,8 +372,12 @@ describe("V12. Preloader sólo pide columnas necesarias", () => {
             if (t === "media_asset_variants") variantSelect = cols;
             return q;
           },
-          in() { return q; },
-          eq() { return q; },
+          in() {
+            return q;
+          },
+          eq() {
+            return q;
+          },
           then(onOk: (v: unknown) => unknown) {
             return Promise.resolve({ data: [], error: null }).then(onOk);
           },

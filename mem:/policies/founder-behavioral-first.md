@@ -3,6 +3,7 @@ name: Founder Behavioral First Principle
 description: El software es medio; el resultado real de cada épica es un cambio observable de comportamiento del viajero. Toda épica debe declarar el cambio antes de la arquitectura.
 type: preference
 ---
+
 **Founder Behavioral First Principle** (vinculante, complementa Founder Business Value Principle).
 
 El software constituye únicamente un medio. El verdadero resultado esperado de cada épica es un cambio positivo en el comportamiento del viajero. Una funcionalidad correctamente implementada que no modifica el comportamiento esperado NO cumple su propósito.

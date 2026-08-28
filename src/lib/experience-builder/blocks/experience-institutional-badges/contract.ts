@@ -14,13 +14,7 @@ export const badgeKindSchema = z.enum(BADGE_KINDS);
 export const badgeVariantSchema = z.enum(["filled", "soft", "outline", "icon-only"]);
 export const badgeSizeSchema = z.enum(["sm", "md", "lg"]);
 export const badgeLayoutSchema = z.enum(["strip", "stack"]);
-export const badgeSourceSchema = z.enum([
-  "manual",
-  "destination",
-  "business",
-  "product",
-  "event",
-]);
+export const badgeSourceSchema = z.enum(["manual", "destination", "business", "product", "event"]);
 export const badgeVerificationStatusSchema = z.enum([
   "verified",
   "unverified",

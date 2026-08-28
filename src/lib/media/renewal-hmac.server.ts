@@ -12,11 +12,11 @@
 
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
-export const RENEW_TIMESTAMP_WINDOW_S = 300;      // ±5 min
-export const RENEW_BODY_MAX_BYTES     = 1024;      // 1 KB
-export const RENEW_BATCH_MAX          = 50;        // filas por lote
-export const RENEW_NONCE_MIN          = 24;
-export const RENEW_NONCE_MAX          = 128;
+export const RENEW_TIMESTAMP_WINDOW_S = 300; // ±5 min
+export const RENEW_BODY_MAX_BYTES = 1024; // 1 KB
+export const RENEW_BATCH_MAX = 50; // filas por lote
+export const RENEW_NONCE_MIN = 24;
+export const RENEW_NONCE_MAX = 128;
 
 export function computeBodyHashHex(body: string): string {
   return createHash("sha256").update(body, "utf8").digest("hex");

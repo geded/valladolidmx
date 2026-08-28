@@ -61,10 +61,7 @@ export function TrustBadge({
       aria-label={`Calificación ${data.average.toFixed(1)} de 5 basada en ${data.count} reseñas`}
     >
       <Star
-        className={cn(
-          isCompact ? "h-3 w-3" : "h-3.5 w-3.5",
-          "fill-amber-500 text-amber-500",
-        )}
+        className={cn(isCompact ? "h-3 w-3" : "h-3.5 w-3.5", "fill-amber-500 text-amber-500")}
         aria-hidden
       />
       <span className="tabular-nums">{data.average.toFixed(1)}</span>
@@ -73,7 +70,9 @@ export function TrustBadge({
       </span>
       {data.verifiedCount > 0 ? (
         <>
-          <span aria-hidden className="text-muted-foreground/60">·</span>
+          <span aria-hidden className="text-muted-foreground/60">
+            ·
+          </span>
           <span
             className="inline-flex items-center gap-0.5 text-emerald-700 dark:text-emerald-400"
             title={`${data.verifiedCount} verificada${data.verifiedCount === 1 ? "" : "s"}`}

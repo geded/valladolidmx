@@ -3,6 +3,7 @@ name: Tourist Hero Policy
 description: Directiva Founder — Tourist Hero como única familia oficial de Hero, evolución sólo por variantes/capabilities.
 type: constraint
 ---
+
 El Tourist Hero (`vmx.experience.hero`) es la ÚNICA familia oficial de Hero para todo el ecosistema Valladolid.mx.
 
 Función: componente emocional que provoca deseo de descubrir el destino y prepara la decisión del visitante. Transmite identidad del lugar, emoción, contexto territorial, confianza, diferenciación y acción clara. La fotografía es protagonista; la información apoya, nunca compite.

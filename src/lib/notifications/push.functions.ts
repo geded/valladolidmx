@@ -16,8 +16,9 @@ import { assertUncPublisher } from "./_authz";
 
 type Category = Database["public"]["Enums"]["notification_category"];
 
-export const getVapidPublicKey = createServerFn({ method: "GET" })
-  .handler(async () => ({ publicKey: process.env.VAPID_PUBLIC_KEY ?? null }));
+export const getVapidPublicKey = createServerFn({ method: "GET" }).handler(async () => ({
+  publicKey: process.env.VAPID_PUBLIC_KEY ?? null,
+}));
 
 export const registerPushSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

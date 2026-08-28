@@ -25,7 +25,9 @@ function safeParse(raw: unknown): ExperienceInfoGridConfig {
   return r.success ? r.data : experienceInfoGridConfigSchema.parse({});
 }
 
-function baseDTO(cfg: ExperienceInfoGridConfig): Omit<ExperienceInfoGridDTO, "items" | "provenance"> {
+function baseDTO(
+  cfg: ExperienceInfoGridConfig,
+): Omit<ExperienceInfoGridDTO, "items" | "provenance"> {
   return {
     variant: cfg.variant,
     heading: cfg.heading?.trim() || null,
@@ -69,7 +71,11 @@ export function ExperienceInfoGridBlock({ config }: ExperienceInfoGridBlockProps
         <GovernedSourceUnavailable reason="Configuración histórica sin datos persistidos. Render congelado, sin nueva autoría." />
       );
     }
-    return <ExperienceInfoGrid dto={{ ...baseDTO(cfg), items: cfg.items, provenance: "legacy_frozen" }} />;
+    return (
+      <ExperienceInfoGrid
+        dto={{ ...baseDTO(cfg), items: cfg.items, provenance: "legacy_frozen" }}
+      />
+    );
   }
 
   if (!governedItems) {
@@ -78,7 +84,9 @@ export function ExperienceInfoGridBlock({ config }: ExperienceInfoGridBlockProps
     );
   }
 
-  return <ExperienceInfoGrid dto={{ ...baseDTO(cfg), items: governedItems, provenance: "published" }} />;
+  return (
+    <ExperienceInfoGrid dto={{ ...baseDTO(cfg), items: governedItems, provenance: "published" }} />
+  );
 }
 
 export function ExperienceInfoGridPreview() {

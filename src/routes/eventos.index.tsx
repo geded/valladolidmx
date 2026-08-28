@@ -17,7 +17,9 @@ export const Route = createFileRoute("/eventos/")({
       path: "/eventos",
     }),
   loader: async () => {
-    const events = await listPublishedEvents({ data: { upcomingOnly: true, limit: 60 } }).catch(() => []);
+    const events = await listPublishedEvents({ data: { upcomingOnly: true, limit: 60 } }).catch(
+      () => [],
+    );
     return { events };
   },
   component: EventosPage,

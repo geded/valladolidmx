@@ -84,11 +84,7 @@ function loadImage(file: File): Promise<HTMLImageElement> {
   });
 }
 
-function canvasToBlob(
-  canvas: HTMLCanvasElement,
-  type: string,
-  quality: number,
-): Promise<Blob> {
+function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (b) => (b ? resolve(b) : reject(new Error("Falló la compresión."))),
@@ -114,9 +110,7 @@ export async function compressImageIfNeeded(file: File): Promise<File> {
     // Aún así puede tener dimensiones enormes; hacemos una comprobación rápida.
     try {
       const img = await loadImage(file);
-      if (
-        Math.max(img.naturalWidth, img.naturalHeight) <= MAX_DIMENSION
-      ) {
+      if (Math.max(img.naturalWidth, img.naturalHeight) <= MAX_DIMENSION) {
         return file;
       }
     } catch {
@@ -186,10 +180,7 @@ async function pngHasAlpha(file: File): Promise<boolean> {
  * GIF y AVIF se dejan intactos (canvas no preserva animación / encoder
  * AVIF no está garantizado en el navegador).
  */
-export async function prepareImageForRole(
-  file: File,
-  role: ImageRole,
-): Promise<File> {
+export async function prepareImageForRole(file: File, role: ImageRole): Promise<File> {
   const invalid = validateImageFile(file);
   if (invalid) throw new Error(invalid.reason);
 
@@ -239,30 +230,17 @@ export async function prepareImageForRole(
   // 3) Elegir formato de salida.
   const isPng = file.type === "image/png";
   const keepPng = isPng && (await pngHasAlpha(file));
-  const outType = keepPng
-    ? "image/png"
-    : file.type === "image/jpeg"
-      ? "image/jpeg"
-      : "image/webp";
+  const outType = keepPng ? "image/png" : file.type === "image/jpeg" ? "image/jpeg" : "image/webp";
 
-  const blob = await canvasToBlob(
-    canvas,
-    outType,
-    outType === "image/png" ? 1 : spec.quality,
-  );
+  const blob = await canvasToBlob(canvas, outType, outType === "image/png" ? 1 : spec.quality);
 
   // Si tras procesar sigue pesando más que el original Y ya está dentro
   // de los límites de dimensión, devuelve el original.
-  if (
-    blob.size >= file.size &&
-    Math.max(srcW, srcH) <= spec.maxLongSide &&
-    spec.ratio === null
-  ) {
+  if (blob.size >= file.size && Math.max(srcW, srcH) <= spec.maxLongSide && spec.ratio === null) {
     return file;
   }
 
-  const ext =
-    outType === "image/jpeg" ? "jpg" : outType === "image/png" ? "png" : "webp";
+  const ext = outType === "image/jpeg" ? "jpg" : outType === "image/png" ? "png" : "webp";
   const baseName = file.name.replace(/\.[^.]+$/, "") || "imagen";
   return new File([blob], `${baseName}.${ext}`, {
     type: outType,
@@ -276,10 +254,7 @@ export interface RetryOptions {
   onAttempt?: (attempt: number, err?: unknown) => void;
 }
 
-export async function withRetry<T>(
-  fn: () => Promise<T>,
-  opts: RetryOptions = {},
-): Promise<T> {
+export async function withRetry<T>(fn: () => Promise<T>, opts: RetryOptions = {}): Promise<T> {
   const retries = opts.retries ?? 2;
   const base = opts.baseDelayMs ?? 500;
   let lastErr: unknown;

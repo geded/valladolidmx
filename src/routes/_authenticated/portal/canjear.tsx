@@ -38,8 +38,7 @@ function useActiveBusinessId(): string | null {
       setId(detail ?? null);
     };
     window.addEventListener("portal:active-business-changed", handler);
-    return () =>
-      window.removeEventListener("portal:active-business-changed", handler);
+    return () => window.removeEventListener("portal:active-business-changed", handler);
   }, []);
   return id;
 }
@@ -69,12 +68,9 @@ function RedeemPage() {
       const r = await lookup({ data: { key: key.trim(), business_id: businessId } });
       setResult(r);
       setIdentityConfirmed(false);
-      if (r.reason === "not_found")
-        toast.error("No encontramos un cupón con ese código.");
-      else if (r.reason === "not_your_business")
-        toast.error("Este cupón no es de esta empresa.");
-      else if (r.reason === "already_redeemed")
-        toast.warning("Este cupón ya fue canjeado.");
+      if (r.reason === "not_found") toast.error("No encontramos un cupón con ese código.");
+      else if (r.reason === "not_your_business") toast.error("Este cupón no es de esta empresa.");
+      else if (r.reason === "already_redeemed") toast.warning("Este cupón ya fue canjeado.");
       else if (r.reason === "expired") toast.warning("Este cupón ya expiró.");
     } catch (e) {
       toast.error((e as Error).message || "Error al buscar el cupón.");
@@ -121,7 +117,9 @@ function RedeemPage() {
         if (typeof navigator !== "undefined" && "vibrate" in navigator) {
           (navigator as Navigator).vibrate?.(180);
         }
-      } catch { /* noop */ }
+      } catch {
+        /* noop */
+      }
       setResult(null);
       setCode("");
       setIdentityConfirmed(false);
@@ -154,9 +152,7 @@ function RedeemPage() {
       );
       scannerInstance.current = scanner as unknown as { stop: () => Promise<void> };
     } catch (e) {
-      toast.error(
-        "No pudimos abrir la cámara. Verifica los permisos del navegador.",
-      );
+      toast.error("No pudimos abrir la cámara. Verifica los permisos del navegador.");
       setScanning(false);
       console.error(e);
     }
@@ -183,13 +179,11 @@ function RedeemPage() {
       <header className="space-y-1">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-primary">
-              Panel de canje
-            </p>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Panel de canje</p>
             <h1 className="text-2xl font-semibold">Canjear cupón digital</h1>
             <p className="text-sm text-muted-foreground">
-              Pide al viajero que te muestre el QR o dicte el código. Sólo puedes
-              canjear cupones asignados a la empresa activa.
+              Pide al viajero que te muestre el QR o dicte el código. Sólo puedes canjear cupones
+              asignados a la empresa activa.
             </p>
           </div>
           <Button asChild variant="outline" size="sm">
@@ -256,11 +250,7 @@ function RedeemPage() {
         <div
           ref={scannerRef}
           id="qr-scanner-region"
-          className={
-            scanning
-              ? "mt-3 overflow-hidden rounded-lg border border-border"
-              : "hidden"
-          }
+          className={scanning ? "mt-3 overflow-hidden rounded-lg border border-border" : "hidden"}
         />
       </section>
 
@@ -292,8 +282,8 @@ function RedeemPage() {
               </div>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              Verifica que la persona frente a ti coincide con esta información
-              antes de aplicar el descuento.
+              Verifica que la persona frente a ti coincide con esta información antes de aplicar el
+              descuento.
             </p>
             <label className="mt-2 flex items-start gap-2 text-xs">
               <input
@@ -302,9 +292,7 @@ function RedeemPage() {
                 onChange={(e) => setIdentityConfirmed(e.target.checked)}
                 className="mt-0.5 size-4 accent-primary"
               />
-              <span>
-                Confirmo que verifiqué la identidad del viajero.
-              </span>
+              <span>Confirmo que verifiqué la identidad del viajero.</span>
             </label>
           </div>
 
@@ -342,11 +330,7 @@ function RedeemPage() {
             </Button>
             {result.coupon.status === "active" &&
               new Date(result.coupon.valid_until) > new Date() && (
-                <Button
-                  type="button"
-                  onClick={doRedeem}
-                  disabled={busy || !identityConfirmed}
-                >
+                <Button type="button" onClick={doRedeem} disabled={busy || !identityConfirmed}>
                   <Check className="mr-2 size-4" aria-hidden />
                   Marcar como canjeado
                 </Button>

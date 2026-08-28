@@ -41,7 +41,10 @@ export function StaticMap({
   list.forEach((m, i) => {
     // Etiqueta A-Z automática si no viene explícita, para que cada pin
     // se pueda leer y correlacionar con la lista lateral.
-    const label = (m.label ?? String.fromCharCode(65 + (i % 26))).toString().slice(0, 1).toUpperCase();
+    const label = (m.label ?? String.fromCharCode(65 + (i % 26)))
+      .toString()
+      .slice(0, 1)
+      .toUpperCase();
     params.append("m", `${m.kind ?? "poi"}:${label}:${m.lat},${m.lng}`);
   });
   const src = `/api/public/maps/static?${params.toString()}`;
@@ -55,7 +58,8 @@ export function StaticMap({
         )}
         style={{ minHeight: height / 2 }}
       >
-        Mapa no disponible por ahora. Prueba <strong className="mx-1 font-medium text-foreground">Ver mapa interactivo</strong>.
+        Mapa no disponible por ahora. Prueba{" "}
+        <strong className="mx-1 font-medium text-foreground">Ver mapa interactivo</strong>.
       </div>
     );
   }

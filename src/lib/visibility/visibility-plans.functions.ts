@@ -102,10 +102,12 @@ export const listVisibilityPlans = createServerFn({ method: "GET" })
 
 export const upsertVisibilityPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: Partial<VisibilityPlan> & { id?: string; slug: string; name: string }) => {
-    if (!input?.slug || !input?.name) throw new Error("invalid_input");
-    return input;
-  })
+  .inputValidator(
+    (input: Partial<VisibilityPlan> & { id?: string; slug: string; name: string }) => {
+      if (!input?.slug || !input?.name) throw new Error("invalid_input");
+      return input;
+    },
+  )
   .handler(async ({ data, context }): Promise<VisibilityPlan> => {
     await assertAdmin(context as never);
     const payload = {
@@ -114,7 +116,12 @@ export const upsertVisibilityPlan = createServerFn({ method: "POST" })
       updated_at: new Date().toISOString(),
     };
     const query = data.id
-      ? context.supabase.from("visibility_plans").update(payload).eq("id", data.id).select("*").single()
+      ? context.supabase
+          .from("visibility_plans")
+          .update(payload)
+          .eq("id", data.id)
+          .select("*")
+          .single()
       : context.supabase.from("visibility_plans").insert(payload).select("*").single();
     const { data: row, error } = await query;
     if (error) throw error;
@@ -125,7 +132,8 @@ export const toggleVisibilityPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string; field: "is_active" | "is_public"; value: boolean }) => {
     if (!input?.id) throw new Error("missing_id");
-    if (input.field !== "is_active" && input.field !== "is_public") throw new Error("invalid_field");
+    if (input.field !== "is_active" && input.field !== "is_public")
+      throw new Error("invalid_field");
     return input;
   })
   .handler(async ({ data, context }) => {

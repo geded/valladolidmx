@@ -50,10 +50,7 @@ export const Route = createFileRoute("/viajero/$handle")({
   },
   component: ViajeroPublicRoute,
   notFoundComponent: () => (
-    <PublicShell
-      title="Perfil no encontrado"
-      crumbs={[{ label: "Viajero" }, { label: "—" }]}
-    >
+    <PublicShell title="Perfil no encontrado" crumbs={[{ label: "Viajero" }, { label: "—" }]}>
       <p className="text-sm text-muted-foreground">
         Este perfil no existe o su dueño lo mantiene privado.
       </p>
@@ -68,7 +65,5 @@ export const Route = createFileRoute("/viajero/$handle")({
 
 function ViajeroPublicRoute() {
   const { profile, reviewerStats } = Route.useLoaderData();
-  return (
-    <TravelerPublicProfileSurface profile={profile} reviewerStats={reviewerStats} />
-  );
+  return <TravelerPublicProfileSurface profile={profile} reviewerStats={reviewerStats} />;
 }

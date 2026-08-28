@@ -45,7 +45,10 @@ export const DEFAULT_ALUX_FLAGS: AluxFlags = {
 type SupabaseLike = {
   from: (t: string) => {
     select: (s: string) => {
-      eq: (a: string, b: unknown) => {
+      eq: (
+        a: string,
+        b: unknown,
+      ) => {
         maybeSingle: () => Promise<{ data: unknown; error: { message: string } | null }>;
       };
     };
@@ -66,8 +69,7 @@ function normalize(row: Record<string, unknown> | null): AluxSettings | null {
     temperature: Number(row.temperature ?? 0.7),
     max_tokens: Number(row.max_tokens ?? 1200),
     flags,
-    capability_overrides:
-      (row.capability_overrides as AluxSettings["capability_overrides"]) ?? {},
+    capability_overrides: (row.capability_overrides as AluxSettings["capability_overrides"]) ?? {},
     updated_at: String(row.updated_at ?? new Date().toISOString()),
     updated_by: (row.updated_by as string | null) ?? null,
   };
@@ -141,9 +143,7 @@ export const updateAluxSettings = createServerFn({ method: "POST" })
  * Supabase autenticado que ya usan y devuelve settings normalizados o
  * los defaults si no hay fila (defensivo).
  */
-export async function resolveAluxSettingsServer(
-  supabase: unknown,
-): Promise<AluxSettings> {
+export async function resolveAluxSettingsServer(supabase: unknown): Promise<AluxSettings> {
   const c = supabase as SupabaseLike;
   const { data } = await c
     .from("alux_settings")

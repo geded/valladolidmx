@@ -54,8 +54,7 @@ export function RelatedOverridesPanel({ entityType, entityId }: Props) {
   });
 
   const upsertMut = useMutation({
-    mutationFn: (input: Parameters<typeof upsertFn>[0]["data"]) =>
-      upsertFn({ data: input }),
+    mutationFn: (input: Parameters<typeof upsertFn>[0]["data"]) => upsertFn({ data: input }),
     onSuccess: () => qc.invalidateQueries({ queryKey }),
   });
   const deleteMut = useMutation({
@@ -63,10 +62,7 @@ export function RelatedOverridesPanel({ entityType, entityId }: Props) {
     onSuccess: () => qc.invalidateQueries({ queryKey }),
   });
 
-  const rows = useMemo<RelatedOverrideRow[]>(
-    () => query.data?.rows ?? [],
-    [query.data],
-  );
+  const rows = useMemo<RelatedOverrideRow[]>(() => query.data?.rows ?? [], [query.data]);
 
   const defaultRelatedKind: RelatedEntityKind =
     entityType === "destination" ? "business" : entityType;
@@ -115,7 +111,9 @@ export function RelatedOverridesPanel({ entityType, entityId }: Props) {
             className="h-9 w-full rounded-md border bg-background px-2"
           >
             {(Object.keys(KIND_LABELS) as RelatedEntityKind[]).map((k) => (
-              <option key={k} value={k}>{KIND_LABELS[k]}</option>
+              <option key={k} value={k}>
+                {KIND_LABELS[k]}
+              </option>
             ))}
           </select>
         </label>
@@ -161,13 +159,9 @@ export function RelatedOverridesPanel({ entityType, entityId }: Props) {
         </div>
       </form>
 
-      {query.isLoading && (
-        <p className="text-xs text-muted-foreground">Cargando overrides…</p>
-      )}
+      {query.isLoading && <p className="text-xs text-muted-foreground">Cargando overrides…</p>}
       {!query.isLoading && rows.length === 0 && (
-        <p className="text-xs text-muted-foreground">
-          Aún no hay pins ni hides. Añade uno arriba.
-        </p>
+        <p className="text-xs text-muted-foreground">Aún no hay pins ni hides. Añade uno arriba.</p>
       )}
       {rows.length > 0 && (
         <ul className="divide-y">
@@ -187,9 +181,7 @@ export function RelatedOverridesPanel({ entityType, entityId }: Props) {
                 <code className="block truncate text-[10px] text-muted-foreground">
                   {r.related_entity_id}
                 </code>
-                {r.note && (
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">{r.note}</p>
-                )}
+                {r.note && <p className="mt-0.5 text-[11px] text-muted-foreground">{r.note}</p>}
               </div>
               <button
                 type="button"

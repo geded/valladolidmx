@@ -8,18 +8,18 @@
 
 ## 1. Estado previo (snapshot registrado en `content_audit_log`)
 
-| Destino histórico | ID | Estado | Medios | Zonas | POI | SEO | Empresas | Eventos |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Chichén Itzá | `ec9eb324-1952-4849-a1d4-00506d7cabb5` | `draft` | 0 | 0 | 0 | 0 | 0 | 0 |
-| Ek Balam | `11111111-aaaa-4aaa-8aaa-000000000002` | `published` | 0 | 0 | 0 | 0 | 0 | 0 |
+| Destino histórico | ID                                     | Estado      | Medios | Zonas | POI | SEO | Empresas | Eventos |
+| ----------------- | -------------------------------------- | ----------- | ------ | ----- | --- | --- | -------- | ------- |
+| Chichén Itzá      | `ec9eb324-1952-4849-a1d4-00506d7cabb5` | `draft`     | 0      | 0     | 0   | 0   | 0        | 0       |
+| Ek Balam          | `11111111-aaaa-4aaa-8aaa-000000000002` | `published` | 0      | 0     | 0   | 0   | 0        | 0       |
 
 Acción de auditoría: `q2c_a.snapshot.before` (2 filas).
 
 ## 2. Destinos territoriales creados (FASE 2)
 
-| Nombre | Slug | ID | Estado | Región |
-| --- | --- | --- | --- | --- |
-| Tinum | `tinum` | `bdeb0bdd-178b-4b04-b36f-6982e7d1ae17` | `draft` | Oriente Maya |
+| Nombre  | Slug      | ID                                     | Estado  | Región       |
+| ------- | --------- | -------------------------------------- | ------- | ------------ |
+| Tinum   | `tinum`   | `bdeb0bdd-178b-4b04-b36f-6982e7d1ae17` | `draft` | Oriente Maya |
 | Temozón | `temozon` | `a7111b9a-a1de-49c0-b251-9818645a9a43` | `draft` | Oriente Maya |
 
 Sin descripción, medios, coordenadas, SEO, categorías ni zonas. Auditoría:
@@ -27,10 +27,10 @@ Sin descripción, medios, coordenadas, SEO, categorías ni zonas. Auditoría:
 
 ## 3. Lugares y atractivos creados (FASE 3)
 
-| Nombre | Slug | ID | Tipo | Destino | `source_destination_id` | Estado |
-| --- | --- | --- | --- | --- | --- | --- |
-| Chichén Itzá | `chichen-itza` | `3842b6cb-80e9-4d50-abde-57560a563e21` | `zona-arqueologica` | Tinum | `ec9eb324-1952-4849-a1d4-00506d7cabb5` | `draft` |
-| Ek' Balam | `ek-balam` | `6c22aa5f-62f9-4faa-ba39-c66e884d7904` | `zona-arqueologica` | Temozón | `11111111-aaaa-4aaa-8aaa-000000000002` | `draft` |
+| Nombre       | Slug           | ID                                     | Tipo                | Destino | `source_destination_id`                | Estado  |
+| ------------ | -------------- | -------------------------------------- | ------------------- | ------- | -------------------------------------- | ------- |
+| Chichén Itzá | `chichen-itza` | `3842b6cb-80e9-4d50-abde-57560a563e21` | `zona-arqueologica` | Tinum   | `ec9eb324-1952-4849-a1d4-00506d7cabb5` | `draft` |
+| Ek' Balam    | `ek-balam`     | `6c22aa5f-62f9-4faa-ba39-c66e884d7904` | `zona-arqueologica` | Temozón | `11111111-aaaa-4aaa-8aaa-000000000002` | `draft` |
 
 Campos copiados (acreditados): `name`, `description`, `latitude`, `longitude`
 (`20.6843 / -88.5678` y `20.8917 / -88.1367`).
@@ -64,12 +64,12 @@ por slug único más `NOT EXISTS`.
 
 ## 6. Auditoría
 
-| Acción | Filas |
-| --- | --- |
-| `q2c_a.snapshot.before` | 2 |
-| `q2c_a.destination.create` | 2 |
-| `q2c_a.place.create` | 2 |
-| `q2c_a.snapshot.after` | 2 |
+| Acción                     | Filas |
+| -------------------------- | ----- |
+| `q2c_a.snapshot.before`    | 2     |
+| `q2c_a.destination.create` | 2     |
+| `q2c_a.place.create`       | 2     |
+| `q2c_a.snapshot.after`     | 2     |
 
 ## 7. Rollback
 

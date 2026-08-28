@@ -24,7 +24,13 @@
       "path": "src/lib/experience-builder/route-inventory.ts"
     }
   ],
-  "public_routes": ["/casas-de-vacaciones", "/hoteles", "/restaurantes", "/experiencias", "/eventos"],
+  "public_routes": [
+    "/casas-de-vacaciones",
+    "/hoteles",
+    "/restaurantes",
+    "/experiencias",
+    "/eventos"
+  ],
   "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
   "required_tests": [
     "bun run lint",

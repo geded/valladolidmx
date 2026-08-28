@@ -171,8 +171,20 @@ describe("deriveAluxSpatialProposals (CV6.6)", () => {
       liveDay: emptyLiveDay,
       decisionCenter: center([
         card({ id: "destination.traffic:leave-now:A", slot: "now" }),
-        card({ id: "destination.weather:rain", slot: "next", tone: "warning", priority: 55, primaryAction: undefined }),
-        card({ id: "destination.hours:closing:C", slot: "later", tone: "warning", priority: 72, primaryAction: undefined }),
+        card({
+          id: "destination.weather:rain",
+          slot: "next",
+          tone: "warning",
+          priority: 55,
+          primaryAction: undefined,
+        }),
+        card({
+          id: "destination.hours:closing:C",
+          slot: "later",
+          tone: "warning",
+          priority: 72,
+          primaryAction: undefined,
+        }),
       ]),
       at: NOW,
     });

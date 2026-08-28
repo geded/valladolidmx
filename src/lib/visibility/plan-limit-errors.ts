@@ -16,8 +16,7 @@ export interface ParsedPlanLimitError {
 }
 
 export function parsePlanLimitError(err: unknown): ParsedPlanLimitError | null {
-  const raw =
-    err instanceof Error ? err.message : typeof err === "string" ? err : "";
+  const raw = err instanceof Error ? err.message : typeof err === "string" ? err : "";
   const m = /plan_limit_reached:([a-z_]+):(\d+)(?::([a-z0-9_-]+))?/i.exec(raw);
   if (!m) return null;
   const key = m[1] as PlanLimitKey;

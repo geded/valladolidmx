@@ -12,9 +12,7 @@ import type {
 
 const listeners = new Set<ContextEngineEventListener>();
 
-export function subscribeContextEngineEvents(
-  listener: ContextEngineEventListener,
-): () => void {
+export function subscribeContextEngineEvents(listener: ContextEngineEventListener): () => void {
   listeners.add(listener);
   return () => {
     listeners.delete(listener);

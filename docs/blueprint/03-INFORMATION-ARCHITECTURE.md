@@ -1,6 +1,7 @@
 # 03-INFORMATION-ARCHITECTURE.md
 
 # Arquitectura de Información
+
 Versión 1.0
 
 ## Objetivo

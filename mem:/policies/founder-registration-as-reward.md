@@ -3,6 +3,7 @@ name: Founder Registration As Reward Principle
 description: Crear cuenta debe sentirse como recompensa para el viajero, no como requisito. Cada momento de registro comunica explícitamente qué gana el usuario a partir de ese instante.
 type: constraint
 ---
+
 Vinculante desde AC1.4. Sólo afecta UX/copy de superficies de registro — no altera arquitectura ni contratos.
 
 Reglas:

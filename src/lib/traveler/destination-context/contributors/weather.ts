@@ -7,10 +7,7 @@
  * activación en runtime (registro efectivo) queda a cargo del arranque
  * server, no de superficies.
  */
-import type {
-  DestinationContextContributor,
-  DestinationSignal,
-} from "../types";
+import type { DestinationContextContributor, DestinationSignal } from "../types";
 
 export interface WeatherSignalPayload {
   tempC: number;

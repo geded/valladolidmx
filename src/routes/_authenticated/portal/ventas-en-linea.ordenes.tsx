@@ -19,9 +19,7 @@ import { Badge } from "@/components/ui/badge";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
-export const Route = createFileRoute(
-  "/_authenticated/portal/ventas-en-linea/ordenes",
-)({
+export const Route = createFileRoute("/_authenticated/portal/ventas-en-linea/ordenes")({
   component: MyOnlineSalesPage,
 });
 
@@ -41,13 +39,7 @@ function useActiveBusinessId(): string | null {
   return id;
 }
 
-type StatusFilter =
-  | "all"
-  | "paid"
-  | "fulfilled"
-  | "refunded"
-  | "cancelled"
-  | "awaiting_payment";
+type StatusFilter = "all" | "paid" | "fulfilled" | "refunded" | "cancelled" | "awaiting_payment";
 
 const STATUS_LABEL: Record<string, string> = {
   awaiting_payment: "Por confirmar",
@@ -136,15 +128,12 @@ function MyOnlineSalesPage() {
         </p>
         <h1 className="mt-2 text-3xl font-semibold">Mis ventas en línea</h1>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-          Consulta las órdenes de venta directa que incluyen tus experiencias.
-          Aquí verás el folio del viaje confirmado, el monto que pagó el
-          viajero, la comisión de la plataforma y el neto que recibes.
+          Consulta las órdenes de venta directa que incluyen tus experiencias. Aquí verás el folio
+          del viaje confirmado, el monto que pagó el viajero, la comisión de la plataforma y el neto
+          que recibes.
         </p>
         <div className="mt-3">
-          <Link
-            to="/portal/ventas-en-linea"
-            className="text-xs text-primary underline"
-          >
+          <Link to="/portal/ventas-en-linea" className="text-xs text-primary underline">
             ← Volver a configuración de ventas
           </Link>
         </div>
@@ -159,27 +148,15 @@ function MyOnlineSalesPage() {
         />
         <Kpi
           label="Ventas brutas"
-          value={
-            summary
-              ? formatMoney(summary.gross_amount, summary.currency)
-              : "—"
-          }
+          value={summary ? formatMoney(summary.gross_amount, summary.currency) : "—"}
         />
         <Kpi
           label="Comisión plataforma"
-          value={
-            summary
-              ? formatMoney(summary.commission_amount, summary.currency)
-              : "—"
-          }
+          value={summary ? formatMoney(summary.commission_amount, summary.currency) : "—"}
         />
         <Kpi
           label="Neto a recibir"
-          value={
-            summary
-              ? formatMoney(summary.net_amount, summary.currency)
-              : "—"
-          }
+          value={summary ? formatMoney(summary.net_amount, summary.currency) : "—"}
           highlight
         />
       </section>
@@ -188,29 +165,15 @@ function MyOnlineSalesPage() {
       <section className="rounded-xl border border-border bg-card p-4">
         <div className="grid gap-3 sm:grid-cols-4">
           <div>
-            <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-              Desde
-            </Label>
-            <Input
-              type="date"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-            />
+            <Label className="text-xs uppercase tracking-wide text-muted-foreground">Desde</Label>
+            <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-              Hasta
-            </Label>
-            <Input
-              type="date"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-            />
+            <Label className="text-xs uppercase tracking-wide text-muted-foreground">Hasta</Label>
+            <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-              Estado
-            </Label>
+            <Label className="text-xs uppercase tracking-wide text-muted-foreground">Estado</Label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as StatusFilter)}
@@ -266,16 +229,13 @@ function MyOnlineSalesPage() {
               ) : ordersQ.error ? (
                 <tr>
                   <td colSpan={8} className="px-3 py-6 text-center text-destructive">
-                    {ordersQ.error instanceof Error
-                      ? ordersQ.error.message
-                      : "Error al cargar."}
+                    {ordersQ.error instanceof Error ? ordersQ.error.message : "Error al cargar."}
                   </td>
                 </tr>
               ) : orders.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-3 py-8 text-center text-muted-foreground">
-                    Aún no hay órdenes de venta directa para esta empresa en el
-                    rango seleccionado.
+                    Aún no hay órdenes de venta directa para esta empresa en el rango seleccionado.
                   </td>
                 </tr>
               ) : (
@@ -319,9 +279,9 @@ function MyOnlineSalesPage() {
       </section>
 
       <p className="text-[11px] text-muted-foreground">
-        El neto mostrado es indicativo; la liquidación se realiza según los
-        ciclos operativos de Valladolid.mx. Las comisiones aplicadas
-        corresponden al porcentaje configurado al momento de cada venta.
+        El neto mostrado es indicativo; la liquidación se realiza según los ciclos operativos de
+        Valladolid.mx. Las comisiones aplicadas corresponden al porcentaje configurado al momento de
+        cada venta.
       </p>
     </div>
   );
@@ -341,17 +301,13 @@ function Kpi({
   return (
     <div
       className={`rounded-xl border p-4 ${
-        highlight
-          ? "border-primary/40 bg-primary/5"
-          : "border-border bg-card"
+        highlight ? "border-primary/40 bg-primary/5" : "border-border bg-card"
       }`}
     >
       <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </p>
-      <p className={`mt-1 text-2xl font-semibold ${highlight ? "text-primary" : ""}`}>
-        {value}
-      </p>
+      <p className={`mt-1 text-2xl font-semibold ${highlight ? "text-primary" : ""}`}>{value}</p>
       {hint ? <p className="mt-1 text-[11px] text-muted-foreground">{hint}</p> : null}
     </div>
   );

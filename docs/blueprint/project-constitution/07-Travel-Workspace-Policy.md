@@ -7,12 +7,12 @@
 
 ## 1. Vocabulario oficial
 
-| Término | Significado |
-|---|---|
-| **Arma tu Viaje** | Funcionalidad pública de descubrimiento y planificación. |
-| **Agregar a Mi Viaje** | Acción universal disponible desde cualquier card/entidad. |
-| **Mi Viaje** | Workspace personal del viajero autenticado. URL canónica: `/cuenta/mi-viaje`. |
-| **Travel Workspace** | Fuente única de contexto del viajero para todos los sistemas. |
+| Término                | Significado                                                                   |
+| ---------------------- | ----------------------------------------------------------------------------- |
+| **Arma tu Viaje**      | Funcionalidad pública de descubrimiento y planificación.                      |
+| **Agregar a Mi Viaje** | Acción universal disponible desde cualquier card/entidad.                     |
+| **Mi Viaje**           | Workspace personal del viajero autenticado. URL canónica: `/cuenta/mi-viaje`. |
+| **Travel Workspace**   | Fuente única de contexto del viajero para todos los sistemas.                 |
 
 ## 2. Fuente única de contexto
 

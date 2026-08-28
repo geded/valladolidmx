@@ -20,13 +20,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-export type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonValue[]
-  | { [k: string]: JsonValue };
+export type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
 
 /** Señal serializable (payload libre JSON). */
 export interface SerializableDestinationSignal {
@@ -61,9 +55,7 @@ const InputSchema = z.object({
         id: z.string().min(1).max(64),
         type: z.string().min(1).max(32),
         timezone: z.string().max(64).optional(),
-        role: z
-          .enum(["current", "next", "later", "previous"])
-          .optional(),
+        role: z.enum(["current", "next", "later", "previous"]).optional(),
         geo: z
           .object({
             lat: z.number().gte(-90).lte(90),
@@ -86,13 +78,7 @@ const InputSchema = z.object({
             .optional(),
           label: z.string().max(80).optional(),
           precision: z
-            .enum([
-              "device",
-              "hotel",
-              "previous_activity",
-              "destination_center",
-              "unknown",
-            ])
+            .enum(["device", "hotel", "previous_activity", "destination_center", "unknown"])
             .optional(),
         })
         .optional(),

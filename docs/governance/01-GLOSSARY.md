@@ -884,10 +884,10 @@ No se permite utilizar un término nuevo en documentos oficiales, PRD, ADR, cód
 
 El Glosario constituye un documento vivo con vocación de permanencia.
 
-| Versión | Fecha | Autor | Descripción |
-|---|---|---|---|
-| v1.0 | 2026-07-18 | Founder | Emisión inicial del vocabulario oficial de Valladolid.mx. |
-| v1.1 | 2026-07-20 | Founder | Consolidación del placeholder `04-CANONICAL-VOCABULARY.md` y formalización del historial de versiones. |
+| Versión | Fecha      | Autor   | Descripción                                                                                            |
+| ------- | ---------- | ------- | ------------------------------------------------------------------------------------------------------ |
+| v1.0    | 2026-07-18 | Founder | Emisión inicial del vocabulario oficial de Valladolid.mx.                                              |
+| v1.1    | 2026-07-20 | Founder | Consolidación del placeholder `04-CANONICAL-VOCABULARY.md` y formalización del historial de versiones. |
 
 No deberán realizarse modificaciones que contradigan la misión, visión o principios fundamentales del CANON sin una revisión integral del propio Glosario y del CANON.
 

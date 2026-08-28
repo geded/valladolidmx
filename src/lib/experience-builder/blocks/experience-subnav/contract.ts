@@ -15,19 +15,19 @@ import { z } from "zod";
 export const EXPERIENCE_SUBNAV_CONTRACT_VERSION = "1.0.0";
 
 export const experienceSubnavVariantSchema = z.enum([
-  "pill",   // Chips redondeados (default).
-  "tabs",   // Tabs con underline activo.
+  "pill", // Chips redondeados (default).
+  "tabs", // Tabs con underline activo.
   "underline", // Enlaces con línea inferior (editorial).
 ]);
 export type ExperienceSubnavVariant = z.infer<typeof experienceSubnavVariantSchema>;
 
 export const experienceSubnavSourceSchema = z.enum([
-  "manual",      // Anclas definidas explícitamente en config.
-  "auto",        // Wrapper detecta secciones con `data-eb-anchor` en la página.
-  "business",    // Presets curados para ficha empresa.
-  "product",     // Reservado.
+  "manual", // Anclas definidas explícitamente en config.
+  "auto", // Wrapper detecta secciones con `data-eb-anchor` en la página.
+  "business", // Presets curados para ficha empresa.
+  "product", // Reservado.
   "destination", // Reservado.
-  "event",       // Reservado.
+  "event", // Reservado.
 ]);
 export type ExperienceSubnavSource = z.infer<typeof experienceSubnavSourceSchema>;
 

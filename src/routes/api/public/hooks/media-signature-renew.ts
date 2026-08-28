@@ -13,10 +13,7 @@
  */
 
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  RENEW_BODY_MAX_BYTES,
-  verifyHmacRequest,
-} from "@/lib/media/renewal-hmac.server";
+import { RENEW_BODY_MAX_BYTES, verifyHmacRequest } from "@/lib/media/renewal-hmac.server";
 
 const CANONICAL_PATH = "/api/public/hooks/media-signature-renew";
 const HANDLER_DEADLINE_MS = 12_000;
@@ -64,10 +61,13 @@ export const Route = createFileRoute("/api/public/hooks/media-signature-renew")(
           });
           if (!check.ok) {
             const s =
-              check.reason === "method" ? 405 :
-              check.reason === "content_type" ? 415 :
-              check.reason === "body_too_large" ? 413 :
-              401;
+              check.reason === "method"
+                ? 405
+                : check.reason === "content_type"
+                  ? 415
+                  : check.reason === "body_too_large"
+                    ? 413
+                    : 401;
             return sanitized(s);
           }
 
@@ -81,7 +81,8 @@ export const Route = createFileRoute("/api/public/hooks/media-signature-renew")(
           if (nonceErr || nonceOk !== true) return sanitized(401);
 
           // Kill switch.
-          const { isPersistedSignaturesEnabled } = await import("@/lib/media/persisted-flag.server");
+          const { isPersistedSignaturesEnabled } =
+            await import("@/lib/media/persisted-flag.server");
           if (!(await isPersistedSignaturesEnabled())) {
             return json({ status: "disabled", claimed: 0, applied: 0, stale: 0, failed: 0 });
           }

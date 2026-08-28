@@ -20,10 +20,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import {
-  assertAllowedTransition,
-  type ContentStatus,
-} from "@/lib/cms/workflow";
+import { assertAllowedTransition, type ContentStatus } from "@/lib/cms/workflow";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function assertAdmin(context: { supabase: any; userId: string }) {
@@ -145,10 +142,7 @@ export const moderateReview = createServerFn({ method: "POST" })
       patch.published_at = new Date().toISOString();
     }
 
-    const { error: updErr } = await db
-      .from("reviews")
-      .update(patch)
-      .eq("id", data.id);
+    const { error: updErr } = await db.from("reviews").update(patch).eq("id", data.id);
     if (updErr) throw updErr;
 
     return { id: data.id, from, to: data.to };

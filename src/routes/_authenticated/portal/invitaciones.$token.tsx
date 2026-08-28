@@ -20,9 +20,7 @@ import {
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
-export const Route = createFileRoute(
-  "/_authenticated/portal/invitaciones/$token",
-)({
+export const Route = createFileRoute("/_authenticated/portal/invitaciones/$token")({
   component: AcceptInvitationPage,
 });
 
@@ -59,8 +57,7 @@ function AcceptInvitationPage() {
   });
 
   const preview = previewQuery.data;
-  const expired =
-    preview?.expires_at && new Date(preview.expires_at).getTime() <= Date.now();
+  const expired = preview?.expires_at && new Date(preview.expires_at).getTime() <= Date.now();
   const usable = preview?.found && preview.status === "pending" && !expired;
 
   useEffect(() => {
@@ -77,15 +74,11 @@ function AcceptInvitationPage() {
       </header>
 
       {previewQuery.isLoading && (
-        <p className="mt-6 text-sm text-muted-foreground">
-          Verificando invitación…
-        </p>
+        <p className="mt-6 text-sm text-muted-foreground">Verificando invitación…</p>
       )}
 
       {previewQuery.isError && (
-        <p className="mt-6 text-sm text-destructive">
-          No pudimos verificar la invitación.
-        </p>
+        <p className="mt-6 text-sm text-destructive">No pudimos verificar la invitación.</p>
       )}
 
       {preview && !preview.found && (
@@ -115,19 +108,14 @@ function AcceptInvitationPage() {
       {preview && usable && (
         <section className="mt-6 rounded-lg border border-border bg-card p-5">
           <p className="text-sm text-muted-foreground">Has sido invitado a</p>
-          <p className="mt-1 text-xl font-semibold">
-            {preview.business_name ?? "una empresa"}
-          </p>
+          <p className="mt-1 text-xl font-semibold">{preview.business_name ?? "una empresa"}</p>
           <p className="mt-2 text-xs uppercase tracking-[0.14em] text-muted-foreground">
             Rol propuesto: <span className="font-semibold">{preview.role}</span>
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Expira el{" "}
-            {new Date(preview.expires_at as string).toLocaleString("es-MX")}
+            Expira el {new Date(preview.expires_at as string).toLocaleString("es-MX")}
           </p>
-          {errorMessage && (
-            <p className="mt-3 text-xs text-destructive">{errorMessage}</p>
-          )}
+          {errorMessage && <p className="mt-3 text-xs text-destructive">{errorMessage}</p>}
           <button
             type="button"
             onClick={() => acceptMutation.mutate()}
@@ -142,22 +130,12 @@ function AcceptInvitationPage() {
   );
 }
 
-function Notice({
-  tone,
-  title,
-  body,
-}: {
-  tone: "warn" | "info";
-  title: string;
-  body: string;
-}) {
+function Notice({ tone, title, body }: { tone: "warn" | "info"; title: string; body: string }) {
   return (
     <div
       className={[
         "mt-6 rounded-lg border p-5",
-        tone === "warn"
-          ? "border-amber-500/30 bg-amber-500/5"
-          : "border-border bg-card",
+        tone === "warn" ? "border-amber-500/30 bg-amber-500/5" : "border-border bg-card",
       ].join(" ")}
     >
       <p className="font-semibold">{title}</p>

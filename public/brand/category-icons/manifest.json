@@ -13,9 +13,27 @@
     "upscale": false
   },
   "immutable_slugs": [
-    "hoteles", "restaurantes", "destinos", "casas-de-vacaciones", "eventos",
-    "experiencias", "que-hacer", "tours", "promociones", "zonas-arqueologicas",
-    "comunidades", "cenotes", "rutas", "artesanias", "naturaleza", "gastronomia",
-    "cultura", "compras", "pueblos", "bienestar", "vida-nocturna", "mapas"
+    "hoteles",
+    "restaurantes",
+    "destinos",
+    "casas-de-vacaciones",
+    "eventos",
+    "experiencias",
+    "que-hacer",
+    "tours",
+    "promociones",
+    "zonas-arqueologicas",
+    "comunidades",
+    "cenotes",
+    "rutas",
+    "artesanias",
+    "naturaleza",
+    "gastronomia",
+    "cultura",
+    "compras",
+    "pueblos",
+    "bienestar",
+    "vida-nocturna",
+    "mapas"
   ]
 }

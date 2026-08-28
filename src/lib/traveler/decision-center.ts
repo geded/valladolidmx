@@ -25,11 +25,7 @@
  * documentado como puntos de extensión listos para CV6.3+.
  */
 
-import type {
-  DestinationContext,
-  LiveDayContext,
-  LiveDayItemInput,
-} from "@/lib/traveler/live-day";
+import type { DestinationContext, LiveDayContext, LiveDayItemInput } from "@/lib/traveler/live-day";
 import type { TripPhase } from "@/lib/traveler/trip-phase";
 
 /** Ranura conceptual del Centro de Decisiones. */
@@ -203,9 +199,7 @@ export const liveDayNextContributor: DecisionContributor = {
     const item = liveDay.items[liveDay.nextIndex];
     if (!item) return [];
     const startsAt = item.starts_at ? new Date(item.starts_at) : null;
-    const minsUntil = startsAt
-      ? Math.round((startsAt.getTime() - at.getTime()) / 60_000)
-      : null;
+    const minsUntil = startsAt ? Math.round((startsAt.getTime() - at.getTime()) / 60_000) : null;
     const soon = minsUntil != null && minsUntil <= 30 && minsUntil >= 0;
     const label = startsAt ? humanTime(item.starts_at) : undefined;
 

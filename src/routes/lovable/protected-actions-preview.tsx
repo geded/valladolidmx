@@ -83,8 +83,7 @@ function PlaygroundPage() {
         </p>
         <h1 className="text-2xl font-semibold">Protected Actions — Playground</h1>
         <p className="text-sm text-muted-foreground">
-          Ruta interna (`noindex`). No expone consumidores reales de producción.
-          Sesión actual:{" "}
+          Ruta interna (`noindex`). No expone consumidores reales de producción. Sesión actual:{" "}
           <span className="font-mono">
             {user ? `authenticated (${user.id.slice(0, 8)}…)` : "guest"}
           </span>
@@ -145,7 +144,7 @@ function PlaygroundPage() {
       <section className="rounded-2xl border border-border bg-card p-5">
         <h2 className="mb-3 text-sm font-semibold">Estado del registry</h2>
         <pre className="max-h-40 overflow-auto rounded-lg bg-muted/40 p-3 text-xs">
-{JSON.stringify(PendingActionRegistry.peek(), null, 2)}
+          {JSON.stringify(PendingActionRegistry.peek(), null, 2)}
         </pre>
       </section>
 
@@ -161,9 +160,7 @@ function PlaygroundPage() {
                   {new Date(row.ts).toLocaleTimeString()}{" "}
                 </span>
                 <span>{row.event}</span>{" "}
-                <span className="text-muted-foreground">
-                  {JSON.stringify(row.meta)}
-                </span>
+                <span className="text-muted-foreground">{JSON.stringify(row.meta)}</span>
               </div>
             ))
           )}

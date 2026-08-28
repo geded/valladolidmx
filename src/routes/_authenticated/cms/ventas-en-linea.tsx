@@ -34,13 +34,7 @@ export const Route = createFileRoute("/_authenticated/cms/ventas-en-linea")({
   component: DirectSalesAdminPage,
 });
 
-type StatusFilter =
-  | "all"
-  | "paid"
-  | "fulfilled"
-  | "refunded"
-  | "cancelled"
-  | "awaiting_payment";
+type StatusFilter = "all" | "paid" | "fulfilled" | "refunded" | "cancelled" | "awaiting_payment";
 
 function formatMoney(amount: number, currency: string): string {
   try {
@@ -170,14 +164,11 @@ function DirectSalesAdminPage() {
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
           Ventas en línea
         </p>
-        <h1 className="mt-2 text-3xl font-semibold">
-          Comisiones de venta directa
-        </h1>
+        <h1 className="mt-2 text-3xl font-semibold">Comisiones de venta directa</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Órdenes donde el visitante compró directo a un proveedor. Se
-          reporta el monto bruto cobrado, la comisión de plataforma y el
-          neto a liquidar. Todos los montos en centavos convertidos a{" "}
-          {currency}.
+          Órdenes donde el visitante compró directo a un proveedor. Se reporta el monto bruto
+          cobrado, la comisión de plataforma y el neto a liquidar. Todos los montos en centavos
+          convertidos a {currency}.
         </p>
       </header>
 
@@ -186,23 +177,15 @@ function DirectSalesAdminPage() {
         <KpiCard
           label="Órdenes pagadas"
           value={summary ? String(summary.paid_orders) : "—"}
-          hint={
-            summary ? `${summary.total_orders} totales en el periodo` : ""
-          }
+          hint={summary ? `${summary.total_orders} totales en el periodo` : ""}
         />
         <KpiCard
           label="Ventas brutas"
-          value={
-            summary ? formatMoney(summary.gross_amount, currency) : "—"
-          }
+          value={summary ? formatMoney(summary.gross_amount, currency) : "—"}
         />
         <KpiCard
           label="Comisión plataforma"
-          value={
-            summary
-              ? formatMoney(summary.commission_amount, currency)
-              : "—"
-          }
+          value={summary ? formatMoney(summary.commission_amount, currency) : "—"}
           hint={
             summary && summary.gross_amount > 0
               ? `${((summary.commission_amount / summary.gross_amount) * 100).toFixed(1)}% del bruto`
@@ -211,11 +194,7 @@ function DirectSalesAdminPage() {
         />
         <KpiCard
           label="Neto a proveedores"
-          value={
-            summary
-              ? formatMoney(summary.net_to_providers, currency)
-              : "—"
-          }
+          value={summary ? formatMoney(summary.net_to_providers, currency) : "—"}
           hint={
             summary && summary.refunded_amount > 0
               ? `Reembolsado: ${formatMoney(summary.refunded_amount, currency)}`
@@ -290,12 +269,7 @@ function DirectSalesAdminPage() {
             <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
             Actualizar
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={downloadCsv}
-            disabled={rows.length === 0}
-          >
+          <Button size="sm" variant="outline" onClick={downloadCsv} disabled={rows.length === 0}>
             <Download className="mr-1.5 h-3.5 w-3.5" />
             Exportar CSV ({rows.length})
           </Button>
@@ -321,9 +295,7 @@ function DirectSalesAdminPage() {
             <tbody>
               {(summary?.by_business ?? []).map((b) => (
                 <tr key={b.business_id} className="border-t border-border">
-                  <td className="px-3 py-2 font-medium">
-                    {b.business_name}
-                  </td>
+                  <td className="px-3 py-2 font-medium">{b.business_name}</td>
                   <td className="px-3 py-2 text-right">{b.orders_count}</td>
                   <td className="px-3 py-2 text-right">
                     {formatMoney(b.gross_amount, b.currency)}
@@ -338,13 +310,8 @@ function DirectSalesAdminPage() {
               ))}
               {(!summary || summary.by_business.length === 0) && (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-3 py-6 text-center text-muted-foreground"
-                  >
-                    {summaryQ.isLoading
-                      ? "Cargando…"
-                      : "Sin ventas directas en el periodo."}
+                  <td colSpan={5} className="px-3 py-6 text-center text-muted-foreground">
+                    {summaryQ.isLoading ? "Cargando…" : "Sin ventas directas en el periodo."}
                   </td>
                 </tr>
               )}
@@ -378,9 +345,7 @@ function DirectSalesAdminPage() {
                 const when = r.paid_at ?? r.created_at;
                 return (
                   <tr key={r.order_id} className="border-t border-border">
-                    <td className="px-3 py-2 font-mono text-xs">
-                      {r.folio}
-                    </td>
+                    <td className="px-3 py-2 font-mono text-xs">{r.folio}</td>
                     <td className="px-3 py-2 whitespace-nowrap">
                       {new Date(when).toLocaleDateString("es-MX", {
                         year: "numeric",
@@ -389,25 +354,17 @@ function DirectSalesAdminPage() {
                       })}
                     </td>
                     <td className="px-3 py-2">
-                      <Badge
-                        variant="outline"
-                        className={statusTone(r.status)}
-                      >
+                      <Badge variant="outline" className={statusTone(r.status)}>
                         {STATUS_LABEL[r.status] ?? r.status}
                       </Badge>
                     </td>
                     <td className="px-3 py-2">
-                      {r.business_name ?? (
-                        <span className="text-muted-foreground">—</span>
-                      )}
+                      {r.business_name ?? <span className="text-muted-foreground">—</span>}
                     </td>
                     <td className="px-3 py-2">
                       {r.product_title ?? "—"}
                       {r.quantity > 1 ? (
-                        <span className="text-muted-foreground">
-                          {" "}
-                          × {r.quantity}
-                        </span>
+                        <span className="text-muted-foreground"> × {r.quantity}</span>
                       ) : null}
                     </td>
                     <td className="px-3 py-2 text-right whitespace-nowrap">
@@ -424,10 +381,7 @@ function DirectSalesAdminPage() {
               })}
               {rows.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={8}
-                    className="px-3 py-6 text-center text-muted-foreground"
-                  >
+                  <td colSpan={8} className="px-3 py-6 text-center text-muted-foreground">
                     {listQ.isLoading
                       ? "Cargando…"
                       : "Sin órdenes de venta directa con estos filtros."}
@@ -442,24 +396,14 @@ function DirectSalesAdminPage() {
   );
 }
 
-function KpiCard({
-  label,
-  value,
-  hint,
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-}) {
+function KpiCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4">
       <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
         {label}
       </p>
       <p className="mt-2 text-2xl font-semibold">{value}</p>
-      {hint ? (
-        <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
-      ) : null}
+      {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
     </div>
   );
 }

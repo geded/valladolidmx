@@ -11,17 +11,28 @@ import { useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { UserRound, LogOut, ChevronDown, Shield, LayoutDashboard, Briefcase, Headphones, Compass, Globe } from "lucide-react";
+import {
+  UserRound,
+  LogOut,
+  ChevronDown,
+  Shield,
+  LayoutDashboard,
+  Briefcase,
+  Headphones,
+  Compass,
+  Globe,
+} from "lucide-react";
 import { useTranslation } from "@/i18n/context";
 import { ROLE_LABELS, type AppRole } from "@/types/auth";
 import { useAuth } from "@/hooks/useAuth";
 import { ProfileModeSwitcher } from "@/components/layout/ProfileModeSwitcher";
-import {
-  getProfileModeState,
-  type ProfileMode,
-} from "@/lib/profile-mode/mode.functions";
+import { getProfileModeState, type ProfileMode } from "@/lib/profile-mode/mode.functions";
 
-type MenuLink = { to: "/admin" | "/cms" | "/portal" | "/portal/ficha" | "/concierge" | "/mi-viaje" | "/cuenta"; label: string; icon: typeof UserRound };
+type MenuLink = {
+  to: "/admin" | "/cms" | "/portal" | "/portal/ficha" | "/concierge" | "/mi-viaje" | "/cuenta";
+  label: string;
+  icon: typeof UserRound;
+};
 
 // Los enlaces del menú se derivan del MODO ACTIVO (Airbnb-style), no
 // solo del rol. En modo Empresa/Concierge/Staff no debe aparecer "Mi
@@ -87,7 +98,10 @@ export function UserMenu() {
     (p) => pathname === p || pathname.startsWith(p + "/"),
   );
   // Landing canónico del modo activo (para "Mi cuenta" desde la parte pública).
-  const MODE_LANDING: Record<ProfileMode, "/cuenta" | "/portal" | "/concierge" | "/cms" | "/mi-viaje" | "/admin"> = {
+  const MODE_LANDING: Record<
+    ProfileMode,
+    "/cuenta" | "/portal" | "/concierge" | "/cms" | "/mi-viaje" | "/admin"
+  > = {
     traveler: "/mi-viaje",
     business: "/portal",
     concierge: "/concierge",

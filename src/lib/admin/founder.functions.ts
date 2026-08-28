@@ -24,5 +24,5 @@ export const getFounderKpis = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase.rpc("founder_dashboard_kpis");
     if (error) throw new Error(error.message);
-    return (data as unknown) as FounderKpis;
+    return data as unknown as FounderKpis;
   });

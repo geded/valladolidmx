@@ -9,11 +9,7 @@
  */
 import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   createBusinessContact,
@@ -83,10 +79,9 @@ function PresenciaPage() {
         </p>
         <h1 className="mt-1 text-3xl font-semibold">Presencia de la empresa</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Administra los datos de contacto, ubicaciones físicas, horarios de
-          atención y enlaces a redes sociales. Sólo propietarios, gerentes y
-          editores con acceso a esta empresa pueden modificar esta
-          información.
+          Administra los datos de contacto, ubicaciones físicas, horarios de atención y enlaces a
+          redes sociales. Sólo propietarios, gerentes y editores con acceso a esta empresa pueden
+          modificar esta información.
         </p>
       </header>
 
@@ -127,13 +122,7 @@ function EmptyState({ title, body }: { title: string; body: string }) {
   );
 }
 
-function PanelHeader({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
+function PanelHeader({ title, description }: { title: string; description: string }) {
   return (
     <div>
       <h2 className="text-lg font-semibold">{title}</h2>
@@ -172,14 +161,12 @@ function ContactsPanel({ businessId }: { businessId: string }) {
       label: string | null;
       is_public: boolean;
     }) => create({ data: { businessId, ...data } }),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["portal", businessId, "contacts"] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["portal", businessId, "contacts"] }),
   });
 
   const delMut = useMutation({
     mutationFn: (id: string) => del({ data: { businessId, id } }),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["portal", businessId, "contacts"] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["portal", businessId, "contacts"] }),
   });
 
   return (
@@ -189,10 +176,7 @@ function ContactsPanel({ businessId }: { businessId: string }) {
         description="Teléfonos, correos y enlaces de contacto. Marca como públicos sólo los que pueden mostrarse en la ficha pública."
       />
 
-      <ContactForm
-        pending={createMut.isPending}
-        onSubmit={(d) => createMut.mutate(d)}
-      />
+      <ContactForm pending={createMut.isPending} onSubmit={(d) => createMut.mutate(d)} />
       <ErrorBanner error={createMut.error} />
 
       {q.isLoading ? (
@@ -200,16 +184,11 @@ function ContactsPanel({ businessId }: { businessId: string }) {
       ) : q.error ? (
         <ErrorBanner error={q.error} />
       ) : !q.data?.length ? (
-        <p className="text-sm text-muted-foreground">
-          Sin contactos registrados.
-        </p>
+        <p className="text-sm text-muted-foreground">Sin contactos registrados.</p>
       ) : (
         <ul className="divide-y divide-border rounded-md border border-border">
           {q.data.map((c: PortalContact) => (
-            <li
-              key={c.id}
-              className="flex items-center justify-between gap-3 px-4 py-3 text-sm"
-            >
+            <li key={c.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
               <div className="min-w-0">
                 <p className="font-medium">
                   {c.label ?? c.contact_type}
@@ -349,14 +328,12 @@ function LocationsPanel({ businessId }: { businessId: string }) {
       longitude: number | null;
       is_primary: boolean;
     }) => create({ data: { businessId, ...data } }),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["portal", businessId, "locations"] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["portal", businessId, "locations"] }),
   });
 
   const delMut = useMutation({
     mutationFn: (id: string) => del({ data: { businessId, id } }),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["portal", businessId, "locations"] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["portal", businessId, "locations"] }),
   });
 
   return (
@@ -366,10 +343,7 @@ function LocationsPanel({ businessId }: { businessId: string }) {
         description="Direcciones físicas asociadas a esta empresa. Marca una como principal para que sea la predeterminada en la ficha pública."
       />
 
-      <LocationForm
-        pending={createMut.isPending}
-        onSubmit={(d) => createMut.mutate(d)}
-      />
+      <LocationForm pending={createMut.isPending} onSubmit={(d) => createMut.mutate(d)} />
       <ErrorBanner error={createMut.error} />
 
       {q.isLoading ? (
@@ -377,9 +351,7 @@ function LocationsPanel({ businessId }: { businessId: string }) {
       ) : q.error ? (
         <ErrorBanner error={q.error} />
       ) : !q.data?.length ? (
-        <p className="text-sm text-muted-foreground">
-          Sin ubicaciones registradas.
-        </p>
+        <p className="text-sm text-muted-foreground">Sin ubicaciones registradas.</p>
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
           {q.data.map((l: PortalLocation) => (
@@ -400,8 +372,7 @@ function LocationsPanel({ businessId }: { businessId: string }) {
                   type="button"
                   disabled={delMut.isPending}
                   onClick={() => {
-                    if (confirm("¿Eliminar esta ubicación?"))
-                      delMut.mutate(l.id);
+                    if (confirm("¿Eliminar esta ubicación?")) delMut.mutate(l.id);
                   }}
                   className="rounded-md border border-border px-2 py-0.5 text-[11px] hover:bg-accent"
                 >
@@ -412,11 +383,7 @@ function LocationsPanel({ businessId }: { businessId: string }) {
                 {l.address_line1 ?? "—"}
                 {l.address_line2 ? `, ${l.address_line2}` : ""}
               </p>
-              {l.postal_code && (
-                <p className="text-xs text-muted-foreground">
-                  CP {l.postal_code}
-                </p>
-              )}
+              {l.postal_code && <p className="text-xs text-muted-foreground">CP {l.postal_code}</p>}
               {(l.latitude !== null || l.longitude !== null) && (
                 <p className="text-xs text-muted-foreground">
                   {l.latitude}, {l.longitude}
@@ -516,11 +483,7 @@ function LocationForm({
         className="rounded-md border border-border bg-background px-3 py-2 text-sm"
       />
       <label className="flex items-center gap-2 text-xs">
-        <input
-          type="checkbox"
-          checked={primary}
-          onChange={(e) => setPrimary(e.target.checked)}
-        />
+        <input type="checkbox" checked={primary} onChange={(e) => setPrimary(e.target.checked)} />
         Marcar como ubicación principal
       </label>
       <button
@@ -536,15 +499,7 @@ function LocationForm({
 
 // --- Horarios -------------------------------------------------------------
 
-const DAY_NAMES = [
-  "Domingo",
-  "Lunes",
-  "Martes",
-  "Miércoles",
-  "Jueves",
-  "Viernes",
-  "Sábado",
-];
+const DAY_NAMES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
 function HoursPanel({ businessId }: { businessId: string }) {
   const qc = useQueryClient();
@@ -565,14 +520,12 @@ function HoursPanel({ businessId }: { businessId: string }) {
       closes_at: string | null;
       notes: string | null;
     }) => create({ data: { businessId, ...data } }),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["portal", businessId, "hours"] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["portal", businessId, "hours"] }),
   });
 
   const delMut = useMutation({
     mutationFn: (id: string) => del({ data: { businessId, id } }),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["portal", businessId, "hours"] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["portal", businessId, "hours"] }),
   });
 
   return (
@@ -582,10 +535,7 @@ function HoursPanel({ businessId }: { businessId: string }) {
         description="Define una o varias franjas por día. Marca el día como cerrado si no hay atención."
       />
 
-      <HourForm
-        pending={createMut.isPending}
-        onSubmit={(d) => createMut.mutate(d)}
-      />
+      <HourForm pending={createMut.isPending} onSubmit={(d) => createMut.mutate(d)} />
       <ErrorBanner error={createMut.error} />
 
       {q.isLoading ? (
@@ -593,24 +543,15 @@ function HoursPanel({ businessId }: { businessId: string }) {
       ) : q.error ? (
         <ErrorBanner error={q.error} />
       ) : !q.data?.length ? (
-        <p className="text-sm text-muted-foreground">
-          Sin horarios registrados.
-        </p>
+        <p className="text-sm text-muted-foreground">Sin horarios registrados.</p>
       ) : (
         <ul className="divide-y divide-border rounded-md border border-border">
           {q.data.map((h: PortalHour) => (
-            <li
-              key={h.id}
-              className="flex items-center justify-between gap-3 px-4 py-3 text-sm"
-            >
+            <li key={h.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
               <div>
-                <p className="font-medium">
-                  {DAY_NAMES[h.day_of_week] ?? `Día ${h.day_of_week}`}
-                </p>
+                <p className="font-medium">{DAY_NAMES[h.day_of_week] ?? `Día ${h.day_of_week}`}</p>
                 <p className="text-xs text-muted-foreground">
-                  {h.is_closed
-                    ? "Cerrado"
-                    : `${h.opens_at ?? "??"} – ${h.closes_at ?? "??"}`}
+                  {h.is_closed ? "Cerrado" : `${h.opens_at ?? "??"} – ${h.closes_at ?? "??"}`}
                   {h.notes ? ` · ${h.notes}` : ""}
                 </p>
               </div>
@@ -702,11 +643,7 @@ function HourForm({
       />
       <div className="flex items-center gap-3">
         <label className="flex items-center gap-2 text-xs">
-          <input
-            type="checkbox"
-            checked={closed}
-            onChange={(e) => setClosed(e.target.checked)}
-          />
+          <input type="checkbox" checked={closed} onChange={(e) => setClosed(e.target.checked)} />
           Cerrado
         </label>
         <button
@@ -749,14 +686,12 @@ function SocialPanel({ businessId }: { businessId: string }) {
   const createMut = useMutation({
     mutationFn: (data: { platform: string; url: string }) =>
       create({ data: { businessId, ...data } }),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["portal", businessId, "social"] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["portal", businessId, "social"] }),
   });
 
   const delMut = useMutation({
     mutationFn: (id: string) => del({ data: { businessId, id } }),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["portal", businessId, "social"] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["portal", businessId, "social"] }),
   });
 
   const [platform, setPlatform] = useState("instagram");
@@ -773,10 +708,7 @@ function SocialPanel({ businessId }: { businessId: string }) {
         onSubmit={(e) => {
           e.preventDefault();
           if (!url.trim()) return;
-          createMut.mutate(
-            { platform, url: url.trim() },
-            { onSuccess: () => setUrl("") },
-          );
+          createMut.mutate({ platform, url: url.trim() }, { onSuccess: () => setUrl("") });
         }}
         className="grid gap-3 rounded-md border border-border bg-card/40 p-4 sm:grid-cols-[160px_1fr_auto]"
       >
@@ -816,10 +748,7 @@ function SocialPanel({ businessId }: { businessId: string }) {
       ) : (
         <ul className="divide-y divide-border rounded-md border border-border">
           {q.data.map((s: PortalSocialLink) => (
-            <li
-              key={s.id}
-              className="flex items-center justify-between gap-3 px-4 py-3 text-sm"
-            >
+            <li key={s.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
               <div className="min-w-0">
                 <p className="font-medium capitalize">{s.platform}</p>
                 <a

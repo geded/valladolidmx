@@ -39,7 +39,10 @@ interface Props {
   onOpenPlan: (planId: string) => void;
 }
 
-const TYPE_META: Record<AttentionType, { icon: React.ComponentType<{ className?: string }>; label: string }> = {
+const TYPE_META: Record<
+  AttentionType,
+  { icon: React.ComponentType<{ className?: string }>; label: string }
+> = {
   sla_breach: { icon: AlertTriangle, label: "SLA vencido" },
   sla_at_risk: { icon: Clock, label: "SLA en riesgo" },
   proposal_awaiting: { icon: Send, label: "Propuesta esperando" },
@@ -209,7 +212,9 @@ function Column({
             {empty}
           </li>
         ) : (
-          signals.map((s, i) => <SignalCard key={`${s.plan_id}-${s.type}-${i}`} s={s} onOpenPlan={onOpenPlan} />)
+          signals.map((s, i) => (
+            <SignalCard key={`${s.plan_id}-${s.type}-${i}`} s={s} onOpenPlan={onOpenPlan} />
+          ))
         )}
       </ul>
     </div>

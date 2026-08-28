@@ -10,10 +10,7 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
-import {
-  composeSystemPrompt,
-  resolveAluxSettingsServer,
-} from "@/lib/alux/settings.functions";
+import { composeSystemPrompt, resolveAluxSettingsServer } from "@/lib/alux/settings.functions";
 
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 
@@ -98,7 +95,8 @@ async function runAlux(
 ): Promise<AluxSuggestion> {
   const settings = await resolveAluxSettingsServer(supabase);
   const provider = createLovableAiGatewayProvider(requireApiKey());
-  const model = settings.capability_overrides[capability]?.model ?? settings.default_model ?? DEFAULT_MODEL;
+  const model =
+    settings.capability_overrides[capability]?.model ?? settings.default_model ?? DEFAULT_MODEL;
   const effectiveSystem = composeSystemPrompt(settings, capability, systemPrompt);
   const t0 = Date.now();
   const { text, usage } = await generateText({

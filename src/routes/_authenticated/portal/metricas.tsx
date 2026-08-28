@@ -9,7 +9,15 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart3, TrendingUp, Users, Ticket, ArrowLeft, MessageSquareHeart, Star } from "lucide-react";
+import {
+  BarChart3,
+  TrendingUp,
+  Users,
+  Ticket,
+  ArrowLeft,
+  MessageSquareHeart,
+  Star,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -39,8 +47,7 @@ function useActiveBusinessId(): string | null {
       setId(d ?? null);
     };
     window.addEventListener("portal:active-business-changed", h);
-    return () =>
-      window.removeEventListener("portal:active-business-changed", h);
+    return () => window.removeEventListener("portal:active-business-changed", h);
   }, []);
   return id;
 }
@@ -65,20 +72,14 @@ function MetricsPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-primary">
-            Portal empresa
-          </p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Portal empresa</p>
           <h1 className="text-2xl font-semibold">Métricas de cupones</h1>
           <p className="text-sm text-muted-foreground">
-            Emisión, canjes y perfil de los viajeros que aprovechan tus
-            promociones.
+            Emisión, canjes y perfil de los viajeros que aprovechan tus promociones.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Select
-            value={String(windowDays)}
-            onValueChange={(v) => setWindowDays(Number(v))}
-          >
+          <Select value={String(windowDays)} onValueChange={(v) => setWindowDays(Number(v))}>
             <SelectTrigger className="w-[130px]">
               <SelectValue />
             </SelectTrigger>
@@ -145,9 +146,7 @@ function MetricsPage() {
           {/* Ola 6.3 · Conversión canje → reseña verificada */}
           <section className="rounded-2xl border border-border bg-card p-4 shadow-soft">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold">
-                Conversión canje → reseña verificada
-              </h2>
+              <h2 className="text-sm font-semibold">Conversión canje → reseña verificada</h2>
               <Link
                 to="/portal/resenas"
                 className="text-xs font-medium text-primary hover:underline"
@@ -173,29 +172,21 @@ function MetricsPage() {
               <Kpi
                 icon={Star}
                 label="Rating promedio"
-                value={
-                  m.totals.reviewed > 0
-                    ? m.totals.avg_verified_rating.toFixed(1)
-                    : "—"
-                }
+                value={m.totals.reviewed > 0 ? m.totals.avg_verified_rating.toFixed(1) : "—"}
                 hint="Solo canjes verificados"
               />
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              Enviamos recordatorios a las 48h y a los 7 días para animar
-              al viajero a dejar su reseña con sello verificado.
+              Enviamos recordatorios a las 48h y a los 7 días para animar al viajero a dejar su
+              reseña con sello verificado.
             </p>
           </section>
 
           {/* Serie temporal */}
           <section className="rounded-2xl border border-border bg-card p-4 shadow-soft">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold">
-                Emisión y canje diarios
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                {m.window_days} días
-              </p>
+              <h2 className="text-sm font-semibold">Emisión y canje diarios</h2>
+              <p className="text-xs text-muted-foreground">{m.window_days} días</p>
             </div>
             <SeriesChart data={m.series} />
             <Legend />
@@ -203,13 +194,9 @@ function MetricsPage() {
 
           {/* Top promociones */}
           <section className="rounded-2xl border border-border bg-card p-4 shadow-soft">
-            <h2 className="mb-3 text-sm font-semibold">
-              Promociones con más canjes
-            </h2>
+            <h2 className="mb-3 text-sm font-semibold">Promociones con más canjes</h2>
             {m.top_promotions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Aún no hay canjes en esta ventana.
-              </p>
+              <p className="text-sm text-muted-foreground">Aún no hay canjes en esta ventana.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -232,9 +219,7 @@ function MetricsPage() {
                         </td>
                         <td className="py-2">{p.issued}</td>
                         <td className="py-2 font-semibold">{p.redeemed}</td>
-                        <td className="py-2">
-                          {Math.round(p.conversion * 100)}%
-                        </td>
+                        <td className="py-2">{Math.round(p.conversion * 100)}%</td>
                       </tr>
                     ))}
                   </tbody>
@@ -245,13 +230,9 @@ function MetricsPage() {
 
           {/* Países */}
           <section className="rounded-2xl border border-border bg-card p-4 shadow-soft">
-            <h2 className="mb-3 text-sm font-semibold">
-              Origen de los viajeros que canjearon
-            </h2>
+            <h2 className="mb-3 text-sm font-semibold">Origen de los viajeros que canjearon</h2>
             {m.countries.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Aún no hay datos de países.
-              </p>
+              <p className="text-sm text-muted-foreground">Aún no hay datos de países.</p>
             ) : (
               <ul className="grid gap-2 sm:grid-cols-2">
                 {m.countries.map((c) => {
@@ -259,29 +240,22 @@ function MetricsPage() {
                   const pct = total ? (c.count / total) * 100 : 0;
                   return (
                     <li key={c.country_code} className="flex items-center gap-3">
-                      <span className="text-xl leading-none">
-                        {flag(c.country_code)}
-                      </span>
+                      <span className="text-xl leading-none">{flag(c.country_code)}</span>
                       <span className="w-8 font-mono text-xs uppercase text-muted-foreground">
                         {c.country_code}
                       </span>
                       <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-muted">
-                        <div
-                          className="h-full bg-primary"
-                          style={{ width: `${pct}%` }}
-                        />
+                        <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
                       </div>
-                      <span className="w-10 text-right text-xs tabular-nums">
-                        {c.count}
-                      </span>
+                      <span className="w-10 text-right text-xs tabular-nums">{c.count}</span>
                     </li>
                   );
                 })}
               </ul>
             )}
             <p className="mt-3 text-[11px] italic text-muted-foreground">
-              Datos agregados. Alux nunca comparte información personal
-              identificable de un viajero individual.
+              Datos agregados. Alux nunca comparte información personal identificable de un viajero
+              individual.
             </p>
           </section>
         </>
@@ -304,27 +278,17 @@ function Kpi({
   tone?: "default" | "success" | "info";
 }) {
   const toneCls =
-    tone === "success"
-      ? "text-success"
-      : tone === "info"
-        ? "text-info"
-        : "text-primary";
+    tone === "success" ? "text-success" : tone === "info" ? "text-info" : "text-primary";
   return (
     <div className="rounded-2xl border border-border bg-card p-3 shadow-soft">
       <div className="flex items-center gap-2">
-        <span
-          className={`grid size-7 place-items-center rounded-md bg-primary/10 ${toneCls}`}
-        >
+        <span className={`grid size-7 place-items-center rounded-md bg-primary/10 ${toneCls}`}>
           <Icon className="size-4" aria-hidden />
         </span>
-        <p className="text-xs uppercase tracking-wide text-muted-foreground">
-          {label}
-        </p>
+        <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
       </div>
       <p className="mt-1 text-2xl font-semibold">{value}</p>
-      {hint && (
-        <p className="text-[11px] text-muted-foreground">{hint}</p>
-      )}
+      {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
     </div>
   );
 }

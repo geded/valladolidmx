@@ -82,15 +82,24 @@ function trustFor(stageIndex: number, transitionId: JourneyTransitionId): TrustL
 
 function surfaceFor(transitionId: JourneyTransitionId, dest: DestinationSlug): string {
   switch (transitionId) {
-    case "T1_stranger_to_anonymous": return "landing";
-    case "T2_anonymous_to_identified": return "auth";
-    case "T3_identified_to_explorer": return `discovery:${dest}`;
-    case "T4_explorer_to_interested": return `listing:${dest}`;
-    case "T5_interested_to_travel_plan": return "workspace:trip";
-    case "T6_travel_plan_to_concierge": return "workspace:concierge";
-    case "T7_concierge_to_reservation": return "checkout";
-    case "T8_reservation_to_traveler": return `live_day:${dest}`;
-    case "T9_traveler_to_ambassador": return "post_trip";
+    case "T1_stranger_to_anonymous":
+      return "landing";
+    case "T2_anonymous_to_identified":
+      return "auth";
+    case "T3_identified_to_explorer":
+      return `discovery:${dest}`;
+    case "T4_explorer_to_interested":
+      return `listing:${dest}`;
+    case "T5_interested_to_travel_plan":
+      return "workspace:trip";
+    case "T6_travel_plan_to_concierge":
+      return "workspace:concierge";
+    case "T7_concierge_to_reservation":
+      return "checkout";
+    case "T8_reservation_to_traveler":
+      return `live_day:${dest}`;
+    case "T9_traveler_to_ambassador":
+      return "post_trip";
   }
 }
 
@@ -124,17 +133,26 @@ export function simulateVisitor(params: {
 
   // Acumuladores de sub-motores (CV8.S.3).
   let aluxTotals: AluxOutcome["interactions"] = {
-    asks: 0, recommendations: 0, accepted: 0, rejected: 0,
-    itinerary_optimizations: 0, onsite_queries: 0,
+    asks: 0,
+    recommendations: 0,
+    accepted: 0,
+    rejected: 0,
+    itinerary_optimizations: 0,
+    onsite_queries: 0,
   };
   let conciergeSummary: VisitorTrace["interactions"]["concierge"] = {
-    opened: false, status: "none", slow_response: false,
+    opened: false,
+    status: "none",
+    slow_response: false,
   };
   let commerceSummary: VisitorTrace["interactions"]["commerce"] = {
-    status: "not_created", amount_usd: null,
+    status: "not_created",
+    amount_usd: null,
   };
   let reviewsSummary: VisitorTrace["interactions"]["reviews"] = {
-    published: false, rating: null, business_responded: false,
+    published: false,
+    rating: null,
+    business_responded: false,
   };
   /** Estado inter-sub-motor: última propuesta aceptada (Concierge). */
   let conciergeOutcome: ConciergeOutcome | null = null;
@@ -258,8 +276,13 @@ export function simulateVisitor(params: {
     // CV8.S.3 · Hooks causales de sub-motores por transición.
     // ==========================================================
     const subCtx: SubMotorContext = {
-      runId, subject_id, locale, profile,
-      destination: dest, scenario, prng,
+      runId,
+      subject_id,
+      locale,
+      profile,
+      destination: dest,
+      scenario,
+      prng,
       cursor_ms: cursorMs,
       from_transition: transitionId,
       trust_level: trust,
@@ -297,7 +320,9 @@ export function simulateVisitor(params: {
       cursorMs = c.cursor_ms;
       conciergeOutcome = c;
       conciergeSummary = {
-        opened: true, status: c.status, slow_response: c.slow_response,
+        opened: true,
+        status: c.status,
+        slow_response: c.slow_response,
       };
     }
     // Commerce post-T7 (sólo si propuesta aceptada).
@@ -336,7 +361,12 @@ export function simulateVisitor(params: {
   }
 
   return {
-    subject_id, profile: profile.id, locale, path, final_stage: finalStage, events,
+    subject_id,
+    profile: profile.id,
+    locale,
+    path,
+    final_stage: finalStage,
+    events,
     interactions: {
       alux: aluxTotals,
       concierge: conciergeSummary,

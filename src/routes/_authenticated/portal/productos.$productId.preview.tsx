@@ -20,14 +20,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { getPortalProductPreview } from "@/lib/portal/portal-product-publish.functions";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
-import {
-  ProductSurface,
-  ProductSurfaceProvider,
-} from "@/components/surfaces/ProductSurface";
+import { ProductSurface, ProductSurfaceProvider } from "@/components/surfaces/ProductSurface";
 
-export const Route = createFileRoute(
-  "/_authenticated/portal/productos/$productId/preview",
-)({
+export const Route = createFileRoute("/_authenticated/portal/productos/$productId/preview")({
   head: () => ({
     meta: [
       { title: "Vista previa · Portal Empresarial" },
@@ -54,11 +49,7 @@ function PortalProductPreview() {
   });
 
   if (isLoading) {
-    return (
-      <div className="p-8 text-sm text-muted-foreground">
-        Cargando vista previa…
-      </div>
-    );
+    return <div className="p-8 text-sm text-muted-foreground">Cargando vista previa…</div>;
   }
   if (error) {
     return (
@@ -68,11 +59,7 @@ function PortalProductPreview() {
     );
   }
   if (!data?.product) {
-    return (
-      <div className="p-8 text-sm text-muted-foreground">
-        Producto no encontrado.
-      </div>
-    );
+    return <div className="p-8 text-sm text-muted-foreground">Producto no encontrado.</div>;
   }
 
   return (

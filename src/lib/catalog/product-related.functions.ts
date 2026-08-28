@@ -98,17 +98,15 @@ export const getProductRelated = createServerFn({ method: "GET" })
     const otherCat: MarketplaceProductCard[] = [];
     const byId = new Map<string, MarketplaceProductCard>();
     for (const row of rows ?? []) {
-      const biz = row.business as
-        | {
-            id?: string;
-            slug?: string;
-            display_name?: string;
-            status?: string;
-            deleted_at?: string | null;
-            destinations?: { slug?: unknown } | null;
-            business_categories?: { slug?: unknown } | null;
-          }
-        | null;
+      const biz = row.business as {
+        id?: string;
+        slug?: string;
+        display_name?: string;
+        status?: string;
+        deleted_at?: string | null;
+        destinations?: { slug?: unknown } | null;
+        business_categories?: { slug?: unknown } | null;
+      } | null;
       if (!biz || biz.status !== "published" || biz.deleted_at) continue;
       if (biz.id === data.businessId) continue;
       if (row.id === data.productId) continue;
@@ -154,10 +152,10 @@ export const getProductRelated = createServerFn({ method: "GET" })
       if (c) pinnedCards.push(c);
     }
     const pinnedSet = new Set(pinnedCards.map((c) => c.id));
-    const sameCategoryOut = [
-      ...pinnedCards,
-      ...sameCat.filter((c) => !pinnedSet.has(c.id)),
-    ].slice(0, 6);
+    const sameCategoryOut = [...pinnedCards, ...sameCat.filter((c) => !pinnedSet.has(c.id))].slice(
+      0,
+      6,
+    );
     const otherOut = otherCat.filter((c) => !pinnedSet.has(c.id)).slice(0, 6);
 
     return {

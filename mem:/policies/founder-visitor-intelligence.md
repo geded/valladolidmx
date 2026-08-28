@@ -3,6 +3,7 @@ name: Founder Visitor Intelligence Principle
 description: No medimos páginas ni clics ni tráfico — medimos personas, decisiones y evolución del viajero. Toda métrica debe responder cómo un anónimo termina siendo viajero satisfecho del Oriente Maya.
 type: constraint
 ---
+
 **Founder Visitor Intelligence Principle** (vinculante, CV8).
 
 - No medimos páginas → medimos personas.

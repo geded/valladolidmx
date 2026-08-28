@@ -1,6 +1,7 @@
 # START-HERE-FIRST.md
 
 # Valladolid.mx – Blueprint Master
+
 ## Documento de Inicio para Lovable
 
 **Estado:** Active — entrada al Blueprint histórico
@@ -166,6 +167,7 @@ La precedencia obligatoria es:
 12. Serie Blueprint `00–10` y documentos posteriores, respetando sus dependencias y versiones aprobadas.
 
 **Gate obligatorio y notas de gobernanza:**
+
 - Toda propuesta de cambio debe pasar `bun run governance:validate` antes de solicitarse merge; sin PASS no hay revisión Founder.
 - La organización de dominios documentales está regida por [`ADR-GOV-0001`](../decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md).
 - [`.lovable/plan.md`](../../.lovable/plan.md) es estado operativo subordinado a esta precedencia; nunca la sustituye.

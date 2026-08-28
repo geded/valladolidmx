@@ -44,10 +44,7 @@ async function anonClient() {
  * Firma las URLs de los activos del propio lugar. Nunca hereda medios de
  * destinos, empresas, productos ni de otros lugares.
  */
-async function signPlaceMedia(
-  sb: any,
-  placeId: string,
-): Promise<PublicPlaceMediaDTO[]> {
+async function signPlaceMedia(sb: any, placeId: string): Promise<PublicPlaceMediaDTO[]> {
   const { data: links } = await sb
     .from("place_media")
     .select("media_asset_id, role, sort_order")

@@ -29,10 +29,7 @@ export interface AluxNearbySuggestionBannerProps {
   radiusKm?: number;
 }
 
-function haversineKm(
-  a: { lat: number; lng: number },
-  b: { lat: number; lng: number },
-): number {
+function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
   const R = 6371;
   const toRad = (d: number) => (d * Math.PI) / 180;
   const dLat = toRad(b.lat - a.lat);
@@ -63,8 +60,7 @@ export function AluxNearbySuggestionBanner({
 
   const count = nearby.length;
   const maxKm = nearby[Math.min(count - 1, 4)].km;
-  const distanceLabel =
-    maxKm < 1 ? `${Math.round(maxKm * 1000)} m` : `${maxKm.toFixed(1)} km`;
+  const distanceLabel = maxKm < 1 ? `${Math.round(maxKm * 1000)} m` : `${maxKm.toFixed(1)} km`;
 
   return (
     <div
@@ -81,8 +77,8 @@ export function AluxNearbySuggestionBanner({
             Alux te sugiere {count} lugares a menos de {distanceLabel} de ti
           </p>
           <p className="text-xs text-muted-foreground">
-            Ordenados por cercanía real en {destinationLabel}. Puedo priorizar
-            por tus intereses o filtrar por lo que está abierto ahora.
+            Ordenados por cercanía real en {destinationLabel}. Puedo priorizar por tus intereses o
+            filtrar por lo que está abierto ahora.
           </p>
         </div>
       </div>

@@ -8,10 +8,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import {
-  assertUnderLimit,
-  getEffectiveLimits,
-} from "@/lib/visibility/plan-limits";
+import { assertUnderLimit, getEffectiveLimits } from "@/lib/visibility/plan-limits";
 
 export type ProductType =
   | "experiencia"
@@ -23,12 +20,7 @@ export type ProductType =
   | "servicio"
   | "artesanal";
 
-export type ContentStatus =
-  | "draft"
-  | "in_review"
-  | "approved"
-  | "published"
-  | "archived";
+export type ContentStatus = "draft" | "in_review" | "approved" | "published" | "archived";
 
 export type PortalProduct = {
   id: string;
@@ -157,13 +149,10 @@ export const createBusinessProduct = createServerFn({ method: "POST" })
       capacity?: number | null;
     }) => {
       if (!data?.businessId) throw new Error("businessId required");
-      if (!data.name?.trim() || data.name.length > 200)
-        throw new Error("invalid_name");
+      if (!data.name?.trim() || data.name.length > 200) throw new Error("invalid_name");
       assertSlug(data.slug);
-      if (!PRODUCT_TYPES.has(data.productType))
-        throw new Error("invalid_product_type");
-      if (data.priceAmount != null && data.priceAmount < 0)
-        throw new Error("invalid_price");
+      if (!PRODUCT_TYPES.has(data.productType)) throw new Error("invalid_product_type");
+      if (data.priceAmount != null && data.priceAmount < 0) throw new Error("invalid_price");
       return data;
     },
   )
@@ -212,8 +201,7 @@ export const updateBusinessProduct = createServerFn({ method: "POST" })
       if (!data?.productId) throw new Error("productId required");
       if (data.name != null && (!data.name.trim() || data.name.length > 200))
         throw new Error("invalid_name");
-      if (data.priceAmount != null && data.priceAmount < 0)
-        throw new Error("invalid_price");
+      if (data.priceAmount != null && data.priceAmount < 0) throw new Error("invalid_price");
       return data;
     },
   )
@@ -294,19 +282,11 @@ export const createBusinessPromotion = createServerFn({ method: "POST" })
       productId?: string | null;
     }) => {
       if (!data?.businessId) throw new Error("businessId required");
-      if (!data.title?.trim() || data.title.length > 200)
-        throw new Error("invalid_title");
+      if (!data.title?.trim() || data.title.length > 200) throw new Error("invalid_title");
       assertSlug(data.slug);
-      if (
-        data.discountPercent != null &&
-        (data.discountPercent < 0 || data.discountPercent > 100)
-      )
+      if (data.discountPercent != null && (data.discountPercent < 0 || data.discountPercent > 100))
         throw new Error("invalid_discount");
-      if (
-        data.startsAt &&
-        data.endsAt &&
-        new Date(data.endsAt) <= new Date(data.startsAt)
-      )
+      if (data.startsAt && data.endsAt && new Date(data.endsAt) <= new Date(data.startsAt))
         throw new Error("invalid_date_range");
       return data;
     },
@@ -327,20 +307,17 @@ export const createBusinessPromotion = createServerFn({ method: "POST" })
       const { count } = await query;
       assertUnderLimit(limits, "max_active_coupons", count ?? 0);
     }
-    const { data: id, error } = await (context.supabase.rpc as any)(
-      "create_business_promotion",
-      {
-        _business_id: data.businessId,
-        _title: data.title,
-        _slug: data.slug,
-        _description: data.description ?? null,
-        _terms: data.terms ?? null,
-        _discount_percent: data.discountPercent ?? null,
-        _starts_at: data.startsAt ?? null,
-        _ends_at: data.endsAt ?? null,
-        _product_id: data.productId ?? null,
-      },
-    );
+    const { data: id, error } = await (context.supabase.rpc as any)("create_business_promotion", {
+      _business_id: data.businessId,
+      _title: data.title,
+      _slug: data.slug,
+      _description: data.description ?? null,
+      _terms: data.terms ?? null,
+      _discount_percent: data.discountPercent ?? null,
+      _starts_at: data.startsAt ?? null,
+      _ends_at: data.endsAt ?? null,
+      _product_id: data.productId ?? null,
+    });
     if (error) throw new Error(error.message);
     return { id: id as string };
   });
@@ -362,10 +339,7 @@ export const updateBusinessPromotion = createServerFn({ method: "POST" })
       if (!data?.promotionId) throw new Error("promotionId required");
       if (data.title != null && (!data.title.trim() || data.title.length > 200))
         throw new Error("invalid_title");
-      if (
-        data.discountPercent != null &&
-        (data.discountPercent < 0 || data.discountPercent > 100)
-      )
+      if (data.discountPercent != null && (data.discountPercent < 0 || data.discountPercent > 100))
         throw new Error("invalid_discount");
       return data;
     },
@@ -452,10 +426,7 @@ export const updateProductDirectSaleSettings = createServerFn({ method: "POST" }
         if (data.priceAmount == null || data.priceAmount <= 0)
           throw new Error("direct_sale_price_required");
       }
-      if (
-        data.commissionBps != null &&
-        (data.commissionBps < 0 || data.commissionBps > 10000)
-      )
+      if (data.commissionBps != null && (data.commissionBps < 0 || data.commissionBps > 10000))
         throw new Error("invalid_commission_bps");
       if (data.minLeadHours != null && data.minLeadHours < 0)
         throw new Error("invalid_min_lead_hours");
@@ -465,20 +436,17 @@ export const updateProductDirectSaleSettings = createServerFn({ method: "POST" }
     },
   )
   .handler(async ({ data, context }) => {
-    const { error } = await (context.supabase.rpc as any)(
-      "update_product_direct_sale_settings",
-      {
-        _product_id: data.productId,
-        _enabled: data.enabled,
-        _price_amount: data.priceAmount ?? null,
-        _currency: data.currency ?? null,
-        _commission_bps: data.commissionBps ?? null,
-        _cancellation_policy: data.cancellationPolicy ?? null,
-        _terms: data.terms ?? null,
-        _min_lead_hours: data.minLeadHours ?? null,
-        _max_quantity: data.maxQuantity ?? null,
-      },
-    );
+    const { error } = await (context.supabase.rpc as any)("update_product_direct_sale_settings", {
+      _product_id: data.productId,
+      _enabled: data.enabled,
+      _price_amount: data.priceAmount ?? null,
+      _currency: data.currency ?? null,
+      _commission_bps: data.commissionBps ?? null,
+      _cancellation_policy: data.cancellationPolicy ?? null,
+      _terms: data.terms ?? null,
+      _min_lead_hours: data.minLeadHours ?? null,
+      _max_quantity: data.maxQuantity ?? null,
+    });
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });

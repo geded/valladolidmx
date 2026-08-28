@@ -3,6 +3,7 @@ name: Founder Relationship Before Account Principle
 description: El objetivo del registro no es crear cuentas — es iniciar una relación de largo plazo entre el viajero y Alux. Cada momento se siente como invitación natural a continuar el viaje juntos, nunca como requisito técnico.
 type: constraint
 ---
+
 Vinculante desde AC1.4. Sólo afecta estrategia de experiencia/comunicación — no altera arquitectura, contratos, `AnonymousTravelDraft`, `TravelPlan` ni políticas previas.
 
 Reglas:

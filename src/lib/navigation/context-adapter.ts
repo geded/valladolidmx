@@ -12,7 +12,11 @@
  * breadcrumbs manualmente en superficies. Toda superficie territorial
  * declara su contexto vía este adapter.
  */
-import type { RouteContextDeclaration, ContextNode, ContextEntityKind } from "@/lib/context-engine/types";
+import type {
+  RouteContextDeclaration,
+  ContextNode,
+  ContextEntityKind,
+} from "@/lib/context-engine/types";
 import { resolveCanonicalPath } from "./canonical-paths";
 import type { CanonicalRef, NavigationContext, NavEntityKind } from "./types";
 import { DEFAULT_REGION_SLUG } from "./types";

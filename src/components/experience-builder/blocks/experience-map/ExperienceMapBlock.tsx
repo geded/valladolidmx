@@ -55,9 +55,7 @@ export function ExperienceMapBlock({ dto: rawDto, className }: ExperienceMapBloc
   // `scripts/experience-map-defaults.test.ts`). Sin Zod en el árbol público.
   const dto = useMemo(() => applyExperienceMapDefaults(rawDto), [rawDto]);
   const [interactive, setInteractive] = useState(false);
-  const [activeId, setActiveId] = useState<string | null>(
-    dto.points[0]?.id ?? null,
-  );
+  const [activeId, setActiveId] = useState<string | null>(dto.points[0]?.id ?? null);
 
   const center = useMemo(() => {
     if (dto.center) return dto.center;
@@ -91,17 +89,13 @@ export function ExperienceMapBlock({ dto: rawDto, className }: ExperienceMapBloc
       <div
         className={cn(
           "grid gap-6",
-          isMulti
-            ? "md:grid-cols-[minmax(0,1fr)_320px]"
-            : "md:grid-cols-[minmax(0,1fr)_320px]",
+          isMulti ? "md:grid-cols-[minmax(0,1fr)_320px]" : "md:grid-cols-[minmax(0,1fr)_320px]",
         )}
       >
         <div className="min-w-0 space-y-3">
           {interactive && dto.capabilities.allowInteractiveToggle ? (
             <Suspense
-              fallback={
-                <div className="h-[420px] w-full animate-pulse rounded-2xl bg-muted" />
-              }
+              fallback={<div className="h-[420px] w-full animate-pulse rounded-2xl bg-muted" />}
             >
               <InteractiveMap
                 lat={center.lat}
@@ -149,12 +143,7 @@ export function ExperienceMapBlock({ dto: rawDto, className }: ExperienceMapBloc
 
         <aside className="space-y-4">
           <ul
-            className={cn(
-              "space-y-3",
-              isMulti
-                ? "max-h-[560px] overflow-y-auto pr-1"
-                : undefined,
-            )}
+            className={cn("space-y-3", isMulti ? "max-h-[560px] overflow-y-auto pr-1" : undefined)}
             aria-label="Puntos en el mapa"
           >
             {dto.points.map((p, i) => {
@@ -190,14 +179,10 @@ export function ExperienceMapBlock({ dto: rawDto, className }: ExperienceMapBloc
                             {p.title}
                           </p>
                           {p.subtitle ? (
-                            <p className="mt-0.5 text-xs text-muted-foreground">
-                              {p.subtitle}
-                            </p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">{p.subtitle}</p>
                           ) : null}
                           {p.priceLabel ? (
-                            <p className="mt-1 text-xs font-medium text-primary">
-                              {p.priceLabel}
-                            </p>
+                            <p className="mt-1 text-xs font-medium text-primary">{p.priceLabel}</p>
                           ) : null}
                         </div>
                       </div>
@@ -224,12 +209,7 @@ export function ExperienceMapBlock({ dto: rawDto, className }: ExperienceMapBloc
                         </Button>
                       ) : null}
                       {p.href ? (
-                        <Button
-                          asChild
-                          size="sm"
-                          variant="outline"
-                          className="w-full"
-                        >
+                        <Button asChild size="sm" variant="outline" className="w-full">
                           <a href={p.href}>Ver detalles</a>
                         </Button>
                       ) : null}

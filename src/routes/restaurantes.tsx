@@ -8,10 +8,7 @@ import {
 } from "@/lib/catalog/marketplace-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
-import {
-  defineRouteContext,
-  type RouteContextDeclaration,
-} from "@/lib/context-engine";
+import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import {
   TourismListingSurface,
   buildDestinationFacet,
@@ -31,12 +28,27 @@ function destinationLabel(slug: string): string {
 function buildRestaurantesContext(destino: string | undefined): RouteContextDeclaration {
   const explicitAncestors = destino
     ? [
-        { kind: "region" as const, slug: ORIENTE_MAYA.slug, label: ORIENTE_MAYA.name, href: "/oriente-maya" },
-        { kind: "destination" as const, slug: destino, label: destinationLabel(destino), href: `/oriente-maya/${destino}` },
+        {
+          kind: "region" as const,
+          slug: ORIENTE_MAYA.slug,
+          label: ORIENTE_MAYA.name,
+          href: "/oriente-maya",
+        },
+        {
+          kind: "destination" as const,
+          slug: destino,
+          label: destinationLabel(destino),
+          href: `/oriente-maya/${destino}`,
+        },
       ]
     : [];
   return defineRouteContext({
-    current: { kind: "category", slug: "restaurantes", label: "Restaurantes", href: "/restaurantes" },
+    current: {
+      kind: "category",
+      slug: "restaurantes",
+      label: "Restaurantes",
+      href: "/restaurantes",
+    },
     ancestors: explicitAncestors,
     inherit: destino ? [] : ["region", "destination"],
     canonical: "/restaurantes",
@@ -80,11 +92,7 @@ function RestaurantesRoute() {
   );
   const destinoFacet = buildDestinationFacet(cards);
   return (
-    <PublicShell
-      crumbs={legacyCrumbs}
-      contextDeclaration={contextDeclaration}
-      useContextCrumbs
-    >
+    <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs>
       <TourismListingSurface
         hero={{
           eyebrow: "Sabores del Oriente Maya",

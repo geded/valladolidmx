@@ -67,9 +67,7 @@ export const listBusinessInvitations = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data: rows, error } = await supabase
       .from("invitations")
-      .select(
-        "id, email, role, status, token, expires_at, accepted_at, created_at",
-      )
+      .select("id, email, role, status, token, expires_at, accepted_at, created_at")
       .eq("scope_type", "business")
       .eq("scope_id", data.businessId)
       .order("created_at", { ascending: false });
@@ -90,11 +88,11 @@ export const createBusinessInvitation = createServerFn({ method: "POST" })
       role?: PortalInvitationRole;
       ttlDays?: number;
     }) => {
-      if (!input || typeof input.businessId !== "string")
-        throw new Error("invalid_business");
-      const email = String(input.email ?? "").trim().toLowerCase();
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-        throw new Error("invalid_email");
+      if (!input || typeof input.businessId !== "string") throw new Error("invalid_business");
+      const email = String(input.email ?? "")
+        .trim()
+        .toLowerCase();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("invalid_email");
       const role: PortalInvitationRole = input.role ?? "editor";
       const ttlDays = Math.min(Math.max(input.ttlDays ?? 7, 1), 30);
       return { businessId: input.businessId, email, role, ttlDays };
@@ -103,20 +101,15 @@ export const createBusinessInvitation = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<PortalInvitation> => {
     const { supabase, userId } = context;
     // Doble verificación server-side: el caller debe ser owner.
-    const { data: allowed, error: aErr } = await supabase.rpc(
-      "has_business_access",
-      {
-        _user_id: userId,
-        _business_id: data.businessId,
-        _min_role: "owner",
-      },
-    );
+    const { data: allowed, error: aErr } = await supabase.rpc("has_business_access", {
+      _user_id: userId,
+      _business_id: data.businessId,
+      _min_role: "owner",
+    });
     if (aErr) throw new Error(`access_check_failed: ${aErr.message}`);
     if (!allowed) throw new Error("forbidden_not_owner");
 
-    const expiresAt = new Date(
-      Date.now() + data.ttlDays * 24 * 60 * 60 * 1000,
-    ).toISOString();
+    const expiresAt = new Date(Date.now() + data.ttlDays * 24 * 60 * 60 * 1000).toISOString();
 
     const { data: inserted, error } = await supabase
       .from("invitations")
@@ -130,9 +123,7 @@ export const createBusinessInvitation = createServerFn({ method: "POST" })
         status: "pending",
         invited_by: userId,
       })
-      .select(
-        "id, email, role, status, token, expires_at, accepted_at, created_at",
-      )
+      .select("id, email, role, status, token, expires_at, accepted_at, created_at")
       .single();
     if (error) throw new Error(`create_invitation_failed: ${error.message}`);
     return inserted as PortalInvitation;
@@ -145,8 +136,7 @@ export const createBusinessInvitation = createServerFn({ method: "POST" })
 export const revokeBusinessInvitation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { invitationId: string }) => {
-    if (!input || typeof input.invitationId !== "string")
-      throw new Error("invalid_input");
+    if (!input || typeof input.invitationId !== "string") throw new Error("invalid_input");
     return { invitationId: input.invitationId };
   })
   .handler(async ({ data, context }) => {
@@ -174,10 +164,9 @@ export const previewInvitation = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }): Promise<InvitationPreview> => {
     const { supabase } = context;
-    const { data: res, error } = await supabase.rpc(
-      "preview_business_invitation",
-      { _token: data.token },
-    );
+    const { data: res, error } = await supabase.rpc("preview_business_invitation", {
+      _token: data.token,
+    });
     if (error) throw new Error(`preview_failed: ${error.message}`);
     return (res ?? { found: false }) as unknown as InvitationPreview;
   });
@@ -199,10 +188,9 @@ export const acceptInvitation = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const { data: res, error } = await supabase.rpc(
-      "accept_business_invitation",
-      { _token: data.token },
-    );
+    const { data: res, error } = await supabase.rpc("accept_business_invitation", {
+      _token: data.token,
+    });
     if (error) {
       throw new Error(error.message ?? "accept_failed");
     }

@@ -10,8 +10,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequestHost } from "@tanstack/react-start/server";
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function assertUuid(v: unknown, name: string): string {
   if (typeof v !== "string" || !UUID_RE.test(v)) {
@@ -44,12 +43,10 @@ export interface StartPaymentResult {
  */
 export const startPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { order_id?: string; client_request_id?: string }) => ({
-      order_id: assertUuid(input?.order_id, "order_id"),
-      client_request_id: clampRequestId(input?.client_request_id),
-    }),
-  )
+  .inputValidator((input: { order_id?: string; client_request_id?: string }) => ({
+    order_id: assertUuid(input?.order_id, "order_id"),
+    client_request_id: clampRequestId(input?.client_request_id),
+  }))
   .handler(async ({ context, data }): Promise<StartPaymentResult> => {
     const { supabase, userId } = context;
 
@@ -75,9 +72,7 @@ export const startPayment = createServerFn({ method: "POST" })
 
     const { data: items, error: iErr } = await supabase
       .from("order_items")
-      .select(
-        "id, product_id, quantity, unit_price, currency, snapshot_name",
-      )
+      .select("id, product_id, quantity, unit_price, currency, snapshot_name")
       .eq("order_id", order.id);
     if (iErr) throw new Error(`order_items_read_failed: ${iErr.message}`);
     const rows = (items ?? []) as Array<{
@@ -93,16 +88,11 @@ export const startPayment = createServerFn({ method: "POST" })
     const productIds = Array.from(new Set(rows.map((r) => r.product_id)));
     const { data: products, error: pErr } = await supabase
       .from("products")
-      .select(
-        "id, status, price_currency, price_amount, conversion_mode, accepts_online_payment",
-      )
+      .select("id, status, price_currency, price_amount, conversion_mode, accepts_online_payment")
       .in("id", productIds);
     if (pErr) throw new Error(`products_read_failed: ${pErr.message}`);
     const byId = new Map(
-      ((products ?? []) as unknown as Array<Record<string, unknown>>).map((p) => [
-        String(p.id),
-        p,
-      ]),
+      ((products ?? []) as unknown as Array<Record<string, unknown>>).map((p) => [String(p.id), p]),
     );
     for (const it of rows) {
       const p = byId.get(it.product_id);
@@ -130,8 +120,7 @@ export const startPayment = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .maybeSingle();
     const customerEmail =
-      (profile?.email as string | undefined) ??
-      (context.claims?.email as string | undefined);
+      (profile?.email as string | undefined) ?? (context.claims?.email as string | undefined);
 
     const { getActiveProvider } = await import("./registry.server");
     const provider = getActiveProvider();

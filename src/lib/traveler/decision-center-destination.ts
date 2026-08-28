@@ -26,9 +26,7 @@ import type { WeatherSignalPayload } from "@/lib/traveler/destination-context/co
 import type { HoursSignalPayload } from "@/lib/traveler/destination-context/contributors/hours";
 import type { TrafficSignalPayload } from "@/lib/traveler/destination-context/contributors/traffic";
 
-function asResolved(
-  input: DecisionContributorInput,
-): ResolvedDestinationContext | null {
+function asResolved(input: DecisionContributorInput): ResolvedDestinationContext | null {
   const d = input.destination as ResolvedDestinationContext | undefined;
   if (!d || typeof d !== "object" || !("signals" in d)) return null;
   return d;
@@ -116,10 +114,7 @@ export const destinationHoursDecisionContributor: DecisionContributor = {
           slot: "next",
           priority: p.status === "closed_today" ? 44 : 40,
           tone: "critical",
-          title:
-            p.status === "closed_today"
-              ? "Cerrado hoy"
-              : "Está cerrado ahora",
+          title: p.status === "closed_today" ? "Cerrado hoy" : "Está cerrado ahora",
           rationale: p.opensAt
             ? `Reabre ${p.opensDayLabel ?? "próximamente"} ${p.opensAt}. Ajusta el orden de tu día.`
             : `Actualmente cerrado. Considera un plan alternativo.`,
@@ -158,13 +153,10 @@ export const destinationTrafficDecisionContributor: DecisionContributor = {
         t.trafficDeltaMinutes != null && t.trafficDeltaMinutes > 0
           ? `, +${t.trafficDeltaMinutes} min por tráfico`
           : "";
-      const originHint =
-        t.originPrecision !== "device" ? ` · desde ${t.originLabel}` : "";
+      const originHint = t.originPrecision !== "device" ? ` · desde ${t.originLabel}` : "";
       const baseSources: DecisionCard["sources"] = [
         "destination_context",
-        ...(t.originPrecision === "device"
-          ? (["geolocation"] as const)
-          : []),
+        ...(t.originPrecision === "device" ? (["geolocation"] as const) : []),
       ];
       const navAction = {
         id: "navigate",
@@ -192,10 +184,7 @@ export const destinationTrafficDecisionContributor: DecisionContributor = {
             slot: "next",
             priority: 75,
             tone: "info",
-            title:
-              t.minutesToLeave != null
-                ? `Sal en ${t.minutesToLeave} min`
-                : "Sal pronto",
+            title: t.minutesToLeave != null ? `Sal en ${t.minutesToLeave} min` : "Sal pronto",
             rationale: `${durTxt}${distTxt}${deltaTxt}${originHint}.`,
             primaryAction: navAction,
             sources: baseSources,

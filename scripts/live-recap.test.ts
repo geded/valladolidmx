@@ -3,10 +3,7 @@
  * Ejecutar: `bun test scripts/live-recap.test.ts`
  */
 import { describe, expect, test } from "bun:test";
-import {
-  deriveLiveRecap,
-  type LiveRecapInput,
-} from "../src/lib/traveler/live-recap";
+import { deriveLiveRecap, type LiveRecapInput } from "../src/lib/traveler/live-recap";
 import type { LiveDayContext, LiveDayItemInput } from "../src/lib/traveler/live-day";
 
 const AT = new Date("2026-07-13T23:00:00Z");
@@ -69,9 +66,7 @@ describe("deriveLiveRecap (CV6.8)", () => {
   });
 
   test("Handoff-tomorrow · si existen ítems para day+1", () => {
-    const todayItems: LiveDayItemInput[] = [
-      { id: "a", day_number: 2, status: "done" },
-    ];
+    const todayItems: LiveDayItemInput[] = [{ id: "a", day_number: 2, status: "done" }];
     const tomorrow: LiveDayItemInput[] = [
       { id: "b", day_number: 3, starts_at: "2026-07-14T14:00:00Z" },
     ];
@@ -89,9 +84,7 @@ describe("deriveLiveRecap (CV6.8)", () => {
 
   test("Handoff-post-trip · último día del viaje", () => {
     const at = new Date("2026-07-15T23:00:00Z");
-    const items: LiveDayItemInput[] = [
-      { id: "a", day_number: 4, status: "done" },
-    ];
+    const items: LiveDayItemInput[] = [{ id: "a", day_number: 4, status: "done" }];
     const r = deriveLiveRecap({
       phase: "onsite",
       liveDay: ctx({ day: 4 }, items),
@@ -107,9 +100,7 @@ describe("deriveLiveRecap (CV6.8)", () => {
     const items: LiveDayItemInput[] = [
       { id: "p1", day_number: 2, status: "planned", starts_at: "2026-07-13T18:00:00Z" },
     ];
-    const r = deriveLiveRecap(
-      base({ liveDay: ctx({ day: 2 }, items), planItems: items }),
-    );
+    const r = deriveLiveRecap(base({ liveDay: ctx({ day: 2 }, items), planItems: items }));
     expect(r.pendingItems.some((p) => p.id === "pi:p1")).toBe(true);
   });
 

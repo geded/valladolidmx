@@ -23,9 +23,7 @@ const VALID: readonly string[] = ALL_STAGES;
 export const Route = createFileRoute("/_authenticated/cuenta/stage-simulator")({
   validateSearch: (raw: Record<string, unknown>): SimulatorSearch => {
     const s = raw.stage;
-    return typeof s === "string" && VALID.includes(s)
-      ? { stage: s as TravelStage }
-      : {};
+    return typeof s === "string" && VALID.includes(s) ? { stage: s as TravelStage } : {};
   },
   component: StageSimulator,
 });
@@ -35,8 +33,7 @@ function StageSimulator() {
   const navigate = useNavigate({ from: "/cuenta/stage-simulator" });
   const active: TravelStage = stage ?? "inspiration";
   const { role, loading } = useAuth();
-  const allowed =
-    import.meta.env.DEV === true || role === "super_admin" || role === "admin";
+  const allowed = import.meta.env.DEV === true || role === "super_admin" || role === "admin";
 
   if (loading) return null;
   if (!allowed) {
@@ -44,9 +41,9 @@ function StageSimulator() {
       <div className="max-w-3xl space-y-3">
         <h1 className="font-serif text-2xl">Herramienta interna</h1>
         <p className="text-sm text-muted-foreground">
-          El Stage Simulator es una utilidad de validación reservada al equipo
-          Founder/Admin. Como viajero no necesitas esta vista: Alux ya se adapta
-          automáticamente a la etapa real de tu viaje.
+          El Stage Simulator es una utilidad de validación reservada al equipo Founder/Admin. Como
+          viajero no necesitas esta vista: Alux ya se adapta automáticamente a la etapa real de tu
+          viaje.
         </p>
         <Link to="/cuenta" className="text-sm underline">
           Volver a mi cuenta
@@ -65,8 +62,8 @@ function StageSimulator() {
           Recorre cómo Alux acompaña cada etapa
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Elige una etapa del Journey para ver cómo cambia la narrativa, la misión
-          diaria, el CTA principal y qué permisos se solicitan (o no).
+          Elige una etapa del Journey para ver cómo cambia la narrativa, la misión diaria, el CTA
+          principal y qué permisos se solicitan (o no).
         </p>
       </header>
 
@@ -90,8 +87,8 @@ function StageSimulator() {
       <StageAwareCompanionBoard stage={active} firstName="Viajero" preview />
 
       <footer className="rounded-2xl border border-dashed border-border p-4 text-xs text-muted-foreground">
-        Vista de validación. El viajero real ve una única etapa —la suya— y jamás
-        recibe una solicitud de ubicación antes de la etapa <strong>En destino</strong>.
+        Vista de validación. El viajero real ve una única etapa —la suya— y jamás recibe una
+        solicitud de ubicación antes de la etapa <strong>En destino</strong>.
         <div className="mt-2">
           <Link to="/cuenta" className="underline">
             Volver a mi cuenta

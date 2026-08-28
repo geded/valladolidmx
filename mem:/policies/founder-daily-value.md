@@ -3,6 +3,7 @@ name: Founder Daily Value Principle
 description: Cada etapa del Journey debe ofrecer una razón clara para volver a abrir Alux hoy. Una misión principal por etapa, respondida antes de que el viajero la formule. Vinculante para toda épica CV6+.
 type: constraint
 ---
+
 Principio Founder vinculante (2026-07-13). Reglas:
 
 1. Cada etapa oficial del Journey declara UNA misión diaria principal, expresada en una frase corta y accionable. Fuente única: `src/lib/traveler/journey-stage.ts` (`getDailyMission(stage)`).

@@ -25,8 +25,8 @@ function OfflinePage() {
         </p>
         <h1 className="mt-2 text-3xl md:text-4xl">Estás sin conexión</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          No pudimos alcanzar la red. Puedes seguir navegando el contenido que ya
-          hayas visitado; puede estar desactualizado hasta que recuperes conexión.
+          No pudimos alcanzar la red. Puedes seguir navegando el contenido que ya hayas visitado;
+          puede estar desactualizado hasta que recuperes conexión.
         </p>
         <div
           role="status"

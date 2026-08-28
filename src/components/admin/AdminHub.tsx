@@ -35,13 +35,12 @@ export function AdminHub({ eyebrow, title, description, domains, sections, foote
   return (
     <div className="max-w-5xl">
       <header>
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-          {eyebrow}
-        </p>
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">{eyebrow}</p>
         <h1 className="mt-2 text-3xl">{title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{description}</p>
         <p className="mt-3 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-          Dominios consumidos: <span className="font-semibold text-foreground">{domains.join(" · ")}</span>
+          Dominios consumidos:{" "}
+          <span className="font-semibold text-foreground">{domains.join(" · ")}</span>
         </p>
       </header>
 

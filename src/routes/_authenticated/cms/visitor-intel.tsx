@@ -47,20 +47,13 @@ import {
   type SegmentFinding,
   type SegmentFindingType,
 } from "@/lib/visitor-intel/segment-prioritization";
-import {
-  KPI_CATALOG,
-  JOURNEY_TRANSITIONS,
-  type JourneyTransitionId,
-} from "@/lib/visitor-intel";
+import { KPI_CATALOG, JOURNEY_TRANSITIONS, type JourneyTransitionId } from "@/lib/visitor-intel";
 import {
   decisionSourceFromPrioritizedOpportunity,
   decisionSourceFromSegmentFinding,
   type DecisionSource,
 } from "@/lib/visitor-intel/decisions";
-import {
-  getDecisionActorAccess,
-  proposeDecision,
-} from "@/lib/visitor-intel/decisions.functions";
+import { getDecisionActorAccess, proposeDecision } from "@/lib/visitor-intel/decisions.functions";
 
 export const Route = createFileRoute("/_authenticated/cms/visitor-intel")({
   validateSearch: z.object({
@@ -91,8 +84,7 @@ function VisitorIntelCenter() {
   const call = useServerFn(aggregateJourneyIntel);
   const q = useQuery({
     queryKey: ["cms", "visitor-intel", win, mode, runId ?? "none"],
-    queryFn: () =>
-      call({ data: { window_days: win, mode, simulation_run_id: runId } }),
+    queryFn: () => call({ data: { window_days: win, mode, simulation_run_id: runId } }),
     staleTime: 60_000,
   });
 
@@ -113,7 +105,8 @@ function VisitorIntelCenter() {
             {runId ? ` · run ${runId.slice(0, 8)}…` : ""}
             {" · "}
             <span className="font-normal opacity-80">
-              Los KPIs principales aplican filtro. Oportunidades / segmentos / validación aún combinan fuentes.
+              Los KPIs principales aplican filtro. Oportunidades / segmentos / validación aún
+              combinan fuentes.
             </span>
           </span>
           <Link
@@ -131,14 +124,10 @@ function VisitorIntelCenter() {
         </p>
         <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight">
-              Visitor Intelligence Center
-            </h1>
+            <h1 className="text-3xl font-semibold tracking-tight">Visitor Intelligence Center</h1>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              Cada módulo responde una pregunta de negocio y declara la
-              decisión que permite tomar. No es un dashboard — es un Centro
-              de Decisiones. Ventana:{" "}
-              <strong>{win} días</strong>.
+              Cada módulo responde una pregunta de negocio y declara la decisión que permite tomar.
+              No es un dashboard — es un Centro de Decisiones. Ventana: <strong>{win} días</strong>.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -218,10 +207,9 @@ function SegmentationSection({ window: win }: { window: 7 | 30 | 90 }) {
             ¿Cómo recorre el Journey cada grupo?
           </h2>
           <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-            Segmentación ética: sólo datos mínimos, agregados, con umbral
-            mínimo de <strong>{MIN_SEGMENT_POPULATION}</strong> sujetos.
-            Segmentos menores se agrupan como <em>Otros</em>. Cero
-            identidades individuales.
+            Segmentación ética: sólo datos mínimos, agregados, con umbral mínimo de{" "}
+            <strong>{MIN_SEGMENT_POPULATION}</strong> sujetos. Segmentos menores se agrupan como{" "}
+            <em>Otros</em>. Cero identidades individuales.
           </p>
         </div>
         <div className="flex flex-wrap gap-1 rounded-full border border-border p-1 text-xs">
@@ -272,9 +260,7 @@ function SegmentationBody({
   if (snapshot.status === "contract_pending") {
     return (
       <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
-        <p className="font-medium text-foreground">
-          Segmentación pendiente de contrato
-        </p>
+        <p className="font-medium text-foreground">Segmentación pendiente de contrato</p>
         <p className="mt-1">{snapshot.pending_reason}</p>
       </div>
     );
@@ -287,9 +273,9 @@ function SegmentationBody({
           Sin muestra suficiente en la ventana seleccionada
         </p>
         <p className="mt-1">
-          Baseline: <strong>{snapshot.baseline.active_subjects}</strong> sujetos ·
-          JPR {(snapshot.baseline.jpr * 100).toFixed(1)}%. Se activará cuando
-          existan segmentos con ≥ {snapshot.min_population} sujetos activos.
+          Baseline: <strong>{snapshot.baseline.active_subjects}</strong> sujetos · JPR{" "}
+          {(snapshot.baseline.jpr * 100).toFixed(1)}%. Se activará cuando existan segmentos con ≥{" "}
+          {snapshot.min_population} sujetos activos.
         </p>
       </div>
     );
@@ -298,10 +284,9 @@ function SegmentationBody({
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">
-        Baseline global · <strong>{snapshot.baseline.active_subjects}</strong>{" "}
-        sujetos · JPR{" "}
-        <strong>{(snapshot.baseline.jpr * 100).toFixed(1)}%</strong>. Delta ={" "}
-        JPR del segmento − baseline.
+        Baseline global · <strong>{snapshot.baseline.active_subjects}</strong> sujetos · JPR{" "}
+        <strong>{(snapshot.baseline.jpr * 100).toFixed(1)}%</strong>. Delta = JPR del segmento −
+        baseline.
       </p>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
@@ -327,18 +312,14 @@ function SegmentationBody({
         </table>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        Contrato v{snapshot.contract_version} · dimensión{" "}
-        <code>{snapshot.dimension}</code> · recomputado sin persistencia.
+        Contrato v{snapshot.contract_version} · dimensión <code>{snapshot.dimension}</code> ·
+        recomputado sin persistencia.
       </p>
     </div>
   );
 }
 
-function SegmentRow({
-  b,
-}: {
-  b: JourneySegmentSnapshot["buckets"][number];
-}) {
+function SegmentRow({ b }: { b: JourneySegmentSnapshot["buckets"][number] }) {
   const delta = b.jpr_delta_vs_baseline;
   const deltaColor =
     delta > 0.02 ? "text-success" : delta < -0.02 ? "text-destructive" : "text-muted-foreground";
@@ -376,13 +357,9 @@ function IntelModules({
   snapshot: JourneyIntelSnapshot | undefined;
   loading: boolean;
 }) {
-  const kpi = useMemo(
-    () => Object.fromEntries(KPI_CATALOG.map((k) => [k.id, k])),
-    [],
-  );
+  const kpi = useMemo(() => Object.fromEntries(KPI_CATALOG.map((k) => [k.id, k])), []);
 
-  const t = (id: JourneyTransitionId) =>
-    snapshot?.transitions.find((x) => x.id === id);
+  const t = (id: JourneyTransitionId) => snapshot?.transitions.find((x) => x.id === id);
 
   return (
     <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -405,13 +382,10 @@ function IntelModules({
                   className="flex items-center justify-between border-b border-border/60 py-1"
                 >
                   <span className="text-muted-foreground">
-                    {row.id.replace(/^T(\d).*/, "T$1")} ·{" "}
-                    {JOURNEY_TRANSITIONS[row.id].from} →{" "}
+                    {row.id.replace(/^T(\d).*/, "T$1")} · {JOURNEY_TRANSITIONS[row.id].from} →{" "}
                     {JOURNEY_TRANSITIONS[row.id].to}
                   </span>
-                  <span className="font-mono">
-                    {row.distinct_subjects}
-                  </span>
+                  <span className="font-mono">{row.distinct_subjects}</span>
                 </li>
               ))}
             </ul>
@@ -464,9 +438,7 @@ function IntelModules({
         question="¿Qué volumen de señales de intención genera Alux/Discovery?"
         why="Suma de intent.signal en la ventana."
         decision="Repriorizar surfaces/recomendaciones con menor generación de intención."
-        value={
-          snapshot ? `${snapshot.intent_signals_total} señales` : undefined
-        }
+        value={snapshot ? `${snapshot.intent_signals_total} señales` : undefined}
         activatesWhen="las superficies emitan intent.signal."
         loading={loading}
       />
@@ -477,9 +449,7 @@ function IntelModules({
         why="Transición T6 · propuesta Alux."
         decision={kpi["T6_conversion"]?.actionable_decision ?? ""}
         value={
-          snapshot
-            ? `${t("T6_travel_plan_to_concierge")?.distinct_subjects ?? 0} casos`
-            : undefined
+          snapshot ? `${t("T6_travel_plan_to_concierge")?.distinct_subjects ?? 0} casos` : undefined
         }
         activatesWhen="lleguen transiciones T6."
         loading={loading}
@@ -581,9 +551,7 @@ function DecisionCard({
         <span
           className={
             "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide " +
-            (hasData
-              ? "bg-success/15 text-success"
-              : "bg-muted text-muted-foreground")
+            (hasData ? "bg-success/15 text-success" : "bg-muted text-muted-foreground")
           }
         >
           {hasData ? "Accionable" : "Pendiente"}
@@ -608,12 +576,10 @@ function DecisionCard({
 
       <div className="mt-4 space-y-1 border-t border-border/60 pt-3 text-xs">
         <p>
-          <strong>Por qué:</strong>{" "}
-          <span className="text-muted-foreground">{why}</span>
+          <strong>Por qué:</strong> <span className="text-muted-foreground">{why}</span>
         </p>
         <p>
-          <strong>Decisión:</strong>{" "}
-          <span className="text-muted-foreground">{decision}</span>
+          <strong>Decisión:</strong> <span className="text-muted-foreground">{decision}</span>
         </p>
       </div>
     </article>
@@ -623,31 +589,29 @@ function DecisionCard({
 /* CV8.5 · Benchmarks & Opportunity Intelligence                         */
 /* --------------------------------------------------------------------- */
 
-const SEVERITY_STYLE: Record<
-  OpportunitySeverity,
-  { label: string; badge: string; ring: string }
-> = {
-  critical: {
-    label: "Crítica",
-    badge: "bg-destructive/15 text-destructive",
-    ring: "border-destructive/40",
-  },
-  attention: {
-    label: "Atención",
-    badge: "bg-warning/15 text-warning",
-    ring: "border-warning/40",
-  },
-  opportunity: {
-    label: "Oportunidad",
-    badge: "bg-success/15 text-success",
-    ring: "border-success/40",
-  },
-  informative: {
-    label: "Informativa",
-    badge: "bg-muted text-muted-foreground",
-    ring: "border-border",
-  },
-};
+const SEVERITY_STYLE: Record<OpportunitySeverity, { label: string; badge: string; ring: string }> =
+  {
+    critical: {
+      label: "Crítica",
+      badge: "bg-destructive/15 text-destructive",
+      ring: "border-destructive/40",
+    },
+    attention: {
+      label: "Atención",
+      badge: "bg-warning/15 text-warning",
+      ring: "border-warning/40",
+    },
+    opportunity: {
+      label: "Oportunidad",
+      badge: "bg-success/15 text-success",
+      ring: "border-success/40",
+    },
+    informative: {
+      label: "Informativa",
+      badge: "bg-muted text-muted-foreground",
+      ring: "border-border",
+    },
+  };
 
 function OpportunitySection({ window: win }: { window: 7 | 30 | 90 }) {
   const call = useServerFn(detectJourneyOpportunities);
@@ -667,9 +631,8 @@ function OpportunitySection({ window: win }: { window: 7 | 30 | 90 }) {
           ¿Qué acción concreta recomendamos ahora?
         </h2>
         <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-          Detección automática de oportunidades: cada hallazgo compara la
-          ventana actual contra el periodo anterior y declara evidencia,
-          confianza y acción sugerida. Muestra mínima:{" "}
+          Detección automática de oportunidades: cada hallazgo compara la ventana actual contra el
+          periodo anterior y declara evidencia, confianza y acción sugerida. Muestra mínima:{" "}
           <strong>{MIN_SAMPLE_FOR_OPPORTUNITY}</strong> sujetos.
         </p>
       </header>
@@ -743,8 +706,8 @@ function OpportunityBody({
         <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
           <p className="font-medium text-foreground">Sin hallazgos significativos</p>
           <p className="mt-1">
-            Ninguna transición se movió más de ±10% frente al periodo previo con
-            muestra ≥ {MIN_SAMPLE_FOR_OPPORTUNITY}. El Journey se mantiene estable.
+            Ninguna transición se movió más de ±10% frente al periodo previo con muestra ≥{" "}
+            {MIN_SAMPLE_FOR_OPPORTUNITY}. El Journey se mantiene estable.
           </p>
         </div>
       ) : (
@@ -756,8 +719,8 @@ function OpportunityBody({
       )}
 
       <p className="text-[11px] text-muted-foreground">
-        Contrato v{snapshot.contract_version} · referencia:{" "}
-        <code>previous_period</code> · recomputado sin persistencia.
+        Contrato v{snapshot.contract_version} · referencia: <code>previous_period</code> ·
+        recomputado sin persistencia.
       </p>
     </div>
   );
@@ -778,9 +741,7 @@ function OpportunityCard({ o }: { o: Opportunity }) {
           >
             {style.label}
           </span>
-          <h3 className="mt-2 text-sm font-semibold leading-snug">
-            {o.headline}
-          </h3>
+          <h3 className="mt-2 text-sm font-semibold leading-snug">{o.headline}</h3>
         </div>
         <div className="text-right text-[11px] text-muted-foreground">
           <p>
@@ -819,9 +780,8 @@ function OpportunityCard({ o }: { o: Opportunity }) {
       </dl>
 
       <p className="mt-3 rounded-lg bg-surface-raised p-2 text-[11px] font-mono text-muted-foreground">
-        Evidencia · actual={ev.current_value} · previo={ev.reference_value} · Δ
-        abs={ev.delta_absolute} · Δ rel={(ev.delta_relative * 100).toFixed(1)}% ·
-        vs {ev.reference}
+        Evidencia · actual={ev.current_value} · previo={ev.reference_value} · Δ abs=
+        {ev.delta_absolute} · Δ rel={(ev.delta_relative * 100).toFixed(1)}% · vs {ev.reference}
       </p>
     </li>
   );
@@ -863,14 +823,12 @@ function PrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) {
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
           CV8.7 · Prescriptive Decision Prioritization
         </p>
-        <h2 className="mt-1 text-xl font-semibold tracking-tight">
-          ¿Qué deberíamos hacer hoy?
-        </h2>
+        <h2 className="mt-1 text-xl font-semibold tracking-tight">¿Qué deberíamos hacer hoy?</h2>
         <p className="mt-1 max-w-3xl text-xs text-muted-foreground">
           Ranking prescriptivo derivado — cero persistencia. Combina{" "}
-          <strong>confianza aprendida (CV8.6)</strong>, impacto, urgencia,
-          alcance, etapa del Journey y beneficio para el ecosistema. Cada
-          posición se justifica con factores auditables.
+          <strong>confianza aprendida (CV8.6)</strong>, impacto, urgencia, alcance, etapa del
+          Journey y beneficio para el ecosistema. Cada posición se justifica con factores
+          auditables.
         </p>
         <div className="mt-3 flex flex-wrap gap-1 text-[10px] font-mono text-muted-foreground">
           {Object.entries(PRIORITIZATION_WEIGHTS).map(([k, v]) => (
@@ -898,8 +856,8 @@ function PrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) {
             Sin oportunidades priorizables en la ventana actual
           </p>
           <p className="mt-1">
-            Cuando existan hallazgos con muestra suficiente, el motor los
-            ordenará por impacto esperado.
+            Cuando existan hallazgos con muestra suficiente, el motor los ordenará por impacto
+            esperado.
           </p>
         </div>
       ) : (
@@ -930,36 +888,28 @@ function PrioritizedCard({ p }: { p: PrioritizedOpportunity }) {
             #{p.rank}
           </span>
           <div>
-            <h3 className="text-sm font-semibold leading-snug">
-              {p.opportunity.headline}
-            </h3>
+            <h3 className="text-sm font-semibold leading-snug">{p.opportunity.headline}</h3>
             <p className="mt-1 text-[11px] text-muted-foreground">
-              <code>{p.opportunity.transition}</code> ·{" "}
-              <code>{p.opportunity.metric_id}</code>
+              <code>{p.opportunity.transition}</code> · <code>{p.opportunity.metric_id}</code>
             </p>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-2xl font-bold tracking-tight">
-            {(p.score * 100).toFixed(0)}
-          </p>
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-            score / 100
-          </p>
+          <p className="text-2xl font-bold tracking-tight">{(p.score * 100).toFixed(0)}</p>
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">score / 100</p>
           <span
             className={
               "mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide " +
               reliabilityBadge
             }
           >
-            confianza: {p.confidence_reliability === "insufficient_data" ? "n.d." : p.confidence_reliability}
+            confianza:{" "}
+            {p.confidence_reliability === "insufficient_data" ? "n.d." : p.confidence_reliability}
           </span>
         </div>
       </header>
 
-      <p className="mt-3 rounded-lg bg-surface p-2 text-xs italic text-foreground">
-        {p.rationale}
-      </p>
+      <p className="mt-3 rounded-lg bg-surface p-2 text-xs italic text-foreground">{p.rationale}</p>
 
       <dl className="mt-3 grid gap-2 text-xs md:grid-cols-2">
         <div>
@@ -984,8 +934,8 @@ function PrioritizedCard({ p }: { p: PrioritizedOpportunity }) {
             >
               <div className="flex-1">
                 <p className="font-mono font-semibold">
-                  {f.key} · peso {(f.weight * 100).toFixed(0)}% · valor{" "}
-                  {(f.value * 100).toFixed(0)}%
+                  {f.key} · peso {(f.weight * 100).toFixed(0)}% · valor {(f.value * 100).toFixed(0)}
+                  %
                 </p>
                 <p className="text-muted-foreground">{f.explanation}</p>
               </div>
@@ -1001,10 +951,7 @@ function PrioritizedCard({ p }: { p: PrioritizedOpportunity }) {
   );
 }
 
-const STATUS_STYLE: Record<
-  string,
-  { label: string; badge: string }
-> = {
+const STATUS_STYLE: Record<string, { label: string; badge: string }> = {
   detected: { label: "Detectada", badge: "bg-muted text-muted-foreground" },
   accepted: { label: "Aceptada", badge: "bg-info/15 text-info" },
   implemented: { label: "Implementada", badge: "bg-primary/15 text-primary" },
@@ -1073,13 +1020,12 @@ function SegmentPrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) 
     staleTime: 60_000,
   });
 
-  const loading =
-    localeQ.isLoading || destQ.isLoading || capQ.isLoading || valQ.isLoading;
+  const loading = localeQ.isLoading || destQ.isLoading || capQ.isLoading || valQ.isLoading;
   const anyError = !!(localeQ.error || destQ.error || capQ.error);
 
   const result = useMemo(() => {
-    const segments = [localeQ.data, destQ.data, capQ.data].filter(
-      (s): s is NonNullable<typeof s> => Boolean(s),
+    const segments = [localeQ.data, destQ.data, capQ.data].filter((s): s is NonNullable<typeof s> =>
+      Boolean(s),
     );
     if (segments.length === 0) return null;
     return prioritizeSegments({
@@ -1103,13 +1049,11 @@ function SegmentPrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) 
           ¿Dónde actuar por segmento — con equidad?
         </h2>
         <p className="mt-1 max-w-3xl text-xs text-muted-foreground">
-          Cruza segmentos oficiales de <strong>CV8.4</strong> con la confianza
-          aprendida de <strong>CV8.6</strong>. Distingue oportunidad
-          comercial, de experiencia, de inclusión, riesgo de abandono y
-          evidencia insuficiente. Cada fila declara muestra, delta vs
-          baseline, confianza, impacto esperado, riesgo de sesgo y
-          explicación alternativa. Cero snapshots persistidos. Cero
-          identidades individuales. Sujeto a{" "}
+          Cruza segmentos oficiales de <strong>CV8.4</strong> con la confianza aprendida de{" "}
+          <strong>CV8.6</strong>. Distingue oportunidad comercial, de experiencia, de inclusión,
+          riesgo de abandono y evidencia insuficiente. Cada fila declara muestra, delta vs baseline,
+          confianza, impacto esperado, riesgo de sesgo y explicación alternativa. Cero snapshots
+          persistidos. Cero identidades individuales. Sujeto a{" "}
           <code>MIN_SEGMENT_POPULATION = {MIN_SEGMENT_POPULATION}</code>.
         </p>
         <div className="mt-3 flex flex-wrap gap-1 text-[10px] font-mono text-muted-foreground">
@@ -1132,8 +1076,8 @@ function SegmentPrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) 
 
       {pendingDims.length > 0 ? (
         <p className="rounded-xl border border-border bg-surface-raised p-3 text-[11px] text-muted-foreground">
-          Dimensiones en <code>contract_pending</code>: {pendingDims.join(", ")}. Se
-          activarán cuando el contrato de evento las incluya.
+          Dimensiones en <code>contract_pending</code>: {pendingDims.join(", ")}. Se activarán
+          cuando el contrato de evento las incluya.
         </p>
       ) : null}
 
@@ -1154,8 +1098,7 @@ function SegmentPrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) 
                 <span
                   key={t}
                   className={
-                    "rounded-full px-2 py-1 text-center font-semibold " +
-                    FINDING_TYPE_META[t].badge
+                    "rounded-full px-2 py-1 text-center font-semibold " + FINDING_TYPE_META[t].badge
                   }
                 >
                   {FINDING_TYPE_META[t].short}: {n}
@@ -1190,18 +1133,11 @@ function SegmentFindingCard({ f }: { f: SegmentFinding }) {
             #{f.rank}
           </span>
           <div>
-            <h3 className="text-sm font-semibold leading-snug">
-              {f.segment_label}
-            </h3>
+            <h3 className="text-sm font-semibold leading-snug">{f.segment_label}</h3>
             <p className="mt-1 text-[11px] text-muted-foreground">
-              <code>{f.dimension}</code> · n={f.sample_size} · JPR{" "}
-              {(f.jpr * 100).toFixed(1)}% vs baseline{" "}
-              {(f.baseline_jpr * 100).toFixed(1)}% ·{" "}
-              <strong
-                className={
-                  f.delta_vs_baseline >= 0 ? "text-success" : "text-destructive"
-                }
-              >
+              <code>{f.dimension}</code> · n={f.sample_size} · JPR {(f.jpr * 100).toFixed(1)}% vs
+              baseline {(f.baseline_jpr * 100).toFixed(1)}% ·{" "}
+              <strong className={f.delta_vs_baseline >= 0 ? "text-success" : "text-destructive"}>
                 Δ {(f.delta_vs_baseline * 100).toFixed(1)}%
               </strong>
             </p>
@@ -1209,13 +1145,9 @@ function SegmentFindingCard({ f }: { f: SegmentFinding }) {
         </div>
         <div className="flex flex-col items-end gap-1 text-right">
           {f.type !== "insufficient_data" ? (
-            <p className="text-2xl font-bold tracking-tight">
-              {(f.score * 100).toFixed(0)}
-            </p>
+            <p className="text-2xl font-bold tracking-tight">{(f.score * 100).toFixed(0)}</p>
           ) : (
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              n.d.
-            </p>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">n.d.</p>
           )}
           <span
             className={
@@ -1236,9 +1168,7 @@ function SegmentFindingCard({ f }: { f: SegmentFinding }) {
         </div>
       </header>
 
-      <p className="mt-3 rounded-lg bg-surface p-2 text-xs italic text-foreground">
-        {f.rationale}
-      </p>
+      <p className="mt-3 rounded-lg bg-surface p-2 text-xs italic text-foreground">{f.rationale}</p>
 
       <dl className="mt-3 grid gap-2 text-xs md:grid-cols-2">
         <div>
@@ -1361,9 +1291,9 @@ function ValidationLoopSection() {
             ¿Nuestras recomendaciones mejoraron el Journey?
           </h2>
           <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-            Ciclo de vida completo de cada recomendación: detectada → aceptada →
-            implementada → observada → validada / descartada. Confianza aprendida
-            desde resultados observados (n ≥ <strong>{MIN_FAMILY_SIGNAL}</strong>
+            Ciclo de vida completo de cada recomendación: detectada → aceptada → implementada →
+            observada → validada / descartada. Confianza aprendida desde resultados observados (n ≥{" "}
+            <strong>{MIN_FAMILY_SIGNAL}</strong>
             por familia). Sin reglas manuales ocultas.
           </p>
         </div>
@@ -1409,16 +1339,15 @@ function ValidationLoopBody({
   }
   if (loading || !snapshot) return <p className="h-6 w-32 animate-pulse rounded bg-muted" />;
 
-  const total =
-    snapshot.active.length + snapshot.closed.length;
+  const total = snapshot.active.length + snapshot.closed.length;
 
   if (total === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
         <p className="font-medium text-foreground">Sin recomendaciones registradas</p>
         <p className="mt-1">
-          Cuando el equipo marque una oportunidad como <em>aceptada</em>, aparecerá
-          aquí y podrá recorrer su ciclo de vida completo hasta la validación.
+          Cuando el equipo marque una oportunidad como <em>aceptada</em>, aparecerá aquí y podrá
+          recorrer su ciclo de vida completo hasta la validación.
         </p>
       </div>
     );
@@ -1428,10 +1357,7 @@ function ValidationLoopBody({
     <div className="space-y-5">
       <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {Object.entries(snapshot.totals).map(([status, count]) => (
-          <div
-            key={status}
-            className="rounded-xl border border-border bg-surface-raised p-3"
-          >
+          <div key={status} className="rounded-xl border border-border bg-surface-raised p-3">
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
               {STATUS_STYLE[status]?.label ?? status}
             </p>
@@ -1470,13 +1396,11 @@ function ValidationLoopBody({
       </div>
 
       <div>
-        <h3 className="mb-2 text-sm font-semibold">
-          Confianza aprendida por familia de KPI
-        </h3>
+        <h3 className="mb-2 text-sm font-semibold">Confianza aprendida por familia de KPI</h3>
         {snapshot.family_confidence.length === 0 ? (
           <p className="text-xs text-muted-foreground">
-            Aún no hay resultados observados. La confianza se aprenderá al cerrar
-            recomendaciones con evidencia.
+            Aún no hay resultados observados. La confianza se aprenderá al cerrar recomendaciones
+            con evidencia.
           </p>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-border">
@@ -1502,8 +1426,8 @@ function ValidationLoopBody({
       </div>
 
       <p className="text-[11px] text-muted-foreground">
-        Contrato v{snapshot.contract_version} · Estado recomputado desde el
-        historial append-only (Founder Journey State).
+        Contrato v{snapshot.contract_version} · Estado recomputado desde el historial append-only
+        (Founder Journey State).
       </p>
     </div>
   );
@@ -1568,19 +1492,14 @@ function FamilyRow({ f }: { f: FamilyLearningSignal }) {
       <td className="p-2">{f.sample_size}</td>
       <td className="p-2 text-success">{f.validated}</td>
       <td className="p-2 text-destructive">{f.discarded}</td>
-      <td className="p-2 font-semibold">
-        {(f.learned_confidence * 100).toFixed(0)}%
-      </td>
+      <td className="p-2 font-semibold">{(f.learned_confidence * 100).toFixed(0)}%</td>
       <td className="p-2">
         <span
           className={
-            "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide " +
-            badge
+            "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide " + badge
           }
         >
-          {f.reliability === "insufficient_data"
-            ? "muestra insuficiente"
-            : f.reliability}
+          {f.reliability === "insufficient_data" ? "muestra insuficiente" : f.reliability}
         </span>
       </td>
     </tr>

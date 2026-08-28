@@ -16,10 +16,7 @@ import { PublicProfileBenefitsCard } from "@/components/traveler/PublicProfileBe
 import { getMyPublicProfile } from "@/lib/traveler/traveler-public.functions";
 import { ReviewerBadge } from "@/components/traveler/ReviewerBadge";
 import { getMyReviewerStats } from "@/lib/reviews/reviewer-stats.functions";
-import {
-  getProfileModeState,
-  type ProfileMode,
-} from "@/lib/profile-mode/mode.functions";
+import { getProfileModeState, type ProfileMode } from "@/lib/profile-mode/mode.functions";
 import { Briefcase, Compass, Headphones, Mail, Shield, UserRound } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cuenta/")({
@@ -189,15 +186,10 @@ function TravelerCuenta() {
             <Field
               label="Destinos preferidos"
               value={
-                data.preferred_destinations.length
-                  ? data.preferred_destinations.join(", ")
-                  : "—"
+                data.preferred_destinations.length ? data.preferred_destinations.join(", ") : "—"
               }
             />
-            <Field
-              label="Restricciones alimentarias"
-              value={data.dietary_restrictions ?? "—"}
-            />
+            <Field label="Restricciones alimentarias" value={data.dietary_restrictions ?? "—"} />
           </dl>
         ) : (
           <p className="mt-2 text-sm text-muted-foreground">
@@ -259,18 +251,12 @@ const NON_TRAVELER_META: Record<
   },
 };
 
-function NonTravelerCuenta({
-  mode,
-}: {
-  mode: Exclude<ProfileMode, "traveler">;
-}) {
+function NonTravelerCuenta({ mode }: { mode: Exclude<ProfileMode, "traveler"> }) {
   const meta = NON_TRAVELER_META[mode];
   const { Icon } = meta;
   return (
     <div className="max-w-3xl">
-      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-        {meta.eyebrow}
-      </p>
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">{meta.eyebrow}</p>
       <h1 className="mt-2 text-4xl">{meta.title}</h1>
       <p className="mt-3 text-sm text-muted-foreground">{meta.body}</p>
 
@@ -278,9 +264,12 @@ function NonTravelerCuenta({
         <div className="flex items-start gap-3">
           <Icon className="mt-0.5 size-5 text-primary" aria-hidden />
           <div className="min-w-0 flex-1">
-            <h2 className="text-base font-semibold">Continuar en {meta.eyebrow.replace("Modo ", "")}</h2>
+            <h2 className="text-base font-semibold">
+              Continuar en {meta.eyebrow.replace("Modo ", "")}
+            </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Estás operando como <strong className="text-foreground">{meta.eyebrow.replace("Modo ", "")}</strong>.
+              Estás operando como{" "}
+              <strong className="text-foreground">{meta.eyebrow.replace("Modo ", "")}</strong>.
               Puedes cambiar a otro modo en cualquier momento desde el menú de tu foto.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -305,7 +294,8 @@ function NonTravelerCuenta({
         <div className="flex items-start gap-3">
           <Compass className="mt-0.5 size-4 text-muted-foreground" aria-hidden />
           <p className="text-xs text-muted-foreground">
-            ¿Quieres explorar como viajero? Cambia a modo <strong>Viajero</strong> desde el menú de tu foto para ver tu perfil de viaje, favoritos e historial.
+            ¿Quieres explorar como viajero? Cambia a modo <strong>Viajero</strong> desde el menú de
+            tu foto para ver tu perfil de viaje, favoritos e historial.
           </p>
         </div>
       </section>

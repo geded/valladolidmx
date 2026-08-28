@@ -17,10 +17,7 @@ type Row = {
 
 export const Route = createFileRoute("/_authenticated/cms/reviews/")({
   head: () => ({
-    meta: [
-      { title: "Reseñas · CMS Studio" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Reseñas · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: ReviewsPage,
 });
@@ -31,7 +28,6 @@ function ReviewsPage() {
       queryKey="reviews"
       fn={listReviewsCms}
       title="Reseñas"
-
       description="Listado de reseñas con acceso directo al panel de moderación."
       rowKey={(r) => r.id}
       columns={[
@@ -44,9 +40,7 @@ function ReviewsPage() {
         {
           key: "title",
           header: "Título",
-          render: (r) => (
-            <span className="font-medium">{r.title ?? "(sin título)"}</span>
-          ),
+          render: (r) => <span className="font-medium">{r.title ?? "(sin título)"}</span>,
         },
         {
           key: "author",
@@ -61,9 +55,7 @@ function ReviewsPage() {
           key: "kind",
           header: "Sujeto",
           render: (r) => (
-            <span className="text-xs text-muted-foreground">
-              {r.subject_kind ?? "—"}
-            </span>
+            <span className="text-xs text-muted-foreground">{r.subject_kind ?? "—"}</span>
           ),
         },
         {

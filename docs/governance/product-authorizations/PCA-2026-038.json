@@ -32,12 +32,8 @@
       "path": "src/lib/experience-builder/composition-renderer.tsx"
     }
   ],
-  "public_routes": [
-    "/"
-  ],
-  "required_feature_flags": [
-    "omxds_visual_v1_contracts_enabled=false"
-  ],
+  "public_routes": ["/"],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
   "required_tests": [
     "bun run lint",
     "bun run typecheck",

@@ -8,10 +8,7 @@ import {
 } from "@/lib/catalog/marketplace-reads.functions";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { DESTINOS_MOCK } from "@/mocks/destinos";
-import {
-  defineRouteContext,
-  type RouteContextDeclaration,
-} from "@/lib/context-engine";
+import { defineRouteContext, type RouteContextDeclaration } from "@/lib/context-engine";
 import {
   TourismListingSurface,
   buildDestinationFacet,
@@ -102,11 +99,7 @@ function HotelesRoute() {
   );
   const destinoFacet = buildDestinationFacet(cards);
   return (
-    <PublicShell
-      crumbs={legacyCrumbs}
-      contextDeclaration={contextDeclaration}
-      useContextCrumbs
-    >
+    <PublicShell crumbs={legacyCrumbs} contextDeclaration={contextDeclaration} useContextCrumbs>
       <TourismListingSurface
         hero={{
           eyebrow: "Descansa en el Oriente Maya",

@@ -17,9 +17,9 @@ export const EXPERIENCE_GALLERY_CONTRACT_VERSION = "1.0.0";
 
 export const experienceGalleryVariantSchema = z.enum([
   "mosaic", // Grid asimétrico editorial (default).
-  "grid",   // Grid uniforme.
+  "grid", // Grid uniforme.
   "carousel", // Carrusel horizontal snap.
-  "strip",  // Tira compacta (usable dentro de secciones).
+  "strip", // Tira compacta (usable dentro de secciones).
 ]);
 export type ExperienceGalleryVariant = z.infer<typeof experienceGalleryVariantSchema>;
 

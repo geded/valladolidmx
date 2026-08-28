@@ -31,14 +31,7 @@ export interface PreloadedAsset {
   id: string;
   original_width: number | null;
   original_height: number | null;
-  pipeline_status:
-    | "disabled"
-    | "pending"
-    | "processing"
-    | "ready"
-    | "failed"
-    | "skipped"
-    | null;
+  pipeline_status: "disabled" | "pending" | "processing" | "ready" | "failed" | "skipped" | null;
   has_original_checksum: boolean;
 }
 
@@ -108,7 +101,10 @@ export async function preloadShadowAssetBundles(
   if (isTimeout(assetsRes)) {
     return { assets: {}, latencyMs: Date.now() - started, queryCount: 1, error: "db_timeout" };
   }
-  const { data: assetRows, error: assetsErr } = assetsRes as { data: unknown[] | null; error: unknown };
+  const { data: assetRows, error: assetsErr } = assetsRes as {
+    data: unknown[] | null;
+    error: unknown;
+  };
   if (assetsErr || !assetRows) {
     return { assets: {}, latencyMs: Date.now() - started, queryCount: 1, error: "db_error" };
   }
@@ -124,7 +120,10 @@ export async function preloadShadowAssetBundles(
   if (isTimeout(variantsRes)) {
     return { assets: {}, latencyMs: Date.now() - started, queryCount: 2, error: "db_timeout" };
   }
-  const { data: variantRows, error: variantsErr } = variantsRes as { data: unknown[] | null; error: unknown };
+  const { data: variantRows, error: variantsErr } = variantsRes as {
+    data: unknown[] | null;
+    error: unknown;
+  };
   if (variantsErr || !variantRows) {
     return { assets: {}, latencyMs: Date.now() - started, queryCount: 2, error: "db_error" };
   }

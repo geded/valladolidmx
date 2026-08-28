@@ -57,15 +57,17 @@ function getTemporalContext(): {
   const parts = fmt.formatToParts(now);
   const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
   const hour = Number(get("hour"));
-  const monthIdx = new Date(
-    now.toLocaleString("en-US", { timeZone: tz }),
-  ).getMonth(); // 0..11
+  const monthIdx = new Date(now.toLocaleString("en-US", { timeZone: tz })).getMonth(); // 0..11
   const partOfDay: "madrugada" | "mañana" | "mediodía" | "tarde" | "noche" =
-    hour < 6 ? "madrugada"
-    : hour < 12 ? "mañana"
-    : hour < 14 ? "mediodía"
-    : hour < 19 ? "tarde"
-    : "noche";
+    hour < 6
+      ? "madrugada"
+      : hour < 12
+        ? "mañana"
+        : hour < 14
+          ? "mediodía"
+          : hour < 19
+            ? "tarde"
+            : "noche";
   // Yucatán: temporada de lluvias mayo–octubre; seca noviembre–abril.
   const season: "seca" | "lluvias" = monthIdx >= 4 && monthIdx <= 9 ? "lluvias" : "seca";
   const isoLocal = `${get("weekday")} ${get("day")} de ${get("month")}, ${get("hour")}:${get("minute")}`;
@@ -77,9 +79,11 @@ function getTemporalContext(): {
 }
 
 async function fetchActiveEvents(
-  supabaseAdmin: typeof import("@/integrations/supabase/client.server")["supabaseAdmin"],
+  supabaseAdmin: (typeof import("@/integrations/supabase/client.server"))["supabaseAdmin"],
   destinationSlug: string | null,
-): Promise<Array<{ title: string; venue: string | null; startsAt: string; isFree: boolean | null }>> {
+): Promise<
+  Array<{ title: string; venue: string | null; startsAt: string; isFree: boolean | null }>
+> {
   if (!destinationSlug) return [];
   const { data: dest } = await supabaseAdmin
     .from("destinations")
@@ -88,9 +92,7 @@ async function fetchActiveEvents(
     .maybeSingle();
   if (!dest?.id) return [];
   const nowIso = new Date().toISOString();
-  const untilIso = new Date(
-    Date.now() + EVENTS_LOOKAHEAD_DAYS * 24 * 60 * 60 * 1000,
-  ).toISOString();
+  const untilIso = new Date(Date.now() + EVENTS_LOOKAHEAD_DAYS * 24 * 60 * 60 * 1000).toISOString();
   const { data, error } = await supabaseAdmin
     .from("events")
     .select("title, venue_name, starts_at, ends_at, is_free")
@@ -227,7 +229,7 @@ function parseVisitor(input: unknown): Visitor | null {
 }
 
 async function fetchNearbyBusinesses(
-  supabaseAdmin: typeof import("@/integrations/supabase/client.server")["supabaseAdmin"],
+  supabaseAdmin: (typeof import("@/integrations/supabase/client.server"))["supabaseAdmin"],
   visitor: Visitor,
 ): Promise<Array<{ id: string; name: string; category: string | null; km: number; slug: string }>> {
   const { data, error } = await supabaseAdmin
@@ -238,7 +240,13 @@ async function fetchNearbyBusinesses(
     .eq("status", "published")
     .limit(200);
   if (error || !data) return [];
-  const scored: Array<{ id: string; name: string; category: string | null; km: number; slug: string }> = [];
+  const scored: Array<{
+    id: string;
+    name: string;
+    category: string | null;
+    km: number;
+    slug: string;
+  }> = [];
   for (const r of data as Array<{
     id: string;
     slug: string;
@@ -407,9 +415,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         const visitor = parseVisitor(body.visitor);
         const pathContext = parsePathContext(body.pathContext);
         const locale =
-          typeof body.locale === "string" && ALLOWED_LOCALES.has(body.locale)
-            ? body.locale
-            : "es";
+          typeof body.locale === "string" && ALLOWED_LOCALES.has(body.locale) ? body.locale : "es";
         const localeBlock = LOCALE_DIRECTIVES[locale];
 
         const history = Array.isArray(body.history)
@@ -434,14 +440,11 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
         // 1) Rate-limit atómico por IP.
-        const { data: rate, error: rateErr } = await supabaseAdmin.rpc(
-          "alux_public_check_rate",
-          {
-            _ip_hash: ipHash,
-            _hour_limit: HOUR_LIMIT,
-            _day_limit: DAY_LIMIT,
-          },
-        );
+        const { data: rate, error: rateErr } = await supabaseAdmin.rpc("alux_public_check_rate", {
+          _ip_hash: ipHash,
+          _hour_limit: HOUR_LIMIT,
+          _day_limit: DAY_LIMIT,
+        });
         if (rateErr) return json({ error: "rate_check_failed" }, 500);
         const rateRow = Array.isArray(rate) ? rate[0] : rate;
         if (rateRow && rateRow.allowed === false) {
@@ -477,8 +480,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           .single();
         if (sessErr || !sessionRow) return json({ error: "session_upsert_failed" }, 500);
         const sessionId = sessionRow.id as string;
-        const previousSummary =
-          (sessionRow as { summary?: string | null }).summary ?? null;
+        const previousSummary = (sessionRow as { summary?: string | null }).summary ?? null;
         const prev = sessionRow as {
           last_destination_slug?: string | null;
           last_category_slug?: string | null;
@@ -502,9 +504,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         // 4) Retrieval M4 (KB) + settings.
         const settings = await resolveAluxSettingsServer(supabaseAdmin).catch(() => null);
         const model = settings?.default_model ?? "google/gemini-3-flash-preview";
-        const query = [message, ...history.slice(-2).map((m) => m.content)]
-          .join(" ")
-          .slice(0, 500);
+        const query = [message, ...history.slice(-2).map((m) => m.content)].join(" ").slice(0, 500);
         const matches =
           !settings || settings.flags.m4_knowledge
             ? await retrieveAluxKnowledgeServer(supabaseAdmin, query, { matchCount: 4, locale })
@@ -518,7 +518,13 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         // 4b) Contexto espacial (opt-in).
         let nearbyBlock = "";
         let nearbyCount = 0;
-        let nearbyProposals: Array<{ id: string; slug: string; name: string; category: string | null; km: number }> = [];
+        let nearbyProposals: Array<{
+          id: string;
+          slug: string;
+          name: string;
+          category: string | null;
+          km: number;
+        }> = [];
         if (visitor) {
           const nearby = await fetchNearbyBusinesses(supabaseAdmin, visitor).catch(
             () => [] as Awaited<ReturnType<typeof fetchNearbyBusinesses>>,
@@ -534,10 +540,9 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           pathContext?.destination ??
           (sessionRow as { last_destination_slug?: string | null }).last_destination_slug ??
           null;
-        const activeEvents = await fetchActiveEvents(
-          supabaseAdmin,
-          activeDestination,
-        ).catch(() => []);
+        const activeEvents = await fetchActiveEvents(supabaseAdmin, activeDestination).catch(
+          () => [],
+        );
         const eventsBlock = eventsToPromptBlock(activeEvents);
 
         // 4e) Clima real (Ola A10 · Open-Meteo, sin API key).
@@ -570,17 +575,10 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           }
         }
         if (weatherSource && weatherLat !== null && weatherLon !== null) {
-          const { fetchWeatherCached, weatherToPromptBlock } = await import(
-            "@/lib/alux/weather.server"
-          );
-          const snapshot = await fetchWeatherCached(weatherLat, weatherLon).catch(
-            () => null,
-          );
-          weatherBlock = weatherToPromptBlock(
-            snapshot,
-            weatherSource,
-            destinationLabel,
-          );
+          const { fetchWeatherCached, weatherToPromptBlock } =
+            await import("@/lib/alux/weather.server");
+          const snapshot = await fetchWeatherCached(weatherLat, weatherLon).catch(() => null);
+          weatherBlock = weatherToPromptBlock(snapshot, weatherSource, destinationLabel);
         }
 
         // 5) Genera respuesta.
@@ -589,8 +587,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           settings?.persona ??
           "Eres Alux, la inteligencia turística de Valladolid y el Oriente Maya.";
         const guardrails =
-          settings?.guardrails ??
-          "Nunca inventes datos. Prioriza al viajero. Cita el contexto.";
+          settings?.guardrails ?? "Nunca inventes datos. Prioriza al viajero. Cita el contexto.";
         const system = [
           persona,
           PUBLIC_PERSONA_EXTRA,
@@ -652,9 +649,8 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         const newSignals = detected.filter((s) => !prevSignals.includes(s));
         const mergedSignals = Array.from(new Set([...prevSignals, ...detected]));
 
-        const nextSpatialState: string = visitor ? "granted" : prev.last_spatial_state ?? "none";
-        const spatialTransitioned =
-          !!visitor && (prev.last_spatial_state ?? "none") !== "granted";
+        const nextSpatialState: string = visitor ? "granted" : (prev.last_spatial_state ?? "none");
+        const spatialTransitioned = !!visitor && (prev.last_spatial_state ?? "none") !== "granted";
         const geoMovedKm =
           visitor && prev.last_lat != null && prev.last_lng != null
             ? haversineKm(visitor, { lat: Number(prev.last_lat), lng: Number(prev.last_lng) })
@@ -666,8 +662,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         const territoryChanged =
           (!!pathContext?.destination &&
             pathContext.destination !== (prev.last_destination_slug ?? null)) ||
-          (!!pathContext?.category &&
-            pathContext.category !== (prev.last_category_slug ?? null));
+          (!!pathContext?.category && pathContext.category !== (prev.last_category_slug ?? null));
 
         const refreshReasons: string[] = [];
         if (!previousSummary && detected.length > 0) refreshReasons.push("first_signal");
@@ -677,7 +672,8 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         if (territoryChanged) refreshReasons.push("territory_changed");
 
         let nextSummary: string | null = previousSummary;
-        let nextSummaryCount = (sessionRow as { summary_message_count?: number }).summary_message_count ?? 0;
+        let nextSummaryCount =
+          (sessionRow as { summary_message_count?: number }).summary_message_count ?? 0;
         let memoryRefreshed = false;
         if (refreshReasons.length > 0) {
           const refreshed = await refreshSessionSummary(
@@ -726,7 +722,9 @@ export const Route = createFileRoute("/api/public/alux/chat")({
             entity_id: n.id,
             entity_slug: n.slug,
             title: n.name,
-            subtitle: n.category ? `${n.category} · a ${n.km.toFixed(1)} km` : `a ${n.km.toFixed(1)} km`,
+            subtitle: n.category
+              ? `${n.category} · a ${n.km.toFixed(1)} km`
+              : `a ${n.km.toFixed(1)} km`,
             rationale: `Alux te lo sugiere porque está a ${n.km.toFixed(1)} km de tu ubicación.`,
           })),
           spatial_context: visitor ? "granted" : "none",

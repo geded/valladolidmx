@@ -3,6 +3,7 @@ name: Founder Journey First Principle
 description: La etapa del viaje es el contexto primario de la experiencia. Toda funcionalidad del Carril A debe responder primero "¿en qué etapa del Journey está el viajero?" y sólo después decidir qué mostrar, priorizar, permitir, recomendar y proponer. Vinculante desde CV6.O1.
 type: constraint
 ---
+
 Principio Founder vinculante (2026-07-13). Reglas:
 
 1. La etapa del Journey (`TravelStage`) es el contexto primario. Toda funcionalidad Carril A debe resolver primero la etapa y sólo después decidir información visible, acciones priorizadas, permisos solicitados, recomendaciones ofrecidas, CTAs presentados y misión diaria asignada.

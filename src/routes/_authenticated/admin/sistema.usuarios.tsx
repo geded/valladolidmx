@@ -53,11 +53,23 @@ const BUSINESS_ROLES: AppRole[] = ["business_owner"];
 type TabKey = "travelers" | "staff" | "business" | "roles" | "permissions";
 
 const TABS: { key: TabKey; label: string; hint: string }[] = [
-  { key: "travelers", label: "Viajeros", hint: "Cuentas con rol de viajero (uso final del sitio)." },
+  {
+    key: "travelers",
+    label: "Viajeros",
+    hint: "Cuentas con rol de viajero (uso final del sitio).",
+  },
   { key: "staff", label: "Staff interno", hint: "Administradores, editores y concierge." },
   { key: "business", label: "Empresas", hint: "Dueños y colaboradores de negocios." },
-  { key: "roles", label: "Roles y permisos", hint: "Crea roles personalizados y marca qué puede hacer cada uno." },
-  { key: "permissions", label: "Matriz operativa", hint: "Matriz oficial derivada del Blueprint 11.2 (solo consulta)." },
+  {
+    key: "roles",
+    label: "Roles y permisos",
+    hint: "Crea roles personalizados y marca qué puede hacer cada uno.",
+  },
+  {
+    key: "permissions",
+    label: "Matriz operativa",
+    hint: "Matriz oficial derivada del Blueprint 11.2 (solo consulta).",
+  },
 ];
 
 async function fetchIsSuperAdmin(): Promise<boolean> {
@@ -74,7 +86,9 @@ async function fetchIsSuperAdmin(): Promise<boolean> {
 async function fetchUsersWithRoles(): Promise<AdminUserRow[]> {
   const { data, error } = await supabase.rpc("admin_list_users_with_roles");
   if (error) throw new Error(`No se pudieron cargar usuarios: ${error.message}`);
-  return ((data ?? []) as unknown as Array<Omit<AdminUserRow, "custom_roles"> & { custom_roles: unknown }>).map((r) => ({
+  return (
+    (data ?? []) as unknown as Array<Omit<AdminUserRow, "custom_roles"> & { custom_roles: unknown }>
+  ).map((r) => ({
     ...r,
     custom_roles: Array.isArray(r.custom_roles) ? (r.custom_roles as CustomRoleRef[]) : [],
   }));
@@ -142,7 +156,9 @@ function AdminUsuariosPage() {
   if (gate.error) {
     return (
       <div className="max-w-xl rounded-2xl border border-destructive/40 bg-destructive/5 p-6">
-        <h1 className="text-lg font-semibold text-destructive">No se pudo abrir Usuarios y roles</h1>
+        <h1 className="text-lg font-semibold text-destructive">
+          No se pudo abrir Usuarios y roles
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">{(gate.error as Error).message}</p>
       </div>
     );
@@ -152,7 +168,8 @@ function AdminUsuariosPage() {
       <div className="max-w-xl rounded-2xl border border-destructive/40 bg-destructive/5 p-6">
         <h1 className="text-lg font-semibold text-destructive">Acceso restringido</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Esta superficie es exclusiva del rol <code>super_admin</code>. La autorización se valida en el servidor.
+          Esta superficie es exclusiva del rol <code>super_admin</code>. La autorización se valida
+          en el servidor.
         </p>
       </div>
     );
@@ -160,9 +177,15 @@ function AdminUsuariosPage() {
 
   const all = users.data ?? [];
   const travelers = all.filter(
-    (u) => u.roles.includes("traveler") && !u.roles.some((r) => STAFF_ROLES.includes(r) || BUSINESS_ROLES.includes(r) || r === "super_admin"),
+    (u) =>
+      u.roles.includes("traveler") &&
+      !u.roles.some(
+        (r) => STAFF_ROLES.includes(r) || BUSINESS_ROLES.includes(r) || r === "super_admin",
+      ),
   );
-  const staff = all.filter((u) => u.roles.some((r) => STAFF_ROLES.includes(r) || r === "super_admin"));
+  const staff = all.filter((u) =>
+    u.roles.some((r) => STAFF_ROLES.includes(r) || r === "super_admin"),
+  );
   const business = all.filter((u) => u.roles.some((r) => BUSINESS_ROLES.includes(r)));
 
   const counts: Record<TabKey, number | null> = {
@@ -183,9 +206,9 @@ function AdminUsuariosPage() {
         </p>
         <h1 className="mt-2 text-3xl">Usuarios y roles</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Gestión segmentada por tipo de cuenta. Toda asignación o revocación queda
-          registrada en <code>permissions_audit_log</code>. El rol{" "}
-          <code>super_admin</code> no puede modificarse desde esta superficie.
+          Gestión segmentada por tipo de cuenta. Toda asignación o revocación queda registrada en{" "}
+          <code>permissions_audit_log</code>. El rol <code>super_admin</code> no puede modificarse
+          desde esta superficie.
         </p>
       </header>
 
@@ -204,7 +227,9 @@ function AdminUsuariosPage() {
           >
             {t.label}
             {counts[t.key] !== null ? (
-              <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs">{counts[t.key]}</span>
+              <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs">
+                {counts[t.key]}
+              </span>
             ) : null}
           </button>
         ))}
@@ -229,13 +254,22 @@ function AdminUsuariosPage() {
   );
 }
 
-function UsersTable({ rows, variant }: { rows: AdminUserRow[]; variant: "travelers" | "staff" | "business" }) {
+function UsersTable({
+  rows,
+  variant,
+}: {
+  rows: AdminUserRow[];
+  variant: "travelers" | "staff" | "business";
+}) {
   const [filter, setFilter] = useState("");
   const [inviteOpen, setInviteOpen] = useState(false);
   const fetchRoles = useServerFn(listRoles);
   const customRolesQuery = useQuery({
     queryKey: ["admin", "roles-catalog"],
-    queryFn: () => fetchRoles() as Promise<Array<{ id: string; slug: string; name: string; color: string; is_system: boolean }>>,
+    queryFn: () =>
+      fetchRoles() as Promise<
+        Array<{ id: string; slug: string; name: string; color: string; is_system: boolean }>
+      >,
     retry: false,
   });
   const customRoles = (customRolesQuery.data ?? []).filter((r) => !r.is_system);
@@ -350,12 +384,18 @@ function UserRow({
 
   const assignCustomMut = useMutation({
     mutationFn: (roleId: string) => assignCustomRoleRpc(row.user_id, roleId),
-    onSuccess: () => { toast.success("Rol personalizado asignado"); invalidate(); },
+    onSuccess: () => {
+      toast.success("Rol personalizado asignado");
+      invalidate();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   const revokeCustomMut = useMutation({
     mutationFn: (roleId: string) => revokeCustomRoleRpc(row.user_id, roleId),
-    onSuccess: () => { toast.success("Rol personalizado revocado"); invalidate(); },
+    onSuccess: () => {
+      toast.success("Rol personalizado revocado");
+      invalidate();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -408,7 +448,9 @@ function UserRow({
                 >
                   {ROLE_LABELS[r]}
                   {locked ? (
-                    <span title="Protegido" className="text-muted-foreground">🔒</span>
+                    <span title="Protegido" className="text-muted-foreground">
+                      🔒
+                    </span>
                   ) : (
                     <button
                       type="button"
@@ -433,7 +475,11 @@ function UserRow({
                 className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs"
                 style={{ borderColor: c.color, color: c.color }}
               >
-                <span aria-hidden className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: c.color }} />
+                <span
+                  aria-hidden
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ backgroundColor: c.color }}
+                />
                 {c.name}
                 <button
                   type="button"
@@ -489,7 +535,9 @@ function UserRow({
             >
               <option value="">Rol personalizado…</option>
               {availableCustom.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
               ))}
             </select>
             <button
@@ -531,17 +579,26 @@ function EditUserDialog({ row, onClose }: { row: AdminUserRow; onClose: () => vo
 
   const nameMut = useMutation({
     mutationFn: () => nameFn({ data: { userId: row.user_id, displayName: displayName.trim() } }),
-    onSuccess: () => { toast.success("Nombre actualizado"); invalidate(); },
+    onSuccess: () => {
+      toast.success("Nombre actualizado");
+      invalidate();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   const emailMut = useMutation({
     mutationFn: () => emailFn({ data: { userId: row.user_id, email: email.trim() } }),
-    onSuccess: () => { toast.success("Correo actualizado"); invalidate(); },
+    onSuccess: () => {
+      toast.success("Correo actualizado");
+      invalidate();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   const passMut = useMutation({
     mutationFn: () => passFn({ data: { userId: row.user_id, password } }),
-    onSuccess: () => { toast.success("Contraseña actualizada"); setPassword(""); },
+    onSuccess: () => {
+      toast.success("Contraseña actualizada");
+      setPassword("");
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   const resetMut = useMutation({
@@ -551,7 +608,11 @@ function EditUserDialog({ row, onClose }: { row: AdminUserRow; onClose: () => vo
   });
   const delMut = useMutation({
     mutationFn: () => delFn({ data: { userId: row.user_id } }),
-    onSuccess: () => { toast.success("Usuario eliminado"); invalidate(); onClose(); },
+    onSuccess: () => {
+      toast.success("Usuario eliminado");
+      invalidate();
+      onClose();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -571,7 +632,9 @@ function EditUserDialog({ row, onClose }: { row: AdminUserRow; onClose: () => vo
             <h2 className="text-lg font-semibold">Editar usuario</h2>
             <p className="text-xs text-muted-foreground">{row.email}</p>
           </div>
-          <button type="button" onClick={onClose} className="text-sm text-muted-foreground">✕</button>
+          <button type="button" onClick={onClose} className="text-sm text-muted-foreground">
+            ✕
+          </button>
         </header>
 
         {isSuper ? (
@@ -694,20 +757,92 @@ type Capability = {
 };
 
 const PERMISSIONS: Capability[] = [
-  { area: "Contenido público", action: "Leer contenido publicado", roles: { visitor: true, traveler: true, business_owner: true, concierge: true, concierge_lead: true, editor: true, admin: true, super_admin: true } },
-  { area: "Perfil", action: "Editar perfil propio", roles: { traveler: true, business_owner: true, concierge: true, concierge_lead: true, editor: true, admin: true, super_admin: true } },
-  { area: "Viaje", action: "Crear/editar planes de viaje", roles: { traveler: true, admin: true, super_admin: true } },
-  { area: "Viaje", action: "Solicitar concierge", roles: { traveler: true, admin: true, super_admin: true } },
-  { area: "Reseñas", action: "Escribir reseñas propias", roles: { traveler: true, business_owner: true, concierge: true, editor: true, admin: true, super_admin: true } },
+  {
+    area: "Contenido público",
+    action: "Leer contenido publicado",
+    roles: {
+      visitor: true,
+      traveler: true,
+      business_owner: true,
+      concierge: true,
+      concierge_lead: true,
+      editor: true,
+      admin: true,
+      super_admin: true,
+    },
+  },
+  {
+    area: "Perfil",
+    action: "Editar perfil propio",
+    roles: {
+      traveler: true,
+      business_owner: true,
+      concierge: true,
+      concierge_lead: true,
+      editor: true,
+      admin: true,
+      super_admin: true,
+    },
+  },
+  {
+    area: "Viaje",
+    action: "Crear/editar planes de viaje",
+    roles: { traveler: true, admin: true, super_admin: true },
+  },
+  {
+    area: "Viaje",
+    action: "Solicitar concierge",
+    roles: { traveler: true, admin: true, super_admin: true },
+  },
+  {
+    area: "Reseñas",
+    action: "Escribir reseñas propias",
+    roles: {
+      traveler: true,
+      business_owner: true,
+      concierge: true,
+      editor: true,
+      admin: true,
+      super_admin: true,
+    },
+  },
   { area: "Reseñas", action: "Moderar reseñas", roles: { admin: true, super_admin: true } },
-  { area: "Empresas", action: "Editar empresa propia y catálogo", roles: { business_owner: true, admin: true, super_admin: true } },
-  { area: "Empresas", action: "Invitar colaboradores a empresa", roles: { business_owner: true, admin: true, super_admin: true } },
-  { area: "Concierge", action: "Ver expedientes asignados", roles: { concierge: true, concierge_lead: true, admin: true, super_admin: true } },
-  { area: "Concierge", action: "Preparar propuestas", roles: { concierge: true, concierge_lead: true, admin: true, super_admin: true } },
-  { area: "CMS", action: "Editar contenido editorial y geográfico", roles: { editor: true, admin: true, super_admin: true } },
-  { area: "CMS", action: "Publicar contenido", roles: { editor: true, admin: true, super_admin: true } },
+  {
+    area: "Empresas",
+    action: "Editar empresa propia y catálogo",
+    roles: { business_owner: true, admin: true, super_admin: true },
+  },
+  {
+    area: "Empresas",
+    action: "Invitar colaboradores a empresa",
+    roles: { business_owner: true, admin: true, super_admin: true },
+  },
+  {
+    area: "Concierge",
+    action: "Ver expedientes asignados",
+    roles: { concierge: true, concierge_lead: true, admin: true, super_admin: true },
+  },
+  {
+    area: "Concierge",
+    action: "Preparar propuestas",
+    roles: { concierge: true, concierge_lead: true, admin: true, super_admin: true },
+  },
+  {
+    area: "CMS",
+    action: "Editar contenido editorial y geográfico",
+    roles: { editor: true, admin: true, super_admin: true },
+  },
+  {
+    area: "CMS",
+    action: "Publicar contenido",
+    roles: { editor: true, admin: true, super_admin: true },
+  },
   { area: "Sistema", action: "Asignar/revocar roles", roles: { super_admin: true } },
-  { area: "Sistema", action: "Ver auditoría de permisos", roles: { admin: true, super_admin: true } },
+  {
+    area: "Sistema",
+    action: "Ver auditoría de permisos",
+    roles: { admin: true, super_admin: true },
+  },
   { area: "Sistema", action: "Configuración global", roles: { super_admin: true } },
 ];
 
@@ -731,9 +866,9 @@ function PermissionsMatrix() {
   return (
     <div className="mt-6 space-y-3">
       <div className="rounded-xl border border-border bg-muted/30 p-4 text-xs text-muted-foreground">
-        Matriz oficial derivada del <strong>Blueprint 11.2 — Users, Roles & Security</strong>.
-        Los permisos se aplican vía RLS en la base de datos; esta vista es sólo consulta.
-        Cualquier cambio requiere migración aprobada.
+        Matriz oficial derivada del <strong>Blueprint 11.2 — Users, Roles & Security</strong>. Los
+        permisos se aplican vía RLS en la base de datos; esta vista es sólo consulta. Cualquier
+        cambio requiere migración aprobada.
       </div>
       <div className="overflow-x-auto rounded-2xl border border-border">
         <table className="w-full min-w-[900px] text-sm">
@@ -742,7 +877,9 @@ function PermissionsMatrix() {
               <th className="px-4 py-2">Área</th>
               <th className="px-4 py-2">Acción</th>
               {MATRIX_ROLES.map((r) => (
-                <th key={r} className="px-2 py-2 text-center">{MATRIX_LABELS[r]}</th>
+                <th key={r} className="px-2 py-2 text-center">
+                  {MATRIX_LABELS[r]}
+                </th>
               ))}
             </tr>
           </thead>
@@ -754,9 +891,13 @@ function PermissionsMatrix() {
                 {MATRIX_ROLES.map((r) => (
                   <td key={r} className="px-2 py-2 text-center">
                     {cap.roles[r] ? (
-                      <span className="text-primary" aria-label="permitido">✓</span>
+                      <span className="text-primary" aria-label="permitido">
+                        ✓
+                      </span>
                     ) : (
-                      <span className="text-muted-foreground/30" aria-label="denegado">—</span>
+                      <span className="text-muted-foreground/30" aria-label="denegado">
+                        —
+                      </span>
                     )}
                   </td>
                 ))}
@@ -1053,9 +1194,7 @@ function RoleEditor({
   const [slug, setSlug] = useState(role?.slug ?? "");
   const [description, setDescription] = useState(role?.description ?? "");
   const [color, setColor] = useState(role?.color ?? "#64748b");
-  const [selected, setSelected] = useState<Set<string>>(
-    () => new Set(role?.permissionIds ?? []),
-  );
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(role?.permissionIds ?? []));
   const [confirmDel, setConfirmDel] = useState("");
 
   const createFn = useServerFn(createRole);

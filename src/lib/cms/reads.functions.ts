@@ -132,10 +132,9 @@ export const listBusinessesCms = createServerFn({ method: "POST" })
     const { limit, offset, search } = normalizeInput(data);
     let q = context.supabase
       .from("businesses")
-      .select(
-        "id, slug, display_name, status, verified, destination_id, updated_at",
-        { count: "exact" },
-      )
+      .select("id, slug, display_name, status, verified, destination_id, updated_at", {
+        count: "exact",
+      })
       .is("deleted_at", null)
       .order("display_name", { ascending: true })
       .range(offset, offset + limit - 1);
@@ -155,10 +154,7 @@ export const listProductsCms = createServerFn({ method: "POST" })
     const { limit, offset, search } = normalizeInput(data);
     let q = context.supabase
       .from("products")
-      .select(
-        "id, slug, name, product_type, status, business_id, updated_at",
-        { count: "exact" },
-      )
+      .select("id, slug, name, product_type, status, business_id, updated_at", { count: "exact" })
       .is("deleted_at", null)
       .order("updated_at", { ascending: false })
       .range(offset, offset + limit - 1);

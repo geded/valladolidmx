@@ -14,7 +14,8 @@ export interface PublicPromoCard {
 
 export const listFeaturedPromotions = createServerFn({ method: "GET" })
   .inputValidator((input?: { limit?: number }) => {
-    const limit = typeof input?.limit === "number" && input.limit > 0 ? Math.min(input.limit, 12) : 6;
+    const limit =
+      typeof input?.limit === "number" && input.limit > 0 ? Math.min(input.limit, 12) : 6;
     return { limit };
   })
   .handler(async ({ data }): Promise<PublicPromoCard[]> => {

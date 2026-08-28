@@ -40,16 +40,12 @@ export function businessToShellVM(b: MarketplaceBusinessDetail): ShellVM {
   };
 }
 
-export function businessToHeaderBadgeVMs(
-  b: MarketplaceBusinessDetail,
-): BadgeVM[] {
+export function businessToHeaderBadgeVMs(b: MarketplaceBusinessDetail): BadgeVM[] {
   if (!b.verified) return [];
   return [{ label: "Verificado", tone: "primary" }];
 }
 
-export function businessToInfoRowVMs(
-  b: MarketplaceBusinessDetail,
-): InfoRowVM[] {
+export function businessToInfoRowVMs(b: MarketplaceBusinessDetail): InfoRowVM[] {
   return [
     { label: "Destino", value: b.destination_slug || "—" },
     { label: "Categoría", value: b.category_slug || "—" },
@@ -64,9 +60,7 @@ export function businessToInfoRowVMs(
  * el Kit formatea con `Intl.NumberFormat`. El shim inyecta el bloque de
  * precio dentro del composite; el mapper mantiene la forma neutra.
  */
-export function businessToProductCardVMs(
-  b: MarketplaceBusinessDetail,
-): CardVM[] {
+export function businessToProductCardVMs(b: MarketplaceBusinessDetail): CardVM[] {
   return b.products.map((p: MarketplaceProductCard) => ({
     id: p.id,
     eyebrow: p.product_type,
@@ -75,9 +69,7 @@ export function businessToProductCardVMs(
   }));
 }
 
-export function businessToPromoVMs(
-  b: MarketplaceBusinessDetail,
-): PromoVM[] {
+export function businessToPromoVMs(b: MarketplaceBusinessDetail): PromoVM[] {
   return b.promotions.map((p: MarketplacePromotionCard) => ({
     id: p.id,
     title: p.title,

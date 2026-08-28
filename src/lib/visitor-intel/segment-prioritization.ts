@@ -11,11 +11,7 @@
  *
  * Función pura, sin red, sin snapshots, sin identidades individuales.
  */
-import type {
-  JourneySegmentSnapshot,
-  SegmentBucket,
-  SegmentDimension,
-} from "./segments.functions";
+import type { JourneySegmentSnapshot, SegmentBucket, SegmentDimension } from "./segments.functions";
 import type { RecommendationValidationSnapshot } from "./recommendations.functions";
 
 export const SEGMENT_PRIORITIZATION_CONTRACT_VERSION = "1.0.0" as const;
@@ -101,14 +97,20 @@ const DIMENSION_LABEL: Record<SegmentDimension, string> = {
   device: "Dispositivo",
 };
 
-function averageLearnedConfidence(
-  v: RecommendationValidationSnapshot | null,
-): { value: number; reliability: "unknown" | "insufficient_data" | "learning" | "reliable" } {
+function averageLearnedConfidence(v: RecommendationValidationSnapshot | null): {
+  value: number;
+  reliability: "unknown" | "insufficient_data" | "learning" | "reliable";
+} {
   if (!v || v.family_confidence.length === 0) return { value: 0.5, reliability: "unknown" };
   const reliable = v.family_confidence.filter((f) => f.reliability !== "insufficient_data");
   const src = reliable.length > 0 ? reliable : v.family_confidence;
   const mean = src.reduce((s, f) => s + f.learned_confidence, 0) / src.length;
-  const rel = reliable.length === 0 ? "insufficient_data" : reliable.length === v.family_confidence.length ? "reliable" : "learning";
+  const rel =
+    reliable.length === 0
+      ? "insufficient_data"
+      : reliable.length === v.family_confidence.length
+        ? "reliable"
+        : "learning";
   return { value: Number(mean.toFixed(4)), reliability: rel };
 }
 
@@ -124,18 +126,13 @@ function biasFor(sample: number, minPop: number): BiasRisk {
   return "low";
 }
 
-function classify(
-  b: SegmentBucket,
-  baselineJpr: number,
-  minPop: number,
-): SegmentFindingType {
+function classify(b: SegmentBucket, baselineJpr: number, minPop: number): SegmentFindingType {
   if (b.suppressed || b.active_subjects < minPop) return "insufficient_data";
   const delta = b.jpr_delta_vs_baseline;
   if (delta <= ABANDONMENT_DELTA_THRESHOLD) return "abandonment_risk";
   if (delta <= INCLUSION_DELTA_THRESHOLD) return "inclusion_opportunity";
   if (delta >= COMMERCIAL_DELTA_THRESHOLD) return "commercial_opportunity";
-  const intentRatio =
-    b.active_subjects === 0 ? 0 : b.intent_signals / b.active_subjects;
+  const intentRatio = b.active_subjects === 0 ? 0 : b.intent_signals / b.active_subjects;
   if (intentRatio >= EXPERIENCE_INTENT_RATIO && b.jpr <= baselineJpr) {
     return "experience_opportunity";
   }
@@ -166,9 +163,14 @@ function travelerBenefit(t: SegmentFindingType): { value: number; label: string 
   }
 }
 
-function ecosystemBenefit(dim: SegmentDimension, t: SegmentFindingType): { value: number; label: string } {
-  if (dim === "destination") return { value: 1.0, label: "Impacta directamente al ecosistema del destino." };
-  if (dim === "capability") return { value: 0.8, label: "Fortalece una capacidad transversal del ecosistema." };
+function ecosystemBenefit(
+  dim: SegmentDimension,
+  t: SegmentFindingType,
+): { value: number; label: string } {
+  if (dim === "destination")
+    return { value: 1.0, label: "Impacta directamente al ecosistema del destino." };
+  if (dim === "capability")
+    return { value: 0.8, label: "Fortalece una capacidad transversal del ecosistema." };
   if (dim === "locale" && t === "inclusion_opportunity") {
     return { value: 0.9, label: "Expande cobertura lingüística del ecosistema." };
   }
@@ -242,11 +244,8 @@ function expectedImpactFor(t: SegmentFindingType, delta: number, sample: number)
   return "Impacto no determinable — evidencia insuficiente.";
 }
 
-export function prioritizeSegments(
-  input: SegmentPrioritizationInput,
-): SegmentPrioritizationResult {
-  const minPop =
-    input.segments[0]?.min_population ?? 25;
+export function prioritizeSegments(input: SegmentPrioritizationInput): SegmentPrioritizationResult {
+  const minPop = input.segments[0]?.min_population ?? 25;
   const confAvg = averageLearnedConfidence(input.validation);
 
   const maxSample = input.segments.reduce((m, s) => {
@@ -267,7 +266,8 @@ export function prioritizeSegments(
       // Métricas normalizadas ∈ [0,1]
       const impact = Number(Math.min(1, Math.abs(delta) / 0.5).toFixed(4));
       const urgency = Number(urgencyFor(type, delta).toFixed(4));
-      const reach = maxSample === 0 ? 0 : Number(Math.min(1, b.active_subjects / maxSample).toFixed(4));
+      const reach =
+        maxSample === 0 ? 0 : Number(Math.min(1, b.active_subjects / maxSample).toFixed(4));
       const friction = delta < 0 ? Number(Math.min(1, Math.abs(delta) / 0.5).toFixed(4)) : 0;
       const trav = travelerBenefit(type);
       const eco = ecosystemBenefit(snap.dimension, type);
@@ -284,7 +284,9 @@ export function prioritizeSegments(
           key: "confidence",
           weight: SEGMENT_PRIORITIZATION_WEIGHTS.confidence,
           value: Number(confAvg.value.toFixed(4)),
-          contribution: Number((SEGMENT_PRIORITIZATION_WEIGHTS.confidence * confAvg.value).toFixed(4)),
+          contribution: Number(
+            (SEGMENT_PRIORITIZATION_WEIGHTS.confidence * confAvg.value).toFixed(4),
+          ),
           explanation:
             confAvg.reliability === "unknown"
               ? "Sin validación previa suficiente — se usa 0.5 por defecto (CV8.6)."
@@ -318,14 +320,18 @@ export function prioritizeSegments(
           key: "traveler_benefit",
           weight: SEGMENT_PRIORITIZATION_WEIGHTS.traveler_benefit,
           value: trav.value,
-          contribution: Number((SEGMENT_PRIORITIZATION_WEIGHTS.traveler_benefit * trav.value).toFixed(4)),
+          contribution: Number(
+            (SEGMENT_PRIORITIZATION_WEIGHTS.traveler_benefit * trav.value).toFixed(4),
+          ),
           explanation: trav.label,
         },
         {
           key: "ecosystem_benefit",
           weight: SEGMENT_PRIORITIZATION_WEIGHTS.ecosystem_benefit,
           value: eco.value,
-          contribution: Number((SEGMENT_PRIORITIZATION_WEIGHTS.ecosystem_benefit * eco.value).toFixed(4)),
+          contribution: Number(
+            (SEGMENT_PRIORITIZATION_WEIGHTS.ecosystem_benefit * eco.value).toFixed(4),
+          ),
           explanation: eco.label,
         },
       ];

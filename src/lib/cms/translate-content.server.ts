@@ -15,7 +15,14 @@ import type { Database } from "@/integrations/supabase/types";
 
 const MODEL = "google/gemini-3-flash-preview";
 
-const TRANSLATABLE_FIELDS = ["name", "display_name", "legal_name", "tagline", "description", "short_description"];
+const TRANSLATABLE_FIELDS = [
+  "name",
+  "display_name",
+  "legal_name",
+  "tagline",
+  "description",
+  "short_description",
+];
 
 type EntityKind = Database["public"]["Enums"]["entity_kind"];
 
@@ -62,7 +69,7 @@ export async function translateEntityContentBestEffort(
   if (targets.length === 0) return { translated: 0, skipped: true, reason: "no-targets" };
 
   const system =
-    "Eres traductor profesional para una plataforma turística mexicana (Valladolid, Yucatán, Oriente Maya). Traduce cada campo del idioma base al idioma destino conservando: nombres propios (Valladolid, Yucatán, Oriente Maya, Alux, Chichén Itzá, Cenote), tono cálido y comercial, y longitud similar. No traduzcas 'name' si es un nombre propio (déjalo igual). Devuelve exclusivamente JSON con la forma {\"<locale>\":{\"<field>\":\"<traducción>\"}}.";
+    'Eres traductor profesional para una plataforma turística mexicana (Valladolid, Yucatán, Oriente Maya). Traduce cada campo del idioma base al idioma destino conservando: nombres propios (Valladolid, Yucatán, Oriente Maya, Alux, Chichén Itzá, Cenote), tono cálido y comercial, y longitud similar. No traduzcas \'name\' si es un nombre propio (déjalo igual). Devuelve exclusivamente JSON con la forma {"<locale>":{"<field>":"<traducción>"}}.';
   const prompt = `Idioma base: ${base}. Idiomas destino: ${targets.join(", ")}\n\nCampos:\n${JSON.stringify(fields, null, 2)}`;
 
   let raw = "";

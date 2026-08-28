@@ -25,8 +25,6 @@
     "reason": "Reconciliacion append-only de la proyeccion generada tras G8-E2 y tras las correcciones autorizadas previas de sesion (src/hooks/useAuth.tsx y migraciones de correccion de concierge_case_file_v1).",
     "generator": "scripts/governance/generate-artifact-inventory.mjs"
   },
-  "invariants": [
-    "omxds_visual_v1_contracts_enabled=false"
-  ],
+  "invariants": ["omxds_visual_v1_contracts_enabled=false"],
   "recorded_at": "2026-08-27"
 }

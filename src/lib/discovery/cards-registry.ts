@@ -17,12 +17,7 @@ import { CategoriaCard } from "@/components/cards/CategoriaCard";
 import { ResenaCard } from "@/components/cards/ResenaCard";
 import { RutaCard } from "@/components/cards/RutaCard";
 
-export type DiscoveryCardKind =
-  | "empresa"
-  | "destino"
-  | "categoria"
-  | "resena"
-  | "ruta";
+export type DiscoveryCardKind = "empresa" | "destino" | "categoria" | "resena" | "ruta";
 
 export interface DiscoveryCardDefinition<TProps = any> {
   kind: DiscoveryCardKind;

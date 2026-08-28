@@ -91,10 +91,16 @@ export const proposeAluxPlanAddition = createServerFn({ method: "POST" })
         if (concierge && typeof concierge === "object") {
           const c = concierge as Record<string, unknown>;
           const bucket: Record<string, string[]> = {
-            business: Array.isArray(c.reserved_business_ids) ? (c.reserved_business_ids as string[]) : [],
-            product: Array.isArray(c.reserved_product_ids) ? (c.reserved_product_ids as string[]) : [],
+            business: Array.isArray(c.reserved_business_ids)
+              ? (c.reserved_business_ids as string[])
+              : [],
+            product: Array.isArray(c.reserved_product_ids)
+              ? (c.reserved_product_ids as string[])
+              : [],
             event: Array.isArray(c.reserved_event_ids) ? (c.reserved_event_ids as string[]) : [],
-            destination: Array.isArray(c.reserved_destination_ids) ? (c.reserved_destination_ids as string[]) : [],
+            destination: Array.isArray(c.reserved_destination_ids)
+              ? (c.reserved_destination_ids as string[])
+              : [],
           };
           const reserved = bucket[data.entityType] ?? [];
           if (reserved.includes(data.entityId)) {
@@ -152,7 +158,10 @@ export const proposeAluxPlanAddition = createServerFn({ method: "POST" })
 // listMyAluxPlanProposals — Bandeja del viajero
 // -------------------------------------------------------------------------
 const ListInput = z.object({
-  status: z.enum(["pending", "accepted", "dismissed", "expired", "all"]).optional().default("pending"),
+  status: z
+    .enum(["pending", "accepted", "dismissed", "expired", "all"])
+    .optional()
+    .default("pending"),
   limit: z.number().int().min(1).max(100).optional().default(30),
 });
 

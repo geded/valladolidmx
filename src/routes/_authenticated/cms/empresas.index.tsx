@@ -15,10 +15,7 @@ type Row = {
 
 export const Route = createFileRoute("/_authenticated/cms/empresas/")({
   head: () => ({
-    meta: [
-      { title: "Empresas · CMS Studio" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Empresas · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: EmpresasPage,
 });
@@ -29,7 +26,6 @@ function EmpresasPage() {
       queryKey="businesses"
       fn={listBusinessesCms}
       title="Empresas"
-
       description="Fichas editoriales de empresas locales."
       rowKey={(r) => r.id}
       headerActions={
@@ -41,11 +37,33 @@ function EmpresasPage() {
         </Link>
       }
       columns={[
-        { key: "name", header: "Nombre", render: (r) => <span className="font-medium">{r.display_name}</span> },
-        { key: "slug", header: "Slug", render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code> },
-        { key: "verified", header: "Verificada", render: (r) => <span className="text-xs text-muted-foreground">{r.verified ? "Sí" : "No"}</span> },
+        {
+          key: "name",
+          header: "Nombre",
+          render: (r) => <span className="font-medium">{r.display_name}</span>,
+        },
+        {
+          key: "slug",
+          header: "Slug",
+          render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code>,
+        },
+        {
+          key: "verified",
+          header: "Verificada",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">{r.verified ? "Sí" : "No"}</span>
+          ),
+        },
         { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
-        { key: "updated", header: "Actualizado", render: (r) => <span className="text-xs text-muted-foreground">{new Date(r.updated_at).toLocaleDateString("es-MX")}</span> },
+        {
+          key: "updated",
+          header: "Actualizado",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">
+              {new Date(r.updated_at).toLocaleDateString("es-MX")}
+            </span>
+          ),
+        },
         {
           key: "acciones",
           header: "",

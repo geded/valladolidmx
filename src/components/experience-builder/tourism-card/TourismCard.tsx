@@ -56,12 +56,7 @@ export const TOURISM_ENTITY_LABEL: Record<TourismEntityKind, string> = {
   mixed: "Descubrir",
 };
 
-export type TourismCardBadgeTone =
-  | "default"
-  | "primary"
-  | "success"
-  | "warning"
-  | "info";
+export type TourismCardBadgeTone = "default" | "primary" | "success" | "warning" | "info";
 
 export interface TourismCardBadge {
   label: string;
@@ -291,10 +286,7 @@ function MediaPlaceholder({ kind }: { kind: TourismEntityKind | null }) {
   return (
     <div
       aria-hidden="true"
-      className={cn(
-        "h-full w-full bg-gradient-to-br",
-        gradient[kind ?? "default"],
-      )}
+      className={cn("h-full w-full bg-gradient-to-br", gradient[kind ?? "default"])}
     />
   );
 }
@@ -324,14 +316,10 @@ export function TourismCard({
   const caps = withDefaultCapabilities(capabilities);
   const price = caps.showPrice ? formatPrice(vm.priceAmount, vm.priceCurrency) : null;
   const eyebrow = caps.showEyebrow ? entityEyebrow(vm) : null;
-  const distance = caps.showDistance
-    ? formatDistance(vm.location?.distanceKm ?? null)
-    : null;
+  const distance = caps.showDistance ? formatDistance(vm.location?.distanceKm ?? null) : null;
   const highlights = caps.showHighlights ? vm.highlights.slice(0, 3) : [];
   const badges = caps.showBadges ? vm.badges.slice(0, 2) : [];
-  const institutional = caps.showInstitutionalBadges
-    ? vm.institutionalBadges.slice(0, 2)
-    : [];
+  const institutional = caps.showInstitutionalBadges ? vm.institutionalBadges.slice(0, 2) : [];
   return (
     <article
       data-eb-entity={vm.entityKind ?? undefined}
@@ -451,21 +439,15 @@ export function TourismCard({
           <p className="mt-0.5 text-xs text-muted-foreground">{vm.businessName}</p>
         ) : null}
         {caps.showTagline && vm.tagline ? (
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-            {vm.tagline}
-          </p>
+          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{vm.tagline}</p>
         ) : null}
 
         {caps.showRating && vm.rating ? (
           <p className="mt-2 flex items-center gap-1 text-xs">
             <StarIcon className="text-warning" />
-            <span className="font-semibold text-foreground">
-              {vm.rating.value.toFixed(1)}
-            </span>
+            <span className="font-semibold text-foreground">{vm.rating.value.toFixed(1)}</span>
             {vm.rating.count > 0 ? (
-              <span className="text-muted-foreground">
-                ({vm.rating.count} reseñas)
-              </span>
+              <span className="text-muted-foreground">({vm.rating.count} reseñas)</span>
             ) : null}
           </p>
         ) : null}
@@ -492,15 +474,9 @@ export function TourismCard({
         <div className="mt-auto pt-4">
           {caps.showPrice && (price || vm.priceHint) ? (
             <p className="flex items-baseline gap-1.5">
-              {price ? (
-                <span className="text-base font-bold text-foreground">
-                  {price}
-                </span>
-              ) : null}
+              {price ? <span className="text-base font-bold text-foreground">{price}</span> : null}
               {vm.priceHint ? (
-                <span className="text-xs text-muted-foreground">
-                  {vm.priceHint}
-                </span>
+                <span className="text-xs text-muted-foreground">{vm.priceHint}</span>
               ) : null}
             </p>
           ) : null}
@@ -561,13 +537,9 @@ export function TourismCardRow({
   const caps = withDefaultCapabilities(capabilities);
   const price = caps.showPrice ? formatPrice(vm.priceAmount, vm.priceCurrency) : null;
   const eyebrow = caps.showEyebrow ? entityEyebrow(vm) : null;
-  const distance = caps.showDistance
-    ? formatDistance(vm.location?.distanceKm ?? null)
-    : null;
+  const distance = caps.showDistance ? formatDistance(vm.location?.distanceKm ?? null) : null;
   const badges = caps.showBadges ? vm.badges.slice(0, 2) : [];
-  const institutional = caps.showInstitutionalBadges
-    ? vm.institutionalBadges.slice(0, 2)
-    : [];
+  const institutional = caps.showInstitutionalBadges ? vm.institutionalBadges.slice(0, 2) : [];
   const size = caps.compact ? "h-16 w-16" : "h-24 w-24";
   return (
     <article
@@ -580,12 +552,7 @@ export function TourismCardRow({
       )}
     >
       {caps.showMedia ? (
-        <div
-          className={cn(
-            "shrink-0 overflow-hidden rounded-xl bg-muted",
-            size,
-          )}
-        >
+        <div className={cn("shrink-0 overflow-hidden rounded-xl bg-muted", size)}>
           {vm.mediaUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -626,9 +593,7 @@ export function TourismCardRow({
               <p className="text-xs text-muted-foreground">{vm.businessName}</p>
             ) : null}
             {!caps.compact && caps.showTagline && vm.tagline ? (
-              <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">
-                {vm.tagline}
-              </p>
+              <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">{vm.tagline}</p>
             ) : null}
             {caps.showLocation && vm.location ? (
               <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
@@ -644,13 +609,9 @@ export function TourismCardRow({
             {caps.showRating && vm.rating ? (
               <p className="mt-1 flex items-center gap-1 text-xs">
                 <StarIcon className="text-warning" />
-                <span className="font-semibold text-foreground">
-                  {vm.rating.value.toFixed(1)}
-                </span>
+                <span className="font-semibold text-foreground">{vm.rating.value.toFixed(1)}</span>
                 {vm.rating.count > 0 ? (
-                  <span className="text-muted-foreground">
-                    ({vm.rating.count})
-                  </span>
+                  <span className="text-muted-foreground">({vm.rating.count})</span>
                 ) : null}
               </p>
             ) : null}
@@ -678,9 +639,7 @@ export function TourismCardRow({
               </p>
             ) : null}
             {caps.showPrice && (price || vm.priceHint) ? (
-              <p className="text-sm font-semibold">
-                {price ?? vm.priceHint}
-              </p>
+              <p className="text-sm font-semibold">{price ?? vm.priceHint}</p>
             ) : null}
           </div>
         </div>
@@ -723,21 +682,13 @@ export function FeaturedTourismLayout({
   return (
     <div className="grid min-w-0 gap-4 lg:grid-cols-3">
       <div className="min-w-0 lg:col-span-2">
-        <TourismCard
-          vm={featured}
-          capabilities={capabilities}
-          renderActions={renderActions}
-        />
+        <TourismCard vm={featured} capabilities={capabilities} renderActions={renderActions} />
       </div>
       {rest.length > 0 ? (
         <ul role="list" className="flex min-w-0 flex-col gap-3">
           {rest.slice(0, 3).map((it) => (
             <li key={it.id} className="min-w-0">
-              <TourismCardRow
-                vm={it}
-                capabilities={capabilities}
-                renderActions={renderActions}
-              />
+              <TourismCardRow vm={it} capabilities={capabilities} renderActions={renderActions} />
             </li>
           ))}
         </ul>

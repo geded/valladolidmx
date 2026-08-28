@@ -18,23 +18,23 @@ El ledger probatorio cerró la adjudicación documental de 439 archivos, pero `0
 
 Se adoptan catorce dominios primarios, mutuamente exclusivos para fines de accountability documental. Cada fila de `06` recibe exactamente un dominio primario. Las relaciones transversales se representan después como aristas en `07`; no se duplican owners en `06`.
 
-| ID | Dominio | Responsabilidad | Documentos |
-|---|---|---|---:|
-| `D01` | `product-governance` | Visión, políticas, decisiones, roadmap y control documental | 31 |
-| `D02` | `platform-foundation` | Arquitectura, infraestructura, datos base, integraciones y release | 20 |
-| `D03` | `identity-security` | Identidad, autenticación, autorización, privacidad y confianza | 45 |
-| `D04` | `content-experience` | CMS, Experience Builder, diseño, marca y composición de superficies | 76 |
-| `D05` | `destination-discovery` | Descubrimiento territorial, navegación y superficies públicas | 35 |
-| `D06` | `marketplace-commerce` | Catálogo comercial, marketplace, promociones, pagos y monetización | 23 |
-| `D07` | `provider-operations` | Portal empresarial, onboarding y operación de prestadores | 24 |
-| `D08` | `traveler-lifecycle` | Plan, workspace, continuidad, viaje en curso, memoria y PWA | 52 |
-| `D09` | `concierge-service` | Casos, solicitudes, cotizaciones, propuestas y operación Concierge | 29 |
-| `D10` | `alux-ai` | Alux, IA, recomendación y asistencia inteligente | 16 |
-| `D11` | `visitor-intelligence` | Eventos, estado, segmentación, métricas y decisión basada en datos | 28 |
-| `D12` | `engagement-notifications` | Notificaciones, mensajería y comunicación transaccional | 14 |
-| `D13` | `media-delivery` | Activos, imágenes, variantes, almacenamiento y entrega multimedia | 29 |
-| `D14` | `growth-reliability` | SEO, performance, observabilidad, QA de experiencia y readiness | 17 |
-|  | **Total** |  | **439** |
+| ID    | Dominio                    | Responsabilidad                                                     | Documentos |
+| ----- | -------------------------- | ------------------------------------------------------------------- | ---------: |
+| `D01` | `product-governance`       | Visión, políticas, decisiones, roadmap y control documental         |         31 |
+| `D02` | `platform-foundation`      | Arquitectura, infraestructura, datos base, integraciones y release  |         20 |
+| `D03` | `identity-security`        | Identidad, autenticación, autorización, privacidad y confianza      |         45 |
+| `D04` | `content-experience`       | CMS, Experience Builder, diseño, marca y composición de superficies |         76 |
+| `D05` | `destination-discovery`    | Descubrimiento territorial, navegación y superficies públicas       |         35 |
+| `D06` | `marketplace-commerce`     | Catálogo comercial, marketplace, promociones, pagos y monetización  |         23 |
+| `D07` | `provider-operations`      | Portal empresarial, onboarding y operación de prestadores           |         24 |
+| `D08` | `traveler-lifecycle`       | Plan, workspace, continuidad, viaje en curso, memoria y PWA         |         52 |
+| `D09` | `concierge-service`        | Casos, solicitudes, cotizaciones, propuestas y operación Concierge  |         29 |
+| `D10` | `alux-ai`                  | Alux, IA, recomendación y asistencia inteligente                    |         16 |
+| `D11` | `visitor-intelligence`     | Eventos, estado, segmentación, métricas y decisión basada en datos  |         28 |
+| `D12` | `engagement-notifications` | Notificaciones, mensajería y comunicación transaccional             |         14 |
+| `D13` | `media-delivery`           | Activos, imágenes, variantes, almacenamiento y entrega multimedia   |         29 |
+| `D14` | `growth-reliability`       | SEO, performance, observabilidad, QA de experiencia y readiness     |         17 |
+|       | **Total**                  |                                                                     |    **439** |
 
 ## 3. Reglas vinculantes
 

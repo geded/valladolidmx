@@ -86,13 +86,11 @@ export function AvatarUploader({
     try {
       const blob = await resizeToSquareJpeg(file);
       const path = `${userId}/avatar_${Date.now()}.jpg`;
-      const up = await supabase.storage
-        .from("avatars")
-        .upload(path, blob, {
-          contentType: "image/jpeg",
-          upsert: true,
-          cacheControl: "3600",
-        });
+      const up = await supabase.storage.from("avatars").upload(path, blob, {
+        contentType: "image/jpeg",
+        upsert: true,
+        cacheControl: "3600",
+      });
       if (up.error) throw up.error;
       const signed = await supabase.storage
         .from("avatars")
@@ -120,12 +118,7 @@ export function AvatarUploader({
         aria-label="Cambiar foto de perfil"
       >
         {shown ? (
-          <img
-            src={shown}
-            alt=""
-            className="size-full object-cover"
-            loading="lazy"
-          />
+          <img src={shown} alt="" className="size-full object-cover" loading="lazy" />
         ) : (
           <span className="flex size-full items-center justify-center text-2xl font-semibold text-muted-foreground">
             {initials(displayName)}
@@ -150,17 +143,12 @@ export function AvatarUploader({
           {shown ? "Cambiar foto" : "Subir foto"}
         </button>
         <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">
-          JPG, PNG o WEBP · hasta 5 MB<br />
+          JPG, PNG o WEBP · hasta 5 MB
+          <br />
           La recortamos cuadrada a 512 px.
         </p>
       </div>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={onFile}
-      />
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={onFile} />
     </div>
   );
 }

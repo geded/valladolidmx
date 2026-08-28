@@ -63,7 +63,9 @@ function ResetPasswordRoute() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm font-medium" htmlFor="password">Nueva contraseña</label>
+              <label className="text-sm font-medium" htmlFor="password">
+                Nueva contraseña
+              </label>
               <input
                 id="password"
                 type="password"
@@ -76,7 +78,9 @@ function ResetPasswordRoute() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium" htmlFor="confirm">Confirmar contraseña</label>
+              <label className="text-sm font-medium" htmlFor="confirm">
+                Confirmar contraseña
+              </label>
               <input
                 id="confirm"
                 type="password"
@@ -89,7 +93,9 @@ function ResetPasswordRoute() {
               />
             </div>
             {error ? (
-              <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>
+              <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {error}
+              </p>
             ) : null}
             <button
               type="submit"

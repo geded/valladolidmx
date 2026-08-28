@@ -34,33 +34,50 @@ function Page() {
           <p className="text-xs font-semibold uppercase tracking-widest text-primary">
             H-03 · Ola I1.b · Fundacionales
           </p>
-          <h1 className="text-3xl font-semibold">
-            Subnav + CTA Bar — demo funcional
-          </h1>
+          <h1 className="text-3xl font-semibold">Subnav + CTA Bar — demo funcional</h1>
           <p className="max-w-2xl text-sm text-muted-foreground">
-            Dos bloques emparejados de la Biblioteca Oficial del Experience
-            Builder. Reutilizables en business, product, event, destination,
-            region, landing, micrositios y toda futura Experience Page.
+            Dos bloques emparejados de la Biblioteca Oficial del Experience Builder. Reutilizables
+            en business, product, event, destination, region, landing, micrositios y toda futura
+            Experience Page.
           </p>
         </header>
 
-        <section id="resumen" data-eb-anchor="Resumen" className="min-h-[60vh] rounded-2xl border border-border bg-card p-8">
+        <section
+          id="resumen"
+          data-eb-anchor="Resumen"
+          className="min-h-[60vh] rounded-2xl border border-border bg-card p-8"
+        >
           <h2 className="text-xl font-semibold">Resumen</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Sección resumen. El scroll-spy del sub-nav se activa a medida que
-            entras en cada bloque.
+            Sección resumen. El scroll-spy del sub-nav se activa a medida que entras en cada bloque.
           </p>
         </section>
-        <section id="galeria" data-eb-anchor="Galería" className="min-h-[60vh] rounded-2xl border border-border bg-card p-8">
+        <section
+          id="galeria"
+          data-eb-anchor="Galería"
+          className="min-h-[60vh] rounded-2xl border border-border bg-card p-8"
+        >
           <h2 className="text-xl font-semibold">Galería</h2>
         </section>
-        <section id="servicios" data-eb-anchor="Servicios" className="min-h-[60vh] rounded-2xl border border-border bg-card p-8">
+        <section
+          id="servicios"
+          data-eb-anchor="Servicios"
+          className="min-h-[60vh] rounded-2xl border border-border bg-card p-8"
+        >
           <h2 className="text-xl font-semibold">Servicios</h2>
         </section>
-        <section id="resenas" data-eb-anchor="Reseñas" className="min-h-[60vh] rounded-2xl border border-border bg-card p-8">
+        <section
+          id="resenas"
+          data-eb-anchor="Reseñas"
+          className="min-h-[60vh] rounded-2xl border border-border bg-card p-8"
+        >
           <h2 className="text-xl font-semibold">Reseñas</h2>
         </section>
-        <section id="ubicacion" data-eb-anchor="Ubicación" className="min-h-[60vh] rounded-2xl border border-border bg-card p-8">
+        <section
+          id="ubicacion"
+          data-eb-anchor="Ubicación"
+          className="min-h-[60vh] rounded-2xl border border-border bg-card p-8"
+        >
           <h2 className="text-xl font-semibold">Ubicación</h2>
         </section>
 

@@ -66,9 +66,7 @@ export function ExperienceHeroFromProduct() {
     eyebrow: p.product_type || null,
     title: p.name,
     description: p.tagline || null,
-    media: gallery[0]
-      ? { url: gallery[0].url, alt: gallery[0].alt, overlay: 0 }
-      : null,
+    media: gallery[0] ? { url: gallery[0].url, alt: gallery[0].alt, overlay: 0 } : null,
     mediaSlides: gallery,
     badges,
     meta,

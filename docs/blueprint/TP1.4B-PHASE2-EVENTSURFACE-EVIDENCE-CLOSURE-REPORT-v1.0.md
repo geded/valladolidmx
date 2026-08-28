@@ -27,15 +27,15 @@
 
 ### 2.1 Render e identidad
 
-| Verificación | Resultado |
-|---|---|
-| Número de `AddToTravelPlanButton` visibles | **1** (única instancia) ✅ |
-| Ubicación DOM | `aside` de la ficha (`inAside: true`) ✅ |
-| `kind` | `"event"` (código-fuente `EventSurface.tsx:34`) ✅ |
-| Identidad usada | UUID canónico `event.id` (línea 36 y 89) ✅ |
-| Slug como identidad | **Nunca** — `slug` sólo se pasa al snapshot para deep-link (línea 91) ✅ |
-| Instancias duplicadas | 0 ✅ |
-| Guardia de elegibilidad | `evaluateTripEligibility({kind:"event", targetId:event.id, title:event.title})` (líneas 33-37) ✅ |
+| Verificación                               | Resultado                                                                                         |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Número de `AddToTravelPlanButton` visibles | **1** (única instancia) ✅                                                                        |
+| Ubicación DOM                              | `aside` de la ficha (`inAside: true`) ✅                                                          |
+| `kind`                                     | `"event"` (código-fuente `EventSurface.tsx:34`) ✅                                                |
+| Identidad usada                            | UUID canónico `event.id` (línea 36 y 89) ✅                                                       |
+| Slug como identidad                        | **Nunca** — `slug` sólo se pasa al snapshot para deep-link (línea 91) ✅                          |
+| Instancias duplicadas                      | 0 ✅                                                                                              |
+| Guardia de elegibilidad                    | `evaluateTripEligibility({kind:"event", targetId:event.id, title:event.title})` (líneas 33-37) ✅ |
 
 Evidencia DOM (post-hidratación, viewport 1280 × 1800):
 
@@ -51,25 +51,25 @@ Evidencia DOM (post-hidratación, viewport 1280 × 1800):
 
 ### 2.2 Flujo anónimo (sin sesión Supabase)
 
-| Paso | Resultado observado |
-|---|---|
-| Estado inicial | `text="Agregar a Mi Viaje"`, `aria-pressed="false"`, `disabled=false` ✅ |
-| Click → feedback óptico | **94 ms** hasta `aria-pressed="true"` (dentro del objetivo TP1.4A/R1 ~80–120 ms) ✅ |
-| Estado tras click | `text="Ya está en Mi Viaje"`, `aria-pressed="true"`, `disabled=true` ✅ |
-| Persistencia después de recarga | Estado preservado. IndexedDBs presentes: `valladolidmx.sync`, `vmx.alux.companion` ✅ |
-| Prevención de duplicados | El botón queda `disabled` tras add; segundo click no dispara mutación adicional; conteo de botones = 1 tras recarga ✅ |
-| Continuidad local-first | Sin sesión Supabase; add persistente en IndexedDB ✅ |
-| **Eliminación inmediata desde la ficha** | **⚠️ NO SOPORTADA** — el patrón vigente (`AddToTravelPlanButton.tsx:233`) es *one-way add*: el botón queda bloqueado tras add y la baja se ejecuta desde `/mi-viaje`. Ver §5 (hallazgo H-1). |
+| Paso                                     | Resultado observado                                                                                                                                                                          |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Estado inicial                           | `text="Agregar a Mi Viaje"`, `aria-pressed="false"`, `disabled=false` ✅                                                                                                                     |
+| Click → feedback óptico                  | **94 ms** hasta `aria-pressed="true"` (dentro del objetivo TP1.4A/R1 ~80–120 ms) ✅                                                                                                          |
+| Estado tras click                        | `text="Ya está en Mi Viaje"`, `aria-pressed="true"`, `disabled=true` ✅                                                                                                                      |
+| Persistencia después de recarga          | Estado preservado. IndexedDBs presentes: `valladolidmx.sync`, `vmx.alux.companion` ✅                                                                                                        |
+| Prevención de duplicados                 | El botón queda `disabled` tras add; segundo click no dispara mutación adicional; conteo de botones = 1 tras recarga ✅                                                                       |
+| Continuidad local-first                  | Sin sesión Supabase; add persistente en IndexedDB ✅                                                                                                                                         |
+| **Eliminación inmediata desde la ficha** | **⚠️ NO SOPORTADA** — el patrón vigente (`AddToTravelPlanButton.tsx:233`) es _one-way add_: el botón queda bloqueado tras add y la baja se ejecuta desde `/mi-viaje`. Ver §5 (hallazgo H-1). |
 
 ### 2.3 Flujo autenticado
 
 `LOVABLE_BROWSER_AUTH_STATUS = signed_out` en este sandbox. No se puede minar sesión Supabase automáticamente.
 
-| Paso | Resultado |
-|---|---|
-| Agregado autenticado | **No verificable en esta corrida** (sandbox sin sesión inyectada). |
-| Persistencia | **No verificable.** |
-| Sincronización entre representaciones | **No verificable en runtime.** |
+| Paso                                  | Resultado                                                          |
+| ------------------------------------- | ------------------------------------------------------------------ |
+| Agregado autenticado                  | **No verificable en esta corrida** (sandbox sin sesión inyectada). |
+| Persistencia                          | **No verificable.**                                                |
+| Sincronización entre representaciones | **No verificable en runtime.**                                     |
 
 **Análisis de código:** el código path autenticado invoca `addPlanItem` (server fn con `requireSupabaseAuth`), reutiliza el hook `useQuery(getMyActivePlan)` para derivar `alreadyInPlan`, y el override optimista aplica idéntica lógica. Contrato canónico: la clave `(plan_id, item_kind, target_id)` fuerza idempotencia server-side; dos superficies con el mismo `(kind:event, targetId:event.id)` derivan del mismo query y sincronizan por invalidación de `queryClient` (`AddToTravelPlanButton.tsx:23-24, 96-100`).
 
@@ -77,15 +77,15 @@ Evidencia DOM (post-hidratación, viewport 1280 × 1800):
 
 ### 2.4 Accesibilidad
 
-| Verificación | Resultado |
-|---|---|
-| Elemento `<button>` nativo | ✅ (foco natural, activación con Enter y Espacio) |
-| `tabIndex` | 0 (no interferencia) ✅ |
-| Nombre accesible | Texto visible `"Agregar a Mi Viaje"` → `accessibleName` derivado del contenido ✅ |
-| `aria-pressed` inicial | `"false"` ✅ |
-| `aria-pressed` tras add | `"true"` ✅ |
-| `title` post-add | `"Ya está en Mi Viaje"` (tooltip nativo) ✅ |
-| Foco visible | Botón hereda ring del design system (visual en `vp_1280.png`) ✅ |
+| Verificación               | Resultado                                                                         |
+| -------------------------- | --------------------------------------------------------------------------------- |
+| Elemento `<button>` nativo | ✅ (foco natural, activación con Enter y Espacio)                                 |
+| `tabIndex`                 | 0 (no interferencia) ✅                                                           |
+| Nombre accesible           | Texto visible `"Agregar a Mi Viaje"` → `accessibleName` derivado del contenido ✅ |
+| `aria-pressed` inicial     | `"false"` ✅                                                                      |
+| `aria-pressed` tras add    | `"true"` ✅                                                                       |
+| `title` post-add           | `"Ya está en Mi Viaje"` (tooltip nativo) ✅                                       |
+| Foco visible               | Botón hereda ring del design system (visual en `vp_1280.png`) ✅                  |
 
 Nota: al ser un `<button>` HTML nativo, la activación con Enter y Espacio es garantía del user agent; no requiere handler custom. La aserción sobre Tab/Enter/Espacio se apoya en la conformidad estructural del elemento.
 
@@ -97,11 +97,11 @@ Análisis de contrato: `AddToTravelPlanButton.tsx:70-72` define `phase: "idle" |
 
 ### 2.6 Viewports
 
-| Viewport | Captura | Observación |
-|---|---|---|
-| 360 × 780 | `vp_360.png` | Botón visible, aside apilado bajo cover. Sin overflow. ✅ |
-| 414 × 900 | `vp_414.png` | Idéntico patrón, aside apilado. ✅ |
-| 1280 × 1800 | `vp_1280.png` | Grid `lg:grid-cols-3`, aside en columna derecha. ✅ |
+| Viewport    | Captura       | Observación                                               |
+| ----------- | ------------- | --------------------------------------------------------- |
+| 360 × 780   | `vp_360.png`  | Botón visible, aside apilado bajo cover. Sin overflow. ✅ |
+| 414 × 900   | `vp_414.png`  | Idéntico patrón, aside apilado. ✅                        |
+| 1280 × 1800 | `vp_1280.png` | Grid `lg:grid-cols-3`, aside en columna derecha. ✅       |
 
 Sin regresiones visuales frente al Closure Report v1.0 de TP1.4B.
 
@@ -117,101 +117,101 @@ Auditoría **READ-ONLY** de las 5 superficies exigidas. No se han modificado arc
 
 ### 3.1 `home/EventosSection` — `src/components/home/EventosSection.tsx`
 
-| Campo | Valor |
-|---|---|
-| Entidad presentada | `PublicEventCard` (Sprint 4 · `listPublishedEvents`) |
-| `kind` canónico | `"event"` |
-| UUID canónico disponible | ✅ Sí (`e.id`) |
-| Snapshot mínimo | ✅ `e.title`, `e.starts_at`, `e.venue_name`, `e.summary` |
-| Componente utilizado | **Inline** `<Link to="/eventos/$slug">` — NO usa una `EventoCard` reutilizable |
-| `FavoriteButton` | ❌ Ausente |
-| Slot de acciones | ❌ No existe (tarjeta armada inline) |
-| Riesgo de doble render | Bajo (aún sin card oficial) |
-| Elegibilidad TP1 | ✅ Elegible (kind + UUID + título) |
-| Decisión propuesta | **Diferir hasta unificación con EventoCard** (U-UNIFY) O incrustar directo el botón dentro del tile inline |
-| Diff necesario | Ver §4.1 |
+| Campo                    | Valor                                                                                                      |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| Entidad presentada       | `PublicEventCard` (Sprint 4 · `listPublishedEvents`)                                                       |
+| `kind` canónico          | `"event"`                                                                                                  |
+| UUID canónico disponible | ✅ Sí (`e.id`)                                                                                             |
+| Snapshot mínimo          | ✅ `e.title`, `e.starts_at`, `e.venue_name`, `e.summary`                                                   |
+| Componente utilizado     | **Inline** `<Link to="/eventos/$slug">` — NO usa una `EventoCard` reutilizable                             |
+| `FavoriteButton`         | ❌ Ausente                                                                                                 |
+| Slot de acciones         | ❌ No existe (tarjeta armada inline)                                                                       |
+| Riesgo de doble render   | Bajo (aún sin card oficial)                                                                                |
+| Elegibilidad TP1         | ✅ Elegible (kind + UUID + título)                                                                         |
+| Decisión propuesta       | **Diferir hasta unificación con EventoCard** (U-UNIFY) O incrustar directo el botón dentro del tile inline |
+| Diff necesario           | Ver §4.1                                                                                                   |
 
 **Punto de composición inequívoco:** ⚠️ No — la ausencia de una card canónica hace que la implementación implique modelar un slot de acciones sobre un `<Link>` que actualmente es toda la tarjeta. Editorial. **DEFERRED** con propuesta abierta.
 
 ### 3.2 `home/EmpresasSection` — `src/components/home/EmpresasSection.tsx`
 
-| Campo | Valor |
-|---|---|
-| Entidad | `BusinessTeaser` |
-| `kind` canónico | `"business"` |
-| UUID canónico | ✅ Sí (`business.id` : UUID) |
-| Snapshot mínimo | ✅ `business.name` |
-| Componente utilizado | `EmpresaCard` (adaptador oficial sobre `TourismCard`, U1.3) |
-| `FavoriteButton` | ❌ (usa `TrustBadge`) |
-| Slot de acciones | ✅ `renderActions` en `EmpresaCard.tsx:68-70` (actualmente único elemento: `TrustBadge`) |
-| Riesgo de doble render | Nulo (slot único, adaptador único) |
-| Elegibilidad TP1 | ✅ Elegible |
-| Decisión propuesta | **Implementable inmediatamente** (criterios de §"Regla de alcance" cumplidos) |
-| Diff necesario | Ver §4.2 |
+| Campo                  | Valor                                                                                    |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| Entidad                | `BusinessTeaser`                                                                         |
+| `kind` canónico        | `"business"`                                                                             |
+| UUID canónico          | ✅ Sí (`business.id` : UUID)                                                             |
+| Snapshot mínimo        | ✅ `business.name`                                                                       |
+| Componente utilizado   | `EmpresaCard` (adaptador oficial sobre `TourismCard`, U1.3)                              |
+| `FavoriteButton`       | ❌ (usa `TrustBadge`)                                                                    |
+| Slot de acciones       | ✅ `renderActions` en `EmpresaCard.tsx:68-70` (actualmente único elemento: `TrustBadge`) |
+| Riesgo de doble render | Nulo (slot único, adaptador único)                                                       |
+| Elegibilidad TP1       | ✅ Elegible                                                                              |
+| Decisión propuesta     | **Implementable inmediatamente** (criterios de §"Regla de alcance" cumplidos)            |
+| Diff necesario         | Ver §4.2                                                                                 |
 
 **Punto de composición inequívoco:** ✅ Sí. `EmpresaCard` es el adaptador único; agregar `AddToTravelPlanButton` al lado de `TrustBadge` no altera contratos ni layout.
 
 ### 3.3 `home/DestinosSection` — `src/components/home/DestinosSection.tsx`
 
-| Campo | Valor |
-|---|---|
-| Entidad | `Destination` |
-| `kind` canónico | `"destination"` |
-| UUID canónico | ✅ Sí (`destination.id`) |
-| Snapshot mínimo | ✅ `destination.name`, `slug`, `image_url`, `tagline` |
-| Componente utilizado | `DestinoCard` (adaptador sobre `TourismCard`) |
-| `FavoriteButton` | Capability activada (`showFavorite: true`) |
-| Slot de acciones | ✅ `renderActions` YA renderiza `AddToTravelPlanButton kind="destination" eligibilityMode="legacy"` (`DestinoCard.tsx:73-84`) |
-| Riesgo de doble render | Nulo |
-| Elegibilidad TP1 | ✅ Cubierta por herencia (modo `legacy`) |
-| Decisión propuesta | **`covered_inherited`** — sin acción requerida |
-| Diff necesario | Ninguno |
+| Campo                  | Valor                                                                                                                         |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Entidad                | `Destination`                                                                                                                 |
+| `kind` canónico        | `"destination"`                                                                                                               |
+| UUID canónico          | ✅ Sí (`destination.id`)                                                                                                      |
+| Snapshot mínimo        | ✅ `destination.name`, `slug`, `image_url`, `tagline`                                                                         |
+| Componente utilizado   | `DestinoCard` (adaptador sobre `TourismCard`)                                                                                 |
+| `FavoriteButton`       | Capability activada (`showFavorite: true`)                                                                                    |
+| Slot de acciones       | ✅ `renderActions` YA renderiza `AddToTravelPlanButton kind="destination" eligibilityMode="legacy"` (`DestinoCard.tsx:73-84`) |
+| Riesgo de doble render | Nulo                                                                                                                          |
+| Elegibilidad TP1       | ✅ Cubierta por herencia (modo `legacy`)                                                                                      |
+| Decisión propuesta     | **`covered_inherited`** — sin acción requerida                                                                                |
+| Diff necesario         | Ninguno                                                                                                                       |
 
 ### 3.4 `ExperienceProductsBlock` — `src/components/experience-builder/blocks/experience-products/ExperienceProductsBlock.tsx`
 
-| Campo | Valor |
-|---|---|
-| Entidad | `ExperienceProductItem` derivado de `MarketplaceProductCard` |
-| `kind` canónico | `"product"` |
-| UUID canónico | ✅ Sí (`p.id` : UUID; verificable en `catalog/marketplace-reads.functions.ts`) |
-| Snapshot mínimo | ✅ `item.name`, `mediaUrl`, `priceAmount`, `businessName` |
-| Componente utilizado | `ExperienceProducts` con `renderItemActions` |
-| `FavoriteButton` | ✅ (`showFavorite`) |
-| Slot de acciones | ✅ `renderItemActions` en `ExperienceProductsBlock.tsx:153-166` — actualmente entrega `FavoriteButton` + `ProductActions` |
+| Campo                  | Valor                                                                                                                            |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Entidad                | `ExperienceProductItem` derivado de `MarketplaceProductCard`                                                                     |
+| `kind` canónico        | `"product"`                                                                                                                      |
+| UUID canónico          | ✅ Sí (`p.id` : UUID; verificable en `catalog/marketplace-reads.functions.ts`)                                                   |
+| Snapshot mínimo        | ✅ `item.name`, `mediaUrl`, `priceAmount`, `businessName`                                                                        |
+| Componente utilizado   | `ExperienceProducts` con `renderItemActions`                                                                                     |
+| `FavoriteButton`       | ✅ (`showFavorite`)                                                                                                              |
+| Slot de acciones       | ✅ `renderItemActions` en `ExperienceProductsBlock.tsx:153-166` — actualmente entrega `FavoriteButton` + `ProductActions`        |
 | Riesgo de doble render | Bajo — el bloque es la única superficie que compone acciones sobre `ExperienceProductItem`. Elementos coexisten en el mismo slot |
-| Elegibilidad TP1 | ✅ Elegible |
-| Decisión propuesta | **Implementable inmediatamente** (composición inequívoca, contrato TP1 puro, ninguna ampliación de tipos) |
-| Diff necesario | Ver §4.4 |
+| Elegibilidad TP1       | ✅ Elegible                                                                                                                      |
+| Decisión propuesta     | **Implementable inmediatamente** (composición inequívoca, contrato TP1 puro, ninguna ampliación de tipos)                        |
+| Diff necesario         | Ver §4.4                                                                                                                         |
 
 **Nota:** `source==="manual"` puede entregar items cuyo `id` sea de composición y no UUID canónico. `evaluateTripEligibility` protege esa branch (retorna `eligible:false` sin renderizar). Sin riesgo de regresión.
 
 ### 3.5 `ExperienceRelatedCollection` — `src/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollection.tsx`
 
-| Campo | Valor |
-|---|---|
-| Entidad | `ExperienceRelatedItem` (heterogéneo: `product | business | destination | event | ...`) |
-| `kind` canónico | Provisto por `item.kind` (heterogéneo) |
-| UUID canónico | ⚠️ Depende del origen del item; el contrato exige `item.id` pero no garantiza UUID canónico en todas las branches |
-| Snapshot mínimo | ✅ `item.title` obligatorio |
-| Componente utilizado | `TourismCard` / `TourismCardRow` / `FeaturedTourismLayout` con `renderItemActions` |
-| `FavoriteButton` | Controlado por `capabilities.showFavorite` |
-| Slot de acciones | ✅ `renderItemActions` (props del block; el bloque `ExperienceRelatedCollectionBlock` lo inyecta) |
-| Riesgo de doble render | Medio — bloques padre pueden pasar `renderItemActions` propio; combinar sin coordinación produciría duplicación. |
-| Elegibilidad TP1 | Condicional (por-item vía `evaluateTripEligibility`) |
-| Decisión propuesta | **DIFERIR** — requiere decisión editorial sobre punto único de composición (¿bloque? ¿componente presentacional? ¿wrapper por `renderItemActions`?) para no colisionar con el override existente. |
-| Diff necesario | Ver §4.5 (propuesta alternativa) |
+| Campo                  | Valor                                                                                                                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------- | ----- | ----- |
+| Entidad                | `ExperienceRelatedItem` (heterogéneo: `product                                                                                                                                                    | business | destination | event | ...`) |
+| `kind` canónico        | Provisto por `item.kind` (heterogéneo)                                                                                                                                                            |
+| UUID canónico          | ⚠️ Depende del origen del item; el contrato exige `item.id` pero no garantiza UUID canónico en todas las branches                                                                                 |
+| Snapshot mínimo        | ✅ `item.title` obligatorio                                                                                                                                                                       |
+| Componente utilizado   | `TourismCard` / `TourismCardRow` / `FeaturedTourismLayout` con `renderItemActions`                                                                                                                |
+| `FavoriteButton`       | Controlado por `capabilities.showFavorite`                                                                                                                                                        |
+| Slot de acciones       | ✅ `renderItemActions` (props del block; el bloque `ExperienceRelatedCollectionBlock` lo inyecta)                                                                                                 |
+| Riesgo de doble render | Medio — bloques padre pueden pasar `renderItemActions` propio; combinar sin coordinación produciría duplicación.                                                                                  |
+| Elegibilidad TP1       | Condicional (por-item vía `evaluateTripEligibility`)                                                                                                                                              |
+| Decisión propuesta     | **DIFERIR** — requiere decisión editorial sobre punto único de composición (¿bloque? ¿componente presentacional? ¿wrapper por `renderItemActions`?) para no colisionar con el override existente. |
+| Diff necesario         | Ver §4.5 (propuesta alternativa)                                                                                                                                                                  |
 
 **Punto de composición inequívoco:** ❌ No — dos superficies (`ExperienceRelatedCollectionBlock` y consumidores directos) pueden inyectar `renderItemActions`. Requiere directiva Founder.
 
 ### 3.6 Resumen matriz
 
-| Superficie | Estado | Acción |
-|---|---|---|
-| `home/EventosSection` | `gap` | Diferido — sin card canónica; propuesta abierta §4.1 |
-| `home/EmpresasSection` | `gap` | **Elegible immediate** §4.2 — pendiente autorización |
-| `home/DestinosSection` | `covered_inherited` | Ninguna |
-| `ExperienceProductsBlock` | `gap` | **Elegible immediate** §4.4 — pendiente autorización |
-| `ExperienceRelatedCollection` | `gap` | Diferido — requiere decisión editorial §4.5 |
+| Superficie                    | Estado              | Acción                                               |
+| ----------------------------- | ------------------- | ---------------------------------------------------- |
+| `home/EventosSection`         | `gap`               | Diferido — sin card canónica; propuesta abierta §4.1 |
+| `home/EmpresasSection`        | `gap`               | **Elegible immediate** §4.2 — pendiente autorización |
+| `home/DestinosSection`        | `covered_inherited` | Ninguna                                              |
+| `ExperienceProductsBlock`     | `gap`               | **Elegible immediate** §4.4 — pendiente autorización |
+| `ExperienceRelatedCollection` | `gap`               | Diferido — requiere decisión editorial §4.5          |
 
 ---
 
@@ -295,7 +295,7 @@ Diff propuesto en `ExperienceRelatedCollectionBlock.tsx` (fuera del alcance de e
 
 ## 5. Hallazgos
 
-- **H-1 (posible ambigüedad editorial):** el patrón vigente del `AddToTravelPlanButton` es *one-way add* (una vez agregado, el botón queda deshabilitado; la baja se ejecuta desde `/mi-viaje`). La directiva de Phase 2 enumera "eliminación inmediata" como parte del flujo anónimo — puede referirse a la baja dentro de Mi Viaje (consistente con el patrón actual) o a un toggle add/remove desde la ficha. Requiere aclaración Founder antes de convertir el botón en toggle.
+- **H-1 (posible ambigüedad editorial):** el patrón vigente del `AddToTravelPlanButton` es _one-way add_ (una vez agregado, el botón queda deshabilitado; la baja se ejecuta desde `/mi-viaje`). La directiva de Phase 2 enumera "eliminación inmediata" como parte del flujo anónimo — puede referirse a la baja dentro de Mi Viaje (consistente con el patrón actual) o a un toggle add/remove desde la ficha. Requiere aclaración Founder antes de convertir el botón en toggle.
 - **H-2 (limitación de entorno):** flujo autenticado no re-validable en este sandbox (`LOVABLE_BROWSER_AUTH_STATUS = signed_out`). Cobertura declarada por diseño (contrato TP1.1 + `requireSupabaseAuth`) y ya validada en TP1.4A/R1; se solicita sesión inyectada para re-evidencia funcional formal si el Founder lo requiere.
 - **H-3 (SEO/canonical):** sin regresiones. `/eventos/festival-sac-be-valladolid` mantiene canonical estable y JSON-LD intacto.
 
@@ -305,33 +305,33 @@ Diff propuesto en `ExperienceRelatedCollectionBlock.tsx` (fuera del alcance de e
 
 ### 6.1 Diff TP1.4B · Phase 2 (esta entrega)
 
-| Archivo | Hash | Cambio |
-|---|---|---|
+| Archivo                                                                     | Hash    | Cambio                                     |
+| --------------------------------------------------------------------------- | ------- | ------------------------------------------ |
 | `docs/blueprint/TP1.4B-PHASE2-EVENTSURFACE-EVIDENCE-CLOSURE-REPORT-v1.0.md` | (nuevo) | Closure Report + matriz + diffs propuestos |
-| **Ningún otro archivo tocado** | — | READ-ONLY para la matriz |
+| **Ningún otro archivo tocado**                                              | —       | READ-ONLY para la matriz                   |
 
 ### 6.2 Diff TP1.4A/R1 (aceptado previamente — sin modificaciones aquí)
 
-| Archivo | Hash aceptado |
-|---|---|
+| Archivo                                             | Hash aceptado                    |
+| --------------------------------------------------- | -------------------------------- |
 | `src/components/traveler/AddToTravelPlanButton.tsx` | conservado; intacto en esta fase |
-| `src/lib/traveler/trip-eligibility.ts` | conservado; intacto |
+| `src/lib/traveler/trip-eligibility.ts`              | conservado; intacto              |
 
 ### 6.3 Diff RT-1 (cerrado — sin modificaciones aquí)
 
-| Archivo | Hash aceptado |
-|---|---|
-| `src/routes/eventos.tsx` | `eaf8de0a…` |
-| `src/routes/eventos.index.tsx` | `f60bd8b5…` |
+| Archivo                        | Hash aceptado         |
+| ------------------------------ | --------------------- |
+| `src/routes/eventos.tsx`       | `eaf8de0a…`           |
+| `src/routes/eventos.index.tsx` | `f60bd8b5…`           |
 | `src/routes/eventos.$slug.tsx` | `4a7c02a2…` (intacto) |
-| `src/routeTree.gen.ts` | `8272d2c9…` |
+| `src/routeTree.gen.ts`         | `8272d2c9…`           |
 
 ### 6.4 Diff TP1.4B v1 (aceptado funcionalmente — sin modificaciones aquí)
 
-| Archivo | Cambio |
-|---|---|
-| `src/components/surfaces/EventSurface.tsx` | Integración `AddToTravelPlanButton` (líneas 12-13, 33-37, 85-96) — validada en §2 |
-| `src/components/surfaces/TourismListingSurface.tsx` | Cobertura universal (TP1.4A) — conservado |
+| Archivo                                             | Cambio                                                                            |
+| --------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `src/components/surfaces/EventSurface.tsx`          | Integración `AddToTravelPlanButton` (líneas 12-13, 33-37, 85-96) — validada en §2 |
+| `src/components/surfaces/TourismListingSurface.tsx` | Cobertura universal (TP1.4A) — conservado                                         |
 
 ### 6.5 Archivos generados en esta entrega
 
@@ -342,17 +342,17 @@ Diff propuesto en `ExperienceRelatedCollectionBlock.tsx` (fuera del alcance de e
 
 ## 7. Verificación técnica
 
-| Prueba | Resultado |
-|---|---|
-| `bunx tsgo --noEmit` | ✅ PASS (0 errores) |
+| Prueba                                                  | Resultado                                                                           |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `bunx tsgo --noEmit`                                    | ✅ PASS (0 errores)                                                                 |
 | Consola runtime (`/eventos/festival-sac-be-valladolid`) | ✅ 0 errores; warning heredado `RESET_BLANK_CHECK` (cdn.gpteng.co) fuera de alcance |
-| Playwright · flujo anónimo | ✅ PASS |
-| Playwright · viewports 360 / 414 / 1280 | ✅ PASS |
-| Feedback óptico | 94 ms (dentro de objetivo TP1.4A/R1) |
-| Persistencia IndexedDB | ✅ `valladolidmx.sync` |
-| Prevención de duplicados | ✅ único botón; disabled tras add |
-| Regeneración de gobernanza | ❌ NO ejecutada (por instrucción Founder) |
-| Fingerprints manuales | ❌ NO modificados |
+| Playwright · flujo anónimo                              | ✅ PASS                                                                             |
+| Playwright · viewports 360 / 414 / 1280                 | ✅ PASS                                                                             |
+| Feedback óptico                                         | 94 ms (dentro de objetivo TP1.4A/R1)                                                |
+| Persistencia IndexedDB                                  | ✅ `valladolidmx.sync`                                                              |
+| Prevención de duplicados                                | ✅ único botón; disabled tras add                                                   |
+| Regeneración de gobernanza                              | ❌ NO ejecutada (por instrucción Founder)                                           |
+| Fingerprints manuales                                   | ❌ NO modificados                                                                   |
 
 ---
 

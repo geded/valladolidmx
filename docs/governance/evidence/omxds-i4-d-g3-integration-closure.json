@@ -14,12 +14,7 @@
     "preview_route": "/preview/composition/$token",
     "public_routes_added": []
   },
-  "inherited_closure": [
-    "I4-A",
-    "I4-B",
-    "I4-C",
-    "I4-R"
-  ],
+  "inherited_closure": ["I4-A", "I4-B", "I4-C", "I4-R"],
   "human_scenarios": [
     "G3-H01",
     "G3-H02",
@@ -35,16 +30,10 @@
     "G3-H12"
   ],
   "operational_model": "single-actor",
-  "deferred_non_blocking": [
-    "G3-H07",
-    "G3-H11",
-    "G3-H12"
-  ],
+  "deferred_non_blocking": ["G3-H07", "G3-H11", "G3-H12"],
   "open_p0": 0,
   "open_p1": 0,
-  "required_feature_flags": [
-    "omxds_visual_v1_contracts_enabled=false"
-  ],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
   "exact_route_count": 12,
   "exact_routes": [
     "scripts/omxds/i4/editorial-builder-g3.integration.test.ts",

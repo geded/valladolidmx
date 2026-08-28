@@ -52,13 +52,7 @@ export interface ReviewComposerProps {
   hideTrigger?: boolean;
 }
 
-function StarPicker({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (v: number) => void;
-}) {
+function StarPicker({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   return (
     <div className="flex items-center gap-1" role="radiogroup" aria-label="Calificación">
       {[1, 2, 3, 4, 5].map((n) => (
@@ -199,8 +193,7 @@ export function ReviewComposer({
         ) : elig && elig.policy ? (
           <div className="space-y-4">
             <div className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs">
-              <span className="font-medium">Política aplicada:</span>{" "}
-              {POLICY_LABEL[elig.policy]}
+              <span className="font-medium">Política aplicada:</span> {POLICY_LABEL[elig.policy]}
             </div>
 
             <div className="space-y-2">
@@ -220,9 +213,7 @@ export function ReviewComposer({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="review-body">
-                Tu reseña ({body.trim().length}/2000, mín. 30)
-              </Label>
+              <Label htmlFor="review-body">Tu reseña ({body.trim().length}/2000, mín. 30)</Label>
               <Textarea
                 id="review-body"
                 value={body}
@@ -253,9 +244,9 @@ export function ReviewComposer({
                     className="mt-0.5"
                   />
                   <span>
-                    Declaro bajo protesta que efectivamente visité este lugar y que
-                    mi reseña refleja mi experiencia real. Sé que reseñas falsas
-                    pueden ser retiradas y mi cuenta suspendida.
+                    Declaro bajo protesta que efectivamente visité este lugar y que mi reseña
+                    refleja mi experiencia real. Sé que reseñas falsas pueden ser retiradas y mi
+                    cuenta suspendida.
                   </span>
                 </label>
               </>

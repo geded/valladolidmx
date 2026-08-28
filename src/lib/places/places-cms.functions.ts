@@ -43,7 +43,7 @@ const PLACE_SELECT =
   "description, short_description, highlights, amenities, accessibility, directions, address_line, " +
   "google_place_id, visit_duration_minutes, best_time_to_visit, admission_kind, entry_fee_notes, " +
   "price_from, price_to, price_currency, contact_phone, contact_whatsapp, contact_email, " +
-  "contact_website, social_links, latitude, longitude, published_at, created_at, updated_at";
+  "contact_website, social_links, latitude, longitude, metadata, published_at, created_at, updated_at";
 
 /** Autorización dura: staff editorial o permiso granular `poi.write`. */
 async function assertPlacesStaff(context: Ctx) {

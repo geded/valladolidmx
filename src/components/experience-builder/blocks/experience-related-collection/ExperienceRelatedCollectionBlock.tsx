@@ -19,7 +19,10 @@ import { useContext, useMemo } from "react";
 import { ExperienceRelatedCollection } from "./ExperienceRelatedCollection";
 import { DestinationSurfaceContext } from "@/components/surfaces/DestinationSurface";
 import { BusinessSurfaceRelatedContext } from "@/components/surfaces/BusinessSurface";
-import { ProductSurfaceContext, ProductSurfaceRelatedContext } from "@/components/surfaces/ProductSurface";
+import {
+  ProductSurfaceContext,
+  ProductSurfaceRelatedContext,
+} from "@/components/surfaces/ProductSurface";
 import { CategorySurfaceRelatedContext } from "@/components/surfaces/CategorySurface";
 import {
   buildExperienceRelatedCollectionPreviewDTO,
@@ -47,9 +50,7 @@ import type { CategoryRelatedDTO } from "@/lib/catalog/category-related.function
 
 function safeParse(raw: unknown): ExperienceRelatedCollectionConfig {
   const r = experienceRelatedCollectionConfigSchema.safeParse(raw ?? {});
-  return r.success
-    ? r.data
-    : experienceRelatedCollectionConfigSchema.parse({});
+  return r.success ? r.data : experienceRelatedCollectionConfigSchema.parse({});
 }
 
 function resolveDestinationGroupItems(
@@ -61,31 +62,61 @@ function resolveDestinationGroupItems(
     case "hotel":
       return destinationRelatedBucketToItems(related.hoteles, "hotel", "Hoteles del destino");
     case "restaurant":
-      return destinationRelatedBucketToItems(related.restaurantes, "restaurant", "Restaurantes del destino");
+      return destinationRelatedBucketToItems(
+        related.restaurantes,
+        "restaurant",
+        "Restaurantes del destino",
+      );
     case "experience":
-      return destinationRelatedBucketToItems(related.experiencias, "experience", "Experiencias del destino");
+      return destinationRelatedBucketToItems(
+        related.experiencias,
+        "experience",
+        "Experiencias del destino",
+      );
     case "business": {
       if (categorySlug === "hoteles") {
         return destinationRelatedBucketToItems(related.hoteles, "hotel", "Hoteles del destino");
       }
       if (categorySlug === "restaurantes") {
-        return destinationRelatedBucketToItems(related.restaurantes, "restaurant", "Restaurantes del destino");
+        return destinationRelatedBucketToItems(
+          related.restaurantes,
+          "restaurant",
+          "Restaurantes del destino",
+        );
       }
       if (categorySlug === "experiencias") {
-        return destinationRelatedBucketToItems(related.experiencias, "experience", "Experiencias del destino");
+        return destinationRelatedBucketToItems(
+          related.experiencias,
+          "experience",
+          "Experiencias del destino",
+        );
       }
       // Todas las empresas del destino, sin duplicar por bucket.
       return [
         ...destinationRelatedBucketToItems(related.hoteles, "hotel", "Hoteles del destino"),
-        ...destinationRelatedBucketToItems(related.restaurantes, "restaurant", "Restaurantes del destino"),
-        ...destinationRelatedBucketToItems(related.experiencias, "experience", "Experiencias del destino"),
+        ...destinationRelatedBucketToItems(
+          related.restaurantes,
+          "restaurant",
+          "Restaurantes del destino",
+        ),
+        ...destinationRelatedBucketToItems(
+          related.experiencias,
+          "experience",
+          "Experiencias del destino",
+        ),
         ...destinationRelatedBucketToItems(related.otras, "business", "Otras empresas del destino"),
       ];
     }
     case "event":
-      return destinationRelatedEventsToItems(related.eventos ?? [], "Próximos eventos en el destino");
+      return destinationRelatedEventsToItems(
+        related.eventos ?? [],
+        "Próximos eventos en el destino",
+      );
     case "product":
-      return destinationRelatedProductsToItems(related.productos ?? [], "Productos y experiencias del destino");
+      return destinationRelatedProductsToItems(
+        related.productos ?? [],
+        "Productos y experiencias del destino",
+      );
     default:
       return [];
   }
@@ -177,10 +208,7 @@ function resolveCategoryGroupItems(
   }
   // Fallback: unión deduplicada.
   return categoryRelatedBusinessesToItems(
-    [
-      ...related.otherCategoriesInDestination,
-      ...related.sameCategoryOtherDestinations,
-    ],
+    [...related.otherCategoriesInDestination, ...related.sameCategoryOtherDestinations],
     "Sigue descubriendo el Oriente Maya",
   );
 }
@@ -195,9 +223,7 @@ function buildDTO(
   // renderizan por defecto — el editor puede desactivar `showRationale`
   // explícitamente si quiere una vista más compacta.
   const isComputedSource = cfg.source !== "manual";
-  const defaultShowRationale = isComputedSource
-    ? true
-    : (cfg.capabilities.showRationale ?? false);
+  const defaultShowRationale = isComputedSource ? true : (cfg.capabilities.showRationale ?? false);
   const capabilities = {
     showImage: cfg.capabilities.showImage ?? true,
     showMeta: cfg.capabilities.showMeta ?? true,
@@ -294,11 +320,7 @@ export function ExperienceRelatedCollectionBlock({
 
       if (cfg.source === "destination" && destination?.related) {
         // Reemplaza items del grupo por los del bucket correspondiente.
-        items = resolveDestinationGroupItems(
-          g.entityKind,
-          destination.related,
-          g.categorySlug,
-        );
+        items = resolveDestinationGroupItems(g.entityKind, destination.related, g.categorySlug);
       }
       if (cfg.source === "business" && businessRelated) {
         items = resolveBusinessGroupItems(g.id, businessRelated);
@@ -328,9 +350,5 @@ export function ExperienceRelatedCollectionBlock({
 }
 
 export function ExperienceRelatedCollectionPreview() {
-  return (
-    <ExperienceRelatedCollection
-      dto={buildExperienceRelatedCollectionPreviewDTO()}
-    />
-  );
+  return <ExperienceRelatedCollection dto={buildExperienceRelatedCollectionPreviewDTO()} />;
 }

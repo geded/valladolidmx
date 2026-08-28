@@ -170,7 +170,9 @@ export interface SignRequest {
 }
 
 function cacheKeyOf(req: SignRequest): string {
-  return req.variantKey && req.variantKey.length > 0 ? `vk:${req.variantKey}` : `bp:${req.bucket}:${req.path}`;
+  return req.variantKey && req.variantKey.length > 0
+    ? `vk:${req.variantKey}`
+    : `bp:${req.bucket}:${req.path}`;
 }
 
 /** Invalida por `variant_key` — o por bucket/path si se pasa una clave compuesta. */
@@ -199,7 +201,8 @@ const defaultSigner: NetworkSigner = async (bucket, path) => {
         const { data, error } = await supabaseAdmin.storage
           .from(bucket)
           .createSignedUrl(path, SIGN_TTL_SECONDS);
-        if (error || !data?.signedUrl) return { kind: "err" as const, reason: "signed_url_error" as MediaFallbackReason };
+        if (error || !data?.signedUrl)
+          return { kind: "err" as const, reason: "signed_url_error" as MediaFallbackReason };
         return { kind: "ok" as const, url: data.signedUrl };
       })(),
       new Promise<{ kind: "timeout" }>((resolve) => {
@@ -232,7 +235,12 @@ export interface GetSignedOptions {
 async function acquireEntry(
   req: SignRequest,
   opts: GetSignedOptions = {},
-): Promise<{ entry: SignCacheEntry; source: "cache_hit" | "cache_miss" | "coalesced"; networkMs: number; cacheLookupMs: number }> {
+): Promise<{
+  entry: SignCacheEntry;
+  source: "cache_hit" | "cache_miss" | "coalesced";
+  networkMs: number;
+  cacheLookupMs: number;
+}> {
   const now = opts._now ?? Date.now;
   const minMargin = opts.minRemainingSeconds ?? MIN_REMAINING_SECONDS;
   const key = cacheKeyOf(req);
@@ -301,7 +309,10 @@ function estimateWeight(url: string, bucket: string, path: string): number {
  * Sonda de firma para el shadow evaluator: NO devuelve URL. Sólo métricas.
  * Un fallo NO propaga; siempre devuelve un `SignResult` legible.
  */
-export async function probeSignedUrl(req: SignRequest, opts: GetSignedOptions = {}): Promise<SignResult> {
+export async function probeSignedUrl(
+  req: SignRequest,
+  opts: GetSignedOptions = {},
+): Promise<SignResult> {
   const now = opts._now ?? Date.now;
   const t0 = now();
   try {
@@ -317,7 +328,8 @@ export async function probeSignedUrl(req: SignRequest, opts: GetSignedOptions = 
     };
   } catch (err) {
     stats.errors++;
-    const reason = ((err as Error & { reason?: MediaFallbackReason }).reason ?? "signed_url_error") as MediaFallbackReason;
+    const reason = ((err as Error & { reason?: MediaFallbackReason }).reason ??
+      "signed_url_error") as MediaFallbackReason;
     return {
       ok: false,
       latencyMs: now() - t0,
@@ -330,7 +342,10 @@ export async function probeSignedUrl(req: SignRequest, opts: GetSignedOptions = 
 }
 
 /** Firma en lote — cada item se resuelve independientemente (single-flight per key). */
-export async function probeSignedUrlBatch(items: SignRequest[], opts: GetSignedOptions = {}): Promise<SignResult[]> {
+export async function probeSignedUrlBatch(
+  items: SignRequest[],
+  opts: GetSignedOptions = {},
+): Promise<SignResult[]> {
   return Promise.all(items.map((it) => probeSignedUrl(it, opts)));
 }
 
@@ -342,12 +357,22 @@ export async function probeSignedUrlBatch(items: SignRequest[], opts: GetSignedO
 export async function unsafeGetSignedUrl(
   req: SignRequest,
   opts: GetSignedOptions = {},
-): Promise<{ ok: true; url: string; source: SignResult["source"]; issuedAt: number; expiresAt: number } | { ok: false; reason: MediaFallbackReason }> {
+): Promise<
+  | { ok: true; url: string; source: SignResult["source"]; issuedAt: number; expiresAt: number }
+  | { ok: false; reason: MediaFallbackReason }
+> {
   try {
     const { entry, source } = await acquireEntry(req, opts);
-    return { ok: true, url: entry.signedUrl, source, issuedAt: entry.issuedAt, expiresAt: entry.expiresAt };
+    return {
+      ok: true,
+      url: entry.signedUrl,
+      source,
+      issuedAt: entry.issuedAt,
+      expiresAt: entry.expiresAt,
+    };
   } catch (err) {
-    const reason = ((err as Error & { reason?: MediaFallbackReason }).reason ?? "signed_url_error") as MediaFallbackReason;
+    const reason = ((err as Error & { reason?: MediaFallbackReason }).reason ??
+      "signed_url_error") as MediaFallbackReason;
     return { ok: false, reason };
   }
 }

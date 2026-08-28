@@ -74,10 +74,7 @@ function priceOf(p: MarketplaceProductDetail): PriceVM | null {
   return { amount: p.price_amount, currency: p.price_currency || "MXN" };
 }
 
-export function productToPriceCtaVM(
-  p: MarketplaceProductDetail,
-  actions: ReactNode,
-): PriceCtaVM {
+export function productToPriceCtaVM(p: MarketplaceProductDetail, actions: ReactNode): PriceCtaVM {
   return {
     price: priceOf(p),
     mode: p.conversion_mode,
@@ -87,9 +84,7 @@ export function productToPriceCtaVM(
   };
 }
 
-export function productToDescriptionVM(
-  p: MarketplaceProductDetail,
-): RichTextVM {
+export function productToDescriptionVM(p: MarketplaceProductDetail): RichTextVM {
   return {
     heading: "Descripción",
     body: p.description || null,
@@ -122,9 +117,7 @@ export function productToReviewVMs(p: MarketplaceProductDetail): ReviewVM[] {
   }));
 }
 
-export function productToReviewStatsVM(
-  p: MarketplaceProductDetail,
-): ReviewStatsVM {
+export function productToReviewStatsVM(p: MarketplaceProductDetail): ReviewStatsVM {
   return {
     count: p.review_stats.count,
     average: p.review_stats.average,
@@ -137,9 +130,7 @@ export function productToFaqVMs(p: MarketplaceProductDetail): FaqVM[] {
   return p.faqs.map((f) => ({ id: f.id, question: f.question, answer: f.answer }));
 }
 
-export function productToRelatedCardVMs(
-  p: MarketplaceProductDetail,
-): CardVM[] {
+export function productToRelatedCardVMs(p: MarketplaceProductDetail): CardVM[] {
   return p.related.map((r: MarketplaceProductCard) => ({
     id: r.id,
     href: `/producto/${r.slug}`,

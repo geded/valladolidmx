@@ -110,18 +110,20 @@ async function mapCards(rows: CardRow[], withCover: boolean): Promise<PublicEven
 }
 
 export const listPublishedEvents = createServerFn({ method: "GET" })
-  .inputValidator((input?: { destinationSlug?: string; limit?: number; upcomingOnly?: boolean }) => {
-    const i = input ?? {};
-    if (i.destinationSlug !== undefined && !isSlug(i.destinationSlug)) {
-      throw new Error("Invalid destinationSlug");
-    }
-    const limit = typeof i.limit === "number" && i.limit > 0 ? Math.min(i.limit, 100) : 60;
-    return {
-      destinationSlug: i.destinationSlug,
-      limit,
-      upcomingOnly: i.upcomingOnly !== false,
-    };
-  })
+  .inputValidator(
+    (input?: { destinationSlug?: string; limit?: number; upcomingOnly?: boolean }) => {
+      const i = input ?? {};
+      if (i.destinationSlug !== undefined && !isSlug(i.destinationSlug)) {
+        throw new Error("Invalid destinationSlug");
+      }
+      const limit = typeof i.limit === "number" && i.limit > 0 ? Math.min(i.limit, 100) : 60;
+      return {
+        destinationSlug: i.destinationSlug,
+        limit,
+        upcomingOnly: i.upcomingOnly !== false,
+      };
+    },
+  )
   .handler(async ({ data }): Promise<PublicEventCard[]> => {
     const sb = await pubClient();
     let destinationId: string | null = null;
@@ -154,7 +156,8 @@ export const listPublishedEvents = createServerFn({ method: "GET" })
 export const listEventsForDestination = createServerFn({ method: "GET" })
   .inputValidator((input: { destinationId: string; limit?: number }) => {
     if (!input || typeof input.destinationId !== "string") throw new Error("Invalid destinationId");
-    const limit = typeof input.limit === "number" && input.limit > 0 ? Math.min(input.limit, 24) : 6;
+    const limit =
+      typeof input.limit === "number" && input.limit > 0 ? Math.min(input.limit, 24) : 6;
     return { destinationId: input.destinationId, limit };
   })
   .handler(async ({ data }): Promise<PublicEventCard[]> => {
@@ -181,21 +184,16 @@ export const listEventsForDestination = createServerFn({ method: "GET" })
  * editoriales (pin/hide) sobre la superficie `event-detail`.
  */
 export const getEventRelated = createServerFn({ method: "GET" })
-  .inputValidator(
-    (input: { eventId: string; destinationId: string | null; limit?: number }) => {
-      if (!input || typeof input.eventId !== "string" || !input.eventId) {
-        throw new Error("invalid_event_id");
-      }
-      return {
-        eventId: input.eventId,
-        destinationId: typeof input.destinationId === "string" ? input.destinationId : null,
-        limit:
-          typeof input.limit === "number" && input.limit > 0
-            ? Math.min(input.limit, 12)
-            : 6,
-      };
-    },
-  )
+  .inputValidator((input: { eventId: string; destinationId: string | null; limit?: number }) => {
+    if (!input || typeof input.eventId !== "string" || !input.eventId) {
+      throw new Error("invalid_event_id");
+    }
+    return {
+      eventId: input.eventId,
+      destinationId: typeof input.destinationId === "string" ? input.destinationId : null,
+      limit: typeof input.limit === "number" && input.limit > 0 ? Math.min(input.limit, 12) : 6,
+    };
+  })
   .handler(async ({ data }): Promise<PublicEventCard[]> => {
     const sb = await pubClient();
 
@@ -247,9 +245,7 @@ export const getEventRelated = createServerFn({ method: "GET" })
         .order("starts_at", { ascending: true })
         .limit(data.limit * 2);
       const extraCards = await mapCards(
-        ((extra ?? []) as unknown as CardRow[]).filter(
-          (r) => !hidden.has(r.id) && !seen.has(r.id),
-        ),
+        ((extra ?? []) as unknown as CardRow[]).filter((r) => !hidden.has(r.id) && !seen.has(r.id)),
         false,
       );
       out = [...out, ...extraCards];
@@ -308,15 +304,12 @@ export const getEventBySlug = createServerFn({ method: "GET" })
     // eliminada, y expone destino + categoría primaria + slug — datos
     // necesarios para construir un `@id` canónico y visible.
     const biz = r.businesses ?? null;
-    const bizIsPublished =
-      !!biz && biz.status === "published" && !biz.deleted_at;
-    const organizer_business_slug = bizIsPublished ? biz!.slug ?? null : null;
-    const organizer_business_name = bizIsPublished ? biz!.display_name ?? null : null;
-    const organizer_destination_slug = bizIsPublished
-      ? biz!.destinations?.slug ?? null
-      : null;
+    const bizIsPublished = !!biz && biz.status === "published" && !biz.deleted_at;
+    const organizer_business_slug = bizIsPublished ? (biz!.slug ?? null) : null;
+    const organizer_business_name = bizIsPublished ? (biz!.display_name ?? null) : null;
+    const organizer_destination_slug = bizIsPublished ? (biz!.destinations?.slug ?? null) : null;
     const organizer_category_slug = bizIsPublished
-      ? biz!.business_categories?.slug ?? null
+      ? (biz!.business_categories?.slug ?? null)
       : null;
     return {
       id: r.id,

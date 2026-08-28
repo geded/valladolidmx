@@ -107,11 +107,7 @@ export function classifyIntent(input: {
   const savedCoupons = signals.filter((s) => s.action === "save_coupon").length;
   const askedDirections = signals.some((s) => s.action === "request_directions");
 
-  if (
-    pathname.startsWith("/promociones") ||
-    savedCoupons > 0 ||
-    unusedCouponCount >= 2
-  ) {
+  if (pathname.startsWith("/promociones") || savedCoupons > 0 || unusedCouponCount >= 2) {
     return "cazando_cupones";
   }
 
@@ -160,10 +156,7 @@ export function markNudgeShown(intent: TravelIntent): void {
   safeWrite(NUDGE_KEY, state);
 }
 
-export function useTravelIntent(input: {
-  pathname: string;
-  unusedCouponCount?: number;
-}): {
+export function useTravelIntent(input: { pathname: string; unusedCouponCount?: number }): {
   intent: TravelIntent;
   nudge: TravelIntentNudge | null;
 } {

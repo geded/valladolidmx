@@ -58,9 +58,14 @@ function EvaluarCasoPage() {
       <section className="mx-auto max-w-2xl p-6 space-y-3">
         <h1 className="text-2xl font-semibold">Evaluación no disponible</h1>
         <p className="text-sm text-muted-foreground">
-          Solo puedes evaluar este caso cuando esté cerrado. Estado actual: <code>{status || "desconocido"}</code>.
+          Solo puedes evaluar este caso cuando esté cerrado. Estado actual:{" "}
+          <code>{status || "desconocido"}</code>.
         </p>
-        <Link to="/cuenta/concierge/$caseId" params={{ caseId }} className="text-sm text-primary hover:underline">
+        <Link
+          to="/cuenta/concierge/$caseId"
+          params={{ caseId }}
+          className="text-sm text-primary hover:underline"
+        >
           ← Volver al caso
         </Link>
       </section>
@@ -123,7 +128,9 @@ function EvaluarCasoPage() {
         </div>
 
         <div>
-          <label htmlFor="comment" className="text-sm font-medium">Comentario (opcional)</label>
+          <label htmlFor="comment" className="text-sm font-medium">
+            Comentario (opcional)
+          </label>
           <textarea
             id="comment"
             rows={4}

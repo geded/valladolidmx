@@ -33,25 +33,19 @@ function publicClient() {
 const BUSINESS_SURFACE = "business-profile";
 
 export const getBusinessRelated = createServerFn({ method: "GET" })
-  .inputValidator(
-    (data: {
-      businessId: string;
-      destinationSlug: string;
-      categorySlug: string;
-    }) => {
-      if (!data || typeof data.businessId !== "string" || data.businessId.length === 0) {
-        throw new Error("invalid_business_id");
-      }
-      if (typeof data.destinationSlug !== "string" || data.destinationSlug.length === 0) {
-        throw new Error("invalid_destination_slug");
-      }
-      return {
-        businessId: data.businessId,
-        destinationSlug: data.destinationSlug,
-        categorySlug: typeof data.categorySlug === "string" ? data.categorySlug : "",
-      };
-    },
-  )
+  .inputValidator((data: { businessId: string; destinationSlug: string; categorySlug: string }) => {
+    if (!data || typeof data.businessId !== "string" || data.businessId.length === 0) {
+      throw new Error("invalid_business_id");
+    }
+    if (typeof data.destinationSlug !== "string" || data.destinationSlug.length === 0) {
+      throw new Error("invalid_destination_slug");
+    }
+    return {
+      businessId: data.businessId,
+      destinationSlug: data.destinationSlug,
+      categorySlug: typeof data.categorySlug === "string" ? data.categorySlug : "",
+    };
+  })
   .handler(async ({ data }): Promise<BusinessRelatedDTO> => {
     const supabase = publicClient();
     // E6 · Related overrides (pin/hide) para esta ficha de empresa.
@@ -94,10 +88,9 @@ export const getBusinessRelated = createServerFn({ method: "GET" })
       };
     });
 
-    const inDestination = all.filter(
-      (b) =>
-        b.destination_slug === data.destinationSlug && b.id !== data.businessId,
-    ).filter((b) => !hiddenIds.has(b.id));
+    const inDestination = all
+      .filter((b) => b.destination_slug === data.destinationSlug && b.id !== data.businessId)
+      .filter((b) => !hiddenIds.has(b.id));
 
     // Aplica pins: los items fijados se anteponen manteniendo su orden.
     const byId = new Map(all.map((b) => [b.id, b]));
@@ -108,10 +101,12 @@ export const getBusinessRelated = createServerFn({ method: "GET" })
     }
     const pinnedSet = new Set(pinnedCards.map((c) => c.id));
 
-    const sameCategoryNatural = inDestination
-      .filter((b) => b.category_slug === data.categorySlug && !pinnedSet.has(b.id));
-    const sameDestinationOtherNatural = inDestination
-      .filter((b) => b.category_slug !== data.categorySlug && !pinnedSet.has(b.id));
+    const sameCategoryNatural = inDestination.filter(
+      (b) => b.category_slug === data.categorySlug && !pinnedSet.has(b.id),
+    );
+    const sameDestinationOtherNatural = inDestination.filter(
+      (b) => b.category_slug !== data.categorySlug && !pinnedSet.has(b.id),
+    );
 
     const sameCategory = [
       ...pinnedCards.filter((c) => c.category_slug === data.categorySlug),

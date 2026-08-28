@@ -71,9 +71,7 @@ export const suggestMediaAlt = createServerFn({ method: "POST" })
     }
 
     // Firmar URL temporal (bucket privado o público, la firma funciona en ambos).
-    const { supabaseAdmin } = await import(
-      "@/integrations/supabase/client.server"
-    );
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const storage = (supabaseAdmin as any).storage;
     const { data: signed, error: signErr } = await storage
@@ -155,33 +153,29 @@ export const suggestMediaAlt = createServerFn({ method: "POST" })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .update({
           alt_text_ai: parsed.alt,
-          alt_text_source:
-            media.alt_text_source === "human" ? "human" : "ai_pending",
-          review_state:
-            media.alt_text_source === "human" ? "approved" : "ai_suggested",
+          alt_text_source: media.alt_text_source === "human" ? "human" : "ai_pending",
+          review_state: media.alt_text_source === "human" ? "approved" : "ai_suggested",
           intelligence: nextIntelligence as unknown as never,
         } as never)
         .eq("id", data.mediaId);
       if (upErr) throw upErr;
     } else {
       // Idiomas secundarios → tabla de traducciones
-      const { error: tErr } = await context.supabase
-        .from("media_asset_translations")
-        .upsert(
-          {
-            media_id: data.mediaId,
-            locale: data.locale,
-            alt_text_ai: parsed.alt,
-            title: parsed.title ?? null,
-            caption: parsed.caption ?? null,
-            description: parsed.description ?? null,
-            source: "ai_pending",
-            review_state: "ai_suggested",
-            intelligence: intelligencePatch as unknown as never,
-            updated_by: context.userId,
-          } as never,
-          { onConflict: "media_id,locale" },
-        );
+      const { error: tErr } = await context.supabase.from("media_asset_translations").upsert(
+        {
+          media_id: data.mediaId,
+          locale: data.locale,
+          alt_text_ai: parsed.alt,
+          title: parsed.title ?? null,
+          caption: parsed.caption ?? null,
+          description: parsed.description ?? null,
+          source: "ai_pending",
+          review_state: "ai_suggested",
+          intelligence: intelligencePatch as unknown as never,
+          updated_by: context.userId,
+        } as never,
+        { onConflict: "media_id,locale" },
+      );
       if (tErr) throw tErr;
     }
 
@@ -226,16 +220,14 @@ export const saveMediaMetadata = createServerFn({ method: "POST" })
       if (data.alt_text !== undefined) {
         patch.alt_text = data.alt_text;
         patch.alt_text_source = data.source;
-        patch.review_state =
-          data.source === "human" ? "approved" : "ai_suggested";
+        patch.review_state = data.source === "human" ? "approved" : "ai_suggested";
       }
       if (data.title !== undefined) patch.title = data.title;
       if (data.description !== undefined) patch.description = data.description;
       if (data.caption !== undefined) patch.caption = data.caption;
       if (data.entity_kind !== undefined) patch.entity_kind = data.entity_kind;
       if (data.entity_id !== undefined) patch.entity_id = data.entity_id;
-      if (data.usage_context !== undefined)
-        patch.usage_context = data.usage_context;
+      if (data.usage_context !== undefined) patch.usage_context = data.usage_context;
 
       const { error } = await context.supabase
         .from("media_assets")
@@ -337,9 +329,7 @@ export const suggestMediaAltBatch = createServerFn({ method: "POST" })
         }
       }
     }
-    await Promise.all(
-      Array.from({ length: Math.min(CONCURRENCY, tasks.length) }, worker),
-    );
+    await Promise.all(Array.from({ length: Math.min(CONCURRENCY, tasks.length) }, worker));
 
     const ok = results.filter((r) => r.ok).length;
     const skipped = results.filter((r) => r.skipped).length;
@@ -371,7 +361,7 @@ export const approveMediaTranslation = createServerFn({ method: "POST" })
         .select("alt_text_ai")
         .eq("id", data.mediaId)
         .maybeSingle();
-      const finalAlt = data.altText ?? (media?.alt_text_ai ?? null);
+      const finalAlt = data.altText ?? media?.alt_text_ai ?? null;
       if (!finalAlt) throw new Error("nothing_to_approve");
       const { error } = await context.supabase
         .from("media_assets")
@@ -394,21 +384,19 @@ export const approveMediaTranslation = createServerFn({ method: "POST" })
       .eq("media_id", data.mediaId)
       .eq("locale", data.locale)
       .maybeSingle();
-    const finalAlt = data.altText ?? (t?.alt_text_ai ?? null);
+    const finalAlt = data.altText ?? t?.alt_text_ai ?? null;
     if (!finalAlt) throw new Error("nothing_to_approve");
-    const { error } = await context.supabase
-      .from("media_asset_translations")
-      .upsert(
-        {
-          media_id: data.mediaId,
-          locale: data.locale,
-          alt_text: finalAlt,
-          source: data.altText ? "human" : "ai",
-          review_state: "approved",
-          updated_by: context.userId,
-        } as never,
-        { onConflict: "media_id,locale" },
-      );
+    const { error } = await context.supabase.from("media_asset_translations").upsert(
+      {
+        media_id: data.mediaId,
+        locale: data.locale,
+        alt_text: finalAlt,
+        source: data.altText ? "human" : "ai",
+        review_state: "approved",
+        updated_by: context.userId,
+      } as never,
+      { onConflict: "media_id,locale" },
+    );
     if (error) throw error;
     return { ok: true };
   });
@@ -477,10 +465,7 @@ function safeParseProposal(raw: string): Proposal {
       title: j.title ? String(j.title).slice(0, 60) : null,
       caption: j.caption ? String(j.caption).slice(0, 160) : null,
       description: j.description ? String(j.description).slice(0, 400) : null,
-      confidence:
-        typeof j.confidence === "number"
-          ? Math.max(0, Math.min(1, j.confidence))
-          : 0.5,
+      confidence: typeof j.confidence === "number" ? Math.max(0, Math.min(1, j.confidence)) : 0.5,
     };
   } catch {
     // Fallback honesto: usa el texto crudo como ALT y confidence baja.

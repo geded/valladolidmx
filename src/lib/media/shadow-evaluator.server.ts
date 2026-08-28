@@ -23,7 +23,12 @@
 
 import { timingSafeEqual } from "node:crypto";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import type { MediaAssetInput, MediaFallbackReason, MediaUsageContext, MediaVariantFormat } from "./resolve-source";
+import type {
+  MediaAssetInput,
+  MediaFallbackReason,
+  MediaUsageContext,
+  MediaVariantFormat,
+} from "./resolve-source";
 import { resolveMediaSource } from "./resolve-source";
 import { probeSignedUrl, type SignResult } from "./sign.server";
 
@@ -56,11 +61,11 @@ export type ShadowAuthorizationResult =
   | { ok: false; reason: ShadowUnauthorizedReason };
 
 export type ShadowUnauthorizedReason =
-  | "shadow_disabled"       // secreto server-side no configurado
-  | "no_header"             // request sin `x-vmx-shadow`
-  | "bad_header"            // token no coincide (comparación constante)
-  | "no_host"               // request sin host resoluble
-  | "production_host"       // host productivo — jamás autorizado
+  | "shadow_disabled" // secreto server-side no configurado
+  | "no_header" // request sin `x-vmx-shadow`
+  | "bad_header" // token no coincide (comparación constante)
+  | "no_host" // request sin host resoluble
+  | "production_host" // host productivo — jamás autorizado
   | "asset_not_allowlisted"; // asset fuera de la allowlist explícita
 
 export interface ShadowDecision {
@@ -107,7 +112,10 @@ export function constantTimeStringEqual(a: string, b: string): boolean {
  * Autorización multi-factor: entorno preview + secreto server-side + allowlist.
  * El header nunca autoriza por sí solo.
  */
-export function shadowAuthorization(ctx: ShadowContext, assetId: string): ShadowAuthorizationResult {
+export function shadowAuthorization(
+  ctx: ShadowContext,
+  assetId: string,
+): ShadowAuthorizationResult {
   const secret = process.env.MEDIA_SHADOW_INTERNAL_SECRET;
   if (!secret) return { ok: false, reason: "shadow_disabled" };
   if (!ctx.headerToken) return { ok: false, reason: "no_header" };
@@ -139,14 +147,7 @@ export interface PreloadedShadowBundle {
     id: string;
     original_width: number | null;
     original_height: number | null;
-    pipeline_status:
-      | "disabled"
-      | "pending"
-      | "processing"
-      | "ready"
-      | "failed"
-      | "skipped"
-      | null;
+    pipeline_status: "disabled" | "pending" | "processing" | "ready" | "failed" | "skipped" | null;
     has_original_checksum: boolean;
   };
   variants: VariantRow[];
@@ -260,7 +261,10 @@ export interface EvaluateOptions {
   /** Test-only: permite inyectar un fetcher de variantes sin tocar Supabase. */
   _variantFetcher?: (assetId: string) => Promise<VariantRow[]>;
   /** Test-only: permite inyectar un firmador sin tocar Storage. */
-  _signer?: (bucket: string, path: string) => Promise<{ ok: boolean; latencyMs: number; reason?: MediaFallbackReason }>;
+  _signer?: (
+    bucket: string,
+    path: string,
+  ) => Promise<{ ok: boolean; latencyMs: number; reason?: MediaFallbackReason }>;
   /** M2.3: usa la ruta cached del `sign.server`. Cae al `_signer` legacy si se
    * inyecta explícitamente en tests. */
   useSignCache?: boolean;
@@ -330,28 +334,28 @@ export async function evaluateMediaSourceShadow(
       assetPipelineStatus = options.preloaded.asset.pipeline_status;
     } else {
       const fetcher =
-      options._variantFetcher ??
-      (async (assetId: string) => {
-        const { data, error } = await supabaseAdmin
-          .from("media_asset_variants")
-          .select("format,width,height,bucket,path,variant_key,usage_context,status,is_current")
-          .eq("asset_id", assetId)
-          .eq("is_current", true)
-          .eq("status", "ready");
-        if (error) throw error;
-        return ((data ?? []) as Array<Record<string, unknown>>).map(
-          (r) =>
-            ({
-              format: r.format as MediaVariantFormat,
-              width: Number(r.width),
-              height: r.height == null ? null : Number(r.height),
-              bucket: String(r.bucket),
-              path: String(r.path),
-              variant_key: r.variant_key == null ? null : String(r.variant_key),
-              usage_context: (r.usage_context as MediaUsageContext | null) ?? null,
-            }) satisfies VariantRow,
-        );
-      });
+        options._variantFetcher ??
+        (async (assetId: string) => {
+          const { data, error } = await supabaseAdmin
+            .from("media_asset_variants")
+            .select("format,width,height,bucket,path,variant_key,usage_context,status,is_current")
+            .eq("asset_id", assetId)
+            .eq("is_current", true)
+            .eq("status", "ready");
+          if (error) throw error;
+          return ((data ?? []) as Array<Record<string, unknown>>).map(
+            (r) =>
+              ({
+                format: r.format as MediaVariantFormat,
+                width: Number(r.width),
+                height: r.height == null ? null : Number(r.height),
+                bucket: String(r.bucket),
+                path: String(r.path),
+                variant_key: r.variant_key == null ? null : String(r.variant_key),
+                usage_context: (r.usage_context as MediaUsageContext | null) ?? null,
+              }) satisfies VariantRow,
+          );
+        });
       variants = await fetcher(asset.id);
     }
     timings.preflightMs = Date.now() - preflightStart;
@@ -386,7 +390,11 @@ export async function evaluateMediaSourceShadow(
             decision.decision = "would_use_legacy";
           }
         } else {
-          const probe = await probeSignedUrl({ bucket: chosen.bucket, path: chosen.path, variantKey: chosen.variant_key });
+          const probe = await probeSignedUrl({
+            bucket: chosen.bucket,
+            path: chosen.path,
+            variantKey: chosen.variant_key,
+          });
           decision.signedUrlLatencyMs = probe.latencyMs;
           decision.signedUrlOk = probe.ok;
           decision.signSource = probe.source;
@@ -404,7 +412,11 @@ export async function evaluateMediaSourceShadow(
     // 'ready' según el asset, `resolveMediaSource` no elegiría variantes
     // ⇒ marcamos `pipeline_disabled` como razón declarativa.
     const parityStart = Date.now();
-    if (assetPipelineStatus && assetPipelineStatus !== "ready" && decision.decision === "would_use_pipeline") {
+    if (
+      assetPipelineStatus &&
+      assetPipelineStatus !== "ready" &&
+      decision.decision === "would_use_pipeline"
+    ) {
       decision.decision = "would_use_legacy";
       decision.fallbackReason = "pipeline_disabled";
     }

@@ -10,13 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  ArrowLeft,
-  BadgeCheck,
-  Check,
-  Loader2,
-  Sparkles,
-} from "lucide-react";
+import { ArrowLeft, BadgeCheck, Check, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -59,8 +53,7 @@ function useActiveBusinessId(): string | null {
       setId(d ?? null);
     };
     window.addEventListener("portal:active-business-changed", h);
-    return () =>
-      window.removeEventListener("portal:active-business-changed", h);
+    return () => window.removeEventListener("portal:active-business-changed", h);
   }, []);
   return id;
 }
@@ -105,9 +98,7 @@ function VisibilityPage() {
     queryKey: ["visibility-grant", businessId],
     enabled: !!businessId,
     queryFn: () =>
-      fetchGrant({ data: { business_id: businessId! } }) as Promise<
-        BusinessVisibilityGrant | null
-      >,
+      fetchGrant({ data: { business_id: businessId! } }) as Promise<BusinessVisibilityGrant | null>,
   });
 
   const [selectedPlan, setSelectedPlan] = useState<VisibilityPlan | null>(null);
@@ -128,8 +119,7 @@ function VisibilityPage() {
     },
     onSuccess: () => {
       toast.success("Solicitud enviada", {
-        description:
-          "El equipo de Valladolid.mx activará tu paquete en las próximas horas.",
+        description: "El equipo de Valladolid.mx activará tu paquete en las próximas horas.",
       });
       queryClient.invalidateQueries({
         queryKey: ["visibility-grant", businessId],
@@ -151,13 +141,11 @@ function VisibilityPage() {
     <div className="mx-auto max-w-6xl space-y-6">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-primary">
-            Portal empresa
-          </p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Portal empresa</p>
           <h1 className="text-2xl font-semibold">Paquetes de visibilidad</h1>
           <p className="text-sm text-muted-foreground">
-            Elige cuánta exposición quieres en Valladolid.mx, Alux y todo el
-            ecosistema Oriente Maya.
+            Elige cuánta exposición quieres en Valladolid.mx, Alux y todo el ecosistema Oriente
+            Maya.
           </p>
         </div>
         <Button variant="ghost" size="sm" asChild>
@@ -200,9 +188,8 @@ function VisibilityPage() {
           )}
 
           <p className="text-center text-xs text-muted-foreground">
-            El cobro con tarjeta llegará muy pronto. Por ahora, al solicitar un
-            paquete el equipo de Valladolid.mx te contactará para coordinar el
-            pago y activarlo en el mismo día hábil.
+            El cobro con tarjeta llegará muy pronto. Por ahora, al solicitar un paquete el equipo de
+            Valladolid.mx te contactará para coordinar el pago y activarlo en el mismo día hábil.
           </p>
         </>
       )}
@@ -239,12 +226,11 @@ function ActiveGrantCard({
     return (
       <div className="rounded-lg border border-dashed border-border bg-card/40 p-4 text-sm">
         <div className="flex items-center gap-2 font-medium">
-          <Sparkles className="h-4 w-4 text-primary" /> Aún no tienes paquete
-          contratado
+          <Sparkles className="h-4 w-4 text-primary" /> Aún no tienes paquete contratado
         </div>
         <p className="mt-1 text-muted-foreground">
-          Tu empresa aparece con el plan <strong>Básico</strong> gratuito.
-          Contrata un paquete superior para mayor visibilidad.
+          Tu empresa aparece con el plan <strong>Básico</strong> gratuito. Contrata un paquete
+          superior para mayor visibilidad.
         </p>
       </div>
     );
@@ -300,9 +286,7 @@ function PlanCard({
         <div>
           <h3 className="text-lg font-semibold">{plan.name}</h3>
           {plan.description_short ? (
-            <p className="text-xs text-muted-foreground">
-              {plan.description_short}
-            </p>
+            <p className="text-xs text-muted-foreground">{plan.description_short}</p>
           ) : null}
         </div>
         {isCurrent ? (
@@ -316,16 +300,12 @@ function PlanCard({
         <div className="text-2xl font-bold">
           {isFree ? "Gratis" : formatMXN(Number(plan.base_price_mxn))}
           {!isFree ? (
-            <span className="ml-1 text-xs font-normal text-muted-foreground">
-              / mes
-            </span>
+            <span className="ml-1 text-xs font-normal text-muted-foreground">/ mes</span>
           ) : null}
         </div>
         {plan.cycles && plan.cycles.length > 1 ? (
           <p className="text-[11px] text-muted-foreground">
-            Ahorra hasta{" "}
-            {Math.max(...plan.cycles.map((c) => c.discount_pct ?? 0))}% en ciclo
-            anual
+            Ahorra hasta {Math.max(...plan.cycles.map((c) => c.discount_pct ?? 0))}% en ciclo anual
           </p>
         ) : null}
       </div>
@@ -345,11 +325,7 @@ function PlanCard({
         onClick={onSelect}
         className="w-full"
       >
-        {isCurrent
-          ? "Plan actual"
-          : isFree
-            ? "Plan por defecto"
-            : "Contratar"}
+        {isCurrent ? "Plan actual" : isFree ? "Plan por defecto" : "Contratar"}
       </Button>
     </div>
   );
@@ -361,28 +337,21 @@ function buildHighlights(plan: VisibilityPlan): string[] {
   const v = plan.visibility_levers ?? {};
   if (l.max_photos != null) out.push(`Hasta ${l.max_photos} fotos`);
   if (l.max_products != null) out.push(`Hasta ${l.max_products} productos`);
-  if (l.max_active_coupons != null)
-    out.push(`Hasta ${l.max_active_coupons} cupones activos`);
+  if (l.max_active_coupons != null) out.push(`Hasta ${l.max_active_coupons} cupones activos`);
   if (l.max_events != null) out.push(`Hasta ${l.max_events} eventos`);
   if (l.max_featured_campaigns != null && l.max_featured_campaigns > 0)
     out.push(`${l.max_featured_campaigns} campañas destacadas`);
   if (v.discovery_boost && v.discovery_boost > 0)
     out.push(`+${v.discovery_boost} en descubrimiento`);
   if (v.map_boost && v.map_boost > 0) out.push(`+${v.map_boost} en el mapa`);
-  if (v.home_boost && v.home_boost > 0)
-    out.push(`+${v.home_boost} en la home`);
-  if (v.alux_weight && v.alux_weight > 0)
-    out.push(`Alux te recomienda (peso ${v.alux_weight})`);
+  if (v.home_boost && v.home_boost > 0) out.push(`+${v.home_boost} en la home`);
+  if (v.alux_weight && v.alux_weight > 0) out.push(`Alux te recomienda (peso ${v.alux_weight})`);
   if (v.alux_proactive) out.push("Alux te menciona proactivamente");
   if (v.badge_visible) out.push("Badge oficial visible");
   if (v.golden_pin) out.push("Pin dorado en el mapa");
   if (v.in_emails) out.push("Menciones en emails a viajeros");
   if (v.cross_destination)
-    out.push(
-      `Visibilidad cruzada${
-        v.cross_radius_km ? ` (${v.cross_radius_km} km)` : ""
-      }`,
-    );
+    out.push(`Visibilidad cruzada${v.cross_radius_km ? ` (${v.cross_radius_km} km)` : ""}`);
   return out.slice(0, 8);
 }
 
@@ -411,8 +380,8 @@ function RequestDialog({
         <DialogHeader>
           <DialogTitle>Contratar {plan?.name}</DialogTitle>
           <DialogDescription>
-            Elige el ciclo. El equipo de Valladolid.mx te contactará para
-            coordinar el pago y activar tu paquete el mismo día hábil.
+            Elige el ciclo. El equipo de Valladolid.mx te contactará para coordinar el pago y
+            activar tu paquete el mismo día hábil.
           </DialogDescription>
         </DialogHeader>
 

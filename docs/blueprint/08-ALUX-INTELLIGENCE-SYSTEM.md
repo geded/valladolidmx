@@ -1,6 +1,7 @@
 # 08-ALUX-INTELLIGENCE-SYSTEM.md
 
 # Alux Intelligence System
+
 Versión 1.0
 
 ## Objetivo
@@ -39,6 +40,7 @@ Alux ayuda a descubrir destinos, rutas y experiencias.
 Trabaja junto con "Arma tu Viaje".
 
 Sugiere:
+
 - rutas
 - tiempos
 - combinaciones
@@ -52,6 +54,7 @@ Genera automáticamente un expediente para el concierge.
 ## 4. Durante el viaje
 
 Responde preguntas sobre:
+
 - clima
 - horarios
 - transporte

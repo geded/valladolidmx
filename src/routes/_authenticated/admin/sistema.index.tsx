@@ -54,15 +54,21 @@ function AdminSistemaHub() {
         {
           title: "Composición",
           links: [
-            { to: "/cms/experience-builder", label: "Experience Builder", description: "Editor visual." },
-            { to: "/cms/experience-builder/pages", label: "Páginas EB", description: "Inventario de composiciones." },
+            {
+              to: "/cms/experience-builder",
+              label: "Experience Builder",
+              description: "Editor visual.",
+            },
+            {
+              to: "/cms/experience-builder/pages",
+              label: "Páginas EB",
+              description: "Inventario de composiciones.",
+            },
           ],
         },
         {
           title: "Moderación",
-          links: [
-            { to: "/cms/reviews", label: "Reseñas / moderación" },
-          ],
+          links: [{ to: "/cms/reviews", label: "Reseñas / moderación" }],
         },
       ]}
     />

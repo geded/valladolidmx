@@ -23,26 +23,19 @@ export const Route = createFileRoute("/_authenticated/cms")({
 function CmsLayout() {
   const { roles } = useAuth();
   const location = useLocation();
-  const isEditorial = useMemo(
-    () => roles.some((r) => EDITORIAL_ROLES.includes(r)),
-    [roles],
-  );
+  const isEditorial = useMemo(() => roles.some((r) => EDITORIAL_ROLES.includes(r)), [roles]);
   const isAssignedDecisionOperator =
-    roles.includes("concierge_lead") &&
-    location.pathname === "/cms/visitor-intel/decisions";
+    roles.includes("concierge_lead") && location.pathname === "/cms/visitor-intel/decisions";
 
   if (!isEditorial && !isAssignedDecisionOperator) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="max-w-md text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-            403
-          </p>
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">403</p>
           <h1 className="mt-2 text-3xl">Acceso restringido</h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            El CMS Studio está reservado a los roles editoriales de
-            Valladolid.mx. Si crees que deberías tener acceso, contacta al
-            administrador del Blueprint.
+            El CMS Studio está reservado a los roles editoriales de Valladolid.mx. Si crees que
+            deberías tener acceso, contacta al administrador del Blueprint.
           </p>
           <Link
             to="/"

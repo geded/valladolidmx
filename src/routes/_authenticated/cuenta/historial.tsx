@@ -60,8 +60,7 @@ function HistorialPage() {
   });
 
   const payMutation = useMutation({
-    mutationFn: (order_id: string) =>
-      pay({ data: { order_id, client_request_id: genId() } }),
+    mutationFn: (order_id: string) => pay({ data: { order_id, client_request_id: genId() } }),
     onSuccess: (res) => {
       if (res.mode === "redirect" && res.redirectUrl) {
         window.location.href = res.redirectUrl;
@@ -76,8 +75,8 @@ function HistorialPage() {
       </p>
       <h1 className="mt-2 text-4xl">Historial</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        Tus órdenes confirmadas, pendientes y canceladas. El cobro se
-        habilitará en la siguiente etapa.
+        Tus órdenes confirmadas, pendientes y canceladas. El cobro se habilitará en la siguiente
+        etapa.
       </p>
 
       {isLoading ? (
@@ -89,8 +88,7 @@ function HistorialPage() {
       ) : !data || data.length === 0 ? (
         <div className="mt-8 rounded-2xl border border-dashed border-border bg-card p-6">
           <p className="text-sm text-muted-foreground">
-            Aún no tienes órdenes. Cuando confirmes una reserva aparecerá
-            aquí.
+            Aún no tienes órdenes. Cuando confirmes una reserva aparecerá aquí.
           </p>
           <Link
             to="/cuenta/carrito"

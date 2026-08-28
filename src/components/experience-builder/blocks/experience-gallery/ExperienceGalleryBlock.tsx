@@ -36,7 +36,9 @@ function buildDTO(cfg: ExperienceGalleryConfig): ExperienceGalleryDTO {
   };
 }
 
-export interface ExperienceGalleryBlockProps { config?: unknown }
+export interface ExperienceGalleryBlockProps {
+  config?: unknown;
+}
 
 export function ExperienceGalleryBlock({ config }: ExperienceGalleryBlockProps) {
   const cfg = safeParse(config);

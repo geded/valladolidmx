@@ -76,13 +76,7 @@ export interface ConciergeOutcome extends SubMotorResult {
 /** Outcome del sub-motor Commerce. */
 export interface CommerceOutcome extends SubMotorResult {
   order_id: string | null;
-  status:
-    | "not_created"
-    | "payment_pending"
-    | "paid"
-    | "cancelled"
-    | "expired"
-    | "refunded";
+  status: "not_created" | "payment_pending" | "paid" | "cancelled" | "expired" | "refunded";
   amount_usd: number | null;
 }
 

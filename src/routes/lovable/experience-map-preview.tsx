@@ -4,10 +4,7 @@ import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experienc
 
 export const Route = createFileRoute("/lovable/experience-map-preview")({
   head: () => ({
-    meta: [
-      { title: "Preview · Experience Map" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Preview · Experience Map" }, { name: "robots", content: "noindex" }],
   }),
   component: ExperienceMapPreview,
 });
@@ -48,10 +45,54 @@ const multi: ExperienceMapDTO = {
   heading: "Micrositio Destino · variant multi",
   center: CENTER,
   points: [
-    { id: "p1", kind: "business", lat: 20.6896, lng: -88.2011, title: "Cenote Zaci", subtitle: "Cenote urbano", href: "#", thumbUrl: null, badge: null, priceLabel: "MXN 150" },
-    { id: "p2", kind: "business", lat: 20.6875, lng: -88.2028, title: "Convento de Sisal", subtitle: "Patrimonio · s.XVI", href: "#", thumbUrl: null, badge: null, priceLabel: null },
-    { id: "p3", kind: "business", lat: 20.691,  lng: -88.199,  title: "Mercado Municipal", subtitle: "Gastronomía local", href: "#", thumbUrl: null, badge: null, priceLabel: null },
-    { id: "p4", kind: "business", lat: 20.686,  lng: -88.204,  title: "Casa de los Venados", subtitle: "Arte popular", href: "#", thumbUrl: null, badge: null, priceLabel: "MXN 100" },
+    {
+      id: "p1",
+      kind: "business",
+      lat: 20.6896,
+      lng: -88.2011,
+      title: "Cenote Zaci",
+      subtitle: "Cenote urbano",
+      href: "#",
+      thumbUrl: null,
+      badge: null,
+      priceLabel: "MXN 150",
+    },
+    {
+      id: "p2",
+      kind: "business",
+      lat: 20.6875,
+      lng: -88.2028,
+      title: "Convento de Sisal",
+      subtitle: "Patrimonio · s.XVI",
+      href: "#",
+      thumbUrl: null,
+      badge: null,
+      priceLabel: null,
+    },
+    {
+      id: "p3",
+      kind: "business",
+      lat: 20.691,
+      lng: -88.199,
+      title: "Mercado Municipal",
+      subtitle: "Gastronomía local",
+      href: "#",
+      thumbUrl: null,
+      badge: null,
+      priceLabel: null,
+    },
+    {
+      id: "p4",
+      kind: "business",
+      lat: 20.686,
+      lng: -88.204,
+      title: "Casa de los Venados",
+      subtitle: "Arte popular",
+      href: "#",
+      thumbUrl: null,
+      badge: null,
+      priceLabel: "MXN 100",
+    },
   ],
   capabilities: {
     showDistance: true,
@@ -89,9 +130,8 @@ function ExperienceMapPreview() {
           Experience Map · preview de variantes
         </h1>
         <p className="text-sm text-muted-foreground">
-          Bloque oficial <code>vmx.experience.map</code>. Founder Discovery
-          Map Principle: dónde está · qué hay cerca · cómo llegar · qué
-          descubrir alrededor.
+          Bloque oficial <code>vmx.experience.map</code>. Founder Discovery Map Principle: dónde
+          está · qué hay cerca · cómo llegar · qué descubrir alrededor.
         </p>
       </header>
 

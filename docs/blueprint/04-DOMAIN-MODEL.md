@@ -1,6 +1,7 @@
 # 04-DOMAIN-MODEL.md
 
 # Modelo de Dominio
+
 Versión 1.0
 
 ## Objetivo
@@ -12,9 +13,11 @@ Definir las entidades principales de la plataforma y cómo se relacionan entre s
 # Entidades principales
 
 ## Región
+
 Representa un territorio turístico.
 
 Atributos:
+
 - Nombre
 - Descripción
 - Imagen principal
@@ -29,6 +32,7 @@ Tiene muchos Destinos.
 Ejemplo: Valladolid.
 
 Atributos:
+
 - Nombre
 - Historia
 - Coordenadas
@@ -38,6 +42,7 @@ Atributos:
 - SEO
 
 Tiene:
+
 - Hoteles
 - Restaurantes
 - Experiencias
@@ -49,6 +54,7 @@ Tiene:
 ## Categoría
 
 Ejemplos:
+
 - Hotel
 - Restaurante
 - Cenote
@@ -62,6 +68,7 @@ Ejemplos:
 ## Empresa
 
 Atributos:
+
 - Datos generales
 - Contacto
 - Ubicación
@@ -88,6 +95,7 @@ Puede pertenecer a una empresa.
 ## Usuario
 
 Tipos:
+
 - Visitante
 - Registrado
 - Empresa
@@ -99,6 +107,7 @@ Tipos:
 ## Perfil del viajero
 
 Guarda:
+
 - Idioma
 - Preferencias
 - Tipo de viaje
@@ -111,6 +120,7 @@ Guarda:
 ## Arma tu Viaje
 
 Contiene:
+
 - Destinos
 - Hoteles
 - Restaurantes
@@ -120,6 +130,7 @@ Contiene:
 - Fechas
 
 Estados:
+
 - Borrador
 - Solicitado
 - En revisión
@@ -134,6 +145,7 @@ Estados:
 Recibe expedientes creados desde Arma tu Viaje.
 
 Puede:
+
 - Editar
 - Cotizar
 - Comentar
@@ -144,6 +156,7 @@ Puede:
 ## Alux
 
 Entidad lógica que:
+
 - Analiza preferencias
 - Genera recomendaciones
 - Resume reseñas
@@ -155,6 +168,7 @@ Entidad lógica que:
 ## Reseña
 
 Atributos:
+
 - Calificación
 - Comentario
 - Idioma
@@ -168,6 +182,7 @@ Atributos:
 ## Plan de Visibilidad
 
 Tipos sugeridos:
+
 - Gratuito
 - Profesional
 - Premium

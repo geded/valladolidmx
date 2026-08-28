@@ -48,12 +48,8 @@ export const Route = createFileRoute("/api/dev/media-shadow-eval")({
         }
 
         // Import dinámico para mantener el módulo server-only fuera del bundle cliente.
-        const { evaluateMediaSourceShadow } = await import(
-          "@/lib/media/shadow-evaluator.server"
-        );
-        const { preloadShadowAssetBundle } = await import(
-          "@/lib/media/shadow-preloader.server"
-        );
+        const { evaluateMediaSourceShadow } = await import("@/lib/media/shadow-evaluator.server");
+        const { preloadShadowAssetBundle } = await import("@/lib/media/shadow-preloader.server");
 
         // M2.2: precarga server-side batched (0..2 queries). Allowlist se
         // valida dentro del preloader; ids ajenos se descartan silenciosamente.

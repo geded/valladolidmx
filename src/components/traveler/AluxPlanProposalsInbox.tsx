@@ -53,8 +53,7 @@ export function AluxPlanProposalsInbox({ onChanged }: { onChanged?: () => void }
       toast.success("Añadido a tu viaje");
       invalidate();
     },
-    onError: (e: unknown) =>
-      toast.error(e instanceof Error ? e.message : "No se pudo añadir"),
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "No se pudo añadir"),
   });
 
   const dismiss = useMutation({
@@ -63,8 +62,7 @@ export function AluxPlanProposalsInbox({ onChanged }: { onChanged?: () => void }
       toast.success("Sugerencia descartada");
       invalidate();
     },
-    onError: (e: unknown) =>
-      toast.error(e instanceof Error ? e.message : "No se pudo descartar"),
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "No se pudo descartar"),
   });
 
   const items = q.data ?? [];
@@ -129,16 +127,10 @@ function ProposalRow({
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-            {label}
-          </p>
-          <p className="truncate text-sm font-medium text-foreground">
-            {proposal.title}
-          </p>
+          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</p>
+          <p className="truncate text-sm font-medium text-foreground">{proposal.title}</p>
           {proposal.subtitle && (
-            <p className="truncate text-xs text-muted-foreground">
-              {proposal.subtitle}
-            </p>
+            <p className="truncate text-xs text-muted-foreground">{proposal.subtitle}</p>
           )}
           {proposal.rationale && (
             <>
@@ -173,7 +165,9 @@ function ProposalRow({
           onClick={onAccept}
           disabled={busy || !canAccept}
           className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-          title={canAccept ? undefined : "Sugerencia sin referencia; no se puede añadir automáticamente"}
+          title={
+            canAccept ? undefined : "Sugerencia sin referencia; no se puede añadir automáticamente"
+          }
         >
           <Check className="h-3.5 w-3.5" aria-hidden />
           Añadir a mi viaje

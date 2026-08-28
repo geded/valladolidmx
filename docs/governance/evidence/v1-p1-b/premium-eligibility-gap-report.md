@@ -24,12 +24,12 @@ No se crea ningún bypass, placeholder ni excepción.
 
 ## 2. Inventario heredado (19.00 / 19.16 · V1-P1.a)
 
-| Clasificación | Assets | Elegible producción | Motivo de bloqueo |
-| --- | --- | --- | --- |
-| DEMO (destinos) | 6 | 0 | `is_demo_seed` / clasificación DEMO |
-| REAL_UNGOVERNED | 4 | 0 | `rights_status = pending_owner`, ALT ausente o nombre de archivo, dimensiones desconocidas |
-| TECHNICAL | 1 | 0 | benchmark interno, excluido de superficies editoriales |
-| **Total utilizables** | **11 registrados / 10 utilizables** | **0** | — |
+| Clasificación         | Assets                              | Elegible producción | Motivo de bloqueo                                                                          |
+| --------------------- | ----------------------------------- | ------------------- | ------------------------------------------------------------------------------------------ |
+| DEMO (destinos)       | 6                                   | 0                   | `is_demo_seed` / clasificación DEMO                                                        |
+| REAL_UNGOVERNED       | 4                                   | 0                   | `rights_status = pending_owner`, ALT ausente o nombre de archivo, dimensiones desconocidas |
+| TECHNICAL             | 1                                   | 0                   | benchmark interno, excluido de superficies editoriales                                     |
+| **Total utilizables** | **11 registrados / 10 utilizables** | **0**               | —                                                                                          |
 
 Fuente: `docs/governance/evidence/v1-p1-a/asset-governance-matrix.csv` y
 `docs/governance/15-ASSET-RIGHTS-REGISTER-v1.0.md`.
@@ -38,12 +38,12 @@ Fuente: `docs/governance/evidence/v1-p1-a/asset-governance-matrix.csv` y
 
 ## 3. Brecha por vertical
 
-| Vertical | Requisito bloqueante | Estado | Efecto en 19.18 |
-| --- | --- | --- | --- |
-| Hotel | portada con ALT real + galería ≥2 + lat/lng + SEO | sin assets gobernados | no publica premium |
-| Restaurante | portada con ALT real + galería ≥2 + lat/lng + SEO | sin assets gobernados | no publica premium |
+| Vertical         | Requisito bloqueante                                       | Estado                | Efecto en 19.18    |
+| ---------------- | ---------------------------------------------------------- | --------------------- | ------------------ |
+| Hotel            | portada con ALT real + galería ≥2 + lat/lng + SEO          | sin assets gobernados | no publica premium |
+| Restaurante      | portada con ALT real + galería ≥2 + lat/lng + SEO          | sin assets gobernados | no publica premium |
 | Experiencia/Tour | portada + features incluye/no incluye + punto de encuentro | sin assets gobernados | no publica premium |
-| Destino | portada con ALT real, provenance gobernada | sólo material DEMO | no publica premium |
+| Destino          | portada con ALT real, provenance gobernada                 | sólo material DEMO    | no publica premium |
 
 ---
 
@@ -63,12 +63,12 @@ y la ficha asciende automáticamente a plantilla premium, sin cambio de código.
 
 ## 5. Reconciliación estructural verificada
 
-| Dimensión | Cantidad | Observación |
-| --- | --- | --- |
-| Bloques oficiales EB | 13 | `DiscoveryNavigatorBlock` excluido (no oficial) |
-| Superficies | 11 | 4 implicadas + 2 de apoyo |
-| Piezas del kit | 14 | — |
-| Tipos autorables `vmx.kit.*` | 11 | 3 piezas estructurales sin tipo autorable: EmptyHint, PriceCta, Shell |
+| Dimensión                    | Cantidad | Observación                                                           |
+| ---------------------------- | -------- | --------------------------------------------------------------------- |
+| Bloques oficiales EB         | 13       | `DiscoveryNavigatorBlock` excluido (no oficial)                       |
+| Superficies                  | 11       | 4 implicadas + 2 de apoyo                                             |
+| Piezas del kit               | 14       | —                                                                     |
+| Tipos autorables `vmx.kit.*` | 11       | 3 piezas estructurales sin tipo autorable: EmptyHint, PriceCta, Shell |
 
 Asimetría 14 → 11 documentada y aceptada; no se propone cambio.
 

@@ -11,7 +11,9 @@ import { SITE, absoluteUrl } from "@/config/site";
 import { listPublishedEvents, type PublicEventCard } from "@/lib/events/public-reads.functions";
 
 export const Route = createFileRoute("/blog")({
-  loader: async () => ({ eventos: await listPublishedEvents().catch(() => [] as PublicEventCard[]) }),
+  loader: async () => ({
+    eventos: await listPublishedEvents().catch(() => [] as PublicEventCard[]),
+  }),
   head: () =>
     buildPublicHead({
       title: `Blog · ${SITE.name}`,
@@ -51,7 +53,9 @@ function BlogRoute() {
         {eventos.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             Aún no hay notas publicadas. Mientras tanto, descubre los{" "}
-            <Link to="/oriente-maya" className="text-primary hover:underline">23 destinos</Link>{" "}
+            <Link to="/oriente-maya" className="text-primary hover:underline">
+              23 destinos
+            </Link>{" "}
             del Oriente Maya.
           </p>
         ) : (

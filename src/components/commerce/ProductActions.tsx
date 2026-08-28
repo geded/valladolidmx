@@ -44,17 +44,12 @@ const SECONDARY_DEFAULT_LABEL: Record<string, string> = {
   sitio_externo: "Visitar sitio",
 };
 
-function PrimaryButton({
-  product,
-}: {
-  product: ProductActionsProduct;
-}) {
+function PrimaryButton({ product }: { product: ProductActionsProduct }) {
   const mode = product.conversion_mode || "informacion";
   if (mode === "reservar_en_linea" && product.accepts_online_payment) {
     return <AddToCartButton productId={product.id} />;
   }
-  const label =
-    product.primary_action_label ?? PRIMARY_DEFAULT_LABEL[mode] ?? "Ver más";
+  const label = product.primary_action_label ?? PRIMARY_DEFAULT_LABEL[mode] ?? "Ver más";
   return (
     <button
       type="button"
@@ -67,15 +62,10 @@ function PrimaryButton({
   );
 }
 
-function SecondaryAction({
-  product,
-}: {
-  product: ProductActionsProduct;
-}) {
+function SecondaryAction({ product }: { product: ProductActionsProduct }) {
   const mode = product.secondary_action_mode;
   if (!mode) return null;
-  const label =
-    product.secondary_action_label ?? SECONDARY_DEFAULT_LABEL[mode] ?? mode;
+  const label = product.secondary_action_label ?? SECONDARY_DEFAULT_LABEL[mode] ?? mode;
 
   // "guardar_para_despues" se materializa hoy con el botón de favoritos
   // (la infraestructura ya existe en Etapa 4).

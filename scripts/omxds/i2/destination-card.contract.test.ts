@@ -1,5 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createCardAnalyticsEvent, hasAnalyticsPii } from "../../../src/lib/omxds/cards/card-contract";
+import {
+  createCardAnalyticsEvent,
+  hasAnalyticsPii,
+} from "../../../src/lib/omxds/cards/card-contract";
 import { validateDestinationCardContract } from "../../../src/lib/omxds/cards/destination-card.contract";
 
 const fixture = {
@@ -27,7 +30,11 @@ describe("DestinationCard contract", () => {
   });
 
   test("rejects missing CTA and excessive reasons", () => {
-    const result = validateDestinationCardContract({ ...fixture, reasons: ["1", "2", "3", "4"], actions: [] });
+    const result = validateDestinationCardContract({
+      ...fixture,
+      reasons: ["1", "2", "3", "4"],
+      actions: [],
+    });
     expect(result.valid).toBe(false);
     expect(result.errors).toContain("exactly one discover action is required");
   });

@@ -118,10 +118,7 @@ export function AluxContextChip({
   }, [hours]);
 
   // Si no hay NINGÚN insight, no renderices ruido.
-  const hasAny =
-    distanceKm != null ||
-    (openNow && openNow.state !== "unknown") ||
-    hasCoupon;
+  const hasAny = distanceKm != null || (openNow && openNow.state !== "unknown") || hasCoupon;
   if (!hasAny) return null;
 
   return (
@@ -135,7 +132,9 @@ export function AluxContextChip({
         <Sparkles className="h-4 w-4" aria-hidden />
         Alux
       </span>
-      <span className="text-primary/40" aria-hidden>·</span>
+      <span className="text-primary/40" aria-hidden>
+        ·
+      </span>
 
       {distanceKm != null ? (
         <>
@@ -144,7 +143,9 @@ export function AluxContextChip({
             {formatDistance(distanceKm)}
           </span>
           {(openNow?.state !== "unknown" || hasCoupon) && (
-            <span className="text-primary/30" aria-hidden>·</span>
+            <span className="text-primary/30" aria-hidden>
+              ·
+            </span>
           )}
         </>
       ) : null}
@@ -154,15 +155,17 @@ export function AluxContextChip({
           <span
             className={
               "inline-flex items-center gap-1.5 " +
-              (openNow.state === "open"
-                ? "text-success"
-                : "text-muted-foreground")
+              (openNow.state === "open" ? "text-success" : "text-muted-foreground")
             }
           >
             <Clock className="h-3.5 w-3.5" aria-hidden />
             {openNow.label}
           </span>
-          {hasCoupon && <span className="text-primary/30" aria-hidden>·</span>}
+          {hasCoupon && (
+            <span className="text-primary/30" aria-hidden>
+              ·
+            </span>
+          )}
         </>
       ) : null}
 

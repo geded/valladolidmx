@@ -10,10 +10,10 @@ import { z } from "zod";
 export const EXPERIENCE_FEATURES_CONTRACT_VERSION = "1.0.0";
 
 export const experienceFeaturesVariantSchema = z.enum([
-  "grid",     // Grid de tarjetas con icono + título + descripción.
+  "grid", // Grid de tarjetas con icono + título + descripción.
   "checklist", // Lista con checks (amenities).
-  "chips",    // Chips compactos (amenities cortos).
-  "columns",  // Dos columnas editorial.
+  "chips", // Chips compactos (amenities cortos).
+  "columns", // Dos columnas editorial.
 ]);
 
 export const experienceFeaturesSourceSchema = z.enum([
@@ -83,12 +83,37 @@ export function buildExperienceFeaturesPreviewDTO(): ExperienceFeaturesDTO {
     subheading: null,
     columns: 3,
     items: [
-      { iconKey: "wifi", title: "Wi-Fi de alta velocidad", description: "En todo el recinto", available: true },
-      { iconKey: "utensils", title: "Desayuno incluido", description: "Cocina yucateca", available: true },
-      { iconKey: "car", title: "Estacionamiento", description: "Gratuito y vigilado", available: true },
+      {
+        iconKey: "wifi",
+        title: "Wi-Fi de alta velocidad",
+        description: "En todo el recinto",
+        available: true,
+      },
+      {
+        iconKey: "utensils",
+        title: "Desayuno incluido",
+        description: "Cocina yucateca",
+        available: true,
+      },
+      {
+        iconKey: "car",
+        title: "Estacionamiento",
+        description: "Gratuito y vigilado",
+        available: true,
+      },
       { iconKey: "waves", title: "Alberca", description: "Abierta 7:00 – 22:00", available: true },
-      { iconKey: "leaf", title: "Jardín botánico", description: "Recorrido guiado", available: true },
-      { iconKey: "accessibility", title: "Accesibilidad", description: "Rampas y baños adaptados", available: true },
+      {
+        iconKey: "leaf",
+        title: "Jardín botánico",
+        description: "Recorrido guiado",
+        available: true,
+      },
+      {
+        iconKey: "accessibility",
+        title: "Accesibilidad",
+        description: "Rampas y baños adaptados",
+        available: true,
+      },
     ],
     ariaLabel: "Características",
     capabilities: {

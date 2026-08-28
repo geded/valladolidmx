@@ -97,7 +97,8 @@ export const resolveDestinationSwitch = createServerFn({ method: "GET" })
   .inputValidator((input: DestinationSwitchInput) => {
     if (!input || !slugOk(input.to)) throw new Error("invalid_to");
     const f = input.from ?? {};
-    if (f.destination != null && !slugOk(f.destination)) throw new Error("invalid_from_destination");
+    if (f.destination != null && !slugOk(f.destination))
+      throw new Error("invalid_from_destination");
     if (f.category != null && !slugOk(f.category)) throw new Error("invalid_from_category");
     if (f.business != null && !slugOk(f.business)) throw new Error("invalid_from_business");
     if (f.product != null && !slugOk(f.product)) throw new Error("invalid_from_product");

@@ -12,9 +12,9 @@ export const EXPERIENCE_SECTION_CONTRACT_VERSION = "1.0.0";
 
 export const experienceSectionVariantSchema = z.enum([
   "editorial", // Título grande + lead + cuerpo (default).
-  "split",     // Texto a la izquierda, media a la derecha.
-  "centered",  // Título centrado + subtítulo + CTA.
-  "quote",     // Cita destacada con atribución.
+  "split", // Texto a la izquierda, media a la derecha.
+  "centered", // Título centrado + subtítulo + CTA.
+  "quote", // Cita destacada con atribución.
 ]);
 
 export const experienceSectionSourceSchema = z.enum([
@@ -73,9 +73,7 @@ export const experienceSectionDtoSchema = z.object({
   title: z.string().nullable(),
   lead: z.string().nullable(),
   body: z.string().nullable(),
-  media: z
-    .object({ url: z.string(), alt: z.string() })
-    .nullable(),
+  media: z.object({ url: z.string(), alt: z.string() }).nullable(),
   attribution: z.string().nullable(),
   ctas: z.array(experienceSectionCtaSchema),
   align: z.enum(["left", "center"]),

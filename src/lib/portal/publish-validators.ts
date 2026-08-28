@@ -71,13 +71,7 @@ export type ProductPublishSnapshot = {
   businessPublished: boolean;
 };
 
-const REQUIRES_PRICE = new Set([
-  "experiencia",
-  "hotel",
-  "tour",
-  "transporte",
-  "evento",
-]);
+const REQUIRES_PRICE = new Set(["experiencia", "hotel", "tour", "transporte", "evento"]);
 
 export const ProductPublishValidator: PublishValidator<ProductPublishSnapshot> = {
   kind: "product",
@@ -97,10 +91,8 @@ export const ProductPublishValidator: PublishValidator<ProductPublishSnapshot> =
       out.push({
         code: "not_authorized_to_self_publish",
         severity: "block",
-        message:
-          "Tu empresa aún no está autorizada para publicación directa.",
-        fixHint:
-          "Solicita revisión Founder o pide activación de autopublicación.",
+        message: "Tu empresa aún no está autorizada para publicación directa.",
+        fixHint: "Solicita revisión Founder o pide activación de autopublicación.",
       });
     }
 

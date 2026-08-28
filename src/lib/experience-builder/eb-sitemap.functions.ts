@@ -20,20 +20,23 @@ export interface PublishedPageSitemapEntry {
   featured?: boolean;
 }
 
-export const listPublishedPagesForSitemap = createServerFn({ method: "GET" })
-  .handler(async (): Promise<PublishedPageSitemapEntry[]> => {
+export const listPublishedPagesForSitemap = createServerFn({ method: "GET" }).handler(
+  async (): Promise<PublishedPageSitemapEntry[]> => {
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data, error } = await supabaseAdmin
         .from("page_compositions")
-        .select("slug, page_type, published_at, updated_at, active_revision_id, page_revisions:active_revision_id(snapshot)")
+        .select(
+          "slug, page_type, published_at, updated_at, active_revision_id, page_revisions:active_revision_id(snapshot)",
+        )
         .eq("status", "published")
         .neq("page_type", "home")
         .order("published_at", { ascending: false })
         .limit(500);
       if (error || !data) return [];
       return data.map((row) => {
-        const snapshot = (row as { page_revisions?: { snapshot?: unknown } }).page_revisions?.snapshot;
+        const snapshot = (row as { page_revisions?: { snapshot?: unknown } }).page_revisions
+          ?.snapshot;
         const seo = extractSeo(snapshot);
         return {
           slug: row.slug as string,
@@ -47,7 +50,8 @@ export const listPublishedPagesForSitemap = createServerFn({ method: "GET" })
     } catch {
       return [];
     }
-  });
+  },
+);
 
 function extractSeo(snapshot: unknown): { priority?: number; featured?: boolean } | undefined {
   if (!snapshot || typeof snapshot !== "object") return undefined;

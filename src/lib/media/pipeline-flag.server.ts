@@ -28,11 +28,7 @@ export async function isMediaPipelineEnabled(): Promise<boolean> {
     if (error) throw error;
     const raw = (data?.value as unknown) ?? false;
     const value =
-      typeof raw === "boolean"
-        ? raw
-        : typeof raw === "string"
-          ? raw === "true"
-          : Boolean(raw);
+      typeof raw === "boolean" ? raw : typeof raw === "string" ? raw === "true" : Boolean(raw);
     cache = { value, at: now };
     return value;
   } catch {

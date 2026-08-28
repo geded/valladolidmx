@@ -9,15 +9,15 @@ export const options = {
       startVUs: 0,
       stages: [
         { duration: "30s", target: 10 },
-        { duration: "2m",  target: 50 },
-        { duration: "30s", target: 0  },
+        { duration: "2m", target: 50 },
+        { duration: "30s", target: 0 },
       ],
       gracefulRampDown: "10s",
     },
   },
   thresholds: {
     http_req_duration: ["p(95)<800"],
-    http_req_failed:   ["rate<0.01"],
+    http_req_failed: ["rate<0.01"],
   },
 };
 
