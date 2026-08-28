@@ -192,6 +192,87 @@ export const getDestinationGalleryUrls = createServerFn({ method: "GET" })
     return signed.filter((u): u is string => Boolean(u));
   });
 
+/* ------------------------------------------------------------------ *
+ * G8-F1D · DEF-G8F-02 — Lectura pública ACREDITADA de los medios del
+ * destino. Devuelve, además de la URL, la identidad del activo y su
+ * metadata de atribución (ALT, caption, crédito, naturaleza) para que
+ * la superficie pública deje de generar ALT genéricos.
+ *
+ * Compatibilidad: función nueva y aditiva. `getDestinationGalleryUrls`
+ * permanece intacta para los consumidores existentes. No sustituye
+ * URLs, no cambia relaciones y no escribe datos.
+ * ------------------------------------------------------------------ */
+export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
+  .inputValidator((input: { slug: string }) => {
+    if (!input || typeof input.slug !== "string" || !/^[a-z0-9-]{1,80}$/.test(input.slug)) {
+      throw new Error("Invalid slug");
+    }
+    return input;
+  })
+  .handler(async ({ data }): Promise<PublicMediaAttribution[]> => {
+    const { createClient } = await import("@supabase/supabase-js");
+    const { resolveMediaAlt } = await import("@/lib/media/resolve-alt");
+    const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: rows, error } = await sb
+      .from("destination_media")
+      .select(
+        "role, sort_order, media_asset_id, media_assets:media_asset_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata ), destinations!inner(slug)",
+      )
+      .eq("destinations.slug", data.slug)
+      .order("sort_order", { ascending: true })
+      .limit(12);
+    if (error || !rows) return [];
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const resolved = await Promise.all(
+      rows.map(async (r) => {
+        const row = r as unknown as {
+          role: string | null;
+          sort_order: number | null;
+          media_asset_id: string | null;
+          media_assets?: {
+            id: string;
+            storage_bucket: string;
+            storage_path: string;
+            alt_text: string | null;
+            alt_text_ai: string | null;
+            alt_text_source: string | null;
+            review_state: string | null;
+            title: string | null;
+            caption: string | null;
+            credit: string | null;
+            metadata: Record<string, unknown> | null;
+          } | null;
+        };
+        const m = row.media_assets;
+        if (!m?.storage_bucket || !m?.storage_path) return null;
+        const { data: s } = await supabaseAdmin.storage
+          .from(m.storage_bucket)
+          .createSignedUrl(m.storage_path, 60 * 60);
+        if (!s?.signedUrl) return null;
+        const meta = (m.metadata ?? {}) as Record<string, unknown>;
+        const alt = resolveMediaAlt(m, { fallback: "" });
+        const item: PublicMediaAttribution = {
+          mediaAssetId: m.id ?? row.media_asset_id ?? null,
+          url: s.signedUrl,
+          role: row.role ?? null,
+          sortOrder: row.sort_order ?? null,
+          alt: alt.length > 0 ? alt : null,
+          caption: typeof m.caption === "string" && m.caption.trim() ? m.caption.trim() : null,
+          credit: typeof m.credit === "string" && m.credit.trim() ? m.credit.trim() : null,
+          aiGenerated: meta.ai_generated === true,
+          conceptual: meta.conceptual === true,
+          documentary: meta.documentary === true,
+          temporary: meta.temporary === true,
+        };
+        return item;
+      }),
+    );
+    return resolved.filter((x): x is PublicMediaAttribution => x !== null);
+  });
+
+
 const HOTEL_CATS = new Set(["hoteles", "hospedaje"]);
 const RESTO_CATS = new Set(["restaurantes", "gastronomia"]);
 const EXP_CATS = new Set(["experiencias", "experiencias-tours", "tours"]);
