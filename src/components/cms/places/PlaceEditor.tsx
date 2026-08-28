@@ -552,16 +552,26 @@ export function PlaceEditor({ placeId }: Props) {
             </select>
           )}
         </PlaceField>
-        <PlaceField name="zone" label="Zona territorial">
-          {({ id }) => (
+        <PlaceField
+          name="zone"
+          label="Zona territorial (opcional)"
+          help={
+            editZones.length === 0
+              ? "Este destino todavía no tiene zonas registradas. Puedes guardar el lugar sin zona."
+              : "Sólo se listan zonas activas del destino de este lugar."
+          }
+        >
+          {({ id, describedBy }) => (
             <select
               id={id}
+              aria-describedby={describedBy}
               className={inputClass}
               value={zoneId}
+              disabled={editZones.length === 0}
               onChange={(e) => setZoneId(e.target.value)}
             >
               <option value="">Sin zona</option>
-              {zonesForDestination.map((z: { id: string; name: string }) => (
+              {editZones.map((z) => (
                 <option key={z.id} value={z.id}>
                   {z.name}
                 </option>
