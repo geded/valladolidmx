@@ -57,6 +57,8 @@ export interface ListingFamilyContract {
     readonly subtitle: string;
   };
   readonly emptyMessage: string;
+  /** `false` cuando el copy vacío aprobado NO varía por destino. */
+  readonly destinoAwareEmptyMessage?: boolean;
 }
 
 /**
@@ -88,9 +90,9 @@ export const LISTING_FAMILY_CONTRACTS: Record<ListingFamilyId, ListingFamilyCont
     categorySlugs: ["restaurantes", "gastronomia"],
     forcedCategorySlug: "restaurantes",
     hero: {
-      eyebrow: "Sabor del Oriente Maya",
+      eyebrow: "Sabores del Oriente Maya",
       title: "Restaurantes",
-      subtitle: "Cocina yucateca de leña, mercados vivos y mesas de autor en el corazón colonial.",
+      subtitle: "Cocina yucateca, panuchos, recados y mesas de autor.",
     },
     emptyMessage:
       "Aún no hay restaurantes publicados. Vuelve pronto para descubrir cocinas verificadas.",
@@ -105,10 +107,11 @@ export const LISTING_FAMILY_CONTRACTS: Record<ListingFamilyId, ListingFamilyCont
     hero: {
       eyebrow: "Vive el Oriente Maya",
       title: "Experiencias",
-      subtitle: "Cenotes, comunidades mayas, talleres y recorridos guiados por gente de la región.",
+      subtitle:
+        "Vivencias auténticas con comunidades, cocineros y guías locales del Oriente Maya.",
     },
     emptyMessage:
-      "Aún no hay experiencias publicadas. Vuelve pronto para descubrir recorridos verificados.",
+      "Aún no hay experiencias publicadas. Vuelve pronto para descubrir vivencias con guías locales.",
   },
   eventos: {
     id: "eventos",
@@ -141,10 +144,11 @@ export const LISTING_FAMILY_CONTRACTS: Record<ListingFamilyId, ListingFamilyCont
     hero: {
       eyebrow: "Tu casa en el Oriente Maya",
       title: "Casas de vacaciones",
-      subtitle: "Casas coloniales completas, villas con alberca y refugios para viajar en grupo.",
+      subtitle: "Casas, villas y rentas vacacionales para explorar el Oriente Maya a tu ritmo.",
     },
+    destinoAwareEmptyMessage: false,
     emptyMessage:
-      "Aún no hay casas de vacaciones publicadas. Vuelve pronto para descubrir hospedajes verificados.",
+      "Aún estamos verificando casas de vacaciones. Mientras tanto, explora hoteles y haciendas del Oriente Maya.",
   },
   "que-hacer": {
     id: "que-hacer",
@@ -251,7 +255,7 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
       : contract.hero.title;
 
   const emptyMessage =
-    destino && contract.source === "businesses"
+    destino && contract.source === "businesses" && contract.destinoAwareEmptyMessage !== false
       ? `Aún no hay ${contract.label.toLowerCase()} publicados en ${destinationLabel}.`
       : contract.emptyMessage;
 
