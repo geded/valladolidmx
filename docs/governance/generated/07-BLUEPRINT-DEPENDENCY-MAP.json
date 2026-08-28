@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.68",
+    "version": "0.69",
     "state": "Approved",
-    "source_sha256": "a83155d8f2738ee27d7758f40e14911c4327db20773e848d04f5c23e379a5ae3",
+    "source_sha256": "2fc4a0ba3203d8ffd751a4a8fe501da193691c3b3593cd2bf84ebb81b3f82f15",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -8080,6 +8080,69 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-043.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-043.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/places/places-cms-contracts.ts",
+      "type": "artifact",
+      "path": "src/lib/places/places-cms-contracts.ts"
+    },
+    {
+      "id": "ART:src/lib/places/places-cms.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/places/places-cms.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/places/place-territory.ts",
+      "type": "artifact",
+      "path": "src/lib/places/place-territory.ts"
+    },
+    {
+      "id": "ART:src/components/cms/places/PlaceEditor.tsx",
+      "type": "artifact",
+      "path": "src/components/cms/places/PlaceEditor.tsx"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/lugares.index.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/lugares.index.tsx"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/lugares.nuevo.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/lugares.nuevo.tsx"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/lugares.$placeId.editar.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/lugares.$placeId.editar.tsx"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-044.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-044.json"
+    },
+    {
+      "id": "ART:scripts/omxds/q2b/places-cms.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/q2b/places-cms.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/q2b/places-permissions.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/q2b/places-permissions.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/q2b/places-cms.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/q2b/places-cms.evidence.mjs"
     }
   ],
   "edges": [
@@ -21230,6 +21293,114 @@
       "destination": "DOC:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
       "evidence": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/places/places-cms-contracts.ts:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "origin": "ART:src/lib/places/places-cms-contracts.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "evidence": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/places/places-cms.functions.ts:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "origin": "ART:src/lib/places/places-cms.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "evidence": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/places/place-territory.ts:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "origin": "ART:src/lib/places/place-territory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "evidence": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/cms/places/PlaceEditor.tsx:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "origin": "ART:src/components/cms/places/PlaceEditor.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "evidence": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/_authenticated/cms/lugares.index.tsx:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/lugares.index.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "evidence": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/_authenticated/cms/lugares.nuevo.tsx:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/lugares.nuevo.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "evidence": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/_authenticated/cms/lugares.$placeId.editar.tsx:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/lugares.$placeId.editar.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "evidence": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "evidence": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-044.json:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-044.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "evidence": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2b/places-cms.contract.test.ts:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "origin": "ART:scripts/omxds/q2b/places-cms.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "evidence": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2b/places-permissions.contract.test.ts:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "origin": "ART:scripts/omxds/q2b/places-permissions.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "evidence": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2b/places-cms.evidence.mjs:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "origin": "ART:scripts/omxds/q2b/places-cms.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "evidence": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
       "verified_at": "2026-08-28"
     }
   ],

@@ -100,9 +100,7 @@ export const whatsappSchema = z
   .string()
   .regex(E164, "El WhatsApp debe ir en formato internacional E.164 (ej. +5219851234567).");
 
-export const httpsUrlSchema = z
-  .string()
-  .regex(HTTPS, "La dirección debe iniciar con https://");
+export const httpsUrlSchema = z.string().regex(HTTPS, "La dirección debe iniciar con https://");
 
 export const currencySchema = z
   .string()
@@ -319,8 +317,6 @@ export function placeAdvanceBlockers(input: PlacePublishGuardInput): string[] {
 export function placePublishBlockers(input: PlacePublishGuardInput): string[] {
   const blockers = placeAdvanceBlockers(input);
   if (input.hasUnapprovedMedia)
-    blockers.push(
-      "Hay imágenes sin aprobación editorial: apruébalas antes de publicar el lugar.",
-    );
+    blockers.push("Hay imágenes sin aprobación editorial: apruébalas antes de publicar el lugar.");
   return blockers;
 }
