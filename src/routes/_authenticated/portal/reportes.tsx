@@ -49,8 +49,7 @@ function useActiveBusinessId(): string | null {
       setId(d ?? null);
     };
     window.addEventListener("portal:active-business-changed", h);
-    return () =>
-      window.removeEventListener("portal:active-business-changed", h);
+    return () => window.removeEventListener("portal:active-business-changed", h);
   }, []);
   return id;
 }
@@ -75,18 +74,13 @@ function ReportsPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-primary">
-            Portal empresa
-          </p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Portal empresa</p>
           <h1 className="text-2xl font-semibold">Reporte de presencia</h1>
           <p className="text-sm text-muted-foreground">
             Cuánto se ve y cuánto se acciona tu ficha en Valladolid.mx.
           </p>
         </div>
-        <Select
-          value={String(windowDays)}
-          onValueChange={(v) => setWindowDays(Number(v))}
-        >
+        <Select value={String(windowDays)} onValueChange={(v) => setWindowDays(Number(v))}>
           <SelectTrigger className="w-[150px]">
             <SelectValue />
           </SelectTrigger>
@@ -143,21 +137,11 @@ function ReportsPage() {
               hint="Clics al mapa"
               tone="info"
             />
-            <Kpi
-              icon={Globe}
-              label="Sitio web"
-              value={r.totals.web}
-              hint="Clics al sitio"
-            />
+            <Kpi icon={Globe} label="Sitio web" value={r.totals.web} hint="Clics al sitio" />
           </section>
 
           <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <Kpi
-              icon={Phone}
-              label="Teléfono"
-              value={r.totals.phone}
-              hint="Clics para llamar"
-            />
+            <Kpi icon={Phone} label="Teléfono" value={r.totals.phone} hint="Clics para llamar" />
             <LockedKpi
               icon={Sparkles}
               label="Menciones de Alux"
@@ -177,12 +161,8 @@ function ReportsPage() {
           {/* Serie */}
           <section className="rounded-2xl border border-border bg-card p-4 shadow-soft">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold">
-                Actividad diaria
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                {r.window_days} días
-              </p>
+              <h2 className="text-sm font-semibold">Actividad diaria</h2>
+              <p className="text-xs text-muted-foreground">{r.window_days} días</p>
             </div>
             {r.series.length === 0 ? (
               <p className="py-6 text-center text-sm text-muted-foreground">
@@ -212,9 +192,7 @@ function ReportsPage() {
             requiredPlan="Destacado"
           >
             {r.top_sources.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Sin datos de origen aún.
-              </p>
+              <p className="text-sm text-muted-foreground">Sin datos de origen aún.</p>
             ) : (
               <ul className="space-y-2">
                 {r.top_sources.map((s) => {
@@ -222,18 +200,11 @@ function ReportsPage() {
                   const pct = total ? (s.count / total) * 100 : 0;
                   return (
                     <li key={s.source} className="flex items-center gap-3">
-                      <span className="w-28 truncate text-xs font-medium">
-                        {s.source}
-                      </span>
+                      <span className="w-28 truncate text-xs font-medium">{s.source}</span>
                       <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-muted">
-                        <div
-                          className="h-full bg-primary"
-                          style={{ width: `${pct}%` }}
-                        />
+                        <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
                       </div>
-                      <span className="w-10 text-right text-xs tabular-nums">
-                        {s.count}
-                      </span>
+                      <span className="w-10 text-right text-xs tabular-nums">{s.count}</span>
                     </li>
                   );
                 })}
@@ -248,34 +219,22 @@ function ReportsPage() {
             requiredPlan="Destacado"
           >
             {r.countries.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Sin datos de países aún.
-              </p>
+              <p className="text-sm text-muted-foreground">Sin datos de países aún.</p>
             ) : (
               <ul className="grid gap-2 sm:grid-cols-2">
                 {r.countries.map((c) => {
                   const total = r.countries.reduce((a, x) => a + x.count, 0);
                   const pct = total ? (c.count / total) * 100 : 0;
                   return (
-                    <li
-                      key={c.country_code}
-                      className="flex items-center gap-3"
-                    >
-                      <span className="text-xl leading-none">
-                        {flag(c.country_code)}
-                      </span>
+                    <li key={c.country_code} className="flex items-center gap-3">
+                      <span className="text-xl leading-none">{flag(c.country_code)}</span>
                       <span className="w-8 font-mono text-xs uppercase text-muted-foreground">
                         {c.country_code}
                       </span>
                       <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-muted">
-                        <div
-                          className="h-full bg-primary"
-                          style={{ width: `${pct}%` }}
-                        />
+                        <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
                       </div>
-                      <span className="w-10 text-right text-xs tabular-nums">
-                        {c.count}
-                      </span>
+                      <span className="w-10 text-right text-xs tabular-nums">{c.count}</span>
                     </li>
                   );
                 })}
@@ -284,8 +243,8 @@ function ReportsPage() {
           </LockedSection>
 
           <p className="text-[11px] italic text-muted-foreground">
-            Datos agregados y anónimos. Nunca compartimos información
-            identificable de un visitante individual.
+            Datos agregados y anónimos. Nunca compartimos información identificable de un visitante
+            individual.
           </p>
         </>
       )}
@@ -293,22 +252,14 @@ function ReportsPage() {
   );
 }
 
-function PlanBanner({
-  tier,
-  windowDays,
-}: {
-  tier: PresenceReport["tier"];
-  windowDays: number;
-}) {
+function PlanBanner({ tier, windowDays }: { tier: PresenceReport["tier"]; windowDays: number }) {
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="text-sm">
-        <p className="font-semibold text-foreground">
-          Plan activo: {tier.planName}
-        </p>
+        <p className="font-semibold text-foreground">Plan activo: {tier.planName}</p>
         <p className="text-muted-foreground">
-          Estás viendo los últimos {windowDays} días. Máximo permitido en
-          este plan: {tier.maxWindowDays} días.
+          Estás viendo los últimos {windowDays} días. Máximo permitido en este plan:{" "}
+          {tier.maxWindowDays} días.
         </p>
       </div>
       {tier.planSlug !== "elite" && (
@@ -337,22 +288,14 @@ function Kpi({
   tone?: "default" | "success" | "info";
 }) {
   const toneCls =
-    tone === "success"
-      ? "text-success"
-      : tone === "info"
-        ? "text-info"
-        : "text-primary";
+    tone === "success" ? "text-success" : tone === "info" ? "text-info" : "text-primary";
   return (
     <div className="rounded-2xl border border-border bg-card p-3 shadow-soft">
       <div className="flex items-center gap-2">
-        <span
-          className={`grid size-7 place-items-center rounded-md bg-primary/10 ${toneCls}`}
-        >
+        <span className={`grid size-7 place-items-center rounded-md bg-primary/10 ${toneCls}`}>
           <Icon className="size-4" aria-hidden />
         </span>
-        <p className="text-xs uppercase tracking-wide text-muted-foreground">
-          {label}
-        </p>
+        <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
       </div>
       <p className="mt-1 text-2xl font-semibold tabular-nums">{value}</p>
       {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
@@ -380,13 +323,9 @@ function LockedKpi({
           <span className="grid size-7 place-items-center rounded-md bg-primary/10 text-primary">
             <Icon className="size-4" aria-hidden />
           </span>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">
-            {label}
-          </p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
         </div>
-        <p className="mt-1 text-2xl font-semibold tabular-nums">
-          {locked ? "—" : value}
-        </p>
+        <p className="mt-1 text-2xl font-semibold tabular-nums">{locked ? "—" : value}</p>
       </div>
       {locked && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-background/70 p-2 text-center">
@@ -422,9 +361,7 @@ function LockedSection({
       {locked && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 p-4 text-center">
           <Lock className="size-5 text-primary" aria-hidden />
-          <p className="text-sm font-medium">
-            Disponible en el plan {requiredPlan}
-          </p>
+          <p className="text-sm font-medium">Disponible en el plan {requiredPlan}</p>
           <Button asChild size="sm">
             <Link to="/portal/visibilidad">Ver planes</Link>
           </Button>
@@ -440,8 +377,7 @@ function SeriesChart({
   data: Array<{ date: string; impressions: number; interactions: number }>;
 }) {
   const max = useMemo(
-    () =>
-      Math.max(1, ...data.map((d) => Math.max(d.impressions, d.interactions))),
+    () => Math.max(1, ...data.map((d) => Math.max(d.impressions, d.interactions))),
     [data],
   );
   return (

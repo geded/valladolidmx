@@ -58,9 +58,7 @@ export function TravelDocumentsList({ orderId, folio, paidAt }: Props) {
   return (
     <section className="space-y-4">
       <header>
-        <h2 className="font-serif text-lg text-foreground">
-          Documentos de tu viaje
-        </h2>
+        <h2 className="font-serif text-lg text-foreground">Documentos de tu viaje</h2>
         <p className="text-[13px] text-muted-foreground">
           Folio {folio}
           {paidTxt ? ` · Confirmado el ${paidTxt}` : ""}
@@ -80,12 +78,8 @@ export function TravelDocumentsList({ orderId, folio, paidAt }: Props) {
                   <Icon className="size-5" aria-hidden />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="font-serif text-base text-foreground">
-                    {doc.title}
-                  </h3>
-                  <p className="mt-1 text-[13px] text-muted-foreground">
-                    {doc.body}
-                  </p>
+                  <h3 className="font-serif text-base text-foreground">{doc.title}</h3>
+                  <p className="mt-1 text-[13px] text-muted-foreground">{doc.body}</p>
                 </div>
               </div>
               <div className="mt-4 flex items-center justify-between">

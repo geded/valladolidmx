@@ -19,12 +19,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type BusinessContentStatus =
-  | "draft"
-  | "in_review"
-  | "approved"
-  | "published"
-  | "archived";
+export type BusinessContentStatus = "draft" | "in_review" | "approved" | "published" | "archived";
 
 export interface PortalBusinessCard {
   id: string;
@@ -51,12 +46,7 @@ export interface BusinessAuditEntry {
   actor_user_id: string | null;
 }
 
-const ALLOWED_FIELDS = [
-  "display_name",
-  "legal_name",
-  "tagline",
-  "description",
-] as const;
+const ALLOWED_FIELDS = ["display_name", "legal_name", "tagline", "description"] as const;
 
 type AllowedField = (typeof ALLOWED_FIELDS)[number];
 
@@ -79,14 +69,11 @@ export const getBusinessCard = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }): Promise<PortalBusinessCard> => {
     const { supabase, userId } = context;
-    const { data: allowed, error: accErr } = await supabase.rpc(
-      "has_business_access",
-      {
-        _user_id: userId,
-        _business_id: data.businessId,
-        _min_role: "viewer",
-      },
-    );
+    const { data: allowed, error: accErr } = await supabase.rpc("has_business_access", {
+      _user_id: userId,
+      _business_id: data.businessId,
+      _min_role: "viewer",
+    });
     if (accErr) throw new Error(`access_check_failed: ${accErr.message}`);
     if (!allowed) throw new Error("forbidden_business_access");
 
@@ -115,13 +102,9 @@ export const getBusinessCard = createServerFn({ method: "POST" })
 export const updateBusinessCard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (input: {
-      businessId: string;
-      patch: Partial<Record<AllowedField, string | null>>;
-    }) => {
+    (input: { businessId: string; patch: Partial<Record<AllowedField, string | null>> }) => {
       const businessId = assertBusinessId(input);
-      if (!input.patch || typeof input.patch !== "object")
-        throw new Error("invalid_patch");
+      if (!input.patch || typeof input.patch !== "object") throw new Error("invalid_patch");
       const cleaned: Partial<Record<AllowedField, string | null>> = {};
       for (const key of ALLOWED_FIELDS) {
         if (!(key in input.patch)) continue;
@@ -133,8 +116,7 @@ export const updateBusinessCard = createServerFn({ method: "POST" })
         if (typeof raw !== "string") throw new Error(`invalid_field:${key}`);
         const trimmed = raw.trim();
         if (key === "display_name") {
-          if (trimmed.length < 2 || trimmed.length > 160)
-            throw new Error("invalid_display_name");
+          if (trimmed.length < 2 || trimmed.length > 160) throw new Error("invalid_display_name");
           cleaned[key] = trimmed;
         } else if (key === "tagline") {
           if (trimmed.length > 220) throw new Error("invalid_tagline");
@@ -153,14 +135,11 @@ export const updateBusinessCard = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }): Promise<PortalBusinessCard> => {
     const { supabase, userId } = context;
-    const { data: allowed, error: accErr } = await supabase.rpc(
-      "has_business_access",
-      {
-        _user_id: userId,
-        _business_id: data.businessId,
-        _min_role: "editor",
-      },
-    );
+    const { data: allowed, error: accErr } = await supabase.rpc("has_business_access", {
+      _user_id: userId,
+      _business_id: data.businessId,
+      _min_role: "editor",
+    });
     if (accErr) throw new Error(`access_check_failed: ${accErr.message}`);
     if (!allowed) throw new Error("forbidden_business_access");
 
@@ -250,22 +229,17 @@ export const listBusinessAuditLog = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }): Promise<BusinessAuditEntry[]> => {
     const { supabase, userId } = context;
-    const { data: allowed, error: accErr } = await supabase.rpc(
-      "has_business_access",
-      {
-        _user_id: userId,
-        _business_id: data.businessId,
-        _min_role: "viewer",
-      },
-    );
+    const { data: allowed, error: accErr } = await supabase.rpc("has_business_access", {
+      _user_id: userId,
+      _business_id: data.businessId,
+      _min_role: "viewer",
+    });
     if (accErr) throw new Error(`access_check_failed: ${accErr.message}`);
     if (!allowed) throw new Error("forbidden_business_access");
 
     const { data: rows, error } = await supabase
       .from("content_audit_log")
-      .select(
-        "id, action, from_status, to_status, notes, created_at, actor_user_id",
-      )
+      .select("id, action, from_status, to_status, notes, created_at, actor_user_id")
       .eq("entity_kind", "business")
       .eq("entity_id", data.businessId)
       .order("created_at", { ascending: false })

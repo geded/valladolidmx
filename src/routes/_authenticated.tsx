@@ -6,12 +6,7 @@
  * ocurre en cada server function vía requireSupabaseAuth + has_role.
  */
 import { useEffect } from "react";
-import {
-  createFileRoute,
-  Outlet,
-  useNavigate,
-  useLocation,
-} from "@tanstack/react-router";
+import { createFileRoute, Outlet, useNavigate, useLocation } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -37,7 +32,11 @@ function AuthenticatedLayout() {
       const next = pathname + searchStr;
       // Persist intended destination for post-login (survives OAuth round-trip).
       if (typeof window !== "undefined" && next && next !== "/auth") {
-        try { window.sessionStorage.setItem("vmx.auth.next", next); } catch { /* noop */ }
+        try {
+          window.sessionStorage.setItem("vmx.auth.next", next);
+        } catch {
+          /* noop */
+        }
       }
       void navigate({ to: "/auth" });
     }

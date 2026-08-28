@@ -10,12 +10,12 @@
 
 ## 1. Tamaño del entry (autoridad para P3)
 
-| Métrica | Bytes | KB |
-|---|---:|---:|
-| Entry raw | **559 607** | 546.5 KB |
-| Entry gzip -9 | **162 082** | 158.3 KB |
-| Entry brotli -q 11 | **137 359** | 134.1 KB |
-| Total JS todos los chunks (388 archivos) | 3 457 649 | 3 376.6 KB |
+| Métrica                                  |       Bytes |         KB |
+| ---------------------------------------- | ----------: | ---------: |
+| Entry raw                                | **559 607** |   546.5 KB |
+| Entry gzip -9                            | **162 082** |   158.3 KB |
+| Entry brotli -q 11                       | **137 359** |   134.1 KB |
+| Total JS todos los chunks (388 archivos) |   3 457 649 | 3 376.6 KB |
 
 > El "entry de ~637 KB" de reportes previos correspondía al commit `7d8ef897`. El HEAD actual muestra **546 KB raw / 158 KB gzip / 134 KB brotli** — es la línea base **oficial** para P3.
 
@@ -25,47 +25,47 @@ Atribución: bytes cubiertos por sourcemap **543 384 / 559 226 (97.2%)**. El 2.8
 
 ## 2. Top 20 módulos por bytes (raw en entry, atribución por sourcemap)
 
-| # | Bytes | % entry | Módulo |
-|---|---:|---:|---|
-| 1 | 174 834 | 31.3 % | `react-dom/cjs/react-dom-client.production.js` |
-| 2 | 32 639 | 5.8 % | `sonner/dist/index.mjs` |
-| 3 | 21 518 | 3.8 % | `@tanstack/router-core/dist/esm/router.js` |
-| 4 | 20 055 | 3.6 % | `zod/v4/core/schemas.js` |
-| 5 | 18 693 | 3.3 % | `src/routeTree.gen.ts` |
-| 6 | 12 116 | 2.2 % | `zod/v4/classic/schemas.js` |
-| 7 | 11 023 | 2.0 % | `@tanstack/router-core/dist/esm/load-matches.js` |
-| 8 | 7 821 | 1.4 % | `src/components/layout/PrimaryMegaMenu.tsx` |
-| 9 | 7 553 | 1.3 % | `src/routes/__root.tsx` |
-| 10 | 7 462 | 1.3 % | `src/components/layout/SiteHeader.tsx` |
-| 11 | 5 923 | 1.1 % | `zod/v4/core/checks.js` |
-| 12 | 5 831 | 1.0 % | `zod/v4/core/util.js` |
-| 13 | 5 806 | 1.0 % | `src/lib/discovery/seo.ts` |
-| 14 | 5 699 | 1.0 % | `zod/v4/core/to-json-schema.js` |
-| 15 | 5 116 | 0.9 % | `zod/v4/core/json-schema-processors.js` |
-| 16 | 4 951 | 0.9 % | `zod/v4/core/api.js` |
-| 17 | 4 176 | 0.7 % | `@tanstack/history/dist/esm/index.js` |
-| 18 | 4 071 | 0.7 % | `src/lib/traveler/stage-experience.ts` |
-| 19 | 4 048 | 0.7 % | `src/components/layout/UserMenu.tsx` |
-| 20 | 4 023 | 0.7 % | `@tanstack/query-core/build/modern/queryClient.js` |
+| #   |   Bytes | % entry | Módulo                                             |
+| --- | ------: | ------: | -------------------------------------------------- |
+| 1   | 174 834 |  31.3 % | `react-dom/cjs/react-dom-client.production.js`     |
+| 2   |  32 639 |   5.8 % | `sonner/dist/index.mjs`                            |
+| 3   |  21 518 |   3.8 % | `@tanstack/router-core/dist/esm/router.js`         |
+| 4   |  20 055 |   3.6 % | `zod/v4/core/schemas.js`                           |
+| 5   |  18 693 |   3.3 % | `src/routeTree.gen.ts`                             |
+| 6   |  12 116 |   2.2 % | `zod/v4/classic/schemas.js`                        |
+| 7   |  11 023 |   2.0 % | `@tanstack/router-core/dist/esm/load-matches.js`   |
+| 8   |   7 821 |   1.4 % | `src/components/layout/PrimaryMegaMenu.tsx`        |
+| 9   |   7 553 |   1.3 % | `src/routes/__root.tsx`                            |
+| 10  |   7 462 |   1.3 % | `src/components/layout/SiteHeader.tsx`             |
+| 11  |   5 923 |   1.1 % | `zod/v4/core/checks.js`                            |
+| 12  |   5 831 |   1.0 % | `zod/v4/core/util.js`                              |
+| 13  |   5 806 |   1.0 % | `src/lib/discovery/seo.ts`                         |
+| 14  |   5 699 |   1.0 % | `zod/v4/core/to-json-schema.js`                    |
+| 15  |   5 116 |   0.9 % | `zod/v4/core/json-schema-processors.js`            |
+| 16  |   4 951 |   0.9 % | `zod/v4/core/api.js`                               |
+| 17  |   4 176 |   0.7 % | `@tanstack/history/dist/esm/index.js`              |
+| 18  |   4 071 |   0.7 % | `src/lib/traveler/stage-experience.ts`             |
+| 19  |   4 048 |   0.7 % | `src/components/layout/UserMenu.tsx`               |
+| 20  |   4 023 |   0.7 % | `@tanstack/query-core/build/modern/queryClient.js` |
 
 ---
 
 ## 3. Top dependencias externas (agregadas por paquete)
 
-| Paquete | Bytes | % entry | Notas |
-|---|---:|---:|---|
-| `react-dom` | 175 051 | 31.3 % | Runtime obligatorio (client + hydrate). |
-| `zod` (v4 core + classic) | **68 068** | **12.2 %** | Ver §6.a — arrastrado por `block-library.ts`. |
-| `@tanstack/router-core` | 43 087 | 7.7 % | Router matching + loader lifecycle; obligatorio. |
-| `sonner` | 32 639 | 5.8 % | Toaster montado globalmente en `__root.tsx`. |
-| `@tanstack/react-router` | 15 751 | 2.8 % | Hooks / `<Link>` / `<Match>`. Obligatorio. |
-| `@tanstack/query-core` | 13 904 | 2.5 % | QueryClient + hidratación SSR. Obligatorio. |
-| `lucide-react` | 5 047 | 0.9 % | Bien tree-shakeado, ~30 íconos usados. |
-| `@tanstack/history` | 4 176 | 0.7 % | Peer de router. |
-| `@tanstack/store` | 4 171 | 0.7 % | Peer de router. |
-| `scheduler` | 3 526 | 0.6 % | Peer de react-dom. |
-| `@tanstack/react-router-with-query` | 1 782 | 0.3 % | Wrapper de integración. |
-| `@tanstack/react-start` | 1 679 | 0.3 % | Runtime SSR/CSR mínimo. |
+| Paquete                             |      Bytes |    % entry | Notas                                            |
+| ----------------------------------- | ---------: | ---------: | ------------------------------------------------ |
+| `react-dom`                         |    175 051 |     31.3 % | Runtime obligatorio (client + hydrate).          |
+| `zod` (v4 core + classic)           | **68 068** | **12.2 %** | Ver §6.a — arrastrado por `block-library.ts`.    |
+| `@tanstack/router-core`             |     43 087 |      7.7 % | Router matching + loader lifecycle; obligatorio. |
+| `sonner`                            |     32 639 |      5.8 % | Toaster montado globalmente en `__root.tsx`.     |
+| `@tanstack/react-router`            |     15 751 |      2.8 % | Hooks / `<Link>` / `<Match>`. Obligatorio.       |
+| `@tanstack/query-core`              |     13 904 |      2.5 % | QueryClient + hidratación SSR. Obligatorio.      |
+| `lucide-react`                      |      5 047 |      0.9 % | Bien tree-shakeado, ~30 íconos usados.           |
+| `@tanstack/history`                 |      4 176 |      0.7 % | Peer de router.                                  |
+| `@tanstack/store`                   |      4 171 |      0.7 % | Peer de router.                                  |
+| `scheduler`                         |      3 526 |      0.6 % | Peer de react-dom.                               |
+| `@tanstack/react-router-with-query` |      1 782 |      0.3 % | Wrapper de integración.                          |
+| `@tanstack/react-start`             |      1 679 |      0.3 % | Runtime SSR/CSR mínimo.                          |
 
 **Subtotal deps externas:** ≈ **369 KB raw** (66 % del entry).
 **Subtotal código propio:** ≈ **174 KB raw** (31 % del entry).
@@ -75,22 +75,22 @@ Atribución: bytes cubiertos por sourcemap **543 384 / 559 226 (97.2%)**. El 2.8
 
 ## 4. Código propio en el entry (por área)
 
-| Área | Bytes | Observación |
-|---|---:|---|
-| `src/routes/_authenticated/*` (106 archivos) | 30 249 | Sólo metadatos de ruta (path, `beforeLoad`, `validateSearch`); componentes NO están en el entry — están code-split. ~285 B/ruta. |
-| `src/components/layout/*` (Header, Menu, Footer, MegaMenu, UserMenu, ProfileModeSwitcher) | 26 792 | Ver §6.b. |
-| `src/routeTree.gen.ts` | 18 693 | Registry auto-generado; no editable. Crecimiento lineal con nº de rutas. |
-| `src/routes/oriente-maya/*` (5 archivos leaf) | 10 417 | Metadatos de ruta pública. |
-| `src/routes/__root.tsx` | 7 553 | Layout raíz. Ver §6.c (Toaster, PWA, i18n eager). |
-| `src/lib/traveler` | 6 238 | `stage-experience.ts` cargado eager por header. |
-| `src/lib/discovery/seo.ts` | 5 806 | JSON-LD helpers usados en `__root.tsx`. |
-| `src/routes/lovable/*` | 5 488 | Rutas de preview internas (dev/founder). Ver §6.d. |
-| `src/lib/i18n/locales.functions.ts` | 3 432 | Server fn cliente shim. |
-| `src/lib/navigation` | 3 326 | Contrato de navegación oficial. Necesario. |
-| `src/lib/protected-actions/registry.ts` | 3 310 | Registry de acciones autenticadas. |
-| `src/pwa/register-sw.ts` + `sync-queue.ts` + `sync-runner.ts` | 6 591 | Ver §6.e. |
-| `src/i18n/context.tsx` | 2 664 | Provider global de idioma. |
-| `src/lib/alux/*` | 1 469 | Sólo tipos/contratos. Runtime está en chunks lazy. |
+| Área                                                                                      |  Bytes | Observación                                                                                                                      |
+| ----------------------------------------------------------------------------------------- | -----: | -------------------------------------------------------------------------------------------------------------------------------- |
+| `src/routes/_authenticated/*` (106 archivos)                                              | 30 249 | Sólo metadatos de ruta (path, `beforeLoad`, `validateSearch`); componentes NO están en el entry — están code-split. ~285 B/ruta. |
+| `src/components/layout/*` (Header, Menu, Footer, MegaMenu, UserMenu, ProfileModeSwitcher) | 26 792 | Ver §6.b.                                                                                                                        |
+| `src/routeTree.gen.ts`                                                                    | 18 693 | Registry auto-generado; no editable. Crecimiento lineal con nº de rutas.                                                         |
+| `src/routes/oriente-maya/*` (5 archivos leaf)                                             | 10 417 | Metadatos de ruta pública.                                                                                                       |
+| `src/routes/__root.tsx`                                                                   |  7 553 | Layout raíz. Ver §6.c (Toaster, PWA, i18n eager).                                                                                |
+| `src/lib/traveler`                                                                        |  6 238 | `stage-experience.ts` cargado eager por header.                                                                                  |
+| `src/lib/discovery/seo.ts`                                                                |  5 806 | JSON-LD helpers usados en `__root.tsx`.                                                                                          |
+| `src/routes/lovable/*`                                                                    |  5 488 | Rutas de preview internas (dev/founder). Ver §6.d.                                                                               |
+| `src/lib/i18n/locales.functions.ts`                                                       |  3 432 | Server fn cliente shim.                                                                                                          |
+| `src/lib/navigation`                                                                      |  3 326 | Contrato de navegación oficial. Necesario.                                                                                       |
+| `src/lib/protected-actions/registry.ts`                                                   |  3 310 | Registry de acciones autenticadas.                                                                                               |
+| `src/pwa/register-sw.ts` + `sync-queue.ts` + `sync-runner.ts`                             |  6 591 | Ver §6.e.                                                                                                                        |
+| `src/i18n/context.tsx`                                                                    |  2 664 | Provider global de idioma.                                                                                                       |
+| `src/lib/alux/*`                                                                          |  1 469 | Sólo tipos/contratos. Runtime está en chunks lazy.                                                                               |
 
 ---
 
@@ -98,15 +98,15 @@ Atribución: bytes cubiertos por sourcemap **543 384 / 559 226 (97.2%)**. El 2.8
 
 Módulos que arrastran dependencias grandes al entry por ser importados estáticamente desde el árbol raíz:
 
-| Cadena de imports | Efecto |
-|---|---|
-| `src/routes/__root.tsx` → `Toaster` de `sonner` | **32.6 KB** de sonner en entry. |
-| `src/routes/__root.tsx` → `src/i18n/context.tsx` → provider global | 2.7 KB provider + 3.4 KB `locales.functions` shim en entry. |
-| `src/routes/__root.tsx` → `src/lib/discovery/seo.ts` | 5.8 KB JSON-LD builders (usados por todas las rutas públicas, esto SÍ es correcto). |
-| `src/routes/__root.tsx` → `SiteHeader` → `PrimaryMegaMenu` + `UserMenu` + `ProfileModeSwitcher` + `SiteFooter` | ≈ **26.8 KB** de layout. `UserMenu` y `ProfileModeSwitcher` son visibles sólo tras autenticar. |
-| `src/routes/__root.tsx` → `stage-experience.ts` (traveler stage) | 4.1 KB de lógica de estados de viaje ejecutada por todos los visitantes. |
-| `src/lib/experience-builder/composition-renderer.tsx` → `block-library.ts` → `blocks/*/contract.ts` (10 contratos) → `zod/v4` | **68 KB de zod** en entry. Ver §6.a. |
-| `src/pwa/register-sw.ts` (importado por `__root.tsx`) | 2.7 KB + eager virtual PWA imports. |
+| Cadena de imports                                                                                                             | Efecto                                                                                         |
+| ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `src/routes/__root.tsx` → `Toaster` de `sonner`                                                                               | **32.6 KB** de sonner en entry.                                                                |
+| `src/routes/__root.tsx` → `src/i18n/context.tsx` → provider global                                                            | 2.7 KB provider + 3.4 KB `locales.functions` shim en entry.                                    |
+| `src/routes/__root.tsx` → `src/lib/discovery/seo.ts`                                                                          | 5.8 KB JSON-LD builders (usados por todas las rutas públicas, esto SÍ es correcto).            |
+| `src/routes/__root.tsx` → `SiteHeader` → `PrimaryMegaMenu` + `UserMenu` + `ProfileModeSwitcher` + `SiteFooter`                | ≈ **26.8 KB** de layout. `UserMenu` y `ProfileModeSwitcher` son visibles sólo tras autenticar. |
+| `src/routes/__root.tsx` → `stage-experience.ts` (traveler stage)                                                              | 4.1 KB de lógica de estados de viaje ejecutada por todos los visitantes.                       |
+| `src/lib/experience-builder/composition-renderer.tsx` → `block-library.ts` → `blocks/*/contract.ts` (10 contratos) → `zod/v4` | **68 KB de zod** en entry. Ver §6.a.                                                           |
+| `src/pwa/register-sw.ts` (importado por `__root.tsx`)                                                                         | 2.7 KB + eager virtual PWA imports.                                                            |
 
 ---
 
@@ -193,26 +193,26 @@ Rastreo de módulos que aparecen en varios chunks (sourcemap del entry vs chunks
 
 ## 9. Oportunidades de lazy loading por ruta y capability
 
-| Superficie | Componente en entry hoy | Puede diferirse hasta |
-|---|---|---|
-| Home (`/`) | Toaster, MegaMenu, UserMenu | 1ª interacción / autenticación |
-| Rutas públicas de destino | Zod v4 completo | Nunca — reemplazar por render-only contracts |
+| Superficie                | Componente en entry hoy                           | Puede diferirse hasta                                                                                                  |
+| ------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Home (`/`)                | Toaster, MegaMenu, UserMenu                       | 1ª interacción / autenticación                                                                                         |
+| Rutas públicas de destino | Zod v4 completo                                   | Nunca — reemplazar por render-only contracts                                                                           |
 | Rutas públicas de destino | Todos los metadatos de `_authenticated/*` (30 KB) | Split por layout: `routeTree.gen.ts` no permite excluir; requiere segmentación por prefix build-time (avanzado, no P0) |
-| Header | ProfileModeSwitcher | Autenticación |
+| Header                    | ProfileModeSwitcher                               | Autenticación                                                                                                          |
 
 ---
 
 ## 10. Matriz de candidatos (P0/P1/P2)
 
-| # | Candidato | Ahorro esperado (raw / gzip) | Riesgo | Complejidad | Prioridad | Recomendación |
-|---|---|---|---|---|---|---|
-| C1 | Lazy Toaster (`sonner`) | −30 KB / −7 KB | Medio (primer toast) | Baja | **P0** | Autorizar spike aislado y medir. |
-| C2 | Render-only block contracts (drop zod público) | −60 KB / −12 KB | Medio (contratos + Studio) | Media-alta | **P0** | Diseñar propuesta técnica antes de tocar código. |
-| C3 | Lazy MegaMenu + UserMenu + ProfileModeSwitcher | −14 KB / −4 KB | Alto (UX del header) | Media | **P1** | Requiere prefetch on-intent; medir INP. |
-| C4 | Excluir `/lovable/*` en builds prod | −5 KB / −1.3 KB | Bajo | Baja | **P2** | Ganancia marginal; ok como higiene. |
-| C5 | `stage-experience.ts` lazy | −4 KB / −1 KB | Bajo | Media | **P2** | Sólo si se ejecuta post-hidratación. |
-| C6 | Diferir `register-sw.ts` a `requestIdleCallback` | 0 KB entry (mueve trabajo, no bytes) | Bajo | Baja | **P2** | Mejora TTI, no bundle size. |
-| C7 | Declarar `"sideEffects": false` en app propia | ~1-2 KB | Alto (CSS/PWA) | Alta | **P2** | Descartado salvo auditoría formal. |
+| #   | Candidato                                        | Ahorro esperado (raw / gzip)         | Riesgo                     | Complejidad | Prioridad | Recomendación                                    |
+| --- | ------------------------------------------------ | ------------------------------------ | -------------------------- | ----------- | --------- | ------------------------------------------------ |
+| C1  | Lazy Toaster (`sonner`)                          | −30 KB / −7 KB                       | Medio (primer toast)       | Baja        | **P0**    | Autorizar spike aislado y medir.                 |
+| C2  | Render-only block contracts (drop zod público)   | −60 KB / −12 KB                      | Medio (contratos + Studio) | Media-alta  | **P0**    | Diseñar propuesta técnica antes de tocar código. |
+| C3  | Lazy MegaMenu + UserMenu + ProfileModeSwitcher   | −14 KB / −4 KB                       | Alto (UX del header)       | Media       | **P1**    | Requiere prefetch on-intent; medir INP.          |
+| C4  | Excluir `/lovable/*` en builds prod              | −5 KB / −1.3 KB                      | Bajo                       | Baja        | **P2**    | Ganancia marginal; ok como higiene.              |
+| C5  | `stage-experience.ts` lazy                       | −4 KB / −1 KB                        | Bajo                       | Media       | **P2**    | Sólo si se ejecuta post-hidratación.             |
+| C6  | Diferir `register-sw.ts` a `requestIdleCallback` | 0 KB entry (mueve trabajo, no bytes) | Bajo                       | Baja        | **P2**    | Mejora TTI, no bundle size.                      |
+| C7  | Declarar `"sideEffects": false` en app propia    | ~1-2 KB                              | Alto (CSS/PWA)             | Alta        | **P2**    | Descartado salvo auditoría formal.               |
 
 **Techo teórico agregable si C1+C2+C3 se ejecutaran:** ≈ **−104 KB raw / −23 KB gzip** — llevaría el entry de 158 → **~135 KB gzip** (−14.5 %).
 

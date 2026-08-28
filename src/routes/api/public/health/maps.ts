@@ -63,10 +63,7 @@ export const Route = createFileRoute("/api/public/health/maps")({
             hasLovableApiKey: Boolean(lovableKey),
             hasServerKey: Boolean(gmKey),
           });
-          return Response.json(
-            { ok: false, error: "Missing keys" },
-            { status: 500 },
-          );
+          return Response.json({ ok: false, error: "Missing keys" }, { status: 500 });
         }
 
         const gwHeaders = {
@@ -82,7 +79,12 @@ export const Route = createFileRoute("/api/public/health/maps")({
             { headers: gwHeaders },
           );
           const body = await r.json();
-          geocoding = { ok: r.ok && body?.status === "OK", httpStatus: r.status, status: body?.status, error: body?.error_message };
+          geocoding = {
+            ok: r.ok && body?.status === "OK",
+            httpStatus: r.status,
+            status: body?.status,
+            error: body?.error_message,
+          };
         } catch (err) {
           geocoding = { ok: false, error: err instanceof Error ? err.message : String(err) };
         }

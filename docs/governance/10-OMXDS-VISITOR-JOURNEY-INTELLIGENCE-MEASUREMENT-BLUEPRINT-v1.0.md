@@ -86,17 +86,17 @@ OMXDS puede explicar qué experiencias, contenidos, recomendaciones y acciones c
 
 Extraño → Anónimo → Identificado → Explorador → Interesado → Travel Plan → Concierge → Reserva → Viajero → Embajador.
 
-| Transición | Entrada canónica | Pregunta principal |
-|---|---|---|
-| T1 · Extraño → Anónimo | `visitor.session.started` | ¿Qué canal atrajo una visita real? |
-| T2 · Anónimo → Identificado | `visitor.identified` | ¿Qué momento de valor mereció la identificación? |
-| T3 · Identificado → Explorador | `journey.exploration.deepened` | ¿Qué provocó exploración profunda? |
-| T4 · Explorador → Interesado | `intent.signal.captured` | ¿Qué produjo intención verificable? |
-| T5 · Interesado → Travel Plan | `plan.created` | ¿Qué convirtió interés en organización? |
-| T6 · Travel Plan → Concierge | `plan.promoted_to_case` | ¿Qué necesitó asistencia humana? |
-| T7 · Concierge → Reserva | `order.confirmed` | ¿Qué construyó confianza para reservar? |
-| T8 · Reserva → Viajero | `livejourney.onsite` | ¿Qué preparación llegó a experiencia real? |
-| T9 · Viajero → Embajador | `advocacy.signal.captured` | ¿Qué generó recomendación, regreso o ayuda a otros? |
+| Transición                     | Entrada canónica               | Pregunta principal                                  |
+| ------------------------------ | ------------------------------ | --------------------------------------------------- |
+| T1 · Extraño → Anónimo         | `visitor.session.started`      | ¿Qué canal atrajo una visita real?                  |
+| T2 · Anónimo → Identificado    | `visitor.identified`           | ¿Qué momento de valor mereció la identificación?    |
+| T3 · Identificado → Explorador | `journey.exploration.deepened` | ¿Qué provocó exploración profunda?                  |
+| T4 · Explorador → Interesado   | `intent.signal.captured`       | ¿Qué produjo intención verificable?                 |
+| T5 · Interesado → Travel Plan  | `plan.created`                 | ¿Qué convirtió interés en organización?             |
+| T6 · Travel Plan → Concierge   | `plan.promoted_to_case`        | ¿Qué necesitó asistencia humana?                    |
+| T7 · Concierge → Reserva       | `order.confirmed`              | ¿Qué construyó confianza para reservar?             |
+| T8 · Reserva → Viajero         | `livejourney.onsite`           | ¿Qué preparación llegó a experiencia real?          |
+| T9 · Viajero → Embajador       | `advocacy.signal.captured`     | ¿Qué generó recomendación, regreso o ayuda a otros? |
 
 La etapa se deriva de evidencia. No puede editarse manualmente ni crearse un embudo por módulo.
 
@@ -215,16 +215,16 @@ La ubicación precisa no se solicita durante inspiración, exploración o planea
 
 ### 7.1 Identificadores conceptuales
 
-| Referencia | Función | Regla |
-|---|---|---|
-| `session_ref` | Agrupa actividad continua | Rotable; no representa persona. |
-| `anonymous_subject_ref` | Continúa un sujeto AC1 permitido | Propio, pseudónimo y revocable. |
-| `draft_ref` | Identifica borrador local de viaje | No equivale a cuenta. |
-| `user_ref` | Cuenta autenticada | Separada de telemetría cruda. |
-| `plan_ref` | Travel Plan canónico | No duplica su contenido. |
-| `case_ref` | Caso Concierge | Referencia, no copia de notas privadas. |
-| `order_ref` | Reserva/orden | Referencia a resultado permitido. |
-| `trip_ref` | Viaje operativo | Conecta previaje, onsite y postviaje. |
+| Referencia              | Función                            | Regla                                   |
+| ----------------------- | ---------------------------------- | --------------------------------------- |
+| `session_ref`           | Agrupa actividad continua          | Rotable; no representa persona.         |
+| `anonymous_subject_ref` | Continúa un sujeto AC1 permitido   | Propio, pseudónimo y revocable.         |
+| `draft_ref`             | Identifica borrador local de viaje | No equivale a cuenta.                   |
+| `user_ref`              | Cuenta autenticada                 | Separada de telemetría cruda.           |
+| `plan_ref`              | Travel Plan canónico               | No duplica su contenido.                |
+| `case_ref`              | Caso Concierge                     | Referencia, no copia de notas privadas. |
+| `order_ref`             | Reserva/orden                      | Referencia a resultado permitido.       |
+| `trip_ref`              | Viaje operativo                    | Conecta previaje, onsite y postviaje.   |
 
 ### 7.2 Resolución
 
@@ -240,21 +240,21 @@ La ubicación precisa no se solicita durante inspiración, exploración o planea
 
 Todo evento nuevo deberá declarar:
 
-| Campo | Propósito |
-|---|---|
-| `event_id` | Idempotencia y auditoría. |
-| `event_name` / `kind` | Nombre dentro del catálogo aprobado. |
-| `schema_version` | Evolución compatible mediante SemVer. |
-| `occurred_at` | Tiempo UTC del hecho. |
-| `subject_ref` | Sujeto pseudónimo permitido y nivel de confianza. |
-| `session_ref` | Contexto de sesión cuando aplique. |
-| `journey_stage` | Madurez derivada antes/después, si aplica. |
-| `travel_stage` | Momento temporal CV6, si aplica. |
-| `surface` y `route` | Lugar funcional, no texto libre ilimitado. |
-| `entity_ref` | Destino, empresa, producto o experiencia canónica. |
-| `source` | Sistema emisor verificable. |
-| `consent_scope` | Propósito autorizado en el momento del evento. |
-| `evidence_ref` | Referencia mínima a evidencia, sin copiar datos sensibles. |
+| Campo                 | Propósito                                                  |
+| --------------------- | ---------------------------------------------------------- |
+| `event_id`            | Idempotencia y auditoría.                                  |
+| `event_name` / `kind` | Nombre dentro del catálogo aprobado.                       |
+| `schema_version`      | Evolución compatible mediante SemVer.                      |
+| `occurred_at`         | Tiempo UTC del hecho.                                      |
+| `subject_ref`         | Sujeto pseudónimo permitido y nivel de confianza.          |
+| `session_ref`         | Contexto de sesión cuando aplique.                         |
+| `journey_stage`       | Madurez derivada antes/después, si aplica.                 |
+| `travel_stage`        | Momento temporal CV6, si aplica.                           |
+| `surface` y `route`   | Lugar funcional, no texto libre ilimitado.                 |
+| `entity_ref`          | Destino, empresa, producto o experiencia canónica.         |
+| `source`              | Sistema emisor verificable.                                |
+| `consent_scope`       | Propósito autorizado en el momento del evento.             |
+| `evidence_ref`        | Referencia mínima a evidencia, sin copiar datos sensibles. |
 
 ### Familias existentes a reutilizar
 
@@ -370,15 +370,15 @@ No se ejecutan automáticamente campañas, contenidos, precios, mensajes o cambi
 
 ## 11. Acceso por actor
 
-| Actor | Acceso permitido |
-|---|---|
+| Actor                    | Acceso permitido                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------------------ |
 | Founder/Admin autorizado | Agregados del ecosistema; recorrido individual sólo con propósito y privilegio explícitos. |
-| Producto/Marketing | Cohortes y atribución agregadas; PII excluida. |
-| Concierge | Contexto operativo necesario de sus casos; no navegación privada irrelevante. |
-| Empresa | Impacto agregado de su propia oferta; nunca actividad privada ni datos de competidores. |
-| DMO/Institución | Indicadores territoriales agregados con umbrales de privacidad. |
-| Alux | Contexto mínimo autorizado para ayudar; no acceso indiscriminado al almacén analítico. |
-| Viajero | Transparencia, consentimiento, exportación, corrección y eliminación aplicables. |
+| Producto/Marketing       | Cohortes y atribución agregadas; PII excluida.                                             |
+| Concierge                | Contexto operativo necesario de sus casos; no navegación privada irrelevante.              |
+| Empresa                  | Impacto agregado de su propia oferta; nunca actividad privada ni datos de competidores.    |
+| DMO/Institución          | Indicadores territoriales agregados con umbrales de privacidad.                            |
+| Alux                     | Contexto mínimo autorizado para ayudar; no acceso indiscriminado al almacén analítico.     |
+| Viajero                  | Transparencia, consentimiento, exportación, corrección y eliminación aplicables.           |
 
 Toda consulta privilegiada debe ser auditable. La interfaz oculta no equivale a control de acceso.
 
@@ -421,20 +421,20 @@ Una métrica sin calidad visible no se presenta como verdad; se presenta como es
 
 ## 14. Integración con capacidades existentes
 
-| Capacidad | Fuente única | Uso en este Blueprint |
-|---|---|---|
-| Identidad y borrador anónimo | AC1 | Continuidad y momento de registro. |
-| Madurez de relación | CV8 `journey.ts` | 10 etapas y T1–T9 congeladas. |
-| Momento temporal | CV6 Stage-Aware | Seis etapas del viaje real. |
-| Eventos y proyección | CV8.0–CV8.2 | Ingesta append-only y estado derivado. |
-| Visitor Intelligence Center | CV8.3+ | Paneles, cohortes y segmentación. |
-| Decisiones | CV8.9 | Action Queue y gobierno humano. |
-| Plan | Travel Plan Contract | Señales de organización; no copia. |
-| Casos | Concierge | SLA, propuesta y resultado permitido. |
-| Reserva | Commerce / Orders | Confirmación e importe permitido. |
-| Onsite | Live Day / CV6 | Asistencia y experiencia en destino. |
-| Memoria | Travel Passport | Postviaje y Embajador. |
-| Inteligencia | Alux | Decisiones explicables y resultados. |
+| Capacidad                    | Fuente única         | Uso en este Blueprint                  |
+| ---------------------------- | -------------------- | -------------------------------------- |
+| Identidad y borrador anónimo | AC1                  | Continuidad y momento de registro.     |
+| Madurez de relación          | CV8 `journey.ts`     | 10 etapas y T1–T9 congeladas.          |
+| Momento temporal             | CV6 Stage-Aware      | Seis etapas del viaje real.            |
+| Eventos y proyección         | CV8.0–CV8.2          | Ingesta append-only y estado derivado. |
+| Visitor Intelligence Center  | CV8.3+               | Paneles, cohortes y segmentación.      |
+| Decisiones                   | CV8.9                | Action Queue y gobierno humano.        |
+| Plan                         | Travel Plan Contract | Señales de organización; no copia.     |
+| Casos                        | Concierge            | SLA, propuesta y resultado permitido.  |
+| Reserva                      | Commerce / Orders    | Confirmación e importe permitido.      |
+| Onsite                       | Live Day / CV6       | Asistencia y experiencia en destino.   |
+| Memoria                      | Travel Passport      | Postviaje y Embajador.                 |
+| Inteligencia                 | Alux                 | Decisiones explicables y resultados.   |
 
 Si una capacidad ya existe, se extiende mediante su contrato. Este Blueprint no autoriza tablas, trackers, perfiles ni dashboards alternos.
 
@@ -532,17 +532,17 @@ Ninguna fase se inicia por la aprobación de este documento. Cada fase exige aut
 
 ## 19. Riesgos y controles
 
-| Riesgo | Control obligatorio |
-|---|---|
-| Sobreinstrumentación | Catálogo mínimo y pregunta accionable por evento. |
-| Reidentificación | Separación de identidad, pseudónimos, agregación y k≥25. |
-| Doble conteo de noches/ingresos | Reconciliación y niveles de atribución separados. |
-| Identidad equivocada | Unión determinista; incertidumbre permanece separada. |
-| Métrica manipulable | Definición congelada, auditoría y contrapesos. |
-| Automatización sin gobierno | CV8.9 y aprobación humana obligatoria. |
-| Acceso excesivo | RLS, mínimo privilegio, purpose binding y logs. |
-| Simulación confundida con realidad | Namespaces y rotulado técnico/visual obligatorio. |
-| Datos sin adopción | Owner y decisión asociada a cada panel/KPI. |
+| Riesgo                                 | Control obligatorio                                       |
+| -------------------------------------- | --------------------------------------------------------- |
+| Sobreinstrumentación                   | Catálogo mínimo y pregunta accionable por evento.         |
+| Reidentificación                       | Separación de identidad, pseudónimos, agregación y k≥25.  |
+| Doble conteo de noches/ingresos        | Reconciliación y niveles de atribución separados.         |
+| Identidad equivocada                   | Unión determinista; incertidumbre permanece separada.     |
+| Métrica manipulable                    | Definición congelada, auditoría y contrapesos.            |
+| Automatización sin gobierno            | CV8.9 y aprobación humana obligatoria.                    |
+| Acceso excesivo                        | RLS, mínimo privilegio, purpose binding y logs.           |
+| Simulación confundida con realidad     | Namespaces y rotulado técnico/visual obligatorio.         |
+| Datos sin adopción                     | Owner y decisión asociada a cada panel/KPI.               |
 | Optimizar conversión dañando confianza | Trust Index, opt-out, CSAT y continuidad como guardrails. |
 
 ---
@@ -557,6 +557,6 @@ La aprobación es exclusivamente documental. No autoriza modificaciones en produ
 
 ## 21. Control de versión
 
-| Versión | Fecha | Estado | Descripción |
-|---|---|---|---|
-| 1.0 | 2026-07-21 | Approved | Define alcance de observación, dos dimensiones del Journey, identidad progresiva, eventos, métricas, atribución, paneles, acceso, privacidad, fases y criterios de aceptación. |
+| Versión | Fecha      | Estado   | Descripción                                                                                                                                                                    |
+| ------- | ---------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1.0     | 2026-07-21 | Approved | Define alcance de observación, dos dimensiones del Journey, identidad progresiva, eventos, métricas, atribución, paneles, acceso, privacidad, fases y criterios de aceptación. |

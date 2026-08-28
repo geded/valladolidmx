@@ -41,9 +41,7 @@ export function businessRelatedToItems(
     imageUrl: null,
     imageAlt: null,
     meta: [],
-    badges: b.verified
-      ? [{ label: "Verificado", tone: "primary" as const }]
-      : [],
+    badges: b.verified ? [{ label: "Verificado", tone: "primary" as const }] : [],
     tags: [],
     priceAmount: null,
     priceCurrency: null,

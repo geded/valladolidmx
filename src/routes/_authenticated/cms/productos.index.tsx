@@ -15,10 +15,7 @@ type Row = {
 
 export const Route = createFileRoute("/_authenticated/cms/productos/")({
   head: () => ({
-    meta: [
-      { title: "Productos · CMS Studio" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Productos · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: ProductosPage,
 });
@@ -29,7 +26,6 @@ function ProductosPage() {
       queryKey="products"
       fn={listProductsCms}
       title="Productos"
-
       description="Experiencias, hoteles, restaurantes, eventos, tours y más."
       rowKey={(r) => r.id}
       headerActions={
@@ -41,11 +37,33 @@ function ProductosPage() {
         </Link>
       }
       columns={[
-        { key: "name", header: "Nombre", render: (r) => <span className="font-medium">{r.name}</span> },
-        { key: "type", header: "Tipo", render: (r) => <span className="text-xs text-muted-foreground">{r.product_type ?? "—"}</span> },
-        { key: "slug", header: "Slug", render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code> },
+        {
+          key: "name",
+          header: "Nombre",
+          render: (r) => <span className="font-medium">{r.name}</span>,
+        },
+        {
+          key: "type",
+          header: "Tipo",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">{r.product_type ?? "—"}</span>
+          ),
+        },
+        {
+          key: "slug",
+          header: "Slug",
+          render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code>,
+        },
         { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
-        { key: "updated", header: "Actualizado", render: (r) => <span className="text-xs text-muted-foreground">{new Date(r.updated_at).toLocaleDateString("es-MX")}</span> },
+        {
+          key: "updated",
+          header: "Actualizado",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">
+              {new Date(r.updated_at).toLocaleDateString("es-MX")}
+            </span>
+          ),
+        },
         {
           key: "acciones",
           header: "",

@@ -33,7 +33,10 @@ import {
 } from "../src/lib/media/sign.server.ts";
 
 const assetId = Array.from(SHADOW_ALLOWLIST)[0];
-const goodCtx = { headerToken: process.env.MEDIA_SHADOW_INTERNAL_SECRET ?? "", host: "id-preview--m23.lovable.app" };
+const goodCtx = {
+  headerToken: process.env.MEDIA_SHADOW_INTERNAL_SECRET ?? "",
+  host: "id-preview--m23.lovable.app",
+};
 
 function pct(arr, p) {
   if (arr.length === 0) return null;
@@ -52,7 +55,11 @@ function evalOnce(bundle, preloadResult) {
       _silent: true,
       preloaded: bundle,
       preloadTelemetry: preloadResult
-        ? { latencyMs: preloadResult.latencyMs, queryCount: preloadResult.queryCount, error: preloadResult.error }
+        ? {
+            latencyMs: preloadResult.latencyMs,
+            queryCount: preloadResult.queryCount,
+            error: preloadResult.error,
+          }
         : undefined,
     },
     goodCtx,
@@ -93,7 +100,11 @@ const report = { asset_id: assetId, started_utc: new Date().toISOString(), scena
   // Ignoramos el preload y usamos probeSignedUrl directo sobre la primera variante ready.
   const first = bundle.variants[0];
   const t0 = performance.now();
-  const r = await probeSignedUrl({ bucket: first.bucket, path: first.path, variantKey: first.variant_key });
+  const r = await probeSignedUrl({
+    bucket: first.bucket,
+    path: first.path,
+    variantKey: first.variant_key,
+  });
   const total = performance.now() - t0;
   report.scenarios.B2_first_miss = {
     ok: r.ok,
@@ -148,7 +159,9 @@ const report = { asset_id: assetId, started_utc: new Date().toISOString(), scena
   const { bundle, preloadResult } = await withPreload();
   const N = 50;
   const t0 = performance.now();
-  const results = await Promise.all(Array.from({ length: N }, () => evalOnce(bundle, preloadResult)));
+  const results = await Promise.all(
+    Array.from({ length: N }, () => evalOnce(bundle, preloadResult)),
+  );
   const wall = performance.now() - t0;
   const c = getCacheStats();
   const sources = { cache_hit: 0, cache_miss: 0, coalesced: 0, undefined: 0 };
@@ -237,7 +250,10 @@ const report = { asset_id: assetId, started_utc: new Date().toISOString(), scena
   const stub = async () => ({ ok: true, url: "https://opaque.example/tok" });
   await probeSignedUrl({ bucket: "b", path: "p", variantKey: "vk-rot" }, { _signer: stub });
   const invalidated = invalidateByVariantKey("vk-rot");
-  const r = await probeSignedUrl({ bucket: "b", path: "p", variantKey: "vk-rot" }, { _signer: stub });
+  const r = await probeSignedUrl(
+    { bucket: "b", path: "p", variantKey: "vk-rot" },
+    { _signer: stub },
+  );
   report.scenarios.B8_variant_key_rotation = {
     invalidated,
     second_call_source: r.source,

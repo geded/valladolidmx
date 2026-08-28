@@ -93,9 +93,7 @@ function assertAuthorizedResource(endpoint: string, resource: string): void {
   const tag = resource.toLowerCase();
   for (const rx of FORBIDDEN_PATH) {
     if (rx.test(target) || rx.test(tag)) {
-      throw new Error(
-        `[sync-queue] recurso prohibido para cola offline: ${resource}`,
-      );
+      throw new Error(`[sync-queue] recurso prohibido para cola offline: ${resource}`);
     }
   }
 }
@@ -134,7 +132,10 @@ function openDb(): Promise<IDBDatabase> {
   return dbPromise;
 }
 
-function tx<T>(mode: IDBTransactionMode, fn: (store: IDBObjectStore) => Promise<T> | T): Promise<T> {
+function tx<T>(
+  mode: IDBTransactionMode,
+  fn: (store: IDBObjectStore) => Promise<T> | T,
+): Promise<T> {
   return openDb().then(
     (db) =>
       new Promise<T>((resolve, reject) => {
@@ -195,7 +196,9 @@ export async function listQueue(status?: SyncEntryStatus): Promise<SyncEntry[]> 
   return tx("readonly", (store) => {
     return new Promise<SyncEntry[]>((resolve, reject) => {
       const out: SyncEntry[] = [];
-      const src = status ? store.index("status").openCursor(IDBKeyRange.only(status)) : store.openCursor();
+      const src = status
+        ? store.index("status").openCursor(IDBKeyRange.only(status))
+        : store.openCursor();
       src.onsuccess = () => {
         const cursor = src.result;
         if (!cursor) {

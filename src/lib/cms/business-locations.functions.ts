@@ -73,9 +73,7 @@ export const upsertBusinessPrimaryLocation = createServerFn({ method: "POST" })
           ? input.address_line1.trim().slice(0, 200) || null
           : null;
       const label =
-        typeof input.label === "string"
-          ? input.label.trim().slice(0, 80) || null
-          : null;
+        typeof input.label === "string" ? input.label.trim().slice(0, 80) || null : null;
       return { businessId: input.businessId, latitude: lat, longitude: lng, address_line1, label };
     },
   )

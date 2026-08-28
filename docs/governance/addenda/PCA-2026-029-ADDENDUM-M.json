@@ -12,8 +12,6 @@
     "semantic_change": "G8-P2 · Alta en SCANNED_ROUTE_FILES de las rutas internas no indexables src/routes/lovable/g8p2-tour-premium-preview.tsx y src/routes/lovable/g8p2-vacation-rental-premium-preview.tsx, usadas como evidencia visual de las dos familias premium nuevas.",
     "authority": "PCA-2026-041"
   },
-  "invariants": [
-    "omxds_visual_v1_contracts_enabled=false"
-  ],
+  "invariants": ["omxds_visual_v1_contracts_enabled=false"],
   "recorded_at": "2026-08-28"
 }

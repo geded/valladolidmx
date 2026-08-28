@@ -24,7 +24,8 @@ const Query = z.object({
 });
 
 // Marker adicional: "kind:LABEL:lat,lng" o "kind:lat,lng" (legacy).
-const MARKER_RE = /^(poi|business|product|event|destination)(?::([A-Z0-9]))?:(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/;
+const MARKER_RE =
+  /^(poi|business|product|event|destination)(?::([A-Z0-9]))?:(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/;
 const MARKER_COLORS: Record<string, string> = {
   business: "0x0d5c46",
   product: "0xd97706",
@@ -51,9 +52,7 @@ export const Route = createFileRoute("/api/public/maps/static")({
         const { lat, lng, zoom, width, height, scale, format } = parsed.data;
         const rawMarkers = url.searchParams.getAll("m").slice(0, 40);
 
-        const gw = new URL(
-          "https://connector-gateway.lovable.dev/google_maps/maps/api/staticmap",
-        );
+        const gw = new URL("https://connector-gateway.lovable.dev/google_maps/maps/api/staticmap");
         gw.searchParams.set("center", `${lat},${lng}`);
         gw.searchParams.set("zoom", String(zoom));
         gw.searchParams.set("size", `${width}x${height}`);
@@ -61,10 +60,7 @@ export const Route = createFileRoute("/api/public/maps/static")({
         gw.searchParams.set("format", format);
         gw.searchParams.set("maptype", "roadmap");
         if (rawMarkers.length === 0) {
-          gw.searchParams.append(
-            "markers",
-            `color:red|size:mid|${lat},${lng}`,
-          );
+          gw.searchParams.append("markers", `color:red|size:mid|${lat},${lng}`);
         } else {
           // Un `markers=` por pin para preservar la etiqueta individual.
           for (const raw of rawMarkers) {
@@ -96,8 +92,7 @@ export const Route = createFileRoute("/api/public/maps/static")({
         }
 
         const contentType =
-          upstream.headers.get("Content-Type") ??
-          (format === "png" ? "image/png" : "image/jpeg");
+          upstream.headers.get("Content-Type") ?? (format === "png" ? "image/png" : "image/jpeg");
 
         return new Response(upstream.body, {
           status: 200,

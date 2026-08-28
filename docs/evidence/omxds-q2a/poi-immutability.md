@@ -4,13 +4,13 @@
 
 Estado posterior a la migración:
 
-| Nombre | Slug | Estado | `place_type_id` | `updated_at` |
-|---|---|---|---|---|
-| Calzada de los Frailes | `calzada-de-los-frailes` | published | `NULL` | 2026-07-03 17:24:08.785054+00 |
-| Cenote Ik Kil | `cenote-ik-kil` | published | `NULL` | 2026-07-03 17:24:08.785054+00 |
-| Cenote Suytun | `cenote-suytun` | published | `NULL` | 2026-07-03 17:24:08.785054+00 |
-| Cenote Zací | `cenote-zaci` | published | `NULL` | 2026-07-03 17:24:08.785054+00 |
-| Ex Convento de San Bernardino de Siena | `convento-san-bernardino` | published | `NULL` | 2026-07-03 17:24:08.785054+00 |
+| Nombre                                 | Slug                      | Estado    | `place_type_id` | `updated_at`                  |
+| -------------------------------------- | ------------------------- | --------- | --------------- | ----------------------------- |
+| Calzada de los Frailes                 | `calzada-de-los-frailes`  | published | `NULL`          | 2026-07-03 17:24:08.785054+00 |
+| Cenote Ik Kil                          | `cenote-ik-kil`           | published | `NULL`          | 2026-07-03 17:24:08.785054+00 |
+| Cenote Suytun                          | `cenote-suytun`           | published | `NULL`          | 2026-07-03 17:24:08.785054+00 |
+| Cenote Zací                            | `cenote-zaci`             | published | `NULL`          | 2026-07-03 17:24:08.785054+00 |
+| Ex Convento de San Bernardino de Siena | `convento-san-bernardino` | published | `NULL`          | 2026-07-03 17:24:08.785054+00 |
 
 Acreditaciones:
 

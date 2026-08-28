@@ -58,21 +58,17 @@ function DemoPackPanel() {
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
           Demo World · Oriente Maya
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-          Demo Pack v1
-        </h1>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Demo Pack v1</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Estado del ecosistema navegable oficial del Oriente Maya. Cada elemento
-          debe ser descubrible, recomendable por Alux y vendible.
+          Estado del ecosistema navegable oficial del Oriente Maya. Cada elemento debe ser
+          descubrible, recomendable por Alux y vendible.
         </p>
       </header>
 
       {q.isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando cobertura…</p>
       ) : q.error ? (
-        <p className="text-sm text-destructive">
-          No se pudo cargar el estado del Demo Pack.
-        </p>
+        <p className="text-sm text-destructive">No se pudo cargar el estado del Demo Pack.</p>
       ) : q.data ? (
         <>
           <section
@@ -140,7 +136,8 @@ function DemoPackPanel() {
               <DemoLink to="/cms/alux/calidad" label="Alux · Calidad heurística" />
             </ul>
             <p className="mt-4 text-xs text-muted-foreground">
-              Login demo: <code className="rounded bg-muted px-1.5 py-0.5">geded@valladolid.com.mx</code>
+              Login demo:{" "}
+              <code className="rounded bg-muted px-1.5 py-0.5">geded@valladolid.com.mx</code>
             </p>
           </section>
 
@@ -150,19 +147,13 @@ function DemoPackPanel() {
                 <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
                   Validación · Golden Set
                 </p>
-                <h2 className="mt-2 text-lg font-semibold">
-                  Alux recall del recorrido demo
-                </h2>
+                <h2 className="mt-2 text-lg font-semibold">Alux recall del recorrido demo</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Preguntas modelo del viajero: cada elemento debe ser descubrible,
-                  recomendable por Alux y sin alucinaciones.
+                  Preguntas modelo del viajero: cada elemento debe ser descubrible, recomendable por
+                  Alux y sin alucinaciones.
                 </p>
               </div>
-              <Button
-                onClick={() => run.mutate(undefined)}
-                disabled={run.isPending}
-                size="sm"
-              >
+              <Button onClick={() => run.mutate(undefined)} disabled={run.isPending} size="sm">
                 {run.isPending ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
@@ -201,12 +192,9 @@ function GoldenRow({
   running: boolean;
   onRun: () => void;
 }) {
-  const scorePct =
-    ev.last_score != null ? Math.round(ev.last_score * 100) : null;
+  const scorePct = ev.last_score != null ? Math.round(ev.last_score * 100) : null;
   const riskPct =
-    ev.last_hallucination_risk != null
-      ? Math.round(ev.last_hallucination_risk * 100)
-      : null;
+    ev.last_hallucination_risk != null ? Math.round(ev.last_hallucination_risk * 100) : null;
   return (
     <li className="rounded-xl border border-border/70 bg-background p-4">
       <div className="flex items-start justify-between gap-3">
@@ -224,8 +212,7 @@ function GoldenRow({
           <p className="mt-1 text-sm font-medium">{ev.question}</p>
           {ev.last_run_at ? (
             <p className="mt-1 text-xs text-muted-foreground">
-              Score {scorePct}% · Riesgo alucinación {riskPct}% ·{" "}
-              {ev.last_latency_ms}ms ·{" "}
+              Score {scorePct}% · Riesgo alucinación {riskPct}% · {ev.last_latency_ms}ms ·{" "}
               {new Date(ev.last_run_at).toLocaleString("es-MX")}
             </p>
           ) : (
@@ -238,22 +225,14 @@ function GoldenRow({
           ) : null}
           {ev.last_answer ? (
             <details className="mt-2 text-xs">
-              <summary className="cursor-pointer text-muted-foreground">
-                Ver respuesta
-              </summary>
+              <summary className="cursor-pointer text-muted-foreground">Ver respuesta</summary>
               <pre className="mt-2 whitespace-pre-wrap rounded bg-muted p-3 text-[11px] leading-relaxed">
                 {ev.last_answer}
               </pre>
             </details>
           ) : null}
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onRun}
-          disabled={running}
-          className="shrink-0"
-        >
+        <Button variant="ghost" size="sm" onClick={onRun} disabled={running} className="shrink-0">
           <PlayCircle className="h-4 w-4" />
         </Button>
       </div>
@@ -264,10 +243,7 @@ function GoldenRow({
 function DemoLink({ to, label }: { to: string; label: string }) {
   return (
     <li>
-      <Link
-        to={to}
-        className="inline-flex items-center gap-2 text-primary hover:underline"
-      >
+      <Link to={to} className="inline-flex items-center gap-2 text-primary hover:underline">
         <ExternalLink className="h-3.5 w-3.5" />
         {label}
       </Link>

@@ -1,9 +1,6 @@
 import { useRef, type PointerEvent } from "react";
 
-export function useLongPress(
-  onLongPress: () => void,
-  { delay = 500 }: { delay?: number } = {},
-) {
+export function useLongPress(onLongPress: () => void, { delay = 500 }: { delay?: number } = {}) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clear = () => {

@@ -66,8 +66,7 @@ export function BusinessLocationPanel({ businessId }: Props) {
         queryKey: ["cms", "business", businessId, "primary-location"],
       });
     },
-    onError: (e) =>
-      setMsg(e instanceof Error ? e.message : "No se pudo guardar la ubicación."),
+    onError: (e) => setMsg(e instanceof Error ? e.message : "No se pudo guardar la ubicación."),
   });
 
   const useMyLocation = () => {
@@ -96,8 +95,8 @@ export function BusinessLocationPanel({ businessId }: Props) {
         <div>
           <h2 className="text-sm font-semibold tracking-tight">Ubicación en el mapa *</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Marca la ubicación exacta. Se guarda latitud y longitud para calcular
-            distancias y tiempos desde el viajero. Es obligatoria para publicar.
+            Marca la ubicación exacta. Se guarda latitud y longitud para calcular distancias y
+            tiempos desde el viajero. Es obligatoria para publicar.
           </p>
         </div>
         {!hasCoords ? (
@@ -123,8 +122,8 @@ export function BusinessLocationPanel({ businessId }: Props) {
             }}
           />
           <p className="mt-2 text-[11px] text-muted-foreground">
-            Toca el mapa o arrastra el pin para ajustar. La aplicación guarda
-            latitud y longitud automáticamente.
+            Toca el mapa o arrastra el pin para ajustar. La aplicación guarda latitud y longitud
+            automáticamente.
           </p>
         </div>
 

@@ -554,7 +554,9 @@ export const restoreCompositionRevision = createServerFn({ method: "POST" })
           slug: String((existingRow as { slug: string }).slug),
         });
         if (!governed.ok)
-          throw new Error(`i4_rollback_rejected: ${governed.reason ?? "governed_source_unavailable"}`);
+          throw new Error(
+            `i4_rollback_rejected: ${governed.reason ?? "governed_source_unavailable"}`,
+          );
       }
       const { data: result, error } = await context.supabase.rpc("eb_restore_revision", {
         _id: data.id,

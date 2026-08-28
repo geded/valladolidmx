@@ -35,4 +35,4 @@ Consultar el **Documento 12B — Protección de la Identidad Oficial de Marca** 
 
 ---
 
-*Última actualización: Fase 0 — Estructura de repositorio.*
+_Última actualización: Fase 0 — Estructura de repositorio._

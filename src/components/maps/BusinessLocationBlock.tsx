@@ -54,9 +54,7 @@ export function BusinessLocationBlock({
 
         {showInteractive ? (
           <Suspense
-            fallback={
-              <div className="h-[400px] w-full animate-pulse rounded-2xl bg-muted" />
-            }
+            fallback={<div className="h-[400px] w-full animate-pulse rounded-2xl bg-muted" />}
           >
             <InteractiveMap
               lat={lat}

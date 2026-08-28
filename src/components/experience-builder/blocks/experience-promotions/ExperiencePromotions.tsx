@@ -66,7 +66,14 @@ function groupItems(
     if (groupBy === "business") key = it.businessName?.trim() || "otros";
     if (groupBy === "urgency") {
       const days = computeUrgencyDays(it.endsAt);
-      key = days == null ? "sin-fecha" : days <= 3 ? "expira-pronto" : days <= 14 ? "esta-quincena" : "abierta";
+      key =
+        days == null
+          ? "sin-fecha"
+          : days <= 3
+            ? "expira-pronto"
+            : days <= 14
+              ? "esta-quincena"
+              : "abierta";
     }
     if (!map.has(key)) map.set(key, []);
     map.get(key)!.push(it);
@@ -110,12 +117,8 @@ export function ExperiencePromotions({
     >
       {heading || subheading ? (
         <header className="mb-5 flex flex-col gap-1">
-          {heading ? (
-            <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2>
-          ) : null}
-          {subheading ? (
-            <p className="text-sm text-muted-foreground">{subheading}</p>
-          ) : null}
+          {heading ? <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2> : null}
+          {subheading ? <p className="text-sm text-muted-foreground">{subheading}</p> : null}
         </header>
       ) : null}
       {children}
@@ -123,9 +126,7 @@ export function ExperiencePromotions({
   );
 
   if (items.length === 0) {
-    return wrap(
-      <p className="text-sm text-muted-foreground">{emptyMessage}</p>,
-    );
+    return wrap(<p className="text-sm text-muted-foreground">{emptyMessage}</p>);
   }
 
   if (variant === "banner") {
@@ -246,13 +247,7 @@ interface ItemProps {
   renderItemActions?: (item: ExperiencePromotionItem) => ReactNode;
 }
 
-function DiscountBadge({
-  item,
-  compact,
-}: {
-  item: ExperiencePromotionItem;
-  compact?: boolean;
-}) {
+function DiscountBadge({ item, compact }: { item: ExperiencePromotionItem; compact?: boolean }) {
   const label =
     item.discountLabel?.trim() ||
     (item.discountPercent != null ? `−${item.discountPercent}%` : null);
@@ -279,9 +274,7 @@ function UrgencyTag({ item, enabled }: { item: ExperiencePromotionItem; enabled:
     <span
       className={cn(
         "inline-flex items-center gap-1 rounded-pill px-2 py-0.5 text-[10px] font-semibold",
-        tone === "danger"
-          ? "bg-destructive/10 text-destructive"
-          : "bg-warning/10 text-warning",
+        tone === "danger" ? "bg-destructive/10 text-destructive" : "bg-warning/10 text-warning",
       )}
     >
       {label}
@@ -369,7 +362,10 @@ function PromotionCard({
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
             {capabilities.showDiscount ? <DiscountBadge item={item} /> : null}
-            <UrgencyTag item={item} enabled={capabilities.urgencyAware && capabilities.showExpiry} />
+            <UrgencyTag
+              item={item}
+              enabled={capabilities.urgencyAware && capabilities.showExpiry}
+            />
           </div>
           <BadgesRow item={item} />
         </div>
@@ -386,9 +382,7 @@ function PromotionCard({
           <p className="mt-0.5 text-xs text-muted-foreground">{item.businessName}</p>
         ) : null}
         {item.description ? (
-          <p className="mt-1 line-clamp-3 text-sm text-muted-foreground">
-            {item.description}
-          </p>
+          <p className="mt-1 line-clamp-3 text-sm text-muted-foreground">{item.description}</p>
         ) : null}
         <PriceLine item={item} />
         <CouponLine item={item} enabled={capabilities.showCouponCode} />
@@ -492,9 +486,7 @@ function PromotionBanner({ item, capabilities, renderItemActions }: ItemProps) {
         <CouponLine item={item} enabled={capabilities.showCouponCode} />
       </div>
       {(capabilities.showFavorite || capabilities.showActions) && renderItemActions ? (
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
-          {renderItemActions(item)}
-        </div>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">{renderItemActions(item)}</div>
       ) : null}
     </article>
   );

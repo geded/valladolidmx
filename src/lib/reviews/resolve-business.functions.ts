@@ -15,7 +15,9 @@ export interface BusinessBySlug {
 export const resolveBusinessBySlug = createServerFn({ method: "GET" })
   .inputValidator((raw: unknown) => {
     const d = (raw ?? {}) as { slug?: unknown };
-    const slug = String(d.slug ?? "").trim().toLowerCase();
+    const slug = String(d.slug ?? "")
+      .trim()
+      .toLowerCase();
     if (!slug || !/^[a-z0-9-]{1,120}$/.test(slug)) {
       throw new Error("invalid_slug");
     }

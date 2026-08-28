@@ -7,10 +7,30 @@
   "auditButtons1024_1440": "sólo visibles en entornos no productivos (preview/local); no disponibles en el Studio abierto por el Founder",
   "mechanism": "iframe same-origin de ancho exacto (mismo mecanismo de viewport aislado del canvas) sobre http://localhost:8080/",
   "results": {
-    "1024": { "innerWidth": 1024, "overflowX": 0, "headerPosition": "sticky", "headerTopAfterScroll": 0, "headerVisibleAfterScroll": true, "scrollY": 933, "consoleErrors": 0 },
-    "1440": { "innerWidth": 1440, "overflowX": 0, "headerPosition": "sticky", "headerTopAfterScroll": 0, "headerVisibleAfterScroll": true, "scrollY": 933, "consoleErrors": 0 }
+    "1024": {
+      "innerWidth": 1024,
+      "overflowX": 0,
+      "headerPosition": "sticky",
+      "headerTopAfterScroll": 0,
+      "headerVisibleAfterScroll": true,
+      "scrollY": 933,
+      "consoleErrors": 0
+    },
+    "1440": {
+      "innerWidth": 1440,
+      "overflowX": 0,
+      "headerPosition": "sticky",
+      "headerTopAfterScroll": 0,
+      "headerVisibleAfterScroll": true,
+      "scrollY": 933,
+      "consoleErrors": 0
+    }
   },
-  "artifacts": ["canvas-exact-widths.json", "screenshots/canvas_1024.png", "screenshots/canvas_1440.png"],
+  "artifacts": [
+    "canvas-exact-widths.json",
+    "screenshots/canvas_1024.png",
+    "screenshots/canvas_1440.png"
+  ],
   "flag": "omxds_visual_v1_contracts_enabled=false",
   "production": "no tocada",
   "g3": "BLOCKED"

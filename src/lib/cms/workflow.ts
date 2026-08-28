@@ -11,35 +11,23 @@
  * debe modificarse en ESTE archivo y en ningún otro.
  */
 
-export type ContentStatus =
-  | "draft"
-  | "in_review"
-  | "approved"
-  | "published"
-  | "archived";
+export type ContentStatus = "draft" | "in_review" | "approved" | "published" | "archived";
 
-export const ALLOWED_TRANSITIONS: Readonly<
-  Record<ContentStatus, readonly ContentStatus[]>
-> = Object.freeze({
-  draft: ["in_review", "archived"],
-  in_review: ["approved", "draft", "archived"],
-  approved: ["published", "draft", "archived"],
-  published: ["archived", "draft"],
-  archived: ["draft"],
-}) as Readonly<Record<ContentStatus, readonly ContentStatus[]>>;
+export const ALLOWED_TRANSITIONS: Readonly<Record<ContentStatus, readonly ContentStatus[]>> =
+  Object.freeze({
+    draft: ["in_review", "archived"],
+    in_review: ["approved", "draft", "archived"],
+    approved: ["published", "draft", "archived"],
+    published: ["archived", "draft"],
+    archived: ["draft"],
+  }) as Readonly<Record<ContentStatus, readonly ContentStatus[]>>;
 
-export function isAllowedTransition(
-  from: ContentStatus,
-  to: ContentStatus,
-): boolean {
+export function isAllowedTransition(from: ContentStatus, to: ContentStatus): boolean {
   const allowed = ALLOWED_TRANSITIONS[from] ?? [];
   return allowed.includes(to);
 }
 
-export function assertAllowedTransition(
-  from: ContentStatus,
-  to: ContentStatus,
-): void {
+export function assertAllowedTransition(from: ContentStatus, to: ContentStatus): void {
   if (!isAllowedTransition(from, to)) {
     throw new Error(`invalid_transition:${from}->${to}`);
   }

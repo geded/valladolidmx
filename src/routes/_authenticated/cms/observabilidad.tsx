@@ -62,9 +62,7 @@ function ObservabilityPage() {
         setSearch(s);
         setError(null);
       })
-      .catch((e: unknown) =>
-        setError(e instanceof Error ? e.message : String(e)),
-      )
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
       .finally(() => !cancelled && setLoading(false));
     return () => {
       cancelled = true;
@@ -77,12 +75,10 @@ function ObservabilityPage() {
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
           Observabilidad
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-          Observabilidad y Hardening
-        </h1>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Observabilidad y Hardening</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Dashboards técnicos y de negocio de la plataforma. Todas las
-          lecturas son agregadas y exigen rol admin / super_admin server-side.
+          Dashboards técnicos y de negocio de la plataforma. Todas las lecturas son agregadas y
+          exigen rol admin / super_admin server-side.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3 text-xs">
           <label className="flex items-center gap-2">
@@ -181,7 +177,10 @@ function ObservabilityPage() {
           <Card label="Total búsquedas" value={search?.total} />
           <Card label="Zero results" value={search?.zero_results} />
           <Card label="Tasa zero (%)" value={search?.zero_results_rate} />
-          <Card label="p50 / p95 (ms)" value={search ? `${search.p50_ms} / ${search.p95_ms}` : undefined} />
+          <Card
+            label="p50 / p95 (ms)"
+            value={search ? `${search.p50_ms} / ${search.p95_ms}` : undefined}
+          />
         </div>
         {search && search.top_zero_terms.length > 0 && (
           <div className="mt-4 rounded-xl border border-border p-3 text-xs">
@@ -190,10 +189,7 @@ function ObservabilityPage() {
             </p>
             <ul className="mt-2 flex flex-wrap gap-2">
               {search.top_zero_terms.map((t) => (
-                <li
-                  key={t.q}
-                  className="rounded-full border border-border bg-background px-3 py-1"
-                >
+                <li key={t.q} className="rounded-full border border-border bg-background px-3 py-1">
                   <span className="font-medium">{t.q}</span>
                   <span className="ml-2 text-muted-foreground">× {t.count}</span>
                 </li>
@@ -231,9 +227,7 @@ function Card({
       <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
         {label}
       </p>
-      <p className="mt-2 text-2xl font-semibold tabular-nums">
-        {value ?? "—"}
-      </p>
+      <p className="mt-2 text-2xl font-semibold tabular-nums">{value ?? "—"}</p>
     </div>
   );
 }

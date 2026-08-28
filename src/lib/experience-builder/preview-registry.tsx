@@ -356,13 +356,11 @@ const REGISTRY: TemplatePreviewProvider<any>[] = [
     label: "Vista previa con destino",
     placeholder: "Selecciona un destino…",
     async loadCandidates() {
-      return DESTINOS_MOCK.filter((d) => d.region_slug === ORIENTE_MAYA.slug).map(
-        (d) => ({
-          slug: d.slug,
-          label: d.name,
-          secondary: "Oriente Maya",
-        }),
-      );
+      return DESTINOS_MOCK.filter((d) => d.region_slug === ORIENTE_MAYA.slug).map((d) => ({
+        slug: d.slug,
+        label: d.name,
+        secondary: "Oriente Maya",
+      }));
     },
     async loadDetail(slug) {
       try {
@@ -456,9 +454,8 @@ export class PreviewProviderBoundary extends Component<BoundaryProps, BoundarySt
       return (
         <div className="space-y-2">
           <div className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-xs text-destructive">
-            La vista previa del kind <b>{this.props.kind}</b> falló al hidratar
-            datos. El canvas se muestra sin contexto para que puedas seguir
-            editando la plantilla.
+            La vista previa del kind <b>{this.props.kind}</b> falló al hidratar datos. El canvas se
+            muestra sin contexto para que puedas seguir editando la plantilla.
           </div>
           {this.props.children}
         </div>

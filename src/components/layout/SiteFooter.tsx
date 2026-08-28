@@ -67,7 +67,11 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
           <h3 className="text-sm font-semibold text-foreground">{t("footer.explore")}</h3>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             {exploreLinks.map((link) => (
-              <li key={`${link.href}-${link.label}`}><a href={link.href} className="hover:text-foreground">{link.label}</a></li>
+              <li key={`${link.href}-${link.label}`}>
+                <a href={link.href} className="hover:text-foreground">
+                  {link.label}
+                </a>
+              </li>
             ))}
           </ul>
         </div>
@@ -76,21 +80,29 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
           <h3 className="text-sm font-semibold text-foreground">{t("footer.platform")}</h3>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             {platformLinks.map((link) => (
-              <li key={`${link.href}-${link.label}`}><a href={link.href} className="hover:text-foreground">{link.label}</a></li>
+              <li key={`${link.href}-${link.label}`}>
+                <a href={link.href} className="hover:text-foreground">
+                  {link.label}
+                </a>
+              </li>
             ))}
           </ul>
         </div>
 
-        {showLanguage ? <div>
-          <h3 className="text-sm font-semibold text-foreground">{t("common.language")}</h3>
-          <div className="mt-3">
-            <LanguageSwitcher />
+        {showLanguage ? (
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">{t("common.language")}</h3>
+            <div className="mt-3">
+              <LanguageSwitcher />
+            </div>
           </div>
-        </div> : null}
+        ) : null}
       </Container>
       <div className="border-t border-border/60">
         <Container className="flex flex-col items-center justify-between gap-3 py-5 text-xs text-muted-foreground @3xl:flex-row">
-          <p>© {new Date().getFullYear()} {SITE.name}. {t("footer.rights")}</p>
+          <p>
+            © {new Date().getFullYear()} {SITE.name}. {t("footer.rights")}
+          </p>
           <div className="flex gap-4">
             <span>{legalLabel}</span>
             <span>{privacyLabel}</span>

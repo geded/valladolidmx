@@ -65,7 +65,14 @@ export interface BlockFieldSchema {
   /** Para `select`: opciones permitidas. */
   options?: Array<{ value: string; label: string }>;
   /** Para `reference`: dominio referenciado (read-only). */
-  references?: "destination" | "business" | "product" | "event" | "promotion" | "page" | "media_asset";
+  references?:
+    | "destination"
+    | "business"
+    | "product"
+    | "event"
+    | "promotion"
+    | "page"
+    | "media_asset";
   /** Para `list` / `object`: subesquema. */
   fields?: Record<string, BlockFieldSchema>;
   /** Para `list`: subesquema del item. */
@@ -254,8 +261,10 @@ export function validateBlockContract(c: BlockContract): BlockContractValidation
   const errors: string[] = [];
 
   if (!TYPE_RE.test(c.type)) errors.push(`invalid type "${c.type}" — must be namespaced lowercase`);
-  if (!SEMVER_RE.test(c.version)) errors.push(`invalid version "${c.version}" — must be MAJOR.MINOR.PATCH`);
-  if (!c.display_name || c.display_name.trim().length === 0) errors.push("display_name is required");
+  if (!SEMVER_RE.test(c.version))
+    errors.push(`invalid version "${c.version}" — must be MAJOR.MINOR.PATCH`);
+  if (!c.display_name || c.display_name.trim().length === 0)
+    errors.push("display_name is required");
   if (!c.schema || typeof c.schema !== "object") errors.push("schema is required");
   if (!c.capabilities) errors.push("capabilities are required");
 
@@ -266,7 +275,9 @@ export function validateBlockContract(c: BlockContract): BlockContractValidation
       for (const ds of c.data_sources) {
         if (ds.read_only !== true) errors.push(`data source "${ds.reader}" must be read_only`);
         if (!ds.reader && !ds.query) {
-          errors.push(`data source in domain "${ds.domain}" must declare either "reader" or "query"`);
+          errors.push(
+            `data source in domain "${ds.domain}" must declare either "reader" or "query"`,
+          );
         }
         if (ds.query) {
           const q = ds.query;
@@ -276,7 +287,10 @@ export function validateBlockContract(c: BlockContract): BlockContractValidation
           } else if (q.select.includes("*")) {
             errors.push(`data source query "select" must not include "*"`);
           }
-          if (q.limit !== undefined && (!Number.isInteger(q.limit) || q.limit <= 0 || q.limit > 100)) {
+          if (
+            q.limit !== undefined &&
+            (!Number.isInteger(q.limit) || q.limit <= 0 || q.limit > 100)
+          ) {
             errors.push(`data source query "limit" must be an integer between 1 and 100`);
           }
         }
@@ -293,19 +307,23 @@ export function validateBlockContract(c: BlockContract): BlockContractValidation
 
   // Coherencia i18n: cada campo traducible debe existir en schema.
   for (const f of c.i18n?.translatable_fields ?? []) {
-    if (!c.schema[f]) errors.push(`i18n.translatable_fields references missing schema field "${f}"`);
+    if (!c.schema[f])
+      errors.push(`i18n.translatable_fields references missing schema field "${f}"`);
   }
 
   // Coherencia responsive: cada campo overridable debe existir.
   for (const f of c.responsive?.overridable_fields ?? []) {
-    if (!c.schema[f]) errors.push(`responsive.overridable_fields references missing schema field "${f}"`);
+    if (!c.schema[f])
+      errors.push(`responsive.overridable_fields references missing schema field "${f}"`);
   }
 
   if (c.editorial) {
     const editorial = validateEditorialBlockMetadata(
       c.editorial,
       Object.keys(c.schema),
-      Object.fromEntries(Object.entries(c.schema).map(([field, schema]) => [field, schema.editorial])),
+      Object.fromEntries(
+        Object.entries(c.schema).map(([field, schema]) => [field, schema.editorial]),
+      ),
     );
     errors.push(...editorial.errors.map((error) => `editorial policy: ${error}`));
   }

@@ -15,25 +15,25 @@ Primera versión editorial cargada dentro de la composición existente `biz-zazi
 
 El árbol publicado contiene **17 bloques** en el siguiente orden narrativo:
 
-| # | Bloque | Fuente | Rol editorial |
-|---|--------|--------|---------------|
-| 1 | `vmx.experience.hero` (immersive) | `business` | Hero con datos hidratados desde la ficha + copy editorial. |
-| 2 | `vmx.experience.subnav` (pill) | manual | Sub-nav sticky con 7 anclas. |
-| 3 | `vmx.experience.institutional-badges` | manual | Badge `pueblo-magico` (Valladolid). |
-| 4 | `vmx.experience.section` (editorial) | manual | Por qué visitar. |
-| 5 | `vmx.experience.features` (grid) | manual | 6 diferenciadores verificables. |
-| 6 | `vmx.experience.section` (editorial) | manual | Historia del proyecto (matizada, `founder_review_required`). |
-| 7 | `vmx.experience.section` (split) | manual | El Cenote Museo. |
-| 8 | `vmx.experience.section` (editorial) | manual | El recorrido por Xibalbá (con guardrails culturales). |
-| 9 | `vmx.experience.gallery` (mosaic) | `business` | Galería hidratada desde `business_media` (placeholder si vacío). |
-| 10 | `vmx.experience.products` (grid) | `business` | Experiencias oficiales del operador ya cargadas. |
-| 11 | `vmx.experience.info-grid` (cards) | `business` | Información práctica auto-hidratada. |
-| 12 | `vmx.experience.section` (editorial) | manual | Planea tu visita + interlinking. |
-| 13 | `vmx.experience.map` (single) | `business` | Ubicación geográfica. |
-| 14 | `vmx.experience.related-collection` (grid) | `business` | Cenotes hermanos publicados en Valladolid. |
-| 15 | `vmx.experience.reviews` (list) | `business` | Reseñas verificadas. |
-| 16 | `vmx.experience.section` (editorial) | manual | Preguntas frecuentes. |
-| 17 | `vmx.experience.cta-bar` (floating) | manual | CTA persistente: Reservar en sitio oficial + Agregar a mi viaje. |
+| #   | Bloque                                     | Fuente     | Rol editorial                                                    |
+| --- | ------------------------------------------ | ---------- | ---------------------------------------------------------------- |
+| 1   | `vmx.experience.hero` (immersive)          | `business` | Hero con datos hidratados desde la ficha + copy editorial.       |
+| 2   | `vmx.experience.subnav` (pill)             | manual     | Sub-nav sticky con 7 anclas.                                     |
+| 3   | `vmx.experience.institutional-badges`      | manual     | Badge `pueblo-magico` (Valladolid).                              |
+| 4   | `vmx.experience.section` (editorial)       | manual     | Por qué visitar.                                                 |
+| 5   | `vmx.experience.features` (grid)           | manual     | 6 diferenciadores verificables.                                  |
+| 6   | `vmx.experience.section` (editorial)       | manual     | Historia del proyecto (matizada, `founder_review_required`).     |
+| 7   | `vmx.experience.section` (split)           | manual     | El Cenote Museo.                                                 |
+| 8   | `vmx.experience.section` (editorial)       | manual     | El recorrido por Xibalbá (con guardrails culturales).            |
+| 9   | `vmx.experience.gallery` (mosaic)          | `business` | Galería hidratada desde `business_media` (placeholder si vacío). |
+| 10  | `vmx.experience.products` (grid)           | `business` | Experiencias oficiales del operador ya cargadas.                 |
+| 11  | `vmx.experience.info-grid` (cards)         | `business` | Información práctica auto-hidratada.                             |
+| 12  | `vmx.experience.section` (editorial)       | manual     | Planea tu visita + interlinking.                                 |
+| 13  | `vmx.experience.map` (single)              | `business` | Ubicación geográfica.                                            |
+| 14  | `vmx.experience.related-collection` (grid) | `business` | Cenotes hermanos publicados en Valladolid.                       |
+| 15  | `vmx.experience.reviews` (list)            | `business` | Reseñas verificadas.                                             |
+| 16  | `vmx.experience.section` (editorial)       | manual     | Preguntas frecuentes.                                            |
+| 17  | `vmx.experience.cta-bar` (floating)        | manual     | CTA persistente: Reservar en sitio oficial + Agregar a mi viaje. |
 
 ## 3. Bloques reutilizados vs bloques nuevos
 
@@ -77,19 +77,19 @@ No se modificó `businesses`, `products`, `business_media`, `business_locations`
 
 ## 8. Estado editorial
 
-| Bloque | Contenido | Estado |
-|--------|-----------|--------|
-| Hero | verified (datos generales y distancias declaradas por el operador). |
-| Por qué visitar / Features | verified con framings prudentes. |
-| Historia | founder_review_required (redacción matizada; no afirma premios ni fechas). |
-| Cenote Museo · Xibalbá | verified (interpretación, no hechos arqueológicos). |
-| Experiencias | verified (proviene de `products` ya cargados en SEO.A3.M1). |
-| Información práctica | verified/placeholder según lo que exista en `business_hours`, `business_contacts`, `business_locations`. |
-| Planea tu visita | verified. |
-| Ubicación | verified (coordenadas ya sembradas). |
-| Reviews | verified sólo si hay reseñas cargadas; placeholder de lo contrario. |
-| FAQ | verified (respuestas no comprometen datos operativos específicos). |
-| CTA bar | verified. |
+| Bloque                     | Contenido                                                                                                | Estado |
+| -------------------------- | -------------------------------------------------------------------------------------------------------- | ------ |
+| Hero                       | verified (datos generales y distancias declaradas por el operador).                                      |
+| Por qué visitar / Features | verified con framings prudentes.                                                                         |
+| Historia                   | founder_review_required (redacción matizada; no afirma premios ni fechas).                               |
+| Cenote Museo · Xibalbá     | verified (interpretación, no hechos arqueológicos).                                                      |
+| Experiencias               | verified (proviene de `products` ya cargados en SEO.A3.M1).                                              |
+| Información práctica       | verified/placeholder según lo que exista en `business_hours`, `business_contacts`, `business_locations`. |
+| Planea tu visita           | verified.                                                                                                |
+| Ubicación                  | verified (coordenadas ya sembradas).                                                                     |
+| Reviews                    | verified sólo si hay reseñas cargadas; placeholder de lo contrario.                                      |
+| FAQ                        | verified (respuestas no comprometen datos operativos específicos).                                       |
+| CTA bar                    | verified.                                                                                                |
 
 ## 9. Riesgos pendientes
 

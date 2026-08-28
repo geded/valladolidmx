@@ -18,7 +18,9 @@ export function ResenaCard({ review }: { review: Review }) {
           {Array.from({ length: 5 }).map((_, i) => (
             <Star
               key={i}
-              className={i < review.rating ? "size-4 fill-primary text-primary" : "size-4 text-muted"}
+              className={
+                i < review.rating ? "size-4 fill-primary text-primary" : "size-4 text-muted"
+              }
               aria-hidden
             />
           ))}

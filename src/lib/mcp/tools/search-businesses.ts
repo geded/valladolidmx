@@ -35,7 +35,11 @@ export default defineTool({
   description:
     "Busca hoteles, restaurantes, tours, experiencias y demás negocios turísticos publicados en Valladolid y el Oriente Maya. Devuelve resultados públicos del catálogo.",
   inputSchema: {
-    query: z.string().min(3).max(60).describe("Texto de búsqueda (mínimo 3 caracteres alfanuméricos)."),
+    query: z
+      .string()
+      .min(3)
+      .max(60)
+      .describe("Texto de búsqueda (mínimo 3 caracteres alfanuméricos)."),
     limit: z.number().int().min(1).max(SEARCH_RESULT_HARD_CAP).default(10),
     locale: LocaleSchema,
   },
@@ -61,7 +65,11 @@ export default defineTool({
         .ilike("name", `%${clean.value}%`)
         .limit(cappedLimit);
       if (error) {
-        return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true, resultCount: 0 };
+        return {
+          content: [{ type: "text", text: `Error: ${error.message}` }],
+          isError: true,
+          resultCount: 0,
+        };
       }
       const rows = data ?? [];
       const output = OutputSchema.parse({
@@ -71,9 +79,7 @@ export default defineTool({
         explain: {
           rationale: `Coincidencia por nombre (ILIKE) sobre negocios publicados. Locale: ${meta.localeUsed}.`,
           sources: [{ kind: "catalog", table: "businesses" }],
-          limitations: [
-            "Búsqueda por nombre (ILIKE). Se implementará FTS multi-idioma en M2.",
-          ],
+          limitations: ["Búsqueda por nombre (ILIKE). Se implementará FTS multi-idioma en M2."],
           locale_used: meta.localeUsed,
           locale_fallback: meta.localeFallback,
         },
@@ -86,7 +92,10 @@ export default defineTool({
               rows.length === 0
                 ? `No se encontraron negocios para "${query}".`
                 : rows
-                    .map((r) => `• ${r.name}${r.city ? ` (${r.city})` : ""}${r.short_description ? ` — ${r.short_description}` : ""}`)
+                    .map(
+                      (r) =>
+                        `• ${r.name}${r.city ? ` (${r.city})` : ""}${r.short_description ? ` — ${r.short_description}` : ""}`,
+                    )
                     .join("\n"),
           },
         ],

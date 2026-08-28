@@ -30,8 +30,7 @@ function TravelerCasePage() {
       queryFn: () => fn({ data: { caseId } }),
     }),
   );
-  const status =
-    (q.data as { case?: { status?: string } } | null)?.case?.status ?? "";
+  const status = (q.data as { case?: { status?: string } } | null)?.case?.status ?? "";
   const isClosed = ["closed_won", "closed_lost", "archived"].includes(status);
   return (
     <section>

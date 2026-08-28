@@ -2,14 +2,7 @@
  * SheetStackProvider (15.10.5b) — Universal Interaction Layer.
  * Push/pop programático de bottom sheets, reutiliza BottomSheet existente.
  */
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { BottomSheet, type SheetSnap } from "../BottomSheet";
 
 interface SheetEntry {
@@ -34,18 +27,14 @@ export function SheetStackProvider({ children }: { children: ReactNode }) {
   const [stack, setStack] = useState<SheetEntry[]>([]);
 
   const push = useCallback<Ctx["push"]>((entry) => {
-    const id =
-      entry.id ?? `sheet_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const id = entry.id ?? `sheet_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const snap: SheetSnap = entry.snap ?? "half";
     setStack((s) => [...s, { ...entry, snap, id }]);
     return id;
   }, []);
 
   const pop = useCallback(() => setStack((s) => s.slice(0, -1)), []);
-  const close = useCallback(
-    (id: string) => setStack((s) => s.filter((e) => e.id !== id)),
-    [],
-  );
+  const close = useCallback((id: string) => setStack((s) => s.filter((e) => e.id !== id)), []);
   const clear = useCallback(() => setStack([]), []);
 
   const value = useMemo<Ctx>(

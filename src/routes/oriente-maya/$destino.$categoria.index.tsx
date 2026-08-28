@@ -19,10 +19,7 @@ import {
   resolveTerritorialPath,
   resolutionToNavigationContext,
 } from "@/lib/navigation/territorial-resolver.functions";
-import {
-  buildBreadcrumbs,
-  navigationContextToDeclaration,
-} from "@/lib/navigation";
+import { buildBreadcrumbs, navigationContextToDeclaration } from "@/lib/navigation";
 import { ContextEngineProvider } from "@/lib/context-engine";
 import {
   listMarketplaceBusinesses,
@@ -58,8 +55,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
     );
     const items: MarketplaceBusinessCard[] = businesses.filter(
       (b: MarketplaceBusinessCard) =>
-        b.destination_slug === params.destino &&
-        b.category_slug === params.categoria,
+        b.destination_slug === params.destino && b.category_slug === params.categoria,
     );
     // E2 · US-E2.3 — Related Collection para superficie Categoría.
     // Fallback silencioso: el bloque se oculta si no hay datos.
@@ -107,10 +103,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/")({
   notFoundComponent: () => (
     <PublicShell
       title="Categoría no disponible"
-      crumbs={[
-        { label: "Oriente Maya", to: "/oriente-maya" },
-        { label: "—" },
-      ]}
+      crumbs={[{ label: "Oriente Maya", to: "/oriente-maya" }, { label: "—" }]}
     >
       <p className="text-sm text-muted-foreground">
         Aún no publicamos esta categoría en este destino.
@@ -152,27 +145,26 @@ function CategoriaEnDestinoPage() {
   };
   const hasRelated = Boolean(
     related &&
-      (related.otherCategoriesInDestination.length > 0 ||
-        related.sameCategoryOtherDestinations.length > 0),
+    (related.otherCategoriesInDestination.length > 0 ||
+      related.sameCategoryOtherDestinations.length > 0),
   );
 
   // Puntos del mapa (Founder Discovery: mapa arriba + tarjetas abajo).
   const mapPoints = useMemo<ExperienceMapPoint[]>(() => {
-    const arr: (ExperienceMapPoint | null)[] = items
-      .map((b: MarketplaceBusinessCard) => {
-        const point = businessToMapPoint({
-          id: b.id,
-          name: b.display_name,
-          slug: b.slug,
-          latitude: b.latitude ?? null,
-          longitude: b.longitude ?? null,
-          address_line1: b.address_line1 ?? null,
-          cover_url: b.cover_url ?? null,
-          category_label: catLabel,
-        });
-        // Interceptamos href para abrir el modal (no navegar).
-        return point ? { ...point, href: null } : null;
+    const arr: (ExperienceMapPoint | null)[] = items.map((b: MarketplaceBusinessCard) => {
+      const point = businessToMapPoint({
+        id: b.id,
+        name: b.display_name,
+        slug: b.slug,
+        latitude: b.latitude ?? null,
+        longitude: b.longitude ?? null,
+        address_line1: b.address_line1 ?? null,
+        cover_url: b.cover_url ?? null,
+        category_label: catLabel,
       });
+      // Interceptamos href para abrir el modal (no navegar).
+      return point ? { ...point, href: null } : null;
+    });
     return arr.filter((p): p is ExperienceMapPoint => p !== null);
   }, [items, catLabel]);
 
@@ -194,89 +186,84 @@ function CategoriaEnDestinoPage() {
 
   return (
     <ContextEngineProvider declaration={declaration}>
-    <CategorySurfaceRelatedProvider value={categoryValue}>
-    <PublicShell crumbs={crumbs}>
-      <div onClick={handleListingClick}>
-      <TourismListingSurface
-        hero={{
-          eyebrow: destLabel,
-          title: `${catLabel} en ${destLabel}`,
-          subtitle: `Selección editorial de ${catLabel.toLowerCase()} en ${destLabel}, Oriente Maya de Yucatán.`,
-          metaLabel: destLabel,
-        }}
-        items={items.map((b: MarketplaceBusinessCard) => {
-          const vm = businessToTourismCard(b, {
-            destinationLabel: destLabel,
-            regionLabel: "Oriente Maya",
-            forcedCategorySlug: categoria,
-          });
-          const pointIndex = mapPoints.findIndex((p) => p.id === b.id);
-          // Inyectamos CTA primario: abre el modal (interceptado por
-          // handleListingClick porque el href apunta a la ficha completa).
-          return {
-            ...vm,
-            mapLabel:
-              pointIndex >= 0
-                ? String.fromCharCode(65 + (pointIndex % 26))
-                : null,
-            primaryAction: vm.href
-              ? { label: primaryCtaLabel, href: vm.href }
-              : null,
-          };
-        })}
-        destinationSlug={destino}
-        destinationLabel={destLabel}
-        mapSlot={
-          mapPoints.length > 0 ? (
-            <ListingMapHeader
-              heading={`${catLabel} en el mapa de ${destLabel}`}
-              points={mapPoints}
+      <CategorySurfaceRelatedProvider value={categoryValue}>
+        <PublicShell crumbs={crumbs}>
+          <div onClick={handleListingClick}>
+            <TourismListingSurface
+              hero={{
+                eyebrow: destLabel,
+                title: `${catLabel} en ${destLabel}`,
+                subtitle: `Selección editorial de ${catLabel.toLowerCase()} en ${destLabel}, Oriente Maya de Yucatán.`,
+                metaLabel: destLabel,
+              }}
+              items={items.map((b: MarketplaceBusinessCard) => {
+                const vm = businessToTourismCard(b, {
+                  destinationLabel: destLabel,
+                  regionLabel: "Oriente Maya",
+                  forcedCategorySlug: categoria,
+                });
+                const pointIndex = mapPoints.findIndex((p) => p.id === b.id);
+                // Inyectamos CTA primario: abre el modal (interceptado por
+                // handleListingClick porque el href apunta a la ficha completa).
+                return {
+                  ...vm,
+                  mapLabel: pointIndex >= 0 ? String.fromCharCode(65 + (pointIndex % 26)) : null,
+                  primaryAction: vm.href ? { label: primaryCtaLabel, href: vm.href } : null,
+                };
+              })}
+              destinationSlug={destino}
+              destinationLabel={destLabel}
+              mapSlot={
+                mapPoints.length > 0 ? (
+                  <ListingMapHeader
+                    heading={`${catLabel} en el mapa de ${destLabel}`}
+                    points={mapPoints}
+                  />
+                ) : null
+              }
+              emptyMessage={`Aún no publicamos empresas de ${catLabel.toLowerCase()} en ${destLabel}.`}
             />
-          ) : null
-        }
-        emptyMessage={`Aún no publicamos empresas de ${catLabel.toLowerCase()} en ${destLabel}.`}
-      />
-      </div>
-      {hasRelated ? (
-        <section id="descubre" className="mt-12">
-          <ExperienceRelatedCollectionBlock
-            config={{
-              source: "category",
-              entityKind: "business",
-              variant: "grid",
-              columns: 3,
-              heading: "Sigue descubriendo",
-              subheading: `Más ideas para tu viaje por ${destLabel} y el Oriente Maya.`,
-              capabilities: {
-                showRationale: true,
-                showKindBadge: false,
-              },
-              groups: [
-                {
-                  id: "otras-categorias-destino",
+          </div>
+          {hasRelated ? (
+            <section id="descubre" className="mt-12">
+              <ExperienceRelatedCollectionBlock
+                config={{
+                  source: "category",
                   entityKind: "business",
-                  heading: `Otras categorías en ${destLabel}`,
-                  items: [],
-                },
-                {
-                  id: "misma-categoria-otros-destinos",
-                  entityKind: "business",
-                  heading: `${catLabel} en otros destinos del Oriente Maya`,
-                  items: [],
-                },
-              ],
-            }}
+                  variant: "grid",
+                  columns: 3,
+                  heading: "Sigue descubriendo",
+                  subheading: `Más ideas para tu viaje por ${destLabel} y el Oriente Maya.`,
+                  capabilities: {
+                    showRationale: true,
+                    showKindBadge: false,
+                  },
+                  groups: [
+                    {
+                      id: "otras-categorias-destino",
+                      entityKind: "business",
+                      heading: `Otras categorías en ${destLabel}`,
+                      items: [],
+                    },
+                    {
+                      id: "misma-categoria-otros-destinos",
+                      entityKind: "business",
+                      heading: `${catLabel} en otros destinos del Oriente Maya`,
+                      items: [],
+                    },
+                  ],
+                }}
+              />
+            </section>
+          ) : null}
+          <BusinessQuickViewDialog
+            slug={quickViewSlug}
+            destinoSlug={destino}
+            categoriaSlug={categoria}
+            onClose={() => setQuickViewSlug(null)}
           />
-        </section>
-      ) : null}
-      <BusinessQuickViewDialog
-        slug={quickViewSlug}
-        destinoSlug={destino}
-        categoriaSlug={categoria}
-        onClose={() => setQuickViewSlug(null)}
-      />
-    </PublicShell>
-    </CategorySurfaceRelatedProvider>
+        </PublicShell>
+      </CategorySurfaceRelatedProvider>
     </ContextEngineProvider>
   );
 }

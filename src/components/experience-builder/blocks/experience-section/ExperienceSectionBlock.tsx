@@ -16,13 +16,16 @@ function safeParse(raw: unknown): ExperienceSectionConfig {
   return r.success ? r.data : experienceSectionConfigSchema.parse({});
 }
 
-function buildDTO(cfg: ExperienceSectionConfig, business: React.ContextType<typeof BusinessSurfaceContext>): ExperienceSectionDTO {
+function buildDTO(
+  cfg: ExperienceSectionConfig,
+  business: React.ContextType<typeof BusinessSurfaceContext>,
+): ExperienceSectionDTO {
   let title = cfg.title ?? null;
   let lead = cfg.lead ?? null;
   let body = cfg.body ?? null;
   if (cfg.source === "business" && business) {
     title = title || business.display_name;
-    lead = lead || (business.tagline || null);
+    lead = lead || business.tagline || null;
     body = body || business.description || null;
   }
   return {
@@ -48,13 +51,16 @@ function buildDTO(cfg: ExperienceSectionConfig, business: React.ContextType<type
   };
 }
 
-export interface ExperienceSectionBlockProps { config?: unknown }
+export interface ExperienceSectionBlockProps {
+  config?: unknown;
+}
 
 export function ExperienceSectionBlock({ config }: ExperienceSectionBlockProps) {
   const cfg = safeParse(config);
   const business = useContext(BusinessSurfaceContext);
   const dto = useMemo(() => buildDTO(cfg, business), [cfg, business]);
-  if (!dto.title && !dto.body && !dto.lead) return <ExperienceSection dto={buildExperienceSectionPreviewDTO()} />;
+  if (!dto.title && !dto.body && !dto.lead)
+    return <ExperienceSection dto={buildExperienceSectionPreviewDTO()} />;
   return <ExperienceSection dto={dto} />;
 }
 

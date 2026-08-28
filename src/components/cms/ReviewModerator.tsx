@@ -21,7 +21,10 @@ import {
 
 type ContentStatus = ReviewDetail["status"];
 
-const NEXT_ACTIONS: Record<ContentStatus, { to: ContentStatus; label: string; tone?: "default" | "danger" | "primary" }[]> = {
+const NEXT_ACTIONS: Record<
+  ContentStatus,
+  { to: ContentStatus; label: string; tone?: "default" | "danger" | "primary" }[]
+> = {
   draft: [
     { to: "in_review", label: "Enviar a revisión" },
     { to: "archived", label: "Archivar", tone: "danger" },
@@ -60,8 +63,7 @@ export function ReviewModerator({ id }: { id: string }) {
 
   const history = useQuery<ModerationHistoryEntry[]>({
     queryKey: ["cms", "reviews", "history", id],
-    queryFn: () =>
-      fetchHistory({ data: { id } }) as Promise<ModerationHistoryEntry[]>,
+    queryFn: () => fetchHistory({ data: { id } }) as Promise<ModerationHistoryEntry[]>,
   });
 
   const mutation = useMutation({
@@ -73,28 +75,19 @@ export function ReviewModerator({ id }: { id: string }) {
       await detail.refetch();
       await history.refetch();
     },
-    onError: (e) =>
-      setError(e instanceof Error ? e.message : "Error al moderar."),
+    onError: (e) => setError(e instanceof Error ? e.message : "Error al moderar."),
   });
 
   if (detail.isLoading) {
-    return (
-      <p className="mx-auto max-w-3xl text-sm text-muted-foreground">
-        Cargando reseña…
-      </p>
-    );
+    return <p className="mx-auto max-w-3xl text-sm text-muted-foreground">Cargando reseña…</p>;
   }
 
   if (detail.isError || !detail.data) {
     return (
       <div className="mx-auto max-w-2xl rounded-xl border border-destructive/40 bg-destructive/5 p-5 text-sm">
-        <p className="font-semibold text-destructive">
-          No se pudo cargar la reseña.
-        </p>
+        <p className="font-semibold text-destructive">No se pudo cargar la reseña.</p>
         <p className="mt-1 text-destructive/80">
-          {detail.error instanceof Error
-            ? detail.error.message
-            : "Error desconocido."}
+          {detail.error instanceof Error ? detail.error.message : "Error desconocido."}
         </p>
       </div>
     );
@@ -146,12 +139,10 @@ export function ReviewModerator({ id }: { id: string }) {
       </article>
 
       <section className="mt-6 rounded-xl border border-border bg-card p-5">
-        <h2 className="text-sm font-semibold tracking-tight">
-          Decisión de moderación
-        </h2>
+        <h2 className="text-sm font-semibold tracking-tight">Decisión de moderación</h2>
         <p className="mt-1 text-xs text-muted-foreground">
-          La transición se valida server-side contra la máquina oficial
-          (Serie 14). Las notas quedan almacenadas en
+          La transición se valida server-side contra la máquina oficial (Serie 14). Las notas quedan
+          almacenadas en
           <code className="mx-1 rounded bg-muted px-1 py-0.5 text-[11px]">
             reviews.metadata.moderation_history
           </code>
@@ -213,17 +204,13 @@ export function ReviewModerator({ id }: { id: string }) {
 
       <section className="mt-6 rounded-xl border border-border bg-card p-5">
         <header className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold tracking-tight">
-            Historial de moderación
-          </h2>
+          <h2 className="text-sm font-semibold tracking-tight">Historial de moderación</h2>
           <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
             metadata.moderation_history
           </span>
         </header>
         <div className="mt-4 divide-y divide-border text-xs">
-          {history.isLoading && (
-            <p className="py-2 text-muted-foreground">Cargando historial…</p>
-          )}
+          {history.isLoading && <p className="py-2 text-muted-foreground">Cargando historial…</p>}
           {history.data && history.data.length === 0 && (
             <p className="py-2 text-muted-foreground">
               Sin decisiones de moderación registradas aún.
@@ -243,13 +230,9 @@ export function ReviewModerator({ id }: { id: string }) {
                     {h.from_status} → <strong>{h.to_status}</strong>
                   </span>
                 </div>
-                {h.notes && (
-                  <p className="max-w-xl text-muted-foreground">{h.notes}</p>
-                )}
+                {h.notes && <p className="max-w-xl text-muted-foreground">{h.notes}</p>}
               </div>
-              <time className="text-muted-foreground">
-                {new Date(h.at).toLocaleString()}
-              </time>
+              <time className="text-muted-foreground">{new Date(h.at).toLocaleString()}</time>
             </div>
           ))}
         </div>

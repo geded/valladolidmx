@@ -81,9 +81,7 @@ export const aggregateJourneyIntel = createServerFn({ method: "POST" })
         query = query.eq("simulation_run_id", data.simulation_run_id);
       }
     } else if (data.mode === "combined" && data.simulation_run_id) {
-      query = query.or(
-        `is_simulation.eq.false,simulation_run_id.eq.${data.simulation_run_id}`,
-      );
+      query = query.or(`is_simulation.eq.false,simulation_run_id.eq.${data.simulation_run_id}`);
     }
     const { data: rows, error } = (await query) as {
       data: Array<{ subject_id: string; payload: unknown }> | null;
@@ -98,8 +96,16 @@ export const aggregateJourneyIntel = createServerFn({ method: "POST" })
     const activeSubjects = new Set<string>();
     const progressedSubjects = new Set<string>();
     const stagesEntered: Record<VisitorStage, number> = {
-      stranger: 0, anonymous: 0, identified: 0, explorer: 0, interested: 0,
-      travel_plan: 0, concierge: 0, reservation: 0, traveler: 0, ambassador: 0,
+      stranger: 0,
+      anonymous: 0,
+      identified: 0,
+      explorer: 0,
+      interested: 0,
+      travel_plan: 0,
+      concierge: 0,
+      reservation: 0,
+      traveler: 0,
+      ambassador: 0,
     };
     const transitionCount: Record<string, { count: number; subjects: Set<string> }> = {};
     let intent = 0;

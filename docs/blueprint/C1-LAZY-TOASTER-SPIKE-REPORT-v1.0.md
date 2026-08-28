@@ -57,18 +57,18 @@ es `src/components/ui/sonner.tsx` (chunk lazy).
 Build local (`bun run build`, Nitro/Vite prod), medición sobre el entry
 client `dist/client/assets/index-*.js`:
 
-| Métrica | BASELINE (`index-Do7sBHb6.js`) | POST-C1 FINAL (`index-CkMHmkYD.js`) | Δ absoluto | Δ % |
-|---|---:|---:|---:|---:|
-| Entry raw | 559 607 B | 527 758 B | **−31 849 B** | **−5.69 %** |
-| Entry **gzip -9** | 162 073 B | 154 134 B | **−7 939 B** | **−4.90 %** |
-| Entry brotli -q 11 | 137 359 B | 130 336 B | **−7 023 B** | **−5.11 %** |
+| Métrica            | BASELINE (`index-Do7sBHb6.js`) | POST-C1 FINAL (`index-CkMHmkYD.js`) |    Δ absoluto |         Δ % |
+| ------------------ | -----------------------------: | ----------------------------------: | ------------: | ----------: |
+| Entry raw          |                      559 607 B |                           527 758 B | **−31 849 B** | **−5.69 %** |
+| Entry **gzip -9**  |                      162 073 B |                           154 134 B |  **−7 939 B** | **−4.90 %** |
+| Entry brotli -q 11 |                      137 359 B |                           130 336 B |  **−7 023 B** | **−5.11 %** |
 
 **Chunks nuevos** (cargados sólo al primer toast):
 
-| Chunk | raw | gzip | brotli |
-|---|---:|---:|---:|
+| Chunk                                     |      raw |    gzip |  brotli |
+| ----------------------------------------- | -------: | ------: | ------: |
 | `dist-DBv3Pp7-.js` (sonner core diferido) | 32 997 B | 9 126 B | 8 167 B |
-| `sonner-jXX4Rqoz.js` (re-export local) | 608 B | 315 B | 272 B |
+| `sonner-jXX4Rqoz.js` (re-export local)    |    608 B |   315 B |   272 B |
 
 `LazyToasterHost` ya no viaja como chunk propio: se inlinea en el entry
 (coste ~1 KB raw) porque es estático — necesario para suscribirse al
@@ -83,14 +83,14 @@ en el critical path del primer visitante.
 
 ## 3. Guardrails
 
-| Guardrail | Verificación |
-|---|---|
-| Cero regresión funcional | 46 sites migrados por sed puntual; API `toast.*` idéntica; superficies auth/errores/forms/Travel Plan/Concierge/Commerce/CMS/admin conservan su import (sólo cambió la ruta del módulo). |
+| Guardrail                 | Verificación                                                                                                                                                                                                                          |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------ | ----- |
+| Cero regresión funcional  | 46 sites migrados por sed puntual; API `toast.*` idéntica; superficies auth/errores/forms/Travel Plan/Concierge/Commerce/CMS/admin conservan su import (sólo cambió la ruta del módulo).                                              |
 | Cero pérdida primer toast | El shim conserva los toasts previos al montaje mediante su buffer FIFO interno y los despacha una sola vez después de `markToasterReady()`. Sonner, por sí solo, descartaba los eventos emitidos antes de la suscripción del Toaster. |
-| SSR-safe | `import("sonner")` sólo se dispara al llamar `toast()`, cosa que no ocurre en SSR. `LazyToasterHost` renderiza `null` en SSR (state inicial `false`). |
-| Sin sistema paralelo | Es una fachada de sonner; no hay segundo motor. |
-| Rollback simple | Restaurar `import { Toaster } from "@/components/ui/sonner"` + `<Toaster />` en `__root.tsx` y revertir imports masivos (`sed -i 's|@/lib/toast|sonner|g'`). |
-| Medición aislada | Único cambio del spike. No se tocaron C2–C7. |
+| SSR-safe                  | `import("sonner")` sólo se dispara al llamar `toast()`, cosa que no ocurre en SSR. `LazyToasterHost` renderiza `null` en SSR (state inicial `false`).                                                                                 |
+| Sin sistema paralelo      | Es una fachada de sonner; no hay segundo motor.                                                                                                                                                                                       |
+| Rollback simple           | Restaurar `import { Toaster } from "@/components/ui/sonner"` + `<Toaster />` en `__root.tsx` y revertir imports masivos (`sed -i 's                                                                                                   | @/lib/toast | sonner | g'`). |
+| Medición aislada          | Único cambio del spike. No se tocaron C2–C7.                                                                                                                                                                                          |
 
 ---
 
@@ -99,23 +99,24 @@ en el critical path del primer visitante.
 Build final `index-CkMHmkYD.js`. Dev server en `http://localhost:8080`.
 Playwright + Chromium headless. Script: `/tmp/browser/c1-final/test.py`.
 
-| Caso | Resultado |
-|---|---|
-| Primer toast (desktop, anon, `/mapa`) | ✅ 62 ms; `count=5` |
-| Múltiples consecutivos (5 en ráfaga) | ✅ los 5 renderizan |
-| Orden FIFO en cola → LIFO en DOM (sonner apila) | ✅ 1..5 emitidos, 5..1 apilados |
-| Descripción (`toast(msg, { description })`) | ✅ "cuarto · con descripción" |
-| `toast.success` / `.error` / `.info` | ✅ los tres visibles |
-| Cierre manual | ⚠️ superficie pública `/mapa` no monta `<Toaster closeButton>`; no aplica al shim. Comportamiento idéntico a baseline. |
-| Post-navegación (`/promociones`) | ✅ 50 ms; `count=5` |
-| Mobile (390×844) | ✅ 70 ms; `count=5` |
-| Consola: `pageerror` + `console.error` | ✅ vacíos |
-| Warnings hidratación | ✅ vacíos |
-| Probe `window.__lvToast` filtrado | ✅ `undefined` |
-| Sesión autenticada | ✅ mismo shim; sin código específico por auth |
-| `toast.promise` | No usado en app en este momento; API expuesta en `methods[]`, delegación transparente a sonner. |
+| Caso                                            | Resultado                                                                                                              |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Primer toast (desktop, anon, `/mapa`)           | ✅ 62 ms; `count=5`                                                                                                    |
+| Múltiples consecutivos (5 en ráfaga)            | ✅ los 5 renderizan                                                                                                    |
+| Orden FIFO en cola → LIFO en DOM (sonner apila) | ✅ 1..5 emitidos, 5..1 apilados                                                                                        |
+| Descripción (`toast(msg, { description })`)     | ✅ "cuarto · con descripción"                                                                                          |
+| `toast.success` / `.error` / `.info`            | ✅ los tres visibles                                                                                                   |
+| Cierre manual                                   | ⚠️ superficie pública `/mapa` no monta `<Toaster closeButton>`; no aplica al shim. Comportamiento idéntico a baseline. |
+| Post-navegación (`/promociones`)                | ✅ 50 ms; `count=5`                                                                                                    |
+| Mobile (390×844)                                | ✅ 70 ms; `count=5`                                                                                                    |
+| Consola: `pageerror` + `console.error`          | ✅ vacíos                                                                                                              |
+| Warnings hidratación                            | ✅ vacíos                                                                                                              |
+| Probe `window.__lvToast` filtrado               | ✅ `undefined`                                                                                                         |
+| Sesión autenticada                              | ✅ mismo shim; sin código específico por auth                                                                          |
+| `toast.promise`                                 | No usado en app en este momento; API expuesta en `methods[]`, delegación transparente a sonner.                        |
 
 **Verificación específica del buffer:**
+
 - Flush único: `pending.splice(0)` vacía el array en la primera pasada; el segundo `flushPending` (disparado por `loadSonner().then`) encuentra `pending.length===0` y no hace nada.
 - Cero duplicados: cada elemento se despacha exactamente una vez.
 - FIFO: iteración lineal sobre el `splice(0)`.
@@ -125,11 +126,13 @@ Playwright + Chromium headless. Script: `/tmp/browser/c1-final/test.py`.
 - Llamadas post-mount: fast path (`if (mod && toasterReady) …`) omite el buffer.
 
 **Verificación estática:**
+
 - `rg "from ['\"]sonner['\"]" src/` → sólo `src/components/ui/sonner.tsx` (chunk lazy).
 - `grep -l "__lvToast\|__c1_probe" src/` → sin coincidencias (probes eliminados).
 - `grep -c "sonner" dist/client/assets/index-CkMHmkYD.js` → 2 (referencias del importmap dinámico; sonner **no** en entry).
 
 **Diff limpio (post-cierre):**
+
 - `src/lib/toast.ts`: buffer + `markToasterReady` + cap + catch. **Sin** probe `__c1_probe`, sin `window.__lvToast`.
 - `src/components/ui/LazyToasterHost.tsx`: monta `<Toaster />` bajo demanda y llama `markToasterReady()`. **Sin** logs `[C1]`.
 - `src/routes/__root.tsx`: `LazyToasterHost` importado estáticamente (necesario para suscribirse a tiempo).
@@ -141,11 +144,11 @@ Playwright + Chromium headless. Script: `/tmp/browser/c1-final/test.py`.
 
 ## 5. Riesgos
 
-| Riesgo | Mitigación |
-|---|---|
+| Riesgo                                                  | Mitigación                                                                                                                                                   |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Retraso perceptible del primer toast (chunk ~9 KB gzip) | En 3G ≈ 200–400 ms. Aceptable: sonner es un widget de feedback, no un CTA crítico. Si se percibe, `prefetchToaster()` puede llamarse en idle desde `__root`. |
-| Codemod masivo (46 archivos) | Sólo reescribe la ruta del `import`; la API pública de `toast` no cambia. Rollback = un solo `sed` inverso. |
-| Consumidores que reexportan tipos de `sonner` | Ninguno detectado (`rg "from \"sonner\""` post-cambio devuelve sólo `ui/sonner.tsx`). |
+| Codemod masivo (46 archivos)                            | Sólo reescribe la ruta del `import`; la API pública de `toast` no cambia. Rollback = un solo `sed` inverso.                                                  |
+| Consumidores que reexportan tipos de `sonner`           | Ninguno detectado (`rg "from \"sonner\""` post-cambio devuelve sólo `ui/sonner.tsx`).                                                                        |
 
 ---
 
@@ -168,6 +171,7 @@ find src -type f \( -name "*.ts" -o -name "*.tsx" \) \
 ### **GO — C1 cerrado.**
 
 Criterios §11:
+
 - ✅ Ahorro real **7.9 KB gzip / 7.0 KB brotli** supera umbral mínimo (4 KB).
 - ✅ Build limpio; sonner fuera del entry.
 - ✅ Rollback trivial y auditado.

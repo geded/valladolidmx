@@ -28,8 +28,7 @@ export const Route = createFileRoute("/_authenticated/cms/pagos")({
       { title: "Pagos · CMS Studio · Valladolid.mx" },
       {
         name: "description",
-        content:
-          "Configuración y auditoría del proveedor de pagos de la plataforma.",
+        content: "Configuración y auditoría del proveedor de pagos de la plataforma.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
@@ -61,14 +60,12 @@ function PaymentsAdminPage() {
   return (
     <div className="mx-auto max-w-5xl">
       <header className="border-b border-border pb-6">
-        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          Pagos
-        </p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">Pagos</p>
         <h1 className="mt-2 text-3xl font-semibold">Pagos de la plataforma</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Estado del proveedor de pagos activo, configuración de webhook y
-          últimos eventos recibidos. Las llaves API se almacenan como
-          secretos de plataforma y no son visibles desde este panel.
+          Estado del proveedor de pagos activo, configuración de webhook y últimos eventos
+          recibidos. Las llaves API se almacenan como secretos de plataforma y no son visibles desde
+          este panel.
         </p>
       </header>
 
@@ -83,11 +80,7 @@ function PaymentsAdminPage() {
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Proveedor activo
         </h2>
-        <ProviderStatus
-          status={statusQ.data}
-          loading={statusQ.isLoading}
-          error={statusQ.error}
-        />
+        <ProviderStatus status={statusQ.data} loading={statusQ.isLoading} error={statusQ.error} />
       </section>
 
       <section className="mt-10">
@@ -128,10 +121,7 @@ function SummaryCards({
     return (
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-24 animate-pulse rounded-lg border border-border bg-card/40"
-          />
+          <div key={i} className="h-24 animate-pulse rounded-lg border border-border bg-card/40" />
         ))}
       </div>
     );
@@ -159,14 +149,9 @@ function SummaryCards({
   return (
     <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map((c) => (
-        <div
-          key={c.label}
-          className="rounded-lg border border-border bg-card p-4"
-        >
+        <div key={c.label} className="rounded-lg border border-border bg-card p-4">
           <p className="text-xs text-muted-foreground">{c.label}</p>
-          <p className={`mt-1 text-2xl font-semibold ${c.tone ?? ""}`}>
-            {c.value}
-          </p>
+          <p className={`mt-1 text-2xl font-semibold ${c.tone ?? ""}`}>{c.value}</p>
         </div>
       ))}
     </div>
@@ -192,9 +177,7 @@ function ProviderStatus({
   error: unknown;
 }) {
   if (loading) {
-    return (
-      <div className="mt-3 h-48 animate-pulse rounded-lg border border-border bg-card/40" />
-    );
+    return <div className="mt-3 h-48 animate-pulse rounded-lg border border-border bg-card/40" />;
   }
   if (error || !status) {
     return (
@@ -213,12 +196,8 @@ function ProviderStatus({
     <div className="mt-3 rounded-lg border border-border bg-card">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
         <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">
-            Proveedor
-          </p>
-          <p className="mt-0.5 text-lg font-semibold capitalize">
-            {status.provider}
-          </p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Proveedor</p>
+          <p className="mt-0.5 text-lg font-semibold capitalize">{status.provider}</p>
         </div>
         <span
           className={`rounded-full px-3 py-1 text-[11px] font-semibold tracking-wider ${modeLabel.cls}`}
@@ -227,9 +206,7 @@ function ProviderStatus({
         </span>
         <span
           className={`rounded-full px-3 py-1 text-[11px] font-semibold tracking-wider ${
-            status.ready
-              ? "bg-emerald-600/10 text-emerald-700"
-              : "bg-amber-500/10 text-amber-700"
+            status.ready ? "bg-emerald-600/10 text-emerald-700" : "bg-amber-500/10 text-amber-700"
           }`}
         >
           {status.ready ? "✓ LISTO" : "⚠ PENDIENTE"}
@@ -250,9 +227,7 @@ function ProviderStatus({
       </div>
 
       <div className="border-t border-border px-5 py-4">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">
-          URL del webhook
-        </p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">URL del webhook</p>
         <div className="mt-2 flex items-center gap-2">
           <code className="flex-1 overflow-x-auto rounded-md bg-muted px-3 py-2 text-xs">
             {status.webhookUrl}
@@ -289,15 +264,11 @@ function ProviderStatus({
 
       <div className="border-t border-border bg-muted/30 px-5 py-4 text-xs text-muted-foreground">
         <p>
-          <strong className="font-semibold text-foreground">
-            Cómo activar / rotar llaves:
-          </strong>{" "}
-          las llaves API se almacenan como secretos de plataforma cifrados y
-          se inyectan al runtime del servidor. No son visibles ni
-          administrables desde este panel por diseño. Pídele a Lovable
-          actualizar <code>STRIPE_SECRET_KEY</code> y{" "}
-          <code>STRIPE_WEBHOOK_SECRET</code> cuando crees o rotes la cuenta
-          de Stripe.
+          <strong className="font-semibold text-foreground">Cómo activar / rotar llaves:</strong>{" "}
+          las llaves API se almacenan como secretos de plataforma cifrados y se inyectan al runtime
+          del servidor. No son visibles ni administrables desde este panel por diseño. Pídele a
+          Lovable actualizar <code>STRIPE_SECRET_KEY</code> y <code>STRIPE_WEBHOOK_SECRET</code>{" "}
+          cuando crees o rotes la cuenta de Stripe.
         </p>
       </div>
     </div>
@@ -321,9 +292,7 @@ function SecretRow({
       </div>
       <span
         className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-          configured
-            ? "bg-emerald-600/10 text-emerald-700"
-            : "bg-amber-500/10 text-amber-700"
+          configured ? "bg-emerald-600/10 text-emerald-700" : "bg-amber-500/10 text-amber-700"
         }`}
       >
         {configured ? "✓ Configurado" : "⚠ Pendiente"}
@@ -351,9 +320,7 @@ function EventsTable({
 }) {
   const rows = useMemo(() => events.slice(0, 50), [events]);
   if (loading) {
-    return (
-      <div className="mt-3 h-40 animate-pulse rounded-lg border border-border bg-card/40" />
-    );
+    return <div className="mt-3 h-40 animate-pulse rounded-lg border border-border bg-card/40" />;
   }
   if (error) {
     return (
@@ -434,26 +401,21 @@ function DemoModeToggle() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <p className="text-base font-semibold">
-              Modo demo de compras
-            </p>
+            <p className="text-base font-semibold">Modo demo de compras</p>
             <span
               className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-                enabled
-                  ? "bg-amber-500/10 text-amber-700"
-                  : "bg-muted text-muted-foreground"
+                enabled ? "bg-amber-500/10 text-amber-700" : "bg-muted text-muted-foreground"
               }`}
             >
               {enabled ? "ACTIVO" : "APAGADO"}
             </span>
           </div>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Cuando está activo, el botón "Comprar" muestra "Comprar (demo)" y
-            permite simular una transacción con un folio ficticio
-            (<code className="rounded bg-muted px-1 text-[11px]">VMX-XXXXXX-DEMO</code>),
-            aunque el proveedor real de pagos no esté configurado. Úsalo para
-            tours con empresarios o para probar el flujo de compra.
-            Cuando lo apagues, el botón vuelve a "Comprar · próximamente"
+            Cuando está activo, el botón "Comprar" muestra "Comprar (demo)" y permite simular una
+            transacción con un folio ficticio (
+            <code className="rounded bg-muted px-1 text-[11px]">VMX-XXXXXX-DEMO</code>), aunque el
+            proveedor real de pagos no esté configurado. Úsalo para tours con empresarios o para
+            probar el flujo de compra. Cuando lo apagues, el botón vuelve a "Comprar · próximamente"
             hasta que las llaves reales estén activas.
           </p>
         </div>
@@ -465,9 +427,7 @@ function DemoModeToggle() {
           aria-checked={enabled}
           aria-label="Modo demo de compras"
           className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border transition-colors ${
-            enabled
-              ? "border-amber-500 bg-amber-500"
-              : "border-border bg-muted"
+            enabled ? "border-amber-500 bg-amber-500" : "border-border bg-muted"
           } ${pending ? "opacity-60" : ""}`}
         >
           <span
@@ -478,9 +438,7 @@ function DemoModeToggle() {
         </button>
       </div>
       {m.error ? (
-        <p className="mt-3 text-xs text-destructive">
-          No se pudo actualizar el modo demo.
-        </p>
+        <p className="mt-3 text-xs text-destructive">No se pudo actualizar el modo demo.</p>
       ) : null}
     </div>
   );

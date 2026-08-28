@@ -629,12 +629,12 @@ La definición, límites, capacidades y roadmap fundacional aprobados se encuent
 
 El CANON constituye un documento vivo con vocación de permanencia.
 
-| Versión | Fecha | Autor | Descripción |
-|---|---|---|---|
-| v1.0 | 2026-07-18 | Founder | Emisión inicial del CANON de Valladolid.mx. |
-| v1.1 | 2026-07-18 | Founder | Ampliación de principios, North Stars y filosofía de Alux. |
-| v1.2 | 2026-07-20 | Founder | Corrección editorial y formalización del historial de versiones durante la reconciliación de gobernanza. |
-| v1.3 | 2026-07-21 | Founder | Incorpora OMXDS, su jerarquía, North Star operativa y regla para seleccionar el primer vertical después del inventario de capacidades. |
+| Versión | Fecha      | Autor   | Descripción                                                                                                                            |
+| ------- | ---------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| v1.0    | 2026-07-18 | Founder | Emisión inicial del CANON de Valladolid.mx.                                                                                            |
+| v1.1    | 2026-07-18 | Founder | Ampliación de principios, North Stars y filosofía de Alux.                                                                             |
+| v1.2    | 2026-07-20 | Founder | Corrección editorial y formalización del historial de versiones durante la reconciliación de gobernanza.                               |
+| v1.3    | 2026-07-21 | Founder | Incorpora OMXDS, su jerarquía, North Star operativa y regla para seleccionar el primer vertical después del inventario de capacidades. |
 
 No deberán realizarse modificaciones que contradigan la misión, visión o principios fundamentales sin una revisión integral del propio CANON.
 

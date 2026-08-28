@@ -8,10 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Ticket, QrCode, CheckCircle2, Clock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  listMyCoupons,
-  type TravelerCoupon,
-} from "@/lib/promotions/coupons.functions";
+import { listMyCoupons, type TravelerCoupon } from "@/lib/promotions/coupons.functions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,7 +26,11 @@ export const Route = createFileRoute("/_authenticated/cuenta/mis-cupones")({
 function MisCuponesPage() {
   const { user } = useAuth();
   const fetchCoupons = useServerFn(listMyCoupons);
-  const { data = [], isLoading, error } = useQuery({
+  const {
+    data = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["my-coupons", user?.id],
     queryFn: () => fetchCoupons(),
     enabled: Boolean(user?.id),
@@ -43,19 +44,15 @@ function MisCuponesPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-4 py-6">
       <header className="space-y-1">
-        <p className="text-[11px] uppercase tracking-[0.18em] text-primary">
-          Mis cupones
-        </p>
+        <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Mis cupones</p>
         <h1 className="text-2xl font-semibold">Tus descuentos del Oriente Maya</h1>
         <p className="text-sm text-muted-foreground">
-          Presenta el QR o dicta el código en el negocio para aplicar tu
-          descuento. Cada cupón es personal e intransferible.
+          Presenta el QR o dicta el código en el negocio para aplicar tu descuento. Cada cupón es
+          personal e intransferible.
         </p>
       </header>
 
-      {isLoading && (
-        <p className="text-sm text-muted-foreground">Cargando tus cupones…</p>
-      )}
+      {isLoading && <p className="text-sm text-muted-foreground">Cargando tus cupones…</p>}
       {error && (
         <p className="text-sm text-destructive">
           No pudimos cargar tus cupones. Intenta más tarde.
@@ -140,9 +137,7 @@ function CouponCard({ coupon }: { coupon: TravelerCoupon }) {
           ) : null}
         </div>
         <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-          <code className="rounded bg-muted px-2 py-0.5 font-mono text-[11px]">
-            {coupon.code}
-          </code>
+          <code className="rounded bg-muted px-2 py-0.5 font-mono text-[11px]">{coupon.code}</code>
           <span>
             {isActive
               ? `Válido hasta ${formatDate(coupon.valid_until)}`

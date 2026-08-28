@@ -84,8 +84,7 @@ export const createFounderSpotlight = createServerFn({ method: "POST" })
       days: number;
     }) => {
       if (!input?.business_id) throw new Error("business_id required");
-      if (!input?.reason || input.reason.trim().length < 3)
-        throw new Error("reason required");
+      if (!input?.reason || input.reason.trim().length < 3) throw new Error("reason required");
       const days = Math.min(Math.max(Number(input.days ?? 7), 1), 90);
       const boost = Math.min(Math.max(Number(input.boost ?? 1000), 100), 100000);
       return {
@@ -141,7 +140,9 @@ export const deactivateFounderSpotlight = createServerFn({ method: "POST" })
 export const searchBusinessesForSpotlight = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { q: string }) => ({
-    q: String(input?.q ?? "").trim().slice(0, 80),
+    q: String(input?.q ?? "")
+      .trim()
+      .slice(0, 80),
   }))
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);

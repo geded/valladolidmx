@@ -45,7 +45,9 @@ function generateCode(): string {
 export const issueCoupon = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { promotion_slug: string }) => {
-    const s = String(input?.promotion_slug ?? "").trim().toLowerCase();
+    const s = String(input?.promotion_slug ?? "")
+      .trim()
+      .toLowerCase();
     if (!s || s.length > 200) throw new Error("invalid_slug");
     return { promotion_slug: s };
   })
@@ -111,8 +113,7 @@ export const issueCoupon = createServerFn({ method: "POST" })
             (promo?.title as string | undefined) ??
             (comp.title as string | undefined) ??
             data.promotion_slug,
-          discount_percent:
-            (promo?.discount_percent as number | undefined) ?? null,
+          discount_percent: (promo?.discount_percent as number | undefined) ?? null,
           terms: (promo?.terms as string | undefined) ?? null,
           valid_until: validUntil.toISOString(),
         })
@@ -162,13 +163,10 @@ export const listMyCoupons = createServerFn({ method: "GET" })
         .select("id, display_name")
         .in("id", businessIds);
       const nameMap = new Map(
-        ((bs ?? []) as { id: string; display_name: string }[]).map((b) => [
-          b.id,
-          b.display_name,
-        ]),
+        ((bs ?? []) as { id: string; display_name: string }[]).map((b) => [b.id, b.display_name]),
       );
       for (const r of rows) {
-        r.business_name = r.business_id ? nameMap.get(r.business_id) ?? null : null;
+        r.business_name = r.business_id ? (nameMap.get(r.business_id) ?? null) : null;
       }
     }
     return rows;
@@ -195,10 +193,7 @@ export const lookupCoupon = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }): Promise<CouponLookupResult> => {
     // Aceptar code o qr_token (uuid).
-    const isUuid =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        data.key,
-      );
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data.key);
     const col = isUuid ? "qr_token" : "code";
     const value = isUuid ? data.key : data.key.toUpperCase();
 
@@ -224,9 +219,7 @@ export const lookupCoupon = createServerFn({ method: "POST" })
       .maybeSingle();
     const p = (prof ?? {}) as Record<string, string | null>;
     const name =
-      [p.first_name, p.last_name].filter(Boolean).join(" ").trim() ||
-      p.display_name ||
-      null;
+      [p.first_name, p.last_name].filter(Boolean).join(" ").trim() || p.display_name || null;
     // País: intentar profiles.country, luego traveler_profiles.home_country.
     let countryCode = (p.country as string | null) ?? null;
     if (!countryCode) {
@@ -235,9 +228,7 @@ export const lookupCoupon = createServerFn({ method: "POST" })
         .select("home_country")
         .eq("user_id", (row as { user_id: string }).user_id)
         .maybeSingle();
-      countryCode =
-        ((tp as { home_country?: string | null } | null)?.home_country ?? null) ||
-        null;
+      countryCode = ((tp as { home_country?: string | null } | null)?.home_country ?? null) || null;
     }
     let countryName: string | null = null;
     if (countryCode) {
@@ -315,9 +306,7 @@ export const redeemCoupon = createServerFn({ method: "POST" })
       .maybeSingle();
     const p = (prof ?? {}) as Record<string, string | null>;
     const travelerName =
-      [p.first_name, p.last_name].filter(Boolean).join(" ").trim() ||
-      p.display_name ||
-      null;
+      [p.first_name, p.last_name].filter(Boolean).join(" ").trim() || p.display_name || null;
     let businessName: string | null = null;
     let businessSlug: string | null = null;
     if (coupon.business_id) {
@@ -370,13 +359,8 @@ export const listBusinessRedemptions = createServerFn({ method: "POST" })
         business_id,
         from: input?.from ? String(input.from) : null,
         to: input?.to ? String(input.to) : null,
-        promotion_slug: input?.promotion_slug
-          ? String(input.promotion_slug).toLowerCase()
-          : null,
-        channel:
-          input?.channel === "qr" || input?.channel === "code"
-            ? input.channel
-            : null,
+        promotion_slug: input?.promotion_slug ? String(input.promotion_slug).toLowerCase() : null,
+        channel: input?.channel === "qr" || input?.channel === "code" ? input.channel : null,
         limit: Math.min(Math.max(Number(input?.limit ?? 100), 1), 500),
       };
     },
@@ -413,31 +397,22 @@ export const listBusinessRedemptions = createServerFn({ method: "POST" })
     }>;
     if (!list.length) return [];
     const userIds = Array.from(
-      new Set(
-        list
-          .flatMap((r) => [r.user_id, r.redeemed_by])
-          .filter((x): x is string => !!x),
-      ),
+      new Set(list.flatMap((r) => [r.user_id, r.redeemed_by]).filter((x): x is string => !!x)),
     );
     const { data: profs } = await context.supabase
       .from("profiles")
       .select("user_id, first_name, last_name, display_name, country")
       .in("user_id", userIds);
-    const profMap = new Map<
-      string,
-      { name: string | null; country: string | null }
-    >();
-    for (const p of ((profs ?? []) as Array<{
+    const profMap = new Map<string, { name: string | null; country: string | null }>();
+    for (const p of (profs ?? []) as Array<{
       user_id: string;
       first_name: string | null;
       last_name: string | null;
       display_name: string | null;
       country: string | null;
-    }>)) {
+    }>) {
       const nm =
-        [p.first_name, p.last_name].filter(Boolean).join(" ").trim() ||
-        p.display_name ||
-        null;
+        [p.first_name, p.last_name].filter(Boolean).join(" ").trim() || p.display_name || null;
       profMap.set(p.user_id, { name: nm, country: p.country ?? null });
     }
     return list.map((r) => {
@@ -454,9 +429,7 @@ export const listBusinessRedemptions = createServerFn({ method: "POST" })
         redeemed_by: r.redeemed_by,
         redeemed_by_name: s?.name ?? null,
         traveler_name: t?.name ?? null,
-        traveler_country_code: t?.country
-          ? t.country.toUpperCase()
-          : null,
+        traveler_country_code: t?.country ? t.country.toUpperCase() : null,
       };
     });
   });

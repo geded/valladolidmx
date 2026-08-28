@@ -13,10 +13,7 @@ type Row = {
 
 export const Route = createFileRoute("/_authenticated/cms/regiones/")({
   head: () => ({
-    meta: [
-      { title: "Regiones · CMS Studio" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Regiones · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: RegionesPage,
 });
@@ -27,7 +24,6 @@ function RegionesPage() {
       queryKey="regions"
       fn={listRegionsCms}
       title="Regiones turísticas"
-
       description="Regiones que agrupan los destinos del territorio."
       rowKey={(r) => r.id}
       headerActions={
@@ -52,7 +48,11 @@ function RegionesPage() {
             </Link>
           ),
         },
-        { key: "slug", header: "Slug", render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code> },
+        {
+          key: "slug",
+          header: "Slug",
+          render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code>,
+        },
         { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
         {
           key: "updated",

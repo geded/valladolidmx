@@ -23,12 +23,12 @@
 
 ## Criterio de aceptación
 
-| Comprobación | Esperado |
-| ------------ | -------- |
-| Landmarks | banner / nav / main anunciados |
-| Botones | nombre accesible + rol correcto, ninguno «sin etiqueta» |
-| Diálogo | anunciado como diálogo, con nombre |
-| Foco al cerrar | regresa al control de origen |
+| Comprobación   | Esperado                                                |
+| -------------- | ------------------------------------------------------- |
+| Landmarks      | banner / nav / main anunciados                          |
+| Botones        | nombre accesible + rol correcto, ninguno «sin etiqueta» |
+| Diálogo        | anunciado como diálogo, con nombre                      |
+| Foco al cerrar | regresa al control de origen                            |
 
 ## Entrega
 

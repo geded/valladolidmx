@@ -23,10 +23,7 @@ export interface SessionMoment {
 }
 
 /** Muestrea un momento de sesión inicial respetando pesos temporales. */
-export function sampleSessionMoment(
-  cal: CalendarConfig,
-  prng: Prng,
-): SessionMoment {
+export function sampleSessionMoment(cal: CalendarConfig, prng: Prng): SessionMoment {
   const start = new Date(cal.start_date).getTime();
   const end = new Date(cal.end_date).getTime();
   if (end <= start) throw new Error("calendar: end_date must be > start_date");

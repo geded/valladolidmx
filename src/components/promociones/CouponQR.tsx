@@ -5,13 +5,7 @@
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 
-export function CouponQR({
-  value,
-  size = 220,
-}: {
-  value: string;
-  size?: number;
-}) {
+export function CouponQR({ value, size = 220 }: { value: string; size?: number }) {
   const [src, setSrc] = useState<string | null>(null);
   useEffect(() => {
     let cancel = false;

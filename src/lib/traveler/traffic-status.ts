@@ -70,9 +70,7 @@ const DELAY_RISK_BUFFER_MIN = 10;
 const HIDE_MIN = 8;
 const TRAFFIC_DELTA_ALERT_MIN = 8;
 
-export function evaluateTrafficStatus(
-  input: TrafficEvaluateInput,
-): TrafficEvaluateResult {
+export function evaluateTrafficStatus(input: TrafficEvaluateInput): TrafficEvaluateResult {
   if (input.routeUnavailable) {
     return {
       status: "route_unavailable",
@@ -172,10 +170,7 @@ export function evaluateTrafficStatus(
     };
   }
 
-  if (
-    bufferMinutes < DELAY_RISK_BUFFER_MIN ||
-    trafficDelta >= TRAFFIC_DELTA_ALERT_MIN
-  ) {
+  if (bufferMinutes < DELAY_RISK_BUFFER_MIN || trafficDelta >= TRAFFIC_DELTA_ALERT_MIN) {
     return {
       status: "delay_risk",
       etaISO: eta.toISOString(),

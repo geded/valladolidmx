@@ -21,9 +21,7 @@ import {
 } from "@/lib/concierge/orders.functions";
 import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
 
-export const Route = createFileRoute(
-  "/_authenticated/cuenta/checkout/$orderId",
-)({
+export const Route = createFileRoute("/_authenticated/cuenta/checkout/$orderId")({
   component: CheckoutPage,
 });
 
@@ -59,9 +57,7 @@ function CheckoutPage() {
   if (orderQ.isLoading) {
     return (
       <div className="max-w-3xl">
-        <p className="text-sm text-muted-foreground">
-          Preparando tu viaje…
-        </p>
+        <p className="text-sm text-muted-foreground">Preparando tu viaje…</p>
       </div>
     );
   }
@@ -74,8 +70,8 @@ function CheckoutPage() {
         </p>
         <h1 className="mt-2 text-4xl">No pudimos abrir este viaje</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Es posible que el viaje ya no esté disponible o que el enlace haya
-          caducado. Vuelve a tu recorrido y ábrelo desde ahí.
+          Es posible que el viaje ya no esté disponible o que el enlace haya caducado. Vuelve a tu
+          recorrido y ábrelo desde ahí.
         </p>
         <Link
           to="/cuenta/mi-viaje"
@@ -117,8 +113,7 @@ function CheckoutPage() {
       }
       toast.info("Estamos preparando el cobro con el proveedor…");
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Ocurrió un problema";
+      const message = err instanceof Error ? err.message : "Ocurrió un problema";
       toast.error(message);
       navigate({ to: "/cuenta/pagos/error", search: { order: orderId } });
     } finally {
@@ -148,9 +143,7 @@ function CheckoutPage() {
         Oriente Maya de Yucatán
       </p>
       <div className="mt-2 flex flex-wrap items-baseline justify-between gap-3">
-        <h1 className="font-serif text-4xl">
-          {order.editorial_title ?? "Tu viaje está listo"}
-        </h1>
+        <h1 className="font-serif text-4xl">{order.editorial_title ?? "Tu viaje está listo"}</h1>
         <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-primary">
           Folio {order.folio}
         </span>
@@ -162,9 +155,8 @@ function CheckoutPage() {
         </p>
       ) : (
         <p className="mt-3 text-base leading-relaxed text-foreground/80">
-          Todo lo que armaste con Alux y tu concierge está listo. Al confirmar
-          reservamos tu experiencia y avisamos a los anfitriones en el
-          destino.
+          Todo lo que armaste con Alux y tu concierge está listo. Al confirmar reservamos tu
+          experiencia y avisamos a los anfitriones en el destino.
         </p>
       )}
 
@@ -176,20 +168,14 @@ function CheckoutPage() {
               <div>
                 <p className="font-medium">{it.title}</p>
                 {it.description ? (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {it.description}
-                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">{it.description}</p>
                 ) : null}
                 {it.quantity > 1 ? (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Cantidad: {it.quantity}
-                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">Cantidad: {it.quantity}</p>
                 ) : null}
               </div>
               <div className="text-right">
-                <p className="font-mono text-sm">
-                  {money(it.subtotal_amount, it.currency)}
-                </p>
+                <p className="font-mono text-sm">{money(it.subtotal_amount, it.currency)}</p>
               </div>
             </li>
           ))}
@@ -197,9 +183,7 @@ function CheckoutPage() {
 
         <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
           <span className="text-sm text-muted-foreground">Total del viaje</span>
-          <span className="font-serif text-2xl">
-            {money(order.total_amount, order.currency)}
-          </span>
+          <span className="font-serif text-2xl">{money(order.total_amount, order.currency)}</span>
         </div>
       </section>
 
@@ -213,8 +197,7 @@ function CheckoutPage() {
           </p>
           {order.status === "paid" || order.status === "fulfilled" ? (
             <p className="mt-2 text-sm text-muted-foreground">
-              Tu viaje está confirmado. Puedes ver los detalles y comprobante
-              en tu historial.
+              Tu viaje está confirmado. Puedes ver los detalles y comprobante en tu historial.
             </p>
           ) : null}
           <div className="mt-4 flex flex-wrap gap-3">
@@ -236,14 +219,13 @@ function CheckoutPage() {
         <section className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-5">
           <h3 className="font-serif text-lg">Confirmemos tu viaje</h3>
           <p className="mt-2 text-sm text-foreground/80">
-            Al continuar reservamos tu experiencia con los anfitriones
-            seleccionados y activamos el acompañamiento de tu concierge para
-            los siguientes pasos.
+            Al continuar reservamos tu experiencia con los anfitriones seleccionados y activamos el
+            acompañamiento de tu concierge para los siguientes pasos.
           </p>
           {demoMode || !paymentsReady ? (
             <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-[11px] font-medium text-amber-800">
-              Modo demostración: el viaje se confirma al instante sin cobro
-              real. Ideal para recorridos comerciales.
+              Modo demostración: el viaje se confirma al instante sin cobro real. Ideal para
+              recorridos comerciales.
             </p>
           ) : null}
           <div className="mt-5 flex flex-wrap gap-3">
@@ -254,12 +236,7 @@ function CheckoutPage() {
                   ? "Confirmar mi viaje (demo)"
                   : "Confirmar mi viaje"}
             </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleCancel}
-              disabled={busy}
-            >
+            <Button type="button" variant="ghost" onClick={handleCancel} disabled={busy}>
               Cancelar
             </Button>
           </div>

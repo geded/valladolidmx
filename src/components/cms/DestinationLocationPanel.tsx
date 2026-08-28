@@ -47,8 +47,7 @@ export function DestinationLocationPanel({ destinationId }: Props) {
   }, [current.data]);
 
   const save = useMutation({
-    mutationFn: () =>
-      saveFn({ data: { destinationId, latitude: lat, longitude: lng } }),
+    mutationFn: () => saveFn({ data: { destinationId, latitude: lat, longitude: lng } }),
     onSuccess: async () => {
       setDirty(false);
       setMsg("Ubicación del destino guardada.");
@@ -56,8 +55,7 @@ export function DestinationLocationPanel({ destinationId }: Props) {
         queryKey: ["cms", "destination", destinationId, "location"],
       });
     },
-    onError: (e) =>
-      setMsg(e instanceof Error ? e.message : "No se pudo guardar."),
+    onError: (e) => setMsg(e instanceof Error ? e.message : "No se pudo guardar."),
   });
 
   const useMyLocation = () => {
@@ -78,19 +76,16 @@ export function DestinationLocationPanel({ destinationId }: Props) {
     );
   };
 
-  const hasCoords =
-    current.data?.latitude != null && current.data?.longitude != null;
+  const hasCoords = current.data?.latitude != null && current.data?.longitude != null;
 
   return (
     <section className="rounded-xl border border-border bg-card p-5">
       <header className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-sm font-semibold tracking-tight">
-            Ubicación del destino *
-          </h2>
+          <h2 className="text-sm font-semibold tracking-tight">Ubicación del destino *</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Marca el centro geográfico del destino. Se usa como centro del mapa
-            en la ficha pública y para calcular cercanía desde el viajero.
+            Marca el centro geográfico del destino. Se usa como centro del mapa en la ficha pública
+            y para calcular cercanía desde el viajero.
           </p>
         </div>
         {!hasCoords ? (

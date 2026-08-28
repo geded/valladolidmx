@@ -5,10 +5,7 @@
  * pipeline real (Ola de Observabilidad) sin cambiar consumidores.
  * Cualquier módulo puede suscribirse con `subscribeProtectedActionEvents`.
  */
-import type {
-  ProtectedActionEvent,
-  ProtectedActionEventMeta,
-} from "./types";
+import type { ProtectedActionEvent, ProtectedActionEventMeta } from "./types";
 
 type Listener = (event: ProtectedActionEvent, meta: ProtectedActionEventMeta) => void;
 

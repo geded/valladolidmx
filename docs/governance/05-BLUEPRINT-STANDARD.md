@@ -47,11 +47,11 @@ En el ciclo de vida del software de Valladolid.mx, el Blueprint cumple las sigui
 
 Los tres documentos son complementarios, pero tienen responsabilidades distintas.
 
-| Documento | Propósito | Momento | Responsabilidad principal |
-|-----------|-----------|---------|---------------------------|
-| **Blueprint** | Diseñar la iniciativa antes de construir. | Antes del PRD y antes del código. | Responder qué, por qué, para quién, cómo se integra y qué se medirá. |
-| **PRD** | Definir requisitos funcionales y criterios de aceptación. | Después del Blueprint aprobado. | Detallar comportamientos, reglas, flujos, pantallas, validaciones y casos de uso. |
-| **ADR** | Registrar una decisión arquitectónica específica. | Cuando se toma una decisión técnica estructural. | Documentar contexto, alternativas, consecuencias y compromisos de una decisión técnica. |
+| Documento     | Propósito                                                 | Momento                                          | Responsabilidad principal                                                               |
+| ------------- | --------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| **Blueprint** | Diseñar la iniciativa antes de construir.                 | Antes del PRD y antes del código.                | Responder qué, por qué, para quién, cómo se integra y qué se medirá.                    |
+| **PRD**       | Definir requisitos funcionales y criterios de aceptación. | Después del Blueprint aprobado.                  | Detallar comportamientos, reglas, flujos, pantallas, validaciones y casos de uso.       |
+| **ADR**       | Registrar una decisión arquitectónica específica.         | Cuando se toma una decisión técnica estructural. | Documentar contexto, alternativas, consecuencias y compromisos de una decisión técnica. |
 
 El Blueprint puede contener decisiones arquitectónicas preliminares, pero esas decisiones se formalizan en ADRs individuales cuando alcanzan suficiente profundidad. El Blueprint puede contener escenarios de uso, pero los detalles de comportamiento se despliegan en el PRD. El Blueprint no reemplaza al PRD ni al ADR: los precede y los alimenta.
 
@@ -184,16 +184,16 @@ Si existe duda sobre si una iniciativa requiere Blueprint, la respuesta por defe
 
 ## 4.3 Ejemplos
 
-| Iniciativa | ¿Requiere Blueprint? | Justificación |
-|------------|----------------------|---------------|
-| Agregar un nuevo bloque al Experience Builder | Sí | Afecta arquitectura de componentes, contratos, reutilización y experiencia. |
-| Modificar el color de un botón | No | Cambio visual menor dentro del Design System. |
-| Crear un nuevo tipo de página pública | Sí | Afecta superficie, SEO, entidades y modelo de contenido. |
-| Actualizar una traducción | No | Cambio de copy sin alterar funcionalidad. |
-| Cambiar el modelo de reservas | Sí | Afecta negocio, experiencia, arquitectura y datos. |
-| Agregar una nueva integración de pagos | Sí | Afecta arquitectura, seguridad, negocio y experiencia. |
-| Refactor interno de un helper sin cambio de contrato | No | No altera superficie, contrato público ni experiencia. |
-| Cambiar la navegación principal | Sí | Afecta experiencia, arquitectura de rutas y SEO. |
+| Iniciativa                                           | ¿Requiere Blueprint? | Justificación                                                               |
+| ---------------------------------------------------- | -------------------- | --------------------------------------------------------------------------- |
+| Agregar un nuevo bloque al Experience Builder        | Sí                   | Afecta arquitectura de componentes, contratos, reutilización y experiencia. |
+| Modificar el color de un botón                       | No                   | Cambio visual menor dentro del Design System.                               |
+| Crear un nuevo tipo de página pública                | Sí                   | Afecta superficie, SEO, entidades y modelo de contenido.                    |
+| Actualizar una traducción                            | No                   | Cambio de copy sin alterar funcionalidad.                                   |
+| Cambiar el modelo de reservas                        | Sí                   | Afecta negocio, experiencia, arquitectura y datos.                          |
+| Agregar una nueva integración de pagos               | Sí                   | Afecta arquitectura, seguridad, negocio y experiencia.                      |
+| Refactor interno de un helper sin cambio de contrato | No                   | No altera superficie, contrato público ni experiencia.                      |
+| Cambiar la navegación principal                      | Sí                   | Afecta experiencia, arquitectura de rutas y SEO.                            |
 
 ---
 
@@ -563,9 +563,9 @@ La deprecación protege la trazabilidad del proyecto. Borrar un Blueprint borra 
 
 # 12. Control de Versiones
 
-| Versión | Fecha       | Autor    | Descripción                                                              |
-|---------|-------------|----------|--------------------------------------------------------------------------|
-| v1.0    | 2026-07-18  | Founder  | Emisión inicial del estándar oficial de Blueprints de Valladolid.mx.   |
+| Versión | Fecha      | Autor   | Descripción                                                          |
+| ------- | ---------- | ------- | -------------------------------------------------------------------- |
+| v1.0    | 2026-07-18 | Founder | Emisión inicial del estándar oficial de Blueprints de Valladolid.mx. |
 
 Este documento se versiona junto al CANON, al GLOSSARY, a ARCHITECTURAL PRINCIPLES, a DOCUMENTATION STANDARD y a DECISION MAKING. Su versión mayor sólo cambia cuando se redefine su alcance o su filosofía; los cambios editoriales incrementan la versión menor.
 

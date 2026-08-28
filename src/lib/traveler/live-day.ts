@@ -29,7 +29,7 @@ export interface LiveDayItemInput {
   day_number?: number | null;
   order_index?: number | null;
   starts_at?: string | null; // ISO datetime
-  ends_at?: string | null;   // ISO datetime
+  ends_at?: string | null; // ISO datetime
   status?: "planned" | "done" | "skipped" | null;
   entity_type?: string | null;
   entity_id?: string | null;
@@ -39,7 +39,7 @@ export interface LiveDayItemInput {
 export interface LiveDayPlanInput {
   id?: string | null;
   start_date?: string | null; // ISO date
-  end_date?: string | null;   // ISO date
+  end_date?: string | null; // ISO date
   items?: LiveDayItemInput[] | null;
 }
 
@@ -52,12 +52,12 @@ export interface LiveDayPlanInput {
  * Concierge o el Signal Contract existente. Prohibido nuevo modelo.
  */
 export interface DestinationContext {
-  weather?: unknown;         // p.ej. DayWeatherChip data (CV6.3)
-  hours?: unknown;           // horarios reales / cierres (CV6+)
-  events?: unknown;          // eventos del destino
-  traffic?: unknown;         // señales de tráfico (Google Maps)
-  availability?: unknown;    // disponibilidad de negocios
-  incidents?: unknown;       // incidencias reportadas por Concierge
+  weather?: unknown; // p.ej. DayWeatherChip data (CV6.3)
+  hours?: unknown; // horarios reales / cierres (CV6+)
+  events?: unknown; // eventos del destino
+  traffic?: unknown; // señales de tráfico (Google Maps)
+  availability?: unknown; // disponibilidad de negocios
+  incidents?: unknown; // incidencias reportadas por Concierge
   recommendations?: unknown; // recomendaciones curadas
   // extensible: sub-olas futuras pueden añadir claves aditivas.
 }
@@ -134,9 +134,7 @@ export function deriveLiveDay(
 ): LiveDayContext {
   const day = deriveDayNumber(plan, at);
   const allItems = sortLiveDayItems(plan?.items ?? []);
-  const dayItems = day == null
-    ? []
-    : allItems.filter((it) => (it.day_number ?? null) === day);
+  const dayItems = day == null ? [] : allItems.filter((it) => (it.day_number ?? null) === day);
 
   const nowMs = at.getTime();
   let nowIndex: number | null = null;

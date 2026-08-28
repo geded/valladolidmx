@@ -35,27 +35,18 @@ function publicClient() {
 }
 
 export const getCategoryRelated = createServerFn({ method: "GET" })
-  .inputValidator(
-    (data: { destinationSlug: string; categorySlug: string }) => {
-      if (
-        !data ||
-        typeof data.destinationSlug !== "string" ||
-        data.destinationSlug.length === 0
-      ) {
-        throw new Error("invalid_destination_slug");
-      }
-      if (
-        typeof data.categorySlug !== "string" ||
-        data.categorySlug.length === 0
-      ) {
-        throw new Error("invalid_category_slug");
-      }
-      return {
-        destinationSlug: data.destinationSlug,
-        categorySlug: data.categorySlug,
-      };
-    },
-  )
+  .inputValidator((data: { destinationSlug: string; categorySlug: string }) => {
+    if (!data || typeof data.destinationSlug !== "string" || data.destinationSlug.length === 0) {
+      throw new Error("invalid_destination_slug");
+    }
+    if (typeof data.categorySlug !== "string" || data.categorySlug.length === 0) {
+      throw new Error("invalid_category_slug");
+    }
+    return {
+      destinationSlug: data.destinationSlug,
+      categorySlug: data.categorySlug,
+    };
+  })
   .handler(async ({ data }): Promise<CategoryRelatedDTO> => {
     const supabase = publicClient();
     const { data: rows, error } = await supabase
@@ -85,17 +76,13 @@ export const getCategoryRelated = createServerFn({ method: "GET" })
 
     const otherCategoriesInDestination = all
       .filter(
-        (b) =>
-          b.destination_slug === data.destinationSlug &&
-          b.category_slug !== data.categorySlug,
+        (b) => b.destination_slug === data.destinationSlug && b.category_slug !== data.categorySlug,
       )
       .slice(0, 6);
 
     const sameCategoryOtherDestinations = all
       .filter(
-        (b) =>
-          b.category_slug === data.categorySlug &&
-          b.destination_slug !== data.destinationSlug,
+        (b) => b.category_slug === data.categorySlug && b.destination_slug !== data.destinationSlug,
       )
       .slice(0, 6);
 

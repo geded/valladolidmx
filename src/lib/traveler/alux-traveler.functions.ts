@@ -33,8 +33,7 @@ import {
 
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 
-const DISCLAIMER =
-  "Sugerencia generada por Alux. Nunca modifica tu viaje sin tu confirmación.";
+const DISCLAIMER = "Sugerencia generada por Alux. Nunca modifica tu viaje sin tu confirmación.";
 
 // ---------- Capacidades v1 (lista cerrada) ----------
 
@@ -56,10 +55,7 @@ export type AluxTravelerCapability = (typeof CAPABILITIES)[number];
 
 const LocaleField = z.enum(ALUX_KB_LOCALES).optional();
 
-const EmptyInput = z
-  .object({ locale: LocaleField })
-  .optional()
-  .default({});
+const EmptyInput = z.object({ locale: LocaleField }).optional().default({});
 
 const CapabilityInput = z.object({
   planId: z.string().uuid().optional(),
@@ -153,8 +149,8 @@ function extractSources(context: unknown): AluxTravelerSource[] {
 }
 
 function contextActivePlanId(context: unknown): string | null {
-  const active = (context as { active_plan?: { plan?: { id?: string } } } | null)
-    ?.active_plan?.plan?.id;
+  const active = (context as { active_plan?: { plan?: { id?: string } } } | null)?.active_plan?.plan
+    ?.id;
   return typeof active === "string" ? active : null;
 }
 
@@ -176,17 +172,13 @@ interface ConfirmedTripBrief {
   days_to_trip: number | null;
 }
 
-async function fetchConfirmedTripBrief(
-  supabase: unknown,
-): Promise<ConfirmedTripBrief | null> {
+async function fetchConfirmedTripBrief(supabase: unknown): Promise<ConfirmedTripBrief | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const c = supabase as any;
     const { data: order } = await c
       .from("concierge_orders")
-      .select(
-        "folio, editorial_title, destination_name, travel_plan_id, paid_at",
-      )
+      .select("folio, editorial_title, destination_name, travel_plan_id, paid_at")
       .in("status", ["paid", "fulfilled", "refunded"])
       .order("paid_at", { ascending: false, nullsFirst: false })
       .limit(1)
@@ -224,11 +216,7 @@ async function fetchConfirmedTripBrief(
     if (plan_start_date) {
       const target = new Date(`${plan_start_date}T00:00:00Z`).getTime();
       const now = new Date();
-      const todayUtc = Date.UTC(
-        now.getUTCFullYear(),
-        now.getUTCMonth(),
-        now.getUTCDate(),
-      );
+      const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
       days_to_trip = Math.round((target - todayUtc) / 86_400_000);
     }
 
@@ -272,17 +260,16 @@ function confirmedTripToPromptBlock(brief: ConfirmedTripBrief | null): string {
   );
 }
 
-const SYSTEM_BASE =
-  [
-    "Eres Alux, copiloto de viaje del Oriente Maya de Yucatán (Valladolid, Izamal, Espita y sus alrededores). Acompañas al viajero antes, durante y después de su viaje.",
-    "VOZ Y TONO: cálido, cercano, culto sin ser pomposo. Evoca la calidez colonial y la hospitalidad maya. Prefiere frases cortas. Nunca usas jerga corporativa ni promesas comerciales.",
-    "CONTINUIDAD (Founder Memory Principle): el viaje continúa, nunca reinicia. Si el viajero ya tiene plan activo o viaje confirmado, retómalo con naturalidad; no lo hagas empezar de cero.",
-    "CONFIANZA (Founder Trust Principle): tu trabajo es generar confianza en el destino, el concierge y el propio Alux. Antes que vender, orienta.",
-    "REGLA DE ORO: trabajas SÓLO con la información del contexto entregado (perfil, plan activo, catalog_refs, base de conocimiento). Si un dato no está, dilo con claridad y ofrece un siguiente paso concreto (declarar preferencia, hablar con el concierge humano, revisar la sección oficial).",
-    "PROHIBIDO: inventar empresas, direcciones, precios, horarios, disponibilidad, distancias o certificaciones; reservar; modificar el plan; contactar empresas; enviar mensajes al concierge; ofrecer descuentos que no estén en promociones activas del catálogo.",
-    "CITAS: cuando menciones un lugar, negocio, producto, experiencia o entrada de conocimiento, usa exactamente el título tal como aparece en las referencias. Si no aparece en las referencias, no lo nombres.",
-    "FORMATO: usa listas cortas cuando ayuden a decidir. Máximo 180 palabras salvo que se te pida un plan detallado.",
-  ].join(" ");
+const SYSTEM_BASE = [
+  "Eres Alux, copiloto de viaje del Oriente Maya de Yucatán (Valladolid, Izamal, Espita y sus alrededores). Acompañas al viajero antes, durante y después de su viaje.",
+  "VOZ Y TONO: cálido, cercano, culto sin ser pomposo. Evoca la calidez colonial y la hospitalidad maya. Prefiere frases cortas. Nunca usas jerga corporativa ni promesas comerciales.",
+  "CONTINUIDAD (Founder Memory Principle): el viaje continúa, nunca reinicia. Si el viajero ya tiene plan activo o viaje confirmado, retómalo con naturalidad; no lo hagas empezar de cero.",
+  "CONFIANZA (Founder Trust Principle): tu trabajo es generar confianza en el destino, el concierge y el propio Alux. Antes que vender, orienta.",
+  "REGLA DE ORO: trabajas SÓLO con la información del contexto entregado (perfil, plan activo, catalog_refs, base de conocimiento). Si un dato no está, dilo con claridad y ofrece un siguiente paso concreto (declarar preferencia, hablar con el concierge humano, revisar la sección oficial).",
+  "PROHIBIDO: inventar empresas, direcciones, precios, horarios, disponibilidad, distancias o certificaciones; reservar; modificar el plan; contactar empresas; enviar mensajes al concierge; ofrecer descuentos que no estén en promociones activas del catálogo.",
+  "CITAS: cuando menciones un lugar, negocio, producto, experiencia o entrada de conocimiento, usa exactamente el título tal como aparece en las referencias. Si no aparece en las referencias, no lo nombres.",
+  "FORMATO: usa listas cortas cuando ayuden a decidir. Máximo 180 palabras salvo que se te pida un plan detallado.",
+].join(" ");
 
 const LOW_CONTEXT_ANSWERS: Record<AluxKbLocale, string> = {
   es: "Todavía no tengo suficiente contexto de tu viaje para darte una sugerencia sólida. Cuéntame **cuándo viajas**, **con quién** y **qué tipo de experiencia buscas** (naturaleza, cultura, gastronomía, descanso), y de inmediato puedo proponerte algo del Oriente Maya.",
@@ -325,9 +312,7 @@ function estimateHallucinationRisk(
     " | " +
     knowledgeBlock
   ).toLowerCase();
-  const unknown = candidates.filter(
-    (c) => !haystack.includes(c.toLowerCase()),
-  );
+  const unknown = candidates.filter((c) => !haystack.includes(c.toLowerCase()));
   return {
     score: Math.min(1, unknown.length / Math.max(candidates.length, 1)),
     unknown_mentions: unknown.slice(0, 6),
@@ -475,12 +460,7 @@ export const logAluxTravelerSuggestion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => LogInput.parse(d))
   .handler(async ({ data, context }) => {
-    await logSuggestion(
-      context.supabase,
-      data.capability,
-      data.planId ?? null,
-      data.meta,
-    );
+    await logSuggestion(context.supabase, data.capability, data.planId ?? null, data.meta);
     return { ok: true };
   });
 
@@ -628,11 +608,9 @@ export const discoverPromotions = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     // Fuente única y publishable-only. Sin admin, sin RLS bypass.
     const { createClient } = await import("@supabase/supabase-js");
-    const sb = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { persistSession: false, autoRefreshToken: false } },
-    );
+    const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
     const { data: rows } = await sb
       .from("page_compositions")
       .select("slug, title, description")
@@ -648,12 +626,7 @@ export const discoverPromotions = createServerFn({ method: "POST" })
     // luego con `business_effective_visibility.levers` para leer
     // `alux_weight` y `alux_proactive`. Ordenamos por weight desc.
     const promoRows = baseSlugs.length
-      ? (
-          await sb
-            .from("promotions")
-            .select("slug, business_id")
-            .in("slug", baseSlugs)
-        ).data ?? []
+      ? ((await sb.from("promotions").select("slug, business_id").in("slug", baseSlugs)).data ?? [])
       : [];
     const bizBySlug = new Map<string, string>();
     for (const p of promoRows) {
@@ -663,21 +636,27 @@ export const discoverPromotions = createServerFn({ method: "POST" })
     }
     const bizIds = Array.from(new Set(bizBySlug.values()));
     const visRows = bizIds.length
-      ? (
+      ? ((
           await sb
             .from("business_effective_visibility")
             .select("business_id, plan_slug, plan_name, levers")
             .in("business_id", bizIds)
-        ).data ?? []
+        ).data ?? [])
       : [];
-    const visByBiz = new Map<string, { plan_slug: string; plan_name: string; levers: Record<string, unknown> }>();
+    const visByBiz = new Map<
+      string,
+      { plan_slug: string; plan_name: string; levers: Record<string, unknown> }
+    >();
     for (const v of visRows) {
       const id = (v as { business_id?: string }).business_id;
       if (!id) continue;
       visByBiz.set(id, {
         plan_slug: String((v as { plan_slug?: string }).plan_slug ?? "basico"),
         plan_name: String((v as { plan_name?: string }).plan_name ?? "Básico"),
-        levers: ((v as { levers?: Record<string, unknown> }).levers ?? {}) as Record<string, unknown>,
+        levers: ((v as { levers?: Record<string, unknown> }).levers ?? {}) as Record<
+          string,
+          unknown
+        >,
       });
     }
 

@@ -3,14 +3,7 @@
  * Lee el contexto Alux del workspace activo desde el Alux Registry.
  */
 import { useEffect, useState } from "react";
-import {
-  Sparkles,
-  ArrowUpRight,
-  Info,
-  Undo2,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { Sparkles, ArrowUpRight, Info, Undo2, ChevronDown, ChevronUp } from "lucide-react";
 import { useWorkspace } from "./WorkspaceProvider";
 import {
   getAluxContext,
@@ -69,8 +62,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
       await a.run();
       workspaceToast.success(a.label, {
         description: a.effect,
-        undo:
-          a.reversible && a.undo ? { run: a.undo } : undefined,
+        undo: a.reversible && a.undo ? { run: a.undo } : undefined,
       });
     } catch (err) {
       workspaceToast.error("No se pudo ejecutar la acción", {
@@ -81,10 +73,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
 
   return (
     <section
-      className={cn(
-        "flex h-full flex-col gap-4 border-l border-border bg-surface p-4",
-        className,
-      )}
+      className={cn("flex h-full flex-col gap-4 border-l border-border bg-surface p-4", className)}
       aria-label="Copiloto Alux"
     >
       <header className="flex items-center gap-2">
@@ -95,9 +84,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
           <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
             Copiloto · Alux
           </div>
-          <div className="truncate font-display text-sm">
-            {workspace?.label ?? "Workspace"}
-          </div>
+          <div className="truncate font-display text-sm">{workspace?.label ?? "Workspace"}</div>
         </div>
       </header>
 
@@ -105,9 +92,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
         <p className="font-display text-base leading-snug">
           {headline || "Alux está observando el pulso de este workspace."}
         </p>
-        {summary ? (
-          <p className="mt-2 text-sm text-muted-foreground">{summary}</p>
-        ) : null}
+        {summary ? <p className="mt-2 text-sm text-muted-foreground">{summary}</p> : null}
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -122,14 +107,9 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
           ) : (
             actions.map((a) => {
               const isOpen = openExpl[a.id];
-              const explainable = Boolean(
-                a.rationale || a.sources?.length || a.effect,
-              );
+              const explainable = Boolean(a.rationale || a.sources?.length || a.effect);
               return (
-                <li
-                  key={a.id}
-                  className="rounded-xl border border-border bg-surface p-3"
-                >
+                <li key={a.id} className="rounded-xl border border-border bg-surface p-3">
                   <div className="flex items-start gap-3">
                     <span
                       className={cn(
@@ -145,19 +125,14 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                       className="flex min-w-0 flex-1 items-start gap-2 text-left"
                     >
                       <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-semibold">
-                          {a.label}
-                        </span>
+                        <span className="block text-sm font-semibold">{a.label}</span>
                         {a.description ? (
                           <span className="mt-0.5 block text-xs text-muted-foreground">
                             {a.description}
                           </span>
                         ) : null}
                       </span>
-                      <ArrowUpRight
-                        className="h-4 w-4 text-muted-foreground"
-                        aria-hidden
-                      />
+                      <ArrowUpRight className="h-4 w-4 text-muted-foreground" aria-hidden />
                     </button>
                   </div>
 
@@ -170,9 +145,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                     {explainable ? (
                       <button
                         type="button"
-                        onClick={() =>
-                          setOpenExpl((s) => ({ ...s, [a.id]: !s[a.id] }))
-                        }
+                        onClick={() => setOpenExpl((s) => ({ ...s, [a.id]: !s[a.id] }))}
                         className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 hover:bg-muted/80"
                       >
                         <Info className="h-3 w-3" aria-hidden />
@@ -218,9 +191,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                               >
                                 {s.label}
                                 {s.value != null ? (
-                                  <span className="ml-1 text-muted-foreground">
-                                    · {s.value}
-                                  </span>
+                                  <span className="ml-1 text-muted-foreground">· {s.value}</span>
                                 ) : null}
                               </li>
                             ))}

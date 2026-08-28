@@ -152,9 +152,7 @@ export function InteractiveMap({
           fullscreenControl: true,
           gestureHandling: "cooperative",
         });
-        const list = markers && markers.length > 0
-          ? markers
-          : [{ lat, lng, title: markerTitle }];
+        const list = markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }];
         list.forEach((m, i) => {
           const letter = labelForIndex(i);
           new google.maps.Marker({

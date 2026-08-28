@@ -40,9 +40,7 @@ export type {
   ExperienceMapPoint,
   ExperienceMapVariant,
 } from "./types";
-export {
-  EXPERIENCE_MAP_CONTRACT_VERSION,
-} from "./types";
+export { EXPERIENCE_MAP_CONTRACT_VERSION } from "./types";
 export {
   EXPERIENCE_MAP_DEFAULT_CAPABILITIES,
   EXPERIENCE_MAP_DEFAULT_VARIANT,

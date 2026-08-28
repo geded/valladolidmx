@@ -85,15 +85,14 @@ export async function fetchWeatherCached(
     if (!cur || typeof cur.temperature_2m !== "number") return null;
     const isDay = cur.is_day !== 0;
     const desc = describeWmo(cur.weather_code ?? 0, isDay);
-    const probs = (json.hourly?.precipitation_probability ?? [])
-      .filter((v): v is number => typeof v === "number");
+    const probs = (json.hourly?.precipitation_probability ?? []).filter(
+      (v): v is number => typeof v === "number",
+    );
     const rainChanceNext6h = probs.length > 0 ? Math.max(...probs) : 0;
     const snapshot: WeatherSnapshot = {
       tempC: Math.round(cur.temperature_2m),
       feelsLikeC:
-        typeof cur.apparent_temperature === "number"
-          ? Math.round(cur.apparent_temperature)
-          : null,
+        typeof cur.apparent_temperature === "number" ? Math.round(cur.apparent_temperature) : null,
       code: cur.weather_code ?? 0,
       label: desc.label,
       icon: desc.icon,

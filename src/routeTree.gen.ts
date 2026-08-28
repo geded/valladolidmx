@@ -161,6 +161,7 @@ import { Route as AuthenticatedCmsEmpresasIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedCmsDestinosIndexRouteImport } from './routes/_authenticated/cms/destinos.index'
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
 import { Route as AuthenticatedAdminSistemaIndexRouteImport } from './routes/_authenticated/admin/sistema.index'
+import { Route as OrienteMayaDestinoLugaresSlugRouteImport } from './routes/oriente-maya/$destino.lugares.$slug'
 import { Route as OrienteMayaDestinoCategoriaEmpresaRouteImport } from './routes/oriente-maya/$destino.$categoria.$empresa'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -1068,6 +1069,12 @@ const AuthenticatedAdminSistemaIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAdminSistemaRoute,
   } as any)
+const OrienteMayaDestinoLugaresSlugRoute =
+  OrienteMayaDestinoLugaresSlugRouteImport.update({
+    id: '/lugares/$slug',
+    path: '/lugares/$slug',
+    getParentRoute: () => OrienteMayaDestinoRoute,
+  } as any)
 const OrienteMayaDestinoCategoriaEmpresaRoute =
   OrienteMayaDestinoCategoriaEmpresaRouteImport.update({
     id: '/$empresa',
@@ -1572,6 +1579,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaRouteWithChildren
+  '/oriente-maya/$destino/lugares/$slug': typeof OrienteMayaDestinoLugaresSlugRoute
   '/admin/sistema/': typeof AuthenticatedAdminSistemaIndexRoute
   '/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/destinos/': typeof AuthenticatedCmsDestinosIndexRoute
@@ -1770,6 +1778,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/oriente-maya/$destino/lugares/$slug': typeof OrienteMayaDestinoLugaresSlugRoute
   '/admin/sistema': typeof AuthenticatedAdminSistemaIndexRoute
   '/cms/categorias': typeof AuthenticatedCmsCategoriasIndexRoute
   '/cms/destinos': typeof AuthenticatedCmsDestinosIndexRoute
@@ -1980,6 +1989,7 @@ export interface FileRoutesById {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/oriente-maya/$destino/$categoria/$empresa': typeof OrienteMayaDestinoCategoriaEmpresaRouteWithChildren
+  '/oriente-maya/$destino/lugares/$slug': typeof OrienteMayaDestinoLugaresSlugRoute
   '/_authenticated/admin/sistema/': typeof AuthenticatedAdminSistemaIndexRoute
   '/_authenticated/cms/categorias/': typeof AuthenticatedCmsCategoriasIndexRoute
   '/_authenticated/cms/destinos/': typeof AuthenticatedCmsDestinosIndexRoute
@@ -2190,6 +2200,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
     | '/oriente-maya/$destino/$categoria/$empresa'
+    | '/oriente-maya/$destino/lugares/$slug'
     | '/admin/sistema/'
     | '/cms/categorias/'
     | '/cms/destinos/'
@@ -2388,6 +2399,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/oriente-maya/$destino/lugares/$slug'
     | '/admin/sistema'
     | '/cms/categorias'
     | '/cms/destinos'
@@ -2597,6 +2609,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
     | '/oriente-maya/$destino/$categoria/$empresa'
+    | '/oriente-maya/$destino/lugares/$slug'
     | '/_authenticated/admin/sistema/'
     | '/_authenticated/cms/categorias/'
     | '/_authenticated/cms/destinos/'
@@ -3785,6 +3798,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSistemaIndexRouteImport
       parentRoute: typeof AuthenticatedAdminSistemaRoute
     }
+    '/oriente-maya/$destino/lugares/$slug': {
+      id: '/oriente-maya/$destino/lugares/$slug'
+      path: '/lugares/$slug'
+      fullPath: '/oriente-maya/$destino/lugares/$slug'
+      preLoaderRoute: typeof OrienteMayaDestinoLugaresSlugRouteImport
+      parentRoute: typeof OrienteMayaDestinoRoute
+    }
     '/oriente-maya/$destino/$categoria/$empresa': {
       id: '/oriente-maya/$destino/$categoria/$empresa'
       path: '/$empresa'
@@ -4644,12 +4664,14 @@ const OrienteMayaDestinoCategoriaRouteWithChildren =
 interface OrienteMayaDestinoRouteChildren {
   OrienteMayaDestinoCategoriaRoute: typeof OrienteMayaDestinoCategoriaRouteWithChildren
   OrienteMayaDestinoIndexRoute: typeof OrienteMayaDestinoIndexRoute
+  OrienteMayaDestinoLugaresSlugRoute: typeof OrienteMayaDestinoLugaresSlugRoute
 }
 
 const OrienteMayaDestinoRouteChildren: OrienteMayaDestinoRouteChildren = {
   OrienteMayaDestinoCategoriaRoute:
     OrienteMayaDestinoCategoriaRouteWithChildren,
   OrienteMayaDestinoIndexRoute: OrienteMayaDestinoIndexRoute,
+  OrienteMayaDestinoLugaresSlugRoute: OrienteMayaDestinoLugaresSlugRoute,
 }
 
 const OrienteMayaDestinoRouteWithChildren =

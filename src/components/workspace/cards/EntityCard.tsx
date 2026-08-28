@@ -57,9 +57,7 @@ export function EntityCard({
       {description ? (
         <p className="line-clamp-2 text-sm text-muted-foreground">{description}</p>
       ) : null}
-      {actions ? (
-        <div className="mt-1 flex flex-wrap items-center gap-2">{actions}</div>
-      ) : null}
+      {actions ? <div className="mt-1 flex flex-wrap items-center gap-2">{actions}</div> : null}
       {to ? (
         <ChevronRight
           className="absolute right-4 top-5 h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5"

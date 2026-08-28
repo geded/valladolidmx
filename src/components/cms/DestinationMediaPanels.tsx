@@ -15,10 +15,7 @@ import {
   reorderDestinationGallery,
   signDestinationImageUpload,
 } from "@/lib/cms/destinations-media.functions";
-import {
-  prepareImageForRole,
-  withRetry,
-} from "@/lib/cms/image-upload";
+import { prepareImageForRole, withRetry } from "@/lib/cms/image-upload";
 
 type MediaRow = Awaited<ReturnType<typeof listDestinationMedia>>[number];
 
@@ -83,8 +80,7 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
       invalidate();
       toast.success("Imagen destacada actualizada.");
     },
-    onError: (e) =>
-      toast.error(e instanceof Error ? e.message : "No se pudo subir."),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo subir."),
   });
   const galleryUpload = useMutation({
     mutationFn: async (files: File[]) => {
@@ -95,9 +91,7 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
           await uploadOne(f, "gallery");
           ok += 1;
         } catch (err) {
-          errors.push(
-            `${f.name}: ${err instanceof Error ? err.message : "error"}`,
-          );
+          errors.push(`${f.name}: ${err instanceof Error ? err.message : "error"}`);
         }
       }
       return { ok, errors };
@@ -105,25 +99,23 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
     onSuccess: (res) => {
       invalidate();
       if (res.ok > 0)
-        toast.success(`${res.ok} imagen${res.ok === 1 ? "" : "es"} subida${res.ok === 1 ? "" : "s"}.`);
+        toast.success(
+          `${res.ok} imagen${res.ok === 1 ? "" : "es"} subida${res.ok === 1 ? "" : "s"}.`,
+        );
       for (const msg of res.errors) toast.error(msg);
     },
-    onError: (e) =>
-      toast.error(e instanceof Error ? e.message : "No se pudo subir."),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo subir."),
   });
   const removeMut = useMutation({
-    mutationFn: (destinationMediaId: string) =>
-      removeFn({ data: { destinationMediaId } }),
+    mutationFn: (destinationMediaId: string) => removeFn({ data: { destinationMediaId } }),
     onSuccess: () => {
       invalidate();
       toast.success("Imagen eliminada.");
     },
-    onError: (e) =>
-      toast.error(e instanceof Error ? e.message : "No se pudo eliminar."),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo eliminar."),
   });
   const reorderMut = useMutation({
-    mutationFn: (orderedIds: string[]) =>
-      reorderFn({ data: { destinationId, orderedIds } }),
+    mutationFn: (orderedIds: string[]) => reorderFn({ data: { destinationId, orderedIds } }),
     onSuccess: invalidate,
   });
 
@@ -175,9 +167,7 @@ function HeroPanel(props: {
     <section className="rounded-xl border border-border bg-card p-5">
       <header className="mb-3 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold tracking-tight">
-            Imagen destacada
-          </h2>
+          <h2 className="text-sm font-semibold tracking-tight">Imagen destacada</h2>
           <p className="text-xs text-muted-foreground">
             Se usa como portada del destino en la home y en su ficha.
           </p>
@@ -188,11 +178,7 @@ function HeroPanel(props: {
           disabled={props.uploading}
           className="h-9 rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
         >
-          {props.uploading
-            ? "Subiendo…"
-            : props.hero
-              ? "Reemplazar"
-              : "Subir"}
+          {props.uploading ? "Subiendo…" : props.hero ? "Reemplazar" : "Subir"}
         </button>
         <input
           ref={inputRef}
@@ -291,9 +277,7 @@ function GalleryPanel(props: {
           if (files.length) props.onUpload(files);
         }}
         className={`rounded-lg border border-dashed p-3 ${
-          dragOver
-            ? "border-primary bg-primary/5"
-            : "border-border bg-background"
+          dragOver ? "border-primary bg-primary/5" : "border-border bg-background"
         }`}
       >
         {props.items.length === 0 ? (
@@ -308,11 +292,7 @@ function GalleryPanel(props: {
                 className="group relative overflow-hidden rounded-md border border-border bg-card"
               >
                 {m.previewUrl ? (
-                  <img
-                    src={m.previewUrl}
-                    alt={m.alt ?? ""}
-                    className="h-28 w-full object-cover"
-                  />
+                  <img src={m.previewUrl} alt={m.alt ?? ""} className="h-28 w-full object-cover" />
                 ) : (
                   <div className="h-28 w-full bg-muted" />
                 )}

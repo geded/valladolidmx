@@ -12,10 +12,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  stageAllowsPermission,
-  type TravelStage,
-} from "@/lib/traveler/journey-stage";
+import { stageAllowsPermission, type TravelStage } from "@/lib/traveler/journey-stage";
 
 export interface PermissionMomentProps {
   permission: "geolocation" | "notifications" | "camera";

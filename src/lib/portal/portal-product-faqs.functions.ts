@@ -54,32 +54,22 @@ export const listPortalProductFaqs = createServerFn({ method: "POST" })
 export const createPortalProductFaq = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (data: {
-      productId: string;
-      question: string;
-      answer: string;
-      publish?: boolean;
-    }) => {
+    (data: { productId: string; question: string; answer: string; publish?: boolean }) => {
       if (!data?.productId) throw new Error("productId required");
-      if (!data.question?.trim() || data.question.length > 300)
-        throw new Error("invalid_question");
-      if (!data.answer?.trim() || data.answer.length > 4000)
-        throw new Error("invalid_answer");
+      if (!data.question?.trim() || data.question.length > 300) throw new Error("invalid_question");
+      if (!data.answer?.trim() || data.answer.length > 4000) throw new Error("invalid_answer");
       return data;
     },
   )
   .handler(async ({ data, context }): Promise<{ id: string }> => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: id, error } = await (context.supabase.rpc as any)(
-      "create_business_product_faq",
-      {
-        _product_id: data.productId,
-        _question: data.question,
-        _answer: data.answer,
-        _position: null,
-        _publish: data.publish ?? true,
-      },
-    );
+    const { data: id, error } = await (context.supabase.rpc as any)("create_business_product_faq", {
+      _product_id: data.productId,
+      _question: data.question,
+      _answer: data.answer,
+      _position: null,
+      _publish: data.publish ?? true,
+    });
     if (error) throw new Error(error.message);
     return { id: id as string };
   });
@@ -99,15 +89,12 @@ export const updatePortalProductFaq = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (context.supabase.rpc as any)(
-      "update_business_product_faq",
-      {
-        _faq_id: data.faqId,
-        _question: data.question ?? null,
-        _answer: data.answer ?? null,
-        _publish: data.publish ?? null,
-      },
-    );
+    const { error } = await (context.supabase.rpc as any)("update_business_product_faq", {
+      _faq_id: data.faqId,
+      _question: data.question ?? null,
+      _answer: data.answer ?? null,
+      _publish: data.publish ?? null,
+    });
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
@@ -120,10 +107,9 @@ export const deletePortalProductFaq = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (context.supabase.rpc as any)(
-      "delete_business_product_faq",
-      { _faq_id: data.faqId },
-    );
+    const { error } = await (context.supabase.rpc as any)("delete_business_product_faq", {
+      _faq_id: data.faqId,
+    });
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
@@ -137,10 +123,10 @@ export const reorderPortalProductFaqs = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (context.supabase.rpc as any)(
-      "reorder_business_product_faqs",
-      { _product_id: data.productId, _ordered_ids: data.orderedIds },
-    );
+    const { error } = await (context.supabase.rpc as any)("reorder_business_product_faqs", {
+      _product_id: data.productId,
+      _ordered_ids: data.orderedIds,
+    });
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });

@@ -36,15 +36,25 @@ export const searchBusinessesForClaim = createServerFn({ method: "GET" })
       page?: number;
       page_size?: number;
     }) => ({
-      q: z.string().trim().max(120).parse(data?.q ?? ""),
-      destination_id: data?.destination_id
-        ? z.string().uuid().parse(data.destination_id)
-        : null,
-      category_id: data?.category_id
-        ? z.string().uuid().parse(data.category_id)
-        : null,
-      page: z.number().int().min(1).max(500).parse(data?.page ?? 1),
-      page_size: z.number().int().min(1).max(50).parse(data?.page_size ?? 10),
+      q: z
+        .string()
+        .trim()
+        .max(120)
+        .parse(data?.q ?? ""),
+      destination_id: data?.destination_id ? z.string().uuid().parse(data.destination_id) : null,
+      category_id: data?.category_id ? z.string().uuid().parse(data.category_id) : null,
+      page: z
+        .number()
+        .int()
+        .min(1)
+        .max(500)
+        .parse(data?.page ?? 1),
+      page_size: z
+        .number()
+        .int()
+        .min(1)
+        .max(50)
+        .parse(data?.page_size ?? 10),
     }),
   )
   .handler(async ({ data, context }): Promise<BusinessSearchResult> => {
@@ -104,21 +114,17 @@ export const searchBusinessesForClaim = createServerFn({ method: "GET" })
 
 export const listBusinessCategoriesForClaim = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(
-    async ({
-      context,
-    }): Promise<{ id: string; name: string; slug: string }[]> => {
-      const { data, error } = await context.supabase
-        .from("business_categories")
-        .select("id, name, slug")
-        .is("deleted_at", null)
-        .eq("status", "published")
-        .order("sort_order")
-        .order("name");
-      if (error) throw new Error(error.message);
-      return (data as { id: string; name: string; slug: string }[]) ?? [];
-    },
-  );
+  .handler(async ({ context }): Promise<{ id: string; name: string; slug: string }[]> => {
+    const { data, error } = await context.supabase
+      .from("business_categories")
+      .select("id, name, slug")
+      .is("deleted_at", null)
+      .eq("status", "published")
+      .order("sort_order")
+      .order("name");
+    if (error) throw new Error(error.message);
+    return (data as { id: string; name: string; slug: string }[]) ?? [];
+  });
 
 export const claimBusiness = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -158,19 +164,20 @@ export const createOwnedBusiness = createServerFn({ method: "POST" })
       primary_category_id: data?.primary_category_id
         ? z.string().uuid().parse(data.primary_category_id)
         : null,
-      tagline: data?.tagline
-        ? z.string().trim().max(160).parse(data.tagline)
-        : null,
-      description: z.string().trim().min(80).max(2000).parse(data?.description ?? ""),
+      tagline: data?.tagline ? z.string().trim().max(160).parse(data.tagline) : null,
+      description: z
+        .string()
+        .trim()
+        .min(80)
+        .max(2000)
+        .parse(data?.description ?? ""),
       address_line1: data?.address_line1
         ? z.string().trim().max(200).parse(data.address_line1)
         : null,
       address_line2: data?.address_line2
         ? z.string().trim().max(200).parse(data.address_line2)
         : null,
-      postal_code: data?.postal_code
-        ? z.string().trim().max(20).parse(data.postal_code)
-        : null,
+      postal_code: data?.postal_code ? z.string().trim().max(20).parse(data.postal_code) : null,
       phone: data?.phone ? z.string().trim().max(40).parse(data.phone) : null,
       whatsapp: data?.whatsapp ? z.string().trim().max(40).parse(data.whatsapp) : null,
       email: data?.email ? z.string().trim().email().max(200).parse(data.email) : null,
@@ -184,24 +191,21 @@ export const createOwnedBusiness = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data, context }) => {
-    const { data: businessId, error } = await context.supabase.rpc(
-      "create_owned_business",
-      {
-        _display_name: data.display_name,
-        _destination_id: data.destination_id,
-        _primary_category_id: data.primary_category_id,
-        _tagline: data.tagline,
-        _description: data.description,
-        _address_line1: data.address_line1,
-        _address_line2: data.address_line2,
-        _postal_code: data.postal_code,
-        _phone: data.phone,
-        _whatsapp: data.whatsapp,
-        _email: data.email,
-        _website: data.website,
-        _verification_document_url: data.verification_document_url,
-      } as never,
-    );
+    const { data: businessId, error } = await context.supabase.rpc("create_owned_business", {
+      _display_name: data.display_name,
+      _destination_id: data.destination_id,
+      _primary_category_id: data.primary_category_id,
+      _tagline: data.tagline,
+      _description: data.description,
+      _address_line1: data.address_line1,
+      _address_line2: data.address_line2,
+      _postal_code: data.postal_code,
+      _phone: data.phone,
+      _whatsapp: data.whatsapp,
+      _email: data.email,
+      _website: data.website,
+      _verification_document_url: data.verification_document_url,
+    } as never);
     if (error) throw new Error(error.message);
     return { business_id: businessId as string };
   });
@@ -222,22 +226,18 @@ export interface PendingRequestRow {
 export const listPendingBusinessRequests = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<PendingRequestRow[]> => {
-    const { data, error } = await context.supabase.rpc(
-      "list_pending_business_requests",
-    );
+    const { data, error } = await context.supabase.rpc("list_pending_business_requests");
     if (error) throw new Error(error.message);
     return (data as PendingRequestRow[]) ?? [];
   });
 
 export const approveOwnershipClaim = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (data: { transfer_id: string; approve: boolean; notes?: string }) => ({
-      transfer_id: z.string().uuid().parse(data?.transfer_id),
-      approve: z.boolean().parse(data?.approve),
-      notes: data?.notes ? z.string().max(500).parse(data.notes) : null,
-    }),
-  )
+  .inputValidator((data: { transfer_id: string; approve: boolean; notes?: string }) => ({
+    transfer_id: z.string().uuid().parse(data?.transfer_id),
+    approve: z.boolean().parse(data?.approve),
+    notes: data?.notes ? z.string().max(500).parse(data.notes) : null,
+  }))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("approve_ownership_claim", {
       _transfer_id: data.transfer_id,
@@ -250,22 +250,17 @@ export const approveOwnershipClaim = createServerFn({ method: "POST" })
 
 export const approveBusinessRegistration = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (data: { business_id: string; approve: boolean; notes?: string }) => ({
-      business_id: z.string().uuid().parse(data?.business_id),
-      approve: z.boolean().parse(data?.approve),
-      notes: data?.notes ? z.string().max(500).parse(data.notes) : null,
-    }),
-  )
+  .inputValidator((data: { business_id: string; approve: boolean; notes?: string }) => ({
+    business_id: z.string().uuid().parse(data?.business_id),
+    approve: z.boolean().parse(data?.approve),
+    notes: data?.notes ? z.string().max(500).parse(data.notes) : null,
+  }))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc(
-      "approve_business_registration",
-      {
-        _business_id: data.business_id,
-        _approve: data.approve,
-        _notes: data.notes,
-      } as never,
-    );
+    const { error } = await context.supabase.rpc("approve_business_registration", {
+      _business_id: data.business_id,
+      _approve: data.approve,
+      _notes: data.notes,
+    } as never);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -278,23 +273,20 @@ export const submitBusinessForReview = createServerFn({ method: "POST" })
     business_id: z.string().uuid().parse(data?.business_id),
   }))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc(
-      "submit_business_for_review",
-      { _business_id: data.business_id } as never,
-    );
+    const { error } = await context.supabase.rpc("submit_business_for_review", {
+      _business_id: data.business_id,
+    } as never);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
 
 export const publishBusiness = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (data: { business_id: string; approve: boolean; notes?: string }) => ({
-      business_id: z.string().uuid().parse(data?.business_id),
-      approve: z.boolean().parse(data?.approve),
-      notes: data?.notes ? z.string().max(500).parse(data.notes) : null,
-    }),
-  )
+  .inputValidator((data: { business_id: string; approve: boolean; notes?: string }) => ({
+    business_id: z.string().uuid().parse(data?.business_id),
+    approve: z.boolean().parse(data?.approve),
+    notes: data?.notes ? z.string().max(500).parse(data.notes) : null,
+  }))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("publish_business", {
       _business_id: data.business_id,
@@ -455,19 +447,15 @@ export const getBusinessPublishChecklist = createServerFn({ method: "GET" })
 
 export const listPublicDestinations = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(
-    async ({
-      context,
-    }): Promise<{ id: string; name: string; slug: string }[]> => {
-      const { data, error } = await context.supabase
-        .from("destinations")
-        .select("id, name, slug")
-        .is("deleted_at", null)
-        .order("name");
-      if (error) throw new Error(error.message);
-      return (data as { id: string; name: string; slug: string }[]) ?? [];
-    },
-  );
+  .handler(async ({ context }): Promise<{ id: string; name: string; slug: string }[]> => {
+    const { data, error } = await context.supabase
+      .from("destinations")
+      .select("id, name, slug")
+      .is("deleted_at", null)
+      .order("name");
+    if (error) throw new Error(error.message);
+    return (data as { id: string; name: string; slug: string }[]) ?? [];
+  });
 
 export interface PendingClaimRow {
   business_id: string;

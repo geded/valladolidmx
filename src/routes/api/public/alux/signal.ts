@@ -137,7 +137,13 @@ export const Route = createFileRoute("/api/public/alux/signal")({
         // A16 · Memoria territorial persistente — acumular destinos y
         // categorías visitadas entre sesiones/turnos, dedupe por slug.
         const nowIso = new Date().toISOString();
-        type Visit = { slug: string; label?: string | null; first_seen: string; last_seen: string; count: number };
+        type Visit = {
+          slug: string;
+          label?: string | null;
+          first_seen: string;
+          last_seen: string;
+          count: number;
+        };
         if (dest) {
           const arr: Visit[] = Array.isArray(row.visited_destinations)
             ? (row.visited_destinations as Visit[])
@@ -171,13 +177,15 @@ export const Route = createFileRoute("/api/public/alux/signal")({
           patch.visited_categories = arr.slice(-30);
         }
 
-        await (supabaseAdmin as unknown as {
-          from: (t: string) => {
-            update: (v: Record<string, unknown>) => {
-              eq: (c: string, v: unknown) => Promise<{ error: unknown }>;
+        await (
+          supabaseAdmin as unknown as {
+            from: (t: string) => {
+              update: (v: Record<string, unknown>) => {
+                eq: (c: string, v: unknown) => Promise<{ error: unknown }>;
+              };
             };
-          };
-        })
+          }
+        )
           .from("alux_public_sessions")
           .update(patch)
           .eq("id", row.id);

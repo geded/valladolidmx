@@ -3,6 +3,7 @@ name: Founder Invitation Principle
 description: Toda solicitud de registro se formula como invitación basada en el valor ya entregado. Tono cercano, respetuoso y orientado al beneficio. Prohibida presión, urgencia artificial, bloqueo o sensación de pérdida.
 type: constraint
 ---
+
 Vinculante desde AC1.4. Sólo afecta copy/tono — no altera arquitectura ni contratos.
 
 Reglas:

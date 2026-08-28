@@ -40,17 +40,25 @@ export function ExperienceInfoGrid({ dto, className }: ExperienceInfoGridProps) 
           : "grid-cols-2 sm:grid-cols-3";
 
   return (
-    <section aria-label={ariaLabel} data-eb-block="experience-info-grid" className={cn("w-full", className)}>
-      {heading ? (
-        <h2 className="mb-4 text-xl font-semibold tracking-tight">{heading}</h2>
-      ) : null}
+    <section
+      aria-label={ariaLabel}
+      data-eb-block="experience-info-grid"
+      className={cn("w-full", className)}
+    >
+      {heading ? <h2 className="mb-4 text-xl font-semibold tracking-tight">{heading}</h2> : null}
       {variant === "inline" ? (
         <ul className="flex flex-wrap gap-2" role="list">
           {items.map((it, i) => {
             const I = it.iconKey ? ICONS[it.iconKey] : null;
             return (
               <li key={i}>
-                <MaybeLink href={it.href} className={cn("inline-flex items-center gap-1.5 rounded-pill border border-border bg-background px-3 py-1.5 text-sm", TONE[it.tone])}>
+                <MaybeLink
+                  href={it.href}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-pill border border-border bg-background px-3 py-1.5 text-sm",
+                    TONE[it.tone],
+                  )}
+                >
                   {I ? <I className="h-4 w-4" aria-hidden="true" /> : null}
                   <span className="font-medium">{it.label}:</span> <span>{it.value}</span>
                 </MaybeLink>
@@ -59,7 +67,10 @@ export function ExperienceInfoGrid({ dto, className }: ExperienceInfoGridProps) 
           })}
         </ul>
       ) : variant === "list" ? (
-        <ul className="divide-y divide-border rounded-lg border border-border bg-background" role="list">
+        <ul
+          className="divide-y divide-border rounded-lg border border-border bg-background"
+          role="list"
+        >
           {items.map((it, i) => {
             const I = it.iconKey ? ICONS[it.iconKey] : null;
             return (
@@ -85,7 +96,10 @@ export function ExperienceInfoGrid({ dto, className }: ExperienceInfoGridProps) 
                   {I ? <I className="h-4 w-4" aria-hidden="true" /> : null}
                   {it.label}
                 </div>
-                <MaybeLink href={it.href} className={cn("mt-1 block text-base font-semibold", TONE[it.tone])}>
+                <MaybeLink
+                  href={it.href}
+                  className={cn("mt-1 block text-base font-semibold", TONE[it.tone])}
+                >
                   {it.value}
                 </MaybeLink>
               </li>
@@ -97,7 +111,15 @@ export function ExperienceInfoGrid({ dto, className }: ExperienceInfoGridProps) 
   );
 }
 
-function MaybeLink({ href, className, children }: { href?: string; className?: string; children: React.ReactNode }) {
+function MaybeLink({
+  href,
+  className,
+  children,
+}: {
+  href?: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
   if (!href) return <span className={className}>{children}</span>;
   return (
     <a href={href} className={cn(className, "hover:underline")}>

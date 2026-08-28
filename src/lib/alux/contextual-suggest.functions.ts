@@ -235,11 +235,9 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     }
 
     const { createClient } = await import("@supabase/supabase-js");
-    const sb = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { persistSession: false, autoRefreshToken: false } },
-    );
+    const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
     // 1. Destino.
     const { data: dest, error: dErr } = await sb
@@ -311,8 +309,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         if (p.ends_at && p.ends_at < nowIso) continue;
         const biz = p.business_id ? bizById.get(p.business_id) : null;
         if (!biz) continue;
-        if (!promoByBizId.has(biz.id))
-          promoByBizId.set(biz.id, { slug: p.slug, title: p.title });
+        if (!promoByBizId.has(biz.id)) promoByBizId.set(biz.id, { slug: p.slug, title: p.title });
         items.push({
           slug: p.slug,
           title: p.title,
@@ -339,10 +336,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
 
     // 2c. Horarios reales (A7) — precomputa "abierto ahora" por negocio en TZ del destino.
     // Oriente Maya opera en America/Merida (UTC−6 sin DST).
-    const openByBizId = new Map<
-      string,
-      { state: OpenNowState; label: string }
-    >();
+    const openByBizId = new Map<string, { state: OpenNowState; label: string }>();
     if (bizIdsInDest.length) {
       const { data: hoursRows } = await sb
         .from("business_hours")
@@ -350,7 +344,12 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         .in("business_id", bizIdsInDest);
       const byBiz = new Map<
         string,
-        Array<{ day_of_week: number; opens_at: string | null; closes_at: string | null; is_closed: boolean | null }>
+        Array<{
+          day_of_week: number;
+          opens_at: string | null;
+          closes_at: string | null;
+          is_closed: boolean | null;
+        }>
       >();
       for (const r of (hoursRows ?? []) as Array<{
         business_id: string;
@@ -401,12 +400,29 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
       push(otherCats);
     } else {
       // Sólo destino: mezclar categorías principales primero.
-      const buckets = { hoteles: [] as BizRow[], restaurantes: [] as BizRow[], experiencias: [] as BizRow[], otras: [] as BizRow[] };
+      const buckets = {
+        hoteles: [] as BizRow[],
+        restaurantes: [] as BizRow[],
+        experiencias: [] as BizRow[],
+        otras: [] as BizRow[],
+      };
       for (const b of businesses) buckets[bucketOf(b.category_slug)].push(b);
       // Round-robin liviano.
-      const rounds = Math.max(buckets.hoteles.length, buckets.restaurantes.length, buckets.experiencias.length, buckets.otras.length);
+      const rounds = Math.max(
+        buckets.hoteles.length,
+        buckets.restaurantes.length,
+        buckets.experiencias.length,
+        buckets.otras.length,
+      );
       for (let i = 0; i < rounds; i++) {
-        push([buckets.restaurantes[i], buckets.experiencias[i], buckets.hoteles[i], buckets.otras[i]].filter(Boolean) as BizRow[]);
+        push(
+          [
+            buckets.restaurantes[i],
+            buckets.experiencias[i],
+            buckets.hoteles[i],
+            buckets.otras[i],
+          ].filter(Boolean) as BizRow[],
+        );
       }
     }
 
@@ -449,7 +465,8 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     function buildSuggestion(row: BizRow, rationale: string): AluxContextualSuggestion {
       const href = `/oriente-maya/${destination.slug}/${row.category_slug || "empresas"}/${row.slug}`;
       const clean = rationale.trim().replace(/\s+/g, " ");
-      const safeRationale = clean.length > 0 && clean.length <= 200 ? clean : deterministicRationale(row);
+      const safeRationale =
+        clean.length > 0 && clean.length <= 200 ? clean : deterministicRationale(row);
       const hasActiveCoupon = activeCouponSlugSet.has(row.slug.toLowerCase());
       const promo = promoByBizId.get(row.id) ?? null;
       const open = openByBizId.get(row.id);
@@ -505,9 +522,15 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
 
         const contextLine = [
           `Destino: ${destinationLabel}`,
-          currentCategorySlug ? `Categoría activa: ${data.category?.label ?? currentCategorySlug}` : null,
-          currentBusinessSlug ? `Empresa activa: ${data.business?.label ?? currentBusinessSlug}` : null,
-          currentProductSlug ? `Producto activo: ${data.product?.label ?? currentProductSlug}` : null,
+          currentCategorySlug
+            ? `Categoría activa: ${data.category?.label ?? currentCategorySlug}`
+            : null,
+          currentBusinessSlug
+            ? `Empresa activa: ${data.business?.label ?? currentBusinessSlug}`
+            : null,
+          currentProductSlug
+            ? `Producto activo: ${data.product?.label ?? currentProductSlug}`
+            : null,
         ]
           .filter(Boolean)
           .join(" · ");
@@ -520,8 +543,12 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
               hints.travel_style ? `estilo ${hints.travel_style}` : null,
               hints.budget_band ? `presupuesto ${hints.budget_band}` : null,
               hints.dietary?.length ? `dieta ${hints.dietary.join(", ")}` : null,
-              hints.accessibility?.length ? `accesibilidad ${hints.accessibility.join(", ")}` : null,
-              hints.interests?.length ? `intereses ${hints.interests.slice(0, 5).join(", ")}` : null,
+              hints.accessibility?.length
+                ? `accesibilidad ${hints.accessibility.join(", ")}`
+                : null,
+              hints.interests?.length
+                ? `intereses ${hints.interests.slice(0, 5).join(", ")}`
+                : null,
             ]
               .filter(Boolean)
               .join(" · ")
@@ -546,18 +573,24 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           return `Concierge humano activo · ${parts.join(" · ")}. Respeta ese trabajo: NO sugieras esos mismos negocios ni ofrezcas alternativas que los contradigan. Complementa alrededor (traslados, gastronomía cercana, actividades del día, opciones para acompañantes, plan B por clima).`;
         })();
 
-        const intentHintLine = data.travelIntent && data.travelIntent !== "explorando"
-          ? (() => {
-              const map: Record<string, string> = {
-                comparando_hoteles: "El viajero está comparando hoteles ahora — prioriza diferenciadores concretos (zona, ambiente, servicios) y evita generalidades.",
-                buscando_comida: "El viajero está buscando dónde comer — prioriza cocina, ambiente y si aplica horario de cocina.",
-                planeando_noche: "El viajero está planeando su noche — prioriza opciones abiertas después de las 18h y ambiente nocturno.",
-                cazando_cupones: "El viajero está atento a promociones — cuando un candidato tenga [Promo activa] o [Cupón del viajero], mencionalo con naturalidad.",
-                perdido: "El viajero lleva rato explorando sin decidir — sé más directo y ofrece un plan concreto, no una lista neutral.",
-              };
-              return `Intención detectada: ${map[data.travelIntent] ?? ""}`;
-            })()
-          : null;
+        const intentHintLine =
+          data.travelIntent && data.travelIntent !== "explorando"
+            ? (() => {
+                const map: Record<string, string> = {
+                  comparando_hoteles:
+                    "El viajero está comparando hoteles ahora — prioriza diferenciadores concretos (zona, ambiente, servicios) y evita generalidades.",
+                  buscando_comida:
+                    "El viajero está buscando dónde comer — prioriza cocina, ambiente y si aplica horario de cocina.",
+                  planeando_noche:
+                    "El viajero está planeando su noche — prioriza opciones abiertas después de las 18h y ambiente nocturno.",
+                  cazando_cupones:
+                    "El viajero está atento a promociones — cuando un candidato tenga [Promo activa] o [Cupón del viajero], mencionalo con naturalidad.",
+                  perdido:
+                    "El viajero lleva rato explorando sin decidir — sé más directo y ofrece un plan concreto, no una lista neutral.",
+                };
+                return `Intención detectada: ${map[data.travelIntent] ?? ""}`;
+              })()
+            : null;
 
         // A15 · Plan del viajero — memoria de lo que ya decidió.
         const planLine = (() => {
@@ -675,7 +708,10 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         else if (/\b402\b|credit/i.test(message)) aiStatus = "credits_exhausted";
         else aiStatus = "error";
         if (!NoObjectGeneratedError.isInstance(error)) {
-          console.warn("[alux.contextual-suggest] AI enrichment failed, using deterministic fallback:", error);
+          console.warn(
+            "[alux.contextual-suggest] AI enrichment failed, using deterministic fallback:",
+            error,
+          );
         }
         aiRationales = null;
       }

@@ -59,12 +59,10 @@ function Page() {
         </p>
         <h1 className="text-3xl font-semibold">vmx.experience.reviews</h1>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Bloque oficial de confianza y prueba social. Soporta múltiples
-          fuentes (Google, TripAdvisor, propias, Alux, futuras),
-          reputación agregada, respuestas del negocio, moderación
-          consciente y JSON-LD `AggregateRating` para SEO. Preparado
-          para evolución (Alux, idiomas, tipo de viajero) sin
-          duplicarse.
+          Bloque oficial de confianza y prueba social. Soporta múltiples fuentes (Google,
+          TripAdvisor, propias, Alux, futuras), reputación agregada, respuestas del negocio,
+          moderación consciente y JSON-LD `AggregateRating` para SEO. Preparado para evolución
+          (Alux, idiomas, tipo de viajero) sin duplicarse.
         </p>
       </header>
 

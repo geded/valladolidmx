@@ -1,0 +1,69 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-048",
+  "title": "19.44 · G8-Q2D-B · Conexión productiva controlada de Lugares y Atractivos",
+  "status": "Approved",
+  "branch": "feature/omxds-g8-q2d-place-premium-template-v1",
+  "blueprint": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+  "founder_authority": "Autorización Founder G8-Q2D-B sobre la base feature/omxds-g8-q2d-place-premium-template-v1 (HEAD 85c012b72e441a51beaa2cfdca83772cf09b51da). Se autoriza conectar la plantilla reusable premium-entity-place y el bloque vmx.place.premium-q2d con los datos reales administrados desde /cms/lugares mediante: adaptador único PublicPlaceDTO → PlacePremiumSurface; lectura productiva fail-closed pública y preview autenticada restringida a staff editorial; ruta técnica inactiva /oriente-maya/{destino}/lugares/{lugar} que responde 404 público ante draft, archivado, eliminado o territorio incompatible; sección Presentación de la ficha en /cms/lugares/{id}/editar con selector Editorial/Cinematográfica persistible en metadata.presentation_mode, recomendación por tipo y bloqueo de Cinematográfica sin portada gobernada aprobada; medios exclusivamente propios del lugar bajo el flujo gobernado G8-M1 con marcador neutral cuando no existe fotografía acreditada; breadcrumb territorial Inicio → Oriente Maya → Destino → Zona opcional → Lugar; noindex mientras el lugar no esté publicado y JSON-LD preparado por tipo sólo para futura publicación; y el gate validate:q2d:b con veinte casos. Prohibido expresamente: publicar lugares o destinos, crear redirects, tocar la URL histórica /oriente-maya/ek-balam, conectar Qué hacer, incluir fichas de lugar en el sitemap, activar flags, heredar imágenes de destinos u otras entidades, PR, merge y despliegue.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/routes/oriente-maya/$destino.lugares.$slug.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/places/PlacePresentationPanel.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/places/place-presentation.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/places/place-public-contract.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/places/place-public-reads.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/places/place-public-reads.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/cms/places/PlaceEditor.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/place-premium/PlacePremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/places-cms.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    }
+  ],
+  "public_routes": ["/oriente-maya/$destino/lugares/$slug"],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run scripts/route-inventory-coverage.ts",
+    "bun run validate:q2d:a",
+    "bun run validate:q2d:b",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun run governance:product-test",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}

@@ -41,11 +41,7 @@ function crumbsFromContext(
   }));
 }
 
-export function BreadcrumbTerritorial({
-  crumbs,
-  useContextCrumbs = false,
-  className,
-}: Props) {
+export function BreadcrumbTerritorial({ crumbs, useContextCrumbs = false, className }: Props) {
   const ctx = useResolvedContext();
   const effectiveCrumbs: readonly BreadcrumbCrumb[] =
     useContextCrumbs && ctx ? crumbsFromContext(ctx) : (crumbs ?? []);

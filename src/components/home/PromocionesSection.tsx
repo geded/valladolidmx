@@ -10,7 +10,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Container } from "@/components/layout/Container";
 import { SectionHeader } from "@/components/common/SectionHeader";
-import { listFeaturedPromotions, type PublicPromoCard } from "@/lib/promotions/public-reads.functions";
+import {
+  listFeaturedPromotions,
+  type PublicPromoCard,
+} from "@/lib/promotions/public-reads.functions";
 
 export function PromocionesSection({ config }: { config?: Record<string, unknown> } = {}) {
   const fetchPromos = useServerFn(listFeaturedPromotions);
@@ -21,7 +24,10 @@ export function PromocionesSection({ config }: { config?: Record<string, unknown
   });
   const promos: PublicPromoCard[] = data ?? [];
   if (promos.length === 0) return null;
-  const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : "Promociones vigentes";
+  const title =
+    typeof config?.heading === "string" && config.heading.trim()
+      ? config.heading
+      : "Promociones vigentes";
   return (
     <section id="promociones" className="@container py-20 @3xl:py-28">
       <Container>
@@ -38,7 +44,10 @@ export function PromocionesSection({ config }: { config?: Record<string, unknown
             </Link>
           }
         />
-        <ul data-home-grid="promociones" className="grid grid-cols-1 gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
+        <ul
+          data-home-grid="promociones"
+          className="grid grid-cols-1 gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3"
+        >
           {promos.map((p) => (
             <li key={p.slug}>
               <Link

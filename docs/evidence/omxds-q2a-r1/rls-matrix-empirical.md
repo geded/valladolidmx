@@ -9,16 +9,16 @@ helpers reales (`auth.uid()`, `is_editor_or_admin`, `has_permission`, `set_updat
 prueba los ocho sujetos con `SET LOCAL ROLE` + `request.jwt.claim.sub`. No crea
 usuarios ni modifica roles en la base compartida, y nunca escribe en ella.
 
-| Sujeto | read_place_types | read_published_place | read_draft_place | read_place_products | read_place_events | read_place_authorities | write_place_hours | write_place_products | write_place_authorities | exec_duplicate_warnings |
-|---|---|---|---|---|---|---|---|---|---|---|
-| `anon` | filas=15 | filas=1 | filas=0 | filas=1 | filas=1 | DENEGADO | DENEGADO | DENEGADO | DENEGADO | DENEGADO |
-| `traveler` | filas=15 | filas=1 | filas=0 | filas=1 | filas=1 | filas=0 | DENEGADO | DENEGADO | DENEGADO | DENEGADO |
-| `business_owner` | filas=15 | filas=1 | filas=0 | filas=1 | filas=1 | filas=0 | DENEGADO | DENEGADO | DENEGADO | DENEGADO |
-| `concierge` | filas=15 | filas=1 | filas=0 | filas=1 | filas=1 | filas=0 | DENEGADO | DENEGADO | DENEGADO | DENEGADO |
-| `editor` | filas=15 | filas=1 | filas=1 | filas=1 | filas=1 | filas=1 | PERMITIDO | PERMITIDO | PERMITIDO | filas=1 |
-| `admin` | filas=15 | filas=1 | filas=1 | filas=1 | filas=1 | filas=1 | PERMITIDO | PERMITIDO | PERMITIDO | filas=1 |
-| `super_admin` | filas=15 | filas=1 | filas=1 | filas=1 | filas=1 | filas=1 | PERMITIDO | PERMITIDO | PERMITIDO | filas=1 |
-| `service_role` | filas=15 | filas=1 | filas=1 | filas=1 | filas=1 | filas=1 | PERMITIDO | PERMITIDO | PERMITIDO | DENEGADO |
+| Sujeto           | read_place_types | read_published_place | read_draft_place | read_place_products | read_place_events | read_place_authorities | write_place_hours | write_place_products | write_place_authorities | exec_duplicate_warnings |
+| ---------------- | ---------------- | -------------------- | ---------------- | ------------------- | ----------------- | ---------------------- | ----------------- | -------------------- | ----------------------- | ----------------------- |
+| `anon`           | filas=15         | filas=1              | filas=0          | filas=1             | filas=1           | DENEGADO               | DENEGADO          | DENEGADO             | DENEGADO                | DENEGADO                |
+| `traveler`       | filas=15         | filas=1              | filas=0          | filas=1             | filas=1           | filas=0                | DENEGADO          | DENEGADO             | DENEGADO                | DENEGADO                |
+| `business_owner` | filas=15         | filas=1              | filas=0          | filas=1             | filas=1           | filas=0                | DENEGADO          | DENEGADO             | DENEGADO                | DENEGADO                |
+| `concierge`      | filas=15         | filas=1              | filas=0          | filas=1             | filas=1           | filas=0                | DENEGADO          | DENEGADO             | DENEGADO                | DENEGADO                |
+| `editor`         | filas=15         | filas=1              | filas=1          | filas=1             | filas=1           | filas=1                | PERMITIDO         | PERMITIDO            | PERMITIDO               | filas=1                 |
+| `admin`          | filas=15         | filas=1              | filas=1          | filas=1             | filas=1           | filas=1                | PERMITIDO         | PERMITIDO            | PERMITIDO               | filas=1                 |
+| `super_admin`    | filas=15         | filas=1              | filas=1          | filas=1             | filas=1           | filas=1                | PERMITIDO         | PERMITIDO            | PERMITIDO               | filas=1                 |
+| `service_role`   | filas=15         | filas=1              | filas=1          | filas=1             | filas=1           | filas=1                | PERMITIDO         | PERMITIDO            | PERMITIDO               | DENEGADO                |
 
 ## Lecturas del resultado
 

@@ -86,8 +86,8 @@ export function TravelerPublicProfileSurface({
 
         <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Pronto podrás ver los planes de viaje, favoritos y recomendaciones
-            que este viajero decida compartir.
+            Pronto podrás ver los planes de viaje, favoritos y recomendaciones que este viajero
+            decida compartir.
           </p>
           <Link
             to="/arma-tu-viaje"

@@ -3,6 +3,7 @@ name: Founder Scenario Coherence Principle
 description: CV8.S.2+ · El Motor de Eventos genera historias de viaje coherentes (causales, territoriales, temporales) — nunca eventos aislados ni distribuciones planas. Cada T1..T9 declara qué lo habilitó.
 type: constraint
 ---
+
 **Founder Scenario Coherence Principle** (vinculante, CV8.S.2+).
 
 Toda ejecución del Simulation Pack debe representar personas planeando, explorando y viviendo un viaje — no una colección de eventos estadísticos. La calidad se mide por la coherencia de las historias generadas.
@@ -10,6 +11,7 @@ Toda ejecución del Simulation Pack debe representar personas planeando, explora
 ## Regla de Causalidad
 
 Cada evento T1..T9 declara:
+
 - **prerequisite** — evento/condición previa que lo habilitó (transición previa, señal de intención, decisión Alux/Concierge, etc.);
 - **influencer** — capacidad del sistema que intervino;
 - **gap_ms** — tiempo transcurrido desde el evento anterior del mismo sujeto;

@@ -49,9 +49,7 @@ export const signZoneImageUpload = createServerFn({ method: "POST" })
       .slice(2, 8)}-${clean}`;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const storage = context.supabase.storage as any;
-    const { data: signed, error } = await storage
-      .from(BUCKET)
-      .createSignedUploadUrl(path);
+    const { data: signed, error } = await storage.from(BUCKET).createSignedUploadUrl(path);
     if (error) throw error;
     return {
       path: signed.path as string,
@@ -76,10 +74,8 @@ interface RegisterMediaInput {
 export const registerZoneMedia = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: RegisterMediaInput) => {
-    if (!d?.zoneId || !d?.storagePath || !d?.role)
-      throw new Error("invalid_input");
-    if (d.role !== "hero" && d.role !== "gallery")
-      throw new Error("invalid_role");
+    if (!d?.zoneId || !d?.storagePath || !d?.role) throw new Error("invalid_input");
+    if (d.role !== "hero" && d.role !== "gallery") throw new Error("invalid_role");
     return d;
   })
   .handler(async ({ data, context }) => {
@@ -113,14 +109,12 @@ export const registerZoneMedia = createServerFn({ method: "POST" })
         .eq("zone_id", data.zoneId)
         .eq("role", "hero");
 
-      const { error: linkErr } = await db
-        .from("destination_zone_media")
-        .insert({
-          zone_id: data.zoneId,
-          media_asset_id: asset.id,
-          role: "hero",
-          sort_order: 0,
-        });
+      const { error: linkErr } = await db.from("destination_zone_media").insert({
+        zone_id: data.zoneId,
+        media_asset_id: asset.id,
+        role: "hero",
+        sort_order: 0,
+      });
       if (linkErr) throw linkErr;
     } else {
       const { data: last } = await db
@@ -132,14 +126,12 @@ export const registerZoneMedia = createServerFn({ method: "POST" })
         .limit(1)
         .maybeSingle();
       const nextOrder = ((last?.sort_order as number | undefined) ?? -1) + 1;
-      const { error: linkErr } = await db
-        .from("destination_zone_media")
-        .insert({
-          zone_id: data.zoneId,
-          media_asset_id: asset.id,
-          role: "gallery",
-          sort_order: nextOrder,
-        });
+      const { error: linkErr } = await db.from("destination_zone_media").insert({
+        zone_id: data.zoneId,
+        media_asset_id: asset.id,
+        role: "gallery",
+        sort_order: nextOrder,
+      });
       if (linkErr) throw linkErr;
     }
 
@@ -216,8 +208,7 @@ interface ReorderInput {
 export const reorderZoneGallery = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: ReorderInput) => {
-    if (!d?.zoneId || !Array.isArray(d.orderedIds))
-      throw new Error("invalid_input");
+    if (!d?.zoneId || !Array.isArray(d.orderedIds)) throw new Error("invalid_input");
     return d;
   })
   .handler(async ({ data, context }) => {
@@ -255,9 +246,7 @@ export const removeZoneMedia = createServerFn({ method: "POST" })
 
     const { data: link, error: readErr } = await db
       .from("destination_zone_media")
-      .select(
-        "id, role, zone_id, media_asset_id, media_assets:media_assets ( storage_path )",
-      )
+      .select("id, role, zone_id, media_asset_id, media_assets:media_assets ( storage_path )")
       .eq("id", data.zoneMediaId)
       .maybeSingle();
     if (readErr) throw readErr;

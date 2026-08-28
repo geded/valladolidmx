@@ -36,7 +36,9 @@ export const listRedirects = createServerFn({ method: "GET" })
   .handler(async ({ data, context }): Promise<PageRedirect[]> => {
     let q = context.supabase
       .from("page_redirects")
-      .select("id, from_path, to_path, page_composition_id, reason, active, http_status, created_at, updated_at")
+      .select(
+        "id, from_path, to_path, page_composition_id, reason, active, http_status, created_at, updated_at",
+      )
       .order("updated_at", { ascending: false })
       .limit(500);
     if (data.compositionId) q = q.eq("page_composition_id", data.compositionId);

@@ -29,8 +29,8 @@ export function AluxSurface() {
         <ComingSoonBadge label="Activo para Concierge" />
         <h2 className="mt-4 text-lg font-semibold">Workspace operativo</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          El asistente está disponible dentro de los expedientes internos del
-          Concierge Workspace. El acceso público conversacional queda separado.
+          El asistente está disponible dentro de los expedientes internos del Concierge Workspace.
+          El acceso público conversacional queda separado.
         </p>
         <Link
           to="/concierge"

@@ -227,9 +227,7 @@ const AttentionInput = z.object({
 export const getTravelPlansOpsOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.rpc(
-      "admin_travel_plan_overview",
-    );
+    const { data, error } = await context.supabase.rpc("admin_travel_plan_overview");
     if (error) throw new Error(error.message);
     return data as unknown as TravelPlanOpsOverview;
   });
@@ -260,10 +258,9 @@ export const getTravelPlanOperationalDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => DetailInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { data: res, error } = await context.supabase.rpc(
-      "admin_get_travel_plan_detail",
-      { p_plan_id: data.plan_id },
-    );
+    const { data: res, error } = await context.supabase.rpc("admin_get_travel_plan_detail", {
+      p_plan_id: data.plan_id,
+    });
     if (error) throw new Error(error.message);
     return res as unknown as TravelPlanOpsDetail;
   });
@@ -272,13 +269,10 @@ export const getAttentionQueue = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => AttentionInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { data: res, error } = await context.supabase.rpc(
-      "admin_ops_attention_queue",
-      {
-        p_only_mine: data.only_mine ?? false,
-        p_limit: data.limit ?? 60,
-      },
-    );
+    const { data: res, error } = await context.supabase.rpc("admin_ops_attention_queue", {
+      p_only_mine: data.only_mine ?? false,
+      p_limit: data.limit ?? 60,
+    });
     if (error) throw new Error(error.message);
     return res as unknown as AttentionQueueResult;
   });

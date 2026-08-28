@@ -13,10 +13,7 @@
  * añadir un canal dedicado sin refactor de firmas.
  */
 import { emitContextEngineEvent } from "@/lib/context-engine/events";
-import {
-  listDestinationContributors,
-  getContributorsByKind,
-} from "./registry";
+import { listDestinationContributors, getContributorsByKind } from "./registry";
 import type {
   DestinationContributorInput,
   DestinationSignal,

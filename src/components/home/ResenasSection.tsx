@@ -21,7 +21,10 @@ export function ResenasSection({ config }: { config?: Record<string, unknown> } 
     staleTime: 5 * 60 * 1000,
   });
   const reviews = data && data.length > 0 ? data : RESENAS_MOCK;
-  const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.reviews_title");
+  const title =
+    typeof config?.heading === "string" && config.heading.trim()
+      ? config.heading
+      : t("sections.reviews_title");
   return (
     <section id="resenas" className="@container bg-secondary/40 py-20 @3xl:py-28">
       <Container>

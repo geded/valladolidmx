@@ -14,13 +14,11 @@ export function sanitizeSearchQuery(input: string): SanitizeResult {
   if (typeof input !== "string") return { ok: false, error: "Query inválida." };
   const trimmed = input.trim();
   if (trimmed.length === 0) return { ok: false, error: "Query vacía." };
-  if (trimmed.length > MAX_LEN)
-    return { ok: false, error: `Query supera ${MAX_LEN} caracteres.` };
+  if (trimmed.length > MAX_LEN) return { ok: false, error: `Query supera ${MAX_LEN} caracteres.` };
 
   // Rechaza patrones compuestos exclusivamente por wildcards o comodines.
   const wildcardOnly = /^[%_*?\s\\]+$/;
-  if (wildcardOnly.test(trimmed))
-    return { ok: false, error: "Query no puede ser sólo comodines." };
+  if (wildcardOnly.test(trimmed)) return { ok: false, error: "Query no puede ser sólo comodines." };
 
   // Requiere al menos MIN_ALNUM caracteres alfanuméricos (Unicode).
   const alnumMatches = trimmed.match(/[\p{L}\p{N}]/gu);

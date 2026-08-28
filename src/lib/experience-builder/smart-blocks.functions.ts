@@ -13,11 +13,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import type {
-  SmartBlockFilter,
-  SmartBlockOrderBy,
-  SmartBlockQuery,
-} from "./block-contract";
+import type { SmartBlockFilter, SmartBlockOrderBy, SmartBlockQuery } from "./block-contract";
 
 export type SmartBlockJsonValue =
   | string
@@ -37,38 +33,92 @@ export interface SmartBlockResolveResult {
 /** Lista blanca de tablas expuestas al resolver público. */
 const ALLOWED_TABLES: Record<SmartBlockQuery["table"], ReadonlyArray<string>> = {
   destinations: [
-    "id", "slug", "name", "short_description", "hero_image_url",
-    "state_id", "region_id", "country_id", "status", "is_featured", "sort_order",
+    "id",
+    "slug",
+    "name",
+    "short_description",
+    "hero_image_url",
+    "state_id",
+    "region_id",
+    "country_id",
+    "status",
+    "is_featured",
+    "sort_order",
   ],
   destination_zones: [
-    "id", "slug", "name", "short_description", "hero_image_url",
-    "destination_id", "status", "sort_order",
+    "id",
+    "slug",
+    "name",
+    "short_description",
+    "hero_image_url",
+    "destination_id",
+    "status",
+    "sort_order",
   ],
   businesses: [
-    "id", "slug", "name", "short_description", "logo_url", "cover_image_url",
-    "destination_id", "zone_id", "status", "is_featured", "rating_avg",
+    "id",
+    "slug",
+    "name",
+    "short_description",
+    "logo_url",
+    "cover_image_url",
+    "destination_id",
+    "zone_id",
+    "status",
+    "is_featured",
+    "rating_avg",
   ],
   products: [
-    "id", "slug", "name", "short_description", "cover_image_url",
-    "business_id", "destination_id", "price", "currency", "status", "is_featured",
+    "id",
+    "slug",
+    "name",
+    "short_description",
+    "cover_image_url",
+    "business_id",
+    "destination_id",
+    "price",
+    "currency",
+    "status",
+    "is_featured",
   ],
   events: [
-    "id", "slug", "name", "short_description", "cover_image_url",
-    "destination_id", "starts_at", "ends_at", "status", "is_featured",
+    "id",
+    "slug",
+    "name",
+    "short_description",
+    "cover_image_url",
+    "destination_id",
+    "starts_at",
+    "ends_at",
+    "status",
+    "is_featured",
   ],
   promotions: [
-    "id", "slug", "name", "short_description", "cover_image_url",
-    "business_id", "destination_id", "starts_at", "ends_at", "status",
+    "id",
+    "slug",
+    "name",
+    "short_description",
+    "cover_image_url",
+    "business_id",
+    "destination_id",
+    "starts_at",
+    "ends_at",
+    "status",
   ],
   articles: [
-    "id", "slug", "title", "excerpt", "cover_image_url",
-    "destination_id", "published_at", "status", "is_featured",
+    "id",
+    "slug",
+    "title",
+    "excerpt",
+    "cover_image_url",
+    "destination_id",
+    "published_at",
+    "status",
+    "is_featured",
   ],
 };
 
-const ALLOWED_OPS = new Set([
-  "eq", "neq", "gt", "gte", "lt", "lte", "in", "contains", "ilike",
-]);
+const ALLOWED_OPS = new Set(["eq", "neq", "gt", "gte", "lt", "lte", "in", "contains", "ilike"]);
 
 const MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 12;
@@ -83,8 +133,7 @@ function cacheKey(q: SmartBlockQuery): string {
 
 function getPublicClient() {
   const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
-  const key =
-    process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) throw new Error("Supabase public client env missing");
   return createClient<Database>(url, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },

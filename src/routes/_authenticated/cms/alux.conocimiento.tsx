@@ -145,9 +145,7 @@ function AluxKnowledgePage() {
     },
     onSuccess: () => {
       toast.success(
-        draft.status === "published"
-          ? "Entrada publicada y embebida."
-          : "Entrada guardada.",
+        draft.status === "published" ? "Entrada publicada y embebida." : "Entrada guardada.",
       );
       setDraft(EMPTY_DRAFT);
       qc.invalidateQueries({ queryKey: ["alux-knowledge"] });
@@ -185,17 +183,14 @@ function AluxKnowledgePage() {
     onSuccess: (res) => {
       const ok = res.results.filter((r) => r.ok).length;
       const fail = res.results.length - ok;
-      toast.success(
-        `Traducción: ${ok} ok${fail ? ` · ${fail} omitidas/fallidas` : ""}`,
-      );
+      toast.success(`Traducción: ${ok} ok${fail ? ` · ${fail} omitidas/fallidas` : ""}`);
       qc.invalidateQueries({ queryKey: ["alux-knowledge-coverage"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const reviewMut = useMutation({
-    mutationFn: (v: { entryId: string; locale: AluxKbLocale }) =>
-      markReviewedFn({ data: v }),
+    mutationFn: (v: { entryId: string; locale: AluxKbLocale }) => markReviewedFn({ data: v }),
     onSuccess: () => {
       toast.success("Traducción marcada como revisada.");
       qc.invalidateQueries({ queryKey: ["alux-knowledge-coverage"] });
@@ -209,23 +204,18 @@ function AluxKnowledgePage() {
     const embedded = entries.filter((e) => e.embedded_at).length;
     const nonEsLocales = ALUX_KB_LOCALES.filter((l) => l !== "es").length;
     const expected = published * nonEsLocales;
-    const translated = coverage.filter(
-      (c) => c.locale !== "es" && c.embedded,
-    ).length;
+    const translated = coverage.filter((c) => c.locale !== "es" && c.embedded).length;
     return { total, published, embedded, translated, expected };
   }, [entries, coverage]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">
-          Alux · Ola A2
-        </p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">Alux · Ola A2</p>
         <h1 className="text-3xl font-serif">Base de conocimiento</h1>
         <p className="text-muted-foreground max-w-2xl">
-          Entradas curadas del Oriente Maya que Alux usa para responder con
-          contexto real (cultura, clima, transporte, gastronomía, FAQs).
-          Publicar genera automáticamente el embedding.
+          Entradas curadas del Oriente Maya que Alux usa para responder con contexto real (cultura,
+          clima, transporte, gastronomía, FAQs). Publicar genera automáticamente el embedding.
         </p>
         <div className="flex gap-2 pt-2 flex-wrap">
           <Badge variant="secondary">{stats.total} entradas</Badge>
@@ -241,15 +231,9 @@ function AluxKnowledgePage() {
         {/* Editor */}
         <div className="rounded-2xl border bg-card p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-serif text-xl">
-              {draft.id ? "Editar entrada" : "Nueva entrada"}
-            </h2>
+            <h2 className="font-serif text-xl">{draft.id ? "Editar entrada" : "Nueva entrada"}</h2>
             {draft.id && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setDraft(EMPTY_DRAFT)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setDraft(EMPTY_DRAFT)}>
                 <Plus className="h-4 w-4 mr-1" /> Nueva
               </Button>
             )}
@@ -290,9 +274,7 @@ function AluxKnowledgePage() {
                 <Label>Estado</Label>
                 <Select
                   value={draft.status}
-                  onValueChange={(v) =>
-                    setDraft({ ...draft, status: v as AluxKnowledgeStatus })
-                  }
+                  onValueChange={(v) => setDraft({ ...draft, status: v as AluxKnowledgeStatus })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -311,9 +293,7 @@ function AluxKnowledgePage() {
               <Textarea
                 value={draft.summary}
                 rows={2}
-                onChange={(e) =>
-                  setDraft({ ...draft, summary: e.target.value })
-                }
+                onChange={(e) => setDraft({ ...draft, summary: e.target.value })}
                 placeholder="Resumen breve; si existe, se usa como snippet inyectado al prompt."
               />
             </div>
@@ -358,9 +338,7 @@ function AluxKnowledgePage() {
               <Label>Fuente / URL (opcional)</Label>
               <Input
                 value={draft.source_url}
-                onChange={(e) =>
-                  setDraft({ ...draft, source_url: e.target.value })
-                }
+                onChange={(e) => setDraft({ ...draft, source_url: e.target.value })}
                 placeholder="https://..."
               />
             </div>
@@ -402,8 +380,8 @@ function AluxKnowledgePage() {
                     Traducciones (RAG multilingüe)
                   </Label>
                   <p className="text-xs text-muted-foreground mt-1">
-                    ES es la fuente canónica. Los otros idiomas se generan
-                    con IA y quedan como borrador editorial hasta que las revises.
+                    ES es la fuente canónica. Los otros idiomas se generan con IA y quedan como
+                    borrador editorial hasta que las revises.
                   </p>
                 </div>
                 <Button
@@ -487,9 +465,7 @@ function AluxKnowledgePage() {
                               size="sm"
                               variant="ghost"
                               className="h-7 px-2"
-                              onClick={() =>
-                                reviewMut.mutate({ entryId: draft.id!, locale: loc })
-                              }
+                              onClick={() => reviewMut.mutate({ entryId: draft.id!, locale: loc })}
                               disabled={reviewMut.isPending}
                               title="Marcar como revisada"
                             >
@@ -518,8 +494,7 @@ function AluxKnowledgePage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && query.trim().length >= 3)
-                    searchMut.mutate(query.trim());
+                  if (e.key === "Enter" && query.trim().length >= 3) searchMut.mutate(query.trim());
                 }}
               />
               <Button
@@ -613,9 +588,7 @@ function AluxKnowledgePage() {
                         >
                           {e.status}
                         </Badge>
-                        <span className="text-[10px] text-muted-foreground">
-                          {e.category}
-                        </span>
+                        <span className="text-[10px] text-muted-foreground">{e.category}</span>
                       </div>
                     </div>
                   </li>

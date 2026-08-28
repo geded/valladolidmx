@@ -63,14 +63,17 @@ export function ZoneScopesDialog({
     retry: false,
   });
   const regionsQ = useQuery({ queryKey: ["admin", "zones", "regions"], queryFn: fetchRegions });
-  const destsQ = useQuery({ queryKey: ["admin", "zones", "destinations"], queryFn: fetchDestinations });
+  const destsQ = useQuery({
+    queryKey: ["admin", "zones", "destinations"],
+    queryFn: fetchDestinations,
+  });
 
   const [scopeType, setScopeType] = useState<"region" | "destination">("region");
   const [scopeId, setScopeId] = useState<string>("");
   const [role, setRole] = useState<AppRole>("editor");
   const [notes, setNotes] = useState<string>("");
 
-  const options = scopeType === "region" ? regionsQ.data ?? [] : destsQ.data ?? [];
+  const options = scopeType === "region" ? (regionsQ.data ?? []) : (destsQ.data ?? []);
 
   const nameById = useMemo(() => {
     const m = new Map<string, string>();
@@ -135,8 +138,8 @@ export function ZoneScopesDialog({
         </header>
 
         <p className="mt-2 text-xs text-muted-foreground">
-          Acota lo que este usuario puede editar/operar a regiones o destinos específicos.
-          Los roles globales del usuario no cambian.
+          Acota lo que este usuario puede editar/operar a regiones o destinos específicos. Los roles
+          globales del usuario no cambian.
         </p>
 
         <section className="mt-4">
@@ -148,8 +151,7 @@ export function ZoneScopesDialog({
           ) : (
             <ul className="mt-2 space-y-1.5">
               {scopes.map((s) => {
-                const label =
-                  nameById.get(`${s.scope_type}:${s.scope_id}`) ?? s.scope_id;
+                const label = nameById.get(`${s.scope_type}:${s.scope_id}`) ?? s.scope_id;
                 return (
                   <li
                     key={s.id}

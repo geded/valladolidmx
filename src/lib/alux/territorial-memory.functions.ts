@@ -121,9 +121,8 @@ export const getAluxTerritorialMemory = createServerFn({ method: "POST" })
             first_seen:
               (prev.first_seen ?? "") < (v.first_seen ?? "") && prev.first_seen
                 ? prev.first_seen
-                : v.first_seen ?? prev.first_seen,
-            last_seen:
-              (prev.last_seen ?? "") > (v.last_seen ?? "") ? prev.last_seen : v.last_seen,
+                : (v.first_seen ?? prev.first_seen),
+            last_seen: (prev.last_seen ?? "") > (v.last_seen ?? "") ? prev.last_seen : v.last_seen,
           });
         }
       }

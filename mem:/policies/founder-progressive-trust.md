@@ -3,6 +3,7 @@ name: Founder Progressive Trust Principle
 description: La confianza entre viajero y Alux crece progresivamente. Cada interacción aumenta el valor entregado antes de solicitar más información personal. El objetivo es una relación duradera, no un registro rápido.
 type: constraint
 ---
+
 Vinculante desde AC1.4. Aplica a toda estrategia de conversión, permisos y solicitud de datos personales — presente y futura.
 
 Reglas:

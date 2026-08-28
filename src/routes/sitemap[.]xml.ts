@@ -54,11 +54,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         ]);
         const dynamicEntries: SitemapEntry[] = published.map((row) => {
           const priority =
-            typeof row.priority === "number"
-              ? clamp01(row.priority)
-              : row.featured
-                ? 0.8
-                : 0.6;
+            typeof row.priority === "number" ? clamp01(row.priority) : row.featured ? 0.8 : 0.6;
           const prefix = LANDING_KINDS.has(row.page_type) ? "/l" : "/p";
           return {
             path: `${prefix}/${row.slug}`,
@@ -156,7 +152,10 @@ function clamp01(n: number): number {
   return n;
 }
 
-interface EntityRow { slug: string; updated_at: string | null }
+interface EntityRow {
+  slug: string;
+  updated_at: string | null;
+}
 interface BusinessRow extends EntityRow {
   destination_slug: string | null;
   category_slug: string | null;
@@ -181,7 +180,12 @@ async function fetchPublicEntities(): Promise<PublicEntities> {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
   const [d, b, p, e] = await Promise.all([
-    sb.from("destinations").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(500),
+    sb
+      .from("destinations")
+      .select("slug, updated_at")
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .limit(500),
     sb
       .from("businesses")
       .select(
@@ -198,7 +202,12 @@ async function fetchPublicEntities(): Promise<PublicEntities> {
       .eq("status", "published")
       .is("deleted_at", null)
       .limit(2000),
-    sb.from("events").select("slug, updated_at").eq("status", "published").is("deleted_at", null).limit(1000),
+    sb
+      .from("events")
+      .select("slug, updated_at")
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .limit(1000),
   ]);
   const norm = (rows: { slug: string; updated_at: string | null }[] | null) =>
     (rows ?? []).filter((r) => typeof r.slug === "string" && r.slug.length > 0);

@@ -74,10 +74,7 @@ function BecomeHostRoute() {
     >
       <section className="grid gap-4 sm:grid-cols-3">
         {BENEFITS.map(({ Icon, title, body }) => (
-          <div
-            key={title}
-            className="rounded-2xl border border-border bg-card p-6"
-          >
+          <div key={title} className="rounded-2xl border border-border bg-card p-6">
             <Icon className="mb-3 size-5 text-primary" aria-hidden />
             <h2 className="text-sm font-semibold text-foreground">{title}</h2>
             <p className="mt-1 text-xs text-muted-foreground">{body}</p>
@@ -89,16 +86,14 @@ function BecomeHostRoute() {
         <div className="flex items-start gap-3">
           <Briefcase className="mt-0.5 size-5 text-primary" aria-hidden />
           <div className="min-w-0 flex-1">
-            <h2 className="text-base font-semibold text-foreground">
-              ¿Cómo funciona?
-            </h2>
+            <h2 className="text-base font-semibold text-foreground">¿Cómo funciona?</h2>
             <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
               <li>Crea tu cuenta o inicia sesión.</li>
               <li>Registra tu empresa desde el Portal Empresarial.</li>
               <li>
-                Activa el modo <strong className="text-foreground">Empresa</strong>{" "}
-                desde tu menú de usuario — al estilo Airbnb, puedes alternar
-                entre Viajero y Empresa sin cerrar sesión.
+                Activa el modo <strong className="text-foreground">Empresa</strong> desde tu menú de
+                usuario — al estilo Airbnb, puedes alternar entre Viajero y Empresa sin cerrar
+                sesión.
               </li>
             </ol>
             <div className="mt-4 flex flex-wrap gap-2">

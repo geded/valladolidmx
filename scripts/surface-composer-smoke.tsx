@@ -10,13 +10,8 @@
  *  5. Los IDs son deterministas (idempotencia al reimportar).
  */
 import { renderToStaticMarkup } from "react-dom/server";
-import {
-  KIT_BLOCK_RENDERERS,
-} from "../src/lib/experience-builder/kit-blocks";
-import {
-  SurfaceComposer,
-  isKitOnlyTree,
-} from "../src/lib/experience-builder/surface-composer";
+import { KIT_BLOCK_RENDERERS } from "../src/lib/experience-builder/kit-blocks";
+import { SurfaceComposer, isKitOnlyTree } from "../src/lib/experience-builder/surface-composer";
 import { KIT_SEEDS } from "../src/lib/experience-builder/kit-seeds";
 import "../src/lib/experience-builder/block-library";
 

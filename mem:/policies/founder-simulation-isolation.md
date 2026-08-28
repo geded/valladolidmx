@@ -3,6 +3,7 @@ name: Founder Simulation Isolation Principle
 description: CV8.S+ · Todo dato simulado del Visitor Intelligence Center debe ser inequívocamente identificable, nunca confundible con producción y siempre filtrable en cada consulta (real / simulado / real+simulado autorizado).
 type: constraint
 ---
+
 **Founder Simulation Isolation Principle** (vinculante, CV8.S+).
 
 Complementa a `founder-reproducible-simulation`. Rige la separación operativa entre datos reales y simulados.

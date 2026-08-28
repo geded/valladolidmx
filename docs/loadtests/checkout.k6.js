@@ -8,7 +8,7 @@ export const options = {
   },
   thresholds: {
     http_req_duration: ["p(95)<1500"],
-    http_req_failed:   ["rate<0.01"],
+    http_req_failed: ["rate<0.01"],
   },
 };
 
@@ -20,11 +20,7 @@ export default function () {
     "Content-Type": "application/json",
     Authorization: `Bearer ${BEARER}`,
   };
-  const res = http.post(
-    `${BASE}/_serverFn/createCheckoutSession`,
-    JSON.stringify({}),
-    { headers },
-  );
+  const res = http.post(`${BASE}/_serverFn/createCheckoutSession`, JSON.stringify({}), { headers });
   check(res, { "status 2xx": (r) => r.status >= 200 && r.status < 300 });
   sleep(1);
 }

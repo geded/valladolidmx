@@ -38,11 +38,7 @@ export type MediaLocale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: MediaLocale = "es";
 
 export type MediaTextSource = "none" | "ai_pending" | "ai" | "human";
-export type MediaReviewState =
-  | "unreviewed"
-  | "ai_suggested"
-  | "approved"
-  | "needs_revision";
+export type MediaReviewState = "unreviewed" | "ai_suggested" | "approved" | "needs_revision";
 
 export interface MediaTranslationLike {
   locale: string | null;
@@ -84,10 +80,7 @@ function normalizeLocale(locale: unknown): MediaLocale {
   return DEFAULT_LOCALE;
 }
 
-function findTranslation(
-  media: ResolvableMedia,
-  locale: MediaLocale,
-): MediaTranslationLike | null {
+function findTranslation(media: ResolvableMedia, locale: MediaLocale): MediaTranslationLike | null {
   const list = media.translations ?? [];
   for (const t of list) {
     if (!t?.locale) continue;

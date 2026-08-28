@@ -45,13 +45,16 @@ function admin() {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
-function sha256(buf) { return createHash("sha256").update(buf).digest("hex"); }
+function sha256(buf) {
+  return createHash("sha256").update(buf).digest("hex");
+}
 
 async function buildVerticalReal() {
   // 1600×2400 (retrato 2:3). Composición sintética con degradado + bandas
   // para que los tres formatos derivados (avif/webp/jpeg) tengan variación
   // real de luminancia y color (útil para inspección visual).
-  const W = 1600, H = 2400;
+  const W = 1600,
+    H = 2400;
   const svg = Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
        <defs>
@@ -63,23 +66,26 @@ async function buildVerticalReal() {
        </defs>
        <rect width="100%" height="100%" fill="url(#g)"/>
        <g fill="#ffffff" font-family="serif" text-anchor="middle" opacity="0.85">
-         <text x="${W/2}" y="${H*0.42}" font-size="120">Pilot v1.1</text>
-         <text x="${W/2}" y="${H*0.50}" font-size="60">Vertical 2:3 · 1600×2400</text>
-         <text x="${W/2}" y="${H*0.58}" font-size="48">H3·A4·M1 · test-only</text>
+         <text x="${W / 2}" y="${H * 0.42}" font-size="120">Pilot v1.1</text>
+         <text x="${W / 2}" y="${H * 0.5}" font-size="60">Vertical 2:3 · 1600×2400</text>
+         <text x="${W / 2}" y="${H * 0.58}" font-size="48">H3·A4·M1 · test-only</text>
        </g>
        <g stroke="#ffffff" stroke-width="6" opacity="0.35" fill="none">
-         <rect x="80" y="80" width="${W-160}" height="${H-160}" rx="40"/>
+         <rect x="80" y="80" width="${W - 160}" height="${H - 160}" rx="40"/>
        </g>
      </svg>`,
   );
   const buf = await sharp(svg)
     .jpeg({ quality: 88, mozjpeg: true })
-    .withMetadata({ orientation: 1, exif: {
-      IFD0: {
-        Copyright: "Valladolid.mx · pilot v1.1 · test-only asset",
-        Software: "sharp",
+    .withMetadata({
+      orientation: 1,
+      exif: {
+        IFD0: {
+          Copyright: "Valladolid.mx · pilot v1.1 · test-only asset",
+          Software: "sharp",
+        },
       },
-    } })
+    })
     .toBuffer();
   const meta = await sharp(buf).metadata();
   return { buf, meta };
@@ -90,7 +96,7 @@ async function buildPoisoned() {
   // fallará al leer metadata (input is not a valid image).
   const buf = Buffer.from(
     "H3A4-M1-PILOT-V11 · POISONED · not a real image · " +
-    "forced-failure test on a valid media_assets row.\n",
+      "forced-failure test on a valid media_assets row.\n",
     "utf8",
   );
   return { buf };
@@ -98,7 +104,9 @@ async function buildPoisoned() {
 
 async function upload(sb, bucket, path, buf, contentType) {
   const up = await sb.storage.from(bucket).upload(path, buf, {
-    contentType, upsert: false, cacheControl: "no-store",
+    contentType,
+    upsert: false,
+    cacheControl: "no-store",
   });
   if (up.error) throw new Error(`upload ${bucket}/${path}: ${up.error.message}`);
 }
@@ -139,9 +147,15 @@ async function main() {
     title: "Pilot v1.1 · Vertical 2:3 · test-only",
     usage_context: null,
   });
-  summary.assets.vertical = { id: vId, bucket: BUCKET, path: vPath,
-    width: V.meta.width, height: V.meta.height, bytes: V.buf.length,
-    sha256: sha256(V.buf) };
+  summary.assets.vertical = {
+    id: vId,
+    bucket: BUCKET,
+    path: vPath,
+    width: V.meta.width,
+    height: V.meta.height,
+    bytes: V.buf.length,
+    sha256: sha256(V.buf),
+  };
 
   // B. POISONED
   const P = await buildPoisoned();
@@ -165,8 +179,13 @@ async function main() {
     title: "Pilot v1.1 · POISONED · forced-failure test-only",
     usage_context: null,
   });
-  summary.assets.poisoned = { id: pId, bucket: BUCKET, path: pPath,
-    bytes: P.buf.length, sha256: sha256(P.buf) };
+  summary.assets.poisoned = {
+    id: pId,
+    bucket: BUCKET,
+    path: pPath,
+    bytes: P.buf.length,
+    sha256: sha256(P.buf),
+  };
 
   const outPath = join(OUT, "prepared.json");
   await writeFile(outPath, JSON.stringify(summary, null, 2));
@@ -174,4 +193,7 @@ async function main() {
   console.log(`\n→ manifest: ${outPath}`);
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

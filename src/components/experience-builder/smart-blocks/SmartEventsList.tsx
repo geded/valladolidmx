@@ -25,13 +25,7 @@ function formatDate(iso?: string | null): string {
   }
 }
 
-export function SmartEventsList({
-  items,
-  title,
-}: {
-  items: SmartEventItem[];
-  title?: string;
-}) {
+export function SmartEventsList({ items, title }: { items: SmartEventItem[]; title?: string }) {
   if (!items?.length) return <SmartEmpty message="No hay eventos programados." />;
   return (
     <section className="space-y-4">

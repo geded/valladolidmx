@@ -46,7 +46,9 @@ export function IntentBadge({ level }: { level: IntentLevel }) {
 
 export function ConciergeStatusBadge({ status }: { status: string | null | undefined }) {
   if (!status) {
-    return <span className={cn(base, "border-border text-muted-foreground bg-muted")}>Sin caso</span>;
+    return (
+      <span className={cn(base, "border-border text-muted-foreground bg-muted")}>Sin caso</span>
+    );
   }
   const s = status.toLowerCase();
   const closed = ["closed", "cancelled", "won", "lost"].includes(s);
@@ -66,7 +68,11 @@ export function ConciergeStatusBadge({ status }: { status: string | null | undef
 
 export function ProposalStatusBadge({ status }: { status: string | null | undefined }) {
   if (!status) {
-    return <span className={cn(base, "border-border text-muted-foreground bg-muted")}>Sin propuesta</span>;
+    return (
+      <span className={cn(base, "border-border text-muted-foreground bg-muted")}>
+        Sin propuesta
+      </span>
+    );
   }
   const s = status.toLowerCase();
   const map: Record<string, string> = {

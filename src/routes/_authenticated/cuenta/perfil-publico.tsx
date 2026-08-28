@@ -155,7 +155,12 @@ function PerfilPublicoPage() {
     return <p className="text-sm text-muted-foreground">Cargando…</p>;
   }
 
-  const handleFeedback = renderHandleFeedback(form.public_handle, handleStatus, checking, originalHandle);
+  const handleFeedback = renderHandleFeedback(
+    form.public_handle,
+    handleStatus,
+    checking,
+    originalHandle,
+  );
   const publicPreview = {
     name:
       [personal?.first_name, personal?.last_name].filter(Boolean).join(" ").trim() ||
@@ -173,9 +178,8 @@ function PerfilPublicoPage() {
       </p>
       <h1 className="mt-2 text-4xl">Perfil público</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        Tu perfil público es <strong>opcional</strong>. Complétalo cuando
-        quieras compartir tu URL <code>/viajero/tu-handle</code> con otros
-        viajeros o en redes sociales.
+        Tu perfil público es <strong>opcional</strong>. Complétalo cuando quieras compartir tu URL{" "}
+        <code>/viajero/tu-handle</code> con otros viajeros o en redes sociales.
       </p>
 
       {/* Ventajas de activar el perfil público */}
@@ -209,9 +213,8 @@ function PerfilPublicoPage() {
           <p className="mt-3 flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-200">
             <Lock className="mt-0.5 size-4 shrink-0" aria-hidden />
             <span>
-              Para completar tu perfil público necesitas completar tu perfil personal al 100%.
-              Con eso mostramos tu nombre, foto, país e idioma sin volver a
-              pedírtelos aquí.
+              Para completar tu perfil público necesitas completar tu perfil personal al 100%. Con
+              eso mostramos tu nombre, foto, país e idioma sin volver a pedírtelos aquí.
             </span>
           </p>
         </div>
@@ -230,10 +233,7 @@ function PerfilPublicoPage() {
             <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               Así te verán (datos de tu perfil)
             </p>
-            <Link
-              to="/cuenta/perfil"
-              className="text-xs font-medium text-primary hover:underline"
-            >
+            <Link to="/cuenta/perfil" className="text-xs font-medium text-primary hover:underline">
               Editar en Mi Perfil →
             </Link>
           </div>
@@ -280,7 +280,8 @@ function PerfilPublicoPage() {
             />
           </div>
           <span className="text-xs text-muted-foreground">
-            3–24 caracteres. Solo letras, números y guion bajo. Este es el nombre único que aparecerá en tu URL pública y podrás compartir en redes sociales.
+            3–24 caracteres. Solo letras, números y guion bajo. Este es el nombre único que
+            aparecerá en tu URL pública y podrás compartir en redes sociales.
           </span>
           {handleFeedback}
         </label>
@@ -299,7 +300,8 @@ function PerfilPublicoPage() {
             placeholder="Amante de cenotes, tacos y arte colonial."
           />
           <span className="text-xs text-muted-foreground">
-            Aparece junto a tus reseñas y en tu perfil público. Cuéntale a otros viajeros qué te apasiona del Oriente Maya.
+            Aparece junto a tus reseñas y en tu perfil público. Cuéntale a otros viajeros qué te
+            apasiona del Oriente Maya.
           </span>
         </label>
 
@@ -313,9 +315,7 @@ function PerfilPublicoPage() {
             className="mt-1"
           />
           <span className="grid gap-1 text-sm">
-            <span className="font-medium text-foreground">
-              Completar tu perfil público
-            </span>
+            <span className="font-medium text-foreground">Completar tu perfil público</span>
             <span className="text-xs text-muted-foreground">
               {completion.complete
                 ? "Cuando lo completas, cualquier persona con tu URL podrá ver tu nombre, foto, país e idiomas. Puedes desactivarlo en cualquier momento."
@@ -325,9 +325,7 @@ function PerfilPublicoPage() {
         </label>
 
         {mutation.error ? (
-          <p className="text-sm text-destructive">
-            {mapError((mutation.error as Error).message)}
-          </p>
+          <p className="text-sm text-destructive">{mapError((mutation.error as Error).message)}</p>
         ) : null}
 
         <div className="flex flex-wrap items-center gap-3">
@@ -430,7 +428,6 @@ function mapError(msg: string): string {
     return "Debes completar tu perfil al 100% antes de completar tu perfil público.";
   if (msg.includes("handle_taken")) return "Ese handle ya está en uso.";
   if (msg.includes("reserved_handle")) return "Ese handle está reservado.";
-  if (msg.includes("invalid_handle"))
-    return "El handle no cumple el formato requerido.";
+  if (msg.includes("invalid_handle")) return "El handle no cumple el formato requerido.";
   return msg;
 }

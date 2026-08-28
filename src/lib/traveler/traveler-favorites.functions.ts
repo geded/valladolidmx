@@ -16,8 +16,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export type FavoriteEntityKind = "business" | "product" | "promotion";
 
 const KINDS = new Set<FavoriteEntityKind>(["business", "product", "promotion"]);
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface FavoriteRow {
   id: string;
@@ -68,7 +67,10 @@ export const listMyFavorites = createServerFn({ method: "GET" })
     };
     for (const r of rows) byKind[r.entity_kind].push(r.entity_id);
 
-    const lookup = new Map<string, { title: string; slug: string | null; subtitle: string | null }>();
+    const lookup = new Map<
+      string,
+      { title: string; slug: string | null; subtitle: string | null }
+    >();
 
     if (byKind.business.length > 0) {
       const { data } = await context.supabase
@@ -132,27 +134,25 @@ export const listMyFavorites = createServerFn({ method: "GET" })
 export const addFavorite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(validateInput)
-  .handler(
-    async ({ context, data }): Promise<{ created: boolean; favorite: FavoriteRow }> => {
-      const { data: row, error } = await context.supabase
-        .from("traveler_favorites")
-        .upsert(
-          {
-            user_id: context.userId,
-            entity_kind: data.entity_kind,
-            entity_id: data.entity_id,
-          },
-          { onConflict: "user_id,entity_kind,entity_id", ignoreDuplicates: false },
-        )
-        .select("id, entity_kind, entity_id, created_at")
-        .single();
-      if (error) throw new Error(`favorite_add_failed: ${error.message}`);
-      // `created_at` no cambia si la fila preexistía (PostgREST devuelve
-      // la fila resultante del upsert sin actualizar created_at porque
-      // no está incluido en `update`).
-      return { created: true, favorite: row as FavoriteRow };
-    },
-  );
+  .handler(async ({ context, data }): Promise<{ created: boolean; favorite: FavoriteRow }> => {
+    const { data: row, error } = await context.supabase
+      .from("traveler_favorites")
+      .upsert(
+        {
+          user_id: context.userId,
+          entity_kind: data.entity_kind,
+          entity_id: data.entity_id,
+        },
+        { onConflict: "user_id,entity_kind,entity_id", ignoreDuplicates: false },
+      )
+      .select("id, entity_kind, entity_id, created_at")
+      .single();
+    if (error) throw new Error(`favorite_add_failed: ${error.message}`);
+    // `created_at` no cambia si la fila preexistía (PostgREST devuelve
+    // la fila resultante del upsert sin actualizar created_at porque
+    // no está incluido en `update`).
+    return { created: true, favorite: row as FavoriteRow };
+  });
 
 /**
  * removeFavorite — Elimina el favorito si existe. Idempotente:
@@ -197,13 +197,11 @@ export const toggleFavorite = createServerFn({ method: "POST" })
       if (delErr) throw new Error(`favorite_toggle_delete_failed: ${delErr.message}`);
       return { active: false };
     }
-    const { error: insErr } = await context.supabase
-      .from("traveler_favorites")
-      .insert({
-        user_id: context.userId,
-        entity_kind: data.entity_kind,
-        entity_id: data.entity_id,
-      });
+    const { error: insErr } = await context.supabase.from("traveler_favorites").insert({
+      user_id: context.userId,
+      entity_kind: data.entity_kind,
+      entity_id: data.entity_id,
+    });
     if (insErr) {
       // Race: si otra petición lo creó entre el SELECT y el INSERT, el
       // unique aborta y dejamos el favorito como activo (idempotente).

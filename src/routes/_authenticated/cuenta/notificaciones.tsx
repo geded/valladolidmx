@@ -48,15 +48,23 @@ function NotificationPreferencesPage() {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
 
-  const { data, isLoading, error: queryError } = useQuery({
+  const {
+    data,
+    isLoading,
+    error: queryError,
+  } = useQuery({
     queryKey: ["unc", "preferences", "me"],
     queryFn: () => fetcher(),
     staleTime: 30_000,
   });
 
   const mutation = useMutation({
-    mutationFn: (vars: { category: PreferenceRow["category"]; channel: PreferenceRow["channel"]; enabled: boolean; consent: boolean }) =>
-      updater({ data: vars }),
+    mutationFn: (vars: {
+      category: PreferenceRow["category"];
+      channel: PreferenceRow["channel"];
+      enabled: boolean;
+      consent: boolean;
+    }) => updater({ data: vars }),
     onSuccess: () => {
       setError(null);
       void queryClient.invalidateQueries({ queryKey: ["unc", "preferences", "me"] });
@@ -94,15 +102,13 @@ function NotificationPreferencesPage() {
         </p>
         <h1 className="mt-1 text-2xl font-semibold">Preferencias y consentimiento</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          Elige por dónde quieres recibir cada tipo de notificación. Las categorías de
-          Transaccional y Seguridad están siempre activas para proteger tus reservas y tu cuenta.
+          Elige por dónde quieres recibir cada tipo de notificación. Las categorías de Transaccional
+          y Seguridad están siempre activas para proteger tus reservas y tu cuenta.
         </p>
       </header>
 
       {(error ?? queryError) ? (
-        <p className="text-sm text-destructive">
-          {error ?? (queryError as Error)?.message}
-        </p>
+        <p className="text-sm text-destructive">{error ?? (queryError as Error)?.message}</p>
       ) : null}
 
       {isLoading ? (
@@ -113,10 +119,7 @@ function NotificationPreferencesPage() {
             const rows = grouped.get(cat) ?? [];
             const meta = CATEGORY_LABELS[cat];
             return (
-              <section
-                key={cat}
-                className="rounded-lg border border-border bg-card p-5"
-              >
+              <section key={cat} className="rounded-lg border border-border bg-card p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h2 className="text-base font-semibold">{meta.title}</h2>

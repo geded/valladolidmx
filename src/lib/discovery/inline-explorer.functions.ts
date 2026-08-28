@@ -130,7 +130,17 @@ export const getInlineCategoryExplorer = createServerFn({ method: "GET" })
       .range(from, to);
 
     const items: InlineExplorerItem[] = (rows ?? []).map((r) => {
-      const locs = ((r as { business_locations?: Array<{ latitude: number | null; longitude: number | null; address_line1: string | null; is_primary: boolean | null }> }).business_locations) ?? [];
+      const locs =
+        (
+          r as {
+            business_locations?: Array<{
+              latitude: number | null;
+              longitude: number | null;
+              address_line1: string | null;
+              is_primary: boolean | null;
+            }>;
+          }
+        ).business_locations ?? [];
       const primary = locs.find((l) => l?.is_primary) ?? locs[0] ?? null;
       const catSlug =
         (r as { primary_category?: { slug?: string | null } | null }).primary_category?.slug ??

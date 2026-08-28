@@ -35,17 +35,14 @@ async function assertAdmin(context: {
 export const getPaymentsDemoModeAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ enabled: boolean }> => {
-    await assertAdmin(
-      context as unknown as Parameters<typeof assertAdmin>[0],
-    );
+    await assertAdmin(context as unknown as Parameters<typeof assertAdmin>[0]);
     const { data, error } = await context.supabase
       .from("platform_settings")
       .select("value")
       .eq("key", KEY)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    const enabled =
-      typeof data?.value === "boolean" ? data.value : Boolean(data?.value);
+    const enabled = typeof data?.value === "boolean" ? data.value : Boolean(data?.value);
     return { enabled };
   });
 
@@ -58,9 +55,7 @@ export const setPaymentsDemoModeAdmin = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }): Promise<{ enabled: boolean }> => {
-    await assertAdmin(
-      context as unknown as Parameters<typeof assertAdmin>[0],
-    );
+    await assertAdmin(context as unknown as Parameters<typeof assertAdmin>[0]);
     const { error } = await context.supabase.from("platform_settings").upsert(
       {
         key: KEY,

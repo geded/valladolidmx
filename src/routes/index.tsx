@@ -18,10 +18,7 @@ const ContinuityWelcomeSurface = lazy(() =>
 import { useSectionEditWrap } from "@/components/experience-builder/SectionEditOverlay";
 import { buildPublicHead, pickFirstMediaUrl, webPageJsonLd } from "@/lib/discovery/seo";
 import heroLcpImage from "@/assets/brand/hero/bg01.webp";
-import {
-  getDiscoverySection,
-  type DiscoverySectionKind,
-} from "@/lib/discovery/sections-registry";
+import { getDiscoverySection, type DiscoverySectionKind } from "@/lib/discovery/sections-registry";
 
 const publishedHomeQuery = queryOptions({
   queryKey: ["eb", "published-home", "default"],
@@ -31,7 +28,9 @@ const publishedHomeQuery = queryOptions({
 
 export const Route = createFileRoute("/")({
   head: (ctx) => {
-    const loaderData = ctx.loaderData as { seo?: Record<string, unknown> | null; fallbackImage?: string | null } | undefined;
+    const loaderData = ctx.loaderData as
+      | { seo?: Record<string, unknown> | null; fallbackImage?: string | null }
+      | undefined;
     const seo = (loaderData?.seo ?? {}) as {
       title?: string;
       description?: string;
@@ -50,7 +49,9 @@ export const Route = createFileRoute("/")({
       ogType: "website",
       ogImage,
       noindex: Boolean(seo.noindex),
-      jsonLd: seo.noindex ? undefined : [webPageJsonLd({ title, description, path, image: ogImage })],
+      jsonLd: seo.noindex
+        ? undefined
+        : [webPageJsonLd({ title, description, path, image: ogImage })],
     });
     // H2 · LCP preload: la imagen del hero de la Home es el LCP dominante en móvil.
     return {
@@ -67,7 +68,7 @@ export const Route = createFileRoute("/")({
     const published = await context.queryClient.ensureQueryData(publishedHomeQuery);
     return {
       seo: published?.snapshot?.chrome?.seo ?? null,
-      fallbackImage: published?.snapshot ? pickFirstMediaUrl(published.snapshot) ?? null : null,
+      fallbackImage: published?.snapshot ? (pickFirstMediaUrl(published.snapshot) ?? null) : null,
     };
   },
   component: HomePage,

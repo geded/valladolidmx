@@ -26,9 +26,7 @@
 export const PUSH_SW_PATH = "/push-sw.js" as const;
 export const PUSH_SW_SCOPE = "/push/" as const;
 
-export type PushSupport =
-  | { supported: true }
-  | { supported: false; reason: string };
+export type PushSupport = { supported: true } | { supported: false; reason: string };
 
 type PushEvent =
   | "skipped"

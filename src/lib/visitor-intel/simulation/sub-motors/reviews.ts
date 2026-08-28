@@ -54,46 +54,65 @@ export function emitReviewLoop(ctx: SubMotorContext): ReviewsOutcome {
   // 1. Solicitud de reseña (post-experiencia).
   const requestGap = sampleGap(prng, 12 * HOUR_MS, 3 * DAY_MS);
   cursor += requestGap;
-  events.push(makeEvent(ctx, "decision.offered", cursor, {
-    decision: {
-      capability: "reviews.request",
-      recommendation_id: reviewRequestId,
-      rationale: "Solicitud de reseña tras experiencia completada",
-      accepted: null,
-    },
-  }, {
-    prerequisite: ctx.from_transition,
-    influencer: "reviews",
-    gap_ms: requestGap,
-    scenario_probability: 1,
-  }));
+  events.push(
+    makeEvent(
+      ctx,
+      "decision.offered",
+      cursor,
+      {
+        decision: {
+          capability: "reviews.request",
+          recommendation_id: reviewRequestId,
+          rationale: "Solicitud de reseña tras experiencia completada",
+          accepted: null,
+        },
+      },
+      {
+        prerequisite: ctx.from_transition,
+        influencer: "reviews",
+        gap_ms: requestGap,
+        scenario_probability: 1,
+      },
+    ),
+  );
 
   // 2. Publicación — no todos reseñan.
   const publishRate = 0.25 + 0.35 * profile.propensities.concierge_acceptance;
   if (!prng.bool(publishRate)) {
     return {
-      events, cursor_ms: cursor,
-      review_published: false, rating: null,
-      business_responded: false, ambassador_modifier: 1,
+      events,
+      cursor_ms: cursor,
+      review_published: false,
+      rating: null,
+      business_responded: false,
+      ambassador_modifier: 1,
     };
   }
 
   const publishGap = sampleGap(prng, 4 * HOUR_MS, 7 * DAY_MS);
   cursor += publishGap;
   const rating = prng.int(3, 5); // sesgado positivo tras experiencia completada
-  events.push(makeEvent(ctx, "intent.signal", cursor, {
-    intent: {
-      action: "reviews.published",
-      target_type: "business",
-      target_id: ctx.destination,
-      strength: rating / 5,
-    },
-  }, {
-    prerequisite: reviewRequestId,
-    influencer: "reviews",
-    gap_ms: publishGap,
-    scenario_probability: publishRate,
-  }));
+  events.push(
+    makeEvent(
+      ctx,
+      "intent.signal",
+      cursor,
+      {
+        intent: {
+          action: "reviews.published",
+          target_type: "business",
+          target_id: ctx.destination,
+          strength: rating / 5,
+        },
+      },
+      {
+        prerequisite: reviewRequestId,
+        influencer: "reviews",
+        gap_ms: publishGap,
+        scenario_probability: publishRate,
+      },
+    ),
+  );
 
   // 3. Respuesta del negocio (probabilidad alta si rating >=4).
   const respondRate = rating >= 4 ? 0.75 : 0.55;
@@ -102,28 +121,40 @@ export function emitReviewLoop(ctx: SubMotorContext): ReviewsOutcome {
     const respondGap = sampleGap(prng, 2 * HOUR_MS, 3 * DAY_MS);
     cursor += respondGap;
     businessResponded = true;
-    events.push(makeEvent(ctx, "decision.offered", cursor, {
-      decision: {
-        capability: "reviews.business_response",
-        recommendation_id: reviewRequestId,
-        rationale: rating >= 4 ? "Agradecimiento por reseña positiva" : "Atención a reseña con áreas de mejora",
-        accepted: true,
-      },
-    }, {
-      prerequisite: reviewRequestId,
-      influencer: "reviews.business_response",
-      gap_ms: respondGap,
-      scenario_probability: respondRate,
-    }));
+    events.push(
+      makeEvent(
+        ctx,
+        "decision.offered",
+        cursor,
+        {
+          decision: {
+            capability: "reviews.business_response",
+            recommendation_id: reviewRequestId,
+            rationale:
+              rating >= 4
+                ? "Agradecimiento por reseña positiva"
+                : "Atención a reseña con áreas de mejora",
+            accepted: true,
+          },
+        },
+        {
+          prerequisite: reviewRequestId,
+          influencer: "reviews.business_response",
+          gap_ms: respondGap,
+          scenario_probability: respondRate,
+        },
+      ),
+    );
   }
 
   // 4. Boost para T9 (ambassador): rating alto + respuesta del negocio.
-  const ambassador_modifier =
-    rating >= 4 ? (businessResponded ? 1.5 : 1.25) : 1;
+  const ambassador_modifier = rating >= 4 ? (businessResponded ? 1.5 : 1.25) : 1;
 
   return {
-    events, cursor_ms: cursor,
-    review_published: true, rating,
+    events,
+    cursor_ms: cursor,
+    review_published: true,
+    rating,
     business_responded: businessResponded,
     ambassador_modifier,
   };

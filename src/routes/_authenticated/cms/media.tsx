@@ -4,10 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import { listMediaCms } from "@/lib/cms/reads.functions";
-import {
-  suggestMediaAlt,
-  suggestMediaAltBatch,
-} from "@/lib/cms/media-intelligence.functions";
+import { suggestMediaAlt, suggestMediaAltBatch } from "@/lib/cms/media-intelligence.functions";
 import { MediaTranslationsSheet } from "@/components/cms/media/MediaTranslationsSheet";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/toast";
@@ -20,12 +17,7 @@ type Row = {
   alt_text: string | null;
   alt_text_ai: string | null;
   alt_text_source: "none" | "ai_pending" | "ai" | "human" | null;
-  review_state:
-    | "unreviewed"
-    | "ai_suggested"
-    | "approved"
-    | "needs_revision"
-    | null;
+  review_state: "unreviewed" | "ai_suggested" | "approved" | "needs_revision" | null;
   mime_type: string | null;
   width: number | null;
   height: number | null;
@@ -35,10 +27,7 @@ type Row = {
 
 export const Route = createFileRoute("/_authenticated/cms/media")({
   head: () => ({
-    meta: [
-      { title: "Media · CMS Studio" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Media · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: MediaPage,
 });
@@ -61,9 +50,7 @@ function SuggestAltButton({ mediaId, disabled }: { mediaId: string; disabled?: b
             toast.success("Propuesta IA guardada. Revisa y aprueba en el editor.");
           }
         } catch (err) {
-          toast.error(
-            err instanceof Error ? err.message : "Error al sugerir ALT",
-          );
+          toast.error(err instanceof Error ? err.message : "Error al sugerir ALT");
         } finally {
           setLoading(false);
         }
@@ -81,9 +68,7 @@ function TranslateButton({ mediaId }: { mediaId: string }) {
       <Button size="sm" variant="ghost" onClick={() => setOpen(true)}>
         Traducir
       </Button>
-      {open && (
-        <MediaTranslationsSheet mediaId={mediaId} onClose={() => setOpen(false)} />
-      )}
+      {open && <MediaTranslationsSheet mediaId={mediaId} onClose={() => setOpen(false)} />}
     </>
   );
 }
@@ -134,7 +119,6 @@ function MediaPage() {
       queryKey="media"
       fn={listMediaCms}
       title="Biblioteca multimedia"
-
       description="Media Intelligence Pipeline · IA propone, el editor decide."
       rowKey={(r) => r.id}
       emptyMessage="Sin activos multimedia todavía."
@@ -146,27 +130,38 @@ function MediaPage() {
           render: (r) => (
             <div className="max-w-[320px] space-y-1">
               <div className="font-medium leading-tight">
-                {r.alt_text ?? (
-                  <span className="text-muted-foreground italic">
-                    (sin ALT)
-                  </span>
-                )}
+                {r.alt_text ?? <span className="text-muted-foreground italic">(sin ALT)</span>}
               </div>
               {r.alt_text_ai && r.alt_text_source !== "human" && (
-                <div className="text-xs text-muted-foreground line-clamp-2">
-                  🤖 {r.alt_text_ai}
-                </div>
+                <div className="text-xs text-muted-foreground line-clamp-2">🤖 {r.alt_text_ai}</div>
               )}
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                origen: {r.alt_text_source ?? "none"} · revisión:{" "}
-                {r.review_state ?? "unreviewed"}
+                origen: {r.alt_text_source ?? "none"} · revisión: {r.review_state ?? "unreviewed"}
               </div>
             </div>
           ),
         },
-        { key: "kind", header: "Tipo", render: (r) => <span className="text-xs text-muted-foreground">{r.kind ?? "—"}</span> },
-        { key: "bucket", header: "Bucket", render: (r) => <code className="text-xs text-muted-foreground">{r.storage_bucket ?? "—"}</code> },
-        { key: "dim", header: "Dim.", render: (r) => <span className="text-xs text-muted-foreground">{r.width && r.height ? `${r.width}×${r.height}` : "—"}</span> },
+        {
+          key: "kind",
+          header: "Tipo",
+          render: (r) => <span className="text-xs text-muted-foreground">{r.kind ?? "—"}</span>,
+        },
+        {
+          key: "bucket",
+          header: "Bucket",
+          render: (r) => (
+            <code className="text-xs text-muted-foreground">{r.storage_bucket ?? "—"}</code>
+          ),
+        },
+        {
+          key: "dim",
+          header: "Dim.",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">
+              {r.width && r.height ? `${r.width}×${r.height}` : "—"}
+            </span>
+          ),
+        },
         { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
         {
           key: "actions",

@@ -171,7 +171,6 @@ export function InlineCategoryExplorer({
       data-inline-explorer
       data-omxds-touch-target="44"
     >
-
       <header className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
           {/* G6-S1 · autoridad única de iconografía (fail-closed) */}

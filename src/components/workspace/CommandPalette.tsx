@@ -38,7 +38,10 @@ export function CommandPalette() {
 
   return (
     <CommandDialog open={paletteOpen} onOpenChange={setPaletteOpen}>
-      <CommandInput placeholder="Busca destinos, acciones, workspaces… (⌘K)" data-allow-palette="true" />
+      <CommandInput
+        placeholder="Busca destinos, acciones, workspaces… (⌘K)"
+        data-allow-palette="true"
+      />
       <CommandList>
         <CommandEmpty>Sin resultados.</CommandEmpty>
 
@@ -112,9 +115,7 @@ export function CommandPalette() {
                   >
                     {Icon ? <Icon className="mr-2 h-4 w-4" aria-hidden /> : null}
                     <span>{a.label}</span>
-                    <kbd className="ml-auto text-[10px] text-muted-foreground">
-                      {a.scope}
-                    </kbd>
+                    <kbd className="ml-auto text-[10px] text-muted-foreground">{a.scope}</kbd>
                   </CommandItem>
                 );
               })}

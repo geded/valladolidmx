@@ -6,10 +6,7 @@
  * el contrato `MarketplaceBusinessDetail`.
  */
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  BusinessSurface,
-  BusinessSurfaceProvider,
-} from "@/components/surfaces/BusinessSurface";
+import { BusinessSurface, BusinessSurfaceProvider } from "@/components/surfaces/BusinessSurface";
 import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
 
 const MOCK_HOTEL: MarketplaceBusinessDetail = {
@@ -121,13 +118,7 @@ function PreviewPage() {
   );
 }
 
-function PreviewFrame({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function PreviewFrame({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="border-t border-border pt-6">
       <p className="mx-auto max-w-6xl px-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">

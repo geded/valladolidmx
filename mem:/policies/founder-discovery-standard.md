@@ -3,6 +3,7 @@ name: Founder Discovery Standard
 description: Estándar oficial de listados turísticos post-V3 U-VISUAL; toda categoría nueva se construye por configuración de TourismListingSurface, no por diseño propio.
 type: constraint
 ---
+
 Al cerrar V3 · U-VISUAL, el patrón de listados turísticos queda como estándar oficial del producto.
 
 Toda categoría — presente o futura (museos, spas, tours, guías, transporte, bodas, naturaleza, gastronomía, compras y las que se agreguen) — DEBE reutilizar el mismo sistema:

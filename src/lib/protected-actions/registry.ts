@@ -61,10 +61,7 @@ function readStorage(): PendingActionRecord[] {
 function writeStorage(records: PendingActionRecord[]): void {
   if (!isBrowser()) return;
   try {
-    window.sessionStorage.setItem(
-      PROTECTED_ACTIONS_STORAGE_KEY,
-      JSON.stringify(records),
-    );
+    window.sessionStorage.setItem(PROTECTED_ACTIONS_STORAGE_KEY, JSON.stringify(records));
   } catch {
     /* privado estricto / quota → memoria sólo */
   }
@@ -177,7 +174,10 @@ export const PendingActionRegistry = {
    * existe; si no, devuelve el record para que el runner pueda emitir
    * `restored` sin ejecutar.
    */
-  takeLast(): { record: PendingActionRecord; runtime: PendingActionRuntime<unknown> | null } | null {
+  takeLast(): {
+    record: PendingActionRecord;
+    runtime: PendingActionRuntime<unknown> | null;
+  } | null {
     const now = Date.now();
     const alive = records.filter((r) => r.expiresAt > now);
     const expired = records.filter((r) => r.expiresAt <= now);

@@ -148,7 +148,9 @@ export function BlockCommentsPanel({
         ) : null}
       </div>
       {blockLabel ? (
-        <p className="mb-2 text-[10px] uppercase tracking-wide text-muted-foreground">{blockLabel}</p>
+        <p className="mb-2 text-[10px] uppercase tracking-wide text-muted-foreground">
+          {blockLabel}
+        </p>
       ) : null}
 
       {loading ? (
@@ -157,7 +159,9 @@ export function BlockCommentsPanel({
         </div>
       ) : visible.length === 0 ? (
         <p className="py-2 text-xs text-muted-foreground">
-          {forBlock.length === 0 ? "Aún no hay comentarios en este bloque." : "Sin comentarios abiertos."}
+          {forBlock.length === 0
+            ? "Aún no hay comentarios en este bloque."
+            : "Sin comentarios abiertos."}
         </p>
       ) : (
         <ul className="space-y-2">
@@ -167,13 +171,13 @@ export function BlockCommentsPanel({
               <li
                 key={c.id}
                 className={`rounded-md border p-2 text-xs ${
-                  c.resolved_at ? "border-border/60 bg-muted/40 text-muted-foreground" : "border-border bg-background"
+                  c.resolved_at
+                    ? "border-border/60 bg-muted/40 text-muted-foreground"
+                    : "border-border bg-background"
                 }`}
               >
                 <div className="mb-1 flex items-center justify-between gap-2">
-                  <span className="font-medium text-foreground">
-                    {c.author_name ?? "Editor"}
-                  </span>
+                  <span className="font-medium text-foreground">{c.author_name ?? "Editor"}</span>
                   <span className="text-[10px] text-muted-foreground">{relTime(c.created_at)}</span>
                 </div>
                 <p className="whitespace-pre-wrap leading-relaxed">{c.body}</p>

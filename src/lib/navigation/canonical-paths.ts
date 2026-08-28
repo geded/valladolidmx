@@ -14,11 +14,7 @@
  *
  * Reglas: sin trailing slash. Slugs kebab-case. Ámbito: rutas territoriales.
  */
-import {
-  DEFAULT_REGION_SLUG,
-  type CanonicalRef,
-  type NavigationContext,
-} from "./types";
+import { DEFAULT_REGION_SLUG, type CanonicalRef, type NavigationContext } from "./types";
 
 const REGION_PREFIX = `/${DEFAULT_REGION_SLUG}`;
 
@@ -121,10 +117,7 @@ export function resolveContextFromPath(pathname: string): NavigationContext {
  * La existencia real de la categoría equivalente se valida por el caller
  * (data layer); esta helper resuelve sólo la URL objetivo.
  */
-export function switchDestination(
-  ctx: NavigationContext,
-  destino: string,
-): string {
+export function switchDestination(ctx: NavigationContext, destino: string): string {
   const region = ctx.region?.slug ?? DEFAULT_REGION_SLUG;
   if (ctx.category?.slug) {
     return resolveCanonicalPath({

@@ -10,6 +10,7 @@
 ## 1. Cambios aplicados
 
 ### F1 · Helper central y fallback social (D1 + D2)
+
 - `public/og/default-1200x630.jpg` — asset editorial oficial 1200×630 (marca colonial Valladolid, catedral, cenote, glifo maya). Público, estable, sin auth, sin query strings.
 - `src/config/site.ts` · `SITE.og_image` → URL absoluta oficial.
 - `src/lib/discovery/seo.ts`:
@@ -22,44 +23,49 @@
     - Prioridad conservada: imagen real ≫ fallback.
 
 ### F2/F3 · Rutas territoriales y listados públicos
+
 - Wire-up existente (`/oriente-maya/$destino/*`, empresa, producto, evento) ya pasaba `ogImage` real; se conserva.
 - Categoría territorial, listados (`/experiencias`, `/hoteles`, `/restaurantes`, `/casas-de-vacaciones`, `/empresas`, `/promociones`, `/eventos`) y páginas institucionales (`/arma-tu-viaje`, `/contacto`, `/convertir-en-anfitrion`, `/que-hacer`, `/alux`, `/privacidad`, `/terminos`) heredan automáticamente el fallback vía helper.
 
 ### F4 · Blog (D3)
+
 - `/blog` cambia a `robots: "noindex, follow"` hasta que exista modelo editorial real (`/blog/$slug`, autor, fecha, imagen editorial).
 - Removido `/blog` de `src/routes/sitemap[.]xml.ts`.
 - Ruta permanece accesible al usuario (navegación conservada).
 
 ### F5 · Experience Builder publicado (D4)
+
 - `/p/$slug` y `/l/$slug`: sin cambios de contrato. El helper aplica fallback si `snapshot.chrome.seo.og_image` no existe **y** la página no está marcada `noindex`. Reglas EB ratificadas: `publicado` + `visibility=public` + `!seo.noindex` ⇒ indexable con OG; cualquier otro estado ⇒ `noindex`.
 
 ### F6 · Blindaje de rutas privadas (D6)
+
 - `src/routes/_authenticated.tsx` ahora emite `head()` con `robots: "noindex, nofollow"`. Defensa en profundidad para todo el árbol (`cms`, `cuenta`, `admin`, `concierge`, `empresa`, `mi-viaje`, `portal`, `paginas`).
 - Merge por `name`: hojas pueden añadir title/description; robots hereda salvo que la hoja lo sobrescriba explícitamente (política Founder: prohibido).
 
 ### D5 · `/viaje-compartido/$token`
+
 - Ratificado `noindex, nofollow` permanente. Sin cambios estructurales; sin OG con datos personales. Migración a `buildPublicHead` deferida (cosmética).
 
 ---
 
 ## 2. Matriz antes/después (extracto)
 
-| Ruta | Antes | Después |
-|---|---|---|
-| `/` (Home) | OG sólo si CMS lo define | OG real o fallback oficial |
-| `/oriente-maya` | Sin OG | Fallback oficial |
-| `/oriente-maya/$destino` | Hero real cuando existe | Igual + fallback si vacío |
-| `/oriente-maya/$destino/$categoria` | Sin OG | Fallback oficial |
-| `/oriente-maya/.../$empresa` | `cover_url` | Igual + fallback si vacío |
-| `/oriente-maya/.../$producto` | `cover_url` | Igual + fallback si vacío |
-| `/experiencias` `/hoteles` `/restaurantes` `/casas-de-vacaciones` `/empresas` `/promociones` `/eventos` | Sin OG | Fallback oficial |
-| `/eventos/$slug` | `cover_url` | Igual + fallback si vacío |
-| `/arma-tu-viaje` `/contacto` `/convertir-en-anfitrion` `/que-hacer` `/alux` `/privacidad` `/terminos` | Sin OG | Fallback oficial |
-| `/p/$slug` `/l/$slug` (EB pub) | Sólo si CMS | Igual + fallback si vacío |
-| `/blog` | `index` sin contenido | `noindex, follow` + fuera de sitemap |
-| `/mapa` `/viajero/$handle` `/auth` `/reset-password` `/offline` `/preview/$token` | `noindex` | Igual — **sin fallback aplicado** |
-| `/viaje-compartido/$token` | Manual `noindex, nofollow` | Ratificado |
-| `/_authenticated/*` | Depende de hoja | **`noindex, nofollow` a nivel layout** |
+| Ruta                                                                                                    | Antes                      | Después                                |
+| ------------------------------------------------------------------------------------------------------- | -------------------------- | -------------------------------------- |
+| `/` (Home)                                                                                              | OG sólo si CMS lo define   | OG real o fallback oficial             |
+| `/oriente-maya`                                                                                         | Sin OG                     | Fallback oficial                       |
+| `/oriente-maya/$destino`                                                                                | Hero real cuando existe    | Igual + fallback si vacío              |
+| `/oriente-maya/$destino/$categoria`                                                                     | Sin OG                     | Fallback oficial                       |
+| `/oriente-maya/.../$empresa`                                                                            | `cover_url`                | Igual + fallback si vacío              |
+| `/oriente-maya/.../$producto`                                                                           | `cover_url`                | Igual + fallback si vacío              |
+| `/experiencias` `/hoteles` `/restaurantes` `/casas-de-vacaciones` `/empresas` `/promociones` `/eventos` | Sin OG                     | Fallback oficial                       |
+| `/eventos/$slug`                                                                                        | `cover_url`                | Igual + fallback si vacío              |
+| `/arma-tu-viaje` `/contacto` `/convertir-en-anfitrion` `/que-hacer` `/alux` `/privacidad` `/terminos`   | Sin OG                     | Fallback oficial                       |
+| `/p/$slug` `/l/$slug` (EB pub)                                                                          | Sólo si CMS                | Igual + fallback si vacío              |
+| `/blog`                                                                                                 | `index` sin contenido      | `noindex, follow` + fuera de sitemap   |
+| `/mapa` `/viajero/$handle` `/auth` `/reset-password` `/offline` `/preview/$token`                       | `noindex`                  | Igual — **sin fallback aplicado**      |
+| `/viaje-compartido/$token`                                                                              | Manual `noindex, nofollow` | Ratificado                             |
+| `/_authenticated/*`                                                                                     | Depende de hoja            | **`noindex, nofollow` a nivel layout** |
 
 ---
 
@@ -108,4 +114,4 @@
 
 La cobertura de metadata pública quedó completa, con fuente única fortalecida, fallback oficial estable y blindaje del árbol privado. No hay regresiones ni contratos rotos; el wire-up es aditivo.
 
-*Fin del reporte.*
+_Fin del reporte._

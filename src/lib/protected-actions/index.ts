@@ -5,10 +5,7 @@
  */
 export * from "./types";
 export { PendingActionRegistry } from "./registry";
-export {
-  emitProtectedActionEvent,
-  subscribeProtectedActionEvents,
-} from "./observability";
+export { emitProtectedActionEvent, subscribeProtectedActionEvents } from "./observability";
 export { ProtectedActionResumeRunner } from "./resume-runner";
 export { SheetController } from "./sheet-controller";
 export type { ActiveGate, GateCopy } from "./sheet-controller";

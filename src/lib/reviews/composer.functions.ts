@@ -20,10 +20,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type {
-  PublicReviewSubjectKind,
-  PublicReviewVerifiedSource,
-} from "./public-reads.functions";
+import type { PublicReviewSubjectKind, PublicReviewVerifiedSource } from "./public-reads.functions";
 
 const ALLOWED_SUBJECT_KINDS: PublicReviewSubjectKind[] = [
   "business",

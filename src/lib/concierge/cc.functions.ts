@@ -259,10 +259,10 @@ export const ccCaseEvaluate = createServerFn({ method: "POST" })
 export const ccListMyCases = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.rpc(
-      "concierge_case_list_for_role",
-      { _scope: "traveler", _limit: 50 } as never,
-    );
+    const { data, error } = await context.supabase.rpc("concierge_case_list_for_role", {
+      _scope: "traveler",
+      _limit: 50,
+    } as never);
     if (error) throw new Error(error.message);
     return (data ?? []) as unknown as Array<{
       id: string;

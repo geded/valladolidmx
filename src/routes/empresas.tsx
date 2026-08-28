@@ -43,10 +43,22 @@ function EmpresasLanding() {
     >
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {[
-          { Icon: Building2, t: "Tu panel propio", d: "Perfil, fotos, promociones, horarios y contacto." },
+          {
+            Icon: Building2,
+            t: "Tu panel propio",
+            d: "Perfil, fotos, promociones, horarios y contacto.",
+          },
           { Icon: BarChart3, t: "Estadísticas reales", d: "Quién te ve, desde dónde, qué busca." },
-          { Icon: Megaphone, t: "Visibilidad inteligente", d: "Orden por afinidad y confianza, no por mayor pago." },
-          { Icon: ShieldCheck, t: "Confianza verificada", d: "Índice de Confianza Alux integrado a tu perfil." },
+          {
+            Icon: Megaphone,
+            t: "Visibilidad inteligente",
+            d: "Orden por afinidad y confianza, no por mayor pago.",
+          },
+          {
+            Icon: ShieldCheck,
+            t: "Confianza verificada",
+            d: "Índice de Confianza Alux integrado a tu perfil.",
+          },
         ].map(({ Icon, t, d }) => (
           <div key={t} className="rounded-2xl border border-border bg-card p-6">
             <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
@@ -65,8 +77,8 @@ function EmpresasLanding() {
         </span>
         <h2 className="mt-4 text-2xl">Gestiona tu empresa</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          Accede a ficha pública, presencia, galería, catálogo, pagos,
-          actividad, concierge, invitaciones y propiedad desde el portal.
+          Accede a ficha pública, presencia, galería, catálogo, pagos, actividad, concierge,
+          invitaciones y propiedad desde el portal.
         </p>
         <Link
           to="/portal"

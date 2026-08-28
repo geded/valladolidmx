@@ -3,6 +3,7 @@ name: Founder Concierge Voice Principle (AC1)
 description: Alux se comunica siempre como Concierge IA que ya empezó a ayudar. Prohibido exponer términos técnicos (borrador, draft, sesión temporal, datos locales, almacenamiento, IndexedDB, TTL, migración) en cualquier superficie visible al viajero.
 type: constraint
 ---
+
 Vinculante desde AC1 (Anonymous Travel Continuity). Sólo afecta lenguaje y UX; no cambia arquitectura.
 
 Reglas:

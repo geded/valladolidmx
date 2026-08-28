@@ -19,8 +19,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 type Sb = SupabaseClient<Database>;
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function assertUuid(v: unknown, name: string): string {
   if (typeof v !== "string" || !UUID_RE.test(v)) {
@@ -36,12 +35,7 @@ function clampRequestId(v: unknown): string | null {
   return t;
 }
 
-export type OrderStatus =
-  | "cart"
-  | "pending"
-  | "confirmed"
-  | "cancelled"
-  | "fulfilled";
+export type OrderStatus = "cart" | "pending" | "confirmed" | "cancelled" | "fulfilled";
 
 export interface CartItem {
   id: string;
@@ -88,10 +82,7 @@ function mapItem(row: Record<string, unknown>): CartItem {
   };
 }
 
-function mapOrder(
-  row: Record<string, unknown>,
-  items: Record<string, unknown>[],
-): OrderSummary {
+function mapOrder(row: Record<string, unknown>, items: Record<string, unknown>[]): OrderSummary {
   return {
     id: String(row.id),
     status: row.status as OrderStatus,
@@ -103,8 +94,7 @@ function mapOrder(
     updated_at: String(row.updated_at),
     confirmed_at: (row.confirmed_at as string | null) ?? null,
     cancelled_at: (row.cancelled_at as string | null) ?? null,
-    payment_status:
-      (row.payment_status as OrderSummary["payment_status"]) ?? "unpaid",
+    payment_status: (row.payment_status as OrderSummary["payment_status"]) ?? "unpaid",
     payment_provider: (row.payment_provider as string | null) ?? null,
     paid_at: (row.paid_at as string | null) ?? null,
     items: items.map(mapItem),
@@ -135,10 +125,7 @@ async function loadOrder(
     .eq("order_id", orderId)
     .order("created_at", { ascending: true });
   if (iErr) throw new Error(`order_items_read_failed: ${iErr.message}`);
-  return mapOrder(
-    order as Record<string, unknown>,
-    (items ?? []) as Record<string, unknown>[],
-  );
+  return mapOrder(order as Record<string, unknown>, (items ?? []) as Record<string, unknown>[]);
 }
 
 /** Lectura del carrito activo del viajero (puede ser null). */
@@ -316,7 +303,7 @@ export const listMyOrders = createServerFn({ method: "GET" })
       .in("order_id", ids);
     if (iErr) throw new Error(`orders_items_read_failed: ${iErr.message}`);
     const byOrder = new Map<string, Record<string, unknown>[]>();
-    for (const it of ((items ?? []) as unknown as Record<string, unknown>[])) {
+    for (const it of (items ?? []) as unknown as Record<string, unknown>[]) {
       const oid = String(it.order_id);
       if (!byOrder.has(oid)) byOrder.set(oid, []);
       byOrder.get(oid)!.push(it);

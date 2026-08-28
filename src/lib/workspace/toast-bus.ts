@@ -48,13 +48,8 @@ interface ToastOpts {
   undo?: { label?: string; run: () => void | Promise<void> };
 }
 
-function showWithUndo(
-  kind: "success" | "error" | "info",
-  message: string,
-  opts?: ToastOpts,
-) {
-  const fn =
-    kind === "success" ? toast.success : kind === "error" ? toast.error : toast;
+function showWithUndo(kind: "success" | "error" | "info", message: string, opts?: ToastOpts) {
+  const fn = kind === "success" ? toast.success : kind === "error" ? toast.error : toast;
   const id = `undo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   if (opts?.undo) {
     pushUndo({

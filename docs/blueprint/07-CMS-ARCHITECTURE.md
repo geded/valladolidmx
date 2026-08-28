@@ -1,6 +1,7 @@
 # 07-CMS-ARCHITECTURE.md
 
 # Arquitectura del CMS
+
 Versión 1.0
 
 ## Objetivo
@@ -330,7 +331,6 @@ Cada módulo tendrá permisos independientes.
 # Criterios de aceptación
 
 El sitio completo puede mantenerse actualizado desde el CMS sin modificar código y cada tipo de usuario administra únicamente la información que le corresponde.
-
 
 ---
 

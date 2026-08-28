@@ -102,11 +102,7 @@ function groupItems(
   }));
 }
 
-export function ExperienceProducts({
-  dto,
-  className,
-  renderItemActions,
-}: ExperienceProductsProps) {
+export function ExperienceProducts({ dto, className, renderItemActions }: ExperienceProductsProps) {
   const {
     variant,
     heading,
@@ -120,13 +116,12 @@ export function ExperienceProducts({
   } = dto;
 
   const vmCaps = productCapsToVM(capabilities);
-  const wrapRender =
-    renderItemActions
-      ? (vm: TourismCardVM) => {
-          const original = items.find((it) => it.id === vm.id);
-          return original ? renderItemActions(original) : null;
-        }
-      : undefined;
+  const wrapRender = renderItemActions
+    ? (vm: TourismCardVM) => {
+        const original = items.find((it) => it.id === vm.id);
+        return original ? renderItemActions(original) : null;
+      }
+    : undefined;
 
   const wrap = (children: ReactNode) => (
     <section
@@ -137,12 +132,8 @@ export function ExperienceProducts({
     >
       {heading || subheading ? (
         <header className="mb-5 flex flex-col gap-1">
-          {heading ? (
-            <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2>
-          ) : null}
-          {subheading ? (
-            <p className="text-sm text-muted-foreground">{subheading}</p>
-          ) : null}
+          {heading ? <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2> : null}
+          {subheading ? <p className="text-sm text-muted-foreground">{subheading}</p> : null}
         </header>
       ) : null}
       {children}
@@ -150,9 +141,7 @@ export function ExperienceProducts({
   );
 
   if (items.length === 0) {
-    return wrap(
-      <p className="text-sm text-muted-foreground">{emptyMessage}</p>,
-    );
+    return wrap(<p className="text-sm text-muted-foreground">{emptyMessage}</p>);
   }
 
   const groups = groupItems(items, groupBy);
@@ -172,10 +161,7 @@ export function ExperienceProducts({
               className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:thin]"
             >
               {g.items.map((it) => (
-                <li
-                  key={it.id}
-                  className="min-w-[260px] max-w-[300px] shrink-0 snap-start"
-                >
+                <li key={it.id} className="min-w-[260px] max-w-[300px] shrink-0 snap-start">
                   <TourismCard
                     vm={productItemToVM(it)}
                     capabilities={vmCaps}

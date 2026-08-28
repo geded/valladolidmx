@@ -26,36 +26,36 @@ Cada tipo se declara como `PageKind` (algunos ya existen, otros son extensiones 
 
 ### 1.1 Familia TERRITORIAL (canónica del Navigation Blueprint)
 
-| # | Tipo | Kind actual | Ruta canónica | Entidad primaria | Volumen esperado |
-|---|---|---|---|---|---|
-| T1 | Región | `region` ✅ | `/{regionSlug}` (`/oriente-maya`) | `regions` | 1–5 |
-| T2 | Destino | `destination` ✅ | `/oriente-maya/{destino}` | `destinations` | 10–50 |
-| T3 | Listado categoría en destino | (composición implícita) | `/oriente-maya/{destino}/{categoria}` | Vista `businesses × destino × categoría` | 100–500 |
-| T4 | Empresa | `business` ✅ | `/oriente-maya/{destino}/{categoria}/{empresa}` | `businesses` | 100–1 000 |
-| T5 | Producto | `product` ✅ | `/oriente-maya/{destino}/{categoria}/{empresa}/{producto}` | `products` | 500–5 000 |
+| #   | Tipo                         | Kind actual             | Ruta canónica                                              | Entidad primaria                         | Volumen esperado |
+| --- | ---------------------------- | ----------------------- | ---------------------------------------------------------- | ---------------------------------------- | ---------------- |
+| T1  | Región                       | `region` ✅             | `/{regionSlug}` (`/oriente-maya`)                          | `regions`                                | 1–5              |
+| T2  | Destino                      | `destination` ✅        | `/oriente-maya/{destino}`                                  | `destinations`                           | 10–50            |
+| T3  | Listado categoría en destino | (composición implícita) | `/oriente-maya/{destino}/{categoria}`                      | Vista `businesses × destino × categoría` | 100–500          |
+| T4  | Empresa                      | `business` ✅           | `/oriente-maya/{destino}/{categoria}/{empresa}`            | `businesses`                             | 100–1 000        |
+| T5  | Producto                     | `product` ✅            | `/oriente-maya/{destino}/{categoria}/{empresa}/{producto}` | `products`                               | 500–5 000        |
 
 ### 1.2 Familia POI EDITORIAL (nueva — cubre gaps de demanda del audit A1)
 
-| # | Tipo | Kind propuesto | Ruta canónica sugerida | Entidad primaria | Ejemplos |
-|---|---|---|---|---|---|
-| P1 | Zona arqueológica | `poi_archaeological` | `/oriente-maya/{destino}/zonas-arqueologicas/{slug}` | `points_of_interest` (POI) | Chichén Itzá, Ek Balam, Cobá |
-| P2 | Cenote | `poi_cenote` | `/oriente-maya/{destino}/cenotes/{slug}` | POI | Suytun, X'kekén, Zací, Oxman, Samulá |
-| P3 | Pueblo Mágico | `poi_pueblo_magico` | `/oriente-maya/{destino}` con overlay + hub `/pueblos-magicos` | `destinations` marcados + badge | Valladolid, Izamal, Espita |
-| P4 | Playa / Costa | `poi_beach` | `/oriente-maya/{destino}/playas/{slug}` | POI | San Felipe, Chuburná |
-| P5 | Reserva natural | `poi_nature` | `/oriente-maya/{destino}/naturaleza/{slug}` | POI | Ría Lagartos, Punta Laguna |
-| P6 | Hacienda / Patrimonio | `poi_heritage` | `/oriente-maya/{destino}/patrimonio/{slug}` | POI | Hacienda X, Convento de Sisal |
+| #   | Tipo                  | Kind propuesto       | Ruta canónica sugerida                                         | Entidad primaria                | Ejemplos                             |
+| --- | --------------------- | -------------------- | -------------------------------------------------------------- | ------------------------------- | ------------------------------------ |
+| P1  | Zona arqueológica     | `poi_archaeological` | `/oriente-maya/{destino}/zonas-arqueologicas/{slug}`           | `points_of_interest` (POI)      | Chichén Itzá, Ek Balam, Cobá         |
+| P2  | Cenote                | `poi_cenote`         | `/oriente-maya/{destino}/cenotes/{slug}`                       | POI                             | Suytun, X'kekén, Zací, Oxman, Samulá |
+| P3  | Pueblo Mágico         | `poi_pueblo_magico`  | `/oriente-maya/{destino}` con overlay + hub `/pueblos-magicos` | `destinations` marcados + badge | Valladolid, Izamal, Espita           |
+| P4  | Playa / Costa         | `poi_beach`          | `/oriente-maya/{destino}/playas/{slug}`                        | POI                             | San Felipe, Chuburná                 |
+| P5  | Reserva natural       | `poi_nature`         | `/oriente-maya/{destino}/naturaleza/{slug}`                    | POI                             | Ría Lagartos, Punta Laguna           |
+| P6  | Hacienda / Patrimonio | `poi_heritage`       | `/oriente-maya/{destino}/patrimonio/{slug}`                    | POI                             | Hacienda X, Convento de Sisal        |
 
 > **Modelo de datos común:** todos los POI viven en una única tabla `points_of_interest` con enum `poi_kind`. Un solo motor, N variantes de UI/JSON-LD.
 
 ### 1.3 Familia EDITORIAL / ITINERARIOS
 
-| # | Tipo | Kind actual/propuesto | Ruta canónica | Entidad primaria |
-|---|---|---|---|---|
-| E1 | Ruta / Itinerario | `route` ✅ | `/rutas/{slug}` | `routes` (nueva, ligera) |
-| E2 | Colección temática (hub) | `collection` (propuesto) | `/coleccion/{slug}` | `thematic_collections` (spokes derivados) |
-| E3 | Landing de intención (evergreen) | `landing` ✅ | `/l/{slug}` | Composición EB pura |
-| E4 | Guía / artículo blog | `blog_post` (propuesto) | `/blog/{slug}` | `blog_posts` |
-| E5 | Boda destino | `wedding` ✅ | `/l/{slug}` | Composición EB |
+| #   | Tipo                             | Kind actual/propuesto    | Ruta canónica       | Entidad primaria                          |
+| --- | -------------------------------- | ------------------------ | ------------------- | ----------------------------------------- |
+| E1  | Ruta / Itinerario                | `route` ✅               | `/rutas/{slug}`     | `routes` (nueva, ligera)                  |
+| E2  | Colección temática (hub)         | `collection` (propuesto) | `/coleccion/{slug}` | `thematic_collections` (spokes derivados) |
+| E3  | Landing de intención (evergreen) | `landing` ✅             | `/l/{slug}`         | Composición EB pura                       |
+| E4  | Guía / artículo blog             | `blog_post` (propuesto)  | `/blog/{slug}`      | `blog_posts`                              |
+| E5  | Boda destino                     | `wedding` ✅             | `/l/{slug}`         | Composición EB                            |
 
 ### 1.4 Familia ENTIDAD EDITORIAL (fichas ya existentes)
 
@@ -76,6 +76,7 @@ Todas las familias comparten una **única superficie**: `LandingSurface`, que ya
 ```
 
 Diferenciadores por tipo:
+
 - **Plantilla semilla** (composición inicial en `page_compositions`).
 - **`entity_kind` + `entity_id`** que el renderer inyecta a los Smart Blocks.
 - **JSON-LD `@type` por defecto** (ya declarado en `resolvePageKindDefaults`).
@@ -168,28 +169,28 @@ Composición 100 % editorial (`/que-hacer-en-valladolid`, `/hoteles-en-valladoli
 
 ### 4.1 Matriz general
 
-| Campo | Origen | Modo |
-|---|---|---|
-| Nombre, slug, tagline, hero_url, coordenadas | Entidad (BD) | Datos operativos |
-| Descripción larga, historia, contexto | Editorial | Overlay EB |
-| Info-grid (precio, horario, servicios) | Entidad + overrides EB | Híbrido |
-| Galería | Entidad (`media_assets`) | Media Pipeline |
-| Badges institucionales | Entidad (`institutional_badges`) | Registry |
-| Reseñas | Entidad (`reviews`, publicadas) | Datos operativos |
-| Productos/tours/hoteles cercanos | Smart Blocks (consulta) | Runtime |
-| FAQ | Editorial | Overlay EB |
-| CTA copy | Editorial | Overlay EB |
-| Related territorial | Función `getDestinationRelated` / `getBusinessRelated` / `getProductRelated` | Runtime |
+| Campo                                        | Origen                                                                       | Modo             |
+| -------------------------------------------- | ---------------------------------------------------------------------------- | ---------------- |
+| Nombre, slug, tagline, hero_url, coordenadas | Entidad (BD)                                                                 | Datos operativos |
+| Descripción larga, historia, contexto        | Editorial                                                                    | Overlay EB       |
+| Info-grid (precio, horario, servicios)       | Entidad + overrides EB                                                       | Híbrido          |
+| Galería                                      | Entidad (`media_assets`)                                                     | Media Pipeline   |
+| Badges institucionales                       | Entidad (`institutional_badges`)                                             | Registry         |
+| Reseñas                                      | Entidad (`reviews`, publicadas)                                              | Datos operativos |
+| Productos/tours/hoteles cercanos             | Smart Blocks (consulta)                                                      | Runtime          |
+| FAQ                                          | Editorial                                                                    | Overlay EB       |
+| CTA copy                                     | Editorial                                                                    | Overlay EB       |
+| Related territorial                          | Función `getDestinationRelated` / `getBusinessRelated` / `getProductRelated` | Runtime          |
 
 ### 4.2 Contenido nuevo requerido (por tipo)
 
-| Tipo | Entidad nueva | Contenido editorial mínimo |
-|---|---|---|
-| POI (cenote, arqueológico, playa, naturaleza, patrimonio) | `points_of_interest` (una tabla + enum) | tagline, descripción, historia, FAQ, cómo llegar |
-| Ruta / Itinerario | `routes` (id, título, resumen, días JSON) | narrativa por día |
-| Colección temática | `thematic_collections` (id, título, spokes) | intro editorial |
-| Landing de intención (`/l/*`) | Ninguna (composición EB) | copy + selección de smart blocks |
-| Blog | `blog_posts` (id, título, cuerpo MD, autor) | contenido evergreen |
+| Tipo                                                      | Entidad nueva                               | Contenido editorial mínimo                       |
+| --------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------ |
+| POI (cenote, arqueológico, playa, naturaleza, patrimonio) | `points_of_interest` (una tabla + enum)     | tagline, descripción, historia, FAQ, cómo llegar |
+| Ruta / Itinerario                                         | `routes` (id, título, resumen, días JSON)   | narrativa por día                                |
+| Colección temática                                        | `thematic_collections` (id, título, spokes) | intro editorial                                  |
+| Landing de intención (`/l/*`)                             | Ninguna (composición EB)                    | copy + selección de smart blocks                 |
+| Blog                                                      | `blog_posts` (id, título, cuerpo MD, autor) | contenido evergreen                              |
 
 > **Regla de mínimos:** ninguna landing se publica sin: nombre, slug, tagline, hero_url ≥1600 px, descripción ≥300 caracteres, geo (si aplica), badges (si aplica), ≥3 enlaces internos salientes.
 
@@ -246,14 +247,14 @@ El enlazado se genera automáticamente por bloques `vmx.experience.related-colle
 
 ### 6.2 Clusters iniciales (definidos aquí, implementados en A2.M4)
 
-| Cluster | Hub (E2) | Spokes | Cross-links |
-|---|---|---|---|
-| Cenotes del Oriente Maya | `/coleccion/cenotes-oriente-maya` | POIs `poi_cenote` | Destinos con cenotes, tours cenote |
-| Zonas Arqueológicas | `/coleccion/zonas-arqueologicas` | POIs `poi_archaeological` | Tours a zonas, hoteles cercanos |
-| Pueblos Mágicos del Oriente Maya | `/coleccion/pueblos-magicos` | Destinos con badge | Rutas entre pueblos |
-| Ruta Flamencos & Sal | `/rutas/rio-lagartos-coloradas` | POIs Río Lagartos + Las Coloradas | Tours, hoteles |
-| Gastronomía Yucateca | `/coleccion/gastronomia-yucateca` | Restaurantes categoría | Rutas gastronómicas |
-| Cultura Maya Viva | `/coleccion/cultura-maya` | Experiencias culturales + POIs | Rutas culturales |
+| Cluster                          | Hub (E2)                          | Spokes                            | Cross-links                        |
+| -------------------------------- | --------------------------------- | --------------------------------- | ---------------------------------- |
+| Cenotes del Oriente Maya         | `/coleccion/cenotes-oriente-maya` | POIs `poi_cenote`                 | Destinos con cenotes, tours cenote |
+| Zonas Arqueológicas              | `/coleccion/zonas-arqueologicas`  | POIs `poi_archaeological`         | Tours a zonas, hoteles cercanos    |
+| Pueblos Mágicos del Oriente Maya | `/coleccion/pueblos-magicos`      | Destinos con badge                | Rutas entre pueblos                |
+| Ruta Flamencos & Sal             | `/rutas/rio-lagartos-coloradas`   | POIs Río Lagartos + Las Coloradas | Tours, hoteles                     |
+| Gastronomía Yucateca             | `/coleccion/gastronomia-yucateca` | Restaurantes categoría            | Rutas gastronómicas                |
+| Cultura Maya Viva                | `/coleccion/cultura-maya`         | Experiencias culturales + POIs    | Rutas culturales                   |
 
 ### 6.3 Reglas de interlinking
 
@@ -269,13 +270,13 @@ El enlazado se genera automáticamente por bloques `vmx.experience.related-colle
 
 ### 7.1 Coste marginal por landing
 
-| Recurso | Coste por landing nueva |
-|---|---|
-| Código | **0 líneas** |
-| Ruta | **0 archivos** (resolvedor territorial + `/l/`, `/rutas/`, `/coleccion/`, `/blog/`) |
-| Migración | **0** (fila en tabla existente) |
-| Bloques nuevos | **0** (composición sobre `vmx.*` existentes) |
-| Trabajo editorial | copywriting + selección de bloques + media |
+| Recurso           | Coste por landing nueva                                                             |
+| ----------------- | ----------------------------------------------------------------------------------- |
+| Código            | **0 líneas**                                                                        |
+| Ruta              | **0 archivos** (resolvedor territorial + `/l/`, `/rutas/`, `/coleccion/`, `/blog/`) |
+| Migración         | **0** (fila en tabla existente)                                                     |
+| Bloques nuevos    | **0** (composición sobre `vmx.*` existentes)                                        |
+| Trabajo editorial | copywriting + selección de bloques + media                                          |
 
 ### 7.2 Palancas de escala
 
@@ -288,12 +289,12 @@ El enlazado se genera automáticamente por bloques `vmx.experience.related-colle
 
 ### 7.3 Modelo de crecimiento sostenible (12 meses)
 
-| Trimestre | Meta acumulada | Foco |
-|---|---|---|
-| Q1 | 30 POIs (cenotes + zonas + Pueblos Mágicos) + 5 rutas + 3 colecciones + 10 blog | Cobertura demanda P0 |
-| Q2 | 100 POIs + 15 rutas + 8 colecciones + 30 blog | Long tail |
-| Q3 | 300 POIs + 40 rutas + 15 colecciones + 60 blog | Expansión regional |
-| Q4 | 1 000+ landings totales | Escalado y automatización asistida |
+| Trimestre | Meta acumulada                                                                  | Foco                               |
+| --------- | ------------------------------------------------------------------------------- | ---------------------------------- |
+| Q1        | 30 POIs (cenotes + zonas + Pueblos Mágicos) + 5 rutas + 3 colecciones + 10 blog | Cobertura demanda P0               |
+| Q2        | 100 POIs + 15 rutas + 8 colecciones + 30 blog                                   | Long tail                          |
+| Q3        | 300 POIs + 40 rutas + 15 colecciones + 60 blog                                  | Expansión regional                 |
+| Q4        | 1 000+ landings totales                                                         | Escalado y automatización asistida |
 
 ---
 
@@ -301,29 +302,29 @@ El enlazado se genera automáticamente por bloques `vmx.experience.related-colle
 
 > Cada sub-ola sale con Blueprint propio + aprobación Founder + Completion Report + Demo Pack. Este documento sólo diseña.
 
-| Sub-ola | Alcance | Prerrequisito |
-|---|---|---|
-| **A2.M1** | Extensión aditiva del Page Kind Registry (poi_*, collection, blog_post) + defaults SEO | Este blueprint aprobado |
-| **A2.M2** | Modelo de datos `points_of_interest` (tabla única, enum `poi_kind`) + adapter `poi-to-blocks` | M1 |
-| **A2.M3** | Plantillas semilla oficiales por kind (composiciones `is_template=true`) | M2 |
-| **A2.M4** | Modelo `thematic_collections` + `routes` + ruta canónica del resolvedor | M3 |
-| **A2.M5** | Extensión del sitemap + JSON-LD + breadcrumbs canónicos | M4 |
-| **A2.M6** | Blog (`blog_posts`) reactivación editorial + reindexado | M5 |
-| **A2.M7** | Landings de intención P0 (que-hacer, cenotes, hoteles, Chichén Itzá) | M3 |
-| **A2.M8** | Asistente Alux Studio para borradores de landing | M3 |
+| Sub-ola   | Alcance                                                                                       | Prerrequisito           |
+| --------- | --------------------------------------------------------------------------------------------- | ----------------------- |
+| **A2.M1** | Extensión aditiva del Page Kind Registry (poi\_\*, collection, blog_post) + defaults SEO      | Este blueprint aprobado |
+| **A2.M2** | Modelo de datos `points_of_interest` (tabla única, enum `poi_kind`) + adapter `poi-to-blocks` | M1                      |
+| **A2.M3** | Plantillas semilla oficiales por kind (composiciones `is_template=true`)                      | M2                      |
+| **A2.M4** | Modelo `thematic_collections` + `routes` + ruta canónica del resolvedor                       | M3                      |
+| **A2.M5** | Extensión del sitemap + JSON-LD + breadcrumbs canónicos                                       | M4                      |
+| **A2.M6** | Blog (`blog_posts`) reactivación editorial + reindexado                                       | M5                      |
+| **A2.M7** | Landings de intención P0 (que-hacer, cenotes, hoteles, Chichén Itzá)                          | M3                      |
+| **A2.M8** | Asistente Alux Studio para borradores de landing                                              | M3                      |
 
 ---
 
 ## 9. Riesgos y mitigaciones
 
-| Riesgo | Mitigación |
-|---|---|
-| Explosión de kinds → Studio confuso | Agrupación por familia en el picker; máx 3 kinds nuevos por sub-ola |
-| Thin Content en POIs masivos | Checklist de publicación con mínimos + noindex hasta cumplir |
-| Canibalización entre landing de intención y territorial | Canonical explícito + interlinking descendente |
-| Duplicación de superficies por presión de UX | Este blueprint prohíbe superficies por tipo; se refuerza en constitución |
-| Colecciones sin mantenimiento | `thematic_collections.last_curated_at` + tarea Alux de auditoría |
-| Deuda i18n (6 idiomas) | Diferida a lanzamiento internacional (memoria `founder-i18n-seo`) |
+| Riesgo                                                  | Mitigación                                                               |
+| ------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Explosión de kinds → Studio confuso                     | Agrupación por familia en el picker; máx 3 kinds nuevos por sub-ola      |
+| Thin Content en POIs masivos                            | Checklist de publicación con mínimos + noindex hasta cumplir             |
+| Canibalización entre landing de intención y territorial | Canonical explícito + interlinking descendente                           |
+| Duplicación de superficies por presión de UX            | Este blueprint prohíbe superficies por tipo; se refuerza en constitución |
+| Colecciones sin mantenimiento                           | `thematic_collections.last_curated_at` + tarea Alux de auditoría         |
+| Deuda i18n (6 idiomas)                                  | Diferida a lanzamiento internacional (memoria `founder-i18n-seo`)        |
 
 ---
 

@@ -69,16 +69,12 @@ export function TravelPlansKpiStrip({ active, onSelect }: Props) {
             className={cn(
               "text-left rounded-2xl border p-4 transition-colors",
               "bg-card hover:bg-accent/40",
-              isActive
-                ? "border-primary ring-2 ring-primary/30"
-                : "border-border",
+              isActive ? "border-primary ring-2 ring-primary/30" : "border-border",
               !clickable && "cursor-default opacity-90",
             )}
             aria-pressed={isActive}
           >
-            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
-              {k.label}
-            </p>
+            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">{k.label}</p>
             <p className="mt-1 text-2xl font-semibold tabular-nums">
               {q.isLoading ? "…" : k.value}
             </p>

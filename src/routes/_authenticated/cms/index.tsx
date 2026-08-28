@@ -14,8 +14,7 @@ export const Route = createFileRoute("/_authenticated/cms/")({
       { title: "CMS Studio · Valladolid.mx" },
       {
         name: "description",
-        content:
-          "Panel administrativo del CMS Studio de Valladolid.mx.",
+        content: "Panel administrativo del CMS Studio de Valladolid.mx.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
@@ -31,20 +30,92 @@ interface EntityCard {
 }
 
 const ENTITIES: EntityCard[] = [
-  { key: "tourism_regions", name: "Regiones turísticas", description: "Regiones que agrupan destinos del territorio.", to: "/cms/regiones" },
-  { key: "destinations", name: "Destinos", description: "Pueblos, ciudades y enclaves del Oriente Maya.", to: "/cms/destinos" },
-  { key: "destination_zones", name: "Zonas de destino", description: "Sub-áreas y barrios dentro de cada destino.", to: "/cms/zonas" },
-  { key: "business_categories", name: "Categorías", description: "Taxonomía oficial de empresas y productos.", to: "/cms/categorias" },
-  { key: "businesses", name: "Empresas", description: "Fichas editoriales de empresas locales.", to: "/cms/empresas" },
-  { key: "products", name: "Productos", description: "Experiencias, hoteles, restaurantes, eventos y más.", to: "/cms/productos" },
-  { key: "media_assets", name: "Media", description: "Biblioteca multimedia compartida.", to: "/cms/media" },
-  { key: "reviews", name: "Reseñas", description: "Moderación de reseñas y respuestas.", to: "/cms/reviews" },
-  { key: "visibility_plans", name: "Paquetes de visibilidad", description: "Catálogo comercial editable: precios, ciclos, límites y palancas por paquete.", to: "/cms/visibilidad" },
-  { key: "travel_plans_ops", name: "Viajes en curso (CV1.1)", description: "Vista operativa read-only de Travel Plans activos, Alux y Concierge.", to: "/cms/travel-plans" },
-  { key: "visitor_intel", name: "Visitor Intelligence (CV8.3)", description: "Centro de Inteligencia del Visitante — decisiones accionables sobre el Journey.", to: "/cms/visitor-intel" },
-  { key: "decision_queue", name: "Cola de decisiones (CV8.9)", description: "Backlog humano, asignación, evidencia e historial append-only.", to: "/cms/visitor-intel/decisions" },
-  { key: "simulation", name: "Simulation Console (CV8.S.4)", description: "Ejecuta, audita y elimina simulaciones del Visitor Intelligence sin afectar datos reales.", to: "/cms/simulation" },
-  { key: "demo_pack", name: "Demo Pack v1", description: "Estado del Demo World Oriente Maya: catálogo, KB multilingüe, reseñas y orden VMX-DEMO01.", to: "/cms/demo-pack" },
+  {
+    key: "tourism_regions",
+    name: "Regiones turísticas",
+    description: "Regiones que agrupan destinos del territorio.",
+    to: "/cms/regiones",
+  },
+  {
+    key: "destinations",
+    name: "Destinos",
+    description: "Pueblos, ciudades y enclaves del Oriente Maya.",
+    to: "/cms/destinos",
+  },
+  {
+    key: "destination_zones",
+    name: "Zonas de destino",
+    description: "Sub-áreas y barrios dentro de cada destino.",
+    to: "/cms/zonas",
+  },
+  {
+    key: "business_categories",
+    name: "Categorías",
+    description: "Taxonomía oficial de empresas y productos.",
+    to: "/cms/categorias",
+  },
+  {
+    key: "businesses",
+    name: "Empresas",
+    description: "Fichas editoriales de empresas locales.",
+    to: "/cms/empresas",
+  },
+  {
+    key: "products",
+    name: "Productos",
+    description: "Experiencias, hoteles, restaurantes, eventos y más.",
+    to: "/cms/productos",
+  },
+  {
+    key: "media_assets",
+    name: "Media",
+    description: "Biblioteca multimedia compartida.",
+    to: "/cms/media",
+  },
+  {
+    key: "reviews",
+    name: "Reseñas",
+    description: "Moderación de reseñas y respuestas.",
+    to: "/cms/reviews",
+  },
+  {
+    key: "visibility_plans",
+    name: "Paquetes de visibilidad",
+    description: "Catálogo comercial editable: precios, ciclos, límites y palancas por paquete.",
+    to: "/cms/visibilidad",
+  },
+  {
+    key: "travel_plans_ops",
+    name: "Viajes en curso (CV1.1)",
+    description: "Vista operativa read-only de Travel Plans activos, Alux y Concierge.",
+    to: "/cms/travel-plans",
+  },
+  {
+    key: "visitor_intel",
+    name: "Visitor Intelligence (CV8.3)",
+    description: "Centro de Inteligencia del Visitante — decisiones accionables sobre el Journey.",
+    to: "/cms/visitor-intel",
+  },
+  {
+    key: "decision_queue",
+    name: "Cola de decisiones (CV8.9)",
+    description: "Backlog humano, asignación, evidencia e historial append-only.",
+    to: "/cms/visitor-intel/decisions",
+  },
+  {
+    key: "simulation",
+    name: "Simulation Console (CV8.S.4)",
+    description:
+      "Ejecuta, audita y elimina simulaciones del Visitor Intelligence sin afectar datos reales.",
+    to: "/cms/simulation",
+  },
+  {
+    key: "demo_pack",
+    name: "Demo Pack v1",
+    description:
+      "Estado del Demo World Oriente Maya: catálogo, KB multilingüe, reseñas y orden VMX-DEMO01.",
+    to: "/cms/demo-pack",
+  },
 ];
 
 function CmsDashboard() {
@@ -54,12 +125,10 @@ function CmsDashboard() {
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
           Administración editorial
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-          CMS Studio
-        </h1>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">CMS Studio</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Panel administrativo de Valladolid.mx. Gobierna el contenido editorial,
-          la taxonomía y la moderación desde un único lugar.
+          Panel administrativo de Valladolid.mx. Gobierna el contenido editorial, la taxonomía y la
+          moderación desde un único lugar.
         </p>
       </header>
 
@@ -74,13 +143,10 @@ function CmsDashboard() {
           </p>
           <h2 className="mt-1 text-lg font-semibold">Abrir Experience Builder</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Studio único (Modo Visual por defecto, Profesional opcional para
-            administradores). Elige cualquier página y edítala como la ven
-            los visitantes.
+            Studio único (Modo Visual por defecto, Profesional opcional para administradores). Elige
+            cualquier página y edítala como la ven los visitantes.
           </p>
-          <span className="mt-2 text-xs font-semibold text-primary">
-            Abrir Studio →
-          </span>
+          <span className="mt-2 text-xs font-semibold text-primary">Abrir Studio →</span>
         </Link>
         <Link
           to="/cms/experience-builder"
@@ -92,12 +158,10 @@ function CmsDashboard() {
           </p>
           <h2 className="mt-1 text-lg font-semibold">Editar página de Inicio</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Abre el Studio en Modo Visual y selecciona la página de Inicio
-            para editarla y publicarla en un clic.
+            Abre el Studio en Modo Visual y selecciona la página de Inicio para editarla y
+            publicarla en un clic.
           </p>
-          <span className="mt-2 text-xs font-semibold text-foreground">
-            Abrir Studio →
-          </span>
+          <span className="mt-2 text-xs font-semibold text-foreground">Abrir Studio →</span>
         </Link>
       </section>
 
@@ -113,9 +177,7 @@ function CmsDashboard() {
               className="group block rounded-xl border border-border bg-card p-4 transition-colors hover:bg-accent/40"
             >
               <h3 className="text-base font-semibold">{e.name}</h3>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {e.description}
-              </p>
+              <p className="mt-1 text-xs text-muted-foreground">{e.description}</p>
               <span className="mt-2 inline-block text-xs font-semibold text-primary opacity-0 transition-opacity group-hover:opacity-100">
                 Abrir →
               </span>
@@ -128,26 +190,22 @@ function CmsDashboard() {
         <h2 className="text-sm font-semibold">Workflow editorial</h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Todas las transiciones se ejecutarán mediante{" "}
-          <code className="rounded bg-muted px-1.5 py-0.5">
-            transition_content_status
-          </code>{" "}
-          conforme a 13.4. Estados oficiales:
+          <code className="rounded bg-muted px-1.5 py-0.5">transition_content_status</code> conforme
+          a 13.4. Estados oficiales:
         </p>
         <ol className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-          {["draft", "in_review", "approved", "published", "archived"].map(
-            (s, i, arr) => (
-              <li key={s} className="flex items-center gap-2">
-                <span className="rounded-full border border-border bg-background px-3 py-1 font-medium">
-                  {s}
+          {["draft", "in_review", "approved", "published", "archived"].map((s, i, arr) => (
+            <li key={s} className="flex items-center gap-2">
+              <span className="rounded-full border border-border bg-background px-3 py-1 font-medium">
+                {s}
+              </span>
+              {i < arr.length - 1 && (
+                <span aria-hidden className="text-muted-foreground">
+                  →
                 </span>
-                {i < arr.length - 1 && (
-                  <span aria-hidden className="text-muted-foreground">
-                    →
-                  </span>
-                )}
-              </li>
-            ),
-          )}
+              )}
+            </li>
+          ))}
         </ol>
       </section>
     </div>

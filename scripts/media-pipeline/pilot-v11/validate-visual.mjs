@@ -35,15 +35,20 @@ function admin() {
 async function main() {
   const sb = admin();
 
-  const { data: asset, error: aErr } = await sb.from("media_assets")
+  const { data: asset, error: aErr } = await sb
+    .from("media_assets")
     .select("original_bucket, original_path, original_width, original_height")
-    .eq("id", VERTICAL_ID).single();
+    .eq("id", VERTICAL_ID)
+    .single();
   if (aErr || !asset) throw new Error(`load asset: ${aErr?.message}`);
   const origAspect = asset.original_width / asset.original_height;
 
-  const { data: variants, error: vErr } = await sb.from("media_asset_variants")
+  const { data: variants, error: vErr } = await sb
+    .from("media_asset_variants")
     .select("id, format, width, bytes, bucket, path, status, metadata")
-    .eq("asset_id", VERTICAL_ID).order("format").order("width");
+    .eq("asset_id", VERTICAL_ID)
+    .order("format")
+    .order("width");
   if (vErr) throw new Error(`load variants: ${vErr.message}`);
 
   // Descargar original para referencia visual
@@ -56,9 +61,16 @@ async function main() {
   const thumbs = [];
   for (const v of variants) {
     const dl = await sb.storage.from(v.bucket).download(v.path);
-    if (dl.error) { rows.push({ ...v, ok: false, error: dl.error.message }); continue; }
+    if (dl.error) {
+      rows.push({ ...v, ok: false, error: dl.error.message });
+      continue;
+    }
     const buf = Buffer.from(await dl.data.arrayBuffer());
-    let decoded, err = null, aspect = null, aspectOk = false, orientation = null;
+    let decoded,
+      err = null,
+      aspect = null,
+      aspectOk = false,
+      orientation = null;
     try {
       const s = sharp(buf, { failOn: "none" });
       const m = await s.metadata();
@@ -66,14 +78,24 @@ async function main() {
       orientation = m.orientation ?? 1;
       aspect = m.width / m.height;
       aspectOk = Math.abs(aspect - origAspect) / origAspect <= ASPECT_TOL;
-    } catch (e) { err = String(e?.message ?? e); }
+    } catch (e) {
+      err = String(e?.message ?? e);
+    }
 
     rows.push({
-      format: v.format, target_width: v.width, actual: decoded, orientation,
-      aspect, aspect_original: origAspect, aspect_ok: aspectOk,
+      format: v.format,
+      target_width: v.width,
+      actual: decoded,
+      orientation,
+      aspect,
+      aspect_original: origAspect,
+      aspect_ok: aspectOk,
       width_match: decoded ? decoded.width === v.width : false,
-      height_expected_within_1px: decoded ? Math.abs(decoded.height - Math.round(v.width / origAspect)) <= 1 : false,
-      bytes: buf.length, db_bytes: v.bytes,
+      height_expected_within_1px: decoded
+        ? Math.abs(decoded.height - Math.round(v.width / origAspect)) <= 1
+        : false,
+      bytes: buf.length,
+      db_bytes: v.bytes,
       ok: !err && aspectOk && decoded?.width === v.width,
       error: err,
     });
@@ -103,7 +125,7 @@ async function main() {
     const label = Buffer.from(
       `<svg xmlns="http://www.w3.org/2000/svg" width="${meta[i].width}" height="30">
         <rect width="100%" height="100%" fill="#0e1b2c"/>
-        <text x="${meta[i].width/2}" y="20" text-anchor="middle" fill="#f6d99a"
+        <text x="${meta[i].width / 2}" y="20" text-anchor="middle" fill="#f6d99a"
               font-family="sans-serif" font-size="16">${thumbs[i].format}</text>
       </svg>`,
     );
@@ -113,12 +135,19 @@ async function main() {
   const contactPath = "/mnt/documents/H3A4-M1-Pilot-v11-vertical-contact-sheet.jpg";
   await sharp({
     create: { width: totalW, height: maxH, channels: 3, background: "#e9dcc3" },
-  }).composite(composites).jpeg({ quality: 88 }).toFile(contactPath);
+  })
+    .composite(composites)
+    .jpeg({ quality: 88 })
+    .toFile(contactPath);
 
   const summary = {
     assetId: VERTICAL_ID,
-    original: { width: asset.original_width, height: asset.original_height,
-                aspect: origAspect, exif_orientation: origMeta.orientation ?? 1 },
+    original: {
+      width: asset.original_width,
+      height: asset.original_height,
+      aspect: origAspect,
+      exif_orientation: origMeta.orientation ?? 1,
+    },
     variants_checked: rows.length,
     variants_ok: rows.filter((r) => r.ok).length,
     variants_failed: rows.filter((r) => !r.ok).length,
@@ -127,13 +156,22 @@ async function main() {
     rows,
   };
   await writeFile(join(OUT, "visual-validation.json"), JSON.stringify(summary, null, 2));
-  console.log(JSON.stringify({
-    assetId: VERTICAL_ID,
-    variants_ok: summary.variants_ok,
-    variants_failed: summary.variants_failed,
-    contact_sheet: contactPath,
-  }, null, 2));
+  console.log(
+    JSON.stringify(
+      {
+        assetId: VERTICAL_ID,
+        variants_ok: summary.variants_ok,
+        variants_failed: summary.variants_failed,
+        contact_sheet: contactPath,
+      },
+      null,
+      2,
+    ),
+  );
   if (summary.variants_failed > 0) process.exit(1);
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

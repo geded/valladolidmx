@@ -15,10 +15,7 @@ import {
   reorderBusinessGallery,
   signBusinessImageUpload,
 } from "@/lib/cms/businesses-media.functions";
-import {
-  prepareImageForRole,
-  withRetry,
-} from "@/lib/cms/image-upload";
+import { prepareImageForRole, withRetry } from "@/lib/cms/image-upload";
 
 type MediaRow = Awaited<ReturnType<typeof listBusinessMedia>>[number];
 
@@ -47,10 +44,7 @@ export function BusinessMediaPanels({ businessId, onChanged }: Props) {
     onChanged?.();
   };
 
-  const uploadOne = async (
-    file: File,
-    role: "logo" | "cover" | "gallery",
-  ) => {
+  const uploadOne = async (file: File, role: "logo" | "cover" | "gallery") => {
     const prepared = await prepareImageForRole(file, role);
     await withRetry(async () => {
       const signed = await signFn({
@@ -81,14 +75,12 @@ export function BusinessMediaPanels({ businessId, onChanged }: Props) {
   };
 
   const singleUpload = useMutation({
-    mutationFn: async (v: { file: File; role: "logo" | "cover" }) =>
-      uploadOne(v.file, v.role),
+    mutationFn: async (v: { file: File; role: "logo" | "cover" }) => uploadOne(v.file, v.role),
     onSuccess: (_res, v) => {
       invalidate();
       toast.success(`${v.role === "logo" ? "Logo" : "Portada"} actualizada.`);
     },
-    onError: (e) =>
-      toast.error(e instanceof Error ? e.message : "No se pudo subir."),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo subir."),
   });
   const galleryUpload = useMutation({
     mutationFn: async (files: File[]) => {
@@ -99,9 +91,7 @@ export function BusinessMediaPanels({ businessId, onChanged }: Props) {
           await uploadOne(f, "gallery");
           ok += 1;
         } catch (err) {
-          errors.push(
-            `${f.name}: ${err instanceof Error ? err.message : "error"}`,
-          );
+          errors.push(`${f.name}: ${err instanceof Error ? err.message : "error"}`);
         }
       }
       return { ok, errors };
@@ -109,25 +99,23 @@ export function BusinessMediaPanels({ businessId, onChanged }: Props) {
     onSuccess: (res) => {
       invalidate();
       if (res.ok > 0)
-        toast.success(`${res.ok} imagen${res.ok === 1 ? "" : "es"} subida${res.ok === 1 ? "" : "s"}.`);
+        toast.success(
+          `${res.ok} imagen${res.ok === 1 ? "" : "es"} subida${res.ok === 1 ? "" : "s"}.`,
+        );
       for (const msg of res.errors) toast.error(msg);
     },
-    onError: (e) =>
-      toast.error(e instanceof Error ? e.message : "No se pudo subir."),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo subir."),
   });
   const removeMut = useMutation({
-    mutationFn: (businessMediaId: string) =>
-      removeFn({ data: { businessMediaId } }),
+    mutationFn: (businessMediaId: string) => removeFn({ data: { businessMediaId } }),
     onSuccess: () => {
       invalidate();
       toast.success("Imagen eliminada.");
     },
-    onError: (e) =>
-      toast.error(e instanceof Error ? e.message : "No se pudo eliminar."),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo eliminar."),
   });
   const reorderMut = useMutation({
-    mutationFn: (orderedIds: string[]) =>
-      reorderFn({ data: { businessId, orderedIds } }),
+    mutationFn: (orderedIds: string[]) => reorderFn({ data: { businessId, orderedIds } }),
     onSuccess: invalidate,
   });
 
@@ -300,9 +288,7 @@ function GalleryPanel(props: {
           if (files.length) props.onUpload(files);
         }}
         className={`rounded-lg border border-dashed p-3 ${
-          dragOver
-            ? "border-primary bg-primary/5"
-            : "border-border bg-background"
+          dragOver ? "border-primary bg-primary/5" : "border-border bg-background"
         }`}
       >
         {props.items.length === 0 ? (
@@ -317,11 +303,7 @@ function GalleryPanel(props: {
                 className="group relative overflow-hidden rounded-md border border-border bg-card"
               >
                 {m.previewUrl ? (
-                  <img
-                    src={m.previewUrl}
-                    alt={m.alt ?? ""}
-                    className="h-28 w-full object-cover"
-                  />
+                  <img src={m.previewUrl} alt={m.alt ?? ""} className="h-28 w-full object-cover" />
                 ) : (
                   <div className="h-28 w-full bg-muted" />
                 )}

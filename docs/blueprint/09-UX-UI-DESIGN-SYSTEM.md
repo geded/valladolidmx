@@ -1,6 +1,7 @@
 # 09-UX-UI-DESIGN-SYSTEM.md
 
 # UX / UI Design System
+
 Versión 1.0
 
 ## Objetivo
@@ -200,7 +201,6 @@ Todos reutilizables.
 
 ---
 
-
 # Home (orden recomendado)
 
 1. Hero principal
@@ -247,6 +247,7 @@ Desde el CMS se podrá definir:
 - Relación con destinos
 
 Al seleccionar una publicación podrá abrirse:
+
 - La publicación original.
 - El destino o micrositio relacionado.
 

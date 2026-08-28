@@ -25,11 +25,7 @@ function fmtTime(iso: string | null): string {
   return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
 }
 
-export function LiveRecapSurface({
-  recap,
-  onOpenTomorrow,
-  className,
-}: LiveRecapSurfaceProps) {
+export function LiveRecapSurface({ recap, onOpenTomorrow, className }: LiveRecapSurfaceProps) {
   if (!recap.visible) return null;
 
   return (

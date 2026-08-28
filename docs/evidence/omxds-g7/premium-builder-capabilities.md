@@ -13,25 +13,25 @@ Marcador DOM: `[data-g7-fixture="integrated"]`.
 Monta los componentes productivos reales, sin imitaciones, sin persistencia
 y sin funciones de escritura:
 
-| Capacidad | Componente productivo | Configuración del fixture |
-| --- | --- | --- |
-| `vmx.hero` | `src/components/home/Hero.tsx` | `variant: editorial-split`, `media_side: right`, `mobile_order: media-first`, `text_safe_zone: lg` |
-| `vmx.discovery.navigator` | `DiscoveryNavigatorBlock` → `DiscoveryNavigator` → `CategoryNavGrid` → `TourismCategoryIcon` | orden manual de 9 slugs (uno inexistente), `hiddenSlugs: restaurantes`, `maxItems: 8` |
-| `vmx.alux.planner` | `AluxPlannerBlock` | render-only, 4 sugerencias, CTA `/arma-tu-viaje` |
-| `vmx.section.rutas` | `RutasSection` | `source: manual`, 4 slugs (uno inexistente), `max_items: 3`, `show_stops: true` |
+| Capacidad                 | Componente productivo                                                                        | Configuración del fixture                                                                          |
+| ------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `vmx.hero`                | `src/components/home/Hero.tsx`                                                               | `variant: editorial-split`, `media_side: right`, `mobile_order: media-first`, `text_safe_zone: lg` |
+| `vmx.discovery.navigator` | `DiscoveryNavigatorBlock` → `DiscoveryNavigator` → `CategoryNavGrid` → `TourismCategoryIcon` | orden manual de 9 slugs (uno inexistente), `hiddenSlugs: restaurantes`, `maxItems: 8`              |
+| `vmx.alux.planner`        | `AluxPlannerBlock`                                                                           | render-only, 4 sugerencias, CTA `/arma-tu-viaje`                                                   |
+| `vmx.section.rutas`       | `RutasSection`                                                                               | `source: manual`, 4 slugs (uno inexistente), `max_items: 3`, `show_stops: true`                    |
 
 ## Evidencia visual (seis anchos)
 
 Capturas del fixture: `docs/evidence/omxds-g7/shots/g7-<ancho>.png`.
 
-| Ancho | Overflow horizontal | Hero | Zona segura | Bordados | Orden de categorías | Chips Alux | Rutas / paradas |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 390 px | 0 | `editorial-split` | `lg` | 7 × 44×44 | configurado | ≥44 px | 3 / 3 |
-| 430 px | 0 | `editorial-split` | `lg` | 7 × 44×44 | configurado | ≥44 px | 3 / 3 |
-| 768 px | 0 | `editorial-split` | `lg` | 7 × 44×44 | configurado | ≥44 px | 3 / 3 |
-| 1024 px | 0 | `editorial-split` | `lg` | 7 × 44×44 | configurado | ≥44 px | 3 / 3 |
-| 1280 px | 0 | `editorial-split` | `lg` | 7 × 44×44 | configurado | ≥44 px | 3 / 3 |
-| 1440 px | 0 | `editorial-split` | `lg` | 7 × 44×44 | configurado | ≥44 px | 3 / 3 |
+| Ancho   | Overflow horizontal | Hero              | Zona segura | Bordados  | Orden de categorías | Chips Alux | Rutas / paradas |
+| ------- | ------------------- | ----------------- | ----------- | --------- | ------------------- | ---------- | --------------- |
+| 390 px  | 0                   | `editorial-split` | `lg`        | 7 × 44×44 | configurado         | ≥44 px     | 3 / 3           |
+| 430 px  | 0                   | `editorial-split` | `lg`        | 7 × 44×44 | configurado         | ≥44 px     | 3 / 3           |
+| 768 px  | 0                   | `editorial-split` | `lg`        | 7 × 44×44 | configurado         | ≥44 px     | 3 / 3           |
+| 1024 px | 0                   | `editorial-split` | `lg`        | 7 × 44×44 | configurado         | ≥44 px     | 3 / 3           |
+| 1280 px | 0                   | `editorial-split` | `lg`        | 7 × 44×44 | configurado         | ≥44 px     | 3 / 3           |
+| 1440 px | 0                   | `editorial-split` | `lg`        | 7 × 44×44 | configurado         | ≥44 px     | 3 / 3           |
 
 Orden observado en los seis anchos: `cenotes · hoteles · gastronomia ·
 zonas-arqueologicas · experiencias · artesanias · cultura`.

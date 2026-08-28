@@ -5,6 +5,7 @@ Base leída: HEAD `caeacf99`. Todo lo afirmado abajo fue verificado en el reposi
 ## 1. Inventario real (verificado)
 
 Ya implementado:
+
 - Previews G4 internos, no indexables: `src/routes/lovable/g4-home-premium-preview.tsx` (1518 líneas), `g4-destination-microsite-preview.tsx` (1001), `g4-hotel-premium-preview.tsx` (1176), `g4-restaurant-premium-preview.tsx` (921), `g4-experience-premium-preview.tsx` (1077), `g4-event-premium-preview.tsx` (1131). Total ~6.8k líneas con datos DEMO en constantes locales y panel de afinación con `useState`.
 - Medios gobernados servidos por el proxy estable `/api/public/studio-media/governed/v1p1c/*`; sin URLs firmadas.
 - Mapa único oficial: `ExperienceMapBlock` (`vmx.experience.map`), usado por los previews.
@@ -14,7 +15,8 @@ Ya implementado:
 - Gates de gobernanza I1–I4 y validadores en `scripts/omxds/*` y `scripts/governance/*`, orquestados por `scripts/governance/validate-full-suite.mjs`; cobertura de rutas por `scripts/route-inventory-coverage.ts`.
 
 Faltante (no existe hoy en el repositorio):
-- No existe un eje de presentación compartido: la única coincidencia de "cinemat*" está dentro de los previews y de `experience-hero`; no hay tipo, registro ni contrato `presentation: editorial | cinematic`.
+
+- No existe un eje de presentación compartido: la única coincidencia de "cinemat\*" está dentro de los previews y de `experience-hero`; no hay tipo, registro ni contrato `presentation: editorial | cinematic`.
 - No existen primitivas premium compartidas: cada preview reimplementa hero, galería, secciones y CTAs localmente.
 - Las superficies públicas no consumen las composiciones premium aprobadas ni el nombre territorial de forma unificada.
 - No hay reporte de preparación de entidades (READY/BLOCKED) ni script que lo genere.
@@ -23,6 +25,7 @@ Faltante (no existe hoy en el repositorio):
 ## 2. Mínimo conjunto a crear/modificar
 
 Nuevo (primitivas compartidas, sin lógica de negocio nueva):
+
 - `src/lib/omxds/presentation/presentation.ts` — tipo `PremiumPresentation = "editorial" | "cinematic"`, default y resolución por rol (selector nunca público).
 - `src/components/premium/PremiumHero.tsx`, `PremiumGallery.tsx`, `PremiumSection.tsx`, `PremiumFactsBar.tsx`, `PremiumCtaRail.tsx`, `PremiumBreadcrumb.tsx`, `index.ts` — todos ViewModel-only, alineados al contrato del Surface Kit.
 - `src/lib/omxds/presentation/vm/*.ts` — mappers `toPremiumVM()` por familia (destino, hotel, restaurante, experiencia, evento, casa de vacaciones, ruta), consumiendo los contratos existentes de `src/lib/omxds/surfaces/*`.
@@ -30,6 +33,7 @@ Nuevo (primitivas compartidas, sin lógica de negocio nueva):
 - `scripts/qa/responsive-a11y.mjs` — QA con Playwright ya disponible en sandbox, contra 390/768/1024/1280/1440.
 
 Modificado (mínimo):
+
 - Los 6 previews `g4-*`: sustituyen su implementación local por las primitivas, conservando sus datos DEMO y su panel interno.
 - `src/components/surfaces/DestinationSurface.tsx`, `BusinessSurface.tsx`, `EventSurface.tsx`, `ProductSurface.tsx`: renderizan primitivas premium sólo cuando la elegibilidad por entidad ya existente lo permite; ruta actual intacta si no.
 - `src/lib/experience-builder/route-inventory.ts` para cualquier ruta nueva.
@@ -38,6 +42,7 @@ Modificado (mínimo):
 ## 3. Cómo promover previews a primitivas sin copiar bloques
 
 Extracción por identidad visual, no por copia:
+
 1. Diff estructural de los 6 previews para identificar los patrones repetidos (hero, mosaico/carrusel/cuadrícula/tira, fajas de datos, secciones editoriales, riel de CTAs, breadcrumb territorial).
 2. Cada patrón se implementa una sola vez en `src/components/premium/*` con `presentation` como prop y variantes por `variant`/`capabilities` (prohibido `-v2`, `-pro`).
 3. Cada preview conserva únicamente: constantes DEMO, mapper `toPremiumVM()` y el panel de afinación. Objetivo medible: reducir el total de ~6.8k líneas a menos de la mitad, con cero regresión visual verificada por capturas antes/después.

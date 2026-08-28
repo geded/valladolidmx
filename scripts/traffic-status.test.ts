@@ -8,8 +8,7 @@ import { describe, expect, test } from "bun:test";
 import { evaluateTrafficStatus } from "../src/lib/traveler/traffic-status";
 
 const NOW = new Date("2026-07-13T15:00:00Z");
-const addMin = (min: number) =>
-  new Date(NOW.getTime() + min * 60000).toISOString();
+const addMin = (min: number) => new Date(NOW.getTime() + min * 60000).toISOString();
 
 describe("evaluateTrafficStatus (CV6.5.3)", () => {
   test("1 · viaje con tráfico normal y arriveBy holgado → on_time", () => {

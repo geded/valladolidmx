@@ -60,13 +60,7 @@ const STEPS: Step[] = [
   },
 ];
 
-export function OnboardingTour({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
+export function OnboardingTour({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [step, setStep] = useState(0);
   const [dontShow, setDontShow] = useState(true);
 

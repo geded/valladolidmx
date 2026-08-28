@@ -3,6 +3,7 @@ name: Founder Anonymous Travel Continuity Principle
 description: Los visitantes anónimos reciben valor y construyen viaje parcial sin registro. Local-first (IndexedDB), sin cuenta anónima ni escrituras por interacción; el registro se solicita sólo cuando aporta beneficio evidente.
 type: constraint
 ---
+
 Reglas vinculantes (Iniciativa "Anonymous Travel Continuity"):
 
 - Alux nunca pide antes de dar. Prohibido gating de registro en la 1ª interacción de favorito o "agregar al viaje".

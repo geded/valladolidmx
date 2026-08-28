@@ -3,6 +3,7 @@ name: Founder Transparent Derivation Principle
 description: Las variantes derivadas son responsabilidad exclusiva del Media Pipeline y sus resolvers. Consumidores nunca construyen URLs, formatos, tamaños ni paths.
 type: constraint
 ---
+
 **Founder Transparent Derivation Principle** (H3·A4, vinculante)
 
 - Toda variante (AVIF/WebP/JPEG × anchos) es responsabilidad exclusiva del Media Pipeline (`media-derived`) y sus resolvers oficiales.

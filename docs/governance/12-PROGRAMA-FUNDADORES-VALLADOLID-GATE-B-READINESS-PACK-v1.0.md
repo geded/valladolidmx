@@ -52,18 +52,18 @@ La propuesta vende valor operativo y visibilidad de destino. No debe prometer vo
 
 ### 3.2 Oferta piloto aprobada
 
-| Elemento | Condición aprobada |
-|---|---|
-| Cupo | Cinco empresas piloto en la primera ola. |
-| Duración de onboarding | Hasta 30 días por empresa desde aceptación. |
-| Acompañamiento | Diagnóstico, verificación, normalización de ficha, carga inicial y capacitación breve. |
-| Perfil público | Sin costo durante el piloto, sujeto a calidad, consentimiento y aprobación editorial. |
-| Comisión de plataforma | **0% durante seis meses desde la primera publicación**, sólo si posteriormente se habilitan transacciones. |
-| Costos de terceros | No incluidos: procesamiento de pagos, impuestos, proveedores externos u operación propia de la empresa. Deben transparentarse antes de activar comercio. |
-| Cuota de alta | $0 MXN para la cohorte piloto. |
-| Permanencia forzosa | Ninguna. La empresa puede retirarse conforme al procedimiento de salida. |
-| Condición posterior | Ninguna comisión o cuota posterior se activa automáticamente. Requiere propuesta y aceptación por escrito antes del vencimiento. |
-| Preferencia en resultados | No garantizada. La visibilidad se rige por relevancia, calidad, disponibilidad, contexto y reglas de oportunidad justa. |
+| Elemento                  | Condición aprobada                                                                                                                                       |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cupo                      | Cinco empresas piloto en la primera ola.                                                                                                                 |
+| Duración de onboarding    | Hasta 30 días por empresa desde aceptación.                                                                                                              |
+| Acompañamiento            | Diagnóstico, verificación, normalización de ficha, carga inicial y capacitación breve.                                                                   |
+| Perfil público            | Sin costo durante el piloto, sujeto a calidad, consentimiento y aprobación editorial.                                                                    |
+| Comisión de plataforma    | **0% durante seis meses desde la primera publicación**, sólo si posteriormente se habilitan transacciones.                                               |
+| Costos de terceros        | No incluidos: procesamiento de pagos, impuestos, proveedores externos u operación propia de la empresa. Deben transparentarse antes de activar comercio. |
+| Cuota de alta             | $0 MXN para la cohorte piloto.                                                                                                                           |
+| Permanencia forzosa       | Ninguna. La empresa puede retirarse conforme al procedimiento de salida.                                                                                 |
+| Condición posterior       | Ninguna comisión o cuota posterior se activa automáticamente. Requiere propuesta y aceptación por escrito antes del vencimiento.                         |
+| Preferencia en resultados | No garantizada. La visibilidad se rige por relevancia, calidad, disponibilidad, contexto y reglas de oportunidad justa.                                  |
 
 ### 3.3 Beneficios para empresas fundadoras
 
@@ -120,16 +120,16 @@ Cualquier empresa vinculada al Founder deberá pasar el mismo checklist y no rec
 
 Puntaje máximo: 100. Umbral recomendado: 70, sin fallar un requisito eliminatorio.
 
-| Criterio | Peso | Evidencia esperada |
-|---|---:|---|
-| Legitimidad y representación | 20 | identidad comercial y persona autorizada verificables |
-| Calidad y claridad del producto | 15 | oferta comprensible, diferenciada y realizable |
-| Preparación digital | 10 | canales, contenidos y responsable disponibles |
-| Capacidad de respuesta | 15 | horario, responsable y tiempo de atención declarado |
-| Calidad de datos y contenidos | 15 | precios/condiciones, fotos y datos consistentes |
-| Encaje con permanencia | 10 | potencial para enriquecer itinerario o aumentar estancia |
-| Representatividad de cohorte | 10 | aporta diversidad de categoría o público |
-| Disposición para aprender | 5 | acepta feedback y seguimiento del piloto |
+| Criterio                        | Peso | Evidencia esperada                                       |
+| ------------------------------- | ---: | -------------------------------------------------------- |
+| Legitimidad y representación    |   20 | identidad comercial y persona autorizada verificables    |
+| Calidad y claridad del producto |   15 | oferta comprensible, diferenciada y realizable           |
+| Preparación digital             |   10 | canales, contenidos y responsable disponibles            |
+| Capacidad de respuesta          |   15 | horario, responsable y tiempo de atención declarado      |
+| Calidad de datos y contenidos   |   15 | precios/condiciones, fotos y datos consistentes          |
+| Encaje con permanencia          |   10 | potencial para enriquecer itinerario o aumentar estancia |
+| Representatividad de cohorte    |   10 | aporta diversidad de categoría o público                 |
+| Disposición para aprender       |    5 | acepta feedback y seguimiento del piloto                 |
 
 No se usarán favores personales, promesas políticas, pagos por adelantado ni popularidad en redes como sustitutos de evidencia.
 
@@ -143,13 +143,13 @@ La lista nominal y los datos personales deben permanecer en una superficie de ac
 
 La selección preliminar queda registrada públicamente sólo mediante códigos anónimos y el lugar funcional que cubre cada candidata. Los nombres, puntajes, personas de contacto y brechas de verificación permanecen en el expediente restringido.
 
-| Código | Lugar en la mezcla del piloto | Estado autorizado |
-|---|---|---|
+| Código | Lugar en la mezcla del piloto               | Estado autorizado             |
+| ------ | ------------------------------------------- | ----------------------------- |
 | PFV-01 | experiencia cultural, natural o comunitaria | preseleccionada; no contactar |
-| PFV-02 | alojamiento | preseleccionada; no contactar |
-| PFV-03 | restaurante o experiencia gastronómica | preseleccionada; no contactar |
-| PFV-04 | operador, guía o movilidad turística | preseleccionada; no contactar |
-| PFV-05 | segunda experiencia diferenciada | preseleccionada; no contactar |
+| PFV-02 | alojamiento                                 | preseleccionada; no contactar |
+| PFV-03 | restaurante o experiencia gastronómica      | preseleccionada; no contactar |
+| PFV-04 | operador, guía o movilidad turística        | preseleccionada; no contactar |
+| PFV-05 | segunda experiencia diferenciada            | preseleccionada; no contactar |
 
 La codificación no constituye verificación, aceptación, incorporación ni autorización de uso de marca. Gate B1 continúa cerrado.
 
@@ -230,15 +230,15 @@ Este expediente define requisitos de producto y operación; no sustituye asesor�
 
 ### 7.1 Roles propuestos
 
-| Rol | Responsable nominal | Función | Requisito para B1 |
-|---|---|---|---|
-| Sponsor y decisión | Founder | aprueba oferta, candidatas, excepciones y gates | obligatorio |
-| Responsable del programa | Founder · interino | controla cohorte, agenda, estados y reporte | obligatorio |
-| Verificación | Founder · interino | valida identidad, propiedad, ubicación y operación | delegar antes del primer contacto |
-| Edición | Founder · interino | normaliza ficha y catálogo sin inventar | delegar antes del primer contacto |
-| Soporte empresas | Founder · interino | acompaña alta, portal y correcciones | delegar antes del primer contacto |
-| Concierge/viajeros | Por designar | atiende solicitudes activadas durante piloto | antes de viajeros reales |
-| Legal/fiscal | Por designar o externo | valida textos y flujo comercial | legal para B1; legal/fiscal para B2 |
+| Rol                      | Responsable nominal    | Función                                            | Requisito para B1                   |
+| ------------------------ | ---------------------- | -------------------------------------------------- | ----------------------------------- |
+| Sponsor y decisión       | Founder                | aprueba oferta, candidatas, excepciones y gates    | obligatorio                         |
+| Responsable del programa | Founder · interino     | controla cohorte, agenda, estados y reporte        | obligatorio                         |
+| Verificación             | Founder · interino     | valida identidad, propiedad, ubicación y operación | delegar antes del primer contacto   |
+| Edición                  | Founder · interino     | normaliza ficha y catálogo sin inventar            | delegar antes del primer contacto   |
+| Soporte empresas         | Founder · interino     | acompaña alta, portal y correcciones               | delegar antes del primer contacto   |
+| Concierge/viajeros       | Por designar           | atiende solicitudes activadas durante piloto       | antes de viajeros reales            |
+| Legal/fiscal             | Por designar o externo | valida textos y flujo comercial                    | legal para B1; legal/fiscal para B2 |
 
 Una persona puede cubrir varios roles, pero cada función debe tener nombre, suplencia y forma de contacto.
 
@@ -255,12 +255,12 @@ El número, correo, responsables y horario definitivo deben llenarse antes de ap
 
 ### 7.3 SLA interno propuesto
 
-| Prioridad | Ejemplo | Primera respuesta | Objetivo de resolución o plan |
-|---|---|---:|---:|
-| P0 | riesgo a persona, fraude activo o exposición grave de datos | 15 min en cobertura | contención inmediata y escalación |
-| P1 | servicio confirmado en riesgo dentro de 24 h | 30 min en cobertura | 2 h o plan acordado |
-| P2 | ficha pública incorrecta, acceso bloqueado, solicitud perdida | 4 h hábiles | 1 día hábil |
-| P3 | duda, capacitación o mejora de contenido | 1 día hábil | 3 días hábiles |
+| Prioridad | Ejemplo                                                       |   Primera respuesta |     Objetivo de resolución o plan |
+| --------- | ------------------------------------------------------------- | ------------------: | --------------------------------: |
+| P0        | riesgo a persona, fraude activo o exposición grave de datos   | 15 min en cobertura | contención inmediata y escalación |
+| P1        | servicio confirmado en riesgo dentro de 24 h                  | 30 min en cobertura |               2 h o plan acordado |
+| P2        | ficha pública incorrecta, acceso bloqueado, solicitud perdida |         4 h hábiles |                       1 día hábil |
+| P3        | duda, capacitación o mejora de contenido                      |         1 día hábil |                    3 días hábiles |
 
 Estos tiempos son objetivos internos del piloto, no una garantía pública hasta demostrar capacidad operativa.
 
@@ -418,18 +418,18 @@ Hasta cerrar B2, “ventas en línea” puede existir técnicamente, pero no for
 
 ## 12. Riesgos y controles
 
-| Riesgo | Señal temprana | Control |
-|---|---|---|
+| Riesgo                                                    | Señal temprana                               | Control                                                           |
+| --------------------------------------------------------- | -------------------------------------------- | ----------------------------------------------------------------- |
 | La empresa entiende “Fundador” como inversión o propiedad | pregunta por acciones o derechos societarios | aclarar que es una cohorte comercial, no participación accionaria |
-| Se promete venta garantizada | copy o vendedor usa cifras no sustentadas | guion aprobado y revisión de comunicaciones |
-| Oferta 0% oculta costos | dudas sobre procesador o impuestos | separar comisión de plataforma y costos de terceros |
-| Datos quedan obsoletos | horarios/precios sin owner | revisión 7/14/30 días y fecha de siguiente control |
-| Ficha publicada sin permiso | falta versión/fecha de aceptación | bloqueo obligatorio antes de `Publicable` |
-| Soporte colapsa | SLA P2/P3 incumplido repetidamente | pausar invitaciones y ajustar capacidad |
-| Se construye otro CRM | equipo propone tracker paralelo | reutilizar empresa, portal, estados y Action Queue existentes |
-| Se activa comercio prematuramente | aparece checkout o cobro real | feature flag OFF y Gate B2 independiente |
-| Favoritismo | excepciones por relación personal | scorecard común y registro de excepción Founder |
-| Reputación de destino afectada | quejas graves o experiencia insegura | pausa inmediata, investigación y posible retiro |
+| Se promete venta garantizada                              | copy o vendedor usa cifras no sustentadas    | guion aprobado y revisión de comunicaciones                       |
+| Oferta 0% oculta costos                                   | dudas sobre procesador o impuestos           | separar comisión de plataforma y costos de terceros               |
+| Datos quedan obsoletos                                    | horarios/precios sin owner                   | revisión 7/14/30 días y fecha de siguiente control                |
+| Ficha publicada sin permiso                               | falta versión/fecha de aceptación            | bloqueo obligatorio antes de `Publicable`                         |
+| Soporte colapsa                                           | SLA P2/P3 incumplido repetidamente           | pausar invitaciones y ajustar capacidad                           |
+| Se construye otro CRM                                     | equipo propone tracker paralelo              | reutilizar empresa, portal, estados y Action Queue existentes     |
+| Se activa comercio prematuramente                         | aparece checkout o cobro real                | feature flag OFF y Gate B2 independiente                          |
+| Favoritismo                                               | excepciones por relación personal            | scorecard común y registro de excepción Founder                   |
+| Reputación de destino afectada                            | quejas graves o experiencia insegura         | pausa inmediata, investigación y posible retiro                   |
 
 ---
 
@@ -482,21 +482,21 @@ Hasta cerrar B2, “ventas en línea” puede existir técnicamente, pero no for
 
 Este expediente está completo en estructura, pero Gate B1 no puede aprobarse hasta llenar:
 
-| Decisión | Valor pendiente |
-|---|---|
-| Responsable del programa | Founder · interino |
-| Suplente | pendiente antes del primer contacto |
-| Responsable de verificación | Founder · interino; delegación pendiente |
-| Responsable de edición | Founder · interino; delegación pendiente |
-| Soporte empresas | Founder · interino; delegación pendiente |
-| Canal WhatsApp Business | — |
-| Correo operativo | — |
-| Horario definitivo | — |
-| Responsable legal/privacidad | — |
-| Cinco candidatas titulares | PFV-01 a PFV-05 en GitHub; identidades y scorecard en registro restringido |
-| Hasta cinco reservas | registro restringido, no GitHub |
-| Aceptación de oferta 0% × 6 meses | aprobada por Founder el 2026-07-21 |
-| Modalidad B1 sin cobro | aprobada por Founder el 2026-07-21 |
+| Decisión                          | Valor pendiente                                                            |
+| --------------------------------- | -------------------------------------------------------------------------- |
+| Responsable del programa          | Founder · interino                                                         |
+| Suplente                          | pendiente antes del primer contacto                                        |
+| Responsable de verificación       | Founder · interino; delegación pendiente                                   |
+| Responsable de edición            | Founder · interino; delegación pendiente                                   |
+| Soporte empresas                  | Founder · interino; delegación pendiente                                   |
+| Canal WhatsApp Business           | —                                                                          |
+| Correo operativo                  | —                                                                          |
+| Horario definitivo                | —                                                                          |
+| Responsable legal/privacidad      | —                                                                          |
+| Cinco candidatas titulares        | PFV-01 a PFV-05 en GitHub; identidades y scorecard en registro restringido |
+| Hasta cinco reservas              | registro restringido, no GitHub                                            |
+| Aceptación de oferta 0% × 6 meses | aprobada por Founder el 2026-07-21                                         |
+| Modalidad B1 sin cobro            | aprobada por Founder el 2026-07-21                                         |
 
 ---
 
@@ -546,9 +546,9 @@ No se debe abrir una campaña pública “Sé Fundador” antes de demostrar que
 
 ## 17. Control de versión
 
-| Versión | Fecha | Estado | Descripción |
-|---|---|---|---|
-| 1.0 | 2026-07-21 | Decision-ready | Oferta comercial aprobada; Founder asignado interinamente; cohorte registrada como PFV-01 a PFV-05; Gate B1/B2 cerrados y sin contacto ni cobro. |
+| Versión | Fecha      | Estado         | Descripción                                                                                                                                      |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1.0     | 2026-07-21 | Decision-ready | Oferta comercial aprobada; Founder asignado interinamente; cohorte registrada como PFV-01 a PFV-05; Gate B1/B2 cerrados y sin contacto ni cobro. |
 
 ---
 

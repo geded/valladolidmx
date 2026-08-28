@@ -13,7 +13,9 @@ import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
 import type { Destination } from "@/types/territory";
 
 export const Route = createFileRoute("/mapa")({
-  loader: async () => ({ destinos: await listPublishedDestinations().catch(() => [] as Destination[]) }),
+  loader: async () => ({
+    destinos: await listPublishedDestinations().catch(() => [] as Destination[]),
+  }),
   head: () =>
     buildPublicHead({
       title: `Mapa · ${SITE.name}`,

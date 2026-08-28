@@ -131,7 +131,10 @@ export function HeroSearchPill({
                   {destino?.name ?? destinoPlaceholder}
                 </span>
               </span>
-              <ChevronDown className="ml-auto size-3.5 shrink-0 text-muted-foreground/70" aria-hidden />
+              <ChevronDown
+                className="ml-auto size-3.5 shrink-0 text-muted-foreground/70"
+                aria-hidden
+              />
             </button>
           </PopoverTrigger>
           <PopoverContent align="start" className="w-72 p-1.5">
@@ -176,7 +179,10 @@ export function HeroSearchPill({
                   {categoria?.name ?? categoriaPlaceholder}
                 </span>
               </span>
-              <ChevronDown className="ml-auto size-3.5 shrink-0 text-muted-foreground/70" aria-hidden />
+              <ChevronDown
+                className="ml-auto size-3.5 shrink-0 text-muted-foreground/70"
+                aria-hidden
+              />
             </button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-72 p-1.5">

@@ -49,8 +49,7 @@ function CarritoPage() {
     queryClient.invalidateQueries({ queryKey: ["traveler", "cart", user?.id] });
 
   const qtyMutation = useMutation({
-    mutationFn: (input: { item_id: string; quantity: number }) =>
-      updateQty({ data: input }),
+    mutationFn: (input: { item_id: string; quantity: number }) => updateQty({ data: input }),
     onSuccess: () => void invalidate(),
   });
   const removeMutation = useMutation({
@@ -85,8 +84,8 @@ function CarritoPage() {
       </p>
       <h1 className="mt-2 text-4xl">Mi carrito</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        Revisa, ajusta y confirma tus reservas. La confirmación crea una
-        orden pendiente; el cobro se habilita en una etapa posterior.
+        Revisa, ajusta y confirma tus reservas. La confirmación crea una orden pendiente; el cobro
+        se habilita en una etapa posterior.
       </p>
 
       {isLoading ? (
@@ -94,8 +93,7 @@ function CarritoPage() {
       ) : isEmpty ? (
         <div className="mt-8 rounded-2xl border border-dashed border-border bg-card p-6">
           <p className="text-sm text-muted-foreground">
-            Tu carrito está vacío. Explora Oriente Maya para añadir
-            experiencias.
+            Tu carrito está vacío. Explora Oriente Maya para añadir experiencias.
           </p>
           <Link
             to="/oriente-maya"
@@ -113,9 +111,7 @@ function CarritoPage() {
                 className="flex flex-wrap items-start justify-between gap-4 rounded-2xl border border-border bg-card p-4"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold">
-                    {item.snapshot_name}
-                  </p>
+                  <p className="truncate text-sm font-semibold">{item.snapshot_name}</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     {item.currency} {item.unit_price.toFixed(2)} c/u
                   </p>
@@ -129,7 +125,10 @@ function CarritoPage() {
                       max={99}
                       defaultValue={item.quantity}
                       onBlur={(e) => {
-                        const q = Math.max(1, Math.min(99, Math.floor(Number(e.target.value || 1))));
+                        const q = Math.max(
+                          1,
+                          Math.min(99, Math.floor(Number(e.target.value || 1))),
+                        );
                         if (q !== item.quantity) {
                           qtyMutation.mutate({ item_id: item.id, quantity: q });
                         }
@@ -194,8 +193,8 @@ function CarritoPage() {
               {confirmMutation.isPending ? "Confirmando…" : "Confirmar reserva"}
             </button>
             <p className="mt-2 text-[11px] text-muted-foreground">
-              Al confirmar, tu carrito pasa a estado <strong>pendiente</strong>.
-              El cobro se habilitará en la siguiente etapa.
+              Al confirmar, tu carrito pasa a estado <strong>pendiente</strong>. El cobro se
+              habilitará en la siguiente etapa.
             </p>
           </section>
         </>

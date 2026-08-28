@@ -16,10 +16,7 @@ import type { ReactNode } from "react";
 import { Container } from "@/components/layout/Container";
 import { BreadcrumbTerritorial } from "@/components/layout/BreadcrumbTerritorial";
 import type { BreadcrumbCrumb } from "@/types/territory";
-import {
-  ContextEngineProvider,
-  type RouteContextDeclaration,
-} from "@/lib/context-engine";
+import { ContextEngineProvider, type RouteContextDeclaration } from "@/lib/context-engine";
 import { cn } from "@/lib/utils";
 
 export type PublicShellVariant = "default" | "hero" | "minimal";
@@ -74,11 +71,7 @@ export function PublicShell({
   );
 
   if (contextDeclaration) {
-    return (
-      <ContextEngineProvider declaration={contextDeclaration}>
-        {body}
-      </ContextEngineProvider>
-    );
+    return <ContextEngineProvider declaration={contextDeclaration}>{body}</ContextEngineProvider>;
   }
   return body;
 }
@@ -119,10 +112,7 @@ function PublicShellBody({
     <main id="main" tabIndex={-1} className={cn("pb-24 pt-8 md:pt-12", className)}>
       <Container>
         {hasCrumbs ? (
-          <BreadcrumbTerritorial
-            crumbs={crumbs}
-            useContextCrumbs={useContextCrumbs}
-          />
+          <BreadcrumbTerritorial crumbs={crumbs} useContextCrumbs={useContextCrumbs} />
         ) : null}
         {hasHeader ? (
           <header className={cn("max-w-3xl", hasCrumbs ? "mt-6" : null)}>
@@ -131,9 +121,7 @@ function PublicShellBody({
                 {eyebrow}
               </p>
             ) : null}
-            {title ? (
-              <h1 className="text-balance text-4xl md:text-5xl">{title}</h1>
-            ) : null}
+            {title ? <h1 className="text-balance text-4xl md:text-5xl">{title}</h1> : null}
             {description ? (
               <p className="mt-4 text-lg text-muted-foreground">{description}</p>
             ) : null}

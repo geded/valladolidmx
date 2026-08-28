@@ -43,9 +43,7 @@ export function ZoneEditor({ id }: Props) {
       backTo="/cms/zonas"
       listQueryKey="zones"
       fields={fields}
-      renderExtras={({ id: entityId }) =>
-        entityId ? <ZoneMediaPanels zoneId={entityId} /> : null
-      }
+      renderExtras={({ id: entityId }) => (entityId ? <ZoneMediaPanels zoneId={entityId} /> : null)}
     />
   );
 }

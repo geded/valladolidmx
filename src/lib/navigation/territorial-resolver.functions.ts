@@ -70,10 +70,8 @@ export const resolveTerritorialPath = createServerFn({ method: "GET" })
     if (!input || !validSlug(input.destino)) throw new Error("invalid_destino");
     if (input.categoria != null && !validSlug(input.categoria))
       throw new Error("invalid_categoria");
-    if (input.empresa != null && !validSlug(input.empresa))
-      throw new Error("invalid_empresa");
-    if (input.producto != null && !validSlug(input.producto))
-      throw new Error("invalid_producto");
+    if (input.empresa != null && !validSlug(input.empresa)) throw new Error("invalid_empresa");
+    if (input.producto != null && !validSlug(input.producto)) throw new Error("invalid_producto");
     return {
       destino: input.destino,
       categoria: input.categoria ?? null,

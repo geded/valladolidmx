@@ -27,7 +27,10 @@ function counterTone(len: number, [min, max]: [number, number]): { label: string
 }
 
 function stripHtml(input: string): string {
-  return input.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+  return input
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export function SeoPreview({ config, slug, siteName = SITE.name, siteHost = SITE.domain }: Props) {
@@ -41,7 +44,8 @@ export function SeoPreview({ config, slug, siteName = SITE.name, siteHost = SITE
   const descTone = counterTone(description.length, DESC_IDEAL);
 
   const displayTitle = title || `${siteName} — página`;
-  const displayDesc = description || "Añade una descripción para mejorar la vista en Google y redes.";
+  const displayDesc =
+    description || "Añade una descripción para mejorar la vista en Google y redes.";
   const displayUrl = `https://${siteHost}${canonical.startsWith("/") ? canonical : `/${canonical}`}`;
 
   return (
@@ -50,7 +54,8 @@ export function SeoPreview({ config, slug, siteName = SITE.name, siteHost = SITE
         <div className="flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-2 text-xs text-amber-800">
           <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
           <div>
-            <strong className="font-semibold">Página oculta a buscadores.</strong> Los motores no la indexarán mientras "noindex" esté activo.
+            <strong className="font-semibold">Página oculta a buscadores.</strong> Los motores no la
+            indexarán mientras "noindex" esté activo.
           </div>
         </div>
       ) : null}
@@ -59,13 +64,17 @@ export function SeoPreview({ config, slug, siteName = SITE.name, siteHost = SITE
         <div className="rounded-md border border-border bg-background p-2">
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Título</span>
-            <span className={`font-mono ${titleTone.cls}`}>{title.length}/60 · {titleTone.label}</span>
+            <span className={`font-mono ${titleTone.cls}`}>
+              {title.length}/60 · {titleTone.label}
+            </span>
           </div>
         </div>
         <div className="rounded-md border border-border bg-background p-2">
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Descripción</span>
-            <span className={`font-mono ${descTone.cls}`}>{description.length}/160 · {descTone.label}</span>
+            <span className={`font-mono ${descTone.cls}`}>
+              {description.length}/160 · {descTone.label}
+            </span>
           </div>
         </div>
       </div>
@@ -76,7 +85,9 @@ export function SeoPreview({ config, slug, siteName = SITE.name, siteHost = SITE
         </div>
         <div className="text-[11px] text-emerald-700 truncate">{displayUrl}</div>
         <div className="mt-0.5 line-clamp-1 text-sm font-medium text-[#1a0dab]">{displayTitle}</div>
-        <div className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-muted-foreground">{displayDesc}</div>
+        <div className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-muted-foreground">
+          {displayDesc}
+        </div>
       </div>
 
       <div className="rounded-lg border border-border bg-background p-3">

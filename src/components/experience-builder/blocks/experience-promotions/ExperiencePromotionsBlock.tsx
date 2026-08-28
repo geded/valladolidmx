@@ -31,9 +31,7 @@ function safeParse(raw: unknown): ExperiencePromotionsConfig {
 /* ------------------------------------------------------------------ *
  * Adapter: MarketplacePromotionCard → ExperiencePromotionItem
  * ------------------------------------------------------------------ */
-export function marketplacePromotionToItem(
-  p: MarketplacePromotionCard,
-): ExperiencePromotionItem {
+export function marketplacePromotionToItem(p: MarketplacePromotionCard): ExperiencePromotionItem {
   return {
     id: p.id,
     title: p.title,
@@ -143,13 +141,7 @@ export function ExperiencePromotionsBlock({ config }: ExperiencePromotionsBlockP
       dto={dto}
       renderItemActions={(item) => {
         const showFav = dto.capabilities.showFavorite;
-        return (
-          <>
-            {showFav ? (
-              <FavoriteButton entityKind="promotion" entityId={item.id} />
-            ) : null}
-          </>
-        );
+        return <>{showFav ? <FavoriteButton entityKind="promotion" entityId={item.id} /> : null}</>;
       }}
     />
   );

@@ -22,15 +22,18 @@ export function EmpresasSection({ config }: { config?: Record<string, unknown> }
     staleTime: 5 * 60 * 1000,
   });
   const businesses = data && data.length > 0 ? data : EMPRESAS_MOCK;
-  const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.empresas_title");
+  const title =
+    typeof config?.heading === "string" && config.heading.trim()
+      ? config.heading
+      : t("sections.empresas_title");
   return (
     <section id="empresas" className="@container py-20 @3xl:py-28">
       <Container>
-        <SectionHeader
-          title={title}
-          subtitle={t("sections.empresas_sub")}
-        />
-        <div data-home-grid="empresas" className="grid grid-cols-1 gap-6 @2xl:grid-cols-2 @5xl:grid-cols-4">
+        <SectionHeader title={title} subtitle={t("sections.empresas_sub")} />
+        <div
+          data-home-grid="empresas"
+          className="grid grid-cols-1 gap-6 @2xl:grid-cols-2 @5xl:grid-cols-4"
+        >
           {businesses.map((b) => (
             <EmpresaCard key={b.id} business={b} />
           ))}

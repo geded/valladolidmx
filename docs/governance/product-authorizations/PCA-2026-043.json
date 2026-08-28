@@ -25,9 +25,7 @@
     }
   ],
   "public_routes": [],
-  "required_feature_flags": [
-    "omxds_visual_v1_contracts_enabled=false"
-  ],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
   "required_tests": [
     "bun run lint",
     "bun run typecheck",

@@ -163,18 +163,18 @@ El viajero conoce precio final, políticas y responsable operativo antes de paga
 
 # 6. Actores y responsabilidades
 
-| Actor | Responsabilidad |
-|---|---|
-| Viajero | Seleccionar fecha, horario, participantes, aceptar políticas y pagar |
+| Actor               | Responsabilidad                                                              |
+| ------------------- | ---------------------------------------------------------------------------- |
+| Viajero             | Seleccionar fecha, horario, participantes, aceptar políticas y pagar         |
 | Anfitrión / Empresa | Crear producto, mantener contenido, precio propuesto, inventario y operación |
-| Revisor editorial | Verificar calidad, exactitud, seguridad y publicación |
-| Analista comercial | Evaluar elegibilidad, comisión, políticas y modalidad |
-| Operaciones | Supervisar reservas, cumplimiento, incidencias y no-show |
-| Finanzas | Conciliar cobros, aprobar ajustes, crear liquidaciones y registrar pagos |
-| Soporte | Gestionar casos sin alterar movimientos financieros |
-| Admin | Configurar y supervisar dentro de permisos asignados |
-| Super Admin | Administrar reglas globales y accesos sensibles |
-| Sistema | Bloquear cupo, registrar eventos, calcular snapshots y preservar auditoría |
+| Revisor editorial   | Verificar calidad, exactitud, seguridad y publicación                        |
+| Analista comercial  | Evaluar elegibilidad, comisión, políticas y modalidad                        |
+| Operaciones         | Supervisar reservas, cumplimiento, incidencias y no-show                     |
+| Finanzas            | Conciliar cobros, aprobar ajustes, crear liquidaciones y registrar pagos     |
+| Soporte             | Gestionar casos sin alterar movimientos financieros                          |
+| Admin               | Configurar y supervisar dentro de permisos asignados                         |
+| Super Admin         | Administrar reglas globales y accesos sensibles                              |
+| Sistema             | Bloquear cupo, registrar eventos, calcular snapshots y preservar auditoría   |
 
 ---
 
@@ -182,12 +182,12 @@ El viajero conoce precio final, políticas y responsable operativo antes de paga
 
 Cada producto puede tener una o varias capacidades autorizadas, sin asumir que una implica las demás.
 
-| Modalidad | Visibilidad pública | Arma tu Viaje | Precio vinculante | Checkout |
-|---|---:|---:|---:|---:|
-| Informativa | Sí | Opcional | No | No |
-| Planeación | Sí | Sí | No necesariamente | No |
-| Cotización | Sí | Sí | Propuesto | No |
-| Venta en línea | Sí | Sí | Sí | Sí |
+| Modalidad      | Visibilidad pública | Arma tu Viaje | Precio vinculante | Checkout |
+| -------------- | ------------------: | ------------: | ----------------: | -------: |
+| Informativa    |                  Sí |      Opcional |                No |       No |
+| Planeación     |                  Sí |            Sí | No necesariamente |       No |
+| Cotización     |                  Sí |            Sí |         Propuesto |       No |
+| Venta en línea |                  Sí |            Sí |                Sí |       Sí |
 
 ## 7.1 Regla
 
@@ -1145,20 +1145,20 @@ Estas decisiones requieren asesoría jurídica, fiscal y contable competente en 
 
 # 30. Riesgos y mitigaciones
 
-| Riesgo | Mitigación |
-|---|---|
-| Autoautorización comercial | Permiso Admin y estado independiente |
-| Comisión manipulable | Motor servidor y snapshot |
-| Sobreventa | Holds, concurrencia y pools |
-| Duplicidad por webhook | Idempotencia |
-| Dashboard sin respaldo | Ledger append-only |
-| Liquidar antes de tiempo | Reglas de elegibilidad |
-| Disputa sin reserva | Retenciones y gestión de casos |
-| Cruce de datos empresariales | RLS y scopes |
-| Activación accidental live | Flags, allowlist y Gate B2 |
-| Confusión fiscal | Decisiones previas y validación profesional |
-| Doble pago a empresa | Lotes idempotentes y referencias únicas |
-| Borrar historia | Contramovimientos y auditoría |
+| Riesgo                       | Mitigación                                  |
+| ---------------------------- | ------------------------------------------- |
+| Autoautorización comercial   | Permiso Admin y estado independiente        |
+| Comisión manipulable         | Motor servidor y snapshot                   |
+| Sobreventa                   | Holds, concurrencia y pools                 |
+| Duplicidad por webhook       | Idempotencia                                |
+| Dashboard sin respaldo       | Ledger append-only                          |
+| Liquidar antes de tiempo     | Reglas de elegibilidad                      |
+| Disputa sin reserva          | Retenciones y gestión de casos              |
+| Cruce de datos empresariales | RLS y scopes                                |
+| Activación accidental live   | Flags, allowlist y Gate B2                  |
+| Confusión fiscal             | Decisiones previas y validación profesional |
+| Doble pago a empresa         | Lotes idempotentes y referencias únicas     |
+| Borrar historia              | Contramovimientos y auditoría               |
 
 ---
 

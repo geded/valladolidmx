@@ -43,10 +43,7 @@ export function BecomeHostFlow() {
   return (
     <section className="mt-2">
       <PendingRequestsBanner />
-      <div
-        className="inline-flex rounded-full border border-border bg-card p-1"
-        role="tablist"
-      >
+      <div className="inline-flex rounded-full border border-border bg-card p-1" role="tablist">
         <TabButton active={tab === "claim"} onClick={() => setTab("claim")}>
           Ya existe mi negocio
         </TabButton>
@@ -54,9 +51,7 @@ export function BecomeHostFlow() {
           Registrar nuevo
         </TabButton>
       </div>
-      <div className="mt-6">
-        {tab === "claim" ? <ClaimBranch /> : <RegisterBranch />}
-      </div>
+      <div className="mt-6">{tab === "claim" ? <ClaimBranch /> : <RegisterBranch />}</div>
     </section>
   );
 }
@@ -104,18 +99,14 @@ function PendingRequestsBanner() {
     staleTime: 30_000,
   });
 
-  const businesses = (myBiz.data ?? []).filter(
-    (b) => b.status !== "published",
-  );
+  const businesses = (myBiz.data ?? []).filter((b) => b.status !== "published");
   const claims = myClaims.data ?? [];
 
   if (businesses.length === 0 && claims.length === 0) return null;
 
   return (
     <div className="mb-6 space-y-3">
-      <h2 className="text-sm font-semibold text-muted-foreground">
-        Tus solicitudes en curso
-      </h2>
+      <h2 className="text-sm font-semibold text-muted-foreground">Tus solicitudes en curso</h2>
       {businesses.map((b) => (
         <BusinessStatusCard
           key={b.id}
@@ -130,10 +121,7 @@ function PendingRequestsBanner() {
         />
       ))}
       {claims.map((c) => (
-        <div
-          key={c.business_id}
-          className="rounded-lg border border-border bg-card p-4"
-        >
+        <div key={c.business_id} className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 rounded-full bg-amber-100 p-1.5 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
               <ShieldCheck className="h-4 w-4" />
@@ -152,8 +140,8 @@ function PendingRequestsBanner() {
                   month: "short",
                   year: "numeric",
                 })}
-                {c.destination_name ? ` · ${c.destination_name}` : ""}. Te
-                avisaremos en cuanto un administrador la revise.
+                {c.destination_name ? ` · ${c.destination_name}` : ""}. Te avisaremos en cuanto un
+                administrador la revise.
               </p>
             </div>
           </div>
@@ -188,9 +176,7 @@ function BusinessStatusCard({
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-medium">{business.display_name}</span>
-            <span
-              className={`rounded-full px-2 py-0.5 text-xs font-medium ${meta.badge}`}
-            >
+            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${meta.badge}`}>
               {meta.label}
             </span>
           </div>
@@ -240,10 +226,8 @@ function describeStatus(status: string): {
         label: "Verificando identidad",
         description:
           "Recibimos tu solicitud. Nuestro equipo revisa tu documento en las próximas 24 a 48 horas hábiles.",
-        badge:
-          "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-        iconBg:
-          "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+        badge: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+        iconBg: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
         Icon: ShieldCheck,
         canOpenWorkspace: false,
       };
@@ -252,10 +236,8 @@ function describeStatus(status: string): {
         label: "Identidad verificada",
         description:
           "Tu identidad fue aprobada. Completa el perfil de tu empresa para enviarla a publicación.",
-        badge:
-          "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-        iconBg:
-          "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+        badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+        iconBg: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
         Icon: CheckCircle2,
         canOpenWorkspace: true,
       };
@@ -265,10 +247,8 @@ function describeStatus(status: string): {
         label: "En revisión para publicación",
         description:
           "Enviamos tu perfil al equipo editorial. Revisan las fotos y datos antes de publicarlo.",
-        badge:
-          "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
-        iconBg:
-          "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
+        badge: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
+        iconBg: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
         Icon: FileCheck2,
         canOpenWorkspace: true,
       };
@@ -277,10 +257,8 @@ function describeStatus(status: string): {
         label: "Cambios solicitados",
         description:
           "El administrador pidió ajustes antes de publicar. Revisa la nota y actualiza tu perfil.",
-        badge:
-          "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-        iconBg:
-          "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
+        badge: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+        iconBg: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
         Icon: FileCheck2,
         canOpenWorkspace: true,
       };
@@ -289,10 +267,8 @@ function describeStatus(status: string): {
         label: "Solicitud rechazada",
         description:
           "Tu solicitud no fue aprobada. Consulta la nota del administrador y, si aplica, envía una nueva solicitud.",
-        badge:
-          "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-        iconBg:
-          "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+        badge: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+        iconBg: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
         Icon: ShieldCheck,
         canOpenWorkspace: false,
       };
@@ -451,8 +427,8 @@ function ClaimBranch() {
 
       {results.data && rows.length === 0 && (
         <p className="mt-4 text-sm text-muted-foreground">
-          No encontramos negocios con esos filtros. Prueba con otro término o
-          usa la pestaña <strong>Registrar nuevo</strong>.
+          No encontramos negocios con esos filtros. Prueba con otro término o usa la pestaña{" "}
+          <strong>Registrar nuevo</strong>.
         </p>
       )}
 
@@ -474,8 +450,8 @@ function ClaimBranch() {
               </p>
               {row.has_owner && (
                 <p className="mt-1 text-[11px] text-amber-600">
-                  Este negocio ya tiene un anfitrión asignado. Tu reclamo
-                  quedará como solicitud de transferencia.
+                  Este negocio ya tiene un anfitrión asignado. Tu reclamo quedará como solicitud de
+                  transferencia.
                 </p>
               )}
               {row.has_pending_claim && (
@@ -524,8 +500,8 @@ function ClaimBranch() {
         <div className="mt-4 flex items-start gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-50 p-4 text-sm text-emerald-800">
           <CheckCircle2 className="mt-0.5 size-4" aria-hidden />
           <div>
-            <strong>Solicitud enviada.</strong> Un administrador la revisará y
-            recibirás una notificación cuando se apruebe.
+            <strong>Solicitud enviada.</strong> Un administrador la revisará y recibirás una
+            notificación cuando se apruebe.
           </div>
         </div>
       )}
@@ -556,9 +532,7 @@ function RegisterBranch() {
     verification_document_url: "",
     verification_document_name: "",
   });
-  const [uploadState, setUploadState] = useState<
-    "idle" | "uploading" | "done" | "error"
-  >("idle");
+  const [uploadState, setUploadState] = useState<"idle" | "uploading" | "done" | "error">("idle");
   const [uploadError, setUploadError] = useState<string | null>(null);
 
   const listDest = useServerFn(listPublicDestinations);
@@ -650,9 +624,9 @@ function RegisterBranch() {
           <div className="flex-1">
             <h3 className="text-lg font-semibold">Solicitud enviada</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Un administrador revisará tu documento de verificación. Cuando
-              apruebe tu identidad, verás <strong>Modo Empresa</strong> en el
-              menú y podrás completar tu ficha para publicarla.
+              Un administrador revisará tu documento de verificación. Cuando apruebe tu identidad,
+              verás <strong>Modo Empresa</strong> en el menú y podrás completar tu ficha para
+              publicarla.
             </p>
             <button
               type="button"
@@ -678,8 +652,8 @@ function RegisterBranch() {
                 i < step
                   ? "bg-primary text-primary-foreground"
                   : i === step
-                  ? "bg-primary/15 text-primary ring-2 ring-primary/40"
-                  : "bg-muted text-muted-foreground"
+                    ? "bg-primary/15 text-primary ring-2 ring-primary/40"
+                    : "bg-muted text-muted-foreground"
               }`}
             >
               {i + 1}
@@ -751,10 +725,7 @@ function RegisterBranch() {
               className={inputCls}
             />
           </Field>
-          <Field
-            label="Descripción *"
-            hint={`${form.description.trim().length}/80 mínimo`}
-          >
+          <Field label="Descripción *" hint={`${form.description.trim().length}/80 mínimo`}>
             <textarea
               value={form.description}
               onChange={(e) => set("description", e.target.value)}
@@ -849,9 +820,9 @@ function RegisterBranch() {
                   Verificamos que tu negocio existe y que eres su representante
                 </p>
                 <p className="mt-1 text-muted-foreground">
-                  Sube uno de estos documentos: <strong>RFC</strong>, acta
-                  constitutiva, licencia municipal o comprobante de domicilio
-                  del negocio. Sólo tú y los administradores pueden verlo.
+                  Sube uno de estos documentos: <strong>RFC</strong>, acta constitutiva, licencia
+                  municipal o comprobante de domicilio del negocio. Sólo tú y los administradores
+                  pueden verlo.
                 </p>
               </div>
             </div>
@@ -874,28 +845,18 @@ function RegisterBranch() {
             ) : uploadState === "done" ? (
               <div className="flex flex-col items-center gap-2 text-sm text-foreground">
                 <FileCheck2 className="size-8 text-primary" aria-hidden />
-                <span className="font-medium">
-                  {form.verification_document_name}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  Haz clic para reemplazar
-                </span>
+                <span className="font-medium">{form.verification_document_name}</span>
+                <span className="text-xs text-muted-foreground">Haz clic para reemplazar</span>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
                 <Upload className="size-8" aria-hidden />
-                <span className="font-medium text-foreground">
-                  Sube tu documento
-                </span>
-                <span className="text-xs">
-                  PDF o imagen, máximo 8 MB
-                </span>
+                <span className="font-medium text-foreground">Sube tu documento</span>
+                <span className="text-xs">PDF o imagen, máximo 8 MB</span>
               </div>
             )}
           </label>
-          {uploadError && (
-            <p className="text-sm text-destructive">{uploadError}</p>
-          )}
+          {uploadError && <p className="text-sm text-destructive">{uploadError}</p>}
         </div>
       )}
 
@@ -904,31 +865,21 @@ function RegisterBranch() {
           <ReviewItem label="Nombre" value={form.display_name} />
           <ReviewItem
             label="Destino"
-            value={
-              destinations.data?.find((d) => d.id === form.destination_id)?.name ??
-              "—"
-            }
+            value={destinations.data?.find((d) => d.id === form.destination_id)?.name ?? "—"}
           />
           <ReviewItem
             label="Categoría"
-            value={
-              categories.data?.find((c) => c.id === form.primary_category_id)?.name ??
-              "—"
-            }
+            value={categories.data?.find((c) => c.id === form.primary_category_id)?.name ?? "—"}
           />
           <ReviewItem label="Dirección" value={form.address_line1} />
           <ReviewItem
             label="Contacto"
             value={[form.phone, form.whatsapp, form.email].filter(Boolean).join(" · ")}
           />
-          <ReviewItem
-            label="Documento"
-            value={form.verification_document_name || "—"}
-          />
+          <ReviewItem label="Documento" value={form.verification_document_name || "—"} />
           <p className="mt-4 text-xs text-muted-foreground">
-            Al enviar, tu solicitud pasa a <strong>Revisión de identidad</strong>.
-            Cuando un administrador la apruebe, podrás completar tu ficha y
-            enviarla a publicar.
+            Al enviar, tu solicitud pasa a <strong>Revisión de identidad</strong>. Cuando un
+            administrador la apruebe, podrás completar tu ficha y enviarla a publicar.
           </p>
         </div>
       )}

@@ -3,6 +3,7 @@ name: Founder Trust Continuity Principle
 description: Cada solicitud de registro refuerza que el viajero mantiene control total sobre su información y su relación con Alux. El registro es decisión voluntaria para ampliar el acompañamiento, no cesión de datos.
 type: constraint
 ---
+
 Vinculante desde AC1.4. Sólo afecta UX/copy — no altera arquitectura ni contratos.
 
 Reglas:

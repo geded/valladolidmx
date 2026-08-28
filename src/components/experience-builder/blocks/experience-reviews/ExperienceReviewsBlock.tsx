@@ -67,8 +67,7 @@ function applyFilters(
   }
 
   const norm = (it: ExperienceReviewItem) => (it.rating / (it.ratingScale || 5)) * 5;
-  const ts = (it: ExperienceReviewItem) =>
-    it.publishedAt ? Date.parse(it.publishedAt) : 0;
+  const ts = (it: ExperienceReviewItem) => (it.publishedAt ? Date.parse(it.publishedAt) : 0);
   out = [...out].sort((a, b) => {
     if (sortBy === "highest") return norm(b) - norm(a);
     if (sortBy === "lowest") return norm(a) - norm(b);
@@ -151,10 +150,7 @@ export function ExperienceReviewsBlock({ config }: ExperienceReviewsBlockProps) 
     return applyFilters(base, cfg);
   }, [cfg, business]);
 
-  const dto = useMemo(
-    () => buildDTO(cfg, items, cfg.aggregate ?? null),
-    [cfg, items],
-  );
+  const dto = useMemo(() => buildDTO(cfg, items, cfg.aggregate ?? null), [cfg, items]);
 
   return <ExperienceReviews dto={dto} />;
 }

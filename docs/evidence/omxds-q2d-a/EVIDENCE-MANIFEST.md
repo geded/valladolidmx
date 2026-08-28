@@ -7,29 +7,29 @@
 
 ## 1. Alcance entregado
 
-| Elemento | Ruta |
-| --- | --- |
-| Contrato de plantilla | `src/components/place-premium/place-premium-config.ts` |
-| Autoridad visual (congelada) | `src/components/place-premium/PlacePremiumSurface.tsx` |
-| `pageKind=place` | `src/lib/experience-builder/page-kind-registry.ts` |
-| Presets (6 variantes) | `src/lib/experience-builder/premium-template-registry.ts` |
-| Render único | `src/lib/experience-builder/composition-renderer.tsx` |
-| Política editorial | `src/lib/experience-builder/editorial-builder-policy.ts` |
-| Gate | `bun run validate:q2d:a` |
+| Elemento                     | Ruta                                                      |
+| ---------------------------- | --------------------------------------------------------- |
+| Contrato de plantilla        | `src/components/place-premium/place-premium-config.ts`    |
+| Autoridad visual (congelada) | `src/components/place-premium/PlacePremiumSurface.tsx`    |
+| `pageKind=place`             | `src/lib/experience-builder/page-kind-registry.ts`        |
+| Presets (6 variantes)        | `src/lib/experience-builder/premium-template-registry.ts` |
+| Render único                 | `src/lib/experience-builder/composition-renderer.tsx`     |
+| Política editorial           | `src/lib/experience-builder/editorial-builder-policy.ts`  |
+| Gate                         | `bun run validate:q2d:a`                                  |
 
 Migración aplicada: `ALTER TYPE public.eb_page_kind ADD VALUE IF NOT EXISTS 'place'`
 (aditiva, idempotente, sin tablas, sin datos, sin RLS afectada).
 
 ## 2. Variantes cerradas y direcciones por defecto
 
-| Variante | Dirección por defecto |
-| --- | --- |
-| `zona-arqueologica` | Cinematográfica |
-| `cenote` | Cinematográfica |
-| `area-natural` | Cinematográfica |
-| `museo` | Editorial |
-| `templo-convento` | Editorial |
-| `mercado-artesanal` | Editorial |
+| Variante            | Dirección por defecto |
+| ------------------- | --------------------- |
+| `zona-arqueologica` | Cinematográfica       |
+| `cenote`            | Cinematográfica       |
+| `area-natural`      | Cinematográfica       |
+| `museo`             | Editorial             |
+| `templo-convento`   | Editorial             |
+| `mercado-artesanal` | Editorial             |
 
 Variante desconocida → fail-closed a Editorial, nunca preset genérico.
 
@@ -59,15 +59,15 @@ aprobación permanece sin persistencia.
 
 ## 6. Gates (2026-08-28)
 
-| Gate | Resultado |
-| --- | --- |
-| `bun run typecheck` | PASS |
-| `bun run lint` | PASS |
-| `bun run build` | PASS |
-| `bun run validate:q2d:0` | PASS |
-| `bun run validate:q2d:a` | PASS |
-| `bun run scripts/route-inventory-coverage.ts` | PASS |
-| `bun run governance:check` | PASS |
-| `bun run governance:product-check` | PASS |
-| `bun run governance:product-test` | PASS |
-| `bun scripts/governance/sync-governance.mjs --check` | PASS |
+| Gate                                                 | Resultado |
+| ---------------------------------------------------- | --------- |
+| `bun run typecheck`                                  | PASS      |
+| `bun run lint`                                       | PASS      |
+| `bun run build`                                      | PASS      |
+| `bun run validate:q2d:0`                             | PASS      |
+| `bun run validate:q2d:a`                             | PASS      |
+| `bun run scripts/route-inventory-coverage.ts`        | PASS      |
+| `bun run governance:check`                           | PASS      |
+| `bun run governance:product-check`                   | PASS      |
+| `bun run governance:product-test`                    | PASS      |
+| `bun scripts/governance/sync-governance.mjs --check` | PASS      |

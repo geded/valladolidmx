@@ -58,6 +58,8 @@
     "validate:q2d:0": "bun run test:q2d:0 && bun scripts/omxds/q2d-0/place-premium-visual.evidence.mjs",
     "test:q2d:a": "bun test scripts/omxds/q2d-a/premium-entity-place.contract.test.ts",
     "validate:q2d:a": "bun run test:q2d:a && bun scripts/omxds/q2d-a/premium-entity-place.evidence.mjs",
+    "test:q2d:b": "bun test scripts/omxds/q2d-b/place-public-connection.contract.test.ts",
+    "validate:q2d:b": "bun run test:q2d:b && bun scripts/omxds/q2d-b/place-public-connection.evidence.mjs",
     "lint": "bun scripts/lint/lint-baseline.mjs",
     "lint:full": "eslint .",
     "lint:baseline:check": "bun scripts/lint/lint-baseline.mjs",

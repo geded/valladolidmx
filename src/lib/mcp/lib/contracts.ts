@@ -27,21 +27,11 @@ export const GeoPointSchema = z.object({
 export type GeoPoint = z.infer<typeof GeoPointSchema>;
 
 export const SourceCitationSchema = z.object({
-  kind: z.enum([
-    "catalog",
-    "cms",
-    "events",
-    "destinations",
-    "traveler_profile",
-    "travel_plans",
-  ]),
+  kind: z.enum(["catalog", "cms", "events", "destinations", "traveler_profile", "travel_plans"]),
   table: z.string().optional(),
   slug: z.string().optional(),
   id: z.string().optional(),
-  freshness_hint: z
-    .string()
-    .optional()
-    .describe("Ej. 'updated_at:2026-07-01', 'live'."),
+  freshness_hint: z.string().optional().describe("Ej. 'updated_at:2026-07-01', 'live'."),
 });
 export type SourceCitation = z.infer<typeof SourceCitationSchema>;
 

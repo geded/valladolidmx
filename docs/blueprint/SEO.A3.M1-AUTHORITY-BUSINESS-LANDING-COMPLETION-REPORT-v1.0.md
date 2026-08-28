@@ -57,15 +57,15 @@ conversion_mode=`sitio_externo` → `zaziltunich.com`), y el bloque
 
 ## 3 · Datos sembrados (Demo Pack v1)
 
-| Entidad | Registros | Notas |
-|---|---|---|
-| `businesses` · Zazil Tunich | 1 | verified=true, published, tagline+description editorial |
-| `business_locations` | 1 | lat 20.7167, lng -88.2500 (Yalcobá) |
-| `business_contacts` | 3 | website · whatsapp · email |
-| `business_hours` | 7 | 09:00–17:00 todos los días |
-| `products` | 4 | Recorrido · Nado · Cena Romántica · Ceremonia Maya |
-| `page_compositions` | 1 | slug `biz-zazil-tunich`, variant_key `zazil-tunich` |
-| `page_revisions` | 1 | revisión 1 activa |
+| Entidad                     | Registros | Notas                                                   |
+| --------------------------- | --------- | ------------------------------------------------------- |
+| `businesses` · Zazil Tunich | 1         | verified=true, published, tagline+description editorial |
+| `business_locations`        | 1         | lat 20.7167, lng -88.2500 (Yalcobá)                     |
+| `business_contacts`         | 3         | website · whatsapp · email                              |
+| `business_hours`            | 7         | 09:00–17:00 todos los días                              |
+| `products`                  | 4         | Recorrido · Nado · Cena Romántica · Ceremonia Maya      |
+| `page_compositions`         | 1         | slug `biz-zazil-tunich`, variant_key `zazil-tunich`     |
+| `page_revisions`            | 1         | revisión 1 activa                                       |
 
 URL vivo: **https://valladolid.mx/oriente-maya/valladolid/cenotes/zazil-tunich**
 
@@ -97,13 +97,13 @@ adicionales) sin salir del constructor.
 
 ## 7 · Componentes reutilizados
 
-| Capa | Componente | Rol |
-|---|---|---|
-| Ruta | `oriente-maya/$destino.$categoria.$empresa.index.tsx` | Composition-first + fallback |
-| Server FN | `getPublishedCompositionBySlug` | Resolución composición |
-| Renderer | `CompositionRenderer` | Árbol → JSX |
-| Surface | `vmx.surface.business` → `BusinessSurface` | Orquestador oficial |
-| Adapters | `businessToBlocks`, `businessRelatedToItems` | Datos → bloques |
+| Capa      | Componente                                            | Rol                          |
+| --------- | ----------------------------------------------------- | ---------------------------- |
+| Ruta      | `oriente-maya/$destino.$categoria.$empresa.index.tsx` | Composition-first + fallback |
+| Server FN | `getPublishedCompositionBySlug`                       | Resolución composición       |
+| Renderer  | `CompositionRenderer`                                 | Árbol → JSX                  |
+| Surface   | `vmx.surface.business` → `BusinessSurface`            | Orquestador oficial          |
+| Adapters  | `businessToBlocks`, `businessRelatedToItems`          | Datos → bloques              |
 
 ## 8 · Validaciones
 

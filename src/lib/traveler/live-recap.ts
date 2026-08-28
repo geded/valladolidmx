@@ -15,10 +15,7 @@
  * Trigger canónico: `phase === "onsite"` && `liveDay.livePhase === "post-day"`.
  */
 
-import type {
-  LiveDayContext,
-  LiveDayItemInput,
-} from "@/lib/traveler/live-day";
+import type { LiveDayContext, LiveDayItemInput } from "@/lib/traveler/live-day";
 import type { TripPhase } from "@/lib/traveler/trip-phase";
 import type { DecisionCard } from "@/lib/traveler/decision-center";
 
@@ -215,10 +212,7 @@ export function deriveLiveRecap(input: LiveRecapInput): LiveRecap {
 
   // Auto-Hide: sin valor real (Founder Experience First).
   const hasValue =
-    highlights.length > 0 ||
-    pendingItems.length > 0 ||
-    tomorrowPreview != null ||
-    lastDay;
+    highlights.length > 0 || pendingItems.length > 0 || tomorrowPreview != null || lastDay;
   if (!hasValue) {
     rules.push("no_real_value");
     return { ...HIDDEN, explain: { rules } };
@@ -255,8 +249,7 @@ export function deriveLiveRecap(input: LiveRecapInput): LiveRecap {
   } else if (tomorrowPreview) {
     state = "handoff-tomorrow";
     headline = "Cierre del día · tu viaje sigue mañana";
-    rationale =
-      "Repasa lo vivido hoy y lo que queda pendiente. Mañana continúas con lo planeado.";
+    rationale = "Repasa lo vivido hoy y lo que queda pendiente. Mañana continúas con lo planeado.";
     rules.push("has_tomorrow");
   } else {
     state = "ready";

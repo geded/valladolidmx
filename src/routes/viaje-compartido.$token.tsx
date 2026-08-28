@@ -25,8 +25,7 @@ import {
   type SharedPlanView,
 } from "@/lib/traveler/travel-plans.functions";
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const sharedPlanQuery = (token: string) =>
   queryOptions({
@@ -142,9 +141,7 @@ function SharedPlanView({ data }: { data: SharedPlanView }) {
           <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">
             Expediente de viaje · Oriente Maya
           </p>
-          <h1 className="text-balance text-3xl font-semibold sm:text-4xl">
-            {plan.title}
-          </h1>
+          <h1 className="text-balance text-3xl font-semibold sm:text-4xl">{plan.title}</h1>
           <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
             {range ? (
               <div className="inline-flex items-center gap-1.5">
@@ -191,10 +188,9 @@ function SharedPlanView({ data }: { data: SharedPlanView }) {
 
         <footer className="mt-10 rounded-xl border border-border bg-card p-5 text-xs text-muted-foreground print:mt-8">
           <p>
-            <strong className="text-foreground">Valladolid.mx</strong> ·
-            Planificador Oficial del Oriente Maya. Este expediente fue compartido
-            por su autor; los detalles pueden cambiar. Para reservar o coordinar
-            servicios, contacta a un Concierge humano desde{" "}
+            <strong className="text-foreground">Valladolid.mx</strong> · Planificador Oficial del
+            Oriente Maya. Este expediente fue compartido por su autor; los detalles pueden cambiar.
+            Para reservar o coordinar servicios, contacta a un Concierge humano desde{" "}
             <span className="underline">valladolid.mx</span>.
           </p>
         </footer>

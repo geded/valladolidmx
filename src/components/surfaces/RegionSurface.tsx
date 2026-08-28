@@ -24,12 +24,10 @@ export interface RegionSurfaceProps {
 }
 
 export function RegionSurface({ regionSlug, destinations }: RegionSurfaceProps = {}) {
-  const region =
-    TOURISM_REGIONS.find((r) => r.slug === regionSlug) ?? ORIENTE_MAYA;
+  const region = TOURISM_REGIONS.find((r) => r.slug === regionSlug) ?? ORIENTE_MAYA;
   const fromDb = (destinations ?? []).filter((d) => d.region_slug === region.slug);
-  const destinos = fromDb.length > 0
-    ? fromDb
-    : DESTINOS_MOCK.filter((d) => d.region_slug === region.slug);
+  const destinos =
+    fromDb.length > 0 ? fromDb : DESTINOS_MOCK.filter((d) => d.region_slug === region.slug);
   return (
     <PublicShell
       eyebrow="Región turística"

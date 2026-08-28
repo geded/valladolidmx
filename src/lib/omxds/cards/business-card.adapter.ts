@@ -1,10 +1,7 @@
 import type { BusinessTeaser } from "@/types/entities";
 import { resolveCanonicalPath } from "@/lib/navigation";
 import type { OmxdsCardVariant } from "./card-contract";
-import {
-  validateBusinessCardContract,
-  type BusinessCardContract,
-} from "./business-card.contract";
+import { validateBusinessCardContract, type BusinessCardContract } from "./business-card.contract";
 
 export function resolveBusinessCanonicalUrl(business: BusinessTeaser): string {
   return business.destination_slug && business.category_slug

@@ -48,9 +48,7 @@ export function OnTripConciergePriorityBanner({
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
             Asistencia en tu viaje
           </p>
-          <h3 className="text-sm font-semibold text-foreground">
-            {state.headline}
-          </h3>
+          <h3 className="text-sm font-semibold text-foreground">{state.headline}</h3>
           <p className="text-xs text-muted-foreground">{state.rationale}</p>
           <p className="text-[11px] text-muted-foreground/90">
             <span className="font-medium text-foreground/80">{state.slaLabel}</span>

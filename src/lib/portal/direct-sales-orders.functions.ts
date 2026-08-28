@@ -45,14 +45,7 @@ const FilterInput = z.object({
   from: z.string().datetime().optional(),
   to: z.string().datetime().optional(),
   status: z
-    .enum([
-      "all",
-      "paid",
-      "fulfilled",
-      "refunded",
-      "cancelled",
-      "awaiting_payment",
-    ])
+    .enum(["all", "paid", "fulfilled", "refunded", "cancelled", "awaiting_payment"])
     .default("all"),
   limit: z.number().int().min(1).max(500).default(200),
 });
@@ -61,12 +54,14 @@ async function assertBusinessAccess(
   context: { supabase: unknown; userId: string },
   businessId: string,
 ): Promise<void> {
-  const rpc = (context.supabase as unknown as {
-    rpc: (
-      fn: string,
-      args: Record<string, unknown>,
-    ) => Promise<{ data: boolean | null; error: { message: string } | null }>;
-  }).rpc;
+  const rpc = (
+    context.supabase as unknown as {
+      rpc: (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: boolean | null; error: { message: string } | null }>;
+    }
+  ).rpc;
   const { data, error } = await rpc("has_business_access", {
     _user_id: context.userId,
     _business_id: businessId,

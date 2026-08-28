@@ -4,17 +4,17 @@
 
 ## 1. Tablas `place_*` (base compartida, lectura de catálogo del sistema)
 
-| Tabla | anon | authenticated | service_role |
-|---|---|---|---|
-| `place_types` | `r` | `arwd` | `arwdDxtm` |
-| `place_categories` | `r` | `arwd` | `arwdDxtm` |
-| `place_authority_kinds` | `r` | `arwd` | `arwdDxtm` |
-| `place_category_links` | `r` | `arwd` | `arwdDxtm` |
-| `place_hours` | `r` | `arwd` | `arwdDxtm` |
-| `place_media` | `r` | `arwd` | `arwdDxtm` |
-| `place_products` | `r` | `arwd` | `arwdDxtm` |
-| `place_events` | `r` | `arwd` | `arwdDxtm` |
-| `place_authorities` | **sin privilegio alguno** | `arwd` | `arwdDxtm` |
+| Tabla                   | anon                      | authenticated | service_role |
+| ----------------------- | ------------------------- | ------------- | ------------ |
+| `place_types`           | `r`                       | `arwd`        | `arwdDxtm`   |
+| `place_categories`      | `r`                       | `arwd`        | `arwdDxtm`   |
+| `place_authority_kinds` | `r`                       | `arwd`        | `arwdDxtm`   |
+| `place_category_links`  | `r`                       | `arwd`        | `arwdDxtm`   |
+| `place_hours`           | `r`                       | `arwd`        | `arwdDxtm`   |
+| `place_media`           | `r`                       | `arwd`        | `arwdDxtm`   |
+| `place_products`        | `r`                       | `arwd`        | `arwdDxtm`   |
+| `place_events`          | `r`                       | `arwd`        | `arwdDxtm`   |
+| `place_authorities`     | **sin privilegio alguno** | `arwd`        | `arwdDxtm`   |
 
 Cada tabla recibió `REVOKE ALL ... FROM PUBLIC, anon, authenticated` antes de los
 grants mínimos. No hay `TRUNCATE`, `REFERENCES` ni `TRIGGER` para roles de aplicación.

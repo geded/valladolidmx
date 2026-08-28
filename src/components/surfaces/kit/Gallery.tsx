@@ -11,9 +11,7 @@ export function KitGallery({ vm }: { vm: GalleryVM }) {
           aria-hidden
         />
         {vm.emptyLabel ? (
-          <p className="mt-2 text-[11px] text-muted-foreground">
-            {vm.emptyLabel}
-          </p>
+          <p className="mt-2 text-[11px] text-muted-foreground">{vm.emptyLabel}</p>
         ) : null}
       </section>
     );

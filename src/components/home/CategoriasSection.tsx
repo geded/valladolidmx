@@ -21,12 +21,18 @@ export function CategoriasSection({ config }: { config?: Record<string, unknown>
     staleTime: 5 * 60 * 1000,
   });
   const categories = data && data.length > 0 ? data : CATEGORIAS_MOCK;
-  const title = typeof config?.heading === "string" && config.heading.trim() ? config.heading : t("sections.categories_title");
+  const title =
+    typeof config?.heading === "string" && config.heading.trim()
+      ? config.heading
+      : t("sections.categories_title");
   return (
     <section id="categorias" className="@container bg-secondary/40 py-20 @3xl:py-28">
       <Container>
         <SectionHeader title={title} subtitle={t("sections.categories_sub")} />
-        <div data-home-grid="categorias" className="grid grid-cols-1 gap-4 @2xl:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4">
+        <div
+          data-home-grid="categorias"
+          className="grid grid-cols-1 gap-4 @2xl:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4"
+        >
           {categories.map((c) => (
             <CategoriaCard key={c.id} category={c} />
           ))}

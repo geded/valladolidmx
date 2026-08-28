@@ -10,17 +10,13 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
 function publicClient() {
-  return createClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
-    {
-      auth: {
-        storage: undefined,
-        persistSession: false,
-        autoRefreshToken: false,
-      },
+  return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+    auth: {
+      storage: undefined,
+      persistSession: false,
+      autoRefreshToken: false,
     },
-  );
+  });
 }
 
 export const listPublishedArticles = createServerFn({ method: "GET" })
@@ -29,7 +25,9 @@ export const listPublishedArticles = createServerFn({ method: "GET" })
     const sb = publicClient();
     let q = sb
       .from("articles")
-      .select("id, slug, title, excerpt, locale, published_at, cover_media_id, destination_id, tags")
+      .select(
+        "id, slug, title, excerpt, locale, published_at, cover_media_id, destination_id, tags",
+      )
       .eq("status", "published")
       .is("deleted_at", null)
       .order("published_at", { ascending: false })
@@ -46,7 +44,9 @@ export const getArticleBySlug = createServerFn({ method: "GET" })
     const sb = publicClient();
     const { data: row, error } = await sb
       .from("articles")
-      .select("id, slug, title, excerpt, body, locale, published_at, cover_media_id, destination_id, tags")
+      .select(
+        "id, slug, title, excerpt, body, locale, published_at, cover_media_id, destination_id, tags",
+      )
       .eq("slug", data.slug)
       .eq("status", "published")
       .is("deleted_at", null)
@@ -61,7 +61,9 @@ export const listUpcomingEvents = createServerFn({ method: "GET" })
     const sb = publicClient();
     const { data: rows, error } = await sb
       .from("events")
-      .select("id, slug, title, summary, starts_at, ends_at, venue_name, cover_media_id, destination_id, is_free, external_url")
+      .select(
+        "id, slug, title, summary, starts_at, ends_at, venue_name, cover_media_id, destination_id, is_free, external_url",
+      )
       .eq("status", "published")
       .is("deleted_at", null)
       .gte("starts_at", new Date().toISOString())
@@ -78,7 +80,9 @@ export const listActiveBanners = createServerFn({ method: "GET" })
     const nowIso = new Date().toISOString();
     const { data: rows, error } = await sb
       .from("banners")
-      .select("id, slug, title, subtitle, cta_label, cta_url, placement, position, palette, cover_media_id, starts_at, ends_at")
+      .select(
+        "id, slug, title, subtitle, cta_label, cta_url, placement, position, palette, cover_media_id, starts_at, ends_at",
+      )
       .eq("status", "published")
       .eq("placement", data.placement ?? "home")
       .is("deleted_at", null)
@@ -139,10 +143,12 @@ export const getSeoMetadata = createServerFn({ method: "GET" })
   .inputValidator((data: { entityKind: string; entityId: string; locale?: string }) => data)
   .handler(async ({ data }) => {
     const sb = publicClient();
-    const { data: row, error } = await sb
+    const { data: row, error } = (await sb
       .from("seo_metadata")
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .select("slug, meta_title, meta_description, canonical_url, og_title, og_description, og_image_url, twitter_card, noindex, json_ld") as any;
+      .select(
+        "slug, meta_title, meta_description, canonical_url, og_title, og_description, og_image_url, twitter_card, noindex, json_ld",
+      )) as any;
     if (error) throw error;
     const rows = (row ?? []) as Array<{
       slug: string | null;

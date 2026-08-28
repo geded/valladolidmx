@@ -23,9 +23,7 @@ Ejemplo mínimo:
   "branch": "visual/approved-adjustment",
   "blueprint": "docs/blueprint/18.04-OMXDS-VISUAL-SURFACES-PRD-SUITE-v1.0.md",
   "founder_authority": "Founder Decision YYYY-MM-DD · alcance literal aprobado.",
-  "permissions": [
-    { "operation": "modify", "path": "src/components/cards/ExampleCard.tsx" }
-  ],
+  "permissions": [{ "operation": "modify", "path": "src/components/cards/ExampleCard.tsx" }],
   "public_routes": [],
   "required_feature_flags": [],
   "required_tests": ["bun run typecheck"]

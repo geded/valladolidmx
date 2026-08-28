@@ -29,15 +29,11 @@ function Page() {
         <p className="text-xs font-semibold uppercase tracking-widest text-primary">
           H-03 · Ola I1.c · Fundacionales
         </p>
-        <h1 className="text-3xl font-semibold">
-          Gallery · Info-Grid · Section · Features
-        </h1>
+        <h1 className="text-3xl font-semibold">Gallery · Info-Grid · Section · Features</h1>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Cuatro bloques de la Biblioteca Oficial del Experience Builder,
-          construidos bajo la arquitectura de 3 capas y la Regla de
-          Compatibilidad Evolutiva. Reutilizables en business, product,
-          destination, event, region, landing, micrositios y toda futura
-          Experience Page.
+          Cuatro bloques de la Biblioteca Oficial del Experience Builder, construidos bajo la
+          arquitectura de 3 capas y la Regla de Compatibilidad Evolutiva. Reutilizables en business,
+          product, destination, event, region, landing, micrositios y toda futura Experience Page.
         </p>
       </header>
 

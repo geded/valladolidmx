@@ -14,10 +14,7 @@ type Row = {
 
 export const Route = createFileRoute("/_authenticated/cms/zonas/")({
   head: () => ({
-    meta: [
-      { title: "Zonas · CMS Studio" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Zonas · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: ZonasPage,
 });
@@ -28,7 +25,6 @@ function ZonasPage() {
       queryKey="zones"
       fn={listZonesCms}
       title="Zonas de destino"
-
       description="Sub-áreas y barrios dentro de cada destino."
       rowKey={(r) => r.id}
       headerActions={
@@ -53,10 +49,30 @@ function ZonasPage() {
             </Link>
           ),
         },
-        { key: "slug", header: "Slug", render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code> },
-        { key: "dest", header: "Destino", render: (r) => <span className="text-xs text-muted-foreground">{r.destination_id?.slice(0, 8) ?? "—"}</span> },
+        {
+          key: "slug",
+          header: "Slug",
+          render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code>,
+        },
+        {
+          key: "dest",
+          header: "Destino",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">
+              {r.destination_id?.slice(0, 8) ?? "—"}
+            </span>
+          ),
+        },
         { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
-        { key: "updated", header: "Actualizado", render: (r) => <span className="text-xs text-muted-foreground">{new Date(r.updated_at).toLocaleDateString("es-MX")}</span> },
+        {
+          key: "updated",
+          header: "Actualizado",
+          render: (r) => (
+            <span className="text-xs text-muted-foreground">
+              {new Date(r.updated_at).toLocaleDateString("es-MX")}
+            </span>
+          ),
+        },
         {
           key: "actions",
           header: "",

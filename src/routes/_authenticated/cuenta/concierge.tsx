@@ -5,10 +5,7 @@
 import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  listConciergeCases,
-  type ConciergeCase,
-} from "@/lib/concierge/concierge.functions";
+import { listConciergeCases, type ConciergeCase } from "@/lib/concierge/concierge.functions";
 
 export const Route = createFileRoute("/_authenticated/cuenta/concierge")({
   component: TravelerConciergePage,
@@ -35,9 +32,7 @@ function TravelerConciergePage() {
   return (
     <section>
       <header>
-        <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-          Concierge
-        </p>
+        <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Concierge</p>
         <h1 className="mt-1 text-2xl font-semibold">Mis expedientes Concierge</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Revisa el estado de tus expedientes y las propuestas del equipo Concierge.

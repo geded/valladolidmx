@@ -5,16 +5,16 @@
 
 ## 1. Ciclo probado
 
-| Paso | Resultado |
-|---|---|
-| `up` Q2A sobre esqueleto mínimo | PASS |
-| Reaplicación de Q2A | Aborta en transacción única (objetos ya existentes) · **sin divergencia de schema** |
-| `up` Q2A-R1 | PASS |
-| Reaplicación de Q2A-R1 | **PASS · idempotente** (huella de schema idéntica) |
-| Alta de datos sintéticos (1 destino, 2 lugares, producto, evento, medio, autoridad) | PASS |
-| Rollback operativo R1 | PASS · cero lugares perdidos |
-| Reaplicación de R1 tras rollback | PASS |
-| Rollback operativo Q2A | PASS · cero lugares perdidos, tres políticas históricas restauradas |
+| Paso                                                                                | Resultado                                                                           |
+| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `up` Q2A sobre esqueleto mínimo                                                     | PASS                                                                                |
+| Reaplicación de Q2A                                                                 | Aborta en transacción única (objetos ya existentes) · **sin divergencia de schema** |
+| `up` Q2A-R1                                                                         | PASS                                                                                |
+| Reaplicación de Q2A-R1                                                              | **PASS · idempotente** (huella de schema idéntica)                                  |
+| Alta de datos sintéticos (1 destino, 2 lugares, producto, evento, medio, autoridad) | PASS                                                                                |
+| Rollback operativo R1                                                               | PASS · cero lugares perdidos                                                        |
+| Reaplicación de R1 tras rollback                                                    | PASS                                                                                |
+| Rollback operativo Q2A                                                              | PASS · cero lugares perdidos, tres políticas históricas restauradas                 |
 
 ## 2. Idempotencia
 

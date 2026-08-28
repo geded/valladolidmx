@@ -3,6 +3,7 @@ name: Founder Stable Public Asset Contract
 description: Las URLs públicas ya expuestas o indexadas son contratos estables; no se rompen sin análisis, estrategia de compatibilidad, 301, validación SEO y rollback documentado.
 type: constraint
 ---
+
 **Founder Stable Public Asset Contract** (H3·A4, vinculante)
 
 - Toda URL pública de asset ya expuesta o indexada es un **contrato estable**.

@@ -3,16 +3,10 @@
  * Lee Items exclusivamente del Navigation Registry.
  */
 import { Link, useRouterState } from "@tanstack/react-router";
-import {
-  PanelLeftClose,
-  PanelLeftOpen,
-} from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useWorkspace } from "./WorkspaceProvider";
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
-import {
-  getNavItemsForWorkspace,
-  groupNavItems,
-} from "@/lib/workspace/navigation-registry";
+import { getNavItemsForWorkspace, groupNavItems } from "@/lib/workspace/navigation-registry";
 import { cn } from "@/lib/utils";
 
 const WIDTH = {

@@ -12,14 +12,8 @@
  * / centro del destino declarado en `scope.traffic.origin` y marcamos
  * menor precisión y confianza.
  */
-import type {
-  DestinationContextContributor,
-  DestinationSignal,
-} from "../types";
-import {
-  evaluateTrafficStatus,
-  type TrafficStatus,
-} from "@/lib/traveler/traffic-status";
+import type { DestinationContextContributor, DestinationSignal } from "../types";
+import { evaluateTrafficStatus, type TrafficStatus } from "@/lib/traveler/traffic-status";
 import type { TravelMode } from "@/lib/maps/routes.server";
 
 export interface TrafficSignalPayload {
@@ -28,12 +22,7 @@ export interface TrafficSignalPayload {
   originGeo: { lat: number; lon: number };
   destinationGeo: { lat: number; lon: number };
   originLabel: string;
-  originPrecision:
-    | "device"
-    | "hotel"
-    | "previous_activity"
-    | "destination_center"
-    | "unknown";
+  originPrecision: "device" | "hotel" | "previous_activity" | "destination_center" | "unknown";
   mode: TravelMode;
   distanceKm: number | null;
   durationMinutes: number | null;
@@ -56,28 +45,21 @@ export const trafficContributor: DestinationContextContributor = {
     const trafficReq = scope.traffic;
     const entities = scope.entities ?? [];
     const nextEnt =
-      entities.find((e) => e.role === "next") ??
-      entities.find((e) => e.role !== "previous");
+      entities.find((e) => e.role === "next") ?? entities.find((e) => e.role !== "previous");
     if (!nextEnt) return [];
 
     // Origen (consentimiento + fallbacks documentados).
-    const originGeo =
-      trafficReq?.origin?.geo ?? scope.geo ?? null;
+    const originGeo = trafficReq?.origin?.geo ?? scope.geo ?? null;
     const originLabel =
-      trafficReq?.origin?.label ??
-      (scope.geo ? "Tu ubicación" : "Origen sin definir");
-    const originPrecision =
-      trafficReq?.origin?.precision ??
-      (scope.geo ? "device" : "unknown");
+      trafficReq?.origin?.label ?? (scope.geo ? "Tu ubicación" : "Origen sin definir");
+    const originPrecision = trafficReq?.origin?.precision ?? (scope.geo ? "device" : "unknown");
     if (!originGeo) return [];
 
     // Destino: geo declarado en la entidad, o lookup CMS (businesses).
     let destGeo: { lat: number; lon: number } | null = nextEnt.geo ?? null;
     if (!destGeo && nextEnt.type === "business") {
       try {
-        const { supabaseAdmin } = await import(
-          "@/integrations/supabase/client.server"
-        );
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data } = await supabaseAdmin
           .from("business_locations")
           .select("latitude, longitude, is_primary")
@@ -86,11 +68,7 @@ export const trafficContributor: DestinationContextContributor = {
           .order("is_primary", { ascending: false })
           .limit(1)
           .maybeSingle();
-        if (
-          data &&
-          data.latitude != null &&
-          data.longitude != null
-        ) {
+        if (data && data.latitude != null && data.longitude != null) {
           destGeo = {
             lat: Number(data.latitude),
             lon: Number(data.longitude),
@@ -104,9 +82,7 @@ export const trafficContributor: DestinationContextContributor = {
 
     const mode: TravelMode = trafficReq?.mode ?? "DRIVE";
 
-    const { computeRouteInternal } = await import(
-      "@/lib/maps/routes.server"
-    );
+    const { computeRouteInternal } = await import("@/lib/maps/routes.server");
     const route = await computeRouteInternal({
       origin: originGeo,
       destination: destGeo,
@@ -136,17 +112,11 @@ export const trafficContributor: DestinationContextContributor = {
       originPrecision,
       mode,
       distanceKm:
-        route.distanceMeters != null
-          ? Math.round((route.distanceMeters / 1000) * 10) / 10
-          : null,
+        route.distanceMeters != null ? Math.round((route.distanceMeters / 1000) * 10) / 10 : null,
       durationMinutes:
-        route.durationSeconds != null
-          ? Math.round(route.durationSeconds / 60)
-          : null,
+        route.durationSeconds != null ? Math.round(route.durationSeconds / 60) : null,
       baseDurationMinutes:
-        route.staticDurationSeconds != null
-          ? Math.round(route.staticDurationSeconds / 60)
-          : null,
+        route.staticDurationSeconds != null ? Math.round(route.staticDurationSeconds / 60) : null,
       trafficDeltaMinutes: evalResult.trafficDeltaMinutes,
       etaISO: evalResult.etaISO,
       arriveByISO: trafficReq?.arriveBy ?? null,

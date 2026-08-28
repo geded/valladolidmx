@@ -12,9 +12,7 @@
   "rollback_rule": "geography.location revalidated before eb_restore_revision; rollback stays a draft",
   "release_rule": "publish and schedule require a clean local tree, approved workflow_state and draft_hash === approved_snapshot_hash",
   "public_routes": [],
-  "required_feature_flags": [
-    "omxds_visual_v1_contracts_enabled=false"
-  ],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
   "exact_route_count": 22,
   "exact_routes": [
     "src/lib/catalog/marketplace-reads.functions.ts",

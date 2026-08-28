@@ -1,11 +1,12 @@
 # 00-README.md
 
 # Valladolid.mx / Oriente Maya Digital Platform
+
 ## Blueprint Maestro para Lovable
 
 **Versión:** 1.0  
 **Tipo:** Documentación base para desarrollo en Lovable  
-**Estado:** Documento oficial inicial  
+**Estado:** Documento oficial inicial
 
 ---
 

@@ -66,12 +66,7 @@ export interface DestinationSignalScope {
     origin?: {
       geo?: { lat: number; lon: number };
       label?: string;
-      precision?:
-        | "device"
-        | "hotel"
-        | "previous_activity"
-        | "destination_center"
-        | "unknown";
+      precision?: "device" | "hotel" | "previous_activity" | "destination_center" | "unknown";
     };
     /** ISO datetime — hora objetivo de llegada al `next`. */
     arriveBy?: string;

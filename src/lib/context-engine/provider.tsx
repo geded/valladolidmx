@@ -25,10 +25,7 @@ import {
 } from "react";
 import { emitContextEngineEvent } from "./events";
 import { publishResolvedContext } from "./live-context";
-import {
-  readPreviousContext,
-  writePreviousContext,
-} from "./previous-store";
+import { readPreviousContext, writePreviousContext } from "./previous-store";
 import { resolveContext } from "./resolver";
 import type {
   InheritanceRule,
@@ -39,8 +36,7 @@ import type {
 
 const ResolvedContextCtx = createContext<ResolvedContext | null>(null);
 
-const useIsomorphicLayoutEffect =
-  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 interface ContextEngineProviderProps {
   readonly declaration: RouteContextDeclaration;
@@ -150,8 +146,7 @@ export function ContextEngineProvider({
     .map((n) => `${n.kind}:${n.slug ?? n.href ?? n.label}`)
     .join("|");
   const canPersistBeforePreviousHydrated =
-    (declaration.inherit?.length ?? 0) === 0 &&
-    (declaration.kindDefaults?.length ?? 0) === 0;
+    (declaration.inherit?.length ?? 0) === 0 && (declaration.kindDefaults?.length ?? 0) === 0;
   useIsomorphicLayoutEffect(() => {
     if (!persistOnMount) return;
     if (!previousHydrated && !canPersistBeforePreviousHydrated) return;
@@ -171,9 +166,7 @@ export function ContextEngineProvider({
   ]);
 
   return (
-    <ResolvedContextCtx.Provider value={result.context}>
-      {children}
-    </ResolvedContextCtx.Provider>
+    <ResolvedContextCtx.Provider value={result.context}>{children}</ResolvedContextCtx.Provider>
   );
 }
 
@@ -191,8 +184,6 @@ export function useResolvedContext(): ResolvedContext | null {
  * uniforme y auto-documentado en las rutas. En I1 no está montado en
  * ninguna ruta real; existe para el playground y para I3+.
  */
-export function defineRouteContext(
-  declaration: RouteContextDeclaration,
-): RouteContextDeclaration {
+export function defineRouteContext(declaration: RouteContextDeclaration): RouteContextDeclaration {
   return declaration;
 }

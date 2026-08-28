@@ -17,9 +17,7 @@
     "imgCount": 1,
     "cssBytes": 29012,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com"],
     "httpStatus": 200,
     "id": "S01",
     "viewport": "m",
@@ -44,10 +42,7 @@
     "imgCount": 0,
     "cssBytes": 0,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com",
-      "fonts.gstatic.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com", "fonts.gstatic.com"],
     "httpStatus": 200,
     "id": "S02",
     "viewport": "m",
@@ -133,10 +128,7 @@
     "imgCount": 0,
     "cssBytes": 0,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com",
-      "fonts.gstatic.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com", "fonts.gstatic.com"],
     "httpStatus": 200,
     "id": "S05",
     "viewport": "m",
@@ -161,10 +153,7 @@
     "imgCount": 0,
     "cssBytes": 0,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com",
-      "fonts.gstatic.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com", "fonts.gstatic.com"],
     "httpStatus": 200,
     "id": "S06",
     "viewport": "m",
@@ -189,10 +178,7 @@
     "imgCount": 0,
     "cssBytes": 0,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com",
-      "fonts.gstatic.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com", "fonts.gstatic.com"],
     "httpStatus": 200,
     "id": "S10",
     "viewport": "m",
@@ -217,10 +203,7 @@
     "imgCount": 0,
     "cssBytes": 0,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com",
-      "fonts.gstatic.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com", "fonts.gstatic.com"],
     "httpStatus": 200,
     "id": "S13",
     "viewport": "m",
@@ -245,10 +228,7 @@
     "imgCount": 0,
     "cssBytes": 0,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com",
-      "fonts.gstatic.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com", "fonts.gstatic.com"],
     "httpStatus": 200,
     "id": "S17",
     "viewport": "m",
@@ -273,9 +253,7 @@
     "imgCount": 1,
     "cssBytes": 29012,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com"],
     "httpStatus": 200,
     "id": "S01",
     "viewport": "d",
@@ -300,10 +278,7 @@
     "imgCount": 0,
     "cssBytes": 0,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com",
-      "fonts.gstatic.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com", "fonts.gstatic.com"],
     "httpStatus": 200,
     "id": "S02",
     "viewport": "d",
@@ -389,11 +364,7 @@
     "imgCount": 6,
     "cssBytes": 0,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com",
-      "fonts.gstatic.com",
-      "images.unsplash.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com", "fonts.gstatic.com", "images.unsplash.com"],
     "httpStatus": 200,
     "id": "S05",
     "viewport": "d",
@@ -418,10 +389,7 @@
     "imgCount": 0,
     "cssBytes": 0,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com",
-      "fonts.gstatic.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com", "fonts.gstatic.com"],
     "httpStatus": 200,
     "id": "S06",
     "viewport": "d",
@@ -446,10 +414,7 @@
     "imgCount": 0,
     "cssBytes": 0,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com",
-      "fonts.gstatic.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com", "fonts.gstatic.com"],
     "httpStatus": 200,
     "id": "S10",
     "viewport": "d",
@@ -474,10 +439,7 @@
     "imgCount": 0,
     "cssBytes": 0,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com",
-      "fonts.gstatic.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com", "fonts.gstatic.com"],
     "httpStatus": 200,
     "id": "S13",
     "viewport": "d",
@@ -502,10 +464,7 @@
     "imgCount": 0,
     "cssBytes": 0,
     "fontBytes": 0,
-    "thirdPartyHosts": [
-      "fonts.googleapis.com",
-      "fonts.gstatic.com"
-    ],
+    "thirdPartyHosts": ["fonts.googleapis.com", "fonts.gstatic.com"],
     "httpStatus": 200,
     "id": "S17",
     "viewport": "d",

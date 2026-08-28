@@ -7,14 +7,14 @@
 
 ## 1. Archivos modificados
 
-| Archivo | Cambio |
-|---|---|
-| `src/lib/discovery/seo.ts` | Nuevos helpers `placeId`, `businessEntityId`, `productEntityId`, `collectionId` y constante `ORIENTE_MAYA_PLACE_ID`. Extensión (aditiva) de `touristDestinationJsonLd`, `localBusinessJsonLd`, `productJsonLd`, `collectionPageJsonLd` con `@id` estable, referencias por `@id` (`containedInPlace`, `about`, `publisher`, `isPartOf`) y afinado del mapeo de subtipos Schema.org. Housekeeping: `webPageJsonLd` reconcilia `isPartOf` vía `WEBSITE_ID` y absolutiza `primaryImageOfPage.url`. |
-| `src/routes/oriente-maya/index.tsx` | `CollectionPage.about` referencia `ORIENTE_MAYA_PLACE_ID`. |
-| `src/routes/oriente-maya/$destino.index.tsx` | Destino usa `containedInId: ORIENTE_MAYA_PLACE_ID` (referencia por `@id`, no re-emisión). |
-| `src/routes/oriente-maya/$destino.$categoria.index.tsx` | `CollectionPage.about` → `placeId(destino)`. |
-| `src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx` | Empresa incluye `destinationPlaceId` para `containedInPlace`. |
-| `src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx` | Producto declara `providerBusinessId` (brand = negocio real, nunca Valladolid.mx). |
+| Archivo                                                              | Cambio                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/discovery/seo.ts`                                           | Nuevos helpers `placeId`, `businessEntityId`, `productEntityId`, `collectionId` y constante `ORIENTE_MAYA_PLACE_ID`. Extensión (aditiva) de `touristDestinationJsonLd`, `localBusinessJsonLd`, `productJsonLd`, `collectionPageJsonLd` con `@id` estable, referencias por `@id` (`containedInPlace`, `about`, `publisher`, `isPartOf`) y afinado del mapeo de subtipos Schema.org. Housekeeping: `webPageJsonLd` reconcilia `isPartOf` vía `WEBSITE_ID` y absolutiza `primaryImageOfPage.url`. |
+| `src/routes/oriente-maya/index.tsx`                                  | `CollectionPage.about` referencia `ORIENTE_MAYA_PLACE_ID`.                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `src/routes/oriente-maya/$destino.index.tsx`                         | Destino usa `containedInId: ORIENTE_MAYA_PLACE_ID` (referencia por `@id`, no re-emisión).                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `src/routes/oriente-maya/$destino.$categoria.index.tsx`              | `CollectionPage.about` → `placeId(destino)`.                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx`     | Empresa incluye `destinationPlaceId` para `containedInPlace`.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx` | Producto declara `providerBusinessId` (brand = negocio real, nunca Valladolid.mx).                                                                                                                                                                                                                                                                                                                                                                                                             |
 
 **Cero cambios** en contratos públicos, layouts, breadcrumbs visibles, EB, Discovery, Media Pipeline, MCP ni CMS.
 
@@ -22,21 +22,21 @@
 
 ## 2. Matriz de tipado (interno → Schema.org)
 
-| Interno | Schema.org | Regla |
-|---|---|---|
-| region (Oriente Maya) | `TouristDestination` | `@id = /oriente-maya#place`. Nodo raíz territorial. |
-| destination (pueblo/ciudad) | `TouristDestination` | `containedInPlace → ORIENTE_MAYA_PLACE_ID`. |
-| category (listado en destino) | `CollectionPage` + `ItemList` | `about → placeId(destino)`. No es entidad; es superficie editorial. |
-| business genérico | `LocalBusiness` | Fallback cuando el slug no matchea. |
-| hotel/hospedaje | `Hotel` | (antes `LodgingBusiness`; ahora subtipo específico). |
-| restaurant/gastro | `Restaurant` | |
-| cenote / zona arqueológica / ruinas / atractivo | `TouristAttraction` | Mapeo por slug de categoría. |
-| museo | `Museum` | |
-| tour operator / agencia | `TravelAgency` | |
-| experiencia | `TouristAttraction` | Fallback conservador (no hay `TouristExperience` en Schema.org core). |
-| spa | `HealthAndBeautyBusiness` | |
-| bar / café / tienda | `BarOrPub` / `CafeOrCoffeeShop` / `Store` | |
-| product | `Product` + `Offer` | `brand → @id del negocio operador` (nunca ORG_ID). |
+| Interno                                         | Schema.org                                | Regla                                                                 |
+| ----------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------------- |
+| region (Oriente Maya)                           | `TouristDestination`                      | `@id = /oriente-maya#place`. Nodo raíz territorial.                   |
+| destination (pueblo/ciudad)                     | `TouristDestination`                      | `containedInPlace → ORIENTE_MAYA_PLACE_ID`.                           |
+| category (listado en destino)                   | `CollectionPage` + `ItemList`             | `about → placeId(destino)`. No es entidad; es superficie editorial.   |
+| business genérico                               | `LocalBusiness`                           | Fallback cuando el slug no matchea.                                   |
+| hotel/hospedaje                                 | `Hotel`                                   | (antes `LodgingBusiness`; ahora subtipo específico).                  |
+| restaurant/gastro                               | `Restaurant`                              |                                                                       |
+| cenote / zona arqueológica / ruinas / atractivo | `TouristAttraction`                       | Mapeo por slug de categoría.                                          |
+| museo                                           | `Museum`                                  |                                                                       |
+| tour operator / agencia                         | `TravelAgency`                            |                                                                       |
+| experiencia                                     | `TouristAttraction`                       | Fallback conservador (no hay `TouristExperience` en Schema.org core). |
+| spa                                             | `HealthAndBeautyBusiness`                 |                                                                       |
+| bar / café / tienda                             | `BarOrPub` / `CafeOrCoffeeShop` / `Store` |                                                                       |
+| product                                         | `Product` + `Offer`                       | `brand → @id del negocio operador` (nunca ORG_ID).                    |
 
 Cuando no hay certeza suficiente se usa el tipo más general (`LocalBusiness` / `TouristAttraction`) — documentado en el mapper.
 
@@ -44,34 +44,43 @@ Cuando no hay certeza suficiente se usa el tipo más general (`LocalBusiness` / 
 
 ## 3. Rutas intervenidas y entidades emitidas
 
-| Ruta | Entidades JSON-LD | Referencias por `@id` |
-|---|---|---|
-| `/` (home) | WebSite, Organization, BreadcrumbList, WebPage | WebPage.isPartOf → WEBSITE_ID; primaryImageOfPage absoluto |
-| `/oriente-maya` | WebSite, Organization, BreadcrumbList, TouristDestination (región), CollectionPage | TouristDestination.isPartOf → WEBSITE_ID · CollectionPage.about → ORIENTE_MAYA_PLACE_ID |
-| `/oriente-maya/:destino` | + TouristDestination (destino) | containedInPlace → ORIENTE_MAYA_PLACE_ID |
-| `/oriente-maya/:destino/:categoria` | + CollectionPage | about → placeId(destino) |
-| `/oriente-maya/:destino/:categoria/:empresa` | + Hotel/Restaurant/… | containedInPlace → placeId(destino) · publisher → ORG_ID |
-| `/oriente-maya/:destino/:categoria/:empresa/:producto` | + Product (+ FAQPage) | brand → businessEntityId(empresa) |
+| Ruta                                                   | Entidades JSON-LD                                                                  | Referencias por `@id`                                                                   |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `/` (home)                                             | WebSite, Organization, BreadcrumbList, WebPage                                     | WebPage.isPartOf → WEBSITE_ID; primaryImageOfPage absoluto                              |
+| `/oriente-maya`                                        | WebSite, Organization, BreadcrumbList, TouristDestination (región), CollectionPage | TouristDestination.isPartOf → WEBSITE_ID · CollectionPage.about → ORIENTE_MAYA_PLACE_ID |
+| `/oriente-maya/:destino`                               | + TouristDestination (destino)                                                     | containedInPlace → ORIENTE_MAYA_PLACE_ID                                                |
+| `/oriente-maya/:destino/:categoria`                    | + CollectionPage                                                                   | about → placeId(destino)                                                                |
+| `/oriente-maya/:destino/:categoria/:empresa`           | + Hotel/Restaurant/…                                                               | containedInPlace → placeId(destino) · publisher → ORG_ID                                |
+| `/oriente-maya/:destino/:categoria/:empresa/:producto` | + Product (+ FAQPage)                                                              | brand → businessEntityId(empresa)                                                       |
 
 ---
 
 ## 4. Ejemplos JSON-LD (extracto SSR real)
 
 ### Región `/oriente-maya`
+
 ```json
-{"@type":"TouristDestination","@id":"https://quehacerenvalladolid.com/oriente-maya#place",
- "isPartOf":{"@id":"https://quehacerenvalladolid.com/#website"},
- "touristType":["Cultural","Naturaleza","Historia Maya","Gastronomía","Cenotes"]}
+{
+  "@type": "TouristDestination",
+  "@id": "https://quehacerenvalladolid.com/oriente-maya#place",
+  "isPartOf": { "@id": "https://quehacerenvalladolid.com/#website" },
+  "touristType": ["Cultural", "Naturaleza", "Historia Maya", "Gastronomía", "Cenotes"]
+}
 ```
 
 ### Destino `/oriente-maya/valladolid`
+
 ```json
-{"@type":"TouristDestination","@id":"https://quehacerenvalladolid.com/oriente-maya/valladolid#place",
- "geo":{"@type":"GeoCoordinates","latitude":20.6896,"longitude":-88.202},
- "containedInPlace":{"@id":"https://quehacerenvalladolid.com/oriente-maya#place"}}
+{
+  "@type": "TouristDestination",
+  "@id": "https://quehacerenvalladolid.com/oriente-maya/valladolid#place",
+  "geo": { "@type": "GeoCoordinates", "latitude": 20.6896, "longitude": -88.202 },
+  "containedInPlace": { "@id": "https://quehacerenvalladolid.com/oriente-maya#place" }
+}
 ```
 
 ### Listado `/oriente-maya/valladolid/hoteles`
+
 ```json
 {"@type":"CollectionPage","@id":".../hoteles#collection",
  "isPartOf":{"@id":"https://quehacerenvalladolid.com/#website"},
@@ -80,10 +89,14 @@ Cuando no hay certeza suficiente se usa el tipo más general (`LocalBusiness` / 
 ```
 
 ### Negocio `/oriente-maya/valladolid/hoteles/hacienda-selva-maya`
+
 ```json
-{"@type":"Hotel","@id":".../hacienda-selva-maya#business",
- "containedInPlace":{"@id":"https://quehacerenvalladolid.com/oriente-maya/valladolid#place"},
- "publisher":{"@id":"https://quehacerenvalladolid.com/#organization"}}
+{
+  "@type": "Hotel",
+  "@id": ".../hacienda-selva-maya#business",
+  "containedInPlace": { "@id": "https://quehacerenvalladolid.com/oriente-maya/valladolid#place" },
+  "publisher": { "@id": "https://quehacerenvalladolid.com/#organization" }
+}
 ```
 
 ---
@@ -91,6 +104,7 @@ Cuando no hay certeza suficiente se usa el tipo más general (`LocalBusiness` / 
 ## 5. Evidencia SSR
 
 Verificado con `curl` contra el dev server sobre 4 URLs (región, destino, listado categoría, ficha hotel). En todas:
+
 - JSON-LD emitido antes de hidratación.
 - `@id` únicos por página.
 - `isPartOf` → `WEBSITE_ID`.
@@ -101,15 +115,15 @@ Verificado con `curl` contra el dev server sobre 4 URLs (región, destino, lista
 
 ## 6. Campos omitidos por falta de datos (regla anti-invención)
 
-| Campo | Cuándo se omite |
-|---|---|
-| `telephone` / `email` | Sólo si `primary_contact` existe con tipo compatible. |
-| `streetAddress` | Sólo si hay `address_line1` real. |
-| `geo` | Sólo si latitud y longitud existen (Geolocation Mandatory garantiza cobertura). |
-| `priceRange` | No se emite hasta que haya campo canónico en BD (pendiente Founder). |
-| `aggregateRating` | Sólo si `reviewCount > 0`. |
-| `openingHours` | No emitido — sin fuente canónica todavía. |
-| `image` | Sólo si `cover_url` real. |
+| Campo                 | Cuándo se omite                                                                 |
+| --------------------- | ------------------------------------------------------------------------------- |
+| `telephone` / `email` | Sólo si `primary_contact` existe con tipo compatible.                           |
+| `streetAddress`       | Sólo si hay `address_line1` real.                                               |
+| `geo`                 | Sólo si latitud y longitud existen (Geolocation Mandatory garantiza cobertura). |
+| `priceRange`          | No se emite hasta que haya campo canónico en BD (pendiente Founder).            |
+| `aggregateRating`     | Sólo si `reviewCount > 0`.                                                      |
+| `openingHours`        | No emitido — sin fuente canónica todavía.                                       |
+| `image`               | Sólo si `cover_url` real.                                                       |
 
 Nunca se rellena con placeholders.
 

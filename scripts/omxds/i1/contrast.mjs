@@ -27,7 +27,7 @@ function luminance(value) {
   if (!match) throw new Error(`Unsupported color: ${value}`);
   const L = Number(match[1]);
   const C = Number(match[2]);
-  const h = Number(match[3]) * Math.PI / 180;
+  const h = (Number(match[3]) * Math.PI) / 180;
   const a = C * Math.cos(h);
   const b = C * Math.sin(h);
   const l3 = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
@@ -69,5 +69,11 @@ for (const [theme, tokens] of Object.entries(themes)) {
     if (value < 4.5) failures.push(`${theme}:${background}/${foreground}=${value.toFixed(2)}`);
   }
 }
-console.log(JSON.stringify({ result: failures.length ? "FAIL" : "PASS", standard: "WCAG 2.2 AA", results }, null, 2));
+console.log(
+  JSON.stringify(
+    { result: failures.length ? "FAIL" : "PASS", standard: "WCAG 2.2 AA", results },
+    null,
+    2,
+  ),
+);
 if (failures.length) throw new Error(`Contrast failures: ${failures.join(", ")}`);

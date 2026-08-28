@@ -3,6 +3,7 @@ name: Founder Travel Companion First Principle
 description: Alux nunca solicita permisos antes de demostrar valor. Primero acompaña; después pide sólo los permisos que incrementan ese acompañamiento. La ubicación no es el objetivo — la continuidad del viaje sí. Vinculante para todo onboarding, permisos y activación de capacidades del viajero.
 type: constraint
 ---
+
 Principio Founder vinculante (2026-07-13). Reglas:
 
 1. Prohibido solicitar permisos del navegador (geolocalización, notificaciones, cámara, micrófono) antes de que Alux haya demostrado valor concreto al viajero en su etapa actual.

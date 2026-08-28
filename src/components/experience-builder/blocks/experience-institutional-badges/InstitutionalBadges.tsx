@@ -6,19 +6,8 @@
  */
 import { Fragment, useState } from "react";
 import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   getBadgeRegistryEntry,
   isBadgeEligible,
@@ -48,14 +37,7 @@ interface BadgeChipProps {
   linkToProgram: boolean;
 }
 
-function BadgeChip({
-  item,
-  variant,
-  size,
-  showLabel,
-  monochrome,
-  linkToProgram,
-}: BadgeChipProps) {
+function BadgeChip({ item, variant, size, showLabel, monochrome, linkToProgram }: BadgeChipProps) {
   const entry = getBadgeRegistryEntry(item.kind);
   const Icon = entry.icon;
   const label = item.label || entry.label;
@@ -69,13 +51,11 @@ function BadgeChip({
 
   const style: React.CSSProperties = {
     height: `var(--badge-h-${size})`,
-    paddingInline:
-      variant === "icon-only" ? 0 : `var(--badge-px-${size})`,
+    paddingInline: variant === "icon-only" ? 0 : `var(--badge-px-${size})`,
     width: variant === "icon-only" ? `var(--badge-h-${size})` : undefined,
     gap: `var(--badge-gap-${size})`,
     fontSize: `var(--badge-text-${size})`,
-    borderRadius:
-      variant === "icon-only" ? "999px" : "var(--radius-badge)",
+    borderRadius: variant === "icon-only" ? "999px" : "var(--radius-badge)",
     boxShadow: "var(--shadow-badge)",
   };
 
@@ -153,11 +133,7 @@ function BadgeChip({
 /* Componente principal                                                       */
 /* -------------------------------------------------------------------------- */
 
-export function InstitutionalBadges({
-  dto,
-  subjectSlug,
-  className,
-}: InstitutionalBadgesProps) {
+export function InstitutionalBadges({ dto, subjectSlug, className }: InstitutionalBadgesProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const { variant, size, layout, items, ariaLabel, capabilities } = dto;
 

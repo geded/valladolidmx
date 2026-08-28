@@ -3,6 +3,7 @@ name: Founder Immutable Original Principle
 description: El original de todo asset multimedia es inmutable; nunca se sobrescribe ni recomprime. Nueva versión = nuevo asset con nuevo ID.
 type: constraint
 ---
+
 **Founder Immutable Original Principle** (H3·A4, vinculante)
 
 - El binario original en `media-original` es **inmutable**. Prohibido sobrescribir, recomprimir o sustituir físicamente.

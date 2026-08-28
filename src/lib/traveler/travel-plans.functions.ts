@@ -36,12 +36,7 @@ import {
  * Kinds soportados HOY por la BD (ENUM `travel_item_kind`). El contrato de
  * las funciones es `string`; la validación vive en `KNOWN_ITEM_KINDS`.
  */
-export type TravelItemKind =
-  | "destination"
-  | "business"
-  | "product"
-  | "event"
-  | "note";
+export type TravelItemKind = "destination" | "business" | "product" | "event" | "note";
 
 /**
  * Whitelist activa. Ampliar aquí + en el ENUM de BD para admitir nuevos
@@ -56,11 +51,7 @@ const KNOWN_ITEM_KINDS: ReadonlySet<TravelItemKind> = new Set([
   "note",
 ]);
 
-export type TravelPlanStatus =
-  | "draft"
-  | "active"
-  | "shared_with_concierge"
-  | "archived";
+export type TravelPlanStatus = "draft" | "active" | "shared_with_concierge" | "archived";
 
 export type TravelPlanSource = "web" | "import" | "concierge" | "alux";
 
@@ -118,8 +109,7 @@ export interface TravelPlanSnapshot {
 // Helpers de validación / normalización (server-side)
 // -------------------------------------------------------------------------
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function assertUuid(v: unknown, field: string): string {
@@ -210,7 +200,7 @@ function mapItem(r: ItemRow): TravelPlanItem {
     position: r.position,
     day_index: r.day_index,
     notes: r.notes,
-    snapshot: ((r.snapshot as unknown) as TravelPlanItemSnapshot) ?? {},
+    snapshot: (r.snapshot as unknown as TravelPlanItemSnapshot) ?? {},
     created_at: r.created_at,
     updated_at: r.updated_at,
   };
@@ -227,26 +217,19 @@ function mapItem(r: ItemRow): TravelPlanItem {
 export const getMyActivePlan = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<TravelPlanWithItems> => {
-    const { data: pid, error: rpcErr } = await context.supabase.rpc(
-      "travel_plan_ensure_active",
-    );
+    const { data: pid, error: rpcErr } = await context.supabase.rpc("travel_plan_ensure_active");
     if (rpcErr) throw new Error(`ensure_active_failed: ${rpcErr.message}`);
     const planId = pid as string;
 
-    const [{ data: planRow, error: pErr }, { data: itemRows, error: iErr }] =
-      await Promise.all([
-        context.supabase
-          .from("travel_plans")
-          .select("*")
-          .eq("id", planId)
-          .single(),
-        context.supabase
-          .from("travel_plan_items")
-          .select("*")
-          .eq("plan_id", planId)
-          .order("position", { ascending: true })
-          .order("created_at", { ascending: true }),
-      ]);
+    const [{ data: planRow, error: pErr }, { data: itemRows, error: iErr }] = await Promise.all([
+      context.supabase.from("travel_plans").select("*").eq("id", planId).single(),
+      context.supabase
+        .from("travel_plan_items")
+        .select("*")
+        .eq("plan_id", planId)
+        .order("position", { ascending: true })
+        .order("created_at", { ascending: true }),
+    ]);
     if (pErr) throw new Error(`plan_read_failed: ${pErr.message}`);
     if (iErr) throw new Error(`items_read_failed: ${iErr.message}`);
 
@@ -316,9 +299,7 @@ export const getPlanById = createServerFn({ method: "POST" })
 export const ensureActivePlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ planId: string }> => {
-    const { data, error } = await context.supabase.rpc(
-      "travel_plan_ensure_active",
-    );
+    const { data, error } = await context.supabase.rpc("travel_plan_ensure_active");
     if (error) throw new Error(`ensure_active_failed: ${error.message}`);
     return { planId: data as string };
   });
@@ -466,9 +447,7 @@ export const addPlanItem = createServerFn({ method: "POST" })
     const isNote = kind === "note";
     return {
       planId:
-        src.planId === undefined || src.planId === null
-          ? null
-          : assertUuid(src.planId, "plan_id"),
+        src.planId === undefined || src.planId === null ? null : assertUuid(src.planId, "plan_id"),
       kind,
       targetId: isNote ? null : assertUuid(src.targetId, "target_id"),
       notes: clampStr(src.notes, 2000),
@@ -479,69 +458,34 @@ export const addPlanItem = createServerFn({ method: "POST" })
           : Math.max(0, Math.min(365, Math.round(Number(src.dayIndex) || 0))),
     };
   })
-  .handler(
-    async ({
-      context,
-      data,
-    }): Promise<{ item: TravelPlanItem; created: boolean }> => {
-      // Resolver plan destino (activo si no viene explícito).
-      let planId = data.planId;
-      if (!planId) {
-        const { data: pid, error } = await context.supabase.rpc(
-          "travel_plan_ensure_active",
-        );
-        if (error) throw new Error(`ensure_active_failed: ${error.message}`);
-        planId = pid as string;
-      }
+  .handler(async ({ context, data }): Promise<{ item: TravelPlanItem; created: boolean }> => {
+    // Resolver plan destino (activo si no viene explícito).
+    let planId = data.planId;
+    if (!planId) {
+      const { data: pid, error } = await context.supabase.rpc("travel_plan_ensure_active");
+      if (error) throw new Error(`ensure_active_failed: ${error.message}`);
+      planId = pid as string;
+    }
 
-      // Posición siguiente (server-side, evita colisiones cliente).
-      const { data: last, error: posErr } = await context.supabase
-        .from("travel_plan_items")
-        .select("position")
-        .eq("plan_id", planId)
-        .order("position", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (posErr) throw new Error(`position_read_failed: ${posErr.message}`);
-      const nextPos = ((last?.position as number | undefined) ?? -1) + 1;
+    // Posición siguiente (server-side, evita colisiones cliente).
+    const { data: last, error: posErr } = await context.supabase
+      .from("travel_plan_items")
+      .select("position")
+      .eq("plan_id", planId)
+      .order("position", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (posErr) throw new Error(`position_read_failed: ${posErr.message}`);
+    const nextPos = ((last?.position as number | undefined) ?? -1) + 1;
 
-      // Notas: sin dedupe → insert directo.
-      if (data.kind === "note") {
-        const { data: row, error } = await context.supabase
-          .from("travel_plan_items")
-          .insert({
-            plan_id: planId,
-            item_kind: "note",
-            target_id: null,
-            position: nextPos,
-            day_index: data.dayIndex,
-            notes: data.notes,
-            snapshot: data.snapshot as unknown as Json,
-          })
-          .select("*")
-          .single();
-        if (error) throw new Error(`item_insert_failed: ${error.message}`);
-        return { item: mapItem(row as ItemRow), created: true };
-      }
-
-      // Kinds con target_id: idempotente. Si ya existe, devolverlo.
-      const { data: existing } = await context.supabase
-        .from("travel_plan_items")
-        .select("*")
-        .eq("plan_id", planId)
-        .eq("item_kind", data.kind)
-        .eq("target_id", data.targetId!)
-        .maybeSingle();
-      if (existing) {
-        return { item: mapItem(existing as ItemRow), created: false };
-      }
-
+    // Notas: sin dedupe → insert directo.
+    if (data.kind === "note") {
       const { data: row, error } = await context.supabase
         .from("travel_plan_items")
         .insert({
           plan_id: planId,
-          item_kind: data.kind,
-          target_id: data.targetId!,
+          item_kind: "note",
+          target_id: null,
           position: nextPos,
           day_index: data.dayIndex,
           notes: data.notes,
@@ -549,25 +493,53 @@ export const addPlanItem = createServerFn({ method: "POST" })
         })
         .select("*")
         .single();
-      if (error) {
-        // Race con unique constraint → releer y devolver.
-        if (/duplicate key/i.test(error.message)) {
-          const { data: after } = await context.supabase
-            .from("travel_plan_items")
-            .select("*")
-            .eq("plan_id", planId)
-            .eq("item_kind", data.kind)
-            .eq("target_id", data.targetId!)
-            .single();
-          if (after) {
-            return { item: mapItem(after as ItemRow), created: false };
-          }
-        }
-        throw new Error(`item_insert_failed: ${error.message}`);
-      }
+      if (error) throw new Error(`item_insert_failed: ${error.message}`);
       return { item: mapItem(row as ItemRow), created: true };
-    },
-  );
+    }
+
+    // Kinds con target_id: idempotente. Si ya existe, devolverlo.
+    const { data: existing } = await context.supabase
+      .from("travel_plan_items")
+      .select("*")
+      .eq("plan_id", planId)
+      .eq("item_kind", data.kind)
+      .eq("target_id", data.targetId!)
+      .maybeSingle();
+    if (existing) {
+      return { item: mapItem(existing as ItemRow), created: false };
+    }
+
+    const { data: row, error } = await context.supabase
+      .from("travel_plan_items")
+      .insert({
+        plan_id: planId,
+        item_kind: data.kind,
+        target_id: data.targetId!,
+        position: nextPos,
+        day_index: data.dayIndex,
+        notes: data.notes,
+        snapshot: data.snapshot as unknown as Json,
+      })
+      .select("*")
+      .single();
+    if (error) {
+      // Race con unique constraint → releer y devolver.
+      if (/duplicate key/i.test(error.message)) {
+        const { data: after } = await context.supabase
+          .from("travel_plan_items")
+          .select("*")
+          .eq("plan_id", planId)
+          .eq("item_kind", data.kind)
+          .eq("target_id", data.targetId!)
+          .single();
+        if (after) {
+          return { item: mapItem(after as ItemRow), created: false };
+        }
+      }
+      throw new Error(`item_insert_failed: ${error.message}`);
+    }
+    return { item: mapItem(row as ItemRow), created: true };
+  });
 
 /**
  * removePlanItem — Elimina un item por id. Idempotente.
@@ -607,8 +579,7 @@ export const updatePlanItem = createServerFn({ method: "POST" })
       day_index?: number | null;
     } = {};
     if ("notes" in src) patch.notes = clampStr(src.notes, 2000);
-    if ("snapshot" in src)
-      patch.snapshot = clampSnapshot(src.snapshot) as unknown as Json;
+    if ("snapshot" in src) patch.snapshot = clampSnapshot(src.snapshot) as unknown as Json;
     if ("dayIndex" in src) {
       patch.day_index =
         src.dayIndex === null || src.dayIndex === undefined
@@ -649,36 +620,32 @@ export const reorderPlanItems = createServerFn({ method: "POST" })
     if (src.orderedItemIds.length > 500) {
       throw new Error("too_many_items");
     }
-    const ordered = src.orderedItemIds.map((v, i) =>
-      assertUuid(v, `ordered_item_ids[${i}]`),
-    );
+    const ordered = src.orderedItemIds.map((v, i) => assertUuid(v, `ordered_item_ids[${i}]`));
     return { planId, orderedItemIds: ordered };
   })
-  .handler(
-    async ({ context, data }): Promise<{ updated: number }> => {
-      // Verificar que todos los items pertenecen al plan (RLS lo refuerza).
-      const { data: rows, error: rErr } = await context.supabase
-        .from("travel_plan_items")
-        .select("id")
-        .eq("plan_id", data.planId)
-        .in("id", data.orderedItemIds);
-      if (rErr) throw new Error(`reorder_read_failed: ${rErr.message}`);
-      const valid = new Set((rows ?? []).map((r) => r.id as string));
+  .handler(async ({ context, data }): Promise<{ updated: number }> => {
+    // Verificar que todos los items pertenecen al plan (RLS lo refuerza).
+    const { data: rows, error: rErr } = await context.supabase
+      .from("travel_plan_items")
+      .select("id")
+      .eq("plan_id", data.planId)
+      .in("id", data.orderedItemIds);
+    if (rErr) throw new Error(`reorder_read_failed: ${rErr.message}`);
+    const valid = new Set((rows ?? []).map((r) => r.id as string));
 
-      let updated = 0;
-      for (let i = 0; i < data.orderedItemIds.length; i++) {
-        const id = data.orderedItemIds[i];
-        if (!valid.has(id)) continue;
-        const { error } = await context.supabase
-          .from("travel_plan_items")
-          .update({ position: i })
-          .eq("id", id);
-        if (error) throw new Error(`reorder_write_failed: ${error.message}`);
-        updated += 1;
-      }
-      return { updated };
-    },
-  );
+    let updated = 0;
+    for (let i = 0; i < data.orderedItemIds.length; i++) {
+      const id = data.orderedItemIds[i];
+      if (!valid.has(id)) continue;
+      const { error } = await context.supabase
+        .from("travel_plan_items")
+        .update({ position: i })
+        .eq("id", id);
+      if (error) throw new Error(`reorder_write_failed: ${error.message}`);
+      updated += 1;
+    }
+    return { updated };
+  });
 
 /**
  * updatePlanMeta — Actualiza metadatos del plan: título, fechas,
@@ -715,14 +682,9 @@ export const updatePlanMeta = createServerFn({ method: "POST" })
     if ("endDate" in src) patch.end_date = clampDate(src.endDate);
     if ("partySize" in src) patch.party_size = clampParty(src.partySize);
     if ("notes" in src) patch.notes = clampStr(src.notes, 4000);
-    if ("coverImageUrl" in src)
-      patch.cover_image_url = clampStr(src.coverImageUrl, 500);
+    if ("coverImageUrl" in src) patch.cover_image_url = clampStr(src.coverImageUrl, 500);
     if ("meta" in src) {
-      if (
-        src.meta === null ||
-        typeof src.meta !== "object" ||
-        Array.isArray(src.meta)
-      ) {
+      if (src.meta === null || typeof src.meta !== "object" || Array.isArray(src.meta)) {
         throw new Error("invalid_meta");
       }
       patch.meta = src.meta as Json;
@@ -761,24 +723,19 @@ export const importFavorites = createServerFn({ method: "POST" })
         ? null
         : assertUuid((d as { planId?: unknown }).planId, "plan_id"),
   }))
-  .handler(
-    async ({ context, data }): Promise<{ imported: number; planId: string }> => {
-      let planId = data.planId;
-      if (!planId) {
-        const { data: pid, error } = await context.supabase.rpc(
-          "travel_plan_ensure_active",
-        );
-        if (error) throw new Error(`ensure_active_failed: ${error.message}`);
-        planId = pid as string;
-      }
-      const { data: count, error } = await context.supabase.rpc(
-        "travel_plan_import_favorites",
-        { _plan_id: planId },
-      );
-      if (error) throw new Error(`import_favorites_failed: ${error.message}`);
-      return { imported: (count as number) ?? 0, planId };
-    },
-  );
+  .handler(async ({ context, data }): Promise<{ imported: number; planId: string }> => {
+    let planId = data.planId;
+    if (!planId) {
+      const { data: pid, error } = await context.supabase.rpc("travel_plan_ensure_active");
+      if (error) throw new Error(`ensure_active_failed: ${error.message}`);
+      planId = pid as string;
+    }
+    const { data: count, error } = await context.supabase.rpc("travel_plan_import_favorites", {
+      _plan_id: planId,
+    });
+    if (error) throw new Error(`import_favorites_failed: ${error.message}`);
+    return { imported: (count as number) ?? 0, planId };
+  });
 
 /**
  * buildSnapshot — Devuelve el snapshot completo del plan (plan + items)
@@ -791,10 +748,9 @@ export const buildSnapshot = createServerFn({ method: "POST" })
     planId: assertUuid((d as { planId?: unknown })?.planId, "plan_id"),
   }))
   .handler(async ({ context, data }): Promise<TravelPlanSnapshot> => {
-    const { data: json, error } = await context.supabase.rpc(
-      "travel_plan_build_snapshot",
-      { _plan_id: data.planId },
-    );
+    const { data: json, error } = await context.supabase.rpc("travel_plan_build_snapshot", {
+      _plan_id: data.planId,
+    });
     if (error) throw new Error(`build_snapshot_failed: ${error.message}`);
     const raw = (json ?? {}) as {
       plan?: PlanRow;
@@ -828,72 +784,64 @@ export const promotePlanToCase = createServerFn({ method: "POST" })
     if (!summary || summary.length < 8) throw new Error("invalid_summary");
     return { planId: assertUuid(src.planId, "plan_id"), summary };
   })
-  .handler(
-    async ({
-      context,
-      data,
-    }): Promise<{ caseId: string; planId: string }> => {
-      // 1. Snapshot vía RPC (aplica RLS/visibility).
-      const { data: snapJson, error: snapErr } = await context.supabase.rpc(
-        "travel_plan_build_snapshot",
-        { _plan_id: data.planId },
-      );
-      if (snapErr) throw new Error(`build_snapshot_failed: ${snapErr.message}`);
-      const snap = (snapJson ?? {}) as { items?: ItemRow[] };
+  .handler(async ({ context, data }): Promise<{ caseId: string; planId: string }> => {
+    // 1. Snapshot vía RPC (aplica RLS/visibility).
+    const { data: snapJson, error: snapErr } = await context.supabase.rpc(
+      "travel_plan_build_snapshot",
+      { _plan_id: data.planId },
+    );
+    if (snapErr) throw new Error(`build_snapshot_failed: ${snapErr.message}`);
+    const snap = (snapJson ?? {}) as { items?: ItemRow[] };
 
-      // 2. Traducir items a contrato `cc_case_create_from_plan`
-      //    (product_id/business_id conocidos; el resto viaja como notas).
-      const ccItems = (snap.items ?? []).slice(0, 20).map((r) => {
-        const kind = r.item_kind as TravelItemKind;
-        const snapshot = (r.snapshot as TravelPlanItemSnapshot) ?? {};
-        return {
-          title: snapshot.title ?? undefined,
-          notes: r.notes ?? undefined,
-          kind: "non_reservable" as const,
-          product_id: kind === "product" ? r.target_id : null,
-          business_id: kind === "business" ? r.target_id : null,
-        };
+    // 2. Traducir items a contrato `cc_case_create_from_plan`
+    //    (product_id/business_id conocidos; el resto viaja como notas).
+    const ccItems = (snap.items ?? []).slice(0, 20).map((r) => {
+      const kind = r.item_kind as TravelItemKind;
+      const snapshot = (r.snapshot as TravelPlanItemSnapshot) ?? {};
+      return {
+        title: snapshot.title ?? undefined,
+        notes: r.notes ?? undefined,
+        kind: "non_reservable" as const,
+        product_id: kind === "product" ? r.target_id : null,
+        business_id: kind === "business" ? r.target_id : null,
+      };
+    });
+
+    const { data: caseId, error: ccErr } = await context.supabase.rpc("cc_case_create_from_plan", {
+      _summary: data.summary,
+      _items: ccItems as unknown as never,
+      _travel_plan_id: data.planId,
+    } as never);
+    if (ccErr) throw new Error(`case_create_failed: ${ccErr.message}`);
+
+    // 3. Vincular caso al plan y marcar estado.
+    const { error: linkErr } = await context.supabase
+      .from("travel_plans")
+      .update({
+        case_id: caseId as string,
+        status: "shared_with_concierge",
+      })
+      .eq("id", data.planId);
+    if (linkErr) throw new Error(`plan_link_failed: ${linkErr.message}`);
+
+    // 4. CV2.1 · Handoff Context — Alux adjunta al expediente una
+    //    fotografía compacta del contexto operativo del viajero
+    //    (perfil M2, cupones activos, memoria territorial, plan).
+    //    Best-effort: si falla, no rompemos la promoción del caso.
+    try {
+      await attachHandoffContext({
+        caseId: caseId as string,
+        planId: data.planId,
+        userId: context.userId,
+        userSupabase: context.supabase as unknown as AnySupabase,
+        planItems: snap.items ?? [],
       });
+    } catch (e) {
+      console.warn("[cv2.1] handoff_context_attach_failed", e);
+    }
 
-      const { data: caseId, error: ccErr } = await context.supabase.rpc(
-        "cc_case_create_from_plan",
-        {
-          _summary: data.summary,
-          _items: ccItems as unknown as never,
-          _travel_plan_id: data.planId,
-        } as never,
-      );
-      if (ccErr) throw new Error(`case_create_failed: ${ccErr.message}`);
-
-      // 3. Vincular caso al plan y marcar estado.
-      const { error: linkErr } = await context.supabase
-        .from("travel_plans")
-        .update({
-          case_id: caseId as string,
-          status: "shared_with_concierge",
-        })
-        .eq("id", data.planId);
-      if (linkErr) throw new Error(`plan_link_failed: ${linkErr.message}`);
-
-      // 4. CV2.1 · Handoff Context — Alux adjunta al expediente una
-      //    fotografía compacta del contexto operativo del viajero
-      //    (perfil M2, cupones activos, memoria territorial, plan).
-      //    Best-effort: si falla, no rompemos la promoción del caso.
-      try {
-        await attachHandoffContext({
-          caseId: caseId as string,
-          planId: data.planId,
-          userId: context.userId,
-          userSupabase: context.supabase as unknown as AnySupabase,
-          planItems: snap.items ?? [],
-        });
-      } catch (e) {
-        console.warn("[cv2.1] handoff_context_attach_failed", e);
-      }
-
-      return { caseId: caseId as string, planId: data.planId };
-    },
-  );
+    return { caseId: caseId as string, planId: data.planId };
+  });
 
 // -------------------------------------------------------------------------
 // CV2.1 · Handoff Context helper (Alux → Concierge)
@@ -926,9 +874,7 @@ async function attachHandoffContext(args: {
   const nowIso = new Date().toISOString();
   const couponsPromise = userSupabase
     .from("traveler_coupons")
-    .select(
-      "id,title,code,business_slug,promotion_slug,discount_percent,valid_until,status",
-    )
+    .select("id,title,code,business_slug,promotion_slug,discount_percent,valid_until,status")
     .eq("user_id", userId)
     .eq("status", "issued")
     .gte("valid_until", nowIso)
@@ -938,9 +884,7 @@ async function attachHandoffContext(args: {
   // Memoria territorial (tabla sin grants a authenticated → admin client).
   let memory: unknown = null;
   try {
-    const { supabaseAdmin } = await import(
-      "@/integrations/supabase/client.server"
-    );
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: sess } = await (supabaseAdmin as unknown as AnySupabase)
       .from("alux_public_sessions")
       .select(
@@ -955,10 +899,7 @@ async function attachHandoffContext(args: {
     memory = null;
   }
 
-  const [profileRes, couponsRes] = await Promise.all([
-    profilePromise,
-    couponsPromise,
-  ]);
+  const [profileRes, couponsRes] = await Promise.all([profilePromise, couponsPromise]);
 
   const planSnapshotItems = planItems.slice(0, 30).map((r) => {
     const snap = (r.snapshot as TravelPlanItemSnapshot) ?? {};
@@ -1032,30 +973,28 @@ export const enableShareLink = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => ({
     planId: assertUuid((d as { planId?: unknown })?.planId, "plan_id"),
   }))
-  .handler(
-    async ({ context, data }): Promise<{ token: string; sharedAt: string }> => {
-      const { data: existing, error: readErr } = await context.supabase
-        .from("travel_plans")
-        .select("share_token, shared_at")
-        .eq("id", data.planId)
-        .single();
-      if (readErr) throw new Error(`plan_read_failed: ${readErr.message}`);
-      if (existing.share_token) {
-        return {
-          token: existing.share_token as string,
-          sharedAt: (existing.shared_at as string) ?? new Date().toISOString(),
-        };
-      }
-      const token = crypto.randomUUID();
-      const sharedAt = new Date().toISOString();
-      const { error } = await context.supabase
-        .from("travel_plans")
-        .update({ share_token: token, shared_at: sharedAt })
-        .eq("id", data.planId);
-      if (error) throw new Error(`share_enable_failed: ${error.message}`);
-      return { token, sharedAt };
-    },
-  );
+  .handler(async ({ context, data }): Promise<{ token: string; sharedAt: string }> => {
+    const { data: existing, error: readErr } = await context.supabase
+      .from("travel_plans")
+      .select("share_token, shared_at")
+      .eq("id", data.planId)
+      .single();
+    if (readErr) throw new Error(`plan_read_failed: ${readErr.message}`);
+    if (existing.share_token) {
+      return {
+        token: existing.share_token as string,
+        sharedAt: (existing.shared_at as string) ?? new Date().toISOString(),
+      };
+    }
+    const token = crypto.randomUUID();
+    const sharedAt = new Date().toISOString();
+    const { error } = await context.supabase
+      .from("travel_plans")
+      .update({ share_token: token, shared_at: sharedAt })
+      .eq("id", data.planId);
+    if (error) throw new Error(`share_enable_failed: ${error.message}`);
+    return { token, sharedAt };
+  });
 
 /**
  * disableShareLink — Revoca el link público (limpia token). Owner-only vía RLS.

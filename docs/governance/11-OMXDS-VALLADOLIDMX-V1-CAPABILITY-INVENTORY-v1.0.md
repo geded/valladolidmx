@@ -24,14 +24,14 @@ Por tanto, el siguiente cuello de botella no es una nueva épica técnica. Es la
 
 ## 2. Lenguaje de clasificación
 
-| Estado | Significado |
-|---|---|
-| **Reusable** | Existe, tiene evidencia suficiente y puede usarse en V1 sin reconstrucción. |
-| **Extensible** | Existe y sirve, pero requiere configuración, hardening o validación acotada. |
-| **Operational pending** | El software existe; faltan actores, datos, acuerdos o ejecución real. |
-| **Missing blocker** | No existe lo mínimo y bloquea el soft launch. |
-| **Deferred** | Aporta valor futuro, pero no debe retrasar V1. |
-| **Deprecable / duplicate** | Debe retirarse o consolidarse porque compite con una fuente canónica. |
+| Estado                     | Significado                                                                  |
+| -------------------------- | ---------------------------------------------------------------------------- |
+| **Reusable**               | Existe, tiene evidencia suficiente y puede usarse en V1 sin reconstrucción.  |
+| **Extensible**             | Existe y sirve, pero requiere configuración, hardening o validación acotada. |
+| **Operational pending**    | El software existe; faltan actores, datos, acuerdos o ejecución real.        |
+| **Missing blocker**        | No existe lo mínimo y bloquea el soft launch.                                |
+| **Deferred**               | Aporta valor futuro, pero no debe retrasar V1.                               |
+| **Deprecable / duplicate** | Debe retirarse o consolidarse porque compite con una fuente canónica.        |
 
 Un Blueprint no prueba implementación. Un Completion Report no prueba operación sostenida. Una simulación no prueba adopción.
 
@@ -54,15 +54,15 @@ Las brechas dominantes son operativas:
 
 ### Readiness por naturaleza
 
-| Dimensión | Estado V1 |
-|---|---|
-| Producto para descubrir y planear | **Reusable** |
-| Continuidad anónima y registro progresivo | **Reusable** |
-| Inteligencia y decisión humana | **Reusable técnicamente / Operational pending** |
-| Oferta turística real | **Missing blocker** |
-| Operación y soporte | **Missing blocker** |
-| Cobro comercial completo | **Extensible / condicionado** |
-| Retención postviaje | **Deferred hasta señal real** |
+| Dimensión                                 | Estado V1                                       |
+| ----------------------------------------- | ----------------------------------------------- |
+| Producto para descubrir y planear         | **Reusable**                                    |
+| Continuidad anónima y registro progresivo | **Reusable**                                    |
+| Inteligencia y decisión humana            | **Reusable técnicamente / Operational pending** |
+| Oferta turística real                     | **Missing blocker**                             |
+| Operación y soporte                       | **Missing blocker**                             |
+| Cobro comercial completo                  | **Extensible / condicionado**                   |
+| Retención postviaje                       | **Deferred hasta señal real**                   |
 
 ---
 
@@ -70,129 +70,129 @@ Las brechas dominantes son operativas:
 
 ### 4.1 Identidad y confianza
 
-| Capacidad | Estado | Evidencia | Deuda V1 | Decisión |
-|---|---|---|---|---|
-| Autenticación y Google Auth | Reusable | cierre E1b | Smoke con cohorte real | Reutilizar |
-| Roles Founder/Admin/Empresa/Concierge/Traveler | Reusable | Serie 15.10.4 y RLS | Probar perfiles operativos reales | Reutilizar |
-| Continuidad anónima → cuenta | Reusable | AC1.4–AC1.5; PR #5/#6 | Observar segunda importación real | No reconstruir |
-| Reclamo y verificación de empresa | Operational pending | onboarding multibusiness + Portal | Ejecutar con empresas reales | Vertical V1 |
-| Consentimiento y privacidad | Extensible | políticas Founder + Blueprint 10 | Revisión legal y matriz operativa | Gate de lanzamiento |
-| Trust Engine v1 | Reusable | cierre 16.21 | Señal real y reglas de excepción | Mantener acotado |
+| Capacidad                                      | Estado              | Evidencia                         | Deuda V1                          | Decisión            |
+| ---------------------------------------------- | ------------------- | --------------------------------- | --------------------------------- | ------------------- |
+| Autenticación y Google Auth                    | Reusable            | cierre E1b                        | Smoke con cohorte real            | Reutilizar          |
+| Roles Founder/Admin/Empresa/Concierge/Traveler | Reusable            | Serie 15.10.4 y RLS               | Probar perfiles operativos reales | Reutilizar          |
+| Continuidad anónima → cuenta                   | Reusable            | AC1.4–AC1.5; PR #5/#6             | Observar segunda importación real | No reconstruir      |
+| Reclamo y verificación de empresa              | Operational pending | onboarding multibusiness + Portal | Ejecutar con empresas reales      | Vertical V1         |
+| Consentimiento y privacidad                    | Extensible          | políticas Founder + Blueprint 10  | Revisión legal y matriz operativa | Gate de lanzamiento |
+| Trust Engine v1                                | Reusable            | cierre 16.21                      | Señal real y reglas de excepción  | Mantener acotado    |
 
 ### 4.2 Knowledge & Content
 
-| Capacidad | Estado | Evidencia | Deuda V1 | Decisión |
-|---|---|---|---|---|
-| Entidades territoriales canónicas | Reusable | rutas N2/N3 y SEO/GEO | Validar contenido real | Reutilizar |
-| CMS y Experience Builder | Reusable | Serie 15.10.4b | Entrenamiento editorial | No ampliar |
-| Fichas de empresa y catálogo | Operational pending | Portal + rutas públicas | 15–25 perfiles reales completos | Vertical V1 |
-| Contenido multilingüe | Extensible | es/en/fr + scaffold | Priorizar es/en en V1 | Diferir expansión |
-| Calidad de datos | Missing blocker | checklist 17.1 existe | Owner, revisión, cadencia y evidencia | Resolver manualmente primero |
-| Zazil Tunich editorial | Extensible | cierre técnico SEO.A3.M2 | Aprobación editorial para verified | Usar como piloto |
+| Capacidad                         | Estado              | Evidencia                | Deuda V1                              | Decisión                     |
+| --------------------------------- | ------------------- | ------------------------ | ------------------------------------- | ---------------------------- |
+| Entidades territoriales canónicas | Reusable            | rutas N2/N3 y SEO/GEO    | Validar contenido real                | Reutilizar                   |
+| CMS y Experience Builder          | Reusable            | Serie 15.10.4b           | Entrenamiento editorial               | No ampliar                   |
+| Fichas de empresa y catálogo      | Operational pending | Portal + rutas públicas  | 15–25 perfiles reales completos       | Vertical V1                  |
+| Contenido multilingüe             | Extensible          | es/en/fr + scaffold      | Priorizar es/en en V1                 | Diferir expansión            |
+| Calidad de datos                  | Missing blocker     | checklist 17.1 existe    | Owner, revisión, cadencia y evidencia | Resolver manualmente primero |
+| Zazil Tunich editorial            | Extensible          | cierre técnico SEO.A3.M2 | Aprobación editorial para verified    | Usar como piloto             |
 
 ### 4.3 Discovery
 
-| Capacidad | Estado | Evidencia | Deuda V1 | Decisión |
-|---|---|---|---|---|
-| Home, destinos, hoteles, restaurantes, experiencias y eventos | Reusable | Discovery y Surface Kit | Smoke con contenido real | Reutilizar |
-| Búsqueda, filtros y colecciones | Reusable | Marketplace/Discovery | Densidad de inventario real | No reconstruir |
-| Navegación territorial | Reusable | 15.11 N3 Closure | QA móvil de rutas críticas | Reutilizar |
-| SEO técnico y schema | Extensible | H1 y SEO.A1–A3 | GSC, hreflang y condiciones post-deploy | Cerrar mínimo |
-| Mapas y geolocalización | Extensible | contexto territorial | Verificar claves, facturación y coordenadas | Gate operativo |
+| Capacidad                                                     | Estado     | Evidencia               | Deuda V1                                    | Decisión       |
+| ------------------------------------------------------------- | ---------- | ----------------------- | ------------------------------------------- | -------------- |
+| Home, destinos, hoteles, restaurantes, experiencias y eventos | Reusable   | Discovery y Surface Kit | Smoke con contenido real                    | Reutilizar     |
+| Búsqueda, filtros y colecciones                               | Reusable   | Marketplace/Discovery   | Densidad de inventario real                 | No reconstruir |
+| Navegación territorial                                        | Reusable   | 15.11 N3 Closure        | QA móvil de rutas críticas                  | Reutilizar     |
+| SEO técnico y schema                                          | Extensible | H1 y SEO.A1–A3          | GSC, hreflang y condiciones post-deploy     | Cerrar mínimo  |
+| Mapas y geolocalización                                       | Extensible | contexto territorial    | Verificar claves, facturación y coordenadas | Gate operativo |
 
 ### 4.4 Traveler Journey
 
-| Capacidad | Estado | Evidencia | Deuda V1 | Decisión |
-|---|---|---|---|---|
-| Favoritos y Arma tu Viaje | Reusable | Serie 16.10–16.15 | Uso real y métricas | Reutilizar |
-| Borrador anónimo local-first | Reusable | AC1.4–AC1.5 | Telemetría remota no autorizada | Preservar |
-| Registro en momentos de valor | Reusable | dock y SignInPromptSheet verificados | Medir conversión real | Reutilizar |
-| Intelligent Travel Workspace | Reusable | CV5 | Barrido móvil pendiente | QA acotado |
-| Live Destination Companion | Reusable | CV6.1–CV6.8 | Operación onsite real | Pilotear |
-| Travel Passport / Memory Loop | Deferred | CV7 sólo Blueprint | Sin señal de retención real | No bloquear V1 |
+| Capacidad                     | Estado   | Evidencia                            | Deuda V1                        | Decisión       |
+| ----------------------------- | -------- | ------------------------------------ | ------------------------------- | -------------- |
+| Favoritos y Arma tu Viaje     | Reusable | Serie 16.10–16.15                    | Uso real y métricas             | Reutilizar     |
+| Borrador anónimo local-first  | Reusable | AC1.4–AC1.5                          | Telemetría remota no autorizada | Preservar      |
+| Registro en momentos de valor | Reusable | dock y SignInPromptSheet verificados | Medir conversión real           | Reutilizar     |
+| Intelligent Travel Workspace  | Reusable | CV5                                  | Barrido móvil pendiente         | QA acotado     |
+| Live Destination Companion    | Reusable | CV6.1–CV6.8                          | Operación onsite real           | Pilotear       |
+| Travel Passport / Memory Loop | Deferred | CV7 sólo Blueprint                   | Sin señal de retención real     | No bloquear V1 |
 
 ### 4.5 Commerce
 
-| Capacidad | Estado | Evidencia | Deuda V1 | Decisión |
-|---|---|---|---|---|
-| Productos, órdenes y comisiones | Extensible | Wave 4 + código de pagos | Reconciliación con negocio real | Pilotear controlado |
-| Checkout y Stripe webhook | Extensible | rutas y adaptador Stripe | Configuración/secretos/smoke real | Gate si hay cobro |
-| Cotización Concierge | Reusable técnicamente | casos y propuestas | Operador real + SLA | Pilotear |
-| CFDI 4.0 | Missing blocker para cobro comercial | sólo plan/assessment | Política o proveedor y responsable | Resolver antes de cobrar |
-| Reembolsos, disputas y contracargos | Missing blocker para cobro comercial | pendiente reconocido | Workflow mínimo, aunque manual | Resolver antes de cobrar |
-| Pases/asientos especializados | Deferred | PRD Videomapping externo | No acelera V1 central | Posponer |
+| Capacidad                           | Estado                               | Evidencia                | Deuda V1                           | Decisión                 |
+| ----------------------------------- | ------------------------------------ | ------------------------ | ---------------------------------- | ------------------------ |
+| Productos, órdenes y comisiones     | Extensible                           | Wave 4 + código de pagos | Reconciliación con negocio real    | Pilotear controlado      |
+| Checkout y Stripe webhook           | Extensible                           | rutas y adaptador Stripe | Configuración/secretos/smoke real  | Gate si hay cobro        |
+| Cotización Concierge                | Reusable técnicamente                | casos y propuestas       | Operador real + SLA                | Pilotear                 |
+| CFDI 4.0                            | Missing blocker para cobro comercial | sólo plan/assessment     | Política o proveedor y responsable | Resolver antes de cobrar |
+| Reembolsos, disputas y contracargos | Missing blocker para cobro comercial | pendiente reconocido     | Workflow mínimo, aunque manual     | Resolver antes de cobrar |
+| Pases/asientos especializados       | Deferred                             | PRD Videomapping externo | No acelera V1 central              | Posponer                 |
 
 ### 4.6 Operations
 
-| Capacidad | Estado | Evidencia | Deuda V1 | Decisión |
-|---|---|---|---|---|
-| Portal de Empresas | Reusable técnicamente | cierre multibusiness | 15–25 operadores reales | Vertical V1 |
-| Programa Fundadores | Operational pending | plan 17.1 Approved para preparación; Gate B pendiente | Oferta, responsable y cohorte | Primer vertical confirmado |
-| Concierge Workspace | Reusable técnicamente | CV4/CV6/CV8.9 | Turnos, SLA y cobertura | Gate operativo |
-| Action Queue | Reusable técnicamente | CV8.9 cerrado | Datos y owners reales | Activar con cohorte |
-| Soporte e incidentes | Missing blocker | assessment 17 | Runbooks, canal y guardia | Resolver |
-| Transporte/hoteles integrados | Deferred | capacidades parciales/PRD | No requerido para soft launch base | Posponer |
+| Capacidad                     | Estado                | Evidencia                                             | Deuda V1                           | Decisión                   |
+| ----------------------------- | --------------------- | ----------------------------------------------------- | ---------------------------------- | -------------------------- |
+| Portal de Empresas            | Reusable técnicamente | cierre multibusiness                                  | 15–25 operadores reales            | Vertical V1                |
+| Programa Fundadores           | Operational pending   | plan 17.1 Approved para preparación; Gate B pendiente | Oferta, responsable y cohorte      | Primer vertical confirmado |
+| Concierge Workspace           | Reusable técnicamente | CV4/CV6/CV8.9                                         | Turnos, SLA y cobertura            | Gate operativo             |
+| Action Queue                  | Reusable técnicamente | CV8.9 cerrado                                         | Datos y owners reales              | Activar con cohorte        |
+| Soporte e incidentes          | Missing blocker       | assessment 17                                         | Runbooks, canal y guardia          | Resolver                   |
+| Transporte/hoteles integrados | Deferred              | capacidades parciales/PRD                             | No requerido para soft launch base | Posponer                   |
 
 ### 4.7 Intelligence
 
-| Capacidad | Estado | Evidencia | Deuda V1 | Decisión |
-|---|---|---|---|---|
-| Alux multilingüe y contextual | Reusable técnicamente | cierres Alux/CV6 | Guardrails y costo con tráfico real | Pilotear |
-| Recommendation Engine v1 | Reusable | cierre 16.24 | Validar aceptación real | No ampliar |
-| Context Engine y etapa del viaje | Reusable | CV6 O1/O2 | QA con viajeros reales | Reutilizar |
-| Feedback a recomendaciones | Reusable técnicamente | CV8.6 + CV8.9.4 | Volumen real mínimo | Esperar señal |
-| Perfil contextual | Extensible | fuentes AC1/CV8 | Consentimiento y utilidad real | Mantener mínimo |
+| Capacidad                        | Estado                | Evidencia        | Deuda V1                            | Decisión        |
+| -------------------------------- | --------------------- | ---------------- | ----------------------------------- | --------------- |
+| Alux multilingüe y contextual    | Reusable técnicamente | cierres Alux/CV6 | Guardrails y costo con tráfico real | Pilotear        |
+| Recommendation Engine v1         | Reusable              | cierre 16.24     | Validar aceptación real             | No ampliar      |
+| Context Engine y etapa del viaje | Reusable              | CV6 O1/O2        | QA con viajeros reales              | Reutilizar      |
+| Feedback a recomendaciones       | Reusable técnicamente | CV8.6 + CV8.9.4  | Volumen real mínimo                 | Esperar señal   |
+| Perfil contextual                | Extensible            | fuentes AC1/CV8  | Consentimiento y utilidad real      | Mantener mínimo |
 
 ### 4.8 Engagement
 
-| Capacidad | Estado | Evidencia | Deuda V1 | Decisión |
-|---|---|---|---|---|
-| PWA instalable | Extensible | base PWA/SW | Prueba de campo | No bloquear beta |
-| Offline total | Deferred | 15.10.6 pendiente | Falta evidencia rural | Posponer |
-| Push y email transaccional | Missing blocker para operación asistida | assessment/roadmap | Proveedor, templates, entregabilidad y opt-out | Cerrar mínimo |
-| WhatsApp Concierge | Operational option | recomendado en assessment | Número, horario, consentimiento y handoff | Usar si acelera |
-| Mensajes por etapa | Extensible | CV6 stage-aware | Canal real y medición | Activar gradualmente |
+| Capacidad                  | Estado                                  | Evidencia                 | Deuda V1                                       | Decisión             |
+| -------------------------- | --------------------------------------- | ------------------------- | ---------------------------------------------- | -------------------- |
+| PWA instalable             | Extensible                              | base PWA/SW               | Prueba de campo                                | No bloquear beta     |
+| Offline total              | Deferred                                | 15.10.6 pendiente         | Falta evidencia rural                          | Posponer             |
+| Push y email transaccional | Missing blocker para operación asistida | assessment/roadmap        | Proveedor, templates, entregabilidad y opt-out | Cerrar mínimo        |
+| WhatsApp Concierge         | Operational option                      | recomendado en assessment | Número, horario, consentimiento y handoff      | Usar si acelera      |
+| Mensajes por etapa         | Extensible                              | CV6 stage-aware           | Canal real y medición                          | Activar gradualmente |
 
 ### 4.9 Destination Intelligence
 
-| Capacidad | Estado | Evidencia | Deuda V1 | Decisión |
-|---|---|---|---|---|
-| CV8.0–CV8.8 | Reusable técnicamente | Completion Reports | Outcome y aprobaciones pendientes | Operar con datos reales |
-| CV8.9 decisiones humanas | Reusable | cierre 2026-07-20 | Assigned-only con operadores reales | Seguimiento |
-| Simulation Pack | Reusable para QA | CV8.S | No confundir con tracción | Mantener aislado |
-| Journey end-to-end | Governed / partial instrumentation | Blueprint 10 | Inventario de eventos y feature flags | Fase posterior |
-| North Star de noches adicionales | Defined, not operational | Foundation + Blueprint 10 | Baseline, reconciliación y atribución | Medir en piloto |
-| CSAT/NPS y referrals | Missing / partial | assessment | Encuesta mínima y señal verificable | Cerrar durante piloto |
+| Capacidad                        | Estado                             | Evidencia                 | Deuda V1                              | Decisión                |
+| -------------------------------- | ---------------------------------- | ------------------------- | ------------------------------------- | ----------------------- |
+| CV8.0–CV8.8                      | Reusable técnicamente              | Completion Reports        | Outcome y aprobaciones pendientes     | Operar con datos reales |
+| CV8.9 decisiones humanas         | Reusable                           | cierre 2026-07-20         | Assigned-only con operadores reales   | Seguimiento             |
+| Simulation Pack                  | Reusable para QA                   | CV8.S                     | No confundir con tracción             | Mantener aislado        |
+| Journey end-to-end               | Governed / partial instrumentation | Blueprint 10              | Inventario de eventos y feature flags | Fase posterior          |
+| North Star de noches adicionales | Defined, not operational           | Foundation + Blueprint 10 | Baseline, reconciliación y atribución | Medir en piloto         |
+| CSAT/NPS y referrals             | Missing / partial                  | assessment                | Encuesta mínima y señal verificable   | Cerrar durante piloto   |
 
 ### 4.10 Platform Foundation
 
-| Capacidad | Estado | Evidencia | Deuda V1 | Decisión |
-|---|---|---|---|---|
-| Supabase, RLS y roles | Reusable | auditorías y smoke | Revisión de migraciones objetivo | Reutilizar |
-| Build, typecheck y tests | Reusable | reconciliación y CI | Mantener gate por PR | Obligatorio |
-| Observabilidad interna | Extensible | dashboards CMS | APM y errores de usuario final | Cerrar mínimo |
-| Performance | Extensible | H0–H2 | TTFB productivo no medido | Medir, no proclamar |
-| Media pipeline | Deferred/flagged OFF | H3 M0–M2.3.1 | Flags OFF y hallazgo H-1 | No activar |
-| Accesibilidad y pen-test | Extensible | controles parciales | Auditoría proporcional antes de apertura | Soft-launch gate |
-| MCP M1.0 | Reusable / no prioritario | Completion Report | M1.1–M1.3 sin GO | Diferir |
+| Capacidad                | Estado                    | Evidencia           | Deuda V1                                 | Decisión            |
+| ------------------------ | ------------------------- | ------------------- | ---------------------------------------- | ------------------- |
+| Supabase, RLS y roles    | Reusable                  | auditorías y smoke  | Revisión de migraciones objetivo         | Reutilizar          |
+| Build, typecheck y tests | Reusable                  | reconciliación y CI | Mantener gate por PR                     | Obligatorio         |
+| Observabilidad interna   | Extensible                | dashboards CMS      | APM y errores de usuario final           | Cerrar mínimo       |
+| Performance              | Extensible                | H0–H2               | TTFB productivo no medido                | Medir, no proclamar |
+| Media pipeline           | Deferred/flagged OFF      | H3 M0–M2.3.1        | Flags OFF y hallazgo H-1                 | No activar          |
+| Accesibilidad y pen-test | Extensible                | controles parciales | Auditoría proporcional antes de apertura | Soft-launch gate    |
+| MCP M1.0                 | Reusable / no prioritario | Completion Report   | M1.1–M1.3 sin GO                         | Diferir             |
 
 ---
 
 ## 5. Fuentes únicas que no deben duplicarse
 
-| Concepto | Fuente canónica V1 |
-|---|---|
-| Identidad autenticada y roles | Auth + perfiles/roles existentes |
-| Borrador anónimo | AC1 AnonymousTravelDraft |
-| Madurez de relación | CV8 Journey T1–T9 |
-| Momento temporal | CV6 Stage-Aware |
+| Concepto                                | Fuente canónica V1                          |
+| --------------------------------------- | ------------------------------------------- |
+| Identidad autenticada y roles           | Auth + perfiles/roles existentes            |
+| Borrador anónimo                        | AC1 AnonymousTravelDraft                    |
+| Madurez de relación                     | CV8 Journey T1–T9                           |
+| Momento temporal                        | CV6 Stage-Aware                             |
 | Destinos, empresas, productos y eventos | Entidades canónicas del dominio público/CMS |
-| Plan del viajero | Travel Plan |
-| Caso humano | Concierge Case / promotePlanToCase |
-| Orden y pago | Commerce / Orders / provider adapter |
-| Evento analítico | Catálogo CV8 append-only |
-| Decisión operativa | CV8.9 Action Queue |
-| Prioridad | Roadmap v2.1 |
+| Plan del viajero                        | Travel Plan                                 |
+| Caso humano                             | Concierge Case / promotePlanToCase          |
+| Orden y pago                            | Commerce / Orders / provider adapter        |
+| Evento analítico                        | Catálogo CV8 append-only                    |
+| Decisión operativa                      | CV8.9 Action Queue                          |
+| Prioridad                               | Roadmap v2.1                                |
 
 Se prohíbe crear un segundo CRM, tracker, perfil del viajero, onboarding, catálogo, checkout o dashboard para resolver el vertical.
 
@@ -202,13 +202,13 @@ Se prohíbe crear un segundo CRM, tracker, perfil del viajero, onboarding, catá
 
 ### Candidatos comparados
 
-| Candidato | Impacto en lanzamiento | Reutilización | Deuda nueva | Dependencia externa | Resultado |
-|---|---:|---:|---:|---:|---|
-| Programa Fundadores Valladolid | Muy alto | Muy alta | Baja | Media | **Seleccionado** |
-| Journey Intelligence completo | Alto futuro | Alta | Alta | Legal/analítica | Después del piloto |
-| Night Pass / Videomapping | Medio para OMXDS | Media | Alta | Operación, asientos, transporte | Diferido |
-| Travel Passport CV7 | Medio | Media | Media | Señal postviaje | Diferido |
-| Offline total | Bajo para lanzamiento | Media | Alta | Campo/dispositivos | Diferido |
+| Candidato                      | Impacto en lanzamiento | Reutilización | Deuda nueva |             Dependencia externa | Resultado          |
+| ------------------------------ | ---------------------: | ------------: | ----------: | ------------------------------: | ------------------ |
+| Programa Fundadores Valladolid |               Muy alto |      Muy alta |        Baja |                           Media | **Seleccionado**   |
+| Journey Intelligence completo  |            Alto futuro |          Alta |        Alta |                 Legal/analítica | Después del piloto |
+| Night Pass / Videomapping      |       Medio para OMXDS |         Media |        Alta | Operación, asientos, transporte | Diferido           |
+| Travel Passport CV7            |                  Medio |         Media |       Media |                 Señal postviaje | Diferido           |
+| Offline total                  |  Bajo para lanzamiento |         Media |        Alta |              Campo/dispositivos | Diferido           |
 
 ### Vertical recomendado
 
@@ -302,19 +302,19 @@ El Programa Fundadores Valladolid queda confirmado como primer vertical de OMXDS
 
 ## 9. Métricas del vertical
 
-| Objetivo | Métrica |
-|---|---|
-| Oferta real | empresas publicables/publicadas |
-| Velocidad | mediana contacto → publicación |
-| Calidad | porcentaje con checklist completo |
+| Objetivo               | Métrica                                                 |
+| ---------------------- | ------------------------------------------------------- |
+| Oferta real            | empresas publicables/publicadas                         |
+| Velocidad              | mediana contacto → publicación                          |
+| Calidad                | porcentaje con checklist completo                       |
 | Activación empresarial | empresas con al menos una actualización o atención real |
-| Descubrimiento | viajeros que consultan entidades de la cohorte |
-| Planeación | entidades agregadas a favoritos/plan |
-| Atención | casos y tiempo de primera respuesta |
-| Conversión útil | planes que avanzan a contacto, propuesta u orden |
-| Permanencia | noches planeadas, confirmadas e influenciadas |
-| Confianza | CSAT, incidencias, cancelaciones y opt-out |
-| Valor local | empresas distintas incluidas por viaje |
+| Descubrimiento         | viajeros que consultan entidades de la cohorte          |
+| Planeación             | entidades agregadas a favoritos/plan                    |
+| Atención               | casos y tiempo de primera respuesta                     |
+| Conversión útil        | planes que avanzan a contacto, propuesta u orden        |
+| Permanencia            | noches planeadas, confirmadas e influenciadas           |
+| Confianza              | CSAT, incidencias, cancelaciones y opt-out              |
+| Valor local            | empresas distintas incluidas por viaje                  |
 
 No se declara tracción con seeds, demos, simulación o visitas internas.
 
@@ -322,16 +322,16 @@ No se declara tracción con seeds, demos, simulación o visitas internas.
 
 ## 10. Riesgos y controles
 
-| Riesgo | Control |
-|---|---|
-| Construir antes de observar | cinco empresas piloto antes de automatizar |
-| Contar mocks como oferta | sólo estados Publicable/Publicada reales |
-| Cobrar sin operación fiscal | piloto sin cobro o política CFDI aprobada |
-| Datos desactualizados | owner y fecha de próxima revisión por ficha |
-| Soporte sin dueño | responsable, horario y escalación visibles |
-| Sobreinstrumentación | eventos mínimos ligados a decisión y consentimiento |
-| Confundir simulación con realidad | namespaces y rotulado separados |
-| Prometer cobertura regional prematura | Valladolid como núcleo hasta el gate |
+| Riesgo                                | Control                                             |
+| ------------------------------------- | --------------------------------------------------- |
+| Construir antes de observar           | cinco empresas piloto antes de automatizar          |
+| Contar mocks como oferta              | sólo estados Publicable/Publicada reales            |
+| Cobrar sin operación fiscal           | piloto sin cobro o política CFDI aprobada           |
+| Datos desactualizados                 | owner y fecha de próxima revisión por ficha         |
+| Soporte sin dueño                     | responsable, horario y escalación visibles          |
+| Sobreinstrumentación                  | eventos mínimos ligados a decisión y consentimiento |
+| Confundir simulación con realidad     | namespaces y rotulado separados                     |
+| Prometer cobertura regional prematura | Valladolid como núcleo hasta el gate                |
 
 ---
 
@@ -379,6 +379,6 @@ La aprobación de este documento no autoriza contactar empresas, activar cobros 
 
 ## 13. Control de versión
 
-| Versión | Fecha | Estado | Descripción |
-|---|---|---|---|
-| 1.0 | 2026-07-21 | Approved | Inventario aprobado; Programa Fundadores Valladolid confirmado como primer vertical; roadmap y plan operativo autorizados. Contacto con empresas y cobros permanecen fuera de alcance. |
+| Versión | Fecha      | Estado   | Descripción                                                                                                                                                                            |
+| ------- | ---------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-07-21 | Approved | Inventario aprobado; Programa Fundadores Valladolid confirmado como primer vertical; roadmap y plan operativo autorizados. Contacto con empresas y cobros permanecen fuera de alcance. |

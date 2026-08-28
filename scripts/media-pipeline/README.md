@@ -39,15 +39,15 @@ node scripts/media-pipeline/derive.mjs --asset-id=<uuid> --dry-run
 
 ## Matriz por contexto (adenda benchmark M0)
 
-| usage_context | Formatos              | Anchos                  |
-| ------------- | --------------------- | ----------------------- |
-| hero          | avif, webp, jpeg      | 800, 1200, 1600, 2000   |
-| card          | avif, webp, jpeg      | 400, 800, 1200          |
-| gallery       | avif, webp, jpeg      | 800, 1200, 1600         |
-| thumbnail     | avif, webp, jpeg      | 200, 400                |
-| og            | jpeg                  | 1200                    |
-| editorial     | avif, webp, jpeg      | 800, 1200, 1600         |
-| logo / icon   | webp, png             | 200/400/800 · 64/128/256|
+| usage_context | Formatos         | Anchos                   |
+| ------------- | ---------------- | ------------------------ |
+| hero          | avif, webp, jpeg | 800, 1200, 1600, 2000    |
+| card          | avif, webp, jpeg | 400, 800, 1200           |
+| gallery       | avif, webp, jpeg | 800, 1200, 1600          |
+| thumbnail     | avif, webp, jpeg | 200, 400                 |
+| og            | jpeg             | 1200                     |
+| editorial     | avif, webp, jpeg | 800, 1200, 1600          |
+| logo / icon   | webp, png        | 200/400/800 · 64/128/256 |
 
 ## Rollback
 

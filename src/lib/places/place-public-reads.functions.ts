@@ -37,9 +37,8 @@ export const getPlacePreview = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }): Promise<PublicPlaceDTO | null> => {
     const ctx = context as unknown as { supabase: unknown; userId: string };
-    const { assertPlacePreviewStaff, readPublicPlace } = await import(
-      "./place-public-reads.server"
-    );
+    const { assertPlacePreviewStaff, readPublicPlace } =
+      await import("./place-public-reads.server");
     await assertPlacePreviewStaff(ctx.supabase, ctx.userId);
     return readPublicPlace({
       destinationSlug: data.destinationSlug,

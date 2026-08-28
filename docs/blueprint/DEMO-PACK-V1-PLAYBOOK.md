@@ -27,4 +27,5 @@
 ## Retención
 
 **No borrar datos demo** hasta autorización explícita del Founder:
+
 > "Demo validada. Puedes eliminar los datos temporales."

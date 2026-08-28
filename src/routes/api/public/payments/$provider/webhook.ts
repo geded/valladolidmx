@@ -32,34 +32,33 @@ export const Route = createFileRoute("/api/public/payments/$provider/webhook")({
           console.error("[payments/webhook] verification failed", err);
           // 14.40.7 — alerta crítica: firma de webhook inválida o error de verificación.
           try {
-            const { supabaseAdmin } = await import(
-              "@/integrations/supabase/client.server"
-            );
-            await (supabaseAdmin.rpc as unknown as (
-              fn: string, args: Record<string, unknown>,
-            ) => Promise<unknown>)("raise_system_alert", {
+            const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+            await (
+              supabaseAdmin.rpc as unknown as (
+                fn: string,
+                args: Record<string, unknown>,
+              ) => Promise<unknown>
+            )("raise_system_alert", {
               p_kind: `payments.webhook.${id}.verify_failed`,
               p_severity: "critical",
               p_message: "Verificación de webhook de pago falló",
               p_payload: { provider: id, error: err instanceof Error ? err.message : String(err) },
             });
-          } catch { /* observabilidad no rompe el flujo */ }
+          } catch {
+            /* observabilidad no rompe el flujo */
+          }
           return new Response("Invalid signature", { status: 401 });
         }
 
-        const { supabaseAdmin } = await import(
-          "@/integrations/supabase/client.server"
-        );
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-        const { error: insertErr } = await supabaseAdmin
-          .from("payment_events")
-          .insert({
-            provider: normalized.provider,
-            provider_event_id: normalized.providerEventId,
-            event_type: normalized.type,
-            order_id: normalized.orderId,
-            payload: JSON.parse(JSON.stringify(normalized.raw)),
-          });
+        const { error: insertErr } = await supabaseAdmin.from("payment_events").insert({
+          provider: normalized.provider,
+          provider_event_id: normalized.providerEventId,
+          event_type: normalized.type,
+          order_id: normalized.orderId,
+          payload: JSON.parse(JSON.stringify(normalized.raw)),
+        });
         if (insertErr) {
           if (insertErr.code === "23505") {
             return new Response("ok (duplicate)", { status: 200 });
@@ -80,16 +79,13 @@ export const Route = createFileRoute("/api/public/payments/$provider/webhook")({
             return new Response("Processing error", { status: 500 });
           }
         } else if (normalized.type === "payment_failed" && normalized.orderId) {
-          const { error } = await supabaseAdmin.rpc(
-            "order_mark_payment_failed",
-            {
-              p_order_id: normalized.orderId,
-              p_provider: normalized.provider,
-              p_intent_id: normalized.providerIntentId ?? "",
-              p_event_id: normalized.providerEventId,
-              p_reason: normalized.reason ?? "",
-            },
-          );
+          const { error } = await supabaseAdmin.rpc("order_mark_payment_failed", {
+            p_order_id: normalized.orderId,
+            p_provider: normalized.provider,
+            p_intent_id: normalized.providerIntentId ?? "",
+            p_event_id: normalized.providerEventId,
+            p_reason: normalized.reason ?? "",
+          });
           if (error) {
             console.error("[payments/webhook] mark_failed failed", error);
             return new Response("Processing error", { status: 500 });

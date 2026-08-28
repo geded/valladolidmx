@@ -77,7 +77,9 @@ describe("S3. Single-flight coalescing", () => {
     const s = makeSigner(30);
     const N = 50;
     const results = await Promise.all(
-      Array.from({ length: N }, () => probeSignedUrl({ ...OK, variantKey: "vk-race" }, { _signer: s.fn })),
+      Array.from({ length: N }, () =>
+        probeSignedUrl({ ...OK, variantKey: "vk-race" }, { _signer: s.fn }),
+      ),
     );
     expect(s.calls).toBe(1);
     const misses = results.filter((r) => r.source === "cache_miss").length;
@@ -137,7 +139,11 @@ describe("S6. Storage error/timeout", () => {
 describe("S7. Batch + LRU", () => {
   it("batch resuelve todos e independiza single-flight por key", async () => {
     const s = makeSigner(1);
-    const items = Array.from({ length: 5 }, (_, i) => ({ bucket: "b", path: `p${i}`, variantKey: `vk-b${i}` }));
+    const items = Array.from({ length: 5 }, (_, i) => ({
+      bucket: "b",
+      path: `p${i}`,
+      variantKey: `vk-b${i}`,
+    }));
     const r = await probeSignedUrlBatch(items, { _signer: s.fn });
     expect(r.every((x) => x.ok)).toBe(true);
     expect(s.calls).toBe(5);

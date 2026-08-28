@@ -13,14 +13,8 @@
  * de `sessionStorage`. Toda la política vive en `session-context.ts`.
  */
 import { useEffect } from "react";
-import {
-  subscribeResolvedContext,
-  useResolvedContext,
-} from "@/lib/context-engine";
-import {
-  snapshotFromContext,
-  writeNavigationSession,
-} from "@/lib/navigation/session-context";
+import { subscribeResolvedContext, useResolvedContext } from "@/lib/context-engine";
+import { snapshotFromContext, writeNavigationSession } from "@/lib/navigation/session-context";
 
 /**
  * Modo local: cuando se monta dentro de un `ContextEngineProvider`

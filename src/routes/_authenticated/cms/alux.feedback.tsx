@@ -60,17 +60,14 @@ function AluxFeedbackPage() {
         >
           <ArrowLeft className="size-3" aria-hidden /> Volver a la consola
         </Link>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">
-          CMS · Inteligencia
-        </p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">CMS · Inteligencia</p>
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-serif">Feedback y calidad de Alux</h1>
           <Badge variant="secondary">Ola A4</Badge>
         </div>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          Cada 👍/👎 del viajero se registra aquí. Úsalo para iterar el
-          prompt, curar la Base de Conocimiento (Ola A2) y detectar
-          capacidades con baja calidad.
+          Cada 👍/👎 del viajero se registra aquí. Úsalo para iterar el prompt, curar la Base de
+          Conocimiento (Ola A2) y detectar capacidades con baja calidad.
         </p>
 
         <div className="pt-2 flex flex-wrap gap-2">
@@ -100,7 +97,11 @@ function AluxFeedbackPage() {
         <>
           {/* KPIs globales */}
           <section className="grid gap-4 sm:grid-cols-4">
-            <KpiCard label="CSAT" value={data.totals.total > 0 ? pct(data.totals.csat) : "—"} hint={`${data.totals.total} respuestas`} />
+            <KpiCard
+              label="CSAT"
+              value={data.totals.total > 0 ? pct(data.totals.csat) : "—"}
+              hint={`${data.totals.total} respuestas`}
+            />
             <KpiCard label="👍 Útiles" value={String(data.totals.up)} tone="success" />
             <KpiCard label="👎 Poco útiles" value={String(data.totals.down)} tone="destructive" />
             <KpiCard
@@ -114,9 +115,7 @@ function AluxFeedbackPage() {
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
             <h2 className="font-serif text-lg mb-4">CSAT por capacidad</h2>
             {data.perCapability.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Aún sin feedback en esta ventana.
-              </p>
+              <p className="text-sm text-muted-foreground">Aún sin feedback en esta ventana.</p>
             ) : (
               <div className="space-y-3">
                 {data.perCapability.map((c) => (
@@ -152,10 +151,7 @@ function AluxFeedbackPage() {
               <div className="flex items-end gap-1 h-32">
                 {data.perDay.map((d) => {
                   const total = d.up + d.down;
-                  const max = Math.max(
-                    ...data.perDay.map((x) => x.up + x.down),
-                    1,
-                  );
+                  const max = Math.max(...data.perDay.map((x) => x.up + x.down), 1);
                   const h = (total / max) * 100;
                   const upH = total > 0 ? (d.up / total) * h : 0;
                   const downH = total > 0 ? (d.down / total) * h : 0;
@@ -165,14 +161,8 @@ function AluxFeedbackPage() {
                       className="flex-1 flex flex-col-reverse gap-px min-w-[6px]"
                       title={`${d.day} · ${d.up}👍 / ${d.down}👎`}
                     >
-                      <div
-                        className="bg-success rounded-sm"
-                        style={{ height: `${upH}%` }}
-                      />
-                      <div
-                        className="bg-destructive rounded-sm"
-                        style={{ height: `${downH}%` }}
-                      />
+                      <div className="bg-success rounded-sm" style={{ height: `${upH}%` }} />
+                      <div className="bg-destructive rounded-sm" style={{ height: `${downH}%` }} />
                     </div>
                   );
                 })}
@@ -182,12 +172,9 @@ function AluxFeedbackPage() {
 
           {/* Top KB en respuestas mal calificadas */}
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
-            <h2 className="font-serif text-lg mb-1">
-              Entradas de conocimiento a revisar
-            </h2>
+            <h2 className="font-serif text-lg mb-1">Entradas de conocimiento a revisar</h2>
             <p className="mb-4 text-xs text-muted-foreground">
-              Base de Conocimiento (Ola A2) citada en respuestas con 👎.
-              Revísalas o mejóralas.
+              Base de Conocimiento (Ola A2) citada en respuestas con 👎. Revísalas o mejóralas.
             </p>
             {data.knowledgeDownHits.length === 0 ? (
               <p className="text-sm text-muted-foreground">
@@ -203,9 +190,7 @@ function AluxFeedbackPage() {
                     <code className="text-muted-foreground truncate max-w-[70%]">
                       {k.knowledge_id}
                     </code>
-                    <span className="tabular-nums">
-                      {k.hits} 👎
-                    </span>
+                    <span className="tabular-nums">{k.hits} 👎</span>
                   </li>
                 ))}
               </ul>
@@ -285,15 +270,9 @@ function KpiCard({
         : "text-foreground";
   return (
     <div className="rounded-2xl border bg-card p-4 shadow-soft">
-      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
-        {label}
-      </p>
-      <p className={`mt-1 text-2xl font-serif tabular-nums ${toneClass}`}>
-        {value}
-      </p>
-      {hint ? (
-        <p className="mt-0.5 text-[11px] text-muted-foreground">{hint}</p>
-      ) : null}
+      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className={`mt-1 text-2xl font-serif tabular-nums ${toneClass}`}>{value}</p>
+      {hint ? <p className="mt-0.5 text-[11px] text-muted-foreground">{hint}</p> : null}
     </div>
   );
 }

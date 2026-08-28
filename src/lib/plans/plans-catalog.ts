@@ -36,10 +36,10 @@ export type PlanCapability =
   | "custom_cta"
   | "campaigns"
   | "microsite"
-  | "menu"           // Restaurantes / cafés
-  | "rooms"          // Hoteles / hospedaje
-  | "tours"          // Agencias / operadores
-  | "inventory";     // Tiendas
+  | "menu" // Restaurantes / cafés
+  | "rooms" // Hoteles / hospedaje
+  | "tours" // Agencias / operadores
+  | "inventory"; // Tiendas
 
 export interface PlanLimits {
   /** Fotografías de portada / galería. `Infinity` = sin tope. */
@@ -70,8 +70,15 @@ const FREE: PlanDefinition = {
   label: "Gratis",
   capabilities: new Set<PlanCapability>(["gallery"]),
   limits: {
-    photos: 3, videos: 0, promotions: 0, faqs: 3, forms: 0,
-    menuItems: 0, rooms: 0, tours: 0, campaigns: 0,
+    photos: 3,
+    videos: 0,
+    promotions: 0,
+    faqs: 3,
+    forms: 0,
+    menuItems: 0,
+    rooms: 0,
+    tours: 0,
+    campaigns: 0,
   },
 };
 
@@ -79,11 +86,24 @@ const STARTER: PlanDefinition = {
   tier: "starter",
   label: "Starter",
   capabilities: new Set<PlanCapability>([
-    "gallery", "promotions", "faqs", "menu", "rooms", "tours", "inventory",
+    "gallery",
+    "promotions",
+    "faqs",
+    "menu",
+    "rooms",
+    "tours",
+    "inventory",
   ]),
   limits: {
-    photos: 10, videos: 1, promotions: 2, faqs: 10, forms: 1,
-    menuItems: 20, rooms: 5, tours: 5, campaigns: 0,
+    photos: 10,
+    videos: 1,
+    promotions: 2,
+    faqs: 10,
+    forms: 1,
+    menuItems: 20,
+    rooms: 5,
+    tours: 5,
+    campaigns: 0,
   },
 };
 
@@ -91,12 +111,27 @@ const PRO: PlanDefinition = {
   tier: "pro",
   label: "Pro",
   capabilities: new Set<PlanCapability>([
-    "gallery", "promotions", "videos", "faqs", "forms", "custom_cta",
-    "menu", "rooms", "tours", "inventory",
+    "gallery",
+    "promotions",
+    "videos",
+    "faqs",
+    "forms",
+    "custom_cta",
+    "menu",
+    "rooms",
+    "tours",
+    "inventory",
   ]),
   limits: {
-    photos: 30, videos: 5, promotions: 10, faqs: 30, forms: 3,
-    menuItems: 100, rooms: 30, tours: 30, campaigns: 2,
+    photos: 30,
+    videos: 5,
+    promotions: 10,
+    faqs: 30,
+    forms: 3,
+    menuItems: 100,
+    rooms: 30,
+    tours: 30,
+    campaigns: 2,
   },
 };
 
@@ -104,20 +139,37 @@ const PREMIUM: PlanDefinition = {
   tier: "premium",
   label: "Premium",
   capabilities: new Set<PlanCapability>([
-    "gallery", "promotions", "videos", "faqs", "forms", "custom_cta",
-    "campaigns", "microsite", "menu", "rooms", "tours", "inventory",
+    "gallery",
+    "promotions",
+    "videos",
+    "faqs",
+    "forms",
+    "custom_cta",
+    "campaigns",
+    "microsite",
+    "menu",
+    "rooms",
+    "tours",
+    "inventory",
   ]),
   limits: {
-    photos: Number.POSITIVE_INFINITY, videos: Number.POSITIVE_INFINITY,
-    promotions: Number.POSITIVE_INFINITY, faqs: Number.POSITIVE_INFINITY,
-    forms: Number.POSITIVE_INFINITY, menuItems: Number.POSITIVE_INFINITY,
-    rooms: Number.POSITIVE_INFINITY, tours: Number.POSITIVE_INFINITY,
+    photos: Number.POSITIVE_INFINITY,
+    videos: Number.POSITIVE_INFINITY,
+    promotions: Number.POSITIVE_INFINITY,
+    faqs: Number.POSITIVE_INFINITY,
+    forms: Number.POSITIVE_INFINITY,
+    menuItems: Number.POSITIVE_INFINITY,
+    rooms: Number.POSITIVE_INFINITY,
+    tours: Number.POSITIVE_INFINITY,
     campaigns: Number.POSITIVE_INFINITY,
   },
 };
 
 export const PLANS_CATALOG: Readonly<Record<PlanTier, PlanDefinition>> = {
-  free: FREE, starter: STARTER, pro: PRO, premium: PREMIUM,
+  free: FREE,
+  starter: STARTER,
+  pro: PRO,
+  premium: PREMIUM,
 };
 
 /** Devuelve la definición del plan; fallback a `free` si es desconocido. */
@@ -127,12 +179,18 @@ export function getPlanDefinition(tier: PlanTier | string | null | undefined): P
 }
 
 /** ¿El plan habilita esta capacidad? */
-export function planAllows(tier: PlanTier | string | null | undefined, cap: PlanCapability): boolean {
+export function planAllows(
+  tier: PlanTier | string | null | undefined,
+  cap: PlanCapability,
+): boolean {
   return getPlanDefinition(tier).capabilities.has(cap);
 }
 
 /** Límite numérico por capacidad. Devuelve `0` si la capacidad no aplica. */
-export function planLimit(tier: PlanTier | string | null | undefined, key: keyof PlanLimits): number {
+export function planLimit(
+  tier: PlanTier | string | null | undefined,
+  key: keyof PlanLimits,
+): number {
   return getPlanDefinition(tier).limits[key];
 }
 
@@ -145,9 +203,8 @@ export function planLimit(tier: PlanTier | string | null | undefined, key: keyof
 export function resolveBusinessPlanTier(
   metadata: Record<string, unknown> | null | undefined,
 ): PlanTier {
-  const raw = metadata && typeof metadata === "object"
-    ? (metadata as Record<string, unknown>).plan
-    : null;
+  const raw =
+    metadata && typeof metadata === "object" ? (metadata as Record<string, unknown>).plan : null;
   const tier = typeof raw === "string" ? (raw as PlanTier) : "free";
-  return (["free","starter","pro","premium"] as const).includes(tier) ? tier : "free";
+  return (["free", "starter", "pro", "premium"] as const).includes(tier) ? tier : "free";
 }

@@ -36,7 +36,11 @@ export default defineTool({
         .eq("user_id", ctx.getUserId()!)
         .maybeSingle();
       if (error) {
-        return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true, resultCount: 0 };
+        return {
+          content: [{ type: "text", text: `Error: ${error.message}` }],
+          isError: true,
+          resultCount: 0,
+        };
       }
       const output = OutputSchema.parse({
         profile: (data as Record<string, unknown> | null) ?? null,

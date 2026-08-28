@@ -21,12 +21,7 @@
 import type { LiveDayContext } from "@/lib/traveler/live-day";
 import type { TripPhase } from "@/lib/traveler/trip-phase";
 
-export type AssistanceState =
-  | "hidden"
-  | "standby"
-  | "case_open"
-  | "sla_breach"
-  | "sos";
+export type AssistanceState = "hidden" | "standby" | "case_open" | "sla_breach" | "sos";
 
 /**
  * Contrato extensible de capacidades. TODAS declaradas para permitir
@@ -105,10 +100,7 @@ const HIDDEN: OnTripConciergeState = {
   explain: { sources: [], rules: [] },
 };
 
-function withinOfficeHours(
-  at: Date,
-  hours: { openHour: number; closeHour: number },
-): boolean {
+function withinOfficeHours(at: Date, hours: { openHour: number; closeHour: number }): boolean {
   // America/Merida ≈ UTC-6 (sin DST). Determinista y suficiente para CV6.7.
   const localHour = (at.getUTCHours() - 6 + 24) % 24;
   return localHour >= hours.openHour && localHour < hours.closeHour;
@@ -118,9 +110,7 @@ function withinOfficeHours(
  * Pure derivador oficial. TODA decisión visual del banner debe originarse
  * aquí. La UI no toma decisiones.
  */
-export function deriveOnTripConciergeState(
-  input: OnTripConciergeInput,
-): OnTripConciergeState {
+export function deriveOnTripConciergeState(input: OnTripConciergeInput): OnTripConciergeState {
   const officeHours = input.officeHours ?? { openHour: 8, closeHour: 22 };
   const rules: string[] = [];
   const sources: string[] = ["live_day", "travel_plan_contract"];
@@ -157,8 +147,7 @@ export function deriveOnTripConciergeState(
       conciergeStatus: hoursLabel,
       ctaLabel: "Ver expediente",
       ctaIntent: "view_case",
-      ctaOutcome:
-        "Abrirá tu expediente actual del Concierge sin crear uno nuevo.",
+      ctaOutcome: "Abrirá tu expediente actual del Concierge sin crear uno nuevo.",
       reversible: true,
       channels: DECLARED_CHANNELS,
       activeChannels: ACTIVE_CHANNELS_V1,
@@ -181,8 +170,7 @@ export function deriveOnTripConciergeState(
       conciergeStatus: hoursLabel,
       ctaLabel: "Contactar Concierge",
       ctaIntent: "open_case",
-      ctaOutcome:
-        "Abrirá un expediente vinculado a tu plan y notificará al Concierge asignado.",
+      ctaOutcome: "Abrirá un expediente vinculado a tu plan y notificará al Concierge asignado.",
       reversible: true,
       channels: DECLARED_CHANNELS,
       activeChannels: ACTIVE_CHANNELS_V1,

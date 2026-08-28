@@ -107,9 +107,7 @@ function GaleriaPage() {
         </p>
       </header>
 
-      {isLoading && (
-        <p className="text-sm text-muted-foreground">Cargando galería…</p>
-      )}
+      {isLoading && <p className="text-sm text-muted-foreground">Cargando galería…</p>}
       {error && (
         <p className="text-sm text-destructive">
           {error instanceof Error ? error.message : "Error desconocido"}
@@ -196,10 +194,7 @@ function MediaSection({
       setStatus("Archivo cargado.");
       await refresh();
     } catch (err) {
-      const msg = toPlanLimitMessage(
-        err,
-        err instanceof Error ? err.message : "Error al subir",
-      );
+      const msg = toPlanLimitMessage(err, err instanceof Error ? err.message : "Error al subir");
       setStatus(msg);
       toast.error(msg);
     } finally {
@@ -209,8 +204,7 @@ function MediaSection({
   };
 
   const removeMutation = useMutation({
-    mutationFn: (id: string) =>
-      removeFn({ data: { businessMediaId: id } }).then(refresh),
+    mutationFn: (id: string) => removeFn({ data: { businessMediaId: id } }).then(refresh),
   });
 
   const updateMutation = useMutation({
@@ -252,9 +246,7 @@ function MediaSection({
         )}
       </header>
 
-      {status && (
-        <p className="mt-2 text-xs text-muted-foreground">{status}</p>
-      )}
+      {status && <p className="mt-2 text-xs text-muted-foreground">{status}</p>}
 
       {!items.length ? (
         <p className="mt-4 text-sm text-muted-foreground">
@@ -366,9 +358,7 @@ function MediaMetaForm({
   );
 }
 
-async function readImageDimensions(
-  file: File,
-): Promise<{ width: number; height: number } | null> {
+async function readImageDimensions(file: File): Promise<{ width: number; height: number } | null> {
   if (typeof window === "undefined") return null;
   return new Promise((resolve) => {
     const url = URL.createObjectURL(file);

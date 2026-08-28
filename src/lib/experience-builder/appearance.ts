@@ -6,16 +6,16 @@
 import type { CSSProperties } from "react";
 
 export interface BlockAppearance {
-  font_family?: string;         // "display" | "body" | "script" | "system" | ""
-  font_scale?: number;          // multiplicador (1 = tal cual)
-  text_align?: string;          // left|center|right
-  text_color?: string;          // hex/oklch
-  bg_color?: string;            // hex/transparent
-  padding_y?: number;           // px
-  padding_x?: number;           // px
-  min_height?: number;          // px (0 = auto)
-  max_width?: number;           // px (0 = auto)
-  radius?: number;              // px
+  font_family?: string; // "display" | "body" | "script" | "system" | ""
+  font_scale?: number; // multiplicador (1 = tal cual)
+  text_align?: string; // left|center|right
+  text_color?: string; // hex/oklch
+  bg_color?: string; // hex/transparent
+  padding_y?: number; // px
+  padding_x?: number; // px
+  min_height?: number; // px (0 = auto)
+  max_width?: number; // px (0 = auto)
+  radius?: number; // px
 }
 
 export const FONT_FAMILY_OPTIONS: Array<{ value: string; label: string; css?: string }> = [
@@ -23,7 +23,7 @@ export const FONT_FAMILY_OPTIONS: Array<{ value: string; label: string; css?: st
   { value: "display", label: "Display (Fraunces)", css: '"Fraunces", serif' },
   { value: "body", label: "Cuerpo (Inter)", css: '"Inter", system-ui, sans-serif' },
   { value: "script", label: "Script (Tangerine)", css: '"Tangerine", cursive' },
-  { value: "system", label: "Sistema", css: 'system-ui, -apple-system, sans-serif' },
+  { value: "system", label: "Sistema", css: "system-ui, -apple-system, sans-serif" },
 ];
 
 function familyCss(key?: string): string | undefined {
@@ -31,7 +31,9 @@ function familyCss(key?: string): string | undefined {
   return FONT_FAMILY_OPTIONS.find((o) => o.value === key)?.css;
 }
 
-export function readAppearance(config: Record<string, unknown> | null | undefined): BlockAppearance {
+export function readAppearance(
+  config: Record<string, unknown> | null | undefined,
+): BlockAppearance {
   const raw = config?.__appearance as BlockAppearance | undefined;
   return raw && typeof raw === "object" ? raw : {};
 }

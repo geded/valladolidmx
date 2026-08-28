@@ -92,9 +92,10 @@ function clampTripContext(v: unknown): TripContext {
 }
 
 function mapRow(row: Record<string, unknown>): TravelerProfile {
-  const ctx = row.trip_context && typeof row.trip_context === "object" && !Array.isArray(row.trip_context)
-    ? clampTripContext(row.trip_context)
-    : {};
+  const ctx =
+    row.trip_context && typeof row.trip_context === "object" && !Array.isArray(row.trip_context)
+      ? clampTripContext(row.trip_context)
+      : {};
   return {
     user_id: String(row.user_id),
     travel_style: (row.travel_style as string | null) ?? null,

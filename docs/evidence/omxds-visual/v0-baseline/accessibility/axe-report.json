@@ -4,9 +4,7 @@
       "htmlLang": "es",
       "title": "Valladolid.mx \u00b7 Despierta en el Oriente Maya",
       "mains": 1,
-      "h1s": [
-        "Despierta en Valladolid y descubre el Oriente Maya de Yucat\u00e1n."
-      ],
+      "h1s": ["Despierta en Valladolid y descubre el Oriente Maya de Yucat\u00e1n."],
       "landmarks": {
         "header": 1,
         "nav": 1,
@@ -25,13 +23,7 @@
         "id": "aria-prohibited-attr",
         "impact": "serious",
         "help": "Elements must only use permitted ARIA attributes",
-        "tags": [
-          "cat.aria",
-          "wcag2a",
-          "wcag412",
-          "EN-301-549",
-          "EN-9.4.1.2"
-        ],
+        "tags": ["cat.aria", "wcag2a", "wcag412", "EN-301-549", "EN-9.4.1.2"],
         "count": 3,
         "sample": [
           {
@@ -88,9 +80,7 @@
       "htmlLang": "es",
       "title": "Oriente Maya \u2014 Destinos tur\u00edsticos de Yucat\u00e1n \u00b7 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Oriente Maya"
-      ],
+      "h1s": ["Oriente Maya"],
       "landmarks": {
         "header": 2,
         "nav": 3,
@@ -122,9 +112,7 @@
         "count": 7,
         "sample": [
           {
-            "target": [
-              ".mb-2"
-            ],
+            "target": [".mb-2"],
             "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">Regi\u00f3n tur\u00edstica</p>"
           },
           {
@@ -139,16 +127,11 @@
         "id": "heading-order",
         "impact": "moderate",
         "help": "Heading levels should only increase by one",
-        "tags": [
-          "cat.semantics",
-          "best-practice"
-        ],
+        "tags": ["cat.semantics", "best-practice"],
         "count": 1,
         "sample": [
           {
-            "target": [
-              "article:nth-child(1) > .p-5.flex-1.flex-col > .text-base.leading-tight"
-            ],
+            "target": ["article:nth-child(1) > .p-5.flex-1.flex-col > .text-base.leading-tight"],
             "html": "<h3 class=\"mt-1 text-base font-semibold leading-tight\"><a href=\"/oriente-maya/valladolid\" class=\"hover:underline\">Valladolid</a></h3>"
           }
         ]
@@ -163,9 +146,7 @@
       "htmlLang": "es",
       "title": "Valladolid \u2014 Oriente Maya \u00b7 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Valladolid"
-      ],
+      "h1s": ["Valladolid"],
       "landmarks": {
         "header": 10,
         "nav": 4,
@@ -214,21 +195,11 @@
         "id": "nested-interactive",
         "impact": "serious",
         "help": "Interactive controls must not be nested",
-        "tags": [
-          "cat.keyboard",
-          "wcag2a",
-          "wcag412",
-          "TTv5",
-          "TT6.a",
-          "EN-301-549",
-          "EN-9.4.1.2"
-        ],
+        "tags": ["cat.keyboard", "wcag2a", "wcag412", "TTv5", "TT6.a", "EN-301-549", "EN-9.4.1.2"],
         "count": 1,
         "sample": [
           {
-            "target": [
-              ".h-\\[420px\\]"
-            ],
+            "target": [".h-\\[420px\\]"],
             "html": "<div class=\"h-[420px] w-full rounded-2xl border border-border sm:h-[520px]\" aria-label=\"Mapa interactivo\" role=\"img\" data-ready=\"true\" style=\"position: relative; overflow: hidden;\""
           }
         ]
@@ -283,9 +254,7 @@
         "count": 1,
         "sample": [
           {
-            "target": [
-              "#hero-gallery-Valladolid"
-            ],
+            "target": ["#hero-gallery-Valladolid"],
             "html": "<ul id=\"hero-gallery-Valladolid\" class=\"flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden\" aria-label=\"Galer\u00eda de Va"
           }
         ]
@@ -300,9 +269,7 @@
       "htmlLang": "es",
       "title": "Cenotes en Valladolid \u2014 Oriente Maya \u00b7 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Cenotes en Valladolid"
-      ],
+      "h1s": ["Cenotes en Valladolid"],
       "landmarks": {
         "header": 3,
         "nav": 3,
@@ -334,15 +301,11 @@
         "count": 10,
         "sample": [
           {
-            "target": [
-              ".tracking-\\[0\\.14em\\]"
-            ],
+            "target": [".tracking-\\[0\\.14em\\]"],
             "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Valladolid</p>"
           },
           {
-            "target": [
-              ".py-1.bg-primary\\/10.px-3"
-            ],
+            "target": [".py-1.bg-primary\\/10.px-3"],
             "html": "<span class=\"inline-flex items-center gap-1 rounded-pill bg-primary/10 px-3 py-1 text-xs font-semibold text-primary\">Explorando en Valladolid</span>"
           }
         ]
@@ -351,21 +314,11 @@
         "id": "nested-interactive",
         "impact": "serious",
         "help": "Interactive controls must not be nested",
-        "tags": [
-          "cat.keyboard",
-          "wcag2a",
-          "wcag412",
-          "TTv5",
-          "TT6.a",
-          "EN-301-549",
-          "EN-9.4.1.2"
-        ],
+        "tags": ["cat.keyboard", "wcag2a", "wcag412", "TTv5", "TT6.a", "EN-301-549", "EN-9.4.1.2"],
         "count": 1,
         "sample": [
           {
-            "target": [
-              ".h-\\[320px\\]"
-            ],
+            "target": [".h-\\[320px\\]"],
             "html": "<div class=\"h-[320px] w-full rounded-2xl border border-border md:h-[420px]\" aria-label=\"Mapa de Cenote Suytun\" role=\"img\" data-ready=\"true\" style=\"position: relative; overflow: hid"
           }
         ]
@@ -380,9 +333,7 @@
       "htmlLang": "es",
       "title": "Zazil Tunich \u00b7 Valladolid \u2014 Valladolid.mx",
       "mains": 0,
-      "h1s": [
-        "Zazil Tunich"
-      ],
+      "h1s": ["Zazil Tunich"],
       "landmarks": {
         "header": 6,
         "nav": 3,
@@ -414,15 +365,11 @@
         "count": 17,
         "sample": [
           {
-            "target": [
-              ".tracking-\\[0\\.14em\\]"
-            ],
+            "target": [".tracking-\\[0\\.14em\\]"],
             "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Cenote Museo del Xibalb\u00e1</p>"
           },
           {
-            "target": [
-              ".bg-primary\\/15"
-            ],
+            "target": [".bg-primary\\/15"],
             "html": "<li class=\"inline-flex items-center gap-1.5 rounded-pill border px-2.5 py-1 text-xs font-medium backdrop-blur-sm bg-primary/15 text-primary border-primary/30\">Cenote Museo</li>"
           }
         ]
@@ -431,16 +378,11 @@
         "id": "landmark-one-main",
         "impact": "moderate",
         "help": "Document should have one main landmark",
-        "tags": [
-          "cat.semantics",
-          "best-practice"
-        ],
+        "tags": ["cat.semantics", "best-practice"],
         "count": 1,
         "sample": [
           {
-            "target": [
-              "html"
-            ],
+            "target": ["html"],
             "html": "<html lang=\"es\">"
           }
         ]
@@ -449,22 +391,15 @@
         "id": "region",
         "impact": "moderate",
         "help": "All page content should be contained by landmarks",
-        "tags": [
-          "cat.keyboard",
-          "best-practice"
-        ],
+        "tags": ["cat.keyboard", "best-practice"],
         "count": 15,
         "sample": [
           {
-            "target": [
-              ".sr-only"
-            ],
+            "target": [".sr-only"],
             "html": "<a href=\"#main\" class=\"sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-"
           },
           {
-            "target": [
-              ".tracking-\\[0\\.14em\\]"
-            ],
+            "target": [".tracking-\\[0\\.14em\\]"],
             "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Cenote Museo del Xibalb\u00e1</p>"
           }
         ]
@@ -505,16 +440,11 @@
         "id": "skip-link",
         "impact": "moderate",
         "help": "The skip-link target should exist and be focusable",
-        "tags": [
-          "cat.keyboard",
-          "best-practice"
-        ],
+        "tags": ["cat.keyboard", "best-practice"],
         "count": 1,
         "sample": [
           {
-            "target": [
-              ".sr-only"
-            ],
+            "target": [".sr-only"],
             "html": "<a href=\"#main\" class=\"sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-"
           }
         ]
@@ -529,9 +459,7 @@
       "htmlLang": "es",
       "title": "Nado en el Cenote Sagrado \u00b7 Zazil Tunich \u2014 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Nado en el Cenote Sagrado"
-      ],
+      "h1s": ["Nado en el Cenote Sagrado"],
       "landmarks": {
         "header": 6,
         "nav": 3,
@@ -563,9 +491,7 @@
         "count": 11,
         "sample": [
           {
-            "target": [
-              ".mb-2"
-            ],
+            "target": [".mb-2"],
             "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">experiencia</p>"
           },
           {
@@ -586,9 +512,7 @@
       "htmlLang": "es",
       "title": "Eventos \u00b7 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Eventos"
-      ],
+      "h1s": ["Eventos"],
       "landmarks": {
         "header": 1,
         "nav": 3,
@@ -620,9 +544,7 @@
         "count": 4,
         "sample": [
           {
-            "target": [
-              ".tracking-\\[0\\.14em\\]"
-            ],
+            "target": [".tracking-\\[0\\.14em\\]"],
             "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Agenda cultural</p>"
           },
           {
@@ -637,10 +559,7 @@
         "id": "heading-order",
         "impact": "moderate",
         "help": "Heading levels should only increase by one",
-        "tags": [
-          "cat.semantics",
-          "best-practice"
-        ],
+        "tags": ["cat.semantics", "best-practice"],
         "count": 1,
         "sample": [
           {
@@ -661,9 +580,7 @@
       "htmlLang": "es",
       "title": "Arma tu Viaje \u00b7 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Arma tu Viaje"
-      ],
+      "h1s": ["Arma tu Viaje"],
       "landmarks": {
         "header": 2,
         "nav": 3,
@@ -695,9 +612,7 @@
         "count": 1,
         "sample": [
           {
-            "target": [
-              ".mb-2"
-            ],
+            "target": [".mb-2"],
             "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">Plataforma</p>"
           }
         ]
@@ -706,16 +621,11 @@
         "id": "heading-order",
         "impact": "moderate",
         "help": "Heading levels should only increase by one",
-        "tags": [
-          "cat.semantics",
-          "best-practice"
-        ],
+        "tags": ["cat.semantics", "best-practice"],
         "count": 1,
         "sample": [
           {
-            "target": [
-              "div:nth-child(2) > h3"
-            ],
+            "target": ["div:nth-child(2) > h3"],
             "html": "<h3 class=\"text-sm font-semibold text-foreground\">Explorar</h3>"
           }
         ]
@@ -730,9 +640,7 @@
       "htmlLang": "es",
       "title": "Blog \u00b7 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Blog del Oriente Maya"
-      ],
+      "h1s": ["Blog del Oriente Maya"],
       "landmarks": {
         "header": 2,
         "nav": 3,
@@ -764,9 +672,7 @@
         "count": 1,
         "sample": [
           {
-            "target": [
-              ".mb-2"
-            ],
+            "target": [".mb-2"],
             "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">Editorial</p>"
           }
         ]
@@ -781,9 +687,7 @@
       "htmlLang": "es",
       "title": "Valladolid.mx \u00b7 Despierta en el Oriente Maya",
       "mains": 1,
-      "h1s": [
-        "Despierta en Valladolid y descubre el Oriente Maya de Yucat\u00e1n."
-      ],
+      "h1s": ["Despierta en Valladolid y descubre el Oriente Maya de Yucat\u00e1n."],
       "landmarks": {
         "header": 1,
         "nav": 1,
@@ -802,13 +706,7 @@
         "id": "aria-prohibited-attr",
         "impact": "serious",
         "help": "Elements must only use permitted ARIA attributes",
-        "tags": [
-          "cat.aria",
-          "wcag2a",
-          "wcag412",
-          "EN-301-549",
-          "EN-9.4.1.2"
-        ],
+        "tags": ["cat.aria", "wcag2a", "wcag412", "EN-301-549", "EN-9.4.1.2"],
         "count": 3,
         "sample": [
           {
@@ -865,9 +763,7 @@
       "htmlLang": "es",
       "title": "Oriente Maya \u2014 Destinos tur\u00edsticos de Yucat\u00e1n \u00b7 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Oriente Maya"
-      ],
+      "h1s": ["Oriente Maya"],
       "landmarks": {
         "header": 2,
         "nav": 3,
@@ -899,9 +795,7 @@
         "count": 7,
         "sample": [
           {
-            "target": [
-              ".mb-2"
-            ],
+            "target": [".mb-2"],
             "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">Regi\u00f3n tur\u00edstica</p>"
           },
           {
@@ -916,16 +810,11 @@
         "id": "heading-order",
         "impact": "moderate",
         "help": "Heading levels should only increase by one",
-        "tags": [
-          "cat.semantics",
-          "best-practice"
-        ],
+        "tags": ["cat.semantics", "best-practice"],
         "count": 1,
         "sample": [
           {
-            "target": [
-              "article:nth-child(1) > .p-5.flex-1.flex-col > .text-base.leading-tight"
-            ],
+            "target": ["article:nth-child(1) > .p-5.flex-1.flex-col > .text-base.leading-tight"],
             "html": "<h3 class=\"mt-1 text-base font-semibold leading-tight\"><a href=\"/oriente-maya/valladolid\" class=\"hover:underline\">Valladolid</a></h3>"
           }
         ]
@@ -940,9 +829,7 @@
       "htmlLang": "es",
       "title": "Valladolid \u2014 Oriente Maya \u00b7 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Valladolid"
-      ],
+      "h1s": ["Valladolid"],
       "landmarks": {
         "header": 10,
         "nav": 4,
@@ -991,21 +878,11 @@
         "id": "nested-interactive",
         "impact": "serious",
         "help": "Interactive controls must not be nested",
-        "tags": [
-          "cat.keyboard",
-          "wcag2a",
-          "wcag412",
-          "TTv5",
-          "TT6.a",
-          "EN-301-549",
-          "EN-9.4.1.2"
-        ],
+        "tags": ["cat.keyboard", "wcag2a", "wcag412", "TTv5", "TT6.a", "EN-301-549", "EN-9.4.1.2"],
         "count": 1,
         "sample": [
           {
-            "target": [
-              ".h-\\[420px\\]"
-            ],
+            "target": [".h-\\[420px\\]"],
             "html": "<div class=\"h-[420px] w-full rounded-2xl border border-border sm:h-[520px]\" aria-label=\"Mapa interactivo\" role=\"img\" data-ready=\"true\" style=\"position: relative; overflow: hidden;\""
           }
         ]
@@ -1052,9 +929,7 @@
       "htmlLang": "es",
       "title": "Cenotes en Valladolid \u2014 Oriente Maya \u00b7 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Cenotes en Valladolid"
-      ],
+      "h1s": ["Cenotes en Valladolid"],
       "landmarks": {
         "header": 3,
         "nav": 3,
@@ -1086,15 +961,11 @@
         "count": 10,
         "sample": [
           {
-            "target": [
-              ".tracking-\\[0\\.14em\\]"
-            ],
+            "target": [".tracking-\\[0\\.14em\\]"],
             "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Valladolid</p>"
           },
           {
-            "target": [
-              ".py-1.bg-primary\\/10.px-3"
-            ],
+            "target": [".py-1.bg-primary\\/10.px-3"],
             "html": "<span class=\"inline-flex items-center gap-1 rounded-pill bg-primary/10 px-3 py-1 text-xs font-semibold text-primary\">Explorando en Valladolid</span>"
           }
         ]
@@ -1103,21 +974,11 @@
         "id": "nested-interactive",
         "impact": "serious",
         "help": "Interactive controls must not be nested",
-        "tags": [
-          "cat.keyboard",
-          "wcag2a",
-          "wcag412",
-          "TTv5",
-          "TT6.a",
-          "EN-301-549",
-          "EN-9.4.1.2"
-        ],
+        "tags": ["cat.keyboard", "wcag2a", "wcag412", "TTv5", "TT6.a", "EN-301-549", "EN-9.4.1.2"],
         "count": 1,
         "sample": [
           {
-            "target": [
-              ".h-\\[320px\\]"
-            ],
+            "target": [".h-\\[320px\\]"],
             "html": "<div class=\"h-[320px] w-full rounded-2xl border border-border md:h-[420px]\" aria-label=\"Mapa de Cenote Suytun\" role=\"img\" data-ready=\"true\" style=\"position: relative; overflow: hid"
           }
         ]
@@ -1132,9 +993,7 @@
       "htmlLang": "es",
       "title": "Zazil Tunich \u00b7 Valladolid \u2014 Valladolid.mx",
       "mains": 0,
-      "h1s": [
-        "Zazil Tunich"
-      ],
+      "h1s": ["Zazil Tunich"],
       "landmarks": {
         "header": 6,
         "nav": 3,
@@ -1166,15 +1025,11 @@
         "count": 17,
         "sample": [
           {
-            "target": [
-              ".tracking-\\[0\\.14em\\]"
-            ],
+            "target": [".tracking-\\[0\\.14em\\]"],
             "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Cenote Museo del Xibalb\u00e1</p>"
           },
           {
-            "target": [
-              ".bg-primary\\/15"
-            ],
+            "target": [".bg-primary\\/15"],
             "html": "<li class=\"inline-flex items-center gap-1.5 rounded-pill border px-2.5 py-1 text-xs font-medium backdrop-blur-sm bg-primary/15 text-primary border-primary/30\">Cenote Museo</li>"
           }
         ]
@@ -1183,16 +1038,11 @@
         "id": "landmark-one-main",
         "impact": "moderate",
         "help": "Document should have one main landmark",
-        "tags": [
-          "cat.semantics",
-          "best-practice"
-        ],
+        "tags": ["cat.semantics", "best-practice"],
         "count": 1,
         "sample": [
           {
-            "target": [
-              "html"
-            ],
+            "target": ["html"],
             "html": "<html lang=\"es\">"
           }
         ]
@@ -1201,22 +1051,15 @@
         "id": "region",
         "impact": "moderate",
         "help": "All page content should be contained by landmarks",
-        "tags": [
-          "cat.keyboard",
-          "best-practice"
-        ],
+        "tags": ["cat.keyboard", "best-practice"],
         "count": 15,
         "sample": [
           {
-            "target": [
-              ".sr-only"
-            ],
+            "target": [".sr-only"],
             "html": "<a href=\"#main\" class=\"sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-"
           },
           {
-            "target": [
-              ".tracking-\\[0\\.14em\\]"
-            ],
+            "target": [".tracking-\\[0\\.14em\\]"],
             "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Cenote Museo del Xibalb\u00e1</p>"
           }
         ]
@@ -1257,16 +1100,11 @@
         "id": "skip-link",
         "impact": "moderate",
         "help": "The skip-link target should exist and be focusable",
-        "tags": [
-          "cat.keyboard",
-          "best-practice"
-        ],
+        "tags": ["cat.keyboard", "best-practice"],
         "count": 1,
         "sample": [
           {
-            "target": [
-              ".sr-only"
-            ],
+            "target": [".sr-only"],
             "html": "<a href=\"#main\" class=\"sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-"
           }
         ]
@@ -1281,9 +1119,7 @@
       "htmlLang": "es",
       "title": "Nado en el Cenote Sagrado \u00b7 Zazil Tunich \u2014 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Nado en el Cenote Sagrado"
-      ],
+      "h1s": ["Nado en el Cenote Sagrado"],
       "landmarks": {
         "header": 6,
         "nav": 3,
@@ -1315,9 +1151,7 @@
         "count": 11,
         "sample": [
           {
-            "target": [
-              ".mb-2"
-            ],
+            "target": [".mb-2"],
             "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">experiencia</p>"
           },
           {
@@ -1338,9 +1172,7 @@
       "htmlLang": "es",
       "title": "Eventos \u00b7 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Eventos"
-      ],
+      "h1s": ["Eventos"],
       "landmarks": {
         "header": 1,
         "nav": 3,
@@ -1372,9 +1204,7 @@
         "count": 4,
         "sample": [
           {
-            "target": [
-              ".tracking-\\[0\\.14em\\]"
-            ],
+            "target": [".tracking-\\[0\\.14em\\]"],
             "html": "<p class=\"text-xs font-semibold uppercase tracking-[0.14em] text-primary\">Agenda cultural</p>"
           },
           {
@@ -1389,10 +1219,7 @@
         "id": "heading-order",
         "impact": "moderate",
         "help": "Heading levels should only increase by one",
-        "tags": [
-          "cat.semantics",
-          "best-practice"
-        ],
+        "tags": ["cat.semantics", "best-practice"],
         "count": 1,
         "sample": [
           {
@@ -1413,9 +1240,7 @@
       "htmlLang": "es",
       "title": "Arma tu Viaje \u00b7 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Arma tu Viaje"
-      ],
+      "h1s": ["Arma tu Viaje"],
       "landmarks": {
         "header": 2,
         "nav": 3,
@@ -1447,9 +1272,7 @@
         "count": 1,
         "sample": [
           {
-            "target": [
-              ".mb-2"
-            ],
+            "target": [".mb-2"],
             "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">Plataforma</p>"
           }
         ]
@@ -1458,16 +1281,11 @@
         "id": "heading-order",
         "impact": "moderate",
         "help": "Heading levels should only increase by one",
-        "tags": [
-          "cat.semantics",
-          "best-practice"
-        ],
+        "tags": ["cat.semantics", "best-practice"],
         "count": 1,
         "sample": [
           {
-            "target": [
-              "div:nth-child(2) > h3"
-            ],
+            "target": ["div:nth-child(2) > h3"],
             "html": "<h3 class=\"text-sm font-semibold text-foreground\">Explorar</h3>"
           }
         ]
@@ -1482,9 +1300,7 @@
       "htmlLang": "es",
       "title": "Blog \u00b7 Valladolid.mx",
       "mains": 1,
-      "h1s": [
-        "Blog del Oriente Maya"
-      ],
+      "h1s": ["Blog del Oriente Maya"],
       "landmarks": {
         "header": 2,
         "nav": 3,
@@ -1516,9 +1332,7 @@
         "count": 1,
         "sample": [
           {
-            "target": [
-              ".mb-2"
-            ],
+            "target": [".mb-2"],
             "html": "<p class=\"mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary\">Editorial</p>"
           }
         ]

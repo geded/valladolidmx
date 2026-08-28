@@ -34,11 +34,7 @@ function AluxPage() {
       <div className="mx-auto w-full max-w-3xl px-4 mb-10">
         <PublicAluxChat />
       </div>
-      {composition ? (
-        <CompositionRenderer tree={composition.snapshot} />
-      ) : (
-        <AluxSurface />
-      )}
+      {composition ? <CompositionRenderer tree={composition.snapshot} /> : <AluxSurface />}
     </PublicShell>
   );
 }

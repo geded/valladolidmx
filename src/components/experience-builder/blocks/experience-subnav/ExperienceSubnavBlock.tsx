@@ -30,9 +30,7 @@ function useAutoAnchors(enabled: boolean): ExperienceSubnavAnchor[] {
   useEffect(() => {
     if (!enabled || typeof document === "undefined") return;
     const scan = () => {
-      const nodes = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-eb-anchor][id]"),
-      );
+      const nodes = Array.from(document.querySelectorAll<HTMLElement>("[data-eb-anchor][id]"));
       const list = nodes
         .map((n) => ({
           id: n.id,

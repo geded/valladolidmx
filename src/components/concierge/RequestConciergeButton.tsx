@@ -23,8 +23,7 @@ export function RequestConciergeButton(props: Props) {
   const [err, setErr] = useState<string | null>(null);
 
   const label =
-    props.label ??
-    (props.kind === "product" ? "Solicitar concierge" : "Enviar a mi concierge");
+    props.label ?? (props.kind === "product" ? "Solicitar concierge" : "Enviar a mi concierge");
 
   const protectedRun = useProtectedAction<void, string>({
     kind:

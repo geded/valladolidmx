@@ -8,10 +8,7 @@
  */
 import { renderToStaticMarkup } from "react-dom/server";
 import { getBlock } from "../src/lib/experience-builder/block-registry";
-import {
-  KIT_BLOCK_CONTRACTS,
-  KIT_BLOCK_RENDERERS,
-} from "../src/lib/experience-builder/kit-blocks";
+import { KIT_BLOCK_CONTRACTS, KIT_BLOCK_RENDERERS } from "../src/lib/experience-builder/kit-blocks";
 import "../src/lib/experience-builder/block-library"; // auto-bootstrap
 import type { CompositionNode } from "../src/lib/experience-builder/composition-tree";
 
@@ -24,7 +21,10 @@ const FIXTURES: Record<string, Record<string, unknown>> = {
     items: [{ url: "https://x/1.jpg", alt: "1" }],
   },
   "vmx.kit.info-table": {
-    rows: [{ label: "A", value: "1" }, { label: "B", value: "2" }],
+    rows: [
+      { label: "A", value: "1" },
+      { label: "B", value: "2" },
+    ],
   },
   "vmx.kit.badges": { items: [{ label: "OK", tone: "success" }] },
   "vmx.kit.contact": { contact_type: "email", value: "hola@x" },

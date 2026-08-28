@@ -21,17 +21,17 @@ export const RENEWAL_ASSET_ALLOWLIST: ReadonlySet<string> = new Set<string>([
 ]);
 export const RENEWAL_BUCKET_ALLOWLIST: ReadonlySet<string> = new Set<string>(["media-derived"]);
 
-export const SIGN_TTL_SECONDS = 60 * 60 * 24 * 7;       // 7 días
+export const SIGN_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 días
 export const REFRESH_AFTER_SECONDS = Math.floor(SIGN_TTL_SECONDS / 2);
-export const SERVABLE_MARGIN_SECONDS = 6 * 60 * 60;     // 6h (v1.2 §6)
+export const SERVABLE_MARGIN_SECONDS = 6 * 60 * 60; // 6h (v1.2 §6)
 // Deadline duro para el futuro fallback ON-DEMAND (Fase C). NO se aplica
 // al renovador asíncrono, cuyo p95 real de `createSignedUrl` ≈475ms.
 export const SIGN_ONDEMAND_DEADLINE_MS = 250;
 // Renovador asíncrono: timeout por firma amplio, timeout total de lote
 // y concurrencia limitada. Cancelación cooperativa vía AbortController.
-export const SIGN_ASYNC_DEADLINE_MS   = 5_000;
-export const BATCH_TOTAL_DEADLINE_MS  = 45_000;
-export const RENEWAL_CONCURRENCY      = 4;
+export const SIGN_ASYNC_DEADLINE_MS = 5_000;
+export const BATCH_TOTAL_DEADLINE_MS = 45_000;
+export const RENEWAL_CONCURRENCY = 4;
 export const CLAIM_BATCH_MAX = 50;
 
 export interface RenewalStats {
@@ -94,10 +94,7 @@ export async function runRenewalBatch(): Promise<RenewalStats> {
     }
     try {
       // §5 / §6 revalidación estricta contra la variante actual.
-      if (
-        !RENEWAL_BUCKET_ALLOWLIST.has(row.bucket) ||
-        !RENEWAL_ASSET_ALLOWLIST.has(row.asset_id)
-      ) {
+      if (!RENEWAL_BUCKET_ALLOWLIST.has(row.bucket) || !RENEWAL_ASSET_ALLOWLIST.has(row.asset_id)) {
         await supabaseAdmin.rpc("masu_purge_stale", { _variant_key: row.variant_key });
         stats.stale++;
         return;
@@ -142,17 +139,17 @@ export async function runRenewalBatch(): Promise<RenewalStats> {
       const servableUntil = new Date(expiresAt.getTime() - SERVABLE_MARGIN_SECONDS * 1000);
 
       const { data: upsert, error: uErr } = await supabaseAdmin.rpc("masu_upsert_monotonic", {
-        _variant_key:    row.variant_key,
-        _asset_id:       row.asset_id,
-        _variant_id:     row.variant_id,
-        _bucket:         variant.bucket,
-        _path:           variant.path,
-        _signed_url:     signed.url,
-        _issued_at:      issuedAt.toISOString(),
-        _expires_at:     expiresAt.toISOString(),
-        _refresh_after:  refreshAfter.toISOString(),
+        _variant_key: row.variant_key,
+        _asset_id: row.asset_id,
+        _variant_id: row.variant_id,
+        _bucket: variant.bucket,
+        _path: variant.path,
+        _signed_url: signed.url,
+        _issued_at: issuedAt.toISOString(),
+        _expires_at: expiresAt.toISOString(),
+        _refresh_after: refreshAfter.toISOString(),
         _servable_until: servableUntil.toISOString(),
-        _worker_id:      workerId,
+        _worker_id: workerId,
       });
       if (uErr) {
         await supabaseAdmin.rpc("masu_record_failure", {
@@ -204,7 +201,9 @@ async function signWithDeadline(
   try {
     const race = await Promise.race([
       (async () => {
-        const { data, error } = await supabaseAdmin.storage.from(bucket).createSignedUrl(path, SIGN_TTL_SECONDS);
+        const { data, error } = await supabaseAdmin.storage
+          .from(bucket)
+          .createSignedUrl(path, SIGN_TTL_SECONDS);
         if (error) return { kind: "err" as const, reason: "sign_error" };
         if (!data?.signedUrl) return { kind: "err" as const, reason: "sign_error" };
         return { kind: "ok" as const, url: data.signedUrl };

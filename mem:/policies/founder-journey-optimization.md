@@ -3,6 +3,7 @@ name: Founder Journey Optimization Principle
 description: Visitor Intelligence Platform no mide por medir — descubre qué acciones ayudan al viajero a avanzar de una etapa del Journey a la siguiente. Toda métrica responde qué transición mejorar, qué acción la provocó, qué capacidad influyó y qué resultado produjo para viajero y ecosistema. Incluye Regla de Accionabilidad y Regla de Aprendizaje.
 type: constraint
 ---
+
 **Founder Journey Optimization Principle** (vinculante, CV8).
 
 Visitor Intelligence Platform NO se limita a medir comportamiento. Su propósito es **descubrir qué acciones ayudan a que el viajero avance** de una etapa del Journey a la siguiente.

@@ -3,6 +3,7 @@ name: Founder Signal Quality Principle
 description: Visitor Intelligence prioriza calidad de señales sobre cantidad de eventos. Sólo se ingieren eventos que expliquen una transición del Journey o alimenten aprendizaje/decisión de negocio. Modelo append-only estable; evolución sólo aditiva y compatible con contratos v1.0.
 type: constraint
 ---
+
 **Founder Signal Quality Principle** (vinculante, CV8.1+).
 
 El objetivo de la ingesta NO es registrar todos los clics del visitante. Es registrar únicamente los eventos que ayuden a comprender la evolución del viajero dentro del Journey.

@@ -3,6 +3,7 @@ name: Founder Product Axiom
 description: Axioma permanente. Todo nuevo módulo debe justificar cómo fortalece el Travel Workspace del viajero. Referencia principal para evolución del Destination Operating System.
 type: constraint
 ---
+
 **Todo nuevo módulo que se incorpore a ValladolidMX deberá responder primero a la pregunta:**
 
 > "¿Cómo aporta valor al Travel Workspace del viajero?"

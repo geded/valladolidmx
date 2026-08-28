@@ -1,37 +1,37 @@
-import * as React from 'react'
-import { render } from '@react-email/render'
-import { TEMPLATES } from '@/lib/email-templates/registry'
-import { SITE } from '@/config/site'
+import * as React from "react";
+import { render } from "@react-email/render";
+import { TEMPLATES } from "@/lib/email-templates/registry";
+import { SITE } from "@/config/site";
 
-const SITE_NAME = 'valladolidmx'
-const SENDER_DOMAIN = 'notify.alux.travel'
-const FROM_DOMAIN = 'notify.alux.travel'
+const SITE_NAME = "valladolidmx";
+const SENDER_DOMAIN = "notify.alux.travel";
+const FROM_DOMAIN = "notify.alux.travel";
 // PR-1 · Canonical Core Consolidation — consume la fuente única de verdad.
-const PUBLIC_ORIGIN = SITE.url
+const PUBLIC_ORIGIN = SITE.url;
 
 function generateToken(): string {
-  const bytes = new Uint8Array(32)
-  crypto.getRandomValues(bytes)
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
   return Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
-type SupabaseAdmin = any
+type SupabaseAdmin = any;
 
 export interface VisibilityEmailInput {
   templateName:
-    | 'visibility-request-received'
-    | 'visibility-activated'
-    | 'visibility-rejected'
-    | 'visibility-expiring'
-    | 'visibility-expired'
-  recipientEmail: string
-  recipientName?: string | null
-  businessName?: string | null
-  templateData?: Record<string, unknown>
-  idempotencyKey: string
-  label?: string
+    | "visibility-request-received"
+    | "visibility-activated"
+    | "visibility-rejected"
+    | "visibility-expiring"
+    | "visibility-expired";
+  recipientEmail: string;
+  recipientName?: string | null;
+  businessName?: string | null;
+  templateData?: Record<string, unknown>;
+  idempotencyKey: string;
+  label?: string;
 }
 
 /**
@@ -44,43 +44,40 @@ export async function sendVisibilityEmail(
   input: VisibilityEmailInput,
 ): Promise<{ ok: boolean; skipped?: string; error?: string }> {
   try {
-    const email = (input.recipientEmail ?? '').toLowerCase().trim()
-    if (!email) return { ok: false, skipped: 'missing_email' }
+    const email = (input.recipientEmail ?? "").toLowerCase().trim();
+    if (!email) return { ok: false, skipped: "missing_email" };
 
-    const template = TEMPLATES[input.templateName]
-    if (!template) return { ok: false, error: 'template_not_found' }
+    const template = TEMPLATES[input.templateName];
+    if (!template) return { ok: false, error: "template_not_found" };
 
     // Suppression check
     const { data: suppressed } = await supabaseAdmin
-      .from('suppressed_emails')
-      .select('email')
-      .eq('email', email)
-      .maybeSingle()
-    if (suppressed) return { ok: false, skipped: 'suppressed' }
+      .from("suppressed_emails")
+      .select("email")
+      .eq("email", email)
+      .maybeSingle();
+    if (suppressed) return { ok: false, skipped: "suppressed" };
 
     // Unsubscribe token
-    let unsubToken: string | null = null
+    let unsubToken: string | null = null;
     const { data: existingToken } = await supabaseAdmin
-      .from('email_unsubscribe_tokens')
-      .select('token, used_at')
-      .eq('email', email)
-      .maybeSingle()
+      .from("email_unsubscribe_tokens")
+      .select("token, used_at")
+      .eq("email", email)
+      .maybeSingle();
     if (existingToken && !existingToken.used_at) {
-      unsubToken = existingToken.token
+      unsubToken = existingToken.token;
     } else if (!existingToken) {
-      const newToken = generateToken()
+      const newToken = generateToken();
       await supabaseAdmin
-        .from('email_unsubscribe_tokens')
-        .upsert(
-          { email, token: newToken },
-          { onConflict: 'email', ignoreDuplicates: true },
-        )
+        .from("email_unsubscribe_tokens")
+        .upsert({ email, token: newToken }, { onConflict: "email", ignoreDuplicates: true });
       const { data: readBack } = await supabaseAdmin
-        .from('email_unsubscribe_tokens')
-        .select('token')
-        .eq('email', email)
-        .maybeSingle()
-      unsubToken = readBack?.token ?? newToken
+        .from("email_unsubscribe_tokens")
+        .select("token")
+        .eq("email", email)
+        .maybeSingle();
+      unsubToken = readBack?.token ?? newToken;
     }
 
     const templateData = {
@@ -88,26 +85,24 @@ export async function sendVisibilityEmail(
       businessName: input.businessName ?? undefined,
       portalUrl: `${PUBLIC_ORIGIN}/portal/visibilidad`,
       ...(input.templateData ?? {}),
-    }
-    const element = React.createElement(template.component, templateData)
-    const html = await render(element)
-    const text = await render(element, { plainText: true })
+    };
+    const element = React.createElement(template.component, templateData);
+    const html = await render(element);
+    const text = await render(element, { plainText: true });
     const subject =
-      typeof template.subject === 'function'
-        ? template.subject(templateData)
-        : template.subject
+      typeof template.subject === "function" ? template.subject(templateData) : template.subject;
 
-    const messageId = crypto.randomUUID()
+    const messageId = crypto.randomUUID();
 
-    await supabaseAdmin.from('email_send_log').insert({
+    await supabaseAdmin.from("email_send_log").insert({
       message_id: messageId,
       template_name: input.templateName,
       recipient_email: email,
-      status: 'pending',
-    })
+      status: "pending",
+    });
 
-    const { error: enqueueError } = await supabaseAdmin.rpc('enqueue_email', {
-      queue_name: 'transactional_emails',
+    const { error: enqueueError } = await supabaseAdmin.rpc("enqueue_email", {
+      queue_name: "transactional_emails",
       payload: {
         message_id: messageId,
         to: email,
@@ -116,29 +111,29 @@ export async function sendVisibilityEmail(
         subject,
         html,
         text,
-        purpose: 'transactional',
+        purpose: "transactional",
         label: input.label ?? input.templateName,
         idempotency_key: input.idempotencyKey,
         unsubscribe_token: unsubToken,
         queued_at: new Date().toISOString(),
       },
-    })
+    });
 
     if (enqueueError) {
-      await supabaseAdmin.from('email_send_log').insert({
+      await supabaseAdmin.from("email_send_log").insert({
         message_id: messageId,
         template_name: input.templateName,
         recipient_email: email,
-        status: 'failed',
+        status: "failed",
         error_message: enqueueError.message,
-      })
-      return { ok: false, error: enqueueError.message }
+      });
+      return { ok: false, error: enqueueError.message };
     }
 
-    return { ok: true }
+    return { ok: true };
   } catch (err) {
-    console.error('sendVisibilityEmail failed', err)
-    return { ok: false, error: err instanceof Error ? err.message : String(err) }
+    console.error("sendVisibilityEmail failed", err);
+    return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }
 }
 
@@ -149,22 +144,21 @@ export async function getVisibilityRecipient(
   supabaseAdmin: SupabaseAdmin,
   businessId: string,
 ): Promise<{
-  recipientEmail: string
-  recipientName: string | null
-  businessName: string | null
-  businessSlug: string | null
+  recipientEmail: string;
+  recipientName: string | null;
+  businessName: string | null;
+  businessSlug: string | null;
 } | null> {
-  const { data, error } = await supabaseAdmin.rpc(
-    'get_visibility_notification_recipient',
-    { _business_id: businessId },
-  )
-  if (error || !data || !Array.isArray(data) || data.length === 0) return null
-  const row = data[0]
-  if (!row?.recipient_email) return null
+  const { data, error } = await supabaseAdmin.rpc("get_visibility_notification_recipient", {
+    _business_id: businessId,
+  });
+  if (error || !data || !Array.isArray(data) || data.length === 0) return null;
+  const row = data[0];
+  if (!row?.recipient_email) return null;
   return {
     recipientEmail: row.recipient_email,
     recipientName: row.recipient_name ?? null,
     businessName: row.business_name ?? null,
     businessSlug: row.business_slug ?? null,
-  }
+  };
 }

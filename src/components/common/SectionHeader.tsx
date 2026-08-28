@@ -15,7 +15,14 @@ interface Props {
   className?: string;
 }
 
-export function SectionHeader({ eyebrow, title, subtitle, align = "left", actions, className }: Props) {
+export function SectionHeader({
+  eyebrow,
+  title,
+  subtitle,
+  align = "left",
+  actions,
+  className,
+}: Props) {
   return (
     <div
       className={cn(

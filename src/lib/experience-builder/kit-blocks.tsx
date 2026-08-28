@@ -78,42 +78,57 @@ export const KIT_BLOCK_CONTRACTS: BlockContract[] = [
     title: { type: "text", label: "Título", required: true, translatable: true },
     subtitle: { type: "text", label: "Subtítulo", translatable: true },
   }),
-  kitBlock("vmx.kit.rich-text", "Kit · Texto enriquecido", "Sección de texto con encabezado opcional.", {
-    heading: { type: "text", label: "Encabezado", translatable: true },
-    body: { type: "rich_text", label: "Cuerpo", translatable: true },
-    empty_label: { type: "text", label: "Mensaje vacío", translatable: true },
-  }),
-  kitBlock("vmx.kit.gallery", "Kit · Galería", "Portada y miniaturas en scroll-snap mobile / grid desktop.", {
-    cover_url: { type: "url", label: "URL portada" },
-    cover_alt: { type: "text", label: "Alt portada", translatable: true },
-    items: {
-      type: "list",
-      label: "Miniaturas",
-      item: {
-        type: "object",
-        label: "Media",
-        fields: {
-          url: { type: "url", label: "URL" },
-          alt: { type: "text", label: "Alt", translatable: true },
+  kitBlock(
+    "vmx.kit.rich-text",
+    "Kit · Texto enriquecido",
+    "Sección de texto con encabezado opcional.",
+    {
+      heading: { type: "text", label: "Encabezado", translatable: true },
+      body: { type: "rich_text", label: "Cuerpo", translatable: true },
+      empty_label: { type: "text", label: "Mensaje vacío", translatable: true },
+    },
+  ),
+  kitBlock(
+    "vmx.kit.gallery",
+    "Kit · Galería",
+    "Portada y miniaturas en scroll-snap mobile / grid desktop.",
+    {
+      cover_url: { type: "url", label: "URL portada" },
+      cover_alt: { type: "text", label: "Alt portada", translatable: true },
+      items: {
+        type: "list",
+        label: "Miniaturas",
+        item: {
+          type: "object",
+          label: "Media",
+          fields: {
+            url: { type: "url", label: "URL" },
+            alt: { type: "text", label: "Alt", translatable: true },
+          },
+        },
+      },
+      empty_label: { type: "text", label: "Mensaje vacío", translatable: true },
+    },
+  ),
+  kitBlock(
+    "vmx.kit.info-table",
+    "Kit · Tabla de datos",
+    "Pares clave/valor apilados en dos columnas.",
+    {
+      rows: {
+        type: "list",
+        label: "Filas",
+        item: {
+          type: "object",
+          label: "Fila",
+          fields: {
+            label: { type: "text", label: "Etiqueta", translatable: true },
+            value: { type: "text", label: "Valor", translatable: true },
+          },
         },
       },
     },
-    empty_label: { type: "text", label: "Mensaje vacío", translatable: true },
-  }),
-  kitBlock("vmx.kit.info-table", "Kit · Tabla de datos", "Pares clave/valor apilados en dos columnas.", {
-    rows: {
-      type: "list",
-      label: "Filas",
-      item: {
-        type: "object",
-        label: "Fila",
-        fields: {
-          label: { type: "text", label: "Etiqueta", translatable: true },
-          value: { type: "text", label: "Valor", translatable: true },
-        },
-      },
-    },
-  }),
+  ),
   kitBlock("vmx.kit.badges", "Kit · Insignias", "Colección de píldoras compactas.", {
     items: {
       type: "list",
@@ -139,12 +154,17 @@ export const KIT_BLOCK_CONTRACTS: BlockContract[] = [
       },
     },
   }),
-  kitBlock("vmx.kit.contact", "Kit · Contacto", "Bloque de contacto sencillo (teléfono, whatsapp, email...).", {
-    contact_type: { type: "text", label: "Tipo", default: "whatsapp" },
-    label: { type: "text", label: "Etiqueta", translatable: true },
-    value: { type: "text", label: "Valor", required: true, translatable: true },
-    href: { type: "url", label: "Enlace" },
-  }),
+  kitBlock(
+    "vmx.kit.contact",
+    "Kit · Contacto",
+    "Bloque de contacto sencillo (teléfono, whatsapp, email...).",
+    {
+      contact_type: { type: "text", label: "Tipo", default: "whatsapp" },
+      label: { type: "text", label: "Etiqueta", translatable: true },
+      value: { type: "text", label: "Valor", required: true, translatable: true },
+      href: { type: "url", label: "Enlace" },
+    },
+  ),
   kitBlock("vmx.kit.location", "Kit · Ubicación", "Dirección visible con etiqueta opcional.", {
     label: { type: "text", label: "Etiqueta", translatable: true },
     address_line1: { type: "text", label: "Dirección", required: true, translatable: true },
@@ -169,7 +189,12 @@ export const KIT_BLOCK_CONTRACTS: BlockContract[] = [
     },
   }),
   kitBlock("vmx.kit.faq", "Kit · Preguntas frecuentes", "Listado de FAQs con detalle expandible.", {
-    heading: { type: "text", label: "Encabezado", translatable: true, default: "Preguntas frecuentes" },
+    heading: {
+      type: "text",
+      label: "Encabezado",
+      translatable: true,
+      default: "Preguntas frecuentes",
+    },
     items: {
       type: "list",
       label: "FAQs",
@@ -183,51 +208,66 @@ export const KIT_BLOCK_CONTRACTS: BlockContract[] = [
       },
     },
   }),
-  kitBlock("vmx.kit.promos", "Kit · Promociones", "Tarjetas de promoción con % de descuento opcional.", {
-    heading: { type: "text", label: "Encabezado", translatable: true, default: "Promociones vigentes" },
-    items: {
-      type: "list",
-      label: "Promociones",
-      item: {
-        type: "object",
-        label: "Promo",
-        fields: {
-          title: { type: "text", label: "Título", translatable: true },
-          description: { type: "text", label: "Descripción", translatable: true },
-          discount_percent: { type: "number", label: "Descuento %" },
+  kitBlock(
+    "vmx.kit.promos",
+    "Kit · Promociones",
+    "Tarjetas de promoción con % de descuento opcional.",
+    {
+      heading: {
+        type: "text",
+        label: "Encabezado",
+        translatable: true,
+        default: "Promociones vigentes",
+      },
+      items: {
+        type: "list",
+        label: "Promociones",
+        item: {
+          type: "object",
+          label: "Promo",
+          fields: {
+            title: { type: "text", label: "Título", translatable: true },
+            description: { type: "text", label: "Descripción", translatable: true },
+            discount_percent: { type: "number", label: "Descuento %" },
+          },
         },
       },
     },
-  }),
-  kitBlock("vmx.kit.card-grid", "Kit · Grid de tarjetas", "Rejilla neutra de tarjetas (1-4 columnas).", {
-    columns: {
-      type: "select",
-      label: "Columnas",
-      default: "3",
-      options: [
-        { value: "1", label: "1" },
-        { value: "2", label: "2" },
-        { value: "3", label: "3" },
-        { value: "4", label: "4" },
-      ],
-    },
-    empty_label: { type: "text", label: "Mensaje vacío", translatable: true },
-    items: {
-      type: "list",
-      label: "Tarjetas",
-      item: {
-        type: "object",
-        label: "Tarjeta",
-        fields: {
-          eyebrow: { type: "text", label: "Eyebrow", translatable: true },
-          title: { type: "text", label: "Título", translatable: true },
-          tagline: { type: "text", label: "Bajada", translatable: true },
-          href: { type: "url", label: "Enlace" },
-          image_url: { type: "url", label: "Imagen" },
+  ),
+  kitBlock(
+    "vmx.kit.card-grid",
+    "Kit · Grid de tarjetas",
+    "Rejilla neutra de tarjetas (1-4 columnas).",
+    {
+      columns: {
+        type: "select",
+        label: "Columnas",
+        default: "3",
+        options: [
+          { value: "1", label: "1" },
+          { value: "2", label: "2" },
+          { value: "3", label: "3" },
+          { value: "4", label: "4" },
+        ],
+      },
+      empty_label: { type: "text", label: "Mensaje vacío", translatable: true },
+      items: {
+        type: "list",
+        label: "Tarjetas",
+        item: {
+          type: "object",
+          label: "Tarjeta",
+          fields: {
+            eyebrow: { type: "text", label: "Eyebrow", translatable: true },
+            title: { type: "text", label: "Título", translatable: true },
+            tagline: { type: "text", label: "Bajada", translatable: true },
+            href: { type: "url", label: "Enlace" },
+            image_url: { type: "url", label: "Imagen" },
+          },
         },
       },
     },
-  }),
+  ),
 ];
 
 /* ------------------------------------------------------------------ *
@@ -280,9 +320,7 @@ export const KIT_BLOCK_RENDERERS: Record<string, KitRenderer> = {
     return (
       <KitGallery
         vm={{
-          cover: coverUrl
-            ? { url: coverUrl, alt: readString(node.config.cover_alt) ?? "" }
-            : null,
+          cover: coverUrl ? { url: coverUrl, alt: readString(node.config.cover_alt) ?? "" } : null,
           items,
           emptyLabel: readString(node.config.empty_label),
         }}
@@ -345,10 +383,7 @@ export const KIT_BLOCK_RENDERERS: Record<string, KitRenderer> = {
       answer: readString(f.answer) ?? "",
     }));
     return (
-      <KitFaq
-        faqs={items}
-        heading={readString(node.config.heading) ?? "Preguntas frecuentes"}
-      />
+      <KitFaq faqs={items} heading={readString(node.config.heading) ?? "Preguntas frecuentes"} />
     );
   },
   "vmx.kit.promos": (node) => {

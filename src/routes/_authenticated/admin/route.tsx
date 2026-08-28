@@ -24,10 +24,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 function AdminLayout() {
   const { roles, loading } = useAuth();
   const navigate = useNavigate();
-  const allowed = useMemo(
-    () => roles.some((r) => ADMIN_ROLES.includes(r)),
-    [roles],
-  );
+  const allowed = useMemo(() => roles.some((r) => ADMIN_ROLES.includes(r)), [roles]);
 
   // Si el usuario está autenticado pero no tiene rol admin, en lugar de
   // mostrar 403 lo enviamos silenciosamente al panel que sí le corresponde

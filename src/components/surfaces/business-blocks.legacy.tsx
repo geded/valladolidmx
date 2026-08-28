@@ -47,11 +47,7 @@ function EmptyHint({ children }: { children: React.ReactNode }) {
  *    PublicShell oficial (eyebrow / breadcrumbs / título / descripción).
  * ------------------------------------------------------------------ */
 
-export function BusinessShellBlock({
-  renderChildren,
-}: {
-  renderChildren?: () => React.ReactNode;
-}) {
+export function BusinessShellBlock({ renderChildren }: { renderChildren?: () => React.ReactNode }) {
   const b = useBusiness();
   if (!b) {
     return (
@@ -119,7 +115,8 @@ export function BusinessGalleryBlock() {
       <section className="mt-10">
         <h2 className="text-xl font-semibold">Galería</h2>
         <EmptyHint>
-          La galería no está incluida en el plan actual ({b.plan_tier}). Actualiza el plan para publicarla.
+          La galería no está incluida en el plan actual ({b.plan_tier}). Actualiza el plan para
+          publicarla.
         </EmptyHint>
       </section>
     );
@@ -235,9 +232,7 @@ export function BusinessPromotionsBlock() {
     return (
       <section className="mt-10">
         <h2 className="text-xl font-semibold">Promociones vigentes</h2>
-        <EmptyHint>
-          Las promociones requieren un plan superior al actual ({b.plan_tier}).
-        </EmptyHint>
+        <EmptyHint>Las promociones requieren un plan superior al actual ({b.plan_tier}).</EmptyHint>
       </section>
     );
   }

@@ -166,6 +166,16 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     dependencies: ["page_compositions:home", "experience-builder"],
     notes: "Home pública — composición administrada 100% desde el Experience Builder.",
   },
+  "src/routes/oriente-maya/$destino.lugares.$slug.tsx": {
+    category: "dynamic-template",
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "template-cms",
+    functionalOwner: "CMS",
+    dependencies: ["points_of_interest", "premium-entity-place", "vmx.place.premium-q2d"],
+    notes:
+      "G8-Q2D-B · Ficha de Lugar y Atractivo. Implementación técnica inactiva: sin lugares publicados responde 404 público; preview autenticada sólo para staff editorial.",
+  },
   "src/routes/oriente-maya/index.tsx": {
     category: "studio",
     businessPriority: "critical",
@@ -504,6 +514,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/oriente-maya/$destino.$categoria.index.tsx",
   "src/routes/oriente-maya/$destino.$categoria.tsx",
   "src/routes/oriente-maya/$destino.index.tsx",
+  "src/routes/oriente-maya/$destino.lugares.$slug.tsx",
   "src/routes/oriente-maya/$destino.tsx",
   "src/routes/oriente-maya/index.tsx",
   "src/routes/p.$slug.tsx",

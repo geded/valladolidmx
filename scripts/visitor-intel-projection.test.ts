@@ -11,23 +11,14 @@
  */
 import { describe, expect, it } from "vitest";
 
-import {
-  VISITOR_EVENT_SCHEMA_VERSION,
-  type VisitorEvent,
-} from "@/lib/visitor-intel/events";
-import {
-  JOURNEY_TRANSITIONS,
-  type JourneyTransitionId,
-} from "@/lib/visitor-intel/journey";
+import { VISITOR_EVENT_SCHEMA_VERSION, type VisitorEvent } from "@/lib/visitor-intel/events";
+import { JOURNEY_TRANSITIONS, type JourneyTransitionId } from "@/lib/visitor-intel/journey";
 import { projectVisitorState } from "@/lib/visitor-intel/projection";
 
 const SUBJECT = "550e8400-e29b-41d4-a716-446655440000";
 const NOW = new Date("2026-07-14T12:00:00.000Z");
 
-function mkTransition(
-  id: JourneyTransitionId,
-  offsetMinutes: number,
-): VisitorEvent {
+function mkTransition(id: JourneyTransitionId, offsetMinutes: number): VisitorEvent {
   const t = JOURNEY_TRANSITIONS[id];
   return {
     event_id: `evt-${id}`,
@@ -59,8 +50,9 @@ describe("CV8.2 · Journey State Projection", () => {
   });
 
   it("covers all 9 canonical transitions T1..T9 in order", () => {
-    const evts: VisitorEvent[] = (Object.keys(JOURNEY_TRANSITIONS) as JourneyTransitionId[])
-      .map((id, i) => mkTransition(id, i));
+    const evts: VisitorEvent[] = (Object.keys(JOURNEY_TRANSITIONS) as JourneyTransitionId[]).map(
+      (id, i) => mkTransition(id, i),
+    );
     const s = projectVisitorState(SUBJECT, evts, NOW);
     expect(s.current_stage).toBe("ambassador");
     expect(s.history).toHaveLength(9);

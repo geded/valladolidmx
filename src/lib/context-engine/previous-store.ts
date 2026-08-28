@@ -41,10 +41,7 @@ export function readPreviousContext(): PreviousContext | undefined {
   }
 }
 
-export function writePreviousContext(
-  from: ContextNode,
-  ancestors: readonly ContextNode[],
-): void {
+export function writePreviousContext(from: ContextNode, ancestors: readonly ContextNode[]): void {
   if (!hasWindow()) return;
   try {
     const payload: StoredPrevious = { from, ancestors, at: Date.now() };

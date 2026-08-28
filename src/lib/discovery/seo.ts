@@ -118,7 +118,7 @@ export function buildPublicHead(options: DiscoveryHeadOptions): DiscoveryHead {
   // (sin noindex y sin robots="noindex,*"); nunca sobre superficies
   // privadas/técnicas/temporales.
   const robotsExplicit = robots ?? (noindex ? "noindex, nofollow" : undefined);
-  const isIndexable = !noindex && !(robotsExplicit?.includes("noindex"));
+  const isIndexable = !noindex && !robotsExplicit?.includes("noindex");
   const resolvedOgImage = ogImage
     ? absoluteUrl(ogImage)
     : isIndexable
@@ -381,7 +381,13 @@ function mapCategoryToLocalBusinessType(slug?: string): string {
   const s = slug.toLowerCase();
   if (s.includes("hotel") || s.includes("hosped")) return "Hotel";
   if (s.includes("restaur") || s.includes("gastro")) return "Restaurant";
-  if (s.includes("cenote") || s.includes("zona-arqueolog") || s.includes("ruinas") || s.includes("atractivo")) return "TouristAttraction";
+  if (
+    s.includes("cenote") ||
+    s.includes("zona-arqueolog") ||
+    s.includes("ruinas") ||
+    s.includes("atractivo")
+  )
+    return "TouristAttraction";
   if (s.includes("museo")) return "Museum";
   if (s.includes("tour") || s.includes("agencia")) return "TravelAgency";
   if (s.includes("experien")) return "TouristAttraction";
@@ -657,13 +663,26 @@ export function collectionPageJsonLd(input: {
  */
 export function pickFirstMediaUrl(tree: unknown): string | undefined {
   const IMG_KEYS = new Set([
-    "og_image", "ogImage",
-    "image", "image_url", "imageUrl",
-    "media", "media_url", "mediaUrl",
-    "cover", "cover_url", "coverUrl",
-    "hero", "hero_url", "heroUrl",
-    "background", "background_url", "backgroundUrl",
-    "src", "url", "poster",
+    "og_image",
+    "ogImage",
+    "image",
+    "image_url",
+    "imageUrl",
+    "media",
+    "media_url",
+    "mediaUrl",
+    "cover",
+    "cover_url",
+    "coverUrl",
+    "hero",
+    "hero_url",
+    "heroUrl",
+    "background",
+    "background_url",
+    "backgroundUrl",
+    "src",
+    "url",
+    "poster",
   ]);
   const seen = new WeakSet<object>();
   const stack: unknown[] = [tree];
@@ -692,7 +711,9 @@ export function pickFirstMediaUrl(tree: unknown): string | undefined {
  * primera imagen resuelta por un Smart Block cuando el editor no dejó
  * `og_image` explícito ni imágenes estáticas en la página (15.10.8.5).
  */
-export function findFirstSmartBlockNode(tree: unknown): { type: string; config: Record<string, unknown> } | undefined {
+export function findFirstSmartBlockNode(
+  tree: unknown,
+): { type: string; config: Record<string, unknown> } | undefined {
   const seen = new WeakSet<object>();
   const stack: unknown[] = [tree];
   while (stack.length) {
@@ -718,7 +739,10 @@ function looksLikeImage(value: string): boolean {
   if (!v) return false;
   if (v.startsWith("data:image/")) return true;
   if (/^(https?:)?\/\//i.test(v) || v.startsWith("/")) {
-    return /\.(png|jpe?g|webp|avif|gif|svg)(\?|#|$)/i.test(v) || /supabase|cloudinary|images|storage|cdn/i.test(v);
+    return (
+      /\.(png|jpe?g|webp|avif|gif|svg)(\?|#|$)/i.test(v) ||
+      /supabase|cloudinary|images|storage|cdn/i.test(v)
+    );
   }
   return false;
 }

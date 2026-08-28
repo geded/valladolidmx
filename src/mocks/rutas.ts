@@ -9,7 +9,8 @@ export const RUTAS_MOCK: readonly SuggestedRoute[] = [
     slug: "valladolid-ek-balam",
     name: "Cenotes y jaguares",
     duration_days: 3,
-    summary: "Tres días entre Valladolid y Ek Balam: cenotes ocultos, mercado local y la acrópolis al amanecer.",
+    summary:
+      "Tres días entre Valladolid y Ek Balam: cenotes ocultos, mercado local y la acrópolis al amanecer.",
     destination_slugs: ["valladolid", "ek-balam"],
     palette: "selva",
   },
@@ -18,7 +19,8 @@ export const RUTAS_MOCK: readonly SuggestedRoute[] = [
     slug: "costa-rosada",
     name: "Costa rosada",
     duration_days: 2,
-    summary: "Río Lagartos y Las Coloradas: flamencos, salineras rosadas y atardeceres frente al Golfo.",
+    summary:
+      "Río Lagartos y Las Coloradas: flamencos, salineras rosadas y atardeceres frente al Golfo.",
     destination_slugs: ["rio-lagartos", "las-coloradas"],
     palette: "atardecer",
   },

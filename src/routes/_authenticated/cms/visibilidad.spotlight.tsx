@@ -112,10 +112,7 @@ function SpotlightPage() {
   });
 
   const active = useMemo(
-    () =>
-      (q.data ?? []).filter(
-        (s) => s.is_active && new Date(s.ends_at).getTime() > Date.now(),
-      ),
+    () => (q.data ?? []).filter((s) => s.is_active && new Date(s.ends_at).getTime() > Date.now()),
     [q.data],
   );
   const history = useMemo(
@@ -133,9 +130,8 @@ function SpotlightPage() {
           <Sparkles className="size-6 text-warning" aria-hidden /> Founder Spotlight
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Da sobre-exposición manual a una empresa por un período limitado.
-          Se suma al boost del paquete contratado y aparece con un
-          distintivo especial en discovery.
+          Da sobre-exposición manual a una empresa por un período limitado. Se suma al boost del
+          paquete contratado y aparece con un distintivo especial en discovery.
         </p>
       </header>
 
@@ -150,12 +146,7 @@ function SpotlightPage() {
             {selected ? (
               <div className="flex items-center justify-between rounded-md border border-border bg-muted/40 px-3 py-2 text-sm">
                 <span className="font-medium">{selected.display_name}</span>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setSelected(null)}
-                >
+                <Button type="button" size="sm" variant="ghost" onClick={() => setSelected(null)}>
                   Cambiar
                 </Button>
               </div>
@@ -184,9 +175,7 @@ function SpotlightPage() {
                         className="block w-full px-3 py-2 text-left text-sm hover:bg-muted"
                       >
                         <div className="font-medium">{b.display_name}</div>
-                        <div className="font-mono text-[11px] text-muted-foreground">
-                          {b.slug}
-                        </div>
+                        <div className="font-mono text-[11px] text-muted-foreground">{b.slug}</div>
                       </button>
                     ))}
                   </div>
@@ -205,8 +194,8 @@ function SpotlightPage() {
               maxLength={60}
             />
             <p className="text-[11px] text-muted-foreground">
-              Aparece como badge dorado sobre la tarjeta. Si lo dejas en
-              blanco, se usa "Destacado por Valladolid".
+              Aparece como badge dorado sobre la tarjeta. Si lo dejas en blanco, se usa "Destacado
+              por Valladolid".
             </p>
           </div>
 
@@ -271,9 +260,7 @@ function SpotlightPage() {
         {q.isLoading ? (
           <p className="text-sm text-muted-foreground">Cargando…</p>
         ) : active.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Ningún spotlight activo ahora mismo.
-          </p>
+          <p className="text-sm text-muted-foreground">Ningún spotlight activo ahora mismo.</p>
         ) : (
           <div className="grid gap-3">
             {active.map((s) => (
@@ -324,9 +311,7 @@ function SpotlightCard({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="font-semibold">
-              {row.business?.display_name ?? "—"}
-            </p>
+            <p className="font-semibold">{row.business?.display_name ?? "—"}</p>
             {row.headline && (
               <Badge variant="outline" className="border-warning/50 text-warning">
                 {row.headline}
@@ -340,13 +325,7 @@ function SpotlightCard({
           </p>
         </div>
         {onDeactivate && (
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={onDeactivate}
-            disabled={busy}
-          >
+          <Button type="button" size="sm" variant="outline" onClick={onDeactivate} disabled={busy}>
             <Power className="mr-2 size-4" aria-hidden />
             Desactivar
           </Button>

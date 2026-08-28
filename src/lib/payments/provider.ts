@@ -10,11 +10,7 @@
  * SDKs específicos de proveedor — únicamente este módulo.
  */
 
-export type PaymentProviderId =
-  | "stripe"
-  | "paddle"
-  | "mercadopago"
-  | "paypal";
+export type PaymentProviderId = "stripe" | "paddle" | "mercadopago" | "paypal";
 
 export interface CreateIntentInput {
   /** ID de la orden ya validada server-side. */
@@ -76,8 +72,5 @@ export interface NormalizedEvent {
 export interface PaymentProvider {
   id: PaymentProviderId;
   createIntent(input: CreateIntentInput): Promise<IntentResult>;
-  verifyWebhook(
-    headers: Headers,
-    rawBody: string,
-  ): Promise<NormalizedEvent>;
+  verifyWebhook(headers: Headers, rawBody: string): Promise<NormalizedEvent>;
 }

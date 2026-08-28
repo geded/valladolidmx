@@ -39,11 +39,12 @@ async function loadSharp(): Promise<any | null> {
 async function runSharp(sharp: any, buffer: Buffer, format: Format, width: number) {
   const t0 = performance.now();
   const pipeline = sharp(buffer).resize({ width, withoutEnlargement: true });
-  const out = await (format === "avif"
-    ? pipeline.avif({ quality: QUALITY.avif })
-    : format === "webp"
-      ? pipeline.webp({ quality: QUALITY.webp })
-      : pipeline.jpeg({ quality: QUALITY.jpeg, mozjpeg: true })
+  const out = await (
+    format === "avif"
+      ? pipeline.avif({ quality: QUALITY.avif })
+      : format === "webp"
+        ? pipeline.webp({ quality: QUALITY.webp })
+        : pipeline.jpeg({ quality: QUALITY.jpeg, mozjpeg: true })
   ).toBuffer({ resolveWithObject: true });
   const dt = performance.now() - t0;
   return { bytes: out.data.length, processing_ms: Math.round(dt) };
@@ -77,9 +78,7 @@ async function main() {
       [".jpg", ".jpeg", ".png"].includes(extname(f).toLowerCase()),
     );
   } catch {
-    console.error(
-      `[benchmark] No se encontró ${samplesDir}. Crea muestras según README.md`,
-    );
+    console.error(`[benchmark] No se encontró ${samplesDir}. Crea muestras según README.md`);
     process.exit(2);
   }
   if (files.length < 5) {

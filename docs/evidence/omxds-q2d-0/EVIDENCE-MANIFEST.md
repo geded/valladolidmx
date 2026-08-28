@@ -15,25 +15,25 @@
 
 ## 2. Superficie entregada
 
-| Elemento | Ruta |
-| --- | --- |
-| Vista interna noindex | `/lovable/g8-place-premium-visual-approval` |
-| Propuesta visual | `src/components/place-premium/PlacePremiumSurface.tsx` |
-| Fixture DEMO VISUAL | `src/components/place-premium/place-premium-content.ts` |
+| Elemento              | Ruta                                                    |
+| --------------------- | ------------------------------------------------------- |
+| Vista interna noindex | `/lovable/g8-place-premium-visual-approval`             |
+| Propuesta visual      | `src/components/place-premium/PlacePremiumSurface.tsx`  |
+| Fixture DEMO VISUAL   | `src/components/place-premium/place-premium-content.ts` |
 
 Caso de diseño: **Chichén Itzá** · destino **Tinum** · tipo **zona arqueológica**.
 Breadcrumb: `Inicio → Oriente Maya → Tinum → Chichén Itzá`.
 
 ## 3. Capturas de evidencia
 
-| # | Dirección | Viewport | Archivo |
-| --- | --- | --- | --- |
-| 1 | Editorial | 390 px | `q2d0-editorial-390.png` |
-| 2 | Editorial | 768 px | `q2d0-editorial-768.png` |
-| 3 | Editorial | 1440 px | `q2d0-editorial-1440.png` |
-| 4 | Cinematográfica | 390 px | `q2d0-cinematografica-390.png` |
-| 5 | Cinematográfica | 768 px | `q2d0-cinematografica-768.png` |
-| 6 | Cinematográfica | 1440 px | `q2d0-cinematografica-1440.png` |
+| #   | Dirección       | Viewport | Archivo                         |
+| --- | --------------- | -------- | ------------------------------- |
+| 1   | Editorial       | 390 px   | `q2d0-editorial-390.png`        |
+| 2   | Editorial       | 768 px   | `q2d0-editorial-768.png`        |
+| 3   | Editorial       | 1440 px  | `q2d0-editorial-1440.png`       |
+| 4   | Cinematográfica | 390 px   | `q2d0-cinematografica-390.png`  |
+| 5   | Cinematográfica | 768 px   | `q2d0-cinematografica-768.png`  |
+| 6   | Cinematográfica | 1440 px  | `q2d0-cinematografica-1440.png` |
 
 Cada captura cubre vista superior y secciones inferiores suficientes para
 evaluar la ficha completa, incluidos Header y Footer canónicos.
@@ -51,13 +51,13 @@ evaluar la ficha completa, incluidos Header y Footer canónicos.
 
 ## 5. Diferencias entre direcciones
 
-| Dimensión | Editorial | Cinematográfica |
-| --- | --- | --- |
-| Hero | Split rounded: foto + tarjeta de identidad | Full-bleed con overlay, CTA centrado |
-| Breadcrumb | En flujo, sobre el hero | Barra sticky bajo el hero |
-| Orden | Intro → Esencial (panel) → Galería (mosaico) | Esencial (banda) → Galería (filmstrip) → Intro (centrada) |
-| Densidad | Lectura amplia, fotos intercaladas | Alta densidad superior, contenido progresivo |
-| Datos | Idénticos | Idénticos |
+| Dimensión  | Editorial                                    | Cinematográfica                                           |
+| ---------- | -------------------------------------------- | --------------------------------------------------------- |
+| Hero       | Split rounded: foto + tarjeta de identidad   | Full-bleed con overlay, CTA centrado                      |
+| Breadcrumb | En flujo, sobre el hero                      | Barra sticky bajo el hero                                 |
+| Orden      | Intro → Esencial (panel) → Galería (mosaico) | Esencial (banda) → Galería (filmstrip) → Intro (centrada) |
+| Densidad   | Lectura amplia, fotos intercaladas           | Alta densidad superior, contenido progresivo              |
+| Datos      | Idénticos                                    | Idénticos                                                 |
 
 ## 6. Confirmaciones
 
@@ -70,16 +70,16 @@ evaluar la ficha completa, incluidos Header y Footer canónicos.
 
 ## 7. Resultado de gates (2026-08-28)
 
-| Gate | Resultado |
-| --- | --- |
-| `bun run lint` | PASS — sin nueva deuda |
-| `bun run typecheck` | PASS |
-| `bun run build` | PASS |
-| `bun run scripts/route-inventory-coverage.ts` | PASS — 208 rutas |
-| `bun run validate:q2d:0` | PASS — 12 contratos |
-| `bun run governance:check` | PASS |
-| `bun run governance:product-check` | PASS |
-| `bun run governance:product-test` | PASS — 10 casos |
+| Gate                                                 | Resultado                 |
+| ---------------------------------------------------- | ------------------------- |
+| `bun run lint`                                       | PASS — sin nueva deuda    |
+| `bun run typecheck`                                  | PASS                      |
+| `bun run build`                                      | PASS                      |
+| `bun run scripts/route-inventory-coverage.ts`        | PASS — 208 rutas          |
+| `bun run validate:q2d:0`                             | PASS — 12 contratos       |
+| `bun run governance:check`                           | PASS                      |
+| `bun run governance:product-check`                   | PASS                      |
+| `bun run governance:product-test`                    | PASS — 10 casos           |
 | `bun scripts/governance/sync-governance.mjs --check` | PASS — Master Index v0.71 |
 
 Medición automatizada de las 6 capturas: `overflow = 0` en 390/768/1440 px,

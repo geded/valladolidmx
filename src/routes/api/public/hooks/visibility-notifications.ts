@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { timingSafeEqual } from 'node:crypto'
-import { sendVisibilityEmail } from '@/lib/visibility/visibility-notifications.server'
+import { createFileRoute } from "@tanstack/react-router";
+import { timingSafeEqual } from "node:crypto";
+import { sendVisibilityEmail } from "@/lib/visibility/visibility-notifications.server";
 
 /**
  * Ola 7.9 · Cron diario de notificaciones de ciclo de vida de visibilidad.
@@ -12,63 +12,60 @@ import { sendVisibilityEmail } from '@/lib/visibility/visibility-notifications.s
  */
 
 function safeEqual(a: string, b: string): boolean {
-  const ab = Buffer.from(a)
-  const bb = Buffer.from(b)
-  if (ab.length !== bb.length) return false
-  return timingSafeEqual(ab, bb)
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
 }
 
 interface GrantRow {
-  grant_id: string
-  business_id: string
-  plan_name: string
-  expires_at: string
-  recipient_email: string
-  recipient_name: string | null
-  business_name: string | null
-  business_slug: string | null
+  grant_id: string;
+  business_id: string;
+  plan_name: string;
+  expires_at: string;
+  recipient_email: string;
+  recipient_name: string | null;
+  business_name: string | null;
+  business_slug: string | null;
 }
 
-export const Route = createFileRoute('/api/public/hooks/visibility-notifications')({
+export const Route = createFileRoute("/api/public/hooks/visibility-notifications")({
   server: {
     handlers: {
       POST: async ({ request }) => {
         const provided =
-          request.headers.get('x-cron-secret') ??
-          request.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ??
-          ''
-        const expected = process.env.EB_CRON_SECRET ?? ''
-        const apiKeyProvided = request.headers.get('apikey') ?? ''
-        const publishable = process.env.SUPABASE_PUBLISHABLE_KEY ?? ''
-        const secretMatch = expected && provided && safeEqual(provided, expected)
-        const apiKeyMatch =
-          publishable && apiKeyProvided && safeEqual(apiKeyProvided, publishable)
+          request.headers.get("x-cron-secret") ??
+          request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
+          "";
+        const expected = process.env.EB_CRON_SECRET ?? "";
+        const apiKeyProvided = request.headers.get("apikey") ?? "";
+        const publishable = process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
+        const secretMatch = expected && provided && safeEqual(provided, expected);
+        const apiKeyMatch = publishable && apiKeyProvided && safeEqual(apiKeyProvided, publishable);
         if (!secretMatch && !apiKeyMatch) {
-          return new Response('Unauthorized', { status: 401 })
+          return new Response("Unauthorized", { status: 401 });
         }
 
-        const { createClient } = await import('@supabase/supabase-js')
+        const { createClient } = await import("@supabase/supabase-js");
         const supabase = createClient(
           process.env.SUPABASE_URL!,
           process.env.SUPABASE_SERVICE_ROLE_KEY!,
           { auth: { persistSession: false, autoRefreshToken: false } },
-        )
+        );
 
-        const results = { expiring_7d: 0, expiring_1d: 0, expired: 0, failed: 0, skipped: 0 }
+        const results = { expiring_7d: 0, expiring_1d: 0, expired: 0, failed: 0, skipped: 0 };
 
         async function processBatch(
           rows: GrantRow[],
-          kind: 'expiring_7d' | 'expiring_1d' | 'expired',
+          kind: "expiring_7d" | "expiring_1d" | "expired",
         ) {
           for (const row of rows) {
             try {
-              const daysLeft = kind === 'expiring_7d' ? 7 : kind === 'expiring_1d' ? 1 : 0
+              const daysLeft = kind === "expiring_7d" ? 7 : kind === "expiring_1d" ? 1 : 0;
               const templateName =
-                kind === 'expired' ? 'visibility-expired' : 'visibility-expiring'
+                kind === "expired" ? "visibility-expired" : "visibility-expiring";
               const res = await sendVisibilityEmail(supabase, {
-                templateName: templateName as
-                  | 'visibility-expired'
-                  | 'visibility-expiring',
+                templateName: templateName as "visibility-expired" | "visibility-expiring",
                 recipientEmail: row.recipient_email,
                 recipientName: row.recipient_name,
                 businessName: row.business_name,
@@ -78,55 +75,55 @@ export const Route = createFileRoute('/api/public/hooks/visibility-notifications
                   expiresAt: row.expires_at,
                   daysLeft,
                 },
-              })
+              });
               if (!res.ok) {
-                if (res.skipped) results.skipped += 1
-                else results.failed += 1
-                continue
+                if (res.skipped) results.skipped += 1;
+                else results.failed += 1;
+                continue;
               }
               const patch: Record<string, string> =
-                kind === 'expiring_7d'
+                kind === "expiring_7d"
                   ? { notified_expiring_7d_at: new Date().toISOString() }
-                  : kind === 'expiring_1d'
+                  : kind === "expiring_1d"
                     ? { notified_expiring_1d_at: new Date().toISOString() }
-                    : { notified_expired_at: new Date().toISOString() }
+                    : { notified_expired_at: new Date().toISOString() };
               await supabase
-                .from('business_visibility_grants')
+                .from("business_visibility_grants")
                 .update(patch)
-                .eq('id', row.grant_id)
-              results[kind] += 1
+                .eq("id", row.grant_id);
+              results[kind] += 1;
             } catch (err) {
-              console.error('visibility cron send failed', {
+              console.error("visibility cron send failed", {
                 grant_id: row.grant_id,
                 err: err instanceof Error ? err.message : String(err),
-              })
-              results.failed += 1
+              });
+              results.failed += 1;
             }
           }
         }
 
         const { data: expiring7, error: e7 } = await supabase.rpc(
-          'list_visibility_grants_expiring',
+          "list_visibility_grants_expiring",
           { _reminder: 7 },
-        )
-        if (e7) console.error('list expiring 7d failed', e7)
-        await processBatch((expiring7 ?? []) as GrantRow[], 'expiring_7d')
+        );
+        if (e7) console.error("list expiring 7d failed", e7);
+        await processBatch((expiring7 ?? []) as GrantRow[], "expiring_7d");
 
         const { data: expiring1, error: e1 } = await supabase.rpc(
-          'list_visibility_grants_expiring',
+          "list_visibility_grants_expiring",
           { _reminder: 1 },
-        )
-        if (e1) console.error('list expiring 1d failed', e1)
-        await processBatch((expiring1 ?? []) as GrantRow[], 'expiring_1d')
+        );
+        if (e1) console.error("list expiring 1d failed", e1);
+        await processBatch((expiring1 ?? []) as GrantRow[], "expiring_1d");
 
         const { data: expired, error: ee } = await supabase.rpc(
-          'list_visibility_grants_recently_expired',
-        )
-        if (ee) console.error('list expired failed', ee)
-        await processBatch((expired ?? []) as GrantRow[], 'expired')
+          "list_visibility_grants_recently_expired",
+        );
+        if (ee) console.error("list expired failed", ee);
+        await processBatch((expired ?? []) as GrantRow[], "expired");
 
-        return Response.json({ ok: true, ...results })
+        return Response.json({ ok: true, ...results });
       },
     },
   },
-})
+});

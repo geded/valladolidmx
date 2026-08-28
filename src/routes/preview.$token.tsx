@@ -27,8 +27,7 @@ function PreviewRetired() {
     <main className="mx-auto max-w-xl p-12 text-center">
       <h1 className="text-2xl font-semibold">Vista previa no disponible</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        Este enlace de vista previa ya no está disponible. Solicita uno nuevo
-        desde el Studio.
+        Este enlace de vista previa ya no está disponible. Solicita uno nuevo desde el Studio.
       </p>
     </main>
   );

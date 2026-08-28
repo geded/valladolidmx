@@ -32,10 +32,7 @@
       "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
     }
   ],
-  "public_routes": [
-    "/oriente-maya/valladolid",
-    "/oriente-maya/valladolid/hoteles"
-  ],
+  "public_routes": ["/oriente-maya/valladolid", "/oriente-maya/valladolid/hoteles"],
   "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
   "required_tests": [
     "bun run typecheck",

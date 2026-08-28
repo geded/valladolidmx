@@ -1,6 +1,7 @@
 # 06-AUTHENTICATION-AND-PROFILES.md
 
 # Autenticación y Perfiles
+
 Versión 1.0
 
 ## Objetivo
