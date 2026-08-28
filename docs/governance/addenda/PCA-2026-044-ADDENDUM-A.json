@@ -1,0 +1,57 @@
+{
+  "id": "PCA-2026-044-ADDENDUM-A",
+  "parent_authorization": "PCA-2026-044",
+  "parent": "PCA-2026-044",
+  "title": "Addendum A · Cierre final G8-Q2B · Ratificación de tres proyecciones canónicas y corrección autorizada de DEF-Q2B-001",
+  "status": "Approved",
+  "effective_date": "2026-08-28",
+  "recorded_at": "2026-08-28",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+  "base_head": "6ad422a8379630f8444feda434a31661e27fd168",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Founder Directive 2026-08-28 · ADDENDUM FOUNDER · CIERRE FINAL G8-Q2B · DEF-Q2B-001, sobre la base exacta 6ad422a8379630f8444feda434a31661e27fd168 con worktree limpio, G8-Q2C no iniciado y omxds_visual_v1_contracts_enabled=false. Autoriza exclusivamente dos cosas: (a) la ratificación retrospectiva de las tres rutas adicionales generadas canónicamente por governance:sync que elevaron el incremental de dieciocho a veintiuna rutas; y (b) la modificación exclusiva de src/components/workspace/WorkspaceTopbar.tsx para eliminar el overflow horizontal del breadcrumb en 390 y 430 px, permitiendo que los crumbs intermedios se reduzcan, truncando de forma accesible etiquetas largas como 'Lugares y atractivos', conservando visible el elemento actual cuando sea posible, sin alterar navegación, permisos, jerarquía, rutas ni comportamiento en escritorio, manteniendo foco, nombre accesible y áreas táctiles, sin ocultar información crítica únicamente con CSS, sin introducir scroll horizontal y sin cambiar otros componentes compartidos. Alcance incremental máximo desde 6ad422a8: nueve rutas, a saber, este addendum canónico, WorkspaceTopbar.tsx, el contrato o prueba Q2B existente sólo si necesita acreditar el defecto, el manifiesto de evidencia Q2B, el Blueprint 19.40 únicamente para registrar el cierre, el Master Index sólo si el sincronizador lo exige y las tres proyecciones canónicas sólo si el sincronizador las modifica. No autoriza package.json, migraciones, cambios de esquema, datos, rutas de producto adicionales ni cambios funcionales fuera del Topbar. No autoriza PR, merge, despliegue, publicación, datos reales, G8-Q2C, plantillas públicas ni activación de flags. Sólo con todos los gates en PASS se autoriza crear y publicar la rama estable feature/omxds-g8-q2b-places-cms-v1.",
+  "ratification": {
+    "kind": "retrospective",
+    "scope": "Tres proyecciones canónicas regeneradas mecánicamente por el sincronizador durante la remediación de cierre G8-Q2B (6d729a77...6ad422a8).",
+    "route_ceiling_previous": 18,
+    "route_count_ratified": 21,
+    "route_ceiling_exceeded_by": 3,
+    "constitutes_precedent": false,
+    "authorizes_manual_projection_edits": false,
+    "rewrites_sequence": false,
+    "recorded_as": "Consecuencia mecánica del sincronizador canónico · no precedente",
+    "ratified_routes": [
+      "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
+      "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
+      "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json"
+    ],
+    "statement": "Las tres rutas fueron producidas exclusivamente por la ejecución de governance:sync, que es el único mecanismo canónico autorizado para escribirlas. No hubo edición manual de ninguna proyección. La ratificación se limita a estas tres rutas y no alcanza ninguna otra ruta del exceso anterior."
+  },
+  "defect": {
+    "id": "DEF-Q2B-001",
+    "title": "Overflow horizontal del breadcrumb del Workspace Topbar en anchos menores o iguales a 430 px",
+    "symptom": "47 px de overflow horizontal a 390 px y 7 px a 430 px en /cms/lugares/{placeId}/editar.",
+    "root_cause": "Los crumbs no finales se renderizaban con shrink-0 y sin límite de anchura, de modo que una etiqueta de sección larga no podía reducirse ni truncarse y empujaba la fila del topbar por encima del viewport.",
+    "remediation": "Los crumbs intermedios pasan a ser reducibles y truncables con nombre accesible completo mediante title y texto visible truncado; el crumb actual conserva prioridad de espacio. Sin cambios de navegación, jerarquía, permisos ni comportamiento en escritorio.",
+    "scope": "src/components/workspace/WorkspaceTopbar.tsx"
+  },
+  "permissions": [
+    { "operation": "modify", "path": "src/components/workspace/WorkspaceTopbar.tsx" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:q2a",
+    "bun run validate:q2a-r1",
+    "bun run validate:q2b",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun run governance:product-test",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}
