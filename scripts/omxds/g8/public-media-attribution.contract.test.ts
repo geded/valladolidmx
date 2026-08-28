@@ -10,6 +10,7 @@ import {
   AI_CONCEPTUAL_CREDIT,
   attributionNatureLabel,
   emptyAttribution,
+  isFilenameLike,
   resolveAttributedAlt,
   resolveAttributedCaption,
   resolveAttributedCredit,
@@ -41,6 +42,14 @@ describe("G8-F1D · prioridad de ALT", () => {
       "Valladolid — foto 2",
     );
     expect(resolveAttributedAlt(make({}), { fallback: "" })).toBe("");
+  });
+
+  test("un nombre de archivo no se acepta como ALT accesible", () => {
+    expect(isFilenameLike("IMG_6663.jpeg")).toBe(true);
+    expect(isFilenameLike("Plaza principal de Valladolid")).toBe(false);
+    expect(resolveAttributedAlt(make({ alt: "IMG_6663.jpeg" }), { fallback: "Valladolid" })).toBe(
+      "Valladolid",
+    );
   });
 
   test("ALT en blanco no desplaza al fallback", () => {
