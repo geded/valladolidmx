@@ -15,7 +15,16 @@
  *  - `cinematic`: hero fotográfico dominante y contenido progresivo.
  */
 import { useMemo } from "react";
-import { Accessibility, CalendarDays, Clock, Compass, Heart, Sparkles, Ticket } from "lucide-react";
+import {
+  Accessibility,
+  CalendarDays,
+  Clock,
+  Compass,
+  Heart,
+  ImageOff,
+  Sparkles,
+  Ticket,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
@@ -73,25 +82,40 @@ export function PlacePremiumSurface({
   );
 
   return (
-    <div data-place-presentation={presentation} className={cn("pb-24", className)}>
+    <div
+      data-place-presentation={presentation}
+      /* Founder Review G8-Q2D-0 · zona segura inferior para que el dock de
+         Alux nunca cubra contenido en ninguna dirección visual. */
+      data-alux-safe-zone="true"
+      className={cn("pb-24", className)}
+    >
       <Container className="pt-6">
         <DemoNotice text={content.demoNotice} />
       </Container>
 
       {cinematic ? (
         <>
-          <div className="mt-5">
+          {/* Breadcrumb territorial permanente: visible ANTES del hero y
+              persistente al hacer scroll, igual que en Editorial. */}
+          <div className="sticky top-0 z-20 mt-4 border-y border-border bg-background/90 backdrop-blur">
+            <Container className="py-1.5">
+              <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
+            </Container>
+          </div>
+          <div className="mt-4">
             <PremiumHero
               vm={{
                 presentation: "cinematic",
                 eyebrow: content.identity.eyebrow,
                 title: content.identity.title,
                 description: content.identity.subtitle,
-                media: {
-                  url: content.hero.cover.url,
-                  alt: content.hero.cover.alt,
-                  credit: content.hero.cover.credit,
-                },
+                media: content.hero.cover.url
+                  ? {
+                      url: content.hero.cover.url,
+                      alt: content.hero.cover.alt,
+                      credit: content.hero.cover.credit,
+                    }
+                  : null,
                 badges: content.identity.badges.map((label) => ({ label })),
                 primaryAction: { label: content.hero.primaryCta.label },
                 secondaryAction: {
@@ -101,12 +125,11 @@ export function PlacePremiumSurface({
               }}
             />
           </div>
-          {/* Breadcrumb territorial permanente, aquí como barra fija bajo el hero. */}
-          <div className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur">
-            <Container className="py-1">
-              <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} />
+          {content.hero.cover.url ? null : (
+            <Container className="mt-3">
+              <p className="text-xs text-muted-foreground">{content.hero.cover.credit}</p>
             </Container>
-          </div>
+          )}
           <Container className="mt-8">
             <IdentityStrip content={content} dense />
           </Container>
@@ -120,6 +143,7 @@ export function PlacePremiumSurface({
             <IntroCentered content={content} />
           </Container>
         </>
+
       ) : (
         <>
           <Container className="mt-4">
@@ -299,7 +323,17 @@ export function PlacePremiumSurface({
           </section>
         </div>
       </Container>
+
+      {/* Zona segura: reserva vertical para el dock flotante de Alux
+          (incluye el área segura del dispositivo). Ningún contenido de la
+          ficha queda cubierto en móvil ni en escritorio. */}
+      <div
+        aria-hidden
+        data-alux-safe-zone-spacer="true"
+        className="h-[calc(6.5rem+env(safe-area-inset-bottom))] lg:h-24"
+      />
     </div>
+
   );
 }
 
@@ -331,6 +365,30 @@ function DemoImage({
   className?: string;
   captionHidden?: boolean;
 }) {
+  if (!media.url) {
+    return (
+      <figure
+        data-place-media="placeholder"
+        className={cn(
+          "relative flex flex-col items-center justify-center overflow-hidden border border-dashed border-border bg-gradient-to-br from-muted via-muted/70 to-accent/30 p-4 text-center",
+          className,
+        )}
+      >
+        <ImageOff className="size-6 text-muted-foreground" aria-hidden />
+        {media.placeholderLabel ? (
+          <p className="mt-2 text-xs font-medium text-muted-foreground">{media.placeholderLabel}</p>
+        ) : null}
+        <figcaption
+          className={cn(
+            "mt-1 text-[10px] leading-tight text-muted-foreground",
+            captionHidden && "sr-only",
+          )}
+        >
+          {media.credit}
+        </figcaption>
+      </figure>
+    );
+  }
   return (
     <figure className={cn("relative overflow-hidden bg-muted", className)}>
       <img src={media.url} alt={media.alt} className="size-full object-cover" loading="lazy" />
@@ -343,6 +401,7 @@ function DemoImage({
       )}
     </figure>
   );
+
 }
 
 function IdentityStrip({
@@ -414,7 +473,7 @@ function HeroEditorial({ content }: { content: PlacePremiumContent }) {
         <div className="mt-6 grid grid-cols-2 gap-3">
           {content.hero.supporting.map((media, index) => (
             <DemoImage
-              key={`${media.url}-${index}`}
+              key={`media-${index}`}
               media={media}
               className="aspect-[3/2] rounded-2xl"
             />
@@ -606,7 +665,7 @@ function GalleryMosaic({ content }: { content: PlacePremiumContent }) {
         ) : null}
         {rest.map((media, index) => (
           <DemoImage
-            key={`${media.url}-${index}`}
+            key={`media-${index}`}
             media={media}
             className="aspect-[4/3] rounded-3xl"
           />
@@ -630,7 +689,7 @@ function GalleryFilmstrip({ content }: { content: PlacePremiumContent }) {
       <ul className="mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
         {content.gallery.items.map((media, index) => (
           <li
-            key={`${media.url}-${index}`}
+            key={`media-${index}`}
             className="w-[78%] shrink-0 snap-start sm:w-[46%] lg:w-[31%]"
           >
             <DemoImage media={media} className="aspect-[16/10] rounded-3xl" />
