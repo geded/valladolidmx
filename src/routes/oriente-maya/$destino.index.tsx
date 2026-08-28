@@ -31,7 +31,7 @@ import {
   getPublicDestinationBySlug,
   getDestinationRelated,
   getDestinationMapPoints,
-  getDestinationGalleryUrls,
+  getDestinationGalleryMedia,
 } from "@/lib/destinations/public-reads.functions";
 import {
   ContextEngineProvider,
@@ -79,7 +79,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       db,
       related,
       mapPoints,
-      galleryUrls,
+      galleryMedia,
       specific,
       template,
       surfaceContractsEnabled,
@@ -88,7 +88,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       getPublicDestinationBySlug({ data: { slug: params.destino } }).catch(() => null),
       getDestinationRelated({ data: { slug: params.destino } }).catch(() => null),
       getDestinationMapPoints({ data: { slug: params.destino } }).catch(() => []),
-      getDestinationGalleryUrls({ data: { slug: params.destino } }).catch(() => []),
+      getDestinationGalleryMedia({ data: { slug: params.destino } }).catch(() => []),
       getPublishedCompositionBySlug({ data: { slug: `dest-${params.destino}` } }).catch(() => null),
       getPublishedCompositionBySlug({ data: { slug: "__tpl_destination__" } }).catch(() => null),
       getOmxdsSurfaceContractsFlag().catch(() => false),
@@ -118,11 +118,15 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
           ...(premiumEligibility?.gallery ?? []).map((item) => item.url),
         ]
       : [];
+    // G8-F1D — La lectura acreditada aporta URL + atribución. Los URLs
+    // gobernados Premium conservan prioridad; la atribución viaja aparte.
+    const galleryUrls = galleryMedia.map((m) => m.url);
     return {
       dest,
       db,
       related,
       mapPoints,
+      galleryMedia,
       galleryUrls: governedGalleryUrls.length > 0 ? governedGalleryUrls : galleryUrls,
       composition,
       surfaceContractsEnabled,
@@ -177,6 +181,7 @@ function DestinoPage() {
     related,
     mapPoints,
     galleryUrls,
+    galleryMedia,
     composition,
     surfaceContractsEnabled,
     premiumEnabled,
@@ -194,6 +199,7 @@ function DestinoPage() {
         slug={dest.slug}
         mapPoints={mapPoints ?? []}
         galleryUrls={galleryUrls ?? []}
+        galleryMedia={galleryMedia ?? []}
       >
         <DestinationSurfaceContractBoundary
           // 19.23 — Premium por ficha: el flag global conserva su función
@@ -205,6 +211,7 @@ function DestinoPage() {
           related={related ?? undefined}
           mapPoints={mapPoints ?? []}
           galleryUrls={galleryUrls ?? []}
+          galleryMedia={galleryMedia ?? []}
           premiumEnabled={premiumEnabled}
           legacy={
             composition ? (
@@ -215,6 +222,7 @@ function DestinoPage() {
                 related={related ?? undefined}
                 mapPoints={mapPoints ?? []}
                 galleryUrls={galleryUrls ?? []}
+                galleryMedia={galleryMedia ?? []}
                 premiumEnabled={premiumEnabled}
               />
             )
