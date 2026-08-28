@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "34385d7303491a2cf12beaa50610be0d5e3dcb9662f33af60c912efd5fdecbc5"
+      "source_sha256": "10cf679651219ea398b76c9be075800479fa4a161bcd5c4e7c9516e86abf2250"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -11531,6 +11531,65 @@
       "path": "docs/evidence/omxds-q2c-a/EVIDENCE-MANIFEST.md",
       "source": "docs/evidence/omxds-q2c-a/EVIDENCE-MANIFEST.md",
       "evidence": "docs/evidence/omxds-q2c-a/EVIDENCE-MANIFEST.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "evidence": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md"
+    },
+    {
+      "id": "ART:src/components/place-premium/PlacePremiumSurface.tsx",
+      "type": "artifact",
+      "path": "src/components/place-premium/PlacePremiumSurface.tsx",
+      "source": "src/components/place-premium/PlacePremiumSurface.tsx",
+      "evidence": "src/components/place-premium/PlacePremiumSurface.tsx"
+    },
+    {
+      "id": "ART:src/components/place-premium/place-premium-content.ts",
+      "type": "artifact",
+      "path": "src/components/place-premium/place-premium-content.ts",
+      "source": "src/components/place-premium/place-premium-content.ts",
+      "evidence": "src/components/place-premium/place-premium-content.ts"
+    },
+    {
+      "id": "ART:src/routes/lovable/g8-place-premium-visual-approval.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g8-place-premium-visual-approval.tsx",
+      "source": "src/routes/lovable/g8-place-premium-visual-approval.tsx",
+      "evidence": "src/routes/lovable/g8-place-premium-visual-approval.tsx"
+    },
+    {
+      "id": "ART:scripts/omxds/q2d-0/place-premium-visual.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/q2d-0/place-premium-visual.contract.test.ts",
+      "source": "scripts/omxds/q2d-0/place-premium-visual.contract.test.ts",
+      "evidence": "scripts/omxds/q2d-0/place-premium-visual.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/q2d-0/place-premium-visual.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/q2d-0/place-premium-visual.evidence.mjs",
+      "source": "scripts/omxds/q2d-0/place-premium-visual.evidence.mjs",
+      "evidence": "scripts/omxds/q2d-0/place-premium-visual.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-q2d-0/EVIDENCE-MANIFEST.md",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-q2d-0/EVIDENCE-MANIFEST.md",
+      "source": "docs/evidence/omxds-q2d-0/EVIDENCE-MANIFEST.md",
+      "evidence": "docs/evidence/omxds-q2d-0/EVIDENCE-MANIFEST.md"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-046.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-046.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-046.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-046.json"
     }
   ],
   "edges": [
@@ -31776,6 +31835,95 @@
       "source_row": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
       "verified_at": "2026-08-28",
       "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/place-premium/PlacePremiumSurface.tsx:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "origin": "ART:src/components/place-premium/PlacePremiumSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "evidence": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/place-premium/place-premium-content.ts:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "origin": "ART:src/components/place-premium/place-premium-content.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "evidence": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/lovable/g8-place-premium-visual-approval.tsx:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "origin": "ART:src/routes/lovable/g8-place-premium-visual-approval.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "evidence": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/q2d-0/place-premium-visual.contract.test.ts:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "origin": "ART:scripts/omxds/q2d-0/place-premium-visual.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "evidence": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/q2d-0/place-premium-visual.evidence.mjs:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "origin": "ART:scripts/omxds/q2d-0/place-premium-visual.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "evidence": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/evidence/omxds-q2d-0/EVIDENCE-MANIFEST.md:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-q2d-0/EVIDENCE-MANIFEST.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "evidence": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:package.json:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "evidence": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-046.json:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-046.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "evidence": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "verified_at": "2026-08-28",
+      "origin": "DOC:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.71 · docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {
