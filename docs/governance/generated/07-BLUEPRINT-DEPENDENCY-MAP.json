@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.69",
+    "version": "0.70",
     "state": "Approved",
-    "source_sha256": "2fc4a0ba3203d8ffd751a4a8fe501da193691c3b3593cd2bf84ebb81b3f82f15",
+    "source_sha256": "108bb0e68348c59b26e56dc719370f45262af320ca35b302331e46aa3da7d1f4",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -8143,6 +8143,34 @@
       "id": "ART:scripts/omxds/q2b/places-cms.evidence.mjs",
       "type": "artifact",
       "path": "scripts/omxds/q2b/places-cms.evidence.mjs"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-045.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-045.json"
+    },
+    {
+      "id": "ART:scripts/omxds/q2c-a/territorial-reclassification.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/q2c-a/territorial-reclassification.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/q2c-a/territorial-reclassification.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/q2c-a/territorial-reclassification.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-q2c-a/EVIDENCE-MANIFEST.md",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-q2c-a/EVIDENCE-MANIFEST.md"
     }
   ],
   "edges": [
@@ -21401,6 +21429,51 @@
       "destination": "DOC:docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
       "evidence": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "evidence": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-045.json:docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-045.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "evidence": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2c-a/territorial-reclassification.contract.test.ts:docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "origin": "ART:scripts/omxds/q2c-a/territorial-reclassification.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "evidence": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2c-a/territorial-reclassification.evidence.mjs:docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "origin": "ART:scripts/omxds/q2c-a/territorial-reclassification.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "evidence": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/evidence/omxds-q2c-a/EVIDENCE-MANIFEST.md:docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-q2c-a/EVIDENCE-MANIFEST.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
+      "evidence": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
       "verified_at": "2026-08-28"
     }
   ],

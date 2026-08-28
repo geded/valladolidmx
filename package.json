@@ -52,6 +52,8 @@
     "validate:q2a-r1": "bun run test:q2a-r1 && bun scripts/omxds/q2a-r1/places-remediation.evidence.mjs && bun scripts/omxds/q2a-r1/rls-harness.mjs",
     "test:q2b": "bun test scripts/omxds/q2b/places-cms.contract.test.ts scripts/omxds/q2b/places-permissions.contract.test.ts",
     "validate:q2b": "bun run test:q2b && bun test scripts/place-territorial-coherence.test.ts && bun scripts/omxds/q2b/places-cms.evidence.mjs",
+    "test:q2c:a": "bun test scripts/omxds/q2c-a/territorial-reclassification.contract.test.ts",
+    "validate:q2c:a": "bun run test:q2c:a && bun scripts/omxds/q2c-a/territorial-reclassification.evidence.mjs",
     "lint": "bun scripts/lint/lint-baseline.mjs",
     "lint:full": "eslint .",
     "lint:baseline:check": "bun scripts/lint/lint-baseline.mjs",
