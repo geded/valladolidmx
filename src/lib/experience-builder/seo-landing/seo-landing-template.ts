@@ -20,6 +20,7 @@ export const SEO_LANDING_VARIANT = "authority-editorial-zazil" as const;
 export const SEO_LANDING_CONTRACT_VERSION = "1.0.0" as const;
 export const SEO_LANDING_AUTHORITY = {
   compositionSlug: "biz-zazil-tunich",
+  variantKey: "zazil-tunich",
   revisionLabel: "SEO.A3.M2",
   revisionNumber: 2,
   sha256: "61913a4fa92bdb1c671a392caabc0b08f55a6ec946ed737abcd9038e01113d9c",
