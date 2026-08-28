@@ -162,7 +162,7 @@ function NumberedCase({
 }
 
 function WidthFrame({ width, children }: { width: WidthKey; children: React.ReactNode }) {
-  if (width === "full") return <div className="w-full">{children}</div>;
+  if (width === "full") return <div className="w-full overflow-x-auto">{children}</div>;
   return (
     <div className="w-full overflow-x-auto">
       <div
