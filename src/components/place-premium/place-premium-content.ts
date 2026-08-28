@@ -208,8 +208,9 @@ export const PLACE_PREMIUM_DEMO_CONTENT: PlacePremiumContent = {
     badges: ["Zona arqueológica", "Destino: Tinum", "DEMO VISUAL"],
   },
   hero: {
-    cover: M.piramide,
-    supporting: [M.selva, M.camino],
+    cover: P.cover,
+    supporting: [P.apoyo1, P.apoyo2],
+
     primaryCta: { label: "Agregar a Mi Viaje" },
     secondaryCta: { label: "Ver galería", href: "#galeria-lugar" },
   },
