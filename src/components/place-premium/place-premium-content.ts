@@ -133,21 +133,37 @@ export interface PlacePremiumContent {
 
 const GOVERNED = "/api/public/studio-media/governed/v1p1c";
 const DEMO_CREDIT = "DEMO VISUAL · imagen de biblioteca gobernada · no documenta el lugar";
+const PLACEHOLDER_CREDIT =
+  "Sin fotografía acreditada del lugar · marcador neutral · no representa otro sitio";
+
+/**
+ * Founder Review G8-Q2D-0: ninguna imagen de biblioteca puede representar a
+ * Chichén Itzá. Mientras no exista fotografía acreditada del propio sitio, la
+ * ficha usa marcadores neutrales (sin fotografía de otro lugar).
+ */
+function placeholderMedia(label: string): PlacePremiumMedia {
+  return {
+    url: null,
+    alt: `Marcador neutral: ${label}. Sin fotografía acreditada del lugar.`,
+    credit: PLACEHOLDER_CREDIT,
+    placeholderLabel: label,
+  };
+}
+
+export const PLACE_PREMIUM_PLACE_PLACEHOLDERS = {
+  cover: placeholderMedia("Portada del lugar"),
+  apoyo1: placeholderMedia("Vista de apoyo 1"),
+  apoyo2: placeholderMedia("Vista de apoyo 2"),
+  gal1: placeholderMedia("Galería 1"),
+  gal2: placeholderMedia("Galería 2"),
+  gal3: placeholderMedia("Galería 3"),
+  gal4: placeholderMedia("Galería 4"),
+} as const satisfies Record<string, PlacePremiumMedia>;
 
 export const PLACE_PREMIUM_DEMO_MEDIA = {
-  piramide: {
-    url: `${GOVERNED}/experience-gallery-1.jpg`,
-    alt: "Templo pirámide maya de piedra tallada rodeado de selva bajo luz dorada",
-    credit: DEMO_CREDIT,
-  },
   selva: {
     url: `${GOVERNED}/experience-cover.jpg`,
     alt: "Cenote abierto de aguas turquesa en una caverna de piedra caliza con raíces colgantes",
-    credit: DEMO_CREDIT,
-  },
-  camino: {
-    url: `${GOVERNED}/destination-gallery-2.jpg`,
-    alt: "Calle empedrada con fachadas en tonos terracota y ocre bajo cielo despejado",
     credit: DEMO_CREDIT,
   },
   plaza: {
@@ -168,6 +184,8 @@ export const PLACE_PREMIUM_DEMO_MEDIA = {
 } as const satisfies Record<string, PlacePremiumMedia>;
 
 const M = PLACE_PREMIUM_DEMO_MEDIA;
+const P = PLACE_PREMIUM_PLACE_PLACEHOLDERS;
+
 
 export const PLACE_PREMIUM_DEMO_CONTENT: PlacePremiumContent = {
   demoNotice:
