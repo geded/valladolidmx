@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.63",
+    "version": "0.66",
     "state": "Approved",
-    "source_sha256": "95670f365999b08cbecd4708107bd0d47d958287ec6e728f51133b74267268d3",
+    "source_sha256": "48c8e31402a5b888fc0606a82c55ec8c2ec44597d61a2f2a2746e3df415a1cd1",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -7983,6 +7983,70 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-041.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-041.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.36-G8-Q1-TERRITORIAL-ASSIGNMENT-ADDENDUM-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.36-G8-Q1-TERRITORIAL-ASSIGNMENT-ADDENDUM-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.37-G8-Q1-REAL-TEMPLATE-INVENTORY-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.37-G8-Q1-REAL-TEMPLATE-INVENTORY-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:docs/blueprint/19.36-G8-Q1-TERRITORIAL-ASSIGNMENT-ADDENDUM-v1.0.md",
+      "type": "artifact",
+      "path": "docs/blueprint/19.36-G8-Q1-TERRITORIAL-ASSIGNMENT-ADDENDUM-v1.0.md"
+    },
+    {
+      "id": "ART:docs/blueprint/19.37-G8-Q1-REAL-TEMPLATE-INVENTORY-v1.0.md",
+      "type": "artifact",
+      "path": "docs/blueprint/19.37-G8-Q1-REAL-TEMPLATE-INVENTORY-v1.0.md"
+    },
+    {
+      "id": "ART:supabase/migrations/20260828072703_77c7df42-9a22-4568-ac6a-dddfd53c178e.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260828072703_77c7df42-9a22-4568-ac6a-dddfd53c178e.sql"
+    },
+    {
+      "id": "ART:src/lib/places/place-taxonomy.ts",
+      "type": "artifact",
+      "path": "src/lib/places/place-taxonomy.ts"
+    },
+    {
+      "id": "ART:src/lib/places/place-contracts.ts",
+      "type": "artifact",
+      "path": "src/lib/places/place-contracts.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/q2a/places-model.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/q2a/places-model.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/q2a/places-model.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/q2a/places-model.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-042.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-042.json"
     }
   ],
   "edges": [
@@ -20971,6 +21035,96 @@
       "destination": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
       "evidence": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/blueprint/19.36-G8-Q1-TERRITORIAL-ASSIGNMENT-ADDENDUM-v1.0.md:docs/blueprint/19.36-G8-Q1-TERRITORIAL-ASSIGNMENT-ADDENDUM-v1.0.md",
+      "origin": "ART:docs/blueprint/19.36-G8-Q1-TERRITORIAL-ASSIGNMENT-ADDENDUM-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.36-G8-Q1-TERRITORIAL-ASSIGNMENT-ADDENDUM-v1.0.md",
+      "evidence": "docs/blueprint/19.36-G8-Q1-TERRITORIAL-ASSIGNMENT-ADDENDUM-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.36-G8-Q1-TERRITORIAL-ASSIGNMENT-ADDENDUM-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/blueprint/19.37-G8-Q1-REAL-TEMPLATE-INVENTORY-v1.0.md:docs/blueprint/19.37-G8-Q1-REAL-TEMPLATE-INVENTORY-v1.0.md",
+      "origin": "ART:docs/blueprint/19.37-G8-Q1-REAL-TEMPLATE-INVENTORY-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.37-G8-Q1-REAL-TEMPLATE-INVENTORY-v1.0.md",
+      "evidence": "docs/blueprint/19.37-G8-Q1-REAL-TEMPLATE-INVENTORY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.37-G8-Q1-REAL-TEMPLATE-INVENTORY-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:supabase/migrations/20260828072703_77c7df42-9a22-4568-ac6a-dddfd53c178e.sql:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "origin": "ART:supabase/migrations/20260828072703_77c7df42-9a22-4568-ac6a-dddfd53c178e.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "evidence": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/places/place-taxonomy.ts:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "origin": "ART:src/lib/places/place-taxonomy.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "evidence": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/places/place-contracts.ts:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "origin": "ART:src/lib/places/place-contracts.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "evidence": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2a/places-model.contract.test.ts:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "origin": "ART:scripts/omxds/q2a/places-model.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "evidence": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2a/places-model.evidence.mjs:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "origin": "ART:scripts/omxds/q2a/places-model.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "evidence": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "evidence": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/integrations/supabase/types.ts:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "origin": "ART:src/integrations/supabase/types.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "evidence": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-042.json:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-042.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "evidence": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
       "verified_at": "2026-08-28"
     }
   ],

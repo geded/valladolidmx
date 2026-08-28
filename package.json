@@ -46,6 +46,8 @@
     "validate:g8:f1d": "bun run test:g8:f1d",
     "validate:g8:p2": "bun run test:g8:p2",
     "validate:g8": "bun run test:g8 && bun run test:i4:a && bun run test:i4:0",
+    "test:q2a": "bun test scripts/omxds/q2a/places-model.contract.test.ts",
+    "validate:q2a": "bun run test:q2a && bun scripts/omxds/q2a/places-model.evidence.mjs",
     "lint": "bun scripts/lint/lint-baseline.mjs",
     "lint:full": "eslint .",
     "lint:baseline:check": "bun scripts/lint/lint-baseline.mjs",
