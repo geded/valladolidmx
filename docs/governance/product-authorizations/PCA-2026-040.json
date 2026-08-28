@@ -1,0 +1,54 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-040",
+  "title": "19.34 · G8-M1 · Safe Media Replacement MVP v1.0",
+  "status": "Approved",
+  "branch": "fix/omxds-g8-m1-safe-media-replacement-v1",
+  "blueprint": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-28 · Autorización G8-M1 · Safe Media Replacement MVP sobre HEAD 96febee0a342e668d81c75177f6e3896f655dc18. Autoriza exclusivamente implementar el flujo mínimo seguro para seleccionar, subir, aprobar y sustituir imágenes en los ocho presets premium del Experience Builder, cerrando DEF-M-01, DEF-M-02, DEF-M-04, DEF-M-05, DEF-M-06, DEF-M-07, DEF-M-08 y DEF-M-10. La subida usa exclusivamente signStudioMediaUpload, carga al bucket y registerStudioMedia con SHA-256 calculado en servidor, estado draft, review_state unreviewed y metadata obligatoria de derechos, autoría, crédito, fuente, licencia y naturaleza documental/conceptual/IA. Prohibido FileReader, data: URI y base64 incrustado; prohibido sobrescribir binarios, borrar activos, publicar, migrar la base de datos, tocar páginas públicas, la Home publicada, los 12 activos IA en cuarentena, los 22 PNG bordados, dependencias nuevas, merge o despliegue. Quien sube no autoaprueba salvo super_admin. omxds_visual_v1_contracts_enabled permanece false. DEF-M-03, DEF-M-09 y DEF-M-11 a DEF-M-16 quedan diferidos a G8-M2.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/media/slot-media.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/media-rights.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/studio-media.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/MediaPickerDialog.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/AutoInspector.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "scripts/omxds/g8/safe-media-replacement.contract.test.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:g8:m1",
+    "bun run validate:g8",
+    "bun run validate:g6:s1",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}
