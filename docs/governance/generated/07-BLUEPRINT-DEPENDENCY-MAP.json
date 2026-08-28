@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.66",
+    "version": "0.67",
     "state": "Approved",
-    "source_sha256": "48c8e31402a5b888fc0606a82c55ec8c2ec44597d61a2f2a2746e3df415a1cd1",
+    "source_sha256": "b3bd30c954b835da12e515dfa5685e0797e06f9f2aa41f006b9da3a357b05415",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -8047,6 +8047,39 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-042.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-042.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:supabase/migrations/20260828145637_97e8e025-3cbf-4722-9b2b-cbfd672a2c57.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260828145637_97e8e025-3cbf-4722-9b2b-cbfd672a2c57.sql"
+    },
+    {
+      "id": "ART:scripts/omxds/q2a-r1/places-remediation.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/q2a-r1/places-remediation.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/q2a-r1/places-remediation.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/q2a-r1/places-remediation.evidence.mjs"
+    },
+    {
+      "id": "ART:scripts/omxds/q2a-r1/rls-harness.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/q2a-r1/rls-harness.mjs"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-043.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-043.json"
     }
   ],
   "edges": [
@@ -21125,6 +21158,78 @@
       "destination": "DOC:docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
       "evidence": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.38-G8-Q2A-PLACES-DATA-MODEL-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:supabase/migrations/20260828145637_97e8e025-3cbf-4722-9b2b-cbfd672a2c57.sql:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "origin": "ART:supabase/migrations/20260828145637_97e8e025-3cbf-4722-9b2b-cbfd672a2c57.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/places/place-taxonomy.ts:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "origin": "ART:src/lib/places/place-taxonomy.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/places/place-contracts.ts:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "origin": "ART:src/lib/places/place-contracts.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2a-r1/places-remediation.contract.test.ts:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "origin": "ART:scripts/omxds/q2a-r1/places-remediation.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2a-r1/places-remediation.evidence.mjs:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "origin": "ART:scripts/omxds/q2a-r1/places-remediation.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2a-r1/rls-harness.mjs:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "origin": "ART:scripts/omxds/q2a-r1/rls-harness.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-043.json:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-043.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "evidence": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
       "verified_at": "2026-08-28"
     }
   ],
