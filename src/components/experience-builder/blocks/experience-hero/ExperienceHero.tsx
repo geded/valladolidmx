@@ -230,9 +230,7 @@ export function ExperienceHero({
   const ctas: ExperienceHeroCta[] =
     dto.ctas && dto.ctas.length > 0
       ? dto.ctas
-      : [dto.ctaPrimary, dto.ctaSecondary].filter(
-          (c): c is ExperienceHeroCta => Boolean(c),
-        );
+      : [dto.ctaPrimary, dto.ctaSecondary].filter((c): c is ExperienceHeroCta => Boolean(c));
 
   const textStack = (
     <div
@@ -273,7 +271,12 @@ export function ExperienceHero({
         {dto.title}
       </Heading>
       {dto.description ? (
-        <p className={cn("text-pretty text-base sm:text-lg", onDark ? "text-white/90" : "text-muted-foreground")}>
+        <p
+          className={cn(
+            "text-pretty text-base sm:text-lg",
+            onDark ? "text-white/90" : "text-muted-foreground",
+          )}
+        >
           {dto.description}
         </p>
       ) : null}
@@ -297,13 +300,7 @@ export function ExperienceHero({
   );
 
   if (useCinematic) {
-    return (
-      <CinematicHero
-        dto={dto}
-        className={className}
-        textStack={textStack}
-      />
-    );
+    return <CinematicHero dto={dto} className={className} textStack={textStack} />;
   }
 
   if (useGallery) {
@@ -420,13 +417,13 @@ function CinematicHero({
 
   return (
     <section
-      className={cn(
-        "@container relative isolate overflow-hidden text-white",
-        className,
-      )}
+      className={cn("@container relative isolate overflow-hidden text-white", className)}
       style={dto.overlapHeader ? { marginTop: "-4rem" } : undefined}
     >
-      <div aria-hidden className="absolute inset-0 -z-20 h-full w-full overflow-hidden bg-foreground">
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-20 h-full w-full overflow-hidden bg-foreground"
+      >
         {slides.map((s, i) => (
           <img
             key={`${s.url}-${i}`}
@@ -546,9 +543,7 @@ function GalleryHero({
             <ArrowLeft className="h-5 w-5" aria-hidden="true" />
           </button>
           {headerActionsSlot ? (
-            <div className="pointer-events-auto flex items-center gap-2">
-              {headerActionsSlot}
-            </div>
+            <div className="pointer-events-auto flex items-center gap-2">{headerActionsSlot}</div>
           ) : null}
         </div>
 

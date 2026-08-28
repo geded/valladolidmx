@@ -5,7 +5,10 @@
  * caller can use the static mock.
  */
 import { createServerFn } from "@tanstack/react-start";
-import type { MarketplaceBusinessCard, MarketplaceProductCard } from "@/lib/catalog/marketplace-reads.functions";
+import type {
+  MarketplaceBusinessCard,
+  MarketplaceProductCard,
+} from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
 import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
 
@@ -55,21 +58,23 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
 
     let hero_url: string | null = null;
     let hero_media: PublicMediaAttribution | null = null;
-    const media = (row as unknown as {
-      media_assets?: {
-        id?: string;
-        storage_bucket: string;
-        storage_path: string;
-        alt_text?: string | null;
-        alt_text_ai?: string | null;
-        alt_text_source?: string | null;
-        review_state?: string | null;
-        title?: string | null;
-        caption?: string | null;
-        credit?: string | null;
-        metadata?: Record<string, unknown> | null;
-      } | null;
-    }).media_assets;
+    const media = (
+      row as unknown as {
+        media_assets?: {
+          id?: string;
+          storage_bucket: string;
+          storage_path: string;
+          alt_text?: string | null;
+          alt_text_ai?: string | null;
+          alt_text_source?: string | null;
+          review_state?: string | null;
+          title?: string | null;
+          caption?: string | null;
+          credit?: string | null;
+          metadata?: Record<string, unknown> | null;
+        } | null;
+      }
+    ).media_assets;
     if (media?.storage_bucket && media?.storage_path) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data: signed, error: signErr } = await supabaseAdmin.storage
@@ -156,7 +161,9 @@ export const getDestinationMapPoints = createServerFn({ method: "GET" })
     // inner join en lugar de resolver `destination_id` en dos pasos.
     const { data: rows, error } = await sb
       .from("businesses")
-      .select("id, slug, display_name, tagline, status, deleted_at, business_locations!inner(latitude, longitude, address_line1, is_primary), destinations!inner(slug)")
+      .select(
+        "id, slug, display_name, tagline, status, deleted_at, business_locations!inner(latitude, longitude, address_line1, is_primary), destinations!inner(slug)",
+      )
       .eq("destinations.slug", data.slug)
       .eq("status", "published")
       .is("deleted_at", null)
@@ -207,7 +214,9 @@ export const getDestinationGalleryUrls = createServerFn({ method: "GET" })
     // H2·P1 — Un solo roundtrip vía inner-join sobre `destinations.slug`.
     const { data: rows, error } = await sb
       .from("destination_media")
-      .select("sort_order, media_assets:media_asset_id ( storage_bucket, storage_path ), destinations!inner(slug)")
+      .select(
+        "sort_order, media_assets:media_asset_id ( storage_bucket, storage_path ), destinations!inner(slug)",
+      )
       .eq("destinations.slug", data.slug)
       .order("sort_order", { ascending: true })
       .limit(12);
@@ -217,9 +226,11 @@ export const getDestinationGalleryUrls = createServerFn({ method: "GET" })
     // secuenciales; hoy: una sola oleada Promise.all.
     const signed = await Promise.all(
       rows.map(async (r) => {
-        const m = (r as unknown as {
-          media_assets?: { storage_bucket: string; storage_path: string } | null;
-        }).media_assets;
+        const m = (
+          r as unknown as {
+            media_assets?: { storage_bucket: string; storage_path: string } | null;
+          }
+        ).media_assets;
         if (!m?.storage_bucket || !m?.storage_path) return null;
         const { data: s } = await supabaseAdmin.storage
           .from(m.storage_bucket)
@@ -310,7 +321,6 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
     return resolved.filter((x): x is PublicMediaAttribution => x !== null);
   });
 
-
 const HOTEL_CATS = new Set(["hoteles", "hospedaje"]);
 const RESTO_CATS = new Set(["restaurantes", "gastronomia"]);
 const EXP_CATS = new Set(["experiencias", "experiencias-tours", "tours"]);
@@ -334,9 +344,19 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
     const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const empty: DestinationRelatedDTO = { hoteles: [], restaurantes: [], experiencias: [], otras: [], productos: [], eventos: [] };
+    const empty: DestinationRelatedDTO = {
+      hoteles: [],
+      restaurantes: [],
+      experiencias: [],
+      otras: [],
+      productos: [],
+      eventos: [],
+    };
     const { data: dest, error: dErr } = await sb
-      .from("destinations").select("id, slug").eq("slug", data.slug).maybeSingle();
+      .from("destinations")
+      .select("id, slug")
+      .eq("slug", data.slug)
+      .maybeSingle();
     if (dErr || !dest) return empty;
 
     // H2·P1 — Overrides, businesses y events son independientes entre
@@ -351,7 +371,9 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         .eq("surface", "destination-detail"),
       sb
         .from("businesses")
-        .select("id, slug, display_name, tagline, verified, status, deleted_at, business_categories!businesses_primary_category_id_fkey ( slug )")
+        .select(
+          "id, slug, display_name, tagline, verified, status, deleted_at, business_categories!businesses_primary_category_id_fkey ( slug )",
+        )
         .eq("destination_id", dest.id)
         .eq("status", "published")
         .is("deleted_at", null)
@@ -388,21 +410,33 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
       if (o.mode === "hide") hidden[t].add(o.related_entity_id as string);
       else if (o.mode === "pin") pinnedIds[t].push(o.related_entity_id as string);
     }
-    if (bErr) { console.error("[getDestinationRelated] biz", bErr); return empty; }
+    if (bErr) {
+      console.error("[getDestinationRelated] biz", bErr);
+      return empty;
+    }
 
-    const cards: MarketplaceBusinessCard[] = (biz ?? []).map((row) => {
-      const cat = (row.business_categories as { slug?: unknown } | null)?.slug;
-      return {
-        id: row.id,
-        slug: row.slug,
-        display_name: row.display_name,
-        tagline: row.tagline ?? "",
-        verified: Boolean(row.verified),
-        destination_slug: dest.slug,
-        category_slug: typeof cat === "string" ? cat : "",
-      };
-    }).filter((c) => !hidden.business.has(c.id));
-    const grouped: DestinationRelatedDTO = { hoteles: [], restaurantes: [], experiencias: [], otras: [], productos: [], eventos: [] };
+    const cards: MarketplaceBusinessCard[] = (biz ?? [])
+      .map((row) => {
+        const cat = (row.business_categories as { slug?: unknown } | null)?.slug;
+        return {
+          id: row.id,
+          slug: row.slug,
+          display_name: row.display_name,
+          tagline: row.tagline ?? "",
+          verified: Boolean(row.verified),
+          destination_slug: dest.slug,
+          category_slug: typeof cat === "string" ? cat : "",
+        };
+      })
+      .filter((c) => !hidden.business.has(c.id));
+    const grouped: DestinationRelatedDTO = {
+      hoteles: [],
+      restaurantes: [],
+      experiencias: [],
+      otras: [],
+      productos: [],
+      eventos: [],
+    };
     const bizById = new Map(cards.map((c) => [c.id, c] as const));
     for (const c of cards) {
       if (HOTEL_CATS.has(c.category_slug)) grouped.hoteles.push(c);
@@ -416,13 +450,13 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
       const pinnedSet = new Set<string>();
       for (const id of pinnedIds.business) {
         const c = bizById.get(id);
-        if (c && !pinnedSet.has(id)) { pinnedBiz.push(c); pinnedSet.add(id); }
+        if (c && !pinnedSet.has(id)) {
+          pinnedBiz.push(c);
+          pinnedSet.add(id);
+        }
       }
       if (pinnedBiz.length > 0) {
-        grouped.otras = [
-          ...pinnedBiz,
-          ...grouped.otras.filter((c) => !pinnedSet.has(c.id)),
-        ];
+        grouped.otras = [...pinnedBiz, ...grouped.otras.filter((c) => !pinnedSet.has(c.id))];
       }
     }
 
@@ -443,13 +477,17 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
       const [bmediaRes, prodsRes] = await Promise.all([
         sb
           .from("business_media")
-          .select("business_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path )")
+          .select(
+            "business_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path )",
+          )
           .in("business_id", bizIds)
           .eq("role", "cover")
           .order("sort_order", { ascending: true }),
         sb
           .from("products")
-          .select("id, slug, name, tagline, product_type, price_amount, price_currency, business_id, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, status, deleted_at")
+          .select(
+            "id, slug, name, tagline, product_type, price_amount, price_currency, business_id, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, status, deleted_at",
+          )
           .in("business_id", bizIds)
           .eq("status", "published")
           .is("deleted_at", null)
@@ -476,7 +514,11 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
           });
           const signed = await Promise.all(
             first.map(async (r) => {
-              const a = (r as unknown as { media_assets?: { storage_bucket: string; storage_path: string } | null }).media_assets;
+              const a = (
+                r as unknown as {
+                  media_assets?: { storage_bucket: string; storage_path: string } | null;
+                }
+              ).media_assets;
               if (!a) return { id: r.business_id as string, url: null as string | null };
               const { data: s } = await supabaseAdmin.storage
                 .from(a.storage_bucket)
@@ -485,12 +527,16 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
             }),
           );
           const byBiz = new Map(signed.map((x) => [x.id, x.url] as const));
-          const patchCover = (c: MarketplaceBusinessCard) => ({ ...c, cover_url: byBiz.get(c.id) ?? null });
+          const patchCover = (c: MarketplaceBusinessCard) => ({
+            ...c,
+            cover_url: byBiz.get(c.id) ?? null,
+          });
           grouped.hoteles = grouped.hoteles.map(patchCover);
           grouped.restaurantes = grouped.restaurantes.map(patchCover);
           grouped.experiencias = grouped.experiencias.map(patchCover);
           grouped.otras = grouped.otras.map(patchCover);
-          for (const [bid, url] of byBiz) bizById.set(bid, { ...(bizById.get(bid) as MarketplaceBusinessCard), cover_url: url });
+          for (const [bid, url] of byBiz)
+            bizById.set(bid, { ...(bizById.get(bid) as MarketplaceBusinessCard), cover_url: url });
         } catch (e) {
           console.warn("[getDestinationRelated] biz cover sign failed", e);
         }
@@ -499,34 +545,47 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
 
     if (bizIds.length > 0 && !pErr && prods) {
       {
-        grouped.productos = prods.filter((p) => !hidden.product.has(p.id as string)).map((p) => {
-          const parent = bizById.get(p.business_id as string);
-          return {
-            id: p.id,
-            slug: p.slug,
-            name: p.name,
-            tagline: p.tagline ?? "",
-            product_type: String(p.product_type),
-            price_amount: p.price_amount,
-            price_currency: p.price_currency,
-            business_slug: parent?.slug ?? "",
-            business_name: parent?.display_name ?? "",
-            conversion_mode: String((p as Record<string, unknown>).conversion_mode ?? "informacion"),
-            primary_action_label: ((p as Record<string, unknown>).primary_action_label as string | null) ?? null,
-            secondary_action_mode: ((p as Record<string, unknown>).secondary_action_mode as string | null) ?? null,
-            secondary_action_label: ((p as Record<string, unknown>).secondary_action_label as string | null) ?? null,
-            accepts_online_payment: Boolean((p as Record<string, unknown>).accepts_online_payment),
-            requires_availability: Boolean((p as Record<string, unknown>).requires_availability),
-            visibility_level: String((p as Record<string, unknown>).visibility_level ?? "standard"),
-            cover_url: null,
-          };
-        });
+        grouped.productos = prods
+          .filter((p) => !hidden.product.has(p.id as string))
+          .map((p) => {
+            const parent = bizById.get(p.business_id as string);
+            return {
+              id: p.id,
+              slug: p.slug,
+              name: p.name,
+              tagline: p.tagline ?? "",
+              product_type: String(p.product_type),
+              price_amount: p.price_amount,
+              price_currency: p.price_currency,
+              business_slug: parent?.slug ?? "",
+              business_name: parent?.display_name ?? "",
+              conversion_mode: String(
+                (p as Record<string, unknown>).conversion_mode ?? "informacion",
+              ),
+              primary_action_label:
+                ((p as Record<string, unknown>).primary_action_label as string | null) ?? null,
+              secondary_action_mode:
+                ((p as Record<string, unknown>).secondary_action_mode as string | null) ?? null,
+              secondary_action_label:
+                ((p as Record<string, unknown>).secondary_action_label as string | null) ?? null,
+              accepts_online_payment: Boolean(
+                (p as Record<string, unknown>).accepts_online_payment,
+              ),
+              requires_availability: Boolean((p as Record<string, unknown>).requires_availability),
+              visibility_level: String(
+                (p as Record<string, unknown>).visibility_level ?? "standard",
+              ),
+              cover_url: null,
+            };
+          });
         // Covers de productos (product_media role=cover) + fallback a la portada del negocio.
         const prodIds = grouped.productos.map((p) => p.id);
         if (prodIds.length > 0) {
           const { data: pmedia } = await sb
             .from("product_media")
-            .select("product_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path )")
+            .select(
+              "product_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path )",
+            )
             .in("product_id", prodIds)
             .eq("role", "cover")
             .order("sort_order", { ascending: true });
@@ -543,7 +602,11 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
               });
               const signed = await Promise.all(
                 first.map(async (r) => {
-                  const a = (r as unknown as { media_assets?: { storage_bucket: string; storage_path: string } | null }).media_assets;
+                  const a = (
+                    r as unknown as {
+                      media_assets?: { storage_bucket: string; storage_path: string } | null;
+                    }
+                  ).media_assets;
                   if (!a) return { id: r.product_id as string, url: null as string | null };
                   const { data: s } = await supabaseAdmin.storage
                     .from(a.storage_bucket)
@@ -560,14 +623,17 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
             const own = byProd.get(p.id) ?? null;
             if (own) return { ...p, cover_url: own };
             // Fallback: usar la portada del negocio dueño.
-            const parent = grouped.hoteles.concat(grouped.restaurantes, grouped.experiencias, grouped.otras)
+            const parent = grouped.hoteles
+              .concat(grouped.restaurantes, grouped.experiencias, grouped.otras)
               .find((b) => b.slug === p.business_slug);
             return { ...p, cover_url: parent?.cover_url ?? null };
           });
         }
         if (pinnedIds.product.length > 0) {
           const byId = new Map(grouped.productos.map((c) => [c.id, c] as const));
-          const pinnedCards = pinnedIds.product.map((id) => byId.get(id)).filter(Boolean) as typeof grouped.productos;
+          const pinnedCards = pinnedIds.product
+            .map((id) => byId.get(id))
+            .filter(Boolean) as typeof grouped.productos;
           const pinnedSet = new Set(pinnedCards.map((c) => c.id));
           grouped.productos = [
             ...pinnedCards,
@@ -578,26 +644,27 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
     }
 
     if (!eErr && evs) {
-      grouped.eventos = evs.filter((e) => !hidden.event.has(e.id as string)).map((e) => ({
-        id: e.id as string,
-        slug: e.slug as string,
-        title: e.title as string,
-        summary: (e.summary as string | null) ?? null,
-        starts_at: e.starts_at as string,
-        ends_at: (e.ends_at as string | null) ?? null,
-        venue_name: (e.venue_name as string | null) ?? null,
-        is_free: Boolean(e.is_free),
-        destination_slug: dest.slug,
-        cover_url: null,
-      }));
+      grouped.eventos = evs
+        .filter((e) => !hidden.event.has(e.id as string))
+        .map((e) => ({
+          id: e.id as string,
+          slug: e.slug as string,
+          title: e.title as string,
+          summary: (e.summary as string | null) ?? null,
+          starts_at: e.starts_at as string,
+          ends_at: (e.ends_at as string | null) ?? null,
+          venue_name: (e.venue_name as string | null) ?? null,
+          is_free: Boolean(e.is_free),
+          destination_slug: dest.slug,
+          cover_url: null,
+        }));
       if (pinnedIds.event.length > 0) {
         const byId = new Map(grouped.eventos.map((c) => [c.id, c] as const));
-        const pinnedCards = pinnedIds.event.map((id) => byId.get(id)).filter(Boolean) as typeof grouped.eventos;
+        const pinnedCards = pinnedIds.event
+          .map((id) => byId.get(id))
+          .filter(Boolean) as typeof grouped.eventos;
         const pinnedSet = new Set(pinnedCards.map((c) => c.id));
-        grouped.eventos = [
-          ...pinnedCards,
-          ...grouped.eventos.filter((c) => !pinnedSet.has(c.id)),
-        ];
+        grouped.eventos = [...pinnedCards, ...grouped.eventos.filter((c) => !pinnedSet.has(c.id))];
       }
     }
     return grouped;

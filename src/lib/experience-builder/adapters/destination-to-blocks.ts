@@ -90,7 +90,9 @@ export function toDestinationBlockInput(
     name: dbData?.name ?? mock?.name ?? ctx.slug,
     tagline: dbData?.tagline ?? mock?.tagline ?? null,
     description: dbData?.description ?? null,
-    highlights: (dbData?.highlights?.length ? dbData.highlights : mock?.highlights ?? []) as string[],
+    highlights: (dbData?.highlights?.length
+      ? dbData.highlights
+      : (mock?.highlights ?? [])) as string[],
     heroUrl: dbData?.hero_url ?? null,
     galleryUrls: ctx.galleryUrls ?? [],
     mediaAttribution: [
@@ -103,7 +105,12 @@ export function toDestinationBlockInput(
     regionSlug: ctx.regionSlug,
     regionName: ctx.regionName,
     relatedCounts: ctx.counts ?? {
-      hoteles: 0, restaurantes: 0, experiencias: 0, otras: 0, productos: 0, eventos: 0,
+      hoteles: 0,
+      restaurantes: 0,
+      experiencias: 0,
+      otras: 0,
+      productos: 0,
+      eventos: 0,
     },
   };
 }
@@ -198,9 +205,7 @@ export function destinationToHeroDTO(d: DestinationBlockInput): ExperienceHeroDT
  * institucionales) + Institutional Badges Rule (jamás hardcodeados en
  * plantillas; el registry autoriza).
  * ------------------------------------------------------------------ */
-export function destinationToBadgeItems(
-  d: DestinationBlockInput,
-): InstitutionalBadgeItem[] {
+export function destinationToBadgeItems(d: DestinationBlockInput): InstitutionalBadgeItem[] {
   const items: InstitutionalBadgeItem[] = [];
   const slug = d.slug.toLowerCase();
   if ((PUEBLOS_MAGICOS_AUTORIZADOS as readonly string[]).includes(slug)) {
@@ -240,8 +245,7 @@ export function destinationToSubnavDTO(d: DestinationBlockInput): ExperienceSubn
     anchors.push({ id: "ubicacion", label: "Ubicación" });
   }
   const c = d.relatedCounts;
-  const total =
-    c.hoteles + c.restaurantes + c.experiencias + c.otras + c.eventos + c.productos;
+  const total = c.hoteles + c.restaurantes + c.experiencias + c.otras + c.eventos + c.productos;
   if (total > 0) {
     // H-03 · I3.b — sección unificada de descubrimiento contextual
     // orquestada por `vmx.experience.related-collection`.
@@ -352,9 +356,7 @@ const VALLADOLID_STOCK_FALLBACK: string[] = [
   "https://images.unsplash.com/photo-1512813498716-3e640fed3f39?auto=format&fit=crop&w=1200&q=75",
 ];
 
-export function destinationToGalleryDTO(
-  d: DestinationBlockInput,
-): ExperienceGalleryDTO | null {
+export function destinationToGalleryDTO(d: DestinationBlockInput): ExperienceGalleryDTO | null {
   const urls: string[] = [];
   if (d.heroUrl) urls.push(d.heroUrl);
   urls.push(...d.galleryUrls);
@@ -420,9 +422,7 @@ const DESTINATION_CENTROIDS: Record<string, { lat: number; lng: number }> = {
   espita: { lat: 21.0114, lng: -88.3086 },
 };
 
-export function destinationToMapDTO(
-  d: DestinationBlockInput,
-): ExperienceMapDTO | null {
+export function destinationToMapDTO(d: DestinationBlockInput): ExperienceMapDTO | null {
   const fallback = DESTINATION_CENTROIDS[d.slug.toLowerCase()] ?? null;
   const lat = d.latitude ?? fallback?.lat ?? null;
   const lng = d.longitude ?? fallback?.lng ?? null;

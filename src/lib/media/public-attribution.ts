@@ -13,8 +13,7 @@
  *    crédito conceptual oficial; jamás se atribuye a fotografía real.
  */
 
-export const AI_CONCEPTUAL_CREDIT =
-  "Imagen conceptual generada con IA para Valladolid.mx";
+export const AI_CONCEPTUAL_CREDIT = "Imagen conceptual generada con IA para Valladolid.mx";
 
 export interface PublicMediaAttribution {
   /** Identidad estable del activo (auditoría y deduplicación). */
@@ -65,12 +64,7 @@ export function resolveAttributedAlt(
   attribution: PublicMediaAttribution | null | undefined,
   options: { slotOverride?: string | null; fallback?: string | null } = {},
 ): string {
-  return (
-    clean(options.slotOverride) ??
-    clean(attribution?.alt) ??
-    clean(options.fallback) ??
-    ""
-  );
+  return clean(options.slotOverride) ?? clean(attribution?.alt) ?? clean(options.fallback) ?? "";
 }
 
 /**
