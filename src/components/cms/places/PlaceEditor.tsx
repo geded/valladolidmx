@@ -104,6 +104,25 @@ export function PlaceEditor({ placeId }: Props) {
     enabled: isEdit,
   });
 
+  type NamedRow = { id: string; name: string };
+  const opts = (options.data ?? {}) as {
+    destinations?: NamedRow[];
+    zones?: Array<NamedRow & { destination_id: string }>;
+    placeTypes?: NamedRow[];
+    categories?: NamedRow[];
+    authorityKinds?: NamedRow[];
+  };
+  const det = (detail.data ?? {}) as {
+    place?: Record<string, unknown>;
+    categoryIds?: string[];
+    hours?: unknown[];
+    media?: unknown[];
+    assets?: unknown[];
+    products?: unknown[];
+    events?: unknown[];
+    authorities?: unknown[];
+  };
+
   /* ── Alta ─────────────────────────────────────────────────────────── */
   const [newPlace, setNewPlace] = useState({
     name: "",
