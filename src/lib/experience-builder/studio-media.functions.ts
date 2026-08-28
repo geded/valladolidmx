@@ -61,7 +61,6 @@ interface ListInput {
   filter?: "approved" | "pending" | "conceptual" | "all";
 }
 
-
 export const listStudioMediaLibrary = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: ListInput | undefined) => d ?? {})
@@ -150,7 +149,6 @@ export const listStudioMediaLibrary = createServerFn({ method: "POST" })
     };
   });
 
-
 /* ────────────────────────  Firmar upload  ───────────────────────────── */
 
 interface SignInput {
@@ -172,9 +170,7 @@ export const signStudioMediaUpload = createServerFn({ method: "POST" })
       .slice(2, 8)}-${clean}`;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const storage = context.supabase.storage as any;
-    const { data: signed, error } = await storage
-      .from(BUCKET)
-      .createSignedUploadUrl(path);
+    const { data: signed, error } = await storage.from(BUCKET).createSignedUploadUrl(path);
     if (error) throw error;
     return {
       path: signed.path as string,
@@ -302,13 +298,15 @@ export const approveStudioMedia = createServerFn({ method: "POST" })
       rights?: Record<string, unknown>;
     };
     const rights = meta.rights ?? {};
-    if (!asset.alt_text || String(asset.alt_text).trim().length < 3) throw new Error("alt_required");
+    if (!asset.alt_text || String(asset.alt_text).trim().length < 3)
+      throw new Error("alt_required");
     if (!rights.rights_confirmed) throw new Error("rights_confirmation_required");
     if (!rights.nature) throw new Error("nature_required");
     if (rights.documentary === true && rights.ai_generated === true) {
       throw new Error("ai_cannot_be_documentary");
     }
-    if (rights.documentary === true && !rights.source) throw new Error("documentary_requires_source");
+    if (rights.documentary === true && !rights.source)
+      throw new Error("documentary_requires_source");
     if (!asset.original_checksum) throw new Error("checksum_missing");
 
     const reviewedAt = new Date().toISOString();
@@ -340,7 +338,6 @@ export const approveStudioMedia = createServerFn({ method: "POST" })
       url: publicProxyUrl(asset.storage_path as string),
     };
   });
-
 
 /* ─────────────  Importar URL externa a la Biblioteca  ───────────────── */
 
@@ -387,15 +384,22 @@ export const importUrlToStudioMedia = createServerFn({ method: "POST" })
         const u = new URL(data.url);
         const last = u.pathname.split("/").filter(Boolean).pop();
         if (last) baseName = last;
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
     if (buf.byteLength > 12 * 1024 * 1024) throw new Error("file_too_large");
 
-    const ext = mime === "image/png" ? "png"
-      : mime === "image/webp" ? "webp"
-      : mime === "image/gif" ? "gif"
-      : mime === "image/svg+xml" ? "svg"
-      : "jpg";
+    const ext =
+      mime === "image/png"
+        ? "png"
+        : mime === "image/webp"
+          ? "webp"
+          : mime === "image/gif"
+            ? "gif"
+            : mime === "image/svg+xml"
+              ? "svg"
+              : "jpg";
     const clean = sanitizeFilename(baseName.replace(/\.[a-z0-9]+$/i, "")) + "." + ext;
     const path = `${new Date().getFullYear()}/imported-${Date.now()}-${Math.random()
       .toString(36)

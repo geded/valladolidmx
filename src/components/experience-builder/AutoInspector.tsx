@@ -7,20 +7,27 @@
 
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, CloudUpload, ImageIcon, Languages, Loader2, Monitor, Plus, Smartphone, Tablet, Trash2, Type, Upload } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  CloudUpload,
+  ImageIcon,
+  Languages,
+  Loader2,
+  Monitor,
+  Plus,
+  Smartphone,
+  Tablet,
+  Trash2,
+  Type,
+  Upload,
+} from "lucide-react";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { MediaPickerDialog } from "./MediaPickerDialog";
 import { ReferencePicker } from "./ReferencePicker";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  decodeSlotMedia,
-  encodeSlotMedia,
-  focalObjectPosition,
-} from "@/lib/media/slot-media";
-import type {
-  BlockContract,
-  BlockFieldSchema,
-} from "@/lib/experience-builder/block-contract";
+import { decodeSlotMedia, encodeSlotMedia, focalObjectPosition } from "@/lib/media/slot-media";
+import type { BlockContract, BlockFieldSchema } from "@/lib/experience-builder/block-contract";
 import { VariablePicker } from "./VariablePicker";
 import {
   TYPO_FAMILIES,
@@ -61,7 +68,13 @@ export interface AutoInspectorProps {
   activeBreakpoint?: TypographyBreakpoint;
 }
 
-export function AutoInspector({ contract, config, onChange, simple = false, activeBreakpoint }: AutoInspectorProps) {
+export function AutoInspector({
+  contract,
+  config,
+  onChange,
+  simple = false,
+  activeBreakpoint,
+}: AutoInspectorProps) {
   const set = (key: string, value: unknown) => onChange({ ...config, [key]: value });
   const formRef = useRef<HTMLDivElement | null>(null);
   // US-10: al hacer doble-clic sobre un bloque en el canvas, enfocamos el
@@ -79,7 +92,11 @@ export function AutoInspector({ contract, config, onChange, simple = false, acti
         );
         if (target) {
           target.focus();
-          try { target.select(); } catch { /* noop */ }
+          try {
+            target.select();
+          } catch {
+            /* noop */
+          }
           target.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       }, 60);
@@ -104,7 +121,9 @@ export function AutoInspector({ contract, config, onChange, simple = false, acti
       <header className="space-y-1">
         <h3 className="text-sm font-semibold">{contract.display_name}</h3>
         {simple ? null : (
-          <p className="text-[11px] text-muted-foreground">{contract.type} · v{contract.version}</p>
+          <p className="text-[11px] text-muted-foreground">
+            {contract.type} · v{contract.version}
+          </p>
         )}
         {contract.description ? (
           <p className="text-xs text-muted-foreground">{contract.description}</p>
@@ -114,10 +133,10 @@ export function AutoInspector({ contract, config, onChange, simple = false, acti
       <DeviceVisibilityRow
         value={
           Array.isArray(config.__hidden_on)
-            ? ((config.__hidden_on as unknown[]).filter(
+            ? (config.__hidden_on as unknown[]).filter(
                 (v): v is "mobile" | "tablet" | "desktop" =>
                   v === "mobile" || v === "tablet" || v === "desktop",
-              ))
+              )
             : []
         }
         onChange={(next) => onChange({ ...config, __hidden_on: next })}
@@ -136,7 +155,7 @@ export function AutoInspector({ contract, config, onChange, simple = false, acti
             typography={typoMap[key]}
             typographyDefault={typoDefaults[key]}
             onTypographyChange={(next) => setTypography(key, next)}
-          activeBreakpoint={activeBreakpoint}
+            activeBreakpoint={activeBreakpoint}
           />
         ))}
         {Object.keys(contract.schema).length === 0 ? (
@@ -212,7 +231,9 @@ function CapabilityChips({ contract }: { contract: BlockContract }) {
   return (
     <div className="flex flex-wrap gap-1 pt-1">
       {items.map((i) => (
-        <Badge key={i} variant="secondary" className="text-[9px]">{i}</Badge>
+        <Badge key={i} variant="secondary" className="text-[9px]">
+          {i}
+        </Badge>
       ))}
       {bp.length > 0 ? (
         <Badge variant="outline" className="text-[9px]">
@@ -224,7 +245,17 @@ function CapabilityChips({ contract }: { contract: BlockContract }) {
 }
 
 function FieldRow({
-  name, def, value, onChange, simple, translations, onTranslationChange, typography, typographyDefault, onTypographyChange, activeBreakpoint,
+  name,
+  def,
+  value,
+  onChange,
+  simple,
+  translations,
+  onTranslationChange,
+  typography,
+  typographyDefault,
+  onTypographyChange,
+  activeBreakpoint,
 }: {
   name: string;
   def: BlockFieldSchema;
@@ -238,7 +269,8 @@ function FieldRow({
   onTypographyChange?: (next: FieldTypography) => void;
   activeBreakpoint?: TypographyBreakpoint;
 }) {
-  const canTranslate = Boolean(def.translatable) && !simple && (def.type === "text" || def.type === "rich_text");
+  const canTranslate =
+    Boolean(def.translatable) && !simple && (def.type === "text" || def.type === "rich_text");
   const canStyleText = !simple && (def.type === "text" || def.type === "rich_text");
   const [showI18n, setShowI18n] = useState(false);
   const [showTypo, setShowTypo] = useState(false);
@@ -304,8 +336,16 @@ function fieldValueWithDefault(def: BlockFieldSchema, value: unknown): unknown {
 }
 
 function TypographyEditor({
-  value, defaults, onChange, activeBreakpoint,
-}: { value: FieldTypography; defaults?: FieldTypography; onChange: (next: FieldTypography) => void; activeBreakpoint?: TypographyBreakpoint }) {
+  value,
+  defaults,
+  onChange,
+  activeBreakpoint,
+}: {
+  value: FieldTypography;
+  defaults?: FieldTypography;
+  onChange: (next: FieldTypography) => void;
+  activeBreakpoint?: TypographyBreakpoint;
+}) {
   const [bp, setBp] = useState<TypographyBreakpoint>(activeBreakpoint ?? "base");
   // Sincroniza el tab tipográfico con el dispositivo activo del canvas:
   // si el usuario está viendo Desktop, edita Desktop; Tablet edita Tablet;
@@ -407,18 +447,32 @@ function TypographyEditor({
             </button>
           </div>
           <ul className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px] text-muted-foreground">
-            <li><span className="text-foreground">Fuente:</span> {familyLabel(d.font_family)}</li>
-            <li><span className="text-foreground">Tamaño:</span> {d.font_size ? `${d.font_size} px` : "—"}</li>
-            <li><span className="text-foreground">Peso:</span> {d.font_weight ?? "—"}</li>
-            <li><span className="text-foreground">Interlínea:</span> {d.line_height ?? "—"}</li>
+            <li>
+              <span className="text-foreground">Fuente:</span> {familyLabel(d.font_family)}
+            </li>
+            <li>
+              <span className="text-foreground">Tamaño:</span>{" "}
+              {d.font_size ? `${d.font_size} px` : "—"}
+            </li>
+            <li>
+              <span className="text-foreground">Peso:</span> {d.font_weight ?? "—"}
+            </li>
+            <li>
+              <span className="text-foreground">Interlínea:</span> {d.line_height ?? "—"}
+            </li>
             <li className="flex items-center gap-1">
               <span className="text-foreground">Color:</span>
               {d.color ? (
                 <>
-                  <span className="inline-block size-3 rounded border border-border" style={{ background: d.color }} />
+                  <span
+                    className="inline-block size-3 rounded border border-border"
+                    style={{ background: d.color }}
+                  />
                   <span>{d.color}</span>
                 </>
-              ) : "—"}
+              ) : (
+                "—"
+              )}
             </li>
           </ul>
         </div>
@@ -434,7 +488,9 @@ function TypographyEditor({
             onChange={(e) => set("font_family", e.target.value)}
           >
             {TYPO_FAMILIES.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
             ))}
           </select>
         </label>
@@ -449,7 +505,9 @@ function TypographyEditor({
             className={inp}
             value={active.font_size ?? ""}
             placeholder={eff("font_size") ? String(eff("font_size")) : ""}
-            onChange={(e) => set("font_size", e.target.value === "" ? undefined : Number(e.target.value))}
+            onChange={(e) =>
+              set("font_size", e.target.value === "" ? undefined : Number(e.target.value))
+            }
           />
         </label>
         <label className="space-y-1">
@@ -459,7 +517,9 @@ function TypographyEditor({
           <select
             className={inp}
             value={active.font_weight ?? ""}
-            onChange={(e) => set("font_weight", e.target.value === "" ? undefined : Number(e.target.value))}
+            onChange={(e) =>
+              set("font_weight", e.target.value === "" ? undefined : Number(e.target.value))
+            }
           >
             <option value="">Por defecto</option>
             <option value="300">300 · Light</option>
@@ -483,7 +543,9 @@ function TypographyEditor({
             className={inp}
             value={active.line_height ?? ""}
             placeholder={eff("line_height") ? String(eff("line_height")) : ""}
-            onChange={(e) => set("line_height", e.target.value === "" ? undefined : Number(e.target.value))}
+            onChange={(e) =>
+              set("line_height", e.target.value === "" ? undefined : Number(e.target.value))
+            }
           />
         </label>
         <label className="space-y-1">
@@ -495,7 +557,9 @@ function TypographyEditor({
             step="0.1"
             className={inp}
             value={active.letter_spacing ?? ""}
-            onChange={(e) => set("letter_spacing", e.target.value === "" ? undefined : Number(e.target.value))}
+            onChange={(e) =>
+              set("letter_spacing", e.target.value === "" ? undefined : Number(e.target.value))
+            }
           />
         </label>
         <label className="space-y-1">
@@ -511,7 +575,8 @@ function TypographyEditor({
         </label>
       </div>
       <p className="text-[10px] text-muted-foreground">
-        La alineación se controla desde <strong>«Posición del texto»</strong> del bloque, no por campo.
+        La alineación se controla desde <strong>«Posición del texto»</strong> del bloque, no por
+        campo.
       </p>
       <div className="flex items-center gap-4 pt-1">
         <label className="flex items-center gap-1 text-[11px]">
@@ -536,7 +601,10 @@ function TypographyEditor({
 }
 
 function TranslationsEditor({
-  baseValue, translations, rich, onChange,
+  baseValue,
+  translations,
+  rich,
+  onChange,
 }: {
   baseValue: string;
   translations: Record<string, string>;
@@ -550,7 +618,8 @@ function TranslationsEditor({
     <div className="mt-1 space-y-1 rounded-md border border-primary/30 bg-primary/5 p-2">
       <div className="flex flex-wrap items-center gap-1">
         {I18N_LANGS.map((l) => {
-          const filled = l.code === "es" ? baseValue.length > 0 : (translations[l.code] ?? "").length > 0;
+          const filled =
+            l.code === "es" ? baseValue.length > 0 : (translations[l.code] ?? "").length > 0;
           return (
             <button
               key={l.code}
@@ -592,16 +661,30 @@ function TranslationsEditor({
 }
 
 function FieldControl({
-  def, value, onChange, simple,
-}: { def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void; simple?: boolean }) {
-  const base = "w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-primary/30";
+  def,
+  value,
+  onChange,
+  simple,
+}: {
+  def: BlockFieldSchema;
+  value: unknown;
+  onChange: (v: unknown) => void;
+  simple?: boolean;
+}) {
+  const base =
+    "w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-primary/30";
   switch (def.type) {
     case "text":
     case "url": {
       const v = (value as string) ?? "";
       return (
         <div className="flex items-center gap-1">
-          <input className={base} type={def.type === "url" ? "url" : "text"} value={v} onChange={(e) => onChange(e.target.value)} />
+          <input
+            className={base}
+            type={def.type === "url" ? "url" : "text"}
+            value={v}
+            onChange={(e) => onChange(e.target.value)}
+          />
           {simple ? null : <VariablePicker onPick={(token) => onChange(`${v}${token}`)} />}
         </div>
       );
@@ -610,29 +693,46 @@ function FieldControl({
       const v = (value as string) ?? "";
       return (
         <div className="space-y-1">
-          <textarea className={`${base} min-h-[80px]`} value={v} onChange={(e) => onChange(e.target.value)} />
+          <textarea
+            className={`${base} min-h-[80px]`}
+            value={v}
+            onChange={(e) => onChange(e.target.value)}
+          />
           {simple ? null : <VariablePicker onPick={(token) => onChange(`${v}${token}`)} />}
         </div>
       );
     }
     case "number":
       return (
-        <input className={base} type="number" value={(value as number | undefined) ?? ""}
-          onChange={(e) => onChange(e.target.value === "" ? undefined : Number(e.target.value))} />
+        <input
+          className={base}
+          type="number"
+          value={(value as number | undefined) ?? ""}
+          onChange={(e) => onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+        />
       );
     case "boolean":
       return <Switch checked={Boolean(value)} onCheckedChange={(c) => onChange(c)} />;
     case "color":
       return (
-        <input type="color" className="h-7 w-12 cursor-pointer rounded border border-border bg-background"
-          value={(value as string) ?? "#000000"} onChange={(e) => onChange(e.target.value)} />
+        <input
+          type="color"
+          className="h-7 w-12 cursor-pointer rounded border border-border bg-background"
+          value={(value as string) ?? "#000000"}
+          onChange={(e) => onChange(e.target.value)}
+        />
       );
     case "select":
       return (
-        <select className={base} value={(value as string) ?? ((def.default as string) ?? "")}
-          onChange={(e) => onChange(e.target.value)}>
+        <select
+          className={base}
+          value={(value as string) ?? (def.default as string) ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+        >
           {(def.options ?? []).map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
           ))}
         </select>
       );
@@ -649,7 +749,9 @@ function FieldControl({
       );
     case "list":
       if (def.item?.type === "object" && def.item.fields) {
-        return <StructuredListControl def={def} value={value} onChange={onChange} simple={simple} />;
+        return (
+          <StructuredListControl def={def} value={value} onChange={onChange} simple={simple} />
+        );
       }
       return <PrimitiveListControl def={def} value={value} onChange={onChange} baseClass={base} />;
     case "object":
@@ -675,8 +777,15 @@ function FieldControl({
  * viajan con la referencia del slot y nunca se descartan en silencio.
  */
 function MediaControl({
-  def, value, onChange,
-}: { baseClass: string; def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void }) {
+  def,
+  value,
+  onChange,
+}: {
+  baseClass: string;
+  def: BlockFieldSchema;
+  value: unknown;
+  onChange: (v: unknown) => void;
+}) {
   const raw = (value as string) ?? "";
   const [pickerOpen, setPickerOpen] = useState(false);
   const [showAltOverride, setShowAltOverride] = useState(false);
@@ -692,7 +801,15 @@ function MediaControl({
           : "Naturaleza no declarada";
 
   const applyFocal = (x: number, y: number) =>
-    onChange(encodeSlotMedia({ ...media, src: media.src, focalX: x, focalY: y, reviewState: media.reviewState }));
+    onChange(
+      encodeSlotMedia({
+        ...media,
+        src: media.src,
+        focalX: x,
+        focalY: y,
+        reviewState: media.reviewState,
+      }),
+    );
 
   return (
     <div className="space-y-2">
@@ -707,12 +824,19 @@ function MediaControl({
             />
           </div>
           <dl className="space-y-0.5 text-[10px] text-muted-foreground">
-            <div><span className="font-medium text-foreground">ALT:</span> {media.alt ?? "(sin ALT)"}</div>
-            <div><span className="font-medium text-foreground">Crédito:</span> {media.credit ?? "(sin crédito)"}</div>
-            <div><span className="font-medium text-foreground">Naturaleza:</span> {natureLabel}</div>
+            <div>
+              <span className="font-medium text-foreground">ALT:</span> {media.alt ?? "(sin ALT)"}
+            </div>
+            <div>
+              <span className="font-medium text-foreground">Crédito:</span>{" "}
+              {media.credit ?? "(sin crédito)"}
+            </div>
+            <div>
+              <span className="font-medium text-foreground">Naturaleza:</span> {natureLabel}
+            </div>
             <div>
               <span className="font-medium text-foreground">Revisión:</span>{" "}
-              {media.reviewState === "approved" ? "Aprobada" : media.reviewState ?? "sin dato"}
+              {media.reviewState === "approved" ? "Aprobada" : (media.reviewState ?? "sin dato")}
             </div>
             <div>
               <span className="font-medium text-foreground">Punto focal:</span>{" "}
@@ -750,9 +874,7 @@ function MediaControl({
               className="h-9 w-full rounded-md border border-border bg-background px-2 text-xs"
               placeholder="ALT específico para este contexto"
               value={media.alt ?? ""}
-              onChange={(e) =>
-                onChange(encodeSlotMedia({ ...media, alt: e.target.value || null }))
-              }
+              onChange={(e) => onChange(encodeSlotMedia({ ...media, alt: e.target.value || null }))}
             />
           ) : null}
           <SlotFocalPicker media={media} onChange={applyFocal} />
@@ -830,16 +952,26 @@ function SlotFocalPicker({
   );
 }
 
-
 function StructuredListControl({
-  def, value, onChange, simple,
-}: { def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void; simple?: boolean }) {
+  def,
+  value,
+  onChange,
+  simple,
+}: {
+  def: BlockFieldSchema;
+  value: unknown;
+  onChange: (v: unknown) => void;
+  simple?: boolean;
+}) {
   const rows = Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
   const fields = def.item?.fields ?? {};
   const defaultRows = Array.isArray(def.default) ? (def.default as Record<string, unknown>[]) : [];
   const makeDefault = () =>
     Object.fromEntries(
-      Object.entries(fields).map(([key, field]) => [key, field.default ?? (field.type === "boolean" ? false : "")]),
+      Object.entries(fields).map(([key, field]) => [
+        key,
+        field.default ?? (field.type === "boolean" ? false : ""),
+      ]),
     );
   const setRow = (index: number, nextRow: Record<string, unknown>) => {
     const next = [...rows];
@@ -869,10 +1001,22 @@ function StructuredListControl({
       {rows.map((row, index) => (
         <div key={index} className="rounded-lg border border-border bg-background p-2">
           <div className="mb-2 flex items-center justify-between gap-2">
-            <p className="text-[11px] font-semibold">{def.item?.label ?? "Elemento"} {index + 1}</p>
+            <p className="text-[11px] font-semibold">
+              {def.item?.label ?? "Elemento"} {index + 1}
+            </p>
             <div className="flex items-center gap-1">
-              <MiniIconButton label="Subir" disabled={index === 0} onClick={() => move(index, -1)} icon={<ChevronUp className="size-3" />} />
-              <MiniIconButton label="Bajar" disabled={index === rows.length - 1} onClick={() => move(index, 1)} icon={<ChevronDown className="size-3" />} />
+              <MiniIconButton
+                label="Subir"
+                disabled={index === 0}
+                onClick={() => move(index, -1)}
+                icon={<ChevronUp className="size-3" />}
+              />
+              <MiniIconButton
+                label="Bajar"
+                disabled={index === rows.length - 1}
+                onClick={() => move(index, 1)}
+                icon={<ChevronDown className="size-3" />}
+              />
               <MiniIconButton
                 label="Eliminar"
                 onClick={() => onChange(rows.filter((_, i) => i !== index))}
@@ -900,16 +1044,28 @@ function StructuredListControl({
         onClick={() => onChange([...rows, makeDefault()])}
         className="inline-flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-border bg-background px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
       >
-        <Plus className="size-3.5" aria-hidden /> Agregar {def.item?.label?.toLowerCase() ?? "elemento"}
+        <Plus className="size-3.5" aria-hidden /> Agregar{" "}
+        {def.item?.label?.toLowerCase() ?? "elemento"}
       </button>
     </div>
   );
 }
 
 function ObjectControl({
-  def, value, onChange, simple,
-}: { def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void; simple?: boolean }) {
-  const obj = value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
+  def,
+  value,
+  onChange,
+  simple,
+}: {
+  def: BlockFieldSchema;
+  value: unknown;
+  onChange: (v: unknown) => void;
+  simple?: boolean;
+}) {
+  const obj =
+    value && typeof value === "object" && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : {};
   return (
     <div className="space-y-2 rounded-lg border border-border bg-background p-2">
       {Object.entries(def.fields ?? {}).map(([key, field]) => (
@@ -927,8 +1083,16 @@ function ObjectControl({
 }
 
 function PrimitiveListControl({
-  def, value, onChange, baseClass,
-}: { def: BlockFieldSchema; value: unknown; onChange: (v: unknown) => void; baseClass: string }) {
+  def,
+  value,
+  onChange,
+  baseClass,
+}: {
+  def: BlockFieldSchema;
+  value: unknown;
+  onChange: (v: unknown) => void;
+  baseClass: string;
+}) {
   const items = Array.isArray(value) ? (value as unknown[]) : [];
   const itemType = def.item?.type ?? "text";
   const isNumber = itemType === "number";
@@ -958,7 +1122,9 @@ function PrimitiveListControl({
         <ul className="space-y-1.5">
           {items.map((item, index) => (
             <li key={index} className="flex items-center gap-1">
-              <span className="w-5 text-center text-[10px] font-semibold text-muted-foreground">{index + 1}</span>
+              <span className="w-5 text-center text-[10px] font-semibold text-muted-foreground">
+                {index + 1}
+              </span>
               {isMedia ? (
                 <MediaControl
                   baseClass={baseClass}
@@ -971,7 +1137,9 @@ function PrimitiveListControl({
                   className={baseClass}
                   type="number"
                   value={item === undefined || item === null ? "" : Number(item as number)}
-                  onChange={(e) => setItem(index, e.target.value === "" ? undefined : Number(e.target.value))}
+                  onChange={(e) =>
+                    setItem(index, e.target.value === "" ? undefined : Number(e.target.value))
+                  }
                 />
               ) : (
                 <input
@@ -982,9 +1150,24 @@ function PrimitiveListControl({
                 />
               )}
               <div className="flex items-center gap-0.5">
-                <MiniIconButton label="Subir" disabled={index === 0} onClick={() => move(index, -1)} icon={<ChevronUp className="size-3" />} />
-                <MiniIconButton label="Bajar" disabled={index === items.length - 1} onClick={() => move(index, 1)} icon={<ChevronDown className="size-3" />} />
-                <MiniIconButton label="Eliminar" tone="danger" onClick={() => remove(index)} icon={<Trash2 className="size-3" />} />
+                <MiniIconButton
+                  label="Subir"
+                  disabled={index === 0}
+                  onClick={() => move(index, -1)}
+                  icon={<ChevronUp className="size-3" />}
+                />
+                <MiniIconButton
+                  label="Bajar"
+                  disabled={index === items.length - 1}
+                  onClick={() => move(index, 1)}
+                  icon={<ChevronDown className="size-3" />}
+                />
+                <MiniIconButton
+                  label="Eliminar"
+                  tone="danger"
+                  onClick={() => remove(index)}
+                  icon={<Trash2 className="size-3" />}
+                />
               </div>
             </li>
           ))}
@@ -995,15 +1178,26 @@ function PrimitiveListControl({
         onClick={addDefault}
         className="inline-flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-border bg-background px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
       >
-        <Plus className="size-3.5" aria-hidden /> Agregar {def.item?.label?.toLowerCase() ?? "elemento"}
+        <Plus className="size-3.5" aria-hidden /> Agregar{" "}
+        {def.item?.label?.toLowerCase() ?? "elemento"}
       </button>
     </div>
   );
 }
 
 function MiniIconButton({
-  label, icon, onClick, disabled, tone,
-}: { label: string; icon: ReactNode; onClick: () => void; disabled?: boolean; tone?: "danger" }) {
+  label,
+  icon,
+  onClick,
+  disabled,
+  tone,
+}: {
+  label: string;
+  icon: ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+  tone?: "danger";
+}) {
   return (
     <button
       type="button"

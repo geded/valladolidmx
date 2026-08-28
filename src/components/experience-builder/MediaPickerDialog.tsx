@@ -28,16 +28,9 @@ import {
   registerStudioMedia,
   signStudioMediaUpload,
 } from "@/lib/experience-builder/studio-media.functions";
-import {
-  validateMediaRights,
-  type MediaNature,
-} from "@/lib/experience-builder/media-rights";
+import { validateMediaRights, type MediaNature } from "@/lib/experience-builder/media-rights";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  prepareImageForRole,
-  validateImageFile,
-  type ImageRole,
-} from "@/lib/cms/image-upload";
+import { prepareImageForRole, validateImageFile, type ImageRole } from "@/lib/cms/image-upload";
 
 export interface PickedMedia {
   url: string;
@@ -151,7 +144,9 @@ export function MediaPickerDialog({
     setError(null);
     return list({ data: { search: search.trim() || undefined, filter, limit: 80 } })
       .then((res) => setRows(res.rows as Row[]))
-      .catch((err) => setError(err instanceof Error ? humanize(err.message) : "Error al cargar la biblioteca."))
+      .catch((err) =>
+        setError(err instanceof Error ? humanize(err.message) : "Error al cargar la biblioteca."),
+      )
       .finally(() => setLoading(false));
   }, [list, search, filter]);
 
@@ -260,8 +255,8 @@ export function MediaPickerDialog({
           <div className="min-w-0">
             <h2 className="text-sm font-semibold">Seleccionar o subir imagen</h2>
             <p className="text-[11px] text-muted-foreground">
-              Sólo las imágenes aprobadas pueden usarse en un slot. Las subidas nacen como
-              borrador y conservan sus derechos y crédito.
+              Sólo las imágenes aprobadas pueden usarse en un slot. Las subidas nacen como borrador
+              y conservan sus derechos y crédito.
             </p>
           </div>
           <button
@@ -288,7 +283,11 @@ export function MediaPickerDialog({
               className="h-9 w-full rounded-md border border-border bg-background pl-7 pr-2 text-xs"
             />
           </div>
-          <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Filtro de revisión">
+          <div
+            className="flex flex-wrap items-center gap-1"
+            role="group"
+            aria-label="Filtro de revisión"
+          >
             {FILTERS.map((f) => (
               <button
                 key={f.value}
@@ -404,9 +403,7 @@ function MediaCard({
         <div className="flex flex-wrap gap-1">
           <span
             className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase ${
-              approved
-                ? "bg-primary/10 text-primary"
-                : "bg-muted text-muted-foreground"
+              approved ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
             }`}
           >
             {approved ? "Aprobada" : "Pendiente"}
@@ -462,8 +459,7 @@ function UploadForm({
   onRights: (patch: Partial<typeof emptyRights>) => void;
   onSubmit: () => void;
 }) {
-  const inputCls =
-    "h-9 w-full rounded-md border border-border bg-background px-2 text-xs";
+  const inputCls = "h-9 w-full rounded-md border border-border bg-background px-2 text-xs";
   return (
     <div className="mx-auto max-w-2xl space-y-3">
       <label className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-border bg-muted/30 text-xs font-medium hover:bg-accent">
@@ -500,22 +496,47 @@ function UploadForm({
           />
         </Field>
         <Field label="Autor o creador">
-          <input className={inputCls} value={rights.author} onChange={(e) => onRights({ author: e.target.value })} />
+          <input
+            className={inputCls}
+            value={rights.author}
+            onChange={(e) => onRights({ author: e.target.value })}
+          />
         </Field>
         <Field label="Crédito">
-          <input className={inputCls} value={rights.credit} onChange={(e) => onRights({ credit: e.target.value })} />
+          <input
+            className={inputCls}
+            value={rights.credit}
+            onChange={(e) => onRights({ credit: e.target.value })}
+          />
         </Field>
         <Field label="Fuente">
-          <input className={inputCls} value={rights.source} onChange={(e) => onRights({ source: e.target.value })} />
+          <input
+            className={inputCls}
+            value={rights.source}
+            onChange={(e) => onRights({ source: e.target.value })}
+          />
         </Field>
         <Field label="Tipo de licencia">
-          <input className={inputCls} value={rights.license} onChange={(e) => onRights({ license: e.target.value })} />
+          <input
+            className={inputCls}
+            value={rights.license}
+            onChange={(e) => onRights({ license: e.target.value })}
+          />
         </Field>
         <Field label="Lugar representado">
-          <input className={inputCls} value={rights.place} onChange={(e) => onRights({ place: e.target.value })} />
+          <input
+            className={inputCls}
+            value={rights.place}
+            onChange={(e) => onRights({ place: e.target.value })}
+          />
         </Field>
         <Field label="Fecha (si se conoce)">
-          <input className={inputCls} value={rights.capturedOn} onChange={(e) => onRights({ capturedOn: e.target.value })} placeholder="2026-08-28" />
+          <input
+            className={inputCls}
+            value={rights.capturedOn}
+            onChange={(e) => onRights({ capturedOn: e.target.value })}
+            placeholder="2026-08-28"
+          />
         </Field>
         <Field label="Naturaleza *" className="sm:col-span-2">
           <select
@@ -557,7 +578,11 @@ function UploadForm({
         onClick={onSubmit}
         className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50"
       >
-        {uploading ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Upload className="size-4" aria-hidden />}
+        {uploading ? (
+          <Loader2 className="size-4 animate-spin" aria-hidden />
+        ) : (
+          <Upload className="size-4" aria-hidden />
+        )}
         {uploading ? "Subiendo…" : "Subir imagen"}
       </button>
     </div>
@@ -607,7 +632,11 @@ function FocalPicker({
           onChange(Math.round(x * 100) / 100, Math.round(y * 100) / 100);
         }}
       >
-        <img src={preview} alt="Vista previa de la imagen a subir" className="max-h-56 w-full object-contain" />
+        <img
+          src={preview}
+          alt="Vista previa de la imagen a subir"
+          className="max-h-56 w-full object-contain"
+        />
         <span
           aria-hidden
           className="pointer-events-none absolute size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary bg-primary/30"
