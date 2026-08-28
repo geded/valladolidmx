@@ -72,7 +72,13 @@ export function resolveAttributedAlt(
   attribution: PublicMediaAttribution | null | undefined,
   options: { slotOverride?: string | null; fallback?: string | null } = {},
 ): string {
-  return clean(options.slotOverride) ?? clean(attribution?.alt) ?? clean(options.fallback) ?? "";
+  const accredited = clean(attribution?.alt);
+  return (
+    clean(options.slotOverride) ??
+    (accredited && !isFilenameLike(accredited) ? accredited : null) ??
+    clean(options.fallback) ??
+    ""
+  );
 }
 
 /**
