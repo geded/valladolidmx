@@ -175,20 +175,21 @@ function G8P2VacationRentalPremiumPreview() {
         </dl>
       </PremiumSection>
 
-      <PremiumSection vm={{ id: "amenidades", eyebrow: "Amenidades", title: "Qué incluye la casa" }}>
+      <PremiumSection
+        vm={{ id: "amenidades", eyebrow: "Amenidades", title: "Qué incluye la casa" }}
+      >
         <ul className="flex flex-wrap gap-2">
           {SEMANTICS.amenities.map((item) => (
-            <li
-              key={item}
-              className="rounded-pill border border-border bg-card px-3 py-2 text-sm"
-            >
+            <li key={item} className="rounded-pill border border-border bg-card px-3 py-2 text-sm">
               {item}
             </li>
           ))}
         </ul>
       </PremiumSection>
 
-      <PremiumSection vm={{ id: "reglas", eyebrow: "Reglas", title: "Convivencia y disponibilidad" }}>
+      <PremiumSection
+        vm={{ id: "reglas", eyebrow: "Reglas", title: "Convivencia y disponibilidad" }}
+      >
         <ul className="space-y-2 rounded-2xl border border-border bg-card p-4 text-sm">
           {SEMANTICS.houseRules.map((rule) => (
             <li key={rule}>· {rule}</li>
@@ -197,7 +198,10 @@ function G8P2VacationRentalPremiumPreview() {
         </ul>
       </PremiumSection>
 
-      <PremiumSection vm={{ id: "ubicacion", eyebrow: "Ubicación", title: "Zona aproximada" }} compact>
+      <PremiumSection
+        vm={{ id: "ubicacion", eyebrow: "Ubicación", title: "Zona aproximada" }}
+        compact
+      >
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <MapPin className="size-4" aria-hidden />
           {SEMANTICS.approximateLocation
@@ -206,7 +210,10 @@ function G8P2VacationRentalPremiumPreview() {
         </p>
       </PremiumSection>
 
-      <PremiumSection vm={{ id: "solicitud", eyebrow: "Reserva", title: "Solicita esta casa" }} compact>
+      <PremiumSection
+        vm={{ id: "solicitud", eyebrow: "Reserva", title: "Solicita esta casa" }}
+        compact
+      >
         <p className="text-sm">
           {SEMANTICS.nightlyPrice
             ? `Desde $${SEMANTICS.nightlyPrice.toLocaleString("es-MX")} MXN por noche (demo)`

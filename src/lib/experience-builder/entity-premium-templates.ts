@@ -525,9 +525,7 @@ export function resolveEntityTemplate(
     return STANDARD("entidad sin elegibilidad premium");
   }
   if (!familyPreset.autoAssign) {
-    return STANDARD(
-      `preset ${familyPreset.id} pendiente de aceptación visual Founder`,
-    );
+    return STANDARD(`preset ${familyPreset.id} pendiente de aceptación visual Founder`);
   }
   return {
     source: "family",

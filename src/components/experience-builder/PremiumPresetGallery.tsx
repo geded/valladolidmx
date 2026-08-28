@@ -420,7 +420,10 @@ function PresetField({
  * ------------------------------------------------------------------ */
 function EntityPremiumTemplateSection({ pageKind }: { pageKind?: string }) {
   const entityPresets = useMemo(
-    () => (pageKind ? listEntityPremiumTemplatePresetsForKind(pageKind) : ENTITY_PREMIUM_TEMPLATE_PRESETS),
+    () =>
+      pageKind
+        ? listEntityPremiumTemplatePresetsForKind(pageKind)
+        : ENTITY_PREMIUM_TEMPLATE_PRESETS,
     [pageKind],
   );
   if (entityPresets.length === 0) return null;
