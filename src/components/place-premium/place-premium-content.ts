@@ -17,10 +17,14 @@
  */
 
 export interface PlacePremiumMedia {
-  url: string;
+  /** `null` = placeholder neutral: no existe fotografía acreditada del lugar. */
+  url: string | null;
   alt: string;
   credit: string;
+  /** Etiqueta corta del marcador neutral (sólo cuando `url` es `null`). */
+  placeholderLabel?: string;
 }
+
 
 export interface PlacePremiumFact {
   key: string;
