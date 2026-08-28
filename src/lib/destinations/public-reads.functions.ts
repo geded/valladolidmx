@@ -43,7 +43,7 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
     const { data: row, error } = await sb
       .from("destinations")
       .select(
-        "slug, name, tagline, description, highlights, hero_palette, latitude, longitude, hero_media_id, media_assets:hero_media_id ( storage_bucket, storage_path )",
+        "slug, name, tagline, description, highlights, hero_palette, latitude, longitude, hero_media_id, media_assets:hero_media_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata )",
       )
       .eq("slug", data.slug)
       .maybeSingle();
