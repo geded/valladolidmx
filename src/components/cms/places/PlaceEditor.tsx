@@ -107,7 +107,7 @@ export function PlaceEditor({ placeId }: Props) {
   type NamedRow = { id: string; name: string };
   const opts = (options.data ?? {}) as {
     destinations?: NamedRow[];
-    zones?: Array<NamedRow & { destination_id: string }>;
+    zones?: TerritorialZone[];
     placeTypes?: NamedRow[];
     categories?: NamedRow[];
     authorityKinds?: NamedRow[];
