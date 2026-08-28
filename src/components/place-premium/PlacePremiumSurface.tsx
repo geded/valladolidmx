@@ -346,6 +346,30 @@ function DemoImage({
   className?: string;
   captionHidden?: boolean;
 }) {
+  if (!media.url) {
+    return (
+      <figure
+        data-place-media="placeholder"
+        className={cn(
+          "relative flex flex-col items-center justify-center overflow-hidden border border-dashed border-border bg-gradient-to-br from-muted via-muted/70 to-accent/30 p-4 text-center",
+          className,
+        )}
+      >
+        <ImageOff className="size-6 text-muted-foreground" aria-hidden />
+        {media.placeholderLabel ? (
+          <p className="mt-2 text-xs font-medium text-muted-foreground">{media.placeholderLabel}</p>
+        ) : null}
+        <figcaption
+          className={cn(
+            "mt-1 text-[10px] leading-tight text-muted-foreground",
+            captionHidden && "sr-only",
+          )}
+        >
+          {media.credit}
+        </figcaption>
+      </figure>
+    );
+  }
   return (
     <figure className={cn("relative overflow-hidden bg-muted", className)}>
       <img src={media.url} alt={media.alt} className="size-full object-cover" loading="lazy" />
@@ -358,6 +382,7 @@ function DemoImage({
       )}
     </figure>
   );
+
 }
 
 function IdentityStrip({
