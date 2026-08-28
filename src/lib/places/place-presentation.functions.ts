@@ -21,7 +21,14 @@ export const setPlacePresentationMode = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
-    const ctx = context as unknown as { supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: { message: string } | null }> } };
+    const ctx = context as unknown as {
+      supabase: {
+        rpc: (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ error: { message: string } | null }>;
+      };
+    };
     const { error } = await ctx.supabase.rpc("admin_set_place_presentation_mode", {
       _place_id: data.placeId,
       _mode: data.mode,
