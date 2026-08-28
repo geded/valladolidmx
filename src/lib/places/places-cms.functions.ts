@@ -161,10 +161,13 @@ export const listPlaceFormOptions = createServerFn({ method: "POST" })
         .select("id, name, slug")
         .is("deleted_at", null)
         .order("name"),
+      // Addendum Q2B: sólo zonas vivas; el filtrado por destino ocurre con
+      // `zonesForDestination` en el formulario y se revalida en el servidor.
       ctx.supabase
         .from("destination_zones")
-        .select("id, name, destination_id")
+        .select("id, name, destination_id, status")
         .is("deleted_at", null)
+        .neq("status", "archived")
         .order("name"),
       ctx.supabase
         .from("place_types")
