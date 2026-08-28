@@ -1,0 +1,215 @@
+{
+  "id": "PCA-2026-042-ADDENDUM-A",
+  "parent_authorization": "PCA-2026-042",
+  "parent": "PCA-2026-042",
+  "title": "Addendum A · Ratificación Founder retrospectiva de G8-Q2A-R1 y regularización del instrumento de autorización",
+  "status": "Approved",
+  "effective_date": "2026-08-28",
+  "recorded_at": "2026-08-28",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+  "base_head": "698d717de9dc9e12b28338295a6be123ac703593",
+  "base_tree": "aeaf4c3026b785c5c807650e17a6138b536cbf65",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Founder Directive 2026-08-28 · RATIFICACIÓN FOUNDER Y REMEDIACIÓN DOCUMENTAL FINAL G8-Q2A / G8-Q2A-R1 sobre la base exacta 698d717de9dc9e12b28338295a6be123ac703593 (árbol aeaf4c3026b785c5c807650e17a6138b536cbf65). El Founder ratifica expresamente, de forma retrospectiva y transparente, las 22 rutas exactas del diff G8-Q2A-R1 reportadas en el control final read-only, reconociendo sin atenuación: (a) el exceso de 22 rutas frente al techo previo de 19; (b) la creación de PCA-2026-043 en sustitución no autorizada del instrumento previsto PCA-2026-042-ADDENDUM-A; (c) la creación necesaria de PCA-2026-029-ADDENDUM-O; (d) la creación de dos evidencias adicionales no previstas; (e) la aplicación de la migración 20260828145637_97e8e025-3cbf-4722-9b2b-cbfd672a2c57.sql nueve minutos y treinta y nueve segundos antes de crear PCA-2026-043; (f) la reducción posterior del manifiesto de PCA-2026-043 para satisfacer el gate de autorización de producto. La implementación técnica, la migración, el ACL, la RLS, los contratos, las evidencias y los gates quedan aceptados. Esta ratificación no reescribe la secuencia ni declara que la autorización fue previa: la registra como excepción corregida y establece expresamente que no constituye precedente para futuras ejecuciones. La presente remediación documental autoriza exactamente seis rutas y prohíbe cualquier séptima.",
+  "ratification": {
+    "kind": "retrospective",
+    "scope": "22 rutas exactas del diff ffb2fe9dd40bb7b73ce69e8b6b2c1c5c4ced32f8...698d717de9dc9e12b28338295a6be123ac703593",
+    "route_ceiling_previous": 19,
+    "route_count_ratified": 22,
+    "route_ceiling_exceeded_by": 3,
+    "constitutes_precedent": false,
+    "rewrites_sequence": false,
+    "recorded_as": "Excepción corregida · no precedente",
+    "acknowledged_deviations": [
+      "Exceso de 22 rutas frente al techo previo de 19 rutas autorizadas.",
+      "Creación de PCA-2026-043 en sustitución no autorizada del instrumento designado PCA-2026-042-ADDENDUM-A.",
+      "Creación necesaria de PCA-2026-029-ADDENDUM-O como derivación indispensable para el digest de src/integrations/supabase/types.ts.",
+      "Creación de dos evidencias adicionales no previstas: docs/evidence/omxds-q2a-r1/EVIDENCE-MANIFEST.md y docs/evidence/omxds-q2a-r1/rls-harness-output.json.",
+      "Inversión temporal: la migración se aplicó y comiteó antes de crear el instrumento de autorización.",
+      "Reducción posterior del manifiesto de PCA-2026-043 a cuatro permisos para satisfacer governance:product-check, quedando dieciocho rutas del diff sin cobertura de permiso explícito por estar fuera del ámbito protegido del validador."
+    ]
+  },
+  "temporal_inversion": {
+    "declared": true,
+    "migration_applied_commit": "46f7fd4f",
+    "migration_applied_at": "2026-08-28T15:04:39Z",
+    "authorization_created_commit": "a72da37f",
+    "authorization_created_at": "2026-08-28T15:14:18Z",
+    "delta": "9 min 39 s",
+    "statement": "La autorización operativa PCA-2026-043 fue redactada ex post, después de aplicar la migración y de escribir producto y schema. El orden debido es autorización previa, ejecución posterior. Esta inversión queda declarada de forma explícita y no se representa como autorización previa."
+  },
+  "operative_instrument": {
+    "id": "PCA-2026-043",
+    "path": "docs/governance/product-authorizations/PCA-2026-043.json",
+    "created": "ex post",
+    "disposition": "Incorporado y ratificado íntegramente por este addendum. No se borra, no se modifica y no se sustituye. Conserva su vigencia como autorización operativa de las cuatro rutas protegidas que declara.",
+    "manifest_reduced_after_creation": true,
+    "manifest_reduction_reason": "El validador canónico rechaza permisos fuera del ámbito protegido de producto (src/, supabase/migrations/, supabase/functions/, package.json y ficheros raíz equivalentes). Los permisos documentales fueron retirados para que governance:product-check pasara."
+  },
+  "derived_instruments": [
+    {
+      "id": "PCA-2026-029-ADDENDUM-O",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-O.json",
+      "necessity": "indispensable",
+      "reason": "Única vía schema-válida para superar el digest acreditado de src/integrations/supabase/types.ts tras la regeneración automática de tipos derivada de la migración aditiva. PCA-2026-029 es la única autorización Approved que contiene el permiso modify y la acknowledged revision de esa ruta. Replica el precedente PCA-2026-029-ADDENDUM-N usado en G8-Q2A.",
+      "disposition": "Reconocido y ratificado. No se modifica."
+    }
+  ],
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260828145637_97e8e025-3cbf-4722-9b2b-cbfd672a2c57.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-taxonomy.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-contracts.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    }
+  ],
+  "protected_routes": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260828145637_97e8e025-3cbf-4722-9b2b-cbfd672a2c57.sql",
+      "sha256": "5ee94ffe0dbc2b689fdb6c017c837eb5ee9c9474c3900ec4e43313e857cb613d",
+      "authority": "PCA-2026-043"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-taxonomy.ts",
+      "sha256": "6e1e73b9be0c3503f321a94a7341dbedd2dba339d61ddf1d0c9ef31eb6349013",
+      "authority": "PCA-2026-043"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/places/place-contracts.ts",
+      "sha256": "8e08384c051f7336fe8b99b403a3872702b4983fb69cfad22c6343aaba1feebb",
+      "authority": "PCA-2026-043"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts",
+      "sha256": "eb05e15249c0162dc03ac3303aad41f286175ba6ee3e4710ea9f19b3ccb28c1f",
+      "authority": "PCA-2026-029-ADDENDUM-O · autoridad de paquete PCA-2026-043"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json",
+      "sha256": "f1759484174e2f2670260c4161bc8acceac9e5556d70899ea2373570d42d0c0a",
+      "authority": "PCA-2026-043"
+    }
+  ],
+  "documentary_routes": [
+    "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+    "docs/evidence/omxds-q2a-r1/EVIDENCE-MANIFEST.md",
+    "docs/evidence/omxds-q2a-r1/acl-effective.md",
+    "docs/evidence/omxds-q2a-r1/gates.md",
+    "docs/evidence/omxds-q2a-r1/migration-history-reconciliation.md",
+    "docs/evidence/omxds-q2a-r1/rls-harness-output.json",
+    "docs/evidence/omxds-q2a-r1/rls-matrix-empirical.md",
+    "docs/evidence/omxds-q2a-r1/rollback-and-idempotency.md",
+    "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+    "docs/governance/addenda/PCA-2026-029-ADDENDUM-O.json",
+    "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
+    "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
+    "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
+    "docs/governance/product-authorizations/PCA-2026-043.json",
+    "scripts/omxds/q2a-r1/places-remediation.contract.test.ts",
+    "scripts/omxds/q2a-r1/places-remediation.evidence.mjs",
+    "scripts/omxds/q2a-r1/rls-harness.mjs"
+  ],
+  "authorized_routes": [
+    "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+    "docs/evidence/omxds-q2a-r1/EVIDENCE-MANIFEST.md",
+    "docs/evidence/omxds-q2a-r1/acl-effective.md",
+    "docs/evidence/omxds-q2a-r1/gates.md",
+    "docs/evidence/omxds-q2a-r1/migration-history-reconciliation.md",
+    "docs/evidence/omxds-q2a-r1/rls-harness-output.json",
+    "docs/evidence/omxds-q2a-r1/rls-matrix-empirical.md",
+    "docs/evidence/omxds-q2a-r1/rollback-and-idempotency.md",
+    "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+    "docs/governance/addenda/PCA-2026-029-ADDENDUM-O.json",
+    "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
+    "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
+    "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
+    "docs/governance/product-authorizations/PCA-2026-043.json",
+    "package.json",
+    "scripts/omxds/q2a-r1/places-remediation.contract.test.ts",
+    "scripts/omxds/q2a-r1/places-remediation.evidence.mjs",
+    "scripts/omxds/q2a-r1/rls-harness.mjs",
+    "src/integrations/supabase/types.ts",
+    "src/lib/places/place-contracts.ts",
+    "src/lib/places/place-taxonomy.ts",
+    "supabase/migrations/20260828145637_97e8e025-3cbf-4722-9b2b-cbfd672a2c57.sql"
+  ],
+  "route_classification": {
+    "total": 22,
+    "protected_product_paths": 5,
+    "documentary_or_evidence_paths": 17,
+    "criterion": "Ámbito protegido del validador canónico: src/, supabase/migrations/, supabase/functions/ y ficheros raíz de producto (package.json, bun.lock, vite.config.ts, tsconfig.json, components.json, public/manifest.webmanifest). El resto son artefactos documentales o de evidencia no sensibles y se registran por enumeración, conforme al precedente PCA-2026-038-ADDENDUM-A."
+  },
+  "remediation_scope": {
+    "authorized_route_count": 6,
+    "authorized_routes": [
+      "docs/governance/addenda/PCA-2026-042-ADDENDUM-A.json",
+      "docs/blueprint/19.39-G8-Q2A-R1-PLACES-MODEL-REMEDIATION-v1.0.md",
+      "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
+      "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
+      "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json"
+    ],
+    "stop_condition": "Cualquier séptima ruta detiene la ejecución.",
+    "projections_regenerated_by": "bun scripts/governance/sync-governance.mjs"
+  },
+  "future_execution_rule": {
+    "id": "RULE-DESIGNATED-INSTRUMENT-FIRST",
+    "binding": true,
+    "statement": "Cualquier ejecución futura deberá detenerse antes de escribir si el instrumento de autorización designado por la directiva Founder no existe en el repositorio. Está prohibido sustituirlo por un instrumento distinto, crearlo ex post o inferir simetría con autorizaciones previas. La verificación de existencia del instrumento designado es un gate previo a la primera escritura de producto, schema o documentación."
+  },
+  "prohibitions": [
+    "No modificar PCA-2026-043.",
+    "No modificar PCA-2026-029-ADDENDUM-O.",
+    "No modificar migraciones, schema, datos, contratos, pruebas ni evidencias existentes.",
+    "No modificar código de producto.",
+    "No crear rama, PR, merge ni despliegue.",
+    "No iniciar G8-Q2B ni CMS de Lugares.",
+    "No activar omxds_visual_v1_contracts_enabled."
+  ],
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "Los cinco POI existentes permanecen sin modificación y con place_type_id nulo",
+    "Cero filas en place_products, place_events, place_category_links, place_hours, place_media y place_authorities",
+    "Sólo catálogos estructurales sembrados: place_types 15, place_categories 9, place_authority_kinds 6",
+    "Cero contenido turístico real, sin CMS, rutas públicas, publicación, PR, merge ni despliegue",
+    "Cero cambios técnicos o de datos en esta remediación documental"
+  ],
+  "branch_state": {
+    "stable_branch_expected": "feature/omxds-g8-q2a-places-taxonomy-v1",
+    "exists_locally": false,
+    "exists_on_origin": false,
+    "acceptance": "La ausencia de la rama estable queda aceptada temporalmente como limitación de plataforma. La preservación remota se resolverá mediante una operación Git autorizada separadamente antes de iniciar publicación o integración.",
+    "working_branch_kind": "edit/*"
+  },
+  "gates": [
+    "validación del addendum",
+    "governance:sync",
+    "governance:check",
+    "governance:product-check",
+    "governance:product-test",
+    "sync-governance --check",
+    "diff limitado a seis rutas",
+    "flag omxds_visual_v1_contracts_enabled=false"
+  ]
+}
