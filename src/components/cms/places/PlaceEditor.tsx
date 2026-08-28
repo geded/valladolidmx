@@ -179,6 +179,7 @@ export function PlaceEditor({ placeId }: Props) {
           name: newPlace.name.trim(),
           slug: newPlace.slug.trim(),
           destination_id: newPlace.destination_id,
+          destination_zone_id: newPlace.destination_zone_id || null,
           place_type_id: newPlace.place_type_id,
           description: newPlace.description.trim() || undefined,
         },
@@ -187,8 +188,7 @@ export function PlaceEditor({ placeId }: Props) {
       toast.success("Lugar creado como borrador. No se publica automáticamente.");
       navigate({ to: `/cms/lugares/${res.id}/editar` as never });
     },
-    onError: (e) =>
-      toast.error(e instanceof Error ? e.message : "No se pudo crear el lugar."),
+    onError: (e) => toast.error(describePlaceError(e, "No se pudo crear el lugar.")),
   });
 
   /* ── Edición ──────────────────────────────────────────────────────── */
