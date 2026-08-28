@@ -443,12 +443,43 @@ export function PlaceEditor({ placeId }: Props) {
                 id={id}
                 className={inputClass}
                 value={newPlace.destination_id}
-                onChange={(e) => setNewPlace((p) => ({ ...p, destination_id: e.target.value }))}
+                onChange={(e) => selectNewDestination(e.target.value)}
               >
                 <option value="">Selecciona un destino…</option>
                 {(opts.destinations ?? []).map((d: { id: string; name: string }) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </PlaceField>
+          <PlaceField
+            name="new-zone"
+            label="Zona del destino (opcional)"
+            help={
+              !newPlace.destination_id
+                ? "Elige primero un destino para ver sus zonas."
+                : newPlaceZones.length === 0
+                  ? "Este destino todavía no tiene zonas registradas. Puedes crear el lugar sin zona."
+                  : "Sólo se listan zonas activas del destino seleccionado."
+            }
+          >
+            {({ id, describedBy }) => (
+              <select
+                id={id}
+                aria-describedby={describedBy}
+                className={inputClass}
+                value={newPlace.destination_zone_id}
+                disabled={!newPlace.destination_id || newPlaceZones.length === 0}
+                onChange={(e) =>
+                  setNewPlace((p) => ({ ...p, destination_zone_id: e.target.value }))
+                }
+              >
+                <option value="">Sin zona</option>
+                {newPlaceZones.map((z) => (
+                  <option key={z.id} value={z.id}>
+                    {z.name}
                   </option>
                 ))}
               </select>
