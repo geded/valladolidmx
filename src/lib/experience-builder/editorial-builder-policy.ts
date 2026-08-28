@@ -1622,6 +1622,64 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       ],
     },
     {
+      // G8-Q2D-A · Ficha premium reusable de Lugar y Atractivo.
+      type: "vmx.place.premium-q2d",
+      mode: "authorable",
+      family: "destination",
+      variants: ["lugar-premium-q2d-approved"],
+      allowed_sources: ["routing.canonical", "media.registry"],
+      surfaces: ["landing"],
+      authoring_roles: ["founder_admin", "territorial_editor"],
+      fields: [
+        {
+          field: "variant",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "presentation_mode",
+          class: "editorial",
+          type: "select",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "identity_title",
+          class: "editorial",
+          type: "text",
+          max_length: 200,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "identity_subtitle",
+          class: "editorial",
+          type: "text",
+          max_length: 300,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "hero_media_url",
+          class: "media",
+          type: "media",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "hero_media_alt",
+          class: "media",
+          type: "text",
+          max_length: 300,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "hero_media_credit",
+          class: "media",
+          type: "text",
+          max_length: 300,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+      ],
+    },
+    {
       // G8-E · Plantilla compuesta exclusiva del micrositio de destino.
       type: "vmx.destination.premium-g4",
       mode: "authorable",

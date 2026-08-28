@@ -4,7 +4,7 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.71",
     "state": "Approved",
-    "source_sha256": "c82abd6221c88f9a8af4d0c625b281e328cf5d664eb9bf6ffbb67ad627202e6a",
+    "source_sha256": "79d5c73389d5bcb88a5c027ead40599e2c3c5a558827fc7b25bbfc3e74fd76d0",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -8214,6 +8214,44 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-046.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-046.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/components/place-premium/place-premium-config.ts",
+      "type": "artifact",
+      "path": "src/components/place-premium/place-premium-config.ts"
+    },
+    {
+      "id": "ART:src/lib/experience-builder/premium-template-registry.ts",
+      "type": "artifact",
+      "path": "src/lib/experience-builder/premium-template-registry.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/q2d-a/premium-entity-place.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/q2d-a/premium-entity-place.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/q2d-a/premium-entity-place.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/q2d-a/premium-entity-place.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-q2d-a/EVIDENCE-MANIFEST.md",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-q2d-a/EVIDENCE-MANIFEST.md"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-047.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-047.json"
     }
   ],
   "edges": [
@@ -21589,6 +21627,105 @@
       "destination": "DOC:docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
       "evidence": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/place-premium/place-premium-config.ts:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "origin": "ART:src/components/place-premium/place-premium-config.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "evidence": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/place-premium/PlacePremiumSurface.tsx:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "origin": "ART:src/components/place-premium/PlacePremiumSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "evidence": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/page-kind-registry.ts:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/page-kind-registry.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "evidence": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/premium-template-registry.ts:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/premium-template-registry.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "evidence": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/composition-renderer.tsx:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/composition-renderer.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "evidence": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/editorial-builder-policy.ts:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/editorial-builder-policy.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "evidence": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2d-a/premium-entity-place.contract.test.ts:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "origin": "ART:scripts/omxds/q2d-a/premium-entity-place.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "evidence": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2d-a/premium-entity-place.evidence.mjs:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "origin": "ART:scripts/omxds/q2d-a/premium-entity-place.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "evidence": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/evidence/omxds-q2d-a/EVIDENCE-MANIFEST.md:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-q2d-a/EVIDENCE-MANIFEST.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "evidence": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "evidence": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-047.json:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-047.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+      "evidence": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
       "verified_at": "2026-08-28"
     }
   ],

@@ -41,12 +41,18 @@ import {
 export interface PlacePremiumSurfaceProps {
   content?: PlacePremiumContent;
   presentation?: PremiumPresentation;
+  /** G8-Q2D-A · variante cerrada de la familia (informativa para QA/Studio). */
+  variant?: string;
+  /** G8-Q2D-A · aviso del constructor cuando aplica el fallback de medios. */
+  builderNotice?: string | null;
   className?: string;
 }
 
 export function PlacePremiumSurface({
   content = PLACE_PREMIUM_DEMO_CONTENT,
   presentation = "editorial",
+  variant,
+  builderNotice = null,
   className,
 }: PlacePremiumSurfaceProps) {
   const cinematic = presentation === "cinematic";
@@ -84,6 +90,7 @@ export function PlacePremiumSurface({
   return (
     <div
       data-place-presentation={presentation}
+      data-place-variant={variant ?? undefined}
       /* Founder Review G8-Q2D-0 · zona segura inferior para que el dock de
          Alux nunca cubra contenido en ninguna dirección visual. */
       data-alux-safe-zone="true"
@@ -91,6 +98,15 @@ export function PlacePremiumSurface({
     >
       <Container className="pt-6">
         <DemoNotice text={content.demoNotice} />
+        {builderNotice ? (
+          <p
+            data-place-media-fallback="true"
+            role="status"
+            className="mt-3 rounded-2xl border border-warning/40 bg-warning/10 p-3 text-xs leading-5 text-foreground"
+          >
+            {builderNotice}
+          </p>
+        ) : null}
       </Container>
 
       {cinematic ? (

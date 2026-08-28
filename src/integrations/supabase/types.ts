@@ -8703,6 +8703,7 @@ export type Database = {
         | "trip_builder"
         | "custom"
         | "region"
+        | "place"
       entity_kind:
         | "country"
         | "state"
@@ -8991,6 +8992,7 @@ export const Constants = {
         "trip_builder",
         "custom",
         "region",
+        "place",
       ],
       entity_kind: [
         "country",

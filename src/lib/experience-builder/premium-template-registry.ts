@@ -14,6 +14,14 @@
  */
 import { homePremiumG4DefaultConfig } from "@/components/home-premium/home-premium-config";
 import { listingPremiumG5DefaultConfig } from "@/components/listing-premium/listing-premium-config";
+import {
+  PLACE_PREMIUM_BLOCK_TYPE,
+  PLACE_PREMIUM_CONTRACT_VERSION,
+  PLACE_PREMIUM_TEMPLATE_ID,
+  PLACE_PREMIUM_VARIANT,
+  PLACE_PREMIUM_VARIANTS,
+  placePremiumDefaultConfig,
+} from "@/components/place-premium/place-premium-config";
 import type { EditorialSurface } from "./editorial-builder-policy";
 import type { PageKind } from "./page-kind-registry";
 
@@ -34,7 +42,7 @@ export interface PremiumTemplatePreset {
   /** Superficie editorial en la que el preset es insertable. */
   surface: EditorialSurface;
   /** Familia de plantilla (agrupa la galería). */
-  family: "home" | "destination" | "listing";
+  family: "home" | "destination" | "listing" | "place";
   /** Ruta pública objetivo del preset (informativa). */
   targetRoute: string;
   /** Vista interna que actúa como autoridad visual aprobada. */
@@ -53,10 +61,14 @@ export interface PremiumTemplatePreset {
 }
 
 /** Tipos de página compatibles por familia de plantilla premium. */
-const PAGE_KINDS_BY_FAMILY: Record<"home" | "destination" | "listing", readonly PageKind[]> = {
+const PAGE_KINDS_BY_FAMILY: Record<
+  "home" | "destination" | "listing" | "place",
+  readonly PageKind[]
+> = {
   home: ["home"],
   destination: ["destination"],
   listing: ["landing", "campaign"],
+  place: ["place"],
 };
 
 export const PREMIUM_TEMPLATE_PRESETS: PremiumTemplatePreset[] = [
@@ -92,6 +104,25 @@ export const PREMIUM_TEMPLATE_PRESETS: PremiumTemplatePreset[] = [
     pageKinds: PAGE_KINDS_BY_FAMILY.destination,
     defaultConfig: () => ({}),
   },
+  // G8-Q2D-A · Familia `premium-entity-place` con seis variantes cerradas.
+  ...PLACE_PREMIUM_VARIANTS.map((v) => ({
+    id:
+      v.slug === "zona-arqueologica"
+        ? PLACE_PREMIUM_TEMPLATE_ID
+        : `${PLACE_PREMIUM_TEMPLATE_ID}-${v.slug}`,
+    name: `Lugar Premium · ${v.label}`,
+    description: `Ficha premium de ${v.label.toLowerCase()}: breadcrumb territorial, identidad, esencial, galería, mapa, experiencias y "Agregar a Mi Viaje". Dirección ${v.defaultPresentation === "cinematic" ? "Cinematográfica" : "Editorial"} por defecto.`,
+    blockType: PLACE_PREMIUM_BLOCK_TYPE,
+    variant: PLACE_PREMIUM_VARIANT,
+    surface: "landing" as EditorialSurface,
+    family: "place" as const,
+    targetRoute: "/oriente-maya/{destino}/lugares/{slug}",
+    visualAuthorityRoute: "/lovable/g8-place-premium-visual-approval",
+    contractVersion: PLACE_PREMIUM_CONTRACT_VERSION,
+    status: "aprobada" as const,
+    pageKinds: PAGE_KINDS_BY_FAMILY.place,
+    defaultConfig: () => placePremiumDefaultConfig(v.slug),
+  })),
   ...(
     [
       ["hoteles", "Hoteles", "/hoteles"],
