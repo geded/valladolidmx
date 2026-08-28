@@ -224,7 +224,7 @@ export const PLACE_PREMIUM_DEMO_CONTENT: PlacePremiumContent = {
     ],
     pullQuote:
       "Texto de demostración: una cita editorial destacada para probar la jerarquía tipográfica serif del sistema premium.",
-    media: [M.selva, M.camino],
+    media: [P.apoyo1, P.apoyo2],
   },
   essentials: {
     kicker: "Lo esencial",
