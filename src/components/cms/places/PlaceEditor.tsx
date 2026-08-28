@@ -166,7 +166,7 @@ export function PlaceEditor({ placeId }: Props) {
   });
 
   /* ── Edición ──────────────────────────────────────────────────────── */
-  const place = detail.data?.place as Record<string, unknown> | undefined;
+  const place = det.place as Record<string, unknown> | undefined;
   const [values, setValues] = useState<Values>({});
   const [zoneId, setZoneId] = useState("");
   const [admission, setAdmission] = useState("");
@@ -198,15 +198,15 @@ export function PlaceEditor({ placeId }: Props) {
     setAmenities(Array.isArray(place.amenities) ? (place.amenities as string[]).join("\n") : "");
     setLatitude(place.latitude === null || place.latitude === undefined ? "" : String(place.latitude));
     setLongitude(place.longitude === null || place.longitude === undefined ? "" : String(place.longitude));
-    setCategoryIds(detail.data?.categoryIds ?? []);
-  }, [place, detail.data?.categoryIds]);
+    setCategoryIds(det.categoryIds ?? []);
+  }, [place, det.categoryIds]);
 
   const zonesForDestination = useMemo(() => {
     const destinationId = (place?.destination_id as string | undefined) ?? "";
-    return (options.data?.zones ?? []).filter(
+    return (opts.zones ?? []).filter(
       (z: { destination_id: string }) => z.destination_id === destinationId,
     );
-  }, [options.data?.zones, place?.destination_id]);
+  }, [opts.zones, place?.destination_id]);
 
   const buildPatch = () => {
     const text = (key: string) => {
@@ -392,7 +392,7 @@ export function PlaceEditor({ placeId }: Props) {
                 onChange={(e) => setNewPlace((p) => ({ ...p, destination_id: e.target.value }))}
               >
                 <option value="">Selecciona un destino…</option>
-                {(options.data?.destinations ?? []).map((d: { id: string; name: string }) => (
+                {(opts.destinations ?? []).map((d: { id: string; name: string }) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
                   </option>
@@ -409,7 +409,7 @@ export function PlaceEditor({ placeId }: Props) {
                 onChange={(e) => setNewPlace((p) => ({ ...p, place_type_id: e.target.value }))}
               >
                 <option value="">Selecciona un tipo…</option>
-                {(options.data?.placeTypes ?? []).map((t: { id: string; name: string }) => (
+                {(opts.placeTypes ?? []).map((t: { id: string; name: string }) => (
                   <option key={t.id} value={t.id}>
                     {t.name}
                   </option>
@@ -518,7 +518,7 @@ export function PlaceEditor({ placeId }: Props) {
               onChange={(e) => e.target.value && saveType.mutate(e.target.value)}
             >
               <option value="">Sin tipo asignado</option>
-              {(options.data?.placeTypes ?? []).map((t: { id: string; name: string }) => (
+              {(opts.placeTypes ?? []).map((t: { id: string; name: string }) => (
                 <option key={t.id} value={t.id}>
                   {t.name}
                 </option>
@@ -557,7 +557,7 @@ export function PlaceEditor({ placeId }: Props) {
           <fieldset>
             <legend className="text-xs font-medium">Categorías de descubrimiento</legend>
             <div className="mt-2 flex flex-wrap gap-2">
-              {(options.data?.categories ?? []).map((c: { id: string; name: string }) => {
+              {(opts.categories ?? []).map((c: { id: string; name: string }) => {
                 const checked = categoryIds.includes(c.id);
                 return (
                   <label
@@ -846,23 +846,23 @@ export function PlaceEditor({ placeId }: Props) {
 
       <PlaceHoursPanel
         placeId={placeId!}
-        initial={(detail.data?.hours ?? []) as HoursRow[]}
+        initial={(det.hours ?? []) as HoursRow[]}
         onSaved={() => void detail.refetch()}
       />
 
       <PlaceMediaPanel
         placeId={placeId!}
-        media={(detail.data?.media ?? []) as PlaceMediaRow[]}
-        assets={(detail.data?.assets ?? []) as PlaceMediaAsset[]}
+        media={(det.media ?? []) as PlaceMediaRow[]}
+        assets={(det.assets ?? []) as PlaceMediaAsset[]}
         onChanged={() => void detail.refetch()}
       />
 
       <PlaceRelationsPanel
         placeId={placeId!}
-        products={(detail.data?.products ?? []) as ProductRelation[]}
-        events={(detail.data?.events ?? []) as EventRelation[]}
-        authorities={(detail.data?.authorities ?? []) as AuthorityRelation[]}
-        authorityKinds={(options.data?.authorityKinds ?? []) as { id: string; name: string }[]}
+        products={(det.products ?? []) as ProductRelation[]}
+        events={(det.events ?? []) as EventRelation[]}
+        authorities={(det.authorities ?? []) as AuthorityRelation[]}
+        authorityKinds={(opts.authorityKinds ?? []) as { id: string; name: string }[]}
         onChanged={() => void detail.refetch()}
       />
 
