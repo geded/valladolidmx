@@ -14,6 +14,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertAllowedTransition, type ContentStatus } from "@/lib/cms/workflow";
+import { ZONE_DESTINATION_MISMATCH, isSelectableZone } from "./place-territory";
 import {
   attachPlaceMediaSchema,
   createPlaceCmsSchema,
