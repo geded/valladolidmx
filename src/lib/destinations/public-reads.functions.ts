@@ -17,6 +17,11 @@ export interface PublicDestinationDTO {
   highlights: string[];
   hero_palette: "territorio" | "selva" | "cenote" | "atardecer" | null;
   hero_url: string | null;
+  /**
+   * G8-F1D · Atribución acreditada de la portada (ALT, caption,
+   * crédito, naturaleza). Campo aditivo: `null` cuando no hay medio.
+   */
+  hero_media?: PublicMediaAttribution | null;
   latitude: number | null;
   longitude: number | null;
 }
