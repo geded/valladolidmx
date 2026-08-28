@@ -7055,6 +7055,10 @@ export type Database = {
         Args: { _category_ids: string[]; _place_id: string }
         Returns: undefined
       }
+      admin_set_place_presentation_mode: {
+        Args: { _mode: string; _place_id: string }
+        Returns: undefined
+      }
       admin_top_products: {
         Args: { p_days?: number; p_kind?: string; p_limit?: number }
         Returns: {
