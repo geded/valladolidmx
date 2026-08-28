@@ -85,7 +85,11 @@ function slugify(v: string): string {
 
 function publicPathFromKind(def: PageKindDefinition | undefined, slug: string): string {
   if (!def) return `/p/${slug}`;
-  return def.publicRoutePattern.replace("{slug}", slug) || `/${slug}`;
+  const path = def.publicRoutePattern.replace("{slug}", slug);
+  // G8-P2 · Rutas paramétricas territoriales (`{destino}/{categoria}/…`)
+  // no se pueden resolver desde el slug de la composición.
+  if (!path || path.includes("{")) return `/p/${slug}`;
+  return path;
 }
 
 /**
