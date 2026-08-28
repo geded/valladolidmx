@@ -138,10 +138,11 @@ export const listStudioMediaLibrary = createServerFn({ method: "POST" })
     await assertEditorial(context);
     const limit = Math.min(Math.max(data.limit ?? 60, 1), 200);
     const offset = Math.max(data.offset ?? 0, 0);
+    const filter = data.filter ?? "all";
     let q = context.supabase
       .from("media_assets")
       .select(
-        "id, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, width, height, mime_type, updated_at, media_asset_translations ( locale, alt_text, alt_text_ai, source, review_state )",
+        "id, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, status, credit, metadata, original_checksum, title, width, height, mime_type, updated_at, media_asset_translations ( locale, alt_text, alt_text_ai, source, review_state )",
         { count: "exact" },
       )
       .eq("storage_bucket", BUCKET)
@@ -149,45 +150,71 @@ export const listStudioMediaLibrary = createServerFn({ method: "POST" })
       .order("updated_at", { ascending: false })
       .range(offset, offset + limit - 1);
     if (data.search) q = q.ilike("alt_text", `%${data.search}%`);
+    if (filter === "approved") q = q.eq("review_state", "approved");
+    if (filter === "pending") q = q.neq("review_state", "approved");
     const { data: rows, count, error } = await q;
     if (error) throw error;
-    return {
-      rows: (rows ?? []).map(
-        (r: {
-          id: string;
-          storage_path: string;
+    const mapped = (rows ?? []).map(
+      (r: {
+        id: string;
+        storage_path: string;
+        alt_text: string | null;
+        alt_text_ai: string | null;
+        alt_text_source: string | null;
+        review_state: string | null;
+        status: string | null;
+        credit: string | null;
+        metadata: Record<string, unknown> | null;
+        original_checksum: string | null;
+        title: string | null;
+        width: number | null;
+        height: number | null;
+        mime_type: string | null;
+        media_asset_translations?: Array<{
+          locale: string;
           alt_text: string | null;
           alt_text_ai: string | null;
-          alt_text_source: string | null;
+          source: string | null;
           review_state: string | null;
-          title: string | null;
-          width: number | null;
-          height: number | null;
-          mime_type: string | null;
-          media_asset_translations?: Array<{
-            locale: string;
-            alt_text: string | null;
-            alt_text_ai: string | null;
-            source: string | null;
-            review_state: string | null;
-          }> | null;
-        }) => ({
+        }> | null;
+      }) => {
+        const rights = ((r.metadata ?? {}) as { rights?: Record<string, unknown> }).rights ?? {};
+        const focal = ((r.metadata ?? {}) as { focal?: { x?: number; y?: number } }).focal ?? {};
+        const nature = (rights.nature as string | undefined) ?? null;
+        return {
           id: r.id,
           url: publicProxyUrl(r.storage_path),
           alt: resolveMediaAlt(
             { ...r, translations: r.media_asset_translations ?? [] },
             { locale: "es", fallback: r.title ?? "" },
           ),
+          credit: (rights.credit as string | null) ?? r.credit ?? null,
+          author: (rights.author as string | null) ?? null,
+          source: (rights.source as string | null) ?? null,
+          license: (rights.license as string | null) ?? null,
+          nature,
+          aiGenerated: Boolean(rights.ai_generated),
+          documentary: rights.documentary === true,
+          conceptual: rights.documentary !== true,
+          reviewState: r.review_state ?? "unreviewed",
+          status: r.status ?? "draft",
+          checksum: r.original_checksum,
+          focalX: typeof focal.x === "number" ? focal.x : 0.5,
+          focalY: typeof focal.y === "number" ? focal.y : 0.5,
           width: r.width,
           height: r.height,
           mime: r.mime_type,
-        }),
-      ),
+        };
+      },
+    );
+    return {
+      rows: filter === "conceptual" ? mapped.filter((r) => r.conceptual) : mapped,
       total: count ?? 0,
       limit,
       offset,
     };
   });
+
 
 /* ────────────────────────  Firmar upload  ───────────────────────────── */
 
