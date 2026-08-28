@@ -45,6 +45,8 @@ export interface PlacePremiumSurfaceProps {
   variant?: string;
   /** G8-Q2D-A · aviso del constructor cuando aplica el fallback de medios. */
   builderNotice?: string | null;
+  /** G8-Q2D-B · aviso de preview administrativa (“Borrador · no publicado”). */
+  draftNotice?: string | null;
   className?: string;
 }
 
@@ -53,9 +55,19 @@ export function PlacePremiumSurface({
   presentation = "editorial",
   variant,
   builderNotice = null,
+  draftNotice = null,
   className,
 }: PlacePremiumSurfaceProps) {
   const cinematic = presentation === "cinematic";
+  /* G8-Q2D-B · con datos reales toda sección sin contenido se oculta:
+     jamás se rellena con fixtures ni con datos de otro lugar. */
+  const hasIntro = content.intro.paragraphs.length > 0;
+  const hasEssentials =
+    content.essentials.facts.length > 0 ||
+    content.essentials.recommendations.length > 0 ||
+    content.essentials.accessibility.length > 0;
+  const hasGallery = content.gallery.items.length > 0;
+  const hasMap = content.map.points.length > 0 || content.map.directions.length > 0;
 
   const mapDto: ExperienceMapDTO = useMemo(
     () => ({
@@ -97,7 +109,16 @@ export function PlacePremiumSurface({
       className={cn("pb-24", className)}
     >
       <Container className="pt-6">
-        <DemoNotice text={content.demoNotice} />
+        {content.demoNotice ? <DemoNotice text={content.demoNotice} /> : null}
+        {draftNotice ? (
+          <p
+            data-place-draft-notice="true"
+            role="status"
+            className="rounded-2xl border border-warning/50 bg-warning/10 px-4 py-3 text-xs font-semibold leading-5 text-foreground"
+          >
+            {draftNotice}
+          </p>
+        ) : null}
         {builderNotice ? (
           <p
             data-place-media-fallback="true"
@@ -149,15 +170,21 @@ export function PlacePremiumSurface({
           <Container className="mt-8">
             <IdentityStrip content={content} dense />
           </Container>
-          <Container className="mt-8">
-            <EssentialsBand content={content} />
-          </Container>
-          <Container className="mt-10">
-            <GalleryFilmstrip content={content} />
-          </Container>
-          <Container className="mt-14">
-            <IntroCentered content={content} />
-          </Container>
+          {hasEssentials ? (
+            <Container className="mt-8">
+              <EssentialsBand content={content} />
+            </Container>
+          ) : null}
+          {hasGallery ? (
+            <Container className="mt-10">
+              <GalleryFilmstrip content={content} />
+            </Container>
+          ) : null}
+          {hasIntro ? (
+            <Container className="mt-14">
+              <IntroCentered content={content} />
+            </Container>
+          ) : null}
         </>
       ) : (
         <>
@@ -170,32 +197,42 @@ export function PlacePremiumSurface({
           <Container className="mt-10">
             <IdentityStrip content={content} />
           </Container>
-          <Container className="mt-14">
-            <IntroEditorial content={content} />
-          </Container>
-          <Container className="mt-14">
-            <EssentialsPanel content={content} />
-          </Container>
-          <Container className="mt-14">
-            <GalleryMosaic content={content} />
-          </Container>
+          {hasIntro ? (
+            <Container className="mt-14">
+              <IntroEditorial content={content} />
+            </Container>
+          ) : null}
+          {hasEssentials ? (
+            <Container className="mt-14">
+              <EssentialsPanel content={content} />
+            </Container>
+          ) : null}
+          {hasGallery ? (
+            <Container className="mt-14">
+              <GalleryMosaic content={content} />
+            </Container>
+          ) : null}
         </>
       )}
 
-      <Container className="mt-16">
-        <SectionHeading id="mapa-lugar" kicker="Ubicación" title={content.map.heading} />
-        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-          <ExperienceMapBlock dto={mapDto} />
-          <ul className="space-y-3 rounded-3xl border border-border bg-card p-5 text-sm leading-6 text-muted-foreground">
-            {content.map.directions.map((line, index) => (
-              <li key={`dir-${index}`} className="flex gap-2">
-                <Compass className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
-                <span>{line}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Container>
+      {hasMap ? (
+        <Container className="mt-16">
+          <SectionHeading id="mapa-lugar" kicker="Ubicación" title={content.map.heading} />
+          <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+            {content.map.points.length ? <ExperienceMapBlock dto={mapDto} /> : null}
+            {content.map.directions.length ? (
+              <ul className="space-y-3 rounded-3xl border border-border bg-card p-5 text-sm leading-6 text-muted-foreground">
+                {content.map.directions.map((line, index) => (
+                  <li key={`dir-${index}`} className="flex gap-2">
+                    <Compass className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        </Container>
+      ) : null}
 
       {content.services.length ? (
         <Container className="mt-16">
