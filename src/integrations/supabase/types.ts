@@ -4731,6 +4731,289 @@ export type Database = {
         }
         Relationships: []
       }
+      place_authorities: {
+        Row: {
+          authority_kind_id: string
+          authority_name: string | null
+          business_id: string | null
+          created_at: string
+          id: string
+          is_primary: boolean
+          notes: string | null
+          place_id: string
+          updated_at: string
+        }
+        Insert: {
+          authority_kind_id: string
+          authority_name?: string | null
+          business_id?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          notes?: string | null
+          place_id: string
+          updated_at?: string
+        }
+        Update: {
+          authority_kind_id?: string
+          authority_name?: string | null
+          business_id?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          notes?: string | null
+          place_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_authorities_authority_kind_id_fkey"
+            columns: ["authority_kind_id"]
+            isOneToOne: false
+            referencedRelation: "place_authority_kinds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_authorities_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "place_authorities_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_authorities_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "points_of_interest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      place_authority_kinds: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      place_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      place_category_links: {
+        Row: {
+          category_id: string
+          created_at: string
+          place_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          place_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          place_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_category_links_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "place_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_category_links_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "points_of_interest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      place_hours: {
+        Row: {
+          closes_at: string | null
+          created_at: string
+          day_of_week: number
+          id: string
+          is_closed: boolean
+          notes: string | null
+          opens_at: string | null
+          place_id: string
+          updated_at: string
+        }
+        Insert: {
+          closes_at?: string | null
+          created_at?: string
+          day_of_week: number
+          id?: string
+          is_closed?: boolean
+          notes?: string | null
+          opens_at?: string | null
+          place_id: string
+          updated_at?: string
+        }
+        Update: {
+          closes_at?: string | null
+          created_at?: string
+          day_of_week?: number
+          id?: string
+          is_closed?: boolean
+          notes?: string | null
+          opens_at?: string | null
+          place_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_hours_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "points_of_interest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      place_media: {
+        Row: {
+          created_at: string
+          id: string
+          media_asset_id: string
+          place_id: string
+          role: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          media_asset_id: string
+          place_id: string
+          role?: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          media_asset_id?: string
+          place_id?: string
+          role?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_media_media_asset_id_fkey"
+            columns: ["media_asset_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_media_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "points_of_interest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      place_types: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       platform_locales: {
         Row: {
           code: string
@@ -4799,6 +5082,13 @@ export type Database = {
       }
       points_of_interest: {
         Row: {
+          accessibility: Json
+          address_line: string | null
+          amenities: Json
+          best_time_to_visit: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          contact_website: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
@@ -4808,18 +5098,34 @@ export type Database = {
           description: string | null
           destination_id: string
           destination_zone_id: string | null
+          entry_fee_notes: string | null
+          google_place_id: string | null
+          highlights: Json
           id: string
           is_demo_seed: boolean
           latitude: number | null
           longitude: number | null
           metadata: Json
           name: string
+          official_name: string | null
+          place_type_id: string | null
+          price_currency: string
+          price_from: number | null
+          short_description: string | null
           slug: string
           status: Database["public"]["Enums"]["content_status"]
           updated_at: string
           updated_by: string | null
+          visit_duration_minutes: number | null
         }
         Insert: {
+          accessibility?: Json
+          address_line?: string | null
+          amenities?: Json
+          best_time_to_visit?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_website?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
@@ -4829,18 +5135,34 @@ export type Database = {
           description?: string | null
           destination_id: string
           destination_zone_id?: string | null
+          entry_fee_notes?: string | null
+          google_place_id?: string | null
+          highlights?: Json
           id?: string
           is_demo_seed?: boolean
           latitude?: number | null
           longitude?: number | null
           metadata?: Json
           name: string
+          official_name?: string | null
+          place_type_id?: string | null
+          price_currency?: string
+          price_from?: number | null
+          short_description?: string | null
           slug: string
           status?: Database["public"]["Enums"]["content_status"]
           updated_at?: string
           updated_by?: string | null
+          visit_duration_minutes?: number | null
         }
         Update: {
+          accessibility?: Json
+          address_line?: string | null
+          amenities?: Json
+          best_time_to_visit?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_website?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
@@ -4850,16 +5172,25 @@ export type Database = {
           description?: string | null
           destination_id?: string
           destination_zone_id?: string | null
+          entry_fee_notes?: string | null
+          google_place_id?: string | null
+          highlights?: Json
           id?: string
           is_demo_seed?: boolean
           latitude?: number | null
           longitude?: number | null
           metadata?: Json
           name?: string
+          official_name?: string | null
+          place_type_id?: string | null
+          price_currency?: string
+          price_from?: number | null
+          short_description?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["content_status"]
           updated_at?: string
           updated_by?: string | null
+          visit_duration_minutes?: number | null
         }
         Relationships: [
           {
@@ -4874,6 +5205,13 @@ export type Database = {
             columns: ["destination_zone_id"]
             isOneToOne: false
             referencedRelation: "destination_zones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "points_of_interest_place_type_id_fkey"
+            columns: ["place_type_id"]
+            isOneToOne: false
+            referencedRelation: "place_types"
             referencedColumns: ["id"]
           },
         ]
@@ -6489,6 +6827,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_create_place: {
+        Args: {
+          _description?: string
+          _destination_id: string
+          _name: string
+          _place_type_id: string
+          _slug: string
+        }
+        Returns: string
+      }
       admin_evaluate_functional_alerts: {
         Args: { p_window_minutes?: number }
         Returns: Json
@@ -6589,6 +6937,10 @@ export type Database = {
         Returns: undefined
       }
       admin_search_metrics_summary: { Args: { p_days?: number }; Returns: Json }
+      admin_set_place_categories: {
+        Args: { _category_ids: string[]; _place_id: string }
+        Returns: undefined
+      }
       admin_top_products: {
         Args: { p_days?: number; p_kind?: string; p_limit?: number }
         Returns: {
@@ -6600,6 +6952,10 @@ export type Database = {
         }[]
       }
       admin_travel_plan_overview: { Args: never; Returns: Json }
+      admin_update_place_details: {
+        Args: { _patch: Json; _place_id: string }
+        Returns: undefined
+      }
       alux_get_concierge_context_for_user: {
         Args: { _user_id: string }
         Returns: Json
@@ -7595,6 +7951,15 @@ export type Database = {
         Args: { "": string }
         Returns: Record<string, unknown>[]
       }
+      place_duplicate_warnings: {
+        Args: { _name: string }
+        Returns: {
+          destination_id: string
+          place_id: string
+          place_name: string
+          slug: string
+        }[]
+      }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
       publish_business: {
         Args: { _approve: boolean; _business_id: string; _notes?: string }
@@ -7775,6 +8140,7 @@ export type Database = {
         Returns: boolean
       }
       traveler_alux_context_for_user: { Args: never; Returns: Json }
+      unaccent_immutable_fallback: { Args: { _value: string }; Returns: string }
       unc_activity_admin: {
         Args: { _limit?: number }
         Returns: {
