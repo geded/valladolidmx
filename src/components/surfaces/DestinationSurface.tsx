@@ -56,6 +56,7 @@ import {
   destinationToGalleryDTO,
   type DestinationBlockInput,
 } from "@/lib/experience-builder/adapters/destination-to-blocks";
+import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
 import {
   createOmxdsSurfaceContract,
   isOmxdsSurfaceContract,
@@ -75,6 +76,8 @@ export interface DestinationSurfaceContextValue {
   mapPoints?: ExperienceMapPoint[];
   /** SEO.A2.M1 — galería (URLs) hidratada por la ruta. */
   galleryUrls?: string[];
+  /** G8-F1D — atribución acreditada por medio (ALT, caption, crédito). */
+  galleryMedia?: PublicMediaAttribution[];
 }
 
 export const DestinationSurfaceContext = createContext<DestinationSurfaceContextValue | null>(null);
@@ -85,10 +88,13 @@ export function DestinationSurfaceProvider({
   slug,
   mapPoints,
   galleryUrls,
+  galleryMedia,
   children,
 }: DestinationSurfaceContextValue & { children: React.ReactNode }) {
   return (
-    <DestinationSurfaceContext.Provider value={{ db, related, slug, mapPoints, galleryUrls }}>
+    <DestinationSurfaceContext.Provider
+      value={{ db, related, slug, mapPoints, galleryUrls, galleryMedia }}
+    >
       {children}
     </DestinationSurfaceContext.Provider>
   );
@@ -109,6 +115,8 @@ export interface DestinationSurfaceProps {
   mapPoints?: ExperienceMapPoint[];
   /** U-VISUAL · V4.2 — URLs de galería (BD) para `vmx.experience.gallery`. */
   galleryUrls?: string[];
+  /** G8-F1D — atribución acreditada de los medios (ALT, caption, crédito). */
+  galleryMedia?: PublicMediaAttribution[];
   /** I3-A · contrato validado; ausente conserva exactamente el renderer vigente. */
   surfaceContract?: OmxdsSurfaceContract;
   /** G5 · sólo true cuando la ficha superó la elegibilidad Premium individual. */
@@ -181,6 +189,7 @@ export function DestinationSurfaceContractBoundary({
   related,
   mapPoints,
   galleryUrls,
+  galleryMedia,
   premiumEnabled,
 }: DestinationSurfaceContractBoundaryProps) {
   if (!enabled || !destinationSlug) return legacy;
@@ -197,6 +206,7 @@ export function DestinationSurfaceContractBoundary({
     regionName: ORIENTE_MAYA.name,
     counts: destinationRelatedCounts(related),
     galleryUrls: galleryUrls ?? [],
+    mediaAttribution: galleryMedia ?? [],
     mapPoints: mapPoints ?? [],
   });
   const surfaceContract = buildDestinationSurfaceContract(input);
@@ -209,6 +219,7 @@ export function DestinationSurfaceContractBoundary({
       related={related}
       mapPoints={mapPoints}
       galleryUrls={galleryUrls}
+      galleryMedia={galleryMedia}
       surfaceContract={surfaceContract}
       premiumEnabled={premiumEnabled}
     />
@@ -221,6 +232,7 @@ export function DestinationSurface({
   related,
   mapPoints,
   galleryUrls,
+  galleryMedia,
   surfaceContract,
   premiumEnabled = false,
 }: DestinationSurfaceProps = {}) {
@@ -233,6 +245,7 @@ export function DestinationSurface({
   const rel = related ?? ctx?.related ?? null;
   const effectiveMapPoints = mapPoints ?? ctx?.mapPoints ?? [];
   const effectiveGalleryUrls = galleryUrls ?? ctx?.galleryUrls ?? [];
+  const effectiveGalleryMedia = galleryMedia ?? ctx?.galleryMedia ?? [];
   const mock = slug
     ? DESTINOS_MOCK.find((d) => d.slug === slug && d.region_slug === ORIENTE_MAYA.slug)
     : undefined;
@@ -254,11 +267,30 @@ export function DestinationSurface({
     regionName: ORIENTE_MAYA.name,
     counts: destinationRelatedCounts(rel),
     galleryUrls: effectiveGalleryUrls,
+    mediaAttribution: effectiveGalleryMedia,
     mapPoints: effectiveMapPoints,
   });
 
   const galleryDto = destinationToGalleryDTO(input);
   const heroDtoRaw = destinationToHeroDTO(input);
+  // G8-F1D · Medio acreditado para el renderer Premium compartido: se
+  // reutiliza la primera diapositiva ya resuelta por el adaptador.
+  const heroSlide = heroDtoRaw.mediaSlides?.[0] ?? null;
+  const premiumHeroUrl = input.galleryUrls[0] ?? input.heroUrl ?? "";
+  const premiumHeroMedia = premiumHeroUrl
+    ? {
+        url: premiumHeroUrl,
+        alt:
+          (heroSlide?.url === premiumHeroUrl ? heroSlide?.alt : null) ||
+          `Vista de ${input.name}, Oriente Maya de Yucatán`,
+        ...(heroSlide?.url === premiumHeroUrl && heroSlide?.caption
+          ? { caption: heroSlide.caption }
+          : {}),
+        ...(heroSlide?.url === premiumHeroUrl && heroSlide?.credit
+          ? { credit: heroSlide.credit }
+          : {}),
+      }
+    : null;
   // Tourist Hero `gallery` v1.2.0 — el propio Hero es el carrusel
   // Airbnb-style. Cuando se activa, el mosaico `ExperienceGallery`
   // se omite para no duplicar la imagen dominante.
@@ -325,13 +357,10 @@ export function DestinationSurface({
                 eyebrow: "Destino · Oriente Maya de Yucatán",
                 title: input.name,
                 description: input.tagline || input.description || undefined,
-                media:
-                  (input.galleryUrls[0] ?? input.heroUrl)
-                    ? {
-                        url: input.galleryUrls[0] ?? input.heroUrl ?? "",
-                        alt: `Vista de ${input.name}, Oriente Maya de Yucatán`,
-                      }
-                    : null,
+                // G8-F1D · El medio Premium hereda ALT, caption y crédito
+                // acreditados del hero gobernado; sin metadata conserva
+                // el ALT descriptivo previo.
+                media: premiumHeroMedia,
                 primaryAction: dominantAction?.href
                   ? { label: dominantAction.label, href: dominantAction.href }
                   : undefined,

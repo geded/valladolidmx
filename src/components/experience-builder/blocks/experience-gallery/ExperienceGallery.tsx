@@ -59,7 +59,11 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
   if (visible.length === 0) return null;
 
   return (
-    <section aria-label={ariaLabel} data-eb-block="experience-gallery" className={cn("w-full", className)}>
+    <section
+      aria-label={ariaLabel}
+      data-eb-block="experience-gallery"
+      className={cn("w-full", className)}
+    >
       {(heading || subheading) && (
         <header className="mb-4 flex flex-col gap-1">
           {heading ? <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2> : null}
@@ -73,7 +77,13 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
         >
           {visible.map((it, i) => (
             <li key={i} className="min-w-[80%] snap-start sm:min-w-[45%] md:min-w-[32%]">
-              <Thumb item={it} aspect={aspect} onClick={() => open(i)} lightbox={!!capabilities.lightbox} captions={!!capabilities.captions} />
+              <Thumb
+                item={it}
+                aspect={aspect}
+                onClick={() => open(i)}
+                lightbox={!!capabilities.lightbox}
+                captions={!!capabilities.captions}
+              />
             </li>
           ))}
         </ul>
@@ -81,7 +91,13 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
         <ul className="grid grid-cols-3 gap-2 sm:grid-cols-6" role="list">
           {visible.map((it, i) => (
             <li key={i}>
-              <Thumb item={it} aspect="square" onClick={() => open(i)} lightbox={!!capabilities.lightbox} captions={false} />
+              <Thumb
+                item={it}
+                aspect="square"
+                onClick={() => open(i)}
+                lightbox={!!capabilities.lightbox}
+                captions={false}
+              />
             </li>
           ))}
         </ul>
@@ -89,7 +105,13 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
         <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4" role="list">
           {visible.map((it, i) => (
             <li key={i}>
-              <Thumb item={it} aspect={aspect} onClick={() => open(i)} lightbox={!!capabilities.lightbox} captions={!!capabilities.captions} />
+              <Thumb
+                item={it}
+                aspect={aspect}
+                onClick={() => open(i)}
+                lightbox={!!capabilities.lightbox}
+                captions={!!capabilities.captions}
+              />
             </li>
           ))}
         </ul>
@@ -99,12 +121,16 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
           {visible.map((it, i) => (
             <div
               key={i}
-              className={cn(
-                "relative min-w-0",
-                i === 0 && "sm:col-span-2 sm:row-span-2",
-              )}
+              className={cn("relative min-w-0", i === 0 && "sm:col-span-2 sm:row-span-2")}
             >
-              <Thumb item={it} aspect={i === 0 ? "landscape" : "square"} onClick={() => open(i)} lightbox={!!capabilities.lightbox} captions={!!capabilities.captions} fill />
+              <Thumb
+                item={it}
+                aspect={i === 0 ? "landscape" : "square"}
+                onClick={() => open(i)}
+                lightbox={!!capabilities.lightbox}
+                captions={!!capabilities.captions}
+                fill
+              />
             </div>
           ))}
         </div>
@@ -122,7 +148,10 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
             type="button"
             aria-label="Cerrar"
             className="absolute right-4 top-4 rounded-pill bg-white/10 p-2 text-white hover:bg-white/20 focus-visible:outline-none focus-visible:ring-focus"
-            onClick={(e) => { e.stopPropagation(); close(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              close();
+            }}
           >
             <X className="h-5 w-5" />
           </button>
@@ -130,21 +159,42 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
             type="button"
             aria-label="Anterior"
             className="absolute left-4 top-1/2 -translate-y-1/2 rounded-pill bg-white/10 p-2 text-white hover:bg-white/20 focus-visible:outline-none focus-visible:ring-focus"
-            onClick={(e) => { e.stopPropagation(); nav(-1); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              nav(-1);
+            }}
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
-          <img
-            src={visible[openIdx]!.url}
-            alt={visible[openIdx]!.alt}
-            className="max-h-[85vh] max-w-[95vw] rounded-md object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
+          <figure className="flex flex-col items-center gap-2" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={visible[openIdx]!.url}
+              alt={visible[openIdx]!.alt}
+              className="max-h-[80vh] max-w-[95vw] rounded-md object-contain"
+            />
+            {/* G8-F1D · Caption y crédito acreditados (contraste AA). */}
+            {visible[openIdx]!.caption || visible[openIdx]!.credit ? (
+              <figcaption className="max-w-[95vw] text-center text-xs leading-tight text-white">
+                {visible[openIdx]!.caption ? (
+                  <span className="block">{visible[openIdx]!.caption}</span>
+                ) : null}
+                {visible[openIdx]!.credit ? (
+                  <span className="block text-white/80">
+                    <span className="sr-only">Crédito de la imagen: </span>
+                    {visible[openIdx]!.credit}
+                  </span>
+                ) : null}
+              </figcaption>
+            ) : null}
+          </figure>
           <button
             type="button"
             aria-label="Siguiente"
             className="absolute right-4 top-1/2 -translate-y-1/2 rounded-pill bg-white/10 p-2 text-white hover:bg-white/20 focus-visible:outline-none focus-visible:ring-focus"
-            onClick={(e) => { e.stopPropagation(); nav(1); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              nav(1);
+            }}
           >
             <ChevronRight className="h-6 w-6" />
           </button>
@@ -182,12 +232,28 @@ function Thumb({
           !fill && cls,
         )}
       />
-      {captions && item.caption ? (
-        <span className="mt-1 block truncate text-xs text-muted-foreground">{item.caption}</span>
+      {/* G8-F1D · El crédito acreditado es obligación de atribución, no
+          un caption editorial: se muestra aunque `captions` esté off. */}
+      {(captions && item.caption) || item.credit ? (
+        <span className="mt-1 block text-xs leading-tight text-muted-foreground">
+          {captions && item.caption ? <span className="block truncate">{item.caption}</span> : null}
+          {/* G8-F1D · Crédito acreditado, visible sin login. */}
+          {item.credit ? (
+            <span className="block truncate">
+              <span className="sr-only">Crédito de la imagen: </span>
+              {item.credit}
+            </span>
+          ) : null}
+        </span>
       ) : null}
     </>
   );
-  if (!lightbox) return <div className={cn("group overflow-hidden", fill ? "absolute inset-0" : cls && "relative")}>{inner}</div>;
+  if (!lightbox)
+    return (
+      <div className={cn("group overflow-hidden", fill ? "absolute inset-0" : cls && "relative")}>
+        {inner}
+      </div>
+    );
   return (
     <button
       type="button"
