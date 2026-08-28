@@ -559,6 +559,25 @@ function GalleryHero({
           </div>
         ) : null}
 
+        {/* G8-F1D · Atribución pública acreditada de la foto activa.
+            Sólo se muestra cuando el medio declara caption o crédito. */}
+        {slides[index]?.credit || slides[index]?.caption ? (
+          <p
+            aria-live="polite"
+            className="pointer-events-none absolute bottom-3 left-3 max-w-[70%] rounded-pill bg-black/65 px-2.5 py-1 text-[11px] font-medium leading-tight text-white sm:bottom-4 sm:left-4 sm:text-xs"
+          >
+            {slides[index]?.caption ? (
+              <span className="block">{slides[index]!.caption}</span>
+            ) : null}
+            {slides[index]?.credit ? (
+              <span className="block">
+                <span className="sr-only">Crédito de la imagen: </span>
+                {slides[index]!.credit}
+              </span>
+            ) : null}
+          </p>
+        ) : null}
+
         {/* Prev/Next chevrons on wider screens */}
         {total > 1 ? (
           <>
