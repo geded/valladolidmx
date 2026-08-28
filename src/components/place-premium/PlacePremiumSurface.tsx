@@ -412,8 +412,12 @@ function HeroEditorial({ content }: { content: PlacePremiumContent }) {
           </Button>
         </div>
         <div className="mt-6 grid grid-cols-2 gap-3">
-          {content.hero.supporting.map((media) => (
-            <DemoImage key={`${media.url}-${index}`} media={media} className="aspect-[3/2] rounded-2xl" />
+          {content.hero.supporting.map((media, index) => (
+            <DemoImage
+              key={`${media.url}-${index}`}
+              media={media}
+              className="aspect-[3/2] rounded-2xl"
+            />
           ))}
         </div>
       </div>
@@ -600,8 +604,12 @@ function GalleryMosaic({ content }: { content: PlacePremiumContent }) {
             className="aspect-[4/3] rounded-3xl sm:col-span-2 sm:row-span-2 lg:aspect-auto lg:h-full"
           />
         ) : null}
-        {rest.map((media) => (
-          <DemoImage key={`${media.url}-${index}`} media={media} className="aspect-[4/3] rounded-3xl" />
+        {rest.map((media, index) => (
+          <DemoImage
+            key={`${media.url}-${index}`}
+            media={media}
+            className="aspect-[4/3] rounded-3xl"
+          />
         ))}
       </div>
     </section>
@@ -620,8 +628,11 @@ function GalleryFilmstrip({ content }: { content: PlacePremiumContent }) {
         {content.gallery.note}
       </p>
       <ul className="mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
-        {content.gallery.items.map((media) => (
-          <li key={`${media.url}-${index}`} className="w-[78%] shrink-0 snap-start sm:w-[46%] lg:w-[31%]">
+        {content.gallery.items.map((media, index) => (
+          <li
+            key={`${media.url}-${index}`}
+            className="w-[78%] shrink-0 snap-start sm:w-[46%] lg:w-[31%]"
+          >
             <DemoImage media={media} className="aspect-[16/10] rounded-3xl" />
           </li>
         ))}
