@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-R2",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md",
+  "founder_authority": "Aprobación Founder 2026-08-28 · G8-Q2D-A. Reconoce exclusivamente la regeneración de los tipos generados de Lovable Cloud derivada de la migración aditiva e idempotente que añade el valor 'place' al enum público eb_page_kind. Cambio derivado y no autoral: no crea ni elimina tablas, columnas, políticas RLS ni privilegios, y no altera datos. El addendum se registra bajo PCA-2026-029 por ser la única autorización Approved que contiene el permiso modify y la acknowledged revision de este archivo; la autoridad de paquete es PCA-2026-047.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/integrations/supabase/types.ts",
+    "previous_sha256": "8306d156e914f3a3ec0581b1f058148ac378422c8cb2f7e6a095c589b3ed70ed",
+    "current_sha256": "48566b4a6fbe940839e569239d43b145fb72fda4367f55c3e30ebc2c27fc313f",
+    "semantic_change": "G8-Q2D-A · Alta del valor 'place' en el enum eb_page_kind. Sin cambios de tablas, columnas, funciones, políticas ni datos.",
+    "authority": "PCA-2026-047"
+  },
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "Cero rutas públicas, cero redirects, cero publicación",
+    "Chichén Itzá y Ek' Balam permanecen en draft"
+  ],
+  "recorded_at": "2026-08-28"
+}

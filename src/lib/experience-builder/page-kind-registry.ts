@@ -165,6 +165,25 @@ export const PAGE_KIND_REGISTRY: readonly PageKindDefinition[] = [
     allowedBlockCategories: null,
   },
   {
+    // G8-Q2D-A · Lugar y Atractivo. La plantilla premium reusable
+    // `premium-entity-place` se registra en `premium-template-registry`.
+    // La ruta pública NO está autorizada todavía (sólo Studio/catálogo).
+    kind: "place",
+    label: "Lugar y atractivo",
+    description: "Ficha premium de Lugar o Atractivo (zona arqueológica, cenote, museo…).",
+    slugPattern: "/oriente-maya/{destino}/lugares/{slug}",
+    singleton: false,
+    requiredRoles: ["admin", "super_admin", "editor"],
+    publicRoutePattern: "/oriente-maya/{destino}/lugares/{slug}",
+    allowedBlockCategories: null,
+    defaults: {
+      jsonLdType: "Place",
+      sitemapChangefreq: "monthly",
+      sitemapPriority: 0.6,
+    },
+  },
+
+  {
     // US-R3 · Ola 2 · Sub-ola 2.1 — H-R3-4 (Region como kind oficial).
     // Aunque Oriente Maya es hoy la única región publicada, la ruta
     // pública sigue el patrón `/{regionSlug}` para futuras regiones.
@@ -348,35 +367,173 @@ export function canEditPageKind(kind: PageKind | string, roles: readonly string[
 export interface ResolvedKindDefaults {
   readonly jsonLdType: string;
   readonly sitemapChangefreq:
-    | "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
+    | "always"
+    | "hourly"
+    | "daily"
+    | "weekly"
+    | "monthly"
+    | "yearly"
+    | "never";
   readonly sitemapPriority: number;
   readonly cacheControl: string;
   readonly unpublishFallbackPath: string;
 }
 
 const FALLBACK_BY_KIND: Partial<Record<PageKind, ResolvedKindDefaults>> = {
-  home:         { jsonLdType: "WebSite",  sitemapChangefreq: "daily",   sitemapPriority: 1.0, cacheControl: "public, max-age=60, s-maxage=120",  unpublishFallbackPath: "/" },
-  marketplace:  { jsonLdType: "WebPage",  sitemapChangefreq: "hourly",  sitemapPriority: 0.9, cacheControl: "public, max-age=60, s-maxage=120",  unpublishFallbackPath: "/oriente-maya" },
-  destination:  { jsonLdType: "Place",    sitemapChangefreq: "weekly",  sitemapPriority: 0.8, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/oriente-maya" },
-  region:       { jsonLdType: "Place",    sitemapChangefreq: "weekly",  sitemapPriority: 0.8, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/" },
-  experience:   { jsonLdType: "TouristAttraction", sitemapChangefreq: "weekly",  sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/experiencias" },
-  hotel:        { jsonLdType: "Hotel",    sitemapChangefreq: "weekly",  sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/hoteles" },
-  restaurant:   { jsonLdType: "Restaurant", sitemapChangefreq: "weekly", sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/restaurantes" },
-  event:        { jsonLdType: "Event",    sitemapChangefreq: "daily",   sitemapPriority: 0.7, cacheControl: "public, max-age=120, s-maxage=300", unpublishFallbackPath: "/eventos" },
-  business:     { jsonLdType: "LocalBusiness", sitemapChangefreq: "weekly", sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/empresas" },
-  product:      { jsonLdType: "Product",  sitemapChangefreq: "weekly",  sitemapPriority: 0.7, cacheControl: "public, max-age=300, s-maxage=600", unpublishFallbackPath: "/oriente-maya" },
-  landing:      { jsonLdType: "WebPage",  sitemapChangefreq: "monthly", sitemapPriority: 0.6, cacheControl: "public, max-age=300, s-maxage=900", unpublishFallbackPath: "/" },
-  campaign:     { jsonLdType: "WebPage",  sitemapChangefreq: "weekly",  sitemapPriority: 0.6, cacheControl: "public, max-age=300, s-maxage=900", unpublishFallbackPath: "/" },
-  promo:        { jsonLdType: "WebPage",  sitemapChangefreq: "weekly",  sitemapPriority: 0.6, cacheControl: "public, max-age=300, s-maxage=900", unpublishFallbackPath: "/" },
-  microsite:    { jsonLdType: "WebPage",  sitemapChangefreq: "monthly", sitemapPriority: 0.5, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
-  institutional:{ jsonLdType: "WebPage",  sitemapChangefreq: "yearly",  sitemapPriority: 0.3, cacheControl: "public, max-age=3600, s-maxage=86400", unpublishFallbackPath: "/" },
-  route:        { jsonLdType: "TouristTrip", sitemapChangefreq: "monthly", sitemapPriority: 0.6, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
-  alux:         { jsonLdType: "WebPage",  sitemapChangefreq: "monthly", sitemapPriority: 0.5, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
-  trip_builder: { jsonLdType: "WebPage",  sitemapChangefreq: "monthly", sitemapPriority: 0.5, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
-  wedding:      { jsonLdType: "WebPage",  sitemapChangefreq: "monthly", sitemapPriority: 0.5, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
-  ai_generated: { jsonLdType: "WebPage",  sitemapChangefreq: "weekly",  sitemapPriority: 0.4, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
-  custom:       { jsonLdType: "WebPage",  sitemapChangefreq: "monthly", sitemapPriority: 0.5, cacheControl: "public, max-age=600, s-maxage=1800", unpublishFallbackPath: "/" },
-  site_section: { jsonLdType: "WebPage",  sitemapChangefreq: "yearly",  sitemapPriority: 0.1, cacheControl: "public, max-age=3600, s-maxage=86400", unpublishFallbackPath: "/" },
+  home: {
+    jsonLdType: "WebSite",
+    sitemapChangefreq: "daily",
+    sitemapPriority: 1.0,
+    cacheControl: "public, max-age=60, s-maxage=120",
+    unpublishFallbackPath: "/",
+  },
+  marketplace: {
+    jsonLdType: "WebPage",
+    sitemapChangefreq: "hourly",
+    sitemapPriority: 0.9,
+    cacheControl: "public, max-age=60, s-maxage=120",
+    unpublishFallbackPath: "/oriente-maya",
+  },
+  destination: {
+    jsonLdType: "Place",
+    sitemapChangefreq: "weekly",
+    sitemapPriority: 0.8,
+    cacheControl: "public, max-age=300, s-maxage=600",
+    unpublishFallbackPath: "/oriente-maya",
+  },
+  region: {
+    jsonLdType: "Place",
+    sitemapChangefreq: "weekly",
+    sitemapPriority: 0.8,
+    cacheControl: "public, max-age=300, s-maxage=600",
+    unpublishFallbackPath: "/",
+  },
+  experience: {
+    jsonLdType: "TouristAttraction",
+    sitemapChangefreq: "weekly",
+    sitemapPriority: 0.7,
+    cacheControl: "public, max-age=300, s-maxage=600",
+    unpublishFallbackPath: "/experiencias",
+  },
+  hotel: {
+    jsonLdType: "Hotel",
+    sitemapChangefreq: "weekly",
+    sitemapPriority: 0.7,
+    cacheControl: "public, max-age=300, s-maxage=600",
+    unpublishFallbackPath: "/hoteles",
+  },
+  restaurant: {
+    jsonLdType: "Restaurant",
+    sitemapChangefreq: "weekly",
+    sitemapPriority: 0.7,
+    cacheControl: "public, max-age=300, s-maxage=600",
+    unpublishFallbackPath: "/restaurantes",
+  },
+  event: {
+    jsonLdType: "Event",
+    sitemapChangefreq: "daily",
+    sitemapPriority: 0.7,
+    cacheControl: "public, max-age=120, s-maxage=300",
+    unpublishFallbackPath: "/eventos",
+  },
+  business: {
+    jsonLdType: "LocalBusiness",
+    sitemapChangefreq: "weekly",
+    sitemapPriority: 0.7,
+    cacheControl: "public, max-age=300, s-maxage=600",
+    unpublishFallbackPath: "/empresas",
+  },
+  product: {
+    jsonLdType: "Product",
+    sitemapChangefreq: "weekly",
+    sitemapPriority: 0.7,
+    cacheControl: "public, max-age=300, s-maxage=600",
+    unpublishFallbackPath: "/oriente-maya",
+  },
+  landing: {
+    jsonLdType: "WebPage",
+    sitemapChangefreq: "monthly",
+    sitemapPriority: 0.6,
+    cacheControl: "public, max-age=300, s-maxage=900",
+    unpublishFallbackPath: "/",
+  },
+  campaign: {
+    jsonLdType: "WebPage",
+    sitemapChangefreq: "weekly",
+    sitemapPriority: 0.6,
+    cacheControl: "public, max-age=300, s-maxage=900",
+    unpublishFallbackPath: "/",
+  },
+  promo: {
+    jsonLdType: "WebPage",
+    sitemapChangefreq: "weekly",
+    sitemapPriority: 0.6,
+    cacheControl: "public, max-age=300, s-maxage=900",
+    unpublishFallbackPath: "/",
+  },
+  microsite: {
+    jsonLdType: "WebPage",
+    sitemapChangefreq: "monthly",
+    sitemapPriority: 0.5,
+    cacheControl: "public, max-age=600, s-maxage=1800",
+    unpublishFallbackPath: "/",
+  },
+  institutional: {
+    jsonLdType: "WebPage",
+    sitemapChangefreq: "yearly",
+    sitemapPriority: 0.3,
+    cacheControl: "public, max-age=3600, s-maxage=86400",
+    unpublishFallbackPath: "/",
+  },
+  route: {
+    jsonLdType: "TouristTrip",
+    sitemapChangefreq: "monthly",
+    sitemapPriority: 0.6,
+    cacheControl: "public, max-age=600, s-maxage=1800",
+    unpublishFallbackPath: "/",
+  },
+  alux: {
+    jsonLdType: "WebPage",
+    sitemapChangefreq: "monthly",
+    sitemapPriority: 0.5,
+    cacheControl: "public, max-age=600, s-maxage=1800",
+    unpublishFallbackPath: "/",
+  },
+  trip_builder: {
+    jsonLdType: "WebPage",
+    sitemapChangefreq: "monthly",
+    sitemapPriority: 0.5,
+    cacheControl: "public, max-age=600, s-maxage=1800",
+    unpublishFallbackPath: "/",
+  },
+  wedding: {
+    jsonLdType: "WebPage",
+    sitemapChangefreq: "monthly",
+    sitemapPriority: 0.5,
+    cacheControl: "public, max-age=600, s-maxage=1800",
+    unpublishFallbackPath: "/",
+  },
+  ai_generated: {
+    jsonLdType: "WebPage",
+    sitemapChangefreq: "weekly",
+    sitemapPriority: 0.4,
+    cacheControl: "public, max-age=600, s-maxage=1800",
+    unpublishFallbackPath: "/",
+  },
+  custom: {
+    jsonLdType: "WebPage",
+    sitemapChangefreq: "monthly",
+    sitemapPriority: 0.5,
+    cacheControl: "public, max-age=600, s-maxage=1800",
+    unpublishFallbackPath: "/",
+  },
+  site_section: {
+    jsonLdType: "WebPage",
+    sitemapChangefreq: "yearly",
+    sitemapPriority: 0.1,
+    cacheControl: "public, max-age=3600, s-maxage=86400",
+    unpublishFallbackPath: "/",
+  },
 };
 
 const GENERIC_DEFAULTS: ResolvedKindDefaults = {
@@ -389,8 +546,7 @@ const GENERIC_DEFAULTS: ResolvedKindDefaults = {
 
 export function resolvePageKindDefaults(kind: PageKind | string): ResolvedKindDefaults {
   const def = getPageKindDefinition(kind);
-  const fallback: ResolvedKindDefaults =
-    FALLBACK_BY_KIND[kind as PageKind] ?? GENERIC_DEFAULTS;
+  const fallback: ResolvedKindDefaults = FALLBACK_BY_KIND[kind as PageKind] ?? GENERIC_DEFAULTS;
   const declared = def?.defaults;
   if (!declared) return fallback;
   return {

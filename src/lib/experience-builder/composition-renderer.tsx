@@ -35,6 +35,8 @@ import { DestinationPremiumSurface } from "@/components/destination-premium/Dest
 import { resolveDestinationPremiumG4 } from "@/components/destination-premium/destination-premium-config";
 import { ListingPremiumSurface } from "@/components/listing-premium/ListingPremiumSurface";
 import { resolveListingPremiumG5 } from "@/components/listing-premium/listing-premium-config";
+import { PlacePremiumSurface } from "@/components/place-premium/PlacePremiumSurface";
+import { resolvePlacePremiumQ2d } from "@/components/place-premium/place-premium-config";
 import { resolveHomePremiumG4 } from "@/components/home-premium/home-premium-config";
 import { ConsejoAluxSection } from "@/components/home/ConsejoAluxSection";
 import { ArmaTuViajeSection } from "@/components/home/ArmaTuViajeSection";
@@ -456,6 +458,23 @@ function ListingPremiumG5Render({ node }: BlockPreviewProps): ReactNode {
   );
 }
 
+/**
+ * G8-Q2D-A · `vmx.place.premium-q2d` — render único (Studio y preview).
+ * Autoridad visual: `PlacePremiumSurface` (aprobación Founder G8-Q2D-0).
+ * Regla fail-closed de medios resuelta en `resolvePlacePremiumQ2d`.
+ */
+function PlacePremiumQ2dRender({ node }: BlockPreviewProps): ReactNode {
+  const resolved = resolvePlacePremiumQ2d(node.config as Record<string, unknown>);
+  return (
+    <PlacePremiumSurface
+      content={resolved.content}
+      presentation={resolved.presentation}
+      variant={resolved.variant}
+      builderNotice={resolved.builderNotice}
+    />
+  );
+}
+
 function StudioErrorBlock({ title, detail }: { title: string; detail: string }): ReactNode {
   return (
     <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm">
@@ -479,6 +498,7 @@ const STUDIO_PREVIEW_MAP: Record<string, BlockPreview> = {
   "vmx.home.premium-g4": HomePremiumG4Render,
   "vmx.destination.premium-g4": DestinationPremiumG4Render,
   "vmx.listing.premium-g5": ListingPremiumG5Render,
+  "vmx.place.premium-q2d": PlacePremiumQ2dRender,
   "vmx.section.consejo-alux": NamedSectionPreview,
   "vmx.section.arma-tu-viaje": NamedSectionPreview,
   "vmx.section.en-vivo": NamedSectionPreview,
@@ -664,6 +684,7 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
   "vmx.home.premium-g4": HomePremiumG4Render,
   "vmx.destination.premium-g4": DestinationPremiumG4Render,
   "vmx.listing.premium-g5": ListingPremiumG5Render,
+  "vmx.place.premium-q2d": PlacePremiumQ2dRender,
   "vmx.section.consejo-alux": wrap(ConsejoAluxSection),
   "vmx.section.arma-tu-viaje": wrap(ArmaTuViajeSection),
   "vmx.section.en-vivo": wrap(EnVivoSection),
