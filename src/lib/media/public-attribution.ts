@@ -48,6 +48,14 @@ export function emptyAttribution(url: string): PublicMediaAttribution {
   };
 }
 
+/**
+ * Un nombre de archivo (`IMG_6663.jpeg`) no es un ALT accesible: no
+ * describe la imagen. Se descarta para no degradar la accesibilidad.
+ */
+export function isFilenameLike(value: string): boolean {
+  return /^[\w .()-]+\.(jpe?g|png|webp|avif|gif|heic|tiff?)$/i.test(value.trim());
+}
+
 const clean = (v: unknown): string | null => {
   if (typeof v !== "string") return null;
   const t = v.trim();
