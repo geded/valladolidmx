@@ -135,9 +135,28 @@ export function PlaceEditor({ placeId }: Props) {
     name: "",
     slug: "",
     destination_id: "",
+    destination_zone_id: "",
     place_type_id: "",
     description: "",
   });
+
+  /** Addendum Q2B: zonas activas del destino elegido en el alta. */
+  const newPlaceZones = useMemo(
+    () => selectableZonesForDestination(opts.zones ?? [], newPlace.destination_id),
+    [opts.zones, newPlace.destination_id],
+  );
+
+  /** Al cambiar de destino, cualquier zona incompatible se limpia. */
+  const selectNewDestination = (destinationId: string) =>
+    setNewPlace((prev) => ({
+      ...prev,
+      destination_id: destinationId,
+      destination_zone_id: reconcileZoneForDestination(
+        opts.zones ?? [],
+        destinationId,
+        prev.destination_zone_id,
+      ),
+    }));
   const [duplicates, setDuplicates] = useState<Array<{ place_name: string; slug: string }>>([]);
 
   useEffect(() => {
