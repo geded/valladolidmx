@@ -125,7 +125,8 @@ export const LISTING_FAMILY_CONTRACTS: Record<ListingFamilyId, ListingFamilyCont
       title: "Eventos",
       subtitle: "Fiestas, festivales y celebraciones del calendario maya.",
     },
-    emptyMessage: "Aún no hay eventos publicados en el calendario.",
+    emptyMessage:
+      "Aún no hay eventos publicados. Estamos armando el calendario de fiestas, festivales y celebraciones.",
   },
   "casas-de-vacaciones": {
     id: "casas-de-vacaciones",
@@ -158,11 +159,12 @@ export const LISTING_FAMILY_CONTRACTS: Record<ListingFamilyId, ListingFamilyCont
     categorySlugs: [],
     forcedCategorySlug: null,
     hero: {
-      eyebrow: "Planea tu viaje",
-      title: "Qué hacer",
-      subtitle: "Destinos y agenda viva del Oriente Maya para armar tus días.",
+      eyebrow: "Editorial",
+      title: "¿Qué hacer en el Oriente Maya?",
+      subtitle: "Cultura, naturaleza, aventura, gastronomía y eventos para inspirar tu viaje.",
     },
-    emptyMessage: "Aún no hay actividades publicadas para este momento.",
+    emptyMessage:
+      "Aún estamos armando ideas editoriales. Explora destinos y eventos del Oriente Maya.",
   },
 };
 
