@@ -285,6 +285,8 @@ export const createPlaceCms = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
     await assertPlacesStaff(ctx);
+    // Addendum Q2B: la coherencia destino–zona se verifica ANTES de crear.
+    await assertZoneBelongsToDestination(ctx, data.destination_id, data.destination_zone_id);
     const { data: id, error } = await ctx.supabase.rpc("admin_create_place", {
       _destination_id: data.destination_id,
       _slug: data.slug,
@@ -293,7 +295,18 @@ export const createPlaceCms = createServerFn({ method: "POST" })
       _description: data.description ?? null,
     });
     if (error) throw new Error(error.message);
-    return { id: id as string, status: "draft" as const };
+    const placeId = id as string;
+    if (data.destination_zone_id) {
+      const zoneUpdate = await ctx.supabase
+        .from("points_of_interest")
+        .update({ destination_zone_id: data.destination_zone_id, updated_by: ctx.userId })
+        .eq("id", placeId)
+        .select("id")
+        .maybeSingle();
+      if (zoneUpdate.error) throw new Error(zoneUpdate.error.message);
+      if (!zoneUpdate.data) throw new Error("update_denied");
+    }
+    return { id: placeId, status: "draft" as const };
   });
 
 export const updatePlaceCms = createServerFn({ method: "POST" })
