@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.62",
+    "version": "0.63",
     "state": "Approved",
-    "source_sha256": "51abf0cef8d81ccebabc800ba8b13c75b298ce7974e0274857a6e8bbcfa76747",
+    "source_sha256": "95670f365999b08cbecd4708107bd0d47d958287ec6e728f51133b74267268d3",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -7935,6 +7935,54 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-040.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-040.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/experience-builder/entity-premium-templates.ts",
+      "type": "artifact",
+      "path": "src/lib/experience-builder/entity-premium-templates.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/surfaces/tour-surface.adapter.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/surfaces/tour-surface.adapter.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/surfaces/vacation-rental-surface.adapter.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/surfaces/vacation-rental-surface.adapter.ts"
+    },
+    {
+      "id": "ART:src/components/experience-builder/PremiumPresetGallery.tsx",
+      "type": "artifact",
+      "path": "src/components/experience-builder/PremiumPresetGallery.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g8p2-tour-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g8p2-tour-premium-preview.tsx"
+    },
+    {
+      "id": "ART:src/routes/lovable/g8p2-vacation-rental-premium-preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g8p2-vacation-rental-premium-preview.tsx"
+    },
+    {
+      "id": "ART:scripts/omxds/g8/entity-template-resolution.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/g8/entity-template-resolution.contract.test.ts"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-041.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-041.json"
     }
   ],
   "edges": [
@@ -20815,6 +20863,114 @@
       "destination": "DOC:docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
       "evidence": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.34-G8-M1-SAFE-MEDIA-REPLACEMENT-MVP-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/entity-premium-templates.ts:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/entity-premium-templates.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "evidence": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/surfaces/tour-surface.adapter.ts:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "origin": "ART:src/lib/omxds/surfaces/tour-surface.adapter.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "evidence": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/surfaces/vacation-rental-surface.adapter.ts:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "origin": "ART:src/lib/omxds/surfaces/vacation-rental-surface.adapter.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "evidence": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/page-kind-registry.ts:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/page-kind-registry.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "evidence": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/route-inventory.ts:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/route-inventory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "evidence": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/experience-builder/PremiumPresetGallery.tsx:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "origin": "ART:src/components/experience-builder/PremiumPresetGallery.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "evidence": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/experience-builder/PagesPanel.tsx:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "origin": "ART:src/components/experience-builder/PagesPanel.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "evidence": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/lovable/g8p2-tour-premium-preview.tsx:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g8p2-tour-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "evidence": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/lovable/g8p2-vacation-rental-premium-preview.tsx:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "origin": "ART:src/routes/lovable/g8p2-vacation-rental-premium-preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "evidence": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/g8/entity-template-resolution.contract.test.ts:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "origin": "ART:scripts/omxds/g8/entity-template-resolution.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "evidence": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "evidence": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-041.json:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-041.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+      "evidence": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
       "verified_at": "2026-08-28"
     }
   ],

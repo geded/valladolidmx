@@ -1,0 +1,19 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-M",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-28 · G8-P2 · Automatic Premium Entity Template Resolution v1.0. Reconoce exclusivamente el alta en SCANNED_ROUTE_FILES de las dos rutas internas no indexables de evidencia visual de las familias Tour y Casa de vacaciones. Sin cambios de datos, publicacion, flags, PR, merge ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "344f93723e8d2385448892797fe9c6d7c54e1cd5c5b35c41075fee3636dfe95c",
+    "current_sha256": "838130f47fdd367a996b76147af6105ccaa28e46a8394e360a2d8ff389078563",
+    "semantic_change": "G8-P2 · Alta en SCANNED_ROUTE_FILES de las rutas internas no indexables src/routes/lovable/g8p2-tour-premium-preview.tsx y src/routes/lovable/g8p2-vacation-rental-premium-preview.tsx, usadas como evidencia visual de las dos familias premium nuevas.",
+    "authority": "PCA-2026-041"
+  },
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "recorded_at": "2026-08-28"
+}
