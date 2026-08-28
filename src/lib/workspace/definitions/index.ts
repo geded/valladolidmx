@@ -317,6 +317,7 @@ const cms: WorkspaceDefinition = {
     { id: "cms.destinos", workspaceId: "cms", label: "Destinos", icon: MapPin, to: "/cms/destinos", group: "territorio", order: 3, surfaces: ["sidebar", "palette"] },
     { id: "cms.zonas", workspaceId: "cms", label: "Zonas", icon: MapIcon, to: "/cms/zonas", group: "territorio", order: 4, surfaces: ["sidebar", "palette"] },
     { id: "cms.categorias", workspaceId: "cms", label: "Categorías", icon: Tag, to: "/cms/categorias", group: "territorio", order: 5, surfaces: ["sidebar", "palette"] },
+    { id: "cms.lugares", workspaceId: "cms", label: "Lugares y atractivos", icon: MapPin, to: "/cms/lugares", group: "territorio", order: 5.5, surfaces: ["sidebar", "palette"] },
     { id: "cms.empresas", workspaceId: "cms", label: "Empresas", icon: Building2, to: "/cms/empresas", group: "contenido", order: 6, surfaces: ["sidebar", "bottom", "palette"] },
     { id: "cms.productos", workspaceId: "cms", label: "Productos", icon: Package, to: "/cms/productos", group: "contenido", order: 7, surfaces: ["sidebar", "palette"] },
     { id: "cms.media", workspaceId: "cms", label: "Media", icon: ImageIcon, to: "/cms/media", group: "contenido", order: 8, surfaces: ["sidebar", "bottom", "palette"] },
