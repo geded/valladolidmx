@@ -266,8 +266,9 @@ export const PLACE_PREMIUM_DEMO_CONTENT: PlacePremiumContent = {
   gallery: {
     kicker: "Galería",
     title: "Cómo se ve",
-    note: "Imágenes de biblioteca gobernada usadas como marcador visual. Cada una muestra su crédito y no documenta el lugar.",
-    items: [M.piramide, M.selva, M.camino, M.plaza],
+    note: "Aún no existe fotografía acreditada de este lugar. Se muestran marcadores neutrales: ninguna imagen de otro sitio representa a Chichén Itzá.",
+    items: [P.gal1, P.gal2, P.gal3, P.gal4],
+
   },
   map: {
     heading: "Ubicación y cómo llegar",
