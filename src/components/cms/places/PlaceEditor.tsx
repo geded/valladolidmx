@@ -66,6 +66,15 @@ const NEXT_ACTIONS: Record<ContentStatus, { to: ContentStatus; label: string }[]
 
 type Values = Record<string, string>;
 
+/** Traduce los códigos de error del servidor a lenguaje del editor. */
+function describePlaceError(error: unknown, fallback: string): string {
+  const message = error instanceof Error ? error.message : "";
+  if (message.includes(ZONE_DESTINATION_MISMATCH)) return ZONE_DESTINATION_MISMATCH_MESSAGE;
+  if (message === "conflict_stale_record")
+    return "Otra persona editó este lugar mientras trabajabas. Recarga para ver la versión más reciente.";
+  return message || fallback;
+}
+
 const TEXT_FIELDS = [
   "official_name",
   "short_description",
