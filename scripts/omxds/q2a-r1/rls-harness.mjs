@@ -27,7 +27,6 @@ if (typeof process.getuid === "function" && process.getuid() === 0) {
   process.exit(child.status ?? 1);
 }
 
-
 const ROOT = process.cwd();
 const Q2A = "supabase/migrations/20260828072703_77c7df42-9a22-4568-ac6a-dddfd53c178e.sql";
 const R1 = fs
@@ -47,15 +46,50 @@ function run(cmd, args, opts = {}) {
 }
 
 function sql(query, { db = "omxds", expectFail = false } = {}) {
-  const r = run("psql", ["-X", "-v", "ON_ERROR_STOP=1", "-Atq", "-h", os.tmpdir(), "-p", PORT, "-U", "postgres", "-d", db, "-c", query], {
-    env: { ...process.env, PGPASSWORD: "" },
-  });
+  const r = run(
+    "psql",
+    [
+      "-X",
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-Atq",
+      "-h",
+      os.tmpdir(),
+      "-p",
+      PORT,
+      "-U",
+      "postgres",
+      "-d",
+      db,
+      "-c",
+      query,
+    ],
+    {
+      env: { ...process.env, PGPASSWORD: "" },
+    },
+  );
   if (r.code !== 0 && !expectFail) throw new Error(`SQL failed: ${query.slice(0, 120)}\n${r.err}`);
   return r;
 }
 
 function sqlFile(file, { expectFail = false } = {}) {
-  const r = run("psql", ["-X", "-v", "ON_ERROR_STOP=1", "-q", "-h", os.tmpdir(), "-p", PORT, "-U", "postgres", "-d", "omxds", "-1", "-f", path.join(ROOT, file)]);
+  const r = run("psql", [
+    "-X",
+    "-v",
+    "ON_ERROR_STOP=1",
+    "-q",
+    "-h",
+    os.tmpdir(),
+    "-p",
+    PORT,
+    "-U",
+    "postgres",
+    "-d",
+    "omxds",
+    "-1",
+    "-f",
+    path.join(ROOT, file),
+  ]);
   if (r.code !== 0 && !expectFail) throw new Error(`Migration failed: ${file}\n${r.err}`);
   return r;
 }
@@ -71,9 +105,22 @@ if (init.code !== 0) {
   console.error(init.err || init.out);
   throw new Error("STOP: el clúster efímero no pudo inicializarse");
 }
-const start = run("pg_ctl", ["-D", CLUSTER, "-o", `-p ${PORT} -k ${os.tmpdir()} -c listen_addresses=`, "-w", "-l", path.join(CLUSTER, "log"), "start"]);
+const start = run("pg_ctl", [
+  "-D",
+  CLUSTER,
+  "-o",
+  `-p ${PORT} -k ${os.tmpdir()} -c listen_addresses=`,
+  "-w",
+  "-l",
+  path.join(CLUSTER, "log"),
+  "start",
+]);
 if (start.code !== 0) {
-  console.error(fs.existsSync(path.join(CLUSTER, "log")) ? fs.readFileSync(path.join(CLUSTER, "log"), "utf8") : start.err);
+  console.error(
+    fs.existsSync(path.join(CLUSTER, "log"))
+      ? fs.readFileSync(path.join(CLUSTER, "log"), "utf8")
+      : start.err,
+  );
   throw new Error("STOP: el clúster efímero no arrancó");
 }
 
@@ -226,29 +273,50 @@ GRANT SELECT ON public.destinations, public.products, public.events, public.medi
     ["service_role", "service_role", null, []],
   ];
   for (const [, , uid, roles] of SUBJECTS) {
-    for (const role of roles) sql(`INSERT INTO public.user_roles (user_id, role) VALUES ('${uid}','${role}') ON CONFLICT DO NOTHING`);
+    for (const role of roles)
+      sql(
+        `INSERT INTO public.user_roles (user_id, role) VALUES ('${uid}','${role}') ON CONFLICT DO NOTHING`,
+      );
   }
 
   const PROBES = [
     ["read_place_types", "SELECT count(*) FROM public.place_types"],
-    ["read_published_place", "SELECT count(*) FROM public.points_of_interest WHERE status='published'"],
+    [
+      "read_published_place",
+      "SELECT count(*) FROM public.points_of_interest WHERE status='published'",
+    ],
     ["read_draft_place", "SELECT count(*) FROM public.points_of_interest WHERE status='draft'"],
     ["read_place_products", "SELECT count(*) FROM public.place_products"],
     ["read_place_events", "SELECT count(*) FROM public.place_events"],
     ["read_place_authorities", "SELECT count(*) FROM public.place_authorities"],
-    ["write_place_hours", "INSERT INTO public.place_hours (place_id, day_of_week, is_closed) VALUES ('55555555-5555-4555-8555-555555555555', 1, false)"],
-    ["write_place_products", "INSERT INTO public.place_products (place_id, product_id, relation_kind) VALUES ('66666666-6666-4666-8666-666666666666','22222222-2222-4222-8222-222222222222','ofrecido')"],
-    ["write_place_authorities", "INSERT INTO public.place_authorities (place_id, authority_kind_id, authority_name) SELECT '66666666-6666-4666-8666-666666666666', id, 'x' FROM public.place_authority_kinds LIMIT 1"],
-    ["exec_duplicate_warnings", "SELECT count(*) FROM public.place_duplicate_warnings('Lugar borrador sintético')"],
+    [
+      "write_place_hours",
+      "INSERT INTO public.place_hours (place_id, day_of_week, is_closed) VALUES ('55555555-5555-4555-8555-555555555555', 1, false)",
+    ],
+    [
+      "write_place_products",
+      "INSERT INTO public.place_products (place_id, product_id, relation_kind) VALUES ('66666666-6666-4666-8666-666666666666','22222222-2222-4222-8222-222222222222','ofrecido')",
+    ],
+    [
+      "write_place_authorities",
+      "INSERT INTO public.place_authorities (place_id, authority_kind_id, authority_name) SELECT '66666666-6666-4666-8666-666666666666', id, 'x' FROM public.place_authority_kinds LIMIT 1",
+    ],
+    [
+      "exec_duplicate_warnings",
+      "SELECT count(*) FROM public.place_duplicate_warnings('Lugar borrador sintético')",
+    ],
   ];
 
   for (const [name, dbRole, uid] of SUBJECTS) {
     const row = {};
     for (const [probe, statement] of PROBES) {
       const claim = uid ? `SET LOCAL request.jwt.claim.sub = '${uid}';` : "";
-      const r = sql(`BEGIN; SET LOCAL ROLE ${dbRole}; ${claim} ${statement}; ROLLBACK;`, { expectFail: true });
+      const r = sql(`BEGIN; SET LOCAL ROLE ${dbRole}; ${claim} ${statement}; ROLLBACK;`, {
+        expectFail: true,
+      });
       if (r.code !== 0) row[probe] = "DENEGADO";
-      else if (statement.startsWith("SELECT count")) row[probe] = `filas=${r.out.split("\n").filter(Boolean).pop()}`;
+      else if (statement.startsWith("SELECT count"))
+        row[probe] = `filas=${r.out.split("\n").filter(Boolean).pop()}`;
       else row[probe] = "PERMITIDO";
     }
     results.subjects[name] = row;
@@ -259,15 +327,24 @@ GRANT SELECT ON public.destinations, public.products, public.events, public.medi
     `SELECT c.relname||' => '||coalesce(array_to_string(c.relacl,' | '),'-') FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r' AND c.relname LIKE 'place\\_%' ORDER BY 1`,
   ).out;
   results.acl.effective = acl.split("\n");
-  results.acl.no_anon_on_authorities = /place_authorities => (?!.*anon=)/.test(acl) ? "PASS" : "FAIL";
+  results.acl.no_anon_on_authorities = /place_authorities => (?!.*anon=)/.test(acl)
+    ? "PASS"
+    : "FAIL";
 
   // ACL amplio no elude RLS: se prueba con un rol con todos los privilegios de tabla.
-  sql(`CREATE ROLE broad_acl NOLOGIN; GRANT USAGE ON SCHEMA public TO broad_acl; GRANT ALL ON public.points_of_interest TO broad_acl;`);
-  const broad = sql(`BEGIN; SET LOCAL ROLE broad_acl; SELECT count(*) FROM public.points_of_interest; ROLLBACK;`, { expectFail: true });
+  sql(
+    `CREATE ROLE broad_acl NOLOGIN; GRANT USAGE ON SCHEMA public TO broad_acl; GRANT ALL ON public.points_of_interest TO broad_acl;`,
+  );
+  const broad = sql(
+    `BEGIN; SET LOCAL ROLE broad_acl; SELECT count(*) FROM public.points_of_interest; ROLLBACK;`,
+    { expectFail: true },
+  );
   // El rol tiene ACL total sobre la tabla y aun así RLS le devuelve cero filas:
   // ninguna política lo nombra. El ACL amplio no elude la RLS.
   results.checks.broad_acl_does_not_bypass_rls =
-    broad.code === 0 && broad.out.split("\n").filter(Boolean).pop() === "0" ? "PASS" : `FAIL(${broad.code}:${broad.out})`;
+    broad.code === 0 && broad.out.split("\n").filter(Boolean).pop() === "0"
+      ? "PASS"
+      : `FAIL(${broad.code}:${broad.out})`;
 
   // ------------------------------------------------------- rollback operativo
   const ROLLBACK_R1 = `
@@ -307,10 +384,13 @@ CREATE POLICY "poi_perm_write" ON public.points_of_interest FOR ALL TO authentic
 `;
   sql(ROLLBACK_Q2A);
   const finalPois = sql("SELECT count(*) FROM public.points_of_interest").out;
-  const finalPolicies = sql("SELECT count(*) FROM pg_policy pol JOIN pg_class c ON c.oid=pol.polrelid WHERE c.relname='points_of_interest'").out;
+  const finalPolicies = sql(
+    "SELECT count(*) FROM pg_policy pol JOIN pg_class c ON c.oid=pol.polrelid WHERE c.relname='points_of_interest'",
+  ).out;
   results.checks.rollback_q2a = "PASS";
   results.checks.rollback_q2a_preserves_places = finalPois === poisBefore ? "PASS" : "FAIL";
-  results.checks.rollback_q2a_restores_policies = finalPolicies === "3" ? "PASS" : `FAIL(${finalPolicies})`;
+  results.checks.rollback_q2a_restores_policies =
+    finalPolicies === "3" ? "PASS" : `FAIL(${finalPolicies})`;
 } finally {
   stop();
   fs.rmSync(CLUSTER, { recursive: true, force: true });
@@ -318,13 +398,43 @@ CREATE POLICY "poi_perm_write" ON public.points_of_interest FOR ALL TO authentic
 
 // --------------------------------------------------------------- adjudicación
 const expected = {
-  anon: { read_draft_place: "filas=0", read_place_authorities: "DENEGADO", write_place_hours: "DENEGADO", exec_duplicate_warnings: "DENEGADO" },
-  traveler: { read_draft_place: "filas=0", read_place_authorities: "filas=0", write_place_hours: "DENEGADO", exec_duplicate_warnings: "DENEGADO" },
-  business_owner: { read_draft_place: "filas=0", write_place_products: "DENEGADO", exec_duplicate_warnings: "DENEGADO" },
-  concierge: { read_draft_place: "filas=0", write_place_authorities: "DENEGADO", exec_duplicate_warnings: "DENEGADO" },
-  editor: { read_draft_place: "filas=1", write_place_hours: "PERMITIDO", write_place_authorities: "PERMITIDO" },
-  admin: { read_draft_place: "filas=1", write_place_products: "PERMITIDO", exec_duplicate_warnings: "filas=1" },
-  super_admin: { read_draft_place: "filas=1", write_place_hours: "PERMITIDO", exec_duplicate_warnings: "filas=1" },
+  anon: {
+    read_draft_place: "filas=0",
+    read_place_authorities: "DENEGADO",
+    write_place_hours: "DENEGADO",
+    exec_duplicate_warnings: "DENEGADO",
+  },
+  traveler: {
+    read_draft_place: "filas=0",
+    read_place_authorities: "filas=0",
+    write_place_hours: "DENEGADO",
+    exec_duplicate_warnings: "DENEGADO",
+  },
+  business_owner: {
+    read_draft_place: "filas=0",
+    write_place_products: "DENEGADO",
+    exec_duplicate_warnings: "DENEGADO",
+  },
+  concierge: {
+    read_draft_place: "filas=0",
+    write_place_authorities: "DENEGADO",
+    exec_duplicate_warnings: "DENEGADO",
+  },
+  editor: {
+    read_draft_place: "filas=1",
+    write_place_hours: "PERMITIDO",
+    write_place_authorities: "PERMITIDO",
+  },
+  admin: {
+    read_draft_place: "filas=1",
+    write_place_products: "PERMITIDO",
+    exec_duplicate_warnings: "filas=1",
+  },
+  super_admin: {
+    read_draft_place: "filas=1",
+    write_place_hours: "PERMITIDO",
+    exec_duplicate_warnings: "filas=1",
+  },
   service_role: { read_draft_place: "filas=1", write_place_hours: "PERMITIDO" },
 };
 
@@ -338,11 +448,21 @@ for (const [subject, probes] of Object.entries(expected)) {
 for (const [key, value] of Object.entries(results.checks)) {
   if (typeof value === "string" && value.startsWith("FAIL")) failures.push(`${key}: ${value}`);
 }
-if (results.acl.no_anon_on_authorities !== "PASS") failures.push("place_authorities expuesta a anon");
+if (results.acl.no_anon_on_authorities !== "PASS")
+  failures.push("place_authorities expuesta a anon");
 
 results.result = failures.length === 0 ? "PASS" : "FAIL";
 results.failures = failures;
-results.migrations = { q2a: Q2A, r1: R1, q2a_sha256: createHash("sha256").update(fs.readFileSync(path.join(ROOT, Q2A))).digest("hex"), r1_sha256: createHash("sha256").update(fs.readFileSync(path.join(ROOT, R1))).digest("hex") };
+results.migrations = {
+  q2a: Q2A,
+  r1: R1,
+  q2a_sha256: createHash("sha256")
+    .update(fs.readFileSync(path.join(ROOT, Q2A)))
+    .digest("hex"),
+  r1_sha256: createHash("sha256")
+    .update(fs.readFileSync(path.join(ROOT, R1)))
+    .digest("hex"),
+};
 
 console.log(JSON.stringify(results, null, 2));
 if (failures.length > 0) process.exit(1);

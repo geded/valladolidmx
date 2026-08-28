@@ -14,7 +14,6 @@ import {
   PLACE_TYPE_SLUGS,
 } from "./place-taxonomy";
 
-
 export const placeTypeSchema = z.object({
   id: z.string().uuid(),
   slug: z.enum(PLACE_TYPE_SLUGS),

@@ -50,16 +50,27 @@ describe("G8-Q2A-R1 · modelo completado", () => {
   test("admission_kind es un código cerrado de cuatro valores", () => {
     expect([...PLACE_ADMISSION_KINDS]).toEqual(["gratuito", "pago", "mixto", "no_aplica"]);
     expect(isPlaceAdmissionKind("donativo")).toBe(false);
-    expect(placeRecordSchema.safeParse({ ...base, admission_kind: "donativo" }).success).toBe(false);
+    expect(placeRecordSchema.safeParse({ ...base, admission_kind: "donativo" }).success).toBe(
+      false,
+    );
   });
 
   test("el rango de precio debe ser coherente", () => {
-    expect(placeRecordCoherentSchema.safeParse({ ...base, price_from: 100, price_to: 40 }).success).toBe(false);
-    expect(placeRecordCoherentSchema.safeParse({ ...base, price_from: 40, price_to: 100 }).success).toBe(true);
+    expect(
+      placeRecordCoherentSchema.safeParse({ ...base, price_from: 100, price_to: 40 }).success,
+    ).toBe(false);
+    expect(
+      placeRecordCoherentSchema.safeParse({ ...base, price_from: 40, price_to: 100 }).success,
+    ).toBe(true);
   });
 
   test("las relaciones lugar-producto y lugar-evento usan códigos contratados", () => {
-    expect([...PLACE_PRODUCT_RELATION_KINDS]).toEqual(["oficial", "operado", "ofrecido", "recomendado"]);
+    expect([...PLACE_PRODUCT_RELATION_KINDS]).toEqual([
+      "oficial",
+      "operado",
+      "ofrecido",
+      "recomendado",
+    ]);
     expect([...PLACE_EVENT_RELATION_KINDS]).toEqual(["sede", "organizado", "asociado"]);
     expect(
       placeProductLinkSchema.safeParse({
@@ -129,7 +140,9 @@ describe("G8-Q2A-R1 · invariantes de la migración", () => {
     expect(R1).toMatch(/place_duplicate_warnings[\s\S]*SECURITY INVOKER/);
     expect(R1).not.toMatch(/place_duplicate_warnings[\s\S]*SECURITY DEFINER/);
     expect(R1).toMatch(/RAISE EXCEPTION 'not authorized'/);
-    expect(R1).toContain("REVOKE ALL ON FUNCTION public.place_duplicate_warnings(text) FROM PUBLIC, anon;");
+    expect(R1).toContain(
+      "REVOKE ALL ON FUNCTION public.place_duplicate_warnings(text) FROM PUBLIC, anon;",
+    );
   });
 
   test("no crea, clasifica ni modifica contenido turístico real", () => {
