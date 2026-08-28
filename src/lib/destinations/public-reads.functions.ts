@@ -7,6 +7,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { MarketplaceBusinessCard, MarketplaceProductCard } from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
+import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
 
 export interface PublicDestinationDTO {
   slug: string;
