@@ -90,10 +90,10 @@ describe("DEF-M-05/08 · derechos y procedencia fail-closed", () => {
     expect(validateMediaRights(baseRights)).toBeNull();
   });
 
-  test("rechaza IA declarada como documental", () => {
-    expect(
-      validateMediaRights({ ...baseRights, nature: "ai_generated" as const, source: null }),
-    ).toBe("rights_confirmation_required" as never satisfies string | null);
+  test("una imagen IA nunca puede quedar marcada como documental", () => {
+    const meta = buildRightsMetadata({ ...baseRights, nature: "ai_generated" });
+    expect(meta.rights.documentary).toBe(false);
+    expect(validateMediaRights({ ...baseRights, nature: "ai_generated" })).toBeNull();
   });
 
   test("rechaza documental sin fuente, autor o licencia", () => {
