@@ -314,12 +314,8 @@ export function PlaceEditor({ placeId }: Props) {
       await detail.refetch();
     },
     onError: (e) => {
-      const message = e instanceof Error ? e.message : "No se pudo guardar.";
-      setFieldError(
-        message === "conflict_stale_record"
-          ? "Otra persona editó este lugar mientras trabajabas. Recarga para ver la versión más reciente."
-          : message,
-      );
+      const message = describePlaceError(e, "No se pudo guardar.");
+      setFieldError(message);
       toast.error(message);
     },
   });
