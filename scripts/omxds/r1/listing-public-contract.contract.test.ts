@@ -109,6 +109,6 @@ describe("G8-R1 · R1-A · contrato de listados (casos 1-6)", () => {
     const queHacer = buildPublicListing({ family: "que-hacer", events: [event()] });
     expect(queHacer.source).toBe("editorial");
     expect(queHacer.items).toHaveLength(1);
-    expect(queHacer.hero.title).toBe("Qué hacer");
+    expect(queHacer.hero.title).toBe("¿Qué hacer en el Oriente Maya?");
   });
 });
