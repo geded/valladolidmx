@@ -6,17 +6,17 @@
     "glossary": {
       "document": "docs/governance/01-GLOSSARY.md",
       "state": "Approved",
-      "source_sha256": "0ae43a756f1fb7cd2dd0da0c8af1d3d28e5f6e4b83f33b22a458f59ff9f757ce"
+      "source_sha256": "ab0690ec0f79189ad5708e78f1295cee758d0889350f1dfad074a176123eaf1c"
     },
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "3f67f9b135cda01718146200bc5ca6559ed139137edc70d22935c552935fc51d"
+      "source_sha256": "dc83af5217cab86979069ae1c8c975c0f0785a81879ca471701eb91854a3c8ef"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
       "state": "Approved",
-      "source_sha256": "69b5509a5caf8e2403e03da148075b31b726734d74e746c8c81bd4ea7e5f707d"
+      "source_sha256": "35e457d74252af37c79a3f93ca65f5094cb59eb3f3f86d94f779e509cd6a5bdd"
     },
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
@@ -11642,6 +11642,86 @@
       "path": "docs/governance/product-authorizations/PCA-2026-047.json",
       "source": "docs/governance/product-authorizations/PCA-2026-047.json",
       "evidence": "docs/governance/product-authorizations/PCA-2026-047.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md"
+    },
+    {
+      "id": "ART:src/lib/places/place-public-contract.ts",
+      "type": "artifact",
+      "path": "src/lib/places/place-public-contract.ts",
+      "source": "src/lib/places/place-public-contract.ts",
+      "evidence": "src/lib/places/place-public-contract.ts"
+    },
+    {
+      "id": "ART:src/lib/places/place-public-reads.server.ts",
+      "type": "artifact",
+      "path": "src/lib/places/place-public-reads.server.ts",
+      "source": "src/lib/places/place-public-reads.server.ts",
+      "evidence": "src/lib/places/place-public-reads.server.ts"
+    },
+    {
+      "id": "ART:src/lib/places/place-public-reads.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/places/place-public-reads.functions.ts",
+      "source": "src/lib/places/place-public-reads.functions.ts",
+      "evidence": "src/lib/places/place-public-reads.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/places/place-presentation.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/places/place-presentation.functions.ts",
+      "source": "src/lib/places/place-presentation.functions.ts",
+      "evidence": "src/lib/places/place-presentation.functions.ts"
+    },
+    {
+      "id": "ART:src/components/cms/places/PlacePresentationPanel.tsx",
+      "type": "artifact",
+      "path": "src/components/cms/places/PlacePresentationPanel.tsx",
+      "source": "src/components/cms/places/PlacePresentationPanel.tsx",
+      "evidence": "src/components/cms/places/PlacePresentationPanel.tsx"
+    },
+    {
+      "id": "ART:src/routes/oriente-maya/$destino.lugares.$slug.tsx",
+      "type": "artifact",
+      "path": "src/routes/oriente-maya/$destino.lugares.$slug.tsx",
+      "source": "src/routes/oriente-maya/$destino.lugares.$slug.tsx",
+      "evidence": "src/routes/oriente-maya/$destino.lugares.$slug.tsx"
+    },
+    {
+      "id": "ART:scripts/omxds/q2d-b/place-public-connection.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/q2d-b/place-public-connection.contract.test.ts",
+      "source": "scripts/omxds/q2d-b/place-public-connection.contract.test.ts",
+      "evidence": "scripts/omxds/q2d-b/place-public-connection.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/q2d-b/place-public-connection.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/q2d-b/place-public-connection.evidence.mjs",
+      "source": "scripts/omxds/q2d-b/place-public-connection.evidence.mjs",
+      "evidence": "scripts/omxds/q2d-b/place-public-connection.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-q2d-b/EVIDENCE-MANIFEST.md",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-q2d-b/EVIDENCE-MANIFEST.md",
+      "source": "docs/evidence/omxds-q2d-b/EVIDENCE-MANIFEST.md",
+      "evidence": "docs/evidence/omxds-q2d-b/EVIDENCE-MANIFEST.md"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-048.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-048.json",
+      "source": "docs/governance/product-authorizations/PCA-2026-048.json",
+      "evidence": "docs/governance/product-authorizations/PCA-2026-048.json"
     }
   ],
   "edges": [
@@ -32095,6 +32175,145 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.71 · docs/blueprint/19.43-G8-Q2D-A-PREMIUM-ENTITY-PLACE-TEMPLATE-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/places/place-public-contract.ts:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/lib/places/place-public-contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/places/place-public-reads.server.ts:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/lib/places/place-public-reads.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/places/place-public-reads.functions.ts:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/lib/places/place-public-reads.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/places/place-presentation.functions.ts:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/lib/places/place-presentation.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/cms/places/PlacePresentationPanel.tsx:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/components/cms/places/PlacePresentationPanel.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/cms/places/PlaceEditor.tsx:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/components/cms/places/PlaceEditor.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/oriente-maya/$destino.lugares.$slug.tsx:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/routes/oriente-maya/$destino.lugares.$slug.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/experience-builder/route-inventory.ts:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/route-inventory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/q2d-b/place-public-connection.contract.test.ts:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:scripts/omxds/q2d-b/place-public-connection.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/q2d-b/place-public-connection.evidence.mjs:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:scripts/omxds/q2d-b/place-public-connection.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/evidence/omxds-q2d-b/EVIDENCE-MANIFEST.md:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-q2d-b/EVIDENCE-MANIFEST.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:package.json:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-048.json:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-048.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "verified_at": "2026-08-28",
+      "origin": "DOC:docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.73 · docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {
