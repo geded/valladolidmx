@@ -50,7 +50,15 @@ function splitUrl(raw: string): { base: string; params: URLSearchParams; hash: s
 export function decodeSlotMedia(raw: unknown): SlotMedia {
   const value = typeof raw === "string" ? raw : "";
   if (!value) {
-    return { src: "", alt: null, credit: null, nature: null, reviewState: null, focalX: 0.5, focalY: 0.5 };
+    return {
+      src: "",
+      alt: null,
+      credit: null,
+      nature: null,
+      reviewState: null,
+      focalX: 0.5,
+      focalY: 0.5,
+    };
   }
   const { base, params, hash } = splitUrl(value);
   const focalRaw = params.get(SLOT_PARAM.focal);
@@ -122,7 +130,10 @@ export function focalObjectPosition(media: Pick<SlotMedia, "focalX" | "focalY">)
 }
 
 /** Props listas para un `<img>` a partir del valor guardado en el slot. */
-export function slotImageProps(raw: unknown, fallbackAlt = ""): {
+export function slotImageProps(
+  raw: unknown,
+  fallbackAlt = "",
+): {
   src: string;
   alt: string;
   style: { objectPosition: string };
