@@ -130,15 +130,17 @@ export const listPlacesCms = createServerFn({ method: "POST" })
 
     let q = (context as Ctx).supabase
       .from("points_of_interest")
-      .select("id, slug, name, status, destination_id, place_type_id, latitude, longitude, updated_at", {
-        count: "exact",
-      })
+      .select(
+        "id, slug, name, status, destination_id, destination_zone_id, place_type_id, latitude, longitude, updated_at",
+        { count: "exact" },
+      )
       .is("deleted_at", null)
       .order("name", { ascending: true })
       .range(offset, offset + limit - 1);
 
     if (search) q = q.or(`name.ilike.%${search}%,slug.ilike.%${search}%`);
     if (data.destinationId) q = q.eq("destination_id", data.destinationId);
+    if (data.destinationZoneId) q = q.eq("destination_zone_id", data.destinationZoneId);
     if (data.placeTypeId) q = q.eq("place_type_id", data.placeTypeId);
     if (data.status) q = q.eq("status", data.status);
     if (placeIdFilter) q = q.in("id", placeIdFilter);
