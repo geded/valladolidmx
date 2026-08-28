@@ -77,7 +77,8 @@
     "test:i4:r": "bun test scripts/omxds/i4/editorial-builder-reconciliation.test.ts",
     "validate:i4:r": "bun run test:i4:r && bun scripts/omxds/i4/editorial-builder-reconciliation.evidence.mjs",
     "test:i4:d": "bun test scripts/omxds/i4/editorial-builder-g3.integration.test.ts",
-    "validate:i4:d": "bun run test:i4:d && bun scripts/omxds/i4/editorial-builder-g3.evidence.mjs"
+    "validate:i4:d": "bun run test:i4:d && bun scripts/omxds/i4/editorial-builder-g3.evidence.mjs",
+    "validate:r1:b": "node scripts/omxds/r1/listing-routes.evidence.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.1",
