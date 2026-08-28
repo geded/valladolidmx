@@ -261,3 +261,81 @@ Fase L0 concluida sin modificar producto: cero migraciones, cero schema, cero ca
 3. resuelva el destino de las 4 landings borrador legacy (§11);
 4. autorice Blueprint `19.46` y `PCA-2026-050`;
 5. confirme el tratamiento del piloto 3 (Zazil Tunich) bajo la regla anticanibalización de §9.
+
+---
+
+# ADDENDUM L0.2 · Solapamiento R1-C ↔ R1-L y secuencia integrada
+
+**Estado:** READ-ONLY · cero escrituras de producto · cero SQL · cero migraciones · cero publicación · cero redirects · cero PR/merge/despliegue
+**Cierre R1-B:** preservado íntegro. No se reinicia R1-A ni R1-B. Nada de este addendum toca `listing-public-contract.ts`, `listing-public-reads.functions.ts` ni las seis rutas de listado ya migradas.
+
+## 15 · Superficies reales que tocaría cada ola
+
+| Superficie en HEAD | R1-C (resolutor de fichas) | R1-L (landings SEO) | R1-D (presentación) |
+|---|---|---|---|
+| `src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx` | **escribe** (resolutor) | no | no |
+| `src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx` | **escribe** | no | no |
+| `src/routes/producto.$slug.tsx` | **escribe** | no | no |
+| `src/routes/eventos.$slug.tsx` | **escribe** | no | no |
+| `src/routes/l.$slug.tsx` | no | **escribe** (variantes + `chrome.seo.landing`) | no |
+| `src/lib/experience-builder/entity-premium-templates.ts` | **escribe** (activación) | **lee** (para vincular entidad→landing) | lee |
+| `src/lib/experience-builder/premium-template-registry.ts` | no | **escribe** (familia `premium-seo-landing`) | no |
+| `src/components/cms/BusinessEditor.tsx` | **escribe** (P5 presentación) | **escribe** (botón “Crear Landing SEO”) | **escribe** |
+| `src/components/cms/ProductEditor.tsx` | **escribe** | **escribe** | **escribe** |
+| `src/components/cms/places/PlaceEditor.tsx` | ya tiene P5 | **escribe** | referencia |
+| `src/components/experience-builder/PagesPanel.tsx` / `PremiumPresetGallery.tsx` | lee | **escribe** | lee |
+| Contratos públicos (`*-public-contract.ts`) | **escribe** (entidad) | **escribe** (landing) | no |
+
+## 16 · Solapamiento exacto (cuatro puntos, no más)
+
+| # | Punto de contacto | R1-C aporta | R1-L necesita | Riesgo de doble modificación |
+|---|---|---|---|---|
+| **S1** | **Editores CMS** (`BusinessEditor`, `ProductEditor`, `PlaceEditor`) | barra de acciones + panel de presentación por entidad | botón contextual “Crear Landing SEO” en la misma barra | **ALTO** — mismos tres archivos, misma zona de UI. Ejecutarlas separadas obliga a reabrir y rediseñar la barra dos veces |
+| **S2** | **Identidad tipada de entidad** | contrato/DTO público por familia (`entity-public-contract`) con `entityType` + `family` + `id` + ruta canónica | exactamente ese identificador para poblar `chrome.seo.landing.primary_entity_*` y para el canonical anticanibalización | **ALTO** — sin S2 la landing tendría que inventar su propio modelo de entidad, creando una segunda fuente de verdad (violación de Single Source of Truth Policy) |
+| **S3** | **Detección de intención canónica** | el resolutor declara qué ruta es la ficha canónica de cada entidad | el gate anticanibalización (§9.1/§9.2) necesita saber cuál es la URL canónica a la que apuntar o contra la que bloquear | **MEDIO** — implementable con `canonicalRoutePattern` ya declarado en `entity-premium-templates.ts`, pero frágil hasta que R1-C lo active en rutas reales |
+| **S4** | **Panel de presentación (R1-D)** | generaliza `PlacePresentationPanel` para fichas | la variante `authority-cinematic` requiere el mismo selector Editorial/Cinematográfico | **MEDIO** — si L2 crea su propio selector, R1-D deberá borrarlo después |
+
+**No hay solapamiento** en: rutas (`/l/{slug}` vs rutas de entidad son disjuntas), lecturas de datos (landing lee composición, ficha lee entidad), ni en R1-A/R1-B (contrato de listado intacto).
+
+## 17 · Determinación pedida: ¿migración o schema?
+
+**No.** Ratificado en §4: `chrome.seo.landing` vive en `current_draft` (jsonb), ya versionado por revisión, ya leído por `/l/$slug`. `canonical_override`, `robots_directive`, `previous_slug`, `sitemap_*` y `workflow_state` ya son columnas reales. R1-L completa (L1–L6) es **cero migraciones, cero schema, cero datos**.
+
+R1-C tampoco requiere migración: `entity-premium-templates.ts` declara adaptadores y componentes ya existentes (`BusinessSurface`, `ProductSurface`, `EventSurface`).
+
+## 18 · Secuencia integrada propuesta (evita tocar dos veces las mismas rutas)
+
+Por S1+S2, ejecutar L3 antes o después de R1-C **duplica el trabajo en los tres editores CMS**. La secuencia que minimiza reaperturas:
+
+| Paso | Contenido | Toca | Por qué aquí |
+|---|---|---|---|
+| **C1** | Contrato/DTO público de entidad + resolutor puro (sin tocar rutas) | contratos + `entity-premium-templates` | resuelve **S2** y **S3** de una vez, y es prerrequisito duro de la vinculación entidad→landing |
+| **L1** | Familia `premium-seo-landing` en el registro premium + `seo-landing-public-contract` (consume el DTO de C1) | registro + contrato | aditivo, no toca rutas |
+| **C2** | Activación del resolutor en las 4 rutas de entidad, fail-closed | 4 rutas de entidad | **única** apertura de esas rutas en todo R1-C+L |
+| **L2** | Semillas de las 3 variantes + render en `/l/$slug` (borrador, noindex) | 1 ruta de landing | **única** apertura de `/l/$slug` |
+| **CL3** | **Barra de acciones unificada** en los 3 editores CMS: presentación de ficha (R1-C/D) + “Crear Landing SEO” (R1-L) + detector de colisión | 3 editores CMS | **única** apertura de los editores — resuelve **S1** |
+| **D4** | Panel de presentación persistible generalizado, consumido por fichas **y** por la variante cinemática de landing | panel compartido | resuelve **S4** con un solo selector; incluye preview de `premium-entity-vacation-rental` para aprobación Founder |
+| **L4** | Gates SEO fail-closed de publicación | validación Studio | depende de CL3 |
+| **EF** | Home y Destino (R1-E) + pilotos landing (L5) + QA 390/768/1440 + gates `validate:r1` y `validate:r1:l` (R1-F/L6) | evidencia | cierre único |
+
+Reaperturas evitadas: **3 editores CMS ×2 → ×1**, **panel de presentación ×2 → ×1**, **contrato de entidad ×2 → ×1**. Rutas de entidad y `/l/$slug` se abren **una sola vez cada una**.
+
+Riesgo comparado: **no aumenta**. C1/L1 son puros y aditivos; C2 y L2 son fail-closed sobre rutas disjuntas; CL3 y D4 son UI administrativa sin impacto público. Ninguna migración, publicación, redirect ni cambio de flag en toda la secuencia.
+
+## 19 · Recomendación
+
+**Opción B · R1-C+L integrada.** El resolutor de fichas es prerrequisito **sólo de su parte contractual (C1)**, no de toda la ola; encadenar R1-C completa antes de R1-L obligaría a modificar dos veces los tres editores CMS y el panel de presentación, precisamente lo que el Founder pide evitar. Comparten manifiesto (universo G8-R1), comparten contrato de entidad y comparten superficie administrativa, y la integración **no amplía el perfil de riesgo**: sigue siendo cero migraciones, cero publicación, cero redirects, flag en `false`.
+
+Opción A (R1-C → R1-L) sólo sería preferible si el Founder quisiera cerrar y certificar R1-C de forma independiente antes de abrir cualquier trabajo de landings; el costo es la doble intervención en `BusinessEditor`, `ProductEditor` y `PlaceEditor`.
+
+## 20 · Autorización única solicitada
+
+Se solicita **una sola autorización** para ejecutar la secuencia integrada **R1-C+L** (pasos C1 → L1 → C2 → L2 → CL3 → D4 → L4 → EF), con:
+
+- universo G8-R1 reconciliado a **20 presets + familia `premium-seo-landing` (3 variantes)**, sin reiniciar R1-A ni R1-B;
+- Blueprint `19.46-G8-R1-L-PREMIUM-SEO-LANDINGS-v1.0.md` e instrumento `PCA-2026-050`;
+- invariantes: `omxds_visual_v1_contracts_enabled=false`, cero publicación, cero migraciones, cero datos, cero redirects, cero PR/merge/despliegue;
+- decisión pendiente del Founder sobre las 4 landings borrador legacy (§11) antes de CL3;
+- `premium-entity-vacation-rental` con `autoAssign=false` hasta su preview de aprobación en D4.
+
+**STOP CONDITION L0 mantenida.** No se inicia C1 hasta recibir esa autorización.
