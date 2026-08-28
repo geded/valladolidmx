@@ -2,20 +2,20 @@
   "id": "PCA-2026-029-ADDENDUM-Q",
   "status": "Approved",
   "parent": "PCA-2026-029",
-  "blueprint": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
-  "founder_authority": "Founder Directive 2026-08-28 · Cierre y remediación G8-Q2B. Reconoce exclusivamente el alta en el Route Inventory de las tres rutas autenticadas del CMS de Lugares y Atractivos exigida por la Route Inventory Rule (DOS · SSC-01·P2). Sin rutas públicas, sin publicación, sin flags, sin PR, merge ni despliegue. La autoridad de paquete es PCA-2026-044.",
+  "blueprint": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+  "founder_authority": "Addendum Founder 2026-08-28 · G8-Q2D-0. Reconoce exclusivamente el alta declarativa de la vista interna noindex /lovable/g8-place-premium-visual-approval en el Route Inventory, exigida por la Route Inventory Rule. Cambio aditivo: no elimina, renombra ni reclasifica rutas existentes y no crea rutas públicas. El addendum se registra bajo PCA-2026-029 por ser la única autorización Approved que contiene el permiso modify y la acknowledged revision de esta ruta; la autoridad de paquete es PCA-2026-046.",
   "supersedes_acknowledged_revision": {
     "operation": "modify",
     "path": "src/lib/experience-builder/route-inventory.ts",
-    "previous_sha256": "838130f47fdd367a996b76147af6105ccaa28e46a8394e360a2d8ff389078563",
-    "current_sha256": "fb5a9aec17a5f6a0827d6e2f74180f52380238b209854d34878f21e1b35e406c",
-    "semantic_change": "G8-Q2B · Alta de src/routes/_authenticated/cms/lugares.index.tsx, lugares.nuevo.tsx y lugares.$placeId.editar.tsx en el inventario canónico de rutas. Estrictamente aditivo: ninguna ruta existente cambia de categoría, madurez, prioridad ni propietario funcional.",
-    "authority": "PCA-2026-044"
+    "previous_sha256": "0d9ee377b54f2b93577feb321eee56981d272267c5ead3c59f2304c4132fd6f1",
+    "current_sha256": "8c250b6c4445de1b727275d44ede5a3fea808527220fd6072a2cf63ee7eb4203",
+    "semantic_change": "G8-Q2D-0 · Registro aditivo de una única ruta interna noindex de aprobación visual. Sin cambios en rutas públicas, categorías, madurez ni propiedad funcional de rutas existentes.",
+    "authority": "PCA-2026-046"
   },
   "invariants": [
     "omxds_visual_v1_contracts_enabled=false",
-    "Las tres rutas son autenticadas y noindex; cero rutas públicas nuevas",
-    "Cero contenido turístico real y cero publicación"
+    "Cero rutas públicas, cero redirects, cero datos",
+    "Chichén Itzá y Ek' Balam permanecen en draft"
   ],
   "recorded_at": "2026-08-28"
 }

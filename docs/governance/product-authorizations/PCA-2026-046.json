@@ -1,0 +1,34 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-046",
+  "title": "19.42 · G8-Q2D-0 · Place Premium Visual Authority v1.0",
+  "status": "Approved",
+  "branch": "feature/omxds-g8-q2d-place-visual-authority-v1",
+  "blueprint": "docs/blueprint/19.42-G8-Q2D-0-PLACE-PREMIUM-VISUAL-AUTHORITY-v1.0.md",
+  "founder_authority": "Addendum Founder 2026-08-28 · G8-Q2D-0. Reconocido el preflight que acredita la inexistencia de una ficha visual previamente aprobada de Chichén Itzá, el Founder retira la instrucción de recuperar autoridad visual existente y autoriza expresamente y en exclusiva la creación de una autoridad visual NUEVA para la familia Lugar/Atractivo sobre la base feature/omxds-g8-q2c-places-data-v1 @ 22b6ab58a3dd57a642827bda0de7675e604c0694 (árbol 0bf51acf550dd244d6168aa996d371788789efb8, equivalencia criptográfica de árbol aceptada). Se autoriza: una única vista interna noindex /lovable/g8-place-premium-visual-approval, render-only y sin lecturas ni escrituras de contenido real; una propuesta visual PlacePremiumSurface derivada exclusivamente del sistema premium aprobado (kit @/components/premium, tokens del Valladolid Colonial Design System, bloque oficial ExperienceMapBlock, medios gobernados G8-M1, Header y Footer canónicos de __root, breadcrumb territorial permanente, Agregar a Mi Viaje y Alux); un fixture local marcado DEMO VISUAL · NO PUBLICABLE con crédito visible en cada medio; dos direcciones reales Editorial y Cinematográfica con cambio efectivo de DOM, jerarquía y densidad mediante control local sin persistencia; el alta del gate validate:q2d:0 con contrato y evidencia estática y su registro en package.json; el registro de la ruta interna en el Route Inventory; y el alta documental del Blueprint 19.42, este instrumento, el manifiesto de evidencia y el Master Index v0.71. Prohibido expresamente: crear pageKind=place, registrar premium-entity-place como plantilla productiva, modificar el Experience Builder productivo, publicar Chichén Itzá o Ek' Balam, crear rutas públicas o redirects 301, modificar datos, esquema o migraciones, cambiar Qué hacer, activar flags, extender el selector Editorial/Cinematográfica a otras plantillas, iniciar Q2D-A sin aprobación visual expresa del Founder, PR, merge y despliegue.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "package.json"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run scripts/route-inventory-coverage.ts",
+    "bun run validate:q2d:0",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun run governance:product-test",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}
