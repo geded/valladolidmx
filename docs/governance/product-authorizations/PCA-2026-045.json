@@ -7,16 +7,15 @@
   "blueprint": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md",
   "founder_authority": "Founder Directive 2026-08-28 · CONTINUIDAD ESTRICTA G8-Q2C-A sobre la base exacta feature/omxds-g8-q2b-places-cms-v1 @ bccd2ad442ceb0c0f637a421a9a3f51c9d6626a3 (árbol befb277988e1b7314fe56cd7b7ae1ad01e500a61) con omxds_visual_v1_contracts_enabled=false. Autoriza expresamente y en exclusiva: creación idempotente de los destinos territoriales Tinum (slug tinum) y Temozón (slug temozon) en estado draft dentro de la región turística acreditada Oriente Maya, sin descripción, imágenes, coordenadas, SEO, categorías, zonas ni dato turístico inventado; creación idempotente de los lugares Chichén Itzá (slug chichen-itza) y Ek' Balam (slug ek-balam) en estado draft con tipo canónico zona-arqueologica y destino Tinum y Temozón respectivamente; copia controlada y trazable campo por campo únicamente de información acreditada del registro histórico (nombre, descripción y coordenadas), registrando la procedencia como source_destination_id dentro de la columna existente points_of_interest.metadata sin migración ni cambio de esquema; registro de snapshot previo y posterior y auditoría individual de cada alta o reutilización en content_audit_log con actor Founder; respaldo y rollback limitados a las cuatro altas nuevas; preservación intacta de los destinos históricos Chichén Itzá (draft) y Ek Balam (published) y de todas sus relaciones, medios, composiciones, revisiones, sitemap, menús, Alux y travel plans; alta del gate validate:q2c:a con su contrato y evidencia estática y su registro en package.json; y alta documental del Blueprint 19.41, este instrumento y el Master Index v0.70. Prohibido expresamente: migraciones y cualquier cambio de esquema, relajación de RLS o grants, publicación de cualquier registro, activación de flags, redirects 301, corte o modificación de URLs públicas, despublicación o borrado de registros históricos, creación de zonas, reclamaciones, operadores, productos, tours o eventos, movimiento o alteración de medios, checksums, créditos, licencias, ALT o estados de revisión, invención de texto, coordenadas o SEO, plantilla premium-entity-place, rutas públicas de lugares, cambios en Qué hacer, alta de Casa de los Venados, modificación de Cenote Suytun, Zazil Tunich o los cinco POI históricos, PR, merge y despliegue.",
   "permissions": [
-    { "operation": "create", "path": "docs/blueprint/19.41-G8-Q2C-A-SAFE-TERRITORIAL-RECLASSIFICATION-v1.0.md" },
-    { "operation": "create", "path": "docs/governance/product-authorizations/PCA-2026-045.json" },
-    { "operation": "create", "path": "scripts/omxds/q2c-a/territorial-reclassification.contract.test.ts" },
-    { "operation": "create", "path": "scripts/omxds/q2c-a/territorial-reclassification.evidence.mjs" },
-    { "operation": "create", "path": "docs/evidence/omxds-q2c-a/EVIDENCE-MANIFEST.md" },
-    { "operation": "modify", "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md" },
-    { "operation": "modify", "path": "package.json" }
+    {
+      "operation": "modify",
+      "path": "package.json"
+    }
   ],
   "public_routes": [],
-  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
   "required_tests": [
     "bun run lint",
     "bun run typecheck",
