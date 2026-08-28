@@ -154,9 +154,15 @@ export function destinationToHeroDTO(d: DestinationBlockInput): ExperienceHeroDT
       const caption = resolveAttributedCaption(a);
       return {
         url,
+        // G8-F1D · El fallback nunca puede reducirse al nombre del destino:
+        // sólo aplica cuando no existe ALT acreditado.
         alt: resolveAttributedAlt(a, {
-          fallback: i === 0 ? d.name : `${d.name} — foto ${i + 1}`,
+          fallback:
+            i === 0
+              ? `Vista de ${d.name}, Oriente Maya de Yucatán`
+              : `${d.name} — foto ${i + 1}, Oriente Maya de Yucatán`,
         }),
+
         focalPoint: "center",
         ...(caption ? { caption } : {}),
         ...(credit ? { credit } : {}),
