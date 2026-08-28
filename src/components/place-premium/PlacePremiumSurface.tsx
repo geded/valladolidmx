@@ -438,7 +438,7 @@ function IntroEditorial({ content }: { content: PlacePremiumContent }) {
         </header>
         <div className="min-w-0 space-y-6">
           {content.intro.paragraphs.map((paragraph, index) => (
-            <div key={paragraph.slice(0, 24)} className="space-y-6">
+            <div key={`intro-${index}`} className="space-y-6">
               <p className="text-pretty text-base leading-8">{paragraph}</p>
               {content.intro.media[index] ? (
                 <DemoImage
@@ -464,8 +464,8 @@ function IntroCentered({ content }: { content: PlacePremiumContent }) {
         {content.intro.title}
       </h2>
       <div className="mt-6 space-y-5 text-left">
-        {content.intro.paragraphs.map((paragraph) => (
-          <p key={paragraph.slice(0, 24)} className="text-pretty leading-7 text-muted-foreground">
+        {content.intro.paragraphs.map((paragraph, index) => (
+          <p key={`intro-c-${index}`} className="text-pretty leading-7 text-muted-foreground">
             {paragraph}
           </p>
         ))}
