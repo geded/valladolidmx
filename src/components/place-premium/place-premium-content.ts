@@ -25,7 +25,6 @@ export interface PlacePremiumMedia {
   placeholderLabel?: string;
 }
 
-
 export interface PlacePremiumFact {
   key: string;
   label: string;
@@ -186,7 +185,6 @@ export const PLACE_PREMIUM_DEMO_MEDIA = {
 const M = PLACE_PREMIUM_DEMO_MEDIA;
 const P = PLACE_PREMIUM_PLACE_PLACEHOLDERS;
 
-
 export const PLACE_PREMIUM_DEMO_CONTENT: PlacePremiumContent = {
   demoNotice:
     "DEMO VISUAL · NO PUBLICABLE — textos y fotografías de demostración para evaluar la propuesta visual. Ningún dato proviene de contenido publicado ni se guarda.",
@@ -268,7 +266,6 @@ export const PLACE_PREMIUM_DEMO_CONTENT: PlacePremiumContent = {
     title: "Cómo se ve",
     note: "Aún no existe fotografía acreditada de este lugar. Se muestran marcadores neutrales: ninguna imagen de otro sitio representa a Chichén Itzá.",
     items: [P.gal1, P.gal2, P.gal3, P.gal4],
-
   },
   map: {
     heading: "Ubicación y cómo llegar",
