@@ -188,33 +188,38 @@ export const PAGE_KIND_REGISTRY: readonly PageKindDefinition[] = [
     allowedBlockCategories: null,
   },
   {
+    // G8-P2 · Ruta canónica real del router: la ficha individual de
+    // experiencia se sirve por `/producto/{slug}` (y su ruta territorial
+    // cuando corresponde). `/experiencias` es únicamente el listado.
     kind: "experience",
     label: "Experiencia",
     description: "Página editorial de experiencia turística.",
-    slugPattern: "/experiencias/{slug}",
+    slugPattern: "/producto/{slug}",
     singleton: false,
     requiredRoles: ["admin", "super_admin", "editor"],
-    publicRoutePattern: "/experiencias/{slug}",
+    publicRoutePattern: "/producto/{slug}",
     allowedBlockCategories: null,
   },
   {
+    // G8-P2 · Las fichas de hotel viven en la ruta territorial real.
     kind: "hotel",
     label: "Hotel",
     description: "Ficha editorial de hotel.",
-    slugPattern: "/hoteles/{slug}",
+    slugPattern: "/oriente-maya/{destino}/{categoria}/{empresa}",
     singleton: false,
     requiredRoles: ["admin", "super_admin", "editor"],
-    publicRoutePattern: "/hoteles/{slug}",
+    publicRoutePattern: "/oriente-maya/{destino}/{categoria}/{empresa}",
     allowedBlockCategories: null,
   },
   {
+    // G8-P2 · Las fichas de restaurante viven en la ruta territorial real.
     kind: "restaurant",
     label: "Restaurante",
     description: "Ficha editorial de restaurante.",
-    slugPattern: "/restaurantes/{slug}",
+    slugPattern: "/oriente-maya/{destino}/{categoria}/{empresa}",
     singleton: false,
     requiredRoles: ["admin", "super_admin", "editor"],
-    publicRoutePattern: "/restaurantes/{slug}",
+    publicRoutePattern: "/oriente-maya/{destino}/{categoria}/{empresa}",
     allowedBlockCategories: null,
   },
   {
@@ -228,13 +233,14 @@ export const PAGE_KIND_REGISTRY: readonly PageKindDefinition[] = [
     allowedBlockCategories: null,
   },
   {
+    // G8-P2 · La ficha de empresa se sirve por su ruta territorial.
     kind: "business",
     label: "Empresa",
     description: "Ficha editorial de empresa (zonas editables por dueño).",
-    slugPattern: "/empresas/{slug}",
+    slugPattern: "/oriente-maya/{destino}/{categoria}/{empresa}",
     singleton: false,
     requiredRoles: ["admin", "super_admin", "editor"],
-    publicRoutePattern: "/empresas/{slug}",
+    publicRoutePattern: "/oriente-maya/{destino}/{categoria}/{empresa}",
     allowedBlockCategories: null,
   },
   {
