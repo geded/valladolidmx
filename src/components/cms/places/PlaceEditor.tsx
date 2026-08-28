@@ -24,6 +24,13 @@ import {
   updatePlaceCms,
 } from "@/lib/places/places-cms.functions";
 import { PLACE_ADMISSION_KINDS } from "@/lib/places/place-taxonomy";
+import {
+  ZONE_DESTINATION_MISMATCH,
+  ZONE_DESTINATION_MISMATCH_MESSAGE,
+  reconcileZoneForDestination,
+  zonesForDestination as selectableZonesForDestination,
+  type TerritorialZone,
+} from "@/lib/places/place-territory";
 import { placeDetailsPatchSchema } from "@/lib/places/places-cms-contracts";
 import type { ContentStatus } from "@/lib/cms/workflow";
 import {
