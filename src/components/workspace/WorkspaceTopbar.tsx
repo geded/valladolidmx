@@ -51,8 +51,7 @@ export function WorkspaceTopbar({ title }: { title?: string }) {
     );
     // Raíz del workspace (item primario o el más corto).
     const rootItem =
-      uniq.find((i) => i.primary) ??
-      [...uniq].sort((a, b) => a.to.length - b.to.length)[0];
+      uniq.find((i) => i.primary) ?? [...uniq].sort((a, b) => a.to.length - b.to.length)[0];
     const rootTo = rootItem?.to ?? "/";
     const rootLabel = workspace.label;
 
@@ -71,10 +70,7 @@ export function WorkspaceTopbar({ title }: { title?: string }) {
 
     const base = matched?.to ?? rootTo;
     if (pathname !== base) {
-      const rest = pathname
-        .slice(base.length)
-        .split("/")
-        .filter(Boolean);
+      const rest = pathname.slice(base.length).split("/").filter(Boolean);
       rest.forEach((seg, idx) => {
         const isLast = idx === rest.length - 1;
         list.push({
@@ -135,7 +131,10 @@ export function WorkspaceTopbar({ title }: { title?: string }) {
                     )}
                   >
                     {i > 0 ? (
-                      <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" aria-hidden />
+                      <ChevronRight
+                        className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60"
+                        aria-hidden
+                      />
                     ) : null}
                     {isLast || !c.to ? (
                       <span
@@ -143,7 +142,9 @@ export function WorkspaceTopbar({ title }: { title?: string }) {
                         title={c.label}
                         className={cn(
                           "truncate",
-                          isLast ? "font-display text-base text-foreground md:text-lg" : "text-muted-foreground",
+                          isLast
+                            ? "font-display text-base text-foreground md:text-lg"
+                            : "text-muted-foreground",
                         )}
                       >
                         {c.label}
@@ -162,7 +163,6 @@ export function WorkspaceTopbar({ title }: { title?: string }) {
               })}
             </ol>
           </nav>
-
         ) : (
           <h1 className="truncate font-display text-base md:text-lg">
             {title ?? workspace?.label ?? "Workspace"}
@@ -194,9 +194,7 @@ export function WorkspaceTopbar({ title }: { title?: string }) {
         aria-label="Alternar Copiloto"
         className={cn(
           "grid size-10 shrink-0 place-items-center rounded-full transition",
-          inspectorOpen
-            ? "bg-primary/15 text-primary"
-            : "text-muted-foreground hover:bg-muted",
+          inspectorOpen ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-muted",
         )}
       >
         <Sparkles className="h-4 w-4" aria-hidden />
