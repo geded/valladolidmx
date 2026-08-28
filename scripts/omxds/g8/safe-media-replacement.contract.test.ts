@@ -99,7 +99,9 @@ describe("DEF-M-05/08 · derechos y procedencia fail-closed", () => {
   test("rechaza documental sin fuente, autor o licencia", () => {
     expect(validateMediaRights({ ...baseRights, source: "" })).toBe("documentary_requires_source");
     expect(validateMediaRights({ ...baseRights, author: "" })).toBe("documentary_requires_author");
-    expect(validateMediaRights({ ...baseRights, license: "" })).toBe("documentary_requires_license");
+    expect(validateMediaRights({ ...baseRights, license: "" })).toBe(
+      "documentary_requires_license",
+    );
   });
 
   test("rechaza ALT vacío y falta de confirmación de derechos", () => {
@@ -150,9 +152,7 @@ describe("DEF-M-04/06 · ALT, crédito y punto focal", () => {
   });
 
   test("los valores focales quedan acotados a 0–1", () => {
-    const decoded = decodeSlotMedia(
-      "/api/public/studio-media/2026/foo.jpg?vmxFocal=9,-4",
-    );
+    const decoded = decodeSlotMedia("/api/public/studio-media/2026/foo.jpg?vmxFocal=9,-4");
     expect(decoded.focalX).toBe(1);
     expect(decoded.focalY).toBe(0);
   });
