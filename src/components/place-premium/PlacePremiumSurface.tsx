@@ -109,7 +109,16 @@ export function PlacePremiumSurface({
       className={cn("pb-24", className)}
     >
       <Container className="pt-6">
-        <DemoNotice text={content.demoNotice} />
+        {content.demoNotice ? <DemoNotice text={content.demoNotice} /> : null}
+        {draftNotice ? (
+          <p
+            data-place-draft-notice="true"
+            role="status"
+            className="rounded-2xl border border-warning/50 bg-warning/10 px-4 py-3 text-xs font-semibold leading-5 text-foreground"
+          >
+            {draftNotice}
+          </p>
+        ) : null}
         {builderNotice ? (
           <p
             data-place-media-fallback="true"
