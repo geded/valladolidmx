@@ -473,6 +473,8 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/lovable/g4-home-premium-preview.tsx",
   "src/routes/lovable/g8d-premium-parity.tsx",
   "src/routes/lovable/g8e-premium-template-catalog.tsx",
+  "src/routes/lovable/g8p2-tour-premium-preview.tsx",
+  "src/routes/lovable/g8p2-vacation-rental-premium-preview.tsx",
   "src/routes/lovable/g5-listing-readiness-preview.tsx",
   "src/routes/lovable/g6-category-icon-catalog.tsx",
   "src/routes/lovable/experience-hero-preview.tsx",
