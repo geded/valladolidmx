@@ -342,3 +342,18 @@ export async function readPublicPlace(input: ReadPlaceInput): Promise<PublicPlac
       : null,
   };
 }
+
+/**
+ * G8-Q2D-B · Preview administrativa: sólo staff editorial puede ver
+ * borradores. Fail-closed ante cualquier error de verificación.
+ */
+export async function assertPlacePreviewStaff(client: any, userId: string): Promise<void> {
+  const editorial = await client.rpc("is_editor_or_admin", { _user_id: userId });
+  if (editorial.error) throw new Error(`role_check_failed: ${editorial.error.message}`);
+  if (editorial.data === true) return;
+  const granular = await client.rpc("has_permission", {
+    _user_id: userId,
+    _permission_key: "poi.write",
+  });
+  if (granular.error || granular.data !== true) throw new Error("forbidden");
+}
