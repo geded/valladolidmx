@@ -45,6 +45,8 @@ export interface PlacePremiumSurfaceProps {
   variant?: string;
   /** G8-Q2D-A · aviso del constructor cuando aplica el fallback de medios. */
   builderNotice?: string | null;
+  /** G8-Q2D-B · aviso de preview administrativa (“Borrador · no publicado”). */
+  draftNotice?: string | null;
   className?: string;
 }
 
@@ -53,9 +55,19 @@ export function PlacePremiumSurface({
   presentation = "editorial",
   variant,
   builderNotice = null,
+  draftNotice = null,
   className,
 }: PlacePremiumSurfaceProps) {
   const cinematic = presentation === "cinematic";
+  /* G8-Q2D-B · con datos reales toda sección sin contenido se oculta:
+     jamás se rellena con fixtures ni con datos de otro lugar. */
+  const hasIntro = content.intro.paragraphs.length > 0;
+  const hasEssentials =
+    content.essentials.facts.length > 0 ||
+    content.essentials.recommendations.length > 0 ||
+    content.essentials.accessibility.length > 0;
+  const hasGallery = content.gallery.items.length > 0;
+  const hasMap = content.map.points.length > 0 || content.map.directions.length > 0;
 
   const mapDto: ExperienceMapDTO = useMemo(
     () => ({
