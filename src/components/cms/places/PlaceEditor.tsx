@@ -208,12 +208,31 @@ export function PlaceEditor({ placeId }: Props) {
     setCategoryIds(det.categoryIds ?? []);
   }, [place, det.categoryIds]);
 
-  const zonesForDestination = useMemo(() => {
-    const destinationId = (place?.destination_id as string | undefined) ?? "";
-    return (opts.zones ?? []).filter(
-      (z: { destination_id: string }) => z.destination_id === destinationId,
+  /**
+   * Addendum Q2B: la lista de zonas depende SIEMPRE del destino del lugar.
+   * El destino no es editable después del alta, así que aquí sólo se filtra.
+   */
+  const editZones = useMemo(
+    () =>
+      selectableZonesForDestination(
+        opts.zones ?? [],
+        (place?.destination_id as string | undefined) ?? "",
+      ),
+    [opts.zones, place?.destination_id],
+  );
+
+  // Si la zona guardada dejó de pertenecer al destino (o fue archivada), se
+  // limpia en el formulario para no reenviar una relación incompatible.
+  useEffect(() => {
+    if (!place) return;
+    setZoneId((current) =>
+      reconcileZoneForDestination(
+        opts.zones ?? [],
+        (place.destination_id as string | undefined) ?? "",
+        current,
+      ),
     );
-  }, [opts.zones, place?.destination_id]);
+  }, [opts.zones, place]);
 
   const buildPatch = () => {
     const text = (key: string) => {
