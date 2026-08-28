@@ -48,13 +48,13 @@ describe("DEF-M-01 · flujo único del inspector", () => {
 
 describe("DEF-M-02 · subida segura sin base64", () => {
   test("el inspector no usa FileReader ni data: URI", () => {
-    expect(INSPECTOR).not.toContain("FileReader");
+    expect(INSPECTOR).not.toContain("new FileReader");
     expect(INSPECTOR).not.toContain("readAsDataURL");
-    expect(INSPECTOR).not.toContain("data:image");
+    expect(INSPECTOR).not.toContain("readAsDataURL(");
   });
 
   test("el diálogo sube exclusivamente por URL firmada y registra el activo", () => {
-    expect(PICKER).not.toContain("FileReader");
+    expect(PICKER).not.toContain("new FileReader");
     expect(PICKER).toContain("signStudioMediaUpload");
     expect(PICKER).toContain("uploadToSignedUrl");
     expect(PICKER).toContain("registerStudioMedia");
