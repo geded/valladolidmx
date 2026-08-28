@@ -67,3 +67,25 @@ evaluar la ficha completa, incluidos Header y Footer canónicos.
 - Cero flags: `omxds_visual_v1_contracts_enabled` permanece `false`.
 - Sin `pageKind=place`, sin plantilla productiva `premium-entity-place`,
   sin cambios en el Experience Builder productivo ni en "Qué hacer".
+
+## 7. Resultado de gates (2026-08-28)
+
+| Gate | Resultado |
+| --- | --- |
+| `bun run lint` | PASS — sin nueva deuda |
+| `bun run typecheck` | PASS |
+| `bun run build` | PASS |
+| `bun run scripts/route-inventory-coverage.ts` | PASS — 208 rutas |
+| `bun run validate:q2d:0` | PASS — 12 contratos |
+| `bun run governance:check` | PASS |
+| `bun run governance:product-check` | PASS |
+| `bun run governance:product-test` | PASS — 10 casos |
+| `bun scripts/governance/sync-governance.mjs --check` | PASS — Master Index v0.71 |
+
+Medición automatizada de las 6 capturas: `overflow = 0` en 390/768/1440 px,
+`data-place-presentation` correcto en ambas direcciones y **cero errores de
+consola**.
+
+El alta declarativa de la ruta interna en el Route Inventory queda reconocida
+por `docs/governance/addenda/PCA-2026-029-ADDENDUM-Q.json` bajo la autoridad
+de paquete `PCA-2026-046`.
