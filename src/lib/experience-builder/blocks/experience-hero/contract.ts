@@ -79,6 +79,12 @@ export const experienceHeroSlideSchema = z.object({
   url: z.string().min(1),
   alt: z.string().default(""),
   focalPoint: z.string().optional(),
+  /** G8-F1D — Caption acreditado del medio (jamás inventado). */
+  caption: z.string().optional(),
+  /** G8-F1D — Crédito público acreditado (jamás inventado). */
+  credit: z.string().optional(),
+  /** G8-F1D — Naturaleza declarada para etiquetar el crédito. */
+  nature: z.enum(["documentary", "conceptual"]).optional(),
 });
 export type ExperienceHeroSlide = z.infer<typeof experienceHeroSlideSchema>;
 

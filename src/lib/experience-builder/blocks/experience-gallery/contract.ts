@@ -37,6 +37,10 @@ export const experienceGalleryItemSchema = z.object({
   url: z.string().min(1),
   alt: z.string().default(""),
   caption: z.string().optional(),
+  /** G8-F1D — Crédito público acreditado (jamás inventado). */
+  credit: z.string().optional(),
+  /** G8-F1D — Naturaleza declarada para etiquetar el crédito. */
+  nature: z.enum(["documentary", "conceptual"]).optional(),
   width: z.number().optional(),
   height: z.number().optional(),
 });
