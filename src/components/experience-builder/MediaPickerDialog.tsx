@@ -33,6 +33,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { prepareImageForRole, validateImageFile, type ImageRole } from "@/lib/cms/image-upload";
 
 export interface PickedMedia {
+  /** G8-Q2B: identificador del `media_asset` para relaciones gobernadas. */
+  id: string;
   url: string;
   alt: string | null;
   credit: string | null;
