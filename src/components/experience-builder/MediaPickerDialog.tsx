@@ -27,9 +27,11 @@ import {
   listStudioMediaLibrary,
   registerStudioMedia,
   signStudioMediaUpload,
+} from "@/lib/experience-builder/studio-media.functions";
+import {
   validateMediaRights,
   type MediaNature,
-} from "@/lib/experience-builder/studio-media.functions";
+} from "@/lib/experience-builder/media-rights";
 import { supabase } from "@/integrations/supabase/client";
 import {
   prepareImageForRole,
