@@ -323,14 +323,25 @@ export const updatePlaceCms = createServerFn({ method: "POST" })
     const current = unwrap(
       await ctx.supabase
         .from("points_of_interest")
-        .select("id, updated_at")
+        .select("id, updated_at, destination_id")
         .eq("id", data.place_id)
         .is("deleted_at", null)
         .maybeSingle(),
-    ) as { id: string; updated_at: string } | null;
+    ) as { id: string; updated_at: string; destination_id: string } | null;
     if (!current) throw new Error("place_not_found");
     if (new Date(current.updated_at).getTime() !== new Date(data.expected_updated_at).getTime())
       throw new Error("conflict_stale_record");
+
+    // Addendum Q2B: el destino es inmutable desde el editor, así que la zona
+    // se valida contra el destino persistido, nunca contra el enviado por UI.
+    if ("destination_zone_id" in data.patch) {
+      await assertZoneBelongsToDestination(
+        ctx,
+        current.destination_id,
+        data.patch.destination_zone_id ?? null,
+      );
+    }
+
 
     const payload: Record<string, unknown> = { ...data.patch, updated_by: ctx.userId };
     const { data: updated, error } = await ctx.supabase
