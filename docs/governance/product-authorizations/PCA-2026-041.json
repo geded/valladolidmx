@@ -1,0 +1,71 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-041",
+  "title": "19.35 · G8-P2 · Automatic Premium Entity Template Resolution v1.0",
+  "status": "Approved",
+  "branch": "feat/omxds-g8-p2-entity-template-resolution-v1",
+  "blueprint": "docs/blueprint/19.35-G8-P2-AUTOMATIC-PREMIUM-ENTITY-TEMPLATE-RESOLUTION-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-28 · Autorización G8-P2 · Automatic Premium Entity Template Resolution v1.0. Autoriza registrar los seis presets premium de familia (hotel, restaurante, evento, experiencia, tour y casa de vacaciones), implementar un resolutor determinista y puro resolveEntityPremiumTemplate con normalización de slugs y alias acreditados, orden de resolución override aprobado y compatible → preset canónico de familia → superficie estándar existente, comportamiento fail-closed ante familias no reconocidas, adaptadores semánticos propios para Tour (TouristTrip) y Casa de vacaciones (VacationRental), corrección del page-kind-registry para documentar las rutas paramétricas reales del router, exposición de las plantillas de entidad en Studio filtradas por tipo compatible y dos previews internas noindex. Prohibido modificar entidades reales, crear composiciones por negocio, cambiar categorías o slugs de datos, publicar, habilitar elegibilidad premium, cambiar flags, migrar la base de datos, tocar los 22 bordados, reconstruir previews aprobadas, PR, merge o despliegue. omxds_visual_v1_contracts_enabled permanece false. La plantilla de Casa de vacaciones queda pendiente de aceptación visual Founder y no se auto-asigna.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/entity-premium-templates.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/surfaces/tour-surface.adapter.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/surfaces/vacation-rental-surface.adapter.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g8p2-tour-premium-preview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/lovable/g8p2-vacation-rental-premium-preview.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "scripts/omxds/g8/entity-template-resolution.contract.test.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/page-kind-registry.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/PremiumPresetGallery.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/PagesPanel.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run lint",
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:g8:p2",
+    "bun run validate:g8:m1",
+    "bun run validate:g8",
+    "bun run validate:g6:s1",
+    "bun run governance:check",
+    "bun run governance:product-check",
+    "bun scripts/governance/sync-governance.mjs --check"
+  ]
+}
