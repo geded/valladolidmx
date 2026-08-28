@@ -71,3 +71,40 @@ export function isPlaceCategorySlug(value: string): value is PlaceCategorySlug {
 export function isPlaceAuthorityKindSlug(value: string): value is PlaceAuthorityKindSlug {
   return (PLACE_AUTHORITY_KIND_SLUGS as readonly string[]).includes(value);
 }
+
+/**
+ * G8-Q2A-R1 · Códigos cerrados de acceso al lugar.
+ *
+ * Se implementan como texto con CHECK cerrado en base de datos, nunca como enum
+ * de PostgreSQL: la evolución del catálogo debe ser reversible.
+ */
+export const PLACE_ADMISSION_KINDS = ["gratuito", "pago", "mixto", "no_aplica"] as const;
+
+export type PlaceAdmissionKind = (typeof PLACE_ADMISSION_KINDS)[number];
+
+/** Relación entre un lugar y un producto del catálogo. */
+export const PLACE_PRODUCT_RELATION_KINDS = [
+  "oficial",
+  "operado",
+  "ofrecido",
+  "recomendado",
+] as const;
+
+export type PlaceProductRelationKind = (typeof PLACE_PRODUCT_RELATION_KINDS)[number];
+
+/** Relación entre un lugar y un evento. */
+export const PLACE_EVENT_RELATION_KINDS = ["sede", "organizado", "asociado"] as const;
+
+export type PlaceEventRelationKind = (typeof PLACE_EVENT_RELATION_KINDS)[number];
+
+export function isPlaceAdmissionKind(value: string): value is PlaceAdmissionKind {
+  return (PLACE_ADMISSION_KINDS as readonly string[]).includes(value);
+}
+
+export function isPlaceProductRelationKind(value: string): value is PlaceProductRelationKind {
+  return (PLACE_PRODUCT_RELATION_KINDS as readonly string[]).includes(value);
+}
+
+export function isPlaceEventRelationKind(value: string): value is PlaceEventRelationKind {
+  return (PLACE_EVENT_RELATION_KINDS as readonly string[]).includes(value);
+}

@@ -1,0 +1,142 @@
+{
+  "subjects": {
+    "anon": {
+      "read_place_types": "filas=15",
+      "read_published_place": "filas=1",
+      "read_draft_place": "filas=0",
+      "read_place_products": "filas=1",
+      "read_place_events": "filas=1",
+      "read_place_authorities": "DENEGADO",
+      "write_place_hours": "DENEGADO",
+      "write_place_products": "DENEGADO",
+      "write_place_authorities": "DENEGADO",
+      "exec_duplicate_warnings": "DENEGADO"
+    },
+    "traveler": {
+      "read_place_types": "filas=15",
+      "read_published_place": "filas=1",
+      "read_draft_place": "filas=0",
+      "read_place_products": "filas=1",
+      "read_place_events": "filas=1",
+      "read_place_authorities": "filas=0",
+      "write_place_hours": "DENEGADO",
+      "write_place_products": "DENEGADO",
+      "write_place_authorities": "DENEGADO",
+      "exec_duplicate_warnings": "DENEGADO"
+    },
+    "business_owner": {
+      "read_place_types": "filas=15",
+      "read_published_place": "filas=1",
+      "read_draft_place": "filas=0",
+      "read_place_products": "filas=1",
+      "read_place_events": "filas=1",
+      "read_place_authorities": "filas=0",
+      "write_place_hours": "DENEGADO",
+      "write_place_products": "DENEGADO",
+      "write_place_authorities": "DENEGADO",
+      "exec_duplicate_warnings": "DENEGADO"
+    },
+    "concierge": {
+      "read_place_types": "filas=15",
+      "read_published_place": "filas=1",
+      "read_draft_place": "filas=0",
+      "read_place_products": "filas=1",
+      "read_place_events": "filas=1",
+      "read_place_authorities": "filas=0",
+      "write_place_hours": "DENEGADO",
+      "write_place_products": "DENEGADO",
+      "write_place_authorities": "DENEGADO",
+      "exec_duplicate_warnings": "DENEGADO"
+    },
+    "editor": {
+      "read_place_types": "filas=15",
+      "read_published_place": "filas=1",
+      "read_draft_place": "filas=1",
+      "read_place_products": "filas=1",
+      "read_place_events": "filas=1",
+      "read_place_authorities": "filas=1",
+      "write_place_hours": "PERMITIDO",
+      "write_place_products": "PERMITIDO",
+      "write_place_authorities": "PERMITIDO",
+      "exec_duplicate_warnings": "filas=1"
+    },
+    "admin": {
+      "read_place_types": "filas=15",
+      "read_published_place": "filas=1",
+      "read_draft_place": "filas=1",
+      "read_place_products": "filas=1",
+      "read_place_events": "filas=1",
+      "read_place_authorities": "filas=1",
+      "write_place_hours": "PERMITIDO",
+      "write_place_products": "PERMITIDO",
+      "write_place_authorities": "PERMITIDO",
+      "exec_duplicate_warnings": "filas=1"
+    },
+    "super_admin": {
+      "read_place_types": "filas=15",
+      "read_published_place": "filas=1",
+      "read_draft_place": "filas=1",
+      "read_place_products": "filas=1",
+      "read_place_events": "filas=1",
+      "read_place_authorities": "filas=1",
+      "write_place_hours": "PERMITIDO",
+      "write_place_products": "PERMITIDO",
+      "write_place_authorities": "PERMITIDO",
+      "exec_duplicate_warnings": "filas=1"
+    },
+    "service_role": {
+      "read_place_types": "filas=15",
+      "read_published_place": "filas=1",
+      "read_draft_place": "filas=1",
+      "read_place_products": "filas=1",
+      "read_place_events": "filas=1",
+      "read_place_authorities": "filas=1",
+      "write_place_hours": "PERMITIDO",
+      "write_place_products": "PERMITIDO",
+      "write_place_authorities": "PERMITIDO",
+      "exec_duplicate_warnings": "DENEGADO"
+    }
+  },
+  "checks": {
+    "q2a_up": "PASS",
+    "q2a_replay_exit": 3,
+    "q2a_replay_no_divergence": "PASS",
+    "q2a_replay_note": "reaplicación abortada en transacción única (objetos ya existentes) sin divergencia de schema",
+    "r1_up": "PASS",
+    "r1_replay_exit": 0,
+    "r1_idempotent": "PASS",
+    "broad_acl_does_not_bypass_rls": "PASS",
+    "rollback_r1": "PASS",
+    "rollback_r1_preserves_places": "PASS",
+    "rollback_r1_reapply": "PASS",
+    "rollback_q2a": "PASS",
+    "rollback_q2a_preserves_places": "PASS",
+    "rollback_q2a_restores_policies": "PASS"
+  },
+  "acl": {
+    "effective": [
+      "place_authorities => postgres=arwdDxtm/postgres | service_role=arwdDxtm/postgres | authenticated=arwd/postgres",
+      "place_authority_kinds => postgres=arwdDxtm/postgres | service_role=arwdDxtm/postgres | anon=r/postgres | authenticated=arwd/postgres",
+      "place_categories => postgres=arwdDxtm/postgres | service_role=arwdDxtm/postgres | anon=r/postgres | authenticated=arwd/postgres",
+      "place_category_links => postgres=arwdDxtm/postgres | service_role=arwdDxtm/postgres | anon=r/postgres | authenticated=arwd/postgres",
+      "place_events => postgres=arwdDxtm/postgres | service_role=arwdDxtm/postgres | anon=r/postgres | authenticated=arwd/postgres",
+      "place_hours => postgres=arwdDxtm/postgres | service_role=arwdDxtm/postgres | anon=r/postgres | authenticated=arwd/postgres",
+      "place_media => postgres=arwdDxtm/postgres | service_role=arwdDxtm/postgres | anon=r/postgres | authenticated=arwd/postgres",
+      "place_products => postgres=arwdDxtm/postgres | service_role=arwdDxtm/postgres | anon=r/postgres | authenticated=arwd/postgres",
+      "place_types => postgres=arwdDxtm/postgres | service_role=arwdDxtm/postgres | anon=r/postgres | authenticated=arwd/postgres"
+    ],
+    "no_anon_on_authorities": "PASS"
+  },
+  "fingerprints": {
+    "afterQ2A": "60545c34a295bc3075e9886154f7d5fd",
+    "afterR1": "3a59d690a3551d7ceec4fc0a73235d87"
+  },
+  "result": "PASS",
+  "failures": [],
+  "migrations": {
+    "q2a": "supabase/migrations/20260828072703_77c7df42-9a22-4568-ac6a-dddfd53c178e.sql",
+    "r1": "supabase/migrations/20260828145637_97e8e025-3cbf-4722-9b2b-cbfd672a2c57.sql",
+    "q2a_sha256": "be5cddd03328860d0b5b8f83ba9c2760b2c2ddc1533bf777f934e5ecaa4d0778",
+    "r1_sha256": "5ee94ffe0dbc2b689fdb6c017c837eb5ee9c9474c3900ec4e43313e857cb613d"
+  }
+}

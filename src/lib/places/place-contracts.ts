@@ -6,8 +6,11 @@
  */
 import { z } from "zod";
 import {
+  PLACE_ADMISSION_KINDS,
   PLACE_AUTHORITY_KIND_SLUGS,
   PLACE_CATEGORY_SLUGS,
+  PLACE_EVENT_RELATION_KINDS,
+  PLACE_PRODUCT_RELATION_KINDS,
   PLACE_TYPE_SLUGS,
 } from "./place-taxonomy";
 
@@ -98,7 +101,28 @@ export const placeRecordSchema = z.object({
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
   status: z.enum(["draft", "in_review", "approved", "published", "archived"]),
+  // G8-Q2A-R1 · campos operativos añadidos por la remediación.
+  directions: z.string().nullable().optional(),
+  admission_kind: z.enum(PLACE_ADMISSION_KINDS).nullable().optional(),
+  price_to: z.number().nonnegative().nullable().optional(),
+  contact_whatsapp: z.string().nullable().optional(),
+  social_links: z.record(z.string(), z.string()).default({}),
+  published_at: z.string().nullable().optional(),
 });
+
+/**
+ * Ficha de Lugar con la coherencia de rango de precio aplicada.
+ * Se mantiene separada para no perder `placeRecordSchema.shape`.
+ */
+export const placeRecordCoherentSchema = placeRecordSchema.refine(
+  (row) =>
+    row.price_to === null ||
+    row.price_to === undefined ||
+    row.price_from === null ||
+    row.price_from === undefined ||
+    row.price_to >= row.price_from,
+  { message: "price_to no puede ser menor que price_from" },
+);
 
 /** Alta de lugar: el tipo principal es obligatorio para todo lugar nuevo. */
 export const createPlaceInputSchema = z.object({
@@ -121,6 +145,29 @@ export const updatePlaceDetailsInputSchema = z.object({
       message: "place_type_id no puede vaciarse una vez asignado",
     }),
 });
+
+/** G8-Q2A-R1 · Relación gobernada entre un lugar y un producto del catálogo. */
+export const placeProductLinkSchema = z.object({
+  id: z.string().uuid(),
+  place_id: z.string().uuid(),
+  product_id: z.string().uuid(),
+  relation_kind: z.enum(PLACE_PRODUCT_RELATION_KINDS),
+  sort_order: z.number().int(),
+  notes: z.string().nullable().optional(),
+});
+
+/** G8-Q2A-R1 · Relación gobernada entre un lugar y un evento. */
+export const placeEventLinkSchema = z.object({
+  id: z.string().uuid(),
+  place_id: z.string().uuid(),
+  event_id: z.string().uuid(),
+  relation_kind: z.enum(PLACE_EVENT_RELATION_KINDS),
+  sort_order: z.number().int(),
+  notes: z.string().nullable().optional(),
+});
+
+export type PlaceProductLink = z.infer<typeof placeProductLinkSchema>;
+export type PlaceEventLink = z.infer<typeof placeEventLinkSchema>;
 
 export type PlaceType = z.infer<typeof placeTypeSchema>;
 export type PlaceCategory = z.infer<typeof placeCategorySchema>;
