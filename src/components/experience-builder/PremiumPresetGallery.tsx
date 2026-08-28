@@ -118,6 +118,8 @@ export function PremiumPresetGallery({ pageKind, onClose }: PremiumPresetGallery
         </div>
       )}
 
+      <EntityPremiumTemplateSection pageKind={pageKind} />
+
       {active ? <PresetDraftModal preset={active} onClose={() => setActiveId(null)} /> : null}
     </section>
   );
