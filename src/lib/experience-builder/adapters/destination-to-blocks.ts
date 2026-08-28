@@ -366,6 +366,7 @@ export function destinationToGalleryDTO(
     urls.push(next);
   }
   if (urls.length === 0) return null;
+  const galleryAttribution = attributionIndex(d.mediaAttribution);
   return {
     variant: "mosaic",
     heading: null,
