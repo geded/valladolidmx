@@ -105,6 +105,7 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
       highlights: Array.isArray(row.highlights) ? (row.highlights as string[]) : [],
       hero_palette: (row.hero_palette as PublicDestinationDTO["hero_palette"]) ?? null,
       hero_url,
+      hero_media,
       latitude: row.latitude ?? null,
       longitude: row.longitude ?? null,
     };
