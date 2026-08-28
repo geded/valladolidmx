@@ -15,7 +15,16 @@
  *  - `cinematic`: hero fotográfico dominante y contenido progresivo.
  */
 import { useMemo } from "react";
-import { Accessibility, CalendarDays, Clock, Compass, Heart, Sparkles, Ticket } from "lucide-react";
+import {
+  Accessibility,
+  CalendarDays,
+  Clock,
+  Compass,
+  Heart,
+  ImageOff,
+  Sparkles,
+  Ticket,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
@@ -454,7 +463,7 @@ function HeroEditorial({ content }: { content: PlacePremiumContent }) {
         <div className="mt-6 grid grid-cols-2 gap-3">
           {content.hero.supporting.map((media, index) => (
             <DemoImage
-              key={`${media.url}-${index}`}
+              key={`media-`}
               media={media}
               className="aspect-[3/2] rounded-2xl"
             />
@@ -646,7 +655,7 @@ function GalleryMosaic({ content }: { content: PlacePremiumContent }) {
         ) : null}
         {rest.map((media, index) => (
           <DemoImage
-            key={`${media.url}-${index}`}
+            key={`media-`}
             media={media}
             className="aspect-[4/3] rounded-3xl"
           />
@@ -670,7 +679,7 @@ function GalleryFilmstrip({ content }: { content: PlacePremiumContent }) {
       <ul className="mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
         {content.gallery.items.map((media, index) => (
           <li
-            key={`${media.url}-${index}`}
+            key={`media-`}
             className="w-[78%] shrink-0 snap-start sm:w-[46%] lg:w-[31%]"
           >
             <DemoImage media={media} className="aspect-[16/10] rounded-3xl" />
