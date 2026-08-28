@@ -148,8 +148,8 @@ export function PlacePremiumSurface({
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           <ExperienceMapBlock dto={mapDto} />
           <ul className="space-y-3 rounded-3xl border border-border bg-card p-5 text-sm leading-6 text-muted-foreground">
-            {content.map.directions.map((line) => (
-              <li key={line} className="flex gap-2">
+            {content.map.directions.map((line, index) => (
+              <li key={`dir-${index}`} className="flex gap-2">
                 <Compass className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
                 <span>{line}</span>
               </li>
@@ -285,8 +285,8 @@ export function PlacePremiumSurface({
               {content.alux.description}
             </p>
             <ul className="mt-4 flex flex-wrap gap-2">
-              {content.alux.prompts.map((prompt) => (
-                <li key={prompt}>
+              {content.alux.prompts.map((prompt, index) => (
+                <li key={`prompt-${index}`}>
                   <span className="inline-flex min-h-11 items-center rounded-pill border border-border bg-background px-4 text-sm">
                     {prompt}
                   </span>
@@ -573,8 +573,8 @@ function EssentialList({
         {title}
       </h3>
       <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
-        {items.map((item) => (
-          <li key={item}>{item}</li>
+        {items.map((item, index) => (
+          <li key={`item-${index}`}>{item}</li>
         ))}
       </ul>
     </div>
