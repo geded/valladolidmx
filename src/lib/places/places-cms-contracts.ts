@@ -131,6 +131,11 @@ export type PlaceLocationInput = z.infer<typeof placeLocationSchema>;
 
 export const createPlaceCmsSchema = z.object({
   destination_id: z.string().uuid(),
+  /**
+   * Addendum Q2B: la zona es opcional, pero cuando se envía el servidor
+   * verifica que pertenezca al destino (fail-closed).
+   */
+  destination_zone_id: z.string().uuid().nullable().optional(),
   slug: placeSlugSchema,
   name: z.string().trim().min(2).max(180),
   place_type_id: z.string().uuid(),

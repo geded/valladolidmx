@@ -24,6 +24,13 @@ import {
   updatePlaceCms,
 } from "@/lib/places/places-cms.functions";
 import { PLACE_ADMISSION_KINDS } from "@/lib/places/place-taxonomy";
+import {
+  ZONE_DESTINATION_MISMATCH,
+  ZONE_DESTINATION_MISMATCH_MESSAGE,
+  reconcileZoneForDestination,
+  zonesForDestination as selectableZonesForDestination,
+  type TerritorialZone,
+} from "@/lib/places/place-territory";
 import { placeDetailsPatchSchema } from "@/lib/places/places-cms-contracts";
 import type { ContentStatus } from "@/lib/cms/workflow";
 import {
@@ -58,6 +65,15 @@ const NEXT_ACTIONS: Record<ContentStatus, { to: ContentStatus; label: string }[]
 };
 
 type Values = Record<string, string>;
+
+/** Traduce los códigos de error del servidor a lenguaje del editor. */
+function describePlaceError(error: unknown, fallback: string): string {
+  const message = error instanceof Error ? error.message : "";
+  if (message.includes(ZONE_DESTINATION_MISMATCH)) return ZONE_DESTINATION_MISMATCH_MESSAGE;
+  if (message === "conflict_stale_record")
+    return "Otra persona editó este lugar mientras trabajabas. Recarga para ver la versión más reciente.";
+  return message || fallback;
+}
 
 const TEXT_FIELDS = [
   "official_name",
@@ -107,7 +123,7 @@ export function PlaceEditor({ placeId }: Props) {
   type NamedRow = { id: string; name: string };
   const opts = (options.data ?? {}) as {
     destinations?: NamedRow[];
-    zones?: Array<NamedRow & { destination_id: string }>;
+    zones?: TerritorialZone[];
     placeTypes?: NamedRow[];
     categories?: NamedRow[];
     authorityKinds?: NamedRow[];
@@ -128,9 +144,28 @@ export function PlaceEditor({ placeId }: Props) {
     name: "",
     slug: "",
     destination_id: "",
+    destination_zone_id: "",
     place_type_id: "",
     description: "",
   });
+
+  /** Addendum Q2B: zonas activas del destino elegido en el alta. */
+  const newPlaceZones = useMemo(
+    () => selectableZonesForDestination(opts.zones ?? [], newPlace.destination_id),
+    [opts.zones, newPlace.destination_id],
+  );
+
+  /** Al cambiar de destino, cualquier zona incompatible se limpia. */
+  const selectNewDestination = (destinationId: string) =>
+    setNewPlace((prev) => ({
+      ...prev,
+      destination_id: destinationId,
+      destination_zone_id: reconcileZoneForDestination(
+        opts.zones ?? [],
+        destinationId,
+        prev.destination_zone_id,
+      ),
+    }));
   const [duplicates, setDuplicates] = useState<Array<{ place_name: string; slug: string }>>([]);
 
   useEffect(() => {
@@ -153,6 +188,7 @@ export function PlaceEditor({ placeId }: Props) {
           name: newPlace.name.trim(),
           slug: newPlace.slug.trim(),
           destination_id: newPlace.destination_id,
+          destination_zone_id: newPlace.destination_zone_id || null,
           place_type_id: newPlace.place_type_id,
           description: newPlace.description.trim() || undefined,
         },
@@ -161,8 +197,7 @@ export function PlaceEditor({ placeId }: Props) {
       toast.success("Lugar creado como borrador. No se publica automáticamente.");
       navigate({ to: `/cms/lugares/${res.id}/editar` as never });
     },
-    onError: (e) =>
-      toast.error(e instanceof Error ? e.message : "No se pudo crear el lugar."),
+    onError: (e) => toast.error(describePlaceError(e, "No se pudo crear el lugar.")),
   });
 
   /* ── Edición ──────────────────────────────────────────────────────── */
@@ -201,12 +236,31 @@ export function PlaceEditor({ placeId }: Props) {
     setCategoryIds(det.categoryIds ?? []);
   }, [place, det.categoryIds]);
 
-  const zonesForDestination = useMemo(() => {
-    const destinationId = (place?.destination_id as string | undefined) ?? "";
-    return (opts.zones ?? []).filter(
-      (z: { destination_id: string }) => z.destination_id === destinationId,
+  /**
+   * Addendum Q2B: la lista de zonas depende SIEMPRE del destino del lugar.
+   * El destino no es editable después del alta, así que aquí sólo se filtra.
+   */
+  const editZones = useMemo(
+    () =>
+      selectableZonesForDestination(
+        opts.zones ?? [],
+        (place?.destination_id as string | undefined) ?? "",
+      ),
+    [opts.zones, place?.destination_id],
+  );
+
+  // Si la zona guardada dejó de pertenecer al destino (o fue archivada), se
+  // limpia en el formulario para no reenviar una relación incompatible.
+  useEffect(() => {
+    if (!place) return;
+    setZoneId((current) =>
+      reconcileZoneForDestination(
+        opts.zones ?? [],
+        (place.destination_id as string | undefined) ?? "",
+        current,
+      ),
     );
-  }, [opts.zones, place?.destination_id]);
+  }, [opts.zones, place]);
 
   const buildPatch = () => {
     const text = (key: string) => {
@@ -260,12 +314,8 @@ export function PlaceEditor({ placeId }: Props) {
       await detail.refetch();
     },
     onError: (e) => {
-      const message = e instanceof Error ? e.message : "No se pudo guardar.";
-      setFieldError(
-        message === "conflict_stale_record"
-          ? "Otra persona editó este lugar mientras trabajabas. Recarga para ver la versión más reciente."
-          : message,
-      );
+      const message = describePlaceError(e, "No se pudo guardar.");
+      setFieldError(message);
       toast.error(message);
     },
   });
@@ -389,12 +439,43 @@ export function PlaceEditor({ placeId }: Props) {
                 id={id}
                 className={inputClass}
                 value={newPlace.destination_id}
-                onChange={(e) => setNewPlace((p) => ({ ...p, destination_id: e.target.value }))}
+                onChange={(e) => selectNewDestination(e.target.value)}
               >
                 <option value="">Selecciona un destino…</option>
                 {(opts.destinations ?? []).map((d: { id: string; name: string }) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </PlaceField>
+          <PlaceField
+            name="new-zone"
+            label="Zona del destino (opcional)"
+            help={
+              !newPlace.destination_id
+                ? "Elige primero un destino para ver sus zonas."
+                : newPlaceZones.length === 0
+                  ? "Este destino todavía no tiene zonas registradas. Puedes crear el lugar sin zona."
+                  : "Sólo se listan zonas activas del destino seleccionado."
+            }
+          >
+            {({ id, describedBy }) => (
+              <select
+                id={id}
+                aria-describedby={describedBy}
+                className={inputClass}
+                value={newPlace.destination_zone_id}
+                disabled={!newPlace.destination_id || newPlaceZones.length === 0}
+                onChange={(e) =>
+                  setNewPlace((p) => ({ ...p, destination_zone_id: e.target.value }))
+                }
+              >
+                <option value="">Sin zona</option>
+                {newPlaceZones.map((z) => (
+                  <option key={z.id} value={z.id}>
+                    {z.name}
                   </option>
                 ))}
               </select>
@@ -526,16 +607,26 @@ export function PlaceEditor({ placeId }: Props) {
             </select>
           )}
         </PlaceField>
-        <PlaceField name="zone" label="Zona territorial">
-          {({ id }) => (
+        <PlaceField
+          name="zone"
+          label="Zona territorial (opcional)"
+          help={
+            editZones.length === 0
+              ? "Este destino todavía no tiene zonas registradas. Puedes guardar el lugar sin zona."
+              : "Sólo se listan zonas activas del destino de este lugar."
+          }
+        >
+          {({ id, describedBy }) => (
             <select
               id={id}
+              aria-describedby={describedBy}
               className={inputClass}
               value={zoneId}
+              disabled={editZones.length === 0}
               onChange={(e) => setZoneId(e.target.value)}
             >
               <option value="">Sin zona</option>
-              {zonesForDestination.map((z: { id: string; name: string }) => (
+              {editZones.map((z) => (
                 <option key={z.id} value={z.id}>
                   {z.name}
                 </option>

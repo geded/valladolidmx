@@ -14,6 +14,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertAllowedTransition, type ContentStatus } from "@/lib/cms/workflow";
+import { ZONE_DESTINATION_MISMATCH, isSelectableZone } from "./place-territory";
 import {
   attachPlaceMediaSchema,
   createPlaceCmsSchema,
@@ -63,11 +64,41 @@ function unwrap<T>(res: { data: T; error: { message: string } | null }): T {
   return res.data;
 }
 
+/**
+ * Addendum Q2B · Coherencia territorial fail-closed.
+ *
+ * Rechaza cualquier `destination_zone_id` que no pertenezca al
+ * `destination_id` del lugar. La validación visual del formulario no basta:
+ * este es el único punto de verdad.
+ */
+async function assertZoneBelongsToDestination(
+  ctx: Ctx,
+  destinationId: string,
+  zoneId: string | null | undefined,
+) {
+  if (!zoneId) return;
+  if (!destinationId) throw new Error(ZONE_DESTINATION_MISMATCH);
+  const zone = unwrap(
+    await ctx.supabase
+      .from("destination_zones")
+      .select("id, destination_id, status")
+      .eq("id", zoneId)
+      .is("deleted_at", null)
+      .maybeSingle(),
+  ) as { id: string; destination_id: string; status: string | null } | null;
+  if (!zone) throw new Error(ZONE_DESTINATION_MISMATCH);
+  if (zone.destination_id !== destinationId) throw new Error(ZONE_DESTINATION_MISMATCH);
+  if (!isSelectableZone({ id: zone.id, name: "", destination_id: zone.destination_id, status: zone.status }))
+    throw new Error(ZONE_DESTINATION_MISMATCH);
+}
+
 /* ───────────────────────────────  Lecturas  ─────────────────────────────── */
 
 interface ListPlacesInput {
   search?: string;
   destinationId?: string;
+  /** Addendum Q2B: filtro territorial de segundo nivel (zona del destino). */
+  destinationZoneId?: string;
   placeTypeId?: string;
   categoryId?: string;
   status?: string;
@@ -99,15 +130,17 @@ export const listPlacesCms = createServerFn({ method: "POST" })
 
     let q = (context as Ctx).supabase
       .from("points_of_interest")
-      .select("id, slug, name, status, destination_id, place_type_id, latitude, longitude, updated_at", {
-        count: "exact",
-      })
+      .select(
+        "id, slug, name, status, destination_id, destination_zone_id, place_type_id, latitude, longitude, updated_at",
+        { count: "exact" },
+      )
       .is("deleted_at", null)
       .order("name", { ascending: true })
       .range(offset, offset + limit - 1);
 
     if (search) q = q.or(`name.ilike.%${search}%,slug.ilike.%${search}%`);
     if (data.destinationId) q = q.eq("destination_id", data.destinationId);
+    if (data.destinationZoneId) q = q.eq("destination_zone_id", data.destinationZoneId);
     if (data.placeTypeId) q = q.eq("place_type_id", data.placeTypeId);
     if (data.status) q = q.eq("status", data.status);
     if (placeIdFilter) q = q.in("id", placeIdFilter);
@@ -128,10 +161,13 @@ export const listPlaceFormOptions = createServerFn({ method: "POST" })
         .select("id, name, slug")
         .is("deleted_at", null)
         .order("name"),
+      // Addendum Q2B: sólo zonas vivas; el filtrado por destino ocurre con
+      // `zonesForDestination` en el formulario y se revalida en el servidor.
       ctx.supabase
         .from("destination_zones")
-        .select("id, name, destination_id")
+        .select("id, name, destination_id, status")
         .is("deleted_at", null)
+        .neq("status", "archived")
         .order("name"),
       ctx.supabase
         .from("place_types")
@@ -249,6 +285,8 @@ export const createPlaceCms = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
     await assertPlacesStaff(ctx);
+    // Addendum Q2B: la coherencia destino–zona se verifica ANTES de crear.
+    await assertZoneBelongsToDestination(ctx, data.destination_id, data.destination_zone_id);
     const { data: id, error } = await ctx.supabase.rpc("admin_create_place", {
       _destination_id: data.destination_id,
       _slug: data.slug,
@@ -257,7 +295,18 @@ export const createPlaceCms = createServerFn({ method: "POST" })
       _description: data.description ?? null,
     });
     if (error) throw new Error(error.message);
-    return { id: id as string, status: "draft" as const };
+    const placeId = id as string;
+    if (data.destination_zone_id) {
+      const zoneUpdate = await ctx.supabase
+        .from("points_of_interest")
+        .update({ destination_zone_id: data.destination_zone_id, updated_by: ctx.userId })
+        .eq("id", placeId)
+        .select("id")
+        .maybeSingle();
+      if (zoneUpdate.error) throw new Error(zoneUpdate.error.message);
+      if (!zoneUpdate.data) throw new Error("update_denied");
+    }
+    return { id: placeId, status: "draft" as const };
   });
 
 export const updatePlaceCms = createServerFn({ method: "POST" })
@@ -274,14 +323,25 @@ export const updatePlaceCms = createServerFn({ method: "POST" })
     const current = unwrap(
       await ctx.supabase
         .from("points_of_interest")
-        .select("id, updated_at")
+        .select("id, updated_at, destination_id")
         .eq("id", data.place_id)
         .is("deleted_at", null)
         .maybeSingle(),
-    ) as { id: string; updated_at: string } | null;
+    ) as { id: string; updated_at: string; destination_id: string } | null;
     if (!current) throw new Error("place_not_found");
     if (new Date(current.updated_at).getTime() !== new Date(data.expected_updated_at).getTime())
       throw new Error("conflict_stale_record");
+
+    // Addendum Q2B: el destino es inmutable desde el editor, así que la zona
+    // se valida contra el destino persistido, nunca contra el enviado por UI.
+    if ("destination_zone_id" in data.patch) {
+      await assertZoneBelongsToDestination(
+        ctx,
+        current.destination_id,
+        data.patch.destination_zone_id ?? null,
+      );
+    }
+
 
     const payload: Record<string, unknown> = { ...data.patch, updated_by: ctx.userId };
     const { data: updated, error } = await ctx.supabase
