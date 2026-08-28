@@ -323,7 +323,17 @@ export function PlacePremiumSurface({
           </section>
         </div>
       </Container>
+
+      {/* Zona segura: reserva vertical para el dock flotante de Alux
+          (incluye el área segura del dispositivo). Ningún contenido de la
+          ficha queda cubierto en móvil ni en escritorio. */}
+      <div
+        aria-hidden
+        data-alux-safe-zone-spacer="true"
+        className="h-[calc(6.5rem+env(safe-area-inset-bottom))] lg:h-24"
+      />
     </div>
+
   );
 }
 
