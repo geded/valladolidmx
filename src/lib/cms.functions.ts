@@ -145,10 +145,10 @@ export const getSeoMetadata = createServerFn({ method: "GET" })
     const sb = publicClient();
     const { data: row, error } = (await sb
       .from("seo_metadata")
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .select(
         "slug, meta_title, meta_description, canonical_url, og_title, og_description, og_image_url, twitter_card, noindex, json_ld",
-      )) as any;
+      )) as // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any;
     if (error) throw error;
     const rows = (row ?? []) as Array<{
       slug: string | null;
