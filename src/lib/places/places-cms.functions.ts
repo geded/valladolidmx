@@ -63,6 +63,34 @@ function unwrap<T>(res: { data: T; error: { message: string } | null }): T {
   return res.data;
 }
 
+/**
+ * Addendum Q2B · Coherencia territorial fail-closed.
+ *
+ * Rechaza cualquier `destination_zone_id` que no pertenezca al
+ * `destination_id` del lugar. La validación visual del formulario no basta:
+ * este es el único punto de verdad.
+ */
+async function assertZoneBelongsToDestination(
+  ctx: Ctx,
+  destinationId: string,
+  zoneId: string | null | undefined,
+) {
+  if (!zoneId) return;
+  if (!destinationId) throw new Error(ZONE_DESTINATION_MISMATCH);
+  const zone = unwrap(
+    await ctx.supabase
+      .from("destination_zones")
+      .select("id, destination_id, status")
+      .eq("id", zoneId)
+      .is("deleted_at", null)
+      .maybeSingle(),
+  ) as { id: string; destination_id: string; status: string | null } | null;
+  if (!zone) throw new Error(ZONE_DESTINATION_MISMATCH);
+  if (zone.destination_id !== destinationId) throw new Error(ZONE_DESTINATION_MISMATCH);
+  if (!isSelectableZone({ id: zone.id, name: "", destination_id: zone.destination_id, status: zone.status }))
+    throw new Error(ZONE_DESTINATION_MISMATCH);
+}
+
 /* ───────────────────────────────  Lecturas  ─────────────────────────────── */
 
 interface ListPlacesInput {
