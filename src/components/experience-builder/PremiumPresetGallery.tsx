@@ -27,6 +27,10 @@ import {
   resolvePremiumPresetThumbnail,
   type PremiumTemplatePreset,
 } from "@/lib/experience-builder/premium-template-registry";
+import {
+  ENTITY_PREMIUM_TEMPLATE_PRESETS,
+  listEntityPremiumTemplatePresetsForKind,
+} from "@/lib/experience-builder/entity-premium-templates";
 
 type Cfg = Record<string, unknown>;
 
@@ -403,5 +407,60 @@ function PresetField({
         />
       )}
     </label>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * G8-P2 · Plantillas premium de entidad (ficha individual).
+ *
+ * Se muestran ÚNICAMENTE las familias compatibles con el tipo de página
+ * activo (fail-closed). No abren borrador: la ficha individual se
+ * resuelve automáticamente sobre la ruta paramétrica canónica y su
+ * autoridad visual es la vista interna aprobada.
+ * ------------------------------------------------------------------ */
+function EntityPremiumTemplateSection({ pageKind }: { pageKind?: string }) {
+  const entityPresets = useMemo(
+    () => (pageKind ? listEntityPremiumTemplatePresetsForKind(pageKind) : ENTITY_PREMIUM_TEMPLATE_PRESETS),
+    [pageKind],
+  );
+  if (entityPresets.length === 0) return null;
+
+  return (
+    <section className="mt-6 rounded-2xl border border-dashed border-border bg-muted/30 p-4">
+      <h4 className="text-sm font-semibold">Plantillas premium de entidad</h4>
+      <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
+        Cada ficha publicada adopta automáticamente la plantilla de su familia. No se crea una
+        composición por entidad: el diseño lo controla el preset y la empresa sólo edita su
+        contenido.
+      </p>
+      <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+        {entityPresets.map((preset) => (
+          <li
+            key={preset.id}
+            className="flex min-h-[44px] items-start justify-between gap-3 rounded-xl border border-border bg-background p-3"
+          >
+            <div className="min-w-0">
+              <p className="truncate text-xs font-semibold">{preset.name}</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">
+                {preset.canonicalRoutePattern} · JSON-LD {preset.jsonLdType}
+              </p>
+              {preset.status === "pendiente_aceptacion_founder" ? (
+                <p className="mt-1 text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                  Pendiente de aceptación visual del Founder
+                </p>
+              ) : null}
+            </div>
+            <a
+              href={preset.visualAuthorityRoute}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-lg border border-border px-3 text-[11px] font-medium hover:bg-accent"
+            >
+              Ver <ExternalLink className="h-3 w-3" aria-hidden />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
