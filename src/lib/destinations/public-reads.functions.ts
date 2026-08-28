@@ -54,8 +54,21 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
     if (!row) return null;
 
     let hero_url: string | null = null;
+    let hero_media: PublicMediaAttribution | null = null;
     const media = (row as unknown as {
-      media_assets?: { storage_bucket: string; storage_path: string } | null;
+      media_assets?: {
+        id?: string;
+        storage_bucket: string;
+        storage_path: string;
+        alt_text?: string | null;
+        alt_text_ai?: string | null;
+        alt_text_source?: string | null;
+        review_state?: string | null;
+        title?: string | null;
+        caption?: string | null;
+        credit?: string | null;
+        metadata?: Record<string, unknown> | null;
+      } | null;
     }).media_assets;
     if (media?.storage_bucket && media?.storage_path) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -64,6 +77,24 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
         .createSignedUrl(media.storage_path, 60 * 60);
       if (signErr) console.error("[getPublicDestinationBySlug] sign error", signErr);
       hero_url = signed?.signedUrl ?? null;
+      if (hero_url) {
+        const { resolveMediaAlt } = await import("@/lib/media/resolve-alt");
+        const meta = (media.metadata ?? {}) as Record<string, unknown>;
+        const alt = resolveMediaAlt(media, { fallback: "" });
+        hero_media = {
+          mediaAssetId: media.id ?? null,
+          url: hero_url,
+          role: "cover",
+          sortOrder: 0,
+          alt: alt.length > 0 ? alt : null,
+          caption: media.caption?.trim() || null,
+          credit: media.credit?.trim() || null,
+          aiGenerated: meta.ai_generated === true,
+          conceptual: meta.conceptual === true,
+          documentary: meta.documentary === true,
+          temporary: meta.temporary === true,
+        };
+      }
     }
 
     return {
