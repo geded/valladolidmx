@@ -358,6 +358,7 @@ export function MediaPickerDialog({
                   row={r}
                   onPick={() => {
                     onPick({
+                      id: r.id,
                       url: r.url,
                       alt: r.alt,
                       credit: r.credit,
