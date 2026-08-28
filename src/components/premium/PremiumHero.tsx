@@ -25,6 +25,19 @@ export function PremiumHero({ vm }: { vm: PremiumHeroVM }) {
           className="absolute inset-0 -z-20 size-full object-cover"
         />
       ) : null}
+      {/* G8-F1D · Atribución acreditada. Sólo se muestra cuando el medio
+          gobernado declara caption o crédito; nunca se inventa. */}
+      {vm.media?.caption || vm.media?.credit ? (
+        <p className="absolute bottom-2 right-3 z-10 max-w-[85%] text-right text-[11px] leading-tight text-white/85 sm:bottom-3 sm:text-xs">
+          {vm.media.caption ? <span className="block">{vm.media.caption}</span> : null}
+          {vm.media.credit ? (
+            <span className="block">
+              <span className="sr-only">Crédito de la imagen: </span>
+              {vm.media.credit}
+            </span>
+          ) : null}
+        </p>
+      ) : null}
       <div
         aria-hidden
         className={cn(

@@ -339,13 +339,10 @@ export function DestinationSurface({
                 eyebrow: "Destino · Oriente Maya de Yucatán",
                 title: input.name,
                 description: input.tagline || input.description || undefined,
-                media:
-                  (input.galleryUrls[0] ?? input.heroUrl)
-                    ? {
-                        url: input.galleryUrls[0] ?? input.heroUrl ?? "",
-                        alt: `Vista de ${input.name}, Oriente Maya de Yucatán`,
-                      }
-                    : null,
+                // G8-F1D · El medio Premium hereda ALT, caption y crédito
+                // acreditados del hero gobernado; sin metadata conserva
+                // el ALT descriptivo previo.
+                media: premiumHeroMedia,
                 primaryAction: dominantAction?.href
                   ? { label: dominantAction.label, href: dominantAction.href }
                   : undefined,
