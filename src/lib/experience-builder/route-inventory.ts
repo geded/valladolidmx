@@ -485,6 +485,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/lovable/g4-event-premium-preview.tsx",
   "src/routes/lovable/g4-home-premium-preview.tsx",
   "src/routes/lovable/g8-place-premium-visual-approval.tsx",
+  "src/routes/lovable/g8-r1cl-seo-landing-parity.tsx",
   "src/routes/lovable/g8d-premium-parity.tsx",
   "src/routes/lovable/g8e-premium-template-catalog.tsx",
   "src/routes/lovable/g8p2-tour-premium-preview.tsx",
