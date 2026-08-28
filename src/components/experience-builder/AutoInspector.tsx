@@ -12,8 +12,11 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { MediaPickerDialog } from "./MediaPickerDialog";
 import { ReferencePicker } from "./ReferencePicker";
 import { useServerFn } from "@tanstack/react-start";
-import { importUrlToStudioMedia } from "@/lib/experience-builder/studio-media.functions";
-import { toast } from "@/lib/toast";
+import {
+  decodeSlotMedia,
+  encodeSlotMedia,
+  focalObjectPosition,
+} from "@/lib/media/slot-media";
 import type {
   BlockContract,
   BlockFieldSchema,
