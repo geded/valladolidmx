@@ -370,11 +370,24 @@ export function destinationToGalleryDTO(
     variant: "mosaic",
     heading: null,
     subheading: null,
-    items: urls.slice(0, 5).map((url, i) => ({
-      kind: "image",
-      url,
-      alt: `${d.name} — foto ${i + 1}`,
-    })),
+    items: urls.slice(0, 5).map((url, i) => {
+      // G8-F1D — ALT/caption/crédito acreditados; genérico sólo si falta.
+      const a = galleryAttribution.get(url) ?? emptyAttribution(url);
+      const credit = resolveAttributedCredit(a);
+      const caption = resolveAttributedCaption(a);
+      return {
+        kind: "image" as const,
+        url,
+        alt: resolveAttributedAlt(a, { fallback: `${d.name} — foto ${i + 1}` }),
+        ...(caption ? { caption } : {}),
+        ...(credit ? { credit } : {}),
+        ...(a.aiGenerated || a.conceptual
+          ? { nature: "conceptual" as const }
+          : a.documentary
+            ? { nature: "documentary" as const }
+            : {}),
+      };
+    }),
     maxVisible: 5,
     aspect: "landscape",
     ariaLabel: `Galería de ${d.name}`,
