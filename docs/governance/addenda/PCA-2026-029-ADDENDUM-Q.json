@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-Q",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.40-G8-Q2B-PLACES-CMS-v1.0.md",
+  "founder_authority": "Founder Directive 2026-08-28 · Cierre y remediación G8-Q2B. Reconoce exclusivamente el alta en el Route Inventory de las tres rutas autenticadas del CMS de Lugares y Atractivos exigida por la Route Inventory Rule (DOS · SSC-01·P2). Sin rutas públicas, sin publicación, sin flags, sin PR, merge ni despliegue. La autoridad de paquete es PCA-2026-044.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "838130f47fdd367a996b76147af6105ccaa28e46a8394e360a2d8ff389078563",
+    "current_sha256": "fb5a9aec17a5f6a0827d6e2f74180f52380238b209854d34878f21e1b35e406c",
+    "semantic_change": "G8-Q2B · Alta de src/routes/_authenticated/cms/lugares.index.tsx, lugares.nuevo.tsx y lugares.$placeId.editar.tsx en el inventario canónico de rutas. Estrictamente aditivo: ninguna ruta existente cambia de categoría, madurez, prioridad ni propietario funcional.",
+    "authority": "PCA-2026-044"
+  },
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "Las tres rutas son autenticadas y noindex; cero rutas públicas nuevas",
+    "Cero contenido turístico real y cero publicación"
+  ],
+  "recorded_at": "2026-08-28"
+}

@@ -222,8 +222,12 @@ export function PlaceEditor({ placeId }: Props) {
     setValues(next);
     setZoneId((place.destination_zone_id as string | null) ?? "");
     setAdmission((place.admission_kind as string | null) ?? "");
-    setPriceFrom(place.price_from === null || place.price_from === undefined ? "" : String(place.price_from));
-    setPriceTo(place.price_to === null || place.price_to === undefined ? "" : String(place.price_to));
+    setPriceFrom(
+      place.price_from === null || place.price_from === undefined ? "" : String(place.price_from),
+    );
+    setPriceTo(
+      place.price_to === null || place.price_to === undefined ? "" : String(place.price_to),
+    );
     setDuration(
       place.visit_duration_minutes === null || place.visit_duration_minutes === undefined
         ? ""
@@ -231,8 +235,12 @@ export function PlaceEditor({ placeId }: Props) {
     );
     setHighlights(Array.isArray(place.highlights) ? (place.highlights as string[]).join("\n") : "");
     setAmenities(Array.isArray(place.amenities) ? (place.amenities as string[]).join("\n") : "");
-    setLatitude(place.latitude === null || place.latitude === undefined ? "" : String(place.latitude));
-    setLongitude(place.longitude === null || place.longitude === undefined ? "" : String(place.longitude));
+    setLatitude(
+      place.latitude === null || place.latitude === undefined ? "" : String(place.latitude),
+    );
+    setLongitude(
+      place.longitude === null || place.longitude === undefined ? "" : String(place.longitude),
+    );
     setCategoryIds(det.categoryIds ?? []);
   }, [place, det.categoryIds]);
 
@@ -337,8 +345,7 @@ export function PlaceEditor({ placeId }: Props) {
   });
 
   const saveType = useMutation({
-    mutationFn: (typeId: string) =>
-      typeFn({ data: { place_id: placeId!, place_type_id: typeId } }),
+    mutationFn: (typeId: string) => typeFn({ data: { place_id: placeId!, place_type_id: typeId } }),
     onSuccess: async () => {
       toast.success("Tipo de lugar actualizado.");
       await detail.refetch();
@@ -347,8 +354,7 @@ export function PlaceEditor({ placeId }: Props) {
   });
 
   const saveCategories = useMutation({
-    mutationFn: () =>
-      categoriesFn({ data: { place_id: placeId!, category_ids: categoryIds } }),
+    mutationFn: () => categoriesFn({ data: { place_id: placeId!, category_ids: categoryIds } }),
     onSuccess: async () => {
       toast.success("Categorías guardadas.");
       await detail.refetch();
@@ -546,7 +552,11 @@ export function PlaceEditor({ placeId }: Props) {
         <p className="mt-1 text-destructive/80">
           {detail.error instanceof Error ? detail.error.message : "Error desconocido."}
         </p>
-        <button type="button" className={`${buttonClass} mt-3`} onClick={() => void detail.refetch()}>
+        <button
+          type="button"
+          className={`${buttonClass} mt-3`}
+          onClick={() => void detail.refetch()}
+        >
           Reintentar
         </button>
       </div>

@@ -63,9 +63,7 @@ export function PlaceField({ name, label, help, error, required, wide, children 
           </span>
         )}
       </label>
-      <div className="mt-1.5">
-        {children({ id, describedBy, invalid: Boolean(error) })}
-      </div>
+      <div className="mt-1.5">{children({ id, describedBy, invalid: Boolean(error) })}</div>
       {error && (
         <p id={errorId} role="alert" className="mt-1 text-[11px] font-medium text-destructive">
           {error}

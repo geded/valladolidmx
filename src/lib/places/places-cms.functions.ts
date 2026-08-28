@@ -88,8 +88,46 @@ async function assertZoneBelongsToDestination(
   ) as { id: string; destination_id: string; status: string | null } | null;
   if (!zone) throw new Error(ZONE_DESTINATION_MISMATCH);
   if (zone.destination_id !== destinationId) throw new Error(ZONE_DESTINATION_MISMATCH);
-  if (!isSelectableZone({ id: zone.id, name: "", destination_id: zone.destination_id, status: zone.status }))
+  if (
+    !isSelectableZone({
+      id: zone.id,
+      name: "",
+      destination_id: zone.destination_id,
+      status: zone.status,
+    })
+  )
     throw new Error(ZONE_DESTINATION_MISMATCH);
+}
+
+/**
+ * G8-Q2B · Auditoría de operaciones mutables.
+ *
+ * Usa exclusivamente el mecanismo existente `content_audit_log` (sin tabla,
+ * migración ni sistema paralelo). La escritura es best-effort: un actor
+ * autorizado sólo por el permiso granular `poi.write` puede no satisfacer la
+ * política `content_audit_editor_insert`, y esa limitación jamás debe revertir
+ * la operación de negocio ya aplicada (ver Blueprint 19.40 §5).
+ */
+async function auditPlace(
+  ctx: Ctx,
+  action: string,
+  placeId: string,
+  metadata: Record<string, unknown> = {},
+  status?: { from?: ContentStatus | null; to?: ContentStatus | null },
+) {
+  try {
+    await ctx.supabase.from("content_audit_log").insert({
+      entity_kind: "point_of_interest",
+      entity_id: placeId,
+      action,
+      actor_user_id: ctx.userId,
+      from_status: status?.from ?? null,
+      to_status: status?.to ?? null,
+      metadata: { surface: "cms.lugares", ...metadata },
+    });
+  } catch {
+    /* auditoría best-effort: nunca revierte la operación */
+  }
 }
 
 /* ───────────────────────────────  Lecturas  ─────────────────────────────── */
@@ -124,8 +162,7 @@ export const listPlacesCms = createServerFn({ method: "POST" })
           .eq("category_id", data.categoryId),
       ) as Array<{ place_id: string }>;
       placeIdFilter = links.map((l) => l.place_id);
-      if (placeIdFilter.length === 0)
-        return { rows: [], total: 0, limit, offset };
+      if (placeIdFilter.length === 0) return { rows: [], total: 0, limit, offset };
     }
 
     let q = (context as Ctx).supabase
@@ -239,13 +276,22 @@ export const getPlaceCms = createServerFn({ method: "POST" })
     ]);
 
     const mediaRows = (unwrap(media) ?? []) as Array<{ media_asset_id: string }>;
-    let assets: Array<{ id: string; storage_path: string; alt_text: string | null; review_state: string | null; status: string | null }> = [];
+    let assets: Array<{
+      id: string;
+      storage_path: string;
+      alt_text: string | null;
+      review_state: string | null;
+      status: string | null;
+    }> = [];
     if (mediaRows.length > 0) {
       assets = (unwrap(
         await ctx.supabase
           .from("media_assets")
           .select("id, storage_path, alt_text, review_state, status")
-          .in("id", mediaRows.map((r) => r.media_asset_id)),
+          .in(
+            "id",
+            mediaRows.map((r) => r.media_asset_id),
+          ),
       ) ?? []) as typeof assets;
     }
 
@@ -306,6 +352,21 @@ export const createPlaceCms = createServerFn({ method: "POST" })
       if (zoneUpdate.error) throw new Error(zoneUpdate.error.message);
       if (!zoneUpdate.data) throw new Error("update_denied");
     }
+    await auditPlace(
+      ctx,
+      "place.create",
+      placeId,
+      {
+        after: {
+          slug: data.slug,
+          name: data.name,
+          destination_id: data.destination_id,
+          destination_zone_id: data.destination_zone_id ?? null,
+          place_type_id: data.place_type_id,
+        },
+      },
+      { from: null, to: "draft" },
+    );
     return { id: placeId, status: "draft" as const };
   });
 
@@ -342,7 +403,6 @@ export const updatePlaceCms = createServerFn({ method: "POST" })
       );
     }
 
-
     const payload: Record<string, unknown> = { ...data.patch, updated_by: ctx.userId };
     const { data: updated, error } = await ctx.supabase
       .from("points_of_interest")
@@ -352,6 +412,10 @@ export const updatePlaceCms = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!updated) throw new Error("update_denied");
+    await auditPlace(ctx, "place.update", data.place_id, {
+      fields: Object.keys(data.patch),
+      after: data.patch,
+    });
     return updated as { id: string; updated_at: string };
   });
 
@@ -373,6 +437,9 @@ export const setPlaceLocation = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!updated) throw new Error("update_denied");
+    await auditPlace(ctx, "place.location.set", data.place_id, {
+      after: { latitude: data.latitude, longitude: data.longitude },
+    });
     return updated;
   });
 
@@ -387,6 +454,9 @@ export const setPlaceType = createServerFn({ method: "POST" })
       _patch: { place_type_id: data.place_type_id },
     });
     if (error) throw new Error(error.message);
+    await auditPlace(ctx, "place.type.set", data.place_id, {
+      after: { place_type_id: data.place_type_id },
+    });
     return { ok: true };
   });
 
@@ -401,6 +471,9 @@ export const setPlaceCategoriesCms = createServerFn({ method: "POST" })
       _category_ids: data.category_ids,
     });
     if (error) throw new Error(error.message);
+    await auditPlace(ctx, "place.categories.set", data.place_id, {
+      after: { category_ids: data.category_ids },
+    });
     return { ok: true, count: data.category_ids.length };
   });
 
@@ -425,6 +498,7 @@ export const setPlaceHoursCms = createServerFn({ method: "POST" })
       );
       if (ins.error) throw new Error(ins.error.message);
     }
+    await auditPlace(ctx, "place.hours.set", data.place_id, { after: { hours: data.hours } });
     return { ok: true, count: data.hours.length };
   });
 
@@ -443,6 +517,10 @@ export const setPlaceProductsCms = createServerFn({ method: "POST" })
       if (ins.error) throw new Error(ins.error.message);
     }
     // Nota Q2B: relacionar un producto NO otorga administración del lugar.
+    await auditPlace(ctx, "place.products.set", data.place_id, {
+      after: { relations: data.relations },
+      grants_place_administration: false,
+    });
     return { ok: true, count: data.relations.length, grantsPlaceAdministration: false };
   });
 
@@ -460,6 +538,10 @@ export const setPlaceEventsCms = createServerFn({ method: "POST" })
         .insert(data.relations.map((r) => ({ ...r, place_id: data.place_id })));
       if (ins.error) throw new Error(ins.error.message);
     }
+    await auditPlace(ctx, "place.events.set", data.place_id, {
+      after: { relations: data.relations },
+      grants_place_administration: false,
+    });
     return { ok: true, count: data.relations.length, grantsPlaceAdministration: false };
   });
 
@@ -478,6 +560,10 @@ export const setPlaceAuthoritiesCms = createServerFn({ method: "POST" })
       if (ins.error) throw new Error(ins.error.message);
     }
     // Informativo: no crea gestores ni reclamación empresarial.
+    await auditPlace(ctx, "place.authorities.set", data.place_id, {
+      after: { authorities: data.authorities },
+      grants_place_administration: false,
+    });
     return { ok: true, count: data.authorities.length, grantsPlaceAdministration: false };
   });
 
@@ -517,6 +603,9 @@ export const attachPlaceMedia = createServerFn({ method: "POST" })
       .select("id, media_asset_id, role, sort_order")
       .maybeSingle();
     if (error) throw new Error(error.message);
+    await auditPlace(ctx, "place.media.attach", data.place_id, {
+      after: { media_asset_id: data.media_asset_id, role: data.role },
+    });
     return { row, approved: asset.review_state === "approved" };
   });
 
@@ -532,6 +621,9 @@ export const detachPlaceMedia = createServerFn({ method: "POST" })
       .eq("id", data.media_id)
       .eq("place_id", data.place_id);
     if (error) throw new Error(error.message);
+    await auditPlace(ctx, "place.media.detach", data.place_id, {
+      before: { media_id: data.media_id },
+    });
     return { ok: true };
   });
 
@@ -551,6 +643,9 @@ export const reorderPlaceMedia = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       index += 1;
     }
+    await auditPlace(ctx, "place.media.reorder", data.place_id, {
+      after: { ordered_media_ids: data.ordered_media_ids },
+    });
     return { ok: true };
   });
 
@@ -582,7 +677,10 @@ export const transitionPlaceStatus = createServerFn({ method: "POST" })
 
     if (data.to !== "draft" && data.to !== "archived") {
       const links = (unwrap(
-        await ctx.supabase.from("place_media").select("media_asset_id").eq("place_id", data.place_id),
+        await ctx.supabase
+          .from("place_media")
+          .select("media_asset_id")
+          .eq("place_id", data.place_id),
       ) ?? []) as Array<{ media_asset_id: string }>;
       let hasUnapprovedMedia = false;
       if (links.length > 0) {
@@ -590,7 +688,10 @@ export const transitionPlaceStatus = createServerFn({ method: "POST" })
           await ctx.supabase
             .from("media_assets")
             .select("id, review_state")
-            .in("id", links.map((l) => l.media_asset_id)),
+            .in(
+              "id",
+              links.map((l) => l.media_asset_id),
+            ),
         ) ?? []) as Array<{ review_state: string | null }>;
         hasUnapprovedMedia = assets.some((a) => a.review_state !== "approved");
       }
@@ -616,5 +717,12 @@ export const transitionPlaceStatus = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!updated) throw new Error("transition_denied");
+    await auditPlace(
+      ctx,
+      "place.status.transition",
+      data.place_id,
+      { before: { status: place.status }, after: { status: data.to } },
+      { from: place.status, to: data.to },
+    );
     return updated;
   });

@@ -9,7 +9,10 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/lib/toast";
-import { MediaPickerDialog, type PickedMedia } from "@/components/experience-builder/MediaPickerDialog";
+import {
+  MediaPickerDialog,
+  type PickedMedia,
+} from "@/components/experience-builder/MediaPickerDialog";
 import {
   attachPlaceMedia,
   detachPlaceMedia,

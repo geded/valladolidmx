@@ -203,7 +203,9 @@ function LugaresPage() {
                   {zoneName(r.destination_zone_id)}
                 </td>
                 <td className="px-3 py-2 text-xs text-muted-foreground">
-                  {r.latitude !== null && r.longitude !== null ? "Con coordenadas" : "Sin ubicación"}
+                  {r.latitude !== null && r.longitude !== null
+                    ? "Con coordenadas"
+                    : "Sin ubicación"}
                 </td>
                 <td className="px-3 py-2">
                   <StatusBadge value={r.status} />
