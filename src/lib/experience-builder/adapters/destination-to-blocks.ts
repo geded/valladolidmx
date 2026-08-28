@@ -27,6 +27,14 @@ import type {
 } from "@/lib/experience-builder/blocks/experience-map/contract";
 import { PUEBLOS_MAGICOS_AUTORIZADOS } from "@/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry";
 
+import {
+  emptyAttribution,
+  resolveAttributedAlt,
+  resolveAttributedCaption,
+  resolveAttributedCredit,
+  type PublicMediaAttribution,
+} from "@/lib/media/public-attribution";
+
 /**
  * Modelo unificado consumido por los adapters. Se compone en la ruta a
  * partir de la BD (`PublicDestinationDTO`) y el mock territorial, de
@@ -40,6 +48,12 @@ export interface DestinationBlockInput {
   highlights: string[];
   heroUrl: string | null;
   galleryUrls: string[];
+  /**
+   * G8-F1D — Atribución acreditada por medio (ALT, caption, crédito,
+   * naturaleza), indexada por URL. Aditivo: vacío conserva el
+   * comportamiento previo.
+   */
+  mediaAttribution?: PublicMediaAttribution[];
   latitude: number | null;
   longitude: number | null;
   mapPoints: ExperienceMapPoint[];
@@ -67,6 +81,7 @@ export function toDestinationBlockInput(
     regionName: string;
     counts?: DestinationBlockInput["relatedCounts"];
     galleryUrls?: string[];
+    mediaAttribution?: PublicMediaAttribution[];
     mapPoints?: ExperienceMapPoint[];
   },
 ): DestinationBlockInput {
@@ -78,6 +93,10 @@ export function toDestinationBlockInput(
     highlights: (dbData?.highlights?.length ? dbData.highlights : mock?.highlights ?? []) as string[],
     heroUrl: dbData?.hero_url ?? null,
     galleryUrls: ctx.galleryUrls ?? [],
+    mediaAttribution: [
+      ...(dbData?.hero_media ? [dbData.hero_media] : []),
+      ...(ctx.mediaAttribution ?? []),
+    ],
     latitude: dbData?.latitude ?? null,
     longitude: dbData?.longitude ?? null,
     mapPoints: ctx.mapPoints ?? [],
