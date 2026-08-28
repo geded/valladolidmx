@@ -4895,6 +4895,54 @@ export type Database = {
           },
         ]
       }
+      place_events: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          notes: string | null
+          place_id: string
+          relation_kind: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          notes?: string | null
+          place_id: string
+          relation_kind?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          notes?: string | null
+          place_id?: string
+          relation_kind?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_events_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "points_of_interest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       place_hours: {
         Row: {
           closes_at: string | null
@@ -4977,6 +5025,54 @@ export type Database = {
             columns: ["place_id"]
             isOneToOne: false
             referencedRelation: "points_of_interest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      place_products: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          place_id: string
+          product_id: string
+          relation_kind: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          place_id: string
+          product_id: string
+          relation_kind?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          place_id?: string
+          product_id?: string
+          relation_kind?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_products_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "points_of_interest"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -5084,11 +5180,13 @@ export type Database = {
         Row: {
           accessibility: Json
           address_line: string | null
+          admission_kind: string | null
           amenities: Json
           best_time_to_visit: string | null
           contact_email: string | null
           contact_phone: string | null
           contact_website: string | null
+          contact_whatsapp: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
@@ -5098,6 +5196,7 @@ export type Database = {
           description: string | null
           destination_id: string
           destination_zone_id: string | null
+          directions: string | null
           entry_fee_notes: string | null
           google_place_id: string | null
           highlights: Json
@@ -5111,8 +5210,11 @@ export type Database = {
           place_type_id: string | null
           price_currency: string
           price_from: number | null
+          price_to: number | null
+          published_at: string | null
           short_description: string | null
           slug: string
+          social_links: Json
           status: Database["public"]["Enums"]["content_status"]
           updated_at: string
           updated_by: string | null
@@ -5121,11 +5223,13 @@ export type Database = {
         Insert: {
           accessibility?: Json
           address_line?: string | null
+          admission_kind?: string | null
           amenities?: Json
           best_time_to_visit?: string | null
           contact_email?: string | null
           contact_phone?: string | null
           contact_website?: string | null
+          contact_whatsapp?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
@@ -5135,6 +5239,7 @@ export type Database = {
           description?: string | null
           destination_id: string
           destination_zone_id?: string | null
+          directions?: string | null
           entry_fee_notes?: string | null
           google_place_id?: string | null
           highlights?: Json
@@ -5148,8 +5253,11 @@ export type Database = {
           place_type_id?: string | null
           price_currency?: string
           price_from?: number | null
+          price_to?: number | null
+          published_at?: string | null
           short_description?: string | null
           slug: string
+          social_links?: Json
           status?: Database["public"]["Enums"]["content_status"]
           updated_at?: string
           updated_by?: string | null
@@ -5158,11 +5266,13 @@ export type Database = {
         Update: {
           accessibility?: Json
           address_line?: string | null
+          admission_kind?: string | null
           amenities?: Json
           best_time_to_visit?: string | null
           contact_email?: string | null
           contact_phone?: string | null
           contact_website?: string | null
+          contact_whatsapp?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
@@ -5172,6 +5282,7 @@ export type Database = {
           description?: string | null
           destination_id?: string
           destination_zone_id?: string | null
+          directions?: string | null
           entry_fee_notes?: string | null
           google_place_id?: string | null
           highlights?: Json
@@ -5185,8 +5296,11 @@ export type Database = {
           place_type_id?: string | null
           price_currency?: string
           price_from?: number | null
+          price_to?: number | null
+          published_at?: string | null
           short_description?: string | null
           slug?: string
+          social_links?: Json
           status?: Database["public"]["Enums"]["content_status"]
           updated_at?: string
           updated_by?: string | null
