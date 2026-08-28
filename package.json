@@ -39,6 +39,8 @@
     "test:g7": "bun test scripts/omxds/g7/premium-builder-capabilities.contract.test.ts",
     "validate:g7": "bun run test:g7 && bun scripts/omxds/g7/premium-builder-capabilities.evidence.mjs",
     "test:g8": "bun test scripts/omxds/g8/home-premium-authoring-parity.contract.test.ts",
+    "test:g8:m1": "bun test scripts/omxds/g8/safe-media-replacement.contract.test.ts",
+    "validate:g8:m1": "bun run test:g8:m1",
     "validate:g8": "bun run test:g8 && bun run test:i4:a && bun run test:i4:0",
     "lint": "bun scripts/lint/lint-baseline.mjs",
     "lint:full": "eslint .",
