@@ -97,6 +97,8 @@ async function assertZoneBelongsToDestination(
 interface ListPlacesInput {
   search?: string;
   destinationId?: string;
+  /** Addendum Q2B: filtro territorial de segundo nivel (zona del destino). */
+  destinationZoneId?: string;
   placeTypeId?: string;
   categoryId?: string;
   status?: string;
