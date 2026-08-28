@@ -273,6 +273,24 @@ export function DestinationSurface({
 
   const galleryDto = destinationToGalleryDTO(input);
   const heroDtoRaw = destinationToHeroDTO(input);
+  // G8-F1D · Medio acreditado para el renderer Premium compartido: se
+  // reutiliza la primera diapositiva ya resuelta por el adaptador.
+  const heroSlide = heroDtoRaw.mediaSlides?.[0] ?? null;
+  const premiumHeroUrl = input.galleryUrls[0] ?? input.heroUrl ?? "";
+  const premiumHeroMedia = premiumHeroUrl
+    ? {
+        url: premiumHeroUrl,
+        alt:
+          (heroSlide?.url === premiumHeroUrl ? heroSlide?.alt : null) ||
+          `Vista de ${input.name}, Oriente Maya de Yucatán`,
+        ...(heroSlide?.url === premiumHeroUrl && heroSlide?.caption
+          ? { caption: heroSlide.caption }
+          : {}),
+        ...(heroSlide?.url === premiumHeroUrl && heroSlide?.credit
+          ? { credit: heroSlide.credit }
+          : {}),
+      }
+    : null;
   // Tourist Hero `gallery` v1.2.0 — el propio Hero es el carrusel
   // Airbnb-style. Cuando se activa, el mosaico `ExperienceGallery`
   // se omite para no duplicar la imagen dominante.
