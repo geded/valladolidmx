@@ -164,7 +164,7 @@ export const listStudioMediaLibrary = createServerFn({ method: "POST" })
         review_state: string | null;
         status: string | null;
         credit: string | null;
-        metadata: Record<string, unknown> | null;
+        metadata: unknown;
         original_checksum: string | null;
         title: string | null;
         width: number | null;
@@ -178,8 +178,12 @@ export const listStudioMediaLibrary = createServerFn({ method: "POST" })
           review_state: string | null;
         }> | null;
       }) => {
-        const rights = ((r.metadata ?? {}) as { rights?: Record<string, unknown> }).rights ?? {};
-        const focal = ((r.metadata ?? {}) as { focal?: { x?: number; y?: number } }).focal ?? {};
+        const meta = (r.metadata && typeof r.metadata === "object" ? r.metadata : {}) as {
+          rights?: Record<string, unknown>;
+          focal?: { x?: number; y?: number };
+        };
+        const rights = meta.rights ?? {};
+        const focal = meta.focal ?? {};
         const nature = (rights.nature as string | undefined) ?? null;
         return {
           id: r.id,
