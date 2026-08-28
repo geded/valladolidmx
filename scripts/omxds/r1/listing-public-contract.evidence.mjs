@@ -28,8 +28,8 @@ const read = (p) => fs.readFileSync(path.join(root, p), "utf8");
 const contract = read("src/lib/listings/listing-public-contract.ts");
 const reads = read("src/lib/listings/listing-public-reads.functions.ts");
 
-const noFixture =
-  !contract.includes("listing-premium-content") && !reads.includes("listing-premium-content");
+const importsFixture = (source) => /^\s*import[^;]*listing-premium-content/m.test(source);
+const noFixture = !importsFixture(contract) && !importsFixture(reads);
 if (!noFixture) failed = true;
 console.log(`${noFixture ? "✔" : "✘"} cadena productiva sin fixtures del catálogo`);
 
