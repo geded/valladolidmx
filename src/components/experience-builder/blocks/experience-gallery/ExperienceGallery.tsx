@@ -236,9 +236,7 @@ function Thumb({
           un caption editorial: se muestra aunque `captions` esté off. */}
       {(captions && item.caption) || item.credit ? (
         <span className="mt-1 block text-xs leading-tight text-muted-foreground">
-          {captions && item.caption ? (
-            <span className="block truncate">{item.caption}</span>
-          ) : null}
+          {captions && item.caption ? <span className="block truncate">{item.caption}</span> : null}
           {/* G8-F1D · Crédito acreditado, visible sin login. */}
           {item.credit ? (
             <span className="block truncate">
