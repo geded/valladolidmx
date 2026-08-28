@@ -4,7 +4,8 @@
 **Autorización:** `PCA-2026-044`
 **Base certificada:** `3ba3db23` → base de remediación `6d729a77`
 **Flag:** `omxds_visual_v1_contracts_enabled = false`
-**Fecha de captura:** 2026-08-28
+**Addendum de cierre:** `PCA-2026-044-ADDENDUM-A`
+**Fecha de captura:** 2026-08-28 (recaptura tras corrección de DEF-Q2B-001)
 
 ## 1. Método
 
@@ -47,8 +48,8 @@ Pantalla `/cms/lugares/{placeId}/editar` (52 campos, 0 sin etiqueta):
 
 | Ancho | Overflow | Controles | <44 px (propios) | <44 px (chrome compartido) |
 | --- | --- | --- | --- | --- |
-| 390 | **47 px** | 72 | 0 | 4 |
-| 430 | **7 px** | 72 | 0 | 4 |
+| 390 | 0 | 72 | 0 | 4 |
+| 430 | 0 | 72 | 0 | 4 |
 | 768 | 0 | 72 | 0 | 5 |
 | 1024 | 0 | 73 | 0 | 6 |
 | 1280 | 0 | 73 | 0 | 6 |
@@ -64,24 +65,28 @@ Teclado y foco: la primera pulsación de `Tab` enfoca un control con anillo
 visible (`outline: solid 2px`). Consola del navegador: **0 errores** en las
 tres pantallas y los seis anchos.
 
-## 3. Defectos abiertos
+## 3. Defectos
 
-### DEF-Q2B-001 · Overflow horizontal del breadcrumb a ≤430 px (BLOQUEANTE)
+### DEF-Q2B-001 · Overflow horizontal del breadcrumb a ≤430 px — **CERRADO**
 
-- **Síntoma:** 47 px de desbordamiento a 390 px y 7 px a 430 px en la pantalla
-  de edición.
-- **Causa raíz:** `src/components/workspace/WorkspaceTopbar.tsx` marca los
+- **Síntoma original:** 47 px de desbordamiento a 390 px y 7 px a 430 px en la
+  pantalla de edición.
+- **Causa raíz:** `src/components/workspace/WorkspaceTopbar.tsx` marcaba los
   crumbs no finales como `shrink-0`, de modo que una etiqueta de sección larga
-  ("Lugares y atractivos") no puede truncarse y empuja la fila. Las pantallas
-  equivalentes de Destinos, Empresas y Productos miden 0 px de overflow a 390 px
-  con la misma cadena de cuatro crumbs porque sus etiquetas son cortas.
-- **Ámbito:** componente compartido del Workspace Engine, **fuera de las rutas
-  autorizadas por `PCA-2026-044`**. No se corrigió: hacerlo excedería la
-  autorización vigente.
-- **Requiere:** addendum o autorización nueva que habilite
-  `modify src/components/workspace/WorkspaceTopbar.tsx` (cambio previsto:
-  permitir `min-w-0` + truncado en los crumbs intermedios, sin alterar la
-  jerarquía ni el texto).
+  ("Lugares y atractivos") no podía reducirse ni truncarse y empujaba la fila.
+- **Corrección (autorizada por `PCA-2026-044-ADDENDUM-A`):** los crumbs
+  intermedios pasan a `shrink` con `min-w-0` y truncado accesible; el crumb
+  actual conserva prioridad de espacio con `shrink-0 max-w-full`; la lista
+  añade `overflow-hidden` y cada etiqueta expone su texto completo en `title`.
+  El texto íntegro permanece en el DOM (el truncado es sólo visual), por lo que
+  ningún lector de pantalla pierde información.
+- **Verificación:** overflow horizontal 0 px en las tres pantallas Q2B y en los
+  seis anchos; 0 errores de consola.
+- **No regresión:** `/cms`, `/cms/destinos`, `/cms/empresas`, `/cms/productos`,
+  `/cms/lugares` y `/cms/travel-plans` medidos a 390 y 1440 px: overflow 0 px,
+  cadena de crumbs completa y elemento actual (`aria-current="page"`) visible en
+  los doce casos. Sin cambios de navegación, jerarquía, permisos ni de
+  comportamiento en escritorio.
 
 ### OBS-Q2B-002 · Áreas táctiles del chrome compartido (no bloqueante, preexistente)
 
