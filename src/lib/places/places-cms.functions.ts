@@ -53,7 +53,7 @@ async function assertPlacesStaff(context: Ctx) {
   if (editorial.data === true) return;
   const granular = await context.supabase.rpc("has_permission", {
     _user_id: context.userId,
-    _permission: "poi.write",
+    _permission_key: "poi.write",
   });
   if (granular.error || granular.data !== true) throw new Error("forbidden");
 }
