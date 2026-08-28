@@ -134,12 +134,27 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
-          <img
-            src={visible[openIdx]!.url}
-            alt={visible[openIdx]!.alt}
-            className="max-h-[85vh] max-w-[95vw] rounded-md object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
+          <figure className="flex flex-col items-center gap-2" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={visible[openIdx]!.url}
+              alt={visible[openIdx]!.alt}
+              className="max-h-[80vh] max-w-[95vw] rounded-md object-contain"
+            />
+            {/* G8-F1D · Caption y crédito acreditados (contraste AA). */}
+            {visible[openIdx]!.caption || visible[openIdx]!.credit ? (
+              <figcaption className="max-w-[95vw] text-center text-xs leading-tight text-white">
+                {visible[openIdx]!.caption ? (
+                  <span className="block">{visible[openIdx]!.caption}</span>
+                ) : null}
+                {visible[openIdx]!.credit ? (
+                  <span className="block text-white/80">
+                    <span className="sr-only">Crédito de la imagen: </span>
+                    {visible[openIdx]!.credit}
+                  </span>
+                ) : null}
+              </figcaption>
+            ) : null}
+          </figure>
           <button
             type="button"
             aria-label="Siguiente"
@@ -182,8 +197,17 @@ function Thumb({
           !fill && cls,
         )}
       />
-      {captions && item.caption ? (
-        <span className="mt-1 block truncate text-xs text-muted-foreground">{item.caption}</span>
+      {captions && (item.caption || item.credit) ? (
+        <span className="mt-1 block text-xs leading-tight text-muted-foreground">
+          {item.caption ? <span className="block truncate">{item.caption}</span> : null}
+          {/* G8-F1D · Crédito acreditado, visible sin login. */}
+          {item.credit ? (
+            <span className="block truncate">
+              <span className="sr-only">Crédito de la imagen: </span>
+              {item.credit}
+            </span>
+          ) : null}
+        </span>
       ) : null}
     </>
   );
