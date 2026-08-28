@@ -115,12 +115,38 @@ export function destinationToHeroDTO(d: DestinationBlockInput): ExperienceHeroDT
   // Tourist Hero `gallery` (v1.2.0) — Airbnb-style: carrusel + contador,
   // acciones back/share/favorito en overlay e info debajo. Evolución vía
   // `variant` del contrato oficial (Tourist Hero Policy).
+  // G8-F1D — El ALT, caption y crédito acreditados mandan sobre el
+  // fallback genérico. Sólo se usa "— foto N" cuando no hay metadata.
+  const attribution = attributionIndex(d.mediaAttribution);
+  const seen = new Set<string>();
   const slides = [
-    ...(d.heroUrl ? [{ url: d.heroUrl, alt: d.name, focalPoint: "center" }] : []),
-    ...d.galleryUrls
-      .filter((u) => u && u !== d.heroUrl)
-      .map((u, i) => ({ url: u, alt: `${d.name} — foto ${i + 2}`, focalPoint: "center" })),
-  ];
+    ...(d.heroUrl ? [d.heroUrl] : []),
+    ...d.galleryUrls.filter((u) => u && u !== d.heroUrl),
+  ]
+    .map((url, i) => {
+      const a = attribution.get(url) ?? emptyAttribution(url);
+      if (a.mediaAssetId) {
+        if (seen.has(a.mediaAssetId)) return null;
+        seen.add(a.mediaAssetId);
+      }
+      const credit = resolveAttributedCredit(a);
+      const caption = resolveAttributedCaption(a);
+      return {
+        url,
+        alt: resolveAttributedAlt(a, {
+          fallback: i === 0 ? d.name : `${d.name} — foto ${i + 1}`,
+        }),
+        focalPoint: "center",
+        ...(caption ? { caption } : {}),
+        ...(credit ? { credit } : {}),
+        ...(a.aiGenerated || a.conceptual
+          ? { nature: "conceptual" as const }
+          : a.documentary
+            ? { nature: "documentary" as const }
+            : {}),
+      };
+    })
+    .filter((s): s is NonNullable<typeof s> => s !== null);
   if (slides.length > 0) {
     return {
       variant: "gallery",
