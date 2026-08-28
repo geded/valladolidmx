@@ -28,10 +28,6 @@
       "path": "src/routes/lovable/g8p2-vacation-rental-premium-preview.tsx"
     },
     {
-      "operation": "create",
-      "path": "scripts/omxds/g8/entity-template-resolution.contract.test.ts"
-    },
-    {
       "operation": "modify",
       "path": "src/lib/experience-builder/page-kind-registry.ts"
     },
