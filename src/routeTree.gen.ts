@@ -55,6 +55,11 @@ import { Route as LovableG8p2VacationRentalPremiumPreviewRouteImport } from './r
 import { Route as LovableG8p2TourPremiumPreviewRouteImport } from './routes/lovable/g8p2-tour-premium-preview'
 import { Route as LovableG8ePremiumTemplateCatalogRouteImport } from './routes/lovable/g8e-premium-template-catalog'
 import { Route as LovableG8dPremiumParityRouteImport } from './routes/lovable/g8d-premium-parity'
+import { Route as LovableG8R1f1cZonePreviewRouteImport } from './routes/lovable/g8-r1f1c-zone-preview'
+import { Route as LovableG8R1f1cRoutePreviewRouteImport } from './routes/lovable/g8-r1f1c-route-preview'
+import { Route as LovableG8R1f1cProductGenericPreviewRouteImport } from './routes/lovable/g8-r1f1c-product-generic-preview'
+import { Route as LovableG8R1f1cBusinessGenericPreviewRouteImport } from './routes/lovable/g8-r1f1c-business-generic-preview'
+import { Route as LovableG8R1f1cArticlePreviewRouteImport } from './routes/lovable/g8-r1f1c-article-preview'
 import { Route as LovableG8R1clSeoLandingParityRouteImport } from './routes/lovable/g8-r1cl-seo-landing-parity'
 import { Route as LovableG8PlacePremiumVisualApprovalRouteImport } from './routes/lovable/g8-place-premium-visual-approval'
 import { Route as LovableG6CategoryIconCatalogRouteImport } from './routes/lovable/g6-category-icon-catalog'
@@ -456,6 +461,36 @@ const LovableG8dPremiumParityRoute = LovableG8dPremiumParityRouteImport.update({
   path: '/lovable/g8d-premium-parity',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableG8R1f1cZonePreviewRoute =
+  LovableG8R1f1cZonePreviewRouteImport.update({
+    id: '/lovable/g8-r1f1c-zone-preview',
+    path: '/lovable/g8-r1f1c-zone-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG8R1f1cRoutePreviewRoute =
+  LovableG8R1f1cRoutePreviewRouteImport.update({
+    id: '/lovable/g8-r1f1c-route-preview',
+    path: '/lovable/g8-r1f1c-route-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG8R1f1cProductGenericPreviewRoute =
+  LovableG8R1f1cProductGenericPreviewRouteImport.update({
+    id: '/lovable/g8-r1f1c-product-generic-preview',
+    path: '/lovable/g8-r1f1c-product-generic-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG8R1f1cBusinessGenericPreviewRoute =
+  LovableG8R1f1cBusinessGenericPreviewRouteImport.update({
+    id: '/lovable/g8-r1f1c-business-generic-preview',
+    path: '/lovable/g8-r1f1c-business-generic-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG8R1f1cArticlePreviewRoute =
+  LovableG8R1f1cArticlePreviewRouteImport.update({
+    id: '/lovable/g8-r1f1c-article-preview',
+    path: '/lovable/g8-r1f1c-article-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableG8R1clSeoLandingParityRoute =
   LovableG8R1clSeoLandingParityRouteImport.update({
     id: '/lovable/g8-r1cl-seo-landing-parity',
@@ -1482,6 +1517,11 @@ export interface FileRoutesByFullPath {
   '/lovable/g6-category-icon-catalog': typeof LovableG6CategoryIconCatalogRoute
   '/lovable/g8-place-premium-visual-approval': typeof LovableG8PlacePremiumVisualApprovalRoute
   '/lovable/g8-r1cl-seo-landing-parity': typeof LovableG8R1clSeoLandingParityRoute
+  '/lovable/g8-r1f1c-article-preview': typeof LovableG8R1f1cArticlePreviewRoute
+  '/lovable/g8-r1f1c-business-generic-preview': typeof LovableG8R1f1cBusinessGenericPreviewRoute
+  '/lovable/g8-r1f1c-product-generic-preview': typeof LovableG8R1f1cProductGenericPreviewRoute
+  '/lovable/g8-r1f1c-route-preview': typeof LovableG8R1f1cRoutePreviewRoute
+  '/lovable/g8-r1f1c-zone-preview': typeof LovableG8R1f1cZonePreviewRoute
   '/lovable/g8d-premium-parity': typeof LovableG8dPremiumParityRoute
   '/lovable/g8e-premium-template-catalog': typeof LovableG8ePremiumTemplateCatalogRoute
   '/lovable/g8p2-tour-premium-preview': typeof LovableG8p2TourPremiumPreviewRoute
@@ -1688,6 +1728,11 @@ export interface FileRoutesByTo {
   '/lovable/g6-category-icon-catalog': typeof LovableG6CategoryIconCatalogRoute
   '/lovable/g8-place-premium-visual-approval': typeof LovableG8PlacePremiumVisualApprovalRoute
   '/lovable/g8-r1cl-seo-landing-parity': typeof LovableG8R1clSeoLandingParityRoute
+  '/lovable/g8-r1f1c-article-preview': typeof LovableG8R1f1cArticlePreviewRoute
+  '/lovable/g8-r1f1c-business-generic-preview': typeof LovableG8R1f1cBusinessGenericPreviewRoute
+  '/lovable/g8-r1f1c-product-generic-preview': typeof LovableG8R1f1cProductGenericPreviewRoute
+  '/lovable/g8-r1f1c-route-preview': typeof LovableG8R1f1cRoutePreviewRoute
+  '/lovable/g8-r1f1c-zone-preview': typeof LovableG8R1f1cZonePreviewRoute
   '/lovable/g8d-premium-parity': typeof LovableG8dPremiumParityRoute
   '/lovable/g8e-premium-template-catalog': typeof LovableG8ePremiumTemplateCatalogRoute
   '/lovable/g8p2-tour-premium-preview': typeof LovableG8p2TourPremiumPreviewRoute
@@ -1898,6 +1943,11 @@ export interface FileRoutesById {
   '/lovable/g6-category-icon-catalog': typeof LovableG6CategoryIconCatalogRoute
   '/lovable/g8-place-premium-visual-approval': typeof LovableG8PlacePremiumVisualApprovalRoute
   '/lovable/g8-r1cl-seo-landing-parity': typeof LovableG8R1clSeoLandingParityRoute
+  '/lovable/g8-r1f1c-article-preview': typeof LovableG8R1f1cArticlePreviewRoute
+  '/lovable/g8-r1f1c-business-generic-preview': typeof LovableG8R1f1cBusinessGenericPreviewRoute
+  '/lovable/g8-r1f1c-product-generic-preview': typeof LovableG8R1f1cProductGenericPreviewRoute
+  '/lovable/g8-r1f1c-route-preview': typeof LovableG8R1f1cRoutePreviewRoute
+  '/lovable/g8-r1f1c-zone-preview': typeof LovableG8R1f1cZonePreviewRoute
   '/lovable/g8d-premium-parity': typeof LovableG8dPremiumParityRoute
   '/lovable/g8e-premium-template-catalog': typeof LovableG8ePremiumTemplateCatalogRoute
   '/lovable/g8p2-tour-premium-preview': typeof LovableG8p2TourPremiumPreviewRoute
@@ -2112,6 +2162,11 @@ export interface FileRouteTypes {
     | '/lovable/g6-category-icon-catalog'
     | '/lovable/g8-place-premium-visual-approval'
     | '/lovable/g8-r1cl-seo-landing-parity'
+    | '/lovable/g8-r1f1c-article-preview'
+    | '/lovable/g8-r1f1c-business-generic-preview'
+    | '/lovable/g8-r1f1c-product-generic-preview'
+    | '/lovable/g8-r1f1c-route-preview'
+    | '/lovable/g8-r1f1c-zone-preview'
     | '/lovable/g8d-premium-parity'
     | '/lovable/g8e-premium-template-catalog'
     | '/lovable/g8p2-tour-premium-preview'
@@ -2318,6 +2373,11 @@ export interface FileRouteTypes {
     | '/lovable/g6-category-icon-catalog'
     | '/lovable/g8-place-premium-visual-approval'
     | '/lovable/g8-r1cl-seo-landing-parity'
+    | '/lovable/g8-r1f1c-article-preview'
+    | '/lovable/g8-r1f1c-business-generic-preview'
+    | '/lovable/g8-r1f1c-product-generic-preview'
+    | '/lovable/g8-r1f1c-route-preview'
+    | '/lovable/g8-r1f1c-zone-preview'
     | '/lovable/g8d-premium-parity'
     | '/lovable/g8e-premium-template-catalog'
     | '/lovable/g8p2-tour-premium-preview'
@@ -2527,6 +2587,11 @@ export interface FileRouteTypes {
     | '/lovable/g6-category-icon-catalog'
     | '/lovable/g8-place-premium-visual-approval'
     | '/lovable/g8-r1cl-seo-landing-parity'
+    | '/lovable/g8-r1f1c-article-preview'
+    | '/lovable/g8-r1f1c-business-generic-preview'
+    | '/lovable/g8-r1f1c-product-generic-preview'
+    | '/lovable/g8-r1f1c-route-preview'
+    | '/lovable/g8-r1f1c-zone-preview'
     | '/lovable/g8d-premium-parity'
     | '/lovable/g8e-premium-template-catalog'
     | '/lovable/g8p2-tour-premium-preview'
@@ -2732,6 +2797,11 @@ export interface RootRouteChildren {
   LovableG6CategoryIconCatalogRoute: typeof LovableG6CategoryIconCatalogRoute
   LovableG8PlacePremiumVisualApprovalRoute: typeof LovableG8PlacePremiumVisualApprovalRoute
   LovableG8R1clSeoLandingParityRoute: typeof LovableG8R1clSeoLandingParityRoute
+  LovableG8R1f1cArticlePreviewRoute: typeof LovableG8R1f1cArticlePreviewRoute
+  LovableG8R1f1cBusinessGenericPreviewRoute: typeof LovableG8R1f1cBusinessGenericPreviewRoute
+  LovableG8R1f1cProductGenericPreviewRoute: typeof LovableG8R1f1cProductGenericPreviewRoute
+  LovableG8R1f1cRoutePreviewRoute: typeof LovableG8R1f1cRoutePreviewRoute
+  LovableG8R1f1cZonePreviewRoute: typeof LovableG8R1f1cZonePreviewRoute
   LovableG8dPremiumParityRoute: typeof LovableG8dPremiumParityRoute
   LovableG8ePremiumTemplateCatalogRoute: typeof LovableG8ePremiumTemplateCatalogRoute
   LovableG8p2TourPremiumPreviewRoute: typeof LovableG8p2TourPremiumPreviewRoute
@@ -3094,6 +3164,41 @@ declare module '@tanstack/react-router' {
       path: '/lovable/g8d-premium-parity'
       fullPath: '/lovable/g8d-premium-parity'
       preLoaderRoute: typeof LovableG8dPremiumParityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g8-r1f1c-zone-preview': {
+      id: '/lovable/g8-r1f1c-zone-preview'
+      path: '/lovable/g8-r1f1c-zone-preview'
+      fullPath: '/lovable/g8-r1f1c-zone-preview'
+      preLoaderRoute: typeof LovableG8R1f1cZonePreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g8-r1f1c-route-preview': {
+      id: '/lovable/g8-r1f1c-route-preview'
+      path: '/lovable/g8-r1f1c-route-preview'
+      fullPath: '/lovable/g8-r1f1c-route-preview'
+      preLoaderRoute: typeof LovableG8R1f1cRoutePreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g8-r1f1c-product-generic-preview': {
+      id: '/lovable/g8-r1f1c-product-generic-preview'
+      path: '/lovable/g8-r1f1c-product-generic-preview'
+      fullPath: '/lovable/g8-r1f1c-product-generic-preview'
+      preLoaderRoute: typeof LovableG8R1f1cProductGenericPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g8-r1f1c-business-generic-preview': {
+      id: '/lovable/g8-r1f1c-business-generic-preview'
+      path: '/lovable/g8-r1f1c-business-generic-preview'
+      fullPath: '/lovable/g8-r1f1c-business-generic-preview'
+      preLoaderRoute: typeof LovableG8R1f1cBusinessGenericPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g8-r1f1c-article-preview': {
+      id: '/lovable/g8-r1f1c-article-preview'
+      path: '/lovable/g8-r1f1c-article-preview'
+      fullPath: '/lovable/g8-r1f1c-article-preview'
+      preLoaderRoute: typeof LovableG8R1f1cArticlePreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/g8-r1cl-seo-landing-parity': {
@@ -4804,6 +4909,13 @@ const rootRouteChildren: RootRouteChildren = {
   LovableG8PlacePremiumVisualApprovalRoute:
     LovableG8PlacePremiumVisualApprovalRoute,
   LovableG8R1clSeoLandingParityRoute: LovableG8R1clSeoLandingParityRoute,
+  LovableG8R1f1cArticlePreviewRoute: LovableG8R1f1cArticlePreviewRoute,
+  LovableG8R1f1cBusinessGenericPreviewRoute:
+    LovableG8R1f1cBusinessGenericPreviewRoute,
+  LovableG8R1f1cProductGenericPreviewRoute:
+    LovableG8R1f1cProductGenericPreviewRoute,
+  LovableG8R1f1cRoutePreviewRoute: LovableG8R1f1cRoutePreviewRoute,
+  LovableG8R1f1cZonePreviewRoute: LovableG8R1f1cZonePreviewRoute,
   LovableG8dPremiumParityRoute: LovableG8dPremiumParityRoute,
   LovableG8ePremiumTemplateCatalogRoute: LovableG8ePremiumTemplateCatalogRoute,
   LovableG8p2TourPremiumPreviewRoute: LovableG8p2TourPremiumPreviewRoute,
