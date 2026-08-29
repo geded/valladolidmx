@@ -14,7 +14,7 @@
   "supersedes_acknowledged_revision": {
     "operation": "modify",
     "path": "src/integrations/supabase/types.ts",
-    "previous_sha256": "8605f8410000000000000000000000000000000000000000000000000000000",
+    "previous_sha256": "8605f841b2867068eee1281fb4c504aa3dfcc0484fa502c947922f05135097fc",
     "current_sha256": "370b8ae7b8e06a1d39b1be73ae5fde2b7f1f052c86745fa33845bd72a92717e9",
     "semantic_change": "Regeneración automática de tipos tras la migración aditiva de entity_presentation_modes, entity_presentation_mode_history y sus RPC gobernadas. Sin cambios manuales ni de contrato de datos existente.",
     "authority": "Autorización Founder G8-R1-F1C-A (2026-08-29)"
