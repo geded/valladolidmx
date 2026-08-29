@@ -20,22 +20,6 @@
       "path": "src/routes/lovable/g8-r1cl-seo-landing-parity.tsx"
     },
     {
-      "operation": "create",
-      "path": "scripts/omxds/r1-cl/entity-resolver-seo-landing.contract.test.ts"
-    },
-    {
-      "operation": "create",
-      "path": "scripts/omxds/r1-cl/entity-resolver-seo-landing.evidence.mjs"
-    },
-    {
-      "operation": "create",
-      "path": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md"
-    },
-    {
-      "operation": "create",
-      "path": "docs/evidence/omxds-r1-cl/EVIDENCE-MANIFEST.md"
-    },
-    {
       "operation": "modify",
       "path": "src/lib/experience-builder/route-inventory.ts"
     },
@@ -45,7 +29,9 @@
     }
   ],
   "public_routes": [],
-  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
   "required_tests": [
     "bun run lint",
     "bun run typecheck",

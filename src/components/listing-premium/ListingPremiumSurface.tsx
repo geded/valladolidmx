@@ -11,10 +11,7 @@
  * Standard). Esta capa sólo traduce el contenido aprobado a las props de
  * la superficie oficial; no introduce layout paralelo ni chrome global.
  */
-import {
-  TourismListingSurface,
-  type FacetDef,
-} from "@/components/surfaces/TourismListingSurface";
+import { TourismListingSurface, type FacetDef } from "@/components/surfaces/TourismListingSurface";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 

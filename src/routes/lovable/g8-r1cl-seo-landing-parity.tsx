@@ -187,7 +187,9 @@ function ProbePanel({ probeKey }: { probeKey: ProbeKey }) {
         <h2 className="font-serif text-xl">{probe.label}</h2>
         <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-xs uppercase tracking-wide text-muted-foreground">Familia canónica</dt>
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+              Familia canónica
+            </dt>
             <dd className="font-medium">{r.canonicalFamily ?? "—"}</dd>
           </div>
           <div>
