@@ -96,6 +96,17 @@ export interface AluxUnifiedContext {
     readonly origin: AluxContext["origin"];
     readonly canonical: string | null;
   };
+  /**
+   * G8-R1-E · Composición del viaje derivada de la tarjeta existente
+   * (`derivePartyProfile`). Autoridad funcional única: nunca se captura
+   * ni se persiste aquí un segundo modelo de grupo.
+   */
+  readonly party: PartyProfile;
+  /**
+   * G8-R1-E · Fase 6 — alcance real del contexto. Home entrega alcance
+   * `region` sin fingir destino ni entidad; `none` falla de forma segura.
+   */
+  readonly scope: "entity" | "destination" | "region" | "none";
   /** Motivo humano y explicable del contexto actual. */
   readonly reason: string;
 }
@@ -126,9 +137,17 @@ export interface BuildAluxUnifiedContextInput {
    */
   readonly zone?: { readonly slug: string; readonly destinationSlug: string } | null;
   readonly coords?: { readonly lat: number; readonly lng: number } | null;
+  /** `traveler_profiles.trip_context.party_size` (perfil declarado). */
+  readonly profilePartySize?: number | null;
+  /** `AnonymousTravelDraft.travelerCount` (continuidad anónima local). */
+  readonly anonymousTravelerCount?: {
+    readonly adults: number;
+    readonly children?: number;
+  } | null;
   /** Inyectable para pruebas deterministas. */
   readonly now?: Date;
 }
+
 
 function dayDiff(from: Date, isoDate: string | null | undefined): number | null {
   if (!isoDate) return null;
