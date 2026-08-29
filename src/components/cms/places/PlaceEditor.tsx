@@ -994,6 +994,10 @@ export function PlaceEditor({ placeId }: Props) {
         onChanged={() => void detail.refetch()}
       />
 
+      <SeoLandingAction entityType="place" entityId={placeId!} />
+
+
+
       <PlaceSection
         id="place-workflow"
         title="Workflow editorial"
