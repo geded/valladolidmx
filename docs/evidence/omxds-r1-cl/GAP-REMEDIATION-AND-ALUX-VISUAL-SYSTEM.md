@@ -78,3 +78,58 @@ Slot vacío ⇒ bloque omitido. Autoridad visual y SHA-256 acreditados sin cambi
 
 - `bunx tsgo --noEmit` → PASS
 - `bun test scripts/omxds/r1-cl/` → 32 pass / 0 fail
+
+## C2 · Cierre funcional de GAP-01…04 e integración transversal de Alux
+
+### GAP-01 · Guardar ≠ Agregar a Mi Viaje
+- `experienceCtaBarActionSchema` incorpora `favoriteItem` (entidad real, fail-closed).
+- `ExperienceCtaBar` renderiza `FavoriteButton` (→ `traveler_favorites`) para `favorite`
+  y `AddToTravelPlanButton` (→ Travel Plan canónico) para `add-to-trip`. Almacenes
+  separados; Guardar no agrega al viaje. Estado agregado/guardado lo expone cada
+  componente canónico, idéntico en todas las familias.
+
+### GAP-02 · Mapa real
+- `vmx.experience.map` registrado en producción y Studio del `composition-renderer`.
+- Sin coordenadas reales el bloque se omite (fail-closed).
+
+### GAP-03 · Slot 18 · `vmx.alux.planner`
+- Contrato v1.1.0: `context` (entityRef, entityLabel, destinationSlug/Name, zoneName,
+  relations) normalizado con Zod; contexto inválido ⇒ `null`.
+- `buildAluxPlannerHref` propaga entidad y territorio a `/arma-tu-viaje`.
+- Chips de contexto y prompts provienen SÓLO de relaciones reales; con contexto y
+  sin relaciones no se muestra ningún chip (cero recomendaciones inventadas).
+- `usePlannerPresence` garantiza **un único planificador contextual por página**.
+
+### GAP-04 · FAQ reutilizable
+- `adaptSeoLandingFaq` es el adaptador único: la config de `vmx.kit.faq` y el
+  JSON-LD `FAQPage` derivan de la misma lista normalizada ⇒ FAQ visible ≡ JSON-LD.
+- Sin preguntas reales: ni bloque ni JSON-LD.
+
+### Inventario real por familia (`src/lib/alux/alux-surface-inventory.ts`)
+
+| Familia | Dock global | Alux Planner | Maestro | Contexto recibido | Duplicación |
+|---|---|---|---|---|---|
+| Home | Sí (único) | Sí | avatar+full | territorio Oriente Maya | Ninguna |
+| Destino | Sí (único) | Sí | avatar+full | destino + categorías reales | Ninguna |
+| Listados | Sí (único) | No | avatar | destino + categoría | Ninguna |
+| Hotel | Sí (único) | Sí | avatar+full | business + destino/zona + cercanos | Ninguna |
+| Restaurante | Sí (único) | Sí | avatar+full | business + destino/zona + cercanos | Ninguna |
+| Evento | Sí (único) | Sí | avatar+full | event + destino/zona + sede | Ninguna |
+| Experiencia | Sí (único) | Sí | avatar+full | product + destino/zona + empresa | Ninguna |
+| Tour | Sí (único) | Sí | avatar+full | product + destino/zona + empresa | Ninguna |
+| Producto | Sí (único) | Sí | avatar+full | product + destino/zona + empresa | Ninguna |
+| Lugar | Sí (único) | Sí | avatar+full | place + destino/zona + cercanos | Ninguna |
+| Landing SEO | Sí (único) | Sí (slot 18) | avatar+full | entityRef + destino + slots reales | Ninguna |
+
+Casa de vacaciones (`vacation_rental`) permanece **sin autoasignación productiva**
+hasta la aceptación visual del Founder.
+
+### QA
+- Anchos 390/430/768/1024/1280/1440: overflow horizontal **0**, consola limpia.
+- Un solo `<header>`, un solo footer y un solo `[data-alux-dock]` por página.
+- Safe zone móvil respetada (`data-alux-safe-zone-spacer`, `bottomOffset` sticky).
+- Gates: typecheck, `validate:r1:cl` y contratos Alux en PASS.
+
+### Invariantes
+Cero publicación, cero rutas públicas nuevas, cero redirects, cero sitemap,
+cero migraciones y `omxds_visual_v1_contracts_enabled=false`.
