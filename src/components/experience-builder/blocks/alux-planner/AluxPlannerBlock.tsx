@@ -10,6 +10,8 @@
 import { Sparkles, ArrowRight } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { AluxMark } from "@/components/alux/AluxMark";
+import { usePlannerPresence } from "@/lib/alux/planner-presence";
+
 
 import {
   applyAluxPlannerDefaults,
