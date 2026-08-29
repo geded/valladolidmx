@@ -149,7 +149,7 @@ export async function loadAluxCanonicalCandidates(
     const { data, error } = await sb
       .from("points_of_interest")
       .select(
-        "id, slug, name, official_name, short_description, description, destination_zone_id, place_types ( slug, name ), destination_zones ( slug, destination_id )",
+        "id, slug, name, official_name, short_description, description, destination_zone_id, latitude, longitude, place_types ( slug, name ), destination_zones ( slug, destination_id )",
       )
       .eq("destination_id", input.destinationId)
       .eq("status", "published")
