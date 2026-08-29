@@ -77,6 +77,9 @@ import { bindAluxSessionToTraveler } from "@/lib/alux/bind-session.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 import { AluxMark } from "@/components/alux/AluxMark";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+
 
 function ContextChip({ slot }: { slot: AluxContextSlot }) {
   const content = (
