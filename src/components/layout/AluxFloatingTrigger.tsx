@@ -269,6 +269,7 @@ export function AluxFloatingTrigger() {
   );
   const contextIsSufficient = hasSufficientAluxContext(unified);
 
+
   const suggestionsQuery = useQuery({
     queryKey: [
       "alux",
