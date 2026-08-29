@@ -116,6 +116,12 @@ export interface BuildAluxUnifiedContextInput {
   readonly hasAnonymousDraft?: boolean;
   /** Consentimiento explícito. Sin `true`, las coordenadas se descartan. */
   readonly locationConsent?: boolean;
+  /**
+   * DEF-R1D-004 · Zona territorial candidata. Sólo se acredita si
+   * `destinationSlug` coincide con el destino activo del contexto.
+   * Nunca se infiere por texto, cercanía ni parecido de slug.
+   */
+  readonly zone?: { readonly slug: string; readonly destinationSlug: string } | null;
   readonly coords?: { readonly lat: number; readonly lng: number } | null;
   /** Inyectable para pruebas deterministas. */
   readonly now?: Date;
@@ -150,6 +156,31 @@ function deriveEntity(
     canonicalUrl: ctx.canonical ?? leaf?.slot.href ?? null,
     label: leaf?.slot.label ?? null,
   };
+}
+
+/**
+ * DEF-R1D-004 · Zona acreditada: pertenece al destino activo o es `null`.
+ * Una zona incompatible NUNCA bloquea una recomendación válida: sólo se
+ * descarta el dato territorial opcional.
+ */
+export function resolveContextZoneSlug(
+  zone: { slug: string; destinationSlug: string } | null | undefined,
+  destinationSlug: string | null,
+): string | null {
+  if (!zone) return null;
+  const slug = zone.slug?.trim() ?? "";
+  if (!slug) return null;
+  if (!destinationSlug) return null;
+  if (zone.destinationSlug?.trim() !== destinationSlug) return null;
+  return slug;
+}
+
+/**
+ * `true` cuando el contexto alcanza para sugerir. Contexto insuficiente
+ * ⇒ Alux no sugiere y lo declara; jamás inventa.
+ */
+export function hasSufficientAluxContext(unified: AluxUnifiedContext): boolean {
+  return Boolean(unified.territory.destinationSlug) || Boolean(unified.entity.entityId);
 }
 
 /**
@@ -191,7 +222,7 @@ export function buildAluxUnifiedContext(
       regionSlug: ctx.region?.slug ?? null,
       destinationSlug: ctx.destination?.slug ?? null,
       destinationLabel: ctx.destination?.label ?? null,
-      zoneSlug: null,
+      zoneSlug: resolveContextZoneSlug(input.zone, ctx.destination?.slug ?? null),
     },
     trip: {
       startDate: plan?.start_date ?? null,
