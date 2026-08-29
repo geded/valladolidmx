@@ -66,8 +66,9 @@ const NEUTRAL_TREE = buildSeoLandingComposition({
   idPrefix: "neutral",
   slots: {
     hero: { title: "Título de la entidad", eyebrow: "Categoría", overlay: 0.5 },
-    features: { heading: "Lo que distingue", columns: 3, items: [] },
-    gallery: { heading: "Galería", aspect: "landscape", maxVisible: 9, items: [] },
+    // `features` y `gallery` se omiten deliberadamente: sin ítems reales sus
+    // bloques recurren a contenido de demostración, prohibido en la plantilla
+    // neutral (cero contenido inventado).
     infoGrid: { heading: "Información práctica", columns: 3 },
     map: { heading: "Ubicación" },
     related: { heading: "Sigue descubriendo", columns: 3 },
@@ -113,7 +114,9 @@ function slotIndexer(children: CompositionNode[]) {
 }
 
 function SlotBadge({ n, node }: { n: number; node: CompositionNode }) {
-  const def = SEO_LANDING_SLOTS[n - 1];
+  // La etiqueta se deriva del bloque real renderizado (no de la posición),
+  // porque los slots vacíos se omiten y desplazarían el índice.
+  const def = SEO_LANDING_SLOTS.find((s) => s.blockType === node.type);
   return (
     <div className="pointer-events-none absolute left-2 top-2 z-40 flex max-w-[calc(100%-1rem)] items-center gap-2 rounded-full bg-foreground/85 px-3 py-1 text-[11px] font-medium text-background shadow-soft">
       <span className="tabular-nums">
@@ -343,13 +346,17 @@ function SeoLandingParityPreview() {
         </>
       ) : null}
 
-      {view === "b" || view === "ab" ? (
+      {view === "b" || view === "ab" || isProbe ? (
         <>
           <Container className="pt-12">
-            <h2 className="font-serif text-xl">Caso B · Plantilla reusable neutral</h2>
+            <h2 className="font-serif text-xl">
+              {isProbe
+                ? "Misma plantilla reusable aplicada a la sonda"
+                : "Caso B · Plantilla reusable neutral"}
+            </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Sin datos de entidad: los slots vacíos se omiten por contrato (cero contenido
-              inventado).
+              inventado). Presentación: Editorial (única acreditada).
             </p>
           </Container>
           <WidthFrame width={width}>
