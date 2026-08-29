@@ -14,6 +14,10 @@ const files = [
   "src/lib/experience-builder/canonical-entity-resolver.ts",
   "src/lib/experience-builder/seo-landing/seo-landing-template.ts",
   "src/routes/lovable/g8-r1cl-seo-landing-parity.tsx",
+  "docs/governance/addenda/PCA-2026-050-ADDENDUM-B.json",
+  "src/lib/experience-builder/seo-landing/seo-landing-creation.ts",
+  "src/lib/experience-builder/seo-landing/seo-landing-creation.functions.ts",
+  "src/components/cms/SeoLandingAction.tsx",
 ];
 
 let failed = false;
