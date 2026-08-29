@@ -748,7 +748,7 @@ export function AluxFloatingTrigger() {
               </p>
             )}
             {(() => {
-              const remote = suggestionsQuery.data?.suggestions ?? [];
+              const remote = personalized?.items ?? suggestionsQuery.data?.suggestions ?? [];
               const items: AluxContextualSuggestion[] =
                 remote.length > 0
                   ? [...remote]
