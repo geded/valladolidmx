@@ -308,6 +308,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
   return (
     <>
       <header
+        data-omxds-chrome="site-header"
         ref={headerRef}
         className={cn(
           // 18.54 · `@container` se separa del elemento sticky: en Safari (iPad)
