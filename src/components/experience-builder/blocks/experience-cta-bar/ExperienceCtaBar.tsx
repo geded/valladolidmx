@@ -21,6 +21,7 @@ import type {
 } from "@/lib/experience-builder/blocks/experience-cta-bar/contract";
 import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 
 
 const ICONS: Record<string, LucideIcon> = {
@@ -125,6 +126,24 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
                 subtitle={t.subtitle ?? null}
                 variant="full"
                 eligibilityMode={t.eligibilityMode ?? "universal"}
+                className="min-h-11 rounded-pill"
+              />
+            );
+          }
+          // GAP-01 · "Guardar" es una acción canónica DISTINTA: escribe en
+          // favoritos del viajero, nunca en Mi Viaje. Sin entidad real se
+          // omite (fail-closed).
+          if (a.action === "favorite") {
+            if (!a.favoriteItem) return null;
+            const f = a.favoriteItem;
+            return (
+              <FavoriteButton
+                key={i}
+                entityKind={f.entityKind}
+                entityId={f.entityId}
+                entityTitle={f.entityTitle}
+                entitySlug={f.entitySlug}
+                entityImageUrl={f.entityImageUrl}
                 className="min-h-11 rounded-pill"
               />
             );
