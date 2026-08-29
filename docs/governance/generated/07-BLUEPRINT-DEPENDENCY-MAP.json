@@ -4,7 +4,7 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.74",
     "state": "Approved",
-    "source_sha256": "6c4d8abf4b6c8b39564ebc7b1341050663cb731003b548904265018494a2a0e1",
+    "source_sha256": "4a6a5a4bb0b3e3560f17f9d394821395bc5a0f2a54294ff0f94b8abdbf74a40b",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -8446,6 +8446,57 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-051.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-051.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/alux/canonical-catalog.server.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/canonical-catalog.server.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/unified-context.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/unified-context.ts"
+    },
+    {
+      "id": "ART:src/components/alux/PublicAluxChat.tsx",
+      "type": "artifact",
+      "path": "src/components/alux/PublicAluxChat.tsx"
+    },
+    {
+      "id": "ART:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "type": "artifact",
+      "path": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-d/alux-canonical.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-d/alux-canonical.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-d/chrome-uniqueness.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-d/chrome-uniqueness.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "type": "artifact",
+      "path": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md"
     }
   ],
   "edges": [
@@ -22388,6 +22439,168 @@
       "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
       "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/canonical-catalog.server.ts:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/canonical-catalog.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/unified-context.ts:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/unified-context.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/contextual-suggest.functions.ts:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/contextual-suggest.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/layout/AluxFloatingTrigger.tsx:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/components/layout/AluxFloatingTrigger.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/alux/PublicAluxChat.tsx:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/components/alux/PublicAluxChat.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/traveler/AluxSuggestionCard.tsx:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/components/traveler/AluxSuggestionCard.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-ALUX-CANONICO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/canonical-catalog.server.ts:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/canonical-catalog.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/unified-context.ts:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/unified-context.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/canonical-entity-binding.ts:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/canonical-entity-binding.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/layout/AluxFloatingTrigger.tsx:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/components/layout/AluxFloatingTrigger.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/layout/SiteHeader.tsx:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/components/layout/SiteHeader.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/layout/SiteFooter.tsx:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/components/layout/SiteFooter.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-d/alux-canonical.contract.test.ts:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-d/alux-canonical.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-d/chrome-uniqueness.evidence.mjs:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-d/chrome-uniqueness.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
       "verified_at": "2026-08-29"
     }
   ],
