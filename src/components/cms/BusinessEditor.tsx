@@ -10,6 +10,7 @@ import { EntityEditor } from "@/components/cms/EntityEditor";
 import { BusinessMediaPanels } from "@/components/cms/BusinessMediaPanels";
 import { RelatedOverridesPanel } from "@/components/cms/RelatedOverridesPanel";
 import { BusinessLocationPanel } from "@/components/cms/BusinessLocationPanel";
+import { SeoLandingAction } from "@/components/cms/SeoLandingAction";
 import { BUSINESS_FIELDS } from "@/lib/cms/editor-fields";
 import {
   listBusinessCategoriesForSelect,
@@ -73,6 +74,7 @@ export function BusinessEditor({ id }: Props) {
             <BusinessLocationPanel businessId={entityId} />
             <BusinessMediaPanels businessId={entityId} />
             <RelatedOverridesPanel entityType="business" entityId={entityId} />
+            <SeoLandingAction entityType="business" entityId={entityId} />
           </>
         ) : (
           <NewBusinessLocationNotice />

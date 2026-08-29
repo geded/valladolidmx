@@ -33,6 +33,8 @@ import {
 } from "@/lib/places/place-territory";
 import { placeDetailsPatchSchema } from "@/lib/places/places-cms-contracts";
 import type { ContentStatus } from "@/lib/cms/workflow";
+import { SeoLandingAction } from "@/components/cms/SeoLandingAction";
+
 import {
   PlaceField,
   PlaceSection,
@@ -993,6 +995,8 @@ export function PlaceEditor({ placeId }: Props) {
         authorityKinds={(opts.authorityKinds ?? []) as { id: string; name: string }[]}
         onChanged={() => void detail.refetch()}
       />
+
+      <SeoLandingAction entityType="place" entityId={placeId!} />
 
       <PlaceSection
         id="place-workflow"

@@ -157,8 +157,10 @@ describe("L1 · plantilla reusable premium-seo-landing", () => {
       entityRef: "place:x",
       idPrefix: "t",
       // GAP-04: el slot `faq` sólo produce nodo con preguntas reales.
-      slots: { hero: { title: "X" }, faq: { heading: "Y", items: [{ question: "P", answer: "R" }] } },
-
+      slots: {
+        hero: { title: "X" },
+        faq: { heading: "Y", items: [{ question: "P", answer: "R" }] },
+      },
     });
     expect(tree.root.children.map((n) => n.id)).toEqual(["t-hero", "t-faq"]);
     expect(tree.root.children[0]!.config.variant).toBe("immersive");

@@ -43,3 +43,22 @@ bun run validate:r1:cl
 
 Ejecución detenida tras L2. Se requiere aprobación visual del Founder sobre la
 paridad Caso A / Caso B antes de iniciar C2 (conexión de entidades reales).
+
+## CL3 · Creación contextual de Landings SEO (2026-08-28)
+
+Autorización: `PCA-2026-050-ADDENDUM-B`.
+
+| Requisito Founder | Implementación | Acreditación |
+| --- | --- | --- |
+| 1 · Botón contextual en el administrador | `src/components/cms/SeoLandingAction.tsx`, integrado en `BusinessEditor`, `ProductEditor` y `PlaceEditor` | Visible sólo para `super_admin`/`admin`/`editor` (`canManageSeoLandings`); RLS y `eb_create_composition` aplican la autorización dura |
+| 2 · Comportamiento | `createSeoLandingDraft` crea `page_type=landing` + `kind=landing`, plantilla `premium-seo-landing`, variante `authority-editorial-zazil`, presentación Editorial | Árbol generado por `buildSeoLandingComposition` (18 slots, omisión por vacío) |
+| 3 · Idempotencia | Búsqueda por `chrome.seo.landing.entityRef`; si existe, la acción abre la landing existente y `created=false` | Tests `CL3 · idempotencia` |
+| 4 · SEO y anticanibalización | `robots_directive="noindex,nofollow"` + `canonical_override` hacia la ficha canónica real | `buildSeoLandingSeoPolicy`, tests dedicados |
+| 5 · Pilotos configurables | `SEO_LANDING_PILOTS`: Zazil Tunich, Chichén Itzá, Cenote Suytún, producto genérico | Declarativos, sin contenido embebido |
+| 6 · Borradores legacy | `listLegacySeoLandingDrafts` (diagnóstico) y `archiveLegacySeoLandingDrafts` (archivado transaccional, fail-closed si hubo publicación) | Inventario real verificado: `hoteles`, `restaurantes`, `experiencias`, `oriente-maya` — los cuatro en `draft`, `published_at = null` |
+
+Cero contenido inventado: los slots se llenan sólo con `display_name`/`name`, `tagline`, `description` y media real; sin dato, el bloque no se genera.
+
+Invariantes verificadas: cero publicación, cero redirects, cero sitemap, cero rutas públicas nuevas, cero migración de esquema, `omxds_visual_v1_contracts_enabled=false`.
+
+Gates: `bun run lint` PASS · `bun run typecheck` PASS · `bun run build` PASS · `bun run validate:r1:cl` PASS (33 tests).
