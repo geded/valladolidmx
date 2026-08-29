@@ -261,7 +261,7 @@ export function AluxFloatingTrigger() {
         locationConsent: geo.status === "granted",
         coords: geo.location ?? null,
       }),
-    [ctx, plan, lens, isAuthed, sessionKey, geo.status, geo.location],
+    [ctx, plan, lens, isAuthed, sessionKey, geo],
   );
   const contextIsSufficient = hasSufficientAluxContext(unified);
 
