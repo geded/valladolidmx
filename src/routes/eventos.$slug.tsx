@@ -12,6 +12,7 @@ import { SITE } from "@/config/site";
 import { getEventBySlug, type PublicEventDetail } from "@/lib/events/public-reads.functions";
 import { EventSurface, EventSurfaceContractBoundary } from "@/components/surfaces/EventSurface";
 import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contracts-flag.server";
+import { bindEventRoute } from "@/lib/experience-builder/canonical-entity-binding";
 import {
   ContextEngineProvider,
   defineRouteContext,
@@ -47,7 +48,9 @@ export const Route = createFileRoute("/eventos/$slug")({
       getOmxdsSurfaceContractsFlag().catch(() => false),
     ]);
     if (!event) throw notFound();
-    return { event, surfaceContractsEnabled };
+    // G8-R1-C2 · Resolutor canónico de la familia evento.
+    const canonicalBinding = bindEventRoute({ eventId: event.id });
+    return { event, surfaceContractsEnabled, canonicalBinding };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
@@ -128,12 +131,12 @@ export const Route = createFileRoute("/eventos/$slug")({
 });
 
 function EventoPage() {
-  const { event, surfaceContractsEnabled } = Route.useLoaderData();
+  const { event, surfaceContractsEnabled, canonicalBinding } = Route.useLoaderData();
   const declaration = buildEventContext(event);
   return (
     <ContextEngineProvider declaration={declaration}>
       <EventSurfaceContractBoundary
-        enabled={surfaceContractsEnabled}
+        enabled={surfaceContractsEnabled && canonicalBinding.surface === "premium"}
         event={event}
         legacy={<EventSurface event={event} />}
       />

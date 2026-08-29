@@ -28,6 +28,7 @@ import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contr
 import { getBusinessPremiumEligibility } from "@/lib/omxds/surfaces/business-premium-eligibility.server";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import { bindBusinessRoute } from "@/lib/experience-builder/canonical-entity-binding";
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa/")({
   loader: async ({ params }) => {
@@ -80,6 +81,14 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       related = null;
     }
     const composition = specific ?? template ?? null;
+    // G8-R1-C2 · La decisión de presentación pasa por el resolutor canónico:
+    // override editorial aprobado → preset premium de familia → superficie
+    // estándar fail-closed. `vacation_rental` nunca se autoasigna.
+    const canonicalBinding = bindBusinessRoute({
+      businessId: business.id,
+      categorySlug: business.category_slug,
+      premiumEligible: premiumEligibility?.eligible === true,
+    });
     return {
       resolution,
       business,
@@ -87,6 +96,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       composition,
       surfaceContractsEnabled,
       premiumEligibility,
+      canonicalBinding,
     };
   },
   head: ({ loaderData, params }) => {
@@ -165,6 +175,7 @@ function EmpresaTerritorialPage() {
     composition,
     surfaceContractsEnabled,
     premiumEligibility,
+    canonicalBinding,
   } = Route.useLoaderData();
   const { destino } = Route.useParams();
   const ctx = resolutionToNavigationContext(resolution, destino);
@@ -179,11 +190,13 @@ function EmpresaTerritorialPage() {
   // 19.21 · V1-P1.d — la presentación Premium depende exclusivamente de la
   // elegibilidad efectiva por ficha. El flag global sigue gobernando el resto
   // de contratos: con el flag OFF y ficha no elegible, el render es el legado.
-  const premiumEnabled = premiumEligibility?.eligible === true;
+  // G8-R1-C2 — punto único de decisión: el resolutor canónico.
+  const premiumEnabled = canonicalBinding.surface === "premium";
 
   return (
     <ContextEngineProvider declaration={declaration}>
       <BusinessSurfaceProvider business={business} related={related}>
+        {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
         <BusinessSurfaceContractBoundary
           enabled={surfaceContractsEnabled || premiumEnabled}
           business={business}

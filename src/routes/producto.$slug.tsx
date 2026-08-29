@@ -20,6 +20,7 @@ import {
 } from "@/lib/catalog/marketplace-reads.functions";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import { bindProductRoute } from "@/lib/experience-builder/canonical-entity-binding";
 import {
   ProductSurface,
   ProductSurfaceContractBoundary,
@@ -131,7 +132,12 @@ export const Route = createFileRoute("/producto/$slug")({
       }).catch(() => null),
       getOmxdsSurfaceContractsFlag().catch(() => false),
     ]);
-    return { product, composition, surfaceContractsEnabled };
+    // G8-R1-C2 · Resolutor canónico (experiencia · tour · producto genérico).
+    const canonicalBinding = bindProductRoute({
+      productId: product.id,
+      productType: product.product_type,
+    });
+    return { product, composition, surfaceContractsEnabled, canonicalBinding };
   },
   head: ({ loaderData }) => {
     if (!loaderData) return { meta: [] };
@@ -229,13 +235,14 @@ export const Route = createFileRoute("/producto/$slug")({
 });
 
 function MarketplaceProductPage() {
-  const { product, composition, surfaceContractsEnabled } = Route.useLoaderData();
+  const { product, composition, surfaceContractsEnabled, canonicalBinding } =
+    Route.useLoaderData();
   const declaration = buildProductContext(product);
   return (
     <ContextEngineProvider declaration={declaration}>
       <ProductSurfaceProvider product={product}>
         <ProductSurfaceContractBoundary
-          enabled={surfaceContractsEnabled}
+          enabled={surfaceContractsEnabled && canonicalBinding.surface === "premium"}
           product={product}
           legacy={
             composition ? <CompositionRenderer tree={composition.snapshot} /> : <ProductSurface />
