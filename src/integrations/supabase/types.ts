@@ -4102,8 +4102,6 @@ export type Database = {
           is_active: boolean
           label: string | null
           owner_user_id: string
-          secret_current: string
-          secret_previous: string | null
           updated_at: string
           url: string
         }
@@ -4114,8 +4112,6 @@ export type Database = {
           is_active?: boolean
           label?: string | null
           owner_user_id: string
-          secret_current: string
-          secret_previous?: string | null
           updated_at?: string
           url: string
         }
@@ -4126,8 +4122,6 @@ export type Database = {
           is_active?: boolean
           label?: string | null
           owner_user_id?: string
-          secret_current?: string
-          secret_previous?: string | null
           updated_at?: string
           url?: string
         }
@@ -8597,6 +8591,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      unc_webhook_secret_set: {
+        Args: { _endpoint_id: string; _secret: string }
+        Returns: undefined
       }
       unpublish_business_product: {
         Args: { _product_id: string }

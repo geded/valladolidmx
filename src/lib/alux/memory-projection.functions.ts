@@ -52,18 +52,20 @@ export const syncTravelerMemoryProjection = createServerFn({ method: "POST" })
     const ttlDays = Math.max(1, Math.round(data.summary.ttlMs / 86_400_000));
     const expiresAt = new Date(Date.now() + ttlDays * 86_400_000).toISOString();
 
-    const { data: row, error } = await (context.supabase as never as {
-      from: (t: string) => {
-        upsert: (
-          v: Record<string, unknown>,
-          o: { onConflict: string },
-        ) => {
-          select: (c: string) => {
-            single: () => Promise<{ data: ProjectionRow | null; error: unknown }>;
+    const { data: row, error } = await (
+      context.supabase as never as {
+        from: (t: string) => {
+          upsert: (
+            v: Record<string, unknown>,
+            o: { onConflict: string },
+          ) => {
+            select: (c: string) => {
+              single: () => Promise<{ data: ProjectionRow | null; error: unknown }>;
+            };
           };
         };
-      };
-    })
+      }
+    )
       .from("traveler_memory_projection")
       .upsert(
         {
@@ -94,16 +96,18 @@ export const syncTravelerMemoryProjection = createServerFn({ method: "POST" })
 export const getTravelerMemoryProjection = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<MemoryProjectionResult> => {
-    const { data: row, error } = await (context.supabase as never as {
-      from: (t: string) => {
-        select: (c: string) => {
-          eq: (
-            c: string,
-            v: string,
-          ) => { maybeSingle: () => Promise<{ data: ProjectionRow | null; error: unknown }> };
+    const { data: row, error } = await (
+      context.supabase as never as {
+        from: (t: string) => {
+          select: (c: string) => {
+            eq: (
+              c: string,
+              v: string,
+            ) => { maybeSingle: () => Promise<{ data: ProjectionRow | null; error: unknown }> };
+          };
         };
-      };
-    })
+      }
+    )
       .from("traveler_memory_projection")
       .select("summary, personalization, anonymous_subject_hash")
       .eq("user_id", context.userId)
@@ -124,11 +128,13 @@ export const getTravelerMemoryProjection = createServerFn({ method: "GET" })
 export const clearTravelerMemoryProjection = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ ok: boolean }> => {
-    const { error } = await (context.supabase as never as {
-      from: (t: string) => {
-        delete: () => { eq: (c: string, v: string) => Promise<{ error: unknown }> };
-      };
-    })
+    const { error } = await (
+      context.supabase as never as {
+        from: (t: string) => {
+          delete: () => { eq: (c: string, v: string) => Promise<{ error: unknown }> };
+        };
+      }
+    )
       .from("traveler_memory_projection")
       .delete()
       .eq("user_id", context.userId);
