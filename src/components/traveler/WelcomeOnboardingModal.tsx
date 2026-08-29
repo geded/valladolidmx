@@ -39,7 +39,13 @@ import { deriveTravelStage, getDailyMission } from "@/lib/traveler/journey-stage
 
 type Lang = "es" | "en" | "fr" | "de" | "it" | "pt";
 type Window = "este_mes" | "proximos_3_meses" | "mas_adelante" | "no_se";
-type Party = "solo" | "pareja" | "familiar" | "amigos";
+/**
+ * G8-R1-E · Addendum Founder — esta tarjeta sigue siendo la autoridad
+ * VISUAL de la composición del viaje; su vocabulario ahora vive en
+ * `@/lib/traveler/party-composition` (autoridad funcional compartida con
+ * el perfil, Mi Viaje, la continuidad anónima y la priorización de Alux).
+ */
+type Party = PartyComposition;
 
 const LANG_OPTIONS: { value: Lang; label: string }[] = [
   { value: "es", label: "Español" },
@@ -57,17 +63,6 @@ const WINDOW_OPTIONS: { value: Window; label: string }[] = [
   { value: "no_se", label: "Aún no lo sé" },
 ];
 
-const PARTY_OPTIONS: {
-  value: Party;
-  label: string;
-  style: "aventura" | "romantico" | "familiar" | "cultura";
-  partySize: number;
-}[] = [
-  { value: "solo", label: "Solo/a", style: "aventura", partySize: 1 },
-  { value: "pareja", label: "En pareja", style: "romantico", partySize: 2 },
-  { value: "familiar", label: "Con familia", style: "familiar", partySize: 4 },
-  { value: "amigos", label: "Con amigos", style: "cultura", partySize: 3 },
-];
 
 const DISMISS_KEY = "vmx.onboarding.welcome.dismissedAt";
 const DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000;
