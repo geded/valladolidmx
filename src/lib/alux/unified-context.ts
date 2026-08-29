@@ -250,21 +250,32 @@ export function buildAluxUnifiedContext(input: BuildAluxUnifiedContextInput): Al
   const locationConsent = input.locationConsent === true;
   const coords = locationConsent && input.coords ? input.coords : undefined;
 
+  // R1-E · Addendum: la composición se DERIVA de la tarjeta existente.
+  const party = derivePartyProfile({
+    planPartySize: plan?.party_size ?? null,
+    travelStyle: input.profileHints?.travelStyle ?? null,
+    profilePartySize: input.profilePartySize ?? null,
+    anonymousTravelerCount: input.anonymousTravelerCount ?? null,
+  });
+
+  const entity = deriveEntity(ctx, input.entityId ?? null, input.entityKind ?? null);
+  const territory = {
+    regionSlug: ctx.region?.slug ?? null,
+    destinationSlug: ctx.destination?.slug ?? null,
+    destinationLabel: ctx.destination?.label ?? null,
+    zoneSlug: resolveContextZoneSlug(input.zone, ctx.destination?.slug ?? null),
+  };
+
   return {
     version: ALUX_UNIFIED_CONTEXT_VERSION,
-    entity: deriveEntity(ctx, input.entityId ?? null, input.entityKind ?? null),
-    territory: {
-      regionSlug: ctx.region?.slug ?? null,
-      destinationSlug: ctx.destination?.slug ?? null,
-      destinationLabel: ctx.destination?.label ?? null,
-      zoneSlug: resolveContextZoneSlug(input.zone, ctx.destination?.slug ?? null),
-    },
+    entity,
+    territory,
     trip: {
       startDate: plan?.start_date ?? null,
       endDate: plan?.end_date ?? null,
       daysUntilStart,
-      partySize: plan?.party_size ?? null,
-      partyComposition: plan?.party_composition ?? null,
+      partySize: plan?.party_size ?? party.partySize,
+      partyComposition: plan?.party_composition ?? party.composition,
       stage,
       hasActivePlan: Boolean(plan?.id),
       planItemCount,
@@ -284,6 +295,9 @@ export function buildAluxUnifiedContext(input: BuildAluxUnifiedContextInput): Al
     },
     ...(coords ? { coords } : {}),
     navigation: { origin: ctx.origin, canonical: ctx.canonical ?? null },
+    party,
+    scope: resolveAluxContextScope({ entity, territory }),
     reason: ctx.reason,
   };
+
 }
