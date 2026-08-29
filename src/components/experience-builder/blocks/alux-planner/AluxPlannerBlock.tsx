@@ -24,6 +24,10 @@ const VARIANT_PADDING: Record<AluxPlannerDTO["variant"], string> = {
 
 export function AluxPlannerBlock({ config }: { config?: Record<string, unknown> } = {}) {
   const dto = applyAluxPlannerDefaults(config);
+  // Máximo un planificador contextual por página (el dock global es aparte).
+  const isOwner = usePlannerPresence();
+  if (!isOwner) return null;
+
 
   return (
     <section
