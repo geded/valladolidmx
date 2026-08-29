@@ -365,6 +365,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/cms/destinos.index.tsx",
   "src/routes/_authenticated/cms/destinos.nueva.tsx",
   "src/routes/_authenticated/cms/demo-pack.tsx",
+  "src/routes/_authenticated/cms/rc-visual.tsx",
   "src/routes/_authenticated/cms/empresas.$businessId.editar.tsx",
   "src/routes/_authenticated/cms/empresas.$businessId.preview.tsx",
   "src/routes/_authenticated/cms/empresas.index.tsx",
