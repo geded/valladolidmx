@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.74",
+    "version": "0.76",
     "state": "Approved",
-    "source_sha256": "4a6a5a4bb0b3e3560f17f9d394821395bc5a0f2a54294ff0f94b8abdbf74a40b",
+    "source_sha256": "e3cfdeef3b7ad151d50b7173202591e29ad3c7a1fe35c2effa362db709502079",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -8497,6 +8497,39 @@
       "id": "ART:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
       "type": "artifact",
       "path": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/traveler/party-composition.ts",
+      "type": "artifact",
+      "path": "src/lib/traveler/party-composition.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/behavior-signals.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/behavior-signals.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/personalization.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/personalization.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-e/alux-personalization.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-e/alux-personalization.contract.test.ts"
+    },
+    {
+      "id": "ART:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "type": "artifact",
+      "path": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md"
     }
   ],
   "edges": [
@@ -22601,6 +22634,87 @@
       "destination": "DOC:docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
       "evidence": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md § Implementación",
       "source_row": "docs/blueprint/G8-R1-D-R1-REMEDIACION-Y-CIERRE-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/traveler/party-composition.ts:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/traveler/party-composition.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/behavior-signals.ts:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/behavior-signals.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/personalization.ts:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/personalization.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/unified-context.ts:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/unified-context.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/traveler/WelcomeOnboardingModal.tsx:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/components/traveler/WelcomeOnboardingModal.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/layout/AluxFloatingTrigger.tsx:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/components/layout/AluxFloatingTrigger.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-e/alux-personalization.contract.test.ts:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-e/alux-personalization.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
       "verified_at": "2026-08-29"
     }
   ],

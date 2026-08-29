@@ -23,6 +23,7 @@
  *    inyecta lo que ya cargó con los contratos existentes.
  */
 import { deriveTravelStage, type TravelStage } from "@/lib/traveler/journey-stage";
+import { derivePartyProfile, type PartyProfile } from "@/lib/traveler/party-composition";
 import type { AluxContext } from "./use-alux-context";
 
 export const ALUX_UNIFIED_CONTEXT_VERSION = "1.0.0" as const;
@@ -96,6 +97,17 @@ export interface AluxUnifiedContext {
     readonly origin: AluxContext["origin"];
     readonly canonical: string | null;
   };
+  /**
+   * G8-R1-E · Composición del viaje derivada de la tarjeta existente
+   * (`derivePartyProfile`). Autoridad funcional única: nunca se captura
+   * ni se persiste aquí un segundo modelo de grupo.
+   */
+  readonly party: PartyProfile;
+  /**
+   * G8-R1-E · Fase 6 — alcance real del contexto. Home entrega alcance
+   * `region` sin fingir destino ni entidad; `none` falla de forma segura.
+   */
+  readonly scope: "entity" | "destination" | "region" | "none";
   /** Motivo humano y explicable del contexto actual. */
   readonly reason: string;
 }
@@ -126,6 +138,13 @@ export interface BuildAluxUnifiedContextInput {
    */
   readonly zone?: { readonly slug: string; readonly destinationSlug: string } | null;
   readonly coords?: { readonly lat: number; readonly lng: number } | null;
+  /** `traveler_profiles.trip_context.party_size` (perfil declarado). */
+  readonly profilePartySize?: number | null;
+  /** `AnonymousTravelDraft.travelerCount` (continuidad anónima local). */
+  readonly anonymousTravelerCount?: {
+    readonly adults: number;
+    readonly children?: number;
+  } | null;
   /** Inyectable para pruebas deterministas. */
   readonly now?: Date;
 }
@@ -177,11 +196,27 @@ export function resolveContextZoneSlug(
 }
 
 /**
+ * Alcance real del contexto (Fase 6 · R1-E). Home entrega `region`
+ * legítimamente; sin territorio ni entidad el alcance es `none`.
+ */
+export function resolveAluxContextScope(
+  unified: Pick<AluxUnifiedContext, "entity" | "territory">,
+): "entity" | "destination" | "region" | "none" {
+  if (unified.entity.entityId) return "entity";
+  if (unified.territory.destinationSlug) return "destination";
+  if (unified.territory.regionSlug) return "region";
+  return "none";
+}
+
+/**
  * `true` cuando el contexto alcanza para sugerir. Contexto insuficiente
  * ⇒ Alux no sugiere y lo declara; jamás inventa.
+ *
+ * R1-E · Fase 6: el alcance regional (Home, Oriente Maya) ya es
+ * suficiente para acompañar sin fingir destino ni entidad.
  */
 export function hasSufficientAluxContext(unified: AluxUnifiedContext): boolean {
-  return Boolean(unified.territory.destinationSlug) || Boolean(unified.entity.entityId);
+  return resolveAluxContextScope(unified) !== "none";
 }
 
 /**
@@ -214,21 +249,32 @@ export function buildAluxUnifiedContext(input: BuildAluxUnifiedContextInput): Al
   const locationConsent = input.locationConsent === true;
   const coords = locationConsent && input.coords ? input.coords : undefined;
 
+  // R1-E · Addendum: la composición se DERIVA de la tarjeta existente.
+  const party = derivePartyProfile({
+    planPartySize: plan?.party_size ?? null,
+    travelStyle: input.profileHints?.travelStyle ?? null,
+    profilePartySize: input.profilePartySize ?? null,
+    anonymousTravelerCount: input.anonymousTravelerCount ?? null,
+  });
+
+  const entity = deriveEntity(ctx, input.entityId ?? null, input.entityKind ?? null);
+  const territory = {
+    regionSlug: ctx.region?.slug ?? null,
+    destinationSlug: ctx.destination?.slug ?? null,
+    destinationLabel: ctx.destination?.label ?? null,
+    zoneSlug: resolveContextZoneSlug(input.zone, ctx.destination?.slug ?? null),
+  };
+
   return {
     version: ALUX_UNIFIED_CONTEXT_VERSION,
-    entity: deriveEntity(ctx, input.entityId ?? null, input.entityKind ?? null),
-    territory: {
-      regionSlug: ctx.region?.slug ?? null,
-      destinationSlug: ctx.destination?.slug ?? null,
-      destinationLabel: ctx.destination?.label ?? null,
-      zoneSlug: resolveContextZoneSlug(input.zone, ctx.destination?.slug ?? null),
-    },
+    entity,
+    territory,
     trip: {
       startDate: plan?.start_date ?? null,
       endDate: plan?.end_date ?? null,
       daysUntilStart,
-      partySize: plan?.party_size ?? null,
-      partyComposition: plan?.party_composition ?? null,
+      partySize: plan?.party_size ?? party.partySize,
+      partyComposition: plan?.party_composition ?? party.composition,
       stage,
       hasActivePlan: Boolean(plan?.id),
       planItemCount,
@@ -248,6 +294,8 @@ export function buildAluxUnifiedContext(input: BuildAluxUnifiedContextInput): Al
     },
     ...(coords ? { coords } : {}),
     navigation: { origin: ctx.origin, canonical: ctx.canonical ?? null },
+    party,
+    scope: resolveAluxContextScope({ entity, territory }),
     reason: ctx.reason,
   };
 }

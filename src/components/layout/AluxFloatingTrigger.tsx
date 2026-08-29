@@ -70,6 +70,7 @@ import {
   hasSufficientAluxContext,
   ALUX_UNIFIED_CONTEXT_VERSION,
 } from "@/lib/alux/unified-context";
+import { rankAluxCandidates } from "@/lib/alux/personalization";
 import { useAluxFloatingPresence } from "@/lib/alux/floating-presence";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import {
@@ -342,6 +343,57 @@ export function AluxFloatingTrigger() {
       (!isAuthed || !lensQuery.isLoading),
     staleTime: 60_000,
   });
+
+  /**
+   * G8-R1-E · Fase 4 — Priorización explicable y determinista.
+   * No reemplaza el catálogo ni al modelo: reordena los candidatos ya
+   * devueltos por `aluxContextualSuggest` con la jerarquía aprobada y
+   * añade la razón humana cuando aporta información real.
+   */
+  const personalized = useMemo(() => {
+    const remote = suggestionsQuery.data?.suggestions ?? [];
+    if (!remote.length) return null;
+    const planSlugs = new Set(
+      (plan?.saved_items ?? []).map((i) => (i.slug ?? "").toLowerCase()).filter(Boolean),
+    );
+    const savedCategorySlugs = remote
+      .filter((s) => planSlugs.has(s.slug.toLowerCase()))
+      .map((s) => s.categorySlug ?? "")
+      .filter(Boolean);
+    const result = rankAluxCandidates({
+      unified,
+      limit: remote.length,
+      savedCategorySlugs,
+      requiredAccessibility: lens?.hints.accessibility ?? [],
+      candidates: remote.map((s) => ({
+        entityId: s.entityId ?? s.source.id,
+        entityKind: s.kind,
+        slug: s.slug,
+        label: s.label,
+        canonicalUrl: s.canonicalUrl ?? s.href,
+        published: true,
+        destinationSlug: unified.territory.destinationSlug,
+        categorySlug: s.categorySlug ?? null,
+        categoryName: s.categoryName ?? null,
+        openState: s.openState,
+        alreadyInPlan: planSlugs.has(s.slug.toLowerCase()),
+      })),
+    });
+    const bySlug = new Map(remote.map((s) => [s.slug, s] as const));
+    return {
+      result,
+      items: result.ranked
+        .map((r) => {
+          const base = bySlug.get(r.candidate.slug);
+          if (!base) return null;
+          const extra = r.reasons[0];
+          return extra && !base.rationale.includes(extra)
+            ? { ...base, rationale: `${base.rationale} ${extra}`.slice(0, 220) }
+            : base;
+        })
+        .filter((v): v is AluxContextualSuggestion => Boolean(v)),
+    };
+  }, [suggestionsQuery.data, unified, plan, lens]);
 
   // AT-0: en superficies con CTA sticky comercial, cedemos el espacio.
   if (presence.shouldHide) return null;
@@ -694,7 +746,7 @@ export function AluxFloatingTrigger() {
               </p>
             )}
             {(() => {
-              const remote = suggestionsQuery.data?.suggestions ?? [];
+              const remote = personalized?.items ?? suggestionsQuery.data?.suggestions ?? [];
               const items: AluxContextualSuggestion[] =
                 remote.length > 0
                   ? [...remote]
