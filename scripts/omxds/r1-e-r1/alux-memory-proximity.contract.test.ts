@@ -190,7 +190,10 @@ describe("Emisor único: dedupe y rate limit", () => {
 
 describe("Proximidad acreditada", () => {
   const origin = { lat: 20.6892, lng: -88.2011 }; // Valladolid centro
-  const withCoords = { slug: "cenote-zaci", coords: { lat: 20.6905, lng: -88.1997, source: "poi" as const } };
+  const withCoords = {
+    slug: "cenote-zaci",
+    coords: { lat: 20.6905, lng: -88.1997, source: "poi" as const },
+  };
   const withoutCoords = { slug: "tour-sin-ubicacion", coords: null };
   const getCoords = (c: { coords: { lat: number; lng: number; source: "poi" } | null }) => c.coords;
 
@@ -210,7 +213,12 @@ describe("Proximidad acreditada", () => {
   });
 
   test("20 · con consentimiento y coordenadas acreditadas hay distancia y origen", () => {
-    const out = attachDistance({ candidates: [withCoords], origin, consentGranted: true, getCoords });
+    const out = attachDistance({
+      candidates: [withCoords],
+      origin,
+      consentGranted: true,
+      getCoords,
+    });
     expect(typeof out[0].distanceKm).toBe("number");
     expect(out[0].distanceSource).toBe("poi");
   });

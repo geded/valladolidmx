@@ -52,11 +52,7 @@ import { isValidPoint, type AccreditedCoords, type CoordsSource } from "@/lib/al
 export const ALUX_CANONICAL_CATALOG_VERSION = "1.2.0" as const;
 
 /** Coordenada acreditada o `null`. Nunca aproxima ni inventa. */
-function accredit(
-  lat: unknown,
-  lng: unknown,
-  source: CoordsSource,
-): AccreditedCoords | null {
+function accredit(lat: unknown, lng: unknown, source: CoordsSource): AccreditedCoords | null {
   const point = { lat: Number(lat), lng: Number(lng) };
   return isValidPoint(point) ? { ...point, source } : null;
 }
@@ -163,7 +159,6 @@ export async function loadAluxCanonicalCandidates(
       if (point) businessCoords.set(bizId, point);
     }
   }
-
 
   // ── Lugares y atractivos (points_of_interest → premium-entity-place) ──
   {

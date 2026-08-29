@@ -36,7 +36,10 @@ export interface EmitAluxSignalInput {
 
 export type EmitAluxSignalResult =
   | { readonly emitted: true; readonly published: boolean }
-  | { readonly emitted: false; readonly reason: "paused" | "invalid" | "duplicate" | "rate_limited" | "ssr" };
+  | {
+      readonly emitted: false;
+      readonly reason: "paused" | "invalid" | "duplicate" | "rate_limited" | "ssr";
+    };
 
 function withinRateLimit(now: number): boolean {
   if (now - windowStart > 60_000) {

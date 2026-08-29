@@ -88,7 +88,9 @@ export function toVisitorEvent(
     schema_version: VISITOR_EVENT_SCHEMA_VERSION,
     subject: {
       subject_id: ctx.subjectId,
-      trust_level: ctx.isAuthenticated ? ("N2_personalization" as const) : ("N0_anonymous" as const),
+      trust_level: ctx.isAuthenticated
+        ? ("N2_personalization" as const)
+        : ("N0_anonymous" as const),
       is_authenticated: ctx.isAuthenticated,
       ...(ctx.locale ? { locale: ctx.locale } : {}),
     },

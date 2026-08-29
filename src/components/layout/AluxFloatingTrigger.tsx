@@ -239,7 +239,6 @@ export function AluxFloatingTrigger() {
   const { summary: behaviorSummary } = useAluxMemory();
   const { trip: anonymousTrip } = useAnonymousTrip();
 
-
   /**
    * G8-R1-D-R1 · DEF-R1D-005 — Composición ÚNICA del contexto unificado.
    *
@@ -431,7 +430,11 @@ export function AluxFloatingTrigger() {
       recommendationSource: "alux",
       algorithmVersion: ALUX_UNIFIED_CONTEXT_VERSION,
     } as const;
-    const emit = (kind: "territory_viewed" | "category_explored" | "entity_viewed", key?: string | null, targetType?: string) => {
+    const emit = (
+      kind: "territory_viewed" | "category_explored" | "entity_viewed",
+      key?: string | null,
+      targetType?: string,
+    ) => {
       if (!key) return;
       void emitAluxSignal({ kind, key, context: { ...base, targetType: targetType ?? null } });
     };
@@ -439,8 +442,16 @@ export function AluxFloatingTrigger() {
     emit("category_explored", ctx.category?.slug, "category");
     emit("entity_viewed", ctx.business?.slug, "business");
     emit("entity_viewed", ctx.product?.slug, "product");
-  }, [ctx.destination?.slug, ctx.category?.slug, ctx.business?.slug, ctx.product?.slug, isAuthed, locale, pathname, unified.trip.stage]);
-
+  }, [
+    ctx.destination?.slug,
+    ctx.category?.slug,
+    ctx.business?.slug,
+    ctx.product?.slug,
+    isAuthed,
+    locale,
+    pathname,
+    unified.trip.stage,
+  ]);
 
   // AT-0: en superficies con CTA sticky comercial, cedemos el espacio.
   if (presence.shouldHide) return null;
