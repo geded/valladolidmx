@@ -114,20 +114,24 @@ export function AluxFloatingTrigger() {
   // (Home, Marketplace, /alux, /cuenta, etc.) el Sheet abre siempre en
   // "modo descubrimiento" — nunca arrastra el destino/ficha anterior.
   const contextIsRelevant = pathname.startsWith("/oriente-maya/");
-  const ctx: AluxContext = contextIsRelevant
-    ? rawCtx
-    : {
-        hasContext: false,
-        related: [],
-        reason: rawCtx.reason,
-        origin: "none",
-        region: undefined,
-        destination: undefined,
-        category: undefined,
-        business: undefined,
-        product: undefined,
-        canonical: undefined,
-      };
+  const ctx: AluxContext = useMemo(
+    () =>
+      contextIsRelevant
+        ? rawCtx
+        : {
+            hasContext: false,
+            related: [],
+            reason: rawCtx.reason,
+            origin: "none",
+            region: undefined,
+            destination: undefined,
+            category: undefined,
+            business: undefined,
+            product: undefined,
+            canonical: undefined,
+          },
+    [contextIsRelevant, rawCtx],
+  );
   const presence = useAluxFloatingPresence();
   const [open, setOpen] = useState(false);
 
