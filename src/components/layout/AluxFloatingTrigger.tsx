@@ -331,8 +331,10 @@ export function AluxFloatingTrigger() {
           conciergeLatestProposalSummary: concierge?.latest_proposal_summary ?? undefined,
         },
       }),
+    // Contexto insuficiente ⇒ Alux no sugiere (nunca inventa).
     enabled:
       open &&
+      contextIsSufficient &&
       ctx.hasContext &&
       Boolean(ctx.destination?.slug) &&
       (!isAuthed || !lensQuery.isLoading),
@@ -362,6 +364,19 @@ export function AluxFloatingTrigger() {
     <>
       <div
         data-alux-dock
+        data-omxds-chrome="alux-dock"
+        data-alux-context-version={ALUX_UNIFIED_CONTEXT_VERSION}
+        data-alux-context-sufficient={contextIsSufficient ? "true" : "false"}
+        data-alux-entity-kind={unified.entity.entityKind ?? ""}
+        data-alux-entity-id={unified.entity.entityId ?? ""}
+        data-alux-destination={unified.territory.destinationSlug ?? ""}
+        data-alux-zone={unified.territory.zoneSlug ?? ""}
+        data-alux-stage={unified.trip.stage}
+        data-alux-location-consent={unified.permissions.canUseLocation ? "true" : "false"}
+        data-alux-plan-items={String(unified.trip.planItemCount)}
+        data-alux-saved-items={String(unified.trip.savedItemCount)}
+        data-alux-party-size={unified.trip.partySize == null ? "" : String(unified.trip.partySize)}
+        data-alux-reason={unified.reason}
         className="pointer-events-none fixed right-4 z-40 transition-[bottom] duration-300 md:right-6"
 
         style={{
