@@ -235,8 +235,7 @@ export const Route = createFileRoute("/producto/$slug")({
 });
 
 function MarketplaceProductPage() {
-  const { product, composition, surfaceContractsEnabled, canonicalBinding } =
-    Route.useLoaderData();
+  const { product, composition, surfaceContractsEnabled, canonicalBinding } = Route.useLoaderData();
   const declaration = buildProductContext(product);
   return (
     <ContextEngineProvider declaration={declaration}>

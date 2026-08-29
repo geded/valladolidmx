@@ -33,7 +33,11 @@ const noFixture = !importsFixture(contract) && !importsFixture(reads);
 if (!noFixture) failed = true;
 console.log(`${noFixture ? "✔" : "✘"} cadena productiva sin fixtures del catálogo`);
 
-for (const fn of ["listMarketplaceBusinesses", "listPublishedEvents", "listPublishedDestinations"]) {
+for (const fn of [
+  "listMarketplaceBusinesses",
+  "listPublishedEvents",
+  "listPublishedDestinations",
+]) {
   const ok = reads.includes(fn);
   if (!ok) failed = true;
   console.log(`${ok ? "✔" : "✘"} reutiliza la lectura productiva ${fn}`);

@@ -17,11 +17,7 @@ const ROUTES = [
   ["src/routes/que-hacer.tsx", "que-hacer"],
 ];
 
-const FORBIDDEN = [
-  "listing-premium-content",
-  "listMarketplaceBusinesses",
-  "businessToTourismCard",
-];
+const FORBIDDEN = ["listing-premium-content", "listMarketplaceBusinesses", "businessToTourismCard"];
 
 let failed = false;
 const ok = (m) => console.log(`✔ ${m}`);
@@ -54,6 +50,8 @@ if (!surface.includes("PublicListingDTO")) bad("La superficie premium no consume
 else ok("ListingPremiumSurface consume PublicListingDTO");
 
 console.log(
-  failed ? "✘ G8-R1 · R1-B · evidencia incompleta." : "✔ G8-R1 · R1-B · evidencia estática completa.",
+  failed
+    ? "✘ G8-R1 · R1-B · evidencia incompleta."
+    : "✔ G8-R1 · R1-B · evidencia estática completa.",
 );
 process.exit(failed ? 1 : 0);

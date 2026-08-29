@@ -107,8 +107,7 @@ export const LISTING_FAMILY_CONTRACTS: Record<ListingFamilyId, ListingFamilyCont
     hero: {
       eyebrow: "Vive el Oriente Maya",
       title: "Experiencias",
-      subtitle:
-        "Vivencias auténticas con comunidades, cocineros y guías locales del Oriente Maya.",
+      subtitle: "Vivencias auténticas con comunidades, cocineros y guías locales del Oriente Maya.",
     },
     emptyMessage:
       "Aún no hay experiencias publicadas. Vuelve pronto para descubrir vivencias con guías locales.",
