@@ -332,6 +332,9 @@ export async function loadAluxCanonicalCandidates(
           "publicado · empresa publicada con ficha resoluble · ruta canónica construida por el binding",
         favoriteKind: "product",
         planKind: "product",
+        coords: businessCoords.has(bizId)
+          ? { ...(businessCoords.get(bizId) as AccreditedCoords), source: "product_operator" }
+          : null,
       });
     }
     familyReport.product = {
