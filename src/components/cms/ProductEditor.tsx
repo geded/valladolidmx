@@ -8,6 +8,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { EntityEditor } from "@/components/cms/EntityEditor";
 import { ProductMediaPanels } from "@/components/cms/ProductMediaPanels";
 import { RelatedOverridesPanel } from "@/components/cms/RelatedOverridesPanel";
+import { SeoLandingAction } from "@/components/cms/SeoLandingAction";
 import { PRODUCT_FIELDS } from "@/lib/cms/editor-fields";
 import { listBusinessesForProductSelect } from "@/lib/cms/products-media.functions";
 
@@ -49,6 +50,7 @@ export function ProductEditor({ id }: Props) {
           <>
             <ProductMediaPanels productId={entityId} />
             <RelatedOverridesPanel entityType="product" entityId={entityId} />
+            <SeoLandingAction entityType="product" entityId={entityId} />
           </>
         ) : null
       }
