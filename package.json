@@ -92,6 +92,8 @@
     "test:r1:cl": "bun test scripts/omxds/r1-cl/entity-resolver-seo-landing.contract.test.ts scripts/omxds/r1-cl/seo-landing-creation.contract.test.ts",
     "test:r1:f1b:b3": "bunx vitest run scripts/omxds/r1-f1b-b3/geolocation-preview.contract.test.ts",
     "validate:r1:f1b:b3": "bun run test:r1:f1b:b3 && bun run test:r1:f1b:s1 && bun run test:g8:m1 && bun run test:q2a && bun run test:q2b && bun run lint && bun run typecheck && bun scripts/route-inventory-coverage.ts && bun run governance:check",
+    "test:r1:f1b:b4": "bunx vitest run scripts/omxds/r1-f1b-b4/editorial-approval.contract.test.ts",
+    "validate:r1:f1b:b4": "bun run test:r1:f1b:b4 && bun run test:r1:f1b:b3 && bun run test:r1:f1b:s1 && bun run lint && bun run typecheck && bun scripts/route-inventory-coverage.ts && bun run governance:check",
     "test:r1:f1b:s1": "bunx vitest run scripts/omxds/r1-f1b-s1/provenance-claim-model.contract.test.ts",
     "validate:r1:f1b:s1": "bun run test:r1:f1b:s1 && bun run lint && bun run typecheck && bun run test:q2a && bun run test:q2b && bun run test:r1:a && bun scripts/route-inventory-coverage.ts && bun run governance:check",
     "validate:r1:cl": "bun run test:r1:cl && bun scripts/omxds/r1-cl/entity-resolver-seo-landing.evidence.mjs"

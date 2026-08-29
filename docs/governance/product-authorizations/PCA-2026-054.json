@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-054",
+  "title": "G8-R1-F1B-B4 · Aprobación editorial interna y paquete de reclamación",
+  "status": "Approved",
+  "branch": "edit/edt-42626ea9-1a3f-44ea-bef4-793d5e025885",
+  "blueprint": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+  "founder_authority": "Autorización Founder G8-R1-F1B-B4 (2026-08-29). Autoriza exclusivamente revisar y aprobar editorialmente, sin publicar, las fichas del lote B1-B3 que cumplen todos los mínimos acreditados; preparar el paquete interno de reclamación y la solicitud de medios de las 15 fichas; y registrar la reversión de cada transición. Las fichas sin geolocalización acreditada permanecen en revisión con solicitud concreta al operador, sin geocodificación automática ni aproximación al centro territorial. No autoriza publicación, activación de flags, sitemap, redirects, contacto automático con empresas, importación de fotografías de terceros, PR, merge ni despliegue.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "supabase/migrations/20260829100730_ed564a44-08ec-434e-ba12-195dd95c8222.sql"
+    },
+    {
+      "operation": "modify",
+      "path": "package.json"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run test:r1:f1b:b4",
+    "bun run lint",
+    "bun run typecheck",
+    "bun run validate:r1:f1b:b4"
+  ]
+}

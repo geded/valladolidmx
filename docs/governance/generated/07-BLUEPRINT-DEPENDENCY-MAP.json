@@ -4,7 +4,7 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.79",
     "state": "Approved",
-    "source_sha256": "67a803e2840c26770f86336430aeaa8a148734cbab80f7bb716ba1f014e5e1ec",
+    "source_sha256": "d43dc857df84e19b1141d53d1ba95f2660925c60f9b5ba02520a92b2f96da997",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -8720,6 +8720,39 @@
       "id": "ART:docs/governance/evidence/g8-r1-f1b-b3/geocode-cache.json",
       "type": "artifact",
       "path": "docs/governance/evidence/g8-r1-f1b-b3/geocode-cache.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-f1b-b4/editorial-approval.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-f1b-b4/editorial-approval.contract.test.ts"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-054.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-054.json"
+    },
+    {
+      "id": "ART:docs/governance/evidence/g8-r1-f1b-b4/EDITORIAL-APPROVAL-AND-CLAIM-PACKAGE-v1.0.md",
+      "type": "artifact",
+      "path": "docs/governance/evidence/g8-r1-f1b-b4/EDITORIAL-APPROVAL-AND-CLAIM-PACKAGE-v1.0.md"
+    },
+    {
+      "id": "ART:docs/governance/evidence/g8-r1-f1b-b4/batch-state.snapshot.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/g8-r1-f1b-b4/batch-state.snapshot.json"
+    },
+    {
+      "id": "ART:supabase/migrations/20260829100730_ed564a44-08ec-434e-ba12-195dd95c8222.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260829100730_ed564a44-08ec-434e-ba12-195dd95c8222.sql"
     }
   ],
   "edges": [
@@ -23301,6 +23334,51 @@
       "destination": "DOC:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
       "evidence": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md § Implementación",
       "source_row": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-f1b-b4/editorial-approval.contract.test.ts:docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-f1b-b4/editorial-approval.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-054.json:docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-054.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/g8-r1-f1b-b4/EDITORIAL-APPROVAL-AND-CLAIM-PACKAGE-v1.0.md:docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "origin": "ART:docs/governance/evidence/g8-r1-f1b-b4/EDITORIAL-APPROVAL-AND-CLAIM-PACKAGE-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/g8-r1-f1b-b4/batch-state.snapshot.json:docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "origin": "ART:docs/governance/evidence/g8-r1-f1b-b4/batch-state.snapshot.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:supabase/migrations/20260829100730_ed564a44-08ec-434e-ba12-195dd95c8222.sql:docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "origin": "ART:supabase/migrations/20260829100730_ed564a44-08ec-434e-ba12-195dd95c8222.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
       "verified_at": "2026-08-29"
     }
   ],
