@@ -33,9 +33,9 @@ const template = fs.readFileSync(
   "utf8",
 );
 const slots = (template.match(/order: \d+/g) ?? []).length;
-const okSlots = slots === 17;
+const okSlots = slots === 18;
 if (!okSlots) failed = true;
-console.log(`${okSlots ? "✔" : "✘"} plantilla con 17 slots (${slots})`);
+console.log(`${okSlots ? "✔" : "✘"} plantilla con 18 slots (${slots})`);
 
 if (failed) process.exit(1);
 console.log("✔ G8-R1-C+L · evidencia estática completa.");
