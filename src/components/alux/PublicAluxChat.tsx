@@ -199,9 +199,11 @@ export function PublicAluxChat() {
       className="rounded-3xl border border-border/60 bg-card shadow-elevated overflow-hidden"
     >
       <header className="flex items-center gap-3 border-b border-border/60 bg-muted/40 px-5 py-4">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <Sparkles className="h-5 w-5" />
+        {/* G8-R1-D3 · Identidad canónica: activo gobernado de /brand/alux/. */}
+        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-primary/10">
+          <AluxMark family="avatar" size={40} decorative loading="eager" />
         </div>
+
         <div className="flex-1 min-w-0">
           <h2 className="font-serif text-lg leading-none">Habla con Alux</h2>
           <p className="text-xs text-muted-foreground mt-1">
