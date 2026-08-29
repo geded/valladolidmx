@@ -45,7 +45,7 @@ import {
   Users,
   Headset,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
@@ -65,6 +65,11 @@ import {
   type AluxContext,
   type AluxContextSlot,
 } from "@/lib/alux/use-alux-context";
+import {
+  buildAluxUnifiedContext,
+  hasSufficientAluxContext,
+  ALUX_UNIFIED_CONTEXT_VERSION,
+} from "@/lib/alux/unified-context";
 import { useAluxFloatingPresence } from "@/lib/alux/floating-presence";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import {
@@ -79,7 +84,6 @@ import { useTranslation } from "@/i18n/context";
 import { AluxMark } from "@/components/alux/AluxMark";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
-
 
 function ContextChip({ slot }: { slot: AluxContextSlot }) {
   const content = (
@@ -110,20 +114,24 @@ export function AluxFloatingTrigger() {
   // (Home, Marketplace, /alux, /cuenta, etc.) el Sheet abre siempre en
   // "modo descubrimiento" — nunca arrastra el destino/ficha anterior.
   const contextIsRelevant = pathname.startsWith("/oriente-maya/");
-  const ctx: AluxContext = contextIsRelevant
-    ? rawCtx
-    : {
-        hasContext: false,
-        related: [],
-        reason: rawCtx.reason,
-        origin: "none",
-        region: undefined,
-        destination: undefined,
-        category: undefined,
-        business: undefined,
-        product: undefined,
-        canonical: undefined,
-      };
+  const ctx: AluxContext = useMemo(
+    () =>
+      contextIsRelevant
+        ? rawCtx
+        : {
+            hasContext: false,
+            related: [],
+            reason: rawCtx.reason,
+            origin: "none",
+            region: undefined,
+            destination: undefined,
+            category: undefined,
+            business: undefined,
+            product: undefined,
+            canonical: undefined,
+          },
+    [contextIsRelevant, rawCtx],
+  );
   const presence = useAluxFloatingPresence();
   const [open, setOpen] = useState(false);
 
@@ -218,6 +226,49 @@ export function AluxFloatingTrigger() {
     if (open && nudge) markNudgeShown(nudge.intent);
   }, [open, nudge]);
 
+  /**
+   * G8-R1-D-R1 · DEF-R1D-005 — Composición ÚNICA del contexto unificado.
+   *
+   * Es la sola autoridad de contexto de Alux en superficies públicas
+   * (Home, Destino, Listados, Empresa/hotel/restaurante, Producto/
+   * experiencia/tour, Evento, Lugar y Landing SEO en preview staff): el
+   * dock es el único punto de entrada montado en todas ellas. El contrato
+   * anterior (`AluxContext`) permanece como fuente territorial de entrada,
+   * nunca como segunda autoridad.
+   */
+  const unified = useMemo(
+    () =>
+      buildAluxUnifiedContext({
+        context: ctx,
+        plan: plan
+          ? {
+              id: "active",
+              start_date: plan.start_date,
+              end_date: plan.end_date,
+              party_size: plan.party_size,
+              item_count: plan.item_count,
+            }
+          : null,
+        savedItemCount: plan?.saved_items.length ?? 0,
+        profileHints: lens
+          ? {
+              homeCountry: lens.hints.home_country ?? null,
+              preferredLanguage: lens.hints.preferred_language ?? null,
+              travelStyle: lens.hints.travel_style ?? null,
+              budgetBand: lens.hints.budget_band ?? null,
+              interests: lens.hints.interests ?? [],
+            }
+          : null,
+        hasCompletedProfile: Boolean(lens?.hints.travel_style),
+        isAuthenticated: isAuthed,
+        hasAnonymousDraft: Boolean(sessionKey) && !isAuthed,
+        locationConsent: geo.status === "granted",
+        coords: geo.location ?? null,
+      }),
+    [ctx, plan, lens, isAuthed, sessionKey, geo],
+  );
+  const contextIsSufficient = hasSufficientAluxContext(unified);
+
   const suggestionsQuery = useQuery({
     queryKey: [
       "alux",
@@ -282,8 +333,10 @@ export function AluxFloatingTrigger() {
           conciergeLatestProposalSummary: concierge?.latest_proposal_summary ?? undefined,
         },
       }),
+    // Contexto insuficiente ⇒ Alux no sugiere (nunca inventa).
     enabled:
       open &&
+      contextIsSufficient &&
       ctx.hasContext &&
       Boolean(ctx.destination?.slug) &&
       (!isAuthed || !lensQuery.isLoading),
@@ -313,8 +366,20 @@ export function AluxFloatingTrigger() {
     <>
       <div
         data-alux-dock
+        data-omxds-chrome="alux-dock"
+        data-alux-context-version={ALUX_UNIFIED_CONTEXT_VERSION}
+        data-alux-context-sufficient={contextIsSufficient ? "true" : "false"}
+        data-alux-entity-kind={unified.entity.entityKind ?? ""}
+        data-alux-entity-id={unified.entity.entityId ?? ""}
+        data-alux-destination={unified.territory.destinationSlug ?? ""}
+        data-alux-zone={unified.territory.zoneSlug ?? ""}
+        data-alux-stage={unified.trip.stage}
+        data-alux-location-consent={unified.permissions.canUseLocation ? "true" : "false"}
+        data-alux-plan-items={String(unified.trip.planItemCount)}
+        data-alux-saved-items={String(unified.trip.savedItemCount)}
+        data-alux-party-size={unified.trip.partySize == null ? "" : String(unified.trip.partySize)}
+        data-alux-reason={unified.reason}
         className="pointer-events-none fixed right-4 z-40 transition-[bottom] duration-300 md:right-6"
-
         style={{
           bottom: `calc(env(safe-area-inset-bottom, 0px) + ${1 + presence.bottomOffset / 16}rem)`,
         }}
@@ -789,32 +854,30 @@ export function AluxFloatingTrigger() {
                               {/* G8-R1-D3 · Guardar y Agregar a Mi Viaje son
                                   acciones DISTINTAS. Alux sólo propone: nada
                                   entra al viaje sin confirmación del viajero. */}
-                              {item.entityId &&
-                                (item.favoriteKind || item.planKind) && (
-                                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                                    {item.favoriteKind && (
-                                      <FavoriteButton
-                                        entityKind={item.favoriteKind}
-                                        entityId={item.entityId}
-                                        entityTitle={item.label}
-                                        entitySlug={item.slug}
-                                        className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium text-foreground transition-colors hover:bg-muted"
-                                      />
-                                    )}
-                                    {item.planKind && (
-                                      <AddToTravelPlanButton
-                                        kind={item.planKind}
-                                        targetId={item.entityId}
-                                        title={item.label}
-                                        slug={item.slug}
-                                        subtitle={item.categoryName ?? null}
-                                        variant="compact"
-                                      />
-                                    )}
-                                  </div>
-                                )}
+                              {item.entityId && (item.favoriteKind || item.planKind) && (
+                                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                                  {item.favoriteKind && (
+                                    <FavoriteButton
+                                      entityKind={item.favoriteKind}
+                                      entityId={item.entityId}
+                                      entityTitle={item.label}
+                                      entitySlug={item.slug}
+                                      className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium text-foreground transition-colors hover:bg-muted"
+                                    />
+                                  )}
+                                  {item.planKind && (
+                                    <AddToTravelPlanButton
+                                      kind={item.planKind}
+                                      targetId={item.entityId}
+                                      title={item.label}
+                                      slug={item.slug}
+                                      subtitle={item.categoryName ?? null}
+                                      variant="compact"
+                                    />
+                                  )}
+                                </div>
+                              )}
                             </div>
-
                           </li>
                         ))}
                       </ul>

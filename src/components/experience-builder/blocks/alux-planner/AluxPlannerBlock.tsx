@@ -37,6 +37,7 @@ export function AluxPlannerBlock({ config }: { config?: Record<string, unknown> 
   return (
     <section
       data-block="vmx.alux.planner"
+      data-omxds-chrome="alux-planner"
       data-alux-planner-variant={dto.variant}
       className="@container py-12 @3xl:py-20"
     >

@@ -56,7 +56,10 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
   const privacyLabel = textValue(config?.privacy_label) ?? t("footer.privacy");
   const showLanguage = boolValue(config?.show_language, true);
   return (
-    <footer className="@container mt-24 border-t border-border bg-secondary/40">
+    <footer
+      data-omxds-chrome="public-footer"
+      className="@container mt-24 border-t border-border bg-secondary/40"
+    >
       <Container className="grid grid-cols-1 gap-10 py-12 @3xl:grid-cols-4">
         <div>
           <BrandLogo tone="dark" size="md" />

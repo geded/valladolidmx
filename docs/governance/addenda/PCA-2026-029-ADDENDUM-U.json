@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-U",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+  "founder_authority": "Autorización Founder 2026-08-29 · G8-R1-D-R1 · Remediación y Cierre Definitivo. Autoriza exclusivamente añadir el marcador de chrome canónico data-omxds-chrome=\"site-header\" al encabezado público, para que DEF-R1D-001 pueda medirse sobre un selector inequívoco sin confundir los <header> internos de sección, que son semántica legítima de contenido. Cambio de instrumentación puro: sin datos, sin rutas, sin flags, sin navegación, sin lógica de negocio. La autoridad de paquete es PCA-2026-051.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/layout/SiteHeader.tsx",
+    "previous_sha256": "7b6821faab28b836e38a5dd900d45cc6d1901e88a10cdcda6d366887c90d562a",
+    "current_sha256": "e3dcb968f5d097f1cf319d0a8fb867d17c1322c693f2a79207648093a4e0587d",
+    "semantic_change": "Añade el atributo de instrumentación data-omxds-chrome=\"site-header\" al elemento <header> canónico. Sin cambios de navegación, estructura, estilos ni contratos del header.",
+    "authority": "PCA-2026-051"
+  },
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "Cero rutas públicas, cero redirects, cero datos, cero migraciones",
+    "Header y Footer canónicos conservan estructura aprobada"
+  ],
+  "recorded_at": "2026-08-29"
+}

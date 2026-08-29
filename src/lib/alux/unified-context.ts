@@ -92,7 +92,10 @@ export interface AluxUnifiedContext {
   /** Sólo presente con consentimiento explícito de ubicación. */
   readonly coords?: { readonly lat: number; readonly lng: number };
   /** Contexto de navegación heredado del Context Engine. */
-  readonly navigation: { readonly origin: AluxContext["origin"]; readonly canonical: string | null };
+  readonly navigation: {
+    readonly origin: AluxContext["origin"];
+    readonly canonical: string | null;
+  };
   /** Motivo humano y explicable del contexto actual. */
   readonly reason: string;
 }
@@ -116,6 +119,12 @@ export interface BuildAluxUnifiedContextInput {
   readonly hasAnonymousDraft?: boolean;
   /** Consentimiento explícito. Sin `true`, las coordenadas se descartan. */
   readonly locationConsent?: boolean;
+  /**
+   * DEF-R1D-004 · Zona territorial candidata. Sólo se acredita si
+   * `destinationSlug` coincide con el destino activo del contexto.
+   * Nunca se infiere por texto, cercanía ni parecido de slug.
+   */
+  readonly zone?: { readonly slug: string; readonly destinationSlug: string } | null;
   readonly coords?: { readonly lat: number; readonly lng: number } | null;
   /** Inyectable para pruebas deterministas. */
   readonly now?: Date;
@@ -125,9 +134,7 @@ function dayDiff(from: Date, isoDate: string | null | undefined): number | null 
   if (!isoDate) return null;
   const target = new Date(`${isoDate.slice(0, 10)}T00:00:00Z`);
   if (Number.isNaN(target.getTime())) return null;
-  const base = new Date(
-    Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate()),
-  );
+  const base = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate()));
   return Math.round((target.getTime() - base.getTime()) / 86_400_000);
 }
 
@@ -153,12 +160,35 @@ function deriveEntity(
 }
 
 /**
+ * DEF-R1D-004 · Zona acreditada: pertenece al destino activo o es `null`.
+ * Una zona incompatible NUNCA bloquea una recomendación válida: sólo se
+ * descarta el dato territorial opcional.
+ */
+export function resolveContextZoneSlug(
+  zone: { slug: string; destinationSlug: string } | null | undefined,
+  destinationSlug: string | null,
+): string | null {
+  if (!zone) return null;
+  const slug = zone.slug?.trim() ?? "";
+  if (!slug) return null;
+  if (!destinationSlug) return null;
+  if (zone.destinationSlug?.trim() !== destinationSlug) return null;
+  return slug;
+}
+
+/**
+ * `true` cuando el contexto alcanza para sugerir. Contexto insuficiente
+ * ⇒ Alux no sugiere y lo declara; jamás inventa.
+ */
+export function hasSufficientAluxContext(unified: AluxUnifiedContext): boolean {
+  return Boolean(unified.territory.destinationSlug) || Boolean(unified.entity.entityId);
+}
+
+/**
  * Compone el contexto unificado. Fail-safe: cualquier fuente ausente se
  * omite; nunca se inventa fecha, grupo, coordenada ni perfil.
  */
-export function buildAluxUnifiedContext(
-  input: BuildAluxUnifiedContextInput,
-): AluxUnifiedContext {
+export function buildAluxUnifiedContext(input: BuildAluxUnifiedContextInput): AluxUnifiedContext {
   const now = input.now ?? new Date();
   const ctx = input.context;
   const plan = input.plan ?? null;
@@ -191,7 +221,7 @@ export function buildAluxUnifiedContext(
       regionSlug: ctx.region?.slug ?? null,
       destinationSlug: ctx.destination?.slug ?? null,
       destinationLabel: ctx.destination?.label ?? null,
-      zoneSlug: null,
+      zoneSlug: resolveContextZoneSlug(input.zone, ctx.destination?.slug ?? null),
     },
     trip: {
       startDate: plan?.start_date ?? null,
