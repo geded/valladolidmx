@@ -138,6 +138,7 @@ import { Route as AuthenticatedCmsVisibilidadRouteImport } from './routes/_authe
 import { Route as AuthenticatedCmsVentasEnLineaRouteImport } from './routes/_authenticated/cms/ventas-en-linea'
 import { Route as AuthenticatedCmsTravelPlansRouteImport } from './routes/_authenticated/cms/travel-plans'
 import { Route as AuthenticatedCmsSimulationRouteImport } from './routes/_authenticated/cms/simulation'
+import { Route as AuthenticatedCmsRcVisualRouteImport } from './routes/_authenticated/cms/rc-visual'
 import { Route as AuthenticatedCmsPagosRouteImport } from './routes/_authenticated/cms/pagos'
 import { Route as AuthenticatedCmsObservabilidadRouteImport } from './routes/_authenticated/cms/observabilidad'
 import { Route as AuthenticatedCmsMediaRouteImport } from './routes/_authenticated/cms/media'
@@ -945,6 +946,12 @@ const AuthenticatedCmsSimulationRoute =
     path: '/simulation',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsRcVisualRoute =
+  AuthenticatedCmsRcVisualRouteImport.update({
+    id: '/rc-visual',
+    path: '/rc-visual',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsPagosRoute = AuthenticatedCmsPagosRouteImport.update({
   id: '/pagos',
   path: '/pagos',
@@ -1564,6 +1571,7 @@ export interface FileRoutesByFullPath {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
+  '/cms/rc-visual': typeof AuthenticatedCmsRcVisualRoute
   '/cms/simulation': typeof AuthenticatedCmsSimulationRoute
   '/cms/travel-plans': typeof AuthenticatedCmsTravelPlansRoute
   '/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
@@ -1774,6 +1782,7 @@ export interface FileRoutesByTo {
   '/cms/media': typeof AuthenticatedCmsMediaRoute
   '/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
+  '/cms/rc-visual': typeof AuthenticatedCmsRcVisualRoute
   '/cms/simulation': typeof AuthenticatedCmsSimulationRoute
   '/cms/travel-plans': typeof AuthenticatedCmsTravelPlansRoute
   '/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
@@ -1992,6 +2001,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/media': typeof AuthenticatedCmsMediaRoute
   '/_authenticated/cms/observabilidad': typeof AuthenticatedCmsObservabilidadRoute
   '/_authenticated/cms/pagos': typeof AuthenticatedCmsPagosRoute
+  '/_authenticated/cms/rc-visual': typeof AuthenticatedCmsRcVisualRoute
   '/_authenticated/cms/simulation': typeof AuthenticatedCmsSimulationRoute
   '/_authenticated/cms/travel-plans': typeof AuthenticatedCmsTravelPlansRoute
   '/_authenticated/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
@@ -2212,6 +2222,7 @@ export interface FileRouteTypes {
     | '/cms/media'
     | '/cms/observabilidad'
     | '/cms/pagos'
+    | '/cms/rc-visual'
     | '/cms/simulation'
     | '/cms/travel-plans'
     | '/cms/ventas-en-linea'
@@ -2422,6 +2433,7 @@ export interface FileRouteTypes {
     | '/cms/media'
     | '/cms/observabilidad'
     | '/cms/pagos'
+    | '/cms/rc-visual'
     | '/cms/simulation'
     | '/cms/travel-plans'
     | '/cms/ventas-en-linea'
@@ -2639,6 +2651,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/media'
     | '/_authenticated/cms/observabilidad'
     | '/_authenticated/cms/pagos'
+    | '/_authenticated/cms/rc-visual'
     | '/_authenticated/cms/simulation'
     | '/_authenticated/cms/travel-plans'
     | '/_authenticated/cms/ventas-en-linea'
@@ -3761,6 +3774,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsSimulationRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/rc-visual': {
+      id: '/_authenticated/cms/rc-visual'
+      path: '/rc-visual'
+      fullPath: '/cms/rc-visual'
+      preLoaderRoute: typeof AuthenticatedCmsRcVisualRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/pagos': {
       id: '/_authenticated/cms/pagos'
       path: '/pagos'
@@ -4662,6 +4682,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsMediaRoute: typeof AuthenticatedCmsMediaRoute
   AuthenticatedCmsObservabilidadRoute: typeof AuthenticatedCmsObservabilidadRoute
   AuthenticatedCmsPagosRoute: typeof AuthenticatedCmsPagosRoute
+  AuthenticatedCmsRcVisualRoute: typeof AuthenticatedCmsRcVisualRoute
   AuthenticatedCmsSimulationRoute: typeof AuthenticatedCmsSimulationRoute
   AuthenticatedCmsTravelPlansRoute: typeof AuthenticatedCmsTravelPlansRoute
   AuthenticatedCmsVentasEnLineaRoute: typeof AuthenticatedCmsVentasEnLineaRoute
@@ -4706,6 +4727,7 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsMediaRoute: AuthenticatedCmsMediaRoute,
   AuthenticatedCmsObservabilidadRoute: AuthenticatedCmsObservabilidadRoute,
   AuthenticatedCmsPagosRoute: AuthenticatedCmsPagosRoute,
+  AuthenticatedCmsRcVisualRoute: AuthenticatedCmsRcVisualRoute,
   AuthenticatedCmsSimulationRoute: AuthenticatedCmsSimulationRoute,
   AuthenticatedCmsTravelPlansRoute: AuthenticatedCmsTravelPlansRoute,
   AuthenticatedCmsVentasEnLineaRoute: AuthenticatedCmsVentasEnLineaRoute,
