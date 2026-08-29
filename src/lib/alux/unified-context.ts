@@ -196,12 +196,29 @@ export function resolveContextZoneSlug(
 }
 
 /**
+ * Alcance real del contexto (Fase 6 · R1-E). Home entrega `region`
+ * legítimamente; sin territorio ni entidad el alcance es `none`.
+ */
+export function resolveAluxContextScope(
+  unified: Pick<AluxUnifiedContext, "entity" | "territory">,
+): "entity" | "destination" | "region" | "none" {
+  if (unified.entity.entityId) return "entity";
+  if (unified.territory.destinationSlug) return "destination";
+  if (unified.territory.regionSlug) return "region";
+  return "none";
+}
+
+/**
  * `true` cuando el contexto alcanza para sugerir. Contexto insuficiente
  * ⇒ Alux no sugiere y lo declara; jamás inventa.
+ *
+ * R1-E · Fase 6: el alcance regional (Home, Oriente Maya) ya es
+ * suficiente para acompañar sin fingir destino ni entidad.
  */
 export function hasSufficientAluxContext(unified: AluxUnifiedContext): boolean {
-  return Boolean(unified.territory.destinationSlug) || Boolean(unified.entity.entityId);
+  return resolveAluxContextScope(unified) !== "none";
 }
+
 
 /**
  * Compone el contexto unificado. Fail-safe: cualquier fuente ausente se
