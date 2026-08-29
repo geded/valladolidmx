@@ -138,7 +138,8 @@ const ACTIVATION_MATRIX: MatrixRow[] = [
     rollback: "flag OFF",
   },
   {
-    route: "Listados (/hoteles, /restaurantes, /experiencias, /eventos, /casas-de-vacaciones, /que-hacer)",
+    route:
+      "Listados (/hoteles, /restaurantes, /experiencias, /eventos, /casas-de-vacaciones, /que-hacer)",
     offComponent: "TourismListingSurface estándar",
     onComponent: "Misma superficie con contratos de tarjeta OMXDS v1",
     preset: "listing premium G5",
@@ -192,8 +193,14 @@ const CORE_SURFACES: { label: string; href: string; note: string }[] = [
 ];
 
 const INTERNAL_PREVIEWS: { label: string; href: string }[] = [
-  { label: "Zona territorial (DEMO VISUAL · NO PUBLICABLE)", href: "/lovable/g8-r1f1c-zone-preview" },
-  { label: "Ruta / itinerario (DEMO VISUAL · NO PUBLICABLE)", href: "/lovable/g8-r1f1c-route-preview" },
+  {
+    label: "Zona territorial (DEMO VISUAL · NO PUBLICABLE)",
+    href: "/lovable/g8-r1f1c-zone-preview",
+  },
+  {
+    label: "Ruta / itinerario (DEMO VISUAL · NO PUBLICABLE)",
+    href: "/lovable/g8-r1f1c-route-preview",
+  },
   {
     label: "Artículo / guía editorial (DEMO VISUAL · NO PUBLICABLE)",
     href: "/lovable/g8-r1f1c-article-preview",
@@ -233,7 +240,13 @@ const FAMILY_ORDER = [
  * UI
  * ------------------------------------------------------------------ */
 
-function Chip({ children, tone = "neutral" }: { children: string; tone?: "neutral" | "ok" | "warn" }) {
+function Chip({
+  children,
+  tone = "neutral",
+}: {
+  children: string;
+  tone?: "neutral" | "ok" | "warn";
+}) {
   const cls =
     tone === "ok"
       ? "bg-success/10 text-success"
@@ -336,7 +349,9 @@ function RcVisualHub() {
 
         <section className="mt-12">
           <h2 className="font-serif text-xl">Las nueve familias con entidades reales</h2>
-          {isLoading ? <p className="mt-3 text-sm text-muted-foreground">Cargando catálogo…</p> : null}
+          {isLoading ? (
+            <p className="mt-3 text-sm text-muted-foreground">Cargando catálogo…</p>
+          ) : null}
           {error || data?.readError ? (
             <p className="mt-3 text-sm text-destructive">
               No fue posible leer el catálogo real. Nada se sustituye con fixtures.

@@ -207,7 +207,9 @@ export const listReleaseCandidateCatalog = createServerFn({ method: "GET" })
       }>) {
         const dest = pl.destination_id ? (destSlug.get(pl.destination_id) ?? null) : null;
         const rawType = pl.place_types;
-        const placeType = Array.isArray(rawType) ? (rawType[0]?.slug ?? null) : (rawType?.slug ?? null);
+        const placeType = Array.isArray(rawType)
+          ? (rawType[0]?.slug ?? null)
+          : (rawType?.slug ?? null);
         const fam = resolvePresentationFamily({
           entityId: pl.id,
           entityType: "place",
