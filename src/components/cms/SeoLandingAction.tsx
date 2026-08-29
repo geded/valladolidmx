@@ -51,7 +51,10 @@ export function SeoLandingAction({ entityType, entityId }: Props) {
       toast.success(
         res.created ? "Landing SEO creada como borrador." : "Esta entidad ya tenía Landing SEO.",
       );
-      void navigate({ to: "/cms/experience-builder", search: { page: res.id, mode: undefined, block: undefined } });
+      void navigate({
+        to: "/cms/experience-builder",
+        search: { page: res.id, mode: undefined, block: undefined },
+      });
     },
     onError: (error) =>
       toast.error(
@@ -88,7 +91,10 @@ export function SeoLandingAction({ entityType, entityId }: Props) {
           disabled={resolution.isLoading || create.isPending}
           onClick={() => {
             if (existingId) {
-              void navigate({ to: "/cms/experience-builder", search: { page: existingId, mode: undefined, block: undefined } });
+              void navigate({
+                to: "/cms/experience-builder",
+                search: { page: existingId, mode: undefined, block: undefined },
+              });
               return;
             }
             create.mutate();

@@ -998,8 +998,6 @@ export function PlaceEditor({ placeId }: Props) {
 
       <SeoLandingAction entityType="place" entityId={placeId!} />
 
-
-
       <PlaceSection
         id="place-workflow"
         title="Workflow editorial"

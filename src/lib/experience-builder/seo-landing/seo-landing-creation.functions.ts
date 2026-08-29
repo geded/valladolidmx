@@ -12,6 +12,8 @@
  *  - Cero publicación, cero redirects, cero sitemap, cero migración.
  */
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { CompositionTree } from "../composition-tree";
 import {
@@ -30,6 +32,21 @@ import {
   type SeoLandingResolution,
 } from "./seo-landing-creation";
 
+type Db = SupabaseClient<Database>;
+
+interface CompositionRow {
+  id: string;
+  slug: string;
+  title: string;
+  status: string;
+  published_at: string | null;
+  current_draft?: unknown;
+}
+
+interface SeoChromeShape {
+  seo?: { landing?: { entityRef?: string; populatedSlots?: string[] } };
+}
+
 interface EntitySnapshot {
   id: string;
   slug: string;
@@ -46,7 +63,7 @@ interface EntitySnapshot {
  * ------------------------------------------------------------------ */
 
 async function loadEntity(
-  supabase: any,
+  supabase: Db,
   entityType: SeoLandingEntityType,
   entityId: string,
 ): Promise<EntitySnapshot> {
@@ -144,7 +161,7 @@ function canonicalEntityUrl(
     : null;
 }
 
-async function resolveMediaUrl(supabase: any, mediaId: string | null): Promise<string | null> {
+async function resolveMediaUrl(supabase: Db, mediaId: string | null): Promise<string | null> {
   if (!mediaId) return null;
   const { data } = await supabase
     .from("media_assets")
@@ -156,7 +173,7 @@ async function resolveMediaUrl(supabase: any, mediaId: string | null): Promise<s
 
 /** Slots reales: sin dato ⇒ sin slot (cero contenido inventado). */
 async function buildRealSlots(
-  supabase: any,
+  supabase: Db,
   entityType: SeoLandingEntityType,
   entity: EntitySnapshot,
 ): Promise<Partial<Record<SeoLandingSlotId, SeoLandingSlotConfig | null>>> {
@@ -189,7 +206,7 @@ async function buildRealSlots(
  * ------------------------------------------------------------------ */
 
 async function findExistingLanding(
-  supabase: any,
+  supabase: Db,
   entityRef: string,
 ): Promise<ExistingSeoLandingRow | null> {
   const { data, error } = await supabase
@@ -199,8 +216,9 @@ async function findExistingLanding(
     .order("updated_at", { ascending: false })
     .limit(200);
   if (error) throw new Error(error.message);
-  const match = (data ?? []).find((row: any) => {
-    const ref = row?.current_draft?.chrome?.seo?.landing?.entityRef;
+  const match = (data ?? []).find((row: CompositionRow) => {
+    const chrome = (row.current_draft as { chrome?: SeoChromeShape } | null)?.chrome;
+    const ref = chrome?.seo?.landing?.entityRef;
     return typeof ref === "string" && ref === entityRef;
   });
   if (!match) return null;
@@ -230,7 +248,7 @@ export const createSeoLandingDraft = createServerFn({ method: "POST" })
       data,
       context,
     }): Promise<{ id: string; slug: string; created: boolean; populatedSlots: string[] }> => {
-      const supabase = context.supabase as any;
+      const supabase = context.supabase as Db;
       const ref = buildSeoLandingEntityRef(data.entityType, data.entityId);
 
       // 1 · Idempotencia: si ya existe, se devuelve la misma landing.
@@ -274,7 +292,7 @@ export const createSeoLandingDraft = createServerFn({ method: "POST" })
       if (updateError) throw new Error(updateError.message);
 
       const populated =
-        ((tree.chrome as any)?.seo?.landing?.populatedSlots as string[] | undefined) ?? [];
+        (tree.chrome as unknown as SeoChromeShape)?.seo?.landing?.populatedSlots ?? [];
       return { id, slug, created: true, populatedSlots: populated };
     },
   );
@@ -287,13 +305,13 @@ export const listLegacySeoLandingDrafts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const slugs = LEGACY_SEO_LANDING_DRAFTS.map((d) => d.slug);
-    const { data, error } = await (context.supabase as any)
+    const { data, error } = await (context.supabase as Db)
       .from("page_compositions")
       .select("id, slug, title, status, published_at")
       .in("slug", slugs);
     if (error) throw new Error(error.message);
     return LEGACY_SEO_LANDING_DRAFTS.map((entry) => {
-      const row = (data ?? []).find((r: any) => r.slug === entry.slug) ?? null;
+      const row = (data ?? []).find((r) => r.slug === entry.slug) ?? null;
       return {
         ...entry,
         found: Boolean(row),
@@ -311,7 +329,7 @@ export const archiveLegacySeoLandingDrafts = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }) => {
     if (data.confirm !== true) throw new Error("seo_landing_archive_not_confirmed");
-    const supabase = context.supabase as any;
+    const supabase = context.supabase as Db;
     const slugs = LEGACY_SEO_LANDING_DRAFTS.filter((d) => d.disposition === "archive").map(
       (d) => d.slug,
     );
