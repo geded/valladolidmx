@@ -14,7 +14,8 @@
  * corresponde a un tipo del Travel Workspace (destination/business/
  * product/event). Alux nunca modifica el plan por su cuenta.
  */
-import { Sparkles, ShieldCheck, Info, Zap } from "lucide-react";
+import { ShieldCheck, Info, Zap } from "lucide-react";
+import { AluxMark } from "@/components/alux/AluxMark";
 import type {
   AluxTravelerSource,
   AluxTravelerSuggestion,
@@ -42,8 +43,9 @@ export function AluxSuggestionCard({ capabilityLabel, suggestion }: AluxSuggesti
     <article className="rounded-xl border border-primary/20 bg-primary/5 p-4">
       {/* Header */}
       <header className="mb-3 flex items-center gap-2">
-        <span className="grid size-7 place-items-center rounded-full bg-primary/15 text-primary">
-          <Sparkles className="size-3.5" aria-hidden />
+        <span className="grid size-7 place-items-center overflow-hidden rounded-full bg-primary/15">
+          {/* G8-R1-D3 · identidad canónica de Alux (activo gobernado). */}
+          <AluxMark family="avatar" size={28} decorative />
         </span>
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
