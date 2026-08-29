@@ -1,0 +1,35 @@
+{
+  "id": "PCA-2026-050-ADDENDUM-B",
+  "parent_authorization": "PCA-2026-050",
+  "parent": "PCA-2026-050",
+  "title": "Addendum B · CL3 · Creación contextual de Landings SEO",
+  "status": "Approved",
+  "effective_date": "2026-08-28",
+  "recorded_at": "2026-08-28",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorización Founder · G8-R1-C+L · Iniciar CL3 — Creación contextual de Landings SEO. (1) Acción contextual en el administrador de la ficha (empresa, producto, lugar) visible sólo para super_admin/admin/editor. (2) Crea borrador kind=landing con la plantilla premium-seo-landing, variante authority-editorial-zazil y presentación Editorial, llenada exclusivamente con datos reales del CMS. (3) Idempotencia por chrome.seo.landing.entityRef: nunca se crea una segunda landing para la misma entidad; si existe, la acción abre la existente. (4) SEO y anticanibalización: el borrador nace robots=noindex,nofollow con canonical_override apuntando a la ficha canónica real cuando existe. (5) Pilotos configurables declarativos: Zazil Tunich, Chichén Itzá, Cenote Suytún y producto genérico. (6) Cuatro borradores legacy (hoteles, restaurantes, experiencias, oriente-maya) inventariados y archivables transaccionalmente sólo si nunca se publicaron (fail-closed). Invariantes: cero publicación, cero redirects, cero sitemap, cero rutas públicas nuevas, cero migración de esquema, cero contenido inventado, cero activación de flags.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-creation.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-creation.functions.ts"
+    },
+    { "operation": "create", "path": "src/components/cms/SeoLandingAction.tsx" },
+    {
+      "operation": "create",
+      "path": "scripts/omxds/r1-cl/seo-landing-creation.contract.test.ts"
+    },
+    { "operation": "modify", "path": "src/components/cms/BusinessEditor.tsx" },
+    { "operation": "modify", "path": "src/components/cms/ProductEditor.tsx" },
+    { "operation": "modify", "path": "src/components/cms/places/PlaceEditor.tsx" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": ["bun run lint", "bun run typecheck", "bun run build", "bun run validate:r1:cl"]
+}
