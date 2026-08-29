@@ -15,7 +15,22 @@ import {
 const root = process.cwd();
 const read = (f: string) => fs.readFileSync(path.join(root, f), "utf8");
 const manifest = JSON.parse(read("public/brand/alux/manifest.json")) as {
-  assets: Array<{ role: string; path: string; sha256: string; format?: string }>;
+  version: string;
+  assets: Array<{
+    role: string;
+    path: string;
+    canonicalPath: string;
+    originalFilename: string;
+    family?: string | null;
+    size?: number;
+    width: number;
+    height: number;
+    format: string;
+    sha256: string;
+    derivedFrom: string | null;
+    transparent: boolean;
+    usage: string;
+  }>;
   rules: string[];
 };
 
@@ -80,10 +95,61 @@ describe("E/F/G/H · Sistema visual canónico Alux IA", () => {
     }
   });
 
-  test("existen derivadas en los tres formatos", () => {
+  test("conteo reconciliado: 45 derivadas + 1 original + 2 maestras = 48", () => {
+    const by = (r: string) => manifest.assets.filter((a) => a.role === r);
+    expect(manifest.assets.length).toBe(48);
+    expect(by("original").length).toBe(1);
+    expect(by("master").length).toBe(2);
+    expect(by("derivative").length).toBe(45);
+    const fam = (f: string) => by("derivative").filter((a) => a.family === f);
+    expect(fam("alux-ia-full").length).toBe(18);
+    expect(fam("alux-ia-avatar").length).toBe(27);
     for (const fmt of ["png", "webp", "avif"]) {
-      expect(manifest.assets.some((a) => a.format === fmt)).toBe(true);
+      expect(by("derivative").filter((a) => a.format === fmt).length).toBe(15);
     }
+  });
+
+  test("sólo existen los tamaños autorizados", () => {
+    const sizes = (f: string) => [
+      ...new Set(
+        manifest.assets.filter((a) => a.role === "derivative" && a.family === f).map((a) => a.size),
+      ),
+    ].sort((x, y) => (x as number) - (y as number));
+    expect(sizes("alux-ia-full")).toEqual([96, 128, 192, 256, 384, 512]);
+    expect(sizes("alux-ia-avatar")).toEqual([32, 40, 44, 48, 64, 80, 96, 128, 192]);
+  });
+
+  test("cada entrada declara los campos obligatorios de trazabilidad", () => {
+    for (const a of manifest.assets) {
+      for (const k of [
+        "originalFilename",
+        "canonicalPath",
+        "role",
+        "width",
+        "height",
+        "format",
+        "sha256",
+        "derivedFrom",
+        "transparent",
+        "usage",
+      ]) {
+        expect(k in a).toBe(true);
+      }
+      expect(a.canonicalPath).toBe(a.path);
+      if (a.role !== "original") expect(a.transparent).toBe(true);
+    }
+  });
+
+  test("los nombres IMG_* son sólo procedencia, nunca rutas públicas", () => {
+    for (const a of manifest.assets) {
+      expect(a.canonicalPath.includes("IMG_")).toBe(false);
+      expect(/^(IMG_\d+\.png|3a53f1cb-.*\.jpeg)$/.test(a.originalFilename)).toBe(true);
+    }
+  });
+
+  test("las rutas canónicas son únicas", () => {
+    const p = manifest.assets.map((a) => a.canonicalPath);
+    expect(new Set(p).size).toBe(p.length);
   });
 
   test("el dock global usa la marca canónica, no un icono genérico", () => {
