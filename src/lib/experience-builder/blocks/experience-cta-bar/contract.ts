@@ -28,16 +28,44 @@ export const experienceCtaBarSourceSchema = z.enum([
 ]);
 export type ExperienceCtaBarSource = z.infer<typeof experienceCtaBarSourceSchema>;
 
+/**
+ * G8-R1-C+L · GAP-01 — Referencia canónica de entidad para la acción
+ * `add-to-trip`. La barra NO implementa lógica de Travel Plan: delega
+ * íntegramente en `AddToTravelPlanButton` (acción canónica ya existente).
+ * Sin esta referencia la acción se omite (fail-closed).
+ */
+export const experienceCtaBarTravelItemSchema = z.object({
+  kind: z.enum(["product", "business", "event", "destination"]),
+  targetId: z.string().min(1),
+  title: z.string().min(1),
+  slug: z.string().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
+  subtitle: z.string().nullable().optional(),
+  eligibilityMode: z.enum(["universal", "legacy"]).optional(),
+});
+export type ExperienceCtaBarTravelItem = z.infer<typeof experienceCtaBarTravelItemSchema>;
+
 export const experienceCtaBarActionSchema = z.object({
   label: z.string().min(1),
   href: z.string().min(1).optional(),
   iconKey: z.string().optional(),
   action: z
-    .enum(["navigate", "favorite", "contact", "book", "share", "phone", "whatsapp"])
+    .enum([
+      "navigate",
+      "favorite",
+      "contact",
+      "book",
+      "share",
+      "phone",
+      "whatsapp",
+      "add-to-trip",
+    ])
     .default("navigate"),
   emphasis: z.enum(["primary", "secondary", "ghost"]).default("secondary"),
+  travelItem: experienceCtaBarTravelItemSchema.optional(),
 });
 export type ExperienceCtaBarAction = z.infer<typeof experienceCtaBarActionSchema>;
+
 
 export const experienceCtaBarConfigSchema = z.object({
   contractVersion: z.string().default(EXPERIENCE_CTA_BAR_CONTRACT_VERSION),

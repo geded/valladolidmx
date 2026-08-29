@@ -130,6 +130,13 @@ import {
   InstitutionalBadgesBlock,
   InstitutionalBadgesPreview,
 } from "@/components/experience-builder/blocks/experience-institutional-badges/InstitutionalBadgesBlock";
+import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
+import type {
+  ExperienceMapDTO,
+  ExperienceMapPoint,
+} from "@/lib/experience-builder/blocks/experience-map/types";
+
+
 
 /**
  * US-R3 · Sub-ola 2.5d — mapa de renderers `vmx.kit.*`. Se expande de
@@ -877,6 +884,69 @@ PRODUCTION_COMPONENT_MAP["vmx.experience.related-collection"] = ({ node }) => (
 PRODUCTION_COMPONENT_MAP["vmx.experience.institutional-badges"] = ({ node }) => (
   <InstitutionalBadgesBlock config={node.config} />
 );
+
+/* ------------------------------------------------------------------ *
+ * G8-R1-C+L · GAP-02 — `vmx.experience.map`
+ * El bloque estaba registrado en la biblioteca pero no tenía caso en el
+ * renderer. Se conecta con el MISMO componente en Studio y producción.
+ * Fail-closed: sin puntos con coordenadas reales el bloque se omite.
+ * ------------------------------------------------------------------ */
+const MAP_KINDS = ["business", "product", "destination", "event", "promotion"] as const;
+
+function readMapDto(config: Record<string, unknown>): ExperienceMapDTO | null {
+  const raw = Array.isArray(config.points) ? (config.points as Record<string, unknown>[]) : [];
+  const points: ExperienceMapPoint[] = [];
+  raw.forEach((p, i) => {
+    const lat = Number(p.lat);
+    const lng = Number(p.lng);
+    const title = typeof p.title === "string" ? p.title : "";
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || !title) return;
+    const kind = MAP_KINDS.includes(p.kind as (typeof MAP_KINDS)[number])
+      ? (p.kind as ExperienceMapPoint["kind"])
+      : "business";
+    points.push({
+      id: typeof p.id === "string" && p.id ? p.id : `pt-${i}`,
+      kind,
+      lat,
+      lng,
+      title,
+      subtitle: typeof p.subtitle === "string" ? p.subtitle : null,
+      href: typeof p.href === "string" ? p.href : null,
+      priceLabel: typeof p.priceLabel === "string" ? p.priceLabel : null,
+    });
+  });
+  if (points.length === 0) return null;
+  const variant = (["single", "multi", "list-sync", "cluster"] as const).includes(
+    config.variant as never,
+  )
+    ? (config.variant as ExperienceMapDTO["variant"])
+    : points.length > 1
+      ? "multi"
+      : "single";
+  return {
+    variant,
+    heading: typeof config.heading === "string" ? config.heading : null,
+    points,
+  } as ExperienceMapDTO;
+}
+
+
+const ExperienceMapRender: BlockPreview = ({ node }) => {
+  const dto = readMapDto(node.config);
+  if (!dto) return null;
+  return <ExperienceMapBlock dto={dto} />;
+};
+
+PRODUCTION_COMPONENT_MAP["vmx.experience.map"] = ExperienceMapRender;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.experience.map"] = ExperienceMapRender;
+
+// G8-R1-C+L · GAP-03 — paridad Studio/producción del Planificador Alux.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(STUDIO_PREVIEW_MAP as any)["vmx.alux.planner"] = ({ node }: { node: CompositionNode }) => (
+  <AluxPlannerBlock config={node.config} />
+);
+
 
 /* ------------------------------------------------------------------ *
  * Bloque formulario configurable

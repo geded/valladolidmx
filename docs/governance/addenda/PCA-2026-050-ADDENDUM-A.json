@@ -1,0 +1,51 @@
+{
+  "id": "PCA-2026-050-ADDENDUM-A",
+  "parent_authorization": "PCA-2026-050",
+  "parent": "PCA-2026-050",
+  "title": "Addendum A · Remediación GAP-01…04 y Sistema Visual Canónico Alux IA",
+  "status": "Approved",
+  "effective_date": "2026-08-28",
+  "recorded_at": "2026-08-28",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorización Founder · G8-R1-C+L · Remediación GAP-01…04 + Sistema Visual Canónico Alux IA. (A) GAP-01: 'Agregar a Mi Viaje' se incorpora como acción contractual de vmx.experience.cta-bar delegando íntegramente en la acción canónica de Travel Plan, sin lógica paralela y fail-closed sin entidad real. (B) GAP-02: se añade el caso faltante de vmx.experience.map al renderer, mismo componente en Studio y producción, omitido sin coordenadas reales. (C) GAP-03: el Planificador Alux pasa a ser slot contractual y premium-seo-landing pasa formalmente de 17 a 18 slots. (D) GAP-04: no se crea vmx.experience.faq; se reutiliza el bloque neutral ya registrado vmx.kit.faq y el FAQPage JSON-LD refleja exactamente las preguntas visibles. (E) Sistema visual transversal Alux IA con un único componente canónico de marca y un único dock/chat global por página. (F) Derivadas generadas mecánicamente desde las maestras, sin nuevas poses, monocromos ni recoloraciones. (G) Gobernanza de activos con original inmutable, checksums SHA-256 y raíz canónica /brand/alux/. (H) Accesibilidad y responsive. Invariantes: cero publicación, cero redirects, cero sitemap, cero activación de flags, cero contenido inventado.",
+  "gaps": [
+    {
+      "id": "GAP-01",
+      "resolution": "Acción `add-to-trip` en el contrato de `vmx.experience.cta-bar`, renderizada por `AddToTravelPlanButton` (acción canónica). Sin `travelItem` real la acción se omite."
+    },
+    {
+      "id": "GAP-02",
+      "resolution": "`vmx.experience.map` conectado en Studio y producción con el mismo componente `ExperienceMapBlock`; sin puntos con lat/lng reales el bloque no se renderiza."
+    },
+    {
+      "id": "GAP-03",
+      "resolution": "Slot `aluxPlanner` (`vmx.alux.planner`) incorporado; `premium-seo-landing` pasa de 17 a 18 slots, contractVersion 1.1.0."
+    },
+    {
+      "id": "GAP-04",
+      "resolution": "`vmx.product.faq` NO es neutral (depende de ProductSurfaceContext). Se reutiliza `vmx.kit.faq`, ya registrado y neutral. No se crea bloque nuevo. JSON-LD FAQPage espejo de lo visible."
+    }
+  ],
+  "permissions": [
+    { "operation": "create", "path": "src/components/alux/AluxMark.tsx" },
+    { "operation": "create", "path": "scripts/brand/alux/generate-alux-derivatives.py" },
+    { "operation": "create", "path": "public/brand/alux/manifest.json" },
+    { "operation": "modify", "path": "src/lib/experience-builder/seo-landing/seo-landing-template.ts" },
+    { "operation": "modify", "path": "src/lib/experience-builder/composition-renderer.tsx" },
+    { "operation": "modify", "path": "src/lib/experience-builder/blocks/experience-cta-bar/contract.ts" },
+    { "operation": "modify", "path": "src/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar.tsx" },
+    { "operation": "modify", "path": "src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx" },
+    { "operation": "modify", "path": "src/components/layout/AluxFloatingTrigger.tsx" },
+    { "operation": "modify", "path": "scripts/omxds/r1-cl/entity-resolver-seo-landing.contract.test.ts" }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run build",
+    "bun run validate:r1:cl"
+  ]
+}

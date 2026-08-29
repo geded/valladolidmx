@@ -20,6 +20,8 @@ import type {
   ExperienceCtaBarDTO,
 } from "@/lib/experience-builder/blocks/experience-cta-bar/contract";
 import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+
 
 const ICONS: Record<string, LucideIcon> = {
   calendar: Calendar,
@@ -107,7 +109,28 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
       )}
       <div className="ml-auto flex items-center gap-2">
         {actions.map((a, i) => {
+          // GAP-01 · "Agregar a Mi Viaje" delega SIEMPRE en la acción
+          // canónica de Travel Plan. Sin entidad real se omite (fail-closed).
+          if (a.action === "add-to-trip") {
+            if (!a.travelItem) return null;
+            const t = a.travelItem;
+            return (
+              <AddToTravelPlanButton
+                key={i}
+                kind={t.kind}
+                targetId={t.targetId}
+                title={t.title}
+                slug={t.slug ?? null}
+                imageUrl={t.imageUrl ?? null}
+                subtitle={t.subtitle ?? null}
+                variant="full"
+                eligibilityMode={t.eligibilityMode ?? "universal"}
+                className="min-h-11 rounded-pill"
+              />
+            );
+          }
           const iconOnly = !a.label && Boolean(a.iconKey);
+
           const classes = cn(
             "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-pill text-sm font-semibold transition",
             "focus-visible:outline-none focus-visible:ring-focus",
