@@ -19,7 +19,9 @@ import {
 import { resolveZoneSlug } from "../../../src/lib/alux/canonical-catalog.server";
 import type { AluxContext } from "../../../src/lib/alux/use-alux-context";
 
-const CATALOG = readFileSync("src/lib/alux/canonical-catalog.server.ts", "utf8");
+const CATALOG_RAW = readFileSync("src/lib/alux/canonical-catalog.server.ts", "utf8");
+/** Código ejecutable sin comentarios: las reglas se verifican sobre el código. */
+const CATALOG = CATALOG_RAW.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
 
 const baseCtx = (over: Partial<AluxContext> = {}): AluxContext => ({
   hasContext: true,
@@ -112,9 +114,9 @@ describe("R1-D · DEF-R1D-003 · URL canónica desde el binding oficial", () => 
   });
 
   test("9 · el catálogo NO contiene plantillas literales de ruta", () => {
-    expect(CATALOG).not.toContain("`/oriente-maya/");
-    expect(CATALOG).not.toContain("`/producto/");
-    expect(CATALOG).not.toContain("`/eventos/");
+    expect(CATALOG).not.toContain("/oriente-maya/");
+    expect(CATALOG).not.toContain("/producto/");
+    expect(CATALOG).not.toContain("/eventos/");
     expect(CATALOG).toContain("buildCanonicalEntityUrl");
     expect(CANONICAL_ENTITY_BINDING_VERSION).toBe("1.0.0");
   });
@@ -128,10 +130,11 @@ describe("R1-D · DEF-R1D-002 · Fail-closed estructural de candidatos", () => {
 
   test("11 · lugar en draft nunca entra (sin lectura de borradores)", () => {
     expect(CATALOG).not.toContain('"draft"');
+    expect(CATALOG).not.toContain("'draft'");
   });
 
   test("12 · tour/producto sin empresa publicada se excluye y registra razón", () => {
-    expect(CATALOG).toContain("empresa contenedora no publicada o sin ficha pública resoluble");
+    expect(CATALOG).toContain("empresa contenedora no publicada");
     expect(CATALOG).toContain("rejected.push");
   });
 
@@ -141,12 +144,14 @@ describe("R1-D · DEF-R1D-002 · Fail-closed estructural de candidatos", () => {
 
   test("14 · ruta no construible ⇒ exclusión (sin petición HTTP por candidato)", () => {
     expect(CATALOG).toContain("ruta canónica no construible");
+    expect(CATALOG).toContain("buildCanonicalEntityUrl(");
     expect(CATALOG).not.toContain("fetch(");
   });
 
   test("15 · zonas y rutas quedan fuera del catálogo recomendable", () => {
-    expect(CATALOG).toContain("BLOQUEADO como candidato");
-    expect(CATALOG).toContain("FUERA DEL CATÁLOGO");
+    expect(CATALOG_RAW).toContain("BLOQUEADO como candidato");
+    expect(CATALOG).not.toContain('from("destination_zones")');
+    expect(CATALOG).not.toContain('from("editorial_routes")');
   });
 });
 
