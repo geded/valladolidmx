@@ -144,6 +144,27 @@ export async function loadAluxCanonicalCandidates(
   const rejected: AluxRejectedCandidate[] = [];
   const familyReport: Record<string, { loaded: number; eligible: number; note: string }> = {};
 
+  /**
+   * DEF-R1E-002 · Ubicación canónica publicada de las empresas del destino.
+   * Un producto/experiencia/tour sin ubicación propia HEREDA la de su
+   * empresa operadora, declarando el origen (`product_operator`).
+   */
+  const businessCoords = new Map<string, AccreditedCoords>();
+  if (input.publishedBusinessIds.length) {
+    const { data } = await sb
+      .from("business_locations")
+      .select("business_id, latitude, longitude, is_primary")
+      .in("business_id", input.publishedBusinessIds as string[]);
+    for (const row of (data ?? []) as Array<Record<string, unknown>>) {
+      const bizId = clean(row.business_id);
+      if (!bizId) continue;
+      if (businessCoords.has(bizId) && row.is_primary !== true) continue;
+      const point = accredit(row.latitude, row.longitude, "business_location");
+      if (point) businessCoords.set(bizId, point);
+    }
+  }
+
+
   // ── Lugares y atractivos (points_of_interest → premium-entity-place) ──
   {
     const { data, error } = await sb
