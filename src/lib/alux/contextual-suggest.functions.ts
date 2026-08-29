@@ -823,5 +823,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           : `Aún no hay más publicaciones en ${destinationLabel} para sugerir.`,
       rationaleSource,
       aiStatus,
+      catalogFamilies,
     };
+
   });
