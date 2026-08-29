@@ -4,12 +4,12 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.73",
     "state": "Approved",
-    "source_sha256": "d5c5819d57604253c8e8f4da83b45ea76d9758d726503f8f6f06284f9f8b3424",
+    "source_sha256": "a3bd52be5d524872a0f87a03fa5c70811a93e8491f730a508ec85c0d6bea8e5e",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
   },
-  "generated_at": "2026-08-28T00:00:00.000Z",
+  "generated_at": "2026-08-29T00:00:00.000Z",
   "nodes": [
     {
       "id": "ART:[`13.A-MIGRATIONS-CONVENTIONS-v1.0.md`](../blueprint/13.A-MIGRATIONS-CONVENTIONS-v1.0.md)",
@@ -8310,6 +8310,142 @@
       "id": "ART:docs/governance/product-authorizations/PCA-2026-048.json",
       "type": "artifact",
       "path": "docs/governance/product-authorizations/PCA-2026-048.json"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/listings/listing-public-contract.ts",
+      "type": "artifact",
+      "path": "src/lib/listings/listing-public-contract.ts"
+    },
+    {
+      "id": "ART:src/lib/listings/listing-public-reads.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/listings/listing-public-reads.functions.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/r1/listing-public-contract.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/r1/listing-public-contract.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/r1/listing-public-contract.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/r1/listing-public-contract.evidence.mjs"
+    },
+    {
+      "id": "ART:scripts/omxds/r1/listing-routes.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/r1/listing-routes.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-r1/PHASE-0-INVENTORY.md",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-r1/PHASE-0-INVENTORY.md"
+    },
+    {
+      "id": "ART:src/components/listing-premium/ListingPremiumSurface.tsx",
+      "type": "artifact",
+      "path": "src/components/listing-premium/ListingPremiumSurface.tsx"
+    },
+    {
+      "id": "ART:src/components/listing-premium/listing-premium-config.ts",
+      "type": "artifact",
+      "path": "src/components/listing-premium/listing-premium-config.ts"
+    },
+    {
+      "id": "ART:src/components/home-premium/home-premium-config.ts",
+      "type": "artifact",
+      "path": "src/components/home-premium/home-premium-config.ts"
+    },
+    {
+      "id": "ART:src/components/destination-premium/destination-premium-config.ts",
+      "type": "artifact",
+      "path": "src/components/destination-premium/destination-premium-config.ts"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-049.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-049.json"
+    },
+    {
+      "id": "ART:src/lib/experience-builder/canonical-entity-resolver.ts",
+      "type": "artifact",
+      "path": "src/lib/experience-builder/canonical-entity-resolver.ts"
+    },
+    {
+      "id": "ART:src/lib/experience-builder/canonical-entity-binding.ts",
+      "type": "artifact",
+      "path": "src/lib/experience-builder/canonical-entity-binding.ts"
+    },
+    {
+      "id": "ART:src/lib/experience-builder/seo-landing/seo-landing-template.ts",
+      "type": "artifact",
+      "path": "src/lib/experience-builder/seo-landing/seo-landing-template.ts"
+    },
+    {
+      "id": "ART:src/routes/lovable/g8-r1cl-seo-landing-parity.tsx",
+      "type": "artifact",
+      "path": "src/routes/lovable/g8-r1cl-seo-landing-parity.tsx"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-cl/entity-resolver-seo-landing.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-cl/entity-resolver-seo-landing.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-cl/entity-resolver-seo-landing.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-cl/entity-resolver-seo-landing.evidence.mjs"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-c2/canonical-entity-binding.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-c2/canonical-entity-binding.contract.test.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-c2/canonical-entity-binding.evidence.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-c2/canonical-entity-binding.evidence.mjs"
+    },
+    {
+      "id": "ART:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "type": "artifact",
+      "path": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-r1-cl/EVIDENCE-MANIFEST.md",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-r1-cl/EVIDENCE-MANIFEST.md"
+    },
+    {
+      "id": "ART:docs/evidence/omxds-r1-c2/EVIDENCE-MANIFEST.md",
+      "type": "artifact",
+      "path": "docs/evidence/omxds-r1-c2/EVIDENCE-MANIFEST.md"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-050.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-050.json"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-051.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-051.json"
     }
   ],
   "edges": [
@@ -21902,6 +22038,357 @@
       "evidence": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/19.44-G8-Q2D-B-PLACE-PRODUCTIVE-CONNECTION-v1.0.md",
       "verified_at": "2026-08-28"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/listings/listing-public-contract.ts:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/lib/listings/listing-public-contract.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/listings/listing-public-reads.functions.ts:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/lib/listings/listing-public-reads.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1/listing-public-contract.contract.test.ts:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:scripts/omxds/r1/listing-public-contract.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1/listing-public-contract.evidence.mjs:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:scripts/omxds/r1/listing-public-contract.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1/listing-routes.evidence.mjs:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:scripts/omxds/r1/listing-routes.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/evidence/omxds-r1/PHASE-0-INVENTORY.md:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-r1/PHASE-0-INVENTORY.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/listing-premium/ListingPremiumSurface.tsx:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/components/listing-premium/ListingPremiumSurface.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/listing-premium/listing-premium-config.ts:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/components/listing-premium/listing-premium-config.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/hoteles.tsx:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/routes/hoteles.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/restaurantes.tsx:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/routes/restaurantes.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/experiencias.tsx:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/routes/experiencias.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/casas-de-vacaciones.tsx:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/routes/casas-de-vacaciones.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/eventos.index.tsx:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/routes/eventos.index.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/que-hacer.tsx:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/routes/que-hacer.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/entity-premium-templates.ts:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/entity-premium-templates.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/premium-template-registry.ts:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/premium-template-registry.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/home-premium/home-premium-config.ts:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/components/home-premium/home-premium-config.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/destination-premium/destination-premium-config.ts:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:src/components/destination-premium/destination-premium-config.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-049.json:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-049.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "evidence": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.45-G8-R1-PREMIUM-TEMPLATES-PARITY-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/canonical-entity-resolver.ts:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/canonical-entity-resolver.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/canonical-entity-binding.ts:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/canonical-entity-binding.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/seo-landing/seo-landing-template.ts:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/seo-landing/seo-landing-template.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/lovable/g8-r1cl-seo-landing-parity.tsx:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:src/routes/lovable/g8-r1cl-seo-landing-parity.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/producto.$slug.tsx:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:src/routes/producto.$slug.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/eventos.$slug.tsx:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:src/routes/eventos.$slug.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/oriente-maya/$destino.lugares.$slug.tsx:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:src/routes/oriente-maya/$destino.lugares.$slug.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-cl/entity-resolver-seo-landing.contract.test.ts:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-cl/entity-resolver-seo-landing.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-cl/entity-resolver-seo-landing.evidence.mjs:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-cl/entity-resolver-seo-landing.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-c2/canonical-entity-binding.contract.test.ts:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-c2/canonical-entity-binding.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-c2/canonical-entity-binding.evidence.mjs:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-c2/canonical-entity-binding.evidence.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/evidence/omxds-r1-cl/EVIDENCE-MANIFEST.md:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-r1-cl/EVIDENCE-MANIFEST.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/evidence/omxds-r1-c2/EVIDENCE-MANIFEST.md:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:docs/evidence/omxds-r1-c2/EVIDENCE-MANIFEST.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/route-inventory.ts:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/route-inventory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-050.json:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-050.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-051.json:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-051.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "evidence": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.46-G8-R1-C-L-RESOLVER-AND-SEO-LANDING-v1.0.md",
+      "verified_at": "2026-08-29"
     }
   ],
   "critical_chain_coverage": [
