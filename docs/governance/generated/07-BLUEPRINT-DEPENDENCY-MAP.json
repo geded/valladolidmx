@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.78",
+    "version": "0.79",
     "state": "Approved",
-    "source_sha256": "e0fc35f52144945ef7c76fd3a16a1dcbbd945d8061bd18b08e7935fc3b44f22c",
+    "source_sha256": "67a803e2840c26770f86336430aeaa8a148734cbab80f7bb716ba1f014e5e1ec",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -8677,6 +8677,49 @@
       "id": "ART:docs/governance/evidence/g8-r1-f1b-s1/COMPLETION-REPORT-v1.0.md",
       "type": "artifact",
       "path": "docs/governance/evidence/g8-r1-f1b-s1/COMPLETION-REPORT-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-f1b-b3/geocode-batch.mjs",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-f1b-b3/geocode-batch.mjs"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-f1b-b3/geolocation-preview.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-f1b-b3/geolocation-preview.contract.test.ts"
+    },
+    {
+      "id": "ART:src/lib/cms/business-draft-preview.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/cms/business-draft-preview.functions.ts"
+    },
+    {
+      "id": "ART:src/routes/_authenticated/cms/empresas.$businessId.preview.tsx",
+      "type": "artifact",
+      "path": "src/routes/_authenticated/cms/empresas.$businessId.preview.tsx"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-053.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-053.json"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-Z.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-Z.json"
+    },
+    {
+      "id": "ART:docs/governance/evidence/g8-r1-f1b-b3/geocode-cache.json",
+      "type": "artifact",
+      "path": "docs/governance/evidence/g8-r1-f1b-b3/geocode-cache.json"
     }
   ],
   "edges": [
@@ -23195,6 +23238,69 @@
       "destination": "DOC:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
       "evidence": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-f1b-b3/geocode-batch.mjs:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-f1b-b3/geocode-batch.mjs",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-f1b-b3/geolocation-preview.contract.test.ts:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-f1b-b3/geolocation-preview.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/cms/business-draft-preview.functions.ts:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "origin": "ART:src/lib/cms/business-draft-preview.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/_authenticated/cms/empresas.$businessId.preview.tsx:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "origin": "ART:src/routes/_authenticated/cms/empresas.$businessId.preview.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-053.json:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-053.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-029-ADDENDUM-Z.json:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-Z.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/g8-r1-f1b-b3/geocode-cache.json:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "origin": "ART:docs/governance/evidence/g8-r1-f1b-b3/geocode-cache.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
       "verified_at": "2026-08-29"
     }
   ],

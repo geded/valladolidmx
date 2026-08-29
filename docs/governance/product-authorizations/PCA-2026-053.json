@@ -3,18 +3,10 @@
   "id": "PCA-2026-053",
   "title": "G8-R1-F1B-B3 · Geolocalización acreditada y preview interno de borradores",
   "status": "Approved",
-  "branch": "feature/omxds-i4-d-g3-integration-evidence-closure-v1",
-  "blueprint": "docs/governance/evidence/g8-r1-f1b-b3/GEOLOCATION-AND-DRAFT-PREVIEW-REPORT-v1.0.md",
+  "branch": "edit/edt-42626ea9-1a3f-44ea-bef4-793d5e025885",
+  "blueprint": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
   "founder_authority": "Autorización Founder G8-R1-F1B-B3 (2026-08-29). Autoriza exclusivamente (1) completar la geolocalización de las 15 fichas B1/B2 mediante una única consulta deliberada por dirección a Nominatim/OpenStreetMap, con User-Agent identificable, rate limit ≥1s, caché idempotente, licencia ODbL y atribución, validación humana de coherencia territorial y vialidad, precisión declarada sin inflar y procedencia campo por campo; y (2) crear una vista interna autenticada de preview que renderice los borradores con la misma superficie productiva. No autoriza publicación, aprobación editorial definitiva, activación de flags, sitemap, redirects, importación de medios, scraping de POIs, PR, merge ni despliegue. Las coordenadas no acreditadas permanecen pendientes de confirmación manual; prohibido aproximar al centro del destino.",
   "permissions": [
-    {
-      "operation": "create",
-      "path": "scripts/omxds/r1-f1b-b3/geocode-batch.mjs"
-    },
-    {
-      "operation": "create",
-      "path": "scripts/omxds/r1-f1b-b3/geolocation-preview.contract.test.ts"
-    },
     {
       "operation": "create",
       "path": "src/lib/cms/business-draft-preview.functions.ts"
@@ -30,10 +22,6 @@
     {
       "operation": "modify",
       "path": "src/lib/provenance/provenance-contracts.ts"
-    },
-    {
-      "operation": "modify",
-      "path": "src/lib/experience-builder/route-inventory.ts"
     },
     {
       "operation": "modify",
