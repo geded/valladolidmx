@@ -4,7 +4,7 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.76",
     "state": "Approved",
-    "source_sha256": "0c57ca5b36ff765eb1d59ae2b40c303e7b97ae43b7796205d694aa093ea3b5c2",
+    "source_sha256": "89948e17eb4453058d5d7115c9bc0b559ade4c96a75194056b1848d8b8fcf96a",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -8621,6 +8621,24 @@
       "id": "ART:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
       "type": "artifact",
       "path": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-X.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-X.json"
+    },
+    {
+      "id": "ART:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "type": "artifact",
+      "path": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md"
     }
   ],
   "edges": [
@@ -23031,6 +23049,60 @@
       "destination": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
       "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md § Implementación",
       "source_row": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/notifications/webhooks.functions.ts:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "origin": "ART:src/lib/notifications/webhooks.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/memory-projection.functions.ts:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "origin": "ART:src/lib/alux/memory-projection.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/memory-summary.ts:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "origin": "ART:src/lib/alux/memory-summary.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/q2b/places-cms.contract.test.ts:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "origin": "ART:scripts/omxds/q2b/places-cms.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-029-ADDENDUM-X.json:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-X.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "origin": "ART:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
       "verified_at": "2026-08-29"
     }
   ],

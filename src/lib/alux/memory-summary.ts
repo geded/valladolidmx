@@ -67,9 +67,10 @@ export function toMemorySummary(input: {
   readonly preferences?: AluxMemorySummary["preferences"];
 }): AluxMemorySummary {
   const clean = (values: readonly string[]) =>
-    Array.from(
-      new Set(values.map((v) => String(v).trim().toLowerCase()).filter(Boolean)),
-    ).slice(0, 30);
+    Array.from(new Set(values.map((v) => String(v).trim().toLowerCase()).filter(Boolean))).slice(
+      0,
+      30,
+    );
   const topCategories = Object.entries(input.signals.categoryAffinity ?? {})
     .sort((a, b) => b[1] - a[1])
     .map(([slugValue]) => slugValue);
@@ -89,10 +90,7 @@ export function toMemorySummary(input: {
 }
 
 /** Valida un resumen recuperado del servidor. `null` si no es admisible o caducó. */
-export function normalizeMemorySummary(
-  raw: unknown,
-  now = Date.now(),
-): AluxMemorySummary | null {
+export function normalizeMemorySummary(raw: unknown, now = Date.now()): AluxMemorySummary | null {
   const parsed = AluxMemorySummarySchema.safeParse(raw);
   if (!parsed.success) return null;
   if (now - parsed.data.updatedAt > parsed.data.ttlMs) return null;

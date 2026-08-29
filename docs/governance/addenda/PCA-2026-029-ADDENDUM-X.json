@@ -1,0 +1,29 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-X",
+  "status": "Approved",
+  "parent": "PCA-2026-029",
+  "blueprint": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+  "founder_authority": "Autorización Founder G8-R1-F1A (2026-08-29). Autoriza una migración mínima, aditiva, reversible e idempotente para cerrar la exposición de notification_webhook_endpoints.secret_current/secret_previous, y reconoce la regeneración derivada de los tipos generados de Lovable Cloud. Autoriza asimismo actualizar el único test Q2B obsoleto mediante addendum formal, sin debilitarlo, preservando content_audit_log como autoridad única de auditoría de lugares.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/integrations/supabase/types.ts",
+    "previous_sha256": "0fdb89a43b9a62667e347801a7ec26839e4614a16cf91d059e6526a99def9488",
+    "current_sha256": "19352a114a414e0fb9a902e81e03f9d8b24cbbea17c9b99b6a8393483f6fb767",
+    "semantic_change": "G8-R1-F1A · Baja de las columnas secret_current y secret_previous en public.notification_webhook_endpoints y alta de la función public.unc_webhook_secret_set. El almacén privado private.notification_webhook_secrets y private.unc_webhook_secret_get quedan fuera de la Data API y no aparecen en los tipos cliente.",
+    "authority": "Autorización Founder G8-R1-F1A (2026-08-29)"
+  },
+  "permissions": [
+    { "operation": "modify", "path": "src/lib/notifications/webhooks.functions.ts" },
+    { "operation": "modify", "path": "src/lib/alux/memory-projection.functions.ts" },
+    { "operation": "modify", "path": "src/lib/alux/memory-summary.ts" },
+    { "operation": "modify", "path": "scripts/omxds/q2b/places-cms.contract.test.ts" }
+  ],
+  "invariants": [
+    "omxds_visual_v1_contracts_enabled=false",
+    "Cero publicación, cero cambios de contenido, sitemap o redirects",
+    "Ningún rol anon/authenticated puede leer secretos de webhook por ninguna vía",
+    "content_audit_log permanece como autoridad única de auditoría de point_of_interest",
+    "Cero renombrado, archivado o redirección de slugs"
+  ],
+  "recorded_at": "2026-08-29"
+}

@@ -235,8 +235,24 @@ describe("G8-Q2B · auditoría", () => {
   test("la auditoría es best-effort y no crea sistema paralelo", () => {
     expect(FUNCTIONS).toContain("best-effort");
     expect(FUNCTIONS).not.toContain("place_audit");
-    const migrations = fs.readdirSync(path.join(root, "supabase/migrations"));
-    expect(migrations.filter((file) => file > "20260828145637_z")).toEqual([]);
+    // G8-R1-F1A · Addendum PCA-2026-029-ADDENDUM-X.
+    // La instantánea de migraciones congelada en Q2B (20260828145637) quedó
+    // obsoleta por evoluciones gobernadas posteriores (R1-E-R3). El invariante
+    // real es que `content_audit_log` siga siendo la única autoridad de
+    // auditoría de lugares: ninguna migración puede introducir un almacén
+    // paralelo de auditoría para `point_of_interest`.
+    const migrationsDir = path.join(root, "supabase/migrations");
+    const parallelAuditStores = fs
+      .readdirSync(migrationsDir)
+      .filter((file) => file.endsWith(".sql"))
+      .filter((file) => {
+        const sql = fs.readFileSync(path.join(migrationsDir, file), "utf8").toLowerCase();
+        return (
+          /create\s+table[^;]*\bplace[_a-z]*audit/.test(sql) ||
+          /create\s+table[^;]*\bpoi[_a-z]*audit/.test(sql)
+        );
+      });
+    expect(parallelAuditStores).toEqual([]);
   });
 });
 
