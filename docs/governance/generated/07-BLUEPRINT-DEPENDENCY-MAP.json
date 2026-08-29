@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "derived_from": {
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-    "version": "0.76",
+    "version": "0.78",
     "state": "Approved",
-    "source_sha256": "89948e17eb4453058d5d7115c9bc0b559ade4c96a75194056b1848d8b8fcf96a",
+    "source_sha256": "e0fc35f52144945ef7c76fd3a16a1dcbbd945d8061bd18b08e7935fc3b44f22c",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -8639,6 +8639,44 @@
       "id": "ART:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
       "type": "artifact",
       "path": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/provenance/provenance-contracts.ts",
+      "type": "artifact",
+      "path": "src/lib/provenance/provenance-contracts.ts"
+    },
+    {
+      "id": "ART:src/lib/provenance/provenance.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/provenance/provenance.functions.ts"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-f1b-s1/provenance-claim-model.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-f1b-s1/provenance-claim-model.contract.test.ts"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-052.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-052.json"
+    },
+    {
+      "id": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-Y.json",
+      "type": "artifact",
+      "path": "docs/governance/addenda/PCA-2026-029-ADDENDUM-Y.json"
+    },
+    {
+      "id": "ART:docs/governance/evidence/g8-r1-f1b-s1/COMPLETION-REPORT-v1.0.md",
+      "type": "artifact",
+      "path": "docs/governance/evidence/g8-r1-f1b-s1/COMPLETION-REPORT-v1.0.md"
     }
   ],
   "edges": [
@@ -23103,6 +23141,60 @@
       "destination": "DOC:docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
       "evidence": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md § Implementación",
       "source_row": "docs/blueprint/G8-R1-F1A-REMEDIACION-TECNICA-PREVIA-AL-RELEASE-CANDIDATE-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/provenance/provenance-contracts.ts:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "origin": "ART:src/lib/provenance/provenance-contracts.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/provenance/provenance.functions.ts:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "origin": "ART:src/lib/provenance/provenance.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-f1b-s1/provenance-claim-model.contract.test.ts:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-f1b-s1/provenance-claim-model.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-052.json:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-052.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/addenda/PCA-2026-029-ADDENDUM-Y.json:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "origin": "ART:docs/governance/addenda/PCA-2026-029-ADDENDUM-Y.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/evidence/g8-r1-f1b-s1/COMPLETION-REPORT-v1.0.md:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "origin": "ART:docs/governance/evidence/g8-r1-f1b-s1/COMPLETION-REPORT-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
       "verified_at": "2026-08-29"
     }
   ],
