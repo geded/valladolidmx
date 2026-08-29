@@ -133,7 +133,7 @@ export async function loadAluxCanonicalCandidates(
     const { data, error } = await sb
       .from("points_of_interest")
       .select(
-        "id, slug, name, official_name, short_description, description, zone_id, place_types ( slug, name ), destination_zones ( slug, destination_id )",
+        "id, slug, name, official_name, short_description, description, destination_zone_id, place_types ( slug, name ), destination_zones ( slug, destination_id )",
       )
       .eq("destination_id", input.destinationId)
       .eq("status", "published")
@@ -372,7 +372,7 @@ export async function loadAluxCanonicalCandidates(
   {
     const { data, error } = await sb
       .from("destinations")
-      .select("id, slug, name, short_description")
+      .select("id, slug, name")
       .eq("status", "published")
       .is("deleted_at", null)
       .neq("id", input.destinationId)
@@ -398,7 +398,7 @@ export async function loadAluxCanonicalCandidates(
         label,
         canonicalUrl,
         family: null,
-        summary: clean(row.short_description) || null,
+        summary: null,
         categorySlug: null,
         categoryName: null,
         zoneSlug: null,
