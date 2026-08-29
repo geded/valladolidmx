@@ -34,6 +34,8 @@
     "validate:r1:e": "bun run test:r1:e && bun run typecheck && bun run governance:check",
     "test:r1:e:r1": "bunx vitest run scripts/omxds/r1-e-r1/alux-memory-proximity.contract.test.ts",
     "validate:r1:e:r1": "bun run test:r1:e:r1 && bun run test:r1:e && bun run typecheck",
+    "test:r1:e:r3": "bunx vitest run scripts/omxds/r1-e-r3/alux-memory-fusion-proximity.contract.test.ts",
+    "validate:r1:e:r3": "bun run test:r1:e:r3 && bun run test:r1:e:r1 && bun run test:r1:e && bun run typecheck",
     "test:i4:0": "bun test scripts/omxds/i4/editorial-builder.contract.test.ts",
     "validate:i4:0": "bun run test:i4:0 && bun scripts/omxds/i4/editorial-builder.evidence.mjs",
     "test:i4:a": "bun test scripts/omxds/i4/editorial-builder-authoring.test.ts",

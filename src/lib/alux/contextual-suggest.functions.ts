@@ -175,6 +175,12 @@ export interface AluxContextualSuggestion {
   /** G8-R1-D3 · acciones distintas: Guardar vs Agregar a Mi Viaje. */
   readonly favoriteKind?: "business" | "product" | null;
   readonly planKind?: "destination" | "business" | "product" | "event" | null;
+  /**
+   * G8-R1-E-R3 · Coordenadas ACREDITADAS del candidato (sede real o
+   * heredadas del operador con `source="product_operator"`). Nunca se
+   * inventan ni se derivan de centroides no almacenados.
+   */
+  readonly coords?: { lat: number; lng: number; source: string } | null;
 }
 
 
@@ -797,6 +803,9 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           family: c.family,
           favoriteKind: c.favoriteKind,
           planKind: c.planKind,
+          coords: c.coords
+            ? { lat: c.coords.lat, lng: c.coords.lng, source: c.coords.source }
+            : null,
         });
       }
     } catch (error) {

@@ -16,6 +16,8 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+import { consumeDurableRate, INGEST_RATE_CAPABILITY } from "./rate-limit.server";
+
 import {
   VISITOR_EVENT_SCHEMA_VERSION,
   VisitorEventSchema,
@@ -31,8 +33,11 @@ export interface IngestResult {
     | "decision_channel_required"
     | "trust_mismatch"
     | "duplicate"
+    | "rate_limited"
     | "insert_failed";
   event_id?: string;
+  /** Sólo presente cuando `reason === "rate_limited"`. */
+  retry_after_seconds?: number;
 }
 
 export function validateIngestEvent(event: VisitorEvent): IngestResult | null {
@@ -93,23 +98,30 @@ export const ingestVisitorEvent = createServerFn({ method: "POST" })
     if (canonicalError) return canonicalError;
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // R1-E-R3 · rate limit DURABLE por sujeto seudónimo (fail-closed).
+    const rate = await consumeDurableRate(supabaseAdmin, {
+      subjectId: event.subject.subject_id,
+      capability: INGEST_RATE_CAPABILITY,
+    });
+    if (!rate.allowed) {
+      return {
+        accepted: false,
+        reason: "rate_limited",
+        retry_after_seconds: rate.retryAfterSeconds,
+      };
+    }
     // Generated types only cover the `public` schema; `visitor_intel` is
     // an isolated append-only domain (see CV8.1 migration). Cast is safe.
+    // `visitor_intel` no está expuesto en la Data API: la escritura pasa por
+    // la función interna `public.visitor_intel_ingest_event` (service_role).
     const { error } = await (
       supabaseAdmin as unknown as {
-        schema: (s: string) => {
-          from: (t: string) => {
-            upsert: (
-              row: Record<string, unknown>,
-              opts: { onConflict: string; ignoreDuplicates: boolean },
-            ) => Promise<{ error: { code?: string; message: string } | null }>;
-          };
-        };
+        rpc: (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ error: { code?: string; message: string } | null }>;
       }
-    )
-      .schema("visitor_intel")
-      .from("events")
-      .upsert(toRow(event), { onConflict: "event_id", ignoreDuplicates: true });
+    ).rpc("visitor_intel_ingest_event", { p_row: toRow(event) });
 
     if (error) {
       // Idempotent duplicate → treat as accepted-no-op; anything else as failure.
@@ -147,21 +159,28 @@ export const ingestAnonymousVisitorEvent = createServerFn({ method: "POST" })
     if (canonicalError) return canonicalError;
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // R1-E-R3 · rate limit DURABLE por sujeto seudónimo (fail-closed).
+    const rate = await consumeDurableRate(supabaseAdmin, {
+      subjectId: event.subject.subject_id,
+      capability: INGEST_RATE_CAPABILITY,
+    });
+    if (!rate.allowed) {
+      return {
+        accepted: false,
+        reason: "rate_limited",
+        retry_after_seconds: rate.retryAfterSeconds,
+      };
+    }
+    // `visitor_intel` no está expuesto en la Data API: la escritura pasa por
+    // la función interna `public.visitor_intel_ingest_event` (service_role).
     const { error } = await (
       supabaseAdmin as unknown as {
-        schema: (s: string) => {
-          from: (t: string) => {
-            upsert: (
-              row: Record<string, unknown>,
-              opts: { onConflict: string; ignoreDuplicates: boolean },
-            ) => Promise<{ error: { code?: string; message: string } | null }>;
-          };
-        };
+        rpc: (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ error: { code?: string; message: string } | null }>;
       }
-    )
-      .schema("visitor_intel")
-      .from("events")
-      .upsert(toRow(event), { onConflict: "event_id", ignoreDuplicates: true });
+    ).rpc("visitor_intel_ingest_event", { p_row: toRow(event) });
 
     if (error) {
       if (error.code === "23505") {
