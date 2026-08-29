@@ -132,7 +132,10 @@ function ArticlePreview() {
       >
         <ul className="grid gap-3 sm:grid-cols-2">
           {ARTICLE.related.map((r) => (
-            <li key={r} className="flex items-center gap-2 rounded-2xl border border-border bg-card p-4 text-sm">
+            <li
+              key={r}
+              className="flex items-center gap-2 rounded-2xl border border-border bg-card p-4 text-sm"
+            >
               <Landmark className="size-4" aria-hidden />
               {r}
             </li>

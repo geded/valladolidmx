@@ -3212,6 +3212,110 @@ export type Database = {
           },
         ]
       }
+      entity_presentation_mode_history: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          cover_media_asset_id: string | null
+          created_at: string
+          entity_id: string
+          entity_kind: string
+          from_mode: string | null
+          from_state: string | null
+          id: string
+          reason: string | null
+          to_mode: string | null
+          to_state: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          cover_media_asset_id?: string | null
+          created_at?: string
+          entity_id: string
+          entity_kind: string
+          from_mode?: string | null
+          from_state?: string | null
+          id?: string
+          reason?: string | null
+          to_mode?: string | null
+          to_state?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          cover_media_asset_id?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_kind?: string
+          from_mode?: string | null
+          from_state?: string | null
+          id?: string
+          reason?: string | null
+          to_mode?: string | null
+          to_state?: string | null
+        }
+        Relationships: []
+      }
+      entity_presentation_modes: {
+        Row: {
+          approved_mode: string
+          cover_media_asset_id: string | null
+          created_at: string
+          entity_id: string
+          entity_kind: string
+          id: string
+          reason: string | null
+          requested_at: string | null
+          requested_by: string | null
+          requested_mode: string
+          review_state: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          approved_mode?: string
+          cover_media_asset_id?: string | null
+          created_at?: string
+          entity_id: string
+          entity_kind: string
+          id?: string
+          reason?: string | null
+          requested_at?: string | null
+          requested_by?: string | null
+          requested_mode?: string
+          review_state?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          approved_mode?: string
+          cover_media_asset_id?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_kind?: string
+          id?: string
+          reason?: string | null
+          requested_at?: string | null
+          requested_by?: string | null
+          requested_mode?: string
+          review_state?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entity_presentation_modes_cover_media_asset_id_fkey"
+            columns: ["cover_media_asset_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           body: string | null
@@ -7886,6 +7990,18 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      epm_can_request: {
+        Args: { _entity_id: string; _entity_kind: string }
+        Returns: boolean
+      }
+      epm_eligible_cover: {
+        Args: { _entity_id: string; _entity_kind: string }
+        Returns: string
+      }
+      epm_owning_business: {
+        Args: { _entity_id: string; _entity_kind: string }
+        Returns: string
+      }
       expire_stale_coupons: { Args: never; Returns: undefined }
       expire_visibility_grants: { Args: never; Returns: number }
       faq_parent_is_public: {
@@ -7946,6 +8062,19 @@ export type Database = {
           redeemed_at: string
           traveler_first_name: string
           user_id: string
+        }[]
+      }
+      get_entity_presentation_mode: {
+        Args: { _entity_id: string; _entity_kind: string }
+        Returns: {
+          approved_mode: string
+          cover_eligible: boolean
+          cover_media_asset_id: string
+          effective_mode: string
+          fallback_reason: string
+          requested_mode: string
+          review_state: string
+          source: string
         }[]
       }
       get_orders_needing_trip_email: {
@@ -8390,6 +8519,36 @@ export type Database = {
         Args: { _business_id: string }
         Returns: string
       }
+      review_entity_presentation_mode: {
+        Args: {
+          _decision: string
+          _entity_id: string
+          _entity_kind: string
+          _reason?: string
+        }
+        Returns: {
+          approved_mode: string
+          cover_media_asset_id: string | null
+          created_at: string
+          entity_id: string
+          entity_kind: string
+          id: string
+          reason: string | null
+          requested_at: string | null
+          requested_by: string | null
+          requested_mode: string
+          review_state: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "entity_presentation_modes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       revoke_zone_scope: { Args: { _scope_id: string }; Returns: boolean }
       search_marketplace: {
         Args: {
@@ -8428,6 +8587,36 @@ export type Database = {
           business_response_at: string
           id: string
         }[]
+      }
+      set_entity_presentation_mode: {
+        Args: {
+          _entity_id: string
+          _entity_kind: string
+          _mode: string
+          _reason?: string
+        }
+        Returns: {
+          approved_mode: string
+          cover_media_asset_id: string | null
+          created_at: string
+          entity_id: string
+          entity_kind: string
+          id: string
+          reason: string | null
+          requested_at: string | null
+          requested_by: string | null
+          requested_mode: string
+          review_state: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "entity_presentation_modes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       submit_business_for_review: {
         Args: { _business_id: string }

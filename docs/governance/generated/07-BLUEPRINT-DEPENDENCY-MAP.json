@@ -4,7 +4,7 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.79",
     "state": "Approved",
-    "source_sha256": "d43dc857df84e19b1141d53d1ba95f2660925c60f9b5ba02520a92b2f96da997",
+    "source_sha256": "acba1552ebc25fd5e4aed7dc3acf76173dfc88b8f46ecf9d3b503040ecbaa1a7",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -8753,6 +8753,54 @@
       "id": "ART:supabase/migrations/20260829100730_ed564a44-08ec-434e-ba12-195dd95c8222.sql",
       "type": "artifact",
       "path": "supabase/migrations/20260829100730_ed564a44-08ec-434e-ba12-195dd95c8222.sql"
+    },
+    {
+      "id": "DOC:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/entity-presentation.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/entity-presentation.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/entity-presentation.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/entity-presentation.functions.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/premium-eligibility.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/premium-eligibility.ts"
+    },
+    {
+      "id": "ART:src/lib/omxds/presentation/presentation-family.ts",
+      "type": "artifact",
+      "path": "src/lib/omxds/presentation/presentation-family.ts"
+    },
+    {
+      "id": "ART:src/components/premium/PresentationModePanel.tsx",
+      "type": "artifact",
+      "path": "src/components/premium/PresentationModePanel.tsx"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-f1c-a/presentation-authority.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-f1c-a/presentation-authority.contract.test.ts"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-055.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-055.json"
+    },
+    {
+      "id": "ART:supabase/migrations/20260829174459_87b15ae7-59d4-4fb5-8170-b0c0834a37f6.sql",
+      "type": "artifact",
+      "path": "supabase/migrations/20260829174459_87b15ae7-59d4-4fb5-8170-b0c0834a37f6.sql"
     }
   ],
   "edges": [
@@ -23379,6 +23427,78 @@
       "destination": "DOC:docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
       "evidence": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md § Implementación",
       "source_row": "docs/blueprint/G8-R1-F1B-B4-APROBACION-EDITORIAL-Y-PAQUETE-DE-RECLAMACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/presentation/entity-presentation.ts:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/entity-presentation.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/presentation/entity-presentation.functions.ts:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/entity-presentation.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/presentation/premium-eligibility.ts:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/premium-eligibility.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/omxds/presentation/presentation-family.ts:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "origin": "ART:src/lib/omxds/presentation/presentation-family.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/premium/PresentationModePanel.tsx:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "origin": "ART:src/components/premium/PresentationModePanel.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-f1c-a/presentation-authority.contract.test.ts:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-f1c-a/presentation-authority.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-055.json:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-055.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:supabase/migrations/20260829174459_87b15ae7-59d4-4fb5-8170-b0c0834a37f6.sql:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "origin": "ART:supabase/migrations/20260829174459_87b15ae7-59d4-4fb5-8170-b0c0834a37f6.sql",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
       "verified_at": "2026-08-29"
     }
   ],

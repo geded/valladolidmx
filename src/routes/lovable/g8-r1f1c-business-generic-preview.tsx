@@ -149,10 +149,7 @@ function BusinessGenericPreview() {
         </ul>
       </PremiumSection>
 
-      <PremiumSection
-        vm={{ id: "contacto", eyebrow: "Contacto", title: "Cómo continuar" }}
-        compact
-      >
+      <PremiumSection vm={{ id: "contacto", eyebrow: "Contacto", title: "Cómo continuar" }} compact>
         <p className="text-sm text-muted-foreground">
           Contacto y reservación se resuelven con las acciones canónicas de superficie; no se
           publica teléfono ni precio sin acreditación.
