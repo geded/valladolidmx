@@ -142,7 +142,8 @@ const SuggestInput = z.object({
   locale: z.enum(["es", "en", "fr", "de", "it", "pt"]).optional(),
 });
 
-export type AluxSuggestKind = "business" | "product" | "event";
+/** G8-R1-D1 · el catálogo canónico incorpora lugares además de empresas. */
+export type AluxSuggestKind = "business" | "product" | "event" | "place";
 
 export interface AluxSuggestionCta {
   readonly label: string;
@@ -167,7 +168,15 @@ export interface AluxContextualSuggestion {
   /** A7 · Horarios reales. */
   readonly openState?: OpenNowState;
   readonly openLabel?: string;
+  /** G8-R1-D2 · identidad canónica tipada de la entidad sugerida. */
+  readonly entityId?: string;
+  readonly canonicalUrl?: string;
+  readonly family?: string | null;
+  /** G8-R1-D3 · acciones distintas: Guardar vs Agregar a Mi Viaje. */
+  readonly favoriteKind?: "business" | "product" | null;
+  readonly planKind?: "destination" | "business" | "product" | "event" | null;
 }
+
 
 export interface AluxActiveDestinationPromotion {
   readonly slug: string;
