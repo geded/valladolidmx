@@ -70,6 +70,7 @@ import {
   hasSufficientAluxContext,
   ALUX_UNIFIED_CONTEXT_VERSION,
 } from "@/lib/alux/unified-context";
+import { rankAluxCandidates } from "@/lib/alux/personalization";
 import { useAluxFloatingPresence } from "@/lib/alux/floating-presence";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import {
