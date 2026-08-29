@@ -77,6 +77,9 @@ import { bindAluxSessionToTraveler } from "@/lib/alux/bind-session.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 import { AluxMark } from "@/components/alux/AluxMark";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+
 
 function ContextChip({ slot }: { slot: AluxContextSlot }) {
   const content = (
@@ -783,7 +786,35 @@ export function AluxFloatingTrigger() {
                                     ))}
                                 </div>
                               )}
+                              {/* G8-R1-D3 · Guardar y Agregar a Mi Viaje son
+                                  acciones DISTINTAS. Alux sólo propone: nada
+                                  entra al viaje sin confirmación del viajero. */}
+                              {item.entityId &&
+                                (item.favoriteKind || item.planKind) && (
+                                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                                    {item.favoriteKind && (
+                                      <FavoriteButton
+                                        entityKind={item.favoriteKind}
+                                        entityId={item.entityId}
+                                        entityTitle={item.label}
+                                        entitySlug={item.slug}
+                                        className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium text-foreground transition-colors hover:bg-muted"
+                                      />
+                                    )}
+                                    {item.planKind && (
+                                      <AddToTravelPlanButton
+                                        kind={item.planKind}
+                                        targetId={item.entityId}
+                                        title={item.label}
+                                        slug={item.slug}
+                                        subtitle={item.categoryName ?? null}
+                                        variant="compact"
+                                      />
+                                    )}
+                                  </div>
+                                )}
                             </div>
+
                           </li>
                         ))}
                       </ul>

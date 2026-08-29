@@ -142,7 +142,8 @@ const SuggestInput = z.object({
   locale: z.enum(["es", "en", "fr", "de", "it", "pt"]).optional(),
 });
 
-export type AluxSuggestKind = "business" | "product" | "event";
+/** G8-R1-D1 · el catálogo canónico incorpora lugares además de empresas. */
+export type AluxSuggestKind = "business" | "product" | "event" | "place";
 
 export interface AluxSuggestionCta {
   readonly label: string;
@@ -167,7 +168,15 @@ export interface AluxContextualSuggestion {
   /** A7 · Horarios reales. */
   readonly openState?: OpenNowState;
   readonly openLabel?: string;
+  /** G8-R1-D2 · identidad canónica tipada de la entidad sugerida. */
+  readonly entityId?: string;
+  readonly canonicalUrl?: string;
+  readonly family?: string | null;
+  /** G8-R1-D3 · acciones distintas: Guardar vs Agregar a Mi Viaje. */
+  readonly favoriteKind?: "business" | "product" | null;
+  readonly planKind?: "destination" | "business" | "product" | "event" | null;
 }
+
 
 export interface AluxActiveDestinationPromotion {
   readonly slug: string;
@@ -201,7 +210,15 @@ export interface AluxContextualSuggestResult {
    * sin romper las sugerencias (que siguen sirviéndose desde catálogo).
    */
   readonly aiStatus?: "ok" | "skipped" | "rate_limited" | "credits_exhausted" | "error";
+  /**
+   * G8-R1-D1 · Diagnóstico por familia del catálogo canónico consultado
+   * (auditoría; nunca se envía al modelo ni se muestra al viajero).
+   */
+  readonly catalogFamilies?: Readonly<
+    Record<string, { loaded: number; eligible: number; note: string }>
+  >;
 }
+
 
 const EMPTY: AluxContextualSuggestResult = {
   suggestions: [],
@@ -507,7 +524,14 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         activePromotionSlug: promo?.slug,
         openState: open?.state,
         openLabel: open?.label,
+        // G8-R1-D2/D3 · identidad canónica tipada + acciones distintas.
+        entityId: row.id,
+        canonicalUrl: href,
+        family: null,
+        favoriteKind: "business",
+        planKind: "business",
       };
+
     }
 
     // 4a. Enriquecimiento con Alux (Lovable AI Gateway).
@@ -723,6 +747,63 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
     });
     const rationaleSource: "ai" | "deterministic" = aiRationales ? "ai" : "deterministic";
 
+    // ── G8-R1-D1 · Catálogo canónico completo (lugares, productos, eventos).
+    // Se anexa DESPUÉS del ranking de empresas y con rationale determinístico
+    // y explicable: Alux nunca redacta sobre entidades que no leyó.
+    const businessIndex = new Map(
+      businesses.map(
+        (b) => [b.id, { slug: b.slug, categorySlug: b.category_slug, name: b.display_name }] as const,
+      ),
+    );
+    let catalogFamilies: AluxContextualSuggestResult["catalogFamilies"];
+    try {
+      const { loadAluxCanonicalCandidates } = await import("./canonical-catalog.server");
+      const catalog = await loadAluxCanonicalCandidates(sb, {
+        destinationId: destination.id,
+        destinationSlug: destination.slug,
+        publishedBusinessIds: bizIdsInDest,
+        businessIndex,
+        limitPerFamily: 8,
+      });
+      catalogFamilies = catalog.familyReport;
+
+      const already = new Set(suggestions.map((s) => `${s.source.table}:${s.source.id}`));
+      // Cupo acotado por familia para no desplazar a las empresas del destino.
+      const perKind: Record<string, number> = { place: 2, product: 2, event: 2 };
+      for (const c of catalog.candidates) {
+        const key = `${c.source.table}:${c.source.id}`;
+        if (already.has(key)) continue;
+        if ((perKind[c.entityKind] ?? 0) <= 0) continue;
+        if (c.slug === currentProductSlug) continue;
+        perKind[c.entityKind] -= 1;
+        already.add(key);
+        suggestions.push({
+          kind: c.entityKind === "destination" ? "business" : c.entityKind,
+          slug: c.slug,
+          label: c.label,
+          href: c.canonicalUrl,
+          rationale:
+            c.entityKind === "place"
+              ? `Lugar publicado en ${destinationLabel}${c.categoryName ? ` · ${c.categoryName}` : ""}.`
+              : c.entityKind === "event"
+                ? `Evento vigente en ${destinationLabel}.`
+                : `Experiencia publicada en ${destinationLabel}.`,
+          categorySlug: c.categorySlug ?? undefined,
+          categoryName: c.categoryName ?? undefined,
+          source: c.source,
+          ctas: [{ kind: "view", label: "Ver ficha", href: c.canonicalUrl }],
+          entityId: c.entityId,
+          canonicalUrl: c.canonicalUrl,
+          family: c.family,
+          favoriteKind: c.favoriteKind,
+          planKind: c.planKind,
+        });
+      }
+    } catch (error) {
+      console.warn("[alux.contextual-suggest] catálogo canónico no disponible:", error);
+    }
+
+
     return {
       suggestions,
       activePromotions,
@@ -742,5 +823,7 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
           : `Aún no hay más publicaciones en ${destinationLabel} para sugerir.`,
       rationaleSource,
       aiStatus,
+      catalogFamilies,
     };
+
   });
