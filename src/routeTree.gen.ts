@@ -58,6 +58,7 @@ import { Route as LovableG8dPremiumParityRouteImport } from './routes/lovable/g8
 import { Route as LovableG8R1f1cZonePreviewRouteImport } from './routes/lovable/g8-r1f1c-zone-preview'
 import { Route as LovableG8R1f1cRoutePreviewRouteImport } from './routes/lovable/g8-r1f1c-route-preview'
 import { Route as LovableG8R1f1cProductGenericPreviewRouteImport } from './routes/lovable/g8-r1f1c-product-generic-preview'
+import { Route as LovableG8R1f1cPreviewHubRouteImport } from './routes/lovable/g8-r1f1c-preview-hub'
 import { Route as LovableG8R1f1cBusinessGenericPreviewRouteImport } from './routes/lovable/g8-r1f1c-business-generic-preview'
 import { Route as LovableG8R1f1cArticlePreviewRouteImport } from './routes/lovable/g8-r1f1c-article-preview'
 import { Route as LovableG8R1clSeoLandingParityRouteImport } from './routes/lovable/g8-r1cl-seo-landing-parity'
@@ -477,6 +478,12 @@ const LovableG8R1f1cProductGenericPreviewRoute =
   LovableG8R1f1cProductGenericPreviewRouteImport.update({
     id: '/lovable/g8-r1f1c-product-generic-preview',
     path: '/lovable/g8-r1f1c-product-generic-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableG8R1f1cPreviewHubRoute =
+  LovableG8R1f1cPreviewHubRouteImport.update({
+    id: '/lovable/g8-r1f1c-preview-hub',
+    path: '/lovable/g8-r1f1c-preview-hub',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableG8R1f1cBusinessGenericPreviewRoute =
@@ -1519,6 +1526,7 @@ export interface FileRoutesByFullPath {
   '/lovable/g8-r1cl-seo-landing-parity': typeof LovableG8R1clSeoLandingParityRoute
   '/lovable/g8-r1f1c-article-preview': typeof LovableG8R1f1cArticlePreviewRoute
   '/lovable/g8-r1f1c-business-generic-preview': typeof LovableG8R1f1cBusinessGenericPreviewRoute
+  '/lovable/g8-r1f1c-preview-hub': typeof LovableG8R1f1cPreviewHubRoute
   '/lovable/g8-r1f1c-product-generic-preview': typeof LovableG8R1f1cProductGenericPreviewRoute
   '/lovable/g8-r1f1c-route-preview': typeof LovableG8R1f1cRoutePreviewRoute
   '/lovable/g8-r1f1c-zone-preview': typeof LovableG8R1f1cZonePreviewRoute
@@ -1730,6 +1738,7 @@ export interface FileRoutesByTo {
   '/lovable/g8-r1cl-seo-landing-parity': typeof LovableG8R1clSeoLandingParityRoute
   '/lovable/g8-r1f1c-article-preview': typeof LovableG8R1f1cArticlePreviewRoute
   '/lovable/g8-r1f1c-business-generic-preview': typeof LovableG8R1f1cBusinessGenericPreviewRoute
+  '/lovable/g8-r1f1c-preview-hub': typeof LovableG8R1f1cPreviewHubRoute
   '/lovable/g8-r1f1c-product-generic-preview': typeof LovableG8R1f1cProductGenericPreviewRoute
   '/lovable/g8-r1f1c-route-preview': typeof LovableG8R1f1cRoutePreviewRoute
   '/lovable/g8-r1f1c-zone-preview': typeof LovableG8R1f1cZonePreviewRoute
@@ -1945,6 +1954,7 @@ export interface FileRoutesById {
   '/lovable/g8-r1cl-seo-landing-parity': typeof LovableG8R1clSeoLandingParityRoute
   '/lovable/g8-r1f1c-article-preview': typeof LovableG8R1f1cArticlePreviewRoute
   '/lovable/g8-r1f1c-business-generic-preview': typeof LovableG8R1f1cBusinessGenericPreviewRoute
+  '/lovable/g8-r1f1c-preview-hub': typeof LovableG8R1f1cPreviewHubRoute
   '/lovable/g8-r1f1c-product-generic-preview': typeof LovableG8R1f1cProductGenericPreviewRoute
   '/lovable/g8-r1f1c-route-preview': typeof LovableG8R1f1cRoutePreviewRoute
   '/lovable/g8-r1f1c-zone-preview': typeof LovableG8R1f1cZonePreviewRoute
@@ -2164,6 +2174,7 @@ export interface FileRouteTypes {
     | '/lovable/g8-r1cl-seo-landing-parity'
     | '/lovable/g8-r1f1c-article-preview'
     | '/lovable/g8-r1f1c-business-generic-preview'
+    | '/lovable/g8-r1f1c-preview-hub'
     | '/lovable/g8-r1f1c-product-generic-preview'
     | '/lovable/g8-r1f1c-route-preview'
     | '/lovable/g8-r1f1c-zone-preview'
@@ -2375,6 +2386,7 @@ export interface FileRouteTypes {
     | '/lovable/g8-r1cl-seo-landing-parity'
     | '/lovable/g8-r1f1c-article-preview'
     | '/lovable/g8-r1f1c-business-generic-preview'
+    | '/lovable/g8-r1f1c-preview-hub'
     | '/lovable/g8-r1f1c-product-generic-preview'
     | '/lovable/g8-r1f1c-route-preview'
     | '/lovable/g8-r1f1c-zone-preview'
@@ -2589,6 +2601,7 @@ export interface FileRouteTypes {
     | '/lovable/g8-r1cl-seo-landing-parity'
     | '/lovable/g8-r1f1c-article-preview'
     | '/lovable/g8-r1f1c-business-generic-preview'
+    | '/lovable/g8-r1f1c-preview-hub'
     | '/lovable/g8-r1f1c-product-generic-preview'
     | '/lovable/g8-r1f1c-route-preview'
     | '/lovable/g8-r1f1c-zone-preview'
@@ -2799,6 +2812,7 @@ export interface RootRouteChildren {
   LovableG8R1clSeoLandingParityRoute: typeof LovableG8R1clSeoLandingParityRoute
   LovableG8R1f1cArticlePreviewRoute: typeof LovableG8R1f1cArticlePreviewRoute
   LovableG8R1f1cBusinessGenericPreviewRoute: typeof LovableG8R1f1cBusinessGenericPreviewRoute
+  LovableG8R1f1cPreviewHubRoute: typeof LovableG8R1f1cPreviewHubRoute
   LovableG8R1f1cProductGenericPreviewRoute: typeof LovableG8R1f1cProductGenericPreviewRoute
   LovableG8R1f1cRoutePreviewRoute: typeof LovableG8R1f1cRoutePreviewRoute
   LovableG8R1f1cZonePreviewRoute: typeof LovableG8R1f1cZonePreviewRoute
@@ -3185,6 +3199,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/g8-r1f1c-product-generic-preview'
       fullPath: '/lovable/g8-r1f1c-product-generic-preview'
       preLoaderRoute: typeof LovableG8R1f1cProductGenericPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/g8-r1f1c-preview-hub': {
+      id: '/lovable/g8-r1f1c-preview-hub'
+      path: '/lovable/g8-r1f1c-preview-hub'
+      fullPath: '/lovable/g8-r1f1c-preview-hub'
+      preLoaderRoute: typeof LovableG8R1f1cPreviewHubRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/g8-r1f1c-business-generic-preview': {
@@ -4912,6 +4933,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableG8R1f1cArticlePreviewRoute: LovableG8R1f1cArticlePreviewRoute,
   LovableG8R1f1cBusinessGenericPreviewRoute:
     LovableG8R1f1cBusinessGenericPreviewRoute,
+  LovableG8R1f1cPreviewHubRoute: LovableG8R1f1cPreviewHubRoute,
   LovableG8R1f1cProductGenericPreviewRoute:
     LovableG8R1f1cProductGenericPreviewRoute,
   LovableG8R1f1cRoutePreviewRoute: LovableG8R1f1cRoutePreviewRoute,
