@@ -1,0 +1,71 @@
+{
+  "initiative": "G8-R1-F1F · Activación del Piloto Visual Premium Navegable",
+  "authorization": "docs/governance/addenda/PCA-2026-029-ADDENDUM-AC.json",
+  "blueprint": "docs/blueprint/G8-R1-F1F-ACTIVACION-DEL-PILOTO-VISUAL-PREMIUM-NAVEGABLE-v1.0.md",
+  "recorded_at": "2026-08-29",
+  "flag": {
+    "key": "omxds_visual_v1_contracts_enabled",
+    "state_before": false,
+    "state_after": false,
+    "activated": false,
+    "consumer_routes": [
+      "src/routes/oriente-maya/$destino.index.tsx",
+      "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx",
+      "src/routes/oriente-maya/$destino.$categoria.$empresa.$producto.tsx",
+      "src/routes/producto.$slug.tsx",
+      "src/routes/eventos.$slug.tsx"
+    ],
+    "semantics": "override global de SurfaceContractBoundary; no controla Home, portada Oriente Maya ni los seis listados, que ya son premium permanente"
+  },
+  "published_inventory": {
+    "destination": { "published": 7, "real": 1, "demo_seed": 6 },
+    "business": { "published": 26, "real": 3, "demo_seed": 23 },
+    "product": { "published": 9, "real": 0, "demo_seed": 9 },
+    "event": { "published": 10, "real": 0, "demo_seed": 10 },
+    "place": { "published": 5, "real": 0, "demo_seed": 5 },
+    "zone": { "published": 0 },
+    "article": { "published": 0 }
+  },
+  "presentation_authority": {
+    "entity_presentation_modes_rows": 0,
+    "implicit_editorial_default": true,
+    "mass_insert_performed": false,
+    "cinematic_requires_approved_cover": true
+  },
+  "public_smoke_flag_off": [
+    { "path": "/", "http": 200, "h1": 1 },
+    { "path": "/oriente-maya", "http": 200, "h1": 1 },
+    { "path": "/oriente-maya/valladolid", "http": 200, "h1": 1 },
+    { "path": "/oriente-maya/valladolid/hoteles", "http": 200, "h1": 1 },
+    { "path": "/hoteles", "http": 200, "h1": 1 },
+    { "path": "/restaurantes", "http": 200, "h1": 1 },
+    { "path": "/experiencias", "http": 200, "h1": 1 },
+    { "path": "/casas-de-vacaciones", "http": 200, "h1": 1 },
+    { "path": "/que-hacer", "http": 200, "h1": 1 },
+    { "path": "/eventos", "http": 200, "h1": 1 }
+  ],
+  "gates": {
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "route_inventory": "PASS",
+    "validate_r1_f1c_a": "PASS",
+    "validate_g8_m1": "PASS",
+    "governance_check": "PASS",
+    "smoke_off": "PASS",
+    "smoke_on": "NOT_EXECUTED",
+    "rollback": "DOCUMENTED_NOT_EXERCISED"
+  },
+  "stop_conditions_triggered": [
+    "inventario publicado incluye datos demo en el piloto (53/57)",
+    "cobertura del flag PARCIAL: 5 superficies condicionadas, el resto premium permanente"
+  ],
+  "invariants": {
+    "new_publications": 0,
+    "editorial_state_changes": 0,
+    "draft_changes": 0,
+    "public_routes_for_zone_route_article": 0,
+    "unaccredited_images": 0,
+    "payments_or_bookings": 0
+  },
+  "status": "NO-GO · FLAG OFF · ACTIVACIÓN PARCIAL DECLARADA"
+}
