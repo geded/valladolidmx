@@ -30,6 +30,8 @@
     "validate:i3:d": "bun run test:i3:d && bun scripts/omxds/i3/business-premium-surface.evidence.mjs",
     "test:r1:d": "bun test scripts/omxds/r1-d/alux-canonical.contract.test.ts",
     "validate:r1:d": "bun run test:r1:d && bun scripts/omxds/r1-d/chrome-uniqueness.evidence.mjs",
+    "test:r1:e": "vitest run scripts/omxds/r1-e/alux-personalization.contract.test.ts",
+    "validate:r1:e": "bun run test:r1:e && bun run typecheck && bun run route-inventory:check && bun run governance:check",
     "test:i4:0": "bun test scripts/omxds/i4/editorial-builder.contract.test.ts",
     "validate:i4:0": "bun run test:i4:0 && bun scripts/omxds/i4/editorial-builder.evidence.mjs",
     "test:i4:a": "bun test scripts/omxds/i4/editorial-builder-authoring.test.ts",
