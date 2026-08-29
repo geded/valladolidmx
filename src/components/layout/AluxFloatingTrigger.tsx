@@ -71,6 +71,9 @@ import {
   ALUX_UNIFIED_CONTEXT_VERSION,
 } from "@/lib/alux/unified-context";
 import { rankAluxCandidates } from "@/lib/alux/personalization";
+import { useAluxMemory } from "@/lib/alux/use-alux-memory";
+import { emitAluxSignal } from "@/lib/alux/signal-emitter";
+import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
 import { useAluxFloatingPresence } from "@/lib/alux/floating-presence";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import {
@@ -228,6 +231,16 @@ export function AluxFloatingTrigger() {
   }, [open, nudge]);
 
   /**
+   * G8-R1-E-R1 — Memoria funcional y continuidad anónima.
+   * `summary` es el resumen permitido de señales (vacío si el viajero pausó
+   * la personalización). `anonymousTrip` aporta la composición declarada
+   * antes del registro. Ninguno crea un motor ni un perfil paralelo.
+   */
+  const { summary: behaviorSummary } = useAluxMemory();
+  const { trip: anonymousTrip } = useAnonymousTrip();
+
+
+  /**
    * G8-R1-D-R1 · DEF-R1D-005 — Composición ÚNICA del contexto unificado.
    *
    * Es la sola autoridad de contexto de Alux en superficies públicas
@@ -265,8 +278,12 @@ export function AluxFloatingTrigger() {
         hasAnonymousDraft: Boolean(sessionKey) && !isAuthed,
         locationConsent: geo.status === "granted",
         coords: geo.location ?? null,
+        // DEF-R1E-006 · Composición del viaje con orden de autoridad:
+        // perfil/plan declarado → continuidad anónima → desconocido.
+        profilePartySize: plan?.party_size ?? null,
+        anonymousTravelerCount: anonymousTrip?.travelerCount ?? null,
       }),
-    [ctx, plan, lens, isAuthed, sessionKey, geo],
+    [ctx, plan, lens, isAuthed, sessionKey, geo, anonymousTrip],
   );
   const contextIsSufficient = hasSufficientAluxContext(unified);
 
@@ -365,6 +382,8 @@ export function AluxFloatingTrigger() {
       limit: remote.length,
       savedCategorySlugs,
       requiredAccessibility: lens?.hints.accessibility ?? [],
+      // DEF-R1E-001/004 — señales reales del visitante (vacías si pausó).
+      signals: behaviorSummary,
       candidates: remote.map((s) => ({
         entityId: s.entityId ?? s.source.id,
         entityKind: s.kind,
@@ -393,7 +412,35 @@ export function AluxFloatingTrigger() {
         })
         .filter((v): v is AluxContextualSuggestion => Boolean(v)),
     };
-  }, [suggestionsQuery.data, unified, plan, lens]);
+  }, [suggestionsQuery.data, unified, plan, lens, behaviorSummary]);
+
+  /**
+   * DEF-R1E-001/004 — Emisores reales de navegación. Un solo punto: el
+   * contexto ya resuelto por el Context Engine. Sin PII, con deduplicación
+   * y rate limit en `emitAluxSignal`, escritura server-side por la
+   * autoridad existente de `visitor_intel`.
+   */
+  useEffect(() => {
+    const base = {
+      isAuthenticated: isAuthed,
+      locale,
+      surface: "alux_dock",
+      route: pathname,
+      destinationId: null,
+      travelStage: unified.trip.stage,
+      recommendationSource: "alux",
+      algorithmVersion: ALUX_UNIFIED_CONTEXT_VERSION,
+    } as const;
+    const emit = (kind: "territory_viewed" | "category_explored" | "entity_viewed", key?: string | null, targetType?: string) => {
+      if (!key) return;
+      void emitAluxSignal({ kind, key, context: { ...base, targetType: targetType ?? null } });
+    };
+    emit("territory_viewed", ctx.destination?.slug, "destination");
+    emit("category_explored", ctx.category?.slug, "category");
+    emit("entity_viewed", ctx.business?.slug, "business");
+    emit("entity_viewed", ctx.product?.slug, "product");
+  }, [ctx.destination?.slug, ctx.category?.slug, ctx.business?.slug, ctx.product?.slug, isAuthed, locale, pathname, unified.trip.stage]);
+
 
   // AT-0: en superficies con CTA sticky comercial, cedemos el espacio.
   if (presence.shouldHide) return null;

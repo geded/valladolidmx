@@ -18,6 +18,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as QueHacerRouteImport } from './routes/que-hacer'
 import { Route as PromocionesRouteImport } from './routes/promociones'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
+import { Route as PersonalizacionRouteImport } from './routes/personalizacion'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
@@ -262,6 +263,11 @@ const PromocionesRoute = PromocionesRouteImport.update({
 const PrivacidadRoute = PrivacidadRouteImport.update({
   id: '/privacidad',
   path: '/privacidad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PersonalizacionRoute = PersonalizacionRouteImport.update({
+  id: '/personalizacion',
+  path: '/personalizacion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OfflineRoute = OfflineRouteImport.update({
@@ -1426,6 +1432,7 @@ export interface FileRoutesByFullPath {
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
   '/offline': typeof OfflineRoute
+  '/personalizacion': typeof PersonalizacionRoute
   '/privacidad': typeof PrivacidadRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
@@ -1635,6 +1642,7 @@ export interface FileRoutesByTo {
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
   '/offline': typeof OfflineRoute
+  '/personalizacion': typeof PersonalizacionRoute
   '/privacidad': typeof PrivacidadRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
@@ -1838,6 +1846,7 @@ export interface FileRoutesById {
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
   '/offline': typeof OfflineRoute
+  '/personalizacion': typeof PersonalizacionRoute
   '/privacidad': typeof PrivacidadRoute
   '/promociones': typeof PromocionesRoute
   '/que-hacer': typeof QueHacerRoute
@@ -2050,6 +2059,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/mcp'
     | '/offline'
+    | '/personalizacion'
     | '/privacidad'
     | '/promociones'
     | '/que-hacer'
@@ -2259,6 +2269,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/mcp'
     | '/offline'
+    | '/personalizacion'
     | '/privacidad'
     | '/promociones'
     | '/que-hacer'
@@ -2461,6 +2472,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/mcp'
     | '/offline'
+    | '/personalizacion'
     | '/privacidad'
     | '/promociones'
     | '/que-hacer'
@@ -2673,6 +2685,7 @@ export interface RootRouteChildren {
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   McpRoute: typeof McpRoute
   OfflineRoute: typeof OfflineRoute
+  PersonalizacionRoute: typeof PersonalizacionRoute
   PrivacidadRoute: typeof PrivacidadRoute
   PromocionesRoute: typeof PromocionesRoute
   QueHacerRoute: typeof QueHacerRoute
@@ -2809,6 +2822,13 @@ declare module '@tanstack/react-router' {
       path: '/privacidad'
       fullPath: '/privacidad'
       preLoaderRoute: typeof PrivacidadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/personalizacion': {
+      id: '/personalizacion'
+      path: '/personalizacion'
+      fullPath: '/personalizacion'
+      preLoaderRoute: typeof PersonalizacionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/offline': {
@@ -4718,6 +4738,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceRoute: MarketplaceRouteWithChildren,
   McpRoute: McpRoute,
   OfflineRoute: OfflineRoute,
+  PersonalizacionRoute: PersonalizacionRoute,
   PrivacidadRoute: PrivacidadRoute,
   PromocionesRoute: PromocionesRoute,
   QueHacerRoute: QueHacerRoute,
