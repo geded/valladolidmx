@@ -921,6 +921,67 @@ export type Database = {
           },
         ]
       }
+      business_claim_snapshots: {
+        Row: {
+          actor_user_id: string | null
+          audit_ref: string | null
+          business_id: string
+          claim_id: string | null
+          created_at: string
+          id: string
+          reason: string
+          snapshot: Json
+          snapshot_hash: string
+          snapshot_version: number
+        }
+        Insert: {
+          actor_user_id?: string | null
+          audit_ref?: string | null
+          business_id: string
+          claim_id?: string | null
+          created_at?: string
+          id?: string
+          reason: string
+          snapshot: Json
+          snapshot_hash: string
+          snapshot_version?: number
+        }
+        Update: {
+          actor_user_id?: string | null
+          audit_ref?: string | null
+          business_id?: string
+          claim_id?: string | null
+          created_at?: string
+          id?: string
+          reason?: string
+          snapshot?: Json
+          snapshot_hash?: string
+          snapshot_version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_claim_snapshots_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_claim_snapshots_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claim_snapshots_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "business_ownership_transfers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_contacts: {
         Row: {
           business_id: string
@@ -994,7 +1055,9 @@ export type Database = {
           is_closed: boolean
           notes: string | null
           opens_at: string | null
+          source_verified_at: string | null
           updated_at: string
+          valid_until: string | null
         }
         Insert: {
           business_id: string
@@ -1005,7 +1068,9 @@ export type Database = {
           is_closed?: boolean
           notes?: string | null
           opens_at?: string | null
+          source_verified_at?: string | null
           updated_at?: string
+          valid_until?: string | null
         }
         Update: {
           business_id?: string
@@ -1016,7 +1081,9 @@ export type Database = {
           is_closed?: boolean
           notes?: string | null
           opens_at?: string | null
+          source_verified_at?: string | null
           updated_at?: string
+          valid_until?: string | null
         }
         Relationships: [
           {
@@ -1483,19 +1550,23 @@ export type Database = {
           display_name: string
           id: string
           is_demo_seed: boolean
+          last_verified_at: string | null
           legal_name: string | null
           logo_media_id: string | null
           metadata: Json
           primary_category_id: string | null
           published_at: string | null
+          record_origin: string
           review_notes: string | null
           slug: string
+          source_review_state: string
           status: Database["public"]["Enums"]["content_status"]
           submitted_for_review_at: string | null
           tagline: string | null
           updated_at: string
           updated_by: string | null
           verification_document_url: string | null
+          verification_due_at: string | null
           verification_notes: string | null
           verified: boolean
         }
@@ -1513,19 +1584,23 @@ export type Database = {
           display_name: string
           id?: string
           is_demo_seed?: boolean
+          last_verified_at?: string | null
           legal_name?: string | null
           logo_media_id?: string | null
           metadata?: Json
           primary_category_id?: string | null
           published_at?: string | null
+          record_origin?: string
           review_notes?: string | null
           slug: string
+          source_review_state?: string
           status?: Database["public"]["Enums"]["content_status"]
           submitted_for_review_at?: string | null
           tagline?: string | null
           updated_at?: string
           updated_by?: string | null
           verification_document_url?: string | null
+          verification_due_at?: string | null
           verification_notes?: string | null
           verified?: boolean
         }
@@ -1543,19 +1618,23 @@ export type Database = {
           display_name?: string
           id?: string
           is_demo_seed?: boolean
+          last_verified_at?: string | null
           legal_name?: string | null
           logo_media_id?: string | null
           metadata?: Json
           primary_category_id?: string | null
           published_at?: string | null
+          record_origin?: string
           review_notes?: string | null
           slug?: string
+          source_review_state?: string
           status?: Database["public"]["Enums"]["content_status"]
           submitted_for_review_at?: string | null
           tagline?: string | null
           updated_at?: string
           updated_by?: string | null
           verification_document_url?: string | null
+          verification_due_at?: string | null
           verification_notes?: string | null
           verified?: boolean
         }
@@ -3061,6 +3140,77 @@ export type Database = {
           used_at?: string | null
         }
         Relationships: []
+      }
+      entity_field_provenance: {
+        Row: {
+          captured_at: string
+          created_at: string
+          created_by: string | null
+          entity_id: string
+          entity_type: string
+          evidence_checksum: string | null
+          evidence_ref: string | null
+          field_path: string
+          id: string
+          metadata: Json
+          observed_at: string
+          source_kind: string
+          source_owner: string
+          source_url: string
+          superseded_at: string | null
+          superseded_by: string | null
+          updated_at: string
+          verification_level: string
+        }
+        Insert: {
+          captured_at?: string
+          created_at?: string
+          created_by?: string | null
+          entity_id: string
+          entity_type: string
+          evidence_checksum?: string | null
+          evidence_ref?: string | null
+          field_path: string
+          id?: string
+          metadata?: Json
+          observed_at: string
+          source_kind: string
+          source_owner: string
+          source_url: string
+          superseded_at?: string | null
+          superseded_by?: string | null
+          updated_at?: string
+          verification_level?: string
+        }
+        Update: {
+          captured_at?: string
+          created_at?: string
+          created_by?: string | null
+          entity_id?: string
+          entity_type?: string
+          evidence_checksum?: string | null
+          evidence_ref?: string | null
+          field_path?: string
+          id?: string
+          metadata?: Json
+          observed_at?: string
+          source_kind?: string
+          source_owner?: string
+          source_url?: string
+          superseded_at?: string | null
+          superseded_by?: string | null
+          updated_at?: string
+          verification_level?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entity_field_provenance_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "entity_field_provenance"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       events: {
         Row: {
@@ -7148,6 +7298,10 @@ export type Database = {
         }
         Returns: string
       }
+      business_public_source_summary: {
+        Args: { _business_id: string }
+        Returns: Json
+      }
       cancel_business_ownership_transfer: {
         Args: { _transfer_id: string }
         Returns: undefined
@@ -7447,6 +7601,10 @@ export type Database = {
         Returns: Json[]
       }
       concierge_workload_for_lead: { Args: never; Returns: Json[] }
+      create_business_claim_snapshot: {
+        Args: { _business_id: string; _claim_id?: string; _reason: string }
+        Returns: string
+      }
       create_business_product: {
         Args: {
           _business_id: string
@@ -7718,6 +7876,10 @@ export type Database = {
       eb_update_composition_slug: {
         Args: { _id: string; _new_slug: string }
         Returns: undefined
+      }
+      efp_can_read_row: {
+        Args: { _entity_id: string; _entity_type: string; _user_id: string }
+        Returns: boolean
       }
       email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {
@@ -8223,6 +8385,10 @@ export type Database = {
       request_promotion_review: {
         Args: { _notes?: string; _promotion_id: string }
         Returns: undefined
+      }
+      resolve_business_claim_state: {
+        Args: { _business_id: string }
+        Returns: string
       }
       revoke_zone_scope: { Args: { _scope_id: string }; Returns: boolean }
       search_marketplace: {
