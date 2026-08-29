@@ -218,6 +218,50 @@ export function AluxFloatingTrigger() {
     if (open && nudge) markNudgeShown(nudge.intent);
   }, [open, nudge]);
 
+  /**
+   * G8-R1-D-R1 · DEF-R1D-005 — Composición ÚNICA del contexto unificado.
+   *
+   * Es la sola autoridad de contexto de Alux en superficies públicas
+   * (Home, Destino, Listados, Empresa/hotel/restaurante, Producto/
+   * experiencia/tour, Evento, Lugar y Landing SEO en preview staff): el
+   * dock es el único punto de entrada montado en todas ellas. El contrato
+   * anterior (`AluxContext`) permanece como fuente territorial de entrada,
+   * nunca como segunda autoridad.
+   */
+  const unified = useMemo(
+    () =>
+      buildAluxUnifiedContext({
+        context: ctx,
+        plan: plan
+          ? {
+              id: "active",
+              start_date: plan.start_date,
+              end_date: plan.end_date,
+              party_size: plan.party_size,
+              item_count: plan.item_count,
+            }
+          : null,
+        savedItemCount: plan?.saved_items.length ?? 0,
+        profileHints: lens
+          ? {
+              homeCountry: lens.hints.home_country ?? null,
+              preferredLanguage: lens.hints.preferred_language ?? null,
+              travelStyle: lens.hints.travel_style ?? null,
+              budgetBand: lens.hints.budget_band ?? null,
+              interests: lens.hints.interests ?? [],
+            }
+          : null,
+        hasCompletedProfile: Boolean(lens?.hints.travel_style),
+        isAuthenticated: isAuthed,
+        hasAnonymousDraft: Boolean(sessionKey) && !isAuthed,
+        locationConsent: geo.status === "granted",
+        coords: geo.location ?? null,
+      }),
+    [ctx, plan, lens, isAuthed, sessionKey, geo.status, geo.location],
+  );
+  const contextIsSufficient = hasSufficientAluxContext(unified);
+
+
   const suggestionsQuery = useQuery({
     queryKey: [
       "alux",
