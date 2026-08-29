@@ -13,7 +13,12 @@ import {
   DERIVED_CLAIM_STATES,
   PROVENANCE_ENTITY_TYPES,
   PUBLIC_SOURCE_NOTICE,
+  CLAIM_AFFORDANCE_ACTION,
+  CLAIM_AFFORDANCE_QUESTION,
   canBePublic,
+  canShowVerifiedEstablishmentBadge,
+  claimStateAffectsCredibility,
+  resolveClaimAffordance,
   createClaimSnapshotSchema,
   expectedRecordOriginForLegacy,
   hoursValidity,
@@ -319,5 +324,80 @@ describe("Invariante de autoridad y cero captura", () => {
   test("anon no escribe procedencia ni snapshots", () => {
     expect(sql).not.toMatch(/GRANT[^;]*ON public\.entity_field_provenance TO anon/i);
     expect(sql).not.toMatch(/ON public\.business_claim_snapshots TO anon/i);
+  });
+});
+
+describe("ADDENDUM UX · reclamación discreta", () => {
+  const ui = readFileSync("src/components/provenance/ClaimAffordanceLink.tsx", "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/^\s*\/\/.*$/gm, "");
+
+  test("ficha aprobada no reclamada: enlace secundario sólo en el pie de la ficha", () => {
+    const a = resolveClaimAffordance({ claimState: "unclaimed", surface: "detail_footer" });
+    expect(a.visible).toBe(true);
+    expect(a.emphasis).toBe("secondary_link");
+    expect(a.question).toBe(CLAIM_AFFORDANCE_QUESTION);
+    expect(a.action).toBe(CLAIM_AFFORDANCE_ACTION);
+  });
+
+  test("nunca en tarjetas, listados ni hero", () => {
+    for (const surface of ["card", "listing", "hero"] as const) {
+      expect(resolveClaimAffordance({ claimState: "unclaimed", surface }).visible).toBe(false);
+    }
+  });
+
+  test("ficha reclamada o con reclamación pendiente no muestra la afordancia", () => {
+    for (const claimState of ["claimed", "claim_pending"] as const) {
+      expect(resolveClaimAffordance({ claimState, surface: "detail_footer" }).visible).toBe(false);
+    }
+  });
+
+  test("reclamación revocada vuelve a ser reclamable, siempre discreta", () => {
+    const a = resolveClaimAffordance({ claimState: "claim_revoked", surface: "detail_footer" });
+    expect(a.visible).toBe(true);
+    expect(a.emphasis).toBe("secondary_link");
+  });
+
+  test("cero badges, alertas o textos prominentes de ficha no reclamada", () => {
+    expect(ui).not.toMatch(/no reclamada|sin reclamar|unclaimed[^S]/i);
+    expect(ui).not.toMatch(/<Badge|<Alert|role="alert"/);
+    expect(ui).not.toMatch(/text-(base|lg|xl|2xl)|font-bold|destructive|warning/);
+  });
+
+  test("el estado de reclamación no degrada la credibilidad editorial", () => {
+    expect(claimStateAffectsCredibility()).toBe(false);
+    const approvedUnclaimed = {
+      status: "published" as const,
+      deletedAt: null,
+      sourceReviewState: "approved" as const,
+      hasCanonicalRoute: true,
+      hasDestination: true,
+      hasCoordinates: true,
+      verificationDueAt: null,
+      seoReviewed: true,
+      minimumEditorialFieldsComplete: true,
+    };
+    expect(canBePublic(approvedUnclaimed)).toBe(true);
+  });
+
+  test("'Establecimiento verificado' exige operador acreditado y aprobación administrativa", () => {
+    expect(
+      canShowVerifiedEstablishmentBadge({ claimState: "claimed", administrativelyVerified: true }),
+    ).toBe(true);
+    expect(
+      canShowVerifiedEstablishmentBadge({ claimState: "claimed", administrativelyVerified: false }),
+    ).toBe(false);
+    expect(
+      canShowVerifiedEstablishmentBadge({
+        claimState: "unclaimed",
+        administrativelyVerified: true,
+      }),
+    ).toBe(false);
+    expect(
+      canShowVerifiedEstablishmentBadge({
+        claimState: "claim_pending",
+        administrativelyVerified: true,
+      }),
+    ).toBe(false);
   });
 });
