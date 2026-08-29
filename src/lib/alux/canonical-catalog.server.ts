@@ -47,8 +47,15 @@ import {
   type CanonicalEntityFamily,
 } from "@/lib/experience-builder/canonical-entity-resolver";
 import { buildCanonicalEntityUrl } from "@/lib/experience-builder/canonical-entity-binding";
+import { isValidPoint, type AccreditedCoords, type CoordsSource } from "@/lib/alux/proximity";
 
-export const ALUX_CANONICAL_CATALOG_VERSION = "1.1.0" as const;
+export const ALUX_CANONICAL_CATALOG_VERSION = "1.2.0" as const;
+
+/** Coordenada acreditada o `null`. Nunca aproxima ni inventa. */
+function accredit(lat: unknown, lng: unknown, source: CoordsSource): AccreditedCoords | null {
+  const point = { lat: Number(lat), lng: Number(lng) };
+  return isValidPoint(point) ? { ...point, source } : null;
+}
 
 /** Tipo de entidad canónica que Alux puede proponer. */
 export type AluxCandidateKind = "business" | "product" | "event" | "place" | "destination";
@@ -77,6 +84,14 @@ export interface AluxCanonicalCandidate {
   readonly planKind: "destination" | "business" | "product" | "event" | null;
   readonly startsAt?: string | null;
   readonly endsAt?: string | null;
+  /**
+   * G8-R1-E-R1 · DEF-R1E-002 — Coordenadas ACREDITADAS del candidato.
+   * `null` cuando la entidad no tiene ubicación almacenada: en ese caso el
+   * candidato sigue siendo recomendable por afinidad y territorio, pero
+   * nunca recibe etiqueta de distancia ni entra en orden "Cerca de mí".
+   * Prohibido inventar centroides.
+   */
+  readonly coords?: AccreditedCoords | null;
 }
 
 /** Candidato descartado + razón auditable (nunca se expone al modelo). */
@@ -125,12 +140,32 @@ export async function loadAluxCanonicalCandidates(
   const rejected: AluxRejectedCandidate[] = [];
   const familyReport: Record<string, { loaded: number; eligible: number; note: string }> = {};
 
+  /**
+   * DEF-R1E-002 · Ubicación canónica publicada de las empresas del destino.
+   * Un producto/experiencia/tour sin ubicación propia HEREDA la de su
+   * empresa operadora, declarando el origen (`product_operator`).
+   */
+  const businessCoords = new Map<string, AccreditedCoords>();
+  if (input.publishedBusinessIds.length) {
+    const { data } = await sb
+      .from("business_locations")
+      .select("business_id, latitude, longitude, is_primary")
+      .in("business_id", input.publishedBusinessIds as string[]);
+    for (const row of (data ?? []) as Array<Record<string, unknown>>) {
+      const bizId = clean(row.business_id);
+      if (!bizId) continue;
+      if (businessCoords.has(bizId) && row.is_primary !== true) continue;
+      const point = accredit(row.latitude, row.longitude, "business_location");
+      if (point) businessCoords.set(bizId, point);
+    }
+  }
+
   // ── Lugares y atractivos (points_of_interest → premium-entity-place) ──
   {
     const { data, error } = await sb
       .from("points_of_interest")
       .select(
-        "id, slug, name, official_name, short_description, description, destination_zone_id, place_types ( slug, name ), destination_zones ( slug, destination_id )",
+        "id, slug, name, official_name, short_description, description, destination_zone_id, latitude, longitude, place_types ( slug, name ), destination_zones ( slug, destination_id )",
       )
       .eq("destination_id", input.destinationId)
       .eq("status", "published")
@@ -196,6 +231,7 @@ export async function loadAluxCanonicalCandidates(
         eligibility: "publicado · variante de lugar acreditada · ruta canónica válida",
         favoriteKind: null,
         planKind: null,
+        coords: accredit(row.latitude, row.longitude, "poi"),
       });
     }
     familyReport.place = {
@@ -291,6 +327,9 @@ export async function loadAluxCanonicalCandidates(
           "publicado · empresa publicada con ficha resoluble · ruta canónica construida por el binding",
         favoriteKind: "product",
         planKind: "product",
+        coords: businessCoords.has(bizId)
+          ? { ...(businessCoords.get(bizId) as AccreditedCoords), source: "product_operator" }
+          : null,
       });
     }
     familyReport.product = {

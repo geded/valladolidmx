@@ -4,7 +4,7 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.76",
     "state": "Approved",
-    "source_sha256": "e3cfdeef3b7ad151d50b7173202591e29ad3c7a1fe35c2effa362db709502079",
+    "source_sha256": "d2c3a5aa7541eca297f3036b350060e22ae9a32de41b6fffbab92410e39aeef3",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -8530,6 +8530,59 @@
       "id": "ART:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
       "type": "artifact",
       "path": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0"
+    },
+    {
+      "id": "ART:src/lib/alux/memory-store.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/memory-store.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/signal-events.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/signal-events.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/signal-emitter.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/signal-emitter.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/proximity.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/proximity.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/use-alux-memory.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/use-alux-memory.ts"
+    },
+    {
+      "id": "ART:src/components/alux/AluxMemoryPanel.tsx",
+      "type": "artifact",
+      "path": "src/components/alux/AluxMemoryPanel.tsx"
+    },
+    {
+      "id": "ART:src/routes/personalizacion.tsx",
+      "type": "artifact",
+      "path": "src/routes/personalizacion.tsx"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-e-r1/alux-memory-proximity.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-e-r1/alux-memory-proximity.contract.test.ts"
+    },
+    {
+      "id": "ART:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "type": "artifact",
+      "path": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md"
     }
   ],
   "edges": [
@@ -22715,6 +22768,123 @@
       "destination": "DOC:docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
       "evidence": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md § Implementación",
       "source_row": "docs/blueprint/G8-R1-E-PERSONALIZACION-SEGURA-ALUX-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/memory-store.ts:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/memory-store.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/signal-events.ts:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/signal-events.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/signal-emitter.ts:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/signal-emitter.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/proximity.ts:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/proximity.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/use-alux-memory.ts:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/use-alux-memory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/alux/AluxMemoryPanel.tsx:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/components/alux/AluxMemoryPanel.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/routes/personalizacion.tsx:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/routes/personalizacion.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/components/layout/AluxFloatingTrigger.tsx:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/components/layout/AluxFloatingTrigger.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/alux/canonical-catalog.server.ts:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/canonical-catalog.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/experience-builder/route-inventory.ts:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/experience-builder/route-inventory.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:scripts/omxds/r1-e-r1/alux-memory-proximity.contract.test.ts:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-e-r1/alux-memory-proximity.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:package.json:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
       "verified_at": "2026-08-29"
     }
   ],
