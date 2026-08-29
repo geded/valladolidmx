@@ -853,13 +853,29 @@ export function AluxFloatingTrigger() {
                             <div className="rounded-xl border border-border bg-card/60 px-3 py-2.5 text-sm text-foreground">
                               <a
                                 href={item.href}
-                                onClick={() =>
+                                onClick={() => {
                                   logAluxPublicSignal({
                                     action: "view_business",
                                     label: item.label,
                                     slug: item.source.id,
-                                  })
-                                }
+                                  });
+                                  // DEF-R1E-001 · recomendación aceptada.
+                                  void emitAluxSignal({
+                                    kind: "suggestion_accepted",
+                                    key: item.slug,
+                                    context: {
+                                      isAuthenticated: isAuthed,
+                                      locale,
+                                      surface: "alux_dock",
+                                      route: pathname,
+                                      destinationId: null,
+                                      travelStage: unified.trip.stage,
+                                      targetType: item.kind,
+                                      recommendationSource: "alux",
+                                      algorithmVersion: ALUX_UNIFIED_CONTEXT_VERSION,
+                                    },
+                                  });
+                                }}
                                 className="group flex items-start justify-between gap-3"
                               >
                                 <span className="min-w-0">
