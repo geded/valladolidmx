@@ -9,7 +9,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Send,
-  Sparkles,
   Loader2,
   MapPin,
   MapPinOff,
@@ -18,6 +17,8 @@ import {
   Plus,
   Check,
 } from "lucide-react";
+import { AluxMark } from "@/components/alux/AluxMark";
+
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@tanstack/react-router";
