@@ -7,11 +7,13 @@
   "blueprint": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
   "founder_authority": "Autorización Founder G8-R1-F1B-S1 (2026-08-29). Autoriza implementar exclusivamente el modelo aditivo mínimo de procedencia campo por campo, revisión editorial, caducidad de horarios, snapshot inmutable previo a reclamación y estado de reclamación derivado, mediante migración aditiva, idempotente y reversible. No autoriza capturar el lote, crear empresas reales, publicar fichas, cambiar estados turísticos, importar medios, activar flags, sitemap, redirects, PR, merge ni despliegue. Lectura pública fail-closed y `seo_metadata.noindex` como autoridad SEO única.",
   "permissions": [
-    { "operation": "create", "path": "src/lib/provenance/provenance-contracts.ts" },
-    { "operation": "create", "path": "src/lib/provenance/provenance.functions.ts" },
     {
       "operation": "create",
-      "path": "scripts/omxds/r1-f1b-s1/provenance-claim-model.contract.test.ts"
+      "path": "src/lib/provenance/provenance-contracts.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/provenance/provenance.functions.ts"
     },
     {
       "operation": "create",
@@ -23,7 +25,9 @@
     }
   ],
   "public_routes": [],
-  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
   "required_tests": [
     "bun run test:r1:f1b:s1",
     "bun run lint",
