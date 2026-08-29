@@ -4,7 +4,7 @@
  * Autoridad visual acreditada: composición `biz-zazil-tunich`, revisión #2
  * (`SEO.A3.M2`), SHA-256 `61913a4fa92bdb1c671a392caabc0b08f55a6ec946ed737abcd9038e01113d9c`.
  * De esa autoridad se extrae EXCLUSIVAMENTE la estructura narrativa de 17
- * bloques y sus variantes; el contenido específico de Zazil Tunich NO se
+ * bloques (ampliada a 18 slots por GAP-03, Planificador Alux) y sus variantes; el contenido específico de Zazil Tunich NO se
  * copia: todos los slots nacen neutrales y se llenan con datos reales.
  *
  * Módulo PURO: sin red, sin base de datos, sin React, sin flags.
@@ -17,7 +17,7 @@ import type { CompositionNode, CompositionTree } from "../composition-tree";
 
 export const SEO_LANDING_TEMPLATE_ID = "premium-seo-landing" as const;
 export const SEO_LANDING_VARIANT = "authority-editorial-zazil" as const;
-export const SEO_LANDING_CONTRACT_VERSION = "1.0.0" as const;
+export const SEO_LANDING_CONTRACT_VERSION = "1.1.0" as const;
 export const SEO_LANDING_AUTHORITY = {
   compositionSlug: "biz-zazil-tunich",
   variantKey: "zazil-tunich",
@@ -47,7 +47,9 @@ export type SeoLandingSlotId =
   | "related"
   | "reviews"
   | "faq"
+  | "aluxPlanner"
   | "ctaBar";
+
 
 export interface SeoLandingSlotDefinition {
   readonly id: SeoLandingSlotId;
@@ -199,15 +201,28 @@ export const SEO_LANDING_SLOTS: readonly SeoLandingSlotDefinition[] = [
   {
     id: "faq",
     order: 16,
-    blockType: "vmx.experience.faq",
+    // GAP-04 · No se crea `vmx.experience.faq`. `vmx.product.faq` NO es
+    // neutral (depende de `ProductSurfaceContext`), por lo que la landing
+    // reutiliza el bloque neutral ya registrado `vmx.kit.faq`.
+    blockType: "vmx.kit.faq",
     blockVersion: "1.0.0",
-    variant: "accordion",
+    variant: null,
     label: "Preguntas frecuentes",
     omitWhenEmpty: true,
   },
   {
-    id: "ctaBar",
+    id: "aluxPlanner",
     order: 17,
+    // GAP-03 · Planificador Alux como slot contractual (18 slots).
+    blockType: "vmx.alux.planner",
+    blockVersion: "1.0.0",
+    variant: "editorial",
+    label: "Planificador Alux",
+    omitWhenEmpty: true,
+  },
+  {
+    id: "ctaBar",
+    order: 18,
     blockType: "vmx.experience.cta-bar",
     blockVersion: "1.0.0",
     variant: "floating",
@@ -217,6 +232,34 @@ export const SEO_LANDING_SLOTS: readonly SeoLandingSlotDefinition[] = [
 ];
 
 export const SEO_LANDING_BLOCK_COUNT = SEO_LANDING_SLOTS.length;
+
+/* ------------------------------------------------------------------ *
+ * FAQPage JSON-LD — refleja EXACTAMENTE las preguntas visibles.
+ * Sin FAQ visible no se emite structured data (fail-closed).
+ * ------------------------------------------------------------------ */
+
+export function buildSeoLandingFaqJsonLd(
+  faqSlot: SeoLandingSlotConfig | null | undefined,
+): Record<string, unknown> | null {
+  const items = Array.isArray(faqSlot?.items) ? (faqSlot.items as Record<string, unknown>[]) : [];
+  const entities = items
+    .map((it) => ({
+      question: typeof it.question === "string" ? it.question.trim() : "",
+      answer: typeof it.answer === "string" ? it.answer.trim() : "",
+    }))
+    .filter((it) => it.question && it.answer);
+  if (entities.length === 0) return null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: entities.map((it) => ({
+      "@type": "Question",
+      name: it.question,
+      acceptedAnswer: { "@type": "Answer", text: it.answer },
+    })),
+  };
+}
+
 
 /* ------------------------------------------------------------------ *
  * Metadatos editoriales (chrome.seo.landing) — sin migración.
@@ -276,7 +319,7 @@ function hasContent(config: SeoLandingSlotConfig | null | undefined): boolean {
 }
 
 /**
- * Construye la composición de 17 bloques a partir de slots reales.
+ * Construye la composición de 18 slots a partir de slots reales.
  * Determinista y sin contenido inventado: los slots vacíos (salvo `hero`)
  * no generan nodo.
  */

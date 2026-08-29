@@ -5,7 +5,7 @@
  *  - Caso A: autoridad visual acreditada (Zazil Tunich, revisión SEO.A3.M2),
  *    leída tal cual sin modificarla.
  *  - Caso B: plantilla reusable neutral construida por
- *    `buildSeoLandingComposition` (17 slots, sin contenido inventado).
+ *    `buildSeoLandingComposition` (18 slots, sin contenido inventado).
  *  - Sondas de resolución: Chichén Itzá, Cenote Suytun y producto genérico
  *    resueltos por el resolutor canónico (C1), sólo configuración.
  *

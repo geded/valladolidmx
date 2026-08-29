@@ -9,6 +9,8 @@
  */
 import { Sparkles, ArrowRight } from "lucide-react";
 import { Container } from "@/components/layout/Container";
+import { AluxMark } from "@/components/alux/AluxMark";
+
 import {
   applyAluxPlannerDefaults,
   type AluxPlannerDTO,
@@ -37,7 +39,13 @@ export function AluxPlannerBlock({ config }: { config?: Record<string, unknown> 
             aria-hidden
             className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-primary/10 blur-3xl"
           />
+          <div className="relative mb-4 flex items-center gap-3">
+            {/* Sistema visual canónico Alux IA — activo gobernado /brand/alux/. */}
+            <AluxMark family="full" size={96} decorative={Boolean(dto.eyebrow)} loading="lazy" />
+            <p className="text-sm font-semibold text-foreground">Alux · Concierge IA</p>
+          </div>
           <div className="relative flex min-w-0 flex-col gap-4">
+
             {dto.eyebrow ? (
               <p className="inline-flex items-center gap-2 text-sm font-medium text-primary">
                 <Sparkles className="size-4" aria-hidden />

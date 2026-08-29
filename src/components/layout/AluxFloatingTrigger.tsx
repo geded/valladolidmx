@@ -76,6 +76,7 @@ import { getAluxTerritorialMemory } from "@/lib/alux/territorial-memory.function
 import { bindAluxSessionToTraveler } from "@/lib/alux/bind-session.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
+import { AluxMark } from "@/components/alux/AluxMark";
 
 function ContextChip({ slot }: { slot: AluxContextSlot }) {
   const content = (
@@ -319,8 +320,9 @@ export function AluxFloatingTrigger() {
           title={`Alux · ${triggerLabel}`}
           className="pointer-events-auto group flex max-w-[80vw] items-center gap-2 rounded-full border border-border bg-card/90 px-3.5 py-2 text-[13px] font-medium text-foreground shadow-lg backdrop-blur-md transition-all hover:bg-card active:scale-[0.98]"
         >
-          <span className="relative grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
-            <Sparkles className="size-3.5" aria-hidden />
+          <span className="relative grid size-6 shrink-0 place-items-center rounded-full bg-primary/15">
+            {/* Sistema visual canónico Alux IA (activo gobernado). */}
+            <AluxMark family="avatar" size={20} decorative loading="eager" />
             {nudge && !open && (
               <span
                 aria-hidden
@@ -328,6 +330,7 @@ export function AluxFloatingTrigger() {
               />
             )}
           </span>
+
           <span className="hidden sm:inline">Alux</span>
           <span className="hidden text-xs text-muted-foreground sm:inline">· Concierge IA</span>
           <span className="ml-1 truncate text-xs text-muted-foreground sm:hidden">
@@ -350,8 +353,8 @@ export function AluxFloatingTrigger() {
         <SheetContent side="right" className="flex w-full max-w-md flex-col gap-6 overflow-y-auto">
           <SheetHeader className="text-left">
             <div className="flex items-center gap-2">
-              <span className="grid size-8 place-items-center rounded-full bg-primary/15 text-primary">
-                <Sparkles className="size-4" aria-hidden />
+              <span className="grid size-8 place-items-center rounded-full bg-primary/15">
+                <AluxMark family="avatar" size={28} decorative loading="eager" />
               </span>
               <div>
                 <SheetTitle className="text-lg">Alux · Concierge IA del Oriente Maya</SheetTitle>

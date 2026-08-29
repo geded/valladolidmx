@@ -17,6 +17,7 @@ import {
   SEO_LANDING_SLOTS,
   SEO_LANDING_TEMPLATE_ID,
   buildSeoLandingComposition,
+  buildSeoLandingFaqJsonLd,
   readSeoLandingChrome,
 } from "@/lib/experience-builder/seo-landing/seo-landing-template";
 
@@ -108,11 +109,34 @@ describe("C1 · resolutor canónico de 8 familias", () => {
 });
 
 describe("L1 · plantilla reusable premium-seo-landing", () => {
-  test("declara 17 slots en orden narrativo", () => {
-    expect(SEO_LANDING_BLOCK_COUNT).toBe(17);
+  test("declara 18 slots en orden narrativo (GAP-03)", () => {
+    expect(SEO_LANDING_BLOCK_COUNT).toBe(18);
     expect(SEO_LANDING_SLOTS.map((s) => s.order)).toEqual(
-      Array.from({ length: 17 }, (_, i) => i + 1),
+      Array.from({ length: 18 }, (_, i) => i + 1),
     );
+  });
+
+  test("GAP-03 · el Planificador Alux es slot contractual", () => {
+    const slot = SEO_LANDING_SLOTS.find((s) => s.id === "aluxPlanner");
+    expect(slot?.blockType).toBe("vmx.alux.planner");
+    expect(slot?.omitWhenEmpty).toBe(true);
+  });
+
+  test("GAP-04 · la FAQ reutiliza el bloque neutral del Kit", () => {
+    const slot = SEO_LANDING_SLOTS.find((s) => s.id === "faq");
+    expect(slot?.blockType).toBe("vmx.kit.faq");
+  });
+
+  test("GAP-04 · el JSON-LD refleja sólo las preguntas visibles", () => {
+    expect(buildSeoLandingFaqJsonLd(null)).toBeNull();
+    expect(buildSeoLandingFaqJsonLd({ items: [{ question: "P", answer: "" }] })).toBeNull();
+    const ld = buildSeoLandingFaqJsonLd({
+      items: [
+        { question: "P1", answer: "R1" },
+        { question: "P2", answer: "R2" },
+      ],
+    }) as { mainEntity: unknown[] };
+    expect(ld.mainEntity.length).toBe(2);
   });
 
   test("acredita la autoridad visual por SHA-256", () => {
