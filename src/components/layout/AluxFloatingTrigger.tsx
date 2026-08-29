@@ -65,6 +65,11 @@ import {
   type AluxContext,
   type AluxContextSlot,
 } from "@/lib/alux/use-alux-context";
+import {
+  buildAluxUnifiedContext,
+  hasSufficientAluxContext,
+  ALUX_UNIFIED_CONTEXT_VERSION,
+} from "@/lib/alux/unified-context";
 import { useAluxFloatingPresence } from "@/lib/alux/floating-presence";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import {
