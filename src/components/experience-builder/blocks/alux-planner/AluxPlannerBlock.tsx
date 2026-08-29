@@ -67,6 +67,27 @@ export function AluxPlannerBlock({ config }: { config?: Record<string, unknown> 
               </p>
             ) : null}
 
+            {/* Contexto REAL recibido (entidad · territorio). Sin datos del
+                CMS no se muestra nada: cero inferencia, cero invención. */}
+            {contextChips.length > 0 ? (
+              <ul
+                data-alux-planner-context
+                className="flex flex-wrap gap-2"
+                aria-label="Contexto que Alux ya conoce"
+              >
+                {contextChips.map((c) => (
+                  <li
+                    key={c}
+                    className="inline-flex items-center rounded-pill bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+                  >
+                    {c}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
+
+
             <div className="mt-2 flex w-full min-w-0 flex-col gap-3 @2xl:flex-row @2xl:items-center">
               <input
                 type="text"
