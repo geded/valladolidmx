@@ -1,0 +1,37 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-AB",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum AB · G8-R1-F1C-A · Regeneración de tipos por la autoridad de presentación",
+  "status": "Approved",
+  "effective_date": "2026-08-29",
+  "recorded_at": "2026-08-29",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/G8-R1-F1C-A-PARIDAD-DE-PLANTILLAS-Y-AUTORIDAD-DE-PRESENTACION-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorización Founder G8-R1-F1C-A (2026-08-29), alcance corregido a presentación y plantillas. Autoriza sustituir de forma append-only el digest acreditado de la ruta sensible indicada como consecuencia directa de la autoridad única de presentación. No autoriza checkout, pagos, publicación, activación de flags, sitemap, redirects, PR, merge ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/integrations/supabase/types.ts",
+    "previous_sha256": "8605f8410000000000000000000000000000000000000000000000000000000",
+    "current_sha256": "370b8ae7b8e06a1d39b1be73ae5fde2b7f1f052c86745fa33845bd72a92717e9",
+    "semantic_change": "Regeneración automática de tipos tras la migración aditiva de entity_presentation_modes, entity_presentation_mode_history y sus RPC gobernadas. Sin cambios manuales ni de contrato de datos existente.",
+    "authority": "Autorización Founder G8-R1-F1C-A (2026-08-29)"
+  },
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run validate:r1:f1c:a",
+    "bun run governance:check"
+  ]
+}
