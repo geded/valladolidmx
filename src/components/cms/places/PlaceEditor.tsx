@@ -33,6 +33,8 @@ import {
 } from "@/lib/places/place-territory";
 import { placeDetailsPatchSchema } from "@/lib/places/places-cms-contracts";
 import type { ContentStatus } from "@/lib/cms/workflow";
+import { SeoLandingAction } from "@/components/cms/SeoLandingAction";
+
 import {
   PlaceField,
   PlaceSection,
