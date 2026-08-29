@@ -238,26 +238,61 @@ export const SEO_LANDING_BLOCK_COUNT = SEO_LANDING_SLOTS.length;
  * Sin FAQ visible no se emite structured data (fail-closed).
  * ------------------------------------------------------------------ */
 
-export function buildSeoLandingFaqJsonLd(
-  faqSlot: SeoLandingSlotConfig | null | undefined,
-): Record<string, unknown> | null {
-  const items = Array.isArray(faqSlot?.items) ? (faqSlot.items as Record<string, unknown>[]) : [];
-  const entities = items
+export interface SeoLandingFaqEntry {
+  readonly question: string;
+  readonly answer: string;
+}
+
+/**
+ * Adaptador ÚNICO del slot `faq`. Normaliza una sola vez la lista real y
+ * devuelve (a) la config del bloque neutral reutilizado `vmx.kit.faq` y
+ * (b) el JSON-LD `FAQPage`. Ambos derivan de la MISMA lista, por lo que la
+ * FAQ visible y el structured data son idénticos por construcción.
+ * Sin preguntas reales: ni bloque ni JSON-LD (fail-closed).
+ */
+export function adaptSeoLandingFaq(faqSlot: SeoLandingSlotConfig | null | undefined): {
+  entries: SeoLandingFaqEntry[];
+  blockConfig: SeoLandingSlotConfig | null;
+  jsonLd: Record<string, unknown> | null;
+} {
+  const raw = Array.isArray(faqSlot?.items) ? (faqSlot.items as Record<string, unknown>[]) : [];
+  const entries: SeoLandingFaqEntry[] = raw
     .map((it) => ({
       question: typeof it.question === "string" ? it.question.trim() : "",
       answer: typeof it.answer === "string" ? it.answer.trim() : "",
     }))
-    .filter((it) => it.question && it.answer);
-  if (entities.length === 0) return null;
+    .filter((it) => it.question.length > 0 && it.answer.length > 0);
+
+  if (entries.length === 0) return { entries: [], blockConfig: null, jsonLd: null };
+
+  const heading =
+    typeof faqSlot?.heading === "string" && faqSlot.heading.trim()
+      ? faqSlot.heading.trim()
+      : "Preguntas frecuentes";
+
   return {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: entities.map((it) => ({
-      "@type": "Question",
-      name: it.question,
-      acceptedAnswer: { "@type": "Answer", text: it.answer },
-    })),
+    entries,
+    blockConfig: {
+      heading,
+      items: entries.map((e, i) => ({ id: `faq-${i}`, question: e.question, answer: e.answer })),
+    },
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: entries.map((e) => ({
+        "@type": "Question",
+        name: e.question,
+        acceptedAnswer: { "@type": "Answer", text: e.answer },
+      })),
+    },
   };
+}
+
+/** Compatibilidad: JSON-LD derivado del mismo adaptador. */
+export function buildSeoLandingFaqJsonLd(
+  faqSlot: SeoLandingSlotConfig | null | undefined,
+): Record<string, unknown> | null {
+  return adaptSeoLandingFaq(faqSlot).jsonLd;
 }
 
 
@@ -329,7 +364,11 @@ export function buildSeoLandingComposition(input: BuildSeoLandingInput): Composi
   const children: CompositionNode[] = [];
 
   for (const slot of SEO_LANDING_SLOTS) {
-    const config = input.slots[slot.id] ?? null;
+    // GAP-04 · el slot `faq` pasa SIEMPRE por el adaptador único.
+    const config =
+      slot.id === "faq"
+        ? adaptSeoLandingFaq(input.slots.faq ?? null).blockConfig
+        : (input.slots[slot.id] ?? null);
     const filled = hasContent(config);
     if (!filled && slot.omitWhenEmpty) continue;
     if (filled) populated.push(slot.id);
