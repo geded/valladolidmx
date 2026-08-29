@@ -40,7 +40,8 @@ const FAMILIES: Family[] = [
   {
     key: "A",
     family: "Casa de vacaciones",
-    preset: "premium-entity-vacation-rental · vacation-rental-surface.adapter (JSON-LD VacationRental)",
+    preset:
+      "premium-entity-vacation-rental · vacation-rental-surface.adapter (JSON-LD VacationRental)",
     href: "/lovable/g8p2-vacation-rental-premium-preview",
     data: "Fixture neutral interno (demo interna), sin contenido publicable",
     modes: "Editorial (por defecto) · Cinematográfica disponible con portada aprobada",

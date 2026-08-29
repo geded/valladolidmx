@@ -45,7 +45,11 @@ const ZONE = {
 const COLLECTIONS = [
   { icon: Landmark, label: "Lugares", note: "Se omite si la zona no tiene lugares acreditados" },
   { icon: Store, label: "Empresas", note: "Hoteles, restaurantes y comercios dentro del polígono" },
-  { icon: ShoppingBag, label: "Productos", note: "Experiencias y productos con operador en la zona" },
+  {
+    icon: ShoppingBag,
+    label: "Productos",
+    note: "Experiencias y productos con operador en la zona",
+  },
   { icon: CalendarDays, label: "Eventos", note: "Agenda vigente dentro de la zona" },
   { icon: RouteIcon, label: "Rutas", note: "Itinerarios que atraviesan la zona" },
 ];
@@ -101,9 +105,7 @@ function ZonePreview() {
         </p>
       </Container>
 
-      <PremiumSection
-        vm={{ id: "mapa", eyebrow: "Territorio", title: "Mapa del polígono" }}
-      >
+      <PremiumSection vm={{ id: "mapa", eyebrow: "Territorio", title: "Mapa del polígono" }}>
         <div className="flex aspect-[16/9] items-center justify-center rounded-2xl border border-dashed border-border bg-muted/40 text-sm text-muted-foreground">
           <Map className="mr-2 size-4" aria-hidden />
           Mapa territorial (marcador neutral: sin medio gobernado)

@@ -113,9 +113,7 @@ function ProductGenericPreview() {
         </p>
       </Container>
 
-      <PremiumSection
-        vm={{ id: "ficha", eyebrow: "Ficha", title: "Datos del producto" }}
-      >
+      <PremiumSection vm={{ id: "ficha", eyebrow: "Ficha", title: "Datos del producto" }}>
         <dl className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-2xl border border-border bg-card p-4">
             <dt className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
@@ -154,7 +152,9 @@ function ProductGenericPreview() {
               <li
                 key={key}
                 className={`rounded-2xl border p-4 text-sm ${
-                  on ? "border-primary bg-card shadow-soft" : "border-dashed border-border opacity-60"
+                  on
+                    ? "border-primary bg-card shadow-soft"
+                    : "border-dashed border-border opacity-60"
                 }`}
               >
                 <p className="flex items-center gap-2 font-medium">
