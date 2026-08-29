@@ -30,6 +30,15 @@ export function AluxPlannerBlock({ config }: { config?: Record<string, unknown> 
   const isOwner = usePlannerPresence();
   if (!isOwner) return null;
 
+  const ctx = dto.context;
+  const contextChips: string[] = [
+    ctx?.entityLabel,
+    ctx?.zoneName,
+    ctx?.destinationName,
+  ].filter((v): v is string => Boolean(v && v.trim()));
+
+
+
 
   return (
     <section
