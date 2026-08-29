@@ -35,9 +35,5 @@
   ],
   "public_routes": [],
   "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
-  "required_tests": [
-    "bun run typecheck",
-    "bun run validate:r1:f1c:a",
-    "bun run governance:check"
-  ]
+  "required_tests": ["bun run typecheck", "bun run validate:r1:f1c:a", "bun run governance:check"]
 }
