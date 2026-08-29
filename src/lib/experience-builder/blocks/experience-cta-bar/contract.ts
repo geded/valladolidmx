@@ -45,6 +45,22 @@ export const experienceCtaBarTravelItemSchema = z.object({
 });
 export type ExperienceCtaBarTravelItem = z.infer<typeof experienceCtaBarTravelItemSchema>;
 
+/**
+ * G8-R1-C+L · GAP-01 — Referencia canónica para "Guardar" (favoritos).
+ * ACCIÓN DISTINTA de `add-to-trip`: Guardar NO agrega a Mi Viaje.
+ * Guardar   → `traveler_favorites` (guardado rápido, vía `FavoriteButton`).
+ * Mi Viaje  → Travel Plan (expediente estructurado, `AddToTravelPlanButton`).
+ * Sin esta referencia la acción se omite (fail-closed).
+ */
+export const experienceCtaBarFavoriteItemSchema = z.object({
+  entityKind: z.enum(["business", "product", "promotion"]),
+  entityId: z.string().min(1),
+  entityTitle: z.string().min(1).optional(),
+  entitySlug: z.string().optional(),
+  entityImageUrl: z.string().optional(),
+});
+export type ExperienceCtaBarFavoriteItem = z.infer<typeof experienceCtaBarFavoriteItemSchema>;
+
 export const experienceCtaBarActionSchema = z.object({
   label: z.string().min(1),
   href: z.string().min(1).optional(),
@@ -63,6 +79,7 @@ export const experienceCtaBarActionSchema = z.object({
     .default("navigate"),
   emphasis: z.enum(["primary", "secondary", "ghost"]).default("secondary"),
   travelItem: experienceCtaBarTravelItemSchema.optional(),
+  favoriteItem: experienceCtaBarFavoriteItemSchema.optional(),
 });
 export type ExperienceCtaBarAction = z.infer<typeof experienceCtaBarActionSchema>;
 

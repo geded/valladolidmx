@@ -10,6 +10,8 @@
 import { Sparkles, ArrowRight } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { AluxMark } from "@/components/alux/AluxMark";
+import { usePlannerPresence } from "@/lib/alux/planner-presence";
+
 
 import {
   applyAluxPlannerDefaults,
@@ -24,6 +26,19 @@ const VARIANT_PADDING: Record<AluxPlannerDTO["variant"], string> = {
 
 export function AluxPlannerBlock({ config }: { config?: Record<string, unknown> } = {}) {
   const dto = applyAluxPlannerDefaults(config);
+  // Máximo un planificador contextual por página (el dock global es aparte).
+  const isOwner = usePlannerPresence();
+  if (!isOwner) return null;
+
+  const ctx = dto.context;
+  const contextChips: string[] = [
+    ctx?.entityLabel,
+    ctx?.zoneName,
+    ctx?.destinationName,
+  ].filter((v): v is string => Boolean(v && v.trim()));
+
+
+
 
   return (
     <section
@@ -60,6 +75,27 @@ export function AluxPlannerBlock({ config }: { config?: Record<string, unknown> 
                 {dto.subheading}
               </p>
             ) : null}
+
+            {/* Contexto REAL recibido (entidad · territorio). Sin datos del
+                CMS no se muestra nada: cero inferencia, cero invención. */}
+            {contextChips.length > 0 ? (
+              <ul
+                data-alux-planner-context
+                className="flex flex-wrap gap-2"
+                aria-label="Contexto que Alux ya conoce"
+              >
+                {contextChips.map((c) => (
+                  <li
+                    key={c}
+                    className="inline-flex items-center rounded-pill bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+                  >
+                    {c}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
+
 
             <div className="mt-2 flex w-full min-w-0 flex-col gap-3 @2xl:flex-row @2xl:items-center">
               <input
