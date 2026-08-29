@@ -41,18 +41,25 @@ Resolución sin bloque nuevo: el slot `faq` de la landing reutiliza **`vmx.kit.f
 Script determinista e idempotente: `scripts/brand/alux/generate-alux-derivatives.py`.
 Sin IA, sin redibujo, sin nuevas poses, sin monocromos, sin recoloraciones, sin fondos.
 
-| Familia | Tamaños | Formatos |
-| --- | --- | --- |
-| `alux-ia-full` | 96, 128, 192, 256, 384, 512 | PNG · WebP · AVIF |
-| `alux-ia-avatar` | 32, 40, 44, 48, 64, 80, 96, 128, 192 | PNG · WebP · AVIF |
+| Familia | Tamaños | Formatos | Derivadas |
+| --- | --- | --- | --- |
+| `alux-ia-full` | 96, 128, 192, 256, 384, 512 (6) | PNG · WebP · AVIF (3) | **18** |
+| `alux-ia-avatar` | 32, 40, 44, 48, 64, 80, 96, 128, 192 (9) | PNG · WebP · AVIF (3) | **27** |
+| — | — | **Total derivadas** | **45** |
+
+Reconciliación autorizada: **45 derivadas + 1 original + 2 maestras = 48 activos**.
+Inventario físico verificado: `png` 15, `webp` 15, `avif` 15 (6 full + 9 avatar por formato), `master` 2, `source` 1.
+**No existen archivos full adicionales**: la mención previa de "24 derivadas full" fue un error aritmético de redacción en el reporte, no un excedente en disco. Cero archivos eliminados, cero regeneración.
 
 ## G · Gobernanza de activos
 
 - Raíz canónica: `/brand/alux/`.
 - Original inmutable: `/brand/alux/source/alux-ia-source-original.jpeg` (nunca se sobrescribe).
 - Maestras transparentes: `/brand/alux/master/alux-ia-{full,avatar}-master-transparent.png`.
-- `public/brand/alux/manifest.json`: 48 activos, cada uno con `sha256`, `bytes`, `path` y procedencia.
+- `public/brand/alux/manifest.json` v1.1.0: 48 activos; cada entrada declara `originalFilename`, `canonicalPath`, `role`, `family`, `width`, `height`, `format`, `bytes`, `sha256`, `derivedFrom`, `transparent` y `usage`.
+- Los nombres de origen (`IMG_0550.png`, `IMG_0549.png`, `3a53f1cb-….jpeg`) se conservan **sólo** como metadato de procedencia; nunca como rutas públicas.
 - Declarado explícitamente: **no son fotografías turísticas ni medios documentales**; no entran al pipeline de medios editoriales G8-M1.
+
 
 ## H · Accesibilidad y responsive
 
