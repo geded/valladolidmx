@@ -210,7 +210,15 @@ export interface AluxContextualSuggestResult {
    * sin romper las sugerencias (que siguen sirviéndose desde catálogo).
    */
   readonly aiStatus?: "ok" | "skipped" | "rate_limited" | "credits_exhausted" | "error";
+  /**
+   * G8-R1-D1 · Diagnóstico por familia del catálogo canónico consultado
+   * (auditoría; nunca se envía al modelo ni se muestra al viajero).
+   */
+  readonly catalogFamilies?: Readonly<
+    Record<string, { loaded: number; eligible: number; note: string }>
+  >;
 }
+
 
 const EMPTY: AluxContextualSuggestResult = {
   suggestions: [],
