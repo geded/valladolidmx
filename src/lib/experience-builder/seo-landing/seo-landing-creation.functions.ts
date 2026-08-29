@@ -271,7 +271,7 @@ export const createSeoLandingDraft = createServerFn({ method: "POST" })
       const { data: newId, error: createError } = await supabase.rpc("eb_create_composition", {
         _slug: slug,
         _title: entity.title,
-        _description: entity.tagline ?? null,
+        _description: entity.tagline ?? undefined,
         _page_type: "landing",
       });
       if (createError) throw new Error(createError.message);
