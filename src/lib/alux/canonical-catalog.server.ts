@@ -47,8 +47,19 @@ import {
   type CanonicalEntityFamily,
 } from "@/lib/experience-builder/canonical-entity-resolver";
 import { buildCanonicalEntityUrl } from "@/lib/experience-builder/canonical-entity-binding";
+import { isValidPoint, type AccreditedCoords, type CoordsSource } from "@/lib/alux/proximity";
 
-export const ALUX_CANONICAL_CATALOG_VERSION = "1.1.0" as const;
+export const ALUX_CANONICAL_CATALOG_VERSION = "1.2.0" as const;
+
+/** Coordenada acreditada o `null`. Nunca aproxima ni inventa. */
+function accredit(
+  lat: unknown,
+  lng: unknown,
+  source: CoordsSource,
+): AccreditedCoords | null {
+  const point = { lat: Number(lat), lng: Number(lng) };
+  return isValidPoint(point) ? { ...point, source } : null;
+}
 
 /** Tipo de entidad canónica que Alux puede proponer. */
 export type AluxCandidateKind = "business" | "product" | "event" | "place" | "destination";
