@@ -5,7 +5,7 @@
  * continuidad anónima + Addendum de composición del viaje.
  * Capas puras, sin red y sin DB: el gate es determinista.
  */
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import {
   buildAluxUnifiedContext,
   hasSufficientAluxContext,
