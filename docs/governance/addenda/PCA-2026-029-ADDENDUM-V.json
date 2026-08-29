@@ -1,0 +1,35 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-V",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum V · G8-R1-E-R1 · Alta de la superficie de personalización y memoria en el Route Inventory",
+  "status": "Approved",
+  "effective_date": "2026-08-29",
+  "recorded_at": "2026-08-29",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorización Founder G8-R1-E-R1 (2026-08-29) · Memoria anónima e inteligencia de comportamiento de Alux, con Addendum R2 de cierre de defectos. Autoriza exclusivamente el alta aditiva de la ruta pública no indexable src/routes/personalizacion.tsx en SCANNED_ROUTE_FILES conforme a la Route Inventory Rule (DOS · SSC-01 · P2) y, en consecuencia, sustituir de forma append-only el digest acreditado de src/lib/experience-builder/route-inventory.ts. No autoriza publicación, migraciones, redirects, sitemap, cambios de flag, PR, merge ni despliegue: cualquier variación adicional falla cerrado.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "80d33eb454556babda35df0a9b7c1e348b4a9f703ac691d257342c7b2c4c6af1",
+    "current_sha256": "fd18c0150d3527a6668b996417b607230f0269208e004cee21cfc3d0059e3e87",
+    "semantic_change": "Alta aditiva de la entrada src/routes/personalizacion.tsx en SCANNED_ROUTE_FILES. Sin cambios de lógica, heurística, overrides ni API del inventario.",
+    "authority": "Autorización Founder G8-R1-E-R1 (2026-08-29)"
+  },
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run validate:r1:e:r1",
+    "bun run governance:check"
+  ]
+}
