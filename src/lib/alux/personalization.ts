@@ -186,7 +186,9 @@ export const ALUX_WEIGHTS = {
  */
 export function rankAluxCandidates(input: RankAluxCandidatesInput): AluxPersonalizationResult {
   const unified = input.unified;
-  const party = input.party ?? EMPTY_PARTY_PROFILE;
+  // Addendum Founder: la tarjeta de composición es la autoridad. El contexto
+  // unificado ya la deriva; `input.party` sólo sirve para pruebas dirigidas.
+  const party = input.party ?? unified.party ?? EMPTY_PARTY_PROFILE;
   const signals = input.signals ?? EMPTY_SIGNAL_SUMMARY;
   const stage = unified.trip.stage;
   const limit = input.limit ?? 6;
