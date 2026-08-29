@@ -309,6 +309,16 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     functionalOwner: "Founder",
     notes: "Superficie Alux — página consultiva.",
   },
+  "src/routes/_authenticated/cms/empresas.$businessId.preview.tsx": {
+    category: "studio",
+    businessPriority: "high",
+    maturity: "L4",
+    migrationStatus: "native-studio",
+    functionalOwner: "Editorial",
+    notes:
+      "G8-R1-F1B-B3 · Preview interno staff de borradores empresariales. " +
+      "Reutiliza BusinessSurface productiva. noindex,nofollow. Sin publicación.",
+  },
   "src/routes/arma-tu-viaje.tsx": {
     category: "studio",
     businessPriority: "critical",
@@ -356,6 +366,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/cms/destinos.nueva.tsx",
   "src/routes/_authenticated/cms/demo-pack.tsx",
   "src/routes/_authenticated/cms/empresas.$businessId.editar.tsx",
+  "src/routes/_authenticated/cms/empresas.$businessId.preview.tsx",
   "src/routes/_authenticated/cms/empresas.index.tsx",
   "src/routes/_authenticated/cms/empresas.nueva.tsx",
   "src/routes/_authenticated/cms/experience-builder.pages.tsx",
