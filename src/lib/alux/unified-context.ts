@@ -23,6 +23,10 @@
  *    inyecta lo que ya cargó con los contratos existentes.
  */
 import { deriveTravelStage, type TravelStage } from "@/lib/traveler/journey-stage";
+import {
+  derivePartyProfile,
+  type PartyProfile,
+} from "@/lib/traveler/party-composition";
 import type { AluxContext } from "./use-alux-context";
 
 export const ALUX_UNIFIED_CONTEXT_VERSION = "1.0.0" as const;
