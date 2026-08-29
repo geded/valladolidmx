@@ -92,8 +92,17 @@ export const seoLandingChromeSchema = z.object({
   contractVersion: z.string().min(1),
   /** Entidad real de origen: `business:<id>`, `place:<id>`, ... */
   entityRef: z.string().min(1),
-  /** Presentación persistible (paridad con premium-entity-place). */
-  presentation: z.enum(["editorial", "cinematic"]).default("editorial"),
+  /**
+   * Presentación persistible. Para `premium-seo-landing` la ÚNICA autoridad
+   * visual acreditada es `authority-editorial-zazil`, por lo que "editorial"
+   * es el modo aprobado y predeterminado. "cinematic" permanece fail-closed:
+   * se acepta como valor histórico pero se normaliza a "editorial" hasta que
+   * exista una aprobación visual Founder independiente.
+   */
+  presentation: z
+    .enum(["editorial", "cinematic"])
+    .default("editorial")
+    .transform(() => "editorial" as const),
   /** Slots efectivamente poblados con datos reales. */
   populatedSlots: z.array(z.string()).default([]),
   authority: z
@@ -161,7 +170,8 @@ export function buildSeoLandingComposition(input: BuildSeoLandingInput): Composi
     variant: SEO_LANDING_VARIANT,
     contractVersion: SEO_LANDING_CONTRACT_VERSION,
     entityRef: input.entityRef,
-    presentation: input.presentation ?? "editorial",
+    // Fail-closed: sólo Editorial está acreditada para esta familia.
+    presentation: "editorial",
     populatedSlots: populated,
     authority: {
       compositionSlug: SEO_LANDING_AUTHORITY.compositionSlug,

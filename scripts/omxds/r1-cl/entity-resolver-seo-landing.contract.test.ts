@@ -146,7 +146,9 @@ describe("L1 · plantilla reusable premium-seo-landing", () => {
     });
     const chrome = readSeoLandingChrome(tree);
     expect(chrome?.template).toBe(SEO_LANDING_TEMPLATE_ID);
-    expect(chrome?.presentation).toBe("cinematic");
+    // Regla Founder: Cinematográfica NO acreditada para premium-seo-landing.
+    // Cualquier entrada distinta se normaliza fail-closed a Editorial.
+    expect(chrome?.presentation).toBe("editorial");
     expect(chrome?.populatedSlots).toEqual(["hero"]);
   });
 
