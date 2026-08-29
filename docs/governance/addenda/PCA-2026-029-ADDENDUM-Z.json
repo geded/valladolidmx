@@ -1,0 +1,37 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-Z",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum Z · G8-R1-F1B-B3 · Alta del preview interno de borradores en el Route Inventory",
+  "status": "Approved",
+  "effective_date": "2026-08-29",
+  "recorded_at": "2026-08-29",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/G8-R1-F1B-B3-GEOLOCALIZACION-ACREDITADA-Y-PREVIEW-INTERNO-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorización Founder G8-R1-F1B-B3 (2026-08-29). Autoriza exclusivamente el alta aditiva de la ruta interna autenticada src/routes/_authenticated/cms/empresas.$businessId.preview.tsx en SCANNED_ROUTE_FILES y su ficha de metadatos, conforme a la Route Inventory Rule (DOS · SSC-01 · P2), y en consecuencia sustituir de forma append-only el digest acreditado de src/lib/experience-builder/route-inventory.ts. No autoriza publicación, sitemap, redirects, medios, cambios de flag, PR, merge ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "fd18c0150d3527a6668b996417b607230f0269208e004cee21cfc3d0059e3e87",
+    "current_sha256": "a6714e798a322a55543fe2343d61f4edb9ca6ebaf37700798bea9460cde88d14",
+    "semantic_change": "Alta aditiva de la ruta de preview interno en SCANNED_ROUTE_FILES y su entrada de metadatos. Sin cambios de lógica, heurística, overrides ni API del inventario.",
+    "authority": "Autorización Founder G8-R1-F1B-B3 (2026-08-29)"
+  },
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run validate:r1:f1b:b3",
+    "bun run governance:check"
+  ]
+}

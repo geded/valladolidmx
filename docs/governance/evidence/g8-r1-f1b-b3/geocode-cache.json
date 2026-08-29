@@ -1,0 +1,397 @@
+{
+  "generator": "scripts/omxds/r1-f1b-b3/geocode-batch.mjs",
+  "provider": "nominatim.openstreetmap.org",
+  "license": "ODbL-1.0",
+  "attribution": "© OpenStreetMap contributors · ODbL 1.0",
+  "userAgent": "ValladolidMX-EditorialGeocoder/1.0 (one-off batch G8-R1-F1B-B3; contacto: hola@quehacerenvalladolid.com)",
+  "minIntervalMs": 1500,
+  "cacheTtlDays": 180,
+  "queriesThisRun": 0,
+  "entries": {
+    "casa-quetzal-valladolid": {
+      "slug": "casa-quetzal-valladolid",
+      "locationId": "5aff7193-4c58-42cf-aef3-4c62d42b44af",
+      "destination": "valladolid",
+      "query": "Calle 51 218, Centro, Valladolid, Yucatán, México",
+      "requestUrl": "https://nominatim.openstreetmap.org/search?q=Calle%2051%20218%2C%20Centro%2C%20Valladolid%2C%20Yucat%C3%A1n%2C%20M%C3%A9xico&format=jsonv2&addressdetails=1&limit=1&countrycodes=mx",
+      "queriedAt": "2026-08-29T09:33:18.272Z",
+      "httpStatus": 200,
+      "license": "ODbL-1.0",
+      "attribution": "© OpenStreetMap contributors · ODbL 1.0",
+      "provider": "nominatim.openstreetmap.org",
+      "raw": {
+        "lat": 20.6900653,
+        "lon": -88.2035142,
+        "osm_type": "way",
+        "osm_id": 318165653,
+        "class": null,
+        "type": "residential",
+        "display_name": "Calle 44, Colonia Centro, Cabo Siena, Valladolid, Yucatán, 97782, México",
+        "address": {
+          "road": "Calle 44",
+          "neighbourhood": "Colonia Centro",
+          "suburb": "Cabo Siena",
+          "city": "Valladolid",
+          "county": "Valladolid",
+          "state": "Yucatán",
+          "ISO3166-2-lvl4": "MX-YUC",
+          "postcode": "97782",
+          "country": "México",
+          "country_code": "mx"
+        }
+      },
+      "verdict": {
+        "accepted": false,
+        "precision": "calle",
+        "distanceKm": 0.25640807573929597,
+        "reason": "calle_no_coincide"
+      }
+    },
+    "el-sazon-de-valladolid": {
+      "slug": "el-sazon-de-valladolid",
+      "locationId": "6de4976d-412c-48c6-9c1d-cd7e78532e38",
+      "destination": "valladolid",
+      "query": "Calle 41, Valladolid, Yucatán, México",
+      "requestUrl": "https://nominatim.openstreetmap.org/search?q=Calle%2041%2C%20Valladolid%2C%20Yucat%C3%A1n%2C%20M%C3%A9xico&format=jsonv2&addressdetails=1&limit=1&countrycodes=mx",
+      "queriedAt": "2026-08-29T09:33:20.497Z",
+      "httpStatus": 200,
+      "license": "ODbL-1.0",
+      "attribution": "© OpenStreetMap contributors · ODbL 1.0",
+      "provider": "nominatim.openstreetmap.org",
+      "raw": {
+        "lat": 20.689368,
+        "lon": -88.1918608,
+        "osm_type": "way",
+        "osm_id": 50548503,
+        "class": null,
+        "type": "secondary",
+        "display_name": "Calle 41, Colonia Centro, Cabo Siena, Valladolid, Yucatán, 98780, México",
+        "address": {
+          "road": "Calle 41",
+          "neighbourhood": "Colonia Centro",
+          "suburb": "Cabo Siena",
+          "city": "Valladolid",
+          "county": "Valladolid",
+          "state": "Yucatán",
+          "ISO3166-2-lvl4": "MX-YUC",
+          "postcode": "98780",
+          "country": "México",
+          "country_code": "mx"
+        }
+      },
+      "verdict": {
+        "accepted": true,
+        "precision": "calle",
+        "distanceKm": 0.9614432409089798,
+        "reason": "coherente"
+      }
+    },
+    "hotel-bernardino-valladolid": {
+      "slug": "hotel-bernardino-valladolid",
+      "locationId": "303f7a3f-e98d-4c2d-8d6d-8e206000afaa",
+      "destination": "valladolid",
+      "query": "Calle 54A 217, Sisal, Valladolid, Yucatán, México",
+      "requestUrl": "https://nominatim.openstreetmap.org/search?q=Calle%2054A%20217%2C%20Sisal%2C%20Valladolid%2C%20Yucat%C3%A1n%2C%20M%C3%A9xico&format=jsonv2&addressdetails=1&limit=1&countrycodes=mx",
+      "queriedAt": "2026-08-29T09:33:22.274Z",
+      "httpStatus": 200,
+      "license": "ODbL-1.0",
+      "attribution": "© OpenStreetMap contributors · ODbL 1.0",
+      "provider": "nominatim.openstreetmap.org",
+      "raw": {
+        "lat": 20.6870632,
+        "lon": -88.2130809,
+        "osm_type": "way",
+        "osm_id": 365331514,
+        "class": null,
+        "type": "residential",
+        "display_name": "Calle 45, Barrio de Sisal, Valladolid, Yucatán, 97784, México",
+        "address": {
+          "road": "Calle 45",
+          "neighbourhood": "Barrio de Sisal",
+          "city": "Valladolid",
+          "county": "Valladolid",
+          "state": "Yucatán",
+          "ISO3166-2-lvl4": "MX-YUC",
+          "postcode": "97784",
+          "country": "México",
+          "country_code": "mx"
+        }
+      },
+      "verdict": {
+        "accepted": false,
+        "precision": "calle",
+        "distanceKm": 1.2778318179060466,
+        "reason": "calle_no_coincide"
+      }
+    },
+    "hotel-chichen-itza-mayaland": {
+      "slug": "hotel-chichen-itza-mayaland",
+      "locationId": "18cf0a1e-0b00-465b-8d18-9a7ee837568d",
+      "destination": "tinum",
+      "query": "Pisté, Tinúm, Yucatán, México",
+      "requestUrl": "https://nominatim.openstreetmap.org/search?q=Pist%C3%A9%2C%20Tin%C3%BAm%2C%20Yucat%C3%A1n%2C%20M%C3%A9xico&format=jsonv2&addressdetails=1&limit=1&countrycodes=mx",
+      "queriedAt": "2026-08-29T09:33:23.879Z",
+      "httpStatus": 200,
+      "license": "ODbL-1.0",
+      "attribution": "© OpenStreetMap contributors · ODbL 1.0",
+      "provider": "nominatim.openstreetmap.org",
+      "raw": {
+        "lat": 20.6996749,
+        "lon": -88.5892469,
+        "osm_type": "relation",
+        "osm_id": 6267871,
+        "class": null,
+        "type": "administrative",
+        "display_name": "Pisté, Tinum, Yucatán, 97757, México",
+        "address": {
+          "town": "Pisté",
+          "county": "Tinum",
+          "state": "Yucatán",
+          "ISO3166-2-lvl4": "MX-YUC",
+          "postcode": "97757",
+          "country": "México",
+          "country_code": "mx"
+        }
+      },
+      "verdict": {
+        "accepted": false,
+        "precision": "municipio",
+        "distanceKm": 2.8106790499792726,
+        "reason": "pending_manual_confirmation"
+      }
+    },
+    "hotel-olbil": {
+      "slug": "hotel-olbil",
+      "locationId": "fa470695-2bfd-418c-9a32-6687dce9fb78",
+      "destination": "valladolid",
+      "query": "Calle 28, Santa Ana, Valladolid, Yucatán, México",
+      "requestUrl": "https://nominatim.openstreetmap.org/search?q=Calle%2028%2C%20Santa%20Ana%2C%20Valladolid%2C%20Yucat%C3%A1n%2C%20M%C3%A9xico&format=jsonv2&addressdetails=1&limit=1&countrycodes=mx",
+      "queriedAt": "2026-08-29T09:33:25.670Z",
+      "httpStatus": 200,
+      "license": "ODbL-1.0",
+      "attribution": "© OpenStreetMap contributors · ODbL 1.0",
+      "provider": "nominatim.openstreetmap.org",
+      "raw": {
+        "lat": 20.68896,
+        "lon": -88.1931993,
+        "osm_type": "way",
+        "osm_id": 373349918,
+        "class": null,
+        "type": "residential",
+        "display_name": "Calle 28, Colonia Santa Ana, Cabo Siena, Valladolid, Yucatán, 98780, México",
+        "address": {
+          "road": "Calle 28",
+          "neighbourhood": "Colonia Santa Ana",
+          "suburb": "Cabo Siena",
+          "city": "Valladolid",
+          "county": "Valladolid",
+          "state": "Yucatán",
+          "ISO3166-2-lvl4": "MX-YUC",
+          "postcode": "98780",
+          "country": "México",
+          "country_code": "mx"
+        }
+      },
+      "verdict": {
+        "accepted": true,
+        "precision": "calle",
+        "distanceKm": 0.8249375891157861,
+        "reason": "coherente"
+      }
+    },
+    "lemuuch-hotel-boutique": {
+      "slug": "lemuuch-hotel-boutique",
+      "locationId": "ceaf8a00-2281-4232-9c81-9949078cddb1",
+      "destination": "valladolid",
+      "query": "Calle 42, Centro, Valladolid, Yucatán, México",
+      "requestUrl": "https://nominatim.openstreetmap.org/search?q=Calle%2042%2C%20Centro%2C%20Valladolid%2C%20Yucat%C3%A1n%2C%20M%C3%A9xico&format=jsonv2&addressdetails=1&limit=1&countrycodes=mx",
+      "queriedAt": "2026-08-29T09:33:27.598Z",
+      "httpStatus": 200,
+      "license": "ODbL-1.0",
+      "attribution": "© OpenStreetMap contributors · ODbL 1.0",
+      "provider": "nominatim.openstreetmap.org",
+      "raw": {
+        "lat": 20.6878504,
+        "lon": -88.2021476,
+        "osm_type": "way",
+        "osm_id": 1367354345,
+        "class": null,
+        "type": "secondary",
+        "display_name": "Calle 42, Colonia Centro, Cabo Siena, Valladolid, Yucatán, 98780, México",
+        "address": {
+          "road": "Calle 42",
+          "neighbourhood": "Colonia Centro",
+          "suburb": "Cabo Siena",
+          "city": "Valladolid",
+          "county": "Valladolid",
+          "state": "Yucatán",
+          "ISO3166-2-lvl4": "MX-YUC",
+          "postcode": "98780",
+          "country": "México",
+          "country_code": "mx"
+        }
+      },
+      "verdict": {
+        "accepted": true,
+        "precision": "calle",
+        "distanceKm": 0.22298912135294496,
+        "reason": "coherente"
+      }
+    },
+    "paladar-de-cura": {
+      "slug": "paladar-de-cura",
+      "locationId": "5395f85a-71d0-4615-b0a1-076f69476ef6",
+      "destination": "valladolid",
+      "query": "Calle 54A 213, Sisal, Valladolid, Yucatán, México",
+      "requestUrl": "https://nominatim.openstreetmap.org/search?q=Calle%2054A%20213%2C%20Sisal%2C%20Valladolid%2C%20Yucat%C3%A1n%2C%20M%C3%A9xico&format=jsonv2&addressdetails=1&limit=1&countrycodes=mx",
+      "queriedAt": "2026-08-29T09:33:29.540Z",
+      "httpStatus": 200,
+      "license": "ODbL-1.0",
+      "attribution": "© OpenStreetMap contributors · ODbL 1.0",
+      "provider": "nominatim.openstreetmap.org",
+      "raw": {
+        "lat": 20.6845901,
+        "lon": -88.2071003,
+        "osm_type": "way",
+        "osm_id": 338909308,
+        "class": null,
+        "type": "residential",
+        "display_name": "Calle 49, Colonia San Juan, Cabo Siena, Valladolid, Yucatán, 97784, México",
+        "address": {
+          "road": "Calle 49",
+          "neighbourhood": "Colonia San Juan",
+          "suburb": "Cabo Siena",
+          "city": "Valladolid",
+          "county": "Valladolid",
+          "state": "Yucatán",
+          "ISO3166-2-lvl4": "MX-YUC",
+          "postcode": "97784",
+          "country": "México",
+          "country_code": "mx"
+        }
+      },
+      "verdict": {
+        "accepted": false,
+        "precision": "calle",
+        "distanceKm": 0.8366234815784833,
+        "reason": "calle_no_coincide"
+      }
+    },
+    "sikil-restaurante": {
+      "slug": "sikil-restaurante",
+      "locationId": "d82a55da-7c24-4125-8cf9-66b1783400cd",
+      "destination": "valladolid",
+      "query": "Calle 40 211, San Juan, Valladolid, Yucatán, México",
+      "requestUrl": "https://nominatim.openstreetmap.org/search?q=Calle%2040%20211%2C%20San%20Juan%2C%20Valladolid%2C%20Yucat%C3%A1n%2C%20M%C3%A9xico&format=jsonv2&addressdetails=1&limit=1&countrycodes=mx",
+      "queriedAt": "2026-08-29T09:33:31.349Z",
+      "httpStatus": 200,
+      "license": "ODbL-1.0",
+      "attribution": "© OpenStreetMap contributors · ODbL 1.0",
+      "provider": "nominatim.openstreetmap.org",
+      "raw": {
+        "lat": 20.6842325,
+        "lon": -88.2011007,
+        "osm_type": "way",
+        "osm_id": 357571415,
+        "class": null,
+        "type": "residential",
+        "display_name": "Calle 40, Colonia San Juan, Cabo Siena, Valladolid, Yucatán, 98780, México",
+        "address": {
+          "road": "Calle 40",
+          "neighbourhood": "Colonia San Juan",
+          "suburb": "Cabo Siena",
+          "city": "Valladolid",
+          "county": "Valladolid",
+          "state": "Yucatán",
+          "ISO3166-2-lvl4": "MX-YUC",
+          "postcode": "98780",
+          "country": "México",
+          "country_code": "mx"
+        }
+      },
+      "verdict": {
+        "accepted": true,
+        "precision": "calle",
+        "distanceKm": 0.596838773206605,
+        "reason": "coherente"
+      }
+    },
+    "sutuk-hotel-valladolid": {
+      "slug": "sutuk-hotel-valladolid",
+      "locationId": "9f457d4e-6871-4b31-9094-0b0a875f978a",
+      "destination": "valladolid",
+      "query": "Calle 42 159, Valladolid, Yucatán, México",
+      "requestUrl": "https://nominatim.openstreetmap.org/search?q=Calle%2042%20159%2C%20Valladolid%2C%20Yucat%C3%A1n%2C%20M%C3%A9xico&format=jsonv2&addressdetails=1&limit=1&countrycodes=mx",
+      "queriedAt": "2026-08-29T09:33:33.182Z",
+      "httpStatus": 200,
+      "license": "ODbL-1.0",
+      "attribution": "© OpenStreetMap contributors · ODbL 1.0",
+      "provider": "nominatim.openstreetmap.org",
+      "raw": {
+        "lat": 20.6896271,
+        "lon": -88.2022629,
+        "osm_type": "way",
+        "osm_id": 1367354353,
+        "class": null,
+        "type": "secondary",
+        "display_name": "Calle 42, Colonia Centro, Cabo Siena, Valladolid, Yucatán, 98780, México",
+        "address": {
+          "road": "Calle 42",
+          "neighbourhood": "Colonia Centro",
+          "suburb": "Cabo Siena",
+          "city": "Valladolid",
+          "county": "Valladolid",
+          "state": "Yucatán",
+          "ISO3166-2-lvl4": "MX-YUC",
+          "postcode": "98780",
+          "country": "México",
+          "country_code": "mx"
+        }
+      },
+      "verdict": {
+        "accepted": true,
+        "precision": "calle",
+        "distanceKm": 0.12100674955869767,
+        "reason": "coherente"
+      }
+    },
+    "valladolid-expeditions": {
+      "slug": "valladolid-expeditions",
+      "locationId": "864540f9-b77a-40f2-ba56-9ce8ada3c6c2",
+      "destination": "valladolid",
+      "query": "Calle 49, Sisal, Valladolid, Yucatán, México",
+      "requestUrl": "https://nominatim.openstreetmap.org/search?q=Calle%2049%2C%20Sisal%2C%20Valladolid%2C%20Yucat%C3%A1n%2C%20M%C3%A9xico&format=jsonv2&addressdetails=1&limit=1&countrycodes=mx",
+      "queriedAt": "2026-08-29T09:33:34.817Z",
+      "httpStatus": 200,
+      "license": "ODbL-1.0",
+      "attribution": "© OpenStreetMap contributors · ODbL 1.0",
+      "provider": "nominatim.openstreetmap.org",
+      "raw": {
+        "lat": 20.6854548,
+        "lon": -88.2108002,
+        "osm_type": "way",
+        "osm_id": 373152124,
+        "class": null,
+        "type": "residential",
+        "display_name": "Calle 49, Barrio de Sisal, Valladolid, Yucatán, 97784, México",
+        "address": {
+          "road": "Calle 49",
+          "neighbourhood": "Barrio de Sisal",
+          "city": "Valladolid",
+          "county": "Valladolid",
+          "state": "Yucatán",
+          "ISO3166-2-lvl4": "MX-YUC",
+          "postcode": "97784",
+          "country": "México",
+          "country_code": "mx"
+        }
+      },
+      "verdict": {
+        "accepted": true,
+        "precision": "calle",
+        "distanceKm": 1.1093531470934677,
+        "reason": "coherente"
+      }
+    }
+  }
+}

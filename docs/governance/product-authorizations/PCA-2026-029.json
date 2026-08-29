@@ -7,14 +7,38 @@
   "blueprint": "docs/blueprint/19.26-V1-P1-GOVERNANCE-GATE-RECONCILIATION-v1.0.md",
   "founder_authority": "Founder Directive 2026-08-25 · Autoriza exclusivamente reconocer en la rama efectiva 19 rutas sensibles preexistentes a 4c213820ce81bc6b7416481197e9efd06ee978dc, con operacion, ruta, digest SHA-256 y autoridad historica o informe forense exactos. No autoriza editar esas rutas ni introducir cambios funcionales, datos, migraciones, produccion, merge, despliegue, activacion del flag o G4/G5. Cualquier variacion de contenido debe fallar cerrado. I4-D permanece DEFERRED hasta la aceptacion humana multi-actor real.",
   "permissions": [
-    { "operation": "modify", "path": "bun.lock" },
-    { "operation": "modify", "path": "src/components/experience-builder/VisualStudio.tsx" },
-    { "operation": "modify", "path": "src/components/layout/SiteHeader.tsx" },
-    { "operation": "modify", "path": "src/integrations/supabase/client.ts" },
-    { "operation": "create", "path": "src/integrations/supabase/previewAuthStorage.ts" },
-    { "operation": "modify", "path": "src/integrations/supabase/types.ts" },
-    { "operation": "modify", "path": "src/lib/experience-builder/route-inventory.ts" },
-    { "operation": "create", "path": "src/lib/media/stable-public-url.ts" },
+    {
+      "operation": "modify",
+      "path": "bun.lock"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/VisualStudio.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/SiteHeader.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/client.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/integrations/supabase/previewAuthStorage.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/media/stable-public-url.ts"
+    },
     {
       "operation": "modify",
       "path": "src/lib/omxds/surfaces/business-premium-eligibility.server.ts"
@@ -27,8 +51,14 @@
       "operation": "create",
       "path": "src/lib/omxds/surfaces/destination-premium-eligibility.server.ts"
     },
-    { "operation": "modify", "path": "src/lib/reviews/public-reads.functions.ts" },
-    { "operation": "create", "path": "src/lib/reviews/public-reads.server.ts" },
+    {
+      "operation": "modify",
+      "path": "src/lib/reviews/public-reads.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/reviews/public-reads.server.ts"
+    },
     {
       "operation": "modify",
       "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
@@ -171,7 +201,9 @@
     }
   ],
   "public_routes": [],
-  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
   "required_tests": [
     "bun run lint",
     "bun run typecheck",
