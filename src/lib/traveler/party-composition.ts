@@ -138,7 +138,9 @@ export function derivePartyProfile(input: DerivePartyProfileInput): PartyProfile
     const composition = styleComposition ?? compositionFromPartySize(profileSize);
     const size =
       profileSize ??
-      (composition ? (PARTY_OPTIONS.find((o) => o.value === composition)?.partySize ?? null) : null);
+      (composition
+        ? (PARTY_OPTIONS.find((o) => o.value === composition)?.partySize ?? null)
+        : null);
     return finalize({
       composition,
       partySize: size,

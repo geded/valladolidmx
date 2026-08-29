@@ -104,7 +104,12 @@ export function pruneSignals(
     if (!isAllowedSignal(raw)) continue;
     if (now - raw.at > ALUX_SIGNAL_TTL_MS) continue;
     if (raw.at > now + 60_000) continue; // reloj adelantado ⇒ no confiable
-    out.push({ kind: raw.kind, key: raw.key.trim().toLowerCase(), at: raw.at, purpose: raw.purpose });
+    out.push({
+      kind: raw.kind,
+      key: raw.key.trim().toLowerCase(),
+      at: raw.at,
+      purpose: raw.purpose,
+    });
   }
   return out.sort((a, b) => (a.at === b.at ? a.key.localeCompare(b.key) : a.at - b.at));
 }

@@ -64,7 +64,6 @@ const WINDOW_OPTIONS: { value: Window; label: string }[] = [
   { value: "no_se", label: "Aún no lo sé" },
 ];
 
-
 const DISMISS_KEY = "vmx.onboarding.welcome.dismissedAt";
 const DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 

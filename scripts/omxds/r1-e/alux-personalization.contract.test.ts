@@ -119,8 +119,18 @@ describe("R1-E · anónimo", () => {
     const signals = summarizeSignals({
       now: NOW.getTime(),
       signals: [
-        { kind: "category_explored", key: "restaurantes", at: NOW.getTime() - 1000, purpose: "personalization" },
-        { kind: "category_explored", key: "restaurantes", at: NOW.getTime() - 900, purpose: "personalization" },
+        {
+          kind: "category_explored",
+          key: "restaurantes",
+          at: NOW.getTime() - 1000,
+          purpose: "personalization",
+        },
+        {
+          kind: "category_explored",
+          key: "restaurantes",
+          at: NOW.getTime() - 900,
+          purpose: "personalization",
+        },
       ],
     });
     const withSignals = rank(u, { signals });
@@ -128,7 +138,9 @@ describe("R1-E · anónimo", () => {
     expect(withSignals.personalized).toBe(true);
     const scoreOf = (r: ReturnType<typeof rankAluxCandidates>, slug: string) =>
       r.ranked.find((x) => x.candidate.slug === slug)!.score;
-    expect(scoreOf(withSignals, "restaurante-maya")).toBeGreaterThan(scoreOf(rank(u), "restaurante-maya"));
+    expect(scoreOf(withSignals, "restaurante-maya")).toBeGreaterThan(
+      scoreOf(rank(u), "restaurante-maya"),
+    );
   });
 });
 
@@ -263,11 +275,17 @@ describe("R1-E · Mi Viaje, etapa y feedback", () => {
     const signals = summarizeSignals({
       now: NOW.getTime(),
       signals: [
-        { kind: "suggestion_accepted", key: "hotel-colonial", at: NOW.getTime(), purpose: "personalization" },
+        {
+          kind: "suggestion_accepted",
+          key: "hotel-colonial",
+          at: NOW.getTime(),
+          purpose: "personalization",
+        },
       ],
     });
-    expect(rank(u, { signals }).ranked.find((x) => x.candidate.slug === "hotel-colonial")!.signals)
-      .toContain("behavior.accepted");
+    expect(
+      rank(u, { signals }).ranked.find((x) => x.candidate.slug === "hotel-colonial")!.signals,
+    ).toContain("behavior.accepted");
   });
 
   test("16 · sugerencia rechazada baja al final", () => {
@@ -275,7 +293,12 @@ describe("R1-E · Mi Viaje, etapa y feedback", () => {
     const signals = summarizeSignals({
       now: NOW.getTime(),
       signals: [
-        { kind: "suggestion_rejected", key: "cenote-zaci", at: NOW.getTime(), purpose: "personalization" },
+        {
+          kind: "suggestion_rejected",
+          key: "cenote-zaci",
+          at: NOW.getTime(),
+          purpose: "personalization",
+        },
       ],
     });
     expect(slugs(rank(u, { signals })).at(-1)).toBe("cenote-zaci");
@@ -338,8 +361,18 @@ describe("R1-E · restricciones duras", () => {
       unified: u,
       now: NOW,
       candidates: [
-        base({ slug: "feria-pasada", entityKind: "event", startsAt: "2026-01-01", endsAt: "2026-01-05" }),
-        base({ slug: "feria-vigente", entityKind: "event", startsAt: "2026-03-09", endsAt: "2026-03-12" }),
+        base({
+          slug: "feria-pasada",
+          entityKind: "event",
+          startsAt: "2026-01-01",
+          endsAt: "2026-01-05",
+        }),
+        base({
+          slug: "feria-vigente",
+          entityKind: "event",
+          startsAt: "2026-03-09",
+          endsAt: "2026-03-12",
+        }),
       ],
     });
     expect(slugs(r)).toEqual(["feria-vigente"]);
@@ -363,7 +396,12 @@ describe("R1-E · privacidad y patrocinio", () => {
     const kept = pruneSignals(
       [
         { kind: "saved", key: "vigente", at: now - 1000, purpose: "personalization" },
-        { kind: "saved", key: "vieja", at: now - ALUX_SIGNAL_TTL_MS - 1, purpose: "personalization" },
+        {
+          kind: "saved",
+          key: "vieja",
+          at: now - ALUX_SIGNAL_TTL_MS - 1,
+          purpose: "personalization",
+        },
         { kind: "geolocation", key: "no", at: now, purpose: "personalization" },
         { kind: "saved", key: "sin-finalidad", at: now },
       ],

@@ -23,10 +23,7 @@
  *    inyecta lo que ya cargó con los contratos existentes.
  */
 import { deriveTravelStage, type TravelStage } from "@/lib/traveler/journey-stage";
-import {
-  derivePartyProfile,
-  type PartyProfile,
-} from "@/lib/traveler/party-composition";
+import { derivePartyProfile, type PartyProfile } from "@/lib/traveler/party-composition";
 import type { AluxContext } from "./use-alux-context";
 
 export const ALUX_UNIFIED_CONTEXT_VERSION = "1.0.0" as const;
@@ -152,7 +149,6 @@ export interface BuildAluxUnifiedContextInput {
   readonly now?: Date;
 }
 
-
 function dayDiff(from: Date, isoDate: string | null | undefined): number | null {
   if (!isoDate) return null;
   const target = new Date(`${isoDate.slice(0, 10)}T00:00:00Z`);
@@ -222,7 +218,6 @@ export function resolveAluxContextScope(
 export function hasSufficientAluxContext(unified: AluxUnifiedContext): boolean {
   return resolveAluxContextScope(unified) !== "none";
 }
-
 
 /**
  * Compone el contexto unificado. Fail-safe: cualquier fuente ausente se
@@ -303,5 +298,4 @@ export function buildAluxUnifiedContext(input: BuildAluxUnifiedContextInput): Al
     scope: resolveAluxContextScope({ entity, territory }),
     reason: ctx.reason,
   };
-
 }

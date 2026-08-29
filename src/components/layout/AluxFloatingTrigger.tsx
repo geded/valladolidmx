@@ -270,7 +270,6 @@ export function AluxFloatingTrigger() {
   );
   const contextIsSufficient = hasSufficientAluxContext(unified);
 
-
   const suggestionsQuery = useQuery({
     queryKey: [
       "alux",
@@ -395,7 +394,6 @@ export function AluxFloatingTrigger() {
         .filter((v): v is AluxContextualSuggestion => Boolean(v)),
     };
   }, [suggestionsQuery.data, unified, plan, lens]);
-
 
   // AT-0: en superficies con CTA sticky comercial, cedemos el espacio.
   if (presence.shouldHide) return null;

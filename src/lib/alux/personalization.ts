@@ -195,7 +195,9 @@ export function rankAluxCandidates(input: RankAluxCandidatesInput): AluxPersonal
 
   const destinationSlug = norm(unified.territory.destinationSlug);
   const zoneSlug = norm(unified.territory.zoneSlug);
-  const activeCategory = norm(unified.entity.entityKind === "category" ? unified.entity.slug : null);
+  const activeCategory = norm(
+    unified.entity.entityKind === "category" ? unified.entity.slug : null,
+  );
   const interests = unified.profile.interests ?? [];
   const budget = norm(unified.profile.budgetBand) as AluxBudgetBand | "";
   const required = (input.requiredAccessibility ?? []).map(norm).filter(Boolean);
@@ -314,7 +316,11 @@ export function rankAluxCandidates(input: RankAluxCandidatesInput): AluxPersonal
     } else if (c.alreadySaved) {
       score += ALUX_WEIGHTS.alreadySaved;
       fired.push("saved.favorite");
-    } else if (savedCategories.length && norm(c.categorySlug) && savedCategories.includes(norm(c.categorySlug))) {
+    } else if (
+      savedCategories.length &&
+      norm(c.categorySlug) &&
+      savedCategories.includes(norm(c.categorySlug))
+    ) {
       score += ALUX_WEIGHTS.savedAffinity;
       fired.push("saved.affinity");
       reasons.push(`Combina con lo que ya guardaste en ${c.categoryName || c.categorySlug}.`);
