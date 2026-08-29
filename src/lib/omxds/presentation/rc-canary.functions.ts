@@ -69,7 +69,7 @@ export const listReleaseCandidateCatalog = createServerFn({ method: "GET" })
           .limit(200),
         supabase
           .from("products")
-          .select("id, slug, title, status, product_type, business_id")
+          .select("id, slug, name, status, product_type, business_id")
           .limit(200),
         supabase.from("events").select("id, slug, title, status").limit(100),
         supabase
@@ -79,7 +79,7 @@ export const listReleaseCandidateCatalog = createServerFn({ method: "GET" })
         supabase
           .from("entity_presentation_modes")
           .select(
-            "entity_kind, entity_id, approved_mode, review_state, cover_media_asset_id, fallback_reason",
+            "entity_kind, entity_id, approved_mode, review_state, cover_media_asset_id, reason",
           )
           .limit(500),
       ]);
@@ -103,10 +103,10 @@ export const listReleaseCandidateCatalog = createServerFn({ method: "GET" })
         approved_mode: string | null;
         review_state: string | null;
         cover_media_asset_id: string | null;
-        fallback_reason: string | null;
+        reason: string | null;
       };
       const modeMap = new Map<string, ModeRow>();
-      for (const m of (modes.data ?? []) as ModeRow[])
+      for (const m of (modes.data ?? []) as unknown as ModeRow[])
         modeMap.set(`${m.entity_kind}:${m.entity_id}`, m);
 
       const decorate = (
@@ -126,8 +126,8 @@ export const listReleaseCandidateCatalog = createServerFn({ method: "GET" })
           hasApprovedCover,
           fallbackReason:
             effectiveMode === "editorial" && m?.approved_mode === "cinematic"
-              ? (m?.fallback_reason ?? "portada gobernada no elegible")
-              : (m?.fallback_reason ?? null),
+              ? (m?.reason ?? "portada gobernada no elegible")
+              : null,
         };
       };
 
@@ -170,7 +170,7 @@ export const listReleaseCandidateCatalog = createServerFn({ method: "GET" })
           kind: "product",
           id: p.id,
           slug: p.slug,
-          label: (p.title as string | null) ?? p.slug,
+          label: (p.name as string | null) ?? p.slug,
           editorialState: String(p.status),
           family: fam.family,
           familyReason: fam.reason,
