@@ -12,18 +12,6 @@
       "path": "src/lib/experience-builder/canonical-entity-binding.ts"
     },
     {
-      "operation": "create",
-      "path": "scripts/omxds/r1-c2/canonical-entity-binding.contract.test.ts"
-    },
-    {
-      "operation": "create",
-      "path": "scripts/omxds/r1-c2/canonical-entity-binding.evidence.mjs"
-    },
-    {
-      "operation": "create",
-      "path": "docs/evidence/omxds-r1-c2/EVIDENCE-MANIFEST.md"
-    },
-    {
       "operation": "modify",
       "path": "src/routes/oriente-maya/$destino.$categoria.$empresa.index.tsx"
     },
@@ -45,7 +33,9 @@
     }
   ],
   "public_routes": [],
-  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
   "required_tests": [
     "bun run lint",
     "bun run typecheck",
