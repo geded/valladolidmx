@@ -6,7 +6,16 @@ import { describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
 import { experienceCtaBarActionSchema } from "@/lib/experience-builder/blocks/experience-cta-bar/contract";
+import { applyAluxPlannerDefaults } from "@/lib/experience-builder/blocks/alux-planner/contract";
 import {
+  ALUX_PRESENCE_INVARIANTS,
+  ALUX_SURFACE_INVENTORY,
+  ALUX_SURFACE_WITHHELD,
+} from "@/lib/alux/alux-surface-inventory";
+import {
+  adaptSeoLandingFaq,
+  buildSeoLandingComposition,
+  buildSeoLandingFaqJsonLd,
   SEO_LANDING_BLOCK_COUNT,
   SEO_LANDING_CONTRACT_VERSION,
   SEO_LANDING_SLOTS,
@@ -155,5 +164,154 @@ describe("E/F/G/H · Sistema visual canónico Alux IA", () => {
   test("el dock global usa la marca canónica, no un icono genérico", () => {
     const src = read("src/components/layout/AluxFloatingTrigger.tsx");
     expect(src).toContain("AluxMark");
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * C2 · Cierre funcional GAP-01…04 e integración transversal de Alux.
+ * ------------------------------------------------------------------ */
+
+describe("GAP-01 · Guardar y Agregar a Mi Viaje son acciones distintas", () => {
+  test("ambas acciones existen y no comparten referencia de entidad", () => {
+    const save = experienceCtaBarActionSchema.parse({
+      label: "Guardar",
+      action: "favorite",
+      favoriteItem: { entityKind: "business", entityId: "b1" },
+    });
+    const trip = experienceCtaBarActionSchema.parse({
+      label: "Agregar a Mi Viaje",
+      action: "add-to-trip",
+      travelItem: { kind: "business", targetId: "b1", title: "X" },
+    });
+    expect(save.action).toBe("favorite");
+    expect(save.travelItem).toBeUndefined();
+    expect(trip.favoriteItem).toBeUndefined();
+  });
+
+  test("Guardar delega en favoritos y NO en Travel Plan", () => {
+    const src = read(
+      "src/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar.tsx",
+    );
+    const fav = src.slice(src.indexOf('a.action === "favorite"'), src.indexOf("const iconOnly"));
+    expect(fav).toContain("FavoriteButton");
+    expect(fav.includes("AddToTravelPlanButton")).toBe(false);
+    expect(fav).toContain("if (!a.favoriteItem) return null;");
+  });
+
+  test("favoritos y Mi Viaje usan almacenes canónicos separados", () => {
+    expect(read("src/components/commerce/FavoriteButton.tsx")).toContain(
+      "traveler-favorites.functions",
+    );
+    expect(read("src/components/traveler/AddToTravelPlanButton.tsx")).toContain(
+      "travel-plans.functions",
+    );
+  });
+});
+
+describe("GAP-03 · contexto real del planificador", () => {
+  test("sin contexto no se inventan parámetros", () => {
+    const dto = applyAluxPlannerDefaults({});
+    expect(dto.context).toBeNull();
+    expect(dto.cta_href).toBe("/arma-tu-viaje");
+  });
+
+  test("con contexto real propaga entidad y territorio", () => {
+    const dto = applyAluxPlannerDefaults({
+      context: {
+        entityRef: "place:123",
+        entityLabel: "Chichén Itzá",
+        destinationSlug: "tinum",
+        destinationName: "Tinúm",
+        relations: ["Zona arqueológica"],
+      },
+    });
+    expect(dto.cta_href).toBe("/arma-tu-viaje?entity=place%3A123&destino=tinum");
+    expect(dto.prompts.map((p) => p.label)).toEqual(["Zona arqueológica"]);
+  });
+
+  test("con contexto y sin relaciones reales no hay chips inventados", () => {
+    const dto = applyAluxPlannerDefaults({ context: { entityRef: "business:9" } });
+    expect(dto.prompts).toEqual([]);
+  });
+
+  test("contexto inválido es fail-closed", () => {
+    expect(applyAluxPlannerDefaults({ context: "x" }).context).toBeNull();
+  });
+
+  test("máximo un planificador contextual por página", () => {
+    expect(read("src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx"))
+      .toContain("usePlannerPresence");
+  });
+});
+
+describe("GAP-04 · FAQ mediante adaptador único", () => {
+  const slot = {
+    heading: "Dudas",
+    items: [
+      { question: "¿Horario?", answer: "9:00 a 17:00" },
+      { question: "  ", answer: "vacía" },
+      { question: "¿Precio?", answer: "" },
+    ],
+  };
+
+  test("la FAQ visible y el JSON-LD derivan de la misma lista", () => {
+    const a = adaptSeoLandingFaq(slot);
+    const visible = (a.blockConfig!.items as Array<{ question: string; answer: string }>).map(
+      (i) => i.question,
+    );
+    const jsonLd = (a.jsonLd!.mainEntity as Array<{ name: string }>).map((q) => q.name);
+    expect(visible).toEqual(jsonLd);
+    expect(visible).toEqual(["¿Horario?"]);
+    expect(buildSeoLandingFaqJsonLd(slot)).toEqual(a.jsonLd);
+  });
+
+  test("sin FAQ real no hay bloque ni JSON-LD", () => {
+    const a = adaptSeoLandingFaq({ items: [] });
+    expect(a.blockConfig).toBeNull();
+    expect(a.jsonLd).toBeNull();
+    const tree = buildSeoLandingComposition({
+      entityRef: "business:x",
+      slots: { hero: { title: "X" }, faq: { items: [] } },
+    });
+    expect(tree.root.children.some((n) => n.type === "vmx.kit.faq")).toBe(false);
+  });
+
+  test("con FAQ real el bloque neutral se incorpora a la composición", () => {
+    const tree = buildSeoLandingComposition({
+      entityRef: "business:x",
+      slots: { hero: { title: "X" }, faq: slot },
+    });
+    const node = tree.root.children.find((n) => n.type === "vmx.kit.faq");
+    expect(node).toBeDefined();
+    expect((node!.config.items as unknown[]).length).toBe(1);
+  });
+});
+
+describe("Integración transversal · inventario real de familias", () => {
+  test("un solo dock global montado en la raíz", () => {
+    const root = read("src/routes/__root.tsx");
+    expect(root.split("<AluxFloatingTrigger").length - 1).toBe(1);
+    const mounts = ["src/routes", "src/components"].flatMap(() => []);
+    expect(mounts.length).toBe(0);
+  });
+
+  test("las 11 familias productivas declaran dock único y cero duplicación", () => {
+    expect(ALUX_SURFACE_INVENTORY.length).toBe(11);
+    for (const r of ALUX_SURFACE_INVENTORY) {
+      expect(r.globalDock).toBe(true);
+      expect(r.duplication).toBe("none");
+      expect(r.context.length).toBeGreaterThan(0);
+      expect(r.master).toBe(r.planner ? "avatar+full" : "avatar");
+    }
+  });
+
+  test("Casa de vacaciones permanece sin autoasignación productiva", () => {
+    expect(ALUX_SURFACE_WITHHELD.some((f) => f.includes("vacation_rental"))).toBe(true);
+    expect(ALUX_SURFACE_INVENTORY.some((r) => /vacaciones/i.test(r.family))).toBe(false);
+  });
+
+  test("invariantes de presencia", () => {
+    expect(ALUX_PRESENCE_INVARIANTS.maxGlobalDocksPerPage).toBe(1);
+    expect(ALUX_PRESENCE_INVARIANTS.maxContextualPlannersPerPage).toBe(1);
   });
 });
