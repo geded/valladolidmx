@@ -215,6 +215,7 @@ export async function loadAluxCanonicalCandidates(
         eligibility: "publicado · variante de lugar acreditada · ruta canónica válida",
         favoriteKind: null,
         planKind: null,
+        coords: accredit(row.latitude, row.longitude, "poi"),
       });
     }
     familyReport.place = {
