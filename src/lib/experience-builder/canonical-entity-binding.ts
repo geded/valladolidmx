@@ -29,7 +29,6 @@ import type { EntityTemplateOverride } from "./entity-premium-templates";
 
 export const CANONICAL_ENTITY_BINDING_VERSION = "1.0.0" as const;
 
-
 export type CanonicalSurfaceMode = "premium" | "standard";
 
 export interface CanonicalEntityBinding {

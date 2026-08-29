@@ -85,7 +85,6 @@ import { AluxMark } from "@/components/alux/AluxMark";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 
-
 function ContextChip({ slot }: { slot: AluxContextSlot }) {
   const content = (
     <span className="inline-flex items-center rounded-full border border-border bg-card/70 px-2.5 py-1 text-[11px] font-medium text-foreground">
@@ -266,7 +265,6 @@ export function AluxFloatingTrigger() {
   );
   const contextIsSufficient = hasSufficientAluxContext(unified);
 
-
   const suggestionsQuery = useQuery({
     queryKey: [
       "alux",
@@ -378,7 +376,6 @@ export function AluxFloatingTrigger() {
         data-alux-party-size={unified.trip.partySize == null ? "" : String(unified.trip.partySize)}
         data-alux-reason={unified.reason}
         className="pointer-events-none fixed right-4 z-40 transition-[bottom] duration-300 md:right-6"
-
         style={{
           bottom: `calc(env(safe-area-inset-bottom, 0px) + ${1 + presence.bottomOffset / 16}rem)`,
         }}
@@ -853,32 +850,30 @@ export function AluxFloatingTrigger() {
                               {/* G8-R1-D3 · Guardar y Agregar a Mi Viaje son
                                   acciones DISTINTAS. Alux sólo propone: nada
                                   entra al viaje sin confirmación del viajero. */}
-                              {item.entityId &&
-                                (item.favoriteKind || item.planKind) && (
-                                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                                    {item.favoriteKind && (
-                                      <FavoriteButton
-                                        entityKind={item.favoriteKind}
-                                        entityId={item.entityId}
-                                        entityTitle={item.label}
-                                        entitySlug={item.slug}
-                                        className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium text-foreground transition-colors hover:bg-muted"
-                                      />
-                                    )}
-                                    {item.planKind && (
-                                      <AddToTravelPlanButton
-                                        kind={item.planKind}
-                                        targetId={item.entityId}
-                                        title={item.label}
-                                        slug={item.slug}
-                                        subtitle={item.categoryName ?? null}
-                                        variant="compact"
-                                      />
-                                    )}
-                                  </div>
-                                )}
+                              {item.entityId && (item.favoriteKind || item.planKind) && (
+                                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                                  {item.favoriteKind && (
+                                    <FavoriteButton
+                                      entityKind={item.favoriteKind}
+                                      entityId={item.entityId}
+                                      entityTitle={item.label}
+                                      entitySlug={item.slug}
+                                      className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium text-foreground transition-colors hover:bg-muted"
+                                    />
+                                  )}
+                                  {item.planKind && (
+                                    <AddToTravelPlanButton
+                                      kind={item.planKind}
+                                      targetId={item.entityId}
+                                      title={item.label}
+                                      slug={item.slug}
+                                      subtitle={item.categoryName ?? null}
+                                      variant="compact"
+                                    />
+                                  )}
+                                </div>
+                              )}
                             </div>
-
                           </li>
                         ))}
                       </ul>

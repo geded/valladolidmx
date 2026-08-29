@@ -58,7 +58,8 @@ export function SiteFooter({ config }: SiteFooterProps = {}) {
   return (
     <footer
       data-omxds-chrome="public-footer"
-      className="@container mt-24 border-t border-border bg-secondary/40">
+      className="@container mt-24 border-t border-border bg-secondary/40"
+    >
       <Container className="grid grid-cols-1 gap-10 py-12 @3xl:grid-cols-4">
         <div>
           <BrandLogo tone="dark" size="md" />

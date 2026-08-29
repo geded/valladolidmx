@@ -92,7 +92,10 @@ export interface AluxUnifiedContext {
   /** Sólo presente con consentimiento explícito de ubicación. */
   readonly coords?: { readonly lat: number; readonly lng: number };
   /** Contexto de navegación heredado del Context Engine. */
-  readonly navigation: { readonly origin: AluxContext["origin"]; readonly canonical: string | null };
+  readonly navigation: {
+    readonly origin: AluxContext["origin"];
+    readonly canonical: string | null;
+  };
   /** Motivo humano y explicable del contexto actual. */
   readonly reason: string;
 }
@@ -131,9 +134,7 @@ function dayDiff(from: Date, isoDate: string | null | undefined): number | null 
   if (!isoDate) return null;
   const target = new Date(`${isoDate.slice(0, 10)}T00:00:00Z`);
   if (Number.isNaN(target.getTime())) return null;
-  const base = new Date(
-    Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate()),
-  );
+  const base = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate()));
   return Math.round((target.getTime() - base.getTime()) / 86_400_000);
 }
 
@@ -187,9 +188,7 @@ export function hasSufficientAluxContext(unified: AluxUnifiedContext): boolean {
  * Compone el contexto unificado. Fail-safe: cualquier fuente ausente se
  * omite; nunca se inventa fecha, grupo, coordenada ni perfil.
  */
-export function buildAluxUnifiedContext(
-  input: BuildAluxUnifiedContextInput,
-): AluxUnifiedContext {
+export function buildAluxUnifiedContext(input: BuildAluxUnifiedContextInput): AluxUnifiedContext {
   const now = input.now ?? new Date();
   const ctx = input.context;
   const plan = input.plan ?? null;

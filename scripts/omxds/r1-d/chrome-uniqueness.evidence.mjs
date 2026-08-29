@@ -38,8 +38,7 @@ const emitters = {
   header: "src/components/layout/SiteHeader.tsx",
   footer: "src/components/layout/SiteFooter.tsx",
   dock: "src/components/layout/AluxFloatingTrigger.tsx",
-  planner:
-    "src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx",
+  planner: "src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx",
 };
 let staticFailures = 0;
 for (const [key, file] of Object.entries(emitters)) {
@@ -71,8 +70,7 @@ for (const [name, path] of SURFACES) {
   const counts = Object.fromEntries(
     Object.entries(MARKERS).map(([key, marker]) => [key, occurrences(html, marker)]),
   );
-  const ok =
-    counts.header === 1 && counts.footer === 1 && counts.dock <= 1 && counts.planner <= 1;
+  const ok = counts.header === 1 && counts.footer === 1 && counts.dock <= 1 && counts.planner <= 1;
   if (!ok) httpFailures++;
   console.log(
     `${ok ? "PASS" : "FAIL"} ${name} header=${counts.header} footer=${counts.footer} dock=${counts.dock} planner=${counts.planner}`,

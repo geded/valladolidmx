@@ -92,10 +92,7 @@ export interface LoadCanonicalCandidatesInput {
   /** Ids de empresas publicadas del destino ya resueltos por el llamador. */
   readonly publishedBusinessIds: readonly string[];
   /** Mapa businessId → { slug, categorySlug, name } de empresas publicadas. */
-  readonly businessIndex: ReadonlyMap<
-    string,
-    { slug: string; categorySlug: string; name: string }
-  >;
+  readonly businessIndex: ReadonlyMap<string, { slug: string; categorySlug: string; name: string }>;
   readonly limitPerFamily?: number;
 }
 
