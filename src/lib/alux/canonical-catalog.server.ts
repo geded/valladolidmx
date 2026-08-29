@@ -77,6 +77,14 @@ export interface AluxCanonicalCandidate {
   readonly planKind: "destination" | "business" | "product" | "event" | null;
   readonly startsAt?: string | null;
   readonly endsAt?: string | null;
+  /**
+   * G8-R1-E-R1 · DEF-R1E-002 — Coordenadas ACREDITADAS del candidato.
+   * `null` cuando la entidad no tiene ubicación almacenada: en ese caso el
+   * candidato sigue siendo recomendable por afinidad y territorio, pero
+   * nunca recibe etiqueta de distancia ni entra en orden "Cerca de mí".
+   * Prohibido inventar centroides.
+   */
+  readonly coords?: AccreditedCoords | null;
 }
 
 /** Candidato descartado + razón auditable (nunca se expone al modelo). */
