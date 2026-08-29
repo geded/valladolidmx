@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "5b0e2f5b1752dc88b73bd7dca344fd31720dde930f1df2f5061af7303bb4064c"
+      "source_sha256": "61381636454c8be3e274c7727993ba57cfd261e58848a2980da6e3785e1d8121"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -12097,6 +12097,58 @@
       "path": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
       "source": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md",
       "evidence": "docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md"
+    },
+    {
+      "id": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "owner": "D04 · content-experience",
+      "state": "Approved",
+      "version": "1.0",
+      "source": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md"
+    },
+    {
+      "id": "ART:src/lib/visitor-intel/rate-limit.server.ts",
+      "type": "artifact",
+      "path": "src/lib/visitor-intel/rate-limit.server.ts",
+      "source": "src/lib/visitor-intel/rate-limit.server.ts",
+      "evidence": "src/lib/visitor-intel/rate-limit.server.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/memory-summary.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/memory-summary.ts",
+      "source": "src/lib/alux/memory-summary.ts",
+      "evidence": "src/lib/alux/memory-summary.ts"
+    },
+    {
+      "id": "ART:src/lib/alux/memory-projection.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/alux/memory-projection.functions.ts",
+      "source": "src/lib/alux/memory-projection.functions.ts",
+      "evidence": "src/lib/alux/memory-projection.functions.ts"
+    },
+    {
+      "id": "ART:src/components/alux/AluxMemorySyncRunner.tsx",
+      "type": "artifact",
+      "path": "src/components/alux/AluxMemorySyncRunner.tsx",
+      "source": "src/components/alux/AluxMemorySyncRunner.tsx",
+      "evidence": "src/components/alux/AluxMemorySyncRunner.tsx"
+    },
+    {
+      "id": "ART:scripts/omxds/r1-e-r3/alux-memory-fusion-proximity.contract.test.ts",
+      "type": "artifact",
+      "path": "scripts/omxds/r1-e-r3/alux-memory-fusion-proximity.contract.test.ts",
+      "source": "scripts/omxds/r1-e-r3/alux-memory-fusion-proximity.contract.test.ts",
+      "evidence": "scripts/omxds/r1-e-r3/alux-memory-fusion-proximity.contract.test.ts"
+    },
+    {
+      "id": "ART:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "type": "artifact",
+      "path": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "source": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md"
     }
   ],
   "edges": [
@@ -33533,6 +33585,135 @@
       "destination": "DOMAIN:D04",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.76 · docs/blueprint/G8-R1-E-R1-MEMORIA-ANONIMA-E-INTELIGENCIA-DE-COMPORTAMIENTO-COMPLETION-REPORT-v1.0.md → D04 · content-experience"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/visitor-intel/rate-limit.server.ts:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/visitor-intel/rate-limit.server.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/visitor-intel/ingest.functions.ts:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/visitor-intel/ingest.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/alux/memory-summary.ts:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/memory-summary.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/alux/memory-projection.functions.ts:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/memory-projection.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/alux/memory-store.ts:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/memory-store.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/lib/alux/contextual-suggest.functions.ts:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/lib/alux/contextual-suggest.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/alux/AluxMemorySyncRunner.tsx:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/components/alux/AluxMemorySyncRunner.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/components/layout/AluxFloatingTrigger.tsx:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/components/layout/AluxFloatingTrigger.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:src/routes/__root.tsx:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:src/routes/__root.tsx",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:scripts/omxds/r1-e-r3/alux-memory-fusion-proximity.contract.test.ts:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:scripts/omxds/r1-e-r3/alux-memory-fusion-proximity.contract.test.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:package.json:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:package.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "DEP:AUTO:IMPLEMENTS:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "origin": "ART:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "evidence": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29",
+      "source": "docs/governance/07-BLUEPRINT-DEPENDENCY-MAP.md"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "verified_at": "2026-08-29",
+      "origin": "DOC:docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D04",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.76 · docs/blueprint/G8-R1-E-R3-CIERRE-MEMORIA-PROXIMIDAD-E-INGESTA-COMPLETION-REPORT-v1.0.md → D04 · content-experience"
     }
   ],
   "views": {

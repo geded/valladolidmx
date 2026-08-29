@@ -33,6 +33,11 @@ import {
 // interactúa (clic, hidratación completa, evento) el chunk ya está en
 // caché del router (`preload` durante idle vía onIdlePrefetchWidgets).
 import * as React from "react";
+const AluxMemorySyncRunner = React.lazy(() =>
+  import("@/components/alux/AluxMemorySyncRunner").then((m) => ({
+    default: m.AluxMemorySyncRunner,
+  })),
+);
 const AluxFloatingTrigger = React.lazy(() =>
   import("@/components/layout/AluxFloatingTrigger").then((m) => ({
     default: m.AluxFloatingTrigger,
@@ -304,6 +309,9 @@ function RootComponent() {
           ) : null}
           <React.Suspense fallback={null}>
             <FloatingTravelPlanDock />
+          </React.Suspense>
+          <React.Suspense fallback={null}>
+            <AluxMemorySyncRunner />
           </React.Suspense>
           <React.Suspense fallback={null}>
             <ConciergeProposalObserver />

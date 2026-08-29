@@ -71,6 +71,7 @@ import {
   ALUX_UNIFIED_CONTEXT_VERSION,
 } from "@/lib/alux/unified-context";
 import { rankAluxCandidates } from "@/lib/alux/personalization";
+import { attachDistance } from "@/lib/alux/proximity";
 import { useAluxMemory } from "@/lib/alux/use-alux-memory";
 import { emitAluxSignal } from "@/lib/alux/signal-emitter";
 import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
@@ -383,19 +384,33 @@ export function AluxFloatingTrigger() {
       requiredAccessibility: lens?.hints.accessibility ?? [],
       // DEF-R1E-001/004 — señales reales del visitante (vacías si pausó).
       signals: behaviorSummary,
-      candidates: remote.map((s) => ({
-        entityId: s.entityId ?? s.source.id,
-        entityKind: s.kind,
-        slug: s.slug,
-        label: s.label,
-        canonicalUrl: s.canonicalUrl ?? s.href,
-        published: true,
-        destinationSlug: unified.territory.destinationSlug,
-        categorySlug: s.categorySlug ?? null,
-        categoryName: s.categoryName ?? null,
-        openState: s.openState,
-        alreadyInPlan: planSlugs.has(s.slug.toLowerCase()),
-      })),
+      // R1-E-R3 · distancia real (transitoria) antes del ranking.
+      candidates: attachDistance({
+        origin: geo.location,
+        consentGranted: geo.status === "granted" && Boolean(geo.location),
+        getCoords: (c: { coords?: { lat: number; lng: number; source: string } | null }) =>
+          c.coords
+            ? {
+                lat: c.coords.lat,
+                lng: c.coords.lng,
+                source: c.coords.source as never,
+              }
+            : null,
+        candidates: remote.map((s) => ({
+          coords: s.coords ?? null,
+          entityId: s.entityId ?? s.source.id,
+          entityKind: s.kind,
+          slug: s.slug,
+          label: s.label,
+          canonicalUrl: s.canonicalUrl ?? s.href,
+          published: true,
+          destinationSlug: unified.territory.destinationSlug,
+          categorySlug: s.categorySlug ?? null,
+          categoryName: s.categoryName ?? null,
+          openState: s.openState,
+          alreadyInPlan: planSlugs.has(s.slug.toLowerCase()),
+        })),
+      }),
     });
     const bySlug = new Map(remote.map((s) => [s.slug, s] as const));
     return {
@@ -411,7 +426,7 @@ export function AluxFloatingTrigger() {
         })
         .filter((v): v is AluxContextualSuggestion => Boolean(v)),
     };
-  }, [suggestionsQuery.data, unified, plan, lens, behaviorSummary]);
+  }, [suggestionsQuery.data, unified, plan, lens, behaviorSummary, geo.location, geo.status]);
 
   /**
    * DEF-R1E-001/004 — Emisores reales de navegación. Un solo punto: el

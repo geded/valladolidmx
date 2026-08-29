@@ -6503,6 +6503,42 @@ export type Database = {
         }
         Relationships: []
       }
+      traveler_memory_projection: {
+        Row: {
+          anonymous_subject_hash: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          linked_at: string | null
+          personalization: string
+          summary: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          anonymous_subject_hash?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          linked_at?: string | null
+          personalization?: string
+          summary?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          anonymous_subject_hash?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          linked_at?: string | null
+          personalization?: string
+          summary?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       traveler_profiles: {
         Row: {
           accessibility: string[]
@@ -8638,6 +8674,7 @@ export type Database = {
           scope_type: string
         }[]
       }
+      visitor_intel_ingest_event: { Args: { p_row: Json }; Returns: boolean }
       withdraw_business_review: {
         Args: { _business_id: string; _notes?: string }
         Returns: undefined

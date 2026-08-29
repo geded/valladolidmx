@@ -41,6 +41,12 @@ export interface AluxMemoryRecord {
   readonly version: typeof ALUX_MEMORY_VERSION;
   /** Identificador seudónimo aleatorio del navegador. Nunca derivado. */
   readonly subjectId: string;
+  /**
+   * R1-E-R3 · Secreto aleatorio local que acredita POSESIÓN del navegador
+   * al fusionar la memoria anónima con una cuenta. Sólo su hash viaja al
+   * servidor; jamás se envía en claro a terceros ni se registra en eventos.
+   */
+  readonly possessionSecret?: string;
   readonly personalization: AluxPersonalizationState;
   readonly signals: readonly AluxBehaviorSignal[];
   readonly createdAt: number;
@@ -81,6 +87,10 @@ export function normalizeMemory(raw: unknown, now = Date.now()): AluxMemoryRecor
   const r = raw as Partial<AluxMemoryRecord>;
   if (r.version !== ALUX_MEMORY_VERSION) return null;
   if (typeof r.subjectId !== "string" || !r.subjectId) return null;
+  const possessionSecret =
+    typeof r.possessionSecret === "string" && r.possessionSecret.length >= 16
+      ? r.possessionSecret
+      : undefined;
   if (typeof r.updatedAt !== "number" || !Number.isFinite(r.updatedAt)) return null;
   if (now - r.updatedAt > ALUX_MEMORY_TTL_MS) return null;
   const personalization: AluxPersonalizationState =
@@ -91,6 +101,7 @@ export function normalizeMemory(raw: unknown, now = Date.now()): AluxMemoryRecor
   return {
     version: ALUX_MEMORY_VERSION,
     subjectId: r.subjectId,
+    ...(possessionSecret ? { possessionSecret } : {}),
     personalization,
     signals,
     createdAt: typeof r.createdAt === "number" ? r.createdAt : r.updatedAt,
@@ -137,6 +148,7 @@ export function ensureAluxMemory(now = Date.now()): AluxMemoryRecord {
   const created: AluxMemoryRecord = {
     version: ALUX_MEMORY_VERSION,
     subjectId: randomSubjectId(),
+    possessionSecret: randomSubjectId() + randomSubjectId(),
     personalization: "active",
     signals: [],
     createdAt: now,
@@ -186,6 +198,23 @@ export function clearAluxMemory(): void {
   for (const listener of listeners) listener(NEUTRAL_MEMORY);
 }
 
+/**
+ * Secreto de posesión del navegador (lo crea `ensureAluxMemory`).
+ * Vacío en SSR o sin memoria local.
+ */
+export function getAluxPossessionSecret(now = Date.now()): string {
+  if (!hasWindow()) return "";
+  const current = ensureAluxMemory(now);
+  if (current.possessionSecret) return current.possessionSecret;
+  const next: AluxMemoryRecord = {
+    ...current,
+    possessionSecret: randomSubjectId() + randomSubjectId(),
+    updatedAt: now,
+  };
+  persist(next);
+  return next.possessionSecret ?? "";
+}
+
 export function subscribeAluxMemory(listener: Listener): () => void {
   listeners.add(listener);
   return () => {
@@ -199,10 +228,72 @@ export function subscribeAluxMemory(listener: Listener): () => void {
  */
 export function getAluxSignalSummary(now = Date.now()): AluxSignalSummary {
   const memory = readAluxMemory(now);
-  if (!memory.subjectId) return EMPTY_SIGNAL_SUMMARY;
-  return summarizeSignals({
+  if (!memory.subjectId && !remoteSummary) return EMPTY_SIGNAL_SUMMARY;
+  const local = summarizeSignals({
     signals: memory.signals,
     optedOut: memory.personalization === "paused",
     now,
   });
+  if (memory.personalization === "paused") return local;
+  return mergeRemoteSummary(local);
+}
+
+/**
+ * R1-E-R3 · Continuidad multidispositivo: resumen permitido recuperado de
+ * la cuenta. Vive sólo en memoria de la pestaña (no se re-persiste local),
+ * y jamás contiene historial detallado ni ubicación precisa.
+ */
+let remoteSummary: {
+  readonly categoryAffinity: readonly string[];
+  readonly territories: readonly string[];
+  readonly saved: readonly string[];
+} | null = null;
+
+export function applyRemoteMemorySummary(
+  summary: {
+    readonly categoryAffinity: readonly string[];
+    readonly territoryAffinity: readonly string[];
+    readonly interests: readonly string[];
+  } | null,
+): void {
+  remoteSummary = summary
+    ? {
+        categoryAffinity: summary.categoryAffinity,
+        territories: summary.territoryAffinity,
+        saved: summary.interests,
+      }
+    : null;
+  for (const listener of listeners) listener(readAluxMemory());
+}
+
+export function getRemoteMemorySummary() {
+  return remoteSummary;
+}
+
+function mergeRemoteSummary(local: AluxSignalSummary): AluxSignalSummary {
+  if (!remoteSummary) return local;
+  const affinity: Record<string, number> = { ...local.categoryAffinity };
+  remoteSummary.categoryAffinity.forEach((slug, index) => {
+    if (affinity[slug] === undefined) affinity[slug] = Math.max(1, 3 - index);
+  });
+  const territories = Array.from(
+    new Set([...local.exploredTerritories, ...remoteSummary.territories]),
+  );
+  const saved = Array.from(new Set([...local.savedKeys, ...remoteSummary.saved]));
+  const added =
+    Object.keys(affinity).length + territories.length + saved.length >
+    Object.keys(local.categoryAffinity).length +
+      local.exploredTerritories.length +
+      local.savedKeys.length;
+  if (!added) return local;
+  return {
+    ...local,
+    enabled: true,
+    categoryAffinity: affinity,
+    exploredTerritories: territories,
+    savedKeys: saved,
+    reason: local.enabled
+      ? `${local.reason} Complementado con tu memoria de viaje guardada en tu cuenta.`
+      : "Recuperamos tus intereses guardados en tu cuenta.",
+  };
 }
