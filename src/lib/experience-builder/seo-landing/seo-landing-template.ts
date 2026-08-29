@@ -50,7 +50,6 @@ export type SeoLandingSlotId =
   | "aluxPlanner"
   | "ctaBar";
 
-
 export interface SeoLandingSlotDefinition {
   readonly id: SeoLandingSlotId;
   readonly order: number;
@@ -294,7 +293,6 @@ export function buildSeoLandingFaqJsonLd(
 ): Record<string, unknown> | null {
   return adaptSeoLandingFaq(faqSlot).jsonLd;
 }
-
 
 /* ------------------------------------------------------------------ *
  * Metadatos editoriales (chrome.seo.landing) — sin migración.

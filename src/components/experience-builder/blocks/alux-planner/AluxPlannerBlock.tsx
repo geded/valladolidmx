@@ -12,7 +12,6 @@ import { Container } from "@/components/layout/Container";
 import { AluxMark } from "@/components/alux/AluxMark";
 import { usePlannerPresence } from "@/lib/alux/planner-presence";
 
-
 import {
   applyAluxPlannerDefaults,
   type AluxPlannerDTO,
@@ -31,14 +30,9 @@ export function AluxPlannerBlock({ config }: { config?: Record<string, unknown> 
   if (!isOwner) return null;
 
   const ctx = dto.context;
-  const contextChips: string[] = [
-    ctx?.entityLabel,
-    ctx?.zoneName,
-    ctx?.destinationName,
-  ].filter((v): v is string => Boolean(v && v.trim()));
-
-
-
+  const contextChips: string[] = [ctx?.entityLabel, ctx?.zoneName, ctx?.destinationName].filter(
+    (v): v is string => Boolean(v && v.trim()),
+  );
 
   return (
     <section
@@ -60,7 +54,6 @@ export function AluxPlannerBlock({ config }: { config?: Record<string, unknown> 
             <p className="text-sm font-semibold text-foreground">Alux · Concierge IA</p>
           </div>
           <div className="relative flex min-w-0 flex-col gap-4">
-
             {dto.eyebrow ? (
               <p className="inline-flex items-center gap-2 text-sm font-medium text-primary">
                 <Sparkles className="size-4" aria-hidden />
@@ -94,8 +87,6 @@ export function AluxPlannerBlock({ config }: { config?: Record<string, unknown> 
                 ))}
               </ul>
             ) : null}
-
-
 
             <div className="mt-2 flex w-full min-w-0 flex-col gap-3 @2xl:flex-row @2xl:items-center">
               <input

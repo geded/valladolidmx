@@ -119,11 +119,14 @@ describe("E/F/G/H · Sistema visual canónico Alux IA", () => {
   });
 
   test("sólo existen los tamaños autorizados", () => {
-    const sizes = (f: string) => [
-      ...new Set(
-        manifest.assets.filter((a) => a.role === "derivative" && a.family === f).map((a) => a.size),
-      ),
-    ].sort((x, y) => (x as number) - (y as number));
+    const sizes = (f: string) =>
+      [
+        ...new Set(
+          manifest.assets
+            .filter((a) => a.role === "derivative" && a.family === f)
+            .map((a) => a.size),
+        ),
+      ].sort((x, y) => (x as number) - (y as number));
     expect(sizes("alux-ia-full")).toEqual([96, 128, 192, 256, 384, 512]);
     expect(sizes("alux-ia-avatar")).toEqual([32, 40, 44, 48, 64, 80, 96, 128, 192]);
   });
@@ -239,8 +242,9 @@ describe("GAP-03 · contexto real del planificador", () => {
   });
 
   test("máximo un planificador contextual por página", () => {
-    expect(read("src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx"))
-      .toContain("usePlannerPresence");
+    expect(
+      read("src/components/experience-builder/blocks/alux-planner/AluxPlannerBlock.tsx"),
+    ).toContain("usePlannerPresence");
   });
 });
 
