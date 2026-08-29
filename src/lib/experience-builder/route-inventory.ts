@@ -502,6 +502,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/lovable/g8-r1f1c-zone-preview.tsx",
   "src/routes/lovable/g8-r1f1c-route-preview.tsx",
   "src/routes/lovable/g8-r1f1c-article-preview.tsx",
+  "src/routes/lovable/g8-r1f1c-preview-hub.tsx",
   "src/routes/lovable/g8d-premium-parity.tsx",
   "src/routes/lovable/g8e-premium-template-catalog.tsx",
   "src/routes/lovable/g8p2-tour-premium-preview.tsx",
