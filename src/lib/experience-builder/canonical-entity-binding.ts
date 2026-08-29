@@ -229,3 +229,83 @@ export function keepSectionsWithRealData<T>(
 export function omittedSectionIds<T>(sections: readonly CanonicalSection<T>[]): string[] {
   return sections.filter((section) => !hasRealValue(section.data)).map((section) => section.id);
 }
+
+/* ------------------------------------------------------------------ *
+ * G8-R1-D-R1 · DEF-R1D-003 — Fuente ÚNICA de URL canónica de ficha.
+ *
+ * Prohibida toda plantilla literal fuera de este módulo: cualquier
+ * consumidor (Alux, Discovery, CMS) debe pedir la URL aquí. Las rutas
+ * territoriales delegan en `resolveCanonicalPath` (Navigation Blueprint);
+ * `place` y `event` se componen desde los patrones ROUTE_* que este
+ * módulo ya declara como autoridad.
+ *
+ * Fail-closed: si falta cualquier ancestro obligatorio ⇒ `null`. Nunca
+ * se devuelve una URL parcial ni un placeholder.
+ * ------------------------------------------------------------------ */
+
+export type CanonicalUrlInput =
+  | {
+      readonly entityType: "business";
+      readonly slug: string | null | undefined;
+      readonly destinationSlug: string | null | undefined;
+      readonly categorySlug: string | null | undefined;
+    }
+  | {
+      readonly entityType: "product";
+      readonly slug: string | null | undefined;
+      readonly destinationSlug: string | null | undefined;
+      readonly categorySlug: string | null | undefined;
+      readonly businessSlug: string | null | undefined;
+    }
+  | {
+      readonly entityType: "event";
+      readonly slug: string | null | undefined;
+    }
+  | {
+      readonly entityType: "place";
+      readonly slug: string | null | undefined;
+      readonly destinationSlug: string | null | undefined;
+    }
+  | {
+      readonly entityType: "destination";
+      readonly slug: string | null | undefined;
+    };
+
+function nonEmpty(value: string | null | undefined): string | null {
+  const v = typeof value === "string" ? value.trim() : "";
+  return v.length > 0 ? v : null;
+}
+
+/** URL canónica pública de una ficha, o `null` si no es resoluble. */
+export function buildCanonicalEntityUrl(input: CanonicalUrlInput): string | null {
+  const slug = nonEmpty(input.slug);
+  if (!slug) return null;
+
+  switch (input.entityType) {
+    case "destination":
+      return resolveCanonicalPath({ kind: "destination", slug });
+    case "business": {
+      const destination = nonEmpty(input.destinationSlug);
+      const category = nonEmpty(input.categorySlug);
+      if (!destination || !category) return null;
+      return resolveCanonicalPath({ kind: "business", slug, destination, category });
+    }
+    case "product": {
+      const destination = nonEmpty(input.destinationSlug);
+      const category = nonEmpty(input.categorySlug);
+      const business = nonEmpty(input.businessSlug);
+      if (!destination || !category || !business) return null;
+      return resolveCanonicalPath({ kind: "product", slug, destination, category, business });
+    }
+    case "event":
+      return ROUTE_EVENT.replace("{slug}", encodeURIComponent(slug));
+    case "place": {
+      const destination = nonEmpty(input.destinationSlug);
+      if (!destination) return null;
+      return ROUTE_PLACE.replace("{destino}", encodeURIComponent(destination)).replace(
+        "{lugar}",
+        encodeURIComponent(slug),
+      );
+    }
+  }
+}
