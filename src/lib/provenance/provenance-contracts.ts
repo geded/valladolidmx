@@ -250,6 +250,77 @@ export function toPublicSourceSummary(raw: {
   };
 }
 
+// ---------------------------------------------------------------------------
+// ADDENDUM UX · RECLAMACIÓN DISCRETA (2026-08-29)
+//
+// Una ficha aprobada editorialmente NO pierde credibilidad por no estar
+// reclamada. Prohibido: badges, alertas, cintas o textos prominentes de
+// "ficha no reclamada", y cualquier presencia en tarjetas o listados.
+// La reclamación existe únicamente como enlace secundario al final de la ficha.
+// ---------------------------------------------------------------------------
+
+/** Superficies donde puede evaluarse la afordancia de reclamación. */
+export const CLAIM_AFFORDANCE_SURFACES = ["detail_footer", "card", "listing", "hero"] as const;
+export type ClaimAffordanceSurface = (typeof CLAIM_AFFORDANCE_SURFACES)[number];
+
+/** Única superficie autorizada. */
+export const CLAIM_AFFORDANCE_SURFACE: ClaimAffordanceSurface = "detail_footer";
+
+export const CLAIM_AFFORDANCE_QUESTION = "¿Representas a este establecimiento?";
+export const CLAIM_AFFORDANCE_ACTION = "Administra esta ficha";
+
+export type ClaimAffordance = {
+  visible: boolean;
+  surface: ClaimAffordanceSurface;
+  /** Nunca "badge" ni "alert": la afordancia es siempre un enlace secundario. */
+  emphasis: "secondary_link";
+  question: string;
+  action: string;
+};
+
+const HIDDEN_CLAIM_AFFORDANCE: ClaimAffordance = {
+  visible: false,
+  surface: CLAIM_AFFORDANCE_SURFACE,
+  emphasis: "secondary_link",
+  question: CLAIM_AFFORDANCE_QUESTION,
+  action: CLAIM_AFFORDANCE_ACTION,
+};
+
+/**
+ * Resuelve la afordancia de reclamación.
+ * Sólo es visible en el pie de la ficha de detalle y sólo cuando la empresa
+ * aún no tiene operador acreditado. Jamás en tarjetas, listados ni hero, y
+ * jamás compitiendo con CTA turísticos o comerciales.
+ */
+export function resolveClaimAffordance(input: {
+  claimState: DerivedClaimState;
+  surface: ClaimAffordanceSurface;
+}): ClaimAffordance {
+  if (input.surface !== CLAIM_AFFORDANCE_SURFACE) return HIDDEN_CLAIM_AFFORDANCE;
+  const claimable = input.claimState === "unclaimed" || input.claimState === "claim_revoked";
+  return claimable ? { ...HIDDEN_CLAIM_AFFORDANCE, visible: true } : HIDDEN_CLAIM_AFFORDANCE;
+}
+
+/**
+ * "Establecimiento verificado" exige AMBAS condiciones:
+ * operador acreditado (reclamación aprobada) + aprobación administrativa.
+ * No basta la aprobación editorial de la ficha ni la fuente pública vigente.
+ */
+export function canShowVerifiedEstablishmentBadge(input: {
+  claimState: DerivedClaimState;
+  administrativelyVerified: boolean;
+}): boolean {
+  return input.claimState === "claimed" && input.administrativelyVerified === true;
+}
+
+/**
+ * Guarda de credibilidad: ninguna superficie pública puede degradar
+ * visualmente una ficha por su estado interno de reclamación.
+ */
+export function claimStateAffectsCredibility(): false {
+  return false;
+}
+
 /**
  * Reconciliación documental demo_seed ⇄ record_origin.
  * No ejecuta backfill: sólo declara la correspondencia esperada.

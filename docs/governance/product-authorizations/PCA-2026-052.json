@@ -5,7 +5,7 @@
   "status": "Approved",
   "branch": "edit/edt-4a9143ca-e66a-447d-9a46-91a970d0eb90",
   "blueprint": "docs/blueprint/G8-R1-F1B-S1-MODELO-DE-PROCEDENCIA-Y-RECLAMACION-v1.0.md",
-  "founder_authority": "Autorización Founder G8-R1-F1B-S1 (2026-08-29). Autoriza implementar exclusivamente el modelo aditivo mínimo de procedencia campo por campo, revisión editorial, caducidad de horarios, snapshot inmutable previo a reclamación y estado de reclamación derivado, mediante migración aditiva, idempotente y reversible. No autoriza capturar el lote, crear empresas reales, publicar fichas, cambiar estados turísticos, importar medios, activar flags, sitemap, redirects, PR, merge ni despliegue. Lectura pública fail-closed y `seo_metadata.noindex` como autoridad SEO única.",
+  "founder_authority": "Autorización Founder G8-R1-F1B-S1 (2026-08-29). Autoriza implementar exclusivamente el modelo aditivo mínimo de procedencia campo por campo, revisión editorial, caducidad de horarios, snapshot inmutable previo a reclamación y estado de reclamación derivado, mediante migración aditiva, idempotente y reversible. No autoriza capturar el lote, crear empresas reales, publicar fichas, cambiar estados turísticos, importar medios, activar flags, sitemap, redirects, PR, merge ni despliegue. Lectura pública fail-closed y `seo_metadata.noindex` como autoridad SEO única. ADDENDUM UX · RECLAMACIÓN DISCRETA (2026-08-29): en fichas aprobadas pero no reclamadas se prohíben badges, alertas y textos prominentes de 'no reclamada'; la reclamación aparece únicamente como enlace secundario al final de la ficha ('¿Representas a este establecimiento? Administra esta ficha'), nunca en tarjetas ni compitiendo con CTA turísticos o comerciales; el estado interno de reclamación no degrada la credibilidad de una ficha editorialmente aprobada; 'Establecimiento verificado' sólo tras acreditar al operador y aprobar administrativamente la relación.",
   "permissions": [
     {
       "operation": "create",
@@ -22,6 +22,10 @@
     {
       "operation": "create",
       "path": "supabase/migrations/20260829083941_2e5e1bdb-e95e-4c75-8579-e98e625d9d9e.sql"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/provenance/ClaimAffordanceLink.tsx"
     }
   ],
   "public_routes": [],
