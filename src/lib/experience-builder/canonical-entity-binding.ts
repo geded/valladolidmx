@@ -24,9 +24,11 @@ import {
   type CanonicalEntityFamily,
   type CanonicalEntityResolution,
 } from "./canonical-entity-resolver";
+import { resolveCanonicalPath } from "@/lib/navigation/canonical-paths";
 import type { EntityTemplateOverride } from "./entity-premium-templates";
 
 export const CANONICAL_ENTITY_BINDING_VERSION = "1.0.0" as const;
+
 
 export type CanonicalSurfaceMode = "premium" | "standard";
 
