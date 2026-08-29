@@ -524,7 +524,14 @@ export const aluxContextualSuggest = createServerFn({ method: "POST" })
         activePromotionSlug: promo?.slug,
         openState: open?.state,
         openLabel: open?.label,
+        // G8-R1-D2/D3 · identidad canónica tipada + acciones distintas.
+        entityId: row.id,
+        canonicalUrl: href,
+        family: null,
+        favoriteKind: "business",
+        planKind: "business",
       };
+
     }
 
     // 4a. Enriquecimiento con Alux (Lovable AI Gateway).
