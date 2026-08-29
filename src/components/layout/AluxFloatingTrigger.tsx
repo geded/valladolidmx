@@ -309,7 +309,9 @@ export function AluxFloatingTrigger() {
   return (
     <>
       <div
+        data-alux-dock
         className="pointer-events-none fixed right-4 z-40 transition-[bottom] duration-300 md:right-6"
+
         style={{
           bottom: `calc(env(safe-area-inset-bottom, 0px) + ${1 + presence.bottomOffset / 16}rem)`,
         }}
