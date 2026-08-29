@@ -16,18 +16,6 @@
       "path": "src/lib/listings/listing-public-reads.functions.ts"
     },
     {
-      "operation": "create",
-      "path": "scripts/omxds/r1/listing-public-contract.contract.test.ts"
-    },
-    {
-      "operation": "create",
-      "path": "scripts/omxds/r1/listing-public-contract.evidence.mjs"
-    },
-    {
-      "operation": "create",
-      "path": "docs/evidence/omxds-r1/EVIDENCE-MANIFEST.md"
-    },
-    {
       "operation": "modify",
       "path": "src/components/listing-premium/ListingPremiumSurface.tsx"
     },
@@ -81,7 +69,9 @@
     }
   ],
   "public_routes": [],
-  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
   "required_tests": [
     "bun run lint",
     "bun run typecheck",
