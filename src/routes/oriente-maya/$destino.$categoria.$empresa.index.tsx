@@ -196,7 +196,6 @@ function EmpresaTerritorialPage() {
   return (
     <ContextEngineProvider declaration={declaration}>
       <BusinessSurfaceProvider business={business} related={related}>
-        {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
         <BusinessSurfaceContractBoundary
           enabled={surfaceContractsEnabled || premiumEnabled}
           business={business}

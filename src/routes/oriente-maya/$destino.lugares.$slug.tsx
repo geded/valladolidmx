@@ -22,6 +22,7 @@ import {
 } from "@/lib/places/place-public-contract";
 import { getPublicPlace, getPlacePreview } from "@/lib/places/place-public-reads.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { bindPlaceRoute } from "@/lib/experience-builder/canonical-entity-binding";
 
 const SITE = "https://quehacerenvalladolid.com";
 
@@ -79,6 +80,12 @@ function PlaceRoute() {
   const dto = (place ?? preview.data ?? null) as PublicPlaceDTO | null;
   const isDraft = Boolean(dto && dto.status !== "published");
   const projection = useMemo(() => (dto ? adaptPlaceToPremiumSurface(dto) : null), [dto]);
+  /* G8-R1-C2 — el resolutor canónico acredita la familia `place` y delega
+     íntegramente en `premium-entity-place` (seis variantes aprobadas). */
+  const binding = useMemo(
+    () => (dto ? bindPlaceRoute({ placeId: dto.id, placeType: dto.typeSlug }) : null),
+    [dto],
+  );
 
   if (!dto || !projection) {
     if (preview.isLoading) {
@@ -91,7 +98,7 @@ function PlaceRoute() {
     <PlacePremiumSurface
       content={projection.content}
       presentation={projection.presentation}
-      variant={projection.variant ?? undefined}
+      variant={binding?.variant ?? projection.variant ?? undefined}
       builderNotice={projection.resolution.builderNotice}
       draftNotice={isDraft ? "Borrador · no publicado" : null}
     />
