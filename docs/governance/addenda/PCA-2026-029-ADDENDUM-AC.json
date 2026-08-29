@@ -1,0 +1,39 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-AC",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum AC · G8-R1-F1D/F1F · Alta del hub interno Release Candidate en el Route Inventory",
+  "status": "Approved",
+  "effective_date": "2026-08-29",
+  "recorded_at": "2026-08-29",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/blueprint/G8-R1-F1F-ACTIVACION-DEL-PILOTO-VISUAL-PREMIUM-NAVEGABLE-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorización Founder G8-R1-F1F (2026-08-29). Autoriza exclusivamente el alta aditiva de la ruta interna autenticada noindex src/routes/_authenticated/cms/rc-visual.tsx y su server fn de lectura src/lib/omxds/presentation/rc-canary.functions.ts en SCANNED_ROUTE_FILES y en el inventario de artefactos, conforme a la Route Inventory Rule (DOS · SSC-01 · P2), y en consecuencia sustituir de forma append-only el digest acreditado de src/lib/experience-builder/route-inventory.ts. No autoriza publicación de entidades, cambios de estado editorial, sitemap, redirects, activación de flag, PR, merge ni despliegue.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "2a501f25c2e0d8ecc57ccec09d5a2493af3901ed18d8fffd78dde675a5282b52",
+    "current_sha256": "de44f29b9fe7118159e93cfec79907232fcc5f63459e44d971cb5d967c2651c5",
+    "semantic_change": "Alta aditiva de la ruta interna del hub Release Candidate en SCANNED_ROUTE_FILES y su entrada de metadatos. Sin cambios de lógica, heurística, overrides ni API del inventario.",
+    "authority": "Autorización Founder G8-R1-F1F (2026-08-29)"
+  },
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/rc-visual.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/omxds/presentation/rc-canary.functions.ts"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": ["omxds_visual_v1_contracts_enabled=false"],
+  "required_tests": ["bun run typecheck", "bun run validate:r1:f1c:a", "bun run governance:check"]
+}
