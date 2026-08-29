@@ -41,9 +41,6 @@ interface EntitySnapshot {
   categorySlug: string | null;
 }
 
-type Ctx = { supabase: ReturnType<typeof mockClient>; userId: string };
-declare function mockClient(): never;
-
 /* ------------------------------------------------------------------ *
  * Lecturas reales (fail-closed).
  * ------------------------------------------------------------------ */
@@ -341,5 +338,3 @@ export const archiveLegacySeoLandingDrafts = createServerFn({ method: "POST" })
     }
     return { archived, skipped };
   });
-
-export type { Ctx };
