@@ -36,6 +36,7 @@ import {
 import { upsertMyPersonalProfile } from "@/lib/traveler/profile-personal.functions";
 import { Input } from "@/components/ui/input";
 import { deriveTravelStage, getDailyMission } from "@/lib/traveler/journey-stage";
+import { PARTY_OPTIONS, type PartyComposition } from "@/lib/traveler/party-composition";
 
 type Lang = "es" | "en" | "fr" | "de" | "it" | "pt";
 type Window = "este_mes" | "proximos_3_meses" | "mas_adelante" | "no_se";
