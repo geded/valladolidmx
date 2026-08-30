@@ -110,17 +110,22 @@ export const Route = createFileRoute("/oriente-maya/")({
   ),
 });
 
+/** Una composición sólo tiene autoridad si declara un bloque premium G4. */
+function hasPremiumAuthority(snapshot: unknown): boolean {
+  return JSON.stringify(snapshot ?? null).includes("premium-g4");
+}
+
 function OrienteMayaIndex() {
   const { composition, destinations } = Route.useLoaderData();
   const declaration = buildRegionContext();
-  // G8-R1-F1L-R2 — sin composición premium publicada, la portada regional
-  // usa la autoridad premium aprobada en modo Editorial (nunca legacy).
+  // G8-R1-F1L-R2 — la portada regional usa la autoridad premium aprobada en
+  // modo Editorial (marcador neutral sin fotografía acreditada). La
+  // composición sólo prevalece si ya declara autoridad premium.
+  const usePremium = !composition || !hasPremiumAuthority(composition.snapshot);
   const premiumContent = buildRegionPremiumRuntime({ destinations });
   return (
     <ContextEngineProvider declaration={declaration}>
-      {composition ? (
-        <CompositionRenderer tree={composition.snapshot} />
-      ) : (
+      {usePremium ? (
         <div data-destination-template="premium-g4" data-destination-presentation="editorial">
           <DestinationPremiumSurface
             content={premiumContent}
@@ -128,7 +133,10 @@ function OrienteMayaIndex() {
             sections={{ gallery: false, servicePreview: false }}
           />
         </div>
+      ) : (
+        <CompositionRenderer tree={composition!.snapshot} />
       )}
     </ContextEngineProvider>
   );
 }
+
