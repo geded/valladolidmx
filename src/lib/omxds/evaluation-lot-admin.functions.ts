@@ -103,7 +103,7 @@ export const listEvaluationLot = createServerFn({ method: "GET" })
       ]);
       const guarded = new Set<string>();
       for (const res of [owners, claims, items]) {
-        for (const row of ((res.data ?? []) as Array<{ business_id: string }>) ?? []) {
+        for (const row of (res.data ?? []) as Array<{ business_id: string }>) {
           if (row.business_id) guarded.add(row.business_id);
         }
       }
