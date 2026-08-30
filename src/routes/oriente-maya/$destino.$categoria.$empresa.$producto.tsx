@@ -133,6 +133,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       );
     }
     return buildPublicHead({
+      noindex: loaderData.inEvaluationLot,
       title: `${p.name} · ${p.business.display_name} — ${SITE.name}`,
       description,
       path,
