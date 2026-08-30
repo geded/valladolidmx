@@ -8,7 +8,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
 import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
-import { isQuarantinedBusiness } from "@/lib/omxds/unreviewed-quarantine";
+import { getNonDiscoverableBusinessSlugs } from "@/lib/omxds/public-eligibility.functions";
 import { PublicShell } from "@/components/discovery";
 import {
   buildPublicHead,
@@ -44,14 +44,17 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       },
     });
     if (resolution.reason !== "ok" || !resolution.product) throw notFound();
-    const [product, surfaceContractsEnabled, evaluationLot] = await Promise.all([
+    const [product, surfaceContractsEnabled, evaluationLot, nonDiscoverable] = await Promise.all([
       getMarketplaceProductBySlug({
         data: { slug: params.producto },
       }),
       getOmxdsSurfaceContractsFlag().catch(() => false),
       // G8-R1-F1G · Lote interno de evaluación → noindex mientras dure.
       getEvaluationLotSlugs().catch(() => null),
+      // G8-R1-F1I-R1 · DEF-F1I-001 — revisión de fuente no aprobada ⇒ noindex.
+      getNonDiscoverableBusinessSlugs().catch(() => [] as readonly string[]),
     ]);
+
     if (!product) throw notFound();
     // E2 · US-E2.2 — Related Collection contextual del producto.
     // Fallback silencioso: no debe romper el render de la ficha.
@@ -75,8 +78,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       surfaceContractsEnabled,
       inEvaluationLot:
         isInEvaluationLot(evaluationLot, "product", params.producto) ||
-        // G8-R1-F1H · producto de empresa en cuarentena editorial.
-        isQuarantinedBusiness(params.empresa),
+        // G8-R1-F1I-R1 · producto de empresa sin revisión de fuente aprobada.
+        (nonDiscoverable ?? []).includes(params.empresa),
     };
   },
   head: ({ loaderData, params }) => {

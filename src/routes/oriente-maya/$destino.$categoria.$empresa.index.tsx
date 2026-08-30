@@ -9,7 +9,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
 import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
-import { isQuarantinedBusiness } from "@/lib/omxds/unreviewed-quarantine";
+import { getNonDiscoverableBusinessSlugs } from "@/lib/omxds/public-eligibility.functions";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead, localBusinessJsonLd, placeId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
@@ -43,8 +43,14 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       },
     });
     if (resolution.reason !== "ok" || !resolution.business) throw notFound();
-    const [business, specific, template, surfaceContractsEnabled, evaluationLot] =
-      await Promise.all([
+    const [
+      business,
+      specific,
+      template,
+      surfaceContractsEnabled,
+      evaluationLot,
+      nonDiscoverable,
+    ] = await Promise.all([
         getMarketplaceBusinessBySlug({ data: { slug: params.empresa } }),
         // SEO.A3.M1 · Authority Business Landing — composition-first.
         // Se resuelve primero una composición específica por slug
@@ -61,6 +67,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
         getOmxdsSurfaceContractsFlag().catch(() => false),
         // G8-R1-F1G · Lote interno de evaluación → noindex mientras dure.
         getEvaluationLotSlugs().catch(() => null),
+        // G8-R1-F1I-R1 · DEF-F1I-001 — revisión de fuente no aprobada ⇒ noindex.
+        getNonDiscoverableBusinessSlugs().catch(() => [] as readonly string[]),
       ]);
     if (!business) throw notFound();
     // 19.21 · V1-P1.d — la elegibilidad Premium se evalúa SIEMPRE por ficha
@@ -105,8 +113,8 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       canonicalBinding,
       inEvaluationLot:
         isInEvaluationLot(evaluationLot, "business", params.empresa) ||
-        // G8-R1-F1H · empresa owner_submitted sin revisión editorial.
-        isQuarantinedBusiness(params.empresa),
+        // G8-R1-F1I-R1 · empresa publicada sin revisión de fuente aprobada.
+        (nonDiscoverable ?? []).includes(params.empresa),
     };
   },
   head: ({ loaderData, params }) => {

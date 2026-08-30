@@ -19,6 +19,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { MarketplaceBusinessCard } from "./marketplace-reads.functions";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 export interface CategoryRelatedDTO {
   otherCategoriesInDestination: MarketplaceBusinessCard[];
@@ -56,6 +57,8 @@ export const getCategoryRelated = createServerFn({ method: "GET" })
       )
       .eq("status", "published")
       .is("deleted_at", null)
+      // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+      .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .order("display_name", { ascending: true })
       .limit(200);
     if (error) throw new Error(`category_related_failed: ${error.message}`);

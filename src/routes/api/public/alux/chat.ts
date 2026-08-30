@@ -15,6 +15,7 @@ import {
   knowledgeToPromptBlock,
 } from "@/lib/alux/knowledge.functions";
 import { resolveAluxSettingsServer } from "@/lib/alux/settings.functions";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 const HOUR_LIMIT = 10;
 const DAY_LIMIT = 40;
@@ -238,6 +239,8 @@ async function fetchNearbyBusinesses(
       "id, slug, display_name, primary_category:business_categories!businesses_primary_category_id_fkey ( slug, display_name ), business_locations!business_locations_business_id_fkey ( latitude, longitude, is_primary )",
     )
     .eq("status", "published")
+    // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+    .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
     .limit(200);
   if (error || !data) return [];
   const scored: Array<{

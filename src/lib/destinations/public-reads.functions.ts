@@ -11,6 +11,7 @@ import type {
 } from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
 import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 export interface PublicDestinationDTO {
   slug: string;
@@ -167,6 +168,8 @@ export const getDestinationMapPoints = createServerFn({ method: "GET" })
       .eq("destinations.slug", data.slug)
       .eq("status", "published")
       .is("deleted_at", null)
+      // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+      .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .limit(80);
     if (error || !rows) return [];
     const points: DestinationMapPointDTO[] = [];
@@ -384,6 +387,8 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         .select("id, slug, title, summary, starts_at, ends_at, venue_name, is_free, destination_id")
         .eq("status", "published")
         .is("deleted_at", null)
+        // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+        .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
         .eq("destination_id", dest.id)
         .gte("starts_at", nowIso)
         .order("starts_at", { ascending: true })

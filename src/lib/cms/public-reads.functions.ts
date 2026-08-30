@@ -14,6 +14,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { Destination } from "@/types/territory";
 import type { SuggestedRoute, BusinessTeaser, Review } from "@/types/entities";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -124,6 +125,8 @@ export const listFeaturedBusinesses = createServerFn({ method: "GET" }).handler(
       )
       .eq("status", "published")
       .is("deleted_at", null)
+      // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+      .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .filter("metadata->>home_featured", "eq", "true")
       .order("display_name", { ascending: true })
       .limit(24);

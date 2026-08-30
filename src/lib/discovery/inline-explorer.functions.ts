@@ -15,6 +15,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { queryOptions } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
 export interface InlineExplorerItem {
   id: string;
@@ -122,6 +123,8 @@ export const getInlineCategoryExplorer = createServerFn({ method: "GET" })
       )
       .eq("status", "published")
       .is("deleted_at", null)
+      // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
+      .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .eq("destination_id", (dest as { id: string }).id);
     if (catId) q = q.eq("primary_category_id", catId);
     const { data: rows, count } = await q
