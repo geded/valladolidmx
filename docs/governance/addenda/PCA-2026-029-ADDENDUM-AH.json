@@ -1,0 +1,48 @@
+{
+  "id": "PCA-2026-029-ADDENDUM-AH",
+  "parent_authorization": "PCA-2026-029",
+  "parent": "PCA-2026-029",
+  "title": "Addendum AH · G8-R1-F1L · Promoción de autoridades premium P0–P4 · revisión del inventario de rutas",
+  "status": "Approved",
+  "effective_date": "2026-08-30",
+  "recorded_at": "2026-08-30",
+  "authorized_by": "Founder",
+  "repository": "geded/valladolidmx",
+  "blueprint": "docs/governance/audit/2026-08-30-G8-R1-F1L-VISUAL-AUTHORITY-RECONCILIATION-v1.0.md",
+  "flag_state": "omxds_visual_v1_contracts_enabled=false",
+  "founder_authority": "Autorizacion encadenada Founder G8-R1-F1L (2026-08-30) · promocion controlada P0-P4 con aprobacion visual de Home, Destinos, Hotel/Restaurante y Experiencia/Tour. Evento excluido. Sin retirar noindex, sin activar flag, sin datos demo.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    },
+    {
+      "operation": "create",
+      "path": "docs/governance/audit/2026-08-30-G8-R1-F1L-PROMOTION-RUNBOOK-v1.0.md"
+    }
+  ],
+  "database_changes": [],
+  "public_routes": [],
+  "required_feature_flags": [
+    "omxds_visual_v1_contracts_enabled=false"
+  ],
+  "required_tests": [
+    "bun run typecheck",
+    "bun run lint",
+    "bun run governance:check"
+  ],
+  "file_hashes": {
+    "src/lib/experience-builder/route-inventory.ts": "f79791fc1f752a5e954f5b0413bdebb32a46ad277eb4c81b4c642ab1520aa780"
+  },
+  "rollback": [
+    "Revertir src/lib/experience-builder/route-inventory.ts a la revisión 10403dc178eea22c1c39ea03a6b6c373480e14824cb71892c067c655529a4ae3."
+  ],
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/experience-builder/route-inventory.ts",
+    "previous_sha256": "10403dc178eea22c1c39ea03a6b6c373480e14824cb71892c067c655529a4ae3",
+    "current_sha256": "f79791fc1f752a5e954f5b0413bdebb32a46ad277eb4c81b4c642ab1520aa780",
+    "semantic_change": "Alta de las rutas internas de certificación visual de G8-R1-F1L y actualización de metadatos de madurez de las rutas premium promovidas. Sin cambios de contenido, estado editorial ni indexación.",
+    "authority": "Autorización Founder G8-R1-F1L · promoción controlada (2026-08-30)"
+  }
+}
