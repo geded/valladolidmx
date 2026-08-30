@@ -95,7 +95,8 @@ export function evaluatePremiumEligibility(
   const cinematicMissing: string[] = [];
   const cover = evaluateGovernedCover(facts.cover);
   if (!cover.eligible) cinematicMissing.push(...cover.failures.map((f) => `cover:${f}`));
-  if (facts.approvedGalleryCount < MIN_GALLERY[facts.kind]) cinematicMissing.push("gallery_minimum");
+  if (facts.approvedGalleryCount < MIN_GALLERY[facts.kind])
+    cinematicMissing.push("gallery_minimum");
 
   const familyEligible = missing.length === 0;
 
