@@ -144,7 +144,6 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       inEvaluationLot:
         isInEvaluationLot(evaluationLot, "destination", params.destino) ||
         isF1kDestination(params.destino),
-
     };
   },
   head: ({ loaderData, params }) =>

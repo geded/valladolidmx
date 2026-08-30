@@ -69,6 +69,7 @@ export function buildRegionPremiumRuntime(input: {
           title: destination.name,
           subtitle: destination.tagline ?? null,
           badge: PUEBLOS_MAGICOS.includes(destination.slug) ? "Pueblo Mágico" : null,
+          href: `/oriente-maya/${destination.slug}`,
         })),
     },
     nearby: {
@@ -81,6 +82,7 @@ export function buildRegionPremiumRuntime(input: {
         distance: "",
         tagline: destination.tagline ?? "",
         media: { url: "", alt: "" },
+        href: `/oriente-maya/${destination.slug}`,
       })),
     },
   };
