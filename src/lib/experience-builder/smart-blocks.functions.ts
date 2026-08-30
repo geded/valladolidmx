@@ -20,3 +20,9 @@ export const resolveSmartBlock = createServerFn({ method: "POST" })
     const { resolveSmartBlockQuery } = await import("./smart-blocks.server");
     return resolveSmartBlockQuery(data.query);
   });
+
+/** Puntos reales del territorio para `vmx.experience.map`. Read-only. */
+export const resolveTerritoryMapPoints = createServerFn({ method: "GET" }).handler(async () => {
+  const { resolveTerritoryMapPointsQuery } = await import("./smart-blocks.server");
+  return resolveTerritoryMapPointsQuery();
+});

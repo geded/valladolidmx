@@ -334,3 +334,70 @@ export async function resolveSmartBlockQuery(q: SmartBlockQuery): Promise<SmartB
     };
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * G8-R1-F1J-HOME-PREMIUM-R2 · Mapa territorial (`vmx.experience.map`)
+ * El bloque de Home no declara `points` en su configuración: sus puntos
+ * son el corpus real publicado. Se resuelven aquí, con la MISMA autoridad
+ * de elegibilidad y de URL canónica que el resto de Smart Blocks.
+ * ------------------------------------------------------------------ */
+
+export interface TerritoryMapPoint {
+  id: string;
+  kind: "business" | "destination";
+  lat: number;
+  lng: number;
+  title: string;
+  subtitle: string | null;
+  href: string | null;
+}
+
+const MAP_CACHE_TTL_MS = 60_000;
+let mapCache: { at: number; value: TerritoryMapPoint[] } | null = null;
+
+/** Puntos reales del territorio: empresas acreditadas con coordenadas. */
+export async function resolveTerritoryMapPointsQuery(limit = 60): Promise<TerritoryMapPoint[]> {
+  if (mapCache && Date.now() - mapCache.at < MAP_CACHE_TTL_MS) return mapCache.value;
+  try {
+    const client = getPublicClient();
+    const { data, error } = await client
+      .from("businesses")
+      .select(
+        "id, slug, display_name, tagline, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ), business_locations ( latitude, longitude )",
+      )
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .eq("source_review_state", PUBLIC_APPROVED_REVIEW_STATE)
+      .or(PILOT_NON_DEMO_FILTER)
+      .limit(Math.min(200, Math.max(1, limit)));
+    if (error || !data) return [];
+
+    const points: TerritoryMapPoint[] = [];
+    for (const row of data as Row[]) {
+      const slug = str(row.slug);
+      const title = str(row.display_name);
+      const loc = rel(row, "business_locations");
+      const lat = Number(loc?.latitude);
+      const lng = Number(loc?.longitude);
+      if (!slug || !title || !Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+      points.push({
+        id: str(row.id) ?? slug,
+        kind: "business",
+        lat,
+        lng,
+        title,
+        subtitle: str(row.tagline),
+        href: buildCanonicalEntityUrl({
+          entityType: "business",
+          slug,
+          destinationSlug: str(rel(row, "destinations")?.slug),
+          categorySlug: str(rel(row, "business_categories")?.slug),
+        }),
+      });
+    }
+    mapCache = { at: Date.now(), value: points };
+    return points;
+  } catch {
+    return [];
+  }
+}
