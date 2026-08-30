@@ -19,6 +19,9 @@ import { SITE } from "@/config/site";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
 import { RegionSurface } from "@/components/surfaces/RegionSurface";
+import { DestinationPremiumSurface } from "@/components/destination-premium/DestinationPremiumSurface";
+import { buildRegionPremiumRuntime } from "@/components/destination-premium/region-premium-runtime";
+
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
 import {
   ContextEngineProvider,
@@ -107,17 +110,35 @@ export const Route = createFileRoute("/oriente-maya/")({
   ),
 });
 
+/** Una composición sólo tiene autoridad si declara un bloque premium G4. */
+function hasPremiumAuthority(snapshot: unknown): boolean {
+  return JSON.stringify(snapshot ?? null).includes("premium-g4");
+}
+
 function OrienteMayaIndex() {
   const { composition, destinations } = Route.useLoaderData();
   const declaration = buildRegionContext();
-  // Provider a nivel de ruta — igual patrón que I3 en `/oriente-maya/$destino`.
-  // Cubre las dos ramas de render (EB y fallback) sin tocar sus shells.
+  // G8-R1-F1L-R2 — la portada regional usa la autoridad premium aprobada en
+  // modo Editorial (marcador neutral sin fotografía acreditada). La
+  // composición sólo prevalece si ya declara autoridad premium.
+  const usePremium = !composition || !hasPremiumAuthority(composition.snapshot);
+  const premiumContent = buildRegionPremiumRuntime({ destinations });
   return (
     <ContextEngineProvider declaration={declaration}>
-      {composition ? (
-        <CompositionRenderer tree={composition.snapshot} />
+      {usePremium ? (
+        <div data-destination-template="premium-g4" data-destination-presentation="editorial">
+          <DestinationPremiumSurface
+            content={premiumContent}
+            heroVariant="editorial"
+            sections={{
+              gallery: false,
+              servicePreview: false,
+              map: premiumContent.map.points.length > 0,
+            }}
+          />
+        </div>
       ) : (
-        <RegionSurface destinations={destinations} />
+        <CompositionRenderer tree={composition!.snapshot} />
       )}
     </ContextEngineProvider>
   );

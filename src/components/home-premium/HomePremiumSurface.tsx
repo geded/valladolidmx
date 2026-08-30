@@ -397,14 +397,6 @@ function SectionHead({
   );
 }
 
-function DemoTag() {
-  return (
-    <span className="inline-flex rounded-pill border border-border bg-card px-2.5 py-1 text-[10px] font-semibold uppercase text-muted-foreground">
-      Demo visual
-    </span>
-  );
-}
-
 function Stat({ icon, label }: { icon: ReactNode; label: string }) {
   return (
     <div className="min-w-0 rounded-xl bg-muted p-3 text-center text-xs font-medium text-foreground [&_svg]:mx-auto [&_svg]:mb-1 [&_svg]:size-4 [&_svg]:text-primary">
@@ -467,8 +459,9 @@ function AluxPlanner({
         </div>
         <div className="p-6 sm:p-8" aria-live="polite">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <DemoTag />
-            <span className="text-xs text-muted-foreground">Respuesta contextual simulada</span>
+            <span className="text-xs text-muted-foreground">
+              Propuesta construida sobre destinos publicados
+            </span>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">
             Para “{selectedPrompt}”, empezaría por:
@@ -551,7 +544,6 @@ function RoutesSection({
                 />
                 <div className="p-4">
                   <div className="flex flex-wrap gap-2">
-                    <DemoTag />
                     {active ? (
                       <span className="rounded-pill bg-primary/15 px-2 py-1 text-[10px] font-semibold text-foreground">
                         Seleccionada
@@ -658,7 +650,7 @@ function DestinationsSection({
                   )}
                 />
                 <span className="absolute left-3 top-3 rounded-pill bg-card px-2.5 py-1 text-[10px] font-semibold uppercase text-card-foreground shadow-soft">
-                  {destination.demo ? "Demo visual" : "Capital turística"}
+                  {destination.puebloMagico ? "Pueblo Mágico" : "Destino"}
                 </span>
               </div>
               <div className="flex flex-1 flex-col p-4">
@@ -673,19 +665,14 @@ function DestinationsSection({
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                   {destination.note}
                 </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => onOpen(destination.name)}
-                  className="mt-4 min-h-11 rounded-pill"
-                >
-                  {opened === destination.name ? (
-                    <Check className="mr-2 size-4" aria-hidden />
-                  ) : (
-                    <Landmark className="mr-2 size-4" aria-hidden />
-                  )}
-                  {opened === destination.name ? "Micrositio abierto (demo)" : "Ver micrositio"}
-                </Button>
+                {destination.href ? (
+                  <Button asChild variant="outline" className="mt-4 min-h-11 rounded-pill">
+                    <Link to={destination.href} onClick={() => onOpen(destination.name)}>
+                      <Landmark className="mr-2 size-4" aria-hidden />
+                      Ver micrositio
+                    </Link>
+                  </Button>
+                ) : null}
               </div>
             </article>
           );
@@ -783,14 +770,15 @@ function ExperiencesSection({
           />
           <div className="p-5">
             <div className="flex flex-wrap gap-2">
-              <DemoTag />
               <span className="text-xs text-muted-foreground">{featured.category}</span>
             </div>
             <h3 className="mt-3 font-display text-3xl">{featured.title}</h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{featured.summary}</p>
-            <Button type="button" variant="outline" className="mt-4 min-h-11 rounded-pill">
-              Explorar experiencia
-            </Button>
+            {featured.href ? (
+              <Button asChild variant="outline" className="mt-4 min-h-11 rounded-pill">
+                <Link to={featured.href}>Explorar experiencia</Link>
+              </Button>
+            ) : null}
           </div>
         </article>
         <div className="grid gap-3">
@@ -806,10 +794,20 @@ function ExperiencesSection({
 function CompactMediaRow({
   item,
 }: {
-  item: { title: string; category: string; summary: string; media: HomePremiumMedia };
+  item: {
+    title: string;
+    category: string;
+    summary: string;
+    media: HomePremiumMedia;
+    href: string | null;
+  };
 }) {
+  if (!item.href) return null;
   return (
-    <article className="grid min-h-36 grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[10rem_1fr]">
+    <Link
+      to={item.href}
+      className="grid min-h-36 grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-[10rem_1fr]"
+    >
       <EditorialMediaFrame
         media={item.media}
         label={item.title}
@@ -825,7 +823,7 @@ function CompactMediaRow({
           Ver detalle <ChevronRight className="size-3" aria-hidden />
         </span>
       </div>
-    </article>
+    </Link>
   );
 }
 
@@ -885,9 +883,13 @@ function ServiceColumn({
               </p>
               <h4 className="mt-1 font-display text-xl">{item.title}</h4>
               <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{item.summary}</p>
-              <Button type="button" variant="link" className="mt-2 h-auto min-h-11 p-0">
-                Ver ficha <ArrowRight className="ml-1 size-3" aria-hidden />
-              </Button>
+              {item.href ? (
+                <Button asChild variant="link" className="mt-2 h-auto min-h-11 p-0">
+                  <Link to={item.href}>
+                    Ver ficha <ArrowRight className="ml-1 size-3" aria-hidden />
+                  </Link>
+                </Button>
+              ) : null}
             </div>
           </article>
         ))}
@@ -933,14 +935,16 @@ function EventsSection({ content }: { content: HomePremiumContent }) {
                 <h3 className="mt-1 font-display text-xl">{event.title}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{event.detail}</p>
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="min-h-11 justify-self-start rounded-pill sm:justify-self-end"
-              >
-                Ver agenda
-              </Button>
+              {event.href ? (
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className="min-h-11 justify-self-start rounded-pill sm:justify-self-end"
+                >
+                  <Link to={event.href}>Ver agenda</Link>
+                </Button>
+              ) : null}
             </li>
           ))}
         </ol>
@@ -959,24 +963,27 @@ function EditorialSection({ content }: { content: HomePremiumContent }) {
         action={content.queHacer.action}
       />
       <div className="grid gap-4 md:grid-cols-3">
-        {content.queHacer.items.map((item: HomePremiumEditorial) => (
-          <article
-            key={item.title}
-            className="grid grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card md:block"
-          >
-            <EditorialMediaFrame
-              media={item.media}
-              label={item.title}
-              className="h-full min-h-40 w-full object-cover md:aspect-[4/3] md:h-auto"
-            />
+        {content.queHacer.items.map((item: HomePremiumEditorial) =>
+          item.href ? (
+            <Link
+              key={item.title}
+              to={item.href}
+              className="grid grid-cols-[7rem_1fr] overflow-hidden rounded-2xl border border-border bg-card md:block"
+            >
+              <EditorialMediaFrame
+                media={item.media}
+                label={item.title}
+                className="h-full min-h-40 w-full object-cover md:aspect-[4/3] md:h-auto"
+              />
 
-            <div className="p-4">
-              <p className="text-[10px] font-semibold uppercase text-primary">{item.kicker}</p>
-              <h3 className="mt-1 font-display text-xl">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
-            </div>
-          </article>
-        ))}
+              <div className="p-4">
+                <p className="text-[10px] font-semibold uppercase text-primary">{item.kicker}</p>
+                <h3 className="mt-1 font-display text-xl">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+              </div>
+            </Link>
+          ) : null,
+        )}
       </div>
     </section>
   );
@@ -1008,7 +1015,7 @@ function MapSection({
           </p>
         </div>
         <div className="rounded-xl bg-muted p-4">
-          <p className="text-[10px] font-semibold uppercase text-primary">Ruta activa · demo</p>
+          <p className="text-[10px] font-semibold uppercase text-primary">Ruta activa</p>
           <p className="mt-1 font-display text-lg">{route?.title}</p>
           <p className="text-xs text-muted-foreground">
             {route?.duration} · {route?.stops} paradas

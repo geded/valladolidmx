@@ -37,7 +37,15 @@ import { ListingPremiumSurface } from "@/components/listing-premium/ListingPremi
 import { resolveListingPremiumG5 } from "@/components/listing-premium/listing-premium-config";
 import { PlacePremiumSurface } from "@/components/place-premium/PlacePremiumSurface";
 import { resolvePlacePremiumQ2d } from "@/components/place-premium/place-premium-config";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { resolveHomePremiumG4 } from "@/components/home-premium/home-premium-config";
+import { resolveHomePremiumRealContent } from "@/lib/experience-builder/smart-blocks.functions";
+import {
+  mergeHomeRealContent,
+  resolveHomeSectionVisibility,
+} from "@/components/home-premium/home-premium-real";
+
 import { ConsejoAluxSection } from "@/components/home/ConsejoAluxSection";
 import { ArmaTuViajeSection } from "@/components/home/ArmaTuViajeSection";
 import { EnVivoSection } from "@/components/home/EnVivoSection";
@@ -137,8 +145,6 @@ import type {
   ExperienceMapDTO,
   ExperienceMapPoint,
 } from "@/lib/experience-builder/blocks/experience-map/types";
-
-
 
 /**
  * US-R3 · Sub-ola 2.5d — mapa de renderers `vmx.kit.*`. Se expande de
@@ -420,12 +426,22 @@ function GenericBlockPreview({ displayName, renderChildren }: BlockPreviewProps)
  */
 function HomePremiumG4Render({ node }: BlockPreviewProps): ReactNode {
   const resolved = resolveHomePremiumG4(node.config as Record<string, unknown>);
+  const resolveReal = useServerFn(resolveHomePremiumRealContent);
+  const { data } = useQuery({
+    queryKey: ["home-premium-real-content"],
+    queryFn: () => resolveReal(),
+    staleTime: 60_000,
+  });
+
+  const content = mergeHomeRealContent(resolved.content, data);
+  const sections = resolveHomeSectionVisibility(content, resolved.sections);
+
   return (
     <HomePremiumSurface
-      content={resolved.content}
+      content={content}
       heroVariant={resolved.heroVariant}
       layout={resolved.layout}
-      sections={resolved.sections}
+      sections={sections}
       order={resolved.order}
     />
   );
@@ -685,7 +701,6 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
           text_safe_zone: node.config.text_safe_zone as string | undefined,
           __typography:
             (node.config.__typography as Record<string, FieldTypography> | undefined) ?? undefined,
-
         }}
       />
     );
@@ -939,7 +954,6 @@ function readMapDto(config: Record<string, unknown>): ExperienceMapDTO | null {
   } as ExperienceMapDTO;
 }
 
-
 const ExperienceMapRender: BlockPreview = ({ node }) => {
   const dto = readMapDto(node.config);
   // G8-R1-F1J-HOME-PREMIUM-R2 · Sin puntos estáticos el bloque no se omite:
@@ -947,7 +961,6 @@ const ExperienceMapRender: BlockPreview = ({ node }) => {
   if (!dto) return <SmartTerritoryMap config={node.config} />;
   return <ExperienceMapBlock dto={dto} />;
 };
-
 
 PRODUCTION_COMPONENT_MAP["vmx.experience.map"] = ExperienceMapRender;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -958,7 +971,6 @@ PRODUCTION_COMPONENT_MAP["vmx.experience.map"] = ExperienceMapRender;
 (STUDIO_PREVIEW_MAP as any)["vmx.alux.planner"] = ({ node }: { node: CompositionNode }) => (
   <AluxPlannerBlock config={node.config} />
 );
-
 
 /* ------------------------------------------------------------------ *
  * Bloque formulario configurable
