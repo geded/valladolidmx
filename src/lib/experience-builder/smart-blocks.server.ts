@@ -279,7 +279,7 @@ export async function resolveSmartBlockQuery(q: SmartBlockQuery): Promise<SmartB
     if (hit && Date.now() - hit.at < CACHE_TTL_MS) return { ...hit.value, cached: true };
 
     const client = getPublicClient();
-    let builder: any = client.from(q.table).select(spec.select);
+    let builder = client.from(q.table).select(spec.select) as unknown as QueryBuilder;
 
     // Elegibilidad pública fail-closed (no negociable por contrato).
     builder = builder.eq("status", "published").is("deleted_at", null);
