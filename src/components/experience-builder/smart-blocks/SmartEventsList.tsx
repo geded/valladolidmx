@@ -9,6 +9,7 @@ export interface SmartEventItem {
   cover_image_url?: string | null;
   starts_at?: string | null;
   ends_at?: string | null;
+  href?: string | null;
   [k: string]: unknown;
 }
 
@@ -26,13 +27,22 @@ function formatDate(iso?: string | null): string {
 }
 
 export function SmartEventsList({ items, title }: { items: SmartEventItem[]; title?: string }) {
-  if (!items?.length) return <SmartEmpty message="No hay eventos programados." />;
+  // La sección conserva su título aunque no haya resultados: la ausencia
+  // de datos es un estado editorial legible, no un bloque desaparecido.
+  if (!items?.length) {
+    return (
+      <section className="space-y-4">
+        {title ? <h2 className="text-xl font-semibold">{title}</h2> : null}
+        <SmartEmpty message="No hay eventos programados." />
+      </section>
+    );
+  }
   return (
     <section className="space-y-4">
       {title ? <h2 className="text-xl font-semibold">{title}</h2> : null}
       <ul className="divide-y divide-border rounded-2xl border border-border bg-card">
         {items.map((e, i) => {
-          const href = e.slug ? `/eventos/${e.slug}` : null;
+          const href = e.href ?? null;
           const Wrapper: any = href ? "a" : "div";
           const wrapperProps = href ? { href } : {};
           return (
